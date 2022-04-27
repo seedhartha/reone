@@ -28,7 +28,7 @@ namespace game {
 
 namespace neo {
 
-class Game : public graphics::IEventHandler {
+class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(GameID id, ServicesView &services) :
         _id(id),

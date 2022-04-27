@@ -23,7 +23,27 @@ namespace game {
 
 namespace neo {
 
-class Object {
+class Object : boost::noncopyable {
+public:
+    template <class T>
+    class Builder {
+    public:
+        void id(uint32_t val) {
+            _id = val;
+        }
+
+        virtual std::unique_ptr<T> build() = 0;
+
+    protected:
+        uint32_t _id;
+    };
+
+protected:
+    uint32_t _id;
+
+    Object(uint32_t id) :
+        _id(id) {
+    }
 };
 
 } // namespace neo

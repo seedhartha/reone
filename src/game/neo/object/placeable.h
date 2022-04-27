@@ -26,6 +26,17 @@ namespace game {
 namespace neo {
 
 class Placeable : public Object {
+public:
+    class Builder : public Object::Builder<Placeable> {
+    public:
+        std::unique_ptr<Placeable> build() override {
+            return std::make_unique<Placeable>(_id);
+        }
+    };
+
+    Placeable(uint32_t id) :
+        Object(id) {
+    }
 };
 
 } // namespace neo
