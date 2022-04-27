@@ -113,7 +113,16 @@ void Game::loadModule(const string &name) {
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
     for (auto &room : _module->area().rooms()) {
-        scene.addRoot(static_pointer_cast<ModelSceneNode>(room->sceneNodePtr()));
+        auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
+        if (model) {
+            scene.addRoot(move(model));
+        }
+    }
+    for (auto &object : _module->area().objects()) {
+        auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
+        if (model) {
+            scene.addRoot(move(model));
+        }
     }
 }
 
