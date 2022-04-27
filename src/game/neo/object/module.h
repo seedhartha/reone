@@ -20,6 +20,7 @@
 #include "../object.h"
 
 #include "area.h"
+#include "creature.h"
 
 namespace reone {
 
@@ -39,17 +40,23 @@ class Module : public Object {
 public:
     class Builder : public Object::Builder<Module, Builder> {
     public:
-        Builder &areas(std::vector<std::shared_ptr<Area>> areas) {
-            _areas = std::move(areas);
+        Builder &area(std::shared_ptr<Area> area) {
+            _area = std::move(area);
+            return *this;
+        }
+
+        Builder &pc(std::shared_ptr<Creature> pc) {
+            _pc = std::move(pc);
             return *this;
         }
 
         std::unique_ptr<Module> build() override {
-            return std::make_unique<Module>(_id, _tag, _areas);
+            return std::make_unique<Module>(_id, _tag, _area, _pc);
         }
 
     private:
-        std::vector<std::shared_ptr<Area>> _areas;
+        std::shared_ptr<Area> _area;
+        std::shared_ptr<Creature> _pc;
     };
 
     class Loader : boost::noncopyable {
@@ -69,25 +76,28 @@ public:
     Module(
         uint32_t id,
         std::string tag,
-        std::vector<std::shared_ptr<Area>> areas) :
+        std::shared_ptr<Area> area,
+        std::shared_ptr<Creature> pc) :
         Object(
             id,
             ObjectType::Module,
             std::move(tag),
             nullptr),
-        _areas(std::move(areas)) {
+        _area(std::move(area)),
+        _pc(std::move(pc)) {
     }
 
     Area &area() const {
-        return *_areas.front();
+        return *_area;
     }
 
-    std::shared_ptr<Area> areaPtr() const {
-        return _areas.front();
+    Creature &pc() const {
+        return *_pc;
     }
 
 private:
-    std::vector<std::shared_ptr<Area>> _areas;
+    std::shared_ptr<Area> _area;
+    std::shared_ptr<Creature> _pc;
 };
 
 } // namespace neo

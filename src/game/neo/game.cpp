@@ -124,6 +124,8 @@ void Game::loadModule(const string &name) {
             scene.addRoot(move(model));
         }
     }
+    auto pcModel = static_pointer_cast<ModelSceneNode>(_module->pc().sceneNodePtr());
+    scene.addRoot(move(pcModel));
 }
 
 static constexpr float kCameraMouseSensitivity = 0.001f;
