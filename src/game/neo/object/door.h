@@ -26,6 +26,17 @@ namespace game {
 namespace neo {
 
 class Door : public Object {
+public:
+    class Builder : public Object::Builder<Door> {
+    public:
+        std::unique_ptr<Door> build() override {
+            return std::make_unique<Door>(_id);
+        }
+    };
+
+    Door(uint32_t id) :
+        Object(id) {
+    }
 };
 
 } // namespace neo
