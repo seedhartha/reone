@@ -86,13 +86,16 @@ private:
     private:
         scene::SceneNode &_sceneNode;
 
+        // Orientation
         float _yaw {0.0f};
         float _pitch {glm::half_pi<float>()};
 
+        // Movement
         float _forward {0.0f};
         float _left {0.0f};
         float _backward {0.0f};
         float _right {0.0f};
+        bool _highSpeed {false};
     };
 
     class WorldRenderer : boost::noncopyable {
