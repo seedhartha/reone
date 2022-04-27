@@ -25,6 +25,8 @@
 #include "../../layouts.h"
 #include "../../services.h"
 
+#include "creature.h"
+
 using namespace std;
 
 using namespace reone::scene;
@@ -54,21 +56,30 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         throw ValidationException("LYT not found: " + name);
     }
 
+    // Rooms
     auto rooms = vector<shared_ptr<Room>>();
     auto roomLoader = Room::Loader(_idSeq, _services);
     auto areRooms = are->getList("Rooms");
-
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
         auto layoutRoom = layout->findByName(roomName);
         rooms.push_back(roomLoader.load(roomName, layoutRoom->position));
     }
 
-    return Area::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(name)
-        .rooms(move(rooms))
-        .build();
+    auto area = Area::Builder()
+                    .id(_idSeq.nextObjectId())
+                    .tag(name)
+                    .rooms(move(rooms))
+                    .build();
+
+    // Creatures
+    auto creatureLoader = Creature::Loader(_idSeq, _services);
+    auto gitCreatures = git->getList("Creature List");
+    for (auto &gitCreature : gitCreatures) {
+        area->add(creatureLoader.load(*gitCreature));
+    }
+
+    return move(area);
 }
 
 } // namespace neo

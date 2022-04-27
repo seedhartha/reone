@@ -80,12 +80,22 @@ public:
         _rooms(std::move(rooms)) {
     }
 
+    void add(std::unique_ptr<Object> object) {
+        _objects.push_back(std::move(object));
+    }
+
     const std::vector<std::shared_ptr<Room>> &rooms() const {
         return _rooms;
     }
 
+    const std::vector<std::unique_ptr<Object>> &objects() const {
+        return _objects;
+    }
+
 private:
     std::vector<std::shared_ptr<Room>> _rooms;
+
+    std::vector<std::unique_ptr<Object>> _objects;
 };
 
 } // namespace neo

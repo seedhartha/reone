@@ -47,12 +47,13 @@ shared_ptr<Model> Models::get(const string &resRef) {
         return nullptr;
     }
 
-    auto maybeModel = _cache.find(resRef);
+    auto lcResRef = boost::to_lower_copy(resRef);
+    auto maybeModel = _cache.find(lcResRef);
     if (maybeModel != _cache.end()) {
         return maybeModel->second;
     }
 
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
+    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef)));
     return inserted.first->second;
 }
 
