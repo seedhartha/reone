@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/resource/format/bifreader.h"
+#include "../../src/resource/format/bifreader.h"
 
-#include "checkutil.h"
+#include "../checkutil.h"
 
 using namespace std;
 

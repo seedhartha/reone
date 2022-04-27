@@ -17,10 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/script/format/ncswriter.h"
-#include "../src/script/program.h"
+#include "../../src/script/format/ncswriter.h"
+#include "../../src/script/program.h"
 
-#include "checkutil.h"
+#include "../checkutil.h"
 
 using namespace std;
 

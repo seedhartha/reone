@@ -17,47 +17,20 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/common/streamwriter.h"
-#include "../src/resource/format/gffwriter.h"
-#include "../src/resource/gffstruct.h"
+#include "../../src/common/streamwriter.h"
+#include "../../src/resource/format/gffreader.h"
 
-#include "checkutil.h"
+#include "../checkutil.h"
 
 using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(gff_writer)
+BOOST_AUTO_TEST_SUITE(gff_reader)
 
-BOOST_AUTO_TEST_CASE(should_write_gff) {
+BOOST_AUTO_TEST_CASE(should_read_gff) {
     // given
-
-    auto root = make_shared<GffStruct>(
-        0xffffffff,
-        vector<GffField> {
-            GffField::newByte("Byte", 0),
-            GffField::newInt("Int", 1),
-            GffField::newDword("Uint", 2),
-            GffField::newInt64("Int64", 3),
-            GffField::newDword64("Uint64", 4),
-            GffField::newFloat("Float", 1.0f),
-            GffField::newDouble("Double", 1.0),
-            GffField::newCExoString("CExoString", "John"),
-            GffField::newResRef("ResRef", "Jane"),
-            GffField::newCExoLocString("CExoLocString", -1, "Jill"),
-            GffField::newVoid("Void", ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)}),
-            GffField::newOrientation("Orientation", glm::quat(1.0f, 1.0f, 1.0f, 1.0f)),
-            GffField::newVector("Vector", glm::vec3(1.0f, 1.0f, 1.0f)),
-            GffField::newStrRef("StrRef", 1),
-            GffField::newStruct(
-                "Struct",
-                make_shared<GffStruct>(1, vector<GffField> {GffField::newChar("Struct1Char", 1)})),
-            GffField::newList(
-                "List",
-                vector<shared_ptr<GffStruct>> {
-                    make_shared<GffStruct>(2, vector<GffField> {GffField::newWord("Struct2Word", 2)}),
-                    make_shared<GffStruct>(3, vector<GffField> {GffField::newShort("Struct3Short", 3)})})});
 
     auto ss = ostringstream();
 
@@ -205,18 +178,64 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
     ss << string("\x02\x00\x00\x00", 4);
     ss << string("\x03\x00\x00\x00", 4);
 
-    auto writer = GffWriter(ResourceType::Res, root);
-    auto stream = make_shared<ostringstream>();
-    auto expectedOutput = ss.str();
+    auto stream = make_shared<istringstream>(ss.str());
+    auto reader = GffReader();
+    auto expectedData = ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)};
+    auto expectedOrientation = glm::quat {1.0f, 1.0f, 1.0f, 1.0f};
+    auto expectedVector = glm::vec3 {1.0f, 1.0f, 1.0f};
 
     // when
 
-    writer.save(stream);
+    reader.load(stream);
 
     // then
 
-    auto actualOutput = stream->str();
-    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
+    auto gff = reader.root();
+    BOOST_CHECK_EQUAL(16ll, gff->fields().size());
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Byte), static_cast<int>(gff->fields()[0].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Int), static_cast<int>(gff->fields()[1].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Dword), static_cast<int>(gff->fields()[2].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Int64), static_cast<int>(gff->fields()[3].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Dword64), static_cast<int>(gff->fields()[4].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Float), static_cast<int>(gff->fields()[5].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Double), static_cast<int>(gff->fields()[6].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::CExoString), static_cast<int>(gff->fields()[7].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::ResRef), static_cast<int>(gff->fields()[8].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::CExoLocString), static_cast<int>(gff->fields()[9].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Void), static_cast<int>(gff->fields()[10].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Orientation), static_cast<int>(gff->fields()[11].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Vector), static_cast<int>(gff->fields()[12].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::StrRef), static_cast<int>(gff->fields()[13].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Struct), static_cast<int>(gff->fields()[14].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::List), static_cast<int>(gff->fields()[15].type));
+    BOOST_CHECK_EQUAL(1ll, gff->getStruct("Struct")->fields().size());
+    BOOST_CHECK_EQUAL(2ll, gff->getList("List").size());
+    BOOST_CHECK_EQUAL(1ll, gff->getList("List")[0]->fields().size());
+    BOOST_CHECK_EQUAL(1ll, gff->getList("List")[1]->fields().size());
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Char), static_cast<int>(gff->getStruct("Struct")->fields()[0].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Word), static_cast<int>(gff->getList("List")[0]->fields()[0].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Short), static_cast<int>(gff->getList("List")[1]->fields()[0].type));
+    BOOST_CHECK_EQUAL(0, gff->getUint("Byte"));
+    BOOST_CHECK_EQUAL(1, gff->getInt("Int"));
+    BOOST_CHECK_EQUAL(2, gff->getUint("Uint"));
+    BOOST_CHECK_EQUAL(3, gff->getInt64("Int64"));
+    BOOST_CHECK_EQUAL(4, gff->getUint64("Uint64"));
+    BOOST_CHECK_EQUAL(1.0f, gff->getFloat("Float"));
+    BOOST_CHECK_EQUAL(1.0, gff->getDouble("Double"));
+    BOOST_CHECK_EQUAL(string("John"), gff->getString("CExoString"));
+    BOOST_CHECK_EQUAL(string("Jane"), gff->getString("ResRef"));
+    BOOST_CHECK_EQUAL(-1, gff->getInt("CExoLocString"));
+    BOOST_CHECK_EQUAL(string("Jill"), gff->getString("CExoLocString"));
+    auto actualData = gff->getData("Void");
+    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
+    auto actualOrientation = gff->getOrientation("Orientation");
+    BOOST_TEST((expectedOrientation == actualOrientation), notEqualMessage(expectedOrientation, actualOrientation));
+    auto actualVector = gff->getVector("Vector");
+    BOOST_TEST((expectedVector == actualVector), notEqualMessage(expectedVector, actualVector));
+    BOOST_CHECK_EQUAL(1, gff->getInt("StrRef"));
+    BOOST_CHECK_EQUAL(1, gff->getStruct("Struct")->getInt("Struct1Char"));
+    BOOST_CHECK_EQUAL(2, gff->getList("List")[0]->getUint("Struct2Word"));
+    BOOST_CHECK_EQUAL(3, gff->getList("List")[1]->getInt("Struct3Short"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

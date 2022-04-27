@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/resource/format/tlkreader.h"
-#include "../src/resource/talktable.h"
+#include "../../src/resource/format/tlkreader.h"
+#include "../../src/resource/talktable.h"
 
 using namespace std;
 

@@ -19,25 +19,25 @@ set(TEST_HEADERS
     checkutil.h)
 
 set(TEST_SOURCES
-    2dareader.cpp
-    2dawriter.cpp
-    bifreader.cpp
-    erfreader.cpp
-    erfwriter.cpp
-    game.cpp
-    gffreader.cpp
-    gffwriter.cpp
-    keyreader.cpp
+    common/streamreader.cpp
+    common/streamwriter.cpp
+    common/unicode.cpp
+    game/game.cpp
     main.cpp
-    ncsreader.cpp
-    ncswriter.cpp
-    rimreader.cpp
-    rimwriter.cpp
-    streamreader.cpp
-    streamwriter.cpp
-    tlkreader.cpp
-    tlkwriter.cpp
-    unicode.cpp)
+    resource/2dareader.cpp
+    resource/2dawriter.cpp
+    resource/bifreader.cpp
+    resource/erfreader.cpp
+    resource/erfwriter.cpp
+    resource/gffreader.cpp
+    resource/gffwriter.cpp
+    resource/keyreader.cpp
+    resource/rimreader.cpp
+    resource/rimwriter.cpp
+    resource/tlkreader.cpp
+    resource/tlkwriter.cpp
+    script/ncsreader.cpp
+    script/ncswriter.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

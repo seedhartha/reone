@@ -17,18 +17,18 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/resource/format/erfwriter.h"
+#include "../../src/resource/format/erfreader.h"
 
-#include "checkutil.h"
+#include "../checkutil.h"
 
 using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(erf_writer)
+BOOST_AUTO_TEST_SUITE(erf_reader)
 
-BOOST_AUTO_TEST_CASE(should_write_erf) {
+BOOST_AUTO_TEST_CASE(should_read_erf) {
     // given
 
     auto ss = ostringstream();
@@ -55,20 +55,23 @@ BOOST_AUTO_TEST_CASE(should_write_erf) {
     // resource data
     ss << "Bb";
 
-    auto writer = ErfWriter();
-    writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
-
-    auto erf = make_shared<ostringstream>();
-    auto expectedOutput = ss.str();
+    auto reader = ErfReader();
+    auto erf = make_shared<istringstream>(ss.str());
+    auto expectedData = ByteArray {'B', 'b'};
 
     // when
 
-    writer.save(ErfWriter::FileType::ERF, erf);
+    reader.load(erf);
 
     // then
 
-    auto actualOutput = erf->str();
-    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
+    BOOST_CHECK_EQUAL(1, reader.entryCount());
+    BOOST_CHECK_EQUAL(1, reader.keys().size());
+    auto key = reader.keys().front();
+    BOOST_CHECK_EQUAL("aa", key.resId.resRef);
+    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(key.resId.type));
+    auto actualData = reader.getResourceData(0);
+    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
