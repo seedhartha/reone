@@ -26,6 +26,8 @@
 #include "../../services.h"
 
 #include "creature.h"
+#include "door.h"
+#include "placeable.h"
 
 using namespace std;
 
@@ -77,6 +79,20 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
     auto gitCreatures = git->getList("Creature List");
     for (auto &gitCreature : gitCreatures) {
         area->add(creatureLoader.load(*gitCreature));
+    }
+
+    // Placeables
+    auto placeableLoader = Placeable::Loader(_idSeq, _services);
+    auto gitPlaceables = git->getList("Placeable List");
+    for (auto &gitPlaceable : gitPlaceables) {
+        area->add(placeableLoader.load(*gitPlaceable));
+    }
+
+    // Doors
+    auto doorLoader = Door::Loader(_idSeq, _services);
+    auto gitDoors = git->getList("Door List");
+    for (auto &gitDoor : gitDoors) {
+        area->add(doorLoader.load(*gitDoor));
     }
 
     return move(area);

@@ -43,7 +43,7 @@ namespace neo {
 
 static const string kHeadHookNodeName = "headhook";
 
-unique_ptr<Creature> Creature::Loader::load(const resource::GffStruct &gitEntry) {
+unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
     // From GIT entry
 
     auto xPosition = gitEntry.getFloat("XPosition");
@@ -66,35 +66,39 @@ unique_ptr<Creature> Creature::Loader::load(const resource::GffStruct &gitEntry)
 
     auto appearanceTable = _services.resource.twoDas.get("appearance");
     if (!appearanceTable) {
-        throw ValidationException("Appearance 2DA not found");
+        throw ValidationException("appearance 2DA not found");
     }
     auto modelType = appearanceTable->getString(appearanceType, "modeltype");
     auto race = appearanceTable->getString(appearanceType, "race");
 
     // Make scene node
 
-    auto &scene = _services.scene.graphs.get(kSceneMain);
+    shared_ptr<ModelSceneNode> sceneNode;
+
     auto model = _services.graphics.models.get(race);
-    auto sceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
+    if (model) {
+        auto &scene = _services.scene.graphs.get(kSceneMain);
+        sceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
 
-    if (modelType == "B") {
-        auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
-        auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
-        auto headsTable = _services.resource.twoDas.get("heads");
-        if (!headsTable) {
-            throw ValidationException("Heads 2DA not found");
+        if (modelType == "B") {
+            auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
+            auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
+            auto headsTable = _services.resource.twoDas.get("heads");
+            if (!headsTable) {
+                throw ValidationException("heads 2DA not found");
+            }
+            auto head = headsTable->getString(normalHead, "head");
+            auto headModel = _services.graphics.models.get(head);
+            if (headModel) {
+                auto headSceneNode = scene.newModel(move(headModel), ModelUsage::Creature, nullptr);
+                sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
+            }
         }
-        auto head = headsTable->getString(normalHead, "head");
-        auto headModel = _services.graphics.models.get(head);
-        if (headModel) {
-            auto headSceneNode = scene.newModel(move(headModel), ModelUsage::Creature, nullptr);
-            sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
-        }
+
+        auto transform = glm::translate(glm::vec3(xPosition, yPosition, zPosition));
+        transform *= glm::rotate(-glm::atan(xOrientation, yOrientation), glm::vec3(0.0f, 0.0f, 1.0f));
+        sceneNode->setLocalTransform(move(transform));
     }
-
-    auto transform = glm::translate(glm::vec3(xPosition, yPosition, zPosition));
-    transform *= glm::rotate(-glm::atan(xOrientation, yOrientation), glm::vec3(0.0f, 0.0f, 1.0f));
-    sceneNode->setLocalTransform(move(transform));
 
     // Make creature
 
