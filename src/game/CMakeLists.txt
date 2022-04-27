@@ -201,6 +201,12 @@ set(GAME_HEADERS
     layouts.h
     location.h
     neo/game.h
+    neo/object.h
+    neo/object/area.h
+    neo/object/creature.h
+    neo/object/door.h
+    neo/object/module.h
+    neo/object/placeable.h
     object.h
     object/area.h
     object/creature.h
@@ -409,6 +415,11 @@ set(GAME_SOURCES
     guisounds.cpp
     layouts.cpp
     neo/game.cpp
+    neo/object/area.cpp
+    neo/object/creature.cpp
+    neo/object/door.cpp
+    neo/object/module.cpp
+    neo/object/placeable.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
