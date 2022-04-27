@@ -311,7 +311,8 @@ enum class ObjectType {
 
     Module = 0x1000,
     Area = 0x1001,
-    Camera = 0x1002,
+    Room = 0x1002,
+    Camera = 0x1003,
 
     All = 0x7fff,
     Invalid = 0x7fff

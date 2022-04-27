@@ -207,6 +207,7 @@ set(GAME_HEADERS
     neo/object/door.h
     neo/object/module.h
     neo/object/placeable.h
+    neo/object/room.h
     object.h
     object/area.h
     object/creature.h
@@ -420,6 +421,7 @@ set(GAME_SOURCES
     neo/object/door.cpp
     neo/object/module.cpp
     neo/object/placeable.cpp
+    neo/object/room.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
