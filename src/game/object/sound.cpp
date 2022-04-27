@@ -104,7 +104,7 @@ void Sound::loadTransformFromGIT(const GffStruct &gffs) {
 
     updateTransform();
 
-    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     auto sceneNode = sceneGraph.newSound();
     sceneNode->setEnabled(_active);
     sceneNode->setPriority(_priority);

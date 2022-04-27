@@ -69,7 +69,7 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         auto lytRoom = layout->findByName(roomName);
         auto transform = glm::translate(lytRoom->position);
 
-        auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+        auto &scene = _services.scene.graphs.get(kSceneMain);
         auto model = _services.graphics.models.get(roomName);
         auto sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
         sceneNode->setLocalTransform(move(transform));

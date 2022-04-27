@@ -72,7 +72,7 @@ void Map::draw(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) {
         return;
     }
-    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
         drawArea(mode, bounds);
         drawNotes(mode, bounds);
         drawPartyLeader(mode, bounds);
@@ -107,7 +107,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        _services.graphics.graphicsContext.withScissorTest(scissorBounds, [&]() {
+        _services.graphics.context.withScissorTest(scissorBounds, [&]() {
             _services.graphics.meshes.quad().draw();
         });
 

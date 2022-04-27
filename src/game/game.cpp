@@ -99,7 +99,7 @@ void Game::init() {
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
-    for (auto &scene : _services.scene.sceneGraphs.scenes()) {
+    for (auto &scene : _services.scene.graphs.scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
         scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
@@ -198,7 +198,7 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    _services.graphics.graphicsContext.clearColorDepth();
+    _services.graphics.context.clearColorDepth();
 
     if (_movie) {
         _movie->draw();
@@ -238,7 +238,7 @@ void Game::loadModule(const string &name, string entry) {
             }
             drawAll();
 
-            _services.scene.sceneGraphs.get(kSceneMain).clear();
+            _services.scene.graphs.get(kSceneMain).clear();
 
             auto maybeModule = _loadedModules.find(name);
             if (maybeModule != _loadedModules.end()) {
@@ -324,7 +324,7 @@ void Game::playVideo(const string &name) {
 
     BikReader bik(
         path,
-        _services.graphics.graphicsContext,
+        _services.graphics.context,
         _services.graphics.meshes,
         _services.graphics.shaders,
         _services.graphics.textures,
@@ -355,7 +355,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
@@ -527,7 +527,7 @@ void Game::updateSceneGraph(float dt) {
     if (!camera) {
         return;
     }
-    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode());
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());

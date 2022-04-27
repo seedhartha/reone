@@ -53,7 +53,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadTransformFromGIT(gffs);
     loadGeometryFromGIT(gffs);
 
-    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     _sceneNode = sceneGraph.newTrigger(_geometry);
     _sceneNode->setLocalTransform(glm::translate(_position));
 }

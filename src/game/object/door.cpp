@@ -72,7 +72,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     if (!model) {
         return;
     }
-    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
     auto modelSceneNode = sceneGraph.newModel(move(model), ModelUsage::Door);
     modelSceneNode->setUser(*this);
