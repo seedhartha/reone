@@ -21,7 +21,15 @@
 
 namespace reone {
 
+namespace resource {
+
+class GffStruct;
+
+}
+
 namespace game {
+
+struct ServicesView;
 
 namespace neo {
 
@@ -30,16 +38,33 @@ public:
     class Builder : public Object::Builder<Placeable, Builder> {
     public:
         std::unique_ptr<Placeable> build() override {
-            return std::make_unique<Placeable>(_id, _tag);
+            return std::make_unique<Placeable>(_id, _tag, _sceneNode);
         }
     };
 
-    Placeable(uint32_t id, std::string tag) :
+    class Loader : boost::noncopyable {
+    public:
+        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+            _idSeq(idSeq),
+            _services(services) {
+        }
+
+        std::unique_ptr<Placeable> load(const resource::GffStruct &gitEntry);
+
+    private:
+        IObjectIdSequence &_idSeq;
+        ServicesView &_services;
+    };
+
+    Placeable(
+        uint32_t id,
+        std::string tag,
+        std::shared_ptr<scene::SceneNode> sceneNode) :
         Object(
             id,
             ObjectType::Placeable,
             std::move(tag),
-            nullptr) {
+            std::move(sceneNode)) {
     }
 };
 
