@@ -19,15 +19,22 @@
 
 #include "../../../common/exception/validation.h"
 #include "../../../common/logutil.h"
+#include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
+#include "../../../scene/graphs.h"
+#include "../../../scene/node/model.h"
+#include "../../../scene/services.h"
 
 #include "../../services.h"
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -38,24 +45,48 @@ namespace neo {
 unique_ptr<Module> Module::Loader::load(const string &name) {
     info("Loading module " + name);
 
+    // From IFO
+
     auto ifo = _services.resource.gffs.get("module", ResourceType::Ifo);
     if (!ifo) {
         throw ValidationException("IFO not found: " + name);
     }
+    auto entryArea = ifo->getString("Mod_Entry_Area");
+    auto entryX = ifo->getFloat("Mod_Entry_X");
+    auto entryY = ifo->getFloat("Mod_Entry_Y");
+    auto entryZ = ifo->getFloat("Mod_Entry_Z");
+    auto entryDirX = ifo->getFloat("Mod_Entry_Dir_X");
+    auto entryDirY = ifo->getFloat("Mod_Entry_Dir_Y");
 
-    auto areas = vector<shared_ptr<Area>>();
+    // Make area
+
     auto areaLoader = Area::Loader(_idSeq, _services);
-    auto ifoAreas = ifo->getList("Mod_Area_list");
+    auto area = areaLoader.load(entryArea);
 
-    for (auto &ifoArea : ifoAreas) {
-        auto areaName = ifoArea->getString("Area_Name");
-        areas.push_back(areaLoader.load(areaName));
-    }
+    // Make player character
+
+    auto &scene = _services.scene.graphs.get(kSceneMain);
+    auto model = _services.graphics.models.get("PMBTest");
+
+    auto pcTransform = glm::translate(glm::vec3(entryX, entryY, entryZ));
+    pcTransform *= glm::rotate(-glm::atan(entryDirX, entryDirY), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    auto pcSceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
+    pcSceneNode->setLocalTransform(move(pcTransform));
+
+    auto pc = Creature::Builder()
+                  .id(_idSeq.nextObjectId())
+                  .tag(kObjectTagPlayer)
+                  .sceneNode(move(pcSceneNode))
+                  .build();
+
+    // Make module
 
     return Module::Builder()
         .id(_idSeq.nextObjectId())
         .tag(name)
-        .areas(std::move(areas))
+        .area(move(area))
+        .pc(move(pc))
         .build();
 }
 
