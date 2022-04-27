@@ -19,6 +19,8 @@
 
 #include "../src/resource/format/bifreader.h"
 
+#include "checkutil.h"
+
 using namespace std;
 
 using namespace reone;
@@ -29,9 +31,32 @@ BOOST_AUTO_TEST_SUITE(bif_reader)
 BOOST_AUTO_TEST_CASE(should_read_bif) {
     // given
 
+    auto ss = ostringstream();
+    // header
+    ss << "BIFFV1  ";
+    ss << string("\x01\x00\x00\x00", 4); // number of variable resources
+    ss << string("\x00\x00\x00\x00", 4); // number of fixed resources
+    ss << string("\x14\x00\x00\x00", 4); // offset to variable resources
+    // variable resource table
+    ss << string("\x00\x00\x00\x00", 4); // id
+    ss << string("\x24\x00\x00\x00", 4); // offset
+    ss << string("\x0d\x00\x00\x00", 4); // filesize
+    ss << string("\xe6\x07\x00\x00", 4); // type
+    // variable resource data
+    ss << "Hello, world!";
+
+    auto reader = BifReader();
+    auto bif = make_shared<istringstream>(ss.str());
+    auto expectedData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+
     // when
 
+    reader.load(bif);
+
     // then
+
+    auto actualData = reader.getResourceData(0);
+    BOOST_TEST((expectedData == *actualData), notEqualMessage(expectedData, *actualData));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
