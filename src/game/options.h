@@ -28,6 +28,7 @@ namespace game {
 struct Options {
     boost::filesystem::path gamePath;
     bool developer {false};
+    bool neo {false};
 
     graphics::GraphicsOptions graphics;
     audio::AudioOptions audio;

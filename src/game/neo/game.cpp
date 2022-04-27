@@ -17,11 +17,40 @@
 
 #include "game.h"
 
+#include "../../graphics/services.h"
+#include "../../graphics/window.h"
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
+
+void Game::init() {
+    _services.graphics.window.setEventHandler(this);
+}
+
+void Game::run() {
+    while (!_finished) {
+        handleInput();
+        update();
+        render();
+    }
+}
+
+void Game::handleInput() {
+    _services.graphics.window.processEvents(_finished);
+}
+
+void Game::update() {
+}
+
+void Game::render() {
+}
+
+bool Game::handle(const SDL_Event &e) {
+    return false;
+}
 
 } // namespace neo
 

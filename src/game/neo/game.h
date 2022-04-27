@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "../../graphics/eventhandler.h"
+
+#include "../services.h"
 #include "../types.h"
 
 namespace reone {
@@ -25,14 +28,28 @@ namespace game {
 
 namespace neo {
 
-class Game {
+class Game : public graphics::IEventHandler {
 public:
-    Game(GameID id) :
-        _id(id) {
+    Game(GameID id, ServicesView &services) :
+        _id(id),
+        _services(services) {
     }
+
+    void init();
+
+    void run();
+
+    bool handle(const SDL_Event &e) override;
 
 private:
     GameID _id;
+    ServicesView &_services;
+
+    bool _finished {false};
+
+    void handleInput();
+    void update();
+    void render();
 };
 
 } // namespace neo
