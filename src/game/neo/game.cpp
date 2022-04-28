@@ -47,11 +47,10 @@ namespace game {
 
 namespace neo {
 
+static const string kCameraHookNodeName = "camerahook";
+
 void Game::init() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
-
-    auto camera = scene.newCamera();
-    scene.setActiveCamera(move(camera));
 
     _playerController = make_unique<PlayerController>();
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
@@ -100,10 +99,10 @@ void Game::render() {
 }
 
 bool Game::handle(const SDL_Event &e) {
-    if (_module && _module->area().mainCamera().handle(e)) {
+    if (_playerController->handle(e)) {
         return true;
     }
-    if (_playerController->handle(e)) {
+    if (_module && _module->area().mainCamera().handle(e)) {
         return true;
     }
     return false;
@@ -118,7 +117,8 @@ void Game::loadModule(const string &name) {
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
-    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(_module->area().mainCamera().sceneNodePtr()));
+
+    // Rooms
 
     for (auto &room : _module->area().rooms()) {
         auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
@@ -126,6 +126,9 @@ void Game::loadModule(const string &name) {
             scene.addRoot(move(model));
         }
     }
+
+    // Objects
+
     for (auto &object : _module->area().objects()) {
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
         if (model) {
@@ -133,28 +136,36 @@ void Game::loadModule(const string &name) {
         }
     }
 
+    // Main camera
+
+    auto &mainCamera = _module->area().mainCamera();
+    mainCamera.setMode(Camera::Mode::ThirdPerson);
+    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(mainCamera.sceneNodePtr()));
+
+    // Player character
+
     auto &pc = _module->pc();
     _playerController->setCreature(pc);
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
+    pcModel->attach(kCameraHookNodeName, mainCamera.sceneNodePtr());
     scene.addRoot(move(pcModel));
 }
 
-static constexpr float kPlayerOrientationSpeed = 1.0f;
-static constexpr float kPlayerMovementSpeed = 1.0f;
+static constexpr float kPlayerMoveSpeed = 1.0f;
 
 bool Game::PlayerController::handle(const SDL_Event &e) {
     if (e.type == SDL_KEYDOWN) {
         if (e.key.keysym.sym == SDLK_w) {
             _forward = 1.0f;
             return true;
-        } else if (e.key.keysym.sym == SDLK_a) {
+        } else if (e.key.keysym.sym == SDLK_z) {
             _left = 1.0f;
             return true;
         } else if (e.key.keysym.sym == SDLK_s) {
             _backward = 1.0f;
             return true;
-        } else if (e.key.keysym.sym == SDLK_d) {
+        } else if (e.key.keysym.sym == SDLK_c) {
             _right = 1.0f;
             return true;
         }
@@ -162,13 +173,13 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
         if (e.key.keysym.sym == SDLK_w) {
             _forward = 0.0f;
             return true;
-        } else if (e.key.keysym.sym == SDLK_a) {
+        } else if (e.key.keysym.sym == SDLK_z) {
             _left = 0.0f;
             return true;
         } else if (e.key.keysym.sym == SDLK_s) {
             _backward = 0.0f;
             return true;
-        } else if (e.key.keysym.sym == SDLK_d) {
+        } else if (e.key.keysym.sym == SDLK_c) {
             _right = 0.0f;
             return true;
         }
@@ -177,13 +188,11 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
 }
 
 void Game::PlayerController::update(float delta) {
-    _bearing -= delta * kPlayerOrientationSpeed * (_right - _left);
-
     auto &sceneNode = _creature->sceneNode();
 
     auto transform = glm::translate(sceneNode.getOrigin());
     transform *= glm::rotate(_bearing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::translate(delta * kPlayerMovementSpeed * glm::vec3(0.0f, _forward - _backward, 0.0f));
+    transform *= glm::translate(delta * kPlayerMoveSpeed * glm::vec3(_right - _left, _forward - _backward, 0.0f));
 
     sceneNode.setLocalTransform(move(transform));
 }
