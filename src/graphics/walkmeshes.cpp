@@ -39,11 +39,13 @@ void Walkmeshes::invalidate() {
 }
 
 shared_ptr<Walkmesh> Walkmeshes::get(const string &resRef, ResourceType type) {
-    auto maybeWalkmesh = _cache.find(resRef);
+    auto lcResRef = boost::to_lower_copy(resRef);
+
+    auto maybeWalkmesh = _cache.find(lcResRef);
     if (maybeWalkmesh != _cache.end()) {
         return maybeWalkmesh->second;
     }
-    auto inserted = _cache.insert(make_pair(resRef, doGet(resRef, type)));
+    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, type)));
 
     return inserted.first->second;
 }

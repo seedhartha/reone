@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../../scene/node/walkmesh.h"
+
 #include "../object.h"
 
 namespace reone {
@@ -51,9 +53,22 @@ class Placeable : public Object {
 public:
     class Builder : public Object::Builder<Placeable, Builder> {
     public:
-        std::unique_ptr<Placeable> build() override {
-            return std::make_unique<Placeable>(_id, _tag, _sceneNode, *_sceneGraph);
+        Builder &walkmesh(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
+            _walkmesh = std::move(walkmesh);
+            return *this;
         }
+
+        std::unique_ptr<Placeable> build() override {
+            return std::make_unique<Placeable>(
+                _id,
+                _tag,
+                _sceneNode,
+                *_sceneGraph,
+                _walkmesh);
+        }
+
+    private:
+        std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
     };
 
     class Loader : boost::noncopyable {
@@ -85,14 +100,25 @@ public:
         uint32_t id,
         std::string tag,
         std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph) :
+        scene::SceneGraph &sceneGraph,
+        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) :
         Object(
             id,
             ObjectType::Placeable,
             std::move(tag),
             std::move(sceneNode),
-            sceneGraph) {
+            sceneGraph),
+        _walkmesh(std::move(walkmesh)) {
     }
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() {
+        return _walkmesh;
+    }
+
+private:
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
+
+    void flushTransform() override;
 };
 
 } // namespace neo

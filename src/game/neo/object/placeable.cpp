@@ -20,12 +20,14 @@
 #include "../../../common/exception/validation.h"
 #include "../../../graphics/models.h"
 #include "../../../graphics/services.h"
+#include "../../../graphics/walkmeshes.h"
 #include "../../../resource/2das.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
+#include "../../../scene/node/walkmesh.h"
 
 #include "../../services.h"
 
@@ -40,6 +42,18 @@ namespace reone {
 namespace game {
 
 namespace neo {
+
+void Placeable::flushTransform() {
+    Object::flushTransform();
+
+    auto transform = glm::translate(_position);
+    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    if (_walkmesh) {
+        _walkmesh->setLocalTransform(_sceneNode->localTransform());
+    }
+}
 
 unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
     // From GIT entry
@@ -70,10 +84,15 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
     // Make scene node
 
     shared_ptr<ModelSceneNode> sceneNode;
-
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Placeable, nullptr);
+    }
+
+    shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
+    auto walkmesh = _graphicsSvc.walkmeshes.get(modelName, ResourceType::Pwk);
+    if (walkmesh) {
+        walkmeshSceneNode = _sceneGraph.newWalkmesh(move(walkmesh));
     }
 
     // Make placeable
@@ -82,6 +101,7 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
                          .id(_idSeq.nextObjectId())
                          .tag(move(tag))
                          .sceneNode(move(sceneNode))
+                         .walkmesh(move(walkmeshSceneNode))
                          .sceneGraph(&_sceneGraph)
                          .build();
 

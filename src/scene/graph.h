@@ -215,7 +215,7 @@ private:
     // Roots
 
     std::set<std::shared_ptr<ModelSceneNode>> _modelRoots;
-    std::set<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
+    std::list<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
     std::set<std::shared_ptr<TriggerSceneNode>> _triggerRoots;
     std::set<std::shared_ptr<GrassSceneNode>> _grassRoots;
     std::set<std::shared_ptr<SoundSceneNode>> _soundRoots;
