@@ -21,6 +21,7 @@
 
 #include "../object.h"
 
+#include "camera.h"
 #include "room.h"
 
 namespace reone {
@@ -46,12 +47,18 @@ public:
             return *this;
         }
 
+        Builder &mainCamera(std::shared_ptr<Camera> mainCamera) {
+            _mainCamera = std::move(mainCamera);
+            return *this;
+        }
+
         std::unique_ptr<Area> build() override {
-            return std::make_unique<Area>(_id, _tag, _rooms);
+            return std::make_unique<Area>(_id, _tag, _rooms, _mainCamera);
         }
 
     private:
         std::vector<std::shared_ptr<Room>> _rooms;
+        std::shared_ptr<Camera> _mainCamera;
     };
 
     class Loader : boost::noncopyable {
@@ -71,13 +78,15 @@ public:
     Area(
         uint32_t id,
         std::string tag,
-        std::vector<std::shared_ptr<Room>> rooms) :
+        std::vector<std::shared_ptr<Room>> rooms,
+        std::shared_ptr<Camera> mainCamera) :
         Object(
             id,
             ObjectType::Area,
             std::move(tag),
             nullptr),
-        _rooms(std::move(rooms)) {
+        _rooms(std::move(rooms)),
+        _mainCamera(std::move(mainCamera)) {
     }
 
     void add(std::unique_ptr<Object> object) {
@@ -92,10 +101,15 @@ public:
         return _objects;
     }
 
+    Camera &mainCamera() {
+        return *_mainCamera;
+    }
+
 private:
     std::vector<std::shared_ptr<Room>> _rooms;
 
     std::vector<std::unique_ptr<Object>> _objects;
+    std::shared_ptr<Camera> _mainCamera;
 };
 
 } // namespace neo

@@ -25,6 +25,7 @@
 #include "../../layouts.h"
 #include "../../services.h"
 
+#include "camera.h"
 #include "creature.h"
 #include "door.h"
 #include "placeable.h"
@@ -68,10 +69,16 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         rooms.push_back(roomLoader.load(roomName, layoutRoom->position));
     }
 
+    // Main camera
+    auto cameraStyle = are->getInt("CameraStyle");
+    auto cameraLoader = Camera::Loader(_idSeq, _services);
+    auto mainCamera = cameraLoader.load(cameraStyle);
+
     auto area = Area::Builder()
                     .id(_idSeq.nextObjectId())
                     .tag(name)
                     .rooms(move(rooms))
+                    .mainCamera(move(mainCamera))
                     .build();
 
     // Creatures

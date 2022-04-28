@@ -76,30 +76,6 @@ public:
     // END IEventHandler
 
 private:
-    class CameraController : boost::noncopyable {
-    public:
-        CameraController(scene::SceneNode &sceneNode) :
-            _sceneNode(sceneNode) {
-        }
-
-        bool handle(const SDL_Event &e);
-        void update(float delta);
-
-    private:
-        scene::SceneNode &_sceneNode;
-
-        // Orientation
-        float _yaw {0.0f};
-        float _pitch {glm::half_pi<float>()};
-
-        // Movement
-        float _forward {0.0f};
-        float _left {0.0f};
-        float _backward {0.0f};
-        float _right {0.0f};
-        bool _highSpeed {false};
-    };
-
     class PlayerController : boost::noncopyable {
     public:
         bool handle(const SDL_Event &e);
@@ -145,7 +121,6 @@ private:
     Options &_options;
     ServicesView &_services;
 
-    std::unique_ptr<CameraController> _cameraController;
     std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
 
