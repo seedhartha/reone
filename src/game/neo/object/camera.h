@@ -91,8 +91,16 @@ public:
     bool handle(const SDL_Event &e);
     void update(float delta);
 
+    float facing() const {
+        return _facing;
+    }
+
     void setMode(Camera::Mode mode) {
         _mode = mode;
+    }
+
+    void setThirdPersonHook(scene::SceneNode *hook) {
+        _hook = hook;
     }
 
 private:
@@ -100,10 +108,11 @@ private:
     float _aspect;
 
     Mode _mode {Mode::Flycam};
+    scene::SceneNode *_hook {nullptr};
     glm::vec3 _position {0.0f};
 
     // Orientation
-    float _yaw {0.0f};
+    float _facing {0.0f};
     float _pitch {glm::half_pi<float>()};
 
     // Movement

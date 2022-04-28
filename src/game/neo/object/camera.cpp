@@ -77,7 +77,7 @@ bool Camera::handleThirdPerson(const SDL_Event &e) {
 
 bool Camera::handleFlycam(const SDL_Event &e) {
     if (e.type == SDL_MOUSEMOTION) {
-        _yaw -= kCameraMouseSensitivity * static_cast<float>(e.motion.xrel);
+        _facing -= kCameraMouseSensitivity * static_cast<float>(e.motion.xrel);
         _pitch -= kCameraMouseSensitivity * static_cast<float>(e.motion.yrel);
         return true;
     } else if (e.type == SDL_KEYDOWN) {
@@ -121,18 +121,20 @@ void Camera::update(float delta) {
 }
 
 void Camera::updateThirdPerson(float delta) {
-    _yaw += delta * kCameraRotateSpeed * (_left - _right);
-    _yaw = glm::mod(_yaw, glm::two_pi<float>());
+    _facing += delta * kCameraRotateSpeed * (_left - _right);
+    _facing = glm::mod(_facing, glm::two_pi<float>());
 
     _pitch = glm::radians(_style.pitch);
 
-    _position = glm::vec3(0.0f, 0.0f, _style.height) + _style.distance * glm::vec3(glm::sin(_yaw), -glm::cos(_yaw), 0.0f);
+    _position = _hook->getOrigin();
+    _position += glm::vec3(0.0f, 0.0f, _style.height);
+    _position += _style.distance * glm::vec3(glm::sin(_facing), -glm::cos(_facing), 0.0f);
 
     flushTransform();
 }
 
 void Camera::updateFlycam(float delta) {
-    auto rotation = glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+    auto rotation = glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
 
     _position += delta * kCameraMoveSpeed * glm::vec3(rotation * glm::vec4(_right - _left, 0.0f, _backward - _forward, 1.0f));
 
@@ -148,7 +150,7 @@ void Camera::flushProjection() {
 
 void Camera::flushTransform() {
     auto transform = glm::translate(_position);
-    transform *= glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
     transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
 
     static_cast<CameraSceneNode &>(*_sceneNode).setLocalTransform(move(transform));
