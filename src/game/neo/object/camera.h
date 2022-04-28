@@ -85,11 +85,15 @@ public:
         _style(std::move(style)),
         _aspect(aspect) {
 
-        updateProjection();
+        flushProjection();
     }
 
     bool handle(const SDL_Event &e);
     void update(float delta);
+
+    void setMode(Camera::Mode mode) {
+        _mode = mode;
+    }
 
 private:
     CameraStyle _style;
@@ -111,8 +115,11 @@ private:
     bool handleThirdPerson(const SDL_Event &e);
     bool handleFlycam(const SDL_Event &e);
 
-    void updateProjection();
-    void updateTransform();
+    void updateThirdPerson(float delta);
+    void updateFlycam(float delta);
+
+    void flushProjection();
+    void flushTransform();
 };
 
 } // namespace neo

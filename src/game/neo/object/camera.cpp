@@ -41,6 +41,7 @@ static constexpr float kDefaultClipNear = 0.25f;
 static constexpr float kDefaultClipFar = 2500.0f;
 
 static constexpr float kCameraMouseSensitivity = 0.001f;
+static constexpr float kCameraRotateSpeed = 1.0f;
 static constexpr float kCameraMoveSpeed = 5.0f;
 
 bool Camera::handle(const SDL_Event &e) {
@@ -54,6 +55,23 @@ bool Camera::handle(const SDL_Event &e) {
 }
 
 bool Camera::handleThirdPerson(const SDL_Event &e) {
+    if (e.type == SDL_KEYDOWN) {
+        if (e.key.keysym.sym == SDLK_a) {
+            _left = 1.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 1.0f;
+            return true;
+        }
+    } else if (e.type == SDL_KEYUP) {
+        if (e.key.keysym.sym == SDLK_a) {
+            _left = 0.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 0.0f;
+            return true;
+        }
+    }
     return false;
 }
 
@@ -95,21 +113,40 @@ bool Camera::handleFlycam(const SDL_Event &e) {
 }
 
 void Camera::update(float delta) {
+    if (_mode == Mode::ThirdPerson) {
+        updateThirdPerson(delta);
+    } else if (_mode == Mode::Flycam) {
+        updateFlycam(delta);
+    }
+}
+
+void Camera::updateThirdPerson(float delta) {
+    _yaw += delta * kCameraRotateSpeed * (_left - _right);
+    _yaw = glm::mod(_yaw, glm::two_pi<float>());
+
+    _pitch = glm::radians(_style.pitch);
+
+    _position = glm::vec3(0.0f, 0.0f, _style.height) + _style.distance * glm::vec3(glm::sin(_yaw), -glm::cos(_yaw), 0.0f);
+
+    flushTransform();
+}
+
+void Camera::updateFlycam(float delta) {
     auto rotation = glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
 
     _position += delta * kCameraMoveSpeed * glm::vec3(rotation * glm::vec4(_right - _left, 0.0f, _backward - _forward, 1.0f));
 
-    updateTransform();
+    flushTransform();
 }
 
-void Camera::updateProjection() {
+void Camera::flushProjection() {
     static_cast<CameraSceneNode &>(*_sceneNode).setPerspectiveProjection(glm::radians(_style.viewAngle), //
                                                                          _aspect,                        //
                                                                          kDefaultClipNear,               //
                                                                          kDefaultClipFar);
 }
 
-void Camera::updateTransform() {
+void Camera::flushTransform() {
     auto transform = glm::translate(_position);
     transform *= glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f));
     transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
