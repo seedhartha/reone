@@ -23,9 +23,27 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
 namespace neo {
 
@@ -49,7 +67,7 @@ public:
         }
 
         std::unique_ptr<Camera> build() override {
-            return std::make_unique<Camera>(_id, _tag, _sceneNode, _style, _aspect);
+            return std::make_unique<Camera>(_id, _tag, _sceneNode, *_sceneGraph, _style, _aspect);
         }
 
     private:
@@ -59,29 +77,42 @@ public:
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
             _idSeq(idSeq),
-            _services(services) {
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
         }
 
         std::unique_ptr<Camera> load(int style);
 
     private:
         IObjectIdSequence &_idSeq;
-        ServicesView &_services;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
     };
 
     Camera(
         uint32_t id,
         std::string tag,
         std::shared_ptr<scene::SceneNode> sceneNode,
+        scene::SceneGraph &sceneGraph,
         CameraStyle style,
         float aspect) :
         Object(
             id,
             ObjectType::Camera,
             std::move(tag),
-            std::move(sceneNode)),
+            std::move(sceneNode),
+            sceneGraph),
         _style(std::move(style)),
         _aspect(aspect) {
 

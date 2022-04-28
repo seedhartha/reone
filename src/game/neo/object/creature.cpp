@@ -23,9 +23,8 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
-#include "../../scene/graphs.h"
+#include "../../scene/graph.h"
 #include "../../scene/node/model.h"
-#include "../../scene/services.h"
 
 #include "../../services.h"
 
@@ -62,7 +61,7 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
 
     // From UTC
 
-    auto utc = _services.resource.gffs.get(templateResRef, ResourceType::Utc);
+    auto utc = _resourceSvc.gffs.get(templateResRef, ResourceType::Utc);
     if (!utc) {
         throw ValidationException("UTC not found: " + templateResRef);
     }
@@ -71,7 +70,7 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
 
     // From appearance 2DA
 
-    auto appearanceTable = _services.resource.twoDas.get("appearance");
+    auto appearanceTable = _resourceSvc.twoDas.get("appearance");
     if (!appearanceTable) {
         throw ValidationException("appearance 2DA not found");
     }
@@ -82,22 +81,21 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
 
     shared_ptr<ModelSceneNode> sceneNode;
 
-    auto model = _services.graphics.models.get(race);
+    auto model = _graphicsSvc.models.get(race);
     if (model) {
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        sceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
+        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Creature, nullptr);
 
         if (modelType == "B") {
             auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
             auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
-            auto headsTable = _services.resource.twoDas.get("heads");
+            auto headsTable = _resourceSvc.twoDas.get("heads");
             if (!headsTable) {
                 throw ValidationException("heads 2DA not found");
             }
             auto head = headsTable->getString(normalHead, "head");
-            auto headModel = _services.graphics.models.get(head);
+            auto headModel = _graphicsSvc.models.get(head);
             if (headModel) {
-                auto headSceneNode = scene.newModel(move(headModel), ModelUsage::Creature, nullptr);
+                auto headSceneNode = _sceneGraph.newModel(move(headModel), ModelUsage::Creature, nullptr);
                 sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
             }
         }
@@ -106,10 +104,11 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
     // Make creature
 
     auto creature = Creature::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(move(tag))
-        .sceneNode(move(sceneNode))
-        .build();
+                        .id(_idSeq.nextObjectId())
+                        .tag(move(tag))
+                        .sceneNode(move(sceneNode))
+                        .sceneGraph(&_sceneGraph)
+                        .build();
 
     creature->setPosition(glm::vec3(xPosition, yPosition, zPosition));
     creature->setFacing(-glm::atan(xOrientation, yOrientation));

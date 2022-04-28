@@ -24,9 +24,8 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
-#include "../../../scene/graphs.h"
+#include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
-#include "../../../scene/services.h"
 
 #include "../../services.h"
 
@@ -47,7 +46,7 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
 
     // From IFO
 
-    auto ifo = _services.resource.gffs.get("module", ResourceType::Ifo);
+    auto ifo = _resourceSvc.gffs.get("module", ResourceType::Ifo);
     if (!ifo) {
         throw ValidationException("IFO not found: " + name);
     }
@@ -60,19 +59,19 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
 
     // Make area
 
-    auto areaLoader = Area::Loader(_idSeq, _services);
+    auto areaLoader = Area::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
     auto area = areaLoader.load(entryArea);
 
     // Make player character
 
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto model = _services.graphics.models.get("PMBTest");
+    auto model = _graphicsSvc.models.get("PMBTest");
 
-    auto pcSceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
+    auto pcSceneNode = _sceneGraph.newModel(move(model), ModelUsage::Creature, nullptr);
     auto pc = Creature::Builder()
                   .id(_idSeq.nextObjectId())
                   .tag(kObjectTagPlayer)
                   .sceneNode(move(pcSceneNode))
+                  .sceneGraph(&_sceneGraph)
                   .build();
 
     pc->setPosition(glm::vec3(entryX, entryY, entryZ));
@@ -83,6 +82,7 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
     return Module::Builder()
         .id(_idSeq.nextObjectId())
         .tag(name)
+        .sceneGraph(&_sceneGraph)
         .area(move(area))
         .pc(move(pc))
         .build();

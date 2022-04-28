@@ -23,9 +23,27 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
 namespace neo {
 
@@ -39,7 +57,7 @@ public:
         }
 
         std::unique_ptr<Room> build() override {
-            return std::make_unique<Room>(_id, _tag, _sceneNode, _walkmesh);
+            return std::make_unique<Room>(_id, _tag, _sceneNode, *_sceneGraph, _walkmesh);
         }
 
     private:
@@ -48,28 +66,41 @@ public:
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
             _idSeq(idSeq),
-            _services(services) {
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
         }
 
         std::unique_ptr<Room> load(const std::string &name, const glm::vec3 &position);
 
     private:
         IObjectIdSequence &_idSeq;
-        ServicesView &_services;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
     };
 
     Room(
         uint32_t id,
         std::string tag,
         std::shared_ptr<scene::SceneNode> sceneNode,
+        scene::SceneGraph &sceneGraph,
         std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) :
         Object(
             id,
             ObjectType::Room,
             std::move(tag),
-            std::move(sceneNode)),
+            std::move(sceneNode),
+            sceneGraph),
         _walkmesh(std::move(walkmesh)) {
     }
 

@@ -26,15 +26,29 @@
 
 namespace reone {
 
-namespace resource {
+namespace scene {
 
-class GffStruct;
+class SceneGraph;
 
 }
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+class GffStruct;
+
+} // namespace resource
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
 namespace neo {
 
@@ -53,7 +67,7 @@ public:
         }
 
         std::unique_ptr<Area> build() override {
-            return std::make_unique<Area>(_id, _tag, _rooms, _mainCamera);
+            return std::make_unique<Area>(_id, _tag, *_sceneGraph, _rooms, _mainCamera);
         }
 
     private:
@@ -63,28 +77,41 @@ public:
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
             _idSeq(idSeq),
-            _services(services) {
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
         }
 
         std::unique_ptr<Area> load(const std::string &name);
 
     private:
         IObjectIdSequence &_idSeq;
-        ServicesView &_services;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
     };
 
     Area(
         uint32_t id,
         std::string tag,
+        scene::SceneGraph &sceneGraph,
         std::vector<std::shared_ptr<Room>> rooms,
         std::shared_ptr<Camera> mainCamera) :
         Object(
             id,
             ObjectType::Area,
             std::move(tag),
-            nullptr),
+            nullptr,
+            sceneGraph),
         _rooms(std::move(rooms)),
         _mainCamera(std::move(mainCamera)) {
     }
