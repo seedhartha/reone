@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../../scene/node/walkmesh.h"
+
 #include "../object.h"
 
 namespace reone {
@@ -51,9 +53,36 @@ class Door : public Object {
 public:
     class Builder : public Object::Builder<Door, Builder> {
     public:
-        std::unique_ptr<Door> build() override {
-            return std::make_unique<Door>(_id, _tag, _sceneNode, *_sceneGraph);
+        Builder &walkmeshClosed(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
+            _walkmeshClosed = std::move(walkmesh);
+            return *this;
         }
+
+        Builder &walkmeshOpen1(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
+            _walkmeshOpen1 = std::move(walkmesh);
+            return *this;
+        }
+
+        Builder &walkmeshOpen2(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
+            _walkmeshOpen2 = std::move(walkmesh);
+            return *this;
+        }
+
+        std::unique_ptr<Door> build() override {
+            return std::make_unique<Door>(
+                _id,
+                _tag,
+                _sceneNode,
+                *_sceneGraph,
+                _walkmeshClosed,
+                _walkmeshOpen1,
+                _walkmeshOpen2);
+        }
+
+    private:
+        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
+        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
+        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
     };
 
     class Loader : boost::noncopyable {
@@ -85,14 +114,39 @@ public:
         uint32_t id,
         std::string tag,
         std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph) :
+        scene::SceneGraph &sceneGraph,
+        std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosed,
+        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh1,
+        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh2) :
         Object(
             id,
             ObjectType::Door,
             std::move(tag),
             std::move(sceneNode),
-            sceneGraph) {
+            sceneGraph),
+        _walkmeshClosed(std::move(walkmeshClosed)),
+        _walkmeshOpen1(std::move(walkmesh1)),
+        _walkmeshOpen2(std::move(walkmesh2)) {
     }
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosedPtr() {
+        return _walkmeshClosed;
+    }
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1Ptr() {
+        return _walkmeshOpen1;
+    }
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2Ptr() {
+        return _walkmeshOpen2;
+    }
+
+private:
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
+
+    void flushTransform() override;
 };
 
 } // namespace neo

@@ -35,7 +35,9 @@
 #include "../resourcelayout.h"
 #include "../surfaces.h"
 
+#include "object/door.h"
 #include "object/module.h"
+#include "object/placeable.h"
 
 using namespace std;
 
@@ -147,6 +149,27 @@ void Game::loadModule(const string &name) {
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
         if (model) {
             scene.addRoot(move(model));
+        }
+        if (object->type() == ObjectType::Placeable) {
+            auto &placeable = static_cast<Placeable &>(*object);
+            auto walkmesh = placeable.walkmeshPtr();
+            if (walkmesh) {
+                scene.addRoot(move(walkmesh));
+            }
+        } else if (object->type() == ObjectType::Door) {
+            auto &door = static_cast<Door &>(*object);
+            auto walkmesh0 = door.walkmeshClosedPtr();
+            if (walkmesh0) {
+                scene.addRoot(move(walkmesh0));
+            }
+            auto walkmesh1 = door.walkmeshOpen1Ptr();
+            if (walkmesh1) {
+                scene.addRoot(move(walkmesh1));
+            }
+            auto walkmesh2 = door.walkmeshOpen2Ptr();
+            if (walkmesh2) {
+                scene.addRoot(move(walkmesh2));
+            }
         }
     }
 

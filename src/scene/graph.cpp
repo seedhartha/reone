@@ -73,7 +73,11 @@ void SceneGraph::addRoot(shared_ptr<ModelSceneNode> node) {
 }
 
 void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
-    _walkmeshRoots.insert(move(node));
+    if (node->walkmesh().isAreaWalkmesh()) {
+        _walkmeshRoots.push_back(move(node));
+    } else {
+        _walkmeshRoots.push_front(move(node));
+    }
 }
 
 void SceneGraph::addRoot(shared_ptr<TriggerSceneNode> node) {
@@ -101,7 +105,7 @@ void SceneGraph::removeRoot(const shared_ptr<ModelSceneNode> &node) {
 }
 
 void SceneGraph::removeRoot(const shared_ptr<WalkmeshSceneNode> &node) {
-    _walkmeshRoots.erase(node);
+    _walkmeshRoots.remove(node);
 }
 
 void SceneGraph::removeRoot(const shared_ptr<TriggerSceneNode> &node) {
