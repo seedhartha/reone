@@ -21,15 +21,29 @@
 
 namespace reone {
 
-namespace resource {
+namespace scene {
 
-class GffStruct;
+class SceneGraph;
 
 }
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+class GffStruct;
+
+} // namespace resource
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
 namespace neo {
 
@@ -38,33 +52,46 @@ public:
     class Builder : public Object::Builder<Door, Builder> {
     public:
         std::unique_ptr<Door> build() override {
-            return std::make_unique<Door>(_id, _tag, _sceneNode);
+            return std::make_unique<Door>(_id, _tag, _sceneNode, *_sceneGraph);
         }
     };
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
             _idSeq(idSeq),
-            _services(services) {
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
         }
 
         std::unique_ptr<Door> load(const resource::GffStruct &gitEntry);
 
     private:
         IObjectIdSequence &_idSeq;
-        ServicesView &_services;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
     };
 
     Door(
         uint32_t id,
         std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode) :
+        std::shared_ptr<scene::SceneNode> sceneNode,
+        scene::SceneGraph &sceneGraph) :
         Object(
             id,
             ObjectType::Door,
             std::move(tag),
-            std::move(sceneNode)) {
+            std::move(sceneNode),
+            sceneGraph) {
     }
 };
 

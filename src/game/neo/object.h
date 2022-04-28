@@ -18,10 +18,17 @@
 #pragma once
 
 #include "../../scene/node.h"
+#include "../../script/types.h"
 
 #include "../types.h"
 
 namespace reone {
+
+namespace scene {
+
+class SceneGraph;
+
+}
 
 namespace game {
 
@@ -52,13 +59,19 @@ public:
             return static_cast<TBuilder &>(*this);
         }
 
+        TBuilder &sceneGraph(scene::SceneGraph *sceneGraph) {
+            _sceneGraph = sceneGraph;
+            return static_cast<TBuilder &>(*this);
+        }
+
         virtual std::unique_ptr<TObject> build() = 0;
 
     protected:
-        uint32_t _id;
-        ObjectType _type;
+        uint32_t _id {script::kObjectInvalid};
+        ObjectType _type {ObjectType::Invalid};
         std::string _tag;
         std::shared_ptr<scene::SceneNode> _sceneNode;
+        scene::SceneGraph *_sceneGraph {nullptr};
     };
 
     uint32_t id() const {
@@ -92,6 +105,7 @@ protected:
     ObjectType _type;
     std::string _tag;
     std::shared_ptr<scene::SceneNode> _sceneNode;
+    scene::SceneGraph &_sceneGraph;
 
     glm::vec3 _position {0.0f};
     float _facing {0.0f};
@@ -101,11 +115,13 @@ protected:
         uint32_t id,
         ObjectType type,
         std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode) :
+        std::shared_ptr<scene::SceneNode> sceneNode,
+        scene::SceneGraph &sceneGraph) :
         _id(id),
         _type(type),
         _tag(std::move(tag)),
-        _sceneNode(std::move(sceneNode)) {
+        _sceneNode(std::move(sceneNode)),
+        _sceneGraph(sceneGraph) {
     }
 
     virtual void flushTransform() {

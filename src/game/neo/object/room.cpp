@@ -21,7 +21,6 @@
 #include "../../../graphics/services.h"
 #include "../../../graphics/walkmeshes.h"
 #include "../../../scene/graph.h"
-#include "../../../scene/graphs.h"
 #include "../../../scene/node/model.h"
 #include "../../../scene/services.h"
 
@@ -39,26 +38,25 @@ namespace game {
 namespace neo {
 
 unique_ptr<Room> Room::Loader::load(const string &name, const glm::vec3 &position) {
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-
     shared_ptr<ModelSceneNode> sceneNode;
-    auto model = _services.graphics.models.get(name);
+    auto model = _graphicsSvc.models.get(name);
     if (model) {
-        sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
+        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Room, nullptr);
     }
 
     shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-    auto walkmesh = _services.graphics.walkmeshes.get(name, ResourceType::Wok);
+    auto walkmesh = _graphicsSvc.walkmeshes.get(name, ResourceType::Wok);
     if (walkmesh) {
-        walkmeshSceneNode = scene.newWalkmesh(move(walkmesh));
+        walkmeshSceneNode = _sceneGraph.newWalkmesh(move(walkmesh));
     }
 
     auto room = Room::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(name)
-        .sceneNode(move(sceneNode))
-        .walkmesh(move(walkmeshSceneNode))
-        .build();
+                    .id(_idSeq.nextObjectId())
+                    .tag(name)
+                    .sceneNode(move(sceneNode))
+                    .sceneGraph(&_sceneGraph)
+                    .walkmesh(move(walkmeshSceneNode))
+                    .build();
 
     room->setPosition(position);
 

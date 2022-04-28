@@ -22,9 +22,8 @@
 #include "../../../graphics/services.h"
 
 #include "../../camerastyles.h"
-#include "../../scene/graphs.h"
+#include "../../scene/graph.h"
 #include "../../scene/node/camera.h"
-#include "../../scene/services.h"
 #include "../../services.h"
 
 using namespace std;
@@ -149,20 +148,19 @@ void Camera::flushProjection() {
 }
 
 unique_ptr<Camera> Camera::Loader::load(int style) {
-    auto styleValue = _services.game.cameraStyles.get(style);
+    auto styleValue = _gameSvc.cameraStyles.get(style);
     if (!styleValue) {
         throw ValidationException("Camera style not found: " + to_string(style));
     }
 
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-
-    auto &options = _services.graphics.options;
+    auto &options = _graphicsSvc.options;
     float aspect = options.width / static_cast<float>(options.height);
 
     return Camera::Builder()
         .id(_idSeq.nextObjectId())
         .tag("main_camera")
-        .sceneNode(scene.newCamera())
+        .sceneNode(_sceneGraph.newCamera())
+        .sceneGraph(&_sceneGraph)
         .style(*styleValue)
         .aspect(aspect)
         .build();

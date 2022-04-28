@@ -24,15 +24,29 @@
 
 namespace reone {
 
-namespace resource {
+namespace scene {
 
-class GffStruct;
+class SceneGraph;
 
 }
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace resource {
+
+struct ResourceServices;
+
+class GffStruct;
+
+} // namespace resource
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
 namespace neo {
 
@@ -51,7 +65,7 @@ public:
         }
 
         std::unique_ptr<Module> build() override {
-            return std::make_unique<Module>(_id, _tag, _area, _pc);
+            return std::make_unique<Module>(_id, _tag, *_sceneGraph, _area, _pc);
         }
 
     private:
@@ -61,28 +75,41 @@ public:
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
             _idSeq(idSeq),
-            _services(services) {
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
         }
 
         std::unique_ptr<Module> load(const std::string &name);
 
     private:
         IObjectIdSequence &_idSeq;
-        ServicesView &_services;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
     };
 
     Module(
         uint32_t id,
         std::string tag,
+        scene::SceneGraph &sceneGraph,
         std::shared_ptr<Area> area,
         std::shared_ptr<Creature> pc) :
         Object(
             id,
             ObjectType::Module,
             std::move(tag),
-            nullptr),
+            nullptr,
+            sceneGraph),
         _area(std::move(area)),
         _pc(std::move(pc)) {
     }

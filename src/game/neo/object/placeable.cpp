@@ -24,9 +24,8 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
-#include "../../../scene/graphs.h"
+#include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
-#include "../../../scene/services.h"
 
 #include "../../services.h"
 
@@ -53,7 +52,7 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
 
     // From UTP
 
-    auto utp = _services.resource.gffs.get(templateResRef, ResourceType::Utp);
+    auto utp = _resourceSvc.gffs.get(templateResRef, ResourceType::Utp);
     if (!utp) {
         throw ValidationException("UTP not found: " + templateResRef);
     }
@@ -62,7 +61,7 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
 
     // From placeables 2DA
 
-    auto placeablesTable = _services.resource.twoDas.get("placeables");
+    auto placeablesTable = _resourceSvc.twoDas.get("placeables");
     if (!placeablesTable) {
         throw ValidationException("placeables 2DA not found");
     }
@@ -72,19 +71,19 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
 
     shared_ptr<ModelSceneNode> sceneNode;
 
-    auto model = _services.graphics.models.get(modelName);
+    auto model = _graphicsSvc.models.get(modelName);
     if (model) {
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        sceneNode = scene.newModel(move(model), ModelUsage::Placeable, nullptr);
+        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Placeable, nullptr);
     }
 
     // Make placeable
 
     auto placeable = Placeable::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(move(tag))
-        .sceneNode(move(sceneNode))
-        .build();
+                         .id(_idSeq.nextObjectId())
+                         .tag(move(tag))
+                         .sceneNode(move(sceneNode))
+                         .sceneGraph(&_sceneGraph)
+                         .build();
 
     placeable->setPosition(glm::vec3(x, y, z));
     placeable->setFacing(bearing);

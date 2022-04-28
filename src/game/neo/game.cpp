@@ -111,11 +111,11 @@ bool Game::handle(const SDL_Event &e) {
 void Game::loadModule(const string &name) {
     _services.game.resourceLayout.loadModuleResources(name);
 
-    auto newModule = Module::Loader(*this, _services).load(name);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
+    auto newModule = Module::Loader(*this, scene, _services.game, _services.graphics, _services.resource).load(name);
 
     _module = move(newModule);
 
-    auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
 
     // Rooms

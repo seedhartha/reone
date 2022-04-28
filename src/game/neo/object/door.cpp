@@ -24,9 +24,8 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
-#include "../../../scene/graphs.h"
+#include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
-#include "../../../scene/services.h"
 
 #include "../../services.h"
 
@@ -54,7 +53,7 @@ unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
 
     // From UTD
 
-    auto utd = _services.resource.gffs.get(templateResRef, ResourceType::Utd);
+    auto utd = _resourceSvc.gffs.get(templateResRef, ResourceType::Utd);
     if (!utd) {
         throw ValidationException("UTD not found: " + templateResRef);
     }
@@ -62,7 +61,7 @@ unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
 
     // From doortypes 2DA
 
-    auto genericDoorsTable = _services.resource.twoDas.get("genericdoors");
+    auto genericDoorsTable = _resourceSvc.twoDas.get("genericdoors");
     if (!genericDoorsTable) {
         throw ValidationException("genericdoors 2DA not found");
     }
@@ -72,19 +71,19 @@ unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
 
     shared_ptr<ModelSceneNode> sceneNode;
 
-    auto model = _services.graphics.models.get(modelName);
+    auto model = _graphicsSvc.models.get(modelName);
     if (model) {
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        sceneNode = scene.newModel(move(model), ModelUsage::Door, nullptr);
+        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Door, nullptr);
     }
 
     // Make door
 
     auto door = Door::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(move(tag))
-        .sceneNode(move(sceneNode))
-        .build();
+                    .id(_idSeq.nextObjectId())
+                    .tag(move(tag))
+                    .sceneNode(move(sceneNode))
+                    .sceneGraph(&_sceneGraph)
+                    .build();
 
     door->setPosition(glm::vec3(x, y, z));
     door->setFacing(bearing);
