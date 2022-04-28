@@ -27,6 +27,7 @@
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
 #include "../../scene/graphs.h"
+#include "../../scene/node/camera.h"
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"
 
@@ -50,12 +51,6 @@ void Game::init() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
 
     auto camera = scene.newCamera();
-    camera->setPerspectiveProjection(
-        glm::radians(90.0f),
-        _options.graphics.width / static_cast<float>(_options.graphics.height),
-        0.25f,
-        2500.0f);
-    _cameraController = make_unique<CameraController>(*camera);
     scene.setActiveCamera(move(camera));
 
     _playerController = make_unique<PlayerController>();
@@ -90,7 +85,9 @@ void Game::update() {
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
-    _cameraController->update(delta);
+    if (_module) {
+        _module->area().mainCamera().update(delta);
+    }
     _playerController->update(delta);
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
@@ -103,10 +100,10 @@ void Game::render() {
 }
 
 bool Game::handle(const SDL_Event &e) {
-    if (_playerController->handle(e)) {
+    if (_module && _module->area().mainCamera().handle(e)) {
         return true;
     }
-    if (_cameraController->handle(e)) {
+    if (_playerController->handle(e)) {
         return true;
     }
     return false;
@@ -121,6 +118,7 @@ void Game::loadModule(const string &name) {
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
+    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(_module->area().mainCamera().sceneNodePtr()));
 
     for (auto &room : _module->area().rooms()) {
         auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
@@ -140,64 +138,6 @@ void Game::loadModule(const string &name) {
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
     scene.addRoot(move(pcModel));
-}
-
-static constexpr float kCameraMouseSensitivity = 0.001f;
-static constexpr float kCameraMovementSpeedNormal = 5.0f;
-static constexpr float kCameraMovementSpeedHigh = 10.0f;
-
-bool Game::CameraController::handle(const SDL_Event &e) {
-    if (e.type == SDL_MOUSEMOTION) {
-        _yaw -= kCameraMouseSensitivity * static_cast<float>(e.motion.xrel);
-        _pitch -= kCameraMouseSensitivity * static_cast<float>(e.motion.yrel);
-        return true;
-    } else if (e.type == SDL_KEYDOWN) {
-        if (e.key.keysym.sym == SDLK_w) {
-            _forward = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_a) {
-            _left = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_s) {
-            _backward = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_d) {
-            _right = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_LSHIFT) {
-            _highSpeed = true;
-            return true;
-        }
-    } else if (e.type == SDL_KEYUP) {
-        if (e.key.keysym.sym == SDLK_w) {
-            _forward = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_a) {
-            _left = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_s) {
-            _backward = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_d) {
-            _right = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_LSHIFT) {
-            _highSpeed = false;
-            return true;
-        }
-    }
-    return false;
-}
-
-void Game::CameraController::update(float delta) {
-    float speed = _highSpeed ? kCameraMovementSpeedHigh : kCameraMovementSpeedNormal;
-
-    auto transform = glm::translate(_sceneNode.getOrigin());
-    transform *= glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-    transform *= glm::translate(delta * speed * glm::vec3(_right - _left, 0.0f, _backward - _forward));
-
-    _sceneNode.setLocalTransform(move(transform));
 }
 
 static constexpr float kPlayerOrientationSpeed = 1.0f;

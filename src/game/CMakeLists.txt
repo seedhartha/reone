@@ -200,14 +200,6 @@ set(GAME_HEADERS
     layout.h
     layouts.h
     location.h
-    neo/game.h
-    neo/object.h
-    neo/object/area.h
-    neo/object/creature.h
-    neo/object/door.h
-    neo/object/module.h
-    neo/object/placeable.h
-    neo/object/room.h
     object.h
     object/area.h
     object/creature.h
@@ -415,13 +407,6 @@ set(GAME_SOURCES
     gui/selectoverlay.cpp
     guisounds.cpp
     layouts.cpp
-    neo/game.cpp
-    neo/object/area.cpp
-    neo/object/creature.cpp
-    neo/object/door.cpp
-    neo/object/module.cpp
-    neo/object/placeable.cpp
-    neo/object/room.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
@@ -454,7 +439,28 @@ set(GAME_SOURCES
     surfaces.cpp
     visibilities.cpp)
 
-add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
+set(GAME_NEO_HEADERS
+    neo/game.h
+    neo/object.h
+    neo/object/area.h
+    neo/object/camera.h
+    neo/object/creature.h
+    neo/object/door.h
+    neo/object/module.h
+    neo/object/placeable.h
+    neo/object/room.h)
+
+set(GAME_NEO_SOURCES
+    neo/game.cpp
+    neo/object/area.cpp
+    neo/object/camera.cpp
+    neo/object/creature.cpp
+    neo/object/door.cpp
+    neo/object/module.cpp
+    neo/object/placeable.cpp
+    neo/object/room.cpp)
+
+add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${GAME_HEADERS} ${GAME_NEO_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(game PUBLIC script gui scene movie audio graphics resource common)

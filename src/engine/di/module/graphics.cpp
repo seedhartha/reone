@@ -41,6 +41,7 @@ void GraphicsModule::init() {
     _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
 
     _services = make_unique<GraphicsServices>(
+        _options,
         *_fonts,
         *_graphicsContext,
         *_lipAnimations,
