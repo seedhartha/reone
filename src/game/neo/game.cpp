@@ -33,6 +33,7 @@
 
 #include "../options.h"
 #include "../resourcelayout.h"
+#include "../surfaces.h"
 
 #include "object/module.h"
 
@@ -57,6 +58,15 @@ void Game::init() {
 
     _services.graphics.window.setEventHandler(this);
     _services.graphics.window.setRelativeMouseMode(true);
+
+    auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
+    auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
+    auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
+    for (auto &scene : _services.scene.graphs.scenes()) {
+        scene.second->setWalkableSurfaces(walkableSurfaces);
+        scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
+        scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
+    }
 }
 
 void Game::run() {
