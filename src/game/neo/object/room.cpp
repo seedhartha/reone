@@ -19,6 +19,7 @@
 
 #include "../../../graphics/models.h"
 #include "../../../graphics/services.h"
+#include "../../../graphics/walkmeshes.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/model.h"
@@ -28,6 +29,7 @@
 
 using namespace std;
 
+using namespace reone::resource;
 using namespace reone::scene;
 
 namespace reone {
@@ -38,17 +40,29 @@ namespace neo {
 
 unique_ptr<Room> Room::Loader::load(const string &name, const glm::vec3 &position) {
     auto &scene = _services.scene.graphs.get(kSceneMain);
+
+    shared_ptr<ModelSceneNode> sceneNode;
     auto model = _services.graphics.models.get(name);
-    auto sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
+    if (model) {
+        sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
+    }
 
-    auto transform = glm::translate(position);
-    sceneNode->setLocalTransform(move(transform));
+    shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
+    auto walkmesh = _services.graphics.walkmeshes.get(name, ResourceType::Wok);
+    if (walkmesh) {
+        walkmeshSceneNode = scene.newWalkmesh(move(walkmesh));
+    }
 
-    return Room::Builder()
+    auto room = Room::Builder()
         .id(_idSeq.nextObjectId())
         .tag(name)
         .sceneNode(move(sceneNode))
+        .walkmesh(move(walkmeshSceneNode))
         .build();
+
+    room->setPosition(position);
+
+    return move(room);
 }
 
 } // namespace neo

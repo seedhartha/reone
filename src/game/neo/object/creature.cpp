@@ -43,6 +43,13 @@ namespace neo {
 
 static const string kHeadHookNodeName = "headhook";
 
+bool Creature::moveForward(float delta) {
+    auto dir = glm::vec2(-glm::sin(_facing), glm::cos(_facing));
+    _position += delta * 5.0f * glm::vec3(dir, 0.0f);
+    flushTransform();
+    return true;
+}
+
 unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
     // From GIT entry
 
@@ -94,19 +101,20 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
                 sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
             }
         }
-
-        auto transform = glm::translate(glm::vec3(xPosition, yPosition, zPosition));
-        transform *= glm::rotate(-glm::atan(xOrientation, yOrientation), glm::vec3(0.0f, 0.0f, 1.0f));
-        sceneNode->setLocalTransform(move(transform));
     }
 
     // Make creature
 
-    return Creature::Builder()
+    auto creature = Creature::Builder()
         .id(_idSeq.nextObjectId())
         .tag(move(tag))
         .sceneNode(move(sceneNode))
         .build();
+
+    creature->setPosition(glm::vec3(xPosition, yPosition, zPosition));
+    creature->setFacing(-glm::atan(xOrientation, yOrientation));
+
+    return move(creature);
 }
 
 } // namespace neo

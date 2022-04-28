@@ -86,6 +86,8 @@ public:
         _aspect(aspect) {
 
         flushProjection();
+
+        _pitch = glm::half_pi<float>();
     }
 
     bool handle(const SDL_Event &e);
@@ -109,13 +111,8 @@ private:
 
     Mode _mode {Mode::Flycam};
     scene::SceneNode *_hook {nullptr};
-    glm::vec3 _position {0.0f};
 
-    // Orientation
-    float _facing {0.0f};
-    float _pitch {glm::half_pi<float>()};
-
-    // Movement
+    // Controls
     float _forward {0.0f};
     float _left {0.0f};
     float _backward {0.0f};
@@ -128,7 +125,6 @@ private:
     void updateFlycam(float delta);
 
     void flushProjection();
-    void flushTransform();
 };
 
 } // namespace neo

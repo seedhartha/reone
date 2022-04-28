@@ -125,6 +125,10 @@ void Game::loadModule(const string &name) {
         if (model) {
             scene.addRoot(move(model));
         }
+        auto walkmesh = room->walkmeshPtr();
+        if (walkmesh) {
+            scene.addRoot(move(walkmesh));
+        }
     }
 
     // Objects
@@ -152,8 +156,6 @@ void Game::loadModule(const string &name) {
     _playerController->setCreature(&pc);
     _playerController->setCamera(&camera);
 }
-
-static constexpr float kPlayerMoveSpeed = 3.96f;
 
 bool Game::PlayerController::handle(const SDL_Event &e) {
     if (e.type == SDL_KEYDOWN) {
@@ -189,29 +191,20 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
 }
 
 void Game::PlayerController::update(float delta) {
+    float facing;
     if (_forward != 0.0f && _backward == 0.0f) {
-        _facing = _camera->facing();
+        facing = _camera->facing();
     } else if (_forward == 0.0f && _backward != 0.0f) {
-        _facing = glm::mod(_camera->facing() + glm::pi<float>(), glm::two_pi<float>());
+        facing = glm::mod(_camera->facing() + glm::pi<float>(), glm::two_pi<float>());
     } else if (_left != 0.0f && _right == 0.0f) {
-        _facing = glm::mod(_camera->facing() + glm::half_pi<float>(), glm::two_pi<float>());
+        facing = glm::mod(_camera->facing() + glm::half_pi<float>(), glm::two_pi<float>());
     } else if (_left == 0.0f && _right != 0.0f) {
-        _facing = glm::mod(_camera->facing() - glm::half_pi<float>(), glm::two_pi<float>());
+        facing = glm::mod(_camera->facing() - glm::half_pi<float>(), glm::two_pi<float>());
     } else {
         return;
     }
-
-    _position += delta * kPlayerMoveSpeed * glm::vec3(-glm::sin(_facing), glm::cos(_facing), 0.0f);
-
-    auto transform = glm::translate(_position);
-    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
-
-    _creature->sceneNode().setLocalTransform(move(transform));
-}
-
-void Game::PlayerController::setCreature(Creature *creature) {
-    _creature = creature;
-    _position = creature->sceneNode().getOrigin();
+    _creature->setFacing(facing);
+    _creature->moveForward(delta);
 }
 
 void Game::WorldRenderer::render() {

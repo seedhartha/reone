@@ -66,6 +66,8 @@ public:
             std::move(tag),
             std::move(sceneNode)) {
     }
+
+    bool moveForward(float delta);
 };
 
 } // namespace neo

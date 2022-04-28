@@ -81,7 +81,9 @@ private:
         bool handle(const SDL_Event &e);
         void update(float delta);
 
-        void setCreature(Creature *creature);
+        void setCreature(Creature *creature) {
+            _creature = creature;
+        }
 
         void setCamera(Camera *camera) {
             _camera = camera;
@@ -91,10 +93,7 @@ private:
         Creature *_creature {nullptr};
         Camera *_camera {nullptr};
 
-        glm::vec3 _position {0.0f};
-        float _facing {0.0f};
-
-        // Movement
+        // Controls
         float _forward {0.0f};
         float _left {0.0f};
         float _backward {0.0f};
