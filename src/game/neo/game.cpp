@@ -136,23 +136,24 @@ void Game::loadModule(const string &name) {
         }
     }
 
-    // Main camera
-
-    auto &mainCamera = _module->area().mainCamera();
-    mainCamera.setMode(Camera::Mode::ThirdPerson);
-    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(mainCamera.sceneNodePtr()));
-
-    // Player character
+    // Player character / camera
 
     auto &pc = _module->pc();
-    _playerController->setCreature(pc);
+    auto &camera = _module->area().mainCamera();
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
-    pcModel->attach(kCameraHookNodeName, mainCamera.sceneNodePtr());
-    scene.addRoot(move(pcModel));
+    auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);
+    scene.addRoot(pcModel);
+
+    camera.setMode(Camera::Mode::ThirdPerson);
+    camera.setThirdPersonHook(pcCameraHook.get());
+    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()));
+
+    _playerController->setCreature(&pc);
+    _playerController->setCamera(&camera);
 }
 
-static constexpr float kPlayerMoveSpeed = 1.0f;
+static constexpr float kPlayerMoveSpeed = 3.96f;
 
 bool Game::PlayerController::handle(const SDL_Event &e) {
     if (e.type == SDL_KEYDOWN) {
@@ -188,13 +189,29 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
 }
 
 void Game::PlayerController::update(float delta) {
-    auto &sceneNode = _creature->sceneNode();
+    if (_forward != 0.0f && _backward == 0.0f) {
+        _facing = _camera->facing();
+    } else if (_forward == 0.0f && _backward != 0.0f) {
+        _facing = glm::mod(_camera->facing() + glm::pi<float>(), glm::two_pi<float>());
+    } else if (_left != 0.0f && _right == 0.0f) {
+        _facing = glm::mod(_camera->facing() + glm::half_pi<float>(), glm::two_pi<float>());
+    } else if (_left == 0.0f && _right != 0.0f) {
+        _facing = glm::mod(_camera->facing() - glm::half_pi<float>(), glm::two_pi<float>());
+    } else {
+        return;
+    }
 
-    auto transform = glm::translate(sceneNode.getOrigin());
-    transform *= glm::rotate(_bearing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::translate(delta * kPlayerMoveSpeed * glm::vec3(_right - _left, _forward - _backward, 0.0f));
+    _position += delta * kPlayerMoveSpeed * glm::vec3(-glm::sin(_facing), glm::cos(_facing), 0.0f);
 
-    sceneNode.setLocalTransform(move(transform));
+    auto transform = glm::translate(_position);
+    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    _creature->sceneNode().setLocalTransform(move(transform));
+}
+
+void Game::PlayerController::setCreature(Creature *creature) {
+    _creature = creature;
+    _position = creature->sceneNode().getOrigin();
 }
 
 void Game::WorldRenderer::render() {
