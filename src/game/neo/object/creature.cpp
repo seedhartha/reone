@@ -23,6 +23,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
+#include "../../scene/collision.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 
@@ -40,11 +41,20 @@ namespace game {
 
 namespace neo {
 
+static constexpr float kCreatureMoveSpeed = 3.96f;
+
 static const string kHeadHookNodeName = "headhook";
 
 bool Creature::moveForward(float delta) {
     auto dir = glm::vec2(-glm::sin(_facing), glm::cos(_facing));
-    _position += delta * 5.0f * glm::vec3(dir, 0.0f);
+    auto newPosition = glm::vec2(_position) + delta * kCreatureMoveSpeed * dir;
+
+    Collision collision;
+    if (!_sceneGraph.testElevation(glm::vec2(newPosition), collision)) {
+        return false;
+    }
+
+    _position = glm::vec3(newPosition, collision.intersection.z);
     flushTransform();
     return true;
 }
