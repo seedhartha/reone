@@ -148,14 +148,6 @@ void Camera::flushProjection() {
                                                                          kDefaultClipFar);
 }
 
-void Camera::flushTransform() {
-    auto transform = glm::translate(_position);
-    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-
-    static_cast<CameraSceneNode &>(*_sceneNode).setLocalTransform(move(transform));
-}
-
 unique_ptr<Camera> Camera::Loader::load(int style) {
     auto styleValue = _services.game.cameraStyles.get(style);
     if (!styleValue) {

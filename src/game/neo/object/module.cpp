@@ -68,17 +68,15 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
     auto &scene = _services.scene.graphs.get(kSceneMain);
     auto model = _services.graphics.models.get("PMBTest");
 
-    auto pcTransform = glm::translate(glm::vec3(entryX, entryY, entryZ));
-    pcTransform *= glm::rotate(-glm::atan(entryDirX, entryDirY), glm::vec3(0.0f, 0.0f, 1.0f));
-
     auto pcSceneNode = scene.newModel(move(model), ModelUsage::Creature, nullptr);
-    pcSceneNode->setLocalTransform(move(pcTransform));
-
     auto pc = Creature::Builder()
                   .id(_idSeq.nextObjectId())
                   .tag(kObjectTagPlayer)
                   .sceneNode(move(pcSceneNode))
                   .build();
+
+    pc->setPosition(glm::vec3(entryX, entryY, entryZ));
+    pc->setFacing(-glm::atan(entryDirX, entryDirY));
 
     // Make module
 

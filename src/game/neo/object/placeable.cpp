@@ -76,19 +76,20 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
     if (model) {
         auto &scene = _services.scene.graphs.get(kSceneMain);
         sceneNode = scene.newModel(move(model), ModelUsage::Placeable, nullptr);
-
-        auto transform = glm::translate(glm::vec3(x, y, z));
-        transform *= glm::rotate(bearing, glm::vec3(0.0f, 0.0f, 1.0f));
-        sceneNode->setLocalTransform(move(transform));
     }
 
     // Make placeable
 
-    return Placeable::Builder()
+    auto placeable = Placeable::Builder()
         .id(_idSeq.nextObjectId())
         .tag(move(tag))
         .sceneNode(move(sceneNode))
         .build();
+
+    placeable->setPosition(glm::vec3(x, y, z));
+    placeable->setFacing(bearing);
+
+    return move(placeable);
 }
 
 } // namespace neo

@@ -77,11 +77,25 @@ public:
         return _sceneNode;
     }
 
+    void setPosition(glm::vec3 position) {
+        _position = std::move(position);
+        flushTransform();
+    }
+
+    void setFacing(float facing) {
+        _facing = facing;
+        flushTransform();
+    }
+
 protected:
     uint32_t _id;
     ObjectType _type;
     std::string _tag;
     std::shared_ptr<scene::SceneNode> _sceneNode;
+
+    glm::vec3 _position {0.0f};
+    float _facing {0.0f};
+    float _pitch {0.0f};
 
     Object(
         uint32_t id,
@@ -92,6 +106,13 @@ protected:
         _type(type),
         _tag(std::move(tag)),
         _sceneNode(std::move(sceneNode)) {
+    }
+
+    virtual void flushTransform() {
+        auto transform = glm::translate(_position);
+        transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+        transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+        _sceneNode->setLocalTransform(std::move(transform));
     }
 };
 
