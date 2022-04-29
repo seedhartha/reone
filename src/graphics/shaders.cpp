@@ -53,6 +53,7 @@ void Shaders::init() {
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslHash, g_glslHashedAlphaTest, g_glslEnvironmentMapping, g_glslNormalMapping, g_fsModelOpaque});
     auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslEnvironmentMapping, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
+    auto fsAABB = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsAABB});
     auto fsWalkmesh = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_fsWalkmesh});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
@@ -78,6 +79,7 @@ void Shaders::init() {
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spModelOpaque = initShaderProgram({vsModel, fsModelOpaque});
     _spModelTransparent = initShaderProgram({vsModel, fsModelTransparent});
+    _spAABB = initShaderProgram({vsClipSpace, fsAABB});
     _spWalkmesh = initShaderProgram({vsWalkmesh, fsWalkmesh});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
@@ -110,6 +112,7 @@ void Shaders::deinit() {
     _spDirectionalLightShadows.reset();
     _spModelOpaque.reset();
     _spModelTransparent.reset();
+    _spAABB.reset();
     _spWalkmesh.reset();
     _spBillboard.reset();
     _spParticle.reset();

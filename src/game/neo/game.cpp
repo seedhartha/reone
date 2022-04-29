@@ -31,6 +31,7 @@
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"
 
+#include "../debug.h"
 #include "../options.h"
 #include "../resourcelayout.h"
 #include "../surfaces.h"
@@ -54,8 +55,12 @@ static const string kCameraHookNodeName = "camerahook";
 
 void Game::init() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
+    scene.setDrawAABB(isShowAABBEnabled());
+    scene.setDrawWalkmeshes(isShowWalkmeshEnabled());
+    scene.setDrawTriggers(isShowTriggersEnabled());
 
     _playerController = make_unique<PlayerController>();
+    _selectionController = make_unique<SelectionController>(scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
     _services.graphics.window.setEventHandler(this);
@@ -73,7 +78,7 @@ void Game::init() {
 
 void Game::run() {
     auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
-    loadModule("end_m01aa");
+    loadModule(moduleName);
 
     while (!_finished) {
         handleInput();
@@ -112,6 +117,9 @@ void Game::render() {
 
 bool Game::handle(const SDL_Event &e) {
     if (_playerController->handle(e)) {
+        return true;
+    }
+    if (_selectionController->handle(e)) {
         return true;
     }
     if (_module && _module->area().mainCamera().handle(e)) {
@@ -158,17 +166,17 @@ void Game::loadModule(const string &name) {
             }
         } else if (object->type() == ObjectType::Door) {
             auto &door = static_cast<Door &>(*object);
-            auto walkmesh0 = door.walkmeshClosedPtr();
-            if (walkmesh0) {
-                scene.addRoot(move(walkmesh0));
+            auto walkmeshClosed = door.walkmeshClosedPtr();
+            if (walkmeshClosed) {
+                scene.addRoot(move(walkmeshClosed));
             }
-            auto walkmesh1 = door.walkmeshOpen1Ptr();
-            if (walkmesh1) {
-                scene.addRoot(move(walkmesh1));
+            auto walkmeshOpen1 = door.walkmeshOpen1Ptr();
+            if (walkmeshOpen1) {
+                scene.addRoot(move(walkmeshOpen1));
             }
-            auto walkmesh2 = door.walkmeshOpen2Ptr();
-            if (walkmesh2) {
-                scene.addRoot(move(walkmesh2));
+            auto walkmeshOpen2 = door.walkmeshOpen2Ptr();
+            if (walkmeshOpen2) {
+                scene.addRoot(move(walkmeshOpen2));
             }
         }
     }
@@ -188,6 +196,12 @@ void Game::loadModule(const string &name) {
 
     _playerController->setCreature(&pc);
     _playerController->setCamera(&camera);
+
+    _selectionController->setPC(&pc);
+
+    //
+
+    _services.graphics.window.setRelativeMouseMode(false);
 }
 
 bool Game::PlayerController::handle(const SDL_Event &e) {
@@ -238,6 +252,25 @@ void Game::PlayerController::update(float delta) {
     }
     _creature->setFacing(facing);
     _creature->moveForward(delta);
+}
+
+bool Game::SelectionController::handle(const SDL_Event &e) {
+    if (e.type == SDL_MOUSEMOTION) {
+        auto hoveredSceneNode = _sceneGraph.pickModelAt(e.motion.x, e.motion.y, _pc);
+        if (hoveredSceneNode) {
+            _hoveredObject = static_cast<Object *>(hoveredSceneNode->user());
+            debug("Object hovered on: " + to_string(_hoveredObject->id()) + "[" + _hoveredObject->tag() + "]");
+        } else {
+            _hoveredObject = nullptr;
+        }
+        return true;
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN && _hoveredObject) {
+        _clickedObject = _hoveredObject;
+        debug("Object clicked on: " + to_string(_clickedObject->id()) + "[" + _clickedObject->tag() + "]");
+        return true;
+    }
+    return false;
 }
 
 void Game::WorldRenderer::render() {

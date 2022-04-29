@@ -258,7 +258,7 @@ void MeshSceneNode::draw() {
         }
     });
 
-    auto skin = mesh->skin;
+    auto &skin = mesh->skin;
     if (skin) {
         _uniforms.setSkeletal([this, &skin](auto &skeletal) {
             for (size_t i = 0; i < kMaxBones; ++i) {

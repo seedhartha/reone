@@ -109,6 +109,9 @@ unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
                 sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
             }
         }
+
+        sceneNode->setCullable(true);
+        sceneNode->setPickable(true);
     }
 
     // Make creature

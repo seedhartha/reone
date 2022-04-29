@@ -21,9 +21,11 @@ namespace reone {
 
 namespace game {
 
+bool isShowAABBEnabled();
 bool isShowWalkmeshEnabled();
 bool isShowTriggersEnabled();
 
+void setShowAABB(bool show);
 void setShowWalkmesh(bool show);
 void setShowTriggers(bool show);
 

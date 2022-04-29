@@ -433,23 +433,28 @@ void SceneGraph::drawOpaque() {
             walkmesh.materials[kMaxWalkmeshMaterials - 1] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); // triggers
         });
     }
+
+    // Draw opaque meshes
+    for (auto &mesh : _opaqueMeshes) {
+        mesh->draw();
+    }
+    // Draw opaque leafs
+    for (auto &[node, leafs] : _opaqueLeafs) {
+        node->drawLeafs(leafs);
+    }
+
+    if (_drawAABB) {
+        for (auto &model : _modelRoots) {
+            model->drawAABB();
+        }
+    }
     if (_drawWalkmeshes) {
-        // Draw walkmeshes if enabled
         for (auto &walkmesh : _walkmeshRoots) {
             if (walkmesh->isEnabled()) {
                 walkmesh->draw();
             }
         }
-    } else {
-        // Draw opaque meshes
-        for (auto &mesh : _opaqueMeshes) {
-            mesh->draw();
-        }
-        // Draw opaque leafs
-        for (auto &[node, leafs] : _opaqueLeafs) {
-            node->drawLeafs(leafs);
-        }
-    }
+    } 
     if (_drawTriggers) {
         for (auto &trigger : _triggerRoots) {
             trigger->draw();

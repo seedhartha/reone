@@ -21,8 +21,13 @@ namespace reone {
 
 namespace game {
 
+static bool g_showAABB = false;
 static bool g_showWalkmesh = false;
 static bool g_showTriggers = false;
+
+bool isShowAABBEnabled() {
+    return g_showAABB;
+}
 
 bool isShowWalkmeshEnabled() {
     return g_showWalkmesh;
@@ -30,6 +35,10 @@ bool isShowWalkmeshEnabled() {
 
 bool isShowTriggersEnabled() {
     return g_showTriggers;
+}
+
+void setShowAABB(bool show) {
+    g_showAABB = show;
 }
 
 void setShowWalkmesh(bool show) {

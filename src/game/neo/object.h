@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../scene/node.h"
+#include "../../scene/user.h"
 #include "../../script/types.h"
 
 #include "../types.h"
@@ -39,7 +40,7 @@ public:
     virtual uint32_t nextObjectId() = 0;
 };
 
-class Object : boost::noncopyable {
+class Object : public scene::IUser, boost::noncopyable {
 public:
     template <class TObject, class TBuilder>
     class Builder : boost::noncopyable {
@@ -80,6 +81,10 @@ public:
 
     ObjectType type() const {
         return _type;
+    }
+
+    const std::string &tag() const {
+        return _tag;
     }
 
     scene::SceneNode &sceneNode() const {

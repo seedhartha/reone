@@ -59,12 +59,16 @@ public:
         }
 
         std::unique_ptr<Placeable> build() override {
-            return std::make_unique<Placeable>(
+            auto placeable = std::make_unique<Placeable>(
                 _id,
                 _tag,
                 _sceneNode,
                 *_sceneGraph,
                 _walkmesh);
+            if (_sceneNode) {
+                _sceneNode->setUser(*placeable);
+            }
+            return std::move(placeable);
         }
 
     private:

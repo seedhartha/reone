@@ -39,6 +39,9 @@ void GraphicsContext::init() {
     setBlendMode(BlendMode::None);
     _blendModes.push(BlendMode::None);
 
+    setPolygonMode(PolygonMode::Fill);
+    _polygonModes.push(PolygonMode::Fill);
+
     glm::ivec4 viewport(0.0f);
     glGetIntegerv(GL_VIEWPORT, &viewport[0]);
     _viewports.push(move(viewport));
@@ -101,6 +104,20 @@ void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> 
 
     _cullFaceModes.pop();
     setCullFaceMode(_cullFaceModes.top());
+}
+
+void GraphicsContext::withPolygonMode(PolygonMode mode, const function<void()> &block) {
+    if (_polygonModes.top() == mode) {
+        block();
+        return;
+    }
+    setPolygonMode(mode);
+    _polygonModes.push(mode);
+
+    block();
+
+    _polygonModes.pop();
+    setPolygonMode(_polygonModes.top());
 }
 
 void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &block) {
@@ -185,6 +202,14 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
             glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
             break;
         }
+    }
+}
+
+void GraphicsContext::setPolygonMode(PolygonMode mode) {
+    if (mode == PolygonMode::Line) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
 

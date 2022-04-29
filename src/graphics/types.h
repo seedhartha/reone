@@ -66,11 +66,6 @@ enum class TGADataType {
     RGBA_RLE = 10
 };
 
-enum class PolygonMode {
-    Fill,
-    Line
-};
-
 enum class PixelFormat {
     R8,
     R16F,
@@ -116,6 +111,11 @@ enum class BlendMode {
     Additive,
     Lighten,
     OIT_Transparent
+};
+
+enum class PolygonMode {
+    Fill,
+    Line
 };
 
 enum class TextGravity {

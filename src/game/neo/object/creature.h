@@ -52,7 +52,11 @@ public:
     class Builder : public Object::Builder<Creature, Builder> {
     public:
         std::unique_ptr<Creature> build() override {
-            return std::make_unique<Creature>(_id, _tag, _sceneNode, *_sceneGraph);
+            auto creature = std::make_unique<Creature>(_id, _tag, _sceneNode, *_sceneGraph);
+            if (_sceneNode) {
+                _sceneNode->setUser(*creature);
+            }
+            return std::move(creature);
         }
     };
 

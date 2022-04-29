@@ -40,7 +40,7 @@ public:
 
     bool isEmpty() const { return _empty; }
 
-    glm::vec3 getSize() const;
+    glm::vec3 size() const;
 
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
