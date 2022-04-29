@@ -145,6 +145,12 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::write_json(jsonPath.string(), tree);
 }
 
+static string sanitizeXmlElementName(const std::string &s) {
+    auto sanitized = s;
+    boost::replace_all(sanitized, " ", "_");
+    return move(sanitized);
+}
+
 static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int index = -1) {
     printer.OpenElement("struct");
     printer.PushAttribute("type", gff.type());
@@ -153,8 +159,14 @@ static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int inde
     }
 
     for (auto &field : gff.fields()) {
-        printer.OpenElement(field.label.c_str());
+        auto sanitizedName = sanitizeXmlElementName(field.label);
+        printer.OpenElement(sanitizedName.c_str());
+        if (sanitizedName != field.label) {
+            printer.PushAttribute("name", field.label.c_str());
+        }
+
         printer.PushAttribute("type", static_cast<int>(field.type));
+
         switch (field.type) {
         case GffFieldType::CExoLocString:
             printer.PushAttribute("strref", field.intValue);
@@ -186,6 +198,7 @@ static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int inde
             printer.PushAttribute("value", field.toString().c_str());
             break;
         }
+
         printer.CloseElement();
     }
 
@@ -310,12 +323,7 @@ static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
     return move(gffs);
 }
 
-void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
-    if (path.extension() != ".json") {
-        cerr << "Input file must have extension '.json'" << endl;
-        return;
-    }
-
+static void convertJsonToGff(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::read_json(path.string(), tree);
 
@@ -328,6 +336,121 @@ void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
 
     GffWriter writer(resType, treeToGffStruct(tree));
     writer.save(gffPath);
+}
+
+static unique_ptr<GffStruct> elementToGffStruct(const XMLElement &element) {
+    if (strncmp(element.Name(), "struct", 6) != 0) {
+        throw invalid_argument("XML element must have name 'struct'");
+    }
+
+    auto structType = element.UnsignedAttribute("type");
+    auto gffStruct = make_unique<GffStruct>(structType);
+
+    for (auto fieldElement = element.FirstChildElement(); fieldElement; fieldElement = fieldElement->NextSiblingElement()) {
+        auto fieldType = static_cast<GffFieldType>(fieldElement->IntAttribute("type"));
+        auto maybeName = fieldElement->Attribute("name");
+        auto fieldName = maybeName ? maybeName : fieldElement->Name();
+        auto field = GffField(fieldType, fieldName);
+
+        switch (fieldType) {
+        case GffFieldType::Byte:
+        case GffFieldType::Word:
+        case GffFieldType::Dword:
+            field.uintValue = fieldElement->UnsignedAttribute("value");
+            break;
+        case GffFieldType::Char:
+        case GffFieldType::Short:
+        case GffFieldType::Int:
+            field.intValue = fieldElement->IntAttribute("value");
+            break;
+        case GffFieldType::Dword64:
+            field.uint64Value = fieldElement->Unsigned64Attribute("value");
+            break;
+        case GffFieldType::Int64:
+            field.int64Value = fieldElement->Int64Attribute("value");
+            break;
+        case GffFieldType::Float:
+            field.floatValue = fieldElement->FloatAttribute("value");
+            break;
+        case GffFieldType::Double:
+            field.doubleValue = fieldElement->DoubleAttribute("value");
+            break;
+        case GffFieldType::CExoString:
+        case GffFieldType::ResRef:
+            field.strValue = fieldElement->Attribute("value");
+            break;
+        case GffFieldType::CExoLocString:
+            field.intValue = fieldElement->IntAttribute("strref");
+            field.strValue = fieldElement->Attribute("substring");
+            break;
+        case GffFieldType::Void:
+            field.data = unhexify(fieldElement->Attribute("data"));
+            break;
+        case GffFieldType::Struct:
+            field.children.push_back(elementToGffStruct(*fieldElement->FirstChildElement()));
+            break;
+        case GffFieldType::List:
+            for (auto listElement = fieldElement->FirstChildElement(); listElement; listElement = listElement->NextSiblingElement()) {
+                field.children.push_back(elementToGffStruct(*listElement));
+            }
+            break;
+        case GffFieldType::Orientation:
+            field.quatValue = glm::quat(
+                fieldElement->FloatAttribute("w"),
+                fieldElement->FloatAttribute("x"),
+                fieldElement->FloatAttribute("y"),
+                fieldElement->FloatAttribute("z"));
+            break;
+        case GffFieldType::Vector:
+            field.vecValue = glm::vec3(
+                fieldElement->FloatAttribute("x"),
+                fieldElement->FloatAttribute("y"),
+                fieldElement->FloatAttribute("z"));
+            break;
+        default:
+            throw logic_error("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
+        }
+
+        gffStruct->add(move(field));
+    }
+
+    return move(gffStruct);
+}
+
+static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
+    auto fp = fopen(path.string().c_str(), "rb");
+
+    auto document = XMLDocument();
+    document.LoadFile(fp);
+
+    auto rootElement = document.RootElement();
+    if (!rootElement) {
+        cerr << "XML is empty" << endl;
+        fclose(fp);
+        return;
+    }
+
+    auto extensionless = path;
+    extensionless.replace_extension();
+    auto resType = getResTypeByExt(extensionless.extension().string().substr(1));
+
+    auto gffPath = destPath;
+    gffPath.append(extensionless.filename().string());
+
+    auto writer = GffWriter(resType, elementToGffStruct(*rootElement));
+    writer.save(gffPath);
+
+    fclose(fp);
+}
+
+void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
+    if (path.extension() == ".json") {
+        convertJsonToGff(path, destPath);
+    } else if (path.extension() == ".xml") {
+        convertXmlToGff(path, destPath);
+    } else {
+        cerr << "Input file must have either JSON or XML extension" << endl;
+    }
 }
 
 bool GffTool::supports(Operation operation, const fs::path &target) const {

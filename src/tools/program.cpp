@@ -107,7 +107,7 @@ void Program::initOptions() {
         ("to-xml", "convert GFF to XML")                                                   //
         ("to-tga", "convert TPC image to TGA")                                             //
         ("to-2da", "convert JSON to 2DA")                                                  //
-        ("to-gff", "convert JSON to GFF")                                                  //
+        ("to-gff", "convert JSON or XML to GFF")                                           //
         ("to-rim", "create RIM archive from directory")                                    //
         ("to-erf", "create ERF archive from directory")                                    //
         ("to-mod", "create MOD archive from directory")                                    //
