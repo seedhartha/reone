@@ -87,6 +87,8 @@ unique_ptr<Placeable> Placeable::Loader::load(const GffStruct &gitEntry) {
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Placeable, nullptr);
+        sceneNode->setCullable(true);
+        sceneNode->setPickable(true);
     }
 
     shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;

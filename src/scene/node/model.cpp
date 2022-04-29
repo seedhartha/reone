@@ -18,7 +18,10 @@
 #include "../../common/collectionutil.h"
 #include "../../common/logutil.h"
 #include "../../graphics/animation.h"
+#include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
 
 #include "../graph.h"
 #include "../types.h"
@@ -110,6 +113,20 @@ void ModelSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     for (auto &leaf : leafs) {
         static_cast<MeshSceneNode *>(leaf)->draw();
     }
+}
+
+void ModelSceneNode::drawAABB() {
+    _graphicsContext.withPolygonMode(PolygonMode::Line, [this]() {
+        _uniforms.setGeneral([this](auto &u) {
+            u.resetLocals();
+            u.model = _absTransform;
+            u.model *= glm::translate(_aabb.center());
+            u.model *= glm::scale(0.5f * _aabb.size());
+            u.modelInv = glm::inverse(u.model);
+        });
+        _shaders.use(_shaders.aabb());
+        _meshes.box().draw();
+    });
 }
 
 void ModelSceneNode::computeAABB() {

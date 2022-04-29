@@ -155,7 +155,7 @@ bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDista
     return true;
 }
 
-glm::vec3 AABB::getSize() const {
+glm::vec3 AABB::size() const {
     return _max - _min;
 }
 

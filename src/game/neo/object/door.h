@@ -69,7 +69,7 @@ public:
         }
 
         std::unique_ptr<Door> build() override {
-            return std::make_unique<Door>(
+            auto door = std::make_unique<Door>(
                 _id,
                 _tag,
                 _sceneNode,
@@ -77,6 +77,10 @@ public:
                 _walkmeshClosed,
                 _walkmeshOpen1,
                 _walkmeshOpen2);
+            if (_sceneNode) {
+                _sceneNode->setUser(*door);
+            }
+            return std::move(door);
         }
 
     private:

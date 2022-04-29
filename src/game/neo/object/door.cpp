@@ -92,6 +92,8 @@ unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Door, nullptr);
+        sceneNode->setCullable(true);
+        sceneNode->setPickable(true);
     }
 
     shared_ptr<WalkmeshSceneNode> walkmesh0SceneNode;

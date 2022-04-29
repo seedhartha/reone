@@ -58,6 +58,8 @@ public:
 
     void drawLeafs(const std::vector<SceneNode *> &leafs) override;
 
+    void drawAABB();
+
     void computeAABB();
     void signalEvent(const std::string &name);
 

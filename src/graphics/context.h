@@ -39,6 +39,7 @@ public:
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block);
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);
     void withBlending(BlendMode mode, const std::function<void()> &block);
+    void withPolygonMode(PolygonMode mode, const std::function<void()> &block);
     void withViewport(glm::ivec4 viewport, const std::function<void()> &block);
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
@@ -52,6 +53,7 @@ private:
     std::stack<DepthTestMode> _depthTestModes;
     std::stack<CullFaceMode> _cullFaceModes;
     std::stack<BlendMode> _blendModes;
+    std::stack<PolygonMode> _polygonModes;
     std::stack<glm::ivec4> _viewports;
 
     // END States
@@ -59,6 +61,7 @@ private:
     void setDepthTestMode(DepthTestMode mode);
     void setCullFaceMode(CullFaceMode mode);
     void setBlendMode(BlendMode mode);
+    void setPolygonMode(PolygonMode mode);
     void setViewport(glm::ivec4 viewport);
 };
 

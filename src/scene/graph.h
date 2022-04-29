@@ -50,7 +50,8 @@ class AudioPlayer;
 
 namespace scene {
 
-class Collision;
+struct Collision;
+
 class IAnimationEventListener;
 class ModelSceneNode;
 class SoundSceneNode;
@@ -95,6 +96,8 @@ public:
 
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUpdateRoots(bool update) { _updateRoots = update; }
+
+    void setDrawAABB(bool draw) { _drawAABB = draw; }
     void setDrawWalkmeshes(bool draw) { _drawWalkmeshes = draw; }
     void setDrawTriggers(bool draw) { _drawTriggers = draw; }
 
@@ -194,6 +197,8 @@ private:
     graphics::GraphicsOptions &_options;
 
     bool _updateRoots {true};
+
+    bool _drawAABB {false};
     bool _drawWalkmeshes {false};
     bool _drawTriggers {false};
 

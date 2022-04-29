@@ -100,6 +100,27 @@ private:
         float _right {0.0f};
     };
 
+    class SelectionController : boost::noncopyable {
+    public:
+        SelectionController(scene::SceneGraph &sceneGraph) :
+            _sceneGraph(sceneGraph) {
+        }
+
+        bool handle(const SDL_Event &e);
+
+        void setPC(Creature *pc) {
+            _pc = pc;
+        }
+
+    private:
+        scene::SceneGraph &_sceneGraph;
+
+        Creature *_pc {nullptr};
+
+        Object *_hoveredObject {nullptr};
+        Object *_clickedObject {nullptr};
+    };
+
     class WorldRenderer : boost::noncopyable {
     public:
         WorldRenderer(
@@ -124,6 +145,7 @@ private:
     ServicesView &_services;
 
     std::unique_ptr<PlayerController> _playerController;
+    std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
 
     bool _finished {false};

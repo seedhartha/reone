@@ -47,7 +47,7 @@ public:
         if (isInFrustum(center)) {
             return true;
         }
-        glm::vec3 halfSize(aabb.getSize() * 0.5f);
+        glm::vec3 halfSize(aabb.size() * 0.5f);
         std::vector<glm::vec3> corners {
             glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
             glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z),

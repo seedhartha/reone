@@ -17,39 +17,34 @@
 
 #pragma once
 
-#include "mesh.h"
+#include "modelnode.h"
 
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
-class Meshes : boost::noncopyable {
+class DummySceneNode : public ModelNodeSceneNode {
 public:
-    ~Meshes() { deinit(); }
-
-    void init();
-    void deinit();
-
-    Mesh &quad() const { return *_quad; }
-    Mesh &quadNDC() const { return *_quadNDC; }
-    Mesh &billboard() const { return *_billboard; }
-    Mesh &grass() const { return *_grass; }
-
-    Mesh &box() const { return *_box; }
-    Mesh &cubemap() const { return *_cubemap; }
-
-private:
-    bool _inited {false};
-
-    std::unique_ptr<Mesh> _quad;
-    std::unique_ptr<Mesh> _quadNDC;
-    std::unique_ptr<Mesh> _billboard;
-    std::unique_ptr<Mesh> _grass;
-
-    std::unique_ptr<Mesh> _box;
-    std::unique_ptr<Mesh> _cubemap;
+    DummySceneNode(
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneGraph &sceneGraph,
+        graphics::GraphicsContext &graphicsContext,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Uniforms &uniforms) :
+        ModelNodeSceneNode(
+            std::move(modelNode),
+            SceneNodeType::Dummy,
+            sceneGraph,
+            graphicsContext,
+            meshes,
+            shaders,
+            textures,
+            uniforms) {
+    }
 };
 
-} // namespace graphics
+} // namespace scene
 
 } // namespace reone

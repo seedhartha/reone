@@ -42,6 +42,7 @@ public:
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &modelOpaque() const { return *_spModelOpaque; }
     ShaderProgram &modelTransparent() const { return *_spModelTransparent; }
+    ShaderProgram &aabb() const { return *_spAABB; }
     ShaderProgram &walkmesh() const { return *_spWalkmesh; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
@@ -75,6 +76,7 @@ private:
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spModelOpaque;
     std::shared_ptr<ShaderProgram> _spModelTransparent;
+    std::shared_ptr<ShaderProgram> _spAABB;
     std::shared_ptr<ShaderProgram> _spWalkmesh;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;

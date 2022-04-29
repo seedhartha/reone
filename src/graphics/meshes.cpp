@@ -60,7 +60,40 @@ static const Mesh::VertexSpec g_quadSpec {5 * sizeof(float), 0, -1, 3 * sizeof(f
 
 // END Quads
 
-// Cubemap
+// Boxes
+
+static const vector<float> g_boxVertices {
+    // back face
+    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, // bottom-left
+    1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,   // top-right
+    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  // bottom-right
+    -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  // top-left
+    // front face
+    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // bottom-left
+    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // bottom-right
+    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,   // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // top-left
+    // left face
+    -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,   // top-right
+    -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,  // top-left
+    -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+    -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f,  // bottom-right
+    // right face
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,   // top-left
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, // bottom-right
+    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f,  // top-right
+    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f,  // bottom-left
+    // bottom face
+    -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, // top-right
+    1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f,  // top-left
+    1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f,   // bottom-left
+    -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f,  // bottom-right
+    // top face
+    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // top-left
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom-right
+    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,  // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f   // bottom-left
+};
 
 static const vector<float> g_cubemapVertices {
     // back face
@@ -95,7 +128,7 @@ static const vector<float> g_cubemapVertices {
     -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f   // bottom-left
 };
 
-static const vector<Mesh::Face> g_cubemapFaces {
+static const vector<Mesh::Face> g_boxFaces {
     Mesh::Face(0, 1, 2),
     Mesh::Face(1, 0, 3),
     Mesh::Face(4, 5, 6),
@@ -109,9 +142,10 @@ static const vector<Mesh::Face> g_cubemapFaces {
     Mesh::Face(20, 21, 22),
     Mesh::Face(21, 20, 23)};
 
+static const Mesh::VertexSpec g_boxSpec {6 * sizeof(float), 0, 3 * sizeof(float)};
 static const Mesh::VertexSpec g_cubemapSpec {8 * sizeof(float), 0, 3 * sizeof(float), 6 * sizeof(float)};
 
-// END Cubemap
+// END Boxes
 
 static unique_ptr<Mesh> getMesh(vector<float> vertices, vector<Mesh::Face> faces, Mesh::VertexSpec spec) {
     auto mesh = make_unique<Mesh>(move(vertices), move(faces), move(spec));
@@ -123,11 +157,14 @@ void Meshes::init() {
     if (_inited) {
         return;
     }
+
     _quad = getMesh(g_quadVertices, g_quadFaces, g_quadSpec);
     _quadNDC = getMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec);
     _billboard = getMesh(g_billboardVertices, g_quadFaces, g_quadSpec);
     _grass = getMesh(g_grassVertices, g_quadFaces, g_quadSpec);
-    _cubemap = getMesh(g_cubemapVertices, g_cubemapFaces, g_cubemapSpec);
+
+    _box = getMesh(g_boxVertices, g_boxFaces, g_boxSpec);
+    _cubemap = getMesh(g_cubemapVertices, g_boxFaces, g_cubemapSpec);
 
     _inited = true;
 }
@@ -136,10 +173,13 @@ void Meshes::deinit() {
     if (!_inited) {
         return;
     }
+
     _quad.reset();
     _quadNDC.reset();
     _billboard.reset();
     _grass.reset();
+
+    _box.reset();
     _cubemap.reset();
 
     _inited = false;
