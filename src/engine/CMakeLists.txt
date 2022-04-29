@@ -39,7 +39,7 @@ set(REONE_SOURCES
     optionsparser.cpp)
 
 if(WIN32)
-    list(APPEND REONE_SOURCES ${CMAKE_SOURCE_DIR}/res/reone.rc)
+    list(APPEND REONE_SOURCES ${CMAKE_SOURCE_DIR}/assets/reone.rc)
 endif()
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES} ${CLANG_FORMAT_PATH})
