@@ -22,6 +22,7 @@
 #include "../../../graphics/services.h"
 
 #include "../../camerastyles.h"
+#include "../../scene/collision.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/camera.h"
 #include "../../services.h"
@@ -120,14 +121,29 @@ void Camera::update(float delta) {
 }
 
 void Camera::updateThirdPerson(float delta) {
+    // Orientation
+
     _facing += delta * kCameraRotateSpeed * (_left - _right);
     _facing = glm::mod(_facing, glm::two_pi<float>());
 
     _pitch = glm::radians(_style.pitch);
 
-    _position = _hook->getOrigin();
-    _position += glm::vec3(0.0f, 0.0f, _style.height);
-    _position += _style.distance * glm::vec3(glm::sin(_facing), -glm::cos(_facing), 0.0f);
+    // Position
+
+    auto startPos = _hook->getOrigin();
+
+    auto endPos = startPos;
+    endPos += glm::vec3(0.0f, 0.0f, _style.height);
+    endPos += _style.distance * glm::vec3(glm::sin(_facing), -glm::cos(_facing), 0.0f);
+
+    Collision collision;
+    if (_sceneGraph.testLineOfSight(startPos, endPos, collision)) {
+        endPos = collision.intersection;
+    }
+
+    _position = move(endPos);
+
+    //
 
     flushTransform();
 }
