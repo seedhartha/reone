@@ -145,7 +145,13 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::write_json(jsonPath.string(), tree);
 }
 
-static void printStruct(const GffStruct &gff, XMLPrinter &printer) {
+static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int index = -1) {
+    printer.OpenElement("struct");
+    printer.PushAttribute("type", gff.type());
+    if (index != -1) {
+        printer.PushAttribute("index", index);
+    }
+
     for (auto &field : gff.fields()) {
         printer.OpenElement(field.label.c_str());
         printer.PushAttribute("type", static_cast<int>(field.type));
@@ -158,14 +164,11 @@ static void printStruct(const GffStruct &gff, XMLPrinter &printer) {
             printer.PushAttribute("data", hexify(field.data).c_str());
             break;
         case GffFieldType::Struct:
-            printStruct(*field.children[0], printer);
+            printStructToXml(*field.children[0], printer);
             break;
         case GffFieldType::List:
             for (size_t i = 0; i < field.children.size(); ++i) {
-                printer.OpenElement("item");
-                printer.PushAttribute("index", i);
-                printStruct(*field.children[i], printer);
-                printer.CloseElement();
+                printStructToXml(*field.children[i], printer, i);
             }
             break;
         case GffFieldType::Orientation:
@@ -185,6 +188,8 @@ static void printStruct(const GffStruct &gff, XMLPrinter &printer) {
         }
         printer.CloseElement();
     }
+
+    printer.CloseElement();
 }
 
 void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
@@ -199,9 +204,7 @@ void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
 
     auto printer = XMLPrinter(fp);
     printer.PushHeader(false, true);
-    printer.OpenElement("root");
-    printStruct(*gff, printer);
-    printer.CloseElement();
+    printStructToXml(*gff, printer);
 
     fclose(fp);
 }
