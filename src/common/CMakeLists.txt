@@ -16,6 +16,7 @@
 set(COMMON_HEADERS
     collectionutil.h
     exception/validation.h
+    hexutil.h
     logutil.h
     memorycache.h
     pathutil.h
@@ -28,6 +29,7 @@ set(COMMON_HEADERS
     unicodeutil.h)
 
 set(COMMON_SOURCES
+    hexutil.cpp
     logutil.cpp
     pathutil.cpp
     randomutil.cpp

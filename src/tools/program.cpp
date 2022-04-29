@@ -47,6 +47,7 @@ static const unordered_map<string, Operation> g_operations {
     {"extract", Operation::Extract},
     {"unwrap", Operation::Unwrap},
     {"to-json", Operation::ToJSON},
+    {"to-xml", Operation::ToXML},
     {"to-tga", Operation::ToTGA},
     {"to-2da", Operation::To2DA},
     {"to-gff", Operation::ToGFF},
@@ -102,7 +103,8 @@ void Program::initOptions() {
         ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
         ("list", "list file contents")("extract", "extract file contents")                 //
         ("unwrap", "unwrap an audio file")                                                 //
-        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF file to JSON")                      //
+        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF to JSON")                           //
+        ("to-xml", "convert GFF to XML")                                                   //
         ("to-tga", "convert TPC image to TGA")                                             //
         ("to-2da", "convert JSON to 2DA")                                                  //
         ("to-gff", "convert JSON to GFF")                                                  //

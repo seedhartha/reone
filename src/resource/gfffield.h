@@ -71,6 +71,8 @@ struct GffField {
         type(type), label(std::move(label)) {
     }
 
+    std::string toString() const;
+
     static GffField newByte(std::string label, uint32_t val);
     static GffField newChar(std::string label, int32_t val);
     static GffField newWord(std::string label, uint32_t val);

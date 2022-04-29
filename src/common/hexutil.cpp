@@ -15,28 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "hexutil.h"
+
+using namespace std;
 
 namespace reone {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToXML,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS,
-    ToSSF
-};
+string hexify(const string &s) {
+    ostringstream ss;
+    for (auto &ch : s) {
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << " ";
+    }
+    return ss.str();
+}
+
+string hexify(const u16string &s) {
+    ostringstream ss;
+    for (auto &ch : s) {
+        ss << hex << setw(4) << setfill('0') << static_cast<int>(ch & 0xffff) << " ";
+    }
+    return ss.str();
+}
+
+string hexify(const reone::ByteArray &ba) {
+    ostringstream ss;
+    for (auto &b : ba) {
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(b & 0xff) << " ";
+    }
+    return ss.str();
+}
 
 } // namespace reone
