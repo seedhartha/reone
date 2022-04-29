@@ -17,93 +17,106 @@
 
 #include "2da.h"
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include "../../common/streamwriter.h"
 #include "../../resource/2da.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/2dawriter.h"
 
+#include "tinyxml2.h"
+
 using namespace std;
+
+using namespace tinyxml2;
 
 using namespace reone::resource;
 
 namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace reone {
 
 void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    if (operation == Operation::ToJSON) {
-        toJSON(target, destPath);
+    if (operation == Operation::ToXML) {
+        toXML(target, destPath);
     } else {
         to2DA(target, destPath);
     }
 }
 
-void TwoDaTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    TwoDaReader twoDaFile;
-    twoDaFile.load(path);
+void TwoDaTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto reader = TwoDaReader();
+    reader.load(path);
 
-    pt::ptree tree;
-    pt::ptree children;
-    shared_ptr<TwoDA> twoDa(twoDaFile.twoDa());
+    auto table = reader.twoDa();
 
-    for (int row = 0; row < twoDa->getRowCount(); ++row) {
-        pt::ptree child;
-        child.put("_id", row);
+    auto xmlPath = destPath;
+    xmlPath.append(path.filename().string() + ".xml");
+    auto fp = fopen(xmlPath.string().c_str(), "wb");
 
-        for (int col = 0; col < twoDa->getColumnCount(); ++col) {
-            child.put(twoDa->columns()[col], twoDa->rows()[row].values[col]);
+    auto printer = XMLPrinter(fp);
+    printer.PushHeader(false, true);
+    printer.OpenElement("rows");
+    for (int row = 0; row < table->getRowCount(); ++row) {
+        printer.OpenElement("row");
+        printer.PushAttribute("_index", row);
+        for (int col = 0; col < table->getColumnCount(); ++col) {
+            printer.PushAttribute(
+                table->columns()[col].c_str(),
+                table->rows()[row].values[col].c_str());
         }
-        children.push_back(make_pair("", child));
+        printer.CloseElement();
     }
-    tree.add_child("rows", children);
+    printer.CloseElement();
 
-    fs::path jsonPath(destPath);
-    jsonPath.append(path.filename().string() + ".json");
-
-    pt::write_json(jsonPath.string(), tree);
+    fclose(fp);
 }
 
 void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::read_json(path.string(), tree);
+    auto fp = fopen(path.string().c_str(), "rb");
 
-    auto twoDa = make_unique<TwoDA>();
-    bool columnsInited = false;
+    auto document = XMLDocument();
+    document.LoadFile(fp);
 
-    for (auto &jsonRow : tree.get_child("rows")) {
-        TwoDA::Row row;
+    auto rootElement = document.RootElement();
+    if (!rootElement) {
+        cerr << "XML is empty" << endl;
+        fclose(fp);
+        return;
+    }
 
-        for (auto &prop : jsonRow.second) {
-            // Properties with a leading underscore are metadata
-            if (boost::starts_with(prop.first, "_"))
+    auto table = make_unique<TwoDA>();
+
+    for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
+        auto row = TwoDA::Row();
+        for (auto attribute = element->FirstAttribute(); attribute; attribute = attribute->Next()) {
+            if (strncmp(attribute->Name(), "_index", 6) == 0) {
                 continue;
-
-            if (!columnsInited) {
-                twoDa->addColumn(prop.first);
             }
-            row.values.push_back(prop.second.data());
+            if (table->getRowCount() == 0) {
+                table->addColumn(attribute->Name());
+            }
+            row.values.push_back(attribute->Value());
         }
-
-        twoDa->add(move(row));
-        columnsInited = true;
+        table->add(move(row));
     }
 
     vector<string> tokens;
-    boost::split(tokens, path.filename().string(), boost::is_any_of("."), boost::token_compress_on);
+    boost::split(
+        tokens,
+        path.filename().string(),
+        boost::is_any_of("."),
+        boost::token_compress_on);
 
-    fs::path twoDaPath(destPath);
+    auto twoDaPath = fs::path(destPath);
     twoDaPath.append(tokens[0] + ".2da");
 
-    TwoDaWriter writer(move(twoDa));
+    auto writer = TwoDaWriter(move(table));
     writer.save(twoDaPath);
 }
 
 bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
-           ((target.extension() == ".2da" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::To2DA));
+           ((target.extension() == ".2da" && operation == Operation::ToXML) ||
+            (target.extension() == ".xml" && operation == Operation::To2DA));
 }
 
 } // namespace reone

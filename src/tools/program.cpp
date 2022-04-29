@@ -46,7 +46,6 @@ static const unordered_map<string, Operation> g_operations {
     {"list", Operation::List},
     {"extract", Operation::Extract},
     {"unwrap", Operation::Unwrap},
-    {"to-json", Operation::ToJSON},
     {"to-xml", Operation::ToXML},
     {"to-tga", Operation::ToTGA},
     {"to-2da", Operation::To2DA},
@@ -102,20 +101,19 @@ void Program::initOptions() {
         ("dest", po::value<string>(), "path to destination directory")                     //
         ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
         ("list", "list file contents")("extract", "extract file contents")                 //
-        ("unwrap", "unwrap an audio file")                                                 //
-        ("to-json", "convert 2DA, TLK, LIP or SSF to JSON")                                //
-        ("to-xml", "convert GFF to XML")                                                   //
+        ("to-xml", "convert 2DA, GFF, TLK, LIP or SSF to XML")                             //
         ("to-tga", "convert TPC image to TGA")                                             //
-        ("to-2da", "convert JSON to 2DA")                                                  //
-        ("to-gff", "convert JSON or XML to GFF")                                           //
+        ("to-2da", "convert XML to 2DA")                                                   //
+        ("to-gff", "convert XML to GFF")                                                   //
+        ("to-tlk", "convert XML to TLK")                                                   //
+        ("to-lip", "convert XML to LIP")                                                   //
+        ("to-ssf", "convert XML to SSF")                                                   //
         ("to-rim", "create RIM archive from directory")                                    //
         ("to-erf", "create ERF archive from directory")                                    //
         ("to-mod", "create MOD archive from directory")                                    //
-        ("to-tlk", "convert JSON to TLK")                                                  //
-        ("to-lip", "convert JSON to LIP")                                                  //
         ("to-pcode", "convert NCS to PCODE")                                               //
         ("to-ncs", "convert PCODE to NCS")                                                 //
-        ("to-ssf", "convert JSON to SSF")                                                  //
+        ("unwrap", "unwrap an audio file")                                                 //
         ("target", po::value<string>(), "target name or path to input file");
 }
 

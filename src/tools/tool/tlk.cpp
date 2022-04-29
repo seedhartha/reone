@@ -17,83 +17,93 @@
 
 #include "tlk.h"
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include "../../resource/format/tlkreader.h"
 #include "../../resource/format/tlkwriter.h"
 #include "../../resource/talktable.h"
 
+#include "tinyxml2.h"
+
 using namespace std;
+
+using namespace tinyxml2;
 
 using namespace reone::resource;
 
 namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace reone {
 
 void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    if (operation == Operation::ToJSON) {
-        toJSON(target, destPath);
+    if (operation == Operation::ToXML) {
+        toXML(target, destPath);
     } else if (operation == Operation::ToTLK) {
         toTLK(target, destPath);
     }
 }
 
-void TlkTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::ptree children;
+void TlkTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto reader = TlkReader();
+    reader.load(path);
 
-    TlkReader tlk;
-    tlk.load(path);
+    auto table = reader.table();
 
-    shared_ptr<TalkTable> table(tlk.table());
+    auto xmlPath = destPath;
+    xmlPath.append(path.filename().string() + ".xml");
+    auto fp = fopen(xmlPath.string().c_str(), "wb");
+
+    auto printer = XMLPrinter(fp);
+    printer.PushHeader(false, true);
+    printer.OpenElement("strings");
     for (int i = 0; i < table->getStringCount(); ++i) {
-        const TalkTableString &tableString = table->getString(i);
-
-        pt::ptree child;
-        child.put("_index", i);
-        child.put("text", tableString.text);
-        child.put("soundResRef", tableString.soundResRef);
-
-        children.push_back(make_pair("", child));
+        printer.OpenElement("string");
+        printer.PushAttribute("index", i);
+        printer.PushAttribute("text", table->getString(i).text.c_str());
+        printer.PushAttribute("soundResRef", table->getString(i).soundResRef.c_str());
+        printer.CloseElement();
     }
-    tree.add_child("strings", children);
+    printer.CloseElement();
 
-    fs::path jsonPath(destPath);
-    jsonPath.append(path.filename().string() + ".json");
-
-    pt::write_json(jsonPath.string(), tree);
+    fclose(fp);
 }
 
 void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::read_json(path.string(), tree);
+    auto fp = fopen(path.string().c_str(), "rb");
 
-    auto talkTable = make_shared<TalkTable>();
-    for (auto &str : tree.get_child("strings")) {
-        TalkTableString talkTableString;
-        talkTableString.text = str.second.get("text", "");
-        talkTableString.soundResRef = str.second.get("soundResRef", "");
-        talkTable->addString(move(talkTableString));
+    auto document = XMLDocument();
+    document.LoadFile(fp);
+
+    auto rootElement = document.RootElement();
+    if (!rootElement) {
+        cerr << "XML is empty" << endl;
+        fclose(fp);
+        return;
     }
 
-    fs::path extensionless(path);
-    extensionless.replace_extension(); // remove .json
-    if (extensionless.extension() == ".tlk") {
-        extensionless.replace_extension();
+    auto table = make_unique<TalkTable>();
+    for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
+        table->addString(TalkTableString {
+            element->Attribute("text"),
+            element->Attribute("soundResRef")});
     }
 
-    fs::path tlkPath(destPath);
-    tlkPath.append(extensionless.filename().string() + ".tlk");
+    vector<string> tokens;
+    boost::split(
+        tokens,
+        path.filename().string(),
+        boost::is_any_of("."),
+        boost::token_compress_on);
 
-    TlkWriter writer(move(talkTable));
+    auto tlkPath = fs::path(destPath);
+    tlkPath.append(tokens[0] + ".tlk");
+
+    auto writer = TlkWriter(move(table));
     writer.save(tlkPath);
 }
 
 bool TlkTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
-           ((target.extension() == ".tlk" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToTLK));
+           ((target.extension() == ".tlk" && operation == Operation::ToXML) ||
+            (target.extension() == ".xml" && operation == Operation::ToTLK));
 }
 
 } // namespace reone

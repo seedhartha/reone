@@ -24,7 +24,6 @@ enum class Operation {
     List,
     Extract,
     Unwrap,
-    ToJSON,
     ToXML,
     ToTGA,
     To2DA,

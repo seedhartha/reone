@@ -17,76 +17,94 @@
 
 #include "lip.h"
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include "../../graphics/format/lipreader.h"
 #include "../../graphics/format/lipwriter.h"
 
+#include "tinyxml2.h"
+
 using namespace std;
+
+using namespace tinyxml2;
 
 using namespace reone::graphics;
 
 namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace reone {
 
 void LipTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    if (operation == Operation::ToJSON) {
-        toJSON(target, destPath);
+    if (operation == Operation::ToXML) {
+        toXML(target, destPath);
     } else if (operation == Operation::ToLIP) {
         toLIP(target, destPath);
     }
 }
 
-void LipTool::toJSON(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::ptree keyframes;
+void LipTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto reader = LipReader("");
+    reader.load(path);
 
-    LipReader lip("");
-    lip.load(path);
+    auto animation = reader.animation();
 
-    shared_ptr<LipAnimation> animation(lip.animation());
-    tree.put("length", animation->length());
+    auto xmlPath = destPath;
+    xmlPath.append(path.filename().string() + ".xml");
+    auto fp = fopen(xmlPath.string().c_str(), "wb");
+
+    auto printer = XMLPrinter(fp);
+    printer.PushHeader(false, true);
+    printer.OpenElement("animation");
+    printer.PushAttribute("length", animation->length());
     for (auto &keyframe : animation->keyframes()) {
-        pt::ptree keyframeTree;
-        keyframeTree.put("time", keyframe.time);
-        keyframeTree.put("shape", keyframe.shape);
-        keyframes.push_back(make_pair("", keyframeTree));
+        printer.OpenElement("keyframe");
+        printer.PushAttribute("time", keyframe.time);
+        printer.PushAttribute("shape", keyframe.shape);
+        printer.CloseElement();
     }
-    tree.add_child("keyframes", keyframes);
+    printer.CloseElement();
 
-    fs::path jsonPath(destPath);
-    jsonPath.append(path.filename().string() + ".json");
-
-    pt::write_json(jsonPath.string(), tree);
+    fclose(fp);
 }
 
 void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::read_json(path.string(), tree);
+    auto fp = fopen(path.string().c_str(), "rb");
 
-    float length = tree.get("length", 0.0f);
-    vector<LipAnimation::Keyframe> keyframes;
-    for (auto &keyframeTree : tree.get_child("keyframes")) {
-        LipAnimation::Keyframe keyframe;
-        keyframe.time = keyframeTree.second.get("time", 0.0f);
-        keyframe.shape = keyframeTree.second.get("shape", 0);
-        keyframes.push_back(move(keyframe));
+    auto document = XMLDocument();
+    document.LoadFile(fp);
+
+    auto rootElement = document.RootElement();
+    if (!rootElement) {
+        cerr << "XML is empty" << endl;
+        fclose(fp);
+        return;
     }
-    LipAnimation animation("", length, move(keyframes));
 
-    fs::path lipPath(destPath);
-    lipPath.append(path.filename().string());
-    lipPath.replace_extension(); // remove .json
+    auto length = rootElement->FloatAttribute("length");
+    auto keyframes = vector<LipAnimation::Keyframe>();
+    for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
+        keyframes.push_back(LipAnimation::Keyframe {
+            element->FloatAttribute("time"),
+            static_cast<uint8_t>(element->UnsignedAttribute("shape"))});
+    }
+    auto animation = LipAnimation("", length, move(keyframes));
 
-    LipWriter writer(move(animation));
+    vector<string> tokens;
+    boost::split(
+        tokens,
+        path.filename().string(),
+        boost::is_any_of("."),
+        boost::token_compress_on);
+
+    auto lipPath = fs::path(destPath);
+    lipPath.append(tokens[0] + ".lip");
+
+    auto writer = LipWriter(move(animation));
     writer.save(lipPath);
 }
 
 bool LipTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
-           ((target.extension() == ".lip" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToLIP));
+           ((target.extension() == ".lip" && operation == Operation::ToXML) ||
+            (target.extension() == ".xml" && operation == Operation::ToLIP));
 }
 
 } // namespace reone

@@ -17,68 +17,89 @@
 
 #include "ssf.h"
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include "../../game/format/ssfreader.h"
 #include "../../game/format/ssfwriter.h"
 
+#include "tinyxml2.h"
+
 using namespace std;
+
+using namespace tinyxml2;
 
 using namespace reone::game;
 
 namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace reone {
 
 void SsfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    if (operation == Operation::ToJSON) {
-        toJSON(target, destPath);
+    if (operation == Operation::ToXML) {
+        toXML(target, destPath);
     } else if (operation == Operation::ToSSF) {
         toSSF(target, destPath);
     }
 }
 
-void SsfTool::toJSON(const fs::path &target, const fs::path &destPath) {
-    SsfReader ssf;
-    ssf.load(target);
+void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto reader = SsfReader();
+    reader.load(path);
 
-    pt::ptree soundsTree;
-    for (auto val : ssf.soundSet()) {
-        pt::ptree soundTree;
-        soundTree.put("", val);
-        soundsTree.push_back(make_pair("", soundTree));
+    auto soundSet = reader.soundSet();
+
+    auto xmlPath = destPath;
+    xmlPath.append(path.filename().string() + ".xml");
+    auto fp = fopen(xmlPath.string().c_str(), "wb");
+
+    auto printer = XMLPrinter(fp);
+    printer.PushHeader(false, true);
+    printer.OpenElement("soundset");
+    for (size_t i = 0; i < soundSet.size(); ++i) {
+        printer.OpenElement("sound");
+        printer.PushAttribute("index", i);
+        printer.PushAttribute("strref", soundSet[i]);
+        printer.CloseElement();
     }
+    printer.CloseElement();
 
-    pt::ptree tree;
-    tree.add_child("sounds", soundsTree);
-
-    fs::path jsonPath(destPath);
-    jsonPath.append(target.filename().string() + ".json");
-
-    pt::write_json(jsonPath.string(), tree);
+    fclose(fp);
 }
 
-void SsfTool::toSSF(const fs::path &target, const fs::path &destPath) {
-    pt::ptree tree;
-    pt::read_json(target.string(), tree);
+void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
+    auto fp = fopen(path.string().c_str(), "rb");
 
-    vector<uint32_t> soundSet;
-    for (auto soundTree : tree.get_child("sounds")) {
-        soundSet.push_back(soundTree.second.get_value<uint32_t>());
+    auto document = XMLDocument();
+    document.LoadFile(fp);
+
+    auto rootElement = document.RootElement();
+    if (!rootElement) {
+        cerr << "XML is empty" << endl;
+        fclose(fp);
+        return;
     }
 
-    fs::path ssfPath(destPath);
-    ssfPath.append(target.filename().string());
-    ssfPath.replace_extension(""); // drop .ssf
+    auto soundSet = vector<uint32_t>();
+    for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
+        auto strref = element->UnsignedAttribute("strref");
+        soundSet.push_back(strref);
+    }
 
-    SsfWriter ssf(soundSet);
-    ssf.save(ssfPath);
+    vector<string> tokens;
+    boost::split(
+        tokens,
+        path.filename().string(),
+        boost::is_any_of("."),
+        boost::token_compress_on);
+
+    auto ssfPath = fs::path(destPath);
+    ssfPath.append(tokens[0] + ".ssf");
+
+    auto writer = SsfWriter(move(soundSet));
+    writer.save(ssfPath);
 }
 
 bool SsfTool::supports(Operation operation, const fs::path &target) const {
-    return (operation == Operation::ToJSON && target.extension() == ".ssf") ||
-           (operation == Operation::ToSSF && target.extension() == ".json");
+    return (operation == Operation::ToXML && target.extension() == ".ssf") ||
+           (operation == Operation::ToSSF && target.extension() == ".xml");
 }
 
 } // namespace reone
