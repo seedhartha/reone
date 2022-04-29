@@ -21,26 +21,26 @@ using namespace std;
 
 namespace reone {
 
-string hexify(const string &s) {
+string hexify(const string &s, string separator) {
     ostringstream ss;
     for (auto &ch : s) {
-        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << " ";
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << separator;
     }
     return ss.str();
 }
 
-string hexify(const u16string &s) {
+string hexify(const u16string &s, string separator) {
     ostringstream ss;
     for (auto &ch : s) {
-        ss << hex << setw(4) << setfill('0') << static_cast<int>(ch & 0xffff) << " ";
+        ss << hex << setw(4) << setfill('0') << static_cast<int>(ch & 0xffff) << separator;
     }
     return ss.str();
 }
 
-string hexify(const reone::ByteArray &ba) {
+string hexify(const reone::ByteArray &ba, string separator) {
     ostringstream ss;
     for (auto &b : ba) {
-        ss << hex << setw(2) << setfill('0') << static_cast<int>(b & 0xff) << " ";
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(b & 0xff) << separator;
     }
     return ss.str();
 }

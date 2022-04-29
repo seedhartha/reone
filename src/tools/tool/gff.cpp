@@ -161,7 +161,7 @@ static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int inde
             printer.PushAttribute("substring", field.strValue.c_str());
             break;
         case GffFieldType::Void:
-            printer.PushAttribute("data", hexify(field.data).c_str());
+            printer.PushAttribute("data", hexify(field.data, "").c_str());
             break;
         case GffFieldType::Struct:
             printStructToXml(*field.children[0], printer);
