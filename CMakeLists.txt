@@ -48,7 +48,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm ${CMAKE_SOURCE_DIR}/src/external/tinyxml2)
 
 if(ENABLE_MOVIE)
     if(MSVC)
@@ -85,6 +85,7 @@ add_subdirectory(src/engine) # reone executable
 
 if(BUILD_TOOLS)
     add_subdirectory(src/tools) # reone-tools executable
+    add_subdirectory(src/external/tinyxml2) # tinyxml2 static library
 endif()
 
 if(BUILD_LAUNCHER)

@@ -23,6 +23,33 @@ namespace reone {
 
 namespace resource {
 
+string GffField::toString() const {
+    switch (type) {
+    case GffFieldType::Byte:
+    case GffFieldType::Word:
+    case GffFieldType::Dword:
+        return to_string(uintValue);
+    case GffFieldType::Char:
+    case GffFieldType::Short:
+    case GffFieldType::Int:
+        return to_string(intValue);
+    case GffFieldType::Dword64:
+        return to_string(uint64Value);
+    case GffFieldType::Int64:
+        return to_string(int64Value);
+    case GffFieldType::Float:
+        return to_string(floatValue);
+    case GffFieldType::Double:
+        return to_string(doubleValue);
+    case GffFieldType::CExoString:
+        return strValue;
+    case GffFieldType::ResRef:
+        return strValue;
+    default:
+        throw logic_error("Unsupported field type: " + to_string(static_cast<int>(type)));
+    }
+}
+
 GffField GffField::newByte(string label, uint32_t val) {
     GffField tmp(GffFieldType::Byte, move(label));
     tmp.uintValue = val;

@@ -17,26 +17,12 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToXML,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS,
-    ToSSF
-};
+std::string hexify(const std::string &s);
+std::string hexify(const std::u16string &s);
+std::string hexify(const reone::ByteArray &ba);
 
 } // namespace reone

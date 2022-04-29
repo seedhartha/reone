@@ -19,12 +19,17 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
+#include "../../common/hexutil.h"
 #include "../../common/streamwriter.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/typeutil.h"
 
+#include "tinyxml2.h"
+
 using namespace std;
+
+using namespace tinyxml2;
 
 using namespace reone::resource;
 
@@ -37,6 +42,9 @@ void GffTool::invoke(Operation operation, const fs::path &target, const fs::path
     switch (operation) {
     case Operation::ToJSON:
         toJSON(target, destPath);
+        break;
+    case Operation::ToXML:
+        toXML(target, destPath);
         break;
     case Operation::ToGFF:
         toGFF(target, destPath);
@@ -135,6 +143,67 @@ void GffTool::toJSON(const fs::path &path, const fs::path &destPath) {
     jsonPath.append(path.filename().string() + ".json");
 
     pt::write_json(jsonPath.string(), tree);
+}
+
+static void printStruct(const GffStruct &gff, XMLPrinter &printer) {
+    for (auto &field : gff.fields()) {
+        printer.OpenElement(field.label.c_str());
+        printer.PushAttribute("type", static_cast<int>(field.type));
+        switch (field.type) {
+        case GffFieldType::CExoLocString:
+            printer.PushAttribute("strref", field.intValue);
+            printer.PushAttribute("substring", field.strValue.c_str());
+            break;
+        case GffFieldType::Void:
+            printer.PushAttribute("data", hexify(field.data).c_str());
+            break;
+        case GffFieldType::Struct:
+            printStruct(*field.children[0], printer);
+            break;
+        case GffFieldType::List:
+            for (size_t i = 0; i < field.children.size(); ++i) {
+                printer.OpenElement("item");
+                printer.PushAttribute("index", i);
+                printStruct(*field.children[i], printer);
+                printer.CloseElement();
+            }
+            break;
+        case GffFieldType::Orientation:
+            printer.PushAttribute("w", field.quatValue.w);
+            printer.PushAttribute("x", field.quatValue.x);
+            printer.PushAttribute("y", field.quatValue.y);
+            printer.PushAttribute("z", field.quatValue.z);
+            break;
+        case GffFieldType::Vector:
+            printer.PushAttribute("x", field.vecValue.x);
+            printer.PushAttribute("y", field.vecValue.y);
+            printer.PushAttribute("z", field.vecValue.z);
+            break;
+        default:
+            printer.PushAttribute("value", field.toString().c_str());
+            break;
+        }
+        printer.CloseElement();
+    }
+}
+
+void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto reader = GffReader();
+    reader.load(path);
+
+    auto gff = reader.root();
+
+    auto xmlPath = destPath;
+    xmlPath.append(path.filename().string() + ".xml");
+    auto fp = fopen(xmlPath.string().c_str(), "wb");
+
+    auto printer = XMLPrinter(fp);
+    printer.PushHeader(false, true);
+    printer.OpenElement("root");
+    printStruct(*gff, printer);
+    printer.CloseElement();
+
+    fclose(fp);
 }
 
 static unique_ptr<GffStruct> treeToGffStruct(const pt::ptree &tree) {
@@ -260,7 +329,7 @@ void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
 
 bool GffTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
-           (operation == Operation::ToJSON || operation == Operation::ToGFF);
+           (operation == Operation::ToJSON || operation == Operation::ToXML || operation == Operation::ToGFF);
 }
 
 } // namespace reone

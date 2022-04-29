@@ -33,6 +33,7 @@ public:
 
 private:
     void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
