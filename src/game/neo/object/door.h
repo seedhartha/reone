@@ -80,6 +80,15 @@ public:
             if (_sceneNode) {
                 _sceneNode->setUser(*door);
             }
+            if (_walkmeshClosed) {
+                _walkmeshClosed->setUser(*door);
+            }
+            if (_walkmeshOpen1) {
+                _walkmeshOpen1->setUser(*door);
+            }
+            if (_walkmeshOpen2) {
+                _walkmeshOpen2->setUser(*door);
+            }
             return std::move(door);
         }
 

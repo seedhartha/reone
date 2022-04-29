@@ -131,18 +131,24 @@ bool AABB::intersect(const AABB &other) const {
            (_min.z <= other._max.z && _max.z >= other._min.z);
 }
 
-bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const {
-    glm::vec3 invDir(1.0f / dir);
-    glm::vec3 t1((_min - origin) * invDir);
-    glm::vec3 t2((_max - origin) * invDir);
+bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDistance, float &outDistance) const {
+    float tx1 = (_min.x - origin.x) * invDir.x;
+    float tx2 = (_max.x - origin.x) * invDir.x;
 
-    float tmin = glm::min(t1.x, t2.x);
-    float tmax = glm::max(t1.x, t2.x);
+    float tmin = glm::min(tx1, tx2);
+    float tmax = glm::max(tx1, tx2);
 
-    tmin = glm::max(tmin, glm::min(t1.y, t2.y));
-    tmax = glm::min(tmax, glm::max(t1.y, t2.y));
-    tmin = glm::max(tmin, glm::min(t1.z, t2.z));
-    tmax = glm::min(tmax, glm::max(t1.z, t2.z));
+    float ty1 = (_min.y - origin.y) * invDir.y;
+    float ty2 = (_max.y - origin.y) * invDir.y;
+
+    tmin = glm::max(tmin, glm::min(ty1, ty2));
+    tmax = glm::min(tmax, glm::max(ty1, ty2));
+
+    float tz1 = (_min.z - origin.z) * invDir.z;
+    float tz2 = (_max.z - origin.z) * invDir.z;
+
+    tmin = glm::max(tmin, glm::min(tz1, tz2));
+    tmax = glm::min(tmax, glm::max(tz1, tz2));
 
     if (tmax < glm::max(0.0f, tmin)) {
         return false;

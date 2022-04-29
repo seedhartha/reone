@@ -259,7 +259,7 @@ bool Game::SelectionController::handle(const SDL_Event &e) {
         auto hoveredSceneNode = _sceneGraph.pickModelAt(e.motion.x, e.motion.y, _pc);
         if (hoveredSceneNode) {
             _hoveredObject = static_cast<Object *>(hoveredSceneNode->user());
-            debug("Object hovered on: " + to_string(_hoveredObject->id()) + "[" + _hoveredObject->tag() + "]");
+            // debug("Object hovered on: " + to_string(_hoveredObject->id()) + "[" + _hoveredObject->tag() + "]");
         } else {
             _hoveredObject = nullptr;
         }

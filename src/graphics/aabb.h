@@ -36,7 +36,7 @@ public:
     bool contains(const glm::vec3 &point) const;
     bool intersect(const AABB &other) const;
 
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDistance, float &outDistance) const;
 
     bool isEmpty() const { return _empty; }
 

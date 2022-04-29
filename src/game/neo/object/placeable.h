@@ -68,6 +68,9 @@ public:
             if (_sceneNode) {
                 _sceneNode->setUser(*placeable);
             }
+            if (_walkmesh) {
+                _walkmesh->setUser(*placeable);
+            }
             return std::move(placeable);
         }
 
