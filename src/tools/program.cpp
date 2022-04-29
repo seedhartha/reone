@@ -103,7 +103,7 @@ void Program::initOptions() {
         ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
         ("list", "list file contents")("extract", "extract file contents")                 //
         ("unwrap", "unwrap an audio file")                                                 //
-        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF to JSON")                           //
+        ("to-json", "convert 2DA, TLK, LIP or SSF to JSON")                                //
         ("to-xml", "convert GFF to XML")                                                   //
         ("to-tga", "convert TPC image to TGA")                                             //
         ("to-2da", "convert JSON to 2DA")                                                  //
