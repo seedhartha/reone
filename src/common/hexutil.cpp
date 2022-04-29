@@ -45,4 +45,14 @@ string hexify(const reone::ByteArray &ba, string separator) {
     return ss.str();
 }
 
+ByteArray unhexify(const string &s) {
+    auto bytes = ByteArray();
+    for (size_t i = 0; i < s.size(); i += 2) {
+        uint8_t byte;
+        sscanf(&s[i], "%02hhx", &byte);
+        bytes.push_back(static_cast<char>(byte));
+    }
+    return move(bytes);
+}
+
 } // namespace reone
