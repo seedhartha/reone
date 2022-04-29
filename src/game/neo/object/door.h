@@ -142,6 +142,8 @@ public:
         _walkmeshOpen2(std::move(walkmesh2)) {
     }
 
+    void handleClick(Object &clicker) override;
+
     std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosedPtr() {
         return _walkmeshClosed;
     }
