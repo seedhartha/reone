@@ -645,10 +645,10 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
         if (model->getSquareDistanceTo(start) > kMaxCollisionDistanceLineOfSight2) {
             continue;
         }
-        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        auto objSpaceStart = model->absoluteTransformInverse() * glm::vec4(start, 1.0f);
+        auto objSpaceInvDir = 1.0f / (model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance) && distance > 0.0f) {
+        if (model->aabb().raycast(objSpaceStart, objSpaceInvDir, kMaxCollisionDistanceLineOfSight, distance) && distance > 0.0f) {
             Collision collision;
             if (testLineOfSight(start, start + distance * dir, collision) && collision.user != model->user()) {
                 continue;

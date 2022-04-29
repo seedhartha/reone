@@ -60,6 +60,8 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
     stack<AABB *> aabbs;
     aabbs.push(_rootAabb.get());
 
+    auto invDir = 1.0f / dir;
+
     while (!aabbs.empty()) {
         auto aabb = aabbs.top();
         aabbs.pop();
@@ -75,7 +77,7 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
         }
 
         // Test ray/AABB intersection
-        if (!aabb->value.raycast(origin, dir, maxDistance, distance)) {
+        if (!aabb->value.raycast(origin, invDir, maxDistance, distance)) {
             continue;
         }
 
