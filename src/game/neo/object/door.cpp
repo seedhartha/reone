@@ -60,6 +60,9 @@ void Door::flushTransform() {
     }
 }
 
+void Door::handleClick(Object &clicker) {
+}
+
 unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
     // From GIT entry
 

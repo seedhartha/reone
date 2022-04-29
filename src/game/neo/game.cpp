@@ -268,6 +268,7 @@ bool Game::SelectionController::handle(const SDL_Event &e) {
     if (e.type == SDL_MOUSEBUTTONDOWN && _hoveredObject) {
         _clickedObject = _hoveredObject;
         debug("Object clicked on: " + to_string(_clickedObject->id()) + "[" + _clickedObject->tag() + "]");
+        _clickedObject->handleClick(*_pc);
         return true;
     }
     return false;

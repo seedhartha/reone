@@ -75,6 +75,9 @@ public:
         scene::SceneGraph *_sceneGraph {nullptr};
     };
 
+    virtual void handleClick(Object &clicker) {
+    }
+
     uint32_t id() const {
         return _id;
     }
