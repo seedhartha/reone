@@ -42,7 +42,8 @@ steps = [
     ["extract_textures", "Extract texture packs (y/n)?"],
     ["extract_voices", "Extract streamwaves/streamvoices (y/n)?"],
     ["extract_lips", "Extract LIP files (y/n)?"],
-    ["convert_to_json", "Convert 2DA, GFF, TLK, LIP and SSF to JSON (y/n)?"],
+    ["convert_to_json", "Convert 2DA, TLK, LIP and SSF to JSON (y/n)?"],
+    ["convert_to_xml", "Convert GFF to XML (y/n)?"],
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
 ]
@@ -254,16 +255,10 @@ def extract_lips():
 def is_convertible_to_json(path):
     CONVERTIBLE_EXT = [
         ".2da",
-        ".gui",
-        ".ifo", ".are", ".git",
-        ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
-        ".dlg",
         ".tlk",
         ".lip",
-        ".pth",
         ".ssf"
     ]
-
     _, extension = os.path.splitext(path)
     return extension.lower() in CONVERTIBLE_EXT
 
@@ -278,6 +273,30 @@ def convert_to_json():
                 continue
             print("Converting {} to JSON...".format(f))
             run_subprocess([tools_exe, "--to-json", f])
+
+
+def is_convertible_to_xml(path):
+    CONVERTIBLE_EXT = [
+        ".gui",
+        ".ifo", ".are", ".git",
+        ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
+        ".dlg",
+        ".pth",
+    ]
+    _, extension = os.path.splitext(path)
+    return extension.lower() in CONVERTIBLE_EXT
+
+
+def convert_to_xml():
+    global extract_dir, tools_exe
+
+    for f in glob.glob("{}/**".format(extract_dir), recursive=True):
+        if is_convertible_to_xml(f):
+            xml_path = f + ".xml"
+            if os.path.exists(xml_path):
+                continue
+            print("Converting {} to XML...".format(f))
+            run_subprocess([tools_exe, "--to-xml", f])
 
 
 def convert_to_tga():
@@ -358,6 +377,10 @@ for step in steps:
         if step[0] == "convert_to_json":
             configure_tools_dir()
             convert_to_json()
+
+        if step[0] == "convert_to_xml":
+            configure_tools_dir()
+            convert_to_xml()
 
         if step[0] == "convert_to_tga":
             configure_tools_dir()
