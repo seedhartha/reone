@@ -32,7 +32,7 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 

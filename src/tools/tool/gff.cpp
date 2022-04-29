@@ -210,10 +210,11 @@ static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
     auto document = XMLDocument();
     document.LoadFile(fp);
 
+    fclose(fp);
+
     auto rootElement = document.RootElement();
     if (!rootElement) {
         cerr << "XML is empty" << endl;
-        fclose(fp);
         return;
     }
 
@@ -226,8 +227,6 @@ static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
 
     auto writer = GffWriter(resType, elementToGffStruct(*rootElement));
     writer.save(gffPath);
-
-    fclose(fp);
 }
 
 void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {

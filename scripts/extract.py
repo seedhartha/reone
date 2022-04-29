@@ -42,8 +42,7 @@ steps = [
     ["extract_textures", "Extract texture packs (y/n)?"],
     ["extract_voices", "Extract streamwaves/streamvoices (y/n)?"],
     ["extract_lips", "Extract LIP files (y/n)?"],
-    ["convert_to_json", "Convert 2DA, TLK, LIP and SSF to JSON (y/n)?"],
-    ["convert_to_xml", "Convert GFF to XML (y/n)?"],
+    ["convert_to_xml", "Convert 2DA, GFF, TLK, LIP and SSF to XML (y/n)?"],
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
 ]
@@ -252,29 +251,6 @@ def extract_lips():
                 [tools_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
-def is_convertible_to_json(path):
-    CONVERTIBLE_EXT = [
-        ".2da",
-        ".tlk",
-        ".lip",
-        ".ssf"
-    ]
-    _, extension = os.path.splitext(path)
-    return extension.lower() in CONVERTIBLE_EXT
-
-
-def convert_to_json():
-    global extract_dir, tools_exe
-
-    for f in glob.glob("{}/**".format(extract_dir), recursive=True):
-        if is_convertible_to_json(f):
-            json_path = f + ".json"
-            if os.path.exists(json_path):
-                continue
-            print("Converting {} to JSON...".format(f))
-            run_subprocess([tools_exe, "--to-json", f])
-
-
 def is_convertible_to_xml(path):
     CONVERTIBLE_EXT = [
         ".gui",
@@ -282,6 +258,10 @@ def is_convertible_to_xml(path):
         ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
         ".dlg",
         ".pth",
+        ".2da",
+        ".tlk",
+        ".lip",
+        ".ssf",
     ]
     _, extension = os.path.splitext(path)
     return extension.lower() in CONVERTIBLE_EXT
@@ -373,10 +353,6 @@ for step in steps:
             configure_game_dir()
             configure_tools_dir()
             extract_lips()
-
-        if step[0] == "convert_to_json":
-            configure_tools_dir()
-            convert_to_json()
 
         if step[0] == "convert_to_xml":
             configure_tools_dir()
