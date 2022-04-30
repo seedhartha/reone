@@ -20,6 +20,7 @@
 #include "../../../common/exception/validation.h"
 #include "../../../graphics/options.h"
 #include "../../../graphics/services.h"
+#include "../../../resource/gffstruct.h"
 
 #include "../../camerastyles.h"
 #include "../../scene/collision.h"
@@ -29,6 +30,7 @@
 
 using namespace std;
 
+using namespace reone::resource;
 using namespace reone::scene;
 
 namespace reone {
@@ -179,6 +181,15 @@ unique_ptr<Camera> Camera::Loader::load(int style) {
         .sceneGraph(&_sceneGraph)
         .style(*styleValue)
         .aspect(aspect)
+        .build();
+}
+
+unique_ptr<Camera> Camera::Loader::load(const GffStruct &gitEntry) {
+    return Camera::Builder()
+        .id(_idSeq.nextObjectId())
+        .tag("")
+        .sceneNode(_sceneGraph.newCamera())
+        .sceneGraph(&_sceneGraph)
         .build();
 }
 

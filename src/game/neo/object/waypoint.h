@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../camerastyle.h"
-
 #include "../object.h"
 
 namespace reone {
@@ -49,32 +47,13 @@ struct GameServices;
 
 namespace neo {
 
-class Camera : public Object {
+class Waypoint : public Object {
 public:
-    enum class Mode {
-        ThirdPerson,
-        Flycam
-    };
-
-    class Builder : public Object::Builder<Camera, Builder> {
+    class Builder : public Object::Builder<Waypoint, Builder> {
     public:
-        Builder &style(CameraStyle style) {
-            _style = std::move(style);
-            return *this;
+        std::unique_ptr<Waypoint> build() override {
+            return std::make_unique<Waypoint>(_id, _tag, _sceneNode, *_sceneGraph);
         }
-
-        Builder &aspect(float aspect) {
-            _aspect = aspect;
-            return *this;
-        }
-
-        std::unique_ptr<Camera> build() override {
-            return std::make_unique<Camera>(_id, _tag, _sceneNode, *_sceneGraph, _style, _aspect);
-        }
-
-    private:
-        CameraStyle _style;
-        float _aspect;
     };
 
     class Loader : boost::noncopyable {
@@ -92,8 +71,7 @@ public:
             _resourceSvc(resourceSvc) {
         }
 
-        std::unique_ptr<Camera> load(int style);
-        std::unique_ptr<Camera> load(const resource::GffStruct &gitEntry);
+        std::unique_ptr<Waypoint> load(const resource::GffStruct &gitEntry);
 
     private:
         IObjectIdSequence &_idSeq;
@@ -103,62 +81,18 @@ public:
         resource::ResourceServices &_resourceSvc;
     };
 
-    Camera(
+    Waypoint(
         uint32_t id,
         std::string tag,
         std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph,
-        CameraStyle style,
-        float aspect) :
+        scene::SceneGraph &sceneGraph) :
         Object(
             id,
-            ObjectType::Camera,
+            ObjectType::Waypoint,
             std::move(tag),
             std::move(sceneNode),
-            sceneGraph),
-        _style(std::move(style)),
-        _aspect(aspect) {
-
-        flushProjection();
-
-        _pitch = glm::half_pi<float>();
+            sceneGraph) {
     }
-
-    bool handle(const SDL_Event &e);
-    void update(float delta);
-
-    float facing() const {
-        return _facing;
-    }
-
-    void setMode(Camera::Mode mode) {
-        _mode = mode;
-    }
-
-    void setThirdPersonHook(scene::SceneNode *hook) {
-        _hook = hook;
-    }
-
-private:
-    CameraStyle _style;
-    float _aspect;
-
-    Mode _mode {Mode::Flycam};
-    scene::SceneNode *_hook {nullptr};
-
-    // Controls
-    float _forward {0.0f};
-    float _left {0.0f};
-    float _backward {0.0f};
-    float _right {0.0f};
-
-    bool handleThirdPerson(const SDL_Event &e);
-    bool handleFlycam(const SDL_Event &e);
-
-    void updateThirdPerson(float delta);
-    void updateFlycam(float delta);
-
-    void flushProjection();
 };
 
 } // namespace neo

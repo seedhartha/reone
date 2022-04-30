@@ -28,7 +28,12 @@
 #include "camera.h"
 #include "creature.h"
 #include "door.h"
+#include "encounter.h"
 #include "placeable.h"
+#include "sound.h"
+#include "store.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 using namespace std;
 
@@ -43,6 +48,8 @@ namespace neo {
 
 unique_ptr<Area> Area::Loader::load(const std::string &name) {
     info("Loading area " + name);
+
+    // ARE, GIT, LYT
 
     auto are = _resourceSvc.gffs.get(name, ResourceType::Are);
     if (!are) {
@@ -59,9 +66,22 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         throw ValidationException("LYT not found: " + name);
     }
 
-    // Rooms
-    auto rooms = vector<shared_ptr<Room>>();
+    // Loaders
+
     auto roomLoader = Room::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto cameraLoader = Camera::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto creatureLoader = Creature::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto placeableLoader = Placeable::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto doorLoader = Door::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto soundLoader = Sound::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto triggerLoader = Trigger::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto encounterLoader = Encounter::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto waypointLoader = Waypoint::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto storeLoader = Store::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+
+    // Rooms
+
+    auto rooms = vector<shared_ptr<Room>>();
     auto areRooms = are->getList("Rooms");
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
@@ -70,8 +90,8 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
     }
 
     // Main camera
+
     auto cameraStyle = are->getInt("CameraStyle");
-    auto cameraLoader = Camera::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
     auto mainCamera = cameraLoader.load(cameraStyle);
 
     auto area = Area::Builder()
@@ -83,24 +103,66 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
                     .build();
 
     // Creatures
-    auto creatureLoader = Creature::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+
     auto gitCreatures = git->getList("Creature List");
     for (auto &gitCreature : gitCreatures) {
         area->add(creatureLoader.load(*gitCreature));
     }
 
     // Placeables
-    auto placeableLoader = Placeable::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+
     auto gitPlaceables = git->getList("Placeable List");
     for (auto &gitPlaceable : gitPlaceables) {
         area->add(placeableLoader.load(*gitPlaceable));
     }
 
     // Doors
-    auto doorLoader = Door::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+
     auto gitDoors = git->getList("Door List");
     for (auto &gitDoor : gitDoors) {
         area->add(doorLoader.load(*gitDoor));
+    }
+
+    // Cameras
+
+    auto gitCameras = git->getList("CameraList");
+    for (auto &gitCamera : gitCameras) {
+        area->add(cameraLoader.load(*gitCamera));
+    }
+
+    // Sounds
+
+    auto gitSounds = git->getList("SoundList");
+    for (auto &gitSound : gitDoors) {
+        area->add(soundLoader.load(*gitSound));
+    }
+
+    // Triggers
+
+    auto gitTriggers = git->getList("TriggerList");
+    for (auto &gitTrigger : gitTriggers) {
+        area->add(triggerLoader.load(*gitTrigger));
+    }
+
+    // Encounters
+
+    auto gitEncounters = git->getList("Encounter List");
+    for (auto &gitEncounter : gitEncounters) {
+        area->add(encounterLoader.load(*gitEncounter));
+    }
+
+    // Waypoints
+
+    auto gitWaypoints = git->getList("WaypointList");
+    for (auto &gitWaypoint : gitWaypoints) {
+        area->add(waypointLoader.load(*gitWaypoint));
+    }
+
+    // Stores
+
+    auto gitStores = git->getList("StoreList");
+    for (auto &gitStore : gitStores) {
+        area->add(storeLoader.load(*gitStore));
     }
 
     return move(area);
