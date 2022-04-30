@@ -21,12 +21,6 @@
 
 namespace reone {
 
-namespace scene {
-
-class SceneGraph;
-
-}
-
 namespace game {
 
 namespace neo {

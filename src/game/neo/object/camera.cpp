@@ -171,8 +171,7 @@ unique_ptr<Camera> Camera::Loader::load(int style) {
         throw ValidationException("Camera style not found: " + to_string(style));
     }
 
-    auto &options = _graphicsSvc.options;
-    float aspect = options.width / static_cast<float>(options.height);
+    float aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
 
     return Camera::Builder()
         .id(_idSeq.nextObjectId())

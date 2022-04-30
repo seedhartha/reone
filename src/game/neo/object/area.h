@@ -26,29 +26,13 @@
 
 namespace reone {
 
-namespace scene {
-
-class SceneGraph;
-
-}
-
-namespace graphics {
-
-struct GraphicsServices;
-
-}
-
 namespace resource {
-
-struct ResourceServices;
 
 class Gff;
 
-} // namespace resource
+}
 
 namespace game {
-
-struct GameServices;
 
 namespace neo {
 
@@ -75,29 +59,25 @@ public:
         std::shared_ptr<Camera> _mainCamera;
     };
 
-    class Loader : boost::noncopyable {
+    class Loader : public Object::Loader {
     public:
         Loader(
             IObjectIdSequence &idSeq,
             scene::SceneGraph &sceneGraph,
             game::GameServices &gameSvc,
+            graphics::GraphicsOptions &graphicsOpt,
             graphics::GraphicsServices &graphicsSvc,
             resource::ResourceServices &resourceSvc) :
-            _idSeq(idSeq),
-            _sceneGraph(sceneGraph),
-            _gameSvc(gameSvc),
-            _graphicsSvc(graphicsSvc),
-            _resourceSvc(resourceSvc) {
+            Object::Loader(
+                idSeq,
+                sceneGraph,
+                gameSvc,
+                graphicsOpt,
+                graphicsSvc,
+                resourceSvc) {
         }
 
         std::unique_ptr<Area> load(const std::string &name);
-
-    private:
-        IObjectIdSequence &_idSeq;
-        scene::SceneGraph &_sceneGraph;
-        game::GameServices &_gameSvc;
-        graphics::GraphicsServices &_graphicsSvc;
-        resource::ResourceServices &_resourceSvc;
     };
 
     Area(

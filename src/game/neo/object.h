@@ -31,7 +31,22 @@ class SceneGraph;
 
 }
 
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
+
+struct GameServices;
 
 namespace neo {
 
@@ -73,6 +88,31 @@ public:
         std::string _tag;
         std::shared_ptr<scene::SceneNode> _sceneNode;
         scene::SceneGraph *_sceneGraph {nullptr};
+    };
+
+    class Loader : boost::noncopyable {
+    protected:
+        IObjectIdSequence &_idSeq;
+        scene::SceneGraph &_sceneGraph;
+        game::GameServices &_gameSvc;
+        graphics::GraphicsOptions &_graphicsOpt;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
+
+        Loader(
+            IObjectIdSequence &idSeq,
+            scene::SceneGraph &sceneGraph,
+            game::GameServices &gameSvc,
+            graphics::GraphicsOptions &graphicsOpt,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
+            _idSeq(idSeq),
+            _sceneGraph(sceneGraph),
+            _gameSvc(gameSvc),
+            _graphicsOpt(graphicsOpt),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
+        }
     };
 
     virtual void handleClick(Object &clicker) {

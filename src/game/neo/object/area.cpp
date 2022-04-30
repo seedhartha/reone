@@ -68,16 +68,16 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
 
     // Loaders
 
-    auto roomLoader = Room::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto cameraLoader = Camera::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto creatureLoader = Creature::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto placeableLoader = Placeable::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto doorLoader = Door::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto soundLoader = Sound::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto triggerLoader = Trigger::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto encounterLoader = Encounter::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto waypointLoader = Waypoint::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
-    auto storeLoader = Store::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto roomLoader = Room::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto cameraLoader = Camera::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto creatureLoader = Creature::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto placeableLoader = Placeable::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto doorLoader = Door::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto soundLoader = Sound::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto triggerLoader = Trigger::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto encounterLoader = Encounter::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto waypointLoader = Waypoint::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+    auto storeLoader = Store::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 
     // Rooms
 

@@ -21,8 +21,6 @@ namespace reone {
 
 namespace graphics {
 
-struct GraphicsOptions;
-
 class Fonts;
 class GraphicsContext;
 class LipAnimations;
@@ -36,7 +34,6 @@ class Walkmeshes;
 class Window;
 
 struct GraphicsServices {
-    GraphicsOptions &options;
     Fonts &fonts;
     GraphicsContext &context;
     LipAnimations &lipAnimations;
@@ -50,7 +47,6 @@ struct GraphicsServices {
     Window &window;
 
     GraphicsServices(
-        GraphicsOptions &options,
         Fonts &fonts,
         GraphicsContext &graphicsContext,
         LipAnimations &lipAnimations,
@@ -62,7 +58,6 @@ struct GraphicsServices {
         Uniforms &uniforms,
         Walkmeshes &walkmeshes,
         Window &window) :
-        options(options),
         fonts(fonts),
         context(graphicsContext),
         lipAnimations(lipAnimations),

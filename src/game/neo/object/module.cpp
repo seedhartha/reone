@@ -59,7 +59,7 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
 
     // Make area
 
-    auto areaLoader = Area::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsSvc, _resourceSvc);
+    auto areaLoader = Area::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
     auto area = areaLoader.load(entryArea);
 
     // Make player character

@@ -132,7 +132,7 @@ void Game::loadModule(const string &name) {
     _services.game.resourceLayout.loadModuleResources(name);
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto newModule = Module::Loader(*this, scene, _services.game, _services.graphics, _services.resource).load(name);
+    auto newModule = Module::Loader(*this, scene, _services.game, _options.graphics, _services.graphics, _services.resource).load(name);
 
     _module = move(newModule);
 
