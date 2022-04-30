@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/bifreader.h"
 
 #include "../checkutil.h"
@@ -31,22 +32,23 @@ BOOST_AUTO_TEST_SUITE(bif_reader)
 BOOST_AUTO_TEST_CASE(should_read_bif) {
     // given
 
-    auto ss = ostringstream();
-    // header
-    ss << "BIFFV1  ";
-    ss << string("\x01\x00\x00\x00", 4); // number of variable resources
-    ss << string("\x00\x00\x00\x00", 4); // number of fixed resources
-    ss << string("\x14\x00\x00\x00", 4); // offset to variable resources
-    // variable resource table
-    ss << string("\x00\x00\x00\x00", 4); // id
-    ss << string("\x24\x00\x00\x00", 4); // offset
-    ss << string("\x0d\x00\x00\x00", 4); // filesize
-    ss << string("\xe6\x07\x00\x00", 4); // type
-    // variable resource data
-    ss << "Hello, world!";
+    auto input = StringBuilder()
+                     // header
+                     .append("BIFFV1  ")
+                     .append("\x01\x00\x00\x00", 4) // number of variable resources
+                     .append("\x00\x00\x00\x00", 4) // number of fixed resources
+                     .append("\x14\x00\x00\x00", 4) // offset to variable resources
+                     // variable resource table
+                     .append("\x00\x00\x00\x00", 4) // id
+                     .append("\x24\x00\x00\x00", 4) // offset
+                     .append("\x0d\x00\x00\x00", 4) // filesize
+                     .append("\xe6\x07\x00\x00", 4) // type
+                     // variable resource data
+                     .append("Hello, world!")
+                     .build();
 
     auto reader = BifReader();
-    auto bif = make_shared<istringstream>(ss.str());
+    auto bif = make_shared<istringstream>(input);
     auto expectedData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when

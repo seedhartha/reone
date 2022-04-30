@@ -24,6 +24,7 @@ set(COMMON_HEADERS
     streamreader.h
     streamutil.h
     streamwriter.h
+    stringbuilder.h
     timer.h
     types.h
     unicodeutil.h)

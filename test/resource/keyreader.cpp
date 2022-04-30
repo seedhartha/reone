@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/keyreader.h"
 
 using namespace std;
@@ -29,47 +30,42 @@ BOOST_AUTO_TEST_SUITE(key_reader)
 BOOST_AUTO_TEST_CASE(should_read_key) {
     // given
 
-    auto ss = ostringstream();
-
-    // header
-    ss << "KEY V1  ";
-    ss << string("\x02\x00\x00\x00", 4); // number of files
-    ss << string("\x02\x00\x00\x00", 4); // number of keys
-    ss << string("\x40\x00\x00\x00", 4); // offset to files
-    ss << string("\x5e\x00\x00\x00", 4); // offset to keys
-    ss << string("\x00\x00\x00\x00", 4); // build year
-    ss << string("\x00\x00\x00\x00", 4); // build day
-
-    ss << string("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32); // reserved
-
-    // file 0
-    ss << string("\x80\x00\x00\x00", 4); // filesize
-    ss << string("\x58\x00\x00\x00", 4); // filename offset
-    ss << string("\x02\x00", 2);         // filename length
-    ss << string("\x00\x00", 2);         // drives
-
-    // file 1
-    ss << string("\x00\x01\x00\x00", 4); // filesize
-    ss << string("\x5b\x00\x00\x00", 4); // filename offset
-    ss << string("\x02\x00", 2);         // filename length
-    ss << string("\x00\x00", 2);         // drives
-
-    // filenames
-    ss << string("Aa\x00", 3);
-    ss << string("Bb\x00", 3);
-
-    // key 0
-    ss << string("Cc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16);
-    ss << string("\xe1\x07", 2);
-    ss << string("\xd3\x07\xc0\x00", 4);
-
-    // key 1
-    ss << string("Dd\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16);
-    ss << string("\xf5\x07", 2);
-    ss << string("\xd3\x07\xc0\x00", 4);
+    auto input = StringBuilder()
+                     // header
+                     .append("KEY V1  ")
+                     .append("\x02\x00\x00\x00", 4) // number of files
+                     .append("\x02\x00\x00\x00", 4) // number of keys
+                     .append("\x40\x00\x00\x00", 4) // offset to files
+                     .append("\x5e\x00\x00\x00", 4) // offset to keys
+                     .append("\x00\x00\x00\x00", 4) // build year
+                     .append("\x00\x00\x00\x00", 4) // build day
+                     // reserved
+                     .append("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32)
+                     // file 0
+                     .append("\x80\x00\x00\x00", 4) // filesize
+                     .append("\x58\x00\x00\x00", 4) // filename offset
+                     .append("\x02\x00", 2)         // filename length
+                     .append("\x00\x00", 2)         // drives
+                     // file 1
+                     .append("\x00\x01\x00\x00", 4) // filesize
+                     .append("\x5b\x00\x00\x00", 4) // filename offset
+                     .append("\x02\x00", 2)         // filename length
+                     .append("\x00\x00", 2)         // drives
+                     // filenames
+                     .append("Aa\x00", 3)
+                     .append("Bb\x00", 3)
+                     // key 0
+                     .append("Cc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16)
+                     .append("\xe1\x07", 2)
+                     .append("\xd3\x07\xc0\x00", 4)
+                     // key 1
+                     .append("Dd\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16)
+                     .append("\xf5\x07", 2)
+                     .append("\xd3\x07\xc0\x00", 4)
+                     .build();
 
     auto reader = KeyReader();
-    auto key = make_shared<istringstream>(ss.str());
+    auto key = make_shared<istringstream>(input);
 
     // when
 

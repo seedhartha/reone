@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stringbuilder.h"
 #include "../../src/script/format/ncsreader.h"
 #include "../../src/script/program.h"
 
@@ -30,107 +31,108 @@ BOOST_AUTO_TEST_SUITE(ncs_reader)
 BOOST_AUTO_TEST_CASE(should_read_ncs) {
     // given
 
-    auto ss = ostringstream();
-    ss << "NCS V1.0";
-    ss << string("\x42\x00\x00\x01\x2c", 5);                      // T
-    ss << string("\x01\x01\xff\xff\xff\xfc\x00\x04", 8);          // CPDOWNSP
-    ss << string("\x03\x01\xff\xff\xff\xfc\x00\x04", 8);          // CPTOPSP
-    ss << string("\x26\x01\xff\xff\xff\xfc\x00\x04", 8);          // CPDOWNBP
-    ss << string("\x27\x01\xff\xff\xff\xfc\x00\x04", 8);          // CPTOPBP
-    ss << string("\x04\x03\x00\x00\x00\x01", 6);                  // CONSTI
-    ss << string("\x04\x04\x3f\x80\x00\x00", 6);                  // CONSTF
-    ss << string("\x04\x05\x00\x02\x41\x61", 6);                  // CONSTS
-    ss << string("\x04\x06\x00\x00\x00\x02", 6);                  // CONSTO
-    ss << string("\x05\x00\x00\x01\x02", 5);                      // ACTION
-    ss << string("\x1b\x00\xff\xff\xff\xfc", 6);                  // MOVSP
-    ss << string("\x1d\x00\x00\x00\x00\x01", 6);                  // JMP
-    ss << string("\x1e\x00\x00\x00\x00\x02", 6);                  // JSR
-    ss << string("\x1f\x00\x00\x00\x00\x03", 6);                  // JZ
-    ss << string("\x25\x00\x00\x00\x00\x04", 6);                  // JNZ
-    ss << string("\x21\x01\x00\x08\xff\xfc\x00\x04", 8);          // DESTRUCT
-    ss << string("\x23\x03\xff\xff\xff\xfc", 6);                  // DECISP
-    ss << string("\x24\x03\xff\xff\xff\xfc", 6);                  // INCISP
-    ss << string("\x28\x03\xff\xff\xff\xfc", 6);                  // DECIBP
-    ss << string("\x29\x03\xff\xff\xff\xfc", 6);                  // INCIBP
-    ss << string("\x2c\x10\x00\x00\x00\x04\x00\x00\x00\x08", 10); // STORE_STATE
-    ss << string("\x0b\x24\x00\x04", 4);                          // EQUALTT
-    ss << string("\x0c\x24\x00\x04", 4);                          // NEQUALTT
-    ss << string("\x00\x0c", 2);                                  // NOP
-    ss << string("\x02\x03", 2);                                  // RSADDI
-    ss << string("\x02\x04", 2);                                  // RSADDF
-    ss << string("\x02\x05", 2);                                  // RSADDS
-    ss << string("\x02\x06", 2);                                  // RSADDO
-    ss << string("\x02\x10", 2);                                  // RSADDEFF
-    ss << string("\x02\x11", 2);                                  // RSADDEVT
-    ss << string("\x02\x12", 2);                                  // RSADDLOC
-    ss << string("\x02\x13", 2);                                  // RSADDTAL
-    ss << string("\x06\x20", 2);                                  // LOGANDII
-    ss << string("\x07\x20", 2);                                  // LOGORII
-    ss << string("\x08\x20", 2);                                  // INCORII
-    ss << string("\x09\x20", 2);                                  // EXCORII
-    ss << string("\x0a\x20", 2);                                  // BOOLANDII
-    ss << string("\x0b\x20", 2);                                  // EQUALII
-    ss << string("\x0b\x21", 2);                                  // EQUALFF
-    ss << string("\x0b\x23", 2);                                  // EQUALSS
-    ss << string("\x0b\x22", 2);                                  // EQUALOO
-    ss << string("\x0b\x30", 2);                                  // EQUALEFFEFF
-    ss << string("\x0b\x31", 2);                                  // EQUALEVTEVT
-    ss << string("\x0b\x32", 2);                                  // EQUALLOCLOC
-    ss << string("\x0b\x33", 2);                                  // EQUALTALTAL
-    ss << string("\x0c\x20", 2);                                  // NEQUALII
-    ss << string("\x0c\x21", 2);                                  // NEQUALFF
-    ss << string("\x0c\x23", 2);                                  // NEQUALSS
-    ss << string("\x0c\x22", 2);                                  // NEQUALOO
-    ss << string("\x0c\x30", 2);                                  // NEQUALEFFEFF
-    ss << string("\x0c\x31", 2);                                  // NEQUALEVTEVT
-    ss << string("\x0c\x32", 2);                                  // NEQUALLOCLOC
-    ss << string("\x0c\x33", 2);                                  // NEQUALTALTAL
-    ss << string("\x0d\x20", 2);                                  // GEQII
-    ss << string("\x0d\x21", 2);                                  // GEQFF
-    ss << string("\x0e\x20", 2);                                  // GTII
-    ss << string("\x0e\x21", 2);                                  // GTFF
-    ss << string("\x0f\x20", 2);                                  // LTII
-    ss << string("\x0f\x21", 2);                                  // LTFF
-    ss << string("\x10\x20", 2);                                  // LEQII
-    ss << string("\x10\x21", 2);                                  // LEQFF
-    ss << string("\x11\x20", 2);                                  // SHLEFTII
-    ss << string("\x12\x20", 2);                                  // SHRIGHTII
-    ss << string("\x13\x20", 2);                                  // USHRIGHTII
-    ss << string("\x14\x20", 2);                                  // ADDII
-    ss << string("\x14\x25", 2);                                  // ADDIF
-    ss << string("\x14\x26", 2);                                  // ADDFI
-    ss << string("\x14\x21", 2);                                  // ADDFF
-    ss << string("\x14\x23", 2);                                  // ADDSS
-    ss << string("\x14\x3a", 2);                                  // ADDVV
-    ss << string("\x15\x20", 2);                                  // SUBII
-    ss << string("\x15\x25", 2);                                  // SUBIF
-    ss << string("\x15\x26", 2);                                  // SUBFI
-    ss << string("\x15\x21", 2);                                  // SUBFF
-    ss << string("\x15\x3a", 2);                                  // SUBVV
-    ss << string("\x16\x20", 2);                                  // MULII
-    ss << string("\x16\x25", 2);                                  // MULIF
-    ss << string("\x16\x26", 2);                                  // MULFI
-    ss << string("\x16\x21", 2);                                  // MULFF
-    ss << string("\x16\x3b", 2);                                  // MULVF
-    ss << string("\x16\x3c", 2);                                  // MULFV
-    ss << string("\x17\x20", 2);                                  // DIVII
-    ss << string("\x17\x25", 2);                                  // DIVIF
-    ss << string("\x17\x26", 2);                                  // DIVFI
-    ss << string("\x17\x21", 2);                                  // DIVFF
-    ss << string("\x17\x3b", 2);                                  // DIVVF
-    ss << string("\x17\x3c", 2);                                  // DIVFV
-    ss << string("\x18\x20", 2);                                  // MODII
-    ss << string("\x19\x03", 2);                                  // NEGI
-    ss << string("\x19\x04", 2);                                  // NEGF
-    ss << string("\x1a\x03", 2);                                  // COMPI
-    ss << string("\x20\x00", 2);                                  // RETN
-    ss << string("\x22\x03", 2);                                  // NOTI
-    ss << string("\x2a\x00", 2);                                  // SAVEBP
-    ss << string("\x2b\x00", 2);                                  // RESTOREBP
-    ss << string("\x2d\x00", 2);                                  // NOP2
+    auto input = StringBuilder()
+                     .append("NCS V1.0")
+                     .append("\x42\x00\x00\x01\x2c", 5)                      // T
+                     .append("\x01\x01\xff\xff\xff\xfc\x00\x04", 8)          // CPDOWNSP
+                     .append("\x03\x01\xff\xff\xff\xfc\x00\x04", 8)          // CPTOPSP
+                     .append("\x26\x01\xff\xff\xff\xfc\x00\x04", 8)          // CPDOWNBP
+                     .append("\x27\x01\xff\xff\xff\xfc\x00\x04", 8)          // CPTOPBP
+                     .append("\x04\x03\x00\x00\x00\x01", 6)                  // CONSTI
+                     .append("\x04\x04\x3f\x80\x00\x00", 6)                  // CONSTF
+                     .append("\x04\x05\x00\x02\x41\x61", 6)                  // CONSTS
+                     .append("\x04\x06\x00\x00\x00\x02", 6)                  // CONSTO
+                     .append("\x05\x00\x00\x01\x02", 5)                      // ACTION
+                     .append("\x1b\x00\xff\xff\xff\xfc", 6)                  // MOVSP
+                     .append("\x1d\x00\x00\x00\x00\x01", 6)                  // JMP
+                     .append("\x1e\x00\x00\x00\x00\x02", 6)                  // JSR
+                     .append("\x1f\x00\x00\x00\x00\x03", 6)                  // JZ
+                     .append("\x25\x00\x00\x00\x00\x04", 6)                  // JNZ
+                     .append("\x21\x01\x00\x08\xff\xfc\x00\x04", 8)          // DESTRUCT
+                     .append("\x23\x03\xff\xff\xff\xfc", 6)                  // DECISP
+                     .append("\x24\x03\xff\xff\xff\xfc", 6)                  // INCISP
+                     .append("\x28\x03\xff\xff\xff\xfc", 6)                  // DECIBP
+                     .append("\x29\x03\xff\xff\xff\xfc", 6)                  // INCIBP
+                     .append("\x2c\x10\x00\x00\x00\x04\x00\x00\x00\x08", 10) // STORE_STATE
+                     .append("\x0b\x24\x00\x04", 4)                          // EQUALTT
+                     .append("\x0c\x24\x00\x04", 4)                          // NEQUALTT
+                     .append("\x00\x0c", 2)                                  // NOP
+                     .append("\x02\x03", 2)                                  // RSADDI
+                     .append("\x02\x04", 2)                                  // RSADDF
+                     .append("\x02\x05", 2)                                  // RSADDS
+                     .append("\x02\x06", 2)                                  // RSADDO
+                     .append("\x02\x10", 2)                                  // RSADDEFF
+                     .append("\x02\x11", 2)                                  // RSADDEVT
+                     .append("\x02\x12", 2)                                  // RSADDLOC
+                     .append("\x02\x13", 2)                                  // RSADDTAL
+                     .append("\x06\x20", 2)                                  // LOGANDII
+                     .append("\x07\x20", 2)                                  // LOGORII
+                     .append("\x08\x20", 2)                                  // INCORII
+                     .append("\x09\x20", 2)                                  // EXCORII
+                     .append("\x0a\x20", 2)                                  // BOOLANDII
+                     .append("\x0b\x20", 2)                                  // EQUALII
+                     .append("\x0b\x21", 2)                                  // EQUALFF
+                     .append("\x0b\x23", 2)                                  // EQUALSS
+                     .append("\x0b\x22", 2)                                  // EQUALOO
+                     .append("\x0b\x30", 2)                                  // EQUALEFFEFF
+                     .append("\x0b\x31", 2)                                  // EQUALEVTEVT
+                     .append("\x0b\x32", 2)                                  // EQUALLOCLOC
+                     .append("\x0b\x33", 2)                                  // EQUALTALTAL
+                     .append("\x0c\x20", 2)                                  // NEQUALII
+                     .append("\x0c\x21", 2)                                  // NEQUALFF
+                     .append("\x0c\x23", 2)                                  // NEQUALSS
+                     .append("\x0c\x22", 2)                                  // NEQUALOO
+                     .append("\x0c\x30", 2)                                  // NEQUALEFFEFF
+                     .append("\x0c\x31", 2)                                  // NEQUALEVTEVT
+                     .append("\x0c\x32", 2)                                  // NEQUALLOCLOC
+                     .append("\x0c\x33", 2)                                  // NEQUALTALTAL
+                     .append("\x0d\x20", 2)                                  // GEQII
+                     .append("\x0d\x21", 2)                                  // GEQFF
+                     .append("\x0e\x20", 2)                                  // GTII
+                     .append("\x0e\x21", 2)                                  // GTFF
+                     .append("\x0f\x20", 2)                                  // LTII
+                     .append("\x0f\x21", 2)                                  // LTFF
+                     .append("\x10\x20", 2)                                  // LEQII
+                     .append("\x10\x21", 2)                                  // LEQFF
+                     .append("\x11\x20", 2)                                  // SHLEFTII
+                     .append("\x12\x20", 2)                                  // SHRIGHTII
+                     .append("\x13\x20", 2)                                  // USHRIGHTII
+                     .append("\x14\x20", 2)                                  // ADDII
+                     .append("\x14\x25", 2)                                  // ADDIF
+                     .append("\x14\x26", 2)                                  // ADDFI
+                     .append("\x14\x21", 2)                                  // ADDFF
+                     .append("\x14\x23", 2)                                  // ADDSS
+                     .append("\x14\x3a", 2)                                  // ADDVV
+                     .append("\x15\x20", 2)                                  // SUBII
+                     .append("\x15\x25", 2)                                  // SUBIF
+                     .append("\x15\x26", 2)                                  // SUBFI
+                     .append("\x15\x21", 2)                                  // SUBFF
+                     .append("\x15\x3a", 2)                                  // SUBVV
+                     .append("\x16\x20", 2)                                  // MULII
+                     .append("\x16\x25", 2)                                  // MULIF
+                     .append("\x16\x26", 2)                                  // MULFI
+                     .append("\x16\x21", 2)                                  // MULFF
+                     .append("\x16\x3b", 2)                                  // MULVF
+                     .append("\x16\x3c", 2)                                  // MULFV
+                     .append("\x17\x20", 2)                                  // DIVII
+                     .append("\x17\x25", 2)                                  // DIVIF
+                     .append("\x17\x26", 2)                                  // DIVFI
+                     .append("\x17\x21", 2)                                  // DIVFF
+                     .append("\x17\x3b", 2)                                  // DIVVF
+                     .append("\x17\x3c", 2)                                  // DIVFV
+                     .append("\x18\x20", 2)                                  // MODII
+                     .append("\x19\x03", 2)                                  // NEGI
+                     .append("\x19\x04", 2)                                  // NEGF
+                     .append("\x1a\x03", 2)                                  // COMPI
+                     .append("\x20\x00", 2)                                  // RETN
+                     .append("\x22\x03", 2)                                  // NOTI
+                     .append("\x2a\x00", 2)                                  // SAVEBP
+                     .append("\x2b\x00", 2)                                  // RESTOREBP
+                     .append("\x2d\x00", 2)                                  // NOP2
+                     .build();
 
     auto reader = NcsReader("");
-    auto stream = make_shared<istringstream>(ss.str());
+    auto stream = make_shared<istringstream>(input);
 
     // when
 

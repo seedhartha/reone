@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/tlkreader.h"
 #include "../../src/resource/talktable.h"
 
@@ -30,34 +31,35 @@ BOOST_AUTO_TEST_SUITE(tlk_reader)
 BOOST_AUTO_TEST_CASE(should_read_tlk) {
     // given
 
-    auto ss = ostringstream();
-    // header
-    ss << string("TLK V3.0", 8);
-    ss << string("\x00\x00\x00\x00", 4); // language id
-    ss << string("\x02\x00\x00\x00", 4); // number of strings
-    ss << string("\x64\x00\x00\x00", 4); // offset to string entries
-    // string data 0
-    ss << string("\x07\x00\x00\x00", 4);                                                  // flags
-    ss << string("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16); // sound res ref
-    ss << string("\x00\x00\x00\x00", 4);                                                  // volume variance
-    ss << string("\x00\x00\x00\x00", 4);                                                  // pitch variance
-    ss << string("\x00\x00\x00\x00", 4);                                                  // offset to string
-    ss << string("\x04\x00\x00\x00", 4);                                                  // string size
-    ss << string("\x00\x00\x00\x00", 4);                                                  // sound length
-    // string data 1
-    ss << string("\x07\x00\x00\x00", 4);                                      // flags
-    ss << string("jane\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16); // sound res ref
-    ss << string("\x00\x00\x00\x00", 4);                                      // volume variance
-    ss << string("\x00\x00\x00\x00", 4);                                      // pitch variance
-    ss << string("\x04\x00\x00\x00", 4);                                      // offset to string
-    ss << string("\x04\x00\x00\x00", 4);                                      // string size
-    ss << string("\x00\x00\x00\x00", 4);                                      // sound length
-    // string entries
-    ss << "John";
-    ss << "Jane";
+    auto input = StringBuilder()
+                     // header
+                     .append("TLK V3.0", 8)
+                     .append("\x00\x00\x00\x00", 4) // language id
+                     .append("\x02\x00\x00\x00", 4) // number of strings
+                     .append("\x64\x00\x00\x00", 4) // offset to string entries
+                     // string data 0
+                     .append("\x07\x00\x00\x00", 4)                                                  // flags
+                     .append("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
+                     .append("\x00\x00\x00\x00", 4)                                                  // volume variance
+                     .append("\x00\x00\x00\x00", 4)                                                  // pitch variance
+                     .append("\x00\x00\x00\x00", 4)                                                  // offset to string
+                     .append("\x04\x00\x00\x00", 4)                                                  // string size
+                     .append("\x00\x00\x00\x00", 4)                                                  // sound length
+                     // string data 1
+                     .append("\x07\x00\x00\x00", 4)                                      // flags
+                     .append("jane\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
+                     .append("\x00\x00\x00\x00", 4)                                      // volume variance
+                     .append("\x00\x00\x00\x00", 4)                                      // pitch variance
+                     .append("\x04\x00\x00\x00", 4)                                      // offset to string
+                     .append("\x04\x00\x00\x00", 4)                                      // string size
+                     .append("\x00\x00\x00\x00", 4)                                      // sound length
+                     // string entries
+                     .append("John")
+                     .append("Jane")
+                     .build();
 
     auto reader = TlkReader();
-    auto stream = make_shared<istringstream>(ss.str());
+    auto stream = make_shared<istringstream>(input);
 
     // when
 
