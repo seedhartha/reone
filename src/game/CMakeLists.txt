@@ -446,9 +446,14 @@ set(GAME_NEO_HEADERS
     neo/object/camera.h
     neo/object/creature.h
     neo/object/door.h
+    neo/object/encounter.h
     neo/object/module.h
     neo/object/placeable.h
-    neo/object/room.h)
+    neo/object/room.h
+    neo/object/sound.h
+    neo/object/store.h
+    neo/object/trigger.h
+    neo/object/waypoint.h)
 
 set(GAME_NEO_SOURCES
     neo/game.cpp
@@ -456,11 +461,16 @@ set(GAME_NEO_SOURCES
     neo/object/camera.cpp
     neo/object/creature.cpp
     neo/object/door.cpp
+    neo/object/encounter.cpp
     neo/object/module.cpp
     neo/object/placeable.cpp
-    neo/object/room.cpp)
+    neo/object/room.cpp
+    neo/object/sound.cpp
+    neo/object/store.cpp
+    neo/object/trigger.cpp
+    neo/object/waypoint.cpp)
 
-add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${GAME_HEADERS} ${GAME_NEO_SOURCES} ${CLANG_FORMAT_PATH})
+add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${GAME_HEADERS} ${GAME_NEO_HEADERS} ${GAME_NEO_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(game PUBLIC script gui scene movie audio graphics resource common)
