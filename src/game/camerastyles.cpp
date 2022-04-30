@@ -29,7 +29,7 @@ namespace reone {
 namespace game {
 
 void CameraStyles::init() {
-    shared_ptr<TwoDA> twoDa(_twoDas.get("camerastyle"));
+    shared_ptr<TwoDa> twoDa(_twoDas.get("camerastyle"));
     if (!twoDa) {
         return;
     }

@@ -26,14 +26,42 @@ class TwoDaReader;
 /**
  * Two-dimensional array, similar to a database table.
  */
-class TwoDA : boost::noncopyable {
+class TwoDa : boost::noncopyable {
 public:
     struct Row {
         std::vector<std::string> values;
     };
 
-    void addColumn(std::string name);
-    void add(Row row);
+    class Builder : boost::noncopyable {
+    public:
+        Builder &column(std::string column) {
+            _columns.push_back(std::move(column));
+            return *this;
+        }
+
+        Builder &row(TwoDa::Row row) {
+            _rows.push_back(std::move(row));
+            return *this;
+        }
+
+        Builder &row(std::vector<std::string> values) {
+            _rows.push_back(Row {std::move(values)});
+            return *this;
+        }
+
+        std::unique_ptr<TwoDa> build() {
+            return std::make_unique<TwoDa>(_columns, _rows);
+        }
+
+    private:
+        std::vector<std::string> _columns;
+        std::vector<Row> _rows;
+    };
+
+    TwoDa(std::vector<std::string> columns, std::vector<Row> rows) :
+        _columns(std::move(columns)),
+        _rows(std::move(rows)) {
+    }
 
     /**
      * @return index of the first 2DA row, whose cell value equals the specified value, -1 otherwise
@@ -57,14 +85,18 @@ public:
     const std::vector<std::string> &columns() const { return _columns; }
     const std::vector<Row> &rows() const { return _rows; }
 
+    static Row newRow(std::vector<std::string> values) {
+        auto row = Row();
+        row.values = std::move(values);
+        return std::move(row);
+    }
+
 private:
     std::vector<std::string> _columns;
     std::vector<Row> _rows;
 
     int getColumnIndex(const std::string &column) const;
     std::vector<int> getColumnIndices(const std::vector<std::string> &columns) const;
-
-    friend class TwoDaReader;
 };
 
 } // namespace resource

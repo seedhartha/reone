@@ -79,11 +79,11 @@ void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
         return;
     }
 
-    auto table = make_unique<TalkTable>();
+    auto table = TalkTable::Builder();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
-        table->addString(TalkTableString {
+        table.string(
             element->Attribute("text"),
-            element->Attribute("soundResRef")});
+            element->Attribute("soundResRef"));
     }
 
     vector<string> tokens;
@@ -96,7 +96,7 @@ void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
     auto tlkPath = fs::path(destPath);
     tlkPath.append(tokens[0] + ".tlk");
 
-    auto writer = TlkWriter(move(table));
+    auto writer = TlkWriter(table.build());
     writer.save(tlkPath);
 }
 

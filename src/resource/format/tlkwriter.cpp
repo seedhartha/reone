@@ -45,7 +45,7 @@ void TlkWriter::save(std::shared_ptr<std::ostream> out) {
 
     uint32_t offString = 0;
     for (int i = 0; i < _talkTable->getStringCount(); ++i) {
-        const TalkTableString &str = _talkTable->getString(i);
+        auto &str = _talkTable->getString(i);
         auto strSize = static_cast<uint32_t>(str.text.length());
 
         StringDataElement strDataElem;

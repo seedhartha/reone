@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 void Spells::init() {
-    shared_ptr<TwoDA> spells(_twoDas.get("spells"));
+    shared_ptr<TwoDa> spells(_twoDas.get("spells"));
     if (!spells)
         return;
 

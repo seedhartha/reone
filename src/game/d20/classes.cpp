@@ -30,7 +30,7 @@ namespace game {
 static const char kClassesTableResRef[] = "classes";
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDA> classes(_twoDas.get(kClassesTableResRef));
+    shared_ptr<TwoDa> classes(_twoDas.get(kClassesTableResRef));
 
     auto clazz = make_shared<CreatureClass>(type, *this, _strings, _twoDas);
     clazz->load(*classes, static_cast<int>(type));

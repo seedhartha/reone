@@ -33,7 +33,7 @@ namespace game {
 
 static const char kSkillsTwoDaResRef[] = "skills";
 
-void CreatureClass::load(const TwoDA &twoDa, int row) {
+void CreatureClass::load(const TwoDa &twoDa, int row) {
     _name = _strings.get(twoDa.getInt(row, "name"));
     _description = _strings.get(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
@@ -58,7 +58,7 @@ void CreatureClass::load(const TwoDA &twoDa, int row) {
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
-    shared_ptr<TwoDA> skills(_twoDas.get(kSkillsTwoDaResRef));
+    shared_ptr<TwoDa> skills(_twoDas.get(kSkillsTwoDaResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<SkillType>(row));
@@ -67,7 +67,7 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
 }
 
 void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
-    shared_ptr<TwoDA> twoDa(_twoDas.get(savingThrowTable));
+    shared_ptr<TwoDa> twoDa(_twoDas.get(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -81,7 +81,7 @@ void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
 }
 
 void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
-    shared_ptr<TwoDA> twoDa(_twoDas.get(attackBonusTable));
+    shared_ptr<TwoDa> twoDa(_twoDas.get(attackBonusTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }

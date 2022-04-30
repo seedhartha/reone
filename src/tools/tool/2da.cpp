@@ -83,20 +83,27 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
         return;
     }
 
-    auto table = make_unique<TwoDA>();
+    auto twoDa = TwoDa::Builder();
 
+    // Columns
+    auto firstElement = rootElement->FirstChildElement();
+    for (auto attribute = firstElement->FirstAttribute(); attribute; attribute = attribute->Next()) {
+        if (strncmp(attribute->Name(), "_index", 6) == 0) {
+            continue;
+        }
+        twoDa.column(attribute->Name());
+    }
+
+    // Rows
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
-        auto row = TwoDA::Row();
+        auto row = TwoDa::Row();
         for (auto attribute = element->FirstAttribute(); attribute; attribute = attribute->Next()) {
             if (strncmp(attribute->Name(), "_index", 6) == 0) {
                 continue;
             }
-            if (table->getRowCount() == 0) {
-                table->addColumn(attribute->Name());
-            }
             row.values.push_back(attribute->Value());
         }
-        table->add(move(row));
+        twoDa.row(move(row));
     }
 
     vector<string> tokens;
@@ -109,7 +116,7 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     auto twoDaPath = fs::path(destPath);
     twoDaPath.append(tokens[0] + ".2da");
 
-    auto writer = TwoDaWriter(move(table));
+    auto writer = TwoDaWriter(twoDa.build());
     writer.save(twoDaPath);
 }
 

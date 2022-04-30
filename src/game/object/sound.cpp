@@ -92,7 +92,7 @@ void Sound::loadUTS(const Gff &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const Gff &uts) {
-    shared_ptr<TwoDA> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
+    shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }

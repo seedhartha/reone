@@ -34,7 +34,7 @@ TwoDas::TwoDas(Resources &resources) :
     _resources(resources) {
 }
 
-shared_ptr<TwoDA> TwoDas::doGet(const string &resRef) {
+shared_ptr<TwoDa> TwoDas::doGet(const string &resRef) {
     auto raw = _resources.get(resRef, ResourceType::TwoDa);
     if (!raw) {
         return nullptr;

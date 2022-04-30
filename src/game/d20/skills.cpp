@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 void Skills::init() {
-    shared_ptr<TwoDA> skills(_twoDas.get("skills"));
+    shared_ptr<TwoDa> skills(_twoDas.get("skills"));
     if (!skills) {
         return;
     }

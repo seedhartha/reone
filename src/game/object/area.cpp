@@ -237,7 +237,7 @@ void Area::loadProperties(const Gff &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(_services.resource.twoDas.get("ambientmusic"));
+        shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }

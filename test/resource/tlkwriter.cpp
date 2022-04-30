@@ -34,35 +34,36 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
     // given
 
     auto expectedOutput = StringBuilder()
-                  // header
-                  .append("TLK V3.0", 8)
-                  .append("\x00\x00\x00\x00", 4) // language id
-                  .append("\x02\x00\x00\x00", 4) // number of strings
-                  .append("\x64\x00\x00\x00", 4) // offset to string entries
-                  // string data 0
-                  .append("\x07\x00\x00\x00", 4)                                                  // flags
-                  .append("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
-                  .append("\x00\x00\x00\x00", 4)                                                  // volume variance
-                  .append("\x00\x00\x00\x00", 4)                                                  // pitch variance
-                  .append("\x00\x00\x00\x00", 4)                                                  // offset to string
-                  .append("\x04\x00\x00\x00", 4)                                                  // string size
-                  .append("\x00\x00\x00\x00", 4)                                                  // sound length
-                  // string data 1
-                  .append("\x07\x00\x00\x00", 4)                                      // flags
-                  .append("jane\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
-                  .append("\x00\x00\x00\x00", 4)                                      // volume variance
-                  .append("\x00\x00\x00\x00", 4)                                      // pitch variance
-                  .append("\x04\x00\x00\x00", 4)                                      // offset to string
-                  .append("\x04\x00\x00\x00", 4)                                      // string size
-                  .append("\x00\x00\x00\x00", 4)                                      // sound length
-                  // string entries
-                  .append("John")
-                  .append("Jane")
-                  .build();
+                              // header
+                              .append("TLK V3.0", 8)
+                              .append("\x00\x00\x00\x00", 4) // language id
+                              .append("\x02\x00\x00\x00", 4) // number of strings
+                              .append("\x64\x00\x00\x00", 4) // offset to string entries
+                              // string data 0
+                              .append("\x07\x00\x00\x00", 4)                                                  // flags
+                              .append("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
+                              .append("\x00\x00\x00\x00", 4)                                                  // volume variance
+                              .append("\x00\x00\x00\x00", 4)                                                  // pitch variance
+                              .append("\x00\x00\x00\x00", 4)                                                  // offset to string
+                              .append("\x04\x00\x00\x00", 4)                                                  // string size
+                              .append("\x00\x00\x00\x00", 4)                                                  // sound length
+                              // string data 1
+                              .append("\x07\x00\x00\x00", 4)                                      // flags
+                              .append("jane\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
+                              .append("\x00\x00\x00\x00", 4)                                      // volume variance
+                              .append("\x00\x00\x00\x00", 4)                                      // pitch variance
+                              .append("\x04\x00\x00\x00", 4)                                      // offset to string
+                              .append("\x04\x00\x00\x00", 4)                                      // string size
+                              .append("\x00\x00\x00\x00", 4)                                      // sound length
+                              // string entries
+                              .append("John")
+                              .append("Jane")
+                              .build();
 
-    auto table = make_shared<TalkTable>();
-    table->addString(TalkTableString {"John", ""});
-    table->addString(TalkTableString {"Jane", "jane"});
+    shared_ptr<TalkTable> table = TalkTable::Builder()
+                                      .string("John", "")
+                                      .string("Jane", "jane")
+                                      .build();
 
     auto writer = TlkWriter(table);
     auto stream = make_shared<ostringstream>();

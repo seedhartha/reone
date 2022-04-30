@@ -23,11 +23,11 @@ class StreamWriter;
 
 namespace resource {
 
-class TwoDA;
+class TwoDa;
 
 class TwoDaWriter {
 public:
-    TwoDaWriter(std::shared_ptr<TwoDA> twoDa) :
+    TwoDaWriter(std::shared_ptr<TwoDa> twoDa) :
         _twoDa(std::move(twoDa)) {
     }
 
@@ -35,7 +35,7 @@ public:
     void save(std::shared_ptr<std::ostream> out);
 
 private:
-    std::shared_ptr<TwoDA> _twoDa;
+    std::shared_ptr<TwoDa> _twoDa;
     std::unique_ptr<StreamWriter> _writer;
 
     void writeHeaders();

@@ -65,7 +65,7 @@ void Door::loadFromBlueprint(const string &resRef) {
         return;
     }
     loadUTD(*utd);
-    shared_ptr<TwoDA> doors(_services.resource.twoDas.get("genericdoors"));
+    shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);

@@ -147,8 +147,6 @@ private:
     std::vector<Field> _fields;
 
     const Field *get(const std::string &name) const;
-
-    friend class GffReader;
 };
 
 } // namespace resource
