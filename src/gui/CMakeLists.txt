@@ -41,9 +41,15 @@ set(GUI_SOURCES
     textinput.cpp)
 
 set(GUI_NEO_HEADERS
+    neo/control.h
+    neo/control/label.h
+    neo/control/labelhilight.h
+    neo/control/panel.h
+    neo/control/progressbar.h
     neo/gui.h)
 
 set(GUI_NEO_SOURCES
+    neo/control.cpp
     neo/gui.cpp)
 
 add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES} ${GUI_NEO_HEADERS} ${GUI_NEO_SOURCES} ${CLANG_FORMAT_PATH})

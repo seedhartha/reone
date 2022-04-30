@@ -323,13 +323,13 @@ unique_ptr<Control> GUI::newControl(
     case ControlType::Label:
         control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
-    case ControlType::ImageButton:
+    case ControlType::LabelHilight:
         control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::Button:
         control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
-    case ControlType::ToggleButton:
+    case ControlType::ButtonToggle:
         control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::Slider:

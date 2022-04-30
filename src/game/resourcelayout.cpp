@@ -128,7 +128,7 @@ void ResourceLayout::loadModuleResources(const string &moduleName) {
         throw ValidationException("Modules directory not found");
     }
 
-    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
+    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     if (!modPath.empty()) {
         _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {

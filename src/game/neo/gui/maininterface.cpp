@@ -17,11 +17,17 @@
 
 #include "maininterface.h"
 
+using namespace reone::gui::neo;
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
+
+void MainInterfaceGui::init() {
+    _gui = Gui::Loader(_graphicsOpt, _graphicsSvc, _resourceSvc).load("maininterface");
+}
 
 }
 

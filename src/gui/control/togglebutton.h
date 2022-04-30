@@ -39,7 +39,7 @@ public:
         resource::Strings &strings) :
         Button(
             gui,
-            ControlType::ToggleButton,
+            ControlType::ButtonToggle,
             sceneGraphs,
             fonts,
             graphicsContext,

@@ -292,7 +292,7 @@ void Equipment::updatePortraits() {
 
 void Equipment::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
-        static_cast<ListBox &>(control).setProtoItemType(ControlType::ImageButton);
+        static_cast<ListBox &>(control).setProtoItemType(ControlType::LabelHilight);
     }
 }
 

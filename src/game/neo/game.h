@@ -22,6 +22,7 @@
 #include "../services.h"
 #include "../types.h"
 
+#include "gui/maininterface.h"
 #include "object.h"
 #include "object/module.h"
 
@@ -150,9 +151,15 @@ private:
 
     bool _finished {false};
     uint32_t _prevFrameTicks {0};
-
     uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
+
     std::unique_ptr<Module> _module;
+
+    // GUI
+
+    std::unique_ptr<MainInterfaceGui> _mainInterface;
+
+    // END GUI
 
     void handleInput();
     void update();
