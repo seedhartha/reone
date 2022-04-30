@@ -17,30 +17,35 @@
 
 #pragma once
 
+#include "../2da.h"
+
 #include "binreader.h"
 
 namespace reone {
 
 namespace resource {
 
-class TwoDA;
-
 class TwoDaReader : public BinaryReader {
 public:
     TwoDaReader();
 
-    const std::shared_ptr<TwoDA> &twoDa() const { return _twoDa; }
+    const std::shared_ptr<TwoDa> &twoDa() const { return _twoDa; }
 
 private:
     int _rowCount {0};
     int _dataSize {0};
-    std::shared_ptr<TwoDA> _twoDa;
+
+    std::vector<std::string> _columns;
+    std::vector<TwoDa::Row> _rows;
+
+    std::shared_ptr<TwoDa> _twoDa;
 
     void doLoad() override;
 
     void loadHeaders();
     void loadLabels();
     void loadRows();
+    void loadTable();
 
     bool readToken(std::string &token);
 };

@@ -28,15 +28,7 @@ namespace resource {
 
 static constexpr char kCellValueDeleted[] = "****";
 
-void TwoDA::addColumn(string name) {
-    _columns.push_back(move(name));
-}
-
-void TwoDA::add(Row row) {
-    _rows.push_back(move(row));
-}
-
-int TwoDA::indexByCellValue(const string &column, const string &value) const {
+int TwoDa::indexByCellValue(const string &column, const string &value) const {
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
         warn("2DA: column not found: " + column);
@@ -50,7 +42,7 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
     return -1;
 }
 
-int TwoDA::getColumnIndex(const string &column) const {
+int TwoDa::getColumnIndex(const string &column) const {
     for (size_t i = 0; i < _columns.size(); ++i) {
         if (_columns[i] == column)
             return static_cast<int>(i);
@@ -62,7 +54,7 @@ static vector<string> getColumnNames(const vector<pair<string, string>> &values)
     return transform<pair<string, string>, string>(values, [](auto &pair) { return pair.first; });
 }
 
-int TwoDA::indexByCellValues(const vector<pair<string, string>> &values) const {
+int TwoDa::indexByCellValues(const vector<pair<string, string>> &values) const {
     vector<string> columns(getColumnNames(values));
     vector<int> columnIndices(getColumnIndices(columns));
 
@@ -82,7 +74,7 @@ int TwoDA::indexByCellValues(const vector<pair<string, string>> &values) const {
     return -1;
 }
 
-vector<int> TwoDA::getColumnIndices(const vector<string> &columns) const {
+vector<int> TwoDa::getColumnIndices(const vector<string> &columns) const {
     vector<int> indices;
     for (auto &column : columns) {
         int index = getColumnIndex(column);
@@ -94,7 +86,7 @@ vector<int> TwoDA::getColumnIndices(const vector<string> &columns) const {
     return move(indices);
 }
 
-string TwoDA::getString(int row, const string &column, string defValue) const {
+string TwoDa::getString(int row, const string &column, string defValue) const {
     if (row < 0 || row >= _rows.size()) {
         warn("2DA: row index out of range: " + to_string(row));
         return move(defValue);
@@ -116,7 +108,7 @@ string TwoDA::getString(int row, const string &column, string defValue) const {
     return value;
 }
 
-int TwoDA::getInt(int row, const string &column, int defValue) const {
+int TwoDa::getInt(int row, const string &column, int defValue) const {
     const string &value = getString(row, column);
     if (value.empty())
         return defValue;
@@ -124,7 +116,7 @@ int TwoDA::getInt(int row, const string &column, int defValue) const {
     return stoi(value);
 }
 
-uint32_t TwoDA::getUint(int row, const string &column, uint32_t defValue) const {
+uint32_t TwoDa::getUint(int row, const string &column, uint32_t defValue) const {
     const string &value = getString(row, column);
     if (value.empty())
         return defValue;
@@ -132,7 +124,7 @@ uint32_t TwoDA::getUint(int row, const string &column, uint32_t defValue) const 
     return stoi(value, nullptr, 16);
 }
 
-float TwoDA::getFloat(int row, const string &column, float defValue) const {
+float TwoDa::getFloat(int row, const string &column, float defValue) const {
     const string &value = getString(row, column);
     if (value.empty())
         return defValue;
@@ -140,7 +132,7 @@ float TwoDA::getFloat(int row, const string &column, float defValue) const {
     return stof(value);
 }
 
-bool TwoDA::getBool(int row, const string &column, bool defValue) const {
+bool TwoDa::getBool(int row, const string &column, bool defValue) const {
     const string &value = getString(row, column);
     if (value.empty())
         return defValue;

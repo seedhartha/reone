@@ -58,7 +58,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
         return;
     }
     loadUTP(*utp);
-    shared_ptr<TwoDA> placeables(_services.resource.twoDas.get("placeables"));
+    shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);

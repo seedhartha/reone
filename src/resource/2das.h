@@ -27,14 +27,14 @@ namespace resource {
 
 class Resources;
 
-class TwoDas : public MemoryCache<std::string, TwoDA> {
+class TwoDas : public MemoryCache<std::string, TwoDa> {
 public:
     TwoDas(Resources &resources);
 
 private:
     Resources &_resources;
 
-    std::shared_ptr<TwoDA> doGet(const std::string &resRef);
+    std::shared_ptr<TwoDa> doGet(const std::string &resRef);
 };
 
 } // namespace resource

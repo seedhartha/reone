@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 void Portraits::init() {
-    shared_ptr<TwoDA> portraits(_twoDas.get("portraits"));
+    shared_ptr<TwoDa> portraits(_twoDas.get("portraits"));
     if (!portraits) {
         return;
     }

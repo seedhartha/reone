@@ -50,7 +50,7 @@ public:
         _twoDas(twoDas) {
     }
 
-    void load(const resource::TwoDA &twoDa, int row);
+    void load(const resource::TwoDa &twoDa, int row);
 
     bool isClassSkill(SkillType skill) const;
 

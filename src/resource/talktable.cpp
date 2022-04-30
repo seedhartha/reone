@@ -23,15 +23,11 @@ namespace reone {
 
 namespace resource {
 
-void TalkTable::addString(TalkTableString &&string) {
-    _strings.push_back(string);
-}
-
 int TalkTable::getStringCount() const {
     return static_cast<int>(_strings.size());
 }
 
-const TalkTableString &TalkTable::getString(int index) const {
+const TalkTable::String &TalkTable::getString(int index) const {
     if (index < 0 || index >= static_cast<int>(_strings.size())) {
         throw out_of_range("index is out of range");
     }

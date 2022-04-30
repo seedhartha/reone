@@ -95,7 +95,7 @@ void Creature::loadFromBlueprint(const string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    shared_ptr<TwoDA> appearances(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearances(_services.resource.twoDas.get("appearance"));
     if (!appearances) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1146,7 +1146,7 @@ string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1174,7 +1174,7 @@ string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1205,7 +1205,7 @@ string Creature::getHeadModelName() const {
     if (_modelType != Creature::ModelType::Character) {
         return "";
     }
-    shared_ptr<TwoDA> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1213,7 +1213,7 @@ string Creature::getHeadModelName() const {
     if (headIdx == -1) {
         return "";
     }
-    shared_ptr<TwoDA> heads(_services.resource.twoDas.get("heads"));
+    shared_ptr<TwoDa> heads(_services.resource.twoDas.get("heads"));
     if (!heads) {
         throw ValidationException("heads 2DA is not found");
     }
@@ -1337,7 +1337,7 @@ void Creature::loadSoundSetFromUTC(const Gff &utc) {
     if (soundSetIdx == 0xffff) {
         return;
     }
-    shared_ptr<TwoDA> soundSetTable(_services.resource.twoDas.get("soundset"));
+    shared_ptr<TwoDa> soundSetTable(_services.resource.twoDas.get("soundset"));
     if (!soundSetTable) {
         return;
     }
@@ -1348,7 +1348,7 @@ void Creature::loadSoundSetFromUTC(const Gff &utc) {
 }
 
 void Creature::loadBodyBagFromUTC(const Gff &utc) {
-    shared_ptr<TwoDA> bodyBags(_services.resource.twoDas.get("bodybag"));
+    shared_ptr<TwoDa> bodyBags(_services.resource.twoDas.get("bodybag"));
     if (!bodyBags) {
         return;
     }
@@ -1390,7 +1390,7 @@ void Creature::loadAttributesFromUTC(const Gff &utc) {
 }
 
 void Creature::loadPerceptionRangeFromUTC(const Gff &utc) {
-    shared_ptr<TwoDA> ranges(_services.resource.twoDas.get("ranges"));
+    shared_ptr<TwoDa> ranges(_services.resource.twoDas.get("ranges"));
     if (!ranges) {
         return;
     }

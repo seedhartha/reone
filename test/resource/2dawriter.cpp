@@ -51,11 +51,12 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
                               .append("same\x00", 5)
                               .build();
 
-    auto twoDa = make_shared<TwoDA>();
-    twoDa->addColumn("key");
-    twoDa->addColumn("value");
-    twoDa->add(TwoDA::Row {vector<string> {"unique", "same"}});
-    twoDa->add(TwoDA::Row {vector<string> {"same", "same"}});
+    shared_ptr<TwoDa> twoDa = TwoDa::Builder()
+                     .column("key")
+                     .column("value")
+                     .row(TwoDa::newRow({"unique", "same"}))
+                     .row(TwoDa::newRow({"same", "same"}))
+                     .build();
 
     auto writer = TwoDaWriter(twoDa);
     auto stream = make_shared<ostringstream>();

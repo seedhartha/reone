@@ -21,7 +21,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDA;
+class TwoDa;
 class TwoDas;
 
 } // namespace resource
@@ -57,7 +57,7 @@ private:
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;
 
-    void loadSound(const resource::TwoDA &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
+    void loadSound(const resource::TwoDa &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
 };
 
 } // namespace game

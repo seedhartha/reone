@@ -118,7 +118,7 @@ void Item::loadUTI(const Gff &uti) {
     _textureVariation = uti.getInt("TextureVar", 1);
     _bodyVariation = uti.getInt("BodyVariation", 1);
 
-    shared_ptr<TwoDA> baseItems(_services.resource.twoDas.get("baseitems"));
+    shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
     _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
     _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
@@ -152,11 +152,11 @@ void Item::loadUTI(const Gff &uti) {
 }
 
 void Item::loadAmmunitionType() {
-    shared_ptr<TwoDA> baseItems(_services.resource.twoDas.get("baseitems"));
+    shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
 
     int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
     if (ammunitionIdx != -1) {
-        shared_ptr<TwoDA> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
+        shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
         _ammunitionType->model = _services.graphics.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
         _ammunitionType->shotSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));

@@ -31,7 +31,7 @@ static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
 TwoDaReader::TwoDaReader() :
-    BinaryReader(kSignatureSize, kSignature), _twoDa(make_shared<TwoDA>()) {
+    BinaryReader(kSignatureSize, kSignature) {
 }
 
 void TwoDaReader::doLoad() {
@@ -42,13 +42,56 @@ void TwoDaReader::doLoad() {
 
     loadLabels();
     loadRows();
+    loadTable();
 }
 
 void TwoDaReader::loadHeaders() {
     string token;
     while (readToken(token)) {
-        _twoDa->_columns.push_back(token);
+        _columns.push_back(token);
     }
+}
+
+void TwoDaReader::loadLabels() {
+    string token;
+    for (int i = 0; i < _rowCount; ++i) {
+        readToken(token);
+    }
+}
+
+void TwoDaReader::loadRows() {
+    _rows.reserve(_rowCount);
+
+    int columnCount = static_cast<int>(_columns.size());
+    int cellCount = _rowCount * columnCount;
+    vector<uint16_t> offsets(cellCount);
+    for (int i = 0; i < cellCount; ++i) {
+        offsets[i] = readUint16();
+    }
+
+    uint16_t dataSize = readUint16();
+    size_t pos = tell();
+
+    for (int i = 0; i < _rowCount; ++i) {
+        TwoDa::Row row;
+        for (int j = 0; j < columnCount; ++j) {
+            int cellIdx = i * columnCount + j;
+            size_t off = pos + offsets[cellIdx];
+            row.values.push_back(readCStringAt(off));
+        }
+        _rows.push_back(row);
+    }
+}
+
+void TwoDaReader::loadTable() {
+    auto twoDa = TwoDa::Builder();
+    for (auto &column : _columns) {
+        twoDa.column(column);
+    }
+    for (auto &row : _rows) {
+        twoDa.row(row);
+    }
+    _twoDa = twoDa.build();
 }
 
 bool TwoDaReader::readToken(string &token) {
@@ -72,37 +115,6 @@ bool TwoDaReader::readToken(string &token) {
     }
 
     throw runtime_error("2DA token not terminated");
-}
-
-void TwoDaReader::loadLabels() {
-    string token;
-    for (int i = 0; i < _rowCount; ++i) {
-        readToken(token);
-    }
-}
-
-void TwoDaReader::loadRows() {
-    _twoDa->_rows.reserve(_rowCount);
-
-    int columnCount = static_cast<int>(_twoDa->_columns.size());
-    int cellCount = _rowCount * columnCount;
-    vector<uint16_t> offsets(cellCount);
-    for (int i = 0; i < cellCount; ++i) {
-        offsets[i] = readUint16();
-    }
-
-    uint16_t dataSize = readUint16();
-    size_t pos = tell();
-
-    for (int i = 0; i < _rowCount; ++i) {
-        TwoDA::Row row;
-        for (int j = 0; j < columnCount; ++j) {
-            int cellIdx = i * columnCount + j;
-            size_t off = pos + offsets[cellIdx];
-            row.values.push_back(readCStringAt(off));
-        }
-        _twoDa->_rows.push_back(row);
-    }
 }
 
 } // namespace resource
