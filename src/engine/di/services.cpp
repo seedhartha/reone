@@ -26,12 +26,12 @@ namespace reone {
 namespace engine {
 
 void Services::init() {
-    _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
-    _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
-    _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
-    _scene = make_unique<SceneModule>(_gameOptions.graphics, *_audio, *_graphics);
+    _resource = make_unique<ResourceModule>(_options.game.path);
+    _graphics = make_unique<GraphicsModule>(_options.graphics, *_resource);
+    _audio = make_unique<AudioModule>(_options.audio, *_resource);
+    _scene = make_unique<SceneModule>(_options.graphics, *_audio, *_graphics);
     _script = make_unique<ScriptModule>(*_resource);
-    _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
+    _game = make_unique<GameModule>(_gameId, _options, *_resource, *_graphics, *_audio, *_scene, *_script);
 
     _resource->init();
     _graphics->init();

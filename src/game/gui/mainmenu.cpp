@@ -80,7 +80,7 @@ void MainMenu::load() {
     }
 
     // Hide warp button in developer mode
-    if (!_game.options().developer) {
+    if (!_game.options().game.developer) {
         _binding.btnWarp->setVisible(false);
     }
 

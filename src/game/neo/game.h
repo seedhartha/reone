@@ -43,7 +43,7 @@ struct GraphicsServices;
 
 namespace game {
 
-struct Options;
+struct OptionsView;
 
 namespace neo {
 
@@ -51,7 +51,7 @@ class Creature;
 
 class Game : public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
 public:
-    Game(GameID id, Options &options, ServicesView &services) :
+    Game(GameID id, OptionsView &options, ServicesView &services) :
         _id(id),
         _options(options),
         _services(services) {
@@ -141,7 +141,7 @@ private:
     };
 
     GameID _id;
-    Options &_options;
+    OptionsView &_options;
     ServicesView &_services;
 
     std::unique_ptr<PlayerController> _playerController;

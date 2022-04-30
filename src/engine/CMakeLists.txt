@@ -23,6 +23,7 @@ set(REONE_HEADERS
     di/services.h
     engine.h
     gameprobe.h
+    options.h
     optionsparser.h)
 
 set(REONE_SOURCES

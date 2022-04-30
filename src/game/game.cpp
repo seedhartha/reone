@@ -599,21 +599,21 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
     switch (event.keysym.sym) {
     case SDLK_MINUS:
-        if (_options.developer && _gameSpeed > 1.0f) {
+        if (_options.game.developer && _gameSpeed > 1.0f) {
             _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
             return true;
         }
         break;
 
     case SDLK_EQUALS:
-        if (_options.developer && _gameSpeed < 8.0f) {
+        if (_options.game.developer && _gameSpeed < 8.0f) {
             _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
             return true;
         }
         break;
 
     case SDLK_v:
-        if (_options.developer && _screen == GameScreen::InGame) {
+        if (_options.game.developer && _screen == GameScreen::InGame) {
             toggleInGameCameraType();
             return true;
         }

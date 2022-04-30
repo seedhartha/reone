@@ -25,18 +25,25 @@ namespace reone {
 
 namespace game {
 
-struct Options {
-    boost::filesystem::path gamePath;
+struct GameOptions {
+    boost::filesystem::path path;
     bool developer {false};
     bool neo {false};
+};
 
-    graphics::GraphicsOptions graphics;
-    audio::AudioOptions audio;
+struct OptionsView {
+    GameOptions &game;
+    graphics::GraphicsOptions &graphics;
+    audio::AudioOptions &audio;
 
-    // Logging
-    LogLevel logLevel {LogLevel::Info};
-    int logChannels {LogChannels::general};
-    bool logToFile {false};
+    OptionsView(
+        GameOptions &game,
+        graphics::GraphicsOptions &graphics,
+        audio::AudioOptions &audio) :
+        game(game),
+        graphics(graphics),
+        audio(audio) {
+    }
 };
 
 } // namespace game

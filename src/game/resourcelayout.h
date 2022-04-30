@@ -29,11 +29,11 @@ struct ResourceServices;
 
 namespace game {
 
-struct Options;
+struct OptionsView;
 
 class ResourceLayout : boost::noncopyable {
 public:
-    ResourceLayout(GameID gameId, Options &options, resource::ResourceServices &resourceSvc) :
+    ResourceLayout(GameID gameId, OptionsView &options, resource::ResourceServices &resourceSvc) :
         _gameId(gameId),
         _options(options),
         _resourceSvc(resourceSvc) {
@@ -45,7 +45,7 @@ public:
 
 private:
     GameID _gameId;
-    Options &_options;
+    OptionsView &_options;
     resource::ResourceServices &_resourceSvc;
 
     void initForKotOR();

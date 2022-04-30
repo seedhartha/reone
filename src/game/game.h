@@ -62,7 +62,7 @@ public:
     Game(
         bool tsl,
         boost::filesystem::path path,
-        Options &options,
+        OptionsView &options,
         ServicesView &services) :
         _tsl(tsl),
         _path(std::move(path)),
@@ -91,8 +91,8 @@ public:
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    Options &options() { return _options; }
-    const Options &options() const { return _options; }
+    OptionsView &options() { return _options; }
+    const OptionsView &options() const { return _options; }
     Party &party() { return _party; }
     Combat &combat() { return _combat; }
     ActionFactory &actionFactory() { return _actionFactory; }
@@ -185,7 +185,7 @@ protected:
     };
 
     boost::filesystem::path _path;
-    Options &_options;
+    OptionsView &_options;
     ServicesView &_services;
 
     GameScreen _screen {GameScreen::None};
