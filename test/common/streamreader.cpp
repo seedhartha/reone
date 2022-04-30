@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/streamreader.h"
+#include "../../src/common/stringbuilder.h"
 
 #include "../checkutil.h"
 
@@ -44,21 +45,22 @@ BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
 
 BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     // given
-    auto ss = ostringstream();
-    ss << string("\xff", 1);
-    ss << string("\x01\xff", 2);
-    ss << string("\x02\xff\xff\xff", 4);
-    ss << string("\x03\xff\xff\xff\xff\xff\xff\xff", 8);
-    ss << string("\x01\xff", 2);
-    ss << string("\x02\xff\xff\xff", 4);
-    ss << string("\x03\xff\xff\xff\xff\xff\xff\xff", 8);
-    ss << string("\x00\x00\x80\x3f", 4);
-    ss << string("\x00\x00\x00\x00\x00\x00\xf0\x3f", 8);
-    ss << string("Hello, world!", 13);
-    ss << string("Hello, world!\x00", 14);
-    ss << string("\x48\x00\x65\x00\x6c\x00\x6c\x00\x6f\x00\x2c\x00\x20\x00\x77\x00\x6f\x00\x72\x00\x6c\x00\x64\x00\x21\x00\x00\x00", 28);
-    ss << string("\x01\x02\x03\x04", 4);
-    auto stream = make_shared<istringstream>(ss.str());
+    auto input = StringBuilder()
+                     .append("\xff", 1)
+                     .append("\x01\xff", 2)
+                     .append("\x02\xff\xff\xff", 4)
+                     .append("\x03\xff\xff\xff\xff\xff\xff\xff", 8)
+                     .append("\x01\xff", 2)
+                     .append("\x02\xff\xff\xff", 4)
+                     .append("\x03\xff\xff\xff\xff\xff\xff\xff", 8)
+                     .append("\x00\x00\x80\x3f", 4)
+                     .append("\x00\x00\x00\x00\x00\x00\xf0\x3f", 8)
+                     .append("Hello, world!")
+                     .append("Hello, world!\x00", 14)
+                     .append("\x48\x00\x65\x00\x6c\x00\x6c\x00\x6f\x00\x2c\x00\x20\x00\x77\x00\x6f\x00\x72\x00\x6c\x00\x64\x00\x21\x00\x00\x00", 28)
+                     .append("\x01\x02\x03\x04", 4)
+                     .build();
+    auto stream = make_shared<istringstream>(input);
     auto reader = StreamReader(stream, boost::endian::order::little);
     auto expectedByte = 255u;
     auto expectedUint16 = 65281u;
@@ -107,16 +109,17 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
 
 BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
     // given
-    auto ss = ostringstream();
-    ss << string("\xff\x01", 2);
-    ss << string("\xff\xff\xff\x02", 4);
-    ss << string("\xff\xff\xff\xff\xff\xff\xff\x03", 8);
-    ss << string("\xff\x01", 2);
-    ss << string("\xff\xff\xff\x02", 4);
-    ss << string("\xff\xff\xff\xff\xff\xff\xff\x03", 8);
-    ss << string("\x3f\x80\x00\x00", 4);
-    ss << string("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8);
-    auto stream = make_shared<istringstream>(ss.str());
+    auto input = StringBuilder()
+                     .append("\xff\x01", 2)
+                     .append("\xff\xff\xff\x02", 4)
+                     .append("\xff\xff\xff\xff\xff\xff\xff\x03", 8)
+                     .append("\xff\x01", 2)
+                     .append("\xff\xff\xff\x02", 4)
+                     .append("\xff\xff\xff\xff\xff\xff\xff\x03", 8)
+                     .append("\x3f\x80\x00\x00", 4)
+                     .append("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8)
+                     .build();
+    auto stream = make_shared<istringstream>(input);
     auto reader = StreamReader(stream, boost::endian::order::big);
     auto expectedUint16 = 65281u;
     auto expectedUint32 = 4294967042u;

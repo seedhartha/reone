@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/streamwriter.h"
+#include "../../src/common/stringbuilder.h"
 
 #include "../checkutil.h"
 
@@ -31,18 +32,18 @@ BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
     // given
     auto stream = make_shared<ostringstream>();
     auto writer = StreamWriter(stream, boost::endian::order::little);
-    auto ss = stringstream();
-    ss << string("\x40", 1);
-    ss << string("\x41", 1);
-    ss << string("\x01\x00", 2);
-    ss << string("\x02\x00\x00\x00", 4);
-    ss << string("\xfd\xff", 2);
-    ss << string("\xfc\xff\xff\xff", 4);
-    ss << string("\xfb\xff\xff\xff\xff\xff\xff\xff", 8);
-    ss << string("\x00\x00\x80\x3f", 4);
-    ss << string("AaBbCc\x00", 7);
-    ss << string("\x01\x02\x03\x04", 4);
-    auto expectedOutput = ss.str();
+    auto expectedOutput = StringBuilder()
+                              .append("\x40", 1)
+                              .append("\x41", 1)
+                              .append("\x01\x00", 2)
+                              .append("\x02\x00\x00\x00", 4)
+                              .append("\xfd\xff", 2)
+                              .append("\xfc\xff\xff\xff", 4)
+                              .append("\xfb\xff\xff\xff\xff\xff\xff\xff", 8)
+                              .append("\x00\x00\x80\x3f", 4)
+                              .append("AaBbCc\x00", 7)
+                              .append("\x01\x02\x03\x04", 4)
+                              .build();
 
     // when
     writer.putByte(0x40);
@@ -67,16 +68,16 @@ BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
     // given
     auto stream = make_shared<ostringstream>();
     auto writer = StreamWriter(stream, boost::endian::order::big);
-    auto ss = ostringstream();
-    ss << string("\x40", 1);
-    ss << string("\x41", 1);
-    ss << string("\x00\x01", 2);
-    ss << string("\x00\x00\x00\x02", 4);
-    ss << string("\xff\xfd", 2);
-    ss << string("\xff\xff\xff\xfc", 4);
-    ss << string("\xff\xff\xff\xff\xff\xff\xff\xfb", 8);
-    ss << string("\x3f\x80\x00\x00", 4);
-    auto expectedOutput = ss.str();
+    auto expectedOutput = StringBuilder()
+                              .append("\x40", 1)
+                              .append("\x41", 1)
+                              .append("\x00\x01", 2)
+                              .append("\x00\x00\x00\x02", 4)
+                              .append("\xff\xfd", 2)
+                              .append("\xff\xff\xff\xfc", 4)
+                              .append("\xff\xff\xff\xff\xff\xff\xff\xfb", 8)
+                              .append("\x3f\x80\x00\x00", 4)
+                              .build();
 
     // when
     writer.putByte(0x40);

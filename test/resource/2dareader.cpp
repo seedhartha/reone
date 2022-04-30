@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/streamwriter.h"
+#include "../../src/common/stringbuilder.h"
 #include "../../src/resource/2da.h"
 #include "../../src/resource/format/2dareader.h"
 
@@ -31,23 +32,23 @@ BOOST_AUTO_TEST_SUITE(two_da_reader)
 BOOST_AUTO_TEST_CASE(should_read_two_da) {
     // given
 
-    auto ss = ostringstream();
-    ss << "2DA V2.b";
-    ss << string("\x0a", 1);
-    ss << string("key\x09", 4);
-    ss << string("value\x09", 6);
-    ss << string("\x00", 1);
-    ss << string("\x02\x00\x00\x00", 4);
-    ss << string("\x30\x09\x31\x09", 4);
-    ss << string("\x00\x00", 2);
-    ss << string("\x07\x00", 2);
-    ss << string("\x07\x00", 2);
-    ss << string("\x07\x00", 2);
-    ss << string("\x0c\x00", 2);
-    ss << string("unique\x00", 7);
-    ss << string("same\x00", 5);
-
-    auto stream = make_shared<istringstream>(ss.str());
+    auto input = StringBuilder()
+                     .append("2DA V2.b")
+                     .append("\x0a", 1)
+                     .append("key\x09", 4)
+                     .append("value\x09", 6)
+                     .append("\x00", 1)
+                     .append("\x02\x00\x00\x00", 4)
+                     .append("\x30\x09\x31\x09", 4)
+                     .append("\x00\x00", 2)
+                     .append("\x07\x00", 2)
+                     .append("\x07\x00", 2)
+                     .append("\x07\x00", 2)
+                     .append("\x0c\x00", 2)
+                     .append("unique\x00", 7)
+                     .append("same\x00", 5)
+                     .build();
+    auto stream = make_shared<istringstream>(input);
     auto reader = TwoDaReader();
 
     // when

@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/rimwriter.h"
 
 #include "../checkutil.h"
@@ -26,32 +27,32 @@ using namespace std;
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(rim_reader)
+BOOST_AUTO_TEST_SUITE(rim_writer)
 
 BOOST_AUTO_TEST_CASE(should_write_rim) {
     // given
 
-    auto ss = ostringstream();
-    // header
-    ss << "RIM V1.0";
-    ss << string("\x00\x00\x00\x00", 4); // reserved
-    ss << string("\x01\x00\x00\x00", 4); // number of resources
-    ss << string("\x78\x00\x00\x00", 4); // offset to resources
-    ss << string(100, '\x00'); // reserved
-    // resources
-    ss << string("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16); // resref
-    ss << string("\xe6\x07\x00\x00", 4); // type
-    ss << string("\x00\x00\x00\x00", 4); // id
-    ss << string("\x98\x00\x00\x00", 4); // offset
-    ss << string("\x02\x00\x00\x00", 4); // size
-    // resource data
-    ss << string("Bb", 2);
+    auto expectedOutput = StringBuilder()
+                              // header
+                              .append("RIM V1.0")
+                              .append("\x00\x00\x00\x00", 4) // reserved
+                              .append("\x01\x00\x00\x00", 4) // number of resources
+                              .append("\x78\x00\x00\x00", 4) // offset to resources
+                              .repeat('\x00', 100)           // reserved
+                              // resources
+                              .append("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // resref
+                              .append("\xe6\x07\x00\x00", 4)                                            // type
+                              .append("\x00\x00\x00\x00", 4)                                            // id
+                              .append("\x98\x00\x00\x00", 4)                                            // offset
+                              .append("\x02\x00\x00\x00", 4)                                            // size
+                              // resource data
+                              .append("Bb", 2)
+                              .build();
 
     auto writer = RimWriter();
     writer.add(RimWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
 
     auto rim = make_shared<ostringstream>();
-    auto expectedOutput = ss.str();
 
     // when
 
