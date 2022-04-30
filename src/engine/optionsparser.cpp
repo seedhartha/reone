@@ -42,7 +42,8 @@ Options OptionsParser::parse() {
     po::options_description descCommon;
     descCommon.add_options()                                                                                                       //
         ("game", po::value<string>(), "path to game directory")                                                                    //
-        ("dev", po::value<bool>()->default_value(options.developer), "enable developer mode")                                      //
+        ("dev", po::value<bool>()->default_value(options.game.developer), "enable developer mode")                                 //
+        ("neo", po::value<bool>()->default_value(false), "use new game logic (experimental)")                                      //
         ("width", po::value<int>()->default_value(options.graphics.width), "window width")                                         //
         ("height", po::value<int>()->default_value(options.graphics.height), "window height")                                      //
         ("fullscreen", po::value<bool>()->default_value(options.graphics.fullscreen), "enable fullscreen")                         //
@@ -60,10 +61,9 @@ Options OptionsParser::parse() {
         ("voicevol", po::value<int>()->default_value(options.audio.voiceVolume), "voice volume in percents")                       //
         ("soundvol", po::value<int>()->default_value(options.audio.soundVolume), "sound volume in percents")                       //
         ("movievol", po::value<int>()->default_value(options.audio.movieVolume), "movie volume in percents")                       //
-        ("loglevel", po::value<int>()->default_value(static_cast<int>(options.logLevel)), "log level")                             //
-        ("logch", po::value<int>()->default_value(options.logChannels), "log channel mask")                                        //
-        ("logfile", po::value<bool>()->default_value(options.logToFile), "log to file")                                            //
-        ("neo", po::value<bool>()->default_value(false), "use new game logic (experimental)");
+        ("loglevel", po::value<int>()->default_value(static_cast<int>(options.logging.level)), "log level")                        //
+        ("logch", po::value<int>()->default_value(options.logging.channels), "log channel mask")                                   //
+        ("logfile", po::value<bool>()->default_value(options.logging.logToFile), "log to file");                                   //
 
     po::options_description descCmdLine {"Usage"};
     descCmdLine.add(descCommon);
@@ -79,7 +79,9 @@ Options OptionsParser::parse() {
 
     // Convert Boost options to game options
 
-    options.gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    options.game.path = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    options.game.developer = vars["dev"].as<bool>();
+    options.game.neo = vars["neo"].as<bool>();
     options.graphics.width = vars["width"].as<int>();
     options.graphics.height = vars["height"].as<int>();
     options.graphics.fullscreen = vars["fullscreen"].as<bool>();
@@ -97,11 +99,9 @@ Options OptionsParser::parse() {
     options.audio.voiceVolume = vars["voicevol"].as<int>();
     options.audio.soundVolume = vars["soundvol"].as<int>();
     options.audio.movieVolume = vars["movievol"].as<int>();
-    options.developer = vars["dev"].as<bool>();
-    options.logLevel = static_cast<LogLevel>(vars["loglevel"].as<int>());
-    options.logChannels = vars["logch"].as<int>();
-    options.logToFile = vars["logfile"].as<bool>();
-    options.neo = vars["neo"].as<bool>();
+    options.logging.level = static_cast<LogLevel>(vars["loglevel"].as<int>());
+    options.logging.channels = vars["logch"].as<int>();
+    options.logging.logToFile = vars["logfile"].as<bool>();
 
     return move(options);
 }

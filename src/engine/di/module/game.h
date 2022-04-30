@@ -52,16 +52,14 @@ class GameModule : boost::noncopyable {
 public:
     GameModule(
         game::GameID gameId,
-        game::Options &gameOptions,
-        boost::filesystem::path gamePath,
+        game::OptionsView &options,
         ResourceModule &resource,
         GraphicsModule &graphics,
         AudioModule &audio,
         SceneModule &scene,
         ScriptModule &script) :
         _gameId(gameId),
-        _gamePath(std::move(gamePath)),
-        _gameOptions(gameOptions),
+        _options(options),
         _resource(resource),
         _graphics(graphics),
         _audio(audio),
@@ -78,8 +76,7 @@ public:
 
 private:
     game::GameID _gameId;
-    game::Options &_gameOptions;
-    boost::filesystem::path _gamePath;
+    game::OptionsView &_options;
 
     ResourceModule &_resource;
     GraphicsModule &_graphics;

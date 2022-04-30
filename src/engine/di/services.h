@@ -33,9 +33,9 @@ namespace engine {
 
 class Services {
 public:
-    Services(game::GameID gameId, game::Options &gameOptions) :
+    Services(game::GameID gameId, game::OptionsView &options) :
         _gameId(gameId),
-        _gameOptions(gameOptions) {
+        _options(options) {
     }
 
     ~Services() { deinit(); }
@@ -47,7 +47,7 @@ public:
 
 private:
     game::GameID _gameId;
-    game::Options &_gameOptions;
+    game::OptionsView &_options;
 
     std::unique_ptr<ResourceModule> _resource;
     std::unique_ptr<GraphicsModule> _graphics;

@@ -30,7 +30,7 @@ struct ServicesView;
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(ServicesView &services, Options &options) :
+    ProfileOverlay(ServicesView &services, OptionsView &options) :
         _services(services),
         _options(options) {
     }
@@ -43,7 +43,7 @@ public:
 
 private:
     ServicesView &_services;
-    Options &_options;
+    OptionsView &_options;
 
     bool _enabled {false};
 

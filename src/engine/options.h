@@ -17,26 +17,31 @@
 
 #pragma once
 
-#include <boost/program_options.hpp>
-
-#include "options.h"
+#include "../../audio/options.h"
+#include "../../common/types.h"
+#include "../../game/options.h"
+#include "../../graphics/options.h"
 
 namespace reone {
 
 namespace engine {
 
-class OptionsParser {
-public:
-    OptionsParser(int argc, char **argv) :
-        _argc(argc),
-        _argv(argv) {
+struct Options {
+    struct Logging {
+        LogLevel level {LogLevel::Info};
+        int channels {LogChannels::general};
+        bool logToFile {false};
+    };
+
+    game::GameOptions game;
+    graphics::GraphicsOptions graphics;
+    audio::AudioOptions audio;
+
+    Logging logging;
+
+    game::OptionsView toView() {
+        return game::OptionsView(game, graphics, audio);
     }
-
-    Options parse();
-
-private:
-    int _argc;
-    char **_argv;
 };
 
 } // namespace engine
