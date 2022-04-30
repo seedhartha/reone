@@ -21,15 +21,50 @@
 
 namespace reone {
 
+namespace graphics {
+
+struct GraphicsServices;
+struct GraphicsOptions;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
 namespace neo {
 
-class MainInterfaceGui : gui::neo::Gui {
+class MainInterfaceGui : boost::noncopyable {
+public:
+    MainInterfaceGui(
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
+    }
+
+    void init();
+
+    gui::neo::Gui &gui() {
+        return *_gui;
+    }
+
+private:
+    std::unique_ptr<gui::neo::Gui> _gui;
+
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 };
 
 } // namespace neo
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

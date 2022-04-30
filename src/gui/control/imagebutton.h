@@ -39,7 +39,7 @@ public:
         resource::Strings &strings) :
         Control(
             gui,
-            ControlType::ImageButton,
+            ControlType::LabelHilight,
             sceneGraphs,
             fonts,
             graphicsContext,

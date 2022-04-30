@@ -17,7 +17,24 @@
 
 #pragma once
 
+#include "control.h"
+
 namespace reone {
+
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+class Gff;
+
+} // namespace resource
 
 namespace gui {
 
@@ -25,11 +42,76 @@ namespace neo {
 
 class Gui : boost::noncopyable {
 public:
+    class Builder : boost::noncopyable {
+    public:
+        Builder(
+            graphics::GraphicsOptions &graphicsOpt,
+            graphics::GraphicsServices &graphicsSvc) :
+            _graphicsOpt(graphicsOpt),
+            _graphicsSvc(graphicsSvc) {
+        }
+
+        Builder &rootControl(std::shared_ptr<Control> control) {
+            _rootControl = std::move(control);
+            return *this;
+        }
+
+        std::unique_ptr<Gui> build() {
+            return std::make_unique<Gui>(
+                _rootControl,
+                _graphicsOpt,
+                _graphicsSvc);
+        }
+
+    private:
+        graphics::GraphicsOptions &_graphicsOpt;
+        graphics::GraphicsServices &_graphicsSvc;
+
+        std::shared_ptr<Control> _rootControl;
+    };
+
+    class Loader : boost::noncopyable {
+    public:
+        Loader(
+            graphics::GraphicsOptions &graphicsOpt,
+            graphics::GraphicsServices &graphicsSvc,
+            resource::ResourceServices &resourceSvc) :
+            _graphicsOpt(graphicsOpt),
+            _graphicsSvc(graphicsSvc),
+            _resourceSvc(resourceSvc) {
+        }
+
+        std::unique_ptr<Gui> load(const std::string &resRef);
+
+    private:
+        graphics::GraphicsOptions &_graphicsOpt;
+        graphics::GraphicsServices &_graphicsSvc;
+        resource::ResourceServices &_resourceSvc;
+
+        std::unique_ptr<Control> loadRootControl(const resource::Gff &gui);
+        std::unique_ptr<Control> loadControl(const resource::Gff &gui);
+    };
+
+    Gui(
+        std::shared_ptr<Control> rootControl,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc) :
+        _rootControl(std::move(rootControl)),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc) {
+    }
+
     bool handle(const SDL_Event &e);
     void update(float delta);
+    void render();
+
+private:
+    std::shared_ptr<Control> _rootControl;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
 };
 
-}
+} // namespace neo
 
 } // namespace gui
 
