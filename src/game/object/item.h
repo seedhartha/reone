@@ -128,7 +128,7 @@ private:
 
     // Blueprint
 
-    void loadUTI(const resource::GffStruct &uti);
+    void loadUTI(const resource::Gff &uti);
 
     void loadAmmunitionType();
 

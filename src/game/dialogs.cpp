@@ -36,7 +36,7 @@ shared_ptr<Dialog> Dialogs::doGet(string resRef) {
     return loadDialog(*dlg);
 }
 
-unique_ptr<Dialog> Dialogs::loadDialog(const GffStruct &dlg) {
+unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
     auto dialog = make_unique<Dialog>();
 
     dialog->skippable = dlg.getBool("Skippable");
@@ -62,7 +62,7 @@ unique_ptr<Dialog> Dialogs::loadDialog(const GffStruct &dlg) {
     return move(dialog);
 }
 
-Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const GffStruct &gffs) const {
+Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const Gff &gffs) const {
     Dialog::EntryReplyLink link;
     link.index = gffs.getInt("Index");
     link.active = gffs.getString("Active");
@@ -70,7 +70,7 @@ Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const GffStruct &gffs) const {
     return move(link);
 }
 
-Dialog::EntryReply Dialogs::getEntryReply(const GffStruct &gffs) const {
+Dialog::EntryReply Dialogs::getEntryReply(const Gff &gffs) const {
     int strRef = gffs.getInt("Text");
 
     Dialog::EntryReply entry;
@@ -103,14 +103,14 @@ Dialog::EntryReply Dialogs::getEntryReply(const GffStruct &gffs) const {
     return move(entry);
 }
 
-Dialog::Stunt Dialogs::getStunt(const GffStruct &gffs) const {
+Dialog::Stunt Dialogs::getStunt(const Gff &gffs) const {
     Dialog::Stunt stunt;
     stunt.participant = boost::to_lower_copy(gffs.getString("Participant"));
     stunt.stuntModel = boost::to_lower_copy(gffs.getString("StuntModel"));
     return move(stunt);
 }
 
-Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const GffStruct &gffs) const {
+Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const Gff &gffs) const {
     Dialog::ParticipantAnimation anim;
     anim.participant = boost::to_lower_copy(gffs.getString("Participant"));
     anim.animation = gffs.getInt("Animation");

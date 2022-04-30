@@ -26,7 +26,7 @@
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
-#include "../../resource/gffstruct.h"
+#include "../../resource/gff.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -40,16 +40,16 @@ namespace reone {
 
 namespace gui {
 
-void ScrollBar::load(const GffStruct &gffs) {
+void ScrollBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<GffStruct> dir(gffs.getStruct("DIR"));
+    shared_ptr<Gff> dir(gffs.getStruct("DIR"));
     if (dir) {
         string image(dir->getString("IMAGE"));
         _dir.image = _textures.get(image, TextureUsage::GUI);
     }
 
-    shared_ptr<GffStruct> thumb(gffs.getStruct("THUMB"));
+    shared_ptr<Gff> thumb(gffs.getStruct("THUMB"));
     if (thumb) {
         string image(thumb->getString("IMAGE"));
         _thumb.image = _textures.get(image, TextureUsage::GUI);

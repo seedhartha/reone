@@ -26,7 +26,7 @@
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
-#include "../../resource/gffstruct.h"
+#include "../../resource/gff.h"
 
 #include "../gui.h"
 
@@ -39,10 +39,10 @@ namespace reone {
 
 namespace gui {
 
-void ProgressBar::load(const GffStruct &gffs) {
+void ProgressBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<GffStruct> dir(gffs.getStruct("PROGRESS"));
+    shared_ptr<Gff> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
         string fill(dir->getString("FILL"));
         _progress.fill = _textures.get(fill, TextureUsage::GUI);

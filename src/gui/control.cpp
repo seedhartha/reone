@@ -29,7 +29,7 @@
 #include "../graphics/textutil.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
-#include "../resource/gffstruct.h"
+#include "../resource/gff.h"
 #include "../resource/strings.h"
 #include "../scene/graphs.h"
 
@@ -45,15 +45,15 @@ namespace reone {
 
 namespace gui {
 
-ControlType Control::getType(const GffStruct &gffs) {
+ControlType Control::getType(const Gff &gffs) {
     return static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
 }
 
-string Control::getTag(const GffStruct &gffs) {
+string Control::getTag(const Gff &gffs) {
     return gffs.getString("TAG");
 }
 
-string Control::getParent(const GffStruct &gffs) {
+string Control::getParent(const Gff &gffs) {
     return gffs.getString("Obj_Parent");
 }
 
@@ -70,18 +70,18 @@ void Control::Extent::getCenter(int &x, int &y) const {
     y = top + height / 2;
 }
 
-void Control::load(const GffStruct &gffs) {
+void Control::load(const Gff &gffs) {
     _id = gffs.getInt("ID", -1);
     _padding = gffs.getInt("PADDING", 0);
 
     loadExtent(*gffs.getStruct("EXTENT"));
     loadBorder(*gffs.getStruct("BORDER"));
 
-    shared_ptr<GffStruct> text(gffs.getStruct("TEXT"));
+    shared_ptr<Gff> text(gffs.getStruct("TEXT"));
     if (text) {
         loadText(*text);
     }
-    shared_ptr<GffStruct> hilight(gffs.getStruct("HILIGHT"));
+    shared_ptr<Gff> hilight(gffs.getStruct("HILIGHT"));
     if (hilight) {
         loadHilight(*hilight);
     }
@@ -89,14 +89,14 @@ void Control::load(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Control::loadExtent(const GffStruct &gffs) {
+void Control::loadExtent(const Gff &gffs) {
     _extent.left = gffs.getInt("LEFT");
     _extent.top = gffs.getInt("TOP");
     _extent.width = gffs.getInt("WIDTH");
     _extent.height = gffs.getInt("HEIGHT");
 }
 
-void Control::loadBorder(const GffStruct &gffs) {
+void Control::loadBorder(const Gff &gffs) {
     string corner(gffs.getString("CORNER"));
     string edge(gffs.getString("EDGE"));
     string fill(gffs.getString("FILL"));
@@ -117,7 +117,7 @@ void Control::loadBorder(const GffStruct &gffs) {
     _border->color = gffs.getVector("COLOR");
 }
 
-void Control::loadText(const GffStruct &gffs) {
+void Control::loadText(const Gff &gffs) {
     _text.font = _fonts.get(gffs.getString("FONT"));
 
     int strRef = gffs.getInt("STRREF");
@@ -136,7 +136,7 @@ void Control::updateTextLines() {
     }
 }
 
-void Control::loadHilight(const GffStruct &gffs) {
+void Control::loadHilight(const Gff &gffs) {
     string corner(gffs.getString("CORNER"));
     string edge(gffs.getString("EDGE"));
     string fill(gffs.getString("FILL"));

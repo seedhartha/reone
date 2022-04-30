@@ -80,14 +80,14 @@ void Creature::Path::selectNextPoint() {
     }
 }
 
-void Creature::loadFromGIT(const GffStruct &gffs) {
+void Creature::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(gffs);
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utc(_services.resource.gffs.get(resRef, ResourceType::Utc));
+    shared_ptr<Gff> utc(_services.resource.gffs.get(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
@@ -156,7 +156,7 @@ void Creature::updateModel() {
     _animDirty = true;
 }
 
-void Creature::loadTransformFromGIT(const GffStruct &gffs) {
+void Creature::loadTransformFromGIT(const Gff &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
@@ -1248,7 +1248,7 @@ string Creature::getWeaponModelName(int slot) const {
     return move(modelName);
 }
 
-void Creature::loadUTC(const GffStruct &utc) {
+void Creature::loadUTC(const Gff &utc) {
     _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
     _race = utc.getEnum("Race", RacialType::Invalid);      // index into racialtypes.2da
     _subrace = utc.getEnum("SubraceIndex", Subrace::None); // index into subrace.2da
@@ -1322,7 +1322,7 @@ void Creature::loadUTC(const GffStruct &utc) {
     // - Comment (toolset only)
 }
 
-void Creature::loadNameFromUTC(const GffStruct &utc) {
+void Creature::loadNameFromUTC(const Gff &utc) {
     string firstName(_services.resource.strings.get(utc.getInt("FirstName")));
     string lastName(_services.resource.strings.get(utc.getInt("LastName")));
     if (!firstName.empty() && !lastName.empty()) {
@@ -1332,7 +1332,7 @@ void Creature::loadNameFromUTC(const GffStruct &utc) {
     }
 }
 
-void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
+void Creature::loadSoundSetFromUTC(const Gff &utc) {
     uint32_t soundSetIdx = utc.getUint("SoundSetFile", 0xffff);
     if (soundSetIdx == 0xffff) {
         return;
@@ -1347,7 +1347,7 @@ void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
     }
 }
 
-void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
+void Creature::loadBodyBagFromUTC(const Gff &utc) {
     shared_ptr<TwoDA> bodyBags(_services.resource.twoDas.get("bodybag"));
     if (!bodyBags) {
         return;
@@ -1358,7 +1358,7 @@ void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
 
-void Creature::loadAttributesFromUTC(const GffStruct &utc) {
+void Creature::loadAttributesFromUTC(const Gff &utc) {
     CreatureAttributes &attributes = _attributes;
     attributes.setAbilityScore(Ability::Strength, utc.getInt("Str"));
     attributes.setAbilityScore(Ability::Dexterity, utc.getInt("Dex"));
@@ -1377,7 +1377,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
         }
     }
 
-    vector<shared_ptr<GffStruct>> skillsUtc(utc.getList("SkillList"));
+    vector<shared_ptr<Gff>> skillsUtc(utc.getList("SkillList"));
     for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         SkillType skill = static_cast<SkillType>(i);
         attributes.setSkillRank(skill, skillsUtc[i]->getInt("Rank"));
@@ -1389,7 +1389,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     }
 }
 
-void Creature::loadPerceptionRangeFromUTC(const GffStruct &utc) {
+void Creature::loadPerceptionRangeFromUTC(const Gff &utc) {
     shared_ptr<TwoDA> ranges(_services.resource.twoDas.get("ranges"));
     if (!ranges) {
         return;

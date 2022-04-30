@@ -26,14 +26,14 @@ namespace reone {
 
 namespace game {
 
-void PlaceableCamera::loadFromGIT(const GffStruct &gffs) {
+void PlaceableCamera::loadFromGIT(const Gff &gffs) {
     _cameraId = gffs.getInt("CameraID");
     _fieldOfView = gffs.getFloat("FieldOfView");
 
     loadTransformFromGIT(gffs);
 }
 
-void PlaceableCamera::loadTransformFromGIT(const GffStruct &gffs) {
+void PlaceableCamera::loadTransformFromGIT(const Gff &gffs) {
     glm::vec3 position(gffs.getVector("Position"));
     float height = gffs.getFloat("Height");
 

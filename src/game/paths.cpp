@@ -35,7 +35,7 @@ shared_ptr<Path> Paths::doGet(string resRef) {
     return loadPath(*pth);
 }
 
-unique_ptr<Path> Paths::loadPath(const GffStruct &pth) const {
+unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
     auto path = make_unique<Path>();
 
     vector<int> connections;

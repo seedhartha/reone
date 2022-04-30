@@ -42,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
@@ -85,10 +85,10 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
-    void loadGeometryFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::Gff &gffs);
+    void loadGeometryFromGIT(const resource::Gff &gffs);
 
-    void loadUTT(const resource::GffStruct &utt);
+    void loadUTT(const resource::Gff &utt);
 };
 
 } // namespace game

@@ -17,7 +17,7 @@
 
 #include "trigger.h"
 
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace game {
 
 namespace neo {
 
-unique_ptr<Trigger> Trigger::Loader::load(const GffStruct &gitEntry) {
+unique_ptr<Trigger> Trigger::Loader::load(const Gff &gitEntry) {
     auto tag = "";
     auto sceneNode = shared_ptr<SceneNode>();
 

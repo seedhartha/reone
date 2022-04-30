@@ -39,7 +39,7 @@ namespace resource {
 
 struct ResourceServices;
 
-class GffStruct;
+class Gff;
 
 } // namespace resource
 
@@ -93,7 +93,7 @@ public:
         }
 
         std::unique_ptr<Camera> load(int style);
-        std::unique_ptr<Camera> load(const resource::GffStruct &gitEntry);
+        std::unique_ptr<Camera> load(const resource::Gff &gitEntry);
 
     private:
         IObjectIdSequence &_idSeq;

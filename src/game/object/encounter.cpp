@@ -34,7 +34,7 @@ namespace reone {
 
 namespace game {
 
-void Encounter::loadFromGIT(const GffStruct &gffs) {
+void Encounter::loadFromGIT(const Gff &gffs) {
     string blueprintResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(blueprintResRef);
 
@@ -43,13 +43,13 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
+    shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }
 }
 
-void Encounter::loadPositionFromGIT(const GffStruct &gffs) {
+void Encounter::loadPositionFromGIT(const Gff &gffs) {
     float x = gffs.getFloat("XPosition");
     float y = gffs.getFloat("YPosition");
     float z = gffs.getFloat("ZPosition");
@@ -57,7 +57,7 @@ void Encounter::loadPositionFromGIT(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Encounter::loadGeometryFromGIT(const GffStruct &gffs) {
+void Encounter::loadGeometryFromGIT(const Gff &gffs) {
     for (auto &point : gffs.getList("Geometry")) {
         float x = point->getFloat("X");
         float y = point->getFloat("Y");
@@ -66,7 +66,7 @@ void Encounter::loadGeometryFromGIT(const GffStruct &gffs) {
     }
 }
 
-void Encounter::loadSpawnPointsFromGIT(const GffStruct &gffs) {
+void Encounter::loadSpawnPointsFromGIT(const Gff &gffs) {
     for (auto &pointGffs : gffs.getList("SpawnPointList")) {
         float x = pointGffs->getFloat("X");
         float y = pointGffs->getFloat("Y");
@@ -80,7 +80,7 @@ void Encounter::loadSpawnPointsFromGIT(const GffStruct &gffs) {
     }
 }
 
-void Encounter::loadUTE(const GffStruct &ute) {
+void Encounter::loadUTE(const Gff &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
     _name = _services.resource.strings.get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
@@ -109,7 +109,7 @@ void Encounter::loadUTE(const GffStruct &ute) {
     // - Comment (toolset only)
 }
 
-void Encounter::loadCreaturesFromUTE(const GffStruct &ute) {
+void Encounter::loadCreaturesFromUTE(const Gff &ute) {
     for (auto &creatureGffs : ute.getList("CreatureList")) {
         EncounterCreature creature;
         creature._appearance = creatureGffs->getInt("Appearance");

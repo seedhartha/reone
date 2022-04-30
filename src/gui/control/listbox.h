@@ -77,7 +77,7 @@ public:
 
     void clearSelection();
 
-    void load(const resource::GffStruct &gffs) override;
+    void load(const resource::Gff &gffs) override;
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;

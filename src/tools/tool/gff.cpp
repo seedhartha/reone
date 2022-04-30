@@ -54,7 +54,7 @@ static string sanitizeXmlElementName(const std::string &s) {
     return move(sanitized);
 }
 
-static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int index = -1) {
+static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1) {
     printer.OpenElement("struct");
     printer.PushAttribute("type", gff.type());
     if (index != -1) {
@@ -71,28 +71,28 @@ static void printStructToXml(const GffStruct &gff, XMLPrinter &printer, int inde
         printer.PushAttribute("type", static_cast<int>(field.type));
 
         switch (field.type) {
-        case GffFieldType::CExoLocString:
+        case Gff::FieldType::CExoLocString:
             printer.PushAttribute("strref", field.intValue);
             printer.PushAttribute("substring", field.strValue.c_str());
             break;
-        case GffFieldType::Void:
+        case Gff::FieldType::Void:
             printer.PushAttribute("data", hexify(field.data, "").c_str());
             break;
-        case GffFieldType::Struct:
+        case Gff::FieldType::Struct:
             printStructToXml(*field.children[0], printer);
             break;
-        case GffFieldType::List:
+        case Gff::FieldType::List:
             for (size_t i = 0; i < field.children.size(); ++i) {
                 printStructToXml(*field.children[i], printer, i);
             }
             break;
-        case GffFieldType::Orientation:
+        case Gff::FieldType::Orientation:
             printer.PushAttribute("w", field.quatValue.w);
             printer.PushAttribute("x", field.quatValue.x);
             printer.PushAttribute("y", field.quatValue.y);
             printer.PushAttribute("z", field.quatValue.z);
             break;
-        case GffFieldType::Vector:
+        case Gff::FieldType::Vector:
             printer.PushAttribute("x", field.vecValue.x);
             printer.PushAttribute("y", field.vecValue.y);
             printer.PushAttribute("z", field.vecValue.z);
@@ -125,70 +125,72 @@ void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
     fclose(fp);
 }
 
-static unique_ptr<GffStruct> elementToGffStruct(const XMLElement &element) {
+static unique_ptr<Gff> elementToGff(const XMLElement &element) {
     if (strncmp(element.Name(), "struct", 6) != 0) {
         throw invalid_argument("XML element must have name 'struct'");
     }
 
     auto structType = element.UnsignedAttribute("type");
-    auto gffStruct = make_unique<GffStruct>(structType);
+
+    auto gff = Gff::Builder();
+    gff.type(structType);
 
     for (auto fieldElement = element.FirstChildElement(); fieldElement; fieldElement = fieldElement->NextSiblingElement()) {
-        auto fieldType = static_cast<GffFieldType>(fieldElement->IntAttribute("type"));
+        auto fieldType = static_cast<Gff::FieldType>(fieldElement->IntAttribute("type"));
         auto maybeName = fieldElement->Attribute("name");
         auto fieldName = maybeName ? maybeName : fieldElement->Name();
-        auto field = GffField(fieldType, fieldName);
+        auto field = Gff::Field(fieldType, fieldName);
 
         switch (fieldType) {
-        case GffFieldType::Byte:
-        case GffFieldType::Word:
-        case GffFieldType::Dword:
+        case Gff::FieldType::Byte:
+        case Gff::FieldType::Word:
+        case Gff::FieldType::Dword:
             field.uintValue = fieldElement->UnsignedAttribute("value");
             break;
-        case GffFieldType::Char:
-        case GffFieldType::Short:
-        case GffFieldType::Int:
+        case Gff::FieldType::Char:
+        case Gff::FieldType::Short:
+        case Gff::FieldType::Int:
             field.intValue = fieldElement->IntAttribute("value");
             break;
-        case GffFieldType::Dword64:
+        case Gff::FieldType::Dword64:
             field.uint64Value = fieldElement->Unsigned64Attribute("value");
             break;
-        case GffFieldType::Int64:
+        case Gff::FieldType::Int64:
             field.int64Value = fieldElement->Int64Attribute("value");
             break;
-        case GffFieldType::Float:
+        case Gff::FieldType::Float:
             field.floatValue = fieldElement->FloatAttribute("value");
             break;
-        case GffFieldType::Double:
+        case Gff::FieldType::Double:
             field.doubleValue = fieldElement->DoubleAttribute("value");
             break;
-        case GffFieldType::CExoString:
-        case GffFieldType::ResRef:
+        case Gff::FieldType::CExoString:
+        case Gff::FieldType::ResRef:
             field.strValue = fieldElement->Attribute("value");
             break;
-        case GffFieldType::CExoLocString:
+        case Gff::FieldType::CExoLocString:
             field.intValue = fieldElement->IntAttribute("strref");
             field.strValue = fieldElement->Attribute("substring");
             break;
-        case GffFieldType::Void:
+        case Gff::FieldType::Void:
             field.data = unhexify(fieldElement->Attribute("data"));
             break;
-        case GffFieldType::Struct:
-            field.children.push_back(elementToGffStruct(*fieldElement->FirstChildElement()));
+        case Gff::FieldType::Struct:
+            field.children.push_back(elementToGff(*fieldElement->FirstChildElement()));
             break;
-        case GffFieldType::List:
+        case Gff::FieldType::List:
             for (auto listElement = fieldElement->FirstChildElement(); listElement; listElement = listElement->NextSiblingElement()) {
-                field.children.push_back(elementToGffStruct(*listElement));
+                field.children.push_back(elementToGff(*listElement));
             }
             break;
-        case GffFieldType::Orientation:
+        case Gff::FieldType::Orientation:
             field.quatValue = glm::quat(
                 fieldElement->FloatAttribute("w"),
                 fieldElement->FloatAttribute("x"),
                 fieldElement->FloatAttribute("y"),
                 fieldElement->FloatAttribute("z"));
             break;
-        case GffFieldType::Vector:
+        case Gff::FieldType::Vector:
             field.vecValue = glm::vec3(
                 fieldElement->FloatAttribute("x"),
                 fieldElement->FloatAttribute("y"),
@@ -198,10 +200,10 @@ static unique_ptr<GffStruct> elementToGffStruct(const XMLElement &element) {
             throw logic_error("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
         }
 
-        gffStruct->add(move(field));
+        gff.field(move(field));
     }
 
-    return move(gffStruct);
+    return gff.build();
 }
 
 static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
@@ -225,7 +227,7 @@ static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
     auto gffPath = destPath;
     gffPath.append(extensionless.filename().string());
 
-    auto writer = GffWriter(resType, elementToGffStruct(*rootElement));
+    auto writer = GffWriter(resType, elementToGff(*rootElement));
     writer.save(gffPath);
 }
 

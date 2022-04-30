@@ -47,7 +47,7 @@ namespace reone {
 
 namespace game {
 
-void Door::loadFromGIT(const GffStruct &gffs) {
+void Door::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
@@ -60,7 +60,7 @@ void Door::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
+    shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
     if (!utd) {
         return;
     }
@@ -101,7 +101,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     }
 }
 
-void Door::loadTransformFromGIT(const GffStruct &gffs) {
+void Door::loadTransformFromGIT(const Gff &gffs) {
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
@@ -155,7 +155,7 @@ void Door::setLocked(bool locked) {
     _locked = locked;
 }
 
-void Door::loadUTD(const GffStruct &utd) {
+void Door::loadUTD(const Gff &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
     _name = _services.resource.strings.get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));

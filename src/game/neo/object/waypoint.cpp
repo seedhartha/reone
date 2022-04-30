@@ -17,7 +17,7 @@
 
 #include "waypoint.h"
 
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace game {
 
 namespace neo {
 
-unique_ptr<Waypoint> Waypoint::Loader::load(const GffStruct &gitEntry) {
+unique_ptr<Waypoint> Waypoint::Loader::load(const Gff &gitEntry) {
     auto tag = gitEntry.getString("Tag");
     auto sceneNode = shared_ptr<SceneNode>();
 

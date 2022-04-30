@@ -42,21 +42,21 @@ namespace reone {
 
 namespace game {
 
-void Sound::loadFromGIT(const GffStruct &gffs) {
+void Sound::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(gffs);
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
+    shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
     if (!uts) {
         return;
     }
     loadUTS(*uts);
 }
 
-void Sound::loadUTS(const GffStruct &uts) {
+void Sound::loadUTS(const Gff &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
     _name = _services.resource.strings.get(uts.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
@@ -91,13 +91,13 @@ void Sound::loadUTS(const GffStruct &uts) {
     // - Comment (toolset only)
 }
 
-void Sound::loadPriorityFromUTS(const GffStruct &uts) {
+void Sound::loadPriorityFromUTS(const Gff &uts) {
     shared_ptr<TwoDA> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }
 
-void Sound::loadTransformFromGIT(const GffStruct &gffs) {
+void Sound::loadTransformFromGIT(const Gff &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");

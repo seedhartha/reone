@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 class Gffs;
-class GffStruct;
+class Gff;
 class Resources;
 class Strings;
 
@@ -128,7 +128,7 @@ protected:
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void loadControl(const resource::GffStruct &gffs);
+    void loadControl(const resource::Gff &gffs);
     virtual void preloadControl(Control &control);
 
     std::shared_ptr<Control> getControl(const std::string &tag) const;

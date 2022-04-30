@@ -27,7 +27,7 @@
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../resource/gffs.h"
-#include "../resource/gffstruct.h"
+#include "../resource/gff.h"
 #include "../resource/resources.h"
 
 #include "control/button.h"
@@ -87,7 +87,7 @@ GUI::GUI(
 void GUI::load() {
     debug("Load " + _resRef, LogChannels::gui);
 
-    shared_ptr<GffStruct> gui(_gffs.get(_resRef, ResourceType::Gui));
+    shared_ptr<Gff> gui(_gffs.get(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -121,7 +121,7 @@ void GUI::stretchControl(Control &control) {
     control.stretch(aspectX, aspectY);
 }
 
-void GUI::loadControl(const GffStruct &gffs) {
+void GUI::loadControl(const Gff &gffs) {
     ControlType type = Control::getType(gffs);
     string tag(Control::getTag(gffs));
     string parent(Control::getParent(gffs));

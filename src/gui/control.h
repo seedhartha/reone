@@ -26,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-class GffStruct;
+class Gff;
 class Strings;
 
 } // namespace resource
@@ -106,13 +106,13 @@ public:
         TextAlign align {TextAlign::CenterCenter};
     };
 
-    static ControlType getType(const resource::GffStruct &gffs);
-    static std::string getTag(const resource::GffStruct &gffs);
-    static std::string getParent(const resource::GffStruct &gffs);
+    static ControlType getType(const resource::Gff &gffs);
+    static std::string getTag(const resource::Gff &gffs);
+    static std::string getParent(const resource::Gff &gffs);
 
     virtual ~Control() = default;
 
-    virtual void load(const resource::GffStruct &gffs);
+    virtual void load(const resource::Gff &gffs);
     virtual void update(float dt);
 
     /**
@@ -262,10 +262,10 @@ protected:
     virtual const glm::vec3 &getBorderColor() const;
 
 private:
-    void loadExtent(const resource::GffStruct &gffs);
-    void loadBorder(const resource::GffStruct &gffs);
-    void loadText(const resource::GffStruct &gffs);
-    void loadHilight(const resource::GffStruct &gffs);
+    void loadExtent(const resource::Gff &gffs);
+    void loadBorder(const resource::Gff &gffs);
+    void loadText(const resource::Gff &gffs);
+    void loadHilight(const resource::Gff &gffs);
 
     void updateTransform();
     void updateTextLines();

@@ -20,7 +20,7 @@
 #include "../../src/common/streamwriter.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/gffwriter.h"
-#include "../../src/resource/gffstruct.h"
+#include "../../src/resource/gff.h"
 
 #include "../checkutil.h"
 
@@ -174,31 +174,31 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
                               .append("\x03\x00\x00\x00", 4)
                               .build();
 
-    auto root = make_shared<GffStruct>(
+    auto root = make_shared<Gff>(
         0xffffffff,
-        vector<GffField> {
-            GffField::newByte("Byte", 0),
-            GffField::newInt("Int", 1),
-            GffField::newDword("Uint", 2),
-            GffField::newInt64("Int64", 3),
-            GffField::newDword64("Uint64", 4),
-            GffField::newFloat("Float", 1.0f),
-            GffField::newDouble("Double", 1.0),
-            GffField::newCExoString("CExoString", "John"),
-            GffField::newResRef("ResRef", "Jane"),
-            GffField::newCExoLocString("CExoLocString", -1, "Jill"),
-            GffField::newVoid("Void", ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)}),
-            GffField::newOrientation("Orientation", glm::quat(1.0f, 1.0f, 1.0f, 1.0f)),
-            GffField::newVector("Vector", glm::vec3(1.0f, 1.0f, 1.0f)),
-            GffField::newStrRef("StrRef", 1),
-            GffField::newStruct(
+        vector<Gff::Field> {
+            Gff::Field::newByte("Byte", 0),
+            Gff::Field::newInt("Int", 1),
+            Gff::Field::newDword("Uint", 2),
+            Gff::Field::newInt64("Int64", 3),
+            Gff::Field::newDword64("Uint64", 4),
+            Gff::Field::newFloat("Float", 1.0f),
+            Gff::Field::newDouble("Double", 1.0),
+            Gff::Field::newCExoString("CExoString", "John"),
+            Gff::Field::newResRef("ResRef", "Jane"),
+            Gff::Field::newCExoLocString("CExoLocString", -1, "Jill"),
+            Gff::Field::newVoid("Void", ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)}),
+            Gff::Field::newOrientation("Orientation", glm::quat(1.0f, 1.0f, 1.0f, 1.0f)),
+            Gff::Field::newVector("Vector", glm::vec3(1.0f, 1.0f, 1.0f)),
+            Gff::Field::newStrRef("StrRef", 1),
+            Gff::Field::newStruct(
                 "Struct",
-                make_shared<GffStruct>(1, vector<GffField> {GffField::newChar("Struct1Char", 1)})),
-            GffField::newList(
+                make_shared<Gff>(1, vector<Gff::Field> {Gff::Field::newChar("Struct1Char", 1)})),
+            Gff::Field::newList(
                 "List",
-                vector<shared_ptr<GffStruct>> {
-                    make_shared<GffStruct>(2, vector<GffField> {GffField::newWord("Struct2Word", 2)}),
-                    make_shared<GffStruct>(3, vector<GffField> {GffField::newShort("Struct3Short", 3)})})});
+                vector<shared_ptr<Gff>> {
+                    make_shared<Gff>(2, vector<Gff::Field> {Gff::Field::newWord("Struct2Word", 2)}),
+                    make_shared<Gff>(3, vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
     auto writer = GffWriter(ResourceType::Res, root);
     auto stream = make_shared<ostringstream>();

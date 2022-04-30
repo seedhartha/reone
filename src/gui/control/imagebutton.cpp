@@ -40,7 +40,7 @@ namespace gui {
 
 static const char kIconFontResRef[] = "dialogfont10x10a";
 
-void ImageButton::load(const GffStruct &gffs) {
+void ImageButton::load(const Gff &gffs) {
     Control::load(gffs);
     _iconFont = _fonts.get(kIconFontResRef);
 }

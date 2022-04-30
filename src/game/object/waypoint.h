@@ -40,7 +40,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
     bool isMapNoteEnabled() const { return _mapNoteEnabled; }
@@ -53,9 +53,9 @@ private:
     std::string _mapNote;
     bool _mapNoteEnabled {false};
 
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 
-    void loadUTW(const resource::GffStruct &utw);
+    void loadUTW(const resource::Gff &utw);
 };
 
 } // namespace game

@@ -59,7 +59,7 @@ bool Creature::moveForward(float delta) {
     return true;
 }
 
-unique_ptr<Creature> Creature::Loader::load(const GffStruct &gitEntry) {
+unique_ptr<Creature> Creature::Loader::load(const Gff &gitEntry) {
     // From GIT entry
 
     auto xPosition = gitEntry.getFloat("XPosition");

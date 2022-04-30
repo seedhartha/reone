@@ -16,8 +16,8 @@
 set(RESOURCE_HEADERS
     2da.h
     2das.h
+    gff.h
     gffs.h
-    gffstruct.h
     folder.h
     format/2dareader.h
     format/2dawriter.h
@@ -46,10 +46,9 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     2da.cpp
     2das.cpp
-    gfffield.cpp
-    gffs.cpp
-    gffstruct.cpp
     folder.cpp
+    gff.cpp
+    gffs.cpp
     format/2dareader.cpp
     format/2dawriter.cpp
     format/bifreader.cpp
