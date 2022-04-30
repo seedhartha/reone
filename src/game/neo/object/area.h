@@ -42,7 +42,7 @@ namespace resource {
 
 struct ResourceServices;
 
-class GffStruct;
+class Gff;
 
 } // namespace resource
 

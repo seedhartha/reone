@@ -52,7 +52,7 @@ public:
             strings) {
     }
 
-    void load(const resource::GffStruct &gffs) override;
+    void load(const resource::Gff &gffs) override;
     void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
     void setValue(int value);

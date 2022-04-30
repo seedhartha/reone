@@ -28,13 +28,13 @@ namespace reone {
 
 namespace resource {
 
-shared_ptr<GffStruct> Gffs::get(const string &resRef, ResourceType type) {
+shared_ptr<Gff> Gffs::get(const string &resRef, ResourceType type) {
     ResourceId id(resRef, type);
     auto maybeGff = _cache.find(id);
     if (maybeGff != _cache.end()) {
         return maybeGff->second;
     }
-    shared_ptr<GffStruct> gff;
+    shared_ptr<Gff> gff;
     auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
         GffReader reader;

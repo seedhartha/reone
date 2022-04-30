@@ -73,7 +73,7 @@ public:
         Game &game,
         ServicesView &services);
 
-    void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);
+    void load(std::string name, const resource::Gff &are, const resource::Gff &git, bool fromSave = false);
 
     bool handle(const SDL_Event &event);
     void update(float dt);
@@ -305,31 +305,31 @@ private:
 
     // Loading ARE
 
-    void loadARE(const resource::GffStruct &are);
+    void loadARE(const resource::Gff &are);
 
-    void loadCameraStyle(const resource::GffStruct &are);
-    void loadAmbientColor(const resource::GffStruct &are);
-    void loadScripts(const resource::GffStruct &are);
-    void loadMap(const resource::GffStruct &are);
-    void loadStealthXP(const resource::GffStruct &are);
-    void loadGrass(const resource::GffStruct &are);
-    void loadFog(const resource::GffStruct &are);
+    void loadCameraStyle(const resource::Gff &are);
+    void loadAmbientColor(const resource::Gff &are);
+    void loadScripts(const resource::Gff &are);
+    void loadMap(const resource::Gff &are);
+    void loadStealthXP(const resource::Gff &are);
+    void loadGrass(const resource::Gff &are);
+    void loadFog(const resource::Gff &are);
 
     // END Loading ARE
 
     // Loading GIT
 
-    void loadGIT(const resource::GffStruct &gffs);
+    void loadGIT(const resource::Gff &gffs);
 
-    void loadProperties(const resource::GffStruct &git);
-    void loadCreatures(const resource::GffStruct &git);
-    void loadDoors(const resource::GffStruct &git);
-    void loadPlaceables(const resource::GffStruct &git);
-    void loadWaypoints(const resource::GffStruct &git);
-    void loadTriggers(const resource::GffStruct &git);
-    void loadSounds(const resource::GffStruct &git);
-    void loadCameras(const resource::GffStruct &git);
-    void loadEncounters(const resource::GffStruct &git);
+    void loadProperties(const resource::Gff &git);
+    void loadCreatures(const resource::Gff &git);
+    void loadDoors(const resource::Gff &git);
+    void loadPlaceables(const resource::Gff &git);
+    void loadWaypoints(const resource::Gff &git);
+    void loadTriggers(const resource::Gff &git);
+    void loadSounds(const resource::Gff &git);
+    void loadCameras(const resource::Gff &git);
+    void loadEncounters(const resource::Gff &git);
 
     // END Loading GIT
 

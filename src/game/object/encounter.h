@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/gffstruct.h"
+#include "../../resource/gff.h"
 
 #include "../object.h"
 
@@ -40,7 +40,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
 
 private:
     struct SpawnPoint {
@@ -77,12 +77,12 @@ private:
     // END Scripts
 
     void loadFromBlueprint(const std::string &blueprintResRef);
-    void loadPositionFromGIT(const resource::GffStruct &gffs);
-    void loadGeometryFromGIT(const resource::GffStruct &gffs);
-    void loadSpawnPointsFromGIT(const resource::GffStruct &gffs);
+    void loadPositionFromGIT(const resource::Gff &gffs);
+    void loadGeometryFromGIT(const resource::Gff &gffs);
+    void loadSpawnPointsFromGIT(const resource::Gff &gffs);
 
-    void loadUTE(const resource::GffStruct &ute);
-    void loadCreaturesFromUTE(const resource::GffStruct &ute);
+    void loadUTE(const resource::Gff &ute);
+    void loadCreaturesFromUTE(const resource::Gff &ute);
 };
 
 } // namespace game

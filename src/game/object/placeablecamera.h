@@ -41,7 +41,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
 
     int cameraId() const { return _cameraId; }
     float fieldOfView() const { return _fieldOfView; }
@@ -50,7 +50,7 @@ private:
     int _cameraId {0};
     float _fieldOfView {0.0f};
 
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 };
 
 } // namespace game

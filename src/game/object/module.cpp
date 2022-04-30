@@ -45,7 +45,7 @@ namespace reone {
 
 namespace game {
 
-void Module::load(string name, const GffStruct &ifo, bool fromSave) {
+void Module::load(string name, const Gff &ifo, bool fromSave) {
     _name = move(name);
 
     loadInfo(ifo);
@@ -60,7 +60,7 @@ void Module::load(string name, const GffStruct &ifo, bool fromSave) {
     }
 }
 
-void Module::loadInfo(const GffStruct &ifo) {
+void Module::loadInfo(const Gff &ifo) {
     // Entry location
 
     _info.entryArea = ifo.getString("Mod_Entry_Area");
@@ -77,17 +77,17 @@ void Module::loadInfo(const GffStruct &ifo) {
     _info.entryFacing = -glm::atan(dirX, dirY);
 }
 
-void Module::loadArea(const GffStruct &ifo, bool fromSave) {
+void Module::loadArea(const Gff &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _game.objectFactory().newArea();
 
-    shared_ptr<GffStruct> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
+    shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
         throw ValidationException("Area ARE file not found");
     }
 
-    shared_ptr<GffStruct> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
+    shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
     if (!git) {
         throw ValidationException("Area GIT file not found");
     }

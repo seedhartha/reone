@@ -39,7 +39,7 @@ namespace resource {
 
 struct ResourceServices;
 
-class GffStruct;
+class Gff;
 
 } // namespace resource
 
@@ -113,7 +113,7 @@ public:
             _resourceSvc(resourceSvc) {
         }
 
-        std::unique_ptr<Door> load(const resource::GffStruct &gitEntry);
+        std::unique_ptr<Door> load(const resource::Gff &gitEntry);
 
     private:
         IObjectIdSequence &_idSeq;

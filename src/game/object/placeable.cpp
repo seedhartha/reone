@@ -46,14 +46,14 @@ namespace reone {
 
 namespace game {
 
-void Placeable::loadFromGIT(const GffStruct &gffs) {
+void Placeable::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(gffs);
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
+    shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
     if (!utp) {
         return;
     }
@@ -79,7 +79,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     }
 }
 
-void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
+void Placeable::loadTransformFromGIT(const Gff &gffs) {
     _position[0] = gffs.getFloat("X");
     _position[1] = gffs.getFloat("Y");
     _position[2] = gffs.getFloat("Z");
@@ -101,7 +101,7 @@ void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
     }
 }
 
-void Placeable::loadUTP(const GffStruct &utp) {
+void Placeable::loadUTP(const Gff &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
     _name = _services.resource.strings.get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));

@@ -44,7 +44,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
     bool hasInventory() const { return _hasInventory; }
@@ -94,8 +94,8 @@ private:
 
     // END Scripts
 
-    void loadUTP(const resource::GffStruct &utp);
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadUTP(const resource::Gff &utp);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 
     void updateTransform() override;
 };

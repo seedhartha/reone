@@ -97,7 +97,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
     void loadAppearance();
 
@@ -312,7 +312,7 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 
     void updateModel();
     void updateHealth();
@@ -365,13 +365,13 @@ private:
 
     // Blueprint
 
-    void loadUTC(const resource::GffStruct &utc);
+    void loadUTC(const resource::Gff &utc);
 
-    void loadNameFromUTC(const resource::GffStruct &utc);
-    void loadSoundSetFromUTC(const resource::GffStruct &utc);
-    void loadBodyBagFromUTC(const resource::GffStruct &utc);
-    void loadAttributesFromUTC(const resource::GffStruct &utc);
-    void loadPerceptionRangeFromUTC(const resource::GffStruct &utc);
+    void loadNameFromUTC(const resource::Gff &utc);
+    void loadSoundSetFromUTC(const resource::Gff &utc);
+    void loadBodyBagFromUTC(const resource::Gff &utc);
+    void loadAttributesFromUTC(const resource::Gff &utc);
+    void loadPerceptionRangeFromUTC(const resource::Gff &utc);
 
     // END Blueprint
 };

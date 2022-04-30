@@ -19,7 +19,7 @@
 
 #include "../../../common/exception/validation.h"
 #include "../../../resource/gffs.h"
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 #include "../../../resource/services.h"
 
 #include "../../layouts.h"

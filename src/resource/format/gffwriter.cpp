@@ -19,7 +19,7 @@
 
 #include "../../common/streamwriter.h"
 
-#include "../gffstruct.h"
+#include "../gff.h"
 
 using namespace std;
 
@@ -80,54 +80,54 @@ void GffWriter::save(const shared_ptr<ostream> &out) {
  * @param complex[out] field's data if it is of complex type
  * @return field classification
  */
-static FieldClassification getFieldData(const GffField &field, uint32_t &simple, ByteArray &complex) {
+static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simple, ByteArray &complex) {
     switch (field.type) {
-    case GffFieldType::Byte:
-    case GffFieldType::Word:
-    case GffFieldType::Dword:
+    case Gff::FieldType::Byte:
+    case Gff::FieldType::Word:
+    case Gff::FieldType::Dword:
         simple = field.uintValue;
         return FieldClassification::Simple;
 
-    case GffFieldType::Char:
-    case GffFieldType::Short:
-    case GffFieldType::Int:
+    case Gff::FieldType::Char:
+    case Gff::FieldType::Short:
+    case Gff::FieldType::Int:
         simple = *reinterpret_cast<const uint32_t *>(&field.intValue);
         return FieldClassification::Simple;
 
-    case GffFieldType::Dword64:
+    case Gff::FieldType::Dword64:
         complex.resize(8);
         memcpy(&complex[0], &field.uint64Value, 8);
         return FieldClassification::Complex;
 
-    case GffFieldType::Int64:
+    case Gff::FieldType::Int64:
         complex.resize(8);
         memcpy(&complex[0], &field.int64Value, 8);
         return FieldClassification::Complex;
 
-    case GffFieldType::Float:
+    case Gff::FieldType::Float:
         simple = *reinterpret_cast<const uint32_t *>(&field.floatValue);
         return FieldClassification::Simple;
 
-    case GffFieldType::Double:
+    case Gff::FieldType::Double:
         complex.resize(8);
         memcpy(&complex[0], &field.doubleValue, sizeof(double));
         return FieldClassification::Complex;
 
-    case GffFieldType::CExoString: {
+    case Gff::FieldType::CExoString: {
         uint32_t length = static_cast<uint32_t>(field.strValue.length());
         complex.resize(4ll + length);
         memcpy(&complex[0], &length, 4);
         memcpy(&complex[4], &field.strValue[0], length);
         return FieldClassification::Complex;
     }
-    case GffFieldType::ResRef: {
+    case Gff::FieldType::ResRef: {
         uint32_t length = static_cast<uint32_t>(field.strValue.length());
         complex.resize(1ll + length);
         complex[0] = length;
         memcpy(&complex[1], &field.strValue[0], length);
         return FieldClassification::Complex;
     }
-    case GffFieldType::CExoLocString: {
+    case Gff::FieldType::CExoLocString: {
         uint32_t numSubstrings = !field.strValue.empty() ? 1 : 0;
         uint32_t totalSize = static_cast<uint32_t>(8 + (numSubstrings > 0 ? (8 + field.strValue.length()) : 0));
         complex.resize(4ll + totalSize);
@@ -143,20 +143,20 @@ static FieldClassification getFieldData(const GffField &field, uint32_t &simple,
         }
         return FieldClassification::Complex;
     }
-    case GffFieldType::Void: {
+    case Gff::FieldType::Void: {
         uint32_t dataSize = static_cast<uint32_t>(field.data.size());
         complex.resize(4ll + dataSize);
         memcpy(&complex[0], &dataSize, 4);
         memcpy(&complex[4], &field.data[0], dataSize);
         return FieldClassification::Complex;
     }
-    case GffFieldType::Struct:
+    case Gff::FieldType::Struct:
         return FieldClassification::Struct;
 
-    case GffFieldType::List:
+    case Gff::FieldType::List:
         return FieldClassification::List;
 
-    case GffFieldType::Orientation:
+    case Gff::FieldType::Orientation:
         complex.resize(16);
         memcpy(&complex[0], &field.quatValue.w, 4);
         memcpy(&complex[4], &field.quatValue.x, 4);
@@ -164,12 +164,12 @@ static FieldClassification getFieldData(const GffField &field, uint32_t &simple,
         memcpy(&complex[12], &field.quatValue.z, 4);
         return FieldClassification::Complex;
 
-    case GffFieldType::Vector:
+    case Gff::FieldType::Vector:
         complex.resize(12);
         memcpy(&complex[0], &field.vecValue[0], 12);
         return FieldClassification::Complex;
 
-    case GffFieldType::StrRef: {
+    case Gff::FieldType::StrRef: {
         uint32_t totalSize = 4;
         complex.resize(8);
         memcpy(&complex[0], &totalSize, 4);
@@ -182,14 +182,14 @@ static FieldClassification getFieldData(const GffField &field, uint32_t &simple,
 }
 
 void GffWriter::processTree() {
-    queue<const GffStruct *> aQueue;
+    queue<const Gff *> aQueue;
     aQueue.push(_root.get());
 
     int structIdx = 0;
     int numStructs = 0;
 
     while (!aQueue.empty()) {
-        const GffStruct &aStruct = *aQueue.front();
+        const Gff &aStruct = *aQueue.front();
         aQueue.pop();
 
         vector<uint32_t> fieldIndices;

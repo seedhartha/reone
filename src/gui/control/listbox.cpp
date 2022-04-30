@@ -23,7 +23,7 @@
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textutil.h"
-#include "../../resource/gffstruct.h"
+#include "../../resource/gff.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -78,16 +78,16 @@ void ListBox::clearSelection() {
     _selectedItemIndex = -1;
 }
 
-void ListBox::load(const GffStruct &gffs) {
+void ListBox::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<GffStruct> protoItem(gffs.getStruct("PROTOITEM"));
+    shared_ptr<Gff> protoItem(gffs.getStruct("PROTOITEM"));
     if (protoItem) {
         ControlType type = _protoItemType == ControlType::Invalid ? getType(*protoItem) : _protoItemType;
         _protoItem = _gui.newControl(type, getTag(*protoItem));
         _protoItem->load(*protoItem);
     }
-    shared_ptr<GffStruct> scrollBar(gffs.getStruct("SCROLLBAR"));
+    shared_ptr<Gff> scrollBar(gffs.getStruct("SCROLLBAR"));
     if (scrollBar) {
         _scrollBar = _gui.newControl(getType(*scrollBar), getTag(*scrollBar));
         _scrollBar->load(*scrollBar);

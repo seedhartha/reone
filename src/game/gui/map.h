@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class GffStruct;
+class Gff;
 
 }
 
@@ -47,7 +47,7 @@ public:
         _services(services) {
     }
 
-    void load(const std::string &area, const resource::GffStruct &gffs);
+    void load(const std::string &area, const resource::Gff &gffs);
     void draw(Mode mode, const glm::vec4 &bounds);
 
     bool isLoaded() const { return static_cast<bool>(_areaTexture); }
@@ -72,7 +72,7 @@ private:
     std::string _arrowResRef;
     std::shared_ptr<Waypoint> _selectedNote;
 
-    void loadProperties(const resource::GffStruct &gffs);
+    void loadProperties(const resource::Gff &gffs);
     void loadTextures(const std::string &area);
 
     void drawArea(Mode mode, const glm::vec4 &bounds);

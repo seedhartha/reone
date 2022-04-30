@@ -35,7 +35,7 @@ namespace reone {
 
 namespace game {
 
-void Waypoint::loadFromGIT(const GffStruct &gffs) {
+void Waypoint::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
@@ -49,13 +49,13 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
+    shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }
 }
 
-void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {
+void Waypoint::loadTransformFromGIT(const Gff &gffs) {
     _position[0] = gffs.getFloat("XPosition");
     _position[1] = gffs.getFloat("YPosition");
     _position[2] = gffs.getFloat("ZPosition");
@@ -67,7 +67,7 @@ void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Waypoint::loadUTW(const GffStruct &utw) {
+void Waypoint::loadUTW(const Gff &utw) {
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));

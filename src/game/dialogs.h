@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 class Gffs;
-class GffStruct;
+class Gff;
 class Strings;
 
 } // namespace resource
@@ -47,12 +47,12 @@ private:
 
     std::shared_ptr<Dialog> doGet(std::string resRef);
 
-    std::unique_ptr<Dialog> loadDialog(const resource::GffStruct &dlg);
+    std::unique_ptr<Dialog> loadDialog(const resource::Gff &dlg);
 
-    Dialog::EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
-    Dialog::EntryReply getEntryReply(const resource::GffStruct &gffs) const;
-    Dialog::Stunt getStunt(const resource::GffStruct &gffs) const;
-    Dialog::ParticipantAnimation getParticipantAnimation(const resource::GffStruct &gffs) const;
+    Dialog::EntryReplyLink getEntryReplyLink(const resource::Gff &gffs) const;
+    Dialog::EntryReply getEntryReply(const resource::Gff &gffs) const;
+    Dialog::Stunt getStunt(const resource::Gff &gffs) const;
+    Dialog::ParticipantAnimation getParticipantAnimation(const resource::Gff &gffs) const;
 };
 
 } // namespace game

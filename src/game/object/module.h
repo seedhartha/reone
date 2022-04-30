@@ -62,7 +62,7 @@ public:
             services) {
     }
 
-    void load(std::string name, const resource::GffStruct &ifo, bool fromSave = false);
+    void load(std::string name, const resource::Gff &ifo, bool fromSave = false);
     void loadParty(const std::string &entry = "", bool fromSave = false);
 
     bool handle(const SDL_Event &event);
@@ -90,8 +90,8 @@ private:
 
     // Loading
 
-    void loadInfo(const resource::GffStruct &ifo);
-    void loadArea(const resource::GffStruct &ifo, bool fromSave = false);
+    void loadInfo(const resource::Gff &ifo);
+    void loadArea(const resource::Gff &ifo, bool fromSave = false);
     void loadPlayer();
 
     // END Loading

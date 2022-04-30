@@ -41,7 +41,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
     bool isSelectable() const override;
@@ -109,8 +109,8 @@ private:
 
     // END Scripts
 
-    void loadUTD(const resource::GffStruct &utd);
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadUTD(const resource::Gff &utd);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 
     void updateTransform() override;
 };

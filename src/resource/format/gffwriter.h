@@ -27,13 +27,13 @@ class StreamWriter;
 
 namespace resource {
 
-class GffStruct;
+class Gff;
 
 class GffWriter {
 public:
     GffWriter(
         ResourceType resType,
-        std::shared_ptr<GffStruct> root) :
+        std::shared_ptr<Gff> root) :
         _resType(resType),
         _root(std::move(root)) {
     }
@@ -64,7 +64,7 @@ private:
     };
 
     ResourceType _resType;
-    std::shared_ptr<GffStruct> _root;
+    std::shared_ptr<Gff> _root;
     WriteContext _context;
     std::unique_ptr<StreamWriter> _writer;
 

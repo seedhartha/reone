@@ -22,7 +22,7 @@
 #include "../../../graphics/models.h"
 #include "../../../graphics/services.h"
 #include "../../../resource/gffs.h"
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 #include "../../../resource/services.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"

@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 class Gffs;
-class GffStruct;
+class Gff;
 
 } // namespace resource
 
@@ -44,7 +44,7 @@ private:
 
     std::shared_ptr<Path> doGet(std::string resRef);
 
-    std::unique_ptr<Path> loadPath(const resource::GffStruct &pth) const;
+    std::unique_ptr<Path> loadPath(const resource::Gff &pth) const;
 };
 
 } // namespace game

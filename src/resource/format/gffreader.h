@@ -19,7 +19,7 @@
 
 #include "binreader.h"
 
-#include "../gffstruct.h"
+#include "../gff.h"
 
 namespace reone {
 
@@ -29,7 +29,7 @@ class GffReader : public BinaryReader {
 public:
     GffReader();
 
-    std::shared_ptr<GffStruct> root() const { return _root; }
+    std::shared_ptr<Gff> root() const { return _root; }
 
 private:
     struct LocString {
@@ -49,12 +49,12 @@ private:
     int _fieldIncidesCount {0};
     uint32_t _listIndicesOffset {0};
     int _listIndicesCount {0};
-    std::shared_ptr<GffStruct> _root;
+    std::shared_ptr<Gff> _root;
 
     void doLoad() override;
 
-    std::unique_ptr<GffStruct> readStruct(int idx);
-    GffField readField(int idx);
+    std::unique_ptr<Gff> readStruct(int idx);
+    Gff::Field readField(int idx);
     std::string readLabel(int idx);
     std::vector<uint32_t> readFieldIndices(uint32_t off, int count);
     uint64_t readQWordFieldData(uint32_t off);

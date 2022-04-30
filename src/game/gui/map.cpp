@@ -25,7 +25,7 @@
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
-#include "../../resource/gffstruct.h"
+#include "../../resource/gff.h"
 
 #include "../game.h"
 #include "../services.h"
@@ -43,12 +43,12 @@ static constexpr int kArrowSize = 32;
 static constexpr int kMapNoteSize = 16;
 static constexpr float kSelectedMapNoteScale = 1.5f;
 
-void Map::load(const string &area, const GffStruct &gffs) {
+void Map::load(const string &area, const Gff &gffs) {
     loadProperties(gffs);
     loadTextures(area);
 }
 
-void Map::loadProperties(const GffStruct &gffs) {
+void Map::loadProperties(const Gff &gffs) {
     _northAxis = gffs.getInt("NorthAxis");
     _worldPoint1 = glm::vec2(gffs.getFloat("WorldPt1X"), gffs.getFloat("WorldPt1Y"));
     _worldPoint2 = glm::vec2(gffs.getFloat("WorldPt2X"), gffs.getFloat("WorldPt2Y"));

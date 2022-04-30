@@ -54,7 +54,7 @@ public:
         _clickable = true;
     }
 
-    void load(const resource::GffStruct &gffs) override;
+    void load(const resource::Gff &gffs) override;
 
     void draw(
         const glm::ivec2 &offset,

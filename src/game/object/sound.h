@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class GffStruct;
+class Gff;
 
 }
 
@@ -46,7 +46,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::GffStruct &gffs);
+    void loadFromGIT(const resource::Gff &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
@@ -88,14 +88,14 @@ private:
 
     std::vector<std::string> _sounds;
 
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
+    void loadTransformFromGIT(const resource::Gff &gffs);
 
     void updateTransform() override;
 
     // Blueprint
 
-    void loadUTS(const resource::GffStruct &uts);
-    void loadPriorityFromUTS(const resource::GffStruct &uts);
+    void loadUTS(const resource::Gff &uts);
+    void loadPriorityFromUTS(const resource::Gff &uts);
 
     // END Blueprint
 };

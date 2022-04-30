@@ -20,7 +20,7 @@
 #include "../../../common/exception/validation.h"
 #include "../../../graphics/options.h"
 #include "../../../graphics/services.h"
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 
 #include "../../camerastyles.h"
 #include "../../scene/collision.h"
@@ -184,7 +184,7 @@ unique_ptr<Camera> Camera::Loader::load(int style) {
         .build();
 }
 
-unique_ptr<Camera> Camera::Loader::load(const GffStruct &gitEntry) {
+unique_ptr<Camera> Camera::Loader::load(const Gff &gitEntry) {
     return Camera::Builder()
         .id(_idSeq.nextObjectId())
         .tag("")

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "gffstruct.h"
+#include "gff.h"
 #include "id.h"
 #include "types.h"
 
@@ -37,12 +37,12 @@ public:
         _cache.clear();
     }
 
-    std::shared_ptr<GffStruct> get(const std::string &resRef, ResourceType type);
+    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type);
 
 private:
     Resources &_resources;
 
-    std::unordered_map<ResourceId, std::shared_ptr<GffStruct>, ResourceIdHasher> _cache;
+    std::unordered_map<ResourceId, std::shared_ptr<Gff>, ResourceIdHasher> _cache;
 };
 
 } // namespace resource

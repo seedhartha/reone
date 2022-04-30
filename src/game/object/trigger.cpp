@@ -40,7 +40,7 @@ namespace reone {
 
 namespace game {
 
-void Trigger::loadFromGIT(const GffStruct &gffs) {
+void Trigger::loadFromGIT(const Gff &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
@@ -58,7 +58,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     _sceneNode->setLocalTransform(glm::translate(_position));
 }
 
-void Trigger::loadTransformFromGIT(const GffStruct &gffs) {
+void Trigger::loadTransformFromGIT(const Gff &gffs) {
     _position.x = gffs.getFloat("XPosition");
     _position.y = gffs.getFloat("YPosition");
     _position.z = gffs.getFloat("ZPosition");
@@ -68,7 +68,7 @@ void Trigger::loadTransformFromGIT(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
+void Trigger::loadGeometryFromGIT(const Gff &gffs) {
     for (auto &child : gffs.getList("Geometry")) {
         float x = child->getFloat("PointX");
         float y = child->getFloat("PointY");
@@ -78,7 +78,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
+    shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -115,7 +115,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
     return maybeTenant != _tenants.end();
 }
 
-void Trigger::loadUTT(const GffStruct &utt) {
+void Trigger::loadUTT(const Gff &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
     _name = _services.resource.strings.get(utt.getInt("LocalizedName"));

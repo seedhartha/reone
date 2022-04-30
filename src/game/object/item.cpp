@@ -44,7 +44,7 @@ namespace reone {
 namespace game {
 
 void Item::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
+    shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
     if (uti) {
         loadUTI(*uti);
     }
@@ -100,7 +100,7 @@ void Item::setEquipped(bool equipped) {
     _equipped = equipped;
 }
 
-void Item::loadUTI(const GffStruct &uti) {
+void Item::loadUTI(const Gff &uti) {
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
     _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
     _localizedName = _services.resource.strings.get(uti.getInt("LocalizedName"));

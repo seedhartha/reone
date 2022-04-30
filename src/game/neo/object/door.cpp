@@ -23,7 +23,7 @@
 #include "../../../graphics/walkmeshes.h"
 #include "../../../resource/2das.h"
 #include "../../../resource/gffs.h"
-#include "../../../resource/gffstruct.h"
+#include "../../../resource/gff.h"
 #include "../../../resource/services.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
@@ -63,7 +63,7 @@ void Door::flushTransform() {
 void Door::handleClick(Object &clicker) {
 }
 
-unique_ptr<Door> Door::Loader::load(const GffStruct &gitEntry) {
+unique_ptr<Door> Door::Loader::load(const Gff &gitEntry) {
     // From GIT entry
 
     auto templateResRef = gitEntry.getString("TemplateResRef");
