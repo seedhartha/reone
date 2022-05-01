@@ -27,11 +27,6 @@
 
 #include "../types.h"
 
-#include "control/label.h"
-#include "control/labelhilight.h"
-#include "control/panel.h"
-#include "control/progressbar.h"
-
 using namespace std;
 
 using namespace reone::resource;
@@ -41,6 +36,44 @@ namespace reone {
 namespace gui {
 
 namespace neo {
+
+void Gui::load(const string &resRef) {
+    info("Loading GUI " + resRef, LogChannels::gui);
+
+    auto gui = _resourceSvc.gffs.get(resRef, ResourceType::Gui);
+    if (!gui) {
+        throw ValidationException("GUI not found: " + resRef);
+    }
+
+    _rootControl = loadControl(*gui);
+
+    auto controls = gui->getList("CONTROLS");
+    for (auto &control : controls) {
+        _rootControl->append(loadControl(*control));
+    }
+}
+
+unique_ptr<Control> Gui::loadControl(const Gff &gui) {
+    auto id = gui.getInt("ID", -1);
+    auto tag = gui.getString("TAG");
+    auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
+
+    unique_ptr<Control> control;
+    if (type == ControlType::Panel) {
+        control = newPanel(id, move(tag));
+    } else if (type == ControlType::Label) {
+        control = newLabel(id, move(tag));
+    } else if (type == ControlType::LabelHilight) {
+        control = newLabelHilight(id, move(tag));
+    } else if (type == ControlType::ProgressBar) {
+        control = newProgressBar(id, move(tag));
+    } else {
+        throw ValidationException("Unsupported control type: " + to_string(static_cast<int>(type)));
+    }
+    control->load(gui);
+
+    return move(control);
+}
 
 bool Gui::handle(const SDL_Event &e) {
     return false;
@@ -61,48 +94,20 @@ void Gui::render() {
     _rootControl->render();
 }
 
-unique_ptr<Gui> Gui::Loader::load(const string &resRef) {
-    info("Loading GUI " + resRef, LogChannels::gui);
-
-    auto gui = _resourceSvc.gffs.get(resRef, ResourceType::Gui);
-    if (!gui) {
-        throw ValidationException("GUI not found: " + resRef);
-    }
-
-    return Gui::Builder(_graphicsOpt, _graphicsSvc)
-        .rootControl(loadRootControl(*gui))
-        .build();
+unique_ptr<Label> Gui::newLabel(int id, string tag) {
+    return make_unique<Label>(id, move(tag), _graphicsOpt, _graphicsSvc);
 }
 
-unique_ptr<Control> Gui::Loader::loadRootControl(const Gff &gui) {
-    auto rootControl = loadControl(gui);
-
-    auto guiControls = gui.getList("CONTROLS");
-    for (auto &guiControl : guiControls) {
-        auto child = loadControl(*guiControl);
-        rootControl->addChild(move(child));
-    }
-
-    return move(rootControl);
+unique_ptr<LabelHilight> Gui::newLabelHilight(int id, string tag) {
+    return make_unique<LabelHilight>(id, move(tag), _graphicsOpt, _graphicsSvc);
 }
 
-unique_ptr<Control> Gui::Loader::loadControl(const Gff &gui) {
-    auto controlType = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
+unique_ptr<Panel> Gui::newPanel(int id, string tag) {
+    return make_unique<Panel>(id, move(tag), _graphicsOpt, _graphicsSvc);
+}
 
-    unique_ptr<Control::Loader> loader;
-    if (controlType == ControlType::Panel) {
-        loader = make_unique<Panel::Loader>(_graphicsOpt, _graphicsSvc);
-    } else if (controlType == ControlType::Label) {
-        loader = make_unique<Label::Loader>(_graphicsOpt, _graphicsSvc);
-    } else if (controlType == ControlType::LabelHilight) {
-        loader = make_unique<LabelHilight::Loader>(_graphicsOpt, _graphicsSvc);
-    } else if (controlType == ControlType::ProgressBar) {
-        loader = make_unique<ProgressBar::Loader>(_graphicsOpt, _graphicsSvc);
-    } else {
-        throw ValidationException("Unsupported control type: " + to_string(static_cast<int>(controlType)));
-    }
-
-    return loader->load(gui);
+unique_ptr<ProgressBar> Gui::newProgressBar(int id, string tag) {
+    return make_unique<ProgressBar>(id, move(tag), _graphicsOpt, _graphicsSvc);
 }
 
 } // namespace neo

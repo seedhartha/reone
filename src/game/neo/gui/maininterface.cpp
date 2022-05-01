@@ -26,7 +26,7 @@ namespace game {
 namespace neo {
 
 void MainInterfaceGui::init() {
-    _gui = Gui::Loader(_graphicsOpt, _graphicsSvc, _resourceSvc).load("maininterface");
+    load("maininterface");
 }
 
 }

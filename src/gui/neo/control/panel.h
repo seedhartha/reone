@@ -27,60 +27,15 @@ namespace neo {
 
 class Panel : public Control {
 public:
-    class Builder : public Control::Builder {
-    public:
-        Builder(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc) :
-            Control::Builder(
-                graphicsOpt,
-                graphicsSvc) {
-        }
-
-        std::unique_ptr<Control> build() override {
-            return std::make_unique<Panel>(
-                _id,
-                _tag,
-                _extent,
-                _border,
-                _text,
-                _graphicsOpt,
-                _graphicsSvc);
-        }
-    };
-
-    class Loader : public Control::Loader {
-    public:
-        Loader(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc) :
-            Control::Loader(
-                graphicsOpt,
-                graphicsSvc) {
-        }
-
-        std::unique_ptr<Control> load(const resource::Gff &gui) {
-            return Builder(_graphicsOpt, _graphicsSvc)
-                .tap([this, &gui](auto &builder) { configure(builder, gui); })
-                .build();
-        }
-    };
-
     Panel(
         int id,
         std::string tag,
-        glm::ivec4 extent,
-        Border border,
-        Text text,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         Control(
             id,
-            ControlType::Panel,
             std::move(tag),
-            std::move(extent),
-            std::move(border),
-            std::move(text),
+            ControlType::Panel,
             graphicsOpt,
             graphicsSvc) {
     }

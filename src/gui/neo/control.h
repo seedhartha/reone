@@ -62,111 +62,49 @@ public:
         int strref {-1};
     };
 
-    class Builder : boost::noncopyable {
-    public:
-        Builder(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc) :
-            _graphicsOpt(graphicsOpt),
-            _graphicsSvc(graphicsSvc) {
-        }
+    void load(const resource::Gff &gui);
 
-        Builder &id(int id) {
-            _id = id;
-            return *this;
-        }
-
-        Builder &tag(std::string tag) {
-            _tag = std::move(tag);
-            return *this;
-        }
-
-        Builder &extent(glm::ivec4 extent) {
-            _extent = std::move(extent);
-            return *this;
-        }
-
-        Builder &border(Border border) {
-            _border = std::move(border);
-            return *this;
-        }
-
-        Builder &text(Text text) {
-            _text = std::move(text);
-            return *this;
-        }
-
-        Builder &tap(std::function<void(Builder &)> fn) {
-            fn(*this);
-            return *this;
-        }
-
-        virtual std::unique_ptr<Control> build() = 0;
-
-    protected:
-        graphics::GraphicsOptions &_graphicsOpt;
-        graphics::GraphicsServices &_graphicsSvc;
-
-        int _id;
-        std::string _tag;
-        glm::ivec4 _extent;
-        Border _border;
-        Text _text;
-    };
-
-    class Loader : boost::noncopyable {
-    public:
-        Loader(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc) :
-            _graphicsOpt(graphicsOpt),
-            _graphicsSvc(graphicsSvc) {
-        }
-
-        virtual std::unique_ptr<Control> load(const resource::Gff &gui) = 0;
-
-    protected:
-        graphics::GraphicsOptions &_graphicsOpt;
-        graphics::GraphicsServices &_graphicsSvc;
-
-        virtual void configure(Builder &builder, const resource::Gff &gui);
-    };
-
-    void addChild(std::shared_ptr<Control> child) {
+    void append(std::shared_ptr<Control> child) {
         _children.push_back(std::move(child));
     }
 
     void render();
 
+    void setExtent(glm::ivec4 extent) {
+        _extent = std::move(extent);
+    }
+
+    void setBorder(Border border) {
+        _border = std::move(border);
+    }
+
+    void setText(Text text) {
+        _text = std::move(text);
+    }
+
 protected:
     Control(
         int id,
-        ControlType type,
         std::string tag,
-        glm::ivec4 extent,
-        Border border,
-        Text text,
+        ControlType type,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         _id(id),
-        _type(type),
         _tag(std::move(tag)),
-        _extent(std::move(extent)),
-        _border(std::move(border)),
-        _text(std::move(text)),
+        _type(type),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc) {
     }
 
     int _id;
-    ControlType _type;
     std::string _tag;
-    glm::ivec4 _extent;
-    Border _border;
-    Text _text;
-
+    ControlType _type;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
+
+    glm::ivec4 _extent {0};
+    Border _border;
+    Text _text;
 
     std::vector<std::shared_ptr<Control>> _children;
 };

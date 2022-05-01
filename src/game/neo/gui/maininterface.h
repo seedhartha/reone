@@ -38,29 +38,19 @@ namespace game {
 
 namespace neo {
 
-class MainInterfaceGui : boost::noncopyable {
+class MainInterfaceGui : public gui::neo::Gui {
 public:
     MainInterfaceGui(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        _graphicsOpt(graphicsOpt),
-        _graphicsSvc(graphicsSvc),
-        _resourceSvc(resourceSvc) {
+        gui::neo::Gui(
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
     void init();
-
-    gui::neo::Gui &gui() {
-        return *_gui;
-    }
-
-private:
-    std::unique_ptr<gui::neo::Gui> _gui;
-
-    graphics::GraphicsOptions &_graphicsOpt;
-    graphics::GraphicsServices &_graphicsSvc;
-    resource::ResourceServices &_resourceSvc;
 };
 
 } // namespace neo

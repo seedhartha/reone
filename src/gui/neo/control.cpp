@@ -35,6 +35,34 @@ namespace gui {
 
 namespace neo {
 
+void Control::load(const Gff &gui) {
+    auto extent = gui.getStruct("EXTENT");
+    if (extent) {
+        _extent = glm::ivec4(
+            extent->getInt("LEFT"),
+            extent->getInt("TOP"),
+            extent->getInt("WIDTH"),
+            extent->getInt("HEIGHT"));
+    }
+
+    auto border = gui.getStruct("BORDER");
+    if (border) {
+        _border = Border {
+            border->getString("CORNER"),
+            border->getString("EDGE"),
+            border->getString("FILL")};
+    }
+
+    auto text = gui.getStruct("TEXT");
+    if (text) {
+        _text = Text {
+            static_cast<TextAlignment>(text->getInt("ALIGNMENT")),
+            text->getString("FONT"),
+            text->getString("TEXT"),
+            text->getInt("STRREF")};
+    }
+}
+
 void Control::render() {
     if (!_border.fill.empty()) {
         auto fillTexture = _graphicsSvc.textures.get(_border.fill, TextureUsage::GUI);
@@ -51,33 +79,6 @@ void Control::render() {
     // Render children
     for (auto &child : _children) {
         child->render();
-    }
-}
-
-void Control::Loader::configure(Builder &builder, const Gff &gui) {
-    builder.id(gui.getInt("ID"));
-    builder.tag(gui.getString("TAG"));
-
-    auto extent = gui.getStruct("EXTENT");
-    builder.extent(glm::ivec4(
-        extent->getInt("LEFT"),
-        extent->getInt("TOP"),
-        extent->getInt("WIDTH"),
-        extent->getInt("HEIGHT")));
-
-    auto border = gui.getStruct("BORDER");
-    builder.border(Border {
-        border->getString("CORNER"),
-        border->getString("EDGE"),
-        border->getString("FILL")});
-
-    auto text = gui.getStruct("TEXT");
-    if (text) {
-        builder.text(Text {
-            static_cast<TextAlignment>(text->getInt("ALIGNMENT")),
-            text->getString("FONT"),
-            text->getString("TEXT"),
-            text->getInt("STRREF")});
     }
 }
 
