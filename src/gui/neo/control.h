@@ -58,6 +58,7 @@ public:
         std::string corner;
         std::string edge;
         std::string fill;
+        glm::vec3 color {0.0f};
     };
 
     struct Text {
@@ -94,11 +95,15 @@ public:
         _extent = std::move(extent);
     }
 
-    void setBorder(Border border) {
+    void setBorder(std::unique_ptr<Border> border) {
         _border = std::move(border);
     }
 
-    void setText(Text text) {
+    void setHilight(std::unique_ptr<Border> hilight) {
+        _hilight = std::move(hilight);
+    }
+
+    void setText(std::unique_ptr<Text> text) {
         _text = std::move(text);
     }
 
@@ -124,10 +129,11 @@ protected:
 
     std::string _tag;
     glm::ivec4 _extent {0};
-    Border _border;
-    Text _text;
-
     std::vector<std::shared_ptr<Control>> _children;
+
+    std::unique_ptr<Border> _border;
+    std::unique_ptr<Border> _hilight;
+    std::unique_ptr<Text> _text;
 
     bool _clickable {false};
     bool _hovered {false};
