@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include "control.h"
+#include "control/label.h"
+#include "control/labelhilight.h"
+#include "control/panel.h"
+#include "control/progressbar.h"
 
 namespace reone {
 
@@ -42,73 +45,34 @@ namespace neo {
 
 class Gui : boost::noncopyable {
 public:
-    class Builder : boost::noncopyable {
-    public:
-        Builder(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc) :
-            _graphicsOpt(graphicsOpt),
-            _graphicsSvc(graphicsSvc) {
-        }
-
-        Builder &rootControl(std::shared_ptr<Control> control) {
-            _rootControl = std::move(control);
-            return *this;
-        }
-
-        std::unique_ptr<Gui> build() {
-            return std::make_unique<Gui>(
-                _rootControl,
-                _graphicsOpt,
-                _graphicsSvc);
-        }
-
-    private:
-        graphics::GraphicsOptions &_graphicsOpt;
-        graphics::GraphicsServices &_graphicsSvc;
-
-        std::shared_ptr<Control> _rootControl;
-    };
-
-    class Loader : boost::noncopyable {
-    public:
-        Loader(
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            _graphicsOpt(graphicsOpt),
-            _graphicsSvc(graphicsSvc),
-            _resourceSvc(resourceSvc) {
-        }
-
-        std::unique_ptr<Gui> load(const std::string &resRef);
-
-    private:
-        graphics::GraphicsOptions &_graphicsOpt;
-        graphics::GraphicsServices &_graphicsSvc;
-        resource::ResourceServices &_resourceSvc;
-
-        std::unique_ptr<Control> loadRootControl(const resource::Gff &gui);
-        std::unique_ptr<Control> loadControl(const resource::Gff &gui);
-    };
-
     Gui(
-        std::shared_ptr<Control> rootControl,
         graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc) :
-        _rootControl(std::move(rootControl)),
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         _graphicsOpt(graphicsOpt),
-        _graphicsSvc(graphicsSvc) {
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
+
+    void load(const std::string &resRef);
 
     bool handle(const SDL_Event &e);
     void update(float delta);
     void render();
 
+    std::unique_ptr<Label> newLabel(int id, std::string tag);
+    std::unique_ptr<LabelHilight> newLabelHilight(int id, std::string tag);
+    std::unique_ptr<Panel> newPanel(int id, std::string tag);
+    std::unique_ptr<ProgressBar> newProgressBar(int id, std::string tag);
+
 private:
-    std::shared_ptr<Control> _rootControl;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
+
+    std::unique_ptr<Control> _rootControl;
+
+    std::unique_ptr<Control> loadControl(const resource::Gff &gui);
 };
 
 } // namespace neo

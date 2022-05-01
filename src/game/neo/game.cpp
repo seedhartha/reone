@@ -130,7 +130,7 @@ void Game::update() {
 
     // Update GUI
 
-    _mainInterface->gui().update(delta);
+    _mainInterface->update(delta);
 }
 
 void Game::render() {
@@ -141,13 +141,13 @@ void Game::render() {
     _worldRenderer->render();
 
     // Render GUI
-    _mainInterface->gui().render();
+    _mainInterface->render();
 
     _services.graphics.window.swapBuffers();
 }
 
 bool Game::handle(const SDL_Event &e) {
-    if (_mainInterface->gui().handle(e)) {
+    if (_mainInterface->handle(e)) {
         return true;
     }
     if (_selectionController->handle(e)) {
