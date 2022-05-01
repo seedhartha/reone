@@ -30,12 +30,14 @@ public:
     Label(
         int id,
         graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::Label,
             graphicsOpt,
-            graphicsSvc) {
+            graphicsSvc,
+            resourceSvc) {
     }
 };
 

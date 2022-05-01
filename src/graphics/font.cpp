@@ -65,7 +65,6 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     _uniforms.setGeneral([this, &color](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
         general.color = glm::vec4(color, 1.0f);
     });
 
