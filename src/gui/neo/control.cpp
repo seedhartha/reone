@@ -18,6 +18,7 @@
 #include "control.h"
 
 #include "../../graphics/context.h"
+#include "../../graphics/fonts.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
@@ -26,6 +27,8 @@
 #include "../../graphics/textureutil.h"
 #include "../../graphics/uniforms.h"
 #include "../../resource/gff.h"
+#include "../../resource/services.h"
+#include "../../resource/strings.h"
 
 using namespace std;
 
@@ -62,6 +65,7 @@ void Control::load(const Gff &gui) {
     if (text) {
         _text = Text {
             static_cast<TextAlignment>(text->getInt("ALIGNMENT")),
+            text->getVector("COLOR"),
             text->getString("FONT"),
             text->getString("TEXT"),
             text->getInt("STRREF")};
@@ -69,24 +73,73 @@ void Control::load(const Gff &gui) {
 }
 
 void Control::render() {
+    // Render border
     if (!_border.fill.empty()) {
         auto fillTexture = _graphicsSvc.textures.get(_border.fill, TextureUsage::GUI);
         _graphicsSvc.textures.bind(*fillTexture);
+
         _graphicsSvc.uniforms.setGeneral([this](auto &u) {
             u.resetLocals();
             u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
             u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+
         auto blendMode = hasAlphaChannel(fillTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
         _graphicsSvc.context.withBlending(blendMode, [this]() {
             _graphicsSvc.meshes.quad().draw();
         });
     }
 
+    // Render text
+    if (!_text.text.empty() || _text.strref != -1) {
+        auto font = _graphicsSvc.fonts.get(_text.font);
+        string text = !_text.text.empty() ? _text.text : _resourceSvc.strings.get(_text.strref);
+
+        glm::ivec2 position;
+        TextGravity gravity;
+        getTextPlacement(position, gravity);
+
+        _graphicsSvc.context.withBlending(BlendMode::Normal, [&]() {
+            font->draw(text, glm::vec3(position, 1.0f), _text.color, gravity);
+        });
+    }
+
     // Render children
     for (auto &child : _children) {
         child->render();
+    }
+}
+
+void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) {
+    switch (_text.alignment) {
+    case TextAlignment::LeftTop:
+        outPosition = glm::ivec2(_extent[0], _extent[1]);
+        outGravity = TextGravity::RightBottom;
+        break;
+    case TextAlignment::CenterTop:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1]);
+        outGravity = TextGravity::CenterBottom;
+        break;
+    case TextAlignment::CenterCenter:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::CenterCenter;
+        break;
+    case TextAlignment::RightCenter:
+    case TextAlignment::RightCenter2:
+        outPosition = glm::ivec2(_extent[0] + _extent[2], _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::LeftCenter;
+        break;
+    case TextAlignment::LeftCenter:
+        outPosition = glm::ivec2(_extent[0], _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::RightCenter;
+        break;
+    case TextAlignment::CenterBottom:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1] + _extent[3]);
+        outGravity = TextGravity::CenterTop;
+        break;
+    default:
+        throw invalid_argument("Unsupported text alignment: " + to_string(static_cast<int>(_text.alignment)));
     }
 }
 

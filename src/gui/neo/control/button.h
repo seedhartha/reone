@@ -30,12 +30,14 @@ public:
     Button(
         int id,
         graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::Button,
             graphicsOpt,
-            graphicsSvc) {
+            graphicsSvc,
+            resourceSvc) {
     }
 };
 

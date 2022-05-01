@@ -30,12 +30,14 @@ public:
     ButtonToggle(
         int id,
         graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::ButtonToggle,
             graphicsOpt,
-            graphicsSvc) {
+            graphicsSvc,
+            resourceSvc) {
     }
 };
 

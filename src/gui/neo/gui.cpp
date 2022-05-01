@@ -115,39 +115,39 @@ void Gui::render() {
 }
 
 unique_ptr<Panel> Gui::newPanel(int id) {
-    return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<Label> Gui::newLabel(int id) {
-    return make_unique<Label>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<Label>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<LabelHilight> Gui::newLabelHilight(int id) {
-    return make_unique<LabelHilight>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<LabelHilight>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<Button> Gui::newButton(int id) {
-    return make_unique<Button>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<Button>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<ButtonToggle> Gui::newButtonToggle(int id) {
-    return make_unique<ButtonToggle>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<ButtonToggle>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<Slider> Gui::newSlider(int id) {
-    return make_unique<Slider>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<Slider>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<ScrollBar> Gui::newScrollBar(int id) {
-    return make_unique<ScrollBar>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<ScrollBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<ProgressBar> Gui::newProgressBar(int id) {
-    return make_unique<ProgressBar>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<ProgressBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 unique_ptr<ListBox> Gui::newListBox(int id) {
-    return make_unique<ListBox>(id, _graphicsOpt, _graphicsSvc);
+    return make_unique<ListBox>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 } // namespace neo

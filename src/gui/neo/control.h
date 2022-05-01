@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../graphics/types.h"
+
 #include "../types.h"
 
 namespace reone {
@@ -30,9 +32,11 @@ struct GraphicsServices;
 
 namespace resource {
 
+struct ResourceServices;
+
 class Gff;
 
-}
+} // namespace resource
 
 namespace gui {
 
@@ -46,7 +50,8 @@ public:
         RightCenter = 12,
         LeftCenter = 17,
         CenterCenter = 18,
-        RightCenter2 = 20
+        RightCenter2 = 20,
+        CenterBottom = 34
     };
 
     struct Border {
@@ -57,6 +62,7 @@ public:
 
     struct Text {
         TextAlignment alignment {TextAlignment::LeftTop};
+        glm::vec3 color {0.0f};
         std::string font;
         std::string text;
         int strref {-1};
@@ -91,17 +97,20 @@ protected:
         int id,
         ControlType type,
         graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         _id(id),
         _type(type),
         _graphicsOpt(graphicsOpt),
-        _graphicsSvc(graphicsSvc) {
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
     int _id;
     ControlType _type;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
     std::string _tag;
     glm::ivec4 _extent {0};
@@ -109,6 +118,8 @@ protected:
     Text _text;
 
     std::vector<std::shared_ptr<Control>> _children;
+
+    void getTextPlacement(glm::ivec2 &outPosition, graphics::TextGravity &outGravity);
 };
 
 } // namespace neo
