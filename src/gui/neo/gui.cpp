@@ -127,6 +127,24 @@ void Gui::render() {
     _rootControl->render();
 }
 
+Control *Gui::findControlByTag(const string &tag) {
+    return _rootControl->findControlByTag(tag);
+}
+
+void Gui::enableControl(const string &tag) {
+    auto control = findControlByTag(tag);
+    if (control) {
+        control->setEnabled(true);
+    }
+}
+
+void Gui::disableControl(const string &tag) {
+    auto control = findControlByTag(tag);
+    if (control) {
+        control->setEnabled(false);
+    }
+}
+
 unique_ptr<Panel> Gui::newPanel(int id) {
     return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }

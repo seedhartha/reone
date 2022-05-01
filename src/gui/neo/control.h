@@ -79,6 +79,8 @@ public:
     void update(float delta);
     void render();
 
+    Control *findControlByTag(const std::string &tag);
+
     int id() const {
         return _id;
     }
@@ -105,6 +107,14 @@ public:
 
     void setText(std::unique_ptr<Text> text) {
         _text = std::move(text);
+    }
+
+    void setFlipVertical(bool flip) {
+        _flipVertical = flip;
+    }
+
+    void setEnabled(bool enabled) {
+        _enabled = enabled;
     }
 
 protected:
@@ -135,6 +145,9 @@ protected:
     std::unique_ptr<Border> _hilight;
     std::unique_ptr<Text> _text;
 
+    bool _flipVertical {false};
+
+    bool _enabled {true};
     bool _clickable {false};
     bool _hovered {false};
 

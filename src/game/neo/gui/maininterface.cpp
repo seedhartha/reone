@@ -27,10 +27,77 @@ namespace neo {
 
 void MainInterfaceGui::init() {
     load("mipc28x6");
+    bindControls();
+
+    _btnActionDown0->setFlipVertical(true);
+    _btnActionDown1->setFlipVertical(true);
+    _btnActionDown2->setFlipVertical(true);
+    _btnActionDown3->setFlipVertical(true);
+
+    // Pop-ups
+    disableControl("LBL_ACTIONDESC");
+    disableControl("LBL_ACTIONDESCBG");
+
+    // Party
+    disableControl("LBL_CMBTEFCTINC1");
+    disableControl("LBL_CMBTEFCTINC2");
+    disableControl("LBL_CMBTEFCTINC3");
+    disableControl("LBL_CMBTEFCTRED1");
+    disableControl("LBL_CMBTEFCTRED2");
+    disableControl("LBL_CMBTEFCTRED3");
+    disableControl("LBL_DEBILATATED1");
+    disableControl("LBL_DEBILATATED2");
+    disableControl("LBL_DEBILATATED3");
+    disableControl("LBL_DISABLE1");
+    disableControl("LBL_DISABLE2");
+    disableControl("LBL_DISABLE3");
+    disableControl("LBL_LEVELUP1");
+    disableControl("LBL_LEVELUP2");
+    disableControl("LBL_LEVELUP3");
+
+    // Notifications
+    disableControl("LBL_CASH");
+    disableControl("LBL_DARKSHIFT");
+    disableControl("LBL_ITEMLOST");
+    disableControl("LBL_ITEMRCVD");
+    disableControl("LBL_JOURNAL");
+    disableControl("LBL_LIGHTSHIFT");
+    disableControl("LBL_PLOTXP");
+    disableControl("LBL_STEALTHXP");
+
+    // Combat
+    disableControl("BTN_CLEARALL");
+    disableControl("BTN_TARGET0");
+    disableControl("BTN_TARGET1");
+    disableControl("BTN_TARGET2");
+    disableControl("BTN_TARGETDOWN0");
+    disableControl("BTN_TARGETDOWN1");
+    disableControl("BTN_TARGETDOWN2");
+    disableControl("BTN_TARGETUP0");
+    disableControl("BTN_TARGETUP1");
+    disableControl("BTN_TARGETUP2");
+    disableControl("LBL_CMBTMODEMSG");
+    disableControl("LBL_CMBTMSGBG");
+    disableControl("LBL_COMBATBG1");
+    disableControl("LBL_COMBATBG2");
+    disableControl("LBL_COMBATBG3");
+    disableControl("LBL_HEALTHBG");
+    disableControl("LBL_NAME");
+    disableControl("LBL_NAMEBG");
+    disableControl("LBL_TARGET0");
+    disableControl("LBL_TARGET1");
+    disableControl("LBL_TARGET2");
 }
 
+void MainInterfaceGui::bindControls() {
+    _btnActionDown0 = findControlByTag<Button>("BTN_ACTIONDOWN0");
+    _btnActionDown1 = findControlByTag<Button>("BTN_ACTIONDOWN1");
+    _btnActionDown2 = findControlByTag<Button>("BTN_ACTIONDOWN2");
+    _btnActionDown3 = findControlByTag<Button>("BTN_ACTIONDOWN3");
 }
 
-} // namespace gui
+} // namespace neo
+
+} // namespace game
 
 } // namespace reone
