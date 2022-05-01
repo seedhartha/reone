@@ -25,7 +25,7 @@ namespace game {
 
 namespace neo {
 
-void MainInterfaceGui::init() {
+void MainInterface::init() {
     load("mipc28x6");
     bindControls();
 
@@ -102,7 +102,7 @@ void MainInterfaceGui::init() {
     disableControl("LBL_TARGET2");
 }
 
-void MainInterfaceGui::bindControls() {
+void MainInterface::bindControls() {
     _btnActionDown0 = findControlByTag<Button>("BTN_ACTIONDOWN0");
     _btnActionDown1 = findControlByTag<Button>("BTN_ACTIONDOWN1");
     _btnActionDown2 = findControlByTag<Button>("BTN_ACTIONDOWN2");

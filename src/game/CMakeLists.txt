@@ -442,6 +442,7 @@ set(GAME_SOURCES
 set(GAME_NEO_HEADERS
     neo/game.h
     neo/gui/maininterface.h
+    neo/gui/mainmenu.h
     neo/object.h
     neo/object/area.h
     neo/object/camera.h
@@ -461,6 +462,7 @@ set(GAME_NEO_HEADERS
 set(GAME_NEO_SOURCES
     neo/game.cpp
     neo/gui/maininterface.cpp
+    neo/gui/mainmenu.cpp
     neo/object/area.cpp
     neo/object/camera.cpp
     neo/object/creature.cpp
