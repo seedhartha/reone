@@ -38,6 +38,8 @@ public:
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
+
+        _clickable = true;
     }
 };
 

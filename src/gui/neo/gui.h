@@ -86,9 +86,9 @@ protected:
     resource::ResourceServices &_resourceSvc;
 
     ScaleMode _scaleMode {ScaleMode::ToRootControl};
-    std::unique_ptr<Control> _rootControl;
+    std::shared_ptr<Control> _rootControl;
 
-    std::unique_ptr<Control> loadControl(const resource::Gff &gui);
+    std::unique_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
 };
 
 } // namespace neo

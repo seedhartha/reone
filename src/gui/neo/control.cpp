@@ -17,6 +17,7 @@
 
 #include "control.h"
 
+#include "../../common/logutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/meshes.h"
@@ -41,16 +42,16 @@ namespace gui {
 
 namespace neo {
 
-void Control::load(const Gff &gui) {
+void Control::load(const Gff &gui, const glm::vec4 &scale) {
     _tag = gui.getString("TAG");
 
     auto extent = gui.getStruct("EXTENT");
     if (extent) {
-        _extent = glm::ivec4(
-            extent->getInt("LEFT"),
-            extent->getInt("TOP"),
-            extent->getInt("WIDTH"),
-            extent->getInt("HEIGHT"));
+        _extent = glm::ivec4(scale * glm::vec4(
+                                         extent->getInt("LEFT"),
+                                         extent->getInt("TOP"),
+                                         extent->getInt("WIDTH"),
+                                         extent->getInt("HEIGHT")));
     }
 
     auto border = gui.getStruct("BORDER");
@@ -69,6 +70,49 @@ void Control::load(const Gff &gui) {
             text->getString("FONT"),
             text->getString("TEXT"),
             text->getInt("STRREF")};
+    }
+}
+
+bool Control::handle(const SDL_Event &e) {
+    // Forward to children
+    for (auto &child : _children) {
+        if (child->handle(e)) {
+            return true;
+        }
+    }
+
+    // Handle self
+    if (!_clickable) {
+        return false;
+    }
+    if (e.type == SDL_MOUSEMOTION) {
+        bool mouseOver = isInExtent(e.motion.x, e.motion.y);
+        if (mouseOver && !_hovered) {
+            _hovered = true;
+            // debug("Control hovered over: " + to_string(_id) + "[" + _tag + "]", LogChannels::gui);
+            return true;
+        }
+        if (!mouseOver && _hovered) {
+            _hovered = false;
+            return true;
+        }
+        return false;
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN) {
+        bool mouseOver = isInExtent(e.button.x, e.button.y);
+        if (mouseOver && _hovered) {
+            debug("Control clicked on: " + to_string(_id) + "[" + _tag + "]", LogChannels::gui);
+            return true;
+        }
+        return false;
+    }
+
+    return false;
+}
+
+void Control::update(float delta) {
+    for (auto &child : _children) {
+        child->update(delta);
     }
 }
 
@@ -111,7 +155,12 @@ void Control::render() {
     }
 }
 
-void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) {
+bool Control::isInExtent(float x, float y) const {
+    return _extent[0] <= x && x <= _extent[0] + _extent[2] &&
+           _extent[1] <= y && y <= _extent[1] + _extent[3];
+}
+
+void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) const {
     switch (_text.alignment) {
     case TextAlignment::LeftTop:
         outPosition = glm::ivec2(_extent[0], _extent[1]);
