@@ -45,15 +45,38 @@ void Gui::load(const string &resRef) {
         throw ValidationException("GUI not found: " + resRef);
     }
 
-    _rootControl = loadControl(*gui);
-
-    auto controls = gui->getList("CONTROLS");
-    for (auto &control : controls) {
-        _rootControl->append(loadControl(*control));
+    glm::vec4 scale;
+    if (_scaleMode == ScaleMode::ToRootControl) {
+        float rw = static_cast<float>(gui->getStruct("EXTENT")->getInt("WIDTH"));
+        float rh = static_cast<float>(gui->getStruct("EXTENT")->getInt("HEIGHT"));
+        float sx = _graphicsOpt.width / rw;
+        float sy = _graphicsOpt.height / rh;
+        scale = glm::vec4(sx, sy, sx, sy);
+    } else {
+        scale = glm::vec4(1.0f);
     }
+
+    auto controlById = unordered_map<int, shared_ptr<Control>>();
+    auto rootControl = shared_ptr<Control>(loadControl(*gui, scale));
+    controlById[-1] = rootControl;
+
+    auto guiControls = gui->getList("CONTROLS");
+    for (auto &guiControl : guiControls) {
+        auto control = loadControl(*guiControl, scale);
+        controlById[control->id()] = move(control);
+    }
+    for (auto &guiControl : guiControls) {
+        auto id = guiControl->getInt("ID");
+        auto control = controlById.at(id);
+        auto parentId = guiControl->getInt("Obj_ParentID");
+        auto parentControl = controlById.at(parentId);
+        parentControl->append(control);
+    }
+
+    _rootControl = move(rootControl);
 }
 
-unique_ptr<Control> Gui::loadControl(const Gff &gui) {
+unique_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
     auto id = gui.getInt("ID", -1);
     auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
 
@@ -79,12 +102,15 @@ unique_ptr<Control> Gui::loadControl(const Gff &gui) {
     } else {
         throw ValidationException("Unsupported control type: " + to_string(static_cast<int>(type)));
     }
-    control->load(gui);
+    control->load(gui, scale);
 
     return move(control);
 }
 
 bool Gui::handle(const SDL_Event &e) {
+    if (_rootControl->handle(e)) {
+        return true;
+    }
     return false;
 }
 
@@ -94,23 +120,10 @@ void Gui::update(float delta) {
 void Gui::render() {
     _graphicsSvc.uniforms.setGeneral([this](auto &u) {
         u.resetGlobals();
-
-        float w;
-        float h;
-        if (_scaleMode == ScaleMode::ToRootControl) {
-            w = static_cast<float>(_rootControl->extent()[2]);
-            h = static_cast<float>(_rootControl->extent()[3]);
-        } else {
-            w = static_cast<float>(_graphicsOpt.width);
-            h = static_cast<float>(_graphicsOpt.height);
-        }
-        u.projection = glm::ortho(
-            0.0f,
-            w,
-            h,
-            0.0f);
+        float w = static_cast<float>(_graphicsOpt.width);
+        float h = static_cast<float>(_graphicsOpt.height);
+        u.projection = glm::ortho(0.0f, w, h, 0.0f);
     });
-
     _rootControl->render();
 }
 

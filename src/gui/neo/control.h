@@ -68,13 +68,23 @@ public:
         int strref {-1};
     };
 
-    void load(const resource::Gff &gui);
+    virtual void load(const resource::Gff &gui, const glm::vec4 &scale);
 
     void append(std::shared_ptr<Control> child) {
         _children.push_back(std::move(child));
     }
 
+    bool handle(const SDL_Event &e);
+    void update(float delta);
     void render();
+
+    int id() const {
+        return _id;
+    }
+
+    const std::string &tag() const {
+        return _tag;
+    }
 
     const glm::ivec4 &extent() const {
         return _extent;
@@ -119,7 +129,12 @@ protected:
 
     std::vector<std::shared_ptr<Control>> _children;
 
-    void getTextPlacement(glm::ivec2 &outPosition, graphics::TextGravity &outGravity);
+    bool _clickable {false};
+    bool _hovered {false};
+
+    bool isInExtent(float x, float y) const;
+
+    void getTextPlacement(glm::ivec2 &outPosition, graphics::TextGravity &outGravity) const;
 };
 
 } // namespace neo
