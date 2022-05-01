@@ -97,7 +97,7 @@ void Gui::render() {
 
         float w;
         float h;
-        if (_scalingMode == ScalingMode::ToRootControl) {
+        if (_scaleMode == ScaleMode::ToRootControl) {
             w = static_cast<float>(_rootControl->extent()[2]);
             h = static_cast<float>(_rootControl->extent()[3]);
         } else {
