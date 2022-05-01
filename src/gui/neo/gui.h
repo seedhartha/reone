@@ -50,6 +50,11 @@ namespace neo {
 
 class Gui : boost::noncopyable {
 public:
+    enum class ScalingMode {
+        None,
+        ToRootControl
+    };
+
     Gui(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -75,11 +80,12 @@ public:
     std::unique_ptr<ProgressBar> newProgressBar(int id);
     std::unique_ptr<ListBox> newListBox(int id);
 
-private:
+protected:
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
 
+    ScalingMode _scalingMode {ScalingMode::ToRootControl};
     std::unique_ptr<Control> _rootControl;
 
     std::unique_ptr<Control> loadControl(const resource::Gff &gui);

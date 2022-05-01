@@ -70,6 +70,10 @@ public:
 
     void render();
 
+    const glm::ivec4 &extent() const {
+        return _extent;
+    }
+
     void setExtent(glm::ivec4 extent) {
         _extent = std::move(extent);
     }

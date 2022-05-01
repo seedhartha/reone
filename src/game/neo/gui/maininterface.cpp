@@ -26,7 +26,7 @@ namespace game {
 namespace neo {
 
 void MainInterfaceGui::init() {
-    load("maininterface");
+    load("mipc28x6");
 }
 
 }
