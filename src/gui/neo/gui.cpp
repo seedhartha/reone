@@ -94,12 +94,23 @@ void Gui::update(float delta) {
 void Gui::render() {
     _graphicsSvc.uniforms.setGeneral([this](auto &u) {
         u.resetGlobals();
+
+        float w;
+        float h;
+        if (_scalingMode == ScalingMode::ToRootControl) {
+            w = static_cast<float>(_rootControl->extent()[2]);
+            h = static_cast<float>(_rootControl->extent()[3]);
+        } else {
+            w = static_cast<float>(_graphicsOpt.width);
+            h = static_cast<float>(_graphicsOpt.height);
+        }
         u.projection = glm::ortho(
             0.0f,
-            static_cast<float>(_graphicsOpt.width),
-            static_cast<float>(_graphicsOpt.height),
+            w,
+            h,
             0.0f);
     });
+
     _rootControl->render();
 }
 
