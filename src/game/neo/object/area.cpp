@@ -18,22 +18,20 @@
 #include "area.h"
 
 #include "../../../common/exception/validation.h"
-#include "../../../resource/gffs.h"
 #include "../../../resource/gff.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/services.h"
+#include "../../../scene/graph.h"
 
+#include "../../camerastyles.h"
 #include "../../layouts.h"
 #include "../../services.h"
 
-#include "camera.h"
 #include "creature.h"
 #include "door.h"
-#include "encounter.h"
+#include "factory.h"
 #include "placeable.h"
-#include "sound.h"
-#include "store.h"
-#include "trigger.h"
-#include "waypoint.h"
+#include "room.h"
 
 using namespace std;
 
@@ -46,7 +44,7 @@ namespace game {
 
 namespace neo {
 
-unique_ptr<Area> Area::Loader::load(const std::string &name) {
+void Area::load(const string &name) {
     info("Loading area " + name);
 
     // ARE, GIT, LYT
@@ -66,106 +64,59 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         throw ValidationException("LYT not found: " + name);
     }
 
-    // Loaders
-
-    auto roomLoader = Room::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto cameraLoader = Camera::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto creatureLoader = Creature::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto placeableLoader = Placeable::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto doorLoader = Door::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto soundLoader = Sound::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto triggerLoader = Trigger::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto encounterLoader = Encounter::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto waypointLoader = Waypoint::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto storeLoader = Store::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-
     // Rooms
 
-    auto rooms = vector<shared_ptr<Room>>();
     auto areRooms = are->getList("Rooms");
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
-        auto layoutRoom = layout->findByName(roomName);
-        rooms.push_back(roomLoader.load(roomName, layoutRoom->position));
+        auto lytRoom = layout->findByName(roomName);
+        if (!lytRoom) {
+            continue;
+        }
+        auto room = static_pointer_cast<Room>(shared_ptr<Object>(_objectFactory.newRoom()));
+        room->setSceneGraph(_sceneGraph);
+        room->loadFromLyt(*lytRoom);
+        _rooms.push_back(static_pointer_cast<Room>(room));
     }
 
     // Main camera
 
-    auto cameraStyle = are->getInt("CameraStyle");
-    auto mainCamera = cameraLoader.load(cameraStyle);
-
-    auto area = Area::Builder()
-                    .id(_idSeq.nextObjectId())
-                    .tag(name)
-                    .sceneGraph(&_sceneGraph)
-                    .rooms(move(rooms))
-                    .mainCamera(move(mainCamera))
-                    .build();
+    auto cameraStyleIdx = are->getInt("CameraStyle");
+    auto cameraStyle = _gameSvc.cameraStyles.get(cameraStyleIdx);
+    float aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
+    _mainCamera = static_pointer_cast<Camera>(shared_ptr<Object>(_objectFactory.newCamera()));
+    _mainCamera->setSceneGraph(_sceneGraph);
+    _mainCamera->loadFromStyle(*cameraStyle);
 
     // Creatures
 
     auto gitCreatures = git->getList("Creature List");
     for (auto &gitCreature : gitCreatures) {
-        area->add(creatureLoader.load(*gitCreature));
+        auto creature = static_pointer_cast<Creature>(shared_ptr<Object>(_objectFactory.newCreature()));
+        creature->setSceneGraph(_sceneGraph);
+        creature->loadFromGit(*gitCreature);
+        _objects.push_back(move(creature));
     }
 
     // Placeables
 
     auto gitPlaceables = git->getList("Placeable List");
     for (auto &gitPlaceable : gitPlaceables) {
-        area->add(placeableLoader.load(*gitPlaceable));
+        auto placeable = static_pointer_cast<Placeable>(shared_ptr<Object>(_objectFactory.newPlaceable()));
+        placeable->setSceneGraph(_sceneGraph);
+        placeable->loadFromGit(*gitPlaceable);
+        _objects.push_back(move(placeable));
     }
 
     // Doors
 
     auto gitDoors = git->getList("Door List");
     for (auto &gitDoor : gitDoors) {
-        area->add(doorLoader.load(*gitDoor));
+        auto door = static_pointer_cast<Door>(shared_ptr<Object>(_objectFactory.newDoor()));
+        door->setSceneGraph(_sceneGraph);
+        door->loadFromGit(*gitDoor);
+        _objects.push_back(move(door));
     }
-
-    // Cameras
-
-    auto gitCameras = git->getList("CameraList");
-    for (auto &gitCamera : gitCameras) {
-        area->add(cameraLoader.load(*gitCamera));
-    }
-
-    // Sounds
-
-    auto gitSounds = git->getList("SoundList");
-    for (auto &gitSound : gitDoors) {
-        area->add(soundLoader.load(*gitSound));
-    }
-
-    // Triggers
-
-    auto gitTriggers = git->getList("TriggerList");
-    for (auto &gitTrigger : gitTriggers) {
-        area->add(triggerLoader.load(*gitTrigger));
-    }
-
-    // Encounters
-
-    auto gitEncounters = git->getList("Encounter List");
-    for (auto &gitEncounter : gitEncounters) {
-        area->add(encounterLoader.load(*gitEncounter));
-    }
-
-    // Waypoints
-
-    auto gitWaypoints = git->getList("WaypointList");
-    for (auto &gitWaypoint : gitWaypoints) {
-        area->add(waypointLoader.load(*gitWaypoint));
-    }
-
-    // Stores
-
-    auto gitStores = git->getList("StoreList");
-    for (auto &gitStore : gitStores) {
-        area->add(storeLoader.load(*gitStore));
-    }
-
-    return move(area);
 }
 
 } // namespace neo

@@ -42,7 +42,9 @@ namespace resource {
 
 struct ResourceServices;
 
-}
+class Gff;
+
+} // namespace resource
 
 namespace game {
 
@@ -50,71 +52,10 @@ struct GameServices;
 
 namespace neo {
 
-class IObjectIdSequence {
-public:
-    virtual uint32_t nextObjectId() = 0;
-};
+class ObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
-    template <class TObject, class TBuilder>
-    class Builder : boost::noncopyable {
-    public:
-        TBuilder &id(uint32_t id) {
-            _id = id;
-            return static_cast<TBuilder &>(*this);
-        }
-
-        TBuilder &tag(std::string tag) {
-            _tag = std::move(tag);
-            return static_cast<TBuilder &>(*this);
-        }
-
-        TBuilder &sceneNode(std::shared_ptr<scene::SceneNode> sceneNode) {
-            _sceneNode = std::move(sceneNode);
-            return static_cast<TBuilder &>(*this);
-        }
-
-        TBuilder &sceneGraph(scene::SceneGraph *sceneGraph) {
-            _sceneGraph = sceneGraph;
-            return static_cast<TBuilder &>(*this);
-        }
-
-        virtual std::unique_ptr<TObject> build() = 0;
-
-    protected:
-        uint32_t _id {script::kObjectInvalid};
-        ObjectType _type {ObjectType::Invalid};
-        std::string _tag;
-        std::shared_ptr<scene::SceneNode> _sceneNode;
-        scene::SceneGraph *_sceneGraph {nullptr};
-    };
-
-    class Loader : boost::noncopyable {
-    protected:
-        IObjectIdSequence &_idSeq;
-        scene::SceneGraph &_sceneGraph;
-        game::GameServices &_gameSvc;
-        graphics::GraphicsOptions &_graphicsOpt;
-        graphics::GraphicsServices &_graphicsSvc;
-        resource::ResourceServices &_resourceSvc;
-
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            _idSeq(idSeq),
-            _sceneGraph(sceneGraph),
-            _gameSvc(gameSvc),
-            _graphicsOpt(graphicsOpt),
-            _graphicsSvc(graphicsSvc),
-            _resourceSvc(resourceSvc) {
-        }
-    };
-
     virtual void handleClick(Object &clicker) {
     }
 
@@ -130,12 +71,28 @@ public:
         return _tag;
     }
 
+    const glm::vec3 &position() const {
+        return _position;
+    }
+
+    float facing() const {
+        return _facing;
+    }
+
+    float pitch() const {
+        return _pitch;
+    }
+
     scene::SceneNode &sceneNode() const {
         return *_sceneNode;
     }
 
     std::shared_ptr<scene::SceneNode> sceneNodePtr() const {
         return _sceneNode;
+    }
+
+    void setTag(std::string tag) {
+        _tag = std::move(tag);
     }
 
     void setPosition(glm::vec3 position) {
@@ -148,31 +105,59 @@ public:
         flushTransform();
     }
 
+    void setPitch(float pitch) {
+        _pitch = pitch;
+        flushTransform();
+    }
+
+    void setSceneGraph(scene::SceneGraph *sceneGraph) {
+        _sceneGraph = sceneGraph;
+    }
+
+    void setSceneNode(std::shared_ptr<scene::SceneNode> sceneNode) {
+        _sceneNode = std::move(sceneNode);
+        flushTransform();
+    }
+
 protected:
     uint32_t _id;
     ObjectType _type;
+    ObjectFactory &_objectFactory;
+    GameServices &_gameSvc;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
+
     std::string _tag;
-    std::shared_ptr<scene::SceneNode> _sceneNode;
-    scene::SceneGraph &_sceneGraph;
 
     glm::vec3 _position {0.0f};
     float _facing {0.0f};
     float _pitch {0.0f};
 
+    scene::SceneGraph *_sceneGraph {nullptr};
+    std::shared_ptr<scene::SceneNode> _sceneNode;
+
     Object(
         uint32_t id,
         ObjectType type,
-        std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         _id(id),
         _type(type),
-        _tag(std::move(tag)),
-        _sceneNode(std::move(sceneNode)),
-        _sceneGraph(sceneGraph) {
+        _objectFactory(objectFactory),
+        _gameSvc(gameSvc),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
     virtual void flushTransform() {
+        if (!_sceneNode) {
+            return;
+        }
         auto transform = glm::translate(_position);
         transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
         transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));

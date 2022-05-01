@@ -46,6 +46,17 @@ static constexpr float kCameraMouseSensitivity = 0.001f;
 static constexpr float kCameraRotateSpeed = 1.0f;
 static constexpr float kCameraMoveSpeed = 5.0f;
 
+void Camera::loadFromGit(const Gff &git) {
+}
+
+void Camera::loadFromStyle(const CameraStyle &style) {
+    _style = style;
+    _aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
+    _sceneNode = _sceneGraph->newCamera();
+
+    flushProjection();
+}
+
 bool Camera::handle(const SDL_Event &e) {
     if (_mode == Mode::ThirdPerson) {
         return handleThirdPerson(e);
@@ -139,7 +150,7 @@ void Camera::updateThirdPerson(float delta) {
     endPos += _style.distance * glm::vec3(glm::sin(_facing), -glm::cos(_facing), 0.0f);
 
     Collision collision;
-    if (_sceneGraph.testLineOfSight(startPos, endPos, collision)) {
+    if (_sceneGraph->testLineOfSight(startPos, endPos, collision)) {
         endPos = collision.intersection;
     }
 
@@ -163,33 +174,6 @@ void Camera::flushProjection() {
                                                                          _aspect,                        //
                                                                          kDefaultClipNear,               //
                                                                          kDefaultClipFar);
-}
-
-unique_ptr<Camera> Camera::Loader::load(int style) {
-    auto styleValue = _gameSvc.cameraStyles.get(style);
-    if (!styleValue) {
-        throw ValidationException("Camera style not found: " + to_string(style));
-    }
-
-    float aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
-
-    return Camera::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag("main_camera")
-        .sceneNode(_sceneGraph.newCamera())
-        .sceneGraph(&_sceneGraph)
-        .style(*styleValue)
-        .aspect(aspect)
-        .build();
-}
-
-unique_ptr<Camera> Camera::Loader::load(const Gff &gitEntry) {
-    return Camera::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag("")
-        .sceneNode(_sceneGraph.newCamera())
-        .sceneGraph(&_sceneGraph)
-        .build();
 }
 
 } // namespace neo

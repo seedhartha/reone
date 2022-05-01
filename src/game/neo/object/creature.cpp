@@ -45,30 +45,21 @@ static constexpr float kCreatureMoveSpeed = 3.96f;
 
 static const string kHeadHookNodeName = "headhook";
 
-bool Creature::moveForward(float delta) {
-    auto dir = glm::vec2(-glm::sin(_facing), glm::cos(_facing));
-    auto newPosition = glm::vec2(_position) + delta * kCreatureMoveSpeed * dir;
+void Creature::loadFromGit(const Gff &git) {
+    auto xPosition = git.getFloat("XPosition");
+    auto yPosition = git.getFloat("YPosition");
+    auto zPosition = git.getFloat("ZPosition");
+    auto xOrientation = git.getFloat("XOrientation");
+    auto yOrientation = git.getFloat("YOrientation");
+    auto templateResRef = git.getString("TemplateResRef");
 
-    Collision collision;
-    if (!_sceneGraph.testElevation(glm::vec2(newPosition), collision)) {
-        return false;
-    }
+    _position = glm::vec3(xPosition, yPosition, zPosition);
+    _facing = -glm::atan(xOrientation, yOrientation);
 
-    _position = glm::vec3(newPosition, collision.intersection.z);
-    flushTransform();
-    return true;
+    loadFromUtc(templateResRef);
 }
 
-unique_ptr<Creature> Creature::Loader::load(const Gff &gitEntry) {
-    // From GIT entry
-
-    auto xPosition = gitEntry.getFloat("XPosition");
-    auto yPosition = gitEntry.getFloat("YPosition");
-    auto zPosition = gitEntry.getFloat("ZPosition");
-    auto xOrientation = gitEntry.getFloat("XOrientation");
-    auto yOrientation = gitEntry.getFloat("YOrientation");
-    auto templateResRef = gitEntry.getString("TemplateResRef");
-
+void Creature::loadFromUtc(const string &templateResRef) {
     // From UTC
 
     auto utc = _resourceSvc.gffs.get(templateResRef, ResourceType::Utc);
@@ -90,11 +81,9 @@ unique_ptr<Creature> Creature::Loader::load(const Gff &gitEntry) {
     // Make scene node
 
     shared_ptr<ModelSceneNode> sceneNode;
-
     auto model = _graphicsSvc.models.get(race);
     if (model) {
-        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Creature, nullptr);
-
+        sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Creature, nullptr);
         if (modelType == "B") {
             auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
             auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
@@ -105,28 +94,35 @@ unique_ptr<Creature> Creature::Loader::load(const Gff &gitEntry) {
             auto head = headsTable->getString(normalHead, "head");
             auto headModel = _graphicsSvc.models.get(head);
             if (headModel) {
-                auto headSceneNode = _sceneGraph.newModel(move(headModel), ModelUsage::Creature, nullptr);
+                auto headSceneNode = _sceneGraph->newModel(move(headModel), ModelUsage::Creature, nullptr);
                 sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
             }
         }
-
+        sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);
     }
 
-    // Make creature
+    //
 
-    auto creature = Creature::Builder()
-                        .id(_idSeq.nextObjectId())
-                        .tag(move(tag))
-                        .sceneNode(move(sceneNode))
-                        .sceneGraph(&_sceneGraph)
-                        .build();
+    _tag = move(tag);
+    _sceneNode = move(sceneNode);
 
-    creature->setPosition(glm::vec3(xPosition, yPosition, zPosition));
-    creature->setFacing(-glm::atan(xOrientation, yOrientation));
+    flushTransform();
+}
 
-    return move(creature);
+bool Creature::moveForward(float delta) {
+    auto dir = glm::vec2(-glm::sin(_facing), glm::cos(_facing));
+    auto newPosition = glm::vec2(_position) + delta * kCreatureMoveSpeed * dir;
+
+    Collision collision;
+    if (!_sceneGraph->testElevation(glm::vec2(newPosition), collision)) {
+        return false;
+    }
+
+    _position = glm::vec3(newPosition, collision.intersection.z);
+    flushTransform();
+    return true;
 }
 
 } // namespace neo

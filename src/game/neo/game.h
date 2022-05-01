@@ -23,7 +23,7 @@
 #include "../types.h"
 
 #include "gui/maininterface.h"
-#include "object.h"
+#include "object/factory.h"
 #include "object/module.h"
 
 namespace reone {
@@ -145,6 +145,7 @@ private:
     OptionsView &_options;
     ServicesView &_services;
 
+    std::unique_ptr<ObjectFactory> _objectFactory;
     std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
@@ -153,7 +154,7 @@ private:
     uint32_t _prevFrameTicks {0};
     uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
 
-    std::unique_ptr<Module> _module;
+    std::shared_ptr<Module> _module;
 
     // GUI
 

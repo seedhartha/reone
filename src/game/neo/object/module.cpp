@@ -21,13 +21,15 @@
 #include "../../../common/logutil.h"
 #include "../../../graphics/models.h"
 #include "../../../graphics/services.h"
-#include "../../../resource/gffs.h"
 #include "../../../resource/gff.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/services.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/model.h"
 
 #include "../../services.h"
+
+#include "factory.h"
 
 using namespace std;
 
@@ -41,7 +43,7 @@ namespace game {
 
 namespace neo {
 
-unique_ptr<Module> Module::Loader::load(const string &name) {
+void Module::load(const string &name) {
     info("Loading module " + name);
 
     // From IFO
@@ -50,6 +52,7 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
     if (!ifo) {
         throw ValidationException("IFO not found: " + name);
     }
+
     auto entryArea = ifo->getString("Mod_Entry_Area");
     auto entryX = ifo->getFloat("Mod_Entry_X");
     auto entryY = ifo->getFloat("Mod_Entry_Y");
@@ -57,35 +60,19 @@ unique_ptr<Module> Module::Loader::load(const string &name) {
     auto entryDirX = ifo->getFloat("Mod_Entry_Dir_X");
     auto entryDirY = ifo->getFloat("Mod_Entry_Dir_Y");
 
-    // Make area
-
-    auto areaLoader = Area::Loader(_idSeq, _sceneGraph, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
-    auto area = areaLoader.load(entryArea);
-
     // Make player character
 
-    auto model = _graphicsSvc.models.get("PMBTest");
+    _pc = static_pointer_cast<Creature>(shared_ptr<Object>(_objectFactory.newCreature()));
+    _pc->setSceneGraph(_sceneGraph);
+    _pc->setPosition(glm::vec3(entryX, entryY, entryZ));
+    _pc->setFacing(-glm::atan(entryDirX, entryDirY));
+    _pc->loadFromUtc("p_bastilla");
 
-    auto pcSceneNode = _sceneGraph.newModel(move(model), ModelUsage::Creature, nullptr);
-    auto pc = Creature::Builder()
-                  .id(_idSeq.nextObjectId())
-                  .tag(kObjectTagPlayer)
-                  .sceneNode(move(pcSceneNode))
-                  .sceneGraph(&_sceneGraph)
-                  .build();
+    //
 
-    pc->setPosition(glm::vec3(entryX, entryY, entryZ));
-    pc->setFacing(-glm::atan(entryDirX, entryDirY));
-
-    // Make module
-
-    return Module::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(name)
-        .sceneGraph(&_sceneGraph)
-        .area(move(area))
-        .pc(move(pc))
-        .build();
+    _area = static_pointer_cast<Area>(shared_ptr<Object>(_objectFactory.newArea()));
+    _area->setSceneGraph(_sceneGraph);
+    _area->load(entryArea);
 }
 
 } // namespace neo

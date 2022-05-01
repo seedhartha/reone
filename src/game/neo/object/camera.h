@@ -40,76 +40,30 @@ public:
         Flycam
     };
 
-    class Builder : public Object::Builder<Camera, Builder> {
-    public:
-        Builder &style(CameraStyle style) {
-            _style = std::move(style);
-            return *this;
-        }
-
-        Builder &aspect(float aspect) {
-            _aspect = aspect;
-            return *this;
-        }
-
-        std::unique_ptr<Camera> build() override {
-            return std::make_unique<Camera>(_id, _tag, _sceneNode, *_sceneGraph, _style, _aspect);
-        }
-
-    private:
-        CameraStyle _style;
-        float _aspect;
-    };
-
-    class Loader : public Object::Loader {
-    public:
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            Object::Loader(
-                idSeq,
-                sceneGraph,
-                gameSvc,
-                graphicsOpt,
-                graphicsSvc,
-                resourceSvc) {
-        }
-
-        std::unique_ptr<Camera> load(int style);
-        std::unique_ptr<Camera> load(const resource::Gff &gitEntry);
-    };
-
     Camera(
         uint32_t id,
-        std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph,
-        CameraStyle style,
-        float aspect) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Camera,
-            std::move(tag),
-            std::move(sceneNode),
-            sceneGraph),
-        _style(std::move(style)),
-        _aspect(aspect) {
-
-        flushProjection();
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
 
         _pitch = glm::half_pi<float>();
     }
 
+    void loadFromGit(const resource::Gff &git);
+    void loadFromStyle(const CameraStyle &style);
+
     bool handle(const SDL_Event &e);
     void update(float delta);
-
-    float facing() const {
-        return _facing;
-    }
 
     void setMode(Camera::Mode mode) {
         _mode = mode;
@@ -120,10 +74,9 @@ public:
     }
 
 private:
-    CameraStyle _style;
-    float _aspect;
-
     Mode _mode {Mode::Flycam};
+    CameraStyle _style;
+    float _aspect {1.0f};
     scene::SceneNode *_hook {nullptr};
 
     // Controls

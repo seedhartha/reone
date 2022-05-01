@@ -35,92 +35,24 @@ namespace neo {
 
 class Door : public Object {
 public:
-    class Builder : public Object::Builder<Door, Builder> {
-    public:
-        Builder &walkmeshClosed(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
-            _walkmeshClosed = std::move(walkmesh);
-            return *this;
-        }
-
-        Builder &walkmeshOpen1(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
-            _walkmeshOpen1 = std::move(walkmesh);
-            return *this;
-        }
-
-        Builder &walkmeshOpen2(std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) {
-            _walkmeshOpen2 = std::move(walkmesh);
-            return *this;
-        }
-
-        std::unique_ptr<Door> build() override {
-            auto door = std::make_unique<Door>(
-                _id,
-                _tag,
-                _sceneNode,
-                *_sceneGraph,
-                _walkmeshClosed,
-                _walkmeshOpen1,
-                _walkmeshOpen2);
-            if (_sceneNode) {
-                _sceneNode->setUser(*door);
-            }
-            if (_walkmeshClosed) {
-                _walkmeshClosed->setUser(*door);
-            }
-            if (_walkmeshOpen1) {
-                _walkmeshOpen1->setUser(*door);
-            }
-            if (_walkmeshOpen2) {
-                _walkmeshOpen2->setUser(*door);
-            }
-            return std::move(door);
-        }
-
-    private:
-        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
-        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
-        std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
-    };
-
-    class Loader : public Object::Loader {
-    public:
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            Object::Loader(
-                idSeq,
-                sceneGraph,
-                gameSvc,
-                graphicsOpt,
-                graphicsSvc,
-                resourceSvc) {
-        }
-
-        std::unique_ptr<Door> load(const resource::Gff &gitEntry);
-    };
-
     Door(
         uint32_t id,
-        std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph,
-        std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosed,
-        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh1,
-        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh2) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Door,
-            std::move(tag),
-            std::move(sceneNode),
-            sceneGraph),
-        _walkmeshClosed(std::move(walkmeshClosed)),
-        _walkmeshOpen1(std::move(walkmesh1)),
-        _walkmeshOpen2(std::move(walkmesh2)) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
+
+    void loadFromGit(const resource::Gff &git);
 
     void handleClick(Object &clicker) override;
 

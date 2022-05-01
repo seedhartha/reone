@@ -17,51 +17,54 @@
 
 #pragma once
 
-#include "../../../scene/node/walkmesh.h"
-
 #include "../object.h"
 
 namespace reone {
-
-namespace resource {
-
-class Gff;
-
-}
 
 namespace game {
 
 namespace neo {
 
-class Placeable : public Object {
+class IObjectIdSequence {
 public:
-    Placeable(
-        uint32_t id,
-        ObjectFactory &objectFactory,
+    virtual uint32_t nextObjectId() = 0;
+};
+
+class ObjectFactory : boost::noncopyable {
+public:
+    ObjectFactory(
+        IObjectIdSequence &idSeq,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Placeable,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+        _idSeq(idSeq),
+        _gameSvc(gameSvc),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
-    void loadFromGit(const resource::Gff &git);
-
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() {
-        return _walkmesh;
-    }
+    std::unique_ptr<Object> newArea();
+    std::unique_ptr<Object> newCamera();
+    std::unique_ptr<Object> newCreature();
+    std::unique_ptr<Object> newDoor();
+    std::unique_ptr<Object> newEncounter();
+    std::unique_ptr<Object> newItem();
+    std::unique_ptr<Object> newModule();
+    std::unique_ptr<Object> newPlaceable();
+    std::unique_ptr<Object> newRoom();
+    std::unique_ptr<Object> newSound();
+    std::unique_ptr<Object> newStore();
+    std::unique_ptr<Object> newTrigger();
+    std::unique_ptr<Object> newWaypoint();
 
 private:
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
-
-    void flushTransform() override;
+    IObjectIdSequence &_idSeq;
+    GameServices &_gameSvc;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 };
 
 } // namespace neo

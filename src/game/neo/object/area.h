@@ -38,63 +38,24 @@ namespace neo {
 
 class Area : public Object {
 public:
-    class Builder : public Object::Builder<Area, Builder> {
-    public:
-        Builder &rooms(std::vector<std::shared_ptr<Room>> rooms) {
-            _rooms = std::move(rooms);
-            return *this;
-        }
-
-        Builder &mainCamera(std::shared_ptr<Camera> mainCamera) {
-            _mainCamera = std::move(mainCamera);
-            return *this;
-        }
-
-        std::unique_ptr<Area> build() override {
-            return std::make_unique<Area>(_id, _tag, *_sceneGraph, _rooms, _mainCamera);
-        }
-
-    private:
-        std::vector<std::shared_ptr<Room>> _rooms;
-        std::shared_ptr<Camera> _mainCamera;
-    };
-
-    class Loader : public Object::Loader {
-    public:
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            Object::Loader(
-                idSeq,
-                sceneGraph,
-                gameSvc,
-                graphicsOpt,
-                graphicsSvc,
-                resourceSvc) {
-        }
-
-        std::unique_ptr<Area> load(const std::string &name);
-    };
-
     Area(
         uint32_t id,
-        std::string tag,
-        scene::SceneGraph &sceneGraph,
-        std::vector<std::shared_ptr<Room>> rooms,
-        std::shared_ptr<Camera> mainCamera) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Area,
-            std::move(tag),
-            nullptr,
-            sceneGraph),
-        _rooms(std::move(rooms)),
-        _mainCamera(std::move(mainCamera)) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
+
+    void load(const std::string &name);
 
     void add(std::unique_ptr<Object> object) {
         _objects.push_back(std::move(object));
@@ -104,7 +65,7 @@ public:
         return _rooms;
     }
 
-    const std::vector<std::unique_ptr<Object>> &objects() const {
+    const std::vector<std::shared_ptr<Object>> &objects() const {
         return _objects;
     }
 
@@ -114,8 +75,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<Room>> _rooms;
-
-    std::vector<std::unique_ptr<Object>> _objects;
+    std::vector<std::shared_ptr<Object>> _objects;
     std::shared_ptr<Camera> _mainCamera;
 };
 
