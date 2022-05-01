@@ -23,6 +23,7 @@
 #include "../types.h"
 
 #include "gui/maininterface.h"
+#include "gui/mainmenu.h"
 #include "object/factory.h"
 #include "object/module.h"
 
@@ -77,6 +78,11 @@ public:
     // END IEventHandler
 
 private:
+    enum class Stage {
+        MainMenu,
+        World
+    };
+
     class PlayerController : boost::noncopyable {
     public:
         bool handle(const SDL_Event &e);
@@ -154,11 +160,14 @@ private:
     uint32_t _prevFrameTicks {0};
     uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
 
+    Stage _stage {Stage::MainMenu};
+
     std::shared_ptr<Module> _module;
 
     // GUI
 
-    std::unique_ptr<MainInterfaceGui> _mainInterface;
+    std::unique_ptr<MainMenu> _mainMenu;
+    std::unique_ptr<MainInterface> _mainInterface;
 
     // END GUI
 

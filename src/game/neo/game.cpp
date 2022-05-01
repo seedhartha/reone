@@ -65,7 +65,10 @@ void Game::init() {
 
     // GUI
 
-    _mainInterface = make_unique<MainInterfaceGui>(_options.graphics, _services.graphics, _services.resource);
+    _mainMenu = make_unique<MainMenu>(_options.graphics, _services.graphics, _services.resource);
+    _mainMenu->init();
+
+    _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
     _mainInterface->init();
 
     // Surfaces
@@ -107,17 +110,23 @@ void Game::handleInput() {
 }
 
 bool Game::handle(const SDL_Event &e) {
-    if (_mainInterface->handle(e)) {
-        return true;
-    }
-    if (_module && _module->area().mainCamera().handle(e)) {
-        return true;
-    }
-    if (_selectionController->handle(e)) {
-        return true;
-    }
-    if (_playerController->handle(e)) {
-        return true;
+    if (_stage == Stage::MainMenu) {
+        if (_mainMenu->handle(e)) {
+            return true;
+        }
+    } else if (_stage == Stage::World) {
+        if (_mainInterface->handle(e)) {
+            return true;
+        }
+        if (_module && _module->area().mainCamera().handle(e)) {
+            return true;
+        }
+        if (_selectionController->handle(e)) {
+            return true;
+        }
+        if (_playerController->handle(e)) {
+            return true;
+        }
     }
     return false;
 }
@@ -133,32 +142,42 @@ void Game::update() {
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
-    // Update game objects
+    if (_stage == Stage::MainMenu) {
+        _mainMenu->update(delta);
 
-    if (_module) {
-        _module->area().mainCamera().update(delta);
+    } else if (_stage == Stage::World) {
+        // Update game objects
+
+        if (_module) {
+            _module->area().mainCamera().update(delta);
+        }
+        _playerController->update(delta);
+
+        // Update scene
+
+        auto &scene = _services.scene.graphs.get(kSceneMain);
+        scene.update(delta);
+
+        // Update GUI
+
+        _mainInterface->update(delta);
     }
-    _playerController->update(delta);
-
-    // Update scene
-
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    scene.update(delta);
-
-    // Update GUI
-
-    _mainInterface->update(delta);
 }
 
 void Game::render() {
     _services.graphics.context.clearColorDepth();
 
-    // Render world
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    _worldRenderer->render();
+    if (_stage == Stage::MainMenu) {
+        _mainMenu->render();
 
-    // Render GUI
-    _mainInterface->render();
+    } else if (_stage == Stage::World) {
+        // Render world
+        auto &scene = _services.scene.graphs.get(kSceneMain);
+        _worldRenderer->render();
+
+        // Render GUI
+        _mainInterface->render();
+    }
 
     _services.graphics.window.swapBuffers();
 }

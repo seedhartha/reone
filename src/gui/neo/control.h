@@ -58,6 +58,7 @@ public:
         std::string corner;
         std::string edge;
         std::string fill;
+        int dimension {0};
         glm::vec3 color {0.0f};
     };
 

@@ -60,6 +60,7 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
             border->getString("CORNER"),
             border->getString("EDGE"),
             border->getString("FILL"),
+            border->getInt("DIMENSION"),
             border->getVector("COLOR")});
     }
 
@@ -69,6 +70,7 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
             hilight->getString("CORNER"),
             hilight->getString("EDGE"),
             hilight->getString("FILL"),
+            hilight->getInt("DIMENSION"),
             hilight->getVector("COLOR")});
     }
 
@@ -137,9 +139,12 @@ void Control::render() {
         return;
     }
 
-    // Render border
     auto &border = (_hovered && _hilight) ? _hilight : _border;
+
+    // Render fill
     if (border && !border->fill.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+
         auto fillTexture = _graphicsSvc.textures.get(border->fill, TextureUsage::GUI);
         _graphicsSvc.textures.bind(*fillTexture);
 
@@ -155,11 +160,114 @@ void Control::render() {
             }
             u.color = glm::vec4(border->color, 1.0f);
         });
-        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
 
         auto blendMode = hasAlphaChannel(fillTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
         _graphicsSvc.context.withBlending(blendMode, [this]() {
             _graphicsSvc.meshes.quad().draw();
+        });
+    }
+
+    // Render corners
+    if (border && !border->corner.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+
+        auto cornerTexture = _graphicsSvc.textures.get(border->corner, TextureUsage::GUI);
+        _graphicsSvc.textures.bind(*cornerTexture);
+
+        auto topLeftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
+        topLeftModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto topLeftUv = glm::mat3x4(1.0f);
+
+        auto topRightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1]), 0.0f));
+        topRightModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto topRightUv = glm::mat3x4(
+            glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+
+        auto bottomLeftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomLeftModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto bottomLeftUv = glm::mat3x4(
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        auto bottomRightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomRightModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto bottomRightUv = glm::mat3x4(
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+        vector<pair<glm::mat4, glm::mat4>> edges {
+            make_pair(topLeftModel, topLeftUv),
+            make_pair(topRightModel, topRightUv),
+            make_pair(bottomLeftModel, bottomLeftUv),
+            make_pair(bottomRightModel, bottomRightUv)};
+
+        auto blendMode = hasAlphaChannel(cornerTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [&]() {
+            for (auto &edge : edges) {
+                _graphicsSvc.uniforms.setGeneral([&](auto &u) {
+                    u.resetLocals();
+                    u.model = edge.first;
+                    u.uv = edge.second;
+                    u.color = glm::vec4(border->color, 1.0f);
+                });
+                _graphicsSvc.meshes.quad().draw();
+            }
+        });
+    }
+
+    // Render edges
+    if (border && !border->edge.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+
+        auto edgeTexture = _graphicsSvc.textures.get(border->edge, TextureUsage::GUI);
+        _graphicsSvc.textures.bind(*edgeTexture);
+
+        auto leftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1] + border->dimension), 0.0f));
+        leftModel *= glm::scale(glm::vec3(border->dimension, static_cast<float>(_extent[3] - 2 * border->dimension), 1.0f));
+        auto leftUv = glm::mat3x4(
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        auto topModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + border->dimension), static_cast<float>(_extent[1]), 0.0f));
+        topModel *= glm::scale(glm::vec3(static_cast<float>(_extent[2] - 2 * border->dimension), border->dimension, 1.0f));
+        auto topUv = glm::mat3x4(1.0f);
+
+        auto rightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1] + border->dimension), 0.0f));
+        rightModel *= glm::scale(glm::vec3(border->dimension, static_cast<float>(_extent[3] - 2 * border->dimension), 1.0f));
+        auto rightUv = glm::mat3x4(
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+        auto bottomModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + border->dimension), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomModel *= glm::scale(glm::vec3(static_cast<float>(_extent[2] - 2 * border->dimension), border->dimension, 1.0f));
+        auto bottomUv = glm::mat3x4(
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        vector<pair<glm::mat4, glm::mat4>> edges {
+            make_pair(leftModel, leftUv),
+            make_pair(topModel, topUv),
+            make_pair(rightModel, rightUv),
+            make_pair(bottomModel, bottomUv)};
+
+        auto blendMode = hasAlphaChannel(edgeTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [&]() {
+            for (auto &edge : edges) {
+                _graphicsSvc.uniforms.setGeneral([&](auto &u) {
+                    u.resetLocals();
+                    u.model = edge.first;
+                    u.uv = edge.second;
+                    u.color = glm::vec4(border->color, 1.0f);
+                });
+                _graphicsSvc.meshes.quad().draw();
+            }
         });
     }
 

@@ -48,9 +48,9 @@ namespace game {
 
 namespace neo {
 
-class MainInterface : public gui::neo::Gui {
+class MainMenu : public gui::neo::Gui {
 public:
-    MainInterface(
+    MainMenu(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
@@ -63,11 +63,6 @@ public:
     void init();
 
 private:
-    gui::neo::Button *_btnActionDown0 {nullptr};
-    gui::neo::Button *_btnActionDown1 {nullptr};
-    gui::neo::Button *_btnActionDown2 {nullptr};
-    gui::neo::Button *_btnActionDown3 {nullptr};
-
     void bindControls();
 };
 
