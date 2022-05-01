@@ -17,10 +17,13 @@
 
 #include "control.h"
 
+#include "../../graphics/context.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
+#include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/textureutil.h"
 #include "../../graphics/uniforms.h"
 #include "../../resource/gff.h"
 
@@ -75,7 +78,10 @@ void Control::render() {
             u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
-        _graphicsSvc.meshes.quad().draw();
+        auto blendMode = hasAlphaChannel(fillTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [this]() {
+            _graphicsSvc.meshes.quad().draw();
+        });
     }
 
     // Render children
