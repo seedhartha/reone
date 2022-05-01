@@ -39,6 +39,12 @@ void MainInterfaceGui::init() {
     disableControl("LBL_ACTIONDESCBG");
 
     // Party
+    disableControl("BTN_CHAR2");
+    disableControl("BTN_CHAR3");
+    disableControl("LBL_BACK2");
+    disableControl("LBL_BACK3");
+    disableControl("LBL_CHAR2");
+    disableControl("LBL_CHAR3");
     disableControl("LBL_CMBTEFCTINC1");
     disableControl("LBL_CMBTEFCTINC2");
     disableControl("LBL_CMBTEFCTINC3");
@@ -54,6 +60,13 @@ void MainInterfaceGui::init() {
     disableControl("LBL_LEVELUP1");
     disableControl("LBL_LEVELUP2");
     disableControl("LBL_LEVELUP3");
+    disableControl("LBL_LVLUPBG1");
+    disableControl("LBL_LVLUPBG2");
+    disableControl("LBL_LVLUPBG3");
+    disableControl("PB_FORCE2");
+    disableControl("PB_FORCE3");
+    disableControl("PB_VIT2");
+    disableControl("PB_VIT3");
 
     // Notifications
     disableControl("LBL_CASH");
