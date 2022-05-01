@@ -29,12 +29,10 @@ class Panel : public Control {
 public:
     Panel(
         int id,
-        std::string tag,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         Control(
             id,
-            std::move(tag),
             ControlType::Panel,
             graphicsOpt,
             graphicsSvc) {

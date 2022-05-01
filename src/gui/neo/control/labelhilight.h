@@ -29,12 +29,10 @@ class LabelHilight : public Control {
 public:
     LabelHilight(
         int id,
-        std::string tag,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         Control(
             id,
-            std::move(tag),
             ControlType::LabelHilight,
             graphicsOpt,
             graphicsSvc) {

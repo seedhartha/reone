@@ -55,18 +55,27 @@ void Gui::load(const string &resRef) {
 
 unique_ptr<Control> Gui::loadControl(const Gff &gui) {
     auto id = gui.getInt("ID", -1);
-    auto tag = gui.getString("TAG");
     auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
 
     unique_ptr<Control> control;
     if (type == ControlType::Panel) {
-        control = newPanel(id, move(tag));
+        control = newPanel(id);
     } else if (type == ControlType::Label) {
-        control = newLabel(id, move(tag));
+        control = newLabel(id);
     } else if (type == ControlType::LabelHilight) {
-        control = newLabelHilight(id, move(tag));
+        control = newLabelHilight(id);
+    } else if (type == ControlType::Button) {
+        control = newButton(id);
+    } else if (type == ControlType::ButtonToggle) {
+        control = newButtonToggle(id);
+    } else if (type == ControlType::Slider) {
+        control = newSlider(id);
+    } else if (type == ControlType::ScrollBar) {
+        control = newScrollBar(id);
     } else if (type == ControlType::ProgressBar) {
-        control = newProgressBar(id, move(tag));
+        control = newProgressBar(id);
+    } else if (type == ControlType::ListBox) {
+        control = newListBox(id);
     } else {
         throw ValidationException("Unsupported control type: " + to_string(static_cast<int>(type)));
     }
@@ -94,20 +103,40 @@ void Gui::render() {
     _rootControl->render();
 }
 
-unique_ptr<Label> Gui::newLabel(int id, string tag) {
-    return make_unique<Label>(id, move(tag), _graphicsOpt, _graphicsSvc);
+unique_ptr<Panel> Gui::newPanel(int id) {
+    return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc);
 }
 
-unique_ptr<LabelHilight> Gui::newLabelHilight(int id, string tag) {
-    return make_unique<LabelHilight>(id, move(tag), _graphicsOpt, _graphicsSvc);
+unique_ptr<Label> Gui::newLabel(int id) {
+    return make_unique<Label>(id, _graphicsOpt, _graphicsSvc);
 }
 
-unique_ptr<Panel> Gui::newPanel(int id, string tag) {
-    return make_unique<Panel>(id, move(tag), _graphicsOpt, _graphicsSvc);
+unique_ptr<LabelHilight> Gui::newLabelHilight(int id) {
+    return make_unique<LabelHilight>(id, _graphicsOpt, _graphicsSvc);
 }
 
-unique_ptr<ProgressBar> Gui::newProgressBar(int id, string tag) {
-    return make_unique<ProgressBar>(id, move(tag), _graphicsOpt, _graphicsSvc);
+unique_ptr<Button> Gui::newButton(int id) {
+    return make_unique<Button>(id, _graphicsOpt, _graphicsSvc);
+}
+
+unique_ptr<ButtonToggle> Gui::newButtonToggle(int id) {
+    return make_unique<ButtonToggle>(id, _graphicsOpt, _graphicsSvc);
+}
+
+unique_ptr<Slider> Gui::newSlider(int id) {
+    return make_unique<Slider>(id, _graphicsOpt, _graphicsSvc);
+}
+
+unique_ptr<ScrollBar> Gui::newScrollBar(int id) {
+    return make_unique<ScrollBar>(id, _graphicsOpt, _graphicsSvc);
+}
+
+unique_ptr<ProgressBar> Gui::newProgressBar(int id) {
+    return make_unique<ProgressBar>(id, _graphicsOpt, _graphicsSvc);
+}
+
+unique_ptr<ListBox> Gui::newListBox(int id) {
+    return make_unique<ListBox>(id, _graphicsOpt, _graphicsSvc);
 }
 
 } // namespace neo

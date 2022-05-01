@@ -29,12 +29,10 @@ class Label : public Control {
 public:
     Label(
         int id,
-        std::string tag,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         Control(
             id,
-            std::move(tag),
             ControlType::Label,
             graphicsOpt,
             graphicsSvc) {

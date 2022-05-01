@@ -25,15 +25,15 @@ namespace gui {
 
 namespace neo {
 
-class ProgressBar : public Control {
+class Slider : public Control {
 public:
-    ProgressBar(
+    Slider(
         int id,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         Control(
             id,
-            ControlType::ProgressBar,
+            ControlType::Slider,
             graphicsOpt,
             graphicsSvc) {
     }
