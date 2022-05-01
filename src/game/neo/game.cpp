@@ -56,8 +56,9 @@ static const string kCameraHookNodeName = "camerahook";
 void Game::init() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
 
-    // Helpers
+    // Services
 
+    _objectFactory = make_unique<ObjectFactory>(*this, _services.game, _options.graphics, _services.graphics, _services.resource);
     _playerController = make_unique<PlayerController>();
     _selectionController = make_unique<SelectionController>(scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
@@ -105,6 +106,22 @@ void Game::handleInput() {
     _services.graphics.window.processEvents(_finished);
 }
 
+bool Game::handle(const SDL_Event &e) {
+    if (_mainInterface->handle(e)) {
+        return true;
+    }
+    if (_module && _module->area().mainCamera().handle(e)) {
+        return true;
+    }
+    if (_selectionController->handle(e)) {
+        return true;
+    }
+    if (_playerController->handle(e)) {
+        return true;
+    }
+    return false;
+}
+
 void Game::update() {
     // Calculate delta time
 
@@ -146,31 +163,20 @@ void Game::render() {
     _services.graphics.window.swapBuffers();
 }
 
-bool Game::handle(const SDL_Event &e) {
-    if (_mainInterface->handle(e)) {
-        return true;
-    }
-    if (_selectionController->handle(e)) {
-        return true;
-    }
-    if (_playerController->handle(e)) {
-        return true;
-    }
-    if (_module && _module->area().mainCamera().handle(e)) {
-        return true;
-    }
-    return false;
-}
-
 void Game::loadModule(const string &name) {
     _services.game.resourceLayout.loadModuleResources(name);
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto newModule = Module::Loader(*this, scene, _services.game, _options.graphics, _services.graphics, _services.resource).load(name);
-
-    _module = move(newModule);
-
     scene.clear();
+
+    _module = static_pointer_cast<Module>(shared_ptr<Object>(_objectFactory->newModule()));
+    _module->setSceneGraph(&scene);
+    _module->load(name);
+
+    // Main camera
+
+    auto &camera = _module->area().mainCamera();
+    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()));
 
     // Rooms
 
@@ -215,18 +221,16 @@ void Game::loadModule(const string &name) {
         }
     }
 
-    // Player character / camera
+    // Player character
 
     auto &pc = _module->pc();
-    auto &camera = _module->area().mainCamera();
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
-    auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);
     scene.addRoot(pcModel);
 
+    auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);
     camera.setMode(Camera::Mode::ThirdPerson);
     camera.setThirdPersonHook(pcCameraHook.get());
-    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()));
 
     _playerController->setCreature(&pc);
     _playerController->setCamera(&camera);
@@ -272,6 +276,9 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
 }
 
 void Game::PlayerController::update(float delta) {
+    if (!_camera) {
+        return;
+    }
     float facing;
     if (_forward != 0.0f && _backward == 0.0f) {
         facing = _camera->facing();

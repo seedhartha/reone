@@ -27,24 +27,21 @@ namespace neo {
 
 class Item : public Object {
 public:
-    class Builder : public Object::Builder<Item, Builder> {
-    public:
-        std::unique_ptr<Item> build() override {
-            return std::make_unique<Item>(_id, _tag, nullptr, *_sceneGraph);
-        }
-    };
-
     Item(
         uint32_t id,
-        std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Item,
-            std::move(tag),
-            std::move(sceneNode),
-            sceneGraph) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 };
 

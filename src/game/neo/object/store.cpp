@@ -17,30 +17,11 @@
 
 #include "store.h"
 
-#include "../../../resource/gff.h"
-
-using namespace std;
-
-using namespace reone::resource;
-using namespace reone::scene;
-
 namespace reone {
 
 namespace game {
 
 namespace neo {
-
-unique_ptr<Store> Store::Loader::load(const Gff &gitEntry) {
-    auto tag = "";
-    auto sceneNode = shared_ptr<SceneNode>();
-
-    return Store::Builder()
-        .id(_idSeq.nextObjectId())
-        .tag(move(tag))
-        .sceneNode(move(sceneNode))
-        .sceneGraph(&_sceneGraph)
-        .build();
-}
 
 } // namespace neo
 

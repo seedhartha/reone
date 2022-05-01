@@ -24,8 +24,6 @@
 #include "../../../scene/node/model.h"
 #include "../../../scene/services.h"
 
-#include "../../services.h"
-
 using namespace std;
 
 using namespace reone::resource;
@@ -37,30 +35,23 @@ namespace game {
 
 namespace neo {
 
-unique_ptr<Room> Room::Loader::load(const string &name, const glm::vec3 &position) {
-    shared_ptr<ModelSceneNode> sceneNode;
-    auto model = _graphicsSvc.models.get(name);
+void Room::loadFromLyt(const Layout::Room &lyt) {
+    // Model
+    auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
-        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Room, nullptr);
+        _sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Room, nullptr);
+        _sceneNode->setUser(*this);
     }
 
-    shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-    auto walkmesh = _graphicsSvc.walkmeshes.get(name, ResourceType::Wok);
+    // Walkmesh
+    auto walkmesh = _graphicsSvc.walkmeshes.get(lyt.name, ResourceType::Wok);
     if (walkmesh) {
-        walkmeshSceneNode = _sceneGraph.newWalkmesh(move(walkmesh));
+        _walkmesh = _sceneGraph->newWalkmesh(move(walkmesh));
+        _walkmesh->setUser(*this);
     }
 
-    auto room = Room::Builder()
-                    .id(_idSeq.nextObjectId())
-                    .tag(name)
-                    .sceneNode(move(sceneNode))
-                    .sceneGraph(&_sceneGraph)
-                    .walkmesh(move(walkmeshSceneNode))
-                    .build();
-
-    room->setPosition(position);
-
-    return move(room);
+    _position = lyt.position;
+    flushTransform();
 }
 
 } // namespace neo

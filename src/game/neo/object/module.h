@@ -24,75 +24,30 @@
 
 namespace reone {
 
-namespace resource {
-
-class Gff;
-
-}
-
 namespace game {
 
 namespace neo {
 
 class Module : public Object {
 public:
-    class Builder : public Object::Builder<Module, Builder> {
-    public:
-        Builder &area(std::shared_ptr<Area> area) {
-            _area = std::move(area);
-            return *this;
-        }
-
-        Builder &pc(std::shared_ptr<Creature> pc) {
-            _pc = std::move(pc);
-            return *this;
-        }
-
-        std::unique_ptr<Module> build() override {
-            return std::make_unique<Module>(_id, _tag, *_sceneGraph, _area, _pc);
-        }
-
-    private:
-        std::shared_ptr<Area> _area;
-        std::shared_ptr<Creature> _pc;
-    };
-
-    class Loader : public Object::Loader {
-    public:
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            Object::Loader(
-                idSeq,
-                sceneGraph,
-                gameSvc,
-                graphicsOpt,
-                graphicsSvc,
-                resourceSvc) {
-        }
-
-        std::unique_ptr<Module> load(const std::string &name);
-    };
-
     Module(
         uint32_t id,
-        std::string tag,
-        scene::SceneGraph &sceneGraph,
-        std::shared_ptr<Area> area,
-        std::shared_ptr<Creature> pc) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Module,
-            std::move(tag),
-            nullptr,
-            sceneGraph),
-        _area(std::move(area)),
-        _pc(std::move(pc)) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
+
+    void load(const std::string &name);
 
     Area &area() const {
         return *_area;

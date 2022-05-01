@@ -448,6 +448,7 @@ set(GAME_NEO_HEADERS
     neo/object/creature.h
     neo/object/door.h
     neo/object/encounter.h
+    neo/object/factory.h
     neo/object/item.h
     neo/object/module.h
     neo/object/placeable.h
@@ -465,6 +466,7 @@ set(GAME_NEO_SOURCES
     neo/object/creature.cpp
     neo/object/door.cpp
     neo/object/encounter.cpp
+    neo/object/factory.cpp
     neo/object/item.cpp
     neo/object/module.cpp
     neo/object/placeable.cpp

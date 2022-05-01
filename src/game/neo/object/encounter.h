@@ -33,49 +33,24 @@ namespace neo {
 
 class Encounter : public Object {
 public:
-    class Builder : public Object::Builder<Encounter, Builder> {
-    public:
-        std::unique_ptr<Encounter> build() override {
-            return std::make_unique<Encounter>(
-                _id,
-                _tag,
-                _sceneNode,
-                *_sceneGraph);
-        }
-    };
-
-    class Loader : public Object::Loader {
-    public:
-        Loader(
-            IObjectIdSequence &idSeq,
-            scene::SceneGraph &sceneGraph,
-            game::GameServices &gameSvc,
-            graphics::GraphicsOptions &graphicsOpt,
-            graphics::GraphicsServices &graphicsSvc,
-            resource::ResourceServices &resourceSvc) :
-            Object::Loader(
-                idSeq,
-                sceneGraph,
-                gameSvc,
-                graphicsOpt,
-                graphicsSvc,
-                resourceSvc) {
-        }
-
-        std::unique_ptr<Encounter> load(const resource::Gff &gitEntry);
-    };
-
     Encounter(
         uint32_t id,
-        std::string tag,
-        std::shared_ptr<scene::SceneNode> sceneNode,
-        scene::SceneGraph &sceneGraph) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Encounter,
-            std::move(tag),
-            std::move(sceneNode),
-            sceneGraph) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
+    }
+
+    void loadFromGit(const resource::Gff &git) {
     }
 };
 

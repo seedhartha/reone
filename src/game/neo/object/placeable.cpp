@@ -43,26 +43,14 @@ namespace game {
 
 namespace neo {
 
-void Placeable::flushTransform() {
-    Object::flushTransform();
+void Placeable::loadFromGit(const Gff &git) {
+    // From GIT
 
-    auto transform = glm::translate(_position);
-    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-
-    if (_walkmesh) {
-        _walkmesh->setLocalTransform(_sceneNode->localTransform());
-    }
-}
-
-unique_ptr<Placeable> Placeable::Loader::load(const Gff &gitEntry) {
-    // From GIT entry
-
-    auto templateResRef = gitEntry.getString("TemplateResRef");
-    auto x = gitEntry.getFloat("X");
-    auto y = gitEntry.getFloat("Y");
-    auto z = gitEntry.getFloat("Z");
-    auto bearing = gitEntry.getFloat("Bearing");
+    auto templateResRef = git.getString("TemplateResRef");
+    auto x = git.getFloat("X");
+    auto y = git.getFloat("Y");
+    auto z = git.getFloat("Z");
+    auto bearing = git.getFloat("Bearing");
 
     // From UTP
 
@@ -81,12 +69,13 @@ unique_ptr<Placeable> Placeable::Loader::load(const Gff &gitEntry) {
     }
     auto modelName = placeablesTable->getString(appearance, "modelname");
 
-    // Make scene node
+    // Make scene nodes
 
     shared_ptr<ModelSceneNode> sceneNode;
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
-        sceneNode = _sceneGraph.newModel(move(model), ModelUsage::Placeable, nullptr);
+        sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Placeable, nullptr);
+        sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);
     }
@@ -94,23 +83,31 @@ unique_ptr<Placeable> Placeable::Loader::load(const Gff &gitEntry) {
     shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
     auto walkmesh = _graphicsSvc.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {
-        walkmeshSceneNode = _sceneGraph.newWalkmesh(move(walkmesh));
+        walkmeshSceneNode = _sceneGraph->newWalkmesh(move(walkmesh));
+        walkmeshSceneNode->setUser(*this);
     }
 
-    // Make placeable
+    //
 
-    auto placeable = Placeable::Builder()
-                         .id(_idSeq.nextObjectId())
-                         .tag(move(tag))
-                         .sceneNode(move(sceneNode))
-                         .walkmesh(move(walkmeshSceneNode))
-                         .sceneGraph(&_sceneGraph)
-                         .build();
+    _tag = move(tag);
+    _position = glm::vec3(x, y, z);
+    _facing = bearing;
+    _sceneNode = move(sceneNode);
+    _walkmesh = move(walkmeshSceneNode);
 
-    placeable->setPosition(glm::vec3(x, y, z));
-    placeable->setFacing(bearing);
+    flushTransform();
+}
 
-    return move(placeable);
+void Placeable::flushTransform() {
+    Object::flushTransform();
+
+    auto transform = glm::translate(_position);
+    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    if (_walkmesh) {
+        _walkmesh->setLocalTransform(_sceneNode->localTransform());
+    }
 }
 
 } // namespace neo
