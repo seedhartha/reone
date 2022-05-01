@@ -56,20 +56,30 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
 
     auto border = gui.getStruct("BORDER");
     if (border) {
-        _border = Border {
+        _border = make_unique<Border>(Border {
             border->getString("CORNER"),
             border->getString("EDGE"),
-            border->getString("FILL")};
+            border->getString("FILL"),
+            border->getVector("COLOR")});
+    }
+
+    auto hilight = gui.getStruct("HILIGHT");
+    if (hilight) {
+        _hilight = make_unique<Border>(Border {
+            hilight->getString("CORNER"),
+            hilight->getString("EDGE"),
+            hilight->getString("FILL"),
+            hilight->getVector("COLOR")});
     }
 
     auto text = gui.getStruct("TEXT");
     if (text) {
-        _text = Text {
+        _text = make_unique<Text>(Text {
             static_cast<TextAlignment>(text->getInt("ALIGNMENT")),
             text->getVector("COLOR"),
             text->getString("FONT"),
             text->getString("TEXT"),
-            text->getInt("STRREF")};
+            text->getInt("STRREF")});
     }
 }
 
@@ -118,14 +128,16 @@ void Control::update(float delta) {
 
 void Control::render() {
     // Render border
-    if (!_border.fill.empty()) {
-        auto fillTexture = _graphicsSvc.textures.get(_border.fill, TextureUsage::GUI);
+    auto &border = (_hovered && _hilight) ? _hilight : _border;
+    if (border && !border->fill.empty()) {
+        auto fillTexture = _graphicsSvc.textures.get(border->fill, TextureUsage::GUI);
         _graphicsSvc.textures.bind(*fillTexture);
 
-        _graphicsSvc.uniforms.setGeneral([this](auto &u) {
+        _graphicsSvc.uniforms.setGeneral([this, &border](auto &u) {
             u.resetLocals();
             u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
             u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
+            u.color = glm::vec4(border->color, 1.0f);
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
 
@@ -136,16 +148,16 @@ void Control::render() {
     }
 
     // Render text
-    if (!_text.text.empty() || _text.strref != -1) {
-        auto font = _graphicsSvc.fonts.get(_text.font);
-        string text = !_text.text.empty() ? _text.text : _resourceSvc.strings.get(_text.strref);
+    if (_text && (!_text->text.empty() || _text->strref != -1)) {
+        auto font = _graphicsSvc.fonts.get(_text->font);
+        string text = !_text->text.empty() ? _text->text : _resourceSvc.strings.get(_text->strref);
 
         glm::ivec2 position;
         TextGravity gravity;
         getTextPlacement(position, gravity);
 
         _graphicsSvc.context.withBlending(BlendMode::Normal, [&]() {
-            font->draw(text, glm::vec3(position, 1.0f), _text.color, gravity);
+            font->draw(text, glm::vec3(position, 1.0f), _text->color, gravity);
         });
     }
 
@@ -161,7 +173,7 @@ bool Control::isInExtent(float x, float y) const {
 }
 
 void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) const {
-    switch (_text.alignment) {
+    switch (_text->alignment) {
     case TextAlignment::LeftTop:
         outPosition = glm::ivec2(_extent[0], _extent[1]);
         outGravity = TextGravity::RightBottom;
@@ -188,7 +200,7 @@ void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity)
         outGravity = TextGravity::CenterTop;
         break;
     default:
-        throw invalid_argument("Unsupported text alignment: " + to_string(static_cast<int>(_text.alignment)));
+        throw invalid_argument("Unsupported text alignment: " + to_string(static_cast<int>(_text->alignment)));
     }
 }
 
