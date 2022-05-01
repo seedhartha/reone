@@ -17,10 +17,15 @@
 
 #pragma once
 
+#include "control/button.h"
+#include "control/buttontoggle.h"
 #include "control/label.h"
 #include "control/labelhilight.h"
+#include "control/listbox.h"
 #include "control/panel.h"
 #include "control/progressbar.h"
+#include "control/scrollbar.h"
+#include "control/slider.h"
 
 namespace reone {
 
@@ -60,10 +65,15 @@ public:
     void update(float delta);
     void render();
 
-    std::unique_ptr<Label> newLabel(int id, std::string tag);
-    std::unique_ptr<LabelHilight> newLabelHilight(int id, std::string tag);
-    std::unique_ptr<Panel> newPanel(int id, std::string tag);
-    std::unique_ptr<ProgressBar> newProgressBar(int id, std::string tag);
+    std::unique_ptr<Panel> newPanel(int id);
+    std::unique_ptr<Label> newLabel(int id);
+    std::unique_ptr<LabelHilight> newLabelHilight(int id);
+    std::unique_ptr<Button> newButton(int id);
+    std::unique_ptr<ButtonToggle> newButtonToggle(int id);
+    std::unique_ptr<Slider> newSlider(int id);
+    std::unique_ptr<ScrollBar> newScrollBar(int id);
+    std::unique_ptr<ProgressBar> newProgressBar(int id);
+    std::unique_ptr<ListBox> newListBox(int id);
 
 private:
     graphics::GraphicsOptions &_graphicsOpt;

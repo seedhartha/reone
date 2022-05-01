@@ -36,6 +36,8 @@ namespace gui {
 namespace neo {
 
 void Control::load(const Gff &gui) {
+    _tag = gui.getString("TAG");
+
     auto extent = gui.getStruct("EXTENT");
     if (extent) {
         _extent = glm::ivec4(

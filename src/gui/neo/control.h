@@ -85,23 +85,21 @@ public:
 protected:
     Control(
         int id,
-        std::string tag,
         ControlType type,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc) :
         _id(id),
-        _tag(std::move(tag)),
         _type(type),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc) {
     }
 
     int _id;
-    std::string _tag;
     ControlType _type;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
 
+    std::string _tag;
     glm::ivec4 _extent {0};
     Border _border;
     Text _text;

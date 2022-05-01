@@ -42,10 +42,17 @@ set(GUI_SOURCES
 
 set(GUI_NEO_HEADERS
     neo/control.h
+    neo/control/button.h
+    neo/control/button.h
+    neo/control/buttontoggle.h
     neo/control/label.h
     neo/control/labelhilight.h
+    neo/control/listbox.h
     neo/control/panel.h
     neo/control/progressbar.h
+    neo/control/progressbar.h
+    neo/control/scrollbar.h
+    neo/control/slider.h
     neo/gui.h)
 
 set(GUI_NEO_SOURCES
