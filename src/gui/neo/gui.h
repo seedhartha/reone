@@ -89,6 +89,16 @@ protected:
     std::shared_ptr<Control> _rootControl;
 
     std::unique_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
+
+    Control *findControlByTag(const std::string &tag);
+
+    void enableControl(const std::string &tag);
+    void disableControl(const std::string &tag);
+
+    template <class T>
+    T *findControlByTag(const std::string &tag) {
+        return dynamic_cast<T *>(findControlByTag(tag));
+    }
 };
 
 } // namespace neo

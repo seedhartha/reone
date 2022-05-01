@@ -21,6 +21,16 @@
 
 namespace reone {
 
+namespace gui {
+
+namespace neo {
+
+class Button;
+
+}
+
+} // namespace gui
+
 namespace graphics {
 
 struct GraphicsServices;
@@ -51,6 +61,14 @@ public:
     }
 
     void init();
+
+private:
+    gui::neo::Button *_btnActionDown0 {nullptr};
+    gui::neo::Button *_btnActionDown1 {nullptr};
+    gui::neo::Button *_btnActionDown2 {nullptr};
+    gui::neo::Button *_btnActionDown3 {nullptr};
+
+    void bindControls();
 };
 
 } // namespace neo

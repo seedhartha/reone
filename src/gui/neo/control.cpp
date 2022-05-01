@@ -85,6 +85,9 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
 
 bool Control::handle(const SDL_Event &e) {
     // Forward to children
+    if (!_enabled) {
+        return false;
+    }
     for (auto &child : _children) {
         if (child->handle(e)) {
             return true;
@@ -121,12 +124,19 @@ bool Control::handle(const SDL_Event &e) {
 }
 
 void Control::update(float delta) {
+    if (!_enabled) {
+        return;
+    }
     for (auto &child : _children) {
         child->update(delta);
     }
 }
 
 void Control::render() {
+    if (!_enabled) {
+        return;
+    }
+
     // Render border
     auto &border = (_hovered && _hilight) ? _hilight : _border;
     if (border && !border->fill.empty()) {
@@ -137,6 +147,12 @@ void Control::render() {
             u.resetLocals();
             u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
             u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
+            if (_flipVertical) {
+                u.uv = glm::mat3x4(
+                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+            }
             u.color = glm::vec4(border->color, 1.0f);
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
@@ -202,6 +218,19 @@ void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity)
     default:
         throw invalid_argument("Unsupported text alignment: " + to_string(static_cast<int>(_text->alignment)));
     }
+}
+
+Control *Control::findControlByTag(const string &tag) {
+    if (_tag == tag) {
+        return this;
+    }
+    for (auto &child : _children) {
+        auto control = child->findControlByTag(tag);
+        if (control) {
+            return control;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace neo
