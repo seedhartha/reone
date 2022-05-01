@@ -103,10 +103,10 @@ void MainInterface::init() {
 }
 
 void MainInterface::bindControls() {
-    _btnActionDown0 = findControlByTag<Button>("BTN_ACTIONDOWN0");
-    _btnActionDown1 = findControlByTag<Button>("BTN_ACTIONDOWN1");
-    _btnActionDown2 = findControlByTag<Button>("BTN_ACTIONDOWN2");
-    _btnActionDown3 = findControlByTag<Button>("BTN_ACTIONDOWN3");
+    _btnActionDown0 = findControl<Button>("BTN_ACTIONDOWN0");
+    _btnActionDown1 = findControl<Button>("BTN_ACTIONDOWN1");
+    _btnActionDown2 = findControl<Button>("BTN_ACTIONDOWN2");
+    _btnActionDown3 = findControl<Button>("BTN_ACTIONDOWN3");
 }
 
 } // namespace neo

@@ -76,11 +76,11 @@ public:
         _children.push_back(std::move(child));
     }
 
-    bool handle(const SDL_Event &e);
     void update(float delta);
     void render();
 
     Control *findControlByTag(const std::string &tag);
+    Control *pickControlAt(int x, int y);
 
     int id() const {
         return _id;
@@ -110,12 +110,16 @@ public:
         _text = std::move(text);
     }
 
+    void setEnabled(bool enabled) {
+        _enabled = enabled;
+    }
+
     void setFlipVertical(bool flip) {
         _flipVertical = flip;
     }
 
-    void setEnabled(bool enabled) {
-        _enabled = enabled;
+    void setInFocus(bool focus) {
+        _focus = focus;
     }
 
 protected:
@@ -146,11 +150,10 @@ protected:
     std::unique_ptr<Border> _hilight;
     std::unique_ptr<Text> _text;
 
-    bool _flipVertical {false};
-
     bool _enabled {true};
+    bool _flipVertical {false};
     bool _clickable {false};
-    bool _hovered {false};
+    bool _focus {false};
 
     bool isInExtent(float x, float y) const;
 

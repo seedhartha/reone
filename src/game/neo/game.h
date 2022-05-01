@@ -22,6 +22,7 @@
 #include "../services.h"
 #include "../types.h"
 
+#include "gui/game.h"
 #include "gui/maininterface.h"
 #include "gui/mainmenu.h"
 #include "object/factory.h"
@@ -51,7 +52,7 @@ namespace neo {
 
 class Creature;
 
-class Game : public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
+class Game : public IGuiGame, public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(GameID id, OptionsView &options, ServicesView &services) :
         _id(id),
@@ -62,6 +63,14 @@ public:
     void init();
 
     void run();
+
+    // IGuiGame
+
+    void startNewGame() override;
+
+    void quit() override;
+
+    // END IGuiGame
 
     // IObjectIdSequence
 

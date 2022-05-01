@@ -88,16 +88,23 @@ protected:
     ScaleMode _scaleMode {ScaleMode::ToRootControl};
     std::shared_ptr<Control> _rootControl;
 
+    Control *_controlInFocus {nullptr};
+
     std::unique_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
 
-    Control *findControlByTag(const std::string &tag);
+    Control *findControl(const std::string &tag);
+    Control *pickControlAt(int x, int y);
 
     void enableControl(const std::string &tag);
     void disableControl(const std::string &tag);
 
+    virtual bool handleClick(const Control &control) {
+        return false;
+    }
+
     template <class T>
-    T *findControlByTag(const std::string &tag) {
-        return dynamic_cast<T *>(findControlByTag(tag));
+    T *findControl(const std::string &tag) {
+        return dynamic_cast<T *>(findControl(tag));
     }
 };
 

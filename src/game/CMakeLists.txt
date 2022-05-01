@@ -441,6 +441,7 @@ set(GAME_SOURCES
 
 set(GAME_NEO_HEADERS
     neo/game.h
+    neo/gui/game.h
     neo/gui/maininterface.h
     neo/gui/mainmenu.h
     neo/object.h

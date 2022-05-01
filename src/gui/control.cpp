@@ -17,7 +17,6 @@
 
 #include "control.h"
 
-#include "../common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/fonts.h"
 #include "../graphics/mesh.h"
