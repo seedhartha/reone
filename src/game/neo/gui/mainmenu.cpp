@@ -17,6 +17,8 @@
 
 #include "mainmenu.h"
 
+#include "game.h"
+
 using namespace reone::gui::neo;
 
 namespace reone {
@@ -36,6 +38,17 @@ void MainMenu::init() {
 }
 
 void MainMenu::bindControls() {
+}
+
+bool MainMenu::handleClick(const Control &control) {
+    if (control.tag() == "BTN_NEWGAME") {
+        _game.startNewGame();
+        return true;
+    } else if (control.tag() == "BTN_EXIT") {
+        _game.quit();
+        return true;
+    }
+    return false;
 }
 
 } // namespace neo

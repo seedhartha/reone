@@ -65,7 +65,7 @@ void Game::init() {
 
     // GUI
 
-    _mainMenu = make_unique<MainMenu>(_options.graphics, _services.graphics, _services.resource);
+    _mainMenu = make_unique<MainMenu>(*this, _options.graphics, _services.graphics, _services.resource);
     _mainMenu->init();
 
     _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
@@ -91,13 +91,9 @@ void Game::init() {
     //
 
     _services.graphics.window.setEventHandler(this);
-    _services.graphics.window.setRelativeMouseMode(true);
 }
 
 void Game::run() {
-    auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
-    loadModule(moduleName);
-
     while (!_finished) {
         handleInput();
         update();
@@ -255,10 +251,17 @@ void Game::loadModule(const string &name) {
     _playerController->setCamera(&camera);
 
     _selectionController->setPC(&pc);
+}
 
-    //
+void Game::startNewGame() {
+    auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
+    loadModule(moduleName);
 
-    _services.graphics.window.setRelativeMouseMode(false);
+    _stage = Stage::World;
+}
+
+void Game::quit() {
+    _finished = true;
 }
 
 bool Game::PlayerController::handle(const SDL_Event &e) {

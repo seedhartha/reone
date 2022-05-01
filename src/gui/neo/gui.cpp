@@ -108,8 +108,25 @@ unique_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
 }
 
 bool Gui::handle(const SDL_Event &e) {
-    if (_rootControl->handle(e)) {
-        return true;
+    if (e.type == SDL_MOUSEMOTION) {
+        auto control = pickControlAt(e.motion.x, e.motion.y);
+        if (_controlInFocus != control) {
+            if (_controlInFocus) {
+                _controlInFocus->setInFocus(false);
+            }
+            if (control) {
+                control->setInFocus(true);
+            }
+            _controlInFocus = control;
+            return true;
+        }
+    } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+        if (_controlInFocus) {
+            debug("Control clicked on: " + to_string(_controlInFocus->id()) + "[" + _controlInFocus->tag() + "]", LogChannels::gui);
+            if (handleClick(*_controlInFocus)) {
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -127,19 +144,23 @@ void Gui::render() {
     _rootControl->render();
 }
 
-Control *Gui::findControlByTag(const string &tag) {
+Control *Gui::findControl(const string &tag) {
     return _rootControl->findControlByTag(tag);
 }
 
+Control *Gui::pickControlAt(int x, int y) {
+    return _rootControl->pickControlAt(x, y);
+}
+
 void Gui::enableControl(const string &tag) {
-    auto control = findControlByTag(tag);
+    auto control = findControl(tag);
     if (control) {
         control->setEnabled(true);
     }
 }
 
 void Gui::disableControl(const string &tag) {
-    auto control = findControlByTag(tag);
+    auto control = findControl(tag);
     if (control) {
         control->setEnabled(false);
     }

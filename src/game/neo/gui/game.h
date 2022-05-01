@@ -21,57 +21,14 @@
 
 namespace reone {
 
-namespace gui {
-
-namespace neo {
-
-class Button;
-
-}
-
-} // namespace gui
-
-namespace graphics {
-
-struct GraphicsServices;
-struct GraphicsOptions;
-
-} // namespace graphics
-
-namespace resource {
-
-struct ResourceServices;
-
-}
-
 namespace game {
 
 namespace neo {
 
-class IGuiGame;
-
-class MainMenu : public gui::neo::Gui {
+class IGuiGame {
 public:
-    MainMenu(
-        IGuiGame &game,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::neo::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc),
-        _game(game) {
-    }
-
-    void init();
-
-private:
-    IGuiGame &_game;
-
-    void bindControls();
-
-    bool handleClick(const gui::neo::Control &control) override;
+    virtual void startNewGame() = 0;
+    virtual void quit() = 0;
 };
 
 } // namespace neo

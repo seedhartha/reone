@@ -85,46 +85,6 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
     }
 }
 
-bool Control::handle(const SDL_Event &e) {
-    // Forward to children
-    if (!_enabled) {
-        return false;
-    }
-    for (auto &child : _children) {
-        if (child->handle(e)) {
-            return true;
-        }
-    }
-
-    // Handle self
-    if (!_clickable) {
-        return false;
-    }
-    if (e.type == SDL_MOUSEMOTION) {
-        bool mouseOver = isInExtent(e.motion.x, e.motion.y);
-        if (mouseOver && !_hovered) {
-            _hovered = true;
-            // debug("Control hovered over: " + to_string(_id) + "[" + _tag + "]", LogChannels::gui);
-            return true;
-        }
-        if (!mouseOver && _hovered) {
-            _hovered = false;
-            return true;
-        }
-        return false;
-    }
-    if (e.type == SDL_MOUSEBUTTONDOWN) {
-        bool mouseOver = isInExtent(e.button.x, e.button.y);
-        if (mouseOver && _hovered) {
-            debug("Control clicked on: " + to_string(_id) + "[" + _tag + "]", LogChannels::gui);
-            return true;
-        }
-        return false;
-    }
-
-    return false;
-}
-
 void Control::update(float delta) {
     if (!_enabled) {
         return;
@@ -139,7 +99,7 @@ void Control::render() {
         return;
     }
 
-    auto &border = (_hovered && _hilight) ? _hilight : _border;
+    auto &border = (_focus && _hilight) ? _hilight : _border;
 
     // Render fill
     if (border && !border->fill.empty()) {
@@ -337,6 +297,22 @@ Control *Control::findControlByTag(const string &tag) {
         if (control) {
             return control;
         }
+    }
+    return nullptr;
+}
+
+Control *Control::pickControlAt(int x, int y) {
+    if (!_enabled) {
+        return nullptr;
+    }
+    for (auto &child : _children) {
+        auto control = child->pickControlAt(x, y);
+        if (control) {
+            return control;
+        }
+    }
+    if (_clickable && isInExtent(x, y)) {
+        return this;
     }
     return nullptr;
 }
