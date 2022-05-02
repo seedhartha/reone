@@ -35,6 +35,12 @@ namespace neo {
 
 class Door : public Object {
 public:
+    enum class State {
+        Closed,
+        Opening,
+        Open
+    };
+
     Door(
         uint32_t id,
         ObjectFactory &objectFactory,
@@ -68,10 +74,22 @@ public:
         return _walkmeshOpen2;
     }
 
+    void setState(State state) {
+        _state = state;
+    }
+
+    // Object
+
+    void update(float delta) override;
+
+    // END Object
+
 private:
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
+
+    State _state {State::Closed};
 
     void flushTransform() override;
 };

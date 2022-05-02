@@ -145,6 +145,9 @@ void Game::update() {
         // Update game objects
 
         if (_module) {
+            for (auto &object : _module->area().objects()) {
+                object->update(delta);
+            }
             _module->area().mainCamera().update(delta);
         }
         _playerController->update(delta);
@@ -298,6 +301,8 @@ bool Game::PlayerController::handle(const SDL_Event &e) {
 }
 
 void Game::PlayerController::update(float delta) {
+    _creature->update(delta);
+
     if (!_camera) {
         return;
     }
@@ -311,9 +316,11 @@ void Game::PlayerController::update(float delta) {
     } else if (_left == 0.0f && _right != 0.0f) {
         facing = glm::mod(_camera->facing() - glm::half_pi<float>(), glm::two_pi<float>());
     } else {
+        _creature->setState(Creature::State::Pause);
         return;
     }
     _creature->setFacing(facing);
+    _creature->setState(Creature::State::Run);
     _creature->moveForward(delta);
 }
 

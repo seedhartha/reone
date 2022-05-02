@@ -115,6 +115,33 @@ void Door::loadFromGit(const Gff &git) {
 }
 
 void Door::handleClick(Object &clicker) {
+    if (_state == State::Closed) {
+        _state = State::Opening;
+    }
+}
+
+void Door::update(float delta) {
+    if (_sceneNode) {
+        auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
+        if (_state == State::Closed) {
+            if (modelSceneNode.getActiveAnimationName() != "closed") {
+                modelSceneNode.playAnimation("closed");
+            }
+        } else if (_state == State::Opening) {
+            auto animName = modelSceneNode.getActiveAnimationName();
+            if (animName == "opening1" && modelSceneNode.isAnimationFinished()) {
+                _state = State::Open;
+                _walkmeshClosed->setEnabled(false);
+                _walkmeshOpen1->setEnabled(true);
+            } else if (animName != "opening1") {
+                modelSceneNode.playAnimation("opening1");
+            }
+        } else if (_state == State::Open) {
+            if (modelSceneNode.getActiveAnimationName() != "open1") {
+                modelSceneNode.playAnimation("open1");
+            }
+        }
+    }
 }
 
 void Door::flushTransform() {

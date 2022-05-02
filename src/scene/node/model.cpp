@@ -314,7 +314,7 @@ void ModelSceneNode::updateAnimations(float dt) {
     switch (_animBlendMode) {
     case AnimationBlendMode::Single:
     case AnimationBlendMode::Overlay: {
-        auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished; });
+        auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished && (channel.properties.flags & AnimationFlags::fireForget); });
         _animChannels.erase(channelsToErase, _animChannels.end());
         break;
     }
@@ -560,7 +560,7 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
 }
 
 bool ModelSceneNode::isAnimationFinished() const {
-    return _animChannels.empty();
+    return _animChannels.empty() || _animChannels.front().finished;
 }
 
 string ModelSceneNode::getActiveAnimationName() const {
@@ -568,7 +568,7 @@ string ModelSceneNode::getActiveAnimationName() const {
         return "";
     }
     const AnimationChannel &channel = _animChannels.front();
-    if (!channel.anim || channel.finished) {
+    if (!channel.anim /* || channel.finished */) {
         return "";
     }
     return channel.anim->name();
