@@ -41,7 +41,7 @@ namespace game {
 
 namespace neo {
 
-static constexpr float kCreatureMoveSpeed = 3.96f;
+static constexpr float kCreatureRunSpeed = 3.96f;
 
 static const string kHeadHookNodeName = "headhook";
 
@@ -113,7 +113,7 @@ void Creature::loadFromUtc(const string &templateResRef) {
 
 bool Creature::moveForward(float delta) {
     auto dir = glm::vec2(-glm::sin(_facing), glm::cos(_facing));
-    auto newPosition = glm::vec2(_position) + delta * kCreatureMoveSpeed * dir;
+    auto newPosition = glm::vec2(_position) + delta * kCreatureRunSpeed * dir;
 
     Collision collision;
     if (!_sceneGraph->testElevation(glm::vec2(newPosition), collision)) {
@@ -123,6 +123,19 @@ bool Creature::moveForward(float delta) {
     _position = glm::vec3(newPosition, collision.intersection.z);
     flushTransform();
     return true;
+}
+
+void Creature::update(float delta) {
+    if (_sceneNode) {
+        auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
+        if (_state == State::Pause && modelSceneNode.getActiveAnimationName() != "pause1") {
+            modelSceneNode.playAnimation("pause1", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
+        } else if (_state == State::Walk && modelSceneNode.getActiveAnimationName() != "walk") {
+            modelSceneNode.playAnimation("walk", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
+        } else if (_state == State::Run && modelSceneNode.getActiveAnimationName() != "run") {
+            modelSceneNode.playAnimation("run", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
+        }
+    }
 }
 
 } // namespace neo

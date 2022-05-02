@@ -49,9 +49,12 @@ enum class ModelUsage {
 
 struct AnimationFlags {
     static constexpr int loop = 1;
-    static constexpr int blend = 2;     /**< blend previous animation into the next one */
-    static constexpr int overlay = 4;   /**< overlay next animation on top of the previous one */
-    static constexpr int propagate = 8; /**< propagate animation to attached models */
+    static constexpr int fireForget = 2;
+
+    static constexpr int blend = 4;     /**< blend previous animation into the next one */
+    static constexpr int overlay = 8;   /**< overlay next animation on top of the previous one */
+
+    static constexpr int propagate = 0x10; /**< propagate animation to attached models */
 
     static constexpr int loopOverlay = loop | overlay;
     static constexpr int loopBlend = loop | blend;

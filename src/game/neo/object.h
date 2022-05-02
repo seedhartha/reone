@@ -56,6 +56,9 @@ class ObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
+    virtual void update(float delta) {
+    }
+
     virtual void handleClick(Object &clicker) {
     }
 

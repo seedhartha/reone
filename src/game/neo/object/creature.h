@@ -33,6 +33,12 @@ namespace neo {
 
 class Creature : public Object {
 public:
+    enum class State {
+        Pause,
+        Walk,
+        Run
+    };
+
     Creature(
         uint32_t id,
         ObjectFactory &objectFactory,
@@ -54,6 +60,19 @@ public:
     void loadFromUtc(const std::string &templateResRef);
 
     bool moveForward(float delta);
+
+    void setState(State state) {
+        _state = state;
+    }
+
+    // Object
+
+    void update(float delta) override;
+
+    // END Object
+
+private:
+    State _state {State::Pause};
 };
 
 } // namespace neo
