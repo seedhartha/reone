@@ -22,6 +22,7 @@
 #include "../../graphics/options.h"
 #include "../../graphics/services.h"
 #include "../../graphics/uniforms.h"
+#include "../../graphics/window.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
 
@@ -132,14 +133,13 @@ bool Gui::handle(const SDL_Event &e) {
 }
 
 void Gui::update(float delta) {
+    _rootControl->update(delta);
 }
 
 void Gui::render() {
     _graphicsSvc.uniforms.setGeneral([this](auto &u) {
         u.resetGlobals();
-        float w = static_cast<float>(_graphicsOpt.width);
-        float h = static_cast<float>(_graphicsOpt.height);
-        u.projection = glm::ortho(0.0f, w, h, 0.0f);
+        u.projection = _graphicsSvc.window.getOrthoProjection();
     });
     _rootControl->render();
 }

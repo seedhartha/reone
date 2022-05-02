@@ -157,6 +157,9 @@ void GraphicsContext::setDepthTestMode(DepthTestMode mode) {
         case DepthTestMode::LessOrEqual:
             glDepthFunc(GL_LEQUAL);
             break;
+        case DepthTestMode::Always:
+            glDepthFunc(GL_ALWAYS);
+            break;
         case DepthTestMode::Less:
         default:
             glDepthFunc(GL_LESS);

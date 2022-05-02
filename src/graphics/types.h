@@ -96,7 +96,8 @@ enum class DepthTestMode {
     None,
     Less,
     Equal,
-    LessOrEqual
+    LessOrEqual,
+    Always
 };
 
 enum class CullFaceMode {

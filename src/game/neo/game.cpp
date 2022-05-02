@@ -65,7 +65,7 @@ void Game::init() {
 
     // GUI
 
-    _mainMenu = make_unique<MainMenu>(*this, _options.graphics, _services.graphics, _services.resource);
+    _mainMenu = make_unique<MainMenu>(*this, _services.scene, _options.graphics, _services.graphics, _services.resource);
     _mainMenu->init();
 
     _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);

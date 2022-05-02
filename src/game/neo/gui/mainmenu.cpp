@@ -17,9 +17,24 @@
 
 #include "mainmenu.h"
 
+#include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
+#include "../../../graphics/types.h"
+#include "../../../gui/sceneinitializer.h"
+#include "../../../scene/graphs.h"
+#include "../../../scene/node/model.h"
+#include "../../../scene/services.h"
+
+#include "../../types.h"
+
 #include "game.h"
 
+using namespace std;
+
+using namespace reone::gui;
 using namespace reone::gui::neo;
+using namespace reone::scene;
+using namespace reone::graphics;
 
 namespace reone {
 
@@ -30,14 +45,34 @@ namespace neo {
 void MainMenu::init() {
     load("mainmenu16x12");
     bindControls();
+
     disableControl("BTN_WARP");
     disableControl("LB_MODULES");
     disableControl("LBL_BW");
     disableControl("LBL_LUCAS");
     disableControl("LBL_NEWCONTENT");
+
+    // Init 3D view
+
+    auto &scene = _sceneSvc.graphs.get(kSceneMainMenu);
+    float aspect = _lbl3dView->extent()[2] / static_cast<float>(_lbl3dView->extent()[3]);
+
+    auto model = _graphicsSvc.models.get("mainmenu");
+    auto modelSceneNode = shared_ptr<ModelSceneNode>(scene.newModel(move(model), ModelUsage::GUI));
+
+    SceneInitializer(scene)
+        .aspect(aspect)
+        .depth(kDefaultClipPlaneNear, 10.0f)
+        .modelSupplier([&modelSceneNode](auto &_) { return modelSceneNode; })
+        .modelScale(1.4f)
+        .cameraFromModelNode("camerahook")
+        .invoke();
+
+    _lbl3dView->setSceneGraph(&scene);
 }
 
 void MainMenu::bindControls() {
+    _lbl3dView = findControl<Label>("LBL_3DVIEW");
 }
 
 bool MainMenu::handleClick(const Control &control) {
