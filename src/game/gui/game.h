@@ -15,12 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "item.h"
+#pragma once
+
+#include "../../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-}
+class IGuiGame {
+public:
+    virtual void startNewGame() = 0;
+    virtual void quit() = 0;
+};
+
+} // namespace game
 
 } // namespace reone

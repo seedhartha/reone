@@ -18,7 +18,7 @@
 #include "engine.h"
 
 #include "../common/logutil.h"
-#include "../game/neo/game.h"
+#include "../game/game.h"
 
 #include "di/services.h"
 #include "gameprobe.h"
@@ -32,16 +32,6 @@ using namespace reone::game;
 namespace reone {
 
 namespace engine {
-
-static unique_ptr<Game> newGame(GameID gameId, OptionsView options, ServicesView &services) {
-    switch (gameId) {
-    case GameID::KotOR:
-    case GameID::TSL:
-        return make_unique<Game>(gameId == GameID::TSL, options.game.path, options, services);
-    default:
-        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(gameId)));
-    }
-}
 
 int Engine::run() {
     auto optionsParser = OptionsParser(_argc, _argv);
@@ -59,17 +49,11 @@ int Engine::run() {
     auto services = Services(gameId, optionsView);
     services.init();
 
-    if (options.game.neo) {
-        auto game = neo::Game(GameID::KotOR, optionsView, services.view());
-        game.init();
-        game.run();
-        return 0;
-    } else {
-        auto game = newGame(gameId, optionsView, services.view());
-        game->init();
-        services.view().graphics.window.setEventHandler(game.get());
-        return game->run();
-    }
+    auto game = Game(GameID::KotOR, optionsView, services.view());
+    game.init();
+    game.run();
+
+    return 0;
 }
 
 } // namespace engine

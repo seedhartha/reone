@@ -17,30 +17,52 @@
 
 #pragma once
 
-#include "../object.h"
+#include "../../gui/gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
+namespace graphics {
+
+struct GraphicsServices;
+struct GraphicsOptions;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
-class Item : public Object {
+class MainInterface : public gui::Gui {
 public:
-    Item(
-        uint32_t id,
-        ObjectFactory &objectFactory,
-        GameServices &gameSvc,
+    MainInterface(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Item,
-            objectFactory,
-            gameSvc,
+        gui::Gui(
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
     }
+
+    void init();
+
+private:
+    gui::Button *_btnActionDown0 {nullptr};
+    gui::Button *_btnActionDown1 {nullptr};
+    gui::Button *_btnActionDown2 {nullptr};
+    gui::Button *_btnActionDown3 {nullptr};
+
+    void bindControls();
 };
 
 } // namespace game

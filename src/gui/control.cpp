@@ -17,641 +17,329 @@
 
 #include "control.h"
 
+#include "../common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/fonts.h"
-#include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
 #include "../graphics/pipeline.h"
-#include "../graphics/renderbuffer.h"
+#include "../graphics/services.h"
 #include "../graphics/shaders.h"
+#include "../graphics/texture.h"
 #include "../graphics/textures.h"
-#include "../graphics/textutil.h"
+#include "../graphics/textureutil.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../resource/gff.h"
+#include "../resource/services.h"
 #include "../resource/strings.h"
-#include "../scene/graphs.h"
-
-#include "gui.h"
+#include "../scene/graph.h"
 
 using namespace std;
 
 using namespace reone::graphics;
 using namespace reone::resource;
-using namespace reone::scene;
 
 namespace reone {
 
 namespace gui {
 
-ControlType Control::getType(const Gff &gffs) {
-    return static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
-}
+void Control::load(const Gff &gui, const glm::vec4 &scale) {
+    _tag = gui.getString("TAG");
 
-string Control::getTag(const Gff &gffs) {
-    return gffs.getString("TAG");
-}
-
-string Control::getParent(const Gff &gffs) {
-    return gffs.getString("Obj_Parent");
-}
-
-Control::Extent::Extent(int left, int top, int width, int height) :
-    left(left), top(top), width(width), height(height) {
-}
-
-bool Control::Extent::contains(int x, int y) const {
-    return x >= left && x <= left + width && y >= top && y <= top + height;
-}
-
-void Control::Extent::getCenter(int &x, int &y) const {
-    x = left + width / 2;
-    y = top + height / 2;
-}
-
-void Control::load(const Gff &gffs) {
-    _id = gffs.getInt("ID", -1);
-    _padding = gffs.getInt("PADDING", 0);
-
-    loadExtent(*gffs.getStruct("EXTENT"));
-    loadBorder(*gffs.getStruct("BORDER"));
-
-    shared_ptr<Gff> text(gffs.getStruct("TEXT"));
-    if (text) {
-        loadText(*text);
+    auto extent = gui.getStruct("EXTENT");
+    if (extent) {
+        _extent = glm::ivec4(scale * glm::vec4(
+                                         extent->getInt("LEFT"),
+                                         extent->getInt("TOP"),
+                                         extent->getInt("WIDTH"),
+                                         extent->getInt("HEIGHT")));
     }
-    shared_ptr<Gff> hilight(gffs.getStruct("HILIGHT"));
+
+    auto border = gui.getStruct("BORDER");
+    if (border) {
+        _border = make_unique<Border>(Border {
+            border->getString("CORNER"),
+            border->getString("EDGE"),
+            border->getString("FILL"),
+            border->getInt("DIMENSION"),
+            border->getVector("COLOR")});
+    }
+
+    auto hilight = gui.getStruct("HILIGHT");
     if (hilight) {
-        loadHilight(*hilight);
+        _hilight = make_unique<Border>(Border {
+            hilight->getString("CORNER"),
+            hilight->getString("EDGE"),
+            hilight->getString("FILL"),
+            hilight->getInt("DIMENSION"),
+            hilight->getVector("COLOR")});
     }
 
-    updateTransform();
-}
-
-void Control::loadExtent(const Gff &gffs) {
-    _extent.left = gffs.getInt("LEFT");
-    _extent.top = gffs.getInt("TOP");
-    _extent.width = gffs.getInt("WIDTH");
-    _extent.height = gffs.getInt("HEIGHT");
-}
-
-void Control::loadBorder(const Gff &gffs) {
-    string corner(gffs.getString("CORNER"));
-    string edge(gffs.getString("EDGE"));
-    string fill(gffs.getString("FILL"));
-
-    _border = make_shared<Border>();
-
-    if (!corner.empty() && corner != "0") {
-        _border->corner = _textures.get(corner, TextureUsage::GUI);
-    }
-    if (!edge.empty() && edge != "0") {
-        _border->edge = _textures.get(edge, TextureUsage::GUI);
-    }
-    if (!fill.empty() && fill != "0") {
-        _border->fill = _textures.get(fill, TextureUsage::GUI);
-    }
-
-    _border->dimension = gffs.getInt("DIMENSION", 0);
-    _border->color = gffs.getVector("COLOR");
-}
-
-void Control::loadText(const Gff &gffs) {
-    _text.font = _fonts.get(gffs.getString("FONT"));
-
-    int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? gffs.getString("TEXT") : _strings.get(strRef);
-
-    _text.color = gffs.getVector("COLOR");
-    _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
-
-    updateTextLines();
-}
-
-void Control::updateTextLines() {
-    _textLines.clear();
-    if (_text.font && !_text.text.empty()) {
-        _textLines = breakText(_text.text, *_text.font, _extent.width);
+    auto text = gui.getStruct("TEXT");
+    if (text) {
+        _text = make_unique<Text>(Text {
+            static_cast<TextAlignment>(text->getInt("ALIGNMENT")),
+            text->getVector("COLOR"),
+            text->getString("FONT"),
+            text->getString("TEXT"),
+            text->getInt("STRREF")});
     }
 }
 
-void Control::loadHilight(const Gff &gffs) {
-    string corner(gffs.getString("CORNER"));
-    string edge(gffs.getString("EDGE"));
-    string fill(gffs.getString("FILL"));
-
-    _hilight = make_shared<Border>();
-
-    if (!corner.empty() && corner != "0") {
-        _hilight->corner = _textures.get(corner, TextureUsage::GUI);
-    }
-    if (!edge.empty() && edge != "0") {
-        _hilight->edge = _textures.get(edge, TextureUsage::GUI);
-    }
-    if (!fill.empty() && fill != "0") {
-        _hilight->fill = _textures.get(fill, TextureUsage::GUI);
-    }
-
-    _hilight->dimension = gffs.getInt("DIMENSION", 0);
-    _hilight->color = gffs.getVector("COLOR");
-}
-
-void Control::updateTransform() {
-    _transform = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left, _extent.top, 0.0f));
-    _transform = glm::scale(_transform, glm::vec3(_extent.width, _extent.height, 1.0f));
-}
-
-bool Control::handleMouseMotion(int x, int y) {
-    return false;
-}
-
-bool Control::handleMouseWheel(int x, int y) {
-    return false;
-}
-
-bool Control::handleClick(int x, int y) {
-    if (_onClick) {
-        _onClick();
-    }
-    return true;
-}
-
-void Control::update(float dt) {
-    if (_sceneName.empty() || !_visible) {
+void Control::update(float delta) {
+    if (!_enabled) {
         return;
     }
-    _sceneGraphs.get(_sceneName).update(dt);
+    if (_sceneGraph) {
+        _sceneGraph->update(delta);
+    }
+    for (auto &child : _children) {
+        child->update(delta);
+    }
 }
 
-void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
-    if (!_visible) {
+void Control::render() {
+    if (!_enabled) {
         return;
     }
-    glm::ivec2 size(_extent.width, _extent.height);
-    if (_focus && _hilight) {
-        drawBorder(*_hilight, offset, size);
-    } else if (_border) {
-        drawBorder(*_border, offset, size);
-    }
-    if (!text.empty()) {
-        drawText(text, offset, size);
-    }
-    if (_sceneName.empty()) {
-        return;
-    }
-    shared_ptr<Texture> output;
-    _graphicsContext.withBlending(BlendMode::None, [this, &output]() {
-        output = _pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
-    });
-    glm::mat4 projection(glm::ortho(
-        0.0f,
-        static_cast<float>(screenSize.x),
-        static_cast<float>(screenSize.y),
-        0.0f));
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
 
-    _uniforms.setGeneral([this, projection, transform](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.projection = move(projection);
-        general.model = move(transform);
-    });
-    _shaders.use(_shaders.gui());
-    _textures.bind(*output);
-    _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
-        _meshes.quad().draw();
-    });
-}
+    auto &border = (_focus && _hilight) ? _hilight : _border;
 
-void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
-    _shaders.use(_shaders.gui());
+    // Render fill
+    if (border && !border->fill.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
 
-    glm::vec3 color(getBorderColor());
-    glm::mat4 transform(1.0f);
+        auto fillTexture = _graphicsSvc.textures.get(border->fill, TextureUsage::GUI);
+        _graphicsSvc.textures.bind(*fillTexture);
 
-    if (border.fill) {
-        _textures.bind(*border.fill);
-
-        int x = _extent.left + border.dimension + offset.x;
-        int y = _extent.top + border.dimension + offset.y;
-        int w = size.x - 2 * border.dimension;
-        int h = size.y - 2 * border.dimension;
-
-        transform = glm::translate(glm::vec3(x, y, 0.0f));
-        transform *= glm::scale(glm::vec3(w, h, 1.0f));
-
-        _uniforms.setGeneral([this, &transform](auto &general) {
-            general.resetLocals();
-            general.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
-            general.projection = _window.getOrthoProjection();
-            general.model = transform;
-            general.discardColor = glm::vec4(_discardColor, 1.0f);
-        });
-
-        auto blendMode = border.fill->features().blending == Texture::Blending::Additive ? BlendMode::Additive : BlendMode::Normal;
-        _graphicsContext.withBlending(blendMode, [this, &border]() {
-            _meshes.quad().draw();
-        });
-    }
-
-    if (border.edge) {
-        int width = size.x - 2 * border.dimension;
-        int height = size.y - 2 * border.dimension;
-
-        _textures.bind(*border.edge);
-
-        if (height > 0.0f) {
-            int x = _extent.left + offset.x;
-            int y = _extent.top + border.dimension + offset.y;
-
-            // Left edge
-            transform = glm::translate(glm::vec3(x, y, 0.0f));
-            transform *= glm::scale(glm::vec3(border.dimension, height, 1.0f));
-
-            _uniforms.setGeneral([this, &transform, &color](auto &general) {
-                general.resetLocals();
-                general.projection = _window.getOrthoProjection();
-                general.model = transform;
-                general.uv = glm::mat3x4(
-                    glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
-                general.color = glm::vec4(color, 1.0f);
-            });
-
-            _meshes.quad().draw();
-
-            // Right edge
-            transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
-            transform *= glm::scale(glm::vec3(border.dimension, height, 1.0f));
-
-            _uniforms.setGeneral([this, &transform, &color](auto &general) {
-                general.resetLocals();
-                general.projection = _window.getOrthoProjection();
-                general.model = transform;
-                general.uv = glm::mat3x4(
-                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-                    glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-                general.color = glm::vec4(color, 1.0f);
-            });
-
-            _meshes.quad().draw();
-        }
-
-        if (width > 0.0f) {
-            int x = _extent.left + border.dimension + offset.x;
-            int y = _extent.top + offset.y;
-
-            // Top edge
-            transform = glm::translate(glm::vec3(x, y, 0.0f));
-            transform *= glm::scale(glm::vec3(width, border.dimension, 1.0f));
-
-            _uniforms.setGeneral([this, &transform, &color](auto &general) {
-                general.resetLocals();
-                general.projection = _window.getOrthoProjection();
-                general.model = transform;
-                general.color = glm::vec4(color, 1.0f);
-            });
-
-            _meshes.quad().draw();
-
-            // Bottom edge
-            transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
-            transform *= glm::scale(glm::vec3(width, border.dimension, 1.0f));
-
-            _uniforms.setGeneral([this, &transform, &color](auto &general) {
-                general.resetLocals();
-                general.projection = _window.getOrthoProjection();
-                general.model = transform;
-                general.uv = glm::mat3x4(
+        _graphicsSvc.uniforms.setGeneral([this, &border](auto &u) {
+            u.resetLocals();
+            u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
+            u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
+            if (_flipVertical) {
+                u.uv = glm::mat3x4(
                     glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
                     glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
                     glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
-                general.color = glm::vec4(color, 1.0f);
+            }
+            u.color = glm::vec4(border->color, 1.0f);
+        });
+
+        auto blendMode = hasAlphaChannel(fillTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [this]() {
+            _graphicsSvc.meshes.quad().draw();
+        });
+    }
+
+    // Render 3D scene
+    if (_sceneGraph) {
+        auto output = _graphicsSvc.pipeline.draw(*_sceneGraph, glm::ivec2(_extent[2], _extent[3]));
+        if (output) {
+            _graphicsSvc.textures.bind(*output);
+            _graphicsSvc.uniforms.setGeneral([this](auto &u) {
+                u.resetGlobals();
+                u.resetLocals();
+                u.projection = _graphicsSvc.window.getOrthoProjection();
+                u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
+                u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
             });
-
-            _meshes.quad().draw();
+            _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+            _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
+                _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
+                    _graphicsSvc.meshes.quad().draw();
+                });
+            });
         }
     }
 
-    if (border.corner) {
-        int x = _extent.left + offset.x;
-        int y = _extent.top + offset.y;
+    // Render corners
+    if (border && !border->corner.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
 
-        _textures.bind(*border.corner);
+        auto cornerTexture = _graphicsSvc.textures.get(border->corner, TextureUsage::GUI);
+        _graphicsSvc.textures.bind(*cornerTexture);
 
-        // Top left corner
-        transform = glm::translate(glm::vec3(x, y, 0.0f));
-        transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
+        auto topLeftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
+        topLeftModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto topLeftUv = glm::mat3x4(1.0f);
 
-        _uniforms.setGeneral([this, &transform, &color](auto &general) {
-            general.resetLocals();
-            general.projection = _window.getOrthoProjection();
-            general.model = transform;
-            general.color = glm::vec4(color, 1.0f);
+        auto topRightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1]), 0.0f));
+        topRightModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto topRightUv = glm::mat3x4(
+            glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+
+        auto bottomLeftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomLeftModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto bottomLeftUv = glm::mat3x4(
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        auto bottomRightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomRightModel *= glm::scale(glm::vec3(border->dimension, border->dimension, 1.0f));
+        auto bottomRightUv = glm::mat3x4(
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+        vector<pair<glm::mat4, glm::mat4>> edges {
+            make_pair(topLeftModel, topLeftUv),
+            make_pair(topRightModel, topRightUv),
+            make_pair(bottomLeftModel, bottomLeftUv),
+            make_pair(bottomRightModel, bottomRightUv)};
+
+        auto blendMode = hasAlphaChannel(cornerTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [&]() {
+            for (auto &edge : edges) {
+                _graphicsSvc.uniforms.setGeneral([&](auto &u) {
+                    u.resetLocals();
+                    u.model = edge.first;
+                    u.uv = edge.second;
+                    u.color = glm::vec4(border->color, 1.0f);
+                });
+                _graphicsSvc.meshes.quad().draw();
+            }
         });
+    }
 
-        _meshes.quad().draw();
+    // Render edges
+    if (border && !border->edge.empty()) {
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
 
-        // Bottom left corner
-        transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
-        transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
+        auto edgeTexture = _graphicsSvc.textures.get(border->edge, TextureUsage::GUI);
+        _graphicsSvc.textures.bind(*edgeTexture);
 
-        _uniforms.setGeneral([this, &transform, &color](auto &general) {
-            general.resetLocals();
-            general.projection = _window.getOrthoProjection();
-            general.model = transform;
-            general.uv = glm::mat3x4(
-                glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-                glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-                glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
-            general.color = glm::vec4(color, 1.0f);
+        auto leftModel = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1] + border->dimension), 0.0f));
+        leftModel *= glm::scale(glm::vec3(border->dimension, static_cast<float>(_extent[3] - 2 * border->dimension), 1.0f));
+        auto leftUv = glm::mat3x4(
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        auto topModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + border->dimension), static_cast<float>(_extent[1]), 0.0f));
+        topModel *= glm::scale(glm::vec3(static_cast<float>(_extent[2] - 2 * border->dimension), border->dimension, 1.0f));
+        auto topUv = glm::mat3x4(1.0f);
+
+        auto rightModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + _extent[2] - border->dimension), static_cast<float>(_extent[1] + border->dimension), 0.0f));
+        rightModel *= glm::scale(glm::vec3(border->dimension, static_cast<float>(_extent[3] - 2 * border->dimension), 1.0f));
+        auto rightUv = glm::mat3x4(
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+        auto bottomModel = glm::translate(glm::vec3(static_cast<float>(_extent[0] + border->dimension), static_cast<float>(_extent[1] + _extent[3] - border->dimension), 0.0f));
+        bottomModel *= glm::scale(glm::vec3(static_cast<float>(_extent[2] - 2 * border->dimension), border->dimension, 1.0f));
+        auto bottomUv = glm::mat3x4(
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+        vector<pair<glm::mat4, glm::mat4>> edges {
+            make_pair(leftModel, leftUv),
+            make_pair(topModel, topUv),
+            make_pair(rightModel, rightUv),
+            make_pair(bottomModel, bottomUv)};
+
+        auto blendMode = hasAlphaChannel(edgeTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;
+        _graphicsSvc.context.withBlending(blendMode, [&]() {
+            for (auto &edge : edges) {
+                _graphicsSvc.uniforms.setGeneral([&](auto &u) {
+                    u.resetLocals();
+                    u.model = edge.first;
+                    u.uv = edge.second;
+                    u.color = glm::vec4(border->color, 1.0f);
+                });
+                _graphicsSvc.meshes.quad().draw();
+            }
         });
+    }
 
-        _meshes.quad().draw();
+    // Render text
+    if (_text && (!_text->text.empty() || _text->strref != -1)) {
+        auto font = _graphicsSvc.fonts.get(_text->font);
+        string text = !_text->text.empty() ? _text->text : _resourceSvc.strings.get(_text->strref);
 
-        // Top right corner
-        transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
-        transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
+        glm::ivec2 position;
+        TextGravity gravity;
+        getTextPlacement(position, gravity);
 
-        _uniforms.setGeneral([this, &transform, &color](auto &general) {
-            general.resetLocals();
-            general.projection = _window.getOrthoProjection();
-            general.model = transform;
-            general.uv = glm::mat3x4(
-                glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
-                glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-                glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
-            general.color = glm::vec4(color, 1.0f);
+        _graphicsSvc.context.withBlending(BlendMode::Normal, [&]() {
+            font->draw(text, glm::vec3(position, 1.0f), _text->color, gravity);
         });
+    }
 
-        _meshes.quad().draw();
-
-        // Bottom right corner
-        transform = glm::translate(glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
-        transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
-
-        _uniforms.setGeneral([this, &transform, &color](auto &general) {
-            general.resetLocals();
-            general.projection = _window.getOrthoProjection();
-            general.model = transform;
-            general.uv = glm::mat3x4(
-                glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
-                glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-                glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
-            general.color = glm::vec4(color, 1.0f);
-        });
-
-        _meshes.quad().draw();
+    // Render children
+    for (auto &child : _children) {
+        child->render();
     }
 }
 
-const glm::vec3 &Control::getBorderColor() const {
-    if (_useBorderColorOverride) {
-        return _borderColorOverride;
-    }
-    return (_focus && _hilight) ? _hilight->color : _border->color;
+bool Control::isInExtent(float x, float y) const {
+    return _extent[0] <= x && x <= _extent[0] + _extent[2] &&
+           _extent[1] <= y && y <= _extent[1] + _extent[3];
 }
 
-void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
-    glm::ivec2 position;
-    TextGravity gravity;
-    getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
-
-    glm::vec3 linePosition(0.0f);
-    glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
-
-    for (auto &line : lines) {
-        linePosition.x = static_cast<float>(position.x + offset.x);
-        linePosition.y = static_cast<float>(position.y + offset.y);
-        _text.font->draw(line, linePosition, color, gravity);
-        position.y += static_cast<int>(_text.font->height());
-    }
-}
-
-void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
-    // Gravity
-    switch (_text.align) {
-    case TextAlign::LeftTop:
-        gravity = TextGravity::RightBottom;
+void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) const {
+    switch (_text->alignment) {
+    case TextAlignment::LeftTop:
+        outPosition = glm::ivec2(_extent[0], _extent[1]);
+        outGravity = TextGravity::RightBottom;
         break;
-    case TextAlign::CenterTop:
-        gravity = TextGravity::CenterBottom;
+    case TextAlignment::CenterTop:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1]);
+        outGravity = TextGravity::CenterBottom;
         break;
-    case TextAlign::RightCenter:
-    case TextAlign::RightCenter2:
-        gravity = TextGravity::LeftCenter;
+    case TextAlignment::CenterCenter:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::CenterCenter;
         break;
-    case TextAlign::LeftCenter:
-        gravity = TextGravity::RightCenter;
+    case TextAlignment::RightCenter:
+    case TextAlignment::RightCenter2:
+        outPosition = glm::ivec2(_extent[0] + _extent[2], _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::LeftCenter;
         break;
-    case TextAlign::CenterBottom:
-        gravity = TextGravity::CenterTop;
+    case TextAlignment::LeftCenter:
+        outPosition = glm::ivec2(_extent[0], _extent[1] + _extent[3] / 2);
+        outGravity = TextGravity::RightCenter;
         break;
-    case TextAlign::CenterCenter:
+    case TextAlignment::CenterBottom:
+        outPosition = glm::ivec2(_extent[0] + _extent[2] / 2, _extent[1] + _extent[3]);
+        outGravity = TextGravity::CenterTop;
+        break;
     default:
-        gravity = TextGravity::CenterCenter;
-        break;
-    }
-    // Vertical alignment
-    switch (_text.align) {
-    case TextAlign::LeftTop:
-    case TextAlign::CenterTop:
-        position.y = _extent.top;
-        break;
-    case TextAlign::CenterBottom:
-        position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
-        break;
-    case TextAlign::RightCenter:
-    case TextAlign::LeftCenter:
-    case TextAlign::CenterCenter:
-    case TextAlign::RightCenter2:
-    default:
-        position.y = _extent.top + size.y / 2 - static_cast<int>(0.5f * (lineCount - 1) * _text.font->height());
-        break;
-    }
-    // Horizontal alignment
-    switch (_text.align) {
-    case TextAlign::LeftTop:
-    case TextAlign::LeftCenter:
-        position.x = _extent.left;
-        break;
-    case TextAlign::RightCenter:
-    case TextAlign::RightCenter2:
-        position.x = _extent.left + _extent.width;
-        break;
-    case TextAlign::CenterTop:
-    case TextAlign::CenterCenter:
-    case TextAlign::CenterBottom:
-    default:
-        position.x = _extent.left + size.x / 2;
-        break;
+        throw invalid_argument("Unsupported text alignment: " + to_string(static_cast<int>(_text->alignment)));
     }
 }
 
-void Control::stretch(float x, float y, int mask) {
-    if (mask & kStretchLeft) {
-        _extent.left = static_cast<int>(_extent.left * x);
+Control *Control::findControlByTag(const string &tag) {
+    if (_tag == tag) {
+        return this;
     }
-    if (mask & kStretchTop) {
-        _extent.top = static_cast<int>(_extent.top * y);
-    }
-    if (mask & kStretchWidth) {
-        _extent.width = static_cast<int>(_extent.width * x);
-    }
-    if (mask & kStretchHeight) {
-        _extent.height = static_cast<int>(_extent.height * y);
-    }
-    updateTransform();
-}
-
-void Control::setFocusable(bool focusable) {
-    _focusable = focusable;
-}
-
-void Control::setHeight(int height) {
-    _extent.height = height;
-    updateTransform();
-    updateTextLines();
-}
-
-void Control::setVisible(bool visible) {
-    _visible = visible;
-}
-
-void Control::setDisabled(bool disabled) {
-    _disabled = disabled;
-}
-
-void Control::setFocus(bool focus) {
-    if (_focus == focus)
-        return;
-
-    _focus = focus;
-
-    if (_onFocusChanged) {
-        _onFocusChanged(focus);
-    }
-}
-
-void Control::setExtent(Extent extent) {
-    _extent = move(extent);
-    updateTransform();
-    updateTextLines();
-}
-
-void Control::setExtentHeight(int height) {
-    _extent.height = height;
-    updateTransform();
-}
-
-void Control::setExtentTop(int top) {
-    _extent.top = top;
-    updateTransform();
-}
-
-void Control::setBorder(Border border) {
-    _border = make_shared<Border>(move(border));
-}
-
-void Control::setBorderFill(string resRef) {
-    shared_ptr<Texture> texture;
-    if (!resRef.empty()) {
-        texture = _textures.get(resRef, TextureUsage::GUI);
-    }
-    setBorderFill(move(texture));
-}
-
-void Control::setBorderFill(shared_ptr<Texture> texture) {
-    if (!texture && _border) {
-        _border->fill.reset();
-        return;
-    }
-    if (texture) {
-        if (!_border) {
-            _border = make_shared<Border>();
+    for (auto &child : _children) {
+        auto control = child->findControlByTag(tag);
+        if (control) {
+            return control;
         }
-        _border->fill = move(texture);
     }
+    return nullptr;
 }
 
-void Control::setBorderColor(glm::vec3 color) {
-    _border->color = move(color);
-}
-
-void Control::setBorderColorOverride(glm::vec3 color) {
-    _borderColorOverride = move(color);
-}
-
-void Control::setUseBorderColorOverride(bool use) {
-    _useBorderColorOverride = use;
-}
-
-void Control::setHilight(Border hilight) {
-    _hilight = make_shared<Border>(hilight);
-}
-
-void Control::setHilightColor(glm::vec3 color) {
-    if (!_hilight) {
-        _hilight = make_shared<Border>();
+Control *Control::pickControlAt(int x, int y) {
+    if (!_enabled) {
+        return nullptr;
     }
-    _hilight->color = move(color);
-}
-
-void Control::setHilightFill(string resRef) {
-    shared_ptr<Texture> texture;
-    if (!resRef.empty()) {
-        texture = _textures.get(resRef, TextureUsage::GUI);
-    }
-    setHilightFill(texture);
-}
-
-void Control::setHilightFill(shared_ptr<Texture> texture) {
-    if (!texture && _hilight) {
-        _hilight->fill.reset();
-        return;
-    }
-    if (texture) {
-        if (!_hilight) {
-            _hilight = make_shared<Border>();
+    for (auto &child : _children) {
+        auto control = child->pickControlAt(x, y);
+        if (control) {
+            return control;
         }
-        _hilight->fill = move(texture);
     }
-}
-
-void Control::setText(Text text) {
-    _text = move(text);
-    updateTextLines();
-}
-
-void Control::setTextMessage(string text) {
-    _text.text = move(text);
-    updateTextLines();
-}
-
-void Control::setTextFont(shared_ptr<Font> font) {
-    _text.font = move(font);
-    updateTextLines();
-}
-
-void Control::setTextColor(glm::vec3 color) {
-    _text.color = move(color);
-}
-
-void Control::setSceneName(string name) {
-    _sceneName = move(name);
-}
-
-void Control::setPadding(int padding) {
-    _padding = padding;
-}
-
-void Control::setDiscardColor(glm::vec3 color) {
-    _discardEnabled = true;
-    _discardColor = color;
+    if (_clickable && isInExtent(x, y)) {
+        return this;
+    }
+    return nullptr;
 }
 
 } // namespace gui

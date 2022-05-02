@@ -23,108 +23,20 @@ namespace reone {
 
 namespace gui {
 
-constexpr int kDefaultSlotCount = 6;
-
 class ListBox : public Control {
 public:
-    enum class SelectionMode {
-        OnHover,
-        OnClick
-    };
-
-    struct Item {
-        std::string tag;
-        std::string text;
-        std::string iconText;
-        std::shared_ptr<graphics::Texture> iconTexture;
-        std::shared_ptr<graphics::Texture> iconFrame;
-
-        std::vector<std::string> _textLines;
-    };
-
     ListBox(
-        GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::Strings &strings) :
+        int id,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
-            gui,
+            id,
             ControlType::ListBox,
-            sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
-            strings) {
-
-        _clickable = true;
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
-
-    void clearItems();
-    void addItem(Item &&item);
-    void addTextLinesAsItems(const std::string &text);
-
-    void clearSelection();
-
-    void load(const resource::Gff &gffs) override;
-    bool handleMouseMotion(int x, int y) override;
-    bool handleMouseWheel(int x, int y) override;
-    bool handleClick(int x, int y) override;
-    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
-    void stretch(float x, float y, int mask) override;
-
-    void setFocus(bool focus) override;
-    void setExtent(Extent extent) override;
-    void setExtentHeight(int height) override;
-    void setProtoItemType(ControlType type);
-    void setSelectionMode(SelectionMode mode);
-    void setProtoMatchContent(bool match);
-
-    int getItemCount() const;
-    const Item &getItemAt(int index) const;
-
-    Control &protoItem() const { return *_protoItem; }
-    Control &scrollBar() const { return *_scrollBar; }
-    int selectedItemIndex() const { return _selectedItemIndex; }
-
-    // Event listeners
-
-    void setOnItemClick(std::function<void(const std::string &)> fn) { _onItemClick = std::move(fn); }
-
-    // END Event listeners
-
-private:
-    SelectionMode _selectionMode {SelectionMode::OnHover};
-    ControlType _protoItemType {ControlType::Invalid};
-    std::shared_ptr<Control> _protoItem;
-    std::shared_ptr<Control> _scrollBar;
-    std::vector<Item> _items;
-    int _slotCount {0};
-    int _itemOffset {0};
-    int _selectedItemIndex {-1};
-    int _itemMargin {0};
-    bool _protoMatchContent {false}; /**< proto item height must match its content */
-
-    // Event listeners
-
-    std::function<void(const std::string &)> _onItemClick;
-
-    // END Event listeners
-
-    void updateItemSlots();
-
-    int getItemIndex(int y) const;
 };
 
 } // namespace gui

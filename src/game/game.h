@@ -17,325 +17,171 @@
 
 #pragma once
 
-#include "../../audio/source.h"
-#include "../../graphics/eventhandler.h"
-#include "../../movie/movie.h"
-#include "../../script/routines.h"
+#include "../graphics/eventhandler.h"
 
-#include "action/factory.h"
-#include "camera.h"
-#include "combat.h"
-#include "effect/factory.h"
-#include "gui/chargen.h"
-#include "gui/computer.h"
-#include "gui/console.h"
-#include "gui/container.h"
-#include "gui/conversation.h"
-#include "gui/dialog.h"
-#include "gui/hud.h"
-#include "gui/ingame.h"
-#include "gui/loadscreen.h"
+#include "gui/game.h"
+#include "gui/maininterface.h"
 #include "gui/mainmenu.h"
-#include "gui/map.h"
-#include "gui/partyselect.h"
-#include "gui/profileoverlay.h"
-#include "gui/saveload.h"
 #include "object/factory.h"
 #include "object/module.h"
-#include "options.h"
-#include "party.h"
-#include "script/runner.h"
 #include "services.h"
+#include "types.h"
 
 namespace reone {
 
-namespace gui {
+namespace scene {
 
-class GUI;
+class SceneGraph;
+class SceneNode;
 
-}
+} // namespace scene
+
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
 
 namespace game {
 
-class Game : public graphics::IEventHandler, boost::noncopyable {
+struct OptionsView;
+
+class Creature;
+
+class Game : public IGuiGame, public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
 public:
-    Game(
-        bool tsl,
-        boost::filesystem::path path,
-        OptionsView &options,
-        ServicesView &services) :
-        _tsl(tsl),
-        _path(std::move(path)),
+    Game(GameID id, OptionsView &options, ServicesView &services) :
+        _id(id),
         _options(options),
-        _services(services),
-        _party(*this),
-        _combat(*this, services),
-        _actionFactory(*this, services),
-        _objectFactory(*this, services) {
+        _services(services) {
     }
 
     void init();
 
-    /**
-     * @return exit code
-     */
-    int run();
+    void run();
 
-    void quit();
+    // IGuiGame
 
-    void playVideo(const std::string &name);
+    void startNewGame() override;
 
-    bool isPaused() const { return _paused; }
-    bool isTSL() const { return _tsl; }
+    void quit() override;
 
-    Camera *getActiveCamera() const;
-    std::shared_ptr<Object> getObjectById(uint32_t id) const;
+    // END IGuiGame
 
-    OptionsView &options() { return _options; }
-    const OptionsView &options() const { return _options; }
-    Party &party() { return _party; }
-    Combat &combat() { return _combat; }
-    ActionFactory &actionFactory() { return _actionFactory; }
-    EffectFactory &effectFactory() { return _effectFactory; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
-    ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    Map &map() { return *_map; }
-    script::IRoutines &routines() { return *_routines; }
+    // IObjectIdSequence
 
-    std::shared_ptr<Module> module() const { return _module; }
-    CameraType cameraType() const { return _cameraType; }
-    const std::set<std::string> &moduleNames() const { return _moduleNames; }
+    uint32_t nextObjectId() override {
+        return _objectIdCounter++;
+    }
 
-    void setCursorType(CursorType type);
-    void setPaused(bool paused);
-    void setRelativeMouseMode(bool relative);
-
-    void openMainMenu();
-    void openInGame();
-    void openInGameMenu(InGameMenuTab tab);
-    void openLevelUp();
-    void openContainer(const std::shared_ptr<Object> &container);
-    void openPartySelection(const PartySelectionContext &ctx);
-    void openSaveLoad(SaveLoadMode mode);
-
-    void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<Object> &owner, const std::string &resRef);
-
-    void pauseConversation();
-    void resumeConversation();
-
-    void setBarkBubbleText(std::string text, float durartion);
-
-    // Module loading
-
-    /**
-     * @param entry waypoint tag to spawn at, or empty string to spawn at default location
-     */
-    void loadModule(const std::string &name, std::string entry = "");
-
-    void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
-
-    // END Module loading
-
-    // Global variables
-
-    bool getGlobalBoolean(const std::string &name) const;
-    int getGlobalNumber(const std::string &name) const;
-    std::shared_ptr<Location> getGlobalLocation(const std::string &name) const;
-    std::string getGlobalString(const std::string &name) const;
-
-    const std::map<std::string, std::string> &globalStrings() const { return _globalStrings; }
-    const std::map<std::string, bool> &globalBooleans() const { return _globalBooleans; }
-    const std::map<std::string, int> &globalNumbers() const { return _globalNumbers; }
-    const std::map<std::string, std::shared_ptr<Location>> &globalLocations() const { return _globalLocations; }
-
-    void setGlobalBoolean(const std::string &name, bool value);
-    void setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location);
-    void setGlobalNumber(const std::string &name, int value);
-    void setGlobalString(const std::string &name, const std::string &value);
-
-    // END Global variables
-
-    // GUI colors
-
-    const glm::vec3 &getGUIColorBase() const { return _guiColorBase; }
-    const glm::vec3 &getGUIColorHilight() const { return _guiColorHilight; }
-    const glm::vec3 &getGUIColorDisabled() const { return _guiColorDisabled; }
-
-    // END GUI colors
+    // END IObjectIdSequence
 
     // IEventHandler
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const SDL_Event &e) override;
 
     // END IEventHandler
 
-protected:
-    enum class GameScreen {
-        None,
+private:
+    enum class Stage {
         MainMenu,
-        Loading,
-        CharacterGeneration,
-        InGame,
-        InGameMenu,
-        Conversation,
-        Container,
-        PartySelection,
-        SaveLoad
+        World
     };
 
-    boost::filesystem::path _path;
+    class PlayerController : boost::noncopyable {
+    public:
+        bool handle(const SDL_Event &e);
+        void update(float delta);
+
+        void setCreature(Creature *creature) {
+            _creature = creature;
+        }
+
+        void setCamera(Camera *camera) {
+            _camera = camera;
+        }
+
+    private:
+        Creature *_creature {nullptr};
+        Camera *_camera {nullptr};
+
+        // Controls
+        float _forward {0.0f};
+        float _left {0.0f};
+        float _backward {0.0f};
+        float _right {0.0f};
+    };
+
+    class SelectionController : boost::noncopyable {
+    public:
+        SelectionController(scene::SceneGraph &sceneGraph) :
+            _sceneGraph(sceneGraph) {
+        }
+
+        bool handle(const SDL_Event &e);
+
+        void setPC(Creature *pc) {
+            _pc = pc;
+        }
+
+    private:
+        scene::SceneGraph &_sceneGraph;
+
+        Creature *_pc {nullptr};
+
+        Object *_hoveredObject {nullptr};
+        Object *_clickedObject {nullptr};
+    };
+
+    class WorldRenderer : boost::noncopyable {
+    public:
+        WorldRenderer(
+            scene::SceneGraph &sceneGraph,
+            graphics::GraphicsOptions &graphicsOptions,
+            graphics::GraphicsServices &graphicsSvc) :
+            _sceneGraph(sceneGraph),
+            _graphicsOptions(graphicsOptions),
+            _graphicsSvc(graphicsSvc) {
+        }
+
+        void render();
+
+    private:
+        scene::SceneGraph &_sceneGraph;
+        graphics::GraphicsOptions &_graphicsOptions;
+        graphics::GraphicsServices &_graphicsSvc;
+    };
+
+    GameID _id;
     OptionsView &_options;
     ServicesView &_services;
 
-    GameScreen _screen {GameScreen::None};
-    std::string _mainMenuMusicResRef;
-    std::string _charGenMusicResRef;
-    std::string _charGenLoadScreenResRef;
+    std::unique_ptr<ObjectFactory> _objectFactory;
+    std::unique_ptr<PlayerController> _playerController;
+    std::unique_ptr<SelectionController> _selectionController;
+    std::unique_ptr<WorldRenderer> _worldRenderer;
 
-    uint32_t _ticks {0};
-    bool _quit {false};
-    std::shared_ptr<movie::Movie> _movie;
-    CursorType _cursorType {CursorType::None};
-    float _gameSpeed {1.0f};
-    CameraType _cameraType {CameraType::ThirdPerson};
-    bool _paused {false};
-    std::set<std::string> _moduleNames;
+    bool _finished {false};
+    uint32_t _prevFrameTicks {0};
+    uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
 
-    // Services
+    Stage _stage {Stage::MainMenu};
 
-    Party _party;
-    Combat _combat;
-    ActionFactory _actionFactory;
-    EffectFactory _effectFactory;
-    ObjectFactory _objectFactory;
-
-    std::unique_ptr<script::IRoutines> _routines;
-    std::unique_ptr<ScriptRunner> _scriptRunner;
-
-    // END Services
-
-    // GUI colors
-
-    glm::vec3 _guiColorBase {0.0f};
-    glm::vec3 _guiColorHilight {0.0f};
-    glm::vec3 _guiColorDisabled {0.0f};
-
-    // END GUI colors
-
-    // Modules
-
-    std::string _nextModule;
-    std::string _nextEntry;
     std::shared_ptr<Module> _module;
-    std::map<std::string, std::shared_ptr<Module>> _loadedModules;
-
-    // END Modules
-
-    // GUI
-
-    std::unique_ptr<Map> _map;
-    std::unique_ptr<Console> _console;
-    std::unique_ptr<LoadingScreen> _loadScreen;
-    std::unique_ptr<ProfileOverlay> _profileOverlay;
-
-    // END GUI
-
-    // Audio
-
-    std::string _musicResRef;
-    std::shared_ptr<audio::AudioSource> _music;
-
-    // END Audio
-
-    // Globals/locals
-
-    std::map<std::string, std::string> _globalStrings;
-    std::map<std::string, bool> _globalBooleans;
-    std::map<std::string, int> _globalNumbers;
-    std::map<std::string, std::shared_ptr<Location>> _globalLocations;
-
-    // END Globals/locals
-
-    void start();
-
-    void stopMovement();
-
-    void loadModuleNames();
-    void loadModuleResources(const std::string &moduleName);
-
-    void runMainLoop();
-    void update();
-
-    float measureFrameTime();
-
-    void updateMusic();
-    void updateMovie(float dt);
-    void updateCamera(float dt);
-    void updateSceneGraph(float dt);
-
-    void loadDefaultParty();
-    void loadNextModule();
-    void playMusic(const std::string &resRef);
-    void toggleInGameCameraType();
-
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-
-    virtual void onModuleSelected(const std::string &name);
-    virtual void drawHUD();
-
-    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const;
-    gui::GUI *getScreenGUI() const;
-    CameraType getConversationCamera(int &cameraId) const;
-
-    // Rendering
-
-    void drawAll();
-    void drawWorld();
-    void drawGUI();
-
-    // END Rendering
-
-    // GUI
-
-    virtual void loadInGameMenus();
-    virtual void loadLoadingScreen();
-
-    void changeScreen(GameScreen screen);
-
-    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
-
-    // END GUI
-
-private:
-    bool _tsl;
 
     // GUI
 
     std::unique_ptr<MainMenu> _mainMenu;
-    std::unique_ptr<CharacterGeneration> _charGen;
-    std::unique_ptr<HUD> _hud;
-    std::unique_ptr<InGameMenu> _inGame;
-    std::unique_ptr<DialogGUI> _dialog;
-    std::unique_ptr<ComputerGUI> _computer;
-    std::unique_ptr<ContainerGUI> _container;
-    std::unique_ptr<PartySelection> _partySelect;
-    std::unique_ptr<SaveLoad> _saveLoad;
-
-    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
+    std::unique_ptr<MainInterface> _mainInterface;
 
     // END GUI
 
-    void loadMainMenu();
-    void loadCharacterGeneration();
-    void loadHUD();
-    void loadInGame();
-    void loadDialog();
-    void loadComputer();
-    void loadContainer();
-    void loadPartySelection();
-    void loadSaveLoad();
+    void handleInput();
+    void update();
+    void render();
+
+    void loadModule(const std::string &name);
 };
 
 } // namespace game

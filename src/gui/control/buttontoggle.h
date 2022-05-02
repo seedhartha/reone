@@ -15,12 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "item.h"
+#pragma once
+
+#include "../control.h"
 
 namespace reone {
 
-namespace game {
+namespace gui {
 
-}
+class ButtonToggle : public Control {
+public:
+    ButtonToggle(
+        int id,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        Control(
+            id,
+            ControlType::ButtonToggle,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
+
+        _clickable = true;
+    }
+};
+
+} // namespace gui
 
 } // namespace reone

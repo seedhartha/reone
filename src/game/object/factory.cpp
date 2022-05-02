@@ -17,62 +17,76 @@
 
 #include "factory.h"
 
-#include "../../common/collectionutil.h"
+#include "area.h"
+#include "camera.h"
+#include "creature.h"
+#include "door.h"
+#include "encounter.h"
+#include "item.h"
+#include "module.h"
+#include "placeable.h"
+#include "room.h"
+#include "sound.h"
+#include "store.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 using namespace std;
-
-using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-shared_ptr<Module> ObjectFactory::newModule() {
-    return newObject<Module>(_game, _services);
+unique_ptr<Object> ObjectFactory::newArea() {
+    return make_unique<Area>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Item> ObjectFactory::newItem() {
-    return newObject<Item>(_game, _services);
+unique_ptr<Object> ObjectFactory::newCamera() {
+    return make_unique<Camera>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Area> ObjectFactory::newArea(string sceneName) {
-    return newObject<Area>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newCreature() {
+    return make_unique<Creature>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Creature> ObjectFactory::newCreature(string sceneName) {
-    return newObject<Creature>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newDoor() {
+    return make_unique<Door>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Placeable> ObjectFactory::newPlaceable(string sceneName) {
-    return newObject<Placeable>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newEncounter() {
+    return make_unique<Encounter>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Door> ObjectFactory::newDoor(string sceneName) {
-    return newObject<Door>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newItem() {
+    return make_unique<Item>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Waypoint> ObjectFactory::newWaypoint(string sceneName) {
-    return newObject<Waypoint>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newModule() {
+    return make_unique<Module>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Trigger> ObjectFactory::newTrigger(string sceneName) {
-    return newObject<Trigger>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newPlaceable() {
+    return make_unique<Placeable>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Sound> ObjectFactory::newSound(string sceneName) {
-    return newObject<Sound>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newRoom() {
+    return make_unique<Room>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<PlaceableCamera> ObjectFactory::newCamera(string sceneName) {
-    return newObject<PlaceableCamera>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newSound() {
+    return make_unique<Sound>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Encounter> ObjectFactory::newEncounter(string sceneName) {
-    return newObject<Encounter>(move(sceneName), _game, _services);
+unique_ptr<Object> ObjectFactory::newStore() {
+    return make_unique<Store>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
-shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {
-    return getFromLookupOrNull(_objectById, id);
+unique_ptr<Object> ObjectFactory::newTrigger() {
+    return make_unique<Trigger>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<Object> ObjectFactory::newWaypoint() {
+    return make_unique<Waypoint>(_idSeq.nextObjectId(), *this, _gameSvc, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 } // namespace game

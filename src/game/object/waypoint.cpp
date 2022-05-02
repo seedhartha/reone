@@ -17,73 +17,10 @@
 
 #include "waypoint.h"
 
-#include "../../resource/gffs.h"
-#include "../../resource/resources.h"
-#include "../../resource/services.h"
-#include "../../resource/strings.h"
-
-#include "../game.h"
-#include "../services.h"
-
-using namespace std;
-
-using namespace reone::graphics;
-using namespace reone::resource;
-using namespace reone::scene;
-
 namespace reone {
 
 namespace game {
 
-void Waypoint::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
-    loadFromBlueprint(templateResRef);
-
-    _tag = gffs.getString("Tag");
-    _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = _services.resource.strings.get(gffs.getInt("MapNote"));
-    _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
-    _tag = boost::to_lower_copy(gffs.getString("Tag"));
-
-    loadTransformFromGIT(gffs);
 }
-
-void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
-    if (utw) {
-        loadUTW(*utw);
-    }
-}
-
-void Waypoint::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
-
-    float cosine = gffs.getFloat("XOrientation");
-    float sine = gffs.getFloat("YOrientation");
-    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(cosine, sine)));
-
-    updateTransform();
-}
-
-void Waypoint::loadUTW(const Gff &utw) {
-    _appearance = utw.getInt("Appearance");
-    _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
-    _tag = boost::to_lower_copy(utw.getString("Tag"));
-    _name = _services.resource.strings.get(utw.getInt("LocalizedName"));
-    _hasMapNote = utw.getBool("HasMapNote");
-    _mapNote = _services.resource.strings.get(utw.getInt("MapNote"));
-    _mapNoteEnabled = utw.getInt("MapNoteEnabled");
-
-    // Unused fields:
-    //
-    // - LinkedTo (not applicable, always empty)
-    // - Description (toolset only)
-    // - PaletteID (toolset only)
-    // - Comment (toolset only)
-}
-
-} // namespace game
 
 } // namespace reone

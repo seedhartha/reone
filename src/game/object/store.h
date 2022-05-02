@@ -15,12 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "item.h"
+#pragma once
+
+#include "../object.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
+
+class Gff;
 
 }
+
+namespace game {
+
+class Store : public Object {
+public:
+    Store(
+        uint32_t id,
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        Object(
+            id,
+            ObjectType::Store,
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
+    }
+
+    void loadFromGit(const resource::Gff &git) {
+    }
+};
+
+} // namespace game
 
 } // namespace reone

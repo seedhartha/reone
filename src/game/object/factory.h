@@ -17,69 +17,52 @@
 
 #pragma once
 
-#include "../../graphics/types.h"
-#include "../../resource/types.h"
-
-#include "../types.h"
-
-#include "area.h"
-#include "creature.h"
-#include "door.h"
-#include "encounter.h"
-#include "module.h"
-#include "placeable.h"
-#include "placeablecamera.h"
-#include "sound.h"
-#include "trigger.h"
-#include "waypoint.h"
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-struct ServicesView;
-
-class ObjectFactory {
+class IObjectIdSequence {
 public:
-    ObjectFactory(Game &game, ServicesView &services) :
-        _game(game),
-        _services(services) {
+    virtual uint32_t nextObjectId() = 0;
+};
+
+class ObjectFactory : boost::noncopyable {
+public:
+    ObjectFactory(
+        IObjectIdSequence &idSeq,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _idSeq(idSeq),
+        _gameSvc(gameSvc),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
-    std::shared_ptr<Module> newModule();
-    std::shared_ptr<Item> newItem();
-
-    std::shared_ptr<Area> newArea(std::string sceneName = kSceneMain);
-    std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneMain);
-    std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain);
-    std::shared_ptr<Door> newDoor(std::string sceneName = kSceneMain);
-    std::shared_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain);
-    std::shared_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain);
-    std::shared_ptr<Sound> newSound(std::string sceneName = kSceneMain);
-    std::shared_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain);
-    std::shared_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain);
-
-    std::shared_ptr<Object> getObjectById(uint32_t id) const;
-
-    template <class T>
-    std::shared_ptr<T> getObjectById(uint32_t id) const {
-        return std::dynamic_pointer_cast<T>(getObjectById(id));
-    }
+    std::unique_ptr<Object> newArea();
+    std::unique_ptr<Object> newCamera();
+    std::unique_ptr<Object> newCreature();
+    std::unique_ptr<Object> newDoor();
+    std::unique_ptr<Object> newEncounter();
+    std::unique_ptr<Object> newItem();
+    std::unique_ptr<Object> newModule();
+    std::unique_ptr<Object> newPlaceable();
+    std::unique_ptr<Object> newRoom();
+    std::unique_ptr<Object> newSound();
+    std::unique_ptr<Object> newStore();
+    std::unique_ptr<Object> newTrigger();
+    std::unique_ptr<Object> newWaypoint();
 
 private:
-    Game &_game;
-    ServicesView &_services;
-
-    uint32_t _counter {2}; // ids 0 and 1 are reserved
-    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
-
-    template <class T, class... Args>
-    std::shared_ptr<T> newObject(Args &&...args) {
-        uint32_t id = _counter++;
-        std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));
-        _objectById.insert(std::make_pair(id, object));
-        return move(object);
-    }
+    IObjectIdSequence &_idSeq;
+    GameServices &_gameSvc;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 };
 
 } // namespace game

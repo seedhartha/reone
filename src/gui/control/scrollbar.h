@@ -25,62 +25,18 @@ namespace gui {
 
 class ScrollBar : public Control {
 public:
-    struct ScrollState {
-        int count {0};      /**< total number of list items */
-        int numVisible {0}; /**< number of visible list items */
-        int offset {0};     /**< offset into the list of items  */
-    };
-
     ScrollBar(
-        GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::Strings &strings) :
+        int id,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
-            gui,
+            id,
             ControlType::ScrollBar,
-            sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
-            strings) {
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
-
-    void load(const resource::Gff &gffs) override;
-    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
-
-    void setScrollState(ScrollState state);
-
-private:
-    struct Direction {
-        std::shared_ptr<graphics::Texture> image;
-    };
-
-    struct Thumb {
-        std::shared_ptr<graphics::Texture> image;
-    };
-
-    Direction _dir;
-    Thumb _thumb;
-    ScrollState _state;
-
-    void drawThumb(const glm::ivec2 &offset);
-    void drawArrows(const glm::ivec2 &offset);
-
-    void drawUpArrow(const glm::ivec2 &offset);
-    void drawDownArrow(const glm::ivec2 &offset);
 };
 
 } // namespace gui

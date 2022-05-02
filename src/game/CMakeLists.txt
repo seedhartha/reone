@@ -57,32 +57,10 @@ set(GAME_HEADERS
     action/useskill.h
     action/usetalentonobject.h
     action/wait.h
-    animationutil.h
-    camera.h
-    camera/animated.h
-    camera/dialog.h
-    camera/firstperson.h
-    camera/static.h
-    camera/thirdperson.h
     camerastyle.h
     camerastyles.h
-    character.h
-    combat.h
-    contextaction.h
     cursors.h
-    d20/attributes.h
-    d20/class.h
-    d20/classes.h
-    d20/feat.h
-    d20/feats.h
-    d20/savingthrows.h
-    d20/skill.h
-    d20/skills.h
-    d20/spell.h
-    d20/spells.h
     debug.h
-    dialog.h
-    dialogs.h
     effect.h
     effect/abilitydecrease.h
     effect/abilityincrease.h
@@ -157,51 +135,16 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
-    gui.h
-    gui/barkbubble.h
-    gui/chargen.h
-    gui/chargen/abilities.h
-    gui/chargen/classselect.h
-    gui/chargen/custom.h
-    gui/chargen/feats.h
-    gui/chargen/levelup.h
-    gui/chargen/nameentry.h
-    gui/chargen/portraitselect.h
-    gui/chargen/quick.h
-    gui/chargen/quickorcustom.h
-    gui/chargen/skills.h
-    gui/computer.h
-    gui/console.h
-    gui/console.h
-    gui/container.h
-    gui/conversation.h
-    gui/dialog.h
-    gui/hud.h
-    gui/ingame.h
-    gui/ingame/abilities.h
-    gui/ingame/character.h
-    gui/ingame/equip.h
-    gui/ingame/inventory.h
-    gui/ingame/journal.h
-    gui/ingame/map.h
-    gui/ingame/messages.h
-    gui/ingame/options.h
-    gui/loadscreen.h
-    gui/loadscreen.h
+    gui/game.h
+    gui/maininterface.h
     gui/mainmenu.h
-    gui/map.h
-    gui/map.h
-    gui/partyselect.h
-    gui/profileoverlay.h
-    gui/profileoverlay.h
-    gui/saveload.h
-    gui/selectoverlay.h
     guisounds.h
     layout.h
     layouts.h
     location.h
     object.h
     object/area.h
+    object/camera.h
     object/creature.h
     object/door.h
     object/encounter.h
@@ -209,22 +152,17 @@ set(GAME_HEADERS
     object/item.h
     object/module.h
     object/placeable.h
-    object/placeablecamera.h
+    object/room.h
     object/sound.h
+    object/store.h
     object/trigger.h
     object/waypoint.h
     options.h
-    party.h
     path.h
-    pathfinder.h
     paths.h
-    player.h
     portrait.h
     portraits.h
-    reputes.h
     resourcelayout.h
-    room.h
-    savedgame.h
     script/routine/argutil.h
     script/routine/context.h
     script/routine/declarations.h
@@ -240,129 +178,9 @@ set(GAME_HEADERS
     visibilities.h)
 
 set(GAME_SOURCES
-    action.cpp
-    action/attack.cpp
-    action/barkstring.cpp
-    action/castfakespellatlocation.cpp
-    action/castfakespellatobject.cpp
-    action/castspellatobject.cpp
-    action/closedoor.cpp
-    action/docommand.cpp
-    action/equipitem.cpp
-    action/equipmostdamagingmelee.cpp
-    action/equipmostdamagingranged.cpp
-    action/follow.cpp
-    action/followleader.cpp
-    action/followowner.cpp
-    action/giveitem.cpp
-    action/interactobject.cpp
-    action/jumptolocation.cpp
-    action/jumptoobject.cpp
-    action/lockobject.cpp
-    action/moveawayfromobject.cpp
-    action/movetolocation.cpp
-    action/movetoobject.cpp
-    action/movetopoint.cpp
-    action/opencontainer.cpp
-    action/opendoor.cpp
-    action/openlock.cpp
-    action/pauseconversation.cpp
-    action/playanimation.cpp
-    action/randomwalk.cpp
-    action/resumeconversation.cpp
-    action/startconversation.cpp
-    action/surrendertoenemies.cpp
-    action/switchweapons.cpp
-    action/takeitem.cpp
-    action/unequipitem.cpp
-    action/unlockobject.cpp
-    action/usefeat.cpp
-    action/useskill.cpp
-    action/usetalentonobject.cpp
-    action/wait.cpp
-    animationutil.cpp
-    camera.cpp
-    camera/animated.cpp
-    camera/dialog.cpp
-    camera/firstperson.cpp
-    camera/static.cpp
-    camera/thirdperson.cpp
     camerastyles.cpp
-    combat.cpp
     cursors.cpp
-    d20/attributes.cpp
-    d20/class.cpp
-    d20/classes.cpp
-    d20/feats.cpp
-    d20/skills.cpp
-    d20/spells.cpp
     debug.cpp
-    dialogs.cpp
-    effect.cpp
-    effect/abilitydecrease.cpp
-    effect/abilityincrease.cpp
-    effect/acdecrease.cpp
-    effect/acincrease.cpp
-    effect/assuredhit.cpp
-    effect/attackdecrease.cpp
-    effect/attackincrease.cpp
-    effect/beam.cpp
-    effect/blasterdeflectionincrease.cpp
-    effect/blind.cpp
-    effect/bodyfuel.cpp
-    effect/choke.cpp
-    effect/crush.cpp
-    effect/cutscenehorrified.cpp
-    effect/cutsceneparalyze.cpp
-    effect/cutscenestunned.cpp
-    effect/damage.cpp
-    effect/damagedecrease.cpp
-    effect/damageforcepoints.cpp
-    effect/damageimmunityincrease.cpp
-    effect/damageincrease.cpp
-    effect/damageresistance.cpp
-    effect/death.cpp
-    effect/disguise.cpp
-    effect/droidscramble.cpp
-    effect/droidstun.cpp
-    effect/entangle.cpp
-    effect/factionmodifier.cpp
-    effect/forcebody.cpp
-    effect/forcefizzle.cpp
-    effect/forcepushed.cpp
-    effect/forcepushtargeted.cpp
-    effect/forceresistanceincrease.cpp
-    effect/forceresisted.cpp
-    effect/forceshield.cpp
-    effect/forcesight.cpp
-    effect/fury.cpp
-    effect/heal.cpp
-    effect/healforcepoints.cpp
-    effect/horrified.cpp
-    effect/immunity.cpp
-    effect/invisibility.cpp
-    effect/lightsaberthrow.cpp
-    effect/linkeffects.cpp
-    effect/mindtrick.cpp
-    effect/modifyattacks.cpp
-    effect/movementspeeddecrease.cpp
-    effect/movementspeedincrease.cpp
-    effect/paralyze.cpp
-    effect/poison.cpp
-    effect/psychicstatic.cpp
-    effect/regenerate.cpp
-    effect/resurrection.cpp
-    effect/savingthrowdecrease.cpp
-    effect/savingthrowincrease.cpp
-    effect/skillincrease.cpp
-    effect/sleep.cpp
-    effect/stunned.cpp
-    effect/temporaryforcepoints.cpp
-    effect/temporaryhitpoints.cpp
-    effect/trueseeing.cpp
-    effect/visual.cpp
-    effect/vpregenmodifier.cpp
-    effect/whirlwind.cpp
     footstepsounds.cpp
     format/ltrreader.cpp
     format/lytreader.cpp
@@ -370,45 +188,12 @@ set(GAME_SOURCES
     format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
-    gui.cpp
-    gui/barkbubble.cpp
-    gui/chargen.cpp
-    gui/chargen/abilities.cpp
-    gui/chargen/classselect.cpp
-    gui/chargen/custom.cpp
-    gui/chargen/feats.cpp
-    gui/chargen/levelup.cpp
-    gui/chargen/nameentry.cpp
-    gui/chargen/portraitselect.cpp
-    gui/chargen/quick.cpp
-    gui/chargen/quickorcustom.cpp
-    gui/chargen/skills.cpp
-    gui/computer.cpp
-    gui/console.cpp
-    gui/container.cpp
-    gui/conversation.cpp
-    gui/dialog.cpp
-    gui/hud.cpp
-    gui/ingame.cpp
-    gui/ingame/abilities.cpp
-    gui/ingame/character.cpp
-    gui/ingame/equip.cpp
-    gui/ingame/inventory.cpp
-    gui/ingame/journal.cpp
-    gui/ingame/map.cpp
-    gui/ingame/messages.cpp
-    gui/ingame/options.cpp
-    gui/loadscreen.cpp
+    gui/maininterface.cpp
     gui/mainmenu.cpp
-    gui/map.cpp
-    gui/partyselect.cpp
-    gui/profileoverlay.cpp
-    gui/saveload.cpp
-    gui/selectoverlay.cpp
     guisounds.cpp
     layouts.cpp
-    object.cpp
     object/area.cpp
+    object/camera.cpp
     object/creature.cpp
     object/door.cpp
     object/encounter.cpp
@@ -416,18 +201,14 @@ set(GAME_SOURCES
     object/item.cpp
     object/module.cpp
     object/placeable.cpp
-    object/placeablecamera.cpp
+    object/room.cpp
     object/sound.cpp
+    object/store.cpp
     object/trigger.cpp
     object/waypoint.cpp
-    party.cpp
-    pathfinder.cpp
     paths.cpp
-    player.cpp
     portraits.cpp
-    reputes.cpp
     resourcelayout.cpp
-    room.cpp
     script/routine/argutil.cpp
     script/routine/impl/action.cpp
     script/routine/impl/effect.cpp
@@ -439,47 +220,7 @@ set(GAME_SOURCES
     surfaces.cpp
     visibilities.cpp)
 
-set(GAME_NEO_HEADERS
-    neo/game.h
-    neo/gui/game.h
-    neo/gui/maininterface.h
-    neo/gui/mainmenu.h
-    neo/object.h
-    neo/object/area.h
-    neo/object/camera.h
-    neo/object/creature.h
-    neo/object/door.h
-    neo/object/encounter.h
-    neo/object/factory.h
-    neo/object/item.h
-    neo/object/module.h
-    neo/object/placeable.h
-    neo/object/room.h
-    neo/object/sound.h
-    neo/object/store.h
-    neo/object/trigger.h
-    neo/object/waypoint.h)
-
-set(GAME_NEO_SOURCES
-    neo/game.cpp
-    neo/gui/maininterface.cpp
-    neo/gui/mainmenu.cpp
-    neo/object/area.cpp
-    neo/object/camera.cpp
-    neo/object/creature.cpp
-    neo/object/door.cpp
-    neo/object/encounter.cpp
-    neo/object/factory.cpp
-    neo/object/item.cpp
-    neo/object/module.cpp
-    neo/object/placeable.cpp
-    neo/object/room.cpp
-    neo/object/sound.cpp
-    neo/object/store.cpp
-    neo/object/trigger.cpp
-    neo/object/waypoint.cpp)
-
-add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${GAME_NEO_HEADERS} ${GAME_NEO_SOURCES} ${CLANG_FORMAT_PATH})
+add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(game PUBLIC script gui scene movie audio graphics resource common)

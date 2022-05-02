@@ -17,102 +17,79 @@
 
 #pragma once
 
-#include "../../resource/format/gffreader.h"
 #include "../../scene/node/walkmesh.h"
 
 #include "../object.h"
 
 namespace reone {
 
+namespace resource {
+
+class Gff;
+
+}
+
 namespace game {
 
 class Door : public Object {
 public:
+    enum class State {
+        Closed,
+        Opening,
+        Open
+    };
+
     Door(
         uint32_t id,
-        std::string sceneName,
-        Game &game,
-        ServicesView &services) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Door,
-            std::move(sceneName),
-            game,
-            services) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
-    void loadFromBlueprint(const std::string &resRef);
+    void loadFromGit(const resource::Gff &git);
 
-    bool isSelectable() const override;
+    void handleClick(Object &clicker) override;
 
-    void open(const std::shared_ptr<Object> &triggerrer);
-    void close(const std::shared_ptr<Object> &triggerrer);
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosedPtr() {
+        return _walkmeshClosed;
+    }
 
-    bool isLocked() const { return _locked; }
-    bool isStatic() const { return _static; }
-    bool isKeyRequired() const { return _keyRequired; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1Ptr() {
+        return _walkmeshOpen1;
+    }
 
-    const std::string &getOnOpen() const { return _onOpen; }
-    const std::string &getOnFailToOpen() const { return _onFailToOpen; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2Ptr() {
+        return _walkmeshOpen2;
+    }
 
-    int genericType() const { return _genericType; }
-    const std::string &linkedToModule() const { return _linkedToModule; }
-    const std::string &linkedTo() const { return _linkedTo; }
-    const std::string &transitionDestin() const { return _transitionDestin; }
+    void setState(State state) {
+        _state = state;
+    }
 
-    void setLocked(bool locked);
+    // Object
 
-    // Walkmeshes
+    void update(float delta) override;
 
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1() const { return _walkmeshOpen1; }
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2() const { return _walkmeshOpen2; }
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosed() const { return _walkmeshClosed; }
-
-    // END Walkmeshes
+    // END Object
 
 private:
-    bool _locked {false};
-    int _genericType {0};
-    bool _static {false};
-    bool _keyRequired {false};
-    std::string _linkedToModule;
-    std::string _linkedTo;
-    int _linkedToFlags {0};
-    std::string _transitionDestin;
-    Faction _faction {Faction::Invalid};
-    int _openLockDC {0};
-    int _hardness {0};
-    int _fortitude {0};
-    bool _lockable {false};
-    std::string _keyName;
-
-    // Walkmeshes
-
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
 
-    // END Walkmeshes
+    State _state {State::Closed};
 
-    // Scripts
-
-    std::string _onOpen;
-    std::string _onFailToOpen;
-    std::string _onClick;
-    std::string _onClosed;
-    std::string _onDamaged;
-    std::string _onLock;
-    std::string _onUnlock;
-    std::string _onMeleeAttacked;
-    std::string _onSpellCastAt;
-
-    // END Scripts
-
-    void loadUTD(const resource::Gff &utd);
-    void loadTransformFromGIT(const resource::Gff &gffs);
-
-    void updateTransform() override;
+    void flushTransform() override;
 };
 
 } // namespace game

@@ -17,260 +17,156 @@
 
 #pragma once
 
-#include "../graphics/texture.h"
 #include "../graphics/types.h"
 
 #include "types.h"
 
 namespace reone {
 
-namespace resource {
-
-class Gff;
-class Strings;
-
-} // namespace resource
-
-namespace graphics {
-
-class Font;
-class Fonts;
-class GraphicsContext;
-class Meshes;
-class Pipeline;
-class Shaders;
-class Texture;
-class Textures;
-class Uniforms;
-class Window;
-
-} // namespace graphics
-
 namespace scene {
 
-class SceneGraphs;
+class SceneGraph;
 
 }
 
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+class Gff;
+
+} // namespace resource
+
 namespace gui {
 
-class GUI;
-
-/**
- * GUI control. Can render itself and handle events.
- */
 class Control : boost::noncopyable {
 public:
-    static constexpr int kStretchLeft = 1;
-    static constexpr int kStretchTop = 2;
-    static constexpr int kStretchWidth = 4;
-    static constexpr int kStretchHeight = 8;
-    static constexpr int kStretchAll = kStretchLeft | kStretchTop | kStretchWidth | kStretchHeight;
-
-    enum class TextAlign {
+    enum class TextAlignment {
         LeftTop = 9,
         CenterTop = 10,
         RightCenter = 12,
         LeftCenter = 17,
         CenterCenter = 18,
         RightCenter2 = 20,
-
-        CenterBottom = 0x1000
-    };
-
-    struct Extent {
-        int left {0};
-        int top {0};
-        int width {0};
-        int height {0};
-
-        Extent() = default;
-        Extent(int left, int top, int width, int height);
-
-        bool contains(int x, int y) const;
-        void getCenter(int &x, int &y) const;
+        CenterBottom = 34
     };
 
     struct Border {
-        std::shared_ptr<graphics::Texture> corner;
-        std::shared_ptr<graphics::Texture> edge;
-        std::shared_ptr<graphics::Texture> fill;
-        glm::vec3 color {1.0f};
+        std::string corner;
+        std::string edge;
+        std::string fill;
         int dimension {0};
+        glm::vec3 color {0.0f};
     };
 
     struct Text {
+        TextAlignment alignment {TextAlignment::LeftTop};
+        glm::vec3 color {0.0f};
+        std::string font;
         std::string text;
-        std::shared_ptr<graphics::Font> font;
-        glm::vec3 color {1.0f};
-        TextAlign align {TextAlign::CenterCenter};
+        int strref {-1};
     };
 
-    static ControlType getType(const resource::Gff &gffs);
-    static std::string getTag(const resource::Gff &gffs);
-    static std::string getParent(const resource::Gff &gffs);
+    virtual void load(const resource::Gff &gui, const glm::vec4 &scale);
 
-    virtual ~Control() = default;
-
-    virtual void load(const resource::Gff &gffs);
-    virtual void update(float dt);
-
-    /**
-     * Stretches this control in both directions.
-     *
-     * @param mask bitmask, specifying which components to stretch
-     */
-    virtual void stretch(float x, float y, int mask = kStretchAll);
-
-    bool isClickable() const { return _clickable; }
-    bool isDisabled() const { return _disabled; }
-    bool isFocusable() const { return _focusable; }
-    bool isVisible() const { return _visible; }
-
-    Border &border() const { return *_border; }
-    const Extent &extent() const { return _extent; }
-    const Border &hilight() const { return *_hilight; }
-    const std::string &tag() const { return _tag; }
-    const Text &text() const { return _text; }
-    const std::vector<std::string> &textLines() const { return _textLines; }
-    const std::string &sceneName() const { return _sceneName; }
-
-    void setTag(std::string tag) { _tag = std::move(tag); }
-    void setBorder(Border border);
-    void setBorderFill(std::string resRef);
-    void setBorderFill(std::shared_ptr<graphics::Texture> texture);
-    void setBorderColor(glm::vec3 color);
-    void setBorderColorOverride(glm::vec3 color);
-    void setDisabled(bool disabled);
-    void setDiscardColor(glm::vec3 color);
-    virtual void setExtent(Extent extent);
-    virtual void setExtentHeight(int height);
-    void setExtentTop(int top);
-    virtual void setFocus(bool focus);
-    void setFocusable(bool focusable);
-    void setHeight(int height);
-    void setHilight(Border hilight);
-    void setHilightColor(glm::vec3 color);
-    void setHilightFill(std::string resRef);
-    void setHilightFill(std::shared_ptr<graphics::Texture> texture);
-    void setPadding(int padding);
-    void setSceneName(std::string name);
-    void setText(Text text);
-    void setTextColor(glm::vec3 color);
-    void setTextMessage(std::string text);
-    void setTextFont(std::shared_ptr<graphics::Font> font);
-    void setUseBorderColorOverride(bool use);
-    void setVisible(bool visible);
-
-    // User input
-
-    virtual bool handleMouseMotion(int x, int y);
-    virtual bool handleMouseWheel(int x, int y);
-    virtual bool handleClick(int x, int y);
-
-    // END User input
-
-    // Rendering
-
-    virtual void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text);
-
-    // END Rendering
-
-    // Event listeners
-
-    void setOnClick(std::function<void()> fn) { _onClick = std::move(fn); }
-    void setOnFocusChanged(std::function<void(bool)> fn) { _onFocusChanged = std::move(fn); }
-
-    // END Event listeners
-
-protected:
-    GUI &_gui;
-    ControlType _type;
-
-    int _id {-1};
-    std::string _tag;
-    Extent _extent;
-    std::shared_ptr<Border> _border;
-    std::shared_ptr<Border> _hilight;
-    Text _text;
-    std::string _sceneName;
-    int _padding {0};
-    glm::mat4 _transform {1.0f};
-    bool _visible {true};
-    bool _disabled {false};
-    bool _focus {false};
-    bool _focusable {true};
-    bool _clickable {false};
-    bool _discardEnabled {false};
-    glm::vec3 _discardColor {false};
-    glm::vec3 _borderColorOverride {1.0f};
-    bool _useBorderColorOverride {false};
-    std::vector<std::string> _textLines;
-
-    // Services
-
-    graphics::Fonts &_fonts;
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Pipeline &_pipeline;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-    graphics::Window &_window;
-    resource::Strings &_strings;
-    scene::SceneGraphs &_sceneGraphs;
-
-    // END Services
-
-    // Event listeners
-
-    std::function<void()> _onClick;
-    std::function<void(bool)> _onFocusChanged;
-
-    // END Event listeners
-
-    Control(
-        GUI &gui,
-        ControlType type,
-        scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::Strings &strings) :
-        _gui(gui),
-        _type(type),
-        _sceneGraphs(sceneGraphs),
-        _fonts(fonts),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _pipeline(pipeline),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms),
-        _window(window),
-        _strings(strings) {
+    void append(std::shared_ptr<Control> child) {
+        _children.push_back(std::move(child));
     }
 
-    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
-    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void update(float delta);
+    void render();
 
-    virtual const glm::vec3 &getBorderColor() const;
+    Control *findControlByTag(const std::string &tag);
+    Control *pickControlAt(int x, int y);
 
-private:
-    void loadExtent(const resource::Gff &gffs);
-    void loadBorder(const resource::Gff &gffs);
-    void loadText(const resource::Gff &gffs);
-    void loadHilight(const resource::Gff &gffs);
+    int id() const {
+        return _id;
+    }
 
-    void updateTransform();
-    void updateTextLines();
+    const std::string &tag() const {
+        return _tag;
+    }
 
-    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, graphics::TextGravity &gravity) const;
+    const glm::ivec4 &extent() const {
+        return _extent;
+    }
+
+    void setExtent(glm::ivec4 extent) {
+        _extent = std::move(extent);
+    }
+
+    void setBorder(std::unique_ptr<Border> border) {
+        _border = std::move(border);
+    }
+
+    void setHilight(std::unique_ptr<Border> hilight) {
+        _hilight = std::move(hilight);
+    }
+
+    void setText(std::unique_ptr<Text> text) {
+        _text = std::move(text);
+    }
+
+    void setSceneGraph(scene::SceneGraph *sceneGraph) {
+        _sceneGraph = sceneGraph;
+    }
+
+    void setEnabled(bool enabled) {
+        _enabled = enabled;
+    }
+
+    void setFlipVertical(bool flip) {
+        _flipVertical = flip;
+    }
+
+    void setInFocus(bool focus) {
+        _focus = focus;
+    }
+
+protected:
+    Control(
+        int id,
+        ControlType type,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _id(id),
+        _type(type),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
+    }
+
+    int _id;
+    ControlType _type;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
+
+    std::string _tag;
+    glm::ivec4 _extent {0};
+    std::unique_ptr<Border> _border;
+    std::unique_ptr<Border> _hilight;
+    std::unique_ptr<Text> _text;
+    std::vector<std::shared_ptr<Control>> _children;
+
+    scene::SceneGraph *_sceneGraph {nullptr};
+
+    bool _enabled {true};
+    bool _flipVertical {false};
+    bool _clickable {false};
+    bool _focus {false};
+
+    bool isInExtent(float x, float y) const;
+
+    void getTextPlacement(glm::ivec2 &outPosition, graphics::TextGravity &outGravity) const;
 };
 
 } // namespace gui

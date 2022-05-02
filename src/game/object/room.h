@@ -17,15 +17,18 @@
 
 #pragma once
 
+#include "../../scene/node/walkmesh.h"
+
+#include "../layout.h"
 #include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-class Item : public Object {
+class Room : public Object {
 public:
-    Item(
+    Room(
         uint32_t id,
         ObjectFactory &objectFactory,
         GameServices &gameSvc,
@@ -34,13 +37,26 @@ public:
         resource::ResourceServices &resourceSvc) :
         Object(
             id,
-            ObjectType::Item,
+            ObjectType::Room,
             objectFactory,
             gameSvc,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
     }
+
+    void loadFromLyt(const Layout::Room &lyt);
+
+    scene::WalkmeshSceneNode &walkmesh() {
+        return *_walkmesh;
+    }
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() const {
+        return _walkmesh;
+    }
+
+private:
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
 };
 
 } // namespace game

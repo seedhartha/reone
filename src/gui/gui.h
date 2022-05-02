@@ -17,148 +17,93 @@
 
 #pragma once
 
-#include "../graphics/options.h"
-
-#include "control.h"
+#include "control/button.h"
+#include "control/buttontoggle.h"
+#include "control/label.h"
+#include "control/labelhilight.h"
+#include "control/listbox.h"
+#include "control/panel.h"
+#include "control/progressbar.h"
+#include "control/scrollbar.h"
+#include "control/slider.h"
 
 namespace reone {
 
-namespace resource {
-
-class Gffs;
-class Gff;
-class Resources;
-class Strings;
-
-} // namespace resource
-
 namespace graphics {
 
-class Fonts;
-class GraphicsContext;
-class Meshes;
-class Pipeline;
-class Shaders;
-class Texture;
-class Uniforms;
-class Window;
+struct GraphicsOptions;
+struct GraphicsServices;
 
 } // namespace graphics
 
-namespace scene {
+namespace resource {
 
-class SceneGraphs;
+struct ResourceServices;
 
-} // namespace scene
+class Gff;
+
+} // namespace resource
 
 namespace gui {
 
-constexpr int kDefaultResolutionX = 640;
-constexpr int kDefaultResolutionY = 480;
-
-class GUI : boost::noncopyable {
+class Gui : boost::noncopyable {
 public:
-    virtual void load();
-
-    virtual bool handle(const SDL_Event &event);
-    virtual void update(float dt);
-    virtual void draw();
-
-    void resetFocus();
-
-    std::unique_ptr<Control> newControl(ControlType type, std::string tag);
-
-protected:
-    enum class ScalingMode {
-        Center,
-        PositionRelativeToCenter,
-        Stretch
+    enum class ScaleMode {
+        None,
+        ToRootControl
     };
 
-    graphics::GraphicsOptions &_options;
-
-    std::string _resRef;
-    int _resolutionX {kDefaultResolutionX};
-    int _resolutionY {kDefaultResolutionY};
-    ScalingMode _scaling {ScalingMode::Center};
-    float _aspect {0.0f};
-    glm::ivec2 _screenCenter {0};
-    glm::ivec2 _rootOffset {0};
-    glm::ivec2 _controlOffset {0};
-    std::shared_ptr<graphics::Texture> _background;
-    std::unique_ptr<Control> _rootControl;
-    std::vector<std::shared_ptr<Control>> _controls;
-    std::unordered_map<std::string, Control *> _controlByTag;
-    Control *_focus {nullptr};
-    bool _hasDefaultHilightColor {false};
-    glm::vec3 _defaultHilightColor {0.0f};
-    std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
-
-    // Services
-
-    scene::SceneGraphs &_sceneGraphs;
-
-    graphics::Fonts &_fonts;
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Pipeline &_pipeline;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-    graphics::Window &_window;
-
-    resource::Gffs &_gffs;
-    resource::Resources &_resources;
-    resource::Strings &_strings;
-
-    // END Services
-
-    GUI(
-        graphics::GraphicsOptions &options,
-        scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings);
-
-    void loadControl(const resource::Gff &gffs);
-    virtual void preloadControl(Control &control);
-
-    std::shared_ptr<Control> getControl(const std::string &tag) const;
-
-    template <class T>
-    std::shared_ptr<T> getControl(const std::string &tag) const {
-        auto ctrl = getControl(tag);
-        return std::static_pointer_cast<T>(ctrl);
+    Gui(
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
-    // User input
+    void load(const std::string &resRef);
 
-    virtual bool handleKeyDown(SDL_Scancode key);
-    virtual bool handleKeyUp(SDL_Scancode key);
+    bool handle(const SDL_Event &e);
+    void update(float delta);
+    void render();
 
-    // END User input
+    std::unique_ptr<Panel> newPanel(int id);
+    std::unique_ptr<Label> newLabel(int id);
+    std::unique_ptr<LabelHilight> newLabelHilight(int id);
+    std::unique_ptr<Button> newButton(int id);
+    std::unique_ptr<ButtonToggle> newButtonToggle(int id);
+    std::unique_ptr<Slider> newSlider(int id);
+    std::unique_ptr<ScrollBar> newScrollBar(int id);
+    std::unique_ptr<ProgressBar> newProgressBar(int id);
+    std::unique_ptr<ListBox> newListBox(int id);
 
-    virtual void onClick(const std::string &control) {}
-    virtual void onFocusChanged(const std::string &control, bool focus) {}
+protected:
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
-private:
-    bool _leftMouseDown {false};
+    ScaleMode _scaleMode {ScaleMode::ToRootControl};
+    std::shared_ptr<Control> _rootControl;
 
-    void positionRelativeToCenter(Control &control);
-    void stretchControl(Control &control);
-    void updateFocus(int x, int y);
+    Control *_controlInFocus {nullptr};
 
-    void drawBackground();
+    std::unique_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
 
-    Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
+    Control *findControl(const std::string &tag);
+    Control *pickControlAt(int x, int y);
+
+    void enableControl(const std::string &tag);
+    void disableControl(const std::string &tag);
+
+    virtual bool handleClick(const Control &control) {
+        return false;
+    }
+
+    template <class T>
+    T *findControl(const std::string &tag) {
+        return dynamic_cast<T *>(findControl(tag));
+    }
 };
 
 } // namespace gui

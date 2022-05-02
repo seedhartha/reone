@@ -17,87 +17,49 @@
 
 #pragma once
 
-#include "../../resource/format/gffreader.h"
 #include "../../scene/node/walkmesh.h"
 
 #include "../object.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class Game;
-class ObjectFactory;
+class Gff;
+
+}
+
+namespace game {
 
 class Placeable : public Object {
 public:
     Placeable(
         uint32_t id,
-        std::string sceneName,
-        Game &game,
-        ServicesView &services) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Placeable,
-            std::move(sceneName),
-            game,
-            services) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
-    void loadFromBlueprint(const std::string &resRef);
+    void loadFromGit(const resource::Gff &git);
 
-    bool hasInventory() const { return _hasInventory; }
-    bool isSelectable() const override { return _usable; }
-    bool isUsable() const { return _usable; }
-
-    int appearance() const { return _appearance; }
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmesh() const { return _walkmesh; }
-
-    // Scripts
-
-    void runOnUsed(std::shared_ptr<Object> usedBy);
-    void runOnInvDisturbed(std::shared_ptr<Object> triggerrer);
-
-    // END Scripts
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() {
+        return _walkmesh;
+    }
 
 private:
-    int _appearance {0};
-    bool _hasInventory {false};
-    bool _usable {false};
-    Faction _faction {Faction::Invalid};
-    bool _keyRequired {false};
-    bool _lockable {false};
-    bool _locked {false};
-    int _openLockDC {0};
-    int _animationState {0};
-    int _hardness {0};
-    int _fortitude {0};
-    bool _partyInteract {false};
-    bool _static {false};
-
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
 
-    // Scripts
-
-    std::string _onUsed;
-    std::string _onInvDisturbed;
-    std::string _onClosed;
-    std::string _onDamaged;
-    std::string _onDeath;
-    std::string _onLock;
-    std::string _onMeleeAttacked;
-    std::string _onOpen;
-    std::string _onSpellCastAt;
-    std::string _onUnlock;
-    std::string _onEndDialogue;
-
-    // END Scripts
-
-    void loadUTP(const resource::Gff &utp);
-    void loadTransformFromGIT(const resource::Gff &gffs);
-
-    void updateTransform() override;
+    void flushTransform() override;
 };
 
 } // namespace game

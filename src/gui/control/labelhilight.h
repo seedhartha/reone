@@ -15,12 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "item.h"
+#pragma once
+
+#include "../control.h"
 
 namespace reone {
 
-namespace game {
+namespace gui {
 
-}
+class LabelHilight : public Control {
+public:
+    LabelHilight(
+        int id,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        Control(
+            id,
+            ControlType::LabelHilight,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
+    }
+};
+
+} // namespace gui
 
 } // namespace reone

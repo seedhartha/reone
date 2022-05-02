@@ -105,15 +105,23 @@ static inline void throwIfInvalidTalent(const shared_ptr<Talent> &talent) {
 }
 
 shared_ptr<Object> getCaller(const RoutineContext &ctx) {
+    /*
     auto object = ctx.game.getObjectById(ctx.execution.callerId);
     throwIfInvalidObject(ctx.execution.callerId, object);
     return move(object);
+    */
+
+    return nullptr;
 }
 
 shared_ptr<Object> getTriggerrer(const RoutineContext &ctx) {
+    /*
     auto object = ctx.game.getObjectById(ctx.execution.triggererId);
     throwIfInvalidObject(ctx.execution.triggererId, object);
     return move(object);
+    */
+
+    return nullptr;
 }
 
 int getInt(const vector<Variable> &args, int index) {
@@ -144,6 +152,7 @@ shared_ptr<Object> getObject(const vector<Variable> &args, int index, const Rout
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Object, args[index].type);
 
+    /*
     uint32_t objectId = args[index].objectId;
     if (objectId == kObjectSelf) {
         objectId = ctx.execution.callerId;
@@ -152,6 +161,9 @@ shared_ptr<Object> getObject(const vector<Variable> &args, int index, const Rout
     throwIfInvalidObject(objectId, object);
 
     return move(object);
+    */
+
+    return nullptr;
 }
 
 shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
@@ -281,15 +293,23 @@ shared_ptr<Door> getObjectAsDoor(const vector<Variable> &args, int index, const 
 }
 
 shared_ptr<Placeable> getObjectAsPlaceable(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    /*
     auto object = getObject(args, index, ctx);
     throwIfObjectNotPlaceable(object);
     return static_pointer_cast<Placeable>(move(object));
+    */
+
+    return nullptr;
 }
 
 shared_ptr<Item> getObjectAsItem(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    /*
     auto object = getObject(args, index, ctx);
     throwIfObjectNotItem(object);
     return static_pointer_cast<Item>(move(object));
+    */
+
+    return nullptr;
 }
 
 shared_ptr<Item> getObjectAsItemOrNull(const vector<Variable> &args, int index, const RoutineContext &ctx) {
@@ -309,6 +329,8 @@ shared_ptr<Sound> getObjectAsSound(const vector<Variable> &args, int index, cons
 shared_ptr<Area> getObjectAsArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {
     throwIfOutOfRange(args, 0);
     throwIfUnexpectedType(VariableType::Object, args[index].type);
+
+    /*
     uint32_t objectId = args[index].objectId;
     if (objectId == kObjectSelf) {
         objectId = ctx.execution.callerId;
@@ -316,9 +338,13 @@ shared_ptr<Area> getObjectAsArea(const vector<script::Variable> &args, int index
     auto object = ctx.game.getObjectById(objectId);
     throwIfObjectNotArea(object);
     return static_pointer_cast<Area>(object);
+    */
+
+    return nullptr;
 }
 
 shared_ptr<Area> getObjectAsAreaOrCallerArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {
+    /*
     if (isOutOfRange(args, index)) {
         return ctx.game.module()->area();
     }
@@ -332,6 +358,9 @@ shared_ptr<Area> getObjectAsAreaOrCallerArea(const vector<script::Variable> &arg
     auto object = ctx.game.getObjectById(objectId);
     throwIfObjectNotArea(object);
     return static_pointer_cast<Area>(object);
+    */
+
+    return nullptr;
 }
 
 } // namespace game

@@ -17,59 +17,68 @@
 
 #pragma once
 
-#include "../../game/types.h"
-#include "../../gui/control/button.h"
-#include "../../gui/control/label.h"
-#include "../../gui/control/listbox.h"
-#include "../../resource/types.h"
-#include "../../scene/graph.h"
-#include "../../scene/node/model.h"
-
-#include "../gui.h"
+#include "../../gui/gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+} // namespace gui
+
+namespace scene {
+
+struct SceneServices;
+
+}
+
+namespace graphics {
+
+struct GraphicsServices;
+struct GraphicsOptions;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
 namespace game {
 
-class MainMenu : public GameGUI {
+class IGuiGame;
+
+class MainMenu : public gui::Gui {
 public:
-    MainMenu(Game &game, ServicesView &services);
+    MainMenu(
+        IGuiGame &game,
+        scene::SceneServices &sceneSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        gui::Gui(
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc),
+        _game(game),
+        _sceneSvc(sceneSvc) {
+    }
 
-    void load() override;
-
-    void onModuleSelected(const std::string &name);
+    void init();
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::ListBox> lbModules;
-        std::shared_ptr<gui::Label> lbl3dView;
-        std::shared_ptr<gui::Label> lblGameLogo;
-        std::shared_ptr<gui::Label> lblBw;
-        std::shared_ptr<gui::Label> lblLucas;
-        std::shared_ptr<gui::Button> btnLoadGame;
-        std::shared_ptr<gui::Button> btnNewGame;
-        std::shared_ptr<gui::Button> btnMovies;
-        std::shared_ptr<gui::Button> btnOptions;
-        std::shared_ptr<gui::Label> lblNewContent;
-        std::shared_ptr<gui::Button> btnExit;
-        std::shared_ptr<gui::Button> btnWarp;
+    IGuiGame &_game;
+    scene::SceneServices &_sceneSvc;
 
-        // TSL only
-        std::shared_ptr<gui::Label> lblMenuBg;
-        std::shared_ptr<gui::Button> btnMusic;
-        std::shared_ptr<gui::Button> btnMoreGames;
-        std::shared_ptr<gui::Button> btnTslrcm;
-        // END TSL only
-    } _binding;
+    // Binding
+    gui::Label *_lbl3dView {nullptr};
 
     void bindControls();
-    void configureButtons();
-    void setup3DView();
-    void setButtonColors(gui::Control &control);
-    void startModuleSelection();
-    void loadModuleNames();
 
-    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
+    bool handleClick(const gui::Control &control) override;
 };
 
 } // namespace game

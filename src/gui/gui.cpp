@@ -17,341 +17,187 @@
 
 #include "gui.h"
 
+#include "../common/exception/validation.h"
 #include "../common/logutil.h"
-#include "../graphics/context.h"
-#include "../graphics/mesh.h"
-#include "../graphics/meshes.h"
-#include "../graphics/shaders.h"
-#include "../graphics/texture.h"
-#include "../graphics/textures.h"
+#include "../graphics/options.h"
+#include "../graphics/services.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../resource/gffs.h"
-#include "../resource/gff.h"
-#include "../resource/resources.h"
+#include "../resource/services.h"
 
-#include "control/button.h"
-#include "control/imagebutton.h"
-#include "control/label.h"
-#include "control/listbox.h"
-#include "control/panel.h"
-#include "control/progressbar.h"
-#include "control/scrollbar.h"
-#include "control/slider.h"
-#include "control/togglebutton.h"
+#include "types.h"
 
 using namespace std;
-using namespace std::placeholders;
 
-using namespace reone::graphics;
 using namespace reone::resource;
-using namespace reone::scene;
 
 namespace reone {
 
 namespace gui {
 
-GUI::GUI(
-    GraphicsOptions &options,
-    SceneGraphs &sceneGraphs,
-    Fonts &fonts,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Pipeline &pipeline,
-    Shaders &shaders,
-    Textures &textures,
-    Uniforms &uniforms,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings) :
-    _options(options),
-    _sceneGraphs(sceneGraphs),
-    _fonts(fonts),
-    _graphicsContext(graphicsContext),
-    _meshes(meshes),
-    _pipeline(pipeline),
-    _shaders(shaders),
-    _textures(textures),
-    _uniforms(uniforms),
-    _window(window),
-    _gffs(gffs),
-    _resources(resources),
-    _strings(strings) {
+void Gui::load(const string &resRef) {
+    info("Loading GUI " + resRef, LogChannels::gui);
 
-    _aspect = options.width / static_cast<float>(options.height);
-    _screenCenter.x = options.width / 2;
-    _screenCenter.y = options.height / 2;
-}
-
-void GUI::load() {
-    debug("Load " + _resRef, LogChannels::gui);
-
-    shared_ptr<Gff> gui(_gffs.get(_resRef, ResourceType::Gui));
-    ControlType type = Control::getType(*gui);
-    string tag(Control::getTag(*gui));
-
-    _rootControl = newControl(type, tag);
-    _rootControl->load(*gui);
-    _controlByTag[tag] = _rootControl.get();
-
-    switch (_scaling) {
-    case ScalingMode::Center:
-        _rootOffset.x = _screenCenter.x - _resolutionX / 2;
-        _rootOffset.y = _screenCenter.y - _resolutionY / 2;
-        break;
-    case ScalingMode::Stretch:
-        stretchControl(*_rootControl);
-        break;
-    default:
-        break;
+    auto gui = _resourceSvc.gffs.get(resRef, ResourceType::Gui);
+    if (!gui) {
+        throw ValidationException("GUI not found: " + resRef);
     }
 
-    const Control::Extent &rootExtent = _rootControl->extent();
-    _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
-
-    for (auto &ctrlGffs : gui->getList("CONTROLS")) {
-        loadControl(*ctrlGffs);
-    }
-}
-
-void GUI::stretchControl(Control &control) {
-    float aspectX = _options.width / static_cast<float>(_resolutionX);
-    float aspectY = _options.height / static_cast<float>(_resolutionY);
-    control.stretch(aspectX, aspectY);
-}
-
-void GUI::loadControl(const Gff &gffs) {
-    ControlType type = Control::getType(gffs);
-    string tag(Control::getTag(gffs));
-    string parent(Control::getParent(gffs));
-
-    shared_ptr<Control> control(newControl(type, tag));
-    if (!control)
-        return;
-
-    preloadControl(*control);
-    control->load(gffs);
-    if (_hasDefaultHilightColor) {
-        control->setHilightColor(_defaultHilightColor);
+    glm::vec4 scale;
+    if (_scaleMode == ScaleMode::ToRootControl) {
+        float rw = static_cast<float>(gui->getStruct("EXTENT")->getInt("WIDTH"));
+        float rh = static_cast<float>(gui->getStruct("EXTENT")->getInt("HEIGHT"));
+        float sx = _graphicsOpt.width / rw;
+        float sy = _graphicsOpt.height / rh;
+        scale = glm::vec4(sx, sy, sx, sy);
+    } else {
+        scale = glm::vec4(1.0f);
     }
 
-    ScalingMode scaling = _scaling;
-    auto maybeScaling = _scalingByControlTag.find(tag);
-    if (maybeScaling != _scalingByControlTag.end()) {
-        scaling = maybeScaling->second;
+    auto controlById = unordered_map<int, shared_ptr<Control>>();
+    auto rootControl = shared_ptr<Control>(loadControl(*gui, scale));
+    controlById[-1] = rootControl;
+
+    auto guiControls = gui->getList("CONTROLS");
+    for (auto &guiControl : guiControls) {
+        auto control = loadControl(*guiControl, scale);
+        controlById[control->id()] = move(control);
     }
-    switch (scaling) {
-    case ScalingMode::PositionRelativeToCenter:
-        positionRelativeToCenter(*control);
-        break;
-    case ScalingMode::Stretch:
-        stretchControl(*control);
-        break;
-    default:
-        break;
-    }
-
-    _controlByTag[tag] = control.get();
-    _controls.push_back(move(control));
-}
-
-void GUI::preloadControl(Control &control) {
-}
-
-void GUI::positionRelativeToCenter(Control &control) {
-    Control::Extent extent(control.extent());
-    if (extent.left >= 0.5f * _resolutionX) {
-        extent.left = extent.left - _resolutionX + _options.width;
-    }
-    if (extent.top >= 0.5f * _resolutionY) {
-        extent.top = extent.top - _resolutionY + _options.height;
-    }
-    control.setExtent(move(extent));
-}
-
-bool GUI::handle(const SDL_Event &event) {
-    switch (event.type) {
-    case SDL_KEYDOWN:
-        return handleKeyDown(event.key.keysym.scancode);
-
-    case SDL_KEYUP:
-        return handleKeyUp(event.key.keysym.scancode);
-
-    case SDL_MOUSEMOTION: {
-        glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
-        updateFocus(ctrlCoords.x, ctrlCoords.y);
-        if (_focus) {
-            _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
-        }
-        break;
-    }
-    case SDL_MOUSEBUTTONDOWN:
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            _leftMouseDown = true;
-        }
-        break;
-    case SDL_MOUSEBUTTONUP:
-        if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
-            _leftMouseDown = false;
-            glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
-            Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
-            if (control) {
-                debug("Click " + control->tag(), LogChannels::gui);
-                onClick(control->tag());
-                return control->handleClick(ctrlCoords.x, ctrlCoords.y);
-            }
-        }
-        break;
-
-    case SDL_MOUSEWHEEL:
-        if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y))
-            return true;
-        break;
+    for (auto &guiControl : guiControls) {
+        auto id = guiControl->getInt("ID");
+        auto control = controlById.at(id);
+        auto parentId = guiControl->getInt("Obj_ParentID");
+        auto parentControl = controlById.at(parentId);
+        parentControl->append(control);
     }
 
-    return false;
+    _rootControl = move(rootControl);
 }
 
-bool GUI::handleKeyDown(SDL_Scancode key) {
-    return false;
-}
+unique_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
+    auto id = gui.getInt("ID", -1);
+    auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
 
-bool GUI::handleKeyUp(SDL_Scancode key) {
-    return false;
-}
-
-void GUI::updateFocus(int x, int y) {
-    Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
-    if (control == _focus)
-        return;
-
-    if (_focus) {
-        if (_focus->isFocusable()) {
-            _focus->setFocus(false);
-            onFocusChanged(_focus->tag(), false);
-        }
-    }
-    _focus = control;
-
-    if (control) {
-        control->setFocus(true);
-        onFocusChanged(control->tag(), true);
-    }
-}
-
-Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &test) const {
-    for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
-        Control *ctrl = (*it).get();
-        if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl))
-            continue;
-
-        if (ctrl->extent().contains(x, y)) {
-            return ctrl;
-        }
-    }
-
-    return nullptr;
-}
-
-void GUI::update(float dt) {
-    for (auto &control : _controls) {
-        control->update(dt);
-    }
-}
-
-void GUI::draw() {
-    _graphicsContext.withBlending(BlendMode::Normal, [this]() {
-        if (_background) {
-            drawBackground();
-        }
-        if (_rootControl) {
-            _rootControl->draw({_options.width, _options.height}, _rootOffset, _rootControl->textLines());
-        }
-        for (auto &control : _controls) {
-            if (!control->isVisible()) {
-                continue;
-            }
-            control->draw({_options.width, _options.height}, _controlOffset, control->textLines());
-        }
-    });
-}
-
-void GUI::drawBackground() {
-    _textures.bind(*_background);
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
-    transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
-
-    _uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _window.getOrthoProjection();
-        general.model = move(transform);
-    });
-    _shaders.use(_shaders.gui());
-    _meshes.quad().draw();
-}
-
-void GUI::resetFocus() {
-    if (_focus) {
-        if (_focus->isFocusable()) {
-            _focus->setFocus(false);
-        }
-        onFocusChanged(_focus->tag(), false);
-        _focus = nullptr;
-    }
-}
-
-shared_ptr<Control> GUI::getControl(const string &tag) const {
-    for (auto &control : _controls) {
-        if (control->tag() == tag)
-            return control;
-    }
-    warn(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef);
-    return shared_ptr<Control>();
-}
-
-unique_ptr<Control> GUI::newControl(
-    ControlType type,
-    string tag) {
     unique_ptr<Control> control;
-    switch (type) {
-    case ControlType::Panel:
-        control = make_unique<Panel>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::Label:
-        control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::LabelHilight:
-        control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::Button:
-        control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::ButtonToggle:
-        control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::Slider:
-        control = make_unique<Slider>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::ScrollBar:
-        control = make_unique<ScrollBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::ProgressBar:
-        control = make_unique<ProgressBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    case ControlType::ListBox:
-        control = make_unique<ListBox>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
-        break;
-    default:
-        debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
-        return nullptr;
+    if (type == ControlType::Panel) {
+        control = newPanel(id);
+    } else if (type == ControlType::Label) {
+        control = newLabel(id);
+    } else if (type == ControlType::LabelHilight) {
+        control = newLabelHilight(id);
+    } else if (type == ControlType::Button) {
+        control = newButton(id);
+    } else if (type == ControlType::ButtonToggle) {
+        control = newButtonToggle(id);
+    } else if (type == ControlType::Slider) {
+        control = newSlider(id);
+    } else if (type == ControlType::ScrollBar) {
+        control = newScrollBar(id);
+    } else if (type == ControlType::ProgressBar) {
+        control = newProgressBar(id);
+    } else if (type == ControlType::ListBox) {
+        control = newListBox(id);
+    } else {
+        throw ValidationException("Unsupported control type: " + to_string(static_cast<int>(type)));
     }
-
-    control->setTag(tag);
+    control->load(gui, scale);
 
     return move(control);
+}
+
+bool Gui::handle(const SDL_Event &e) {
+    if (e.type == SDL_MOUSEMOTION) {
+        auto control = pickControlAt(e.motion.x, e.motion.y);
+        if (_controlInFocus != control) {
+            if (_controlInFocus) {
+                _controlInFocus->setInFocus(false);
+            }
+            if (control) {
+                control->setInFocus(true);
+            }
+            _controlInFocus = control;
+            return true;
+        }
+    } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+        if (_controlInFocus) {
+            debug("Control clicked on: " + to_string(_controlInFocus->id()) + "[" + _controlInFocus->tag() + "]", LogChannels::gui);
+            if (handleClick(*_controlInFocus)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void Gui::update(float delta) {
+    _rootControl->update(delta);
+}
+
+void Gui::render() {
+    _graphicsSvc.uniforms.setGeneral([this](auto &u) {
+        u.resetGlobals();
+        u.projection = _graphicsSvc.window.getOrthoProjection();
+    });
+    _rootControl->render();
+}
+
+Control *Gui::findControl(const string &tag) {
+    return _rootControl->findControlByTag(tag);
+}
+
+Control *Gui::pickControlAt(int x, int y) {
+    return _rootControl->pickControlAt(x, y);
+}
+
+void Gui::enableControl(const string &tag) {
+    auto control = findControl(tag);
+    if (control) {
+        control->setEnabled(true);
+    }
+}
+
+void Gui::disableControl(const string &tag) {
+    auto control = findControl(tag);
+    if (control) {
+        control->setEnabled(false);
+    }
+}
+
+unique_ptr<Panel> Gui::newPanel(int id) {
+    return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<Label> Gui::newLabel(int id) {
+    return make_unique<Label>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<LabelHilight> Gui::newLabelHilight(int id) {
+    return make_unique<LabelHilight>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<Button> Gui::newButton(int id) {
+    return make_unique<Button>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<ButtonToggle> Gui::newButtonToggle(int id) {
+    return make_unique<ButtonToggle>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<Slider> Gui::newSlider(int id) {
+    return make_unique<Slider>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<ScrollBar> Gui::newScrollBar(int id) {
+    return make_unique<ScrollBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<ProgressBar> Gui::newProgressBar(int id) {
+    return make_unique<ProgressBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+}
+
+unique_ptr<ListBox> Gui::newListBox(int id) {
+    return make_unique<ListBox>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
 }
 
 } // namespace gui

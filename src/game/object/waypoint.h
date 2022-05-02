@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include "../../resource/format/gffreader.h"
-
 #include "../object.h"
 
 namespace reone {
+
+namespace resource {
+
+class Gff;
+
+}
 
 namespace game {
 
@@ -29,33 +33,23 @@ class Waypoint : public Object {
 public:
     Waypoint(
         uint32_t id,
-        std::string sceneName,
-        Game &game,
-        ServicesView &services) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Waypoint,
-            std::move(sceneName),
-            game,
-            services) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
-    void loadFromBlueprint(const std::string &resRef);
-
-    bool isMapNoteEnabled() const { return _mapNoteEnabled; }
-
-    const std::string &mapNote() const { return _mapNote; }
-
-private:
-    int _appearance {0};
-    bool _hasMapNote {false};
-    std::string _mapNote;
-    bool _mapNoteEnabled {false};
-
-    void loadTransformFromGIT(const resource::Gff &gffs);
-
-    void loadUTW(const resource::Gff &utw);
+    void loadFromGit(const resource::Gff &git) {
+    }
 };
 
 } // namespace game

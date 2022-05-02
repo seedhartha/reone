@@ -17,78 +17,39 @@
 
 #pragma once
 
-#include "../../resource/format/gffreader.h"
-
 #include "../object.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class Game;
+class Gff;
+
+}
+
+namespace game {
 
 class Trigger : public Object {
 public:
     Trigger(
         uint32_t id,
-        std::string sceneName,
-        Game &game,
-        ServicesView &services) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Object(
             id,
             ObjectType::Trigger,
-            std::move(sceneName),
-            game,
-            services) {
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
-    void loadFromBlueprint(const std::string &resRef);
-
-    void update(float dt) override;
-
-    void addTenant(const std::shared_ptr<Object> &object);
-
-    bool isIn(const glm::vec2 &point) const;
-    bool isTenant(const std::shared_ptr<Object> &object) const;
-
-    const std::string &getOnEnter() const { return _onEnter; }
-    const std::string &getOnExit() const { return _onExit; }
-
-    const std::string &linkedToModule() const { return _linkedToModule; }
-    const std::string &linkedTo() const { return _linkedTo; }
-
-private:
-    std::string _transitionDestin;
-    std::string _linkedToModule;
-    std::string _linkedTo;
-    int _linkedToFlags {0};
-    Faction _faction {Faction::Invalid};
-    float _hilightHeight {0.0f};
-    int _triggerType {0};
-    bool _trapDetectable {false};
-    int _trapDetectDC {0};
-    bool _trapDisarmable {false};
-    int _disarmDC {0};
-    bool _trapFlag {false};
-    int _trapType {0};
-    std::vector<glm::vec3> _geometry;
-    std::set<std::shared_ptr<Object>> _tenants;
-    std::string _keyName;
-
-    // Scripts
-
-    std::string _onEnter;
-    std::string _onExit;
-    std::string _onDisarm;
-    std::string _onTrapTriggered;
-
-    // END Scripts
-
-    void loadTransformFromGIT(const resource::Gff &gffs);
-    void loadGeometryFromGIT(const resource::Gff &gffs);
-
-    void loadUTT(const resource::Gff &utt);
+    void loadFromGit(const resource::Gff &git) {
+    }
 };
 
 } // namespace game

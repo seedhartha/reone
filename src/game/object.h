@@ -17,286 +17,153 @@
 
 #pragma once
 
-#include "../common/timer.h"
-#include "../scene/animproperties.h"
-#include "../scene/graph.h"
 #include "../scene/node.h"
 #include "../scene/user.h"
+#include "../script/types.h"
 
-#include "action.h"
-#include "action/playanimation.h"
-#include "effect.h"
 #include "types.h"
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+class Gff;
+
+} // namespace resource
+
 namespace game {
 
-struct ServicesView;
+struct GameServices;
 
-class Action;
-class Game;
-class Item;
-class Room;
+class ObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
-    virtual ~Object() = default;
+    virtual void update(float delta) {
+    }
 
-    virtual void update(float dt);
-    virtual void die();
+    virtual void handleClick(Object &clicker) {
+    }
 
-    void face(const Object &other);
-    void face(const glm::vec3 &point);
-    void faceAwayFrom(const Object &other);
+    uint32_t id() const {
+        return _id;
+    }
 
-    bool contains(const glm::vec3 &point) const;
+    ObjectType type() const {
+        return _type;
+    }
 
-    virtual bool isSelectable() const;
-    bool isOpen() const { return _open; }
-    bool isInLineOfSight(const Object &other, float fov) const;
+    const std::string &tag() const {
+        return _tag;
+    }
 
-    bool isMinOneHP() const { return _minOneHP; }
-    bool isDead() const { return _dead; }
-    bool isCommandable() const { return _commandable; }
+    const glm::vec3 &position() const {
+        return _position;
+    }
 
-    float getDistanceTo(const glm::vec2 &point) const;
-    float getSquareDistanceTo(const glm::vec2 &point) const;
-    float getDistanceTo(const glm::vec3 &point) const;
-    float getSquareDistanceTo(const glm::vec3 &point) const;
-    float getDistanceTo(const Object &other) const;
-    float getSquareDistanceTo(const Object &other) const;
+    float facing() const {
+        return _facing;
+    }
 
-    virtual glm::vec3 getSelectablePosition() const;
-    float getFacing() const { return glm::eulerAngles(_orientation).z; }
+    float pitch() const {
+        return _pitch;
+    }
 
-    uint32_t id() const { return _id; }
-    const std::string &tag() const { return _tag; }
-    ObjectType type() const { return _type; }
-    const std::string &blueprintResRef() const { return _blueprintResRef; }
-    const std::string &name() const { return _name; }
-    const std::string &conversation() const { return _conversation; }
-    bool plotFlag() const { return _plot; }
+    scene::SceneNode &sceneNode() const {
+        return *_sceneNode;
+    }
 
-    Room *room() const { return _room; }
-    const glm::vec3 &position() const { return _position; }
-    const glm::mat4 &transform() const { return _transform; }
-    bool visible() const { return _visible; }
-    std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
+    std::shared_ptr<scene::SceneNode> sceneNodePtr() const {
+        return _sceneNode;
+    }
 
-    void setTag(std::string tag) { _tag = std::move(tag); }
-    void setPlotFlag(bool plot) { _plot = plot; }
-    void setCommandable(bool commandable) { _commandable = commandable; }
+    void setTag(std::string tag) {
+        _tag = std::move(tag);
+    }
 
-    void setRoom(Room *room);
-    void setPosition(const glm::vec3 &position);
-    void setFacing(float facing);
-    void setVisible(bool visible);
+    void setPosition(glm::vec3 position) {
+        _position = std::move(position);
+        flushTransform();
+    }
 
-    // Animation
+    void setFacing(float facing) {
+        _facing = facing;
+        flushTransform();
+    }
 
-    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties());
+    void setPitch(float pitch) {
+        _pitch = pitch;
+        flushTransform();
+    }
 
-    virtual std::string getAnimationName(AnimationType type) const { return ""; }
-    virtual std::string getActiveAnimationName() const { return ""; };
+    void setSceneGraph(scene::SceneGraph *sceneGraph) {
+        _sceneGraph = sceneGraph;
+    }
 
-    // END Animation
-
-    // Inventory
-
-    std::shared_ptr<Item> addItem(const std::string &resRef, int stackSize = 1, bool dropable = true);
-    void addItem(const std::shared_ptr<Item> &item);
-    bool removeItem(const std::shared_ptr<Item> &item, bool &last);
-    void moveDropableItemsTo(Object &other);
-
-    std::shared_ptr<Item> getFirstItem();
-    std::shared_ptr<Item> getNextItem();
-    std::shared_ptr<Item> getItemByTag(const std::string &tag);
-
-    const std::vector<std::shared_ptr<Item>> &items() const { return _items; }
-
-    // END Inventory
-
-    // Effects
-
-    void clearAllEffects();
-    void applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration = 0.0f);
-
-    std::shared_ptr<Effect> getFirstEffect();
-    std::shared_ptr<Effect> getNextEffect();
-
-    // END Effects
-
-    // Stunt mode
-
-    bool isStuntMode() const { return _stunt; }
-
-    /**
-     * Places this object into the stunt mode. Objects in this mode have their
-     * position and orientation fixed to the world origin. Subsequent changes to
-     * position and orientation will be buffered and applied when
-     * stopStuntMode is called.
-     */
-    void startStuntMode();
-
-    void stopStuntMode();
-
-    // END Stunt mode
-
-    // Hit Points
-
-    // Base maximum hit points, not considering any bonuses.
-    int hitPoints() const { return _hitPoints; }
-
-    // Maximum hit points, after considering all bonuses and penalties.
-    int maxHitPoints() const { return _maxHitPoints; }
-
-    // Current hit points, not counting any bonuses.
-    int currentHitPoints() const { return _currentHitPoints; }
-
-    void setMinOneHP(bool minOneHP) { _minOneHP = minOneHP; }
-    void setMaxHitPoints(int maxHitPoints) { _maxHitPoints = maxHitPoints; }
-    void setCurrentHitPoints(int hitPoints) { _currentHitPoints = hitPoints; }
-
-    // END Hit Points
-
-    // Actions
-
-    virtual void clearAllActions();
-
-    void addAction(std::unique_ptr<Action> action);
-    void addActionOnTop(std::unique_ptr<Action> action);
-    void delayAction(std::unique_ptr<Action> action, float seconds);
-
-    bool hasUserActionsPending() const;
-
-    std::shared_ptr<Action> getCurrentAction() const;
-
-    const std::deque<std::shared_ptr<Action>> &actions() const { return _actions; }
-
-    // END Actions
-
-    // Local variables
-
-    bool getLocalBoolean(int index) const;
-    int getLocalNumber(int index) const;
-
-    const std::map<int, bool> &localBooleans() const { return _localBooleans; }
-    const std::map<int, int> &localNumbers() const { return _localNumbers; }
-
-    void setLocalBoolean(int index, bool value);
-    void setLocalNumber(int index, int value);
-
-    // END Local variables
-
-    // Scripts
-
-    const std::string &getOnHeartbeat() const { return _onHeartbeat; }
-    const std::string &getOnUserDefined() const { return _onUserDefined; }
-
-    // END Scripts
+    void setSceneNode(std::shared_ptr<scene::SceneNode> sceneNode) {
+        _sceneNode = std::move(sceneNode);
+        flushTransform();
+    }
 
 protected:
-    struct DelayedAction {
-        std::unique_ptr<Action> action;
-        Timer timer;
-    };
-
-    struct AppliedEffect {
-        std::shared_ptr<Effect> effect;
-        DurationType durationType {DurationType::Instant};
-        float duration {0.0f};
-    };
-
     uint32_t _id;
     ObjectType _type;
-    std::string _sceneName;
-    Game &_game;
-    ServicesView &_services;
+    ObjectFactory &_objectFactory;
+    GameServices &_gameSvc;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
     std::string _tag;
-    std::string _blueprintResRef;
-    std::string _name;
-    std::string _conversation;
-    bool _minOneHP {false};
-    int _hitPoints {0};
-    int _maxHitPoints {0};
-    int _currentHitPoints {0};
-    bool _dead {false};
-    bool _plot {false};
-    bool _commandable {true};
-    bool _autoRemoveKey {false};
-    bool _interruptable {false};
 
     glm::vec3 _position {0.0f};
-    glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
-    glm::mat4 _transform {1.0f};
-    bool _visible {true};
-    Room *_room {nullptr};
-    std::vector<std::shared_ptr<Item>> _items;
-    std::deque<AppliedEffect> _effects;
-    bool _open {false};
-    bool _stunt {false};
-    std::string _activeAnimName;
+    float _facing {0.0f};
+    float _pitch {0.0f};
 
+    scene::SceneGraph *_sceneGraph {nullptr};
     std::shared_ptr<scene::SceneNode> _sceneNode;
-
-    int _itemIndex {0};
-    int _effectIndex {0};
-
-    // Actions
-
-    std::deque<std::shared_ptr<Action>> _actions;
-    std::vector<DelayedAction> _delayed;
-
-    // END Actions
-
-    // Local variables
-
-    std::map<int, bool> _localBooleans;
-    std::map<int, int> _localNumbers;
-
-    // END Local variables
-
-    // Scripts
-
-    std::string _onDeath;
-    std::string _onHeartbeat;
-    std::string _onUserDefined;
-
-    // END Scripts
 
     Object(
         uint32_t id,
         ObjectType type,
-        std::string sceneName,
-        Game &game,
-        ServicesView &services) :
+        ObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         _id(id),
         _type(type),
-        _sceneName(std::move(sceneName)),
-        _game(game),
-        _services(services) {
+        _objectFactory(objectFactory),
+        _gameSvc(gameSvc),
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
-    virtual void updateTransform();
-
-    // Actions
-
-    void updateActions(float dt);
-    void removeCompletedActions();
-    void updateDelayedActions(float dt);
-
-    void executeActions(float dt);
-
-    // END Actions
-
-    // Effects
-
-    void updateEffects(float dt);
-    void applyInstantEffect(Effect &effect);
-
-    // END Effects
+    virtual void flushTransform() {
+        if (!_sceneNode) {
+            return;
+        }
+        auto transform = glm::translate(_position);
+        transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+        transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+        _sceneNode->setLocalTransform(std::move(transform));
+    }
 };
 
 } // namespace game

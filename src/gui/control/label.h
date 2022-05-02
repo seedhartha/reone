@@ -26,32 +26,16 @@ namespace gui {
 class Label : public Control {
 public:
     Label(
-        GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::Strings &strings) :
+        int id,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Control(
-            gui,
+            id,
             ControlType::Label,
-            sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
-            strings) {
-
-        _focusable = false;
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 };
 

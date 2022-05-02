@@ -16,14 +16,16 @@
 set(GUI_HEADERS
     control.h
     control/button.h
-    control/imagebutton.h
+    control/button.h
+    control/buttontoggle.h
     control/label.h
+    control/labelhilight.h
     control/listbox.h
     control/panel.h
     control/progressbar.h
+    control/progressbar.h
     control/scrollbar.h
     control/slider.h
-    control/togglebutton.h
     gui.h
     sceneinitializer.h
     textinput.h
@@ -31,34 +33,10 @@ set(GUI_HEADERS
 
 set(GUI_SOURCES
     control.cpp
-    control/imagebutton.cpp
-    control/listbox.cpp
-    control/progressbar.cpp
-    control/scrollbar.cpp
-    control/togglebutton.cpp
     gui.cpp
     sceneinitializer.cpp
     textinput.cpp)
 
-set(GUI_NEO_HEADERS
-    neo/control.h
-    neo/control/button.h
-    neo/control/button.h
-    neo/control/buttontoggle.h
-    neo/control/label.h
-    neo/control/labelhilight.h
-    neo/control/listbox.h
-    neo/control/panel.h
-    neo/control/progressbar.h
-    neo/control/progressbar.h
-    neo/control/scrollbar.h
-    neo/control/slider.h
-    neo/gui.h)
-
-set(GUI_NEO_SOURCES
-    neo/control.cpp
-    neo/gui.cpp)
-
-add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES} ${GUI_NEO_HEADERS} ${GUI_NEO_SOURCES} ${CLANG_FORMAT_PATH})
+add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(gui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(gui PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)

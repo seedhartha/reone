@@ -17,15 +17,27 @@
 
 #pragma once
 
+#include "../camerastyle.h"
 #include "../object.h"
 
 namespace reone {
 
+namespace resource {
+
+class Gff;
+
+}
+
 namespace game {
 
-class Item : public Object {
+class Camera : public Object {
 public:
-    Item(
+    enum class Mode {
+        ThirdPerson,
+        Flycam
+    };
+
+    Camera(
         uint32_t id,
         ObjectFactory &objectFactory,
         GameServices &gameSvc,
@@ -34,13 +46,49 @@ public:
         resource::ResourceServices &resourceSvc) :
         Object(
             id,
-            ObjectType::Item,
+            ObjectType::Camera,
             objectFactory,
             gameSvc,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
+
+        _pitch = glm::half_pi<float>();
     }
+
+    void loadFromGit(const resource::Gff &git);
+    void loadFromStyle(const CameraStyle &style);
+
+    bool handle(const SDL_Event &e);
+    void update(float delta);
+
+    void setMode(Camera::Mode mode) {
+        _mode = mode;
+    }
+
+    void setThirdPersonHook(scene::SceneNode *hook) {
+        _hook = hook;
+    }
+
+private:
+    Mode _mode {Mode::Flycam};
+    CameraStyle _style;
+    float _aspect {1.0f};
+    scene::SceneNode *_hook {nullptr};
+
+    // Controls
+    float _forward {0.0f};
+    float _left {0.0f};
+    float _backward {0.0f};
+    float _right {0.0f};
+
+    bool handleThirdPerson(const SDL_Event &e);
+    bool handleFlycam(const SDL_Event &e);
+
+    void updateThirdPerson(float delta);
+    void updateFlycam(float delta);
+
+    void flushProjection();
 };
 
 } // namespace game
