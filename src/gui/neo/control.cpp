@@ -21,15 +21,18 @@
 #include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/pipeline.h"
 #include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/textureutil.h"
 #include "../../graphics/uniforms.h"
+#include "../../graphics/window.h"
 #include "../../resource/gff.h"
 #include "../../resource/services.h"
 #include "../../resource/strings.h"
+#include "../../scene/graph.h"
 
 using namespace std;
 
@@ -89,6 +92,9 @@ void Control::update(float delta) {
     if (!_enabled) {
         return;
     }
+    if (_sceneGraph) {
+        _sceneGraph->update(delta);
+    }
     for (auto &child : _children) {
         child->update(delta);
     }
@@ -125,6 +131,27 @@ void Control::render() {
         _graphicsSvc.context.withBlending(blendMode, [this]() {
             _graphicsSvc.meshes.quad().draw();
         });
+    }
+
+    // Render 3D scene
+    if (_sceneGraph) {
+        auto output = _graphicsSvc.pipeline.draw(*_sceneGraph, glm::ivec2(_extent[2], _extent[3]));
+        if (output) {
+            _graphicsSvc.textures.bind(*output);
+            _graphicsSvc.uniforms.setGeneral([this](auto &u) {
+                u.resetGlobals();
+                u.resetLocals();
+                u.projection = _graphicsSvc.window.getOrthoProjection();
+                u.model = glm::translate(glm::vec3(static_cast<float>(_extent[0]), static_cast<float>(_extent[1]), 0.0f));
+                u.model *= glm::scale(glm::vec3(static_cast<float>(_extent[2]), static_cast<float>(_extent[3]), 1.0f));
+            });
+            _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+            _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
+                _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
+                    _graphicsSvc.meshes.quad().draw();
+                });
+            });
+        }
     }
 
     // Render corners

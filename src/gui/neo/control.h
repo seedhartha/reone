@@ -23,6 +23,12 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace graphics {
 
 struct GraphicsOptions;
@@ -110,6 +116,10 @@ public:
         _text = std::move(text);
     }
 
+    void setSceneGraph(scene::SceneGraph *sceneGraph) {
+        _sceneGraph = sceneGraph;
+    }
+
     void setEnabled(bool enabled) {
         _enabled = enabled;
     }
@@ -144,11 +154,12 @@ protected:
 
     std::string _tag;
     glm::ivec4 _extent {0};
-    std::vector<std::shared_ptr<Control>> _children;
-
     std::unique_ptr<Border> _border;
     std::unique_ptr<Border> _hilight;
     std::unique_ptr<Text> _text;
+    std::vector<std::shared_ptr<Control>> _children;
+
+    scene::SceneGraph *_sceneGraph {nullptr};
 
     bool _enabled {true};
     bool _flipVertical {false};

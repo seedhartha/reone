@@ -26,10 +26,17 @@ namespace gui {
 namespace neo {
 
 class Button;
+class Label;
 
-}
+} // namespace neo
 
 } // namespace gui
+
+namespace scene {
+
+struct SceneServices;
+
+}
 
 namespace graphics {
 
@@ -54,6 +61,7 @@ class MainMenu : public gui::neo::Gui {
 public:
     MainMenu(
         IGuiGame &game,
+        scene::SceneServices &sceneSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
@@ -61,13 +69,18 @@ public:
             graphicsOpt,
             graphicsSvc,
             resourceSvc),
-        _game(game) {
+        _game(game),
+        _sceneSvc(sceneSvc) {
     }
 
     void init();
 
 private:
     IGuiGame &_game;
+    scene::SceneServices &_sceneSvc;
+
+    // Binding
+    gui::neo::Label *_lbl3dView {nullptr};
 
     void bindControls();
 
