@@ -19,8 +19,10 @@ set(TEST_HEADERS
     checkutil.h)
 
 set(TEST_SOURCES
+    common/hexutil.cpp
     common/streamreader.cpp
     common/streamwriter.cpp
+    common/stringbuilder.cpp
     common/unicode.cpp
     game/game.cpp
     main.cpp
