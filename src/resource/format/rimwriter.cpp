@@ -37,7 +37,7 @@ void RimWriter::save(const fs::path &path) {
 }
 
 void RimWriter::save(shared_ptr<ostream> out) {
-    StreamWriter writer(out);
+    StreamWriter writer(*out);
     uint32_t numResources = static_cast<uint32_t>(_resources.size());
 
     writer.putString("RIM V1.0");

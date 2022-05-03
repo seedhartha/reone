@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(stream_writer)
 
 BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
     // given
-    auto stream = make_shared<ostringstream>();
+    auto stream = ostringstream();
     auto writer = StreamWriter(stream, boost::endian::order::little);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)
@@ -60,13 +60,13 @@ BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
     writer.putBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
 
     // then
-    auto output = stream->str();
+    auto output = stream.str();
     BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
 }
 
 BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
     // given
-    auto stream = make_shared<ostringstream>();
+    auto stream = ostringstream();
     auto writer = StreamWriter(stream, boost::endian::order::big);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
     writer.putFloat(1.0f);
 
     // then
-    auto output = stream->str();
+    auto output = stream.str();
     BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
 }
 

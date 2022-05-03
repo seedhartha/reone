@@ -63,7 +63,7 @@ void GffWriter::save(const fs::path &path) {
 void GffWriter::save(const shared_ptr<ostream> &out) {
     processTree();
 
-    _writer = make_unique<StreamWriter>(out);
+    _writer = make_unique<StreamWriter>(*out);
 
     writeHeader();
     writeStructArray();

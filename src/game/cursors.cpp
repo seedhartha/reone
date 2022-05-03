@@ -85,7 +85,7 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
         return vector<uint32_t>();
     }
 
-    StreamReader reader(wrap(bytes));
+    StreamReader reader(*wrap(bytes));
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();
 

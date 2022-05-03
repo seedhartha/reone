@@ -32,12 +32,12 @@ void AudioTool::invoke(Operation operation, const fs::path &target, const fs::pa
 }
 
 void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
-    auto wav = make_shared<fs::ifstream>(path, ios::binary);
+    auto wav = fs::ifstream(path, ios::binary);
 
     // Determine filesize
-    wav->seekg(0, ios::end);
-    size_t filesize = wav->tellg();
-    wav->seekg(0);
+    wav.seekg(0, ios::end);
+    size_t filesize = wav.tellg();
+    wav.seekg(0);
 
     string suffix;
 

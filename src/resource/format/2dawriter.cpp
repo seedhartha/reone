@@ -37,7 +37,7 @@ void TwoDaWriter::save(const fs::path &path) {
 }
 
 void TwoDaWriter::save(shared_ptr<ostream> out) {
-    _writer = make_unique<StreamWriter>(out);
+    _writer = make_unique<StreamWriter>(*out);
     _writer->putString(kSignature);
     _writer->putChar('\n');
 

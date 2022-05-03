@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(stream_reader)
 
 BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
-    auto stream = make_shared<istringstream>(string("Hello, world!\x00", 14));
+    auto stream = istringstream(string("Hello, world!\x00", 14));
     auto reader = StreamReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;
 
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
                      .append("\x48\x00\x65\x00\x6c\x00\x6c\x00\x6f\x00\x2c\x00\x20\x00\x77\x00\x6f\x00\x72\x00\x6c\x00\x64\x00\x21\x00\x00\x00", 28)
                      .append("\x01\x02\x03\x04", 4)
                      .build();
-    auto stream = make_shared<istringstream>(input);
+    auto stream = istringstream(input);
     auto reader = StreamReader(stream, boost::endian::order::little);
     auto expectedByte = 255u;
     auto expectedUint16 = 65281u;
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
                      .append("\x3f\x80\x00\x00", 4)
                      .append("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8)
                      .build();
-    auto stream = make_shared<istringstream>(input);
+    auto stream = istringstream(input);
     auto reader = StreamReader(stream, boost::endian::order::big);
     auto expectedUint16 = 65281u;
     auto expectedUint32 = 4294967042u;

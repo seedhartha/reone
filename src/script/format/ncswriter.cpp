@@ -39,7 +39,7 @@ void NcsWriter::save(const fs::path &path) {
 }
 
 void NcsWriter::save(std::shared_ptr<std::ostream> out) {
-    auto stream = make_shared<ostringstream>();
+    auto stream = ostringstream();
     StreamWriter writer(stream, endian::order::big);
 
     for (auto &ins : _program.instructions()) {
@@ -110,12 +110,12 @@ void NcsWriter::save(std::shared_ptr<std::ostream> out) {
         }
     }
 
-    StreamWriter ncsWriter(out, endian::order::big);
+    StreamWriter ncsWriter(*out, endian::order::big);
 
     ncsWriter.putString(string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);
     ncsWriter.putUint32(13 + writer.tell());
-    ncsWriter.putString(stream->str());
+    ncsWriter.putString(stream.str());
 }
 
 } // namespace script

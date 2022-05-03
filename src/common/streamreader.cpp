@@ -24,76 +24,76 @@ namespace endian = boost::endian;
 namespace reone {
 
 size_t StreamReader::tell() {
-    return _stream->tellg();
+    return _stream.tellg();
 }
 
 void StreamReader::seek(size_t pos) {
-    _stream->clear();
-    _stream->seekg(pos);
+    _stream.clear();
+    _stream.seekg(pos);
 }
 
 void StreamReader::ignore(int count) {
-    _stream->ignore(count);
+    _stream.ignore(count);
 }
 
 uint8_t StreamReader::getByte() {
     uint8_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 1);
+    _stream.read(reinterpret_cast<char *>(&val), 1);
     return val;
 }
 
 uint16_t StreamReader::getUint16() {
     uint16_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 2);
+    _stream.read(reinterpret_cast<char *>(&val), 2);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 uint32_t StreamReader::getUint32() {
     uint32_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 4);
+    _stream.read(reinterpret_cast<char *>(&val), 4);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 uint64_t StreamReader::getUint64() {
     uint64_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 8);
+    _stream.read(reinterpret_cast<char *>(&val), 8);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int16_t StreamReader::getInt16() {
     int16_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 2);
+    _stream.read(reinterpret_cast<char *>(&val), 2);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int32_t StreamReader::getInt32() {
     int32_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 4);
+    _stream.read(reinterpret_cast<char *>(&val), 4);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 int64_t StreamReader::getInt64() {
     int64_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 8);
+    _stream.read(reinterpret_cast<char *>(&val), 8);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return val;
 }
 
 float StreamReader::getFloat() {
     uint32_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 4);
+    _stream.read(reinterpret_cast<char *>(&val), 4);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return *reinterpret_cast<float *>(&val);
 }
 
 double StreamReader::getDouble() {
     uint64_t val;
-    _stream->read(reinterpret_cast<char *>(&val), 8);
+    _stream.read(reinterpret_cast<char *>(&val), 8);
     endian::conditional_reverse_inplace(val, _endianess, endian::order::native);
     return *reinterpret_cast<double *>(&val);
 }
@@ -101,14 +101,14 @@ double StreamReader::getDouble() {
 string StreamReader::getString(int len) {
     string val;
     val.resize(len);
-    _stream->read(&val[0], len);
+    _stream.read(&val[0], len);
     return move(val);
 }
 
 string StreamReader::getNullTerminatedString() {
     stringbuf ss;
-    _stream->get(ss, '\0');
-    _stream->seekg(1, ios::cur);
+    _stream.get(ss, '\0');
+    _stream.seekg(1, ios::cur);
     return ss.str();
 }
 
@@ -129,12 +129,12 @@ u16string StreamReader::getNullTerminatedStringUTF16() {
 ByteArray StreamReader::getBytes(int count) {
     ByteArray result;
     result.resize(count);
-    _stream->read(reinterpret_cast<char *>(&result[0]), count);
+    _stream.read(reinterpret_cast<char *>(&result[0]), count);
     return move(result);
 }
 
 bool StreamReader::eof() const {
-    return _stream->eof();
+    return _stream.eof();
 }
 
 } // namespace reone

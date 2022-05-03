@@ -28,7 +28,7 @@ namespace reone {
 namespace game {
 
 void SsfWriter::save(const fs::path &path) {
-    auto stream = make_shared<fs::ofstream>(path);
+    auto stream = fs::ofstream(path);
     StreamWriter writer(stream);
 
     writer.putString("SSF V1.1");

@@ -57,7 +57,7 @@ void TlkWriter::save(std::shared_ptr<std::ostream> out) {
         offString += strSize;
     }
 
-    StreamWriter writer(out);
+    StreamWriter writer(*out);
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable->getStringCount());

@@ -21,15 +21,12 @@
 
 namespace reone {
 
-/**
- * Abstraction over reading primitive data types from a standard input stream.
- */
 class StreamReader : boost::noncopyable {
 public:
     StreamReader(
-        std::shared_ptr<std::istream> stream,
+        std::istream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
-        _stream(std::move(stream)),
+        _stream(stream),
         _endianess(endianess) {
     }
 
@@ -101,7 +98,7 @@ public:
     }
 
 private:
-    std::shared_ptr<std::istream> _stream;
+    std::istream &_stream;
     boost::endian::order _endianess;
 };
 

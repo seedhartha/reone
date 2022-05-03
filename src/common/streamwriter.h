@@ -21,15 +21,12 @@
 
 namespace reone {
 
-/**
- * Abstraction over writing primitive data types to a standard output stream.
- */
 class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(
-        std::shared_ptr<std::ostream> stream,
+        std::ostream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
-        _stream(std::move(stream)),
+        _stream(stream),
         _endianess(endianess) {
     }
 
@@ -50,7 +47,7 @@ public:
     size_t tell() const;
 
 private:
-    std::shared_ptr<std::ostream> _stream;
+    std::ostream &_stream;
     boost::endian::order _endianess;
 
     template <class T>
@@ -58,7 +55,7 @@ private:
         boost::endian::conditional_reverse_inplace(val, boost::endian::order::native, _endianess);
         char buf[sizeof(T)];
         memcpy(buf, &val, sizeof(T));
-        _stream->write(buf, sizeof(T));
+        _stream.write(buf, sizeof(T));
     }
 };
 

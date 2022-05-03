@@ -22,11 +22,11 @@ using namespace std;
 namespace reone {
 
 void StreamWriter::putByte(uint8_t val) {
-    _stream->put(val);
+    _stream.put(val);
 }
 
 void StreamWriter::putChar(char val) {
-    _stream->put(val);
+    _stream.put(val);
 }
 
 void StreamWriter::putUint16(uint16_t val) {
@@ -54,36 +54,36 @@ void StreamWriter::putFloat(float val) {
 }
 
 void StreamWriter::putString(const string &str) {
-    _stream->write(&str[0], str.length());
+    _stream.write(&str[0], str.length());
 }
 
 void StreamWriter::putStringExact(const string &str, int len) {
     int strLen = min(len, static_cast<int>(str.length()));
     if (strLen > 0) {
-        _stream->write(&str[0], strLen);
+        _stream.write(&str[0], strLen);
     }
     for (int i = 0; i < len - strLen; ++i) {
-        _stream->put('\0');
+        _stream.put('\0');
     }
 }
 
 void StreamWriter::putCString(const string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
-    _stream->write(&str[0], len);
-    _stream->put('\0');
+    _stream.write(&str[0], len);
+    _stream.put('\0');
 }
 
 void StreamWriter::putBytes(const ByteArray &bytes) {
-    _stream->write(&bytes[0], bytes.size());
+    _stream.write(&bytes[0], bytes.size());
 }
 
 void StreamWriter::putBytes(int count, uint8_t val) {
     ByteArray data(count, val);
-    _stream->write(&data[0], count);
+    _stream.write(&data[0], count);
 }
 
 size_t StreamWriter::tell() const {
-    return _stream->tellp();
+    return _stream.tellp();
 }
 
 } // namespace reone

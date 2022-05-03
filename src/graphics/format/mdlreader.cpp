@@ -62,7 +62,7 @@ MdlReader::MdlReader(Models &models, Textures &textures) :
 }
 
 void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
-    _mdxReader = make_unique<StreamReader>(mdx);
+    _mdxReader = make_unique<StreamReader>(*mdx);
 
     BinaryReader::load(mdl);
 }

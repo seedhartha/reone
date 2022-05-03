@@ -38,7 +38,7 @@ BinaryReader::BinaryReader(int signSize, const char *sign) :
 
 void BinaryReader::load(shared_ptr<istream> in) {
     _in = in;
-    _reader = make_unique<StreamReader>(in, _endianess);
+    _reader = make_unique<StreamReader>(*in, _endianess);
 
     load();
 }
@@ -71,7 +71,7 @@ void BinaryReader::load(fs::path path) {
         throw runtime_error("File not found: " + path.string());
     }
     _in = make_shared<fs::ifstream>(path, ios::binary);
-    _reader = make_unique<StreamReader>(_in, _endianess);
+    _reader = make_unique<StreamReader>(*_in, _endianess);
     _path = path;
 
     load();
