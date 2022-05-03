@@ -21,6 +21,12 @@ set(COMMON_HEADERS
     memorycache.h
     pathutil.h
     randomutil.h
+    stream/bytearrayinput.h
+    stream/bytearrayoutput.h
+    stream/fileinput.h
+    stream/fileoutput.h
+    stream/input.h
+    stream/output.h
     streamreader.h
     streamutil.h
     streamwriter.h
