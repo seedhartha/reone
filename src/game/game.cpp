@@ -297,55 +297,55 @@ void Game::quit() {
 }
 
 shared_ptr<Object> Game::newArea() {
-    return make_shared<Area>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Area>();
 }
 
 shared_ptr<Object> Game::newCamera() {
-    return make_shared<Camera>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Camera>();
 }
 
 shared_ptr<Object> Game::newCreature() {
-    return make_shared<Creature>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Creature>();
 }
 
 shared_ptr<Object> Game::newDoor() {
-    return make_shared<Door>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Door>();
 }
 
 shared_ptr<Object> Game::newEncounter() {
-    return make_shared<Encounter>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Encounter>();
 }
 
 shared_ptr<Object> Game::newItem() {
-    return make_shared<Item>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Item>();
 }
 
 shared_ptr<Object> Game::newModule() {
-    return make_shared<Module>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Module>();
 }
 
 shared_ptr<Object> Game::newPlaceable() {
-    return make_shared<Placeable>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Placeable>();
 }
 
 shared_ptr<Object> Game::newRoom() {
-    return make_shared<Room>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Room>();
 }
 
 shared_ptr<Object> Game::newSound() {
-    return make_shared<Sound>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Sound>();
 }
 
 shared_ptr<Object> Game::newStore() {
-    return make_shared<Store>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Store>();
 }
 
 shared_ptr<Object> Game::newTrigger() {
-    return make_shared<Trigger>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Trigger>();
 }
 
 shared_ptr<Object> Game::newWaypoint() {
-    return make_shared<Waypoint>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+    return newObject<Waypoint>();
 }
 
 bool Game::PlayerController::handle(const SDL_Event &e) {

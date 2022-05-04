@@ -175,8 +175,6 @@ private:
 
     Stage _stage {Stage::MovieLegal};
 
-    std::shared_ptr<Module> _module;
-
     // Services
 
     std::unique_ptr<PlayerController> _playerController;
@@ -191,6 +189,13 @@ private:
 
     // END Movies
 
+    // Objects
+
+    std::shared_ptr<Module> _module;
+    std::map<uint32_t, std::shared_ptr<Object>> _objects;
+
+    // END Objects
+
     // GUI
 
     std::unique_ptr<MainMenu> _mainMenu;
@@ -203,6 +208,20 @@ private:
     void render();
 
     void loadModule(const std::string &name);
+
+    template <class T>
+    inline std::shared_ptr<Object> newObject() {
+        auto object = std::make_shared<T>(
+            nextObjectId(),
+            *this,
+            _services.game,
+            _options.graphics,
+            _services.graphics,
+            _services.resource);
+
+        _objects[object->id()] = object;
+        return std::move(object);
+    }
 
     uint32_t nextObjectId() {
         return _objectIdCounter++;
