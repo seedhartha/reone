@@ -29,18 +29,20 @@ namespace resource {
 class BinaryResourceReader : boost::noncopyable {
 public:
     void load(IInputStream &in);
-    void load(boost::filesystem::path path);
 
 protected:
-    boost::endian::order _endianess {boost::endian::order::little};
-    boost::filesystem::path _path;
-    IInputStream *_in {nullptr};
+    boost::endian::order _endianess;
+
     std::unique_ptr<BinaryReader> _reader;
+
     size_t _size {0};
 
-    BinaryResourceReader(int signSize, const char *sign = 0);
+    BinaryResourceReader(boost::endian::order endianess = boost::endian::order::little) : _endianess(endianess) {
+    }
 
-    virtual void doLoad() = 0;
+    virtual void onLoad() = 0;
+
+    void checkSignature(const std::string &expected);
 
     size_t tell() const;
     void seek(size_t off);
@@ -82,12 +84,7 @@ protected:
     }
 
 private:
-    int _signSize {0};
-    ByteArray _sign;
-
-    void load();
     void querySize();
-    void checkSignature();
 };
 
 } // namespace resource

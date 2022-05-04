@@ -27,8 +27,6 @@ class Walkmesh;
 
 class BwmReader : public resource::BinaryResourceReader {
 public:
-    BwmReader();
-
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
 private:
@@ -63,7 +61,7 @@ private:
 
     std::shared_ptr<Walkmesh> _walkmesh;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadVertices();
     void loadIndices();

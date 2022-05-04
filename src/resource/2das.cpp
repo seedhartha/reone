@@ -39,8 +39,11 @@ shared_ptr<TwoDa> TwoDas::doGet(const string &resRef) {
     if (!raw) {
         return nullptr;
     }
+    auto stream = ByteArrayInputStream(*raw);
+
     TwoDaReader twoDa;
-    twoDa.load(ByteArrayInputStream(*raw));
+    twoDa.load(stream);
+
     return twoDa.twoDa();
 }
 

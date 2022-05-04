@@ -32,7 +32,7 @@ public:
     }
 
     size_t tell();
-    void seek(size_t pos);
+    void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin);
     void ignore(int count);
 
     uint8_t getByte();

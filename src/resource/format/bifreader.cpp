@@ -19,20 +19,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-static constexpr int kSignatureSize = 8;
-static const char kSignature[] = "BIFFV1  ";
-
-BifReader::BifReader() :
-    BinaryResourceReader(kSignatureSize, kSignature) {
-}
-
-void BifReader::doLoad() {
+void BifReader::onLoad() {
+    checkSignature(string("BIFFV1  ", 8));
     _resourceCount = readUint32();
     ignore(4);
     _tableOffset = readUint32();

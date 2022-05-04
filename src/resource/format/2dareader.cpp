@@ -21,20 +21,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-static constexpr int kSignatureSize = 8;
-static const char kSignature[] = "2DA V2.b";
-
-TwoDaReader::TwoDaReader() :
-    BinaryResourceReader(kSignatureSize, kSignature) {
-}
-
-void TwoDaReader::doLoad() {
+void TwoDaReader::onLoad() {
+    checkSignature(string("2DA V2.b", 8));
     ignore(1); // newline
     loadHeaders();
 
@@ -97,18 +89,18 @@ void TwoDaReader::loadTable() {
 bool TwoDaReader::readToken(string &token) {
     size_t pos = tell();
 
-    char buf[256];
-    int chRead = _in->read(buf, sizeof(buf));
-    const char *pch = buf;
+    auto bytes = _reader->getBytes(256);
+    auto start = &bytes[0];
+    auto pch = start;
 
-    for (; pch - buf < chRead; ++pch) {
+    for (; pch - start < bytes.size(); ++pch) {
         if (*pch == '\0') {
-            seek(pos + pch - buf + 1);
+            seek(pos + pch - start + 1);
             return false;
         }
         if (*pch == '\t') {
-            string s(buf, pch - buf);
-            seek(pos + pch - buf + 1);
+            string s(start, pch - start);
+            seek(pos + pch - start + 1);
             token = move(s);
             return true;
         }

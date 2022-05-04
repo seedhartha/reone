@@ -25,11 +25,9 @@ namespace reone {
 
 namespace graphics {
 
-BwmReader::BwmReader() :
-    BinaryResourceReader(8, "BWM V1.0") {
-}
+void BwmReader::onLoad() {
+    checkSignature(string("BWM V1.0", 8));
 
-void BwmReader::doLoad() {
     _type = static_cast<WalkmeshType>(readUint32());
 
     vector<float> relUsePosition1(readFloatArray(3));

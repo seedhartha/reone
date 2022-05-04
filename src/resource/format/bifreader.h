@@ -25,8 +25,6 @@ namespace resource {
 
 class BifReader : public BinaryResourceReader {
 public:
-    BifReader();
-
     std::unique_ptr<ByteArray> getResourceData(int idx);
 
 private:
@@ -38,7 +36,8 @@ private:
     int _resourceCount {0};
     uint32_t _tableOffset {0};
 
-    void doLoad() override;
+    void onLoad() override;
+
     ResourceEntry readResourceEntry(int idx);
 };
 

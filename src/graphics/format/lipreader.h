@@ -27,7 +27,8 @@ class LipAnimation;
 
 class LipReader : public resource::BinaryResourceReader {
 public:
-    LipReader(std::string name);
+    LipReader(std::string name) : _name(std::move(name)) {
+    }
 
     std::shared_ptr<LipAnimation> animation() const { return _animation; }
 
@@ -36,7 +37,7 @@ private:
 
     std::shared_ptr<LipAnimation> _animation;
 
-    void doLoad() override;
+    void onLoad() override;
 };
 
 } // namespace graphics

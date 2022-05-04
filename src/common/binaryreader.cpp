@@ -27,8 +27,8 @@ size_t BinaryReader::tell() {
     return _stream.position();
 }
 
-void BinaryReader::seek(size_t pos) {
-    _stream.seek(pos, SeekOrigin::Begin);
+void BinaryReader::seek(size_t pos, SeekOrigin origin) {
+    _stream.seek(pos, origin);
 }
 
 void BinaryReader::ignore(int count) {
@@ -125,7 +125,7 @@ u16string BinaryReader::getNullTerminatedStringUTF16() {
     do {
         ch = getUint16();
         if (ch) {
-            ss.put(ch);
+            ss << ch;
         }
     } while (ch);
 
@@ -133,10 +133,11 @@ u16string BinaryReader::getNullTerminatedStringUTF16() {
 }
 
 ByteArray BinaryReader::getBytes(int count) {
-    ByteArray result;
-    result.resize(count);
-    _stream.read(reinterpret_cast<char *>(&result[0]), count);
-    return move(result);
+    ByteArray buffer;
+    buffer.resize(count);
+    int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
+    buffer.resize(numRead);
+    return move(buffer);
 }
 
 bool BinaryReader::eof() const {

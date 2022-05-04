@@ -26,11 +26,7 @@ namespace reone {
 
 namespace graphics {
 
-CurReader::CurReader() :
-    BinaryResourceReader(0) {
-}
-
-void CurReader::doLoad() {
+void CurReader::onLoad() {
     loadHeader();
     loadData();
 }

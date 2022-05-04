@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../common/stream/fileinput.h"
+
 #include "format/keyreader.h"
 #include "resourceprovider.h"
 
@@ -44,6 +46,8 @@ private:
     boost::filesystem::path _gamePath;
     KeyReader _keyFile;
     std::unordered_map<int, std::unique_ptr<BifReader>> _bifCache;
+
+    std::vector<std::shared_ptr<FileInputStream>> _openFiles;
 };
 
 } // namespace resource

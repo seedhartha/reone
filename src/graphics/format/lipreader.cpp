@@ -25,13 +25,10 @@ namespace reone {
 
 namespace graphics {
 
-LipReader::LipReader(string name) :
-    BinaryResourceReader(8, "LIP V1.0"),
-    _name(move(name)) {
-}
-
-void LipReader::doLoad() {
+void LipReader::onLoad() {
     // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
+
+    checkSignature(string("LIP V1.0", 8));
 
     float length = readFloat();
     uint32_t entryCount = readUint32();

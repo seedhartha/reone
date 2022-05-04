@@ -17,24 +17,15 @@
 
 #include "erfreader.h"
 
-using namespace std;
+#include "../../common/exception/validation.h"
 
-namespace fs = boost::filesystem;
+using namespace std;
 
 namespace reone {
 
 namespace resource {
 
-static constexpr int kSignatureSize = 8;
-static const char kSignatureErf[] = "ERF V1.0";
-static const char kSignatureMod[] = "MOD V1.0";
-
-ErfReader::ErfReader(int id) :
-    BinaryResourceReader(0, nullptr),
-    _id(id) {
-}
-
-void ErfReader::doLoad() {
+void ErfReader::onLoad() {
     checkSignature();
     ignore(8);
 
@@ -50,17 +41,14 @@ void ErfReader::doLoad() {
 }
 
 void ErfReader::checkSignature() {
-    if (_size < kSignatureSize) {
-        throw runtime_error("Invalid binary file size");
+    if (_size < 8) {
+        throw ValidationException("Invalid binary resource size");
     }
-    string sign(_reader->getString(kSignatureSize));
-
-    bool erf = strncmp(&sign[0], kSignatureErf, kSignatureSize) == 0;
-    if (!erf) {
-        bool mod = strncmp(&sign[0], kSignatureMod, kSignatureSize) == 0;
-        if (!mod) {
-            throw runtime_error("Invalid ERF file signature");
-        }
+    auto signature = readString(8);
+    bool erf = signature == string("ERF V1.0", 8);
+    bool mod = signature == string("MOD V1.0", 8);
+    if (!erf && !mod) {
+        throw ValidationException("Invalid ERF/MOD signature: " + signature);
     }
 }
 

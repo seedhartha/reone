@@ -29,8 +29,6 @@ namespace resource {
 
 class PEReader : public BinaryResourceReader {
 public:
-    PEReader();
-
     std::shared_ptr<ByteArray> find(uint32_t name, PEResourceType type);
 
 private:
@@ -55,7 +53,7 @@ private:
     std::vector<Section> _sections;
     std::vector<Resource> _resources;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadHeader();
     void loadOptionalHeader();

@@ -34,7 +34,8 @@ public:
         uint32_t size {0};
     };
 
-    RimReader(int id = kDefaultProviderId);
+    RimReader(int id = kDefaultProviderId) : _id(id) {
+    }
 
     std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
@@ -51,10 +52,12 @@ private:
     std::vector<ResourceEntry> _resources;
     std::unordered_map<ResourceId, int, ResourceIdHasher> _resIdxByResId;
 
-    void doLoad() override;
+    void onLoad() override;
+
     void loadResources();
 
     ResourceEntry readResource();
+
     ByteArray getResourceData(const ResourceEntry &res);
 };
 

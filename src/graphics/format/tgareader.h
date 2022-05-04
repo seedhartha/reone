@@ -30,7 +30,6 @@ class Texture;
 class TgaReader : public resource::BinaryResourceReader {
 public:
     TgaReader(std::string resRef, TextureUsage usage) :
-        BinaryResourceReader(0),
         _resRef(std::move(resRef)),
         _usage(usage) {
     }
@@ -49,7 +48,7 @@ private:
 
     std::shared_ptr<Texture> _texture;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadTexture();
 

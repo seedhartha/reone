@@ -27,12 +27,9 @@ namespace reone {
 
 namespace script {
 
-NcsReader::NcsReader(const string &resRef) :
-    BinaryResourceReader(8, "NCS V1.0"), _resRef(resRef) {
-    _endianess = boost::endian::order::big;
-}
+void NcsReader::onLoad() {
+    checkSignature(string("NCS V1.0", 8));
 
-void NcsReader::doLoad() {
     uint8_t byteCode = readByte();
     uint32_t length = readUint32();
 

@@ -17,6 +17,7 @@
 
 #include "rim.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../resource/format/rimwriter.h"
 #include "../../resource/typeutil.h"
 
@@ -32,8 +33,9 @@ void RimTool::invoke(Operation operation, const fs::path &target, const fs::path
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
+        auto stream = FileInputStream(target, OpenMode::Binary);
         RimReader rim(0);
-        rim.load(target);
+        rim.load(stream);
         if (operation == Operation::List) {
             list(rim);
         } else if (operation == Operation::Extract) {

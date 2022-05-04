@@ -17,6 +17,7 @@
 
 #include "tpc.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/format/tpcreader.h"
 
@@ -37,8 +38,10 @@ void TpcTool::invoke(Operation operation, const fs::path &target, const fs::path
 void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Read TPC
 
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     TpcReader tpc("", TextureUsage::GUI);
-    tpc.load(path);
+    tpc.load(stream);
 
     // Write TGA
 

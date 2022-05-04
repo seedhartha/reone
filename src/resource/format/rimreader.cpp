@@ -19,21 +19,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-static constexpr int kSignatureSize = 8;
-static const char kSignature[] = "RIM V1.0";
-
-RimReader::RimReader(int id) :
-    BinaryResourceReader(kSignatureSize, kSignature),
-    _id(id) {
-}
-
-void RimReader::doLoad() {
+void RimReader::onLoad() {
+    checkSignature(string("RIM V1.0", 8));
     ignore(4);
 
     _resourceCount = readUint32();

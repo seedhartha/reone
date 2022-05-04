@@ -25,14 +25,12 @@ namespace game {
 
 class SsfReader : public resource::BinaryResourceReader {
 public:
-    SsfReader();
-
     const std::vector<uint32_t> &soundSet() const { return _soundSet; }
 
 private:
     std::vector<uint32_t> _soundSet;
 
-    void doLoad() override;
+    void onLoad() override;
 };
 
 } // namespace game

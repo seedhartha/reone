@@ -28,29 +28,8 @@ namespace resource {
 static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
-PEReader::PEReader() :
-    BinaryResourceReader(2, "MZ") {
-}
-
-shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
-    return findInternal([&name, &type](const Resource &res) {
-        return res.type == type && res.name == name;
-    });
-}
-
-shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pred) {
-    auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
-    if (maybeResource == _resources.end())
-        return nullptr;
-
-    return getResourceData(*maybeResource);
-}
-
-shared_ptr<ByteArray> PEReader::getResourceData(const Resource &res) {
-    return make_shared<ByteArray>(readBytes(res.offset, res.size));
-}
-
-void PEReader::doLoad() {
+void PEReader::onLoad() {
+    checkSignature(string("MZ", 2));
     ignore(58);
 
     uint32_t offPeHeader = readUint32();
@@ -70,6 +49,24 @@ void PEReader::doLoad() {
         seek(maybeSection->offset);
         loadResourceDir(*maybeSection, 0);
     }
+}
+
+shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
+    return findInternal([&name, &type](const Resource &res) {
+        return res.type == type && res.name == name;
+    });
+}
+
+shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pred) {
+    auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
+    if (maybeResource == _resources.end())
+        return nullptr;
+
+    return getResourceData(*maybeResource);
+}
+
+shared_ptr<ByteArray> PEReader::getResourceData(const Resource &res) {
+    return make_shared<ByteArray>(readBytes(res.offset, res.size));
 }
 
 void PEReader::loadHeader() {

@@ -31,11 +31,9 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-TlkReader::TlkReader() :
-    BinaryResourceReader(8, "TLK V3.0") {
-}
+void TlkReader::onLoad() {
+    checkSignature(string("TLK V3.0", 8));
 
-void TlkReader::doLoad() {
     uint32_t languageId = readUint32();
     _stringCount = readUint32();
     _stringsOffset = readUint32();

@@ -17,6 +17,7 @@
 
 #include "tlk.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../resource/format/tlkreader.h"
 #include "../../resource/format/tlkwriter.h"
 #include "../../resource/talktable.h"
@@ -42,8 +43,10 @@ void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void TlkTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     auto reader = TlkReader();
-    reader.load(path);
+    reader.load(stream);
 
     auto table = reader.table();
 

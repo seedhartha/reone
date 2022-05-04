@@ -17,6 +17,7 @@
 
 #include "erf.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/typeutil.h"
 
@@ -32,8 +33,9 @@ void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
+        auto stream = FileInputStream(target, OpenMode::Binary);
         ErfReader erf;
-        erf.load(target);
+        erf.load(stream);
         if (operation == Operation::Extract) {
             extract(erf, destPath);
         } else {

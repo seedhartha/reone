@@ -19,6 +19,7 @@
 
 #include "../common/logutil.h"
 #include "../common/pathutil.h"
+#include "../common/stream/fileinput.h"
 
 #include "folder.h"
 #include "format/bifreader.h"
@@ -48,8 +49,13 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
+
+    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
+    _openFiles.push_back(stream);
+
     auto erf = make_unique<ErfReader>(static_cast<int>(_providers.size()));
-    erf->load(path);
+    erf->load(*stream);
+
     indexProvider(move(erf), path, transient);
 }
 
@@ -57,8 +63,13 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
+
+    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
+    _openFiles.push_back(stream);
+
     auto rim = make_unique<RimReader>(static_cast<int>(_providers.size()));
-    rim->load(path);
+    rim->load(*stream);
+
     indexProvider(move(rim), path, transient);
 }
 
@@ -75,7 +86,11 @@ void Resources::indexExeFile(const fs::path &path) {
     if (!fs::exists(path)) {
         return;
     }
-    _exeFile.load(path);
+
+    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
+    _openFiles.push_back(stream);
+
+    _exeFile.load(*stream);
     debug("Index executable " + path.string(), LogChannels::resources);
 }
 

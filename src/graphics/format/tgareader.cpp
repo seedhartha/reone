@@ -28,7 +28,7 @@ namespace reone {
 
 namespace graphics {
 
-void TgaReader::doLoad() {
+void TgaReader::onLoad() {
     auto idLength = readByte();
 
     ignore(1);

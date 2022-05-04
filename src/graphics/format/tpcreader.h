@@ -27,7 +27,10 @@ namespace graphics {
 
 class TpcReader : public resource::BinaryResourceReader {
 public:
-    TpcReader(const std::string &resRef, TextureUsage usage);
+    TpcReader(std::string resRef, TextureUsage usage) :
+        _resRef(std::move(resRef)),
+        _usage(usage) {
+    }
 
     std::shared_ptr<Texture> texture() const { return _texture; }
     const ByteArray &txiData() const { return _txiData; }
@@ -56,7 +59,7 @@ private:
     std::shared_ptr<Texture> _texture;
     ByteArray _txiData;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadLayers();
     void loadFeatures();

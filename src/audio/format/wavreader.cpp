@@ -27,11 +27,7 @@ namespace reone {
 
 namespace audio {
 
-WavReader::WavReader() :
-    BinaryResourceReader(0) {
-}
-
-void WavReader::doLoad() {
+void WavReader::onLoad() {
     string sign(readString(4));
     if (sign == "\xff\xf3\x60\xc4") {
         seek(0x1da);

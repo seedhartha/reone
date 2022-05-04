@@ -21,6 +21,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
+#include "../../common/stream/fileinput.h"
 #include "../../game/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
@@ -382,8 +383,10 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
     Routines routines;
     initRoutines(_gameId, routines);
 
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     NcsReader ncs("");
-    ncs.load(path);
+    ncs.load(stream);
 
     fs::path pcodePath(destPath);
     pcodePath.append(path.filename().string() + ".pcode");

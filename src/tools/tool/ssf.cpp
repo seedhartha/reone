@@ -17,6 +17,7 @@
 
 #include "ssf.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../game/format/ssfreader.h"
 #include "../../game/format/ssfwriter.h"
 
@@ -41,8 +42,10 @@ void SsfTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     auto reader = SsfReader();
-    reader.load(path);
+    reader.load(stream);
 
     auto soundSet = reader.soundSet();
 

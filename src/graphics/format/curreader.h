@@ -27,8 +27,6 @@ class Texture;
 
 class CurReader : public resource::BinaryResourceReader {
 public:
-    CurReader();
-
     std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
@@ -37,7 +35,7 @@ private:
     int _height {0};
     std::shared_ptr<Texture> _texture;
 
-    void doLoad() override;
+    void onLoad() override;
     void loadHeader();
     void loadData();
 };

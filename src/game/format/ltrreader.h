@@ -44,7 +44,7 @@ private:
     std::vector<LetterSet> _doubleLetters;
     std::vector<std::vector<LetterSet>> _trippleLetters;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void readLetterSet(LetterSet &set);
 };

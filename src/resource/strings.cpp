@@ -19,6 +19,7 @@
 
 #include "../common/exception/validation.h"
 #include "../common/pathutil.h"
+#include "../common/stream/fileinput.h"
 #include "../resource/talktable.h"
 
 using namespace std;
@@ -34,7 +35,8 @@ void Strings::init(const fs::path &gameDir) {
     if (tlkPath.empty()) {
         throw ValidationException("dialog.tlk file not found");
     }
-    _tlk.load(tlkPath);
+    auto stream = FileInputStream(tlkPath, OpenMode::Binary);
+    _tlk.load(stream);
 }
 
 string Strings::get(int strRef) {

@@ -17,6 +17,7 @@
 
 #include "lip.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../graphics/format/lipreader.h"
 #include "../../graphics/format/lipwriter.h"
 
@@ -41,8 +42,10 @@ void LipTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void LipTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     auto reader = LipReader("");
-    reader.load(path);
+    reader.load(stream);
 
     auto animation = reader.animation();
 

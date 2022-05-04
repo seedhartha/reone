@@ -75,7 +75,7 @@ private:
     std::string _modelName;
     uint32_t _offAnimRoot {0};
 
-    void doLoad() override;
+    void onLoad() override;
 
     ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);

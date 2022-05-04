@@ -21,19 +21,13 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-static constexpr int kSignatureSize = 8;
+void GffReader::onLoad() {
+    ignore(8); // signature
 
-GffReader::GffReader() :
-    BinaryResourceReader(kSignatureSize) {
-}
-
-void GffReader::doLoad() {
     _structOffset = readUint32();
     _structCount = readUint32();
     _fieldOffset = readUint32();
@@ -46,6 +40,7 @@ void GffReader::doLoad() {
     _fieldIncidesCount = readUint32();
     _listIndicesOffset = readUint32();
     _listIndicesCount = readUint32();
+
     _root = move(readStruct(0));
 }
 

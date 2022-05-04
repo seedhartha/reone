@@ -27,8 +27,6 @@ class TalkTable;
 
 class TlkReader : public BinaryResourceReader {
 public:
-    TlkReader();
-
     std::shared_ptr<TalkTable> table() const { return _table; }
 
 private:
@@ -36,7 +34,7 @@ private:
     uint32_t _stringsOffset {0};
     std::shared_ptr<TalkTable> _table;
 
-    void doLoad() override;
+    void onLoad() override;
     void loadStrings();
 };
 

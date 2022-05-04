@@ -27,8 +27,6 @@ namespace resource {
 
 class TwoDaReader : public BinaryResourceReader {
 public:
-    TwoDaReader();
-
     const std::shared_ptr<TwoDa> &twoDa() const { return _twoDa; }
 
 private:
@@ -40,7 +38,7 @@ private:
 
     std::shared_ptr<TwoDa> _twoDa;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadHeaders();
     void loadLabels();

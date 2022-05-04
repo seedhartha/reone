@@ -17,8 +17,9 @@
 
 #include "gff.h"
 
-#include "../../common/hexutil.h"
 #include "../../common/binarywriter.h"
+#include "../../common/hexutil.h"
+#include "../../common/stream/fileinput.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/typeutil.h"
@@ -109,8 +110,10 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1
 }
 
 void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     auto reader = GffReader();
-    reader.load(path);
+    reader.load(stream);
 
     auto gff = reader.root();
 

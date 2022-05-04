@@ -31,7 +31,11 @@ namespace resource {
 
 void KeyBifResourceProvider::init(const fs::path &keyPath) {
     _gamePath = keyPath.parent_path();
-    _keyFile.load(keyPath);
+
+    auto stream = make_shared<FileInputStream>(keyPath, OpenMode::Binary);
+    _openFiles.push_back(stream);
+
+    _keyFile.load(*stream);
 }
 
 shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
@@ -54,8 +58,11 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
             throw runtime_error(str(boost::format("BIF file not found: %s %s") % _gamePath % filename));
         }
 
+        auto stream = make_shared<FileInputStream>(bifPath, OpenMode::Binary);
+        _openFiles.push_back(stream);
+
         auto bif = make_unique<BifReader>();
-        bif->load(bifPath);
+        bif->load(*stream);
 
         result = bif->getResourceData(key.resIdx);
 

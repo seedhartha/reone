@@ -31,11 +31,7 @@ namespace reone {
 
 namespace graphics {
 
-TpcReader::TpcReader(const string &resRef, TextureUsage usage) :
-    BinaryResourceReader(0), _resRef(resRef), _usage(usage) {
-}
-
-void TpcReader::doLoad() {
+void TpcReader::onLoad() {
     uint32_t dataSize = readUint32();
 
     ignore(4);

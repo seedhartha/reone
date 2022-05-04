@@ -18,6 +18,7 @@
 #include "2da.h"
 
 #include "../../common/binarywriter.h"
+#include "../../common/stream/fileinput.h"
 #include "../../resource/2da.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/2dawriter.h"
@@ -43,8 +44,10 @@ void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::pa
 }
 
 void TwoDaTool::toXML(const fs::path &path, const fs::path &destPath) {
+    auto stream = FileInputStream(path, OpenMode::Binary);
+
     auto reader = TwoDaReader();
-    reader.load(path);
+    reader.load(stream);
 
     auto table = reader.twoDa();
 

@@ -19,18 +19,9 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
-
-static constexpr int kSignatureSize = 8;
-static const char kSignature[] = "KEY V1  ";
-
-KeyReader::KeyReader() :
-    BinaryResourceReader(kSignatureSize, kSignature) {
-}
 
 bool KeyReader::find(const ResourceId &id, KeyEntry &outKey) const {
     auto maybeKey = _keyIdxByResId.find(id);
@@ -48,7 +39,9 @@ const string &KeyReader::getFilename(int idx) const {
     return _files[idx].filename;
 }
 
-void KeyReader::doLoad() {
+void KeyReader::onLoad() {
+    checkSignature(string("KEY V1  ", 8));
+
     _bifCount = readUint32();
     _keyCount = readUint32();
     _filesOffset = readUint32();

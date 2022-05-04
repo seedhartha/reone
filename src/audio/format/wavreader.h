@@ -34,8 +34,6 @@ class AudioStream;
 
 class WavReader : public resource::BinaryResourceReader {
 public:
-    WavReader();
-
     std::shared_ptr<AudioStream> stream() const { return _stream; }
 
 private:
@@ -57,7 +55,7 @@ private:
     IMA _ima[2];
     std::shared_ptr<AudioStream> _stream;
 
-    void doLoad() override;
+    void onLoad() override;
 
     int16_t getIMASample(int channel, uint8_t nibble);
     void getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, int16_t &sample2);

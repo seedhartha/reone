@@ -25,11 +25,9 @@ namespace reone {
 
 namespace game {
 
-SsfReader::SsfReader() :
-    BinaryResourceReader(8, "SSF V1.1") {
-}
+void SsfReader::onLoad() {
+    checkSignature(string("SSF V1.1", 8));
 
-void SsfReader::doLoad() {
     uint32_t tableOffset = readUint32();
     int entryCount = static_cast<int>((_size - tableOffset) / 4);
     seek(tableOffset);

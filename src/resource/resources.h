@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../common/stream/fileinput.h"
 #include "../common/types.h"
 
 #include "format/pereader.h"
@@ -36,7 +37,6 @@ public:
     void indexDirectory(const boost::filesystem::path &path);
     void indexExeFile(const boost::filesystem::path &path);
 
-    void invalidate();
     void clearTransientProviders();
 
     std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
@@ -46,6 +46,7 @@ private:
     PEReader _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
+    std::vector<std::shared_ptr<FileInputStream>> _openFiles;
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 

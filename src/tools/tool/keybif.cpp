@@ -18,6 +18,7 @@
 #include "keybif.h"
 
 #include "../../common/pathutil.h"
+#include "../../common/stream/fileinput.h"
 #include "../../resource/typeutil.h"
 
 using namespace std;
@@ -31,16 +32,19 @@ namespace reone {
 void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     bool isKey = target.extension() == ".key";
     if (isKey) {
+        auto stream = FileInputStream(target, OpenMode::Binary);
+
         KeyReader key;
-        key.load(target);
+        key.load(stream);
 
         listKEY(key);
 
     } else {
         fs::path keyPath(getPathIgnoreCase(gamePath, "chitin.key"));
+        auto keyStream = FileInputStream(keyPath, OpenMode::Binary);
 
         KeyReader key;
-        key.load(keyPath);
+        key.load(keyStream);
 
         int bifIdx = -1;
         for (size_t i = 0; i < key.files().size(); ++i) {
@@ -52,8 +56,10 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
         if (bifIdx == -1)
             return;
 
+        auto bifStream = FileInputStream(target, OpenMode::Binary);
+
         BifReader bif;
-        bif.load(target);
+        bif.load(bifStream);
 
         if (operation == Operation::List) {
             listBIF(key, bif, bifIdx);

@@ -39,8 +39,6 @@ public:
         int resIdx {0};
     };
 
-    KeyReader();
-
     bool find(const ResourceId &id, KeyEntry &outKey) const;
     const std::string &getFilename(int idx) const;
 
@@ -56,7 +54,7 @@ private:
     std::vector<KeyEntry> _keys;
     std::unordered_map<ResourceId, int, ResourceIdHasher> _keyIdxByResId;
 
-    void doLoad() override;
+    void onLoad() override;
 
     void loadFiles();
     void loadKeys();

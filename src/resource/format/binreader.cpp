@@ -17,65 +17,34 @@
 
 #include "binreader.h"
 
-#include "../../common/stream/fileinput.h"
-#include "../../common/binaryreader.h"
+#include "../../common/exception/validation.h"
 
 using namespace std;
-
-namespace fs = boost::filesystem;
 
 namespace reone {
 
 namespace resource {
 
-BinaryResourceReader::BinaryResourceReader(int signSize, const char *sign) :
-    _signSize(signSize) {
-    if (!sign)
-        return;
-
-    _sign.resize(_signSize);
-    memcpy(&_sign[0], sign, _signSize);
-}
-
 void BinaryResourceReader::load(IInputStream &in) {
-    _in = &in;
     _reader = make_unique<BinaryReader>(in, _endianess);
-
-    load();
-}
-
-void BinaryResourceReader::load() {
     querySize();
-    checkSignature();
-    doLoad();
+    onLoad();
 }
 
 void BinaryResourceReader::querySize() {
-    _in->seek(0, SeekOrigin::End);
-    _size = _in->position();
-    _in->seek(0, SeekOrigin::Begin);
+    _reader->seek(0, SeekOrigin::End);
+    _size = _reader->tell();
+    _reader->seek(0, SeekOrigin::Begin);
 }
 
-void BinaryResourceReader::checkSignature() {
-    if (_size < _signSize) {
-        throw runtime_error("Invalid binary file size");
+void BinaryResourceReader::checkSignature(const string &expected) {
+    if (_size < expected.size()) {
+        throw ValidationException("Invalid binary resource size");
     }
-    char buf[16];
-    _in->read(buf, _signSize);
-    if (!equal(_sign.begin(), _sign.end(), buf)) {
-        throw runtime_error(str(boost::format("Invalid binary file signature: %s") % string(buf, _signSize)));
+    auto actual = readString(expected.size());
+    if (expected != actual) {
+        throw ValidationException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
     }
-}
-
-void BinaryResourceReader::load(fs::path path) {
-    if (!fs::exists(path)) {
-        throw runtime_error("File not found: " + path.string());
-    }
-    _in = new FileInputStream(path, OpenMode::Binary); // TODO: free
-    _reader = make_unique<BinaryReader>(*_in, _endianess);
-    _path = path;
-
-    load();
 }
 
 size_t BinaryResourceReader::tell() const {

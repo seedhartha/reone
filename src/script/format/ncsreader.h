@@ -32,9 +32,12 @@ class ScriptProgram;
  */
 class NcsReader : public resource::BinaryResourceReader {
 public:
-    NcsReader(const std::string &resRef);
+    NcsReader(std::string resRef) :
+        resource::BinaryResourceReader(boost::endian::order::big),
+        _resRef(std::move(resRef)) {
+    }
 
-    void doLoad() override;
+    void onLoad() override;
 
     std::shared_ptr<ScriptProgram> program() const { return _program; }
 

@@ -27,8 +27,6 @@ namespace resource {
 
 class GffReader : public BinaryResourceReader {
 public:
-    GffReader();
-
     std::shared_ptr<Gff> root() const { return _root; }
 
 private:
@@ -51,7 +49,7 @@ private:
     int _listIndicesCount {0};
     std::shared_ptr<Gff> _root;
 
-    void doLoad() override;
+    void onLoad() override;
 
     std::unique_ptr<Gff> readStruct(int idx);
     Gff::Field readField(int idx);

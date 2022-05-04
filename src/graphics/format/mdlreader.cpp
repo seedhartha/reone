@@ -54,7 +54,6 @@ struct EmitterFlags {
 };
 
 MdlReader::MdlReader(Models &models, Textures &textures) :
-    BinaryResourceReader(4, "\000\000\000\000"),
     _models(models),
     _textures(textures) {
 
@@ -71,8 +70,9 @@ static bool isTSLFunctionPointer(uint32_t ptr) {
     return ptr == kMdlModelFuncPtr1TslPC || ptr == kMdlModelFuncPtr1TslXbox;
 }
 
-void MdlReader::doLoad() {
+void MdlReader::onLoad() {
     // File Header
+    ignore(4); // unknown
     uint32_t mdlSize = readUint32();
     uint32_t mdxSize = readUint32();
 
