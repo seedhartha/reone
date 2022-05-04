@@ -30,7 +30,7 @@ static const char kSignatureErf[] = "ERF V1.0";
 static const char kSignatureMod[] = "MOD V1.0";
 
 ErfReader::ErfReader(int id) :
-    BinaryReader(0, nullptr),
+    BinaryResourceReader(0, nullptr),
     _id(id) {
 }
 

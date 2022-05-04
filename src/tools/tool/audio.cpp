@@ -18,7 +18,7 @@
 #include "audio.h"
 
 #include "../../common/stream/fileinput.h"
-#include "../../common/streamreader.h"
+#include "../../common/binaryreader.h"
 
 using namespace std;
 
@@ -43,7 +43,7 @@ void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
     string suffix;
 
     // Read magic number
-    StreamReader reader(wav);
+    BinaryReader reader(wav);
     uint32_t magic = reader.getUint32();
     if (magic == 0xc460f3ff) { // WAV in MP3
         reader.seek(0x1d6);

@@ -32,7 +32,7 @@ class Model;
 class Models;
 class Textures;
 
-class MdlReader : public resource::BinaryReader {
+class MdlReader : public resource::BinaryResourceReader {
 public:
     MdlReader(Models &models, Textures &textures);
 
@@ -66,7 +66,7 @@ private:
     std::unordered_map<uint32_t, ControllerFn> _lightControllers;
     std::unordered_map<uint32_t, ControllerFn> _emitterControllers;
 
-    std::unique_ptr<StreamReader> _mdxReader;
+    std::unique_ptr<BinaryReader> _mdxReader;
     bool _tsl {false}; /**< is this a TSL model? */
     std::vector<std::string> _nodeNames;
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in read order (DFS) */

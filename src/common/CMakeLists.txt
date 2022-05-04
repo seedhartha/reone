@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_HEADERS
+    binaryreader.h
+    binarywriter.h
     collectionutil.h
     exception/validation.h
     hexutil.h
@@ -27,20 +29,18 @@ set(COMMON_HEADERS
     stream/fileoutput.h
     stream/input.h
     stream/output.h
-    streamreader.h
-    streamwriter.h
     stringbuilder.h
     timer.h
     types.h
     unicodeutil.h)
 
 set(COMMON_SOURCES
+    binaryreader.cpp
+    binarywriter.cpp
     hexutil.cpp
     logutil.cpp
     pathutil.cpp
     randomutil.cpp
-    streamreader.cpp
-    streamwriter.cpp
     unicodeutil.cpp)
 
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES} ${CLANG_FORMAT_PATH})

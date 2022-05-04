@@ -29,7 +29,7 @@ static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "KEY V1  ";
 
 KeyReader::KeyReader() :
-    BinaryReader(kSignatureSize, kSignature) {
+    BinaryResourceReader(kSignatureSize, kSignature) {
 }
 
 bool KeyReader::find(const ResourceId &id, KeyEntry &outKey) const {

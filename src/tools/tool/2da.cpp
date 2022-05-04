@@ -17,7 +17,7 @@
 
 #include "2da.h"
 
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 #include "../../resource/2da.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/2dawriter.h"

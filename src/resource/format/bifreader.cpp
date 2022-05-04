@@ -29,7 +29,7 @@ static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "BIFFV1  ";
 
 BifReader::BifReader() :
-    BinaryReader(kSignatureSize, kSignature) {
+    BinaryResourceReader(kSignatureSize, kSignature) {
 }
 
 void BifReader::doLoad() {

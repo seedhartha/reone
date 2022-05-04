@@ -31,7 +31,7 @@ static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
 TwoDaReader::TwoDaReader() :
-    BinaryReader(kSignatureSize, kSignature) {
+    BinaryResourceReader(kSignatureSize, kSignature) {
 }
 
 void TwoDaReader::doLoad() {

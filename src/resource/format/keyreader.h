@@ -26,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-class KeyReader : public BinaryReader {
+class KeyReader : public BinaryResourceReader {
 public:
     struct FileEntry {
         std::string filename;

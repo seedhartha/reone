@@ -54,7 +54,7 @@ struct EmitterFlags {
 };
 
 MdlReader::MdlReader(Models &models, Textures &textures) :
-    BinaryReader(4, "\000\000\000\000"),
+    BinaryResourceReader(4, "\000\000\000\000"),
     _models(models),
     _textures(textures) {
 
@@ -62,9 +62,9 @@ MdlReader::MdlReader(Models &models, Textures &textures) :
 }
 
 void MdlReader::load(IInputStream &mdl, IInputStream &mdx) {
-    _mdxReader = make_unique<StreamReader>(mdx);
+    _mdxReader = make_unique<BinaryReader>(mdx);
 
-    BinaryReader::load(mdl);
+    BinaryResourceReader::load(mdl);
 }
 
 static bool isTSLFunctionPointer(uint32_t ptr) {

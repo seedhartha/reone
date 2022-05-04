@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-class SsfReader : public resource::BinaryReader {
+class SsfReader : public resource::BinaryResourceReader {
 public:
     SsfReader();
 

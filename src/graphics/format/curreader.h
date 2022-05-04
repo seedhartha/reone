@@ -25,7 +25,7 @@ namespace graphics {
 
 class Texture;
 
-class CurReader : public resource::BinaryReader {
+class CurReader : public resource::BinaryResourceReader {
 public:
     CurReader();
 

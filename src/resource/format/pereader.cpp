@@ -29,7 +29,7 @@ static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
 PEReader::PEReader() :
-    BinaryReader(2, "MZ") {
+    BinaryResourceReader(2, "MZ") {
 }
 
 shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {

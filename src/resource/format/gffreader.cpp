@@ -30,7 +30,7 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 
 GffReader::GffReader() :
-    BinaryReader(kSignatureSize) {
+    BinaryResourceReader(kSignatureSize) {
 }
 
 void GffReader::doLoad() {

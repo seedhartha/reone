@@ -32,7 +32,7 @@ static const vector<char> g_letters {
     'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '\'', '-'};
 
 LtrReader::LtrReader() :
-    BinaryReader(8, "LTR V1.0") {
+    BinaryResourceReader(8, "LTR V1.0") {
 }
 
 void LtrReader::doLoad() {

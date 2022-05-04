@@ -28,7 +28,7 @@ namespace reone {
 namespace audio {
 
 WavReader::WavReader() :
-    BinaryReader(0) {
+    BinaryResourceReader(0) {
 }
 
 void WavReader::doLoad() {

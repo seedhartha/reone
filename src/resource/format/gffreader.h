@@ -25,7 +25,7 @@ namespace reone {
 
 namespace resource {
 
-class GffReader : public BinaryReader {
+class GffReader : public BinaryResourceReader {
 public:
     GffReader();
 

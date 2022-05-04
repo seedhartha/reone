@@ -19,11 +19,11 @@ set(TEST_HEADERS
     checkutil.h)
 
 set(TEST_SOURCES
-    common/hexutil.cpp
+    common/binaryreader.cpp
+    common/binarywriter.cpp
     common/bytearrayinputstream.cpp
     common/bytearrayoutputstream.cpp
-    common/streamreader.cpp
-    common/streamwriter.cpp
+    common/hexutil.cpp
     common/stringbuilder.cpp
     common/unicodeutil.cpp
     game/game.cpp

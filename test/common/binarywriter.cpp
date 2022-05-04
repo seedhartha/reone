@@ -18,7 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/stream/bytearrayoutput.h"
-#include "../../src/common/streamwriter.h"
+#include "../../src/common/binarywriter.h"
 #include "../../src/common/stringbuilder.h"
 
 #include "../checkutil.h"
@@ -27,13 +27,13 @@ using namespace std;
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(stream_writer)
+BOOST_AUTO_TEST_SUITE(binary_writer)
 
 BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
-    auto writer = StreamWriter(stream, boost::endian::order::little);
+    auto writer = BinaryWriter(stream, boost::endian::order::little);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)
                               .append("\x41", 1)
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
-    auto writer = StreamWriter(stream, boost::endian::order::big);
+    auto writer = BinaryWriter(stream, boost::endian::order::big);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)
                               .append("\x41", 1)

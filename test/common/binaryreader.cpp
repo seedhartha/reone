@@ -18,7 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/stream/bytearrayinput.h"
-#include "../../src/common/streamreader.h"
+#include "../../src/common/binaryreader.h"
 #include "../../src/common/stringbuilder.h"
 
 #include "../checkutil.h"
@@ -27,13 +27,13 @@ using namespace std;
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(stream_reader)
+BOOST_AUTO_TEST_SUITE(binary_reader)
 
 BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
     auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
     auto stream = ByteArrayInputStream(input);
-    auto reader = StreamReader(stream, boost::endian::order::little);
+    auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;
 
     // when
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
     auto stream = ByteArrayInputStream(inputBytes);
-    auto reader = StreamReader(stream, boost::endian::order::little);
+    auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedByte = 255u;
     auto expectedUint16 = 65281u;
     auto expectedUint32 = 4294967042u;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
     auto stream = ByteArrayInputStream(inputBytes);
-    auto reader = StreamReader(stream, boost::endian::order::big);
+    auto reader = BinaryReader(stream, boost::endian::order::big);
     auto expectedUint16 = 65281u;
     auto expectedUint32 = 4294967042u;
     auto expectedUint64 = 18446744073709551363u;

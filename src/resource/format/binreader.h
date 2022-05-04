@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../common/streamreader.h"
+#include "../../common/binaryreader.h"
 #include "../../common/types.h"
 
 namespace reone {
@@ -26,7 +26,7 @@ class IInputStream;
 
 namespace resource {
 
-class BinaryReader : boost::noncopyable {
+class BinaryResourceReader : boost::noncopyable {
 public:
     void load(IInputStream &in);
     void load(boost::filesystem::path path);
@@ -35,10 +35,10 @@ protected:
     boost::endian::order _endianess {boost::endian::order::little};
     boost::filesystem::path _path;
     IInputStream *_in {nullptr};
-    std::unique_ptr<StreamReader> _reader;
+    std::unique_ptr<BinaryReader> _reader;
     size_t _size {0};
 
-    BinaryReader(int signSize, const char *sign = 0);
+    BinaryResourceReader(int signSize, const char *sign = 0);
 
     virtual void doLoad() = 0;
 

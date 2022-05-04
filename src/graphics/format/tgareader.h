@@ -27,10 +27,10 @@ namespace graphics {
 
 class Texture;
 
-class TgaReader : public resource::BinaryReader {
+class TgaReader : public resource::BinaryResourceReader {
 public:
     TgaReader(std::string resRef, TextureUsage usage) :
-        BinaryReader(0),
+        BinaryResourceReader(0),
         _resRef(std::move(resRef)),
         _usage(usage) {
     }

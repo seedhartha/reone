@@ -86,7 +86,7 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
     }
 
     auto stream = ByteArrayInputStream(*bytes);
-    StreamReader reader(stream);
+    BinaryReader reader(stream);
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();
 

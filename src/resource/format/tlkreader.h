@@ -25,7 +25,7 @@ namespace resource {
 
 class TalkTable;
 
-class TlkReader : public BinaryReader {
+class TlkReader : public BinaryResourceReader {
 public:
     TlkReader();
 

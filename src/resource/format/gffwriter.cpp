@@ -63,7 +63,7 @@ void GffWriter::save(const fs::path &path) {
 void GffWriter::save(IOutputStream &out) {
     processTree();
 
-    _writer = make_unique<StreamWriter>(out);
+    _writer = make_unique<BinaryWriter>(out);
 
     writeHeader();
     writeStructArray();

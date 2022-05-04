@@ -26,7 +26,7 @@ namespace game {
 /**
  * Encapsulates the LTR file format, used to generate random names.
  */
-class LtrReader : public resource::BinaryReader {
+class LtrReader : public resource::BinaryResourceReader {
 public:
     LtrReader();
 

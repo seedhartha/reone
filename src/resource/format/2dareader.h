@@ -25,7 +25,7 @@ namespace reone {
 
 namespace resource {
 
-class TwoDaReader : public BinaryReader {
+class TwoDaReader : public BinaryResourceReader {
 public:
     TwoDaReader();
 

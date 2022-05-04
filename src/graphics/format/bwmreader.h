@@ -25,7 +25,7 @@ namespace graphics {
 
 class Walkmesh;
 
-class BwmReader : public resource::BinaryReader {
+class BwmReader : public resource::BinaryResourceReader {
 public:
     BwmReader();
 

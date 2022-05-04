@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 
 namespace reone {
 
@@ -38,7 +38,7 @@ public:
 
 private:
     std::shared_ptr<TwoDa> _twoDa;
-    std::unique_ptr<StreamWriter> _writer;
+    std::unique_ptr<BinaryWriter> _writer;
 
     void writeHeaders();
     void writeLabels();

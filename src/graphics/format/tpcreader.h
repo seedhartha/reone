@@ -25,7 +25,7 @@ namespace reone {
 
 namespace graphics {
 
-class TpcReader : public resource::BinaryReader {
+class TpcReader : public resource::BinaryResourceReader {
 public:
     TpcReader(const std::string &resRef, TextureUsage usage);
 

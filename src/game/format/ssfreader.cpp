@@ -26,7 +26,7 @@ namespace reone {
 namespace game {
 
 SsfReader::SsfReader() :
-    BinaryReader(8, "SSF V1.1") {
+    BinaryResourceReader(8, "SSF V1.1") {
 }
 
 void SsfReader::doLoad() {

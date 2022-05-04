@@ -22,9 +22,9 @@
 
 namespace reone {
 
-class StreamWriter : boost::noncopyable {
+class BinaryWriter : boost::noncopyable {
 public:
-    StreamWriter(
+    BinaryWriter(
         IOutputStream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
         _stream(stream),

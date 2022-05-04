@@ -32,7 +32,7 @@ namespace reone {
 namespace graphics {
 
 TpcReader::TpcReader(const string &resRef, TextureUsage usage) :
-    BinaryReader(0), _resRef(resRef), _usage(usage) {
+    BinaryResourceReader(0), _resRef(resRef), _usage(usage) {
 }
 
 void TpcReader::doLoad() {

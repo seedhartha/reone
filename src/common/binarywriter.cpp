@@ -15,49 +15,49 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "streamwriter.h"
+#include "binarywriter.h"
 
 using namespace std;
 
 namespace reone {
 
-void StreamWriter::putByte(uint8_t val) {
+void BinaryWriter::putByte(uint8_t val) {
     _stream.writeByte(val);
 }
 
-void StreamWriter::putChar(char val) {
+void BinaryWriter::putChar(char val) {
     _stream.writeByte(*reinterpret_cast<uint8_t *>(&val));
 }
 
-void StreamWriter::putUint16(uint16_t val) {
+void BinaryWriter::putUint16(uint16_t val) {
     put(val);
 }
 
-void StreamWriter::putUint32(uint32_t val) {
+void BinaryWriter::putUint32(uint32_t val) {
     put(val);
 }
 
-void StreamWriter::putInt16(int16_t val) {
+void BinaryWriter::putInt16(int16_t val) {
     put(val);
 }
 
-void StreamWriter::putInt32(int32_t val) {
+void BinaryWriter::putInt32(int32_t val) {
     put(val);
 }
 
-void StreamWriter::putInt64(int64_t val) {
+void BinaryWriter::putInt64(int64_t val) {
     put(val);
 }
 
-void StreamWriter::putFloat(float val) {
+void BinaryWriter::putFloat(float val) {
     put(*reinterpret_cast<uint32_t *>(&val));
 }
 
-void StreamWriter::putString(const string &str) {
+void BinaryWriter::putString(const string &str) {
     _stream.write(&str[0], str.length());
 }
 
-void StreamWriter::putStringExact(const string &str, int len) {
+void BinaryWriter::putStringExact(const string &str, int len) {
     int strLen = min(len, static_cast<int>(str.length()));
     if (strLen > 0) {
         _stream.write(&str[0], strLen);
@@ -67,22 +67,22 @@ void StreamWriter::putStringExact(const string &str, int len) {
     }
 }
 
-void StreamWriter::putCString(const string &str) {
+void BinaryWriter::putCString(const string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream.write(&str[0], len);
     _stream.writeByte('\0');
 }
 
-void StreamWriter::putBytes(const ByteArray &bytes) {
+void BinaryWriter::putBytes(const ByteArray &bytes) {
     _stream.write(&bytes[0], bytes.size());
 }
 
-void StreamWriter::putBytes(int count, uint8_t val) {
+void BinaryWriter::putBytes(int count, uint8_t val) {
     ByteArray data(count, val);
     _stream.write(&data[0], count);
 }
 
-size_t StreamWriter::tell() const {
+size_t BinaryWriter::tell() const {
     return _stream.position();
 }
 

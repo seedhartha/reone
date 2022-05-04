@@ -32,7 +32,7 @@ struct StringFlags {
 };
 
 TlkReader::TlkReader() :
-    BinaryReader(8, "TLK V3.0") {
+    BinaryResourceReader(8, "TLK V3.0") {
 }
 
 void TlkReader::doLoad() {

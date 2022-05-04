@@ -18,7 +18,7 @@
 #include "tlkwriter.h"
 
 #include "../../common/stream/fileoutput.h"
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 
 #include "../talktable.h"
 
@@ -58,7 +58,7 @@ void TlkWriter::save(IOutputStream &out) {
         offString += strSize;
     }
 
-    StreamWriter writer(out);
+    BinaryWriter writer(out);
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable->getStringCount());

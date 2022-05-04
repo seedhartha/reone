@@ -26,7 +26,7 @@ namespace reone {
 namespace graphics {
 
 LipReader::LipReader(string name) :
-    BinaryReader(8, "LIP V1.0"),
+    BinaryResourceReader(8, "LIP V1.0"),
     _name(move(name)) {
 }
 

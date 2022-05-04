@@ -21,7 +21,7 @@
 #include "../../common/exception/validation.h"
 #include "../../common/stream/bytearrayoutput.h"
 #include "../../common/stream/fileoutput.h"
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 
 #include "../program.h"
 
@@ -42,7 +42,7 @@ void NcsWriter::save(const fs::path &path) {
 void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
-    StreamWriter writer(stream, endian::order::big);
+    BinaryWriter writer(stream, endian::order::big);
 
     for (auto &ins : _program.instructions()) {
         auto pos = 13 + static_cast<uint32_t>(writer.tell());
@@ -112,7 +112,7 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
         }
     }
 
-    StreamWriter ncsWriter(*out, endian::order::big);
+    BinaryWriter ncsWriter(*out, endian::order::big);
 
     ncsWriter.putString(string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);

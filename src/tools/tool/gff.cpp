@@ -18,7 +18,7 @@
 #include "gff.h"
 
 #include "../../common/hexutil.h"
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/typeutil.h"

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-class BifReader : public BinaryReader {
+class BifReader : public BinaryResourceReader {
 public:
     BifReader();
 

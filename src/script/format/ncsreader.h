@@ -30,7 +30,7 @@ class ScriptProgram;
  *
  * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
  */
-class NcsReader : public resource::BinaryReader {
+class NcsReader : public resource::BinaryResourceReader {
 public:
     NcsReader(const std::string &resRef);
 

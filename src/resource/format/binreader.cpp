@@ -18,7 +18,7 @@
 #include "binreader.h"
 
 #include "../../common/stream/fileinput.h"
-#include "../../common/streamreader.h"
+#include "../../common/binaryreader.h"
 
 using namespace std;
 
@@ -28,7 +28,7 @@ namespace reone {
 
 namespace resource {
 
-BinaryReader::BinaryReader(int signSize, const char *sign) :
+BinaryResourceReader::BinaryResourceReader(int signSize, const char *sign) :
     _signSize(signSize) {
     if (!sign)
         return;
@@ -37,26 +37,26 @@ BinaryReader::BinaryReader(int signSize, const char *sign) :
     memcpy(&_sign[0], sign, _signSize);
 }
 
-void BinaryReader::load(IInputStream &in) {
+void BinaryResourceReader::load(IInputStream &in) {
     _in = &in;
-    _reader = make_unique<StreamReader>(in, _endianess);
+    _reader = make_unique<BinaryReader>(in, _endianess);
 
     load();
 }
 
-void BinaryReader::load() {
+void BinaryResourceReader::load() {
     querySize();
     checkSignature();
     doLoad();
 }
 
-void BinaryReader::querySize() {
+void BinaryResourceReader::querySize() {
     _in->seek(0, SeekOrigin::End);
     _size = _in->position();
     _in->seek(0, SeekOrigin::Begin);
 }
 
-void BinaryReader::checkSignature() {
+void BinaryResourceReader::checkSignature() {
     if (_size < _signSize) {
         throw runtime_error("Invalid binary file size");
     }
@@ -67,64 +67,64 @@ void BinaryReader::checkSignature() {
     }
 }
 
-void BinaryReader::load(fs::path path) {
+void BinaryResourceReader::load(fs::path path) {
     if (!fs::exists(path)) {
         throw runtime_error("File not found: " + path.string());
     }
     _in = new FileInputStream(path, OpenMode::Binary); // TODO: free
-    _reader = make_unique<StreamReader>(*_in, _endianess);
+    _reader = make_unique<BinaryReader>(*_in, _endianess);
     _path = path;
 
     load();
 }
 
-size_t BinaryReader::tell() const {
+size_t BinaryResourceReader::tell() const {
     return _reader->tell();
 }
 
-void BinaryReader::seek(size_t pos) {
+void BinaryResourceReader::seek(size_t pos) {
     _reader->seek(pos);
 }
 
-void BinaryReader::ignore(int count) {
+void BinaryResourceReader::ignore(int count) {
     _reader->ignore(count);
 }
 
-uint8_t BinaryReader::readByte() {
+uint8_t BinaryResourceReader::readByte() {
     return _reader->getByte();
 }
 
-uint16_t BinaryReader::readUint16() {
+uint16_t BinaryResourceReader::readUint16() {
     return _reader->getUint16();
 }
 
-uint32_t BinaryReader::readUint32() {
+uint32_t BinaryResourceReader::readUint32() {
     return _reader->getUint32();
 }
 
-uint64_t BinaryReader::readUint64() {
+uint64_t BinaryResourceReader::readUint64() {
     return _reader->getUint64();
 }
 
-int16_t BinaryReader::readInt16() {
+int16_t BinaryResourceReader::readInt16() {
     return _reader->getInt16();
 }
 
-int32_t BinaryReader::readInt32() {
+int32_t BinaryResourceReader::readInt32() {
     return _reader->getInt32();
 }
 
-float BinaryReader::readFloat() {
+float BinaryResourceReader::readFloat() {
     return _reader->getFloat();
 }
 
-string BinaryReader::readCString(int len) {
+string BinaryResourceReader::readCString(int len) {
     string result(_reader->getString(len));
     result.erase(find(result.begin(), result.end(), '\0'), result.end());
     return move(result);
 }
 
-string BinaryReader::readCString(size_t off, int len) {
+string BinaryResourceReader::readCString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
@@ -134,7 +134,7 @@ string BinaryReader::readCString(size_t off, int len) {
     return move(result);
 }
 
-string BinaryReader::readCStringAt(size_t off) {
+string BinaryResourceReader::readCStringAt(size_t off) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
@@ -144,11 +144,11 @@ string BinaryReader::readCStringAt(size_t off) {
     return move(result);
 }
 
-string BinaryReader::readString(int len) {
+string BinaryResourceReader::readString(int len) {
     return _reader->getString(len);
 }
 
-string BinaryReader::readString(size_t off, int len) {
+string BinaryResourceReader::readString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
@@ -158,11 +158,11 @@ string BinaryReader::readString(size_t off, int len) {
     return move(result);
 }
 
-ByteArray BinaryReader::readBytes(int count) {
+ByteArray BinaryResourceReader::readBytes(int count) {
     return _reader->getBytes(count);
 }
 
-ByteArray BinaryReader::readBytes(size_t off, int count) {
+ByteArray BinaryResourceReader::readBytes(size_t off, int count) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 

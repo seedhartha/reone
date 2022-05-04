@@ -18,7 +18,7 @@
 #include "rimwriter.h"
 
 #include "../../common/stream/fileoutput.h"
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 
 using namespace std;
 
@@ -38,7 +38,7 @@ void RimWriter::save(const fs::path &path) {
 }
 
 void RimWriter::save(IOutputStream &out) {
-    StreamWriter writer(out);
+    BinaryWriter writer(out);
     uint32_t numResources = static_cast<uint32_t>(_resources.size());
 
     writer.putString("RIM V1.0");

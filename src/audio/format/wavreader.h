@@ -32,7 +32,7 @@ enum class WavAudioFormat {
 
 class AudioStream;
 
-class WavReader : public resource::BinaryReader {
+class WavReader : public resource::BinaryResourceReader {
 public:
     WavReader();
 

@@ -26,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-class ErfReader : public BinaryReader, public IResourceProvider {
+class ErfReader : public BinaryResourceReader, public IResourceProvider {
 public:
     struct KeyEntry {
         ResourceId resId;

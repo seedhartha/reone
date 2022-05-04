@@ -25,7 +25,7 @@ namespace graphics {
 
 class LipAnimation;
 
-class LipReader : public resource::BinaryReader {
+class LipReader : public resource::BinaryResourceReader {
 public:
     LipReader(std::string name);
 

@@ -26,7 +26,7 @@ namespace reone {
 namespace graphics {
 
 BwmReader::BwmReader() :
-    BinaryReader(8, "BWM V1.0") {
+    BinaryResourceReader(8, "BWM V1.0") {
 }
 
 void BwmReader::doLoad() {

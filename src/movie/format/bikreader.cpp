@@ -19,7 +19,7 @@
 
 #include "../../audio/stream.h"
 #include "../../common/logutil.h"
-#include "../../common/streamreader.h"
+#include "../../common/binaryreader.h"
 
 #include "../movie.h"
 #include "../videostream.h"

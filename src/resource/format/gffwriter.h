@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 #include "../../common/types.h"
 
 #include "../types.h"
@@ -67,7 +67,7 @@ private:
     ResourceType _resType;
     std::shared_ptr<Gff> _root;
     WriteContext _context;
-    std::unique_ptr<StreamWriter> _writer;
+    std::unique_ptr<BinaryWriter> _writer;
 
     void processTree();
 

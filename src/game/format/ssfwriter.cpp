@@ -18,7 +18,7 @@
 #include "ssfwriter.h"
 
 #include "../../common/stream/fileoutput.h"
-#include "../../common/streamwriter.h"
+#include "../../common/binarywriter.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace game {
 
 void SsfWriter::save(const fs::path &path) {
     auto stream = FileOutputStream(path, OpenMode::Binary);
-    StreamWriter writer(stream);
+    BinaryWriter writer(stream);
 
     writer.putString("SSF V1.1");
     writer.putUint32(12); // offset to entries

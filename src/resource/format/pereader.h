@@ -27,7 +27,7 @@ namespace reone {
 
 namespace resource {
 
-class PEReader : public BinaryReader {
+class PEReader : public BinaryResourceReader {
 public:
     PEReader();
 

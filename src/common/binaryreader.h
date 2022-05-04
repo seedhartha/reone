@@ -22,9 +22,9 @@
 
 namespace reone {
 
-class StreamReader : boost::noncopyable {
+class BinaryReader : boost::noncopyable {
 public:
-    StreamReader(
+    BinaryReader(
         IInputStream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
         _stream(stream),
