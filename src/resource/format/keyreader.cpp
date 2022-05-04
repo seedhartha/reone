@@ -23,73 +23,56 @@ namespace reone {
 
 namespace resource {
 
-bool KeyReader::find(const ResourceId &id, KeyEntry &outKey) const {
-    auto maybeKey = _keyIdxByResId.find(id);
-    if (maybeKey == _keyIdxByResId.end()) {
-        return false;
-    }
-    outKey = _keys[maybeKey->second];
-    return true;
-}
-
-const string &KeyReader::getFilename(int idx) const {
-    if (idx >= _files.size()) {
-        throw out_of_range("KEY: file index out of range: " + to_string(idx));
-    }
-    return _files[idx].filename;
-}
-
 void KeyReader::onLoad() {
     checkSignature(string("KEY V1  ", 8));
 
-    _bifCount = readUint32();
-    _keyCount = readUint32();
-    _filesOffset = readUint32();
-    _keysOffset = readUint32();
+    _numBifs = readUint32();
+    _numKeys = readUint32();
+    _offFiles = readUint32();
+    _offKeys = readUint32();
 
     loadFiles();
     loadKeys();
 }
 
 void KeyReader::loadFiles() {
-    _files.reserve(_bifCount);
-    seek(_filesOffset);
+    _files.reserve(_numBifs);
 
-    for (int i = 0; i < _bifCount; ++i) {
+    seek(_offFiles);
+
+    for (int i = 0; i < _numBifs; ++i) {
         _files.push_back(readFileEntry());
     }
 }
 
 KeyReader::FileEntry KeyReader::readFileEntry() {
-    uint32_t fileSize = readUint32();
-    uint32_t filenameOffset = readUint32();
-    uint16_t filenameSize = readUint16();
-    ignore(2);
+    auto fileSize = readUint32();
+    auto offFilename = readUint32();
+    auto filenameSize = readUint16();
+    auto drives = readUint16();
 
-    FileEntry entry;
-    entry.filename = readCString(filenameOffset, filenameSize);
+    auto entry = FileEntry();
+    entry.filename = boost::replace_all_copy(readCString(offFilename, filenameSize), "\\", "/");
     entry.fileSize = fileSize;
 
     return move(entry);
 }
 
 void KeyReader::loadKeys() {
-    _keys.reserve(_keyCount);
-    seek(_keysOffset);
+    _keys.reserve(_numKeys);
+    seek(_offKeys);
 
-    for (int i = 0; i < _keyCount; ++i) {
-        KeyEntry entry(readKeyEntry());
-        _keyIdxByResId.insert(make_pair(entry.resId, i));
-        _keys.push_back(move(entry));
+    for (int i = 0; i < _numKeys; ++i) {
+        _keys.push_back(readKeyEntry());
     }
 }
 
 KeyReader::KeyEntry KeyReader::readKeyEntry() {
-    string resRef(boost::to_lower_copy(readCString(16)));
-    uint16_t resType = readUint16();
-    uint32_t resId = readUint32();
+    auto resRef = boost::to_lower_copy(readCString(16));
+    auto resType = readUint16();
+    auto resId = readUint32();
 
-    KeyEntry entry;
+    auto entry = KeyEntry();
     entry.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
     entry.bifIdx = resId >> 20;
     entry.resIdx = resId & 0xfffff;

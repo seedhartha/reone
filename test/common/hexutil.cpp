@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_utf16_string) {
 
 BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
     // given
-    auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto input = ByteArray("Hello, world!", 13);
     auto expectedOutput = string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
 
     // when
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
 BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
     // given
     auto input = string("48656c6c6f2c20776f726c6421");
-    auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto expectedOutput = ByteArray("Hello, world!", 13);
 
     // when
     auto output = unhexify(input);

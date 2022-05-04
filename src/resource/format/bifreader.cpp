@@ -25,30 +25,39 @@ namespace resource {
 
 void BifReader::onLoad() {
     checkSignature(string("BIFFV1  ", 8));
-    _resourceCount = readUint32();
-    ignore(4);
-    _tableOffset = readUint32();
+    loadHeader();
+    loadResources();
 }
 
-unique_ptr<ByteArray> BifReader::getResourceData(int idx) {
-    if (idx >= _resourceCount) {
-        throw out_of_range("BIF: resource index out of range: " + to_string(idx));
+void BifReader::loadHeader() {
+    auto numVariableResources = readUint32();
+    auto numFixedResources = readUint32();
+    auto offVariableTable = readUint32();
+
+    _numResources = numVariableResources;
+    _offResources = offVariableTable;
+}
+
+void BifReader::loadResources() {
+    _resources.reserve(_numResources);
+    seek(_offResources);
+
+    for (auto i = 0; i < _numResources; ++i) {
+        _resources.push_back(readResourceEntry());
     }
-    ResourceEntry entry(readResourceEntry(idx));
-
-    return make_unique<ByteArray>(readBytes(entry.offset, entry.fileSize));
 }
 
-BifReader::ResourceEntry BifReader::readResourceEntry(int idx) {
-    seek(_tableOffset + 16 * idx);
-
-    ignore(4);
+BifReader::ResourceEntry BifReader::readResourceEntry() {
+    uint32_t id = readUint32();
     uint32_t offset = readUint32();
     uint32_t fileSize = readUint32();
+    uint32_t resType = readUint32();
 
-    ResourceEntry entry;
+    auto entry = ResourceEntry();
+    entry.id = id;
     entry.offset = offset;
     entry.fileSize = fileSize;
+    entry.resType = resType;
 
     return move(entry);
 }

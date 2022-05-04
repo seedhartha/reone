@@ -45,7 +45,7 @@ public:
     int entryCount() const { return _entryCount; }
     const std::vector<KeyEntry> &keys() const { return _keys; }
 
-    int getId() const override { return _id; }
+    int id() const override { return _id; }
     ByteArray getResourceData(int idx);
 
 private:

@@ -39,20 +39,17 @@ public:
         int resIdx {0};
     };
 
-    bool find(const ResourceId &id, KeyEntry &outKey) const;
-    const std::string &getFilename(int idx) const;
-
     const std::vector<FileEntry> &files() const { return _files; }
     const std::vector<KeyEntry> &keys() const { return _keys; }
 
 private:
-    int _bifCount {0};
-    int _keyCount {0};
-    uint32_t _filesOffset {0};
-    uint32_t _keysOffset {0};
+    uint32_t _numBifs {0};
+    uint32_t _numKeys {0};
+    uint32_t _offFiles {0};
+    uint32_t _offKeys {0};
+
     std::vector<FileEntry> _files;
     std::vector<KeyEntry> _keys;
-    std::unordered_map<ResourceId, int, ResourceIdHasher> _keyIdxByResId;
 
     void onLoad() override;
 

@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(binary_reader)
 
 BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
-    auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
+    auto input = ByteArray("Hello, world!\x00", 13);
     auto stream = ByteArrayInputStream(input);
     auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;

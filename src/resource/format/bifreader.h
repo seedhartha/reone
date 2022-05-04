@@ -25,20 +25,29 @@ namespace resource {
 
 class BifReader : public BinaryResourceReader {
 public:
-    std::unique_ptr<ByteArray> getResourceData(int idx);
-
-private:
     struct ResourceEntry {
+        uint32_t id {0};
         uint32_t offset {0};
         uint32_t fileSize {0};
+        uint32_t resType {0};
     };
 
-    int _resourceCount {0};
-    uint32_t _tableOffset {0};
+    const std::vector<ResourceEntry> &resources() const {
+        return _resources;
+    }
+
+private:
+    int _numResources {0};
+    uint32_t _offResources {0};
+
+    std::vector<ResourceEntry> _resources;
 
     void onLoad() override;
 
-    ResourceEntry readResourceEntry(int idx);
+    void loadHeader();
+    void loadResources();
+
+    ResourceEntry readResourceEntry();
 };
 
 } // namespace resource

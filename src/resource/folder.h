@@ -36,7 +36,7 @@ public:
 
     std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
-    int getId() const override { return _id; }
+    int id() const override { return _id; }
 
 private:
     struct Resource {

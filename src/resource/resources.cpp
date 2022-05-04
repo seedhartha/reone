@@ -40,8 +40,8 @@ void Resources::indexKeyFile(const fs::path &path) {
     if (!fs::exists(path)) {
         return;
     }
-    auto keyBif = make_unique<KeyBifResourceProvider>(static_cast<int>(_providers.size()));
-    keyBif->init(path);
+    auto keyBif = make_unique<KeyBifResourceProvider>(path, static_cast<int>(_providers.size()));
+    keyBif->init();
     indexProvider(move(keyBif), path);
 }
 
@@ -95,7 +95,7 @@ void Resources::indexExeFile(const fs::path &path) {
 }
 
 void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs::path &path, bool transient) {
-    debug(boost::format("Index provider %d at '%s'") % provider->getId() % path.string(), LogChannels::resources);
+    debug(boost::format("Index provider %d at '%s'") % provider->id() % path.string(), LogChannels::resources);
     if (transient) {
         _transientProviders.push_back(move(provider));
     } else {
@@ -105,7 +105,7 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
 
 void Resources::clearTransientProviders() {
     for (auto &provider : _transientProviders) {
-        debug("Remove provider " + to_string(provider->getId()), LogChannels::resources);
+        debug("Remove provider " + to_string(provider->id()), LogChannels::resources);
     }
     _transientProviders.clear();
 }
@@ -138,7 +138,7 @@ shared_ptr<ByteArray> Resources::getFromProviders(const ResourceId &id, const ve
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
         shared_ptr<ByteArray> data((*provider)->find(id));
         if (data) {
-            debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->getId(), LogChannels::resources2);
+            debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->id(), LogChannels::resources2);
             return data;
         }
     }

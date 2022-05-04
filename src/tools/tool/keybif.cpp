@@ -40,31 +40,27 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
         listKEY(key);
 
     } else {
-        fs::path keyPath(getPathIgnoreCase(gamePath, "chitin.key"));
-        auto keyStream = FileInputStream(keyPath, OpenMode::Binary);
+        auto keyPath = getPathIgnoreCase(gamePath, "chitin.key");
+        auto key = FileInputStream(keyPath, OpenMode::Binary);
 
-        KeyReader key;
-        key.load(keyStream);
+        auto keyReader = KeyReader();
+        keyReader.load(key);
 
         int bifIdx = -1;
-        for (size_t i = 0; i < key.files().size(); ++i) {
-            if (boost::iends_with(key.getFilename(static_cast<int>(i)), target.filename().string())) {
+        for (size_t i = 0; i < keyReader.files().size(); ++i) {
+            if (boost::iends_with(keyReader.files()[i].filename, target.filename().string())) {
                 bifIdx = static_cast<int>(i);
                 break;
             }
         }
-        if (bifIdx == -1)
+        if (bifIdx == -1) {
             return;
-
-        auto bifStream = FileInputStream(target, OpenMode::Binary);
-
-        BifReader bif;
-        bif.load(bifStream);
+        }
 
         if (operation == Operation::List) {
-            listBIF(key, bif, bifIdx);
+            listBIF(keyReader, bifIdx);
         } else if (operation == Operation::Extract) {
-            extractBIF(key, bif, bifIdx, destPath);
+            extractBIF(keyReader, bifIdx, target, destPath);
         }
     }
 }
@@ -75,7 +71,7 @@ void KeyBifTool::listKEY(const KeyReader &key) {
     }
 }
 
-void KeyBifTool::listBIF(const KeyReader &key, const BifReader &bif, int bifIdx) {
+void KeyBifTool::listBIF(const KeyReader &key, int bifIdx) {
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx == bifIdx) {
             cout << keyEntry.resId.string() << endl;
@@ -83,7 +79,7 @@ void KeyBifTool::listBIF(const KeyReader &key, const BifReader &bif, int bifIdx)
     }
 }
 
-void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, const fs::path &destPath) {
+void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const fs::path &bifPath, const fs::path &destPath) {
     if (!fs::exists(destPath)) {
         // Create destination directory if it does not exist
         fs::create_directory(destPath);
@@ -92,19 +88,31 @@ void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, co
         return;
     }
 
+    auto bif = FileInputStream(bifPath, OpenMode::Binary);
+
+    auto bifReader = BifReader();
+    bifReader.load(bif);
+
+    auto &bifResources = bifReader.resources();
+
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx != bifIdx) {
             continue;
         }
         cout << "Extracting " + keyEntry.resId.string() << endl;
-        string ext(getExtByResType(keyEntry.resId.type));
-        unique_ptr<ByteArray> data(bif.getResourceData(keyEntry.resIdx));
 
-        fs::path resPath(destPath);
+        auto &bifResource = bifResources.at(keyEntry.resIdx);
+        auto buffer = ByteArray(bifResource.fileSize, '\0');
+
+        bif.seek(bifResource.offset, SeekOrigin::Begin);
+        bif.read(&buffer[0], buffer.size());
+
+        auto ext = getExtByResType(keyEntry.resId.type);
+        auto resPath = fs::path(destPath);
         resPath.append(keyEntry.resId.resRef + "." + ext);
 
-        fs::ofstream out(resPath, ios::binary);
-        out.write(&(*data)[0], data->size());
+        auto out = fs::ofstream(resPath, ios::binary);
+        out.write(&buffer[0], buffer.size());
     }
 }
 

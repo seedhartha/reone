@@ -41,7 +41,7 @@ public:
 
     const std::vector<ResourceEntry> &resources() const { return _resources; }
 
-    int getId() const override { return _id; }
+    int id() const override { return _id; }
     ByteArray getResourceData(int idx);
 
 private:

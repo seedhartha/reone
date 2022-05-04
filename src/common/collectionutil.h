@@ -37,9 +37,9 @@ template <class Src, class Dest>
 inline std::map<Src, Dest> associate(const std::vector<Src> &source, const std::function<Dest(const Src &)> &fn) {
     std::map<Src, Dest> result;
     for (auto &item : source) {
-        result.insert(make_pair(item, fn(item)));
+        result.insert(std::make_pair(item, fn(item)));
     }
-    return move(result);
+    return std::move(result);
 }
 
 template <class Src, class K, class V>
@@ -49,9 +49,35 @@ inline std::map<K, V> associate(
     const std::function<V(const Src &)> &valueFn) {
     std::map<K, V> result;
     for (auto &item : source) {
-        result.insert(make_pair(keyFn(item), valueFn(item)));
+        result.insert(std::make_pair(keyFn(item), valueFn(item)));
     }
-    return move(result);
+    return std::move(result);
+}
+
+template <class K, class V>
+inline std::map<K, std::vector<V>> groupBy(
+    const std::vector<V> &items,
+    const std::function<K(const V &)> &keyFn) {
+
+    auto map = std::map<K, std::vector<V>>();
+    for (auto &item : items) {
+        auto key = keyFn(item);
+        map[key].push_back(item);
+    }
+    return std::move(map);
+}
+
+template <class I, class K, class V>
+inline std::map<K, std::vector<V>> groupBy(
+    const std::vector<I> &items,
+    const std::function<K(const I &)> &keyFn,
+    const std::function<V(const I &)> &valueFn) {
+
+    auto map = std::map<K, std::vector<V>>();
+    for (auto &item : items) {
+        map[keyFn(item)].push_back(valueFn(item));
+    }
+    return std::move(map);
 }
 
 template <class K, class V>
@@ -96,7 +122,7 @@ inline std::vector<V> mapToValues(const std::unordered_map<K, V> &map) {
     for (auto &pair : map) {
         values.push_back(pair.second);
     }
-    return move(values);
+    return std::move(values);
 }
 
 template <class K, class V>
@@ -105,7 +131,7 @@ inline std::vector<std::pair<K, V>> mapToEntries(const std::unordered_map<K, V> 
     for (auto &pair : map) {
         entries.push_back(pair);
     }
-    return move(entries);
+    return std::move(entries);
 }
 
 } // namespace reone

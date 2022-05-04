@@ -30,24 +30,29 @@ class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:
-    KeyBifResourceProvider(int id = kDefaultProviderId) :
+    KeyBifResourceProvider(boost::filesystem::path keyPath, int id = kDefaultProviderId) :
+        _keyPath(std::move(keyPath)),
         _id(id) {
     }
 
-    void init(const boost::filesystem::path &keyPath);
+    void init();
 
     std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
-    int getId() const override { return _id; }
+    int id() const override { return _id; }
 
 private:
+    struct Resource {
+        int bifIdx {0};
+        uint32_t bifOffset {0};
+        uint32_t fileSize {0};
+    };
+
+    boost::filesystem::path _keyPath;
     int _id;
 
-    boost::filesystem::path _gamePath;
-    KeyReader _keyFile;
-    std::unordered_map<int, std::unique_ptr<BifReader>> _bifCache;
-
-    std::vector<std::shared_ptr<FileInputStream>> _openFiles;
+    std::vector<boost::filesystem::path> _bifPaths;
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _resources;
 };
 
 } // namespace resource

@@ -21,8 +21,6 @@
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/bifreader.h"
 
-#include "../checkutil.h"
-
 using namespace std;
 
 using namespace reone;
@@ -50,7 +48,6 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
 
     auto stream = ByteArrayInputStream(input);
     auto reader = BifReader();
-    auto expectedData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
 
@@ -58,8 +55,12 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
 
     // then
 
-    auto actualData = reader.getResourceData(0);
-    BOOST_TEST((expectedData == *actualData), notEqualMessage(expectedData, *actualData));
+    auto &resources = reader.resources();
+    BOOST_CHECK_EQUAL(1ll, resources.size());
+    BOOST_CHECK_EQUAL(0, resources[0].id);
+    BOOST_CHECK_EQUAL(36, resources[0].offset);
+    BOOST_CHECK_EQUAL(13, resources[0].fileSize);
+    BOOST_CHECK_EQUAL(2022, resources[0].resType);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

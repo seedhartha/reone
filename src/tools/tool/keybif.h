@@ -36,8 +36,8 @@ public:
 
 private:
     void listKEY(const resource::KeyReader &key);
-    void listBIF(const resource::KeyReader &key, const resource::BifReader &bif, int bifIdx);
-    void extractBIF(const resource::KeyReader &key, resource::BifReader &bif, int bifIdx, const boost::filesystem::path &destPath);
+    void listBIF(const resource::KeyReader &key, int bifIdx);
+    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

@@ -26,9 +26,6 @@ namespace reone {
 
 namespace resource {
 
-/**
- * An interface to query for game resources.
- */
 class IResourceProvider {
 public:
     virtual ~IResourceProvider() {
@@ -36,7 +33,7 @@ public:
 
     virtual std::shared_ptr<ByteArray> find(const ResourceId &id) = 0;
 
-    virtual int getId() const = 0;
+    virtual int id() const = 0;
 };
 
 } // namespace resource

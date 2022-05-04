@@ -17,6 +17,7 @@
 
 #include "keybifprovider.h"
 
+#include "../common/collectionutil.h"
 #include "../common/pathutil.h"
 
 #include "format/bifreader.h"
@@ -29,47 +30,59 @@ namespace reone {
 
 namespace resource {
 
-void KeyBifResourceProvider::init(const fs::path &keyPath) {
-    _gamePath = keyPath.parent_path();
+void KeyBifResourceProvider::init() {
+    auto key = FileInputStream(_keyPath, OpenMode::Binary);
+    auto keyReader = KeyReader();
+    keyReader.load(key);
 
-    auto stream = make_shared<FileInputStream>(keyPath, OpenMode::Binary);
-    _openFiles.push_back(stream);
+    auto gamePath = _keyPath.parent_path();
+    auto &files = keyReader.files();
 
-    _keyFile.load(*stream);
+    auto keysByBifIdx = groupBy<KeyReader::KeyEntry, int, const KeyReader::KeyEntry *>(
+        keyReader.keys(),
+        [](auto &item) { return item.bifIdx; },
+        [](auto &item) { return &item; });
+
+    for (auto i = 0; i < keyReader.files().size(); ++i) {
+        auto &file = keyReader.files()[i];
+        auto bifPath = getPathIgnoreCase(gamePath, file.filename);
+        _bifPaths.push_back(bifPath);
+
+        auto bif = FileInputStream(bifPath, OpenMode::Binary);
+        auto bifReader = BifReader();
+        bifReader.load(bif);
+
+        auto &keys = keysByBifIdx.at(i);
+        auto &bifResources = bifReader.resources();
+
+        for (auto &key : keys) {
+            auto &bifResource = bifResources[key->resIdx];
+
+            auto resource = Resource();
+            resource.bifIdx = key->bifIdx;
+            resource.bifOffset = bifResource.offset;
+            resource.fileSize = bifResource.fileSize;
+
+            _resources[key->resId] = move(resource);
+        }
+    }
 }
 
 shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
-    KeyReader::KeyEntry key;
-    if (!_keyFile.find(id, key)) {
+    auto maybeResource = _resources.find(id);
+    if (maybeResource == _resources.end()) {
         return nullptr;
     }
-    shared_ptr<ByteArray> result;
+    auto &resource = maybeResource->second;
 
-    auto maybeBif = _bifCache.find(key.bifIdx);
-    if (maybeBif != _bifCache.end()) {
-        result = maybeBif->second->getResourceData(key.resIdx);
+    auto buffer = make_shared<ByteArray>(resource.fileSize, '\0');
 
-    } else {
-        string filename(_keyFile.getFilename(key.bifIdx).c_str());
-        boost::replace_all(filename, "\\", "/");
+    auto &bifPath = _bifPaths.at(resource.bifIdx);
+    auto bif = FileInputStream(bifPath, OpenMode::Binary);
+    bif.seek(resource.bifOffset, SeekOrigin::Begin);
+    bif.read(buffer->data(), resource.fileSize);
 
-        fs::path bifPath(getPathIgnoreCase(_gamePath, filename));
-        if (bifPath.empty()) {
-            throw runtime_error(str(boost::format("BIF file not found: %s %s") % _gamePath % filename));
-        }
-
-        auto stream = make_shared<FileInputStream>(bifPath, OpenMode::Binary);
-        _openFiles.push_back(stream);
-
-        auto bif = make_unique<BifReader>();
-        bif->load(*stream);
-
-        result = bif->getResourceData(key.resIdx);
-
-        _bifCache.insert(make_pair(key.bifIdx, move(bif)));
-    }
-
-    return move(result);
+    return move(buffer);
 }
 
 } // namespace resource
