@@ -19,6 +19,17 @@
 
 namespace reone {
 
+enum class SeekOrigin {
+    Begin,
+    Current,
+    End
+};
+
+enum class OpenMode {
+    Text,
+    Binary
+};
+
 enum class LogLevel {
     Error,
     Warn,

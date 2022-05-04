@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../common/stream/bytearrayinput.h"
 #include "../../resource/format/binreader.h"
 
 #include "../modelnode.h"
@@ -34,7 +35,7 @@ class MdlReader : public resource::BinaryReader {
 public:
     MdlReader(Models &models, Textures &textures);
 
-    void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
+    void load(const std::shared_ptr<IInputStream> &mdl, const std::shared_ptr<IInputStream> &mdx);
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
 

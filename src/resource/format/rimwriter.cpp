@@ -17,6 +17,7 @@
 
 #include "rimwriter.h"
 
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 using namespace std;
@@ -32,11 +33,11 @@ void RimWriter::add(Resource &&res) {
 }
 
 void RimWriter::save(const fs::path &path) {
-    auto rim = make_shared<fs::ofstream>(path, ios::binary);
+    auto rim = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(rim);
 }
 
-void RimWriter::save(shared_ptr<ostream> out) {
+void RimWriter::save(shared_ptr<IOutputStream> out) {
     StreamWriter writer(*out);
     uint32_t numResources = static_cast<uint32_t>(_resources.size());
 

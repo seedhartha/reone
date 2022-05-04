@@ -23,12 +23,21 @@ namespace reone {
 
 class FileInputStream : public IInputStream {
 public:
-    FileInputStream(const boost::filesystem::path &path, std::ios::openmode mode = std::ios::binary) :
-        _stream(path, mode) {
+    FileInputStream(const boost::filesystem::path &path, OpenMode mode = OpenMode::Text) :
+        _stream(path, mode == OpenMode::Binary ? std::ios::binary : 0) {
     }
 
-    size_t position() override {
-        return static_cast<size_t>(_stream.tellg());
+    void seek(int64_t offset, SeekOrigin origin) {
+        _stream.clear();
+        if (origin == SeekOrigin::Begin) {
+            _stream.seekg(offset, std::ios::beg);
+        } else if (origin == SeekOrigin::Current) {
+            _stream.seekg(offset, std::ios::cur);
+        } else if (origin == SeekOrigin::End) {
+            _stream.seekg(offset, std::ios::end);
+        } else {
+            throw std::invalid_argument("Unsupported origin: " + std::to_string(static_cast<int>(origin)));
+        }
     }
 
     int readByte() override {
@@ -36,9 +45,17 @@ public:
         return !_stream.eof() ? c : -1;
     }
 
-    int read(int length, ByteArray &outBytes) override {
-        _stream.read(&outBytes[0], length);
+    int read(char *outData, int length) override {
+        _stream.read(outData, length);
         return _stream.gcount();
+    }
+
+    size_t position() override {
+        return static_cast<size_t>(_stream.tellg());
+    }
+
+    bool eof() override {
+        return _stream.eof();
     }
 
 private:

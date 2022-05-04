@@ -17,6 +17,7 @@
 
 #include "erfwriter.h"
 
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 using namespace std;
@@ -35,11 +36,11 @@ void ErfWriter::add(Resource &&res) {
 }
 
 void ErfWriter::save(FileType type, const fs::path &path) {
-    auto out = make_shared<fs::ofstream>(path, ios::binary);
+    auto out = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(type, out);
 }
 
-void ErfWriter::save(FileType type, shared_ptr<ostream> out) {
+void ErfWriter::save(FileType type, shared_ptr<IOutputStream> out) {
     StreamWriter writer(*out);
     auto numResources = static_cast<uint32_t>(_resources.size());
     uint32_t offResources = 0xa0 + kKeyStructSize * numResources;

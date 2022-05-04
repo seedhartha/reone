@@ -19,7 +19,7 @@
 
 #include "../common/logutil.h"
 #include "../common/randomutil.h"
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 #include "../resource/resources.h"
 
 #include "format/curreader.h"
@@ -147,14 +147,14 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
         TgaReader tga(resRef, usage);
-        tga.load(wrap(tgaData));
+        tga.load(make_shared<ByteArrayInputStream>(*tgaData));
         texture = tga.texture();
 
         if (texture) {
             auto txiData = _resources.get(resRef, ResourceType::Txi, false);
             if (txiData) {
                 TxiReader txi;
-                txi.load(wrap(txiData));
+                txi.load(make_shared<ByteArrayInputStream>(*txiData));
                 texture->setFeatures(txi.features());
             }
         }
@@ -164,7 +164,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
         if (tpcData) {
             TpcReader tpc(resRef, usage);
-            tpc.load(wrap(tpcData));
+            tpc.load(make_shared<ByteArrayInputStream>(*tpcData));
             texture = tpc.texture();
         }
     }

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../common/stream/output.h"
 #include "../../common/types.h"
 
 #include "../types.h"
@@ -39,7 +40,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
-    void save(const std::shared_ptr<std::ostream> &out);
+    void save(const std::shared_ptr<IOutputStream> &out);
 
 private:
     struct WriteStruct {

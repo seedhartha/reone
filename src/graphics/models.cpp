@@ -19,7 +19,7 @@
 
 #include "../common/exception/validation.h"
 #include "../common/logutil.h"
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 #include "../resource/resources.h"
 
 #include "format/mdlreader.h"
@@ -67,7 +67,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
     if (mdlData && mdxData) {
         MdlReader mdl(*this, _textures);
         try {
-            mdl.load(wrap(mdlData), wrap(mdxData));
+            mdl.load(make_shared<ByteArrayInputStream>(*mdlData), make_shared<ByteArrayInputStream>(*mdxData));
             model = mdl.model();
             if (model) {
                 model->init();

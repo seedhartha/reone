@@ -17,7 +17,7 @@
 
 #include "walkmeshes.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 #include "../resource/resources.h"
 
 #include "format/bwmreader.h"
@@ -56,7 +56,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
 
     if (data) {
         BwmReader bwm;
-        bwm.load(wrap(data));
+        bwm.load(make_shared<ByteArrayInputStream>(*data));
         walkmesh = bwm.walkmesh();
     }
 

@@ -17,6 +17,7 @@
 
 #include "lipwriter.h"
 
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 namespace fs = boost::filesystem;
@@ -32,7 +33,7 @@ LipWriter::LipWriter(LipAnimation &&animation) :
 }
 
 void LipWriter::save(const fs::path &path) {
-    auto lip = make_shared<fs::ofstream>(path, ios::binary);
+    auto lip = make_shared<FileOutputStream>(path, OpenMode::Binary);
 
     StreamWriter writer(*lip);
     writer.putString("LIP V1.0");

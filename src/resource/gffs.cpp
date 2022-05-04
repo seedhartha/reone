@@ -17,7 +17,7 @@
 
 #include "gffs.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 
 #include "format/gffreader.h"
 #include "resources.h"
@@ -38,7 +38,7 @@ shared_ptr<Gff> Gffs::get(const string &resRef, ResourceType type) {
     auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
         GffReader reader;
-        reader.load(wrap(*maybeRaw));
+        reader.load(make_shared<ByteArrayInputStream>(*maybeRaw));
         gff = reader.root();
     }
     auto inserted = _cache.insert(make_pair(id, gff));

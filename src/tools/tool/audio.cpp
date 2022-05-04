@@ -17,6 +17,7 @@
 
 #include "audio.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../common/streamreader.h"
 
 using namespace std;
@@ -32,12 +33,12 @@ void AudioTool::invoke(Operation operation, const fs::path &target, const fs::pa
 }
 
 void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
-    auto wav = fs::ifstream(path, ios::binary);
+    auto wav = FileInputStream(path, OpenMode::Binary);
 
     // Determine filesize
-    wav.seekg(0, ios::end);
-    size_t filesize = wav.tellg();
-    wav.seekg(0);
+    wav.seek(0, SeekOrigin::End);
+    size_t filesize = wav.position();
+    wav.seek(0, SeekOrigin::Begin);
 
     string suffix;
 

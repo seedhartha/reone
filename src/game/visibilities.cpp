@@ -17,7 +17,7 @@
 
 #include "visibilities.h"
 
-#include "../../common/streamutil.h"
+#include "../../common/stream/bytearrayinput.h"
 #include "../../resource/resources.h"
 
 #include "format/visreader.h"
@@ -35,8 +35,9 @@ shared_ptr<Visibility> Visibilities::doGet(string resRef) {
     if (!data) {
         return nullptr;
     }
+    auto stream = make_shared<ByteArrayInputStream>(*data);
     VisReader vis;
-    vis.load(wrap(data));
+    vis.load(stream);
     return make_shared<Visibility>(vis.visibility());
 }
 

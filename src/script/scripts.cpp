@@ -17,7 +17,7 @@
 
 #include "scripts.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 
 #include "format/ncsreader.h"
 
@@ -41,7 +41,7 @@ shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
         return nullptr;
 
     NcsReader ncs(resRef);
-    ncs.load(wrap(data));
+    ncs.load(make_shared<ByteArrayInputStream>(*data));
 
     return ncs.program();
 }

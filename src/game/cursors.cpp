@@ -17,7 +17,7 @@
 
 #include "cursors.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 #include "../graphics/cursor.h"
 #include "../graphics/format/curreader.h"
 #include "../graphics/texture.h"
@@ -85,7 +85,8 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
         return vector<uint32_t>();
     }
 
-    StreamReader reader(*wrap(bytes));
+    auto stream = ByteArrayInputStream(*bytes);
+    StreamReader reader(stream);
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();
 
@@ -103,7 +104,7 @@ shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::Cursor));
 
     CurReader cur;
-    cur.load(wrap(bytes));
+    cur.load(make_shared<ByteArrayInputStream>(*bytes));
 
     return cur.texture();
 }

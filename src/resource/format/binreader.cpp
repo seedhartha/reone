@@ -17,6 +17,7 @@
 
 #include "binreader.h"
 
+#include "../../common/stream/fileinput.h"
 #include "../../common/streamreader.h"
 
 using namespace std;
@@ -36,7 +37,7 @@ BinaryReader::BinaryReader(int signSize, const char *sign) :
     memcpy(&_sign[0], sign, _signSize);
 }
 
-void BinaryReader::load(shared_ptr<istream> in) {
+void BinaryReader::load(shared_ptr<IInputStream> in) {
     _in = in;
     _reader = make_unique<StreamReader>(*in, _endianess);
 
@@ -50,9 +51,9 @@ void BinaryReader::load() {
 }
 
 void BinaryReader::querySize() {
-    _in->seekg(0, ios::end);
-    _size = _in->tellg();
-    _in->seekg(0);
+    _in->seek(0, SeekOrigin::End);
+    _size = _in->position();
+    _in->seek(0, SeekOrigin::Begin);
 }
 
 void BinaryReader::checkSignature() {
@@ -70,7 +71,7 @@ void BinaryReader::load(fs::path path) {
     if (!fs::exists(path)) {
         throw runtime_error("File not found: " + path.string());
     }
-    _in = make_shared<fs::ifstream>(path, ios::binary);
+    _in = make_shared<FileInputStream>(path, OpenMode::Binary);
     _reader = make_unique<StreamReader>(*_in, _endianess);
     _path = path;
 

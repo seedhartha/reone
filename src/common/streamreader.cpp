@@ -24,16 +24,15 @@ namespace endian = boost::endian;
 namespace reone {
 
 size_t StreamReader::tell() {
-    return _stream.tellg();
+    return _stream.position();
 }
 
 void StreamReader::seek(size_t pos) {
-    _stream.clear();
-    _stream.seekg(pos);
+    _stream.seek(pos, SeekOrigin::Begin);
 }
 
 void StreamReader::ignore(int count) {
-    _stream.ignore(count);
+    _stream.seek(count, SeekOrigin::Current);
 }
 
 uint8_t StreamReader::getByte() {
@@ -106,14 +105,21 @@ string StreamReader::getString(int len) {
 }
 
 string StreamReader::getNullTerminatedString() {
-    stringbuf ss;
-    _stream.get(ss, '\0');
-    _stream.seekg(1, ios::cur);
+    ostringstream ss;
+
+    char ch;
+    do {
+        ch = _stream.readByte();
+        if (ch && ch != -1) {
+            ss << ch;
+        }
+    } while (ch);
+
     return ss.str();
 }
 
 u16string StreamReader::getNullTerminatedStringUTF16() {
-    basic_stringstream<char16_t> ss;
+    basic_ostringstream<char16_t> ss;
 
     char16_t ch;
     do {

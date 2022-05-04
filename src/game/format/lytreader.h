@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "../../game/layout.h"
+#include "../../common/stream/input.h"
+
+#include "../layout.h"
 
 namespace reone {
 
@@ -25,7 +27,7 @@ namespace game {
 
 class LytReader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
+    void load(const std::shared_ptr<IInputStream> &in);
     void load(const boost::filesystem::path &path);
 
     const Layout &layout() const { return _layout; }
@@ -37,7 +39,7 @@ private:
         Rooms
     };
 
-    std::shared_ptr<std::istream> _in;
+    std::shared_ptr<IInputStream> _in;
     boost::filesystem::path _path;
     State _state {State::None};
     int _roomCount {0};

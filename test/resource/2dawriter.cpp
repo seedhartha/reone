@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/streamwriter.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/2da.h"
@@ -52,14 +53,15 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
                               .build();
 
     shared_ptr<TwoDa> twoDa = TwoDa::Builder()
-                     .column("key")
-                     .column("value")
-                     .row(TwoDa::newRow({"unique", "same"}))
-                     .row(TwoDa::newRow({"same", "same"}))
-                     .build();
+                                  .column("key")
+                                  .column("value")
+                                  .row(TwoDa::newRow({"unique", "same"}))
+                                  .row(TwoDa::newRow({"same", "same"}))
+                                  .build();
 
     auto writer = TwoDaWriter(twoDa);
-    auto stream = make_shared<ostringstream>();
+    auto bytes = ByteArray();
+    auto stream = make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -67,7 +69,7 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
 
     // then
 
-    auto actualOutput = stream->str();
+    auto actualOutput = string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

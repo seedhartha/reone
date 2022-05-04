@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "stream/output.h"
 #include "types.h"
 
 namespace reone {
@@ -24,7 +25,7 @@ namespace reone {
 class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(
-        std::ostream &stream,
+        IOutputStream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
         _stream(stream),
         _endianess(endianess) {
@@ -47,7 +48,7 @@ public:
     size_t tell() const;
 
 private:
-    std::ostream &_stream;
+    IOutputStream &_stream;
     boost::endian::order _endianess;
 
     template <class T>

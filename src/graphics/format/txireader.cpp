@@ -25,15 +25,20 @@ namespace reone {
 
 namespace graphics {
 
-void TxiReader::load(const shared_ptr<istream> &in) {
+void TxiReader::load(const shared_ptr<IInputStream> &in) {
     if (!in) {
         throw invalid_argument("Invalid TXI input stream");
     }
     char buf[64];
     do {
-        in->getline(buf, sizeof(buf));
+        char *pch = buf;
+        int ch;
+        do {
+            ch = in->readByte();
+            *(pch++) = ch;
+        } while (ch != -1 && ch != '\n');
 
-        string line(buf);
+        string line(buf, pch - buf - 1);
         boost::trim(line);
 
         vector<string> tokens;

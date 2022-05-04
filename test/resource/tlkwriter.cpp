@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/tlkwriter.h"
 #include "../../src/resource/talktable.h"
@@ -66,7 +67,8 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
                                       .build();
 
     auto writer = TlkWriter(table);
-    auto stream = make_shared<ostringstream>();
+    auto bytes = ByteArray();
+    auto stream = make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -74,7 +76,7 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
 
     // then
 
-    auto actualOutput = stream->str();
+    auto actualOutput = string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

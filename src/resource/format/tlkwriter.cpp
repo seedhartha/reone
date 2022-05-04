@@ -17,6 +17,7 @@
 
 #include "tlkwriter.h"
 
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 #include "../talktable.h"
@@ -36,11 +37,11 @@ struct StringFlags {
 };
 
 void TlkWriter::save(const fs::path &path) {
-    auto tlk = make_shared<fs::ofstream>(path, ios::binary);
+    auto tlk = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(tlk);
 }
 
-void TlkWriter::save(std::shared_ptr<std::ostream> out) {
+void TlkWriter::save(std::shared_ptr<IOutputStream> out) {
     vector<StringDataElement> strData;
 
     uint32_t offString = 0;

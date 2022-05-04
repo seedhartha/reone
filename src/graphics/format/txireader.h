@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../common/stream/input.h"
+
 #include "../texture.h"
 
 namespace reone {
@@ -25,7 +27,7 @@ namespace graphics {
 
 class TxiReader {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
+    void load(const std::shared_ptr<IInputStream> &in);
 
     const Texture::Features &features() const { return _features; }
 

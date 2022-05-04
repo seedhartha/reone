@@ -61,7 +61,7 @@ MdlReader::MdlReader(Models &models, Textures &textures) :
     initControllerFn();
 }
 
-void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &mdx) {
+void MdlReader::load(const shared_ptr<IInputStream> &mdl, const shared_ptr<IInputStream> &mdx) {
     _mdxReader = make_unique<StreamReader>(*mdx);
 
     BinaryReader::load(mdl);

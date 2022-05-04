@@ -17,7 +17,7 @@
 
 #include "files.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 #include "../resource/resources.h"
 
 #include "format/mp3reader.h"
@@ -38,14 +38,14 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
     shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
         Mp3Reader mp3;
-        mp3.load(wrap(mp3Data));
+        mp3.load(make_shared<ByteArrayInputStream>(*mp3Data));
         result = mp3.stream();
     }
     if (!result) {
         shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
         if (wavData) {
             WavReader wav;
-            wav.load(wrap(wavData));
+            wav.load(make_shared<ByteArrayInputStream>(*wavData));
             result = wav.stream();
         }
     }

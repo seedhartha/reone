@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/bifreader.h"
 
@@ -48,7 +49,9 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
                      .build();
 
     auto reader = BifReader();
-    auto bif = make_shared<istringstream>(input);
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+    auto bif = make_shared<ByteArrayInputStream>(inputBytes);
     auto expectedData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when

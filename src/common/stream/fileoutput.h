@@ -23,16 +23,24 @@ namespace reone {
 
 class FileOutputStream : public IOutputStream {
 public:
-    FileOutputStream(const boost::filesystem::path &path, std::ios::openmode mode = std::ios::binary) :
-        _stream(path, mode) {
+    FileOutputStream(const boost::filesystem::path &path, OpenMode mode = OpenMode::Text) :
+        _stream(path, mode == OpenMode::Binary ? std::ios::binary : 0) {
     }
 
-    void writeByte(uint8_t b) override {
-        _stream.put(*reinterpret_cast<char *>(&b));
+    void writeByte(char c) override {
+        _stream.put(c);
     }
 
     void write(const ByteArray &bytes) override {
         _stream.write(&bytes[0], bytes.size());
+    }
+
+    void write(const char *data, int length) override {
+        _stream.write(data, length);
+    }
+
+    size_t position() override {
+        return _stream.tellp();
     }
 
 private:

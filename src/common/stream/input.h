@@ -23,9 +23,12 @@ namespace reone {
 
 class IInputStream : boost::noncopyable {
 public:
-    virtual size_t position() = 0;
+    virtual void seek(int64_t offset, SeekOrigin origin) = 0;
     virtual int readByte() = 0;
-    virtual int read(int length, ByteArray &outBytes) = 0;
+    virtual int read(char *outData, int length) = 0;
+
+    virtual size_t position() = 0;
+    virtual bool eof() = 0;
 };
 
 } // namespace reone

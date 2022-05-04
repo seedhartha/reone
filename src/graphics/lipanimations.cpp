@@ -18,7 +18,8 @@
 
 #include "lipanimations.h"
 
-#include "../common/streamutil.h"
+#include "../../common/stream/bytearrayinput.h"
+
 #include "../resource/resources.h"
 
 #include "format/lipreader.h"
@@ -38,7 +39,7 @@ shared_ptr<LipAnimation> LipAnimations::doGet(string resRef) {
         return nullptr;
     }
     LipReader lip(resRef);
-    lip.load(wrap(lipData));
+    lip.load(make_shared<ByteArrayInputStream>(*lipData));
 
     return lip.animation();
 }

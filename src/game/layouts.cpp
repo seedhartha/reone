@@ -17,7 +17,7 @@
 
 #include "layouts.h"
 
-#include "../../common/streamutil.h"
+#include "../../common/stream/bytearrayinput.h"
 #include "../../resource/resources.h"
 
 #include "format/lytreader.h"
@@ -36,7 +36,7 @@ shared_ptr<Layout> Layouts::doGet(string resRef) {
         return nullptr;
     }
     LytReader lyt;
-    lyt.load(wrap(data));
+    lyt.load(make_shared<ByteArrayInputStream>(*data));
     return make_shared<Layout>(lyt.layout());
 }
 

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../common/stream/output.h"
 #include "../../common/types.h"
 
 #include "../types.h"
@@ -41,7 +42,7 @@ public:
     void add(Resource &&res);
 
     void save(FileType type, const boost::filesystem::path &path);
-    void save(FileType type, std::shared_ptr<std::ostream> out);
+    void save(FileType type, std::shared_ptr<IOutputStream> out);
 
 private:
     std::vector<Resource> _resources;

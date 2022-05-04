@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/streamwriter.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/gffwriter.h"
@@ -201,7 +202,8 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
                     make_shared<Gff>(3, vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
     auto writer = GffWriter(ResourceType::Res, root);
-    auto stream = make_shared<ostringstream>();
+    auto bytes = ByteArray();
+    auto stream = make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -209,7 +211,7 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
 
     // then
 
-    auto actualOutput = stream->str();
+    auto actualOutput = string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

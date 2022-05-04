@@ -17,7 +17,7 @@
 
 #include "tpcreader.h"
 
-#include "../../common/streamutil.h"
+#include "../../common/stream/bytearrayinput.h"
 
 #include "../textureutil.h"
 
@@ -97,7 +97,7 @@ void TpcReader::loadFeatures() {
     _txiData = _reader->getBytes(static_cast<int>(_size - pos));
 
     TxiReader txi;
-    txi.load(wrap(_txiData));
+    txi.load(make_shared<ByteArrayInputStream>(_txiData));
 
     _features = txi.features();
 }

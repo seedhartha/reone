@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "stream/input.h"
 #include "types.h"
 
 namespace reone {
@@ -24,7 +25,7 @@ namespace reone {
 class StreamReader : boost::noncopyable {
 public:
     StreamReader(
-        std::istream &stream,
+        IInputStream &stream,
         boost::endian::order endianess = boost::endian::order::little) :
         _stream(stream),
         _endianess(endianess) {
@@ -98,7 +99,7 @@ public:
     }
 
 private:
-    std::istream &_stream;
+    IInputStream &_stream;
     boost::endian::order _endianess;
 };
 

@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/rimreader.h"
 
@@ -50,7 +51,11 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
                      .build();
 
     auto reader = RimReader();
-    auto rim = make_shared<istringstream>(input);
+
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+    auto rim = make_shared<ByteArrayInputStream>(inputBytes);
+
     auto expectedData = ByteArray {'B', 'b'};
 
     // when

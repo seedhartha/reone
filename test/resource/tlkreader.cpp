@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/tlkreader.h"
 #include "../../src/resource/talktable.h"
@@ -59,7 +60,11 @@ BOOST_AUTO_TEST_CASE(should_read_tlk) {
                      .build();
 
     auto reader = TlkReader();
-    auto stream = make_shared<istringstream>(input);
+
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+
+    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
 
     // when
 

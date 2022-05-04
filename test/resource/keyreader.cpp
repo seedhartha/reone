@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/keyreader.h"
 
@@ -65,7 +66,10 @@ BOOST_AUTO_TEST_CASE(should_read_key) {
                      .build();
 
     auto reader = KeyReader();
-    auto key = make_shared<istringstream>(input);
+
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+    auto key = make_shared<ByteArrayInputStream>(inputBytes);
 
     // when
 

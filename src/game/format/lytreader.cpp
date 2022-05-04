@@ -17,6 +17,8 @@
 
 #include "lytreader.h"
 
+#include "../../common/stream/fileinput.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -25,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-void LytReader::load(const shared_ptr<istream> &in) {
+void LytReader::load(const shared_ptr<IInputStream> &in) {
     if (!in) {
         throw invalid_argument("LYT: invalid input stream");
     }
@@ -38,7 +40,7 @@ void LytReader::load(const fs::path &path) {
     if (!fs::exists(path)) {
         throw runtime_error("LYT: file not found: " + path.string());
     }
-    _in = make_shared<fs::ifstream>(path);
+    _in = make_shared<FileInputStream>(path);
     _path = path;
 
     load();
@@ -47,8 +49,13 @@ void LytReader::load(const fs::path &path) {
 void LytReader::load() {
     char buf[256];
     do {
-        _in->getline(buf, sizeof(buf));
-        processLine(string(buf));
+        char *pch = buf;
+        int ch;
+        do {
+            ch = _in->readByte();
+            *(pch++) = ch;
+        } while (ch != -1 && ch != '\n');
+        processLine(string(buf, pch - buf - 1));
     } while (!_in->eof());
 }
 

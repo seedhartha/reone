@@ -28,7 +28,6 @@ set(COMMON_HEADERS
     stream/input.h
     stream/output.h
     streamreader.h
-    streamutil.h
     streamwriter.h
     stringbuilder.h
     timer.h
@@ -41,7 +40,6 @@ set(COMMON_SOURCES
     pathutil.cpp
     randomutil.cpp
     streamreader.cpp
-    streamutil.cpp
     streamwriter.cpp
     unicodeutil.cpp)
 

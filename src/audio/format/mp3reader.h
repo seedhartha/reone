@@ -19,6 +19,7 @@
 
 #include "mad.h"
 
+#include "../../common/stream/input.h"
 #include "../../common/types.h"
 
 namespace reone {
@@ -29,7 +30,7 @@ class AudioStream;
 
 class Mp3Reader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<std::istream> &stream);
+    void load(const std::shared_ptr<IInputStream> &stream);
     void load(ByteArray &&data);
 
     std::shared_ptr<AudioStream> stream() const { return _stream; }

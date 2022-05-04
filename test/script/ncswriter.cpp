@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/script/format/ncswriter.h"
 #include "../../src/script/program.h"
@@ -231,7 +232,8 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
     program.add(Instruction(298, InstructionType::NOP2));
 
     auto writer = NcsWriter(program);
-    auto stream = make_shared<ostringstream>();
+    auto bytes = ByteArray();
+    auto stream = make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -239,7 +241,7 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
 
     // then
 
-    auto actualOutput = stream->str();
+    auto actualOutput = string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

@@ -17,7 +17,7 @@
 
 #include "2das.h"
 
-#include "../common/streamutil.h"
+#include "../common/stream/bytearrayinput.h"
 
 #include "format/2dareader.h"
 #include "resources.h"
@@ -40,7 +40,7 @@ shared_ptr<TwoDa> TwoDas::doGet(const string &resRef) {
         return nullptr;
     }
     TwoDaReader twoDa;
-    twoDa.load(wrap(raw));
+    twoDa.load(make_shared<ByteArrayInputStream>(*raw));
     return twoDa.twoDa();
 }
 

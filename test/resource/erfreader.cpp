@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/erfreader.h"
 
@@ -58,7 +59,9 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
                      .build();
 
     auto reader = ErfReader();
-    auto erf = make_shared<istringstream>(input);
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+    auto erf = make_shared<ByteArrayInputStream>(inputBytes);
     auto expectedData = ByteArray {'B', 'b'};
 
     // when

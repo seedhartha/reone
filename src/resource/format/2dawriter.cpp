@@ -17,6 +17,7 @@
 
 #include "2dawriter.h"
 
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 #include "../2da.h"
@@ -32,11 +33,11 @@ namespace resource {
 static const char kSignature[] = "2DA V2.b";
 
 void TwoDaWriter::save(const fs::path &path) {
-    auto out = make_shared<fs::ofstream>(path, ios::binary);
+    auto out = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(out);
 }
 
-void TwoDaWriter::save(shared_ptr<ostream> out) {
+void TwoDaWriter::save(shared_ptr<IOutputStream> out) {
     _writer = make_unique<StreamWriter>(*out);
     _writer->putString(kSignature);
     _writer->putChar('\n');

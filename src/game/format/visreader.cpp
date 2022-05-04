@@ -23,15 +23,20 @@ namespace reone {
 
 namespace game {
 
-void VisReader::load(const shared_ptr<istream> &in) {
+void VisReader::load(const shared_ptr<IInputStream> &in) {
     if (!in) {
         throw invalid_argument("Invalid input stream");
     }
     char buf[32];
     do {
-        in->getline(buf, sizeof(buf));
+        char *pch = buf;
+        int ch;
+        do {
+            ch = in->readByte();
+            *(pch++) = ch;
+        } while (ch != -1 && ch != '\n');
 
-        string line(buf);
+        string line(buf, pch - buf - 1);
         boost::trim(line);
 
         if (line.empty())

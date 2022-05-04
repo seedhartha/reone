@@ -17,6 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayinput.h"
 #include "../../src/common/streamwriter.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/2da.h"
@@ -48,7 +49,9 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
                      .append("unique\x00", 7)
                      .append("same\x00", 5)
                      .build();
-    auto stream = make_shared<istringstream>(input);
+    auto inputBytes = ByteArray();
+    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
+    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
     auto reader = TwoDaReader();
 
     // when

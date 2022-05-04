@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "../../game/types.h"
+#include "../../common/stream/input.h"
+
+#include "../types.h"
 
 namespace reone {
 
@@ -25,7 +27,7 @@ namespace game {
 
 class VisReader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
+    void load(const std::shared_ptr<IInputStream> &in);
 
     const game::Visibility &visibility() const { return _visibility; }
 

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../common/stream/output.h"
+
 namespace reone {
 
 namespace script {
@@ -30,7 +32,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
-    void save(std::shared_ptr<std::ostream> out);
+    void save(std::shared_ptr<IOutputStream> out);
 
 private:
     ScriptProgram &_program;

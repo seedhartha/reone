@@ -27,8 +27,16 @@ public:
         _bytes(bytes) {
     }
 
-    size_t position() override {
-        return _position;
+    void seek(int64_t offset, SeekOrigin origin) {
+        if (origin == SeekOrigin::Begin) {
+            _position = offset;
+        } else if (origin == SeekOrigin::Current) {
+            _position += offset;
+        } else if (origin == SeekOrigin::End) {
+            _position = _bytes.size() - offset;
+        } else {
+            throw std::invalid_argument("Unsupported origin: " + std::to_string(static_cast<int>(origin)));
+        }
     }
 
     int readByte() override {
@@ -38,12 +46,20 @@ public:
         return _bytes[_position++];
     }
 
-    int read(int length, ByteArray &outBytes) override {
+    int read(char *outData, int length) override {
         size_t available = _bytes.size() - _position;
         size_t toRead = std::min(available, static_cast<size_t>(length));
-        outBytes.resize(std::max(toRead, outBytes.size()));
-        std::copy(_bytes.begin() + _position, _bytes.begin() + _position + toRead, outBytes.begin());
+        std::memcpy(outData, &_bytes[_position], toRead);
+        _position += toRead;
         return toRead;
+    }
+
+    size_t position() override {
+        return _position;
+    }
+
+    bool eof() override {
+        return _position >= _bytes.size();
     }
 
 private:

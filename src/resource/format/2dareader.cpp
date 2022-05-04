@@ -98,7 +98,7 @@ bool TwoDaReader::readToken(string &token) {
     size_t pos = tell();
 
     char buf[256];
-    streamsize chRead = _in->rdbuf()->sgetn(buf, sizeof(buf));
+    int chRead = _in->read(buf, sizeof(buf));
     const char *pch = buf;
 
     for (; pch - buf < chRead; ++pch) {

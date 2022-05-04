@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../common/stream/input.h"
 #include "../../common/streamreader.h"
 #include "../../common/types.h"
 
@@ -31,13 +32,13 @@ namespace resource {
  */
 class BinaryReader : boost::noncopyable {
 public:
-    void load(std::shared_ptr<std::istream> in);
+    void load(std::shared_ptr<IInputStream> in);
     void load(boost::filesystem::path path);
 
 protected:
     boost::endian::order _endianess {boost::endian::order::little};
     boost::filesystem::path _path;
-    std::shared_ptr<std::istream> _in;
+    std::shared_ptr<IInputStream> _in;
     std::unique_ptr<StreamReader> _reader;
     size_t _size {0};
 

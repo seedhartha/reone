@@ -40,13 +40,13 @@ static inline int scale(mad_fixed_t sample) {
     return sample >> (MAD_F_FRACBITS + 1 - 16);
 }
 
-void Mp3Reader::load(const shared_ptr<istream> &stream) {
-    stream->seekg(0, ios::end);
-    size_t size = stream->tellg();
+void Mp3Reader::load(const shared_ptr<IInputStream> &stream) {
+    stream->seek(0, SeekOrigin::End);
+    size_t size = stream->position();
 
     ByteArray data(size);
 
-    stream->seekg(0);
+    stream->seek(0, SeekOrigin::Begin);
     stream->read(&data[0], size);
 
     load(move(data));

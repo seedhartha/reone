@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/common/stringbuilder.h"
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/resource/format/erfwriter.h"
 
 #include "../checkutil.h"
@@ -60,7 +61,8 @@ BOOST_AUTO_TEST_CASE(should_write_erf) {
     auto writer = ErfWriter();
     writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
 
-    auto erf = make_shared<ostringstream>();
+    auto bytes = ByteArray();
+    auto erf = make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -68,7 +70,7 @@ BOOST_AUTO_TEST_CASE(should_write_erf) {
 
     // then
 
-    auto actualOutput = erf->str();
+    auto actualOutput = string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

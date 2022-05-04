@@ -22,11 +22,11 @@ using namespace std;
 namespace reone {
 
 void StreamWriter::putByte(uint8_t val) {
-    _stream.put(val);
+    _stream.writeByte(val);
 }
 
 void StreamWriter::putChar(char val) {
-    _stream.put(val);
+    _stream.writeByte(*reinterpret_cast<uint8_t *>(&val));
 }
 
 void StreamWriter::putUint16(uint16_t val) {
@@ -63,14 +63,14 @@ void StreamWriter::putStringExact(const string &str, int len) {
         _stream.write(&str[0], strLen);
     }
     for (int i = 0; i < len - strLen; ++i) {
-        _stream.put('\0');
+        _stream.writeByte('\0');
     }
 }
 
 void StreamWriter::putCString(const string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream.write(&str[0], len);
-    _stream.put('\0');
+    _stream.writeByte('\0');
 }
 
 void StreamWriter::putBytes(const ByteArray &bytes) {
@@ -83,7 +83,7 @@ void StreamWriter::putBytes(int count, uint8_t val) {
 }
 
 size_t StreamWriter::tell() const {
-    return _stream.tellp();
+    return _stream.position();
 }
 
 } // namespace reone

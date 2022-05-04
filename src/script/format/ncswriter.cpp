@@ -19,7 +19,8 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
-#include "../../common/streamutil.h"
+#include "../../common/stream/bytearrayoutput.h"
+#include "../../common/stream/fileoutput.h"
 #include "../../common/streamwriter.h"
 
 #include "../program.h"
@@ -34,12 +35,13 @@ namespace reone {
 namespace script {
 
 void NcsWriter::save(const fs::path &path) {
-    auto ncs = make_shared<fs::ofstream>(path, ios::binary);
+    auto ncs = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(ncs);
 }
 
-void NcsWriter::save(std::shared_ptr<std::ostream> out) {
-    auto stream = ostringstream();
+void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
+    auto bytes = ByteArray();
+    auto stream = ByteArrayOutputStream(bytes);
     StreamWriter writer(stream, endian::order::big);
 
     for (auto &ins : _program.instructions()) {
@@ -115,7 +117,7 @@ void NcsWriter::save(std::shared_ptr<std::ostream> out) {
     ncsWriter.putString(string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);
     ncsWriter.putUint32(13 + writer.tell());
-    ncsWriter.putString(stream.str());
+    ncsWriter.putString(string(&bytes[0], bytes.size()));
 }
 
 } // namespace script
