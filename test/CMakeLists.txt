@@ -20,10 +20,12 @@ set(TEST_HEADERS
 
 set(TEST_SOURCES
     common/hexutil.cpp
+    common/bytearrayinputstream.cpp
+    common/bytearrayoutputstream.cpp
     common/streamreader.cpp
     common/streamwriter.cpp
     common/stringbuilder.cpp
-    common/unicode.cpp
+    common/unicodeutil.cpp
     game/game.cpp
     main.cpp
     resource/2dareader.cpp
