@@ -18,9 +18,11 @@
 #include "movie.h"
 
 #include "../audio/player.h"
+#include "../audio/services.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
+#include "../graphics/services.h"
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
 #include "../graphics/textureutil.h"
@@ -44,7 +46,7 @@ void Movie::init() {
         _texture->init();
     }
     if (!_audioSource && _audioStream) {
-        _audioSource = _audioPlayer.play(_audioStream, AudioType::Movie);
+        _audioSource = _audioSvc.player.play(_audioStream, AudioType::Movie);
     }
 }
 
@@ -78,13 +80,13 @@ void Movie::update(float dt) {
     }
 }
 
-void Movie::draw() {
+void Movie::render() {
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
-        _textures.bind(*_texture);
+        _graphicsSvc.textures.bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    _uniforms.setGeneral([](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.uv = glm::mat3x4(
@@ -92,8 +94,8 @@ void Movie::draw() {
             glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
-    _shaders.use(_shaders.gui());
-    _meshes.quadNDC().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.meshes.quadNDC().draw();
 }
 
 } // namespace movie

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../graphics/eventhandler.h"
+#include "../movie/movie.h"
 
 #include "gui/game.h"
 #include "gui/maininterface.h"
@@ -85,6 +86,7 @@ public:
 
 private:
     enum class Stage {
+        MovieLegal,
         MainMenu,
         World
     };
@@ -157,18 +159,28 @@ private:
     OptionsView &_options;
     ServicesView &_services;
 
+    bool _finished {false};
+    uint32_t _prevFrameTicks {0};
+    uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
+
+    Stage _stage {Stage::MovieLegal};
+
+    std::shared_ptr<Module> _module;
+
+    // Services
+
     std::unique_ptr<ObjectFactory> _objectFactory;
     std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
 
-    bool _finished {false};
-    uint32_t _prevFrameTicks {0};
-    uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
+    // END Services
 
-    Stage _stage {Stage::MainMenu};
+    // Movies
 
-    std::shared_ptr<Module> _module;
+    std::shared_ptr<movie::Movie> _movieLegal;
+
+    // END Movies
 
     // GUI
 

@@ -17,6 +17,7 @@
 
 #include "game.h"
 
+#include "../common/pathutil.h"
 #include "../graphics/context.h"
 #include "../graphics/meshes.h"
 #include "../graphics/pipeline.h"
@@ -24,6 +25,7 @@
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
 #include "../graphics/window.h"
+#include "../movie/format/bikreader.h"
 #include "../resource/gffs.h"
 #include "../resource/services.h"
 #include "../scene/graphs.h"
@@ -41,8 +43,9 @@
 
 using namespace std;
 
-using namespace reone::scene;
+using namespace reone::movie;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -59,6 +62,13 @@ void Game::init() {
     _playerController = make_unique<PlayerController>();
     _selectionController = make_unique<SelectionController>(scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
+
+    // Movies
+
+    auto legalBikPath = getPathIgnoreCase(_options.game.path, "movies/legal.bik");
+    auto bikReader = BikReader(legalBikPath, _services.graphics, _services.audio);
+    bikReader.load();
+    _movieLegal = bikReader.movie();
 
     // GUI
 
@@ -103,7 +113,12 @@ void Game::handleInput() {
 }
 
 bool Game::handle(const SDL_Event &e) {
-    if (_stage == Stage::MainMenu) {
+    if (_stage == Stage::MovieLegal) {
+        if (e.type == SDL_MOUSEBUTTONDOWN) {
+            _stage = Stage::MainMenu;
+            return true;
+        }
+    } else if (_stage == Stage::MainMenu) {
         if (_mainMenu->handle(e)) {
             return true;
         }
@@ -135,7 +150,13 @@ void Game::update() {
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
-    if (_stage == Stage::MainMenu) {
+    if (_stage == Stage::MovieLegal) {
+        _movieLegal->update(delta);
+        if (_movieLegal->isFinished()) {
+            _stage = Stage::MainMenu;
+        }
+
+    } else if (_stage == Stage::MainMenu) {
         _mainMenu->update(delta);
 
     } else if (_stage == Stage::World) {
@@ -163,7 +184,10 @@ void Game::update() {
 void Game::render() {
     _services.graphics.context.clearColorDepth();
 
-    if (_stage == Stage::MainMenu) {
+    if (_stage == Stage::MovieLegal) {
+        _movieLegal->render();
+
+    } else if (_stage == Stage::MainMenu) {
         _mainMenu->render();
 
     } else if (_stage == Stage::World) {

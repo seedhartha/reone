@@ -19,6 +19,7 @@
 
 #include "../audio/source.h"
 #include "../common/types.h"
+#include "../graphics/texture.h"
 
 #include "videostream.h"
 
@@ -26,18 +27,13 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Meshes;
-class Shaders;
-class Texture;
-class Textures;
-class Uniforms;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace audio {
 
-class AudioPlayer;
+struct AudioServices;
 
 }
 
@@ -48,25 +44,17 @@ class BikReader;
 class Movie {
 public:
     Movie(
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        audio::AudioPlayer &audioPlayer) :
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms),
-        _audioPlayer(audioPlayer) {
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc) {
     }
 
     void init();
     void deinit();
 
     void update(float dt);
-    void draw();
+    void render();
 
     void finish() { _finished = true; }
 
@@ -76,6 +64,9 @@ public:
     void setAudioStream(std::shared_ptr<audio::AudioStream> stream) { _audioStream = std::move(stream); }
 
 private:
+    graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
+
     int _width {0};
     int _height {0};
 
@@ -87,18 +78,6 @@ private:
 
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<audio::AudioSource> _audioSource;
-
-    // Services
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    audio::AudioPlayer &_audioPlayer;
-
-    // END Services
 };
 
 } // namespace movie

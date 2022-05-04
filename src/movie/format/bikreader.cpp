@@ -326,7 +326,7 @@ void BikReader::load() {
     auto decoder = make_shared<BinkVideoDecoder>(_path);
     decoder->load();
 
-    _movie = make_shared<Movie>(_graphicsContext, _meshes, _shaders, _textures, _uniforms, _audioPlayer);
+    _movie = make_shared<Movie>(_graphicsSvc, _audioSvc);
     _movie->setVideoStream(decoder);
     _movie->setAudioStream(decoder->audioStream());
     _movie->init();
