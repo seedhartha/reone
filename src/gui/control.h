@@ -76,8 +76,8 @@ public:
 
     virtual void load(const resource::Gff &gui, const glm::vec4 &scale);
 
-    void append(std::shared_ptr<Control> child) {
-        _children.push_back(std::move(child));
+    void append(Control &child) {
+        _children.push_back(&child);
     }
 
     void update(float delta);
@@ -155,7 +155,7 @@ protected:
     std::unique_ptr<Border> _border;
     std::unique_ptr<Border> _hilight;
     std::unique_ptr<Text> _text;
-    std::vector<std::shared_ptr<Control>> _children;
+    std::vector<Control *> _children;
 
     scene::SceneGraph *_sceneGraph {nullptr};
 

@@ -64,24 +64,20 @@ void Gui::load(const string &resRef) {
         scale = glm::vec4(1.0f);
     }
 
-    auto controlById = unordered_map<int, shared_ptr<Control>>();
-    auto rootControl = shared_ptr<Control>(loadControl(*gui, scale));
-    controlById[-1] = rootControl;
+    _rootControl = loadControl(*gui, scale).get();
 
     auto guiControls = gui->getList("CONTROLS");
     for (auto &guiControl : guiControls) {
-        auto control = loadControl(*guiControl, scale);
-        controlById[control->id()] = move(control);
+        loadControl(*guiControl, scale);
     }
     for (auto &guiControl : guiControls) {
         auto id = guiControl->getInt("ID");
-        auto control = controlById.at(id);
+        auto &control = _controls.at(id);
         auto parentId = guiControl->getInt("Obj_ParentID");
-        auto parentControl = controlById.at(parentId);
-        parentControl->append(control);
+        auto &parentControl = _controls.at(parentId);
+        parentControl->append(*control);
     }
 
-    _rootControl = move(rootControl);
 }
 
 shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {

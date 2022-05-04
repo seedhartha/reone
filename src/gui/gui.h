@@ -83,9 +83,9 @@ protected:
 
     // Controls
 
-    std::shared_ptr<Control> _rootControl;
     std::map<int, std::shared_ptr<Control>> _controls;
 
+    Control *_rootControl {nullptr};
     Control *_controlInFocus {nullptr};
 
     // END Controls
