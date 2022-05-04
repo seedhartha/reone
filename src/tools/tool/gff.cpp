@@ -134,9 +134,7 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
     }
 
     auto structType = element.UnsignedAttribute("type");
-
-    auto gff = Gff::Builder();
-    gff.type(structType);
+    auto fields = vector<Gff::Field>();
 
     for (auto fieldElement = element.FirstChildElement(); fieldElement; fieldElement = fieldElement->NextSiblingElement()) {
         auto fieldType = static_cast<Gff::FieldType>(fieldElement->IntAttribute("type"));
@@ -203,10 +201,10 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
             throw logic_error("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
         }
 
-        gff.field(move(field));
+        fields.push_back(move(field));
     }
 
-    return gff.build();
+    return make_unique<Gff>(structType, move(fields));
 }
 
 static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {

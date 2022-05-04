@@ -43,14 +43,14 @@ void TwoDaWriter::save(IOutputStream &out) {
 
     writeHeaders();
 
-    _writer->putUint32(_twoDa->getRowCount());
+    _writer->putUint32(_twoDa.getRowCount());
 
     writeLabels();
     writeData();
 }
 
 void TwoDaWriter::writeHeaders() {
-    for (auto &column : _twoDa->columns()) {
+    for (auto &column : _twoDa.columns()) {
         _writer->putString(column);
         _writer->putChar('\t');
     }
@@ -58,7 +58,7 @@ void TwoDaWriter::writeHeaders() {
 }
 
 void TwoDaWriter::writeLabels() {
-    for (int i = 0; i < _twoDa->getRowCount(); ++i) {
+    for (int i = 0; i < _twoDa.getRowCount(); ++i) {
         _writer->putString(to_string(i));
         _writer->putChar('\t');
     }
@@ -68,12 +68,12 @@ void TwoDaWriter::writeData() {
     vector<pair<string, int>> data;
     int dataSize = 0;
 
-    size_t columnCount = _twoDa->columns().size();
-    size_t cellCount = columnCount * _twoDa->getRowCount();
+    size_t columnCount = _twoDa.columns().size();
+    size_t cellCount = columnCount * _twoDa.getRowCount();
 
-    for (int i = 0; i < _twoDa->getRowCount(); ++i) {
+    for (int i = 0; i < _twoDa.getRowCount(); ++i) {
         for (size_t j = 0; j < columnCount; ++j) {
-            const string &value = _twoDa->rows()[i].values[j];
+            const string &value = _twoDa.rows()[i].values[j];
             auto maybeData = find_if(data.begin(), data.end(), [&](auto &pair) { return pair.first == value; });
             if (maybeData != data.end()) {
                 _writer->putUint16(maybeData->second);

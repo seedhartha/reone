@@ -42,7 +42,7 @@ void TlkReader::onLoad() {
 }
 
 void TlkReader::loadStrings() {
-    auto table = TalkTable::Builder();
+    auto strings = vector<TalkTable::String>();
 
     for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
@@ -61,10 +61,10 @@ void TlkReader::loadStrings() {
             text = readString(_stringsOffset + stringOffset, stringSize);
         }
 
-        table.string(move(text), move(soundResRef));
+        strings.push_back(TalkTable::String {move(text), move(soundResRef)});
     }
 
-    _table = table.build();
+    _table = make_unique<TalkTable>(move(strings));
 }
 
 } // namespace resource

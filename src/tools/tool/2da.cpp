@@ -86,7 +86,8 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
         return;
     }
 
-    auto twoDa = TwoDa::Builder();
+    auto columns = vector<string>();
+    auto rows = vector<TwoDa::Row>();
 
     // Columns
     auto firstElement = rootElement->FirstChildElement();
@@ -94,7 +95,7 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
         if (strncmp(attribute->Name(), "_index", 6) == 0) {
             continue;
         }
-        twoDa.column(attribute->Name());
+        columns.push_back(attribute->Name());
     }
 
     // Rows
@@ -106,8 +107,10 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
             }
             row.values.push_back(attribute->Value());
         }
-        twoDa.row(move(row));
+        rows.push_back(move(row));
     }
+
+    auto twoDa = TwoDa(move(columns), move(rows));
 
     vector<string> tokens;
     boost::split(
@@ -119,7 +122,7 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     auto twoDaPath = fs::path(destPath);
     twoDaPath.append(tokens[0] + ".2da");
 
-    auto writer = TwoDaWriter(twoDa.build());
+    auto writer = TwoDaWriter(twoDa);
     writer.save(twoDaPath);
 }
 

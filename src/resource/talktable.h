@@ -28,26 +28,6 @@ public:
         std::string soundResRef;
     };
 
-    class Builder : boost::noncopyable {
-    public:
-        Builder &string(TalkTable::String string) {
-            _strings.push_back(std::move(string));
-            return *this;
-        }
-
-        Builder &string(std::string text, std::string soundResRef) {
-            _strings.push_back({std::move(text), std::move(soundResRef)});
-            return *this;
-        }
-
-        std::unique_ptr<TalkTable> build() {
-            return std::make_unique<TalkTable>(_strings);
-        }
-
-    private:
-        std::vector<String> _strings;
-    };
-
     TalkTable(std::vector<String> strings) :
         _strings(std::move(strings)) {
     }

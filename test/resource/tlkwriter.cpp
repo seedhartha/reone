@@ -64,11 +64,11 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
 
-    shared_ptr<TalkTable> table = TalkTable::Builder()
-                                      .string("John", "")
-                                      .string("Jane", "jane")
-                                      .build();
+    auto strings = vector<TalkTable::String> {
+        TalkTable::String {"John", ""},
+        TalkTable::String {"Jane", "jane"}};
 
+    auto table = TalkTable(move(strings));
     auto writer = TlkWriter(table);
 
     // when

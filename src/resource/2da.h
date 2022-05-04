@@ -32,32 +32,6 @@ public:
         std::vector<std::string> values;
     };
 
-    class Builder : boost::noncopyable {
-    public:
-        Builder &column(std::string column) {
-            _columns.push_back(std::move(column));
-            return *this;
-        }
-
-        Builder &row(TwoDa::Row row) {
-            _rows.push_back(std::move(row));
-            return *this;
-        }
-
-        Builder &row(std::vector<std::string> values) {
-            _rows.push_back(Row {std::move(values)});
-            return *this;
-        }
-
-        std::unique_ptr<TwoDa> build() {
-            return std::make_unique<TwoDa>(_columns, _rows);
-        }
-
-    private:
-        std::vector<std::string> _columns;
-        std::vector<Row> _rows;
-    };
-
     TwoDa(std::vector<std::string> columns, std::vector<Row> rows) :
         _columns(std::move(columns)),
         _rows(std::move(rows)) {

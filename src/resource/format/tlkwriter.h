@@ -27,8 +27,8 @@ class TalkTable;
 
 class TlkWriter : boost::noncopyable {
 public:
-    TlkWriter(std::shared_ptr<TalkTable> talkTable) :
-        _talkTable(std::move(talkTable)) {
+    TlkWriter(TalkTable &talkTable) :
+        _talkTable(talkTable) {
     }
 
     void save(const boost::filesystem::path &path);
@@ -41,7 +41,7 @@ private:
         uint32_t stringSize {0};
     };
 
-    std::shared_ptr<TalkTable> _talkTable;
+    TalkTable &_talkTable;
 };
 
 } // namespace resource

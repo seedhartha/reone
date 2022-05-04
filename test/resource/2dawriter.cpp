@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/binarywriter.h"
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/2da.h"
 #include "../../src/resource/format/2dawriter.h"
@@ -52,12 +52,11 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
                               .append("same\x00", 5)
                               .build();
 
-    shared_ptr<TwoDa> twoDa = TwoDa::Builder()
-                                  .column("key")
-                                  .column("value")
-                                  .row(TwoDa::newRow({"unique", "same"}))
-                                  .row(TwoDa::newRow({"same", "same"}))
-                                  .build();
+    auto twoDa = TwoDa(
+        {"key", "value"},
+        vector<TwoDa::Row> {
+            TwoDa::newRow({"unique", "same"}),
+            TwoDa::newRow({"same", "same"})});
 
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);

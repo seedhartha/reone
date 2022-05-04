@@ -51,19 +51,18 @@ unique_ptr<Gff> GffReader::readStruct(int idx) {
     uint32_t dataOffset = readUint32();
     uint32_t fieldCount = readUint32();
 
-    auto gff = Gff::Builder();
-    gff.type(type);
+    auto fields = vector<Gff::Field>();
 
     if (fieldCount == 1) {
-        gff.field(readField(dataOffset));
+        fields.push_back(readField(dataOffset));
     } else {
         vector<uint32_t> indices(readFieldIndices(dataOffset, fieldCount));
         for (auto &idx : indices) {
-            gff.field(readField(idx));
+            fields.push_back(readField(idx));
         }
     }
 
-    return gff.build();
+    return make_unique<Gff>(type, move(fields));
 }
 
 Gff::Field GffReader::readField(int idx) {

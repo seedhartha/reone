@@ -29,15 +29,16 @@ class TwoDa;
 
 class TwoDaWriter {
 public:
-    TwoDaWriter(std::shared_ptr<TwoDa> twoDa) :
-        _twoDa(std::move(twoDa)) {
+    TwoDaWriter(TwoDa &twoDa) :
+        _twoDa(twoDa) {
     }
 
     void save(const boost::filesystem::path &path);
     void save(IOutputStream &out);
 
 private:
-    std::shared_ptr<TwoDa> _twoDa;
+    TwoDa &_twoDa;
+
     std::unique_ptr<BinaryWriter> _writer;
 
     void writeHeaders();

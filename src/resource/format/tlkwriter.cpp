@@ -45,8 +45,8 @@ void TlkWriter::save(IOutputStream &out) {
     vector<StringDataElement> strData;
 
     uint32_t offString = 0;
-    for (int i = 0; i < _talkTable->getStringCount(); ++i) {
-        auto &str = _talkTable->getString(i);
+    for (int i = 0; i < _talkTable.getStringCount(); ++i) {
+        auto &str = _talkTable.getString(i);
         auto strSize = static_cast<uint32_t>(str.text.length());
 
         StringDataElement strDataElem;
@@ -61,10 +61,10 @@ void TlkWriter::save(IOutputStream &out) {
     BinaryWriter writer(out);
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
-    writer.putUint32(_talkTable->getStringCount());
-    writer.putUint32(20 + _talkTable->getStringCount() * sizeof(StringDataElement)); // offset to string entries
+    writer.putUint32(_talkTable.getStringCount());
+    writer.putUint32(20 + _talkTable.getStringCount() * sizeof(StringDataElement)); // offset to string entries
 
-    for (int i = 0; i < _talkTable->getStringCount(); ++i) {
+    for (int i = 0; i < _talkTable.getStringCount(); ++i) {
         const StringDataElement &strDataElem = strData[i];
         writer.putUint32(7); // flags
 
@@ -79,8 +79,8 @@ void TlkWriter::save(IOutputStream &out) {
         writer.putFloat(0.0f); // sound length
     }
 
-    for (int i = 0; i < _talkTable->getStringCount(); ++i) {
-        writer.putString(_talkTable->getString(i).text);
+    for (int i = 0; i < _talkTable.getStringCount(); ++i) {
+        writer.putString(_talkTable.getString(i).text);
     }
 }
 

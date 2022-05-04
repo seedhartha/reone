@@ -76,14 +76,7 @@ void TwoDaReader::loadRows() {
 }
 
 void TwoDaReader::loadTable() {
-    auto twoDa = TwoDa::Builder();
-    for (auto &column : _columns) {
-        twoDa.column(column);
-    }
-    for (auto &row : _rows) {
-        twoDa.row(row);
-    }
-    _twoDa = twoDa.build();
+    _twoDa = make_shared<TwoDa>(_columns, _rows);
 }
 
 bool TwoDaReader::readToken(string &token) {
