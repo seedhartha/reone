@@ -18,6 +18,7 @@
 #include "txireader.h"
 
 #include "../../common/logutil.h"
+#include "../../common/stream/input.h"
 
 using namespace std;
 
@@ -25,16 +26,13 @@ namespace reone {
 
 namespace graphics {
 
-void TxiReader::load(const shared_ptr<IInputStream> &in) {
-    if (!in) {
-        throw invalid_argument("Invalid TXI input stream");
-    }
+void TxiReader::load(IInputStream &in) {
     char buf[64];
     do {
         char *pch = buf;
         int ch;
         do {
-            ch = in->readByte();
+            ch = in.readByte();
             *(pch++) = ch;
         } while (ch != -1 && ch != '\n');
 
@@ -45,7 +43,7 @@ void TxiReader::load(const shared_ptr<IInputStream> &in) {
         boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
 
         processLine(tokens);
-    } while (!in->eof());
+    } while (!in.eof());
 }
 
 static Texture::ProcedureType parseProcedureType(const string &str) {

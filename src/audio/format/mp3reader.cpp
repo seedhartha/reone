@@ -17,6 +17,8 @@
 
 #include "mp3reader.h"
 
+#include "../../common/stream/input.h"
+
 #include "../stream.h"
 
 using namespace std;
@@ -40,14 +42,14 @@ static inline int scale(mad_fixed_t sample) {
     return sample >> (MAD_F_FRACBITS + 1 - 16);
 }
 
-void Mp3Reader::load(const shared_ptr<IInputStream> &stream) {
-    stream->seek(0, SeekOrigin::End);
-    size_t size = stream->position();
+void Mp3Reader::load(IInputStream &stream) {
+    stream.seek(0, SeekOrigin::End);
+    size_t size = stream.position();
 
     ByteArray data(size, '\0');
 
-    stream->seek(0, SeekOrigin::Begin);
-    stream->read(&data[0], size);
+    stream.seek(0, SeekOrigin::Begin);
+    stream.read(&data[0], size);
 
     load(move(data));
 }

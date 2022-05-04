@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include "../../common/stream/bytearrayinput.h"
 #include "../../resource/format/binreader.h"
 
 #include "../modelnode.h"
 
 namespace reone {
+
+class IInputStream;
 
 namespace graphics {
 
@@ -35,7 +36,7 @@ class MdlReader : public resource::BinaryReader {
 public:
     MdlReader(Models &models, Textures &textures);
 
-    void load(const std::shared_ptr<IInputStream> &mdl, const std::shared_ptr<IInputStream> &mdx);
+    void load(IInputStream &mdl, IInputStream &mdx);
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
 

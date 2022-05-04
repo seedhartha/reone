@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../common/stream/output.h"
-
 namespace reone {
+
+class IOutputStream;
 
 namespace resource {
 
@@ -32,7 +32,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
-    void save(std::shared_ptr<IOutputStream> out);
+    void save(IOutputStream &out);
 
 private:
     struct StringDataElement {

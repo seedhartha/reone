@@ -17,28 +17,24 @@
 
 #pragma once
 
-#include "../../common/stream/input.h"
 #include "../../common/streamreader.h"
 #include "../../common/types.h"
 
 namespace reone {
 
+class IInputStream;
+
 namespace resource {
 
-/**
- * Abstract class with utility methods for reading binary files. Descendants are
- * expected to specify the file signature through the constructor and override
- * the doLoad function.
- */
 class BinaryReader : boost::noncopyable {
 public:
-    void load(std::shared_ptr<IInputStream> in);
+    void load(IInputStream &in);
     void load(boost::filesystem::path path);
 
 protected:
     boost::endian::order _endianess {boost::endian::order::little};
     boost::filesystem::path _path;
-    std::shared_ptr<IInputStream> _in;
+    IInputStream *_in {nullptr};
     std::unique_ptr<StreamReader> _reader;
     size_t _size {0};
 

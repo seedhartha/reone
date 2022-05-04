@@ -50,15 +50,15 @@ BOOST_AUTO_TEST_CASE(should_write_rim) {
                               .append("Bb", 2)
                               .build();
 
+    auto bytes = ByteArray();
+    auto stream = ByteArrayOutputStream(bytes);
+
     auto writer = RimWriter();
     writer.add(RimWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
 
-    auto bytes = ByteArray();
-    auto rim = make_shared<ByteArrayOutputStream>(bytes);
-
     // when
 
-    writer.save(rim);
+    writer.save(stream);
 
     // then
 

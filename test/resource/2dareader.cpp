@@ -49,9 +49,8 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
                      .append("unique\x00", 7)
                      .append("same\x00", 5)
                      .build();
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
+
+    auto stream = ByteArrayInputStream(input);
     auto reader = TwoDaReader();
 
     // when

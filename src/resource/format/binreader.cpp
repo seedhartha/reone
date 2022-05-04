@@ -37,9 +37,9 @@ BinaryReader::BinaryReader(int signSize, const char *sign) :
     memcpy(&_sign[0], sign, _signSize);
 }
 
-void BinaryReader::load(shared_ptr<IInputStream> in) {
-    _in = in;
-    _reader = make_unique<StreamReader>(*in, _endianess);
+void BinaryReader::load(IInputStream &in) {
+    _in = &in;
+    _reader = make_unique<StreamReader>(in, _endianess);
 
     load();
 }
@@ -71,7 +71,7 @@ void BinaryReader::load(fs::path path) {
     if (!fs::exists(path)) {
         throw runtime_error("File not found: " + path.string());
     }
-    _in = make_shared<FileInputStream>(path, OpenMode::Binary);
+    _in = new FileInputStream(path, OpenMode::Binary); // TODO: free
     _reader = make_unique<StreamReader>(*_in, _endianess);
     _path = path;
 

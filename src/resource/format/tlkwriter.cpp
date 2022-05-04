@@ -37,11 +37,11 @@ struct StringFlags {
 };
 
 void TlkWriter::save(const fs::path &path) {
-    auto tlk = make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto tlk = FileOutputStream(path, OpenMode::Binary);
     save(tlk);
 }
 
-void TlkWriter::save(std::shared_ptr<IOutputStream> out) {
+void TlkWriter::save(IOutputStream &out) {
     vector<StringDataElement> strData;
 
     uint32_t offString = 0;
@@ -58,7 +58,7 @@ void TlkWriter::save(std::shared_ptr<IOutputStream> out) {
         offString += strSize;
     }
 
-    StreamWriter writer(*out);
+    StreamWriter writer(out);
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable->getStringCount());

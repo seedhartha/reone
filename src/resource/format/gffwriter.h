@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "../../common/stream/output.h"
+#include "../../common/streamwriter.h"
 #include "../../common/types.h"
 
 #include "../types.h"
 
 namespace reone {
 
-class StreamWriter;
+class IOutputStream;
 
 namespace resource {
 
@@ -40,7 +40,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
-    void save(const std::shared_ptr<IOutputStream> &out);
+    void save(IOutputStream &out);
 
 private:
     struct WriteStruct {

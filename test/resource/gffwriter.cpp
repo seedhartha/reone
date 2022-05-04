@@ -201,9 +201,9 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
                     make_shared<Gff>(2, vector<Gff::Field> {Gff::Field::newWord("Struct2Word", 2)}),
                     make_shared<Gff>(3, vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
-    auto writer = GffWriter(ResourceType::Res, root);
     auto bytes = ByteArray();
-    auto stream = make_shared<ByteArrayOutputStream>(bytes);
+    auto stream = ByteArrayOutputStream(bytes);
+    auto writer = GffWriter(ResourceType::Res, root);
 
     // when
 

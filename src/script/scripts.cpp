@@ -41,7 +41,7 @@ shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
         return nullptr;
 
     NcsReader ncs(resRef);
-    ncs.load(make_shared<ByteArrayInputStream>(*data));
+    ncs.load(ByteArrayInputStream(*data));
 
     return ncs.program();
 }

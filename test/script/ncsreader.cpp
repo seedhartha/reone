@@ -132,12 +132,8 @@ BOOST_AUTO_TEST_CASE(should_read_ncs) {
                      .append("\x2d\x00", 2)                                  // NOP2
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = NcsReader("");
-
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-
-    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
 
     // when
 

@@ -39,7 +39,7 @@ shared_ptr<LipAnimation> LipAnimations::doGet(string resRef) {
         return nullptr;
     }
     LipReader lip(resRef);
-    lip.load(make_shared<ByteArrayInputStream>(*lipData));
+    lip.load(ByteArrayInputStream(*lipData));
 
     return lip.animation();
 }

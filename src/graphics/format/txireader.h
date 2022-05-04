@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "../../common/stream/input.h"
-
 #include "../texture.h"
 
 namespace reone {
+
+class IInputStream;
 
 namespace graphics {
 
 class TxiReader {
 public:
-    void load(const std::shared_ptr<IInputStream> &in);
+    void load(IInputStream &in);
 
     const Texture::Features &features() const { return _features; }
 

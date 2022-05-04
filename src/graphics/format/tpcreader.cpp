@@ -97,7 +97,7 @@ void TpcReader::loadFeatures() {
     _txiData = _reader->getBytes(static_cast<int>(_size - pos));
 
     TxiReader txi;
-    txi.load(make_shared<ByteArrayInputStream>(_txiData));
+    txi.load(ByteArrayInputStream(_txiData));
 
     _features = txi.features();
 }

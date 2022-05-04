@@ -59,12 +59,8 @@ BOOST_AUTO_TEST_CASE(should_read_tlk) {
                      .append("Jane")
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = TlkReader();
-
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-
-    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
 
     // when
 

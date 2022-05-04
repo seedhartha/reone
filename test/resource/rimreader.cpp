@@ -50,17 +50,13 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
                      .append("Bb", 2)
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = RimReader();
-
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto rim = make_shared<ByteArrayInputStream>(inputBytes);
-
     auto expectedData = ByteArray {'B', 'b'};
 
     // when
 
-    reader.load(rim);
+    reader.load(stream);
 
     // then
 

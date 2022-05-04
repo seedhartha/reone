@@ -67,7 +67,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
     if (mdlData && mdxData) {
         MdlReader mdl(*this, _textures);
         try {
-            mdl.load(make_shared<ByteArrayInputStream>(*mdlData), make_shared<ByteArrayInputStream>(*mdxData));
+            mdl.load(ByteArrayInputStream(*mdlData), ByteArrayInputStream(*mdxData));
             model = mdl.model();
             if (model) {
                 model->init();

@@ -36,12 +36,12 @@ void ErfWriter::add(Resource &&res) {
 }
 
 void ErfWriter::save(FileType type, const fs::path &path) {
-    auto out = make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto out = FileOutputStream(path, OpenMode::Binary);
     save(type, out);
 }
 
-void ErfWriter::save(FileType type, shared_ptr<IOutputStream> out) {
-    StreamWriter writer(*out);
+void ErfWriter::save(FileType type, IOutputStream &out) {
+    StreamWriter writer(out);
     auto numResources = static_cast<uint32_t>(_resources.size());
     uint32_t offResources = 0xa0 + kKeyStructSize * numResources;
 

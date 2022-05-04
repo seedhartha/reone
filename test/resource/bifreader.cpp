@@ -48,15 +48,13 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
                      .append("Hello, world!")
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = BifReader();
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto bif = make_shared<ByteArrayInputStream>(inputBytes);
     auto expectedData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
 
-    reader.load(bif);
+    reader.load(stream);
 
     // then
 

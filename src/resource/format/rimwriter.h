@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include "../../common/stream/output.h"
 #include "../../common/types.h"
 
 #include "../types.h"
 
 namespace reone {
+
+class IOutputStream;
 
 namespace resource {
 
@@ -37,7 +38,7 @@ public:
     void add(Resource &&res);
 
     void save(const boost::filesystem::path &path);
-    void save(std::shared_ptr<IOutputStream> out);
+    void save(IOutputStream &out);
 
 private:
     std::vector<Resource> _resources;

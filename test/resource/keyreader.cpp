@@ -65,15 +65,12 @@ BOOST_AUTO_TEST_CASE(should_read_key) {
                      .append("\xd3\x07\xc0\x00", 4)
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = KeyReader();
-
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto key = make_shared<ByteArrayInputStream>(inputBytes);
 
     // when
 
-    reader.load(key);
+    reader.load(stream);
 
     auto keys = reader.keys();
     auto files = reader.files();

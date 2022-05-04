@@ -56,7 +56,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
 
     if (data) {
         BwmReader bwm;
-        bwm.load(make_shared<ByteArrayInputStream>(*data));
+        bwm.load(ByteArrayInputStream(*data));
         walkmesh = bwm.walkmesh();
     }
 

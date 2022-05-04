@@ -18,7 +18,6 @@
 #include "gffwriter.h"
 
 #include "../../common/stream/fileoutput.h"
-#include "../../common/streamwriter.h"
 
 #include "../gff.h"
 
@@ -57,14 +56,14 @@ static const unordered_map<ResourceType, string> g_signatures {
     {ResourceType::Pth, "PTH"}};
 
 void GffWriter::save(const fs::path &path) {
-    auto out = make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto out = FileOutputStream(path, OpenMode::Binary);
     save(out);
 }
 
-void GffWriter::save(const shared_ptr<IOutputStream> &out) {
+void GffWriter::save(IOutputStream &out) {
     processTree();
 
-    _writer = make_unique<StreamWriter>(*out);
+    _writer = make_unique<StreamWriter>(out);
 
     writeHeader();
     writeStructArray();

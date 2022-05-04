@@ -58,15 +58,13 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
                      .append("Bb")
                      .build();
 
+    auto stream = ByteArrayInputStream(input);
     auto reader = ErfReader();
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto erf = make_shared<ByteArrayInputStream>(inputBytes);
     auto expectedData = ByteArray {'B', 'b'};
 
     // when
 
-    reader.load(erf);
+    reader.load(stream);
 
     // then
 

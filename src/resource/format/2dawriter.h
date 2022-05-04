@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../../common/stream/output.h"
+#include "../../common/streamwriter.h"
 
 namespace reone {
 
-class StreamWriter;
+class IOutputStream;
 
 namespace resource {
 
@@ -34,7 +34,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
-    void save(std::shared_ptr<IOutputStream> out);
+    void save(IOutputStream &out);
 
 private:
     std::shared_ptr<TwoDa> _twoDa;

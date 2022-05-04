@@ -59,9 +59,9 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
                                   .row(TwoDa::newRow({"same", "same"}))
                                   .build();
 
-    auto writer = TwoDaWriter(twoDa);
     auto bytes = ByteArray();
-    auto stream = make_shared<ByteArrayOutputStream>(bytes);
+    auto stream = ByteArrayOutputStream(bytes);
+    auto writer = TwoDaWriter(twoDa);
 
     // when
 

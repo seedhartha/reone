@@ -174,9 +174,7 @@ BOOST_AUTO_TEST_CASE(should_read_gff) {
                      .append("\x03\x00\x00\x00", 4)
                      .build();
 
-    auto inputBytes = ByteArray();
-    inputBytes.insert(inputBytes.end(), input.begin(), input.end());
-    auto stream = make_shared<ByteArrayInputStream>(inputBytes);
+    auto stream = ByteArrayInputStream(input);
     auto reader = GffReader();
     auto expectedData = ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)};
     auto expectedOrientation = glm::quat {1.0f, 1.0f, 1.0f, 1.0f};

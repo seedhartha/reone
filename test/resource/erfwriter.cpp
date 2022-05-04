@@ -58,15 +58,15 @@ BOOST_AUTO_TEST_CASE(should_write_erf) {
                               .append("Bb")
                               .build();
 
+    auto bytes = ByteArray();
+    auto stream = ByteArrayOutputStream(bytes);
+
     auto writer = ErfWriter();
     writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
 
-    auto bytes = ByteArray();
-    auto erf = make_shared<ByteArrayOutputStream>(bytes);
-
     // when
 
-    writer.save(ErfWriter::FileType::ERF, erf);
+    writer.save(ErfWriter::FileType::ERF, stream);
 
     // then
 
