@@ -23,6 +23,7 @@ set(TEST_SOURCES
     common/binarywriter.cpp
     common/bytearrayinputstream.cpp
     common/bytearrayoutputstream.cpp
+    common/collectionutil.cpp
     common/hexutil.cpp
     common/stringbuilder.cpp
     common/unicodeutil.cpp
