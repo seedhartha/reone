@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "keybifprovider.h"
+#include "keybif.h"
 
-#include "../common/collectionutil.h"
-#include "../common/pathutil.h"
+#include "../../common/collectionutil.h"
+#include "../../common/pathutil.h"
+#include "../../common/stream/fileinput.h"
 
-#include "format/bifreader.h"
+#include "../format/bifreader.h"
+#include "../format/keyreader.h"
 
 using namespace std;
 

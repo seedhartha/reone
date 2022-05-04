@@ -37,7 +37,7 @@ void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path
         ErfReader erf;
         erf.load(stream);
         if (operation == Operation::Extract) {
-            extract(erf, destPath);
+            extract(erf, target, destPath);
         } else {
             list(erf);
         }
@@ -56,7 +56,7 @@ void ErfTool::list(const ErfReader &erf) {
     }
 }
 
-void ErfTool::extract(ErfReader &erf, const fs::path &destPath) {
+void ErfTool::extract(ErfReader &erf, const fs::path &erfPath, const fs::path &destPath) {
     if (!fs::exists(destPath)) {
         // Create destination directory if it does not exist
         fs::create_directory(destPath);
@@ -66,16 +66,20 @@ void ErfTool::extract(ErfReader &erf, const fs::path &destPath) {
     }
 
     for (size_t i = 0; i < erf.keys().size(); ++i) {
-        const ErfReader::KeyEntry &key = erf.keys()[i];
+        auto &key = erf.keys()[i];
+        auto &erfResource = erf.resources()[i];
         cout << "Extracting " << key.resId.string() << endl;
-        string ext(getExtByResType(key.resId.type));
-        ByteArray data(erf.getResourceData(static_cast<int>(i)));
 
-        fs::path resPath(destPath);
+        auto buffer = ByteArray(erfResource.size, '\0');
+        auto erf = FileInputStream(erfPath, OpenMode::Binary);
+        erf.read(&buffer[0], buffer.size());
+    
+        auto resPath = destPath;
+        auto &ext = getExtByResType(key.resId.type);
         resPath.append(key.resId.resRef + "." + ext);
 
-        fs::ofstream res(resPath, ios::binary);
-        res.write(&data[0], data.size());
+        auto res = fs::ofstream(resPath, ios::binary);
+        res.write(&buffer[0], buffer.size());
     }
 }
 

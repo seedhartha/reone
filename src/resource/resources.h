@@ -22,7 +22,7 @@
 
 #include "format/pereader.h"
 #include "id.h"
-#include "resourceprovider.h"
+#include "provider.h"
 #include "types.h"
 
 namespace reone {
@@ -43,10 +43,9 @@ public:
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
 private:
-    PEReader _exeFile;
+    boost::filesystem::path _exePath;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
-    std::vector<std::shared_ptr<FileInputStream>> _openFiles;
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 

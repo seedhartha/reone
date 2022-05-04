@@ -27,56 +27,34 @@ void RimReader::onLoad() {
     checkSignature(string("RIM V1.0", 8));
     ignore(4);
 
-    _resourceCount = readUint32();
-    _resourcesOffset = readUint32();
+    _numResources = readUint32();
+    _offResources = readUint32();
 
     loadResources();
 }
 
 void RimReader::loadResources() {
-    _resources.reserve(_resourceCount);
-    seek(_resourcesOffset);
+    _resources.reserve(_numResources);
+    seek(_offResources);
 
-    for (int i = 0; i < _resourceCount; ++i) {
-        ResourceEntry res(readResource());
-        _resIdxByResId.insert(make_pair(res.resId, i));
-        _resources.push_back(move(res));
+    for (int i = 0; i < _numResources; ++i) {
+        _resources.push_back(readResource());
     }
 }
 
 RimReader::ResourceEntry RimReader::readResource() {
-    string resRef(boost::to_lower_copy(readCString(16)));
-    uint16_t type = readUint16();
+    auto resRef = boost::to_lower_copy(readCString(16));
+    auto type = readUint16();
     ignore(4 + 2);
-    uint32_t offset = readUint32();
-    uint32_t size = readUint32();
+    auto offset = readUint32();
+    auto size = readUint32();
 
-    ResourceEntry res;
-    res.resId = ResourceId(resRef, static_cast<ResourceType>(type));
-    res.offset = offset;
-    res.size = size;
+    ResourceEntry resource;
+    resource.resId = ResourceId(resRef, static_cast<ResourceType>(type));
+    resource.offset = offset;
+    resource.size = size;
 
-    return move(res);
-}
-
-shared_ptr<ByteArray> RimReader::find(const ResourceId &id) {
-    auto maybeIdx = _resIdxByResId.find(id);
-    if (maybeIdx == _resIdxByResId.end()) {
-        return nullptr;
-    }
-    const ResourceEntry &res = _resources[maybeIdx->second];
-    return make_shared<ByteArray>(getResourceData(res));
-}
-
-ByteArray RimReader::getResourceData(const ResourceEntry &res) {
-    return readBytes(res.offset, res.size);
-}
-
-ByteArray RimReader::getResourceData(int idx) {
-    if (idx >= _resourceCount) {
-        throw logic_error("RIM: resource index out of range: " + to_string(idx));
-    }
-    return getResourceData(_resources[idx]);
+    return move(resource);
 }
 
 } // namespace resource

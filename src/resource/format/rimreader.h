@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "../resourceprovider.h"
-#include "../types.h"
+#include "../id.h"
 
 #include "binreader.h"
 
@@ -26,7 +25,7 @@ namespace reone {
 
 namespace resource {
 
-class RimReader : public BinaryResourceReader, public IResourceProvider {
+class RimReader : public BinaryResourceReader {
 public:
     struct ResourceEntry {
         ResourceId resId;
@@ -34,31 +33,21 @@ public:
         uint32_t size {0};
     };
 
-    RimReader(int id = kDefaultProviderId) : _id(id) {
-    }
-
-    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
-
     const std::vector<ResourceEntry> &resources() const { return _resources; }
-
-    int id() const override { return _id; }
-    ByteArray getResourceData(int idx);
 
 private:
     int _id;
 
-    int _resourceCount {0};
-    uint32_t _resourcesOffset {0};
+    int _numResources {0};
+    uint32_t _offResources {0};
+
     std::vector<ResourceEntry> _resources;
-    std::unordered_map<ResourceId, int, ResourceIdHasher> _resIdxByResId;
 
     void onLoad() override;
 
     void loadResources();
 
     ResourceEntry readResource();
-
-    ByteArray getResourceData(const ResourceEntry &res);
 };
 
 } // namespace resource

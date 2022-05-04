@@ -27,7 +27,7 @@ namespace reone {
 
 namespace resource {
 
-class PEReader : public BinaryResourceReader {
+class PeReader : public BinaryResourceReader {
 public:
     std::shared_ptr<ByteArray> find(uint32_t name, PEResourceType type);
 

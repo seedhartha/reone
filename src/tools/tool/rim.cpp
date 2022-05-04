@@ -33,13 +33,13 @@ void RimTool::invoke(Operation operation, const fs::path &target, const fs::path
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto stream = FileInputStream(target, OpenMode::Binary);
-        RimReader rim(0);
-        rim.load(stream);
+        auto rim = FileInputStream(target, OpenMode::Binary);
+        auto rimReader = RimReader();
+        rimReader.load(rim);
         if (operation == Operation::List) {
-            list(rim);
+            list(rimReader);
         } else if (operation == Operation::Extract) {
-            extract(rim, destPath);
+            extract(rimReader, target, destPath);
         }
         break;
     }
@@ -57,7 +57,7 @@ void RimTool::list(const RimReader &rim) {
     }
 }
 
-void RimTool::extract(RimReader &rim, const fs::path &destPath) {
+void RimTool::extract(RimReader &rim, const fs::path &rimPath, const fs::path &destPath) {
     if (!fs::exists(destPath)) {
         // Create destination directory if it does not exist
         fs::create_directory(destPath);
@@ -67,16 +67,20 @@ void RimTool::extract(RimReader &rim, const fs::path &destPath) {
     }
 
     for (size_t i = 0; i < rim.resources().size(); ++i) {
-        const RimReader::ResourceEntry &resEntry = rim.resources()[i];
-        cout << "Extracting " << resEntry.resId.string() << endl;
-        string ext(getExtByResType(resEntry.resId.type));
-        ByteArray data(rim.getResourceData(static_cast<int>(i)));
+        auto &rimResource = rim.resources()[i];
+        cout << "Extracting " << rimResource.resId.string() << endl;
+        auto &ext = getExtByResType(rimResource.resId.type);
 
-        fs::path resPath(destPath);
-        resPath.append(resEntry.resId.resRef + "." + ext);
+        auto buffer = ByteArray(rimResource.size, '\0');
 
-        fs::ofstream res(resPath, ios::binary);
-        res.write(&data[0], data.size());
+        auto rim = FileInputStream(rimPath, OpenMode::Binary);
+        rim.read(&buffer[0], buffer.size());
+
+        auto resPath = destPath;
+        resPath.append(rimResource.resId.resRef + "." + ext);
+
+        auto res = fs::ofstream(resPath, ios::binary);
+        res.write(&buffer[0], buffer.size());
     }
 }
 

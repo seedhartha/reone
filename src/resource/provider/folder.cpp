@@ -17,7 +17,7 @@
 
 #include "folder.h"
 
-#include "typeutil.h"
+#include "../typeutil.h"
 
 using namespace std;
 
@@ -27,12 +27,8 @@ namespace reone {
 
 namespace resource {
 
-void Folder::load(const fs::path &path) {
-    if (!fs::is_directory(path)) {
-        throw runtime_error("Folder not found: " + path.string());
-    }
-    loadDirectory(path);
-    _path = path;
+void Folder::init() {
+    loadDirectory(_path);
 }
 
 void Folder::loadDirectory(const fs::path &path) {

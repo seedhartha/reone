@@ -17,26 +17,42 @@
 
 #pragma once
 
-#include "../../resource/format/erfreader.h"
-
-#include "../tool.h"
+#include "../provider.h"
 
 namespace reone {
 
-class ErfTool : public ITool {
-public:
-    void invoke(
-        Operation operation,
-        const boost::filesystem::path &target,
-        const boost::filesystem::path &gamePath,
-        const boost::filesystem::path &destPath) override;
+namespace resource {
 
-    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+class RimResourceProvider : public IResourceProvider {
+public:
+    RimResourceProvider(boost::filesystem::path path, int id = kDefaultProviderId) :
+        _path(std::move(path)),
+        _id(id) {
+    }
+
+    void init();
+
+    // IResourceProvider
+
+    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
+
+    int id() const override { return _id; }
+
+    // END IResourceProvider
 
 private:
-    void list(const resource::ErfReader &erf);
-    void extract(resource::ErfReader &erf, const boost::filesystem::path &erfPath, const boost::filesystem::path &destPath);
-    void toERF(Operation operation, const boost::filesystem::path &target);
+    struct Resource {
+        ResourceId id;
+        uint32_t offset {0};
+        uint32_t fileSize {0};
+    };
+
+    boost::filesystem::path _path;
+    int _id;
+
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _resources;
 };
+
+} // namespace resource
 
 } // namespace reone

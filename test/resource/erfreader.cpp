@@ -21,8 +21,6 @@
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/erfreader.h"
 
-#include "../checkutil.h"
-
 using namespace std;
 
 using namespace reone;
@@ -60,7 +58,6 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
 
     auto stream = ByteArrayInputStream(input);
     auto reader = ErfReader();
-    auto expectedData = ByteArray {'B', 'b'};
 
     // when
 
@@ -68,13 +65,14 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
 
     // then
 
-    BOOST_CHECK_EQUAL(1, reader.entryCount());
     BOOST_CHECK_EQUAL(1, reader.keys().size());
-    auto key = reader.keys().front();
+    BOOST_CHECK_EQUAL(1, reader.resources().size());
+    auto &key = reader.keys().front();
     BOOST_CHECK_EQUAL("aa", key.resId.resRef);
     BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(key.resId.type));
-    auto actualData = reader.getResourceData(0);
-    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
+    auto &resource = reader.resources().front();
+    BOOST_CHECK_EQUAL(192, resource.offset);
+    BOOST_CHECK_EQUAL(2, resource.size);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

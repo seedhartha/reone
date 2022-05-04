@@ -21,8 +21,6 @@
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/rimreader.h"
 
-#include "../checkutil.h"
-
 using namespace std;
 
 using namespace reone;
@@ -52,7 +50,6 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
 
     auto stream = ByteArrayInputStream(input);
     auto reader = RimReader();
-    auto expectedData = ByteArray {'B', 'b'};
 
     // when
 
@@ -66,8 +63,6 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
     BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(resources.front().resId.type));
     BOOST_CHECK_EQUAL(152, resources.front().offset);
     BOOST_CHECK_EQUAL(2, resources.front().size);
-    auto actualData = reader.getResourceData(0);
-    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

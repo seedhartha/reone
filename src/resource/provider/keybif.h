@@ -17,39 +17,43 @@
 
 #pragma once
 
-#include "../common/types.h"
-
-#include "resourceprovider.h"
-#include "types.h"
+#include "../provider.h"
 
 namespace reone {
 
 namespace resource {
 
-class Folder : public IResourceProvider {
+class BifReader;
+
+class KeyBifResourceProvider : public IResourceProvider {
 public:
-    Folder(int id = kDefaultProviderId) :
+    KeyBifResourceProvider(boost::filesystem::path keyPath, int id = kDefaultProviderId) :
+        _keyPath(std::move(keyPath)),
         _id(id) {
     }
 
-    void load(const boost::filesystem::path &path);
+    void init();
+
+    // IResourceProvider
 
     std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
     int id() const override { return _id; }
 
+    // END IResourceProvider
+
 private:
     struct Resource {
-        boost::filesystem::path path;
-        ResourceType type;
+        int bifIdx {0};
+        uint32_t bifOffset {0};
+        uint32_t fileSize {0};
     };
 
+    boost::filesystem::path _keyPath;
     int _id;
 
-    boost::filesystem::path _path;
-    std::multimap<std::string, Resource> _resources;
-
-    void loadDirectory(const boost::filesystem::path &path);
+    std::vector<boost::filesystem::path> _bifPaths;
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _resources;
 };
 
 } // namespace resource

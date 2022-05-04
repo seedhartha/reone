@@ -18,7 +18,6 @@ set(RESOURCE_HEADERS
     2das.h
     gff.h
     gffs.h
-    folder.h
     format/2dareader.h
     format/2dawriter.h
     format/bifreader.h
@@ -34,8 +33,11 @@ set(RESOURCE_HEADERS
     format/tlkreader.h
     format/tlkwriter.h
     id.h
-    keybifprovider.h
-    resourceprovider.h
+    provider.h
+    provider/erf.h
+    provider/folder.h
+    provider/keybif.h
+    provider/rim.h
     resources.h
     services.h
     strings.h
@@ -46,7 +48,6 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     2da.cpp
     2das.cpp
-    folder.cpp
     gff.cpp
     gffs.cpp
     format/2dareader.cpp
@@ -63,7 +64,10 @@ set(RESOURCE_SOURCES
     format/rimwriter.cpp
     format/tlkreader.cpp
     format/tlkwriter.cpp
-    keybifprovider.cpp
+    provider/erf.cpp
+    provider/folder.cpp
+    provider/keybif.cpp
+    provider/rim.cpp
     resources.cpp
     strings.cpp
     talktable.cpp

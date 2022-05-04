@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "../resourceprovider.h"
-#include "../types.h"
+#include "../id.h"
 
 #include "binreader.h"
 
@@ -26,7 +25,7 @@ namespace reone {
 
 namespace resource {
 
-class ErfReader : public BinaryResourceReader, public IResourceProvider {
+class ErfReader : public BinaryResourceReader {
 public:
     struct KeyEntry {
         ResourceId resId;
@@ -37,26 +36,16 @@ public:
         uint32_t size {0};
     };
 
-    ErfReader(int id = kDefaultProviderId) : _id(id) {
-    }
-
-    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
-
-    int entryCount() const { return _entryCount; }
     const std::vector<KeyEntry> &keys() const { return _keys; }
-
-    int id() const override { return _id; }
-    ByteArray getResourceData(int idx);
+    const std::vector<ResourceEntry> &resources() const { return _resources; }
 
 private:
-    int _id;
+    int _numEntries {0};
+    uint32_t _offKeys {0};
+    uint32_t _offResources {0};
 
-    int _entryCount {0};
-    uint32_t _keysOffset {0};
-    uint32_t _resourcesOffset {0};
     std::vector<KeyEntry> _keys;
     std::vector<ResourceEntry> _resources;
-    std::unordered_map<ResourceId, int, ResourceIdHasher> _resIdxByResId;
 
     void onLoad() override;
 
@@ -66,8 +55,6 @@ private:
 
     KeyEntry readKeyEntry();
     ResourceEntry readResourceEntry();
-
-    ByteArray getResourceData(const ResourceEntry &res);
 };
 
 } // namespace resource

@@ -28,7 +28,7 @@ namespace resource {
 static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
-void PEReader::onLoad() {
+void PeReader::onLoad() {
     checkSignature(string("MZ", 2));
     ignore(58);
 
@@ -51,13 +51,13 @@ void PEReader::onLoad() {
     }
 }
 
-shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
+shared_ptr<ByteArray> PeReader::find(uint32_t name, PEResourceType type) {
     return findInternal([&name, &type](const Resource &res) {
         return res.type == type && res.name == name;
     });
 }
 
-shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pred) {
+shared_ptr<ByteArray> PeReader::findInternal(function<bool(const Resource &)> pred) {
     auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
     if (maybeResource == _resources.end())
         return nullptr;
@@ -65,11 +65,11 @@ shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pr
     return getResourceData(*maybeResource);
 }
 
-shared_ptr<ByteArray> PEReader::getResourceData(const Resource &res) {
+shared_ptr<ByteArray> PeReader::getResourceData(const Resource &res) {
     return make_shared<ByteArray>(readBytes(res.offset, res.size));
 }
 
-void PEReader::loadHeader() {
+void PeReader::loadHeader() {
     ignore(2);
 
     _sectionCount = readUint16();
@@ -78,7 +78,7 @@ void PEReader::loadHeader() {
     ignore(16);
 }
 
-void PEReader::loadOptionalHeader() {
+void PeReader::loadOptionalHeader() {
     ignore(92);
 
     uint32_t dirCount = readUint32();
@@ -86,7 +86,7 @@ void PEReader::loadOptionalHeader() {
     ignore(dirCount * 8);
 }
 
-void PEReader::loadSection() {
+void PeReader::loadSection() {
     string name(readCString(8));
 
     ignore(4);
@@ -100,7 +100,7 @@ void PEReader::loadSection() {
     _sections.push_back({name, virtAddr, offRaw});
 }
 
-void PEReader::loadResourceDir(const Section &section, int level) {
+void PeReader::loadResourceDir(const Section &section, int level) {
     ignore(12);
 
     uint16_t namedEntryCount = readUint16();
@@ -112,7 +112,7 @@ void PEReader::loadResourceDir(const Section &section, int level) {
     }
 }
 
-void PEReader::loadResourceDirEntry(const Section &section, int level) {
+void PeReader::loadResourceDirEntry(const Section &section, int level) {
     uint32_t name = readUint32();
 
     switch (level) {
@@ -145,7 +145,7 @@ void PEReader::loadResourceDirEntry(const Section &section, int level) {
     seek(pos);
 }
 
-void PEReader::loadResourceDataEntry(const Section &section) {
+void PeReader::loadResourceDataEntry(const Section &section) {
     uint32_t offData = readUint32();
     uint32_t sizeData = readUint32();
 

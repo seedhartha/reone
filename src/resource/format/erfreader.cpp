@@ -29,12 +29,12 @@ void ErfReader::onLoad() {
     checkSignature();
     ignore(8);
 
-    _entryCount = readUint32();
+    _numEntries = readUint32();
 
     ignore(4);
 
-    _keysOffset = readUint32();
-    _resourcesOffset = readUint32();
+    _offKeys = readUint32();
+    _offResources = readUint32();
 
     loadKeys();
     loadResources();
@@ -53,66 +53,44 @@ void ErfReader::checkSignature() {
 }
 
 void ErfReader::loadKeys() {
-    _keys.reserve(_entryCount);
-    seek(_keysOffset);
+    _keys.reserve(_numEntries);
+    seek(_offKeys);
 
-    for (int i = 0; i < _entryCount; ++i) {
-        KeyEntry key(readKeyEntry());
-        _resIdxByResId.insert(make_pair(key.resId, i));
-        _keys.push_back(move(key));
+    for (int i = 0; i < _numEntries; ++i) {
+        _keys.push_back(readKeyEntry());
     }
 }
 
 ErfReader::KeyEntry ErfReader::readKeyEntry() {
-    string resRef(boost::to_lower_copy(readCString(16)));
-    uint32_t resId = readUint32();
-    uint16_t resType = readUint16();
-    ignore(2);
+    auto resRef = boost::to_lower_copy(readCString(16));
+    auto resId = readUint32();
+    auto resType = readUint16();
+    ignore(2); // unused
 
-    KeyEntry key;
+    auto key = KeyEntry();
     key.resId = ResourceId(move(resRef), static_cast<ResourceType>(resType));
 
     return move(key);
 }
 
 void ErfReader::loadResources() {
-    _resources.reserve(_entryCount);
-    seek(_resourcesOffset);
+    _resources.reserve(_numEntries);
+    seek(_offResources);
 
-    for (int i = 0; i < _entryCount; ++i) {
+    for (int i = 0; i < _numEntries; ++i) {
         _resources.push_back(readResourceEntry());
     }
 }
 
 ErfReader::ResourceEntry ErfReader::readResourceEntry() {
-    uint32_t offset = readUint32();
-    uint32_t size = readUint32();
+    auto offset = readUint32();
+    auto size = readUint32();
 
-    ResourceEntry res;
-    res.offset = offset;
-    res.size = size;
+    ResourceEntry resource;
+    resource.offset = offset;
+    resource.size = size;
 
-    return move(res);
-}
-
-shared_ptr<ByteArray> ErfReader::find(const ResourceId &id) {
-    auto maybeIdx = _resIdxByResId.find(id);
-    if (maybeIdx == _resIdxByResId.end()) {
-        return nullptr;
-    }
-    const ResourceEntry &res = _resources[maybeIdx->second];
-    return make_shared<ByteArray>(getResourceData(res));
-}
-
-ByteArray ErfReader::getResourceData(const ResourceEntry &res) {
-    return readBytes(res.offset, res.size);
-}
-
-ByteArray ErfReader::getResourceData(int idx) {
-    if (idx >= _entryCount) {
-        throw out_of_range("ERF: resource index out of range: " + to_string(idx));
-    }
-    return getResourceData(_resources[idx]);
+    return move(resource);
 }
 
 } // namespace resource

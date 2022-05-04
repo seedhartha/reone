@@ -21,12 +21,13 @@
 #include "../common/pathutil.h"
 #include "../common/stream/fileinput.h"
 
-#include "folder.h"
 #include "format/bifreader.h"
 #include "format/erfreader.h"
 #include "format/rimreader.h"
-#include "keybifprovider.h"
-#include "resourceprovider.h"
+#include "provider/erf.h"
+#include "provider/folder.h"
+#include "provider/keybif.h"
+#include "provider/rim.h"
 
 using namespace std;
 
@@ -49,13 +50,8 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
-
-    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
-    _openFiles.push_back(stream);
-
-    auto erf = make_unique<ErfReader>(static_cast<int>(_providers.size()));
-    erf->load(*stream);
-
+    auto erf = make_unique<ErfResourceProvider>(path, static_cast<int>(_providers.size()));
+    erf->init();
     indexProvider(move(erf), path, transient);
 }
 
@@ -63,13 +59,8 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
-
-    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
-    _openFiles.push_back(stream);
-
-    auto rim = make_unique<RimReader>(static_cast<int>(_providers.size()));
-    rim->load(*stream);
-
+    auto rim = make_unique<RimResourceProvider>(path, static_cast<int>(_providers.size()));
+    rim->init();
     indexProvider(move(rim), path, transient);
 }
 
@@ -77,8 +68,8 @@ void Resources::indexDirectory(const fs::path &path) {
     if (!fs::exists(path)) {
         return;
     }
-    auto folder = make_unique<Folder>(static_cast<int>(_providers.size()));
-    folder->load(path);
+    auto folder = make_unique<Folder>(path, static_cast<int>(_providers.size()));
+    folder->init();
     indexProvider(move(folder), path);
 }
 
@@ -86,11 +77,7 @@ void Resources::indexExeFile(const fs::path &path) {
     if (!fs::exists(path)) {
         return;
     }
-
-    auto stream = make_shared<FileInputStream>(path, OpenMode::Binary);
-    _openFiles.push_back(stream);
-
-    _exeFile.load(*stream);
+    _exePath = path;
     debug("Index executable " + path.string(), LogChannels::resources);
 }
 
@@ -126,11 +113,17 @@ shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bo
 }
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
-    auto data = _exeFile.find(name, type);
+    auto pe = FileInputStream(_exePath, OpenMode::Binary);
+
+    auto peReader = PeReader();
+    peReader.load(pe);
+
+    auto data = peReader.find(name, type);
     if (!data) {
         warn(boost::format("Resource %u of type %d not found in EXE") % name % static_cast<int>(type), LogChannels::resources);
         return nullptr;
     }
+
     return move(data);
 }
 
