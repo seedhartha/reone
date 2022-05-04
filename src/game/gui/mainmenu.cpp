@@ -56,7 +56,7 @@ void MainMenu::init() {
     float aspect = _lbl3dView->extent()[2] / static_cast<float>(_lbl3dView->extent()[3]);
 
     auto model = _graphicsSvc.models.get("mainmenu");
-    auto modelSceneNode = shared_ptr<ModelSceneNode>(scene.newModel(move(model), ModelUsage::GUI));
+    auto modelSceneNode = shared_ptr<ModelSceneNode>(scene.newModel(*model, ModelUsage::GUI));
 
     SceneInitializer(scene)
         .aspect(aspect)

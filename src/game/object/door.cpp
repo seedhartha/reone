@@ -71,7 +71,7 @@ void Door::loadFromGit(const Gff &git) {
     shared_ptr<ModelSceneNode> sceneNode;
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
-        sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Door, nullptr);
+        sceneNode = _sceneGraph->newModel(*model, ModelUsage::Door, nullptr);
         sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);
@@ -80,14 +80,14 @@ void Door::loadFromGit(const Gff &git) {
     shared_ptr<WalkmeshSceneNode> walkmeshClosedSceneNode;
     auto walkmeshClosed = _graphicsSvc.walkmeshes.get(modelName + "0", ResourceType::Dwk);
     if (walkmeshClosed) {
-        walkmeshClosedSceneNode = _sceneGraph->newWalkmesh(move(walkmeshClosed));
+        walkmeshClosedSceneNode = _sceneGraph->newWalkmesh(*walkmeshClosed);
         walkmeshClosedSceneNode->setUser(*this);
     }
 
     shared_ptr<WalkmeshSceneNode> walkmeshOpen1SceneNode;
     auto walkmeshOpen1 = _graphicsSvc.walkmeshes.get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen1) {
-        walkmeshOpen1SceneNode = _sceneGraph->newWalkmesh(move(walkmeshOpen1));
+        walkmeshOpen1SceneNode = _sceneGraph->newWalkmesh(*walkmeshOpen1);
         walkmeshOpen1SceneNode->setUser(*this);
         walkmeshOpen1SceneNode->setEnabled(false);
     }
@@ -95,7 +95,7 @@ void Door::loadFromGit(const Gff &git) {
     shared_ptr<WalkmeshSceneNode> walkmeshOpen2SceneNode;
     auto walkmeshOpen2 = _graphicsSvc.walkmeshes.get(modelName + "2", ResourceType::Dwk);
     if (walkmeshOpen2) {
-        walkmeshOpen2SceneNode = _sceneGraph->newWalkmesh(move(walkmeshOpen2));
+        walkmeshOpen2SceneNode = _sceneGraph->newWalkmesh(*walkmeshOpen2);
         walkmeshOpen2SceneNode->setEnabled(false);
     }
 

@@ -44,7 +44,7 @@ namespace scene {
 class ModelSceneNode : public SceneNode {
 public:
     ModelSceneNode(
-        std::shared_ptr<graphics::Model> model,
+        graphics::Model &model,
         ModelUsage usage,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
@@ -61,23 +61,23 @@ public:
 
     bool isPickable() const { return _pickable; }
 
-    std::shared_ptr<ModelNodeSceneNode> getNodeByNumber(uint16_t number) const;
-    std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
+    ModelNodeSceneNode *getNodeByNumber(uint16_t number);
+    ModelNodeSceneNode *getNodeByName(const std::string &name);
 
     const graphics::Model &model() const { return *_model; }
     ModelUsage usage() const { return _usage; }
     float drawDistance() const { return _drawDistance; }
 
-    void setModel(std::shared_ptr<graphics::Model> model);
+    void setModel(graphics::Model &model);
     void setDrawDistance(float distance) { _drawDistance = distance; }
-    void setDiffuseMap(std::shared_ptr<graphics::Texture> texture);
-    void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture);
+    void setDiffuseMap(graphics::Texture *texture);
+    void setEnvironmentMap(graphics::Texture *texture);
     void setPickable(bool pickable) { _pickable = pickable; }
 
     // Animation
 
     void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
-    void playAnimation(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
+    void playAnimation(graphics::Animation &anim, graphics::LipAnimation *lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
 
     bool isAnimationFinished() const;
 
@@ -87,9 +87,9 @@ public:
 
     // Attachments
 
-    void attach(const std::string &parentName, std::shared_ptr<SceneNode> node);
+    void attach(const std::string &parentName, SceneNode &node);
 
-    std::shared_ptr<SceneNode> getAttachment(const std::string &parentName) const;
+    SceneNode *getAttachment(const std::string &parentName);
 
     // END Attachments
 
@@ -116,8 +116,8 @@ private:
     };
 
     struct AnimationChannel {
-        std::shared_ptr<graphics::Animation> anim;
-        std::shared_ptr<graphics::LipAnimation> lipAnim;
+        graphics::Animation *anim;
+        graphics::LipAnimation *lipAnim;
         AnimationProperties properties;
         float time {0.0f};
         std::unordered_map<uint16_t, AnimationState> stateByNodeNumber;
@@ -125,14 +125,14 @@ private:
         bool transition {false}; /**< when computing states, use animation transition time as channel time */
         bool finished {false};   /**< finished channels will be erased from the queue */
 
-        AnimationChannel(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim, AnimationProperties properties) :
-            anim(std::move(anim)),
-            lipAnim(std::move(lipAnim)),
+        AnimationChannel(graphics::Animation &anim, graphics::LipAnimation *lipAnim, AnimationProperties properties) :
+            anim(&anim),
+            lipAnim(lipAnim),
             properties(std::move(properties)) {
         }
     };
 
-    std::shared_ptr<graphics::Model> _model;
+    graphics::Model *_model;
     ModelUsage _usage;
     graphics::GraphicsServices &_graphicsSvc;
     IAnimationEventListener *_animEventListener;
@@ -141,9 +141,9 @@ private:
 
     // Lookups
 
-    std::unordered_map<uint16_t, std::shared_ptr<ModelNodeSceneNode>> _nodeByNumber;
-    std::unordered_map<std::string, std::shared_ptr<ModelNodeSceneNode>> _nodeByName;
-    std::unordered_map<std::string, std::shared_ptr<SceneNode>> _attachments;
+    std::unordered_map<uint16_t, ModelNodeSceneNode *> _nodeByNumber;
+    std::unordered_map<std::string, ModelNodeSceneNode *> _nodeByName;
+    std::unordered_map<std::string, SceneNode *> _attachments;
 
     // END Lookups
 
@@ -160,7 +160,7 @@ private:
 
     // END Flags
 
-    void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode &parent);
+    void buildNodeTree(graphics::ModelNode &node, SceneNode &parent);
 
     // Animation
 

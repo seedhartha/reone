@@ -225,18 +225,18 @@ void Game::loadModule(const string &name) {
     // Main camera
 
     auto &camera = module.area().mainCamera();
-    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()));
+    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()).get());
 
     // Rooms
 
     for (auto &room : module.area().rooms()) {
         auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
         if (model) {
-            scene.addRoot(move(model));
+            scene.addRoot(*model);
         }
         auto walkmesh = room->walkmeshPtr();
         if (walkmesh) {
-            scene.addRoot(move(walkmesh));
+            scene.addRoot(*walkmesh);
         }
     }
 
@@ -245,27 +245,27 @@ void Game::loadModule(const string &name) {
     for (auto &object : module.area().objects()) {
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
         if (model) {
-            scene.addRoot(move(model));
+            scene.addRoot(*model);
         }
         if (object->type() == ObjectType::Placeable) {
             auto &placeable = static_cast<Placeable &>(*object);
             auto walkmesh = placeable.walkmeshPtr();
             if (walkmesh) {
-                scene.addRoot(move(walkmesh));
+                scene.addRoot(*walkmesh);
             }
         } else if (object->type() == ObjectType::Door) {
             auto &door = static_cast<Door &>(*object);
             auto walkmeshClosed = door.walkmeshClosedPtr();
             if (walkmeshClosed) {
-                scene.addRoot(move(walkmeshClosed));
+                scene.addRoot(*walkmeshClosed);
             }
             auto walkmeshOpen1 = door.walkmeshOpen1Ptr();
             if (walkmeshOpen1) {
-                scene.addRoot(move(walkmeshOpen1));
+                scene.addRoot(*walkmeshOpen1);
             }
             auto walkmeshOpen2 = door.walkmeshOpen2Ptr();
             if (walkmeshOpen2) {
-                scene.addRoot(move(walkmeshOpen2));
+                scene.addRoot(*walkmeshOpen2);
             }
         }
     }
@@ -275,11 +275,11 @@ void Game::loadModule(const string &name) {
     auto &pc = module.pc();
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
-    scene.addRoot(pcModel);
+    scene.addRoot(*pcModel);
 
     auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);
     camera.setMode(Camera::Mode::ThirdPerson);
-    camera.setThirdPersonHook(pcCameraHook.get());
+    camera.setThirdPersonHook(pcCameraHook);
 
     _playerController->setCreature(&pc);
     _playerController->setCamera(&camera);

@@ -29,7 +29,7 @@ class LightSceneNode : public ModelNodeSceneNode {
 public:
     LightSceneNode(
         ModelSceneNode &model,
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(

@@ -35,7 +35,7 @@ namespace scene {
 class WalkmeshSceneNode : public SceneNode {
 public:
     WalkmeshSceneNode(
-        std::shared_ptr<graphics::Walkmesh> walkmesh,
+        graphics::Walkmesh &walkmesh,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         SceneNode(SceneNodeType::Walkmesh, sceneGraph),
@@ -50,10 +50,10 @@ public:
     void init();
     void draw();
 
-    const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
+    const graphics::Walkmesh &walkmesh() const { return _walkmesh; }
 
 private:
-    std::shared_ptr<graphics::Walkmesh> _walkmesh;
+    graphics::Walkmesh &_walkmesh;
     graphics::GraphicsServices &_graphicsSvc;
 
     std::shared_ptr<graphics::Mesh> _mesh;

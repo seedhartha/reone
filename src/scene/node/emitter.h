@@ -31,7 +31,7 @@ class ParticleSceneNode;
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
     EmitterSceneNode(
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(
@@ -100,7 +100,7 @@ private:
     Timer _birthTimer;
     bool _spawned {false};
 
-    std::deque<std::shared_ptr<SceneNode>> _particlePool; /**< pre-allocated pool of particles */
+    std::deque<ParticleSceneNode *> _particlePool; /**< pre-allocated pool of particles */
 
     void spawnParticles(float dt);
     void removeExpiredParticles(float dt);

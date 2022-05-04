@@ -30,8 +30,8 @@ class SceneGraph;
 
 class SceneNode : boost::noncopyable {
 public:
-    void addChild(std::shared_ptr<SceneNode> node);
-    void removeChild(const std::shared_ptr<SceneNode> &node);
+    void addChild(SceneNode &node);
+    void removeChild(SceneNode &node);
     void removeAllChildren();
 
     virtual void update(float dt);
@@ -58,7 +58,7 @@ public:
     SceneNodeType type() const { return _type; }
     SceneNode *parent() { return _parent; }
     const SceneNode *parent() const { return _parent; }
-    const std::unordered_set<std::shared_ptr<SceneNode>> &children() const { return _children; }
+    const std::unordered_set<SceneNode *> &children() const { return _children; }
     const graphics::AABB &aabb() const { return _aabb; }
     IUser *user() { return _user; }
     const IUser *user() const { return _user; }
@@ -88,7 +88,7 @@ protected:
     SceneGraph &_sceneGraph;
 
     SceneNode *_parent {nullptr};
-    std::unordered_set<std::shared_ptr<SceneNode>> _children;
+    std::unordered_set<SceneNode *> _children;
 
     graphics::AABB _aabb;
 

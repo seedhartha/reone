@@ -36,7 +36,7 @@ void WalkmeshSceneNode::init() {
     vector<float> vertices;
     vector<Mesh::Face> faces;
 
-    for (auto &wface : _walkmesh->faces()) {
+    for (auto &wface : _walkmesh.faces()) {
         size_t vertIdxStart = vertices.size() / 7;
         for (int i = 0; i < 3; ++i) {
             vertices.push_back(wface.vertices[i].x);

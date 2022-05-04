@@ -70,56 +70,56 @@ void SceneGraph::clear() {
     _activeLights.clear();
 }
 
-void SceneGraph::addRoot(shared_ptr<ModelSceneNode> node) {
-    _modelRoots.insert(move(node));
+void SceneGraph::addRoot(ModelSceneNode &node) {
+    _modelRoots.insert(&node);
 }
 
-void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
-    if (node->walkmesh().isAreaWalkmesh()) {
-        _walkmeshRoots.push_back(move(node));
+void SceneGraph::addRoot(WalkmeshSceneNode &node) {
+    if (node.walkmesh().isAreaWalkmesh()) {
+        _walkmeshRoots.push_back(&node);
     } else {
-        _walkmeshRoots.push_front(move(node));
+        _walkmeshRoots.push_front(&node);
     }
 }
 
-void SceneGraph::addRoot(shared_ptr<TriggerSceneNode> node) {
-    _triggerRoots.insert(move(node));
+void SceneGraph::addRoot(TriggerSceneNode &node) {
+    _triggerRoots.insert(&node);
 }
 
-void SceneGraph::addRoot(shared_ptr<GrassSceneNode> node) {
-    _grassRoots.insert(move(node));
+void SceneGraph::addRoot(GrassSceneNode &node) {
+    _grassRoots.insert(&node);
 }
 
-void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
-    _soundRoots.insert(move(node));
+void SceneGraph::addRoot(SoundSceneNode &node) {
+    _soundRoots.insert(&node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<ModelSceneNode> &node) {
+void SceneGraph::removeRoot(ModelSceneNode &node) {
     for (auto it = _activeLights.begin(); it != _activeLights.end();) {
-        if (&(*it)->model() == node.get()) {
+        if (&(*it)->model() == &node) {
             it = _activeLights.erase(it);
         } else {
             ++it;
         }
     }
 
-    _modelRoots.erase(node);
+    _modelRoots.erase(&node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<WalkmeshSceneNode> &node) {
-    _walkmeshRoots.remove(node);
+void SceneGraph::removeRoot(WalkmeshSceneNode &node) {
+    _walkmeshRoots.remove(&node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<TriggerSceneNode> &node) {
-    _triggerRoots.erase(node);
+void SceneGraph::removeRoot(TriggerSceneNode &node) {
+    _triggerRoots.erase(&node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<GrassSceneNode> &node) {
-    _grassRoots.erase(node);
+void SceneGraph::removeRoot(GrassSceneNode &node) {
+    _grassRoots.erase(&node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<SoundSceneNode> &node) {
-    _soundRoots.erase(node);
+void SceneGraph::removeRoot(SoundSceneNode &node) {
+    _soundRoots.erase(&node);
 }
 
 void SceneGraph::update(float dt) {
@@ -247,7 +247,7 @@ void SceneGraph::updateSounds() {
         if (dist2 > maxDist2) {
             continue;
         }
-        distances.push_back(make_pair(root.get(), dist2));
+        distances.push_back(make_pair(root, dist2));
     }
 
     // Take up to N most closest sounds to the camera
@@ -280,51 +280,51 @@ void SceneGraph::refresh() {
     _emitters.clear();
 
     for (auto &root : _modelRoots) {
-        refreshFromNode(root);
+        refreshFromNode(*root);
     }
 }
 
-void SceneGraph::refreshFromNode(const shared_ptr<SceneNode> &node) {
+void SceneGraph::refreshFromNode(SceneNode &node) {
     bool propagate = true;
 
-    switch (node->type()) {
+    switch (node.type()) {
     case SceneNodeType::Model: {
         // Ignore models that have been culled
-        auto model = static_pointer_cast<ModelSceneNode>(node);
-        if (model->isCulled()) {
+        auto &model = static_cast<ModelSceneNode &>(node);
+        if (model.isCulled()) {
             propagate = false;
         }
         break;
     }
     case SceneNodeType::Mesh: {
         // For model nodes, determine whether they should be rendered and cast shadows
-        auto modelNode = static_pointer_cast<MeshSceneNode>(node);
-        if (modelNode->shouldRender()) {
+        auto &modelNode = static_cast<MeshSceneNode &>(node);
+        if (modelNode.shouldRender()) {
             // Sort model nodes into transparent and opaque
-            if (modelNode->isTransparent()) {
-                _transparentMeshes.push_back(modelNode.get());
+            if (modelNode.isTransparent()) {
+                _transparentMeshes.push_back(&modelNode);
             } else {
-                _opaqueMeshes.push_back(modelNode.get());
+                _opaqueMeshes.push_back(&modelNode);
             }
         }
-        if (modelNode->shouldCastShadows()) {
-            _shadowMeshes.push_back(modelNode.get());
+        if (modelNode.shouldCastShadows()) {
+            _shadowMeshes.push_back(&modelNode);
         }
         break;
     }
     case SceneNodeType::Light:
-        _lights.push_back(static_pointer_cast<LightSceneNode>(node).get());
+        _lights.push_back(static_cast<LightSceneNode *>(&node));
         break;
     case SceneNodeType::Emitter:
-        _emitters.push_back(static_pointer_cast<EmitterSceneNode>(node).get());
+        _emitters.push_back(static_cast<EmitterSceneNode *>(&node));
         break;
     default:
         break;
     }
 
     if (propagate) {
-        for (auto &child : node->children()) {
-            refreshFromNode(child);
+        for (auto &child : node.children()) {
+            refreshFromNode(*child);
         }
     }
 }
@@ -344,18 +344,18 @@ void SceneGraph::prepareOpaqueLeafs() {
             if (child->type() != SceneNodeType::GrassCluster) {
                 continue;
             }
-            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
+            auto cluster = static_cast<GrassClusterSceneNode *>(child);
             if (!camera->isInFrustum(cluster->getOrigin())) {
                 continue;
             }
             if (bucket.size() >= kMaxGrassClusters) {
-                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+                _opaqueLeafs.push_back(make_pair(grass, bucket));
                 bucket.clear();
             }
             bucket.push_back(cluster);
         }
         if (!bucket.empty()) {
-            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+            _opaqueLeafs.push_back(make_pair(grass, bucket));
             bucket.clear();
         }
     }
@@ -376,7 +376,7 @@ void SceneGraph::prepareTransparentLeafs() {
             if (child->type() != SceneNodeType::Particle) {
                 continue;
             }
-            auto particle = static_cast<ParticleSceneNode *>(child.get());
+            auto particle = static_cast<ParticleSceneNode *>(child);
             if (!camera->isInFrustum(particle->getOrigin())) {
                 continue;
             }
@@ -628,7 +628,7 @@ bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const 
     return minDistance != numeric_limits<float>::max();
 }
 
-shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) const {
+ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
     if (!_activeCamera) {
         return nullptr;
     }
@@ -639,7 +639,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
     glm::vec3 end(glm::unProject(glm::vec3(x, _graphicsOpt.height - y, 1.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 dir(glm::normalize(end - start));
 
-    vector<pair<shared_ptr<ModelSceneNode>, float>> distances;
+    vector<pair<ModelSceneNode *, float>> distances;
     for (auto &model : _modelRoots) {
         if (!model->isPickable() || model->user() == except) {
             continue;
@@ -687,14 +687,14 @@ shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
     return move(sceneNode);
 }
 
-shared_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    auto sceneNode = make_shared<DummySceneNode>(move(modelNode), *this, _graphicsSvc);
+shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
+    auto sceneNode = make_shared<DummySceneNode>(modelNode, *this, _graphicsSvc);
     _nodes.insert(sceneNode);
     return move(sceneNode);
 }
 
-shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    auto sceneNode = make_shared<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsSvc);
+shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
+    auto sceneNode = make_shared<WalkmeshSceneNode>(walkmesh, *this, _graphicsSvc);
     _nodes.insert(sceneNode);
     return move(sceneNode);
 }
@@ -705,9 +705,9 @@ shared_ptr<SoundSceneNode> SceneGraph::newSound() {
     return move(sceneNode);
 }
 
-shared_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
+shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage, IAnimationEventListener *animEventListener) {
     auto sceneNode = make_shared<ModelSceneNode>(
-        move(model),
+        model,
         usage,
         *this,
         _graphicsSvc,
@@ -716,29 +716,29 @@ shared_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
     return move(sceneNode);
 }
 
-shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, shared_ptr<ModelNode> modelNode) {
+shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, ModelNode &modelNode) {
     auto sceneNode = make_shared<MeshSceneNode>(
         model,
-        move(modelNode),
+        modelNode,
         *this,
         _graphicsSvc);
     _nodes.insert(sceneNode);
     return move(sceneNode);
 }
 
-shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, shared_ptr<ModelNode> modelNode) {
+shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode &modelNode) {
     auto sceneNode = make_shared<LightSceneNode>(
         model,
-        move(modelNode),
+        modelNode,
         *this,
         _graphicsSvc);
     _nodes.insert(sceneNode);
     return move(sceneNode);
 }
 
-shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(shared_ptr<ModelNode> modelNode) {
+shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
     auto sceneNode = make_shared<EmitterSceneNode>(
-        move(modelNode),
+        modelNode,
         *this,
         _graphicsSvc);
     _nodes.insert(sceneNode);
@@ -757,14 +757,20 @@ shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) 
     return move(sceneNode);
 }
 
-shared_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {
+shared_ptr<GrassSceneNode> SceneGraph::newGrass(
+    float density,
+    float quadSize,
+    glm::vec4 probabilities,
+    set<uint32_t> materials,
+    Texture &texture,
+    ModelNode &aabbNode) {
     auto sceneNode = make_shared<GrassSceneNode>(
         density,
         quadSize,
         move(probabilities),
         move(materials),
-        move(texture),
-        move(aabbNode),
+        texture,
+        aabbNode,
         *this,
         _graphicsSvc);
     _nodes.insert(sceneNode);

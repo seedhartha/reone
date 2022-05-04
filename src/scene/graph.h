@@ -78,7 +78,7 @@ public:
         return _name;
     }
 
-    std::shared_ptr<CameraSceneNode> activeCamera() const {
+    CameraSceneNode *activeCamera() const {
         return _activeCamera;
     }
 
@@ -86,7 +86,7 @@ public:
         return _activeCamera ? _activeCamera->camera() : nullptr;
     }
 
-    void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
+    void setActiveCamera(CameraSceneNode *camera) { _activeCamera = camera; }
     void setUpdateRoots(bool update) { _updateRoots = update; }
 
     void setDrawAABB(bool draw) { _drawAABB = draw; }
@@ -97,17 +97,17 @@ public:
 
     void clear();
 
-    void addRoot(std::shared_ptr<ModelSceneNode> node);
-    void addRoot(std::shared_ptr<WalkmeshSceneNode> node);
-    void addRoot(std::shared_ptr<TriggerSceneNode> node);
-    void addRoot(std::shared_ptr<GrassSceneNode> node);
-    void addRoot(std::shared_ptr<SoundSceneNode> node);
+    void addRoot(ModelSceneNode &node);
+    void addRoot(WalkmeshSceneNode &node);
+    void addRoot(TriggerSceneNode &node);
+    void addRoot(GrassSceneNode &node);
+    void addRoot(SoundSceneNode &node);
 
-    void removeRoot(const std::shared_ptr<ModelSceneNode> &node);
-    void removeRoot(const std::shared_ptr<WalkmeshSceneNode> &node);
-    void removeRoot(const std::shared_ptr<TriggerSceneNode> &node);
-    void removeRoot(const std::shared_ptr<GrassSceneNode> &node);
-    void removeRoot(const std::shared_ptr<SoundSceneNode> &node);
+    void removeRoot(ModelSceneNode &node);
+    void removeRoot(WalkmeshSceneNode &node);
+    void removeRoot(TriggerSceneNode &node);
+    void removeRoot(GrassSceneNode &node);
+    void removeRoot(SoundSceneNode &node);
 
     // END Roots
 
@@ -153,7 +153,7 @@ public:
     bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const;
     bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
 
-    std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const;
 
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
@@ -164,19 +164,19 @@ public:
     // Factory methods
 
     std::shared_ptr<CameraSceneNode> newCamera();
-    std::shared_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
+    std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh);
     std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
     std::shared_ptr<SoundSceneNode> newSound();
 
     std::shared_ptr<ModelSceneNode> newModel(
-        std::shared_ptr<graphics::Model> model,
+        graphics::Model &model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
 
-    std::shared_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
-    std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, std::shared_ptr<graphics::ModelNode> modelNode);
-    std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, std::shared_ptr<graphics::ModelNode> modelNode);
-    std::shared_ptr<EmitterSceneNode> newEmitter(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::shared_ptr<DummySceneNode> newDummy(graphics::ModelNode &modelNode);
+    std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, graphics::ModelNode &modelNode);
+    std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, graphics::ModelNode &modelNode);
+    std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode);
     std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter);
 
     std::shared_ptr<GrassSceneNode> newGrass(
@@ -184,8 +184,8 @@ public:
         float quadSize,
         glm::vec4 probabilities,
         std::set<uint32_t> materials,
-        std::shared_ptr<graphics::Texture> texture,
-        std::shared_ptr<graphics::ModelNode> aabbNode);
+        graphics::Texture &texture,
+        graphics::ModelNode &aabbNode);
 
     std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass);
 
@@ -203,22 +203,18 @@ private:
     bool _drawWalkmeshes {false};
     bool _drawTriggers {false};
 
-    std::shared_ptr<CameraSceneNode> _activeCamera;
-    std::vector<LightSceneNode *> _flareLights;
-
-    // Scene nodes
-
     std::set<std::shared_ptr<SceneNode>> _nodes;
 
-    // END Scene nodes
+    CameraSceneNode *_activeCamera {nullptr};
+    std::vector<LightSceneNode *> _flareLights;
 
     // Roots
 
-    std::set<std::shared_ptr<ModelSceneNode>> _modelRoots;
-    std::list<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
-    std::set<std::shared_ptr<TriggerSceneNode>> _triggerRoots;
-    std::set<std::shared_ptr<GrassSceneNode>> _grassRoots;
-    std::set<std::shared_ptr<SoundSceneNode>> _soundRoots;
+    std::set<ModelSceneNode *> _modelRoots;
+    std::list<WalkmeshSceneNode *> _walkmeshRoots;
+    std::set<TriggerSceneNode *> _triggerRoots;
+    std::set<GrassSceneNode *> _grassRoots;
+    std::set<SoundSceneNode *> _soundRoots;
 
     // END Roots
 
@@ -272,7 +268,7 @@ private:
     void cullRoots();
 
     void refresh();
-    void refreshFromNode(const std::shared_ptr<SceneNode> &node);
+    void refreshFromNode(SceneNode &node);
 
     void updateLighting();
     void updateShadowLight(float dt);

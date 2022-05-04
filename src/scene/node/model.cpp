@@ -44,53 +44,53 @@ namespace scene {
 static constexpr float kTransitionLength = 0.25f;
 
 ModelSceneNode::ModelSceneNode(
-    shared_ptr<Model> model,
+    Model &model,
     ModelUsage usage,
     SceneGraph &sceneGraph,
     GraphicsServices &graphicsSvc,
     IAnimationEventListener *animEventListener) :
     SceneNode(SceneNodeType::Model, sceneGraph),
-    _model(model),
+    _model(&model),
     _usage(usage),
     _graphicsSvc(graphicsSvc),
     _animEventListener(animEventListener) {
 
-    buildNodeTree(_model->rootNode(), *this);
+    buildNodeTree(*_model->rootNode(), *this);
     computeAABB();
     _point = _aabb.isEmpty();
 }
 
-void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode &parent) {
+void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
     // Convert model node to scene node
     shared_ptr<ModelNodeSceneNode> sceneNode;
-    if (node->isMesh()) {
+    if (node.isMesh()) {
         sceneNode = _sceneGraph.newMesh(*this, node);
-    } else if (node->isLight()) {
+    } else if (node.isLight()) {
         sceneNode = _sceneGraph.newLight(*this, node);
-    } else if (node->isEmitter()) {
+    } else if (node.isEmitter()) {
         sceneNode = _sceneGraph.newEmitter(node);
     } else {
         sceneNode = _sceneGraph.newDummy(node);
     }
 
-    if (node->isSkinMesh()) {
+    if (node.isSkinMesh()) {
         // Reparent skin meshes to prevent animation being applied twice
-        glm::mat4 transform(node->parent()->absoluteTransform() * node->localTransform());
+        glm::mat4 transform(node.parent()->absoluteTransform() * node.localTransform());
         sceneNode->setLocalTransform(move(transform));
-        addChild(sceneNode);
+        addChild(*sceneNode);
     } else {
-        sceneNode->setLocalTransform(node->localTransform());
-        parent.addChild(sceneNode);
+        sceneNode->setLocalTransform(node.localTransform());
+        parent.addChild(*sceneNode);
     }
-    _nodeByNumber[node->number()] = sceneNode;
-    _nodeByName[node->name()] = sceneNode;
+    _nodeByNumber[node.number()] = sceneNode.get();
+    _nodeByName[node.name()] = sceneNode.get();
 
-    if (node->isReference()) {
-        auto model = _sceneGraph.newModel(node->reference()->model, _usage, _animEventListener);
-        attach(node->name(), move(model));
+    if (node.isReference()) {
+        auto model = _sceneGraph.newModel(*node.reference()->model, _usage, _animEventListener);
+        attach(node.name(), *model);
     }
-    for (auto &child : node->children()) {
-        buildNodeTree(child, *sceneNode);
+    for (auto &child : node.children()) {
+        buildNodeTree(*child, *sceneNode);
     }
 }
 
@@ -145,7 +145,7 @@ void ModelSceneNode::signalEvent(const string &name) {
     if (name == "detonate") {
         for (auto &node : _nodeByNumber) {
             if (node.second->type() == SceneNodeType::Emitter) {
-                static_pointer_cast<EmitterSceneNode>(node.second)->detonate();
+                static_cast<EmitterSceneNode *>(node.second)->detonate();
             }
         }
     } else if (_animEventListener) {
@@ -153,63 +153,63 @@ void ModelSceneNode::signalEvent(const string &name) {
     }
 }
 
-void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node) {
+void ModelSceneNode::attach(const string &parentName, SceneNode &node) {
     auto maybeParent = _nodeByName.find(parentName);
     if (maybeParent == _nodeByName.end())
         return;
 
-    shared_ptr<ModelNodeSceneNode> parent(maybeParent->second);
+    auto parent = maybeParent->second;
     parent->addChild(node);
 
-    _attachments.insert(make_pair(parentName, node));
+    _attachments.insert(make_pair(parentName, &node));
 
     computeAABB();
 }
 
-shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByNumber(uint16_t number) const {
+ModelNodeSceneNode *ModelSceneNode::getNodeByNumber(uint16_t number) {
     return getFromLookupOrNull(_nodeByNumber, number);
 }
 
-shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByName(const string &name) const {
+ModelNodeSceneNode *ModelSceneNode::getNodeByName(const string &name) {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
-shared_ptr<SceneNode> ModelSceneNode::getAttachment(const string &parentName) const {
+SceneNode *ModelSceneNode::getAttachment(const string &parentName) {
     auto parent = _model->getNodeByName(parentName);
     return parent ? getFromLookupOrNull(_attachments, parent->name()) : nullptr;
 }
 
-void ModelSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
+void ModelSceneNode::setDiffuseMap(Texture *texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseMap(texture);
+            static_cast<ModelNodeSceneNode *>(child)->setDiffuseMap(texture);
         }
     }
 }
 
-void ModelSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+void ModelSceneNode::setEnvironmentMap(Texture *texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<ModelNodeSceneNode>(child)->setEnvironmentMap(texture);
+            static_cast<ModelNodeSceneNode *>(child)->setEnvironmentMap(texture);
         }
     }
 }
 
 void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
-    shared_ptr<Animation> anim(_model->getAnimation(name));
+    auto anim = _model->getAnimation(name);
     if (anim) {
-        playAnimation(anim, nullptr, move(properties));
+        playAnimation(*anim, nullptr, move(properties));
     }
 }
 
-void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAnimation> lipAnim, AnimationProperties properties) {
+void ModelSceneNode::playAnimation(Animation &anim, LipAnimation *lipAnim, AnimationProperties properties) {
     if (properties.scale == 0.0f) {
         properties.scale = _model->animationScale();
     }
 
     // Return if same animation is already playing
     if (!_animChannels.empty() &&
-        _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties)
+        _animChannels[0].anim == &anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties)
         return;
 
     AnimationBlendMode blendMode = getAnimationBlendMode(properties.flags);
@@ -261,7 +261,7 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
     if (properties.flags & AnimationFlags::propagate) {
         for (auto &attachment : _attachments) {
             if (attachment.second->type() == SceneNodeType::Model) {
-                static_pointer_cast<ModelSceneNode>(attachment.second)->playAnimation(anim, lipAnim, properties);
+                static_cast<ModelSceneNode *>(attachment.second)->playAnimation(anim, lipAnim, properties);
             }
         }
     }
@@ -310,10 +310,6 @@ void ModelSceneNode::updateAnimations(float dt) {
 }
 
 void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt) {
-    if (!channel.lipAnim && !channel.anim) {
-        return;
-    }
-
     // Take length from the lip animation, if any
     float length = channel.lipAnim ? channel.lipAnim->length() : channel.anim->length();
 
@@ -443,7 +439,7 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
 void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
     auto maybeSceneNode = _nodeByNumber.find(modelNode.number());
     if (maybeSceneNode != _nodeByNumber.end()) {
-        shared_ptr<SceneNode> sceneNode(maybeSceneNode->second);
+        auto sceneNode = maybeSceneNode->second;
         AnimationState combined;
 
         switch (_animBlendMode) {
@@ -522,13 +518,13 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
             sceneNode->setLocalTransform(combined.transform);
         }
         if (combined.flags & AnimationStateFlags::alpha) {
-            static_pointer_cast<MeshSceneNode>(sceneNode)->setAlpha(combined.alpha);
+            static_cast<MeshSceneNode *>(sceneNode)->setAlpha(combined.alpha);
         }
         if (combined.flags & AnimationStateFlags::selfIllumColor) {
-            static_pointer_cast<MeshSceneNode>(sceneNode)->setSelfIllumColor(combined.selfIllumColor);
+            static_cast<MeshSceneNode *>(sceneNode)->setSelfIllumColor(combined.selfIllumColor);
         }
         if (combined.flags & AnimationStateFlags::color) {
-            static_pointer_cast<LightSceneNode>(sceneNode)->setColor(combined.color);
+            static_cast<LightSceneNode *>(sceneNode)->setColor(combined.color);
         }
     }
 
@@ -546,16 +542,13 @@ string ModelSceneNode::getActiveAnimationName() const {
         return "";
     }
     const AnimationChannel &channel = _animChannels.front();
-    if (!channel.anim /* || channel.finished */) {
-        return "";
-    }
     return channel.anim->name();
 }
 
-void ModelSceneNode::setModel(shared_ptr<Model> model) {
+void ModelSceneNode::setModel(Model &model) {
     _children.clear();
 
-    _model = move(model);
+    _model = &model;
 
     _nodeByName.clear();
     _nodeByNumber.clear();
@@ -564,7 +557,7 @@ void ModelSceneNode::setModel(shared_ptr<Model> model) {
     _animChannels.clear();
     _animBlendMode = AnimationBlendMode::Single;
 
-    buildNodeTree(_model->rootNode(), *this);
+    buildNodeTree(*_model->rootNode(), *this);
     computeAABB();
 }
 

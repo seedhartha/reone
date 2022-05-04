@@ -41,8 +41,8 @@ public:
         float quadSize,
         glm::vec4 probabilities,
         std::set<uint32_t> materials,
-        std::shared_ptr<graphics::Texture> texture,
-        std::shared_ptr<graphics::ModelNode> aabbNode,
+        graphics::Texture &texture,
+        graphics::ModelNode &aabbNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         SceneNode(SceneNodeType::Grass, sceneGraph),
@@ -50,8 +50,8 @@ public:
         _quadSize(quadSize),
         _probabilities(std::move(probabilities)),
         _materials(std::move(materials)),
-        _texture(std::move(texture)),
-        _aabbNode(std::move(aabbNode)),
+        _texture(texture),
+        _aabbNode(aabbNode),
         _graphicsSvc(graphicsSvc) {
 
         init();
@@ -71,13 +71,13 @@ private:
     float _quadSize;
     glm::vec4 _probabilities;
     std::set<uint32_t> _materials;
-    std::shared_ptr<graphics::Texture> _texture;
-    std::shared_ptr<graphics::ModelNode> _aabbNode;
+    graphics::Texture &_texture;
+    graphics::ModelNode &_aabbNode;
     graphics::GraphicsServices &_graphicsSvc;
 
     std::vector<int> _grassFaces;
-    std::stack<std::shared_ptr<GrassClusterSceneNode>> _clusterPool;                          /**< pre-allocated pool of clusters */
-    std::map<int, std::vector<std::shared_ptr<GrassClusterSceneNode>>> _materializedClusters; /**< materialized clusters grouped by face */
+    std::stack<GrassClusterSceneNode *> _clusterPool;                          /**< pre-allocated pool of clusters */
+    std::map<int, std::vector<GrassClusterSceneNode *>> _materializedClusters; /**< materialized clusters grouped by face */
 };
 
 } // namespace scene

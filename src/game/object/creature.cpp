@@ -81,7 +81,7 @@ void Creature::loadFromUtc(const string &templateResRef) {
     shared_ptr<ModelSceneNode> sceneNode;
     auto model = _graphicsSvc.models.get(race);
     if (model) {
-        sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Creature, nullptr);
+        sceneNode = _sceneGraph->newModel(*model, ModelUsage::Creature, nullptr);
         if (modelType == "B") {
             auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
             auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
@@ -92,8 +92,8 @@ void Creature::loadFromUtc(const string &templateResRef) {
             auto head = headsTable->getString(normalHead, "head");
             auto headModel = _graphicsSvc.models.get(head);
             if (headModel) {
-                auto headSceneNode = _sceneGraph->newModel(move(headModel), ModelUsage::Creature, nullptr);
-                sceneNode->attach(kHeadHookNodeName, move(headSceneNode));
+                auto headSceneNode = _sceneGraph->newModel(*headModel, ModelUsage::Creature, nullptr);
+                sceneNode->attach(kHeadHookNodeName, *headSceneNode);
             }
         }
         sceneNode->setUser(*this);

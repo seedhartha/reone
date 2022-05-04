@@ -23,10 +23,10 @@ namespace reone {
 
 namespace scene {
 
-void SceneNode::addChild(shared_ptr<SceneNode> node) {
-    node->_parent = this;
-    node->computeAbsoluteTransforms();
-    _children.insert(node);
+void SceneNode::addChild(SceneNode &node) {
+    node._parent = this;
+    node.computeAbsoluteTransforms();
+    _children.insert(&node);
 }
 
 void SceneNode::computeAbsoluteTransforms() {
@@ -44,8 +44,8 @@ void SceneNode::computeAbsoluteTransforms() {
     onAbsoluteTransformChanged();
 }
 
-void SceneNode::removeChild(const shared_ptr<SceneNode> &node) {
-    auto maybeChild = _children.find(node);
+void SceneNode::removeChild(SceneNode &node) {
+    auto maybeChild = _children.find(&node);
     if (maybeChild == _children.end()) {
         return;
     }

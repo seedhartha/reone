@@ -43,16 +43,16 @@ static constexpr float kFadeSpeed = 2.0f;
 static constexpr float kMinDirectionalLightRadius = 100.0f;
 
 void LightSceneNode::init() {
-    _color = _modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
-    _radius = _modelNode->radius().getByFrameOrElse(0, 0.0f);
-    _multiplier = _modelNode->multiplier().getByFrameOrElse(0, 0.0f);
+    _color = _modelNode.color().getByFrameOrElse(0, glm::vec3(0.0f));
+    _radius = _modelNode.radius().getByFrameOrElse(0, 0.0f);
+    _multiplier = _modelNode.multiplier().getByFrameOrElse(0, 0.0f);
 }
 
 void LightSceneNode::update(float dt) {
     SceneNode::update(dt);
 
     // Fading
-    bool fading = _modelNode->light()->fading;
+    bool fading = _modelNode.light()->fading;
     if (_active) {
         if (fading) {
             _strength = glm::min(1.0f, _strength + kFadeSpeed * dt);

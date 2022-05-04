@@ -29,7 +29,7 @@ class MeshSceneNode : public ModelNodeSceneNode {
 public:
     MeshSceneNode(
         ModelSceneNode &model,
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(
@@ -57,17 +57,17 @@ public:
     ModelSceneNode &model() { return _model; }
     const ModelSceneNode &model() const { return _model; }
 
-    void setDiffuseMap(std::shared_ptr<graphics::Texture> texture) override;
-    void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture) override;
+    void setDiffuseMap(graphics::Texture *texture) override;
+    void setEnvironmentMap(graphics::Texture *texture) override;
     void setAlpha(float alpha) { _alpha = alpha; }
     void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }
 
 private:
     struct NodeTextures {
-        std::shared_ptr<graphics::Texture> diffuse;
-        std::shared_ptr<graphics::Texture> lightmap;
-        std::shared_ptr<graphics::Texture> envmap;
-        std::shared_ptr<graphics::Texture> bumpmap;
+        graphics::Texture *diffuse {nullptr};
+        graphics::Texture *lightmap {nullptr};
+        graphics::Texture *envmap {nullptr};
+        graphics::Texture *bumpmap {nullptr};
     } _nodeTextures;
 
     ModelSceneNode &_model;

@@ -48,7 +48,7 @@ static constexpr float kMaxClusterDistance2 = kMaxClusterDistance * kMaxClusterD
 
 void GrassSceneNode::init() {
     // Compute grass faces
-    auto faces = _aabbNode->mesh()->mesh->faces();
+    auto faces = _aabbNode.mesh()->mesh->faces();
     for (size_t faceIdx = 0; faceIdx < faces.size(); ++faceIdx) {
         auto &face = faces[faceIdx];
         if (_materials.count(face.material) == 0) {
@@ -59,7 +59,7 @@ void GrassSceneNode::init() {
 
     // Pre-allocate grass clusters
     for (int i = 0; i < kNumClustersInPool; ++i) {
-        _clusterPool.push(_sceneGraph.newGrassCluster(*this));
+        _clusterPool.push(_sceneGraph.newGrassCluster(*this).get());
     }
 }
 
@@ -71,7 +71,7 @@ void GrassSceneNode::update(float dt) {
     if (!camera) {
         return;
     }
-    auto mesh = _aabbNode->mesh()->mesh;
+    auto mesh = _aabbNode.mesh()->mesh;
     auto &faces = mesh->faces();
     auto cameraPos = camera->getOrigin();
     glm::vec3 meshSpaceCameraPos(_absTransformInv * glm::vec4(cameraPos, 1.0f));
@@ -135,8 +135,8 @@ void GrassSceneNode::update(float dt) {
             cluster->setLocalTransform(glm::translate(position));
             cluster->setVariant(getRandomGrassVariant());
             cluster->setLightmapUV(move(lightmapUV));
-            addChild(cluster);
-            _materializedClusters[faceIdx].push_back(move(cluster));
+            addChild(*cluster);
+            _materializedClusters[faceIdx].push_back(cluster);
         }
     }
 }
@@ -145,12 +145,12 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.textures.bind(*_texture);
+    _graphicsSvc.textures.bind(_texture);
     _graphicsSvc.uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
-        if (_aabbNode->mesh()->lightmap) {
-            _graphicsSvc.textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
+        if (_aabbNode.mesh()->lightmap) {
+            _graphicsSvc.textures.bind(*_aabbNode.mesh()->lightmap, TextureUnits::lightmap);
             general.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });

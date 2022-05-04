@@ -34,22 +34,22 @@ namespace scene {
 
 class ModelNodeSceneNode : public SceneNode {
 public:
-    const graphics::ModelNode &modelNode() const { return *_modelNode; }
+    const graphics::ModelNode &modelNode() const { return _modelNode; }
 
-    virtual void setDiffuseMap(std::shared_ptr<graphics::Texture> texture);
-    virtual void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture);
+    virtual void setDiffuseMap(graphics::Texture *texture);
+    virtual void setEnvironmentMap(graphics::Texture *texture);
 
 protected:
-    std::shared_ptr<graphics::ModelNode> _modelNode;
+    graphics::ModelNode &_modelNode;
     graphics::GraphicsServices &_graphicsSvc;
 
     ModelNodeSceneNode(
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        graphics::ModelNode &modelNode,
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc) :
         SceneNode(type, sceneGraph),
-        _modelNode(std::move(modelNode)),
+        _modelNode(modelNode),
         _graphicsSvc(graphicsSvc) {
     }
 };

@@ -44,32 +44,32 @@ static constexpr float kMotionBlurStrength = 0.25f;
 static constexpr float kProjectileSpeed = 16.0f;
 
 void EmitterSceneNode::init() {
-    _birthrate = _modelNode->birthrate().getByFrameOrElse(0, 0.0f);
-    _lifeExpectancy = _modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
-    _size.x = _modelNode->xSize().getByFrameOrElse(0, 0.0f);
-    _size.y = _modelNode->ySize().getByFrameOrElse(0, 0.0f);
-    _frameStart = static_cast<int>(_modelNode->frameStart().getByFrameOrElse(0, 0.0f));
-    _frameEnd = static_cast<int>(_modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
-    _fps = _modelNode->fps().getByFrameOrElse(0, 0.0f);
-    _spread = _modelNode->spread().getByFrameOrElse(0, 0.0f);
-    _velocity = _modelNode->velocity().getByFrameOrElse(0, 0.0f);
-    _randomVelocity = _modelNode->randVel().getByFrameOrElse(0, 0.0f);
-    _mass = _modelNode->mass().getByFrameOrElse(0, 0.0f);
-    _grav = _modelNode->grav().getByFrameOrElse(0, 0.0f);
-    _lightningDelay = _modelNode->lightingDelay().getByFrameOrElse(0, 0.0f);
-    _lightningRadius = _modelNode->lightingRadius().getByFrameOrElse(0, 0.0f);
-    _lightningScale = _modelNode->lightingScale().getByFrameOrElse(0, 0.0f);
-    _lightningSubDiv = static_cast<int>(_modelNode->lightingSubDiv().getByFrameOrElse(0, 0.0f));
+    _birthrate = _modelNode.birthrate().getByFrameOrElse(0, 0.0f);
+    _lifeExpectancy = _modelNode.lifeExp().getByFrameOrElse(0, 0.0f);
+    _size.x = _modelNode.xSize().getByFrameOrElse(0, 0.0f);
+    _size.y = _modelNode.ySize().getByFrameOrElse(0, 0.0f);
+    _frameStart = static_cast<int>(_modelNode.frameStart().getByFrameOrElse(0, 0.0f));
+    _frameEnd = static_cast<int>(_modelNode.frameEnd().getByFrameOrElse(0, 0.0f));
+    _fps = _modelNode.fps().getByFrameOrElse(0, 0.0f);
+    _spread = _modelNode.spread().getByFrameOrElse(0, 0.0f);
+    _velocity = _modelNode.velocity().getByFrameOrElse(0, 0.0f);
+    _randomVelocity = _modelNode.randVel().getByFrameOrElse(0, 0.0f);
+    _mass = _modelNode.mass().getByFrameOrElse(0, 0.0f);
+    _grav = _modelNode.grav().getByFrameOrElse(0, 0.0f);
+    _lightningDelay = _modelNode.lightingDelay().getByFrameOrElse(0, 0.0f);
+    _lightningRadius = _modelNode.lightingRadius().getByFrameOrElse(0, 0.0f);
+    _lightningScale = _modelNode.lightingScale().getByFrameOrElse(0, 0.0f);
+    _lightningSubDiv = static_cast<int>(_modelNode.lightingSubDiv().getByFrameOrElse(0, 0.0f));
 
-    _particleSize.start = _modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
-    _particleSize.mid = _modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
-    _particleSize.end = _modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
-    _color.start = _modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.mid = _modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.end = _modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
-    _alpha.start = _modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
-    _alpha.mid = _modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
-    _alpha.end = _modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
+    _particleSize.start = _modelNode.sizeStart().getByFrameOrElse(0, 0.0f);
+    _particleSize.mid = _modelNode.sizeMid().getByFrameOrElse(0, 0.0f);
+    _particleSize.end = _modelNode.sizeEnd().getByFrameOrElse(0, 0.0f);
+    _color.start = _modelNode.colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.mid = _modelNode.colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.end = _modelNode.colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha.start = _modelNode.alphaStart().getByFrameOrElse(0, 0.0f);
+    _alpha.mid = _modelNode.alphaMid().getByFrameOrElse(0, 0.0f);
+    _alpha.end = _modelNode.alphaEnd().getByFrameOrElse(0, 0.0f);
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / _birthrate;
@@ -77,13 +77,13 @@ void EmitterSceneNode::init() {
 
     // Pre-allocate particles
     int numParticles;
-    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Single) {
+    if (_modelNode.emitter()->updateMode == ModelNode::Emitter::UpdateMode::Single) {
         numParticles = 1;
     } else {
         numParticles = kMaxParticles;
     }
     for (int i = 0; i < numParticles; ++i) {
-        _particlePool.push_back(_sceneGraph.newParticle(*this));
+        _particlePool.push_back(_sceneGraph.newParticle(*this).get());
     }
 }
 
@@ -92,7 +92,7 @@ void EmitterSceneNode::update(float dt) {
     spawnParticles(dt);
 
     for (auto &child : _children) {
-        auto particle = static_pointer_cast<ParticleSceneNode>(child);
+        auto particle = static_cast<ParticleSceneNode *>(child);
         particle->update(dt);
     }
 }
@@ -101,24 +101,24 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
     if (_lifeExpectancy == -1.0f) {
         return;
     }
-    vector<shared_ptr<SceneNode>> expiredParticles;
+    vector<ParticleSceneNode *> expiredParticles;
     for (auto &child : _children) {
         if (child->type() != SceneNodeType::Particle) {
             continue;
         }
-        auto particle = static_pointer_cast<ParticleSceneNode>(child);
+        auto particle = static_cast<ParticleSceneNode *>(child);
         if (particle->isExpired()) {
-            expiredParticles.push_back(child);
+            expiredParticles.push_back(particle);
         }
     }
     for (auto &particle : expiredParticles) {
-        removeChild(particle);
+        removeChild(*particle);
         _particlePool.push_back(particle);
     }
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
+    shared_ptr<ModelNode::Emitter> emitter(_modelNode.emitter());
     switch (emitter->updateMode) {
     case ModelNode::Emitter::UpdateMode::Fountain:
         if (_birthrate != 0.0f) {
@@ -150,7 +150,7 @@ void EmitterSceneNode::doSpawnParticle() {
     if (_particlePool.empty()) {
         return;
     }
-    auto particle = static_pointer_cast<ParticleSceneNode>(_particlePool.front());
+    auto particle = static_cast<ParticleSceneNode *>(_particlePool.front());
     particle->setLifetime(0.0f);
 
     float halfW = 0.005f * _size.x;
@@ -172,7 +172,7 @@ void EmitterSceneNode::doSpawnParticle() {
 
     // Remove particle from pool and append it to emitter
     _particlePool.pop_front();
-    addChild(move(particle));
+    addChild(*particle);
 }
 
 void EmitterSceneNode::spawnLightningParticles() {
@@ -209,7 +209,7 @@ void EmitterSceneNode::spawnLightningParticles() {
     for (auto it = _children.begin(); it != _children.end();) {
         auto child = *it;
         if ((*it)->type() == SceneNodeType::Particle) {
-            _particlePool.push_back(child);
+            _particlePool.push_back(static_cast<ParticleSceneNode *>(child));
             it = _children.erase(it);
         } else {
             ++it;
@@ -221,7 +221,7 @@ void EmitterSceneNode::spawnLightningParticles() {
         if (_particlePool.empty()) {
             return;
         }
-        auto particle = static_pointer_cast<ParticleSceneNode>(_particlePool.front());
+        auto particle = _particlePool.front();
         _particlePool.pop_front();
         particle->setLifetime(0.0f);
 
@@ -231,7 +231,7 @@ void EmitterSceneNode::spawnLightningParticles() {
         particle->setDir(_absTransform * glm::vec4(glm::normalize(endToStart), 0.0f));
         particle->setSize(glm::vec2(_lightningScale, glm::length(endToStart)));
 
-        addChild(move(particle));
+        addChild(*particle);
     }
 }
 
@@ -243,7 +243,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    auto emitter = _modelNode->emitter();
+    auto emitter = _modelNode.emitter();
     auto texture = emitter->texture;
     if (!texture) {
         return;
@@ -312,7 +312,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     _graphicsSvc.shaders.use(_graphicsSvc.shaders.particle());
     _graphicsSvc.textures.bind(*texture);
 
-    bool twosided = _modelNode->emitter()->twosided || _modelNode->emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
+    bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
     _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
         _graphicsSvc.meshes.billboard().drawInstanced(leafs.size());
     });

@@ -25,18 +25,18 @@ namespace reone {
 
 namespace scene {
 
-void ModelNodeSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
+void ModelNodeSceneNode::setDiffuseMap(Texture *texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseMap(texture);
+            static_cast<ModelNodeSceneNode *>(child)->setDiffuseMap(texture);
         }
     }
 }
 
-void ModelNodeSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+void ModelNodeSceneNode::setEnvironmentMap(Texture *texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<ModelNodeSceneNode>(child)->setEnvironmentMap(texture);
+            static_cast<ModelNodeSceneNode *>(child)->setEnvironmentMap(texture);
         }
     }
 }

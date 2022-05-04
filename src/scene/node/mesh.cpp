@@ -47,44 +47,44 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 
 void MeshSceneNode::init() {
     _point = false;
-    _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
-    _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha = _modelNode.alpha().getByFrameOrElse(0, 1.0f);
+    _selfIllumColor = _modelNode.selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
 
     initTextures();
 }
 
 void MeshSceneNode::initTextures() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;
     }
-    _nodeTextures.diffuse = mesh->diffuseMap;
-    _nodeTextures.lightmap = mesh->lightmap;
-    _nodeTextures.bumpmap = mesh->bumpmap;
+    _nodeTextures.diffuse = mesh->diffuseMap.get();
+    _nodeTextures.lightmap = mesh->lightmap.get();
+    _nodeTextures.bumpmap = mesh->bumpmap.get();
 
     refreshAdditionalTextures();
 }
 
 void MeshSceneNode::refreshAdditionalTextures() {
-    _nodeTextures.bumpmap.reset();
+    _nodeTextures.bumpmap = nullptr;
     if (!_nodeTextures.diffuse) {
         return;
     }
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.envmapTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap = _graphicsSvc.textures.get(features.envmapTexture, TextureUsage::EnvironmentMap).get();
     } else if (!features.bumpyShinyTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap = _graphicsSvc.textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap).get();
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _graphicsSvc.textures.get(features.bumpmapTexture, TextureUsage::BumpMap);
+        _nodeTextures.bumpmap = _graphicsSvc.textures.get(features.bumpmapTexture, TextureUsage::BumpMap).get();
     }
 }
 
 void MeshSceneNode::update(float dt) {
     SceneNode::update(dt);
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
@@ -115,20 +115,20 @@ void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMe
 }
 
 bool MeshSceneNode::shouldRender() const {
-    auto mesh = _modelNode->mesh();
-    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
+    auto mesh = _modelNode.mesh();
+    if (!mesh || !mesh->render || _modelNode.alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
         return false;
     }
-    return !_modelNode->isAABBMesh() && mesh->diffuseMap;
+    return !_modelNode.isAABBMesh() && mesh->diffuseMap;
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return false;
     }
     if (_model.usage() == ModelUsage::Creature) {
-        return mesh->shadow && !_modelNode->isSkinMesh();
+        return mesh->shadow && !_modelNode.isSkinMesh();
     } else if (_model.usage() == ModelUsage::Placeable) {
         return mesh->render;
     } else {
@@ -170,7 +170,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
 }
 
 void MeshSceneNode::draw() {
-    auto mesh = _modelNode->mesh();
+    auto mesh = _modelNode.mesh();
     if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
@@ -274,7 +274,7 @@ void MeshSceneNode::draw() {
                 if (!bone) {
                     continue;
                 }
-                skeletal.bones[i] = _modelNode->absoluteTransformInverse() *
+                skeletal.bones[i] = _modelNode.absoluteTransformInverse() *
                                     _model.absoluteTransformInverse() *
                                     bone->absoluteTransform() *
                                     skin->boneMatrices[skin->boneSerial[i]];
@@ -289,7 +289,7 @@ void MeshSceneNode::draw() {
 }
 
 void MeshSceneNode::drawShadow() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;
     }
@@ -314,13 +314,13 @@ bool MeshSceneNode::isLightingEnabled() const {
     return true;
 }
 
-void MeshSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
+void MeshSceneNode::setDiffuseMap(Texture *texture) {
     ModelNodeSceneNode::setDiffuseMap(texture);
     _nodeTextures.diffuse = texture;
     refreshAdditionalTextures();
 }
 
-void MeshSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+void MeshSceneNode::setEnvironmentMap(Texture *texture) {
     ModelNodeSceneNode::setEnvironmentMap(texture);
     _nodeTextures.envmap = move(texture);
 }

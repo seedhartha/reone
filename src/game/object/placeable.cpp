@@ -72,7 +72,7 @@ void Placeable::loadFromGit(const Gff &git) {
     shared_ptr<ModelSceneNode> sceneNode;
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
-        sceneNode = _sceneGraph->newModel(move(model), ModelUsage::Placeable, nullptr);
+        sceneNode = _sceneGraph->newModel(*model, ModelUsage::Placeable, nullptr);
         sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);
@@ -81,7 +81,7 @@ void Placeable::loadFromGit(const Gff &git) {
     shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
     auto walkmesh = _graphicsSvc.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {
-        walkmeshSceneNode = _sceneGraph->newWalkmesh(move(walkmesh));
+        walkmeshSceneNode = _sceneGraph->newWalkmesh(*walkmesh);
         walkmeshSceneNode->setUser(*this);
     }
 
