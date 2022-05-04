@@ -37,14 +37,6 @@ string hexify(const u16string &s, string separator) {
     return ss.str();
 }
 
-string hexify(const reone::ByteArray &ba, string separator) {
-    ostringstream ss;
-    for (auto &b : ba) {
-        ss << hex << setw(2) << setfill('0') << static_cast<int>(b & 0xff) << separator;
-    }
-    return ss.str();
-}
-
 ByteArray unhexify(const string &s) {
     auto bytes = ByteArray();
     for (size_t i = 0; i < s.size(); i += 2) {

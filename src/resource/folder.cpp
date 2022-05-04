@@ -74,7 +74,7 @@ shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     size_t size = in.tellg();
 
     in.seekg(ios::beg);
-    ByteArray data(size);
+    ByteArray data(size, '\0');
     in.read(&data[0], size);
 
     return make_shared<ByteArray>(move(data));

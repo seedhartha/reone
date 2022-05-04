@@ -55,6 +55,6 @@ struct LogChannels {
     static constexpr int script3 = 2048;
 };
 
-typedef std::vector<char> ByteArray;
+typedef std::string ByteArray;
 
 } // namespace reone

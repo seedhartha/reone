@@ -60,7 +60,7 @@ void CurReader::loadData() {
     ByteArray xorData(_reader->getBytes(numPixels));
     ByteArray andData(_reader->getBytes(numPixels / 8));
 
-    auto pixels = make_shared<ByteArray>(4 * numPixels);
+    auto pixels = make_shared<ByteArray>(4 * numPixels, '\0');
 
     for (int y = 0; y < _width; ++y) {
         for (int x = 0; x < _width; ++x) {

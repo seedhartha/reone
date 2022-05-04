@@ -241,7 +241,7 @@ private:
                 _avFrameScaled->data, _avFrameScaled->linesize);
 
             // Save frame
-            auto pixels = make_shared<ByteArray>(3ll * _videoCodecCtx->width * _videoCodecCtx->height);
+            auto pixels = make_shared<ByteArray>(3ll * _videoCodecCtx->width * _videoCodecCtx->height, '\0');
             for (int y = 0; y < _videoCodecCtx->height; ++y) {
                 int dstIdx = 3 * _videoCodecCtx->width * y;
                 uint8_t *src = _avFrameScaled->data[0] + static_cast<long long>(y) * _avFrameScaled->linesize[0];
@@ -271,7 +271,7 @@ private:
                 // Resample frame
                 int numSamples = swr_get_out_samples(_swrContext, _avFrame->nb_samples);
                 int bufSize = av_samples_get_buffer_size(nullptr, 1, numSamples, AV_SAMPLE_FMT_S16, 1);
-                ByteArray samples(bufSize);
+                ByteArray samples(bufSize, '\0');
                 uint8_t *samplesPtr = reinterpret_cast<uint8_t *>(&samples[0]);
                 swr_convert(
                     _swrContext,

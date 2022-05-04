@@ -95,7 +95,7 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
         fs::ifstream in(path, ios::binary);
         in.seekg(0, ios::end);
         size_t size = in.tellg();
-        ByteArray data(size);
+        ByteArray data(size, '\0');
         in.seekg(0);
         in.read(&data[0], size);
 
