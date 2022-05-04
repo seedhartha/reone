@@ -17,15 +17,7 @@
 
 #pragma once
 
-#include "control/button.h"
-#include "control/buttontoggle.h"
-#include "control/label.h"
-#include "control/labelhilight.h"
-#include "control/listbox.h"
-#include "control/panel.h"
-#include "control/progressbar.h"
-#include "control/scrollbar.h"
-#include "control/slider.h"
+#include "control.h"
 
 namespace reone {
 
@@ -68,15 +60,19 @@ public:
     void update(float delta);
     void render();
 
-    std::unique_ptr<Panel> newPanel(int id);
-    std::unique_ptr<Label> newLabel(int id);
-    std::unique_ptr<LabelHilight> newLabelHilight(int id);
-    std::unique_ptr<Button> newButton(int id);
-    std::unique_ptr<ButtonToggle> newButtonToggle(int id);
-    std::unique_ptr<Slider> newSlider(int id);
-    std::unique_ptr<ScrollBar> newScrollBar(int id);
-    std::unique_ptr<ProgressBar> newProgressBar(int id);
-    std::unique_ptr<ListBox> newListBox(int id);
+    // Control creation
+
+    std::shared_ptr<Control> newPanel(int id);
+    std::shared_ptr<Control> newLabel(int id);
+    std::shared_ptr<Control> newLabelHilight(int id);
+    std::shared_ptr<Control> newButton(int id);
+    std::shared_ptr<Control> newButtonToggle(int id);
+    std::shared_ptr<Control> newSlider(int id);
+    std::shared_ptr<Control> newScrollBar(int id);
+    std::shared_ptr<Control> newProgressBar(int id);
+    std::shared_ptr<Control> newListBox(int id);
+
+    // END Control creation
 
 protected:
     graphics::GraphicsOptions &_graphicsOpt;
@@ -84,11 +80,17 @@ protected:
     resource::ResourceServices &_resourceSvc;
 
     ScaleMode _scaleMode {ScaleMode::ToRootControl};
+
+    // Controls
+
     std::shared_ptr<Control> _rootControl;
+    std::map<int, std::shared_ptr<Control>> _controls;
 
     Control *_controlInFocus {nullptr};
 
-    std::unique_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
+    // END Controls
+
+    std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
 
     Control *findControl(const std::string &tag);
     Control *pickControlAt(int x, int y);
@@ -103,6 +105,14 @@ protected:
     template <class T>
     T *findControl(const std::string &tag) {
         return dynamic_cast<T *>(findControl(tag));
+    }
+
+private:
+    template <class T>
+    std::shared_ptr<Control> newControl(int id) {
+        auto control = std::make_shared<T>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+        _controls[id] = control;
+        return move(control);
     }
 };
 

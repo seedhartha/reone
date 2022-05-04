@@ -20,6 +20,7 @@
 #include "../../graphics/models.h"
 #include "../../graphics/services.h"
 #include "../../graphics/types.h"
+#include "../../gui/control/label.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"

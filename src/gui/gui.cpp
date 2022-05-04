@@ -26,6 +26,15 @@
 #include "../resource/gffs.h"
 #include "../resource/services.h"
 
+#include "control/button.h"
+#include "control/buttontoggle.h"
+#include "control/label.h"
+#include "control/labelhilight.h"
+#include "control/listbox.h"
+#include "control/panel.h"
+#include "control/progressbar.h"
+#include "control/scrollbar.h"
+#include "control/slider.h"
 #include "types.h"
 
 using namespace std;
@@ -75,11 +84,11 @@ void Gui::load(const string &resRef) {
     _rootControl = move(rootControl);
 }
 
-unique_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
+shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
     auto id = gui.getInt("ID", -1);
     auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
 
-    unique_ptr<Control> control;
+    shared_ptr<Control> control;
     if (type == ControlType::Panel) {
         control = newPanel(id);
     } else if (type == ControlType::Label) {
@@ -164,40 +173,40 @@ void Gui::disableControl(const string &tag) {
     }
 }
 
-unique_ptr<Panel> Gui::newPanel(int id) {
-    return make_unique<Panel>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newPanel(int id) {
+    return newControl<Panel>(id);
 }
 
-unique_ptr<Label> Gui::newLabel(int id) {
-    return make_unique<Label>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newLabel(int id) {
+    return newControl<Label>(id);
 }
 
-unique_ptr<LabelHilight> Gui::newLabelHilight(int id) {
-    return make_unique<LabelHilight>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newLabelHilight(int id) {
+    return newControl<LabelHilight>(id);
 }
 
-unique_ptr<Button> Gui::newButton(int id) {
-    return make_unique<Button>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newButton(int id) {
+    return newControl<Button>(id);
 }
 
-unique_ptr<ButtonToggle> Gui::newButtonToggle(int id) {
-    return make_unique<ButtonToggle>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newButtonToggle(int id) {
+    return newControl<ButtonToggle>(id);
 }
 
-unique_ptr<Slider> Gui::newSlider(int id) {
-    return make_unique<Slider>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newSlider(int id) {
+    return newControl<Slider>(id);
 }
 
-unique_ptr<ScrollBar> Gui::newScrollBar(int id) {
-    return make_unique<ScrollBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newScrollBar(int id) {
+    return newControl<ScrollBar>(id);
 }
 
-unique_ptr<ProgressBar> Gui::newProgressBar(int id) {
-    return make_unique<ProgressBar>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newProgressBar(int id) {
+    return newControl<ProgressBar>(id);
 }
 
-unique_ptr<ListBox> Gui::newListBox(int id) {
-    return make_unique<ListBox>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+shared_ptr<Control> Gui::newListBox(int id) {
+    return newControl<ListBox>(id);
 }
 
 } // namespace gui

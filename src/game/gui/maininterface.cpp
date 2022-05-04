@@ -17,6 +17,8 @@
 
 #include "maininterface.h"
 
+#include "../../gui/control/button.h"
+
 using namespace reone::gui;
 
 namespace reone {
