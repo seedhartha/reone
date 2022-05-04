@@ -23,46 +23,21 @@ namespace reone {
 
 namespace game {
 
-class IObjectIdSequence {
+class IObjectFactory {
 public:
-    virtual uint32_t nextObjectId() = 0;
-};
-
-class ObjectFactory : boost::noncopyable {
-public:
-    ObjectFactory(
-        IObjectIdSequence &idSeq,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        _idSeq(idSeq),
-        _gameSvc(gameSvc),
-        _graphicsOpt(graphicsOpt),
-        _graphicsSvc(graphicsSvc),
-        _resourceSvc(resourceSvc) {
-    }
-
-    std::unique_ptr<Object> newArea();
-    std::unique_ptr<Object> newCamera();
-    std::unique_ptr<Object> newCreature();
-    std::unique_ptr<Object> newDoor();
-    std::unique_ptr<Object> newEncounter();
-    std::unique_ptr<Object> newItem();
-    std::unique_ptr<Object> newModule();
-    std::unique_ptr<Object> newPlaceable();
-    std::unique_ptr<Object> newRoom();
-    std::unique_ptr<Object> newSound();
-    std::unique_ptr<Object> newStore();
-    std::unique_ptr<Object> newTrigger();
-    std::unique_ptr<Object> newWaypoint();
-
-private:
-    IObjectIdSequence &_idSeq;
-    GameServices &_gameSvc;
-    graphics::GraphicsOptions &_graphicsOpt;
-    graphics::GraphicsServices &_graphicsSvc;
-    resource::ResourceServices &_resourceSvc;
+    virtual std::shared_ptr<Object> newArea() = 0;
+    virtual std::shared_ptr<Object> newCamera() = 0;
+    virtual std::shared_ptr<Object> newCreature() = 0;
+    virtual std::shared_ptr<Object> newDoor() = 0;
+    virtual std::shared_ptr<Object> newEncounter() = 0;
+    virtual std::shared_ptr<Object> newItem() = 0;
+    virtual std::shared_ptr<Object> newModule() = 0;
+    virtual std::shared_ptr<Object> newPlaceable() = 0;
+    virtual std::shared_ptr<Object> newRoom() = 0;
+    virtual std::shared_ptr<Object> newSound() = 0;
+    virtual std::shared_ptr<Object> newStore() = 0;
+    virtual std::shared_ptr<Object> newTrigger() = 0;
+    virtual std::shared_ptr<Object> newWaypoint() = 0;
 };
 
 } // namespace game

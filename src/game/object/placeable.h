@@ -35,7 +35,7 @@ class Placeable : public Object {
 public:
     Placeable(
         uint32_t id,
-        ObjectFactory &objectFactory,
+        IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,

@@ -34,9 +34,18 @@
 #include "../scene/services.h"
 
 #include "debug.h"
+#include "object/area.h"
+#include "object/camera.h"
+#include "object/creature.h"
 #include "object/door.h"
-#include "object/module.h"
+#include "object/encounter.h"
+#include "object/item.h"
 #include "object/placeable.h"
+#include "object/room.h"
+#include "object/sound.h"
+#include "object/store.h"
+#include "object/trigger.h"
+#include "object/waypoint.h"
 #include "options.h"
 #include "resourcelayout.h"
 #include "surfaces.h"
@@ -58,7 +67,6 @@ void Game::init() {
 
     // Services
 
-    _objectFactory = make_unique<ObjectFactory>(*this, _services.game, _options.graphics, _services.graphics, _services.resource);
     _playerController = make_unique<PlayerController>();
     _selectionController = make_unique<SelectionController>(scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
@@ -208,7 +216,7 @@ void Game::loadModule(const string &name) {
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
 
-    _module = static_pointer_cast<Module>(shared_ptr<Object>(_objectFactory->newModule()));
+    _module = static_pointer_cast<Module>(newModule());
     _module->setSceneGraph(&scene);
     _module->load(name);
 
@@ -286,6 +294,58 @@ void Game::startNewGame() {
 
 void Game::quit() {
     _finished = true;
+}
+
+shared_ptr<Object> Game::newArea() {
+    return make_shared<Area>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newCamera() {
+    return make_shared<Camera>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newCreature() {
+    return make_shared<Creature>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newDoor() {
+    return make_shared<Door>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newEncounter() {
+    return make_shared<Encounter>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newItem() {
+    return make_shared<Item>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newModule() {
+    return make_shared<Module>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newPlaceable() {
+    return make_shared<Placeable>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newRoom() {
+    return make_shared<Room>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newSound() {
+    return make_shared<Sound>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newStore() {
+    return make_shared<Store>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newTrigger() {
+    return make_shared<Trigger>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
+}
+
+shared_ptr<Object> Game::newWaypoint() {
+    return make_shared<Waypoint>(nextObjectId(), *this, _services.game, _options.graphics, _services.graphics, _services.resource);
 }
 
 bool Game::PlayerController::handle(const SDL_Event &e) {

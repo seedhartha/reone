@@ -50,7 +50,7 @@ struct OptionsView;
 
 class Creature;
 
-class Game : public IGuiGame, public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
+class Game : public IGuiGame, public IObjectFactory, public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(GameID id, OptionsView &options, ServicesView &services) :
         _id(id),
@@ -70,13 +70,23 @@ public:
 
     // END IGuiGame
 
-    // IObjectIdSequence
+    // IObjectFactory
 
-    uint32_t nextObjectId() override {
-        return _objectIdCounter++;
-    }
+    std::shared_ptr<Object> newArea() override;
+    std::shared_ptr<Object> newCamera() override;
+    std::shared_ptr<Object> newCreature() override;
+    std::shared_ptr<Object> newDoor() override;
+    std::shared_ptr<Object> newEncounter() override;
+    std::shared_ptr<Object> newItem() override;
+    std::shared_ptr<Object> newModule() override;
+    std::shared_ptr<Object> newPlaceable() override;
+    std::shared_ptr<Object> newRoom() override;
+    std::shared_ptr<Object> newSound() override;
+    std::shared_ptr<Object> newStore() override;
+    std::shared_ptr<Object> newTrigger() override;
+    std::shared_ptr<Object> newWaypoint() override;
 
-    // END IObjectIdSequence
+    // END IObjectFactory
 
     // IEventHandler
 
@@ -169,7 +179,6 @@ private:
 
     // Services
 
-    std::unique_ptr<ObjectFactory> _objectFactory;
     std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
@@ -194,6 +203,10 @@ private:
     void render();
 
     void loadModule(const std::string &name);
+
+    uint32_t nextObjectId() {
+        return _objectIdCounter++;
+    }
 };
 
 } // namespace game

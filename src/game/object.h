@@ -50,7 +50,7 @@ namespace game {
 
 struct GameServices;
 
-class ObjectFactory;
+class IObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
@@ -123,7 +123,7 @@ public:
 protected:
     uint32_t _id;
     ObjectType _type;
-    ObjectFactory &_objectFactory;
+    IObjectFactory &_objectFactory;
     GameServices &_gameSvc;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
@@ -141,7 +141,7 @@ protected:
     Object(
         uint32_t id,
         ObjectType type,
-        ObjectFactory &objectFactory,
+        IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,

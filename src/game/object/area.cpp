@@ -71,7 +71,7 @@ void Area::load(const string &name) {
         if (!lytRoom) {
             continue;
         }
-        auto room = static_pointer_cast<Room>(shared_ptr<Object>(_objectFactory.newRoom()));
+        auto room = static_pointer_cast<Room>(_objectFactory.newRoom());
         room->setSceneGraph(_sceneGraph);
         room->loadFromLyt(*lytRoom);
         _rooms.push_back(static_pointer_cast<Room>(room));
@@ -82,7 +82,7 @@ void Area::load(const string &name) {
     auto cameraStyleIdx = are->getInt("CameraStyle");
     auto cameraStyle = _gameSvc.cameraStyles.get(cameraStyleIdx);
     float aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
-    _mainCamera = static_pointer_cast<Camera>(shared_ptr<Object>(_objectFactory.newCamera()));
+    _mainCamera = static_pointer_cast<Camera>(_objectFactory.newCamera());
     _mainCamera->setSceneGraph(_sceneGraph);
     _mainCamera->loadFromStyle(*cameraStyle);
 
@@ -90,7 +90,7 @@ void Area::load(const string &name) {
 
     auto gitCreatures = git->getList("Creature List");
     for (auto &gitCreature : gitCreatures) {
-        auto creature = static_pointer_cast<Creature>(shared_ptr<Object>(_objectFactory.newCreature()));
+        auto creature = static_pointer_cast<Creature>(_objectFactory.newCreature());
         creature->setSceneGraph(_sceneGraph);
         creature->loadFromGit(*gitCreature);
         _objects.push_back(move(creature));
@@ -100,7 +100,7 @@ void Area::load(const string &name) {
 
     auto gitPlaceables = git->getList("Placeable List");
     for (auto &gitPlaceable : gitPlaceables) {
-        auto placeable = static_pointer_cast<Placeable>(shared_ptr<Object>(_objectFactory.newPlaceable()));
+        auto placeable = static_pointer_cast<Placeable>(_objectFactory.newPlaceable());
         placeable->setSceneGraph(_sceneGraph);
         placeable->loadFromGit(*gitPlaceable);
         _objects.push_back(move(placeable));
@@ -110,7 +110,7 @@ void Area::load(const string &name) {
 
     auto gitDoors = git->getList("Door List");
     for (auto &gitDoor : gitDoors) {
-        auto door = static_pointer_cast<Door>(shared_ptr<Object>(_objectFactory.newDoor()));
+        auto door = static_pointer_cast<Door>(_objectFactory.newDoor());
         door->setSceneGraph(_sceneGraph);
         door->loadFromGit(*gitDoor);
         _objects.push_back(move(door));

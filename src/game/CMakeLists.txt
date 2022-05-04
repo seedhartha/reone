@@ -197,7 +197,6 @@ set(GAME_SOURCES
     object/creature.cpp
     object/door.cpp
     object/encounter.cpp
-    object/factory.cpp
     object/item.cpp
     object/module.cpp
     object/placeable.cpp

@@ -60,7 +60,7 @@ void Module::load(const string &name) {
 
     // Make player character
 
-    _pc = static_pointer_cast<Creature>(shared_ptr<Object>(_objectFactory.newCreature()));
+    _pc = static_pointer_cast<Creature>(_objectFactory.newCreature());
     _pc->setSceneGraph(_sceneGraph);
     _pc->setPosition(glm::vec3(entryX, entryY, entryZ));
     _pc->setFacing(-glm::atan(entryDirX, entryDirY));
@@ -68,7 +68,7 @@ void Module::load(const string &name) {
 
     //
 
-    _area = static_pointer_cast<Area>(shared_ptr<Object>(_objectFactory.newArea()));
+    _area = static_pointer_cast<Area>(_objectFactory.newArea());
     _area->setSceneGraph(_sceneGraph);
     _area->load(entryArea);
 }

@@ -38,7 +38,7 @@ class Area : public Object {
 public:
     Area(
         uint32_t id,
-        ObjectFactory &objectFactory,
+        IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
