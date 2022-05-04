@@ -21,6 +21,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
@@ -82,7 +83,7 @@ void EmitterSceneNode::init() {
         numParticles = kMaxParticles;
     }
     for (int i = 0; i < numParticles; ++i) {
-        _particlePool.push_back(newParticle());
+        _particlePool.push_back(_sceneGraph.newParticle(*this));
     }
 }
 
@@ -256,7 +257,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    _uniforms.setGeneral([&emitter](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([&emitter](auto &general) {
         general.resetLocals();
         general.gridSize = emitter->gridSize;
         switch (emitter->blendMode) {
@@ -269,7 +270,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             break;
         }
     });
-    _uniforms.setParticles([&](auto &particles) {
+    _graphicsSvc.uniforms.setParticles([&](auto &particles) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
             particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
@@ -308,17 +309,13 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             }
         }
     });
-    _shaders.use(_shaders.particle());
-    _textures.bind(*texture);
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.particle());
+    _graphicsSvc.textures.bind(*texture);
 
     bool twosided = _modelNode->emitter()->twosided || _modelNode->emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
-    _graphicsContext.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
-        _meshes.billboard().drawInstanced(leafs.size());
+    _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
+        _graphicsSvc.meshes.billboard().drawInstanced(leafs.size());
     });
-}
-
-unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {
-    return make_unique<ParticleSceneNode>(*this, _sceneGraph);
 }
 
 } // namespace scene

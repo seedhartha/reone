@@ -29,13 +29,9 @@ void SceneGraphs::add(string name) {
     }
     auto scene = make_unique<SceneGraph>(
         name,
-        _options,
-        _audioPlayer,
-        _graphicsContext,
-        _meshes,
-        _shaders,
-        _textures,
-        _uniforms);
+        _graphicsOpt,
+        _graphicsSvc,
+        _audioSvc);
 
     _scenes.insert(make_pair(name, move(scene)));
 }

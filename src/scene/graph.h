@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "../graphics/options.h"
 #include "../graphics/scene.h"
-#include "../graphics/uniforms.h"
 
 #include "node/camera.h"
 #include "node/dummy.h"
@@ -27,24 +25,26 @@
 #include "node/grass.h"
 #include "node/light.h"
 #include "node/mesh.h"
+#include "node/model.h"
+#include "node/sound.h"
+#include "node/trigger.h"
+#include "node/walkmesh.h"
 #include "user.h"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Meshes;
-class Shaders;
-class Textures;
-class Uniforms;
+struct GraphicsOptions;
+struct GraphicsServices;
+
 class Walkmesh;
 
 } // namespace graphics
 
 namespace audio {
 
-class AudioPlayer;
+struct AudioServices;
 
 }
 
@@ -53,30 +53,18 @@ namespace scene {
 struct Collision;
 
 class IAnimationEventListener;
-class ModelSceneNode;
-class SoundSceneNode;
-class TriggerSceneNode;
-class WalkmeshSceneNode;
 
 class SceneGraph : public graphics::IScene, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
-        graphics::GraphicsOptions &options,
-        audio::AudioPlayer &audioPlayer,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
         _name(std::move(name)),
-        _options(options),
-        _audioPlayer(audioPlayer),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms) {
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc) {
     }
 
     void update(float dt);
@@ -86,9 +74,13 @@ public:
     void drawTransparent() override;
     void drawLensFlares() override;
 
-    const std::string &name() const { return _name; }
-    const graphics::GraphicsOptions &options() const { return _options; }
-    std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
+    const std::string &name() const {
+        return _name;
+    }
+
+    std::shared_ptr<CameraSceneNode> activeCamera() const {
+        return _activeCamera;
+    }
 
     std::shared_ptr<graphics::Camera> camera() const override {
         return _activeCamera ? _activeCamera->camera() : nullptr;
@@ -171,18 +163,23 @@ public:
 
     // Factory methods
 
-    std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
-    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
-    std::unique_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
-    std::unique_ptr<CameraSceneNode> newCamera();
-    std::unique_ptr<SoundSceneNode> newSound();
+    std::shared_ptr<CameraSceneNode> newCamera();
+    std::shared_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
+    std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
+    std::shared_ptr<SoundSceneNode> newSound();
 
-    std::unique_ptr<ModelSceneNode> newModel(
+    std::shared_ptr<ModelSceneNode> newModel(
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
 
-    std::unique_ptr<GrassSceneNode> newGrass(
+    std::shared_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, std::shared_ptr<graphics::ModelNode> modelNode);
+    std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, std::shared_ptr<graphics::ModelNode> modelNode);
+    std::shared_ptr<EmitterSceneNode> newEmitter(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter);
+
+    std::shared_ptr<GrassSceneNode> newGrass(
         float density,
         float quadSize,
         glm::vec4 probabilities,
@@ -190,11 +187,15 @@ public:
         std::shared_ptr<graphics::Texture> texture,
         std::shared_ptr<graphics::ModelNode> aabbNode);
 
+    std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass);
+
     // END Factory methods
 
 private:
     std::string _name;
-    graphics::GraphicsOptions &_options;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
 
     bool _updateRoots {true};
 
@@ -205,17 +206,11 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
     std::vector<LightSceneNode *> _flareLights;
 
-    // Services
+    // Scene nodes
 
-    audio::AudioPlayer &_audioPlayer;
+    std::set<std::shared_ptr<SceneNode>> _nodes;
 
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    // END Services
+    // END Scene nodes
 
     // Roots
 

@@ -26,11 +26,9 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Shaders;
-class Uniforms;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace scene {
 
@@ -39,14 +37,10 @@ public:
     WalkmeshSceneNode(
         std::shared_ptr<graphics::Walkmesh> walkmesh,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Shaders &shaders,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         SceneNode(SceneNodeType::Walkmesh, sceneGraph),
         _walkmesh(std::move(walkmesh)),
-        _graphicsContext(graphicsContext),
-        _shaders(shaders),
-        _uniforms(uniforms) {
+        _graphicsSvc(graphicsSvc) {
 
         _point = false;
 
@@ -59,12 +53,10 @@ public:
     const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
 
 private:
-    std::shared_ptr<graphics::Mesh> _mesh;
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
+    graphics::GraphicsServices &_graphicsSvc;
 
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Shaders &_shaders;
-    graphics::Uniforms &_uniforms;
+    std::shared_ptr<graphics::Mesh> _mesh;
 };
 
 } // namespace scene

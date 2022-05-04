@@ -24,6 +24,7 @@
 #include "../graphics/services.h"
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
+#include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../movie/format/bikreader.h"
 #include "../resource/gffs.h"

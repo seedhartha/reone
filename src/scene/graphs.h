@@ -17,25 +17,20 @@
 
 #pragma once
 
-#include "../graphics/options.h"
-
 #include "graph.h"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Meshes;
-class Shaders;
-class Textures;
-class Uniforms;
+struct GraphicsOptions;
+struct GraphicsServices;
 
 } // namespace graphics
 
 namespace audio {
 
-class AudioPlayer;
+struct AudioServices;
 
 }
 
@@ -44,20 +39,12 @@ namespace scene {
 class SceneGraphs {
 public:
     SceneGraphs(
-        graphics::GraphicsOptions &options,
-        audio::AudioPlayer &audioPlayer,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
-        _options(options),
-        _audioPlayer(audioPlayer),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms) {
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc) {
     }
 
     void add(std::string name);
@@ -67,21 +54,11 @@ public:
     const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const { return _scenes; }
 
 private:
-    graphics::GraphicsOptions &_options;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
 
     std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
-
-    // Services
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    audio::AudioPlayer &_audioPlayer;
-
-    // END Services
 };
 
 } // namespace scene

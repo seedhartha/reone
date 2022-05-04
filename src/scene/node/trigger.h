@@ -17,18 +17,17 @@
 
 #pragma once
 
+#include "../../graphics/mesh.h"
+
 #include "../node.h"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Mesh;
-class Shaders;
-class Uniforms;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace scene {
 
@@ -37,14 +36,10 @@ public:
     TriggerSceneNode(
         std::vector<glm::vec3> geometry,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Shaders &shaders,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         SceneNode(SceneNodeType::Trigger, sceneGraph),
         _geometry(std::move(geometry)),
-        _graphicsContext(graphicsContext),
-        _shaders(shaders),
-        _uniforms(uniforms) {
+        _graphicsSvc(graphicsSvc) {
 
         init();
     }
@@ -56,10 +51,7 @@ public:
 
 private:
     std::vector<glm::vec3> _geometry;
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Shaders &_shaders;
-    graphics::Uniforms &_uniforms;
+    graphics::GraphicsServices &_graphicsSvc;
 
     std::unique_ptr<graphics::Mesh> _mesh;
 };

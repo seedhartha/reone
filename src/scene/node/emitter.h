@@ -33,20 +33,12 @@ public:
     EmitterSceneNode(
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Emitter,
             sceneGraph,
-            graphicsContext,
-            meshes,
-            shaders,
-            textures,
-            uniforms) {
+            graphicsSvc) {
 
         init();
     }
@@ -114,8 +106,6 @@ private:
     void removeExpiredParticles(float dt);
     void doSpawnParticle();
     void spawnLightningParticles();
-
-    std::unique_ptr<ParticleSceneNode> newParticle();
 };
 
 } // namespace scene

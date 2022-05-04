@@ -32,15 +32,7 @@ namespace reone {
 namespace engine {
 
 void SceneModule::init() {
-    _sceneGraphs = make_unique<SceneGraphs>(
-        _options,
-        _audio.audioPlayer(),
-        _graphics.graphicsContext(),
-        _graphics.meshes(),
-        _graphics.shaders(),
-        _graphics.textures(),
-        _graphics.uniforms());
-
+    _sceneGraphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
     _services = make_unique<SceneServices>(*_sceneGraphs);
 
     // Init scenes

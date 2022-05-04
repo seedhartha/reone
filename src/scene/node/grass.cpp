@@ -21,6 +21,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
@@ -58,7 +59,7 @@ void GrassSceneNode::init() {
 
     // Pre-allocate grass clusters
     for (int i = 0; i < kNumClustersInPool; ++i) {
-        _clusterPool.push(newCluster());
+        _clusterPool.push(_sceneGraph.newGrassCluster(*this));
     }
 }
 
@@ -144,16 +145,16 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _textures.bind(*_texture);
-    _uniforms.setGeneral([this](auto &general) {
+    _graphicsSvc.textures.bind(*_texture);
+    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (_aabbNode->mesh()->lightmap) {
-            _textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
+            _graphicsSvc.textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
             general.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });
-    _uniforms.setGrass([this, &leafs](auto &grass) {
+    _graphicsSvc.uniforms.setGrass([this, &leafs](auto &grass) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
             grass.quadSize = glm::vec2(_quadSize);
@@ -162,8 +163,8 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             grass.clusters[i].lightmapUV = cluster->lightmapUV();
         }
     });
-    _shaders.use(_shaders.grass());
-    _meshes.grass().drawInstanced(leafs.size());
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.grass());
+    _graphicsSvc.meshes.grass().drawInstanced(leafs.size());
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {
@@ -181,10 +182,6 @@ int GrassSceneNode::getRandomGrassVariant() const {
         }
     }
     return 3;
-}
-
-unique_ptr<GrassClusterSceneNode> GrassSceneNode::newCluster() {
-    return make_unique<GrassClusterSceneNode>(_sceneGraph);
 }
 
 } // namespace scene

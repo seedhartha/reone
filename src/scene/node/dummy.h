@@ -28,20 +28,12 @@ public:
     DummySceneNode(
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(
             std::move(modelNode),
             SceneNodeType::Dummy,
             sceneGraph,
-            graphicsContext,
-            meshes,
-            shaders,
-            textures,
-            uniforms) {
+            graphicsSvc) {
     }
 };
 

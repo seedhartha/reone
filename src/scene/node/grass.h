@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../graphics/modelnode.h"
 #include "../../graphics/types.h"
 
 #include "../node.h"
@@ -27,15 +28,9 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Meshes;
-class ModelNode;
-class Shaders;
-class Texture;
-class Textures;
-class Uniforms;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace scene {
 
@@ -49,11 +44,7 @@ public:
         std::shared_ptr<graphics::Texture> texture,
         std::shared_ptr<graphics::ModelNode> aabbNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         SceneNode(SceneNodeType::Grass, sceneGraph),
         _density(density),
         _quadSize(quadSize),
@@ -61,11 +52,7 @@ public:
         _materials(std::move(materials)),
         _texture(std::move(texture)),
         _aabbNode(std::move(aabbNode)),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms) {
+        _graphicsSvc(graphicsSvc) {
 
         init();
     }
@@ -79,8 +66,6 @@ public:
     int getNumClustersInFace(float area) const;
     int getRandomGrassVariant() const;
 
-    std::unique_ptr<GrassClusterSceneNode> newCluster();
-
 private:
     float _density;
     float _quadSize;
@@ -88,20 +73,11 @@ private:
     std::set<uint32_t> _materials;
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<graphics::ModelNode> _aabbNode;
+    graphics::GraphicsServices &_graphicsSvc;
 
     std::vector<int> _grassFaces;
     std::stack<std::shared_ptr<GrassClusterSceneNode>> _clusterPool;                          /**< pre-allocated pool of clusters */
     std::map<int, std::vector<std::shared_ptr<GrassClusterSceneNode>>> _materializedClusters; /**< materialized clusters grouped by face */
-
-    // Services
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    // END Services
 };
 
 } // namespace scene

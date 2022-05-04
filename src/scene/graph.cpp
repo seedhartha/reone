@@ -17,9 +17,11 @@
 
 #include "graph.h"
 
+#include "../audio/services.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
+#include "../graphics/services.h"
 #include "../graphics/shaders.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/walkmesh.h"
@@ -414,7 +416,7 @@ void SceneGraph::drawShadows() {
     if (!_activeCamera) {
         return;
     }
-    _graphicsContext.withFaceCulling(CullFaceMode::Front, [this]() {
+    _graphicsSvc.context.withFaceCulling(CullFaceMode::Front, [this]() {
         for (auto &mesh : _shadowMeshes) {
             mesh->drawShadow();
         }
@@ -426,7 +428,7 @@ void SceneGraph::drawOpaque() {
         return;
     }
     if (_drawWalkmeshes || _drawTriggers) {
-        _uniforms.setWalkmesh([this](auto &walkmesh) {
+        _graphicsSvc.uniforms.setWalkmesh([this](auto &walkmesh) {
             for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
                 walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
             }
@@ -454,7 +456,7 @@ void SceneGraph::drawOpaque() {
                 walkmesh->draw();
             }
         }
-    } 
+    }
     if (_drawTriggers) {
         for (auto &trigger : _triggerRoots) {
             trigger->draw();
@@ -477,7 +479,7 @@ void SceneGraph::drawLensFlares() {
     if (_flareLights.empty() || _drawWalkmeshes) {
         return;
     }
-    _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
+    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
         for (auto &light : _flareLights) {
             Collision collision;
             if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
@@ -632,9 +634,9 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
     }
 
     auto camera = _activeCamera->camera();
-    glm::vec4 viewport(0.0f, 0.0f, _options.width, _options.height);
-    glm::vec3 start(glm::unProject(glm::vec3(x, _options.height - y, 0.0f), camera->view(), camera->projection(), viewport));
-    glm::vec3 end(glm::unProject(glm::vec3(x, _options.height - y, 1.0f), camera->view(), camera->projection(), viewport));
+    glm::vec4 viewport(0.0f, 0.0f, _graphicsOpt.width, _graphicsOpt.height);
+    glm::vec3 start(glm::unProject(glm::vec3(x, _graphicsOpt.height - y, 0.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 end(glm::unProject(glm::vec3(x, _graphicsOpt.height - y, 1.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 dir(glm::normalize(end - start));
 
     vector<pair<shared_ptr<ModelSceneNode>, float>> distances;
@@ -665,7 +667,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
 }
 
 void SceneGraph::fillLightingUniforms() {
-    _uniforms.setLighting([this](auto &lighting) {
+    _graphicsSvc.uniforms.setLighting([this](auto &lighting) {
         lighting.numLights = static_cast<int>(_activeLights.size());
         for (size_t i = 0; i < _activeLights.size(); ++i) {
             LightUniforms &shaderLight = lighting.lights[i];
@@ -679,41 +681,84 @@ void SceneGraph::fillLightingUniforms() {
     });
 }
 
-unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
+shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
+    auto sceneNode = make_shared<CameraSceneNode>(*this);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
-unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders, _uniforms);
+shared_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
+    auto sceneNode = make_shared<DummySceneNode>(move(modelNode), *this, _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
-unique_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders, _uniforms);
+shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
+    auto sceneNode = make_shared<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
-unique_ptr<CameraSceneNode> SceneGraph::newCamera() {
-    return make_unique<CameraSceneNode>(*this);
+shared_ptr<SoundSceneNode> SceneGraph::newSound() {
+    auto sceneNode = make_shared<SoundSceneNode>(*this, _audioSvc.player);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
-unique_ptr<SoundSceneNode> SceneGraph::newSound() {
-    return make_unique<SoundSceneNode>(*this, _audioPlayer);
-}
-
-unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
-    return make_unique<ModelSceneNode>(
+shared_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
+    auto sceneNode = make_shared<ModelSceneNode>(
         move(model),
         usage,
         *this,
-        _graphicsContext,
-        _meshes,
-        _shaders,
-        _textures,
-        _uniforms,
+        _graphicsSvc,
         animEventListener);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
-unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {
-    return make_unique<GrassSceneNode>(
+shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, shared_ptr<ModelNode> modelNode) {
+    auto sceneNode = make_shared<MeshSceneNode>(
+        model,
+        move(modelNode),
+        *this,
+        _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, shared_ptr<ModelNode> modelNode) {
+    auto sceneNode = make_shared<LightSceneNode>(
+        model,
+        move(modelNode),
+        *this,
+        _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(shared_ptr<ModelNode> modelNode) {
+    auto sceneNode = make_shared<EmitterSceneNode>(
+        move(modelNode),
+        *this,
+        _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
+    auto sceneNode = make_shared<ParticleSceneNode>(emitter, *this);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
+    auto sceneNode = make_shared<TriggerSceneNode>(move(geometry), *this, _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {
+    auto sceneNode = make_shared<GrassSceneNode>(
         density,
         quadSize,
         move(probabilities),
@@ -721,11 +766,15 @@ unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, g
         move(texture),
         move(aabbNode),
         *this,
-        _graphicsContext,
-        _meshes,
-        _shaders,
-        _textures,
-        _uniforms);
+        _graphicsSvc);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
+}
+
+shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {
+    auto sceneNode = make_shared<GrassClusterSceneNode>(*this);
+    _nodes.insert(sceneNode);
+    return move(sceneNode);
 }
 
 } // namespace scene

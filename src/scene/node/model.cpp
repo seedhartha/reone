@@ -21,7 +21,9 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
+#include "../../graphics/uniforms.h"
 
 #include "../graph.h"
 #include "../types.h"
@@ -45,20 +47,12 @@ ModelSceneNode::ModelSceneNode(
     shared_ptr<Model> model,
     ModelUsage usage,
     SceneGraph &sceneGraph,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Shaders &shaders,
-    Textures &textures,
-    Uniforms &uniforms,
+    GraphicsServices &graphicsSvc,
     IAnimationEventListener *animEventListener) :
     SceneNode(SceneNodeType::Model, sceneGraph),
     _model(model),
     _usage(usage),
-    _graphicsContext(graphicsContext),
-    _meshes(meshes),
-    _shaders(shaders),
-    _textures(textures),
-    _uniforms(uniforms),
+    _graphicsSvc(graphicsSvc),
     _animEventListener(animEventListener) {
 
     buildNodeTree(_model->rootNode(), *this);
@@ -70,13 +64,13 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode &parent
     // Convert model node to scene node
     shared_ptr<ModelNodeSceneNode> sceneNode;
     if (node->isMesh()) {
-        sceneNode = newMeshSceneNode(node);
+        sceneNode = _sceneGraph.newMesh(*this, node);
     } else if (node->isLight()) {
-        sceneNode = newLightSceneNode(node);
+        sceneNode = _sceneGraph.newLight(*this, node);
     } else if (node->isEmitter()) {
-        sceneNode = newEmitterSceneNode(node);
+        sceneNode = _sceneGraph.newEmitter(node);
     } else {
-        sceneNode = newDummySceneNode(node);
+        sceneNode = _sceneGraph.newDummy(node);
     }
 
     if (node->isSkinMesh()) {
@@ -116,16 +110,16 @@ void ModelSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 }
 
 void ModelSceneNode::drawAABB() {
-    _graphicsContext.withPolygonMode(PolygonMode::Line, [this]() {
-        _uniforms.setGeneral([this](auto &u) {
+    _graphicsSvc.context.withPolygonMode(PolygonMode::Line, [this]() {
+        _graphicsSvc.uniforms.setGeneral([this](auto &u) {
             u.resetLocals();
             u.model = _absTransform;
             u.model *= glm::translate(_aabb.center());
             u.model *= glm::scale(0.5f * _aabb.size());
             u.modelInv = glm::inverse(u.model);
         });
-        _shaders.use(_shaders.aabb());
-        _meshes.box().draw();
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.aabb());
+        _graphicsSvc.meshes.box().draw();
     });
 }
 
@@ -145,22 +139,6 @@ void ModelSceneNode::computeAABB() {
             _aabb.expand(modelSpaceAABB);
         }
     }
-}
-
-unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
-}
-
-unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
-}
-
-unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<LightSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
-}
-
-unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

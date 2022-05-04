@@ -20,6 +20,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
@@ -72,7 +73,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    _uniforms.setGeneral([this, &flare](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &flare](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::fixedsize;
         general.model = glm::translate(getOrigin());
@@ -80,10 +81,10 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         general.alpha = 0.5f;
         general.color = glm::vec4(_color, 1.0f);
     });
-    _shaders.use(_shaders.billboard());
-    _textures.bind(*flare.texture);
-    _graphicsContext.withBlending(BlendMode::Additive, [this]() {
-        _meshes.billboard().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.billboard());
+    _graphicsSvc.textures.bind(*flare.texture);
+    _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
+        _graphicsSvc.meshes.billboard().draw();
     });
 }
 

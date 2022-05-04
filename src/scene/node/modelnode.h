@@ -17,21 +17,18 @@
 
 #pragma once
 
+#include "../../graphics/modelnode.h"
+#include "../../graphics/texture.h"
+
 #include "../node.h"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-class Meshes;
-class ModelNode;
-class Shaders;
-class Texture;
-class Textures;
-class Uniforms;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace scene {
 
@@ -44,34 +41,17 @@ public:
 
 protected:
     std::shared_ptr<graphics::ModelNode> _modelNode;
+    graphics::GraphicsServices &_graphicsSvc;
 
     ModelNodeSceneNode(
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneNodeType type,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         SceneNode(type, sceneGraph),
         _modelNode(std::move(modelNode)),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms) {
+        _graphicsSvc(graphicsSvc) {
     }
-
-    // Services
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    // END Services
 };
 
 } // namespace scene

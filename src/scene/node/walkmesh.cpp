@@ -18,6 +18,7 @@
 #include "walkmesh.h"
 
 #include "../../graphics/context.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/uniforms.h"
 
@@ -66,12 +67,12 @@ void WalkmeshSceneNode::init() {
 }
 
 void WalkmeshSceneNode::draw() {
-    _uniforms.setGeneral([this](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
     });
-    _shaders.use(_shaders.walkmesh());
-    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this]() {
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.walkmesh());
+    _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {
         _mesh->draw();
     });
 }

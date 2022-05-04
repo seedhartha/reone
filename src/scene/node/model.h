@@ -47,11 +47,7 @@ public:
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
+        graphics::GraphicsServices &graphicsSvc,
         IAnimationEventListener *animEventListener = nullptr);
 
     void update(float dt) override;
@@ -138,19 +134,10 @@ private:
 
     std::shared_ptr<graphics::Model> _model;
     ModelUsage _usage;
+    graphics::GraphicsServices &_graphicsSvc;
     IAnimationEventListener *_animEventListener;
 
     float _drawDistance {std::numeric_limits<float>::max()};
-
-    // Services
-
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-
-    // END Services
 
     // Lookups
 
@@ -174,11 +161,6 @@ private:
     // END Flags
 
     void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode &parent);
-
-    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node);
-    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node);
-    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node);
-    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node);
 
     // Animation
 

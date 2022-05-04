@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../graphics/modelnode.h"
-
 #include "modelnode.h"
 
 namespace reone {
@@ -33,20 +31,12 @@ public:
         ModelSceneNode &model,
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms) :
+        graphics::GraphicsServices &graphicsSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Light,
             sceneGraph,
-            graphicsContext,
-            meshes,
-            shaders,
-            textures,
-            uniforms),
+            graphicsSvc),
         _model(model) {
 
         init();

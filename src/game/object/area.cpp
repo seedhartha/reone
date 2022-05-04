@@ -18,6 +18,7 @@
 #include "area.h"
 
 #include "../../common/exception/validation.h"
+#include "../../graphics/options.h"
 #include "../../resource/gff.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
