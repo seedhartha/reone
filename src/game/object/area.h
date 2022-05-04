@@ -55,15 +55,15 @@ public:
 
     void load(const std::string &name);
 
-    void add(std::unique_ptr<Object> object) {
-        _objects.push_back(std::move(object));
+    void add(Object &object) {
+        _objects.push_back(&object);
     }
 
-    const std::vector<std::shared_ptr<Room>> &rooms() const {
+    const std::vector<Room *> &rooms() const {
         return _rooms;
     }
 
-    const std::vector<std::shared_ptr<Object>> &objects() const {
+    const std::vector<Object *> &objects() const {
         return _objects;
     }
 
@@ -72,9 +72,9 @@ public:
     }
 
 private:
-    std::vector<std::shared_ptr<Room>> _rooms;
-    std::vector<std::shared_ptr<Object>> _objects;
-    std::shared_ptr<Camera> _mainCamera;
+    std::vector<Room *> _rooms;
+    std::vector<Object *> _objects;
+    Camera *_mainCamera {nullptr};
 };
 
 } // namespace game

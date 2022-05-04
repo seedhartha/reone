@@ -191,8 +191,9 @@ private:
 
     // Objects
 
-    std::shared_ptr<Module> _module;
     std::map<uint32_t, std::shared_ptr<Object>> _objects;
+
+    Module *_module {nullptr};
 
     // END Objects
 

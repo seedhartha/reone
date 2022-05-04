@@ -72,10 +72,10 @@ void Area::load(const string &name) {
         if (!lytRoom) {
             continue;
         }
-        auto room = static_pointer_cast<Room>(_objectFactory.newRoom());
-        room->setSceneGraph(_sceneGraph);
-        room->loadFromLyt(*lytRoom);
-        _rooms.push_back(static_pointer_cast<Room>(room));
+        auto &room = static_cast<Room &>(*_objectFactory.newRoom());
+        room.setSceneGraph(_sceneGraph);
+        room.loadFromLyt(*lytRoom);
+        _rooms.push_back(&room);
     }
 
     // Main camera
@@ -83,38 +83,39 @@ void Area::load(const string &name) {
     auto cameraStyleIdx = are->getInt("CameraStyle");
     auto cameraStyle = _gameSvc.cameraStyles.get(cameraStyleIdx);
     float aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
-    _mainCamera = static_pointer_cast<Camera>(_objectFactory.newCamera());
-    _mainCamera->setSceneGraph(_sceneGraph);
-    _mainCamera->loadFromStyle(*cameraStyle);
+    auto &mainCamera = static_cast<Camera &>(*_objectFactory.newCamera());
+    mainCamera.setSceneGraph(_sceneGraph);
+    mainCamera.loadFromStyle(*cameraStyle);
+    _mainCamera = &mainCamera;
 
     // Creatures
 
     auto gitCreatures = git->getList("Creature List");
     for (auto &gitCreature : gitCreatures) {
-        auto creature = static_pointer_cast<Creature>(_objectFactory.newCreature());
-        creature->setSceneGraph(_sceneGraph);
-        creature->loadFromGit(*gitCreature);
-        _objects.push_back(move(creature));
+        auto &creature = static_cast<Creature &>(*_objectFactory.newCreature());
+        creature.setSceneGraph(_sceneGraph);
+        creature.loadFromGit(*gitCreature);
+        _objects.push_back(&creature);
     }
 
     // Placeables
 
     auto gitPlaceables = git->getList("Placeable List");
     for (auto &gitPlaceable : gitPlaceables) {
-        auto placeable = static_pointer_cast<Placeable>(_objectFactory.newPlaceable());
-        placeable->setSceneGraph(_sceneGraph);
-        placeable->loadFromGit(*gitPlaceable);
-        _objects.push_back(move(placeable));
+        auto &placeable = static_cast<Placeable &>(*_objectFactory.newPlaceable());
+        placeable.setSceneGraph(_sceneGraph);
+        placeable.loadFromGit(*gitPlaceable);
+        _objects.push_back(&placeable);
     }
 
     // Doors
 
     auto gitDoors = git->getList("Door List");
     for (auto &gitDoor : gitDoors) {
-        auto door = static_pointer_cast<Door>(_objectFactory.newDoor());
-        door->setSceneGraph(_sceneGraph);
-        door->loadFromGit(*gitDoor);
-        _objects.push_back(move(door));
+        auto &door = static_cast<Door &>(*_objectFactory.newDoor());
+        door.setSceneGraph(_sceneGraph);
+        door.loadFromGit(*gitDoor);
+        _objects.push_back(&door);
     }
 }
 

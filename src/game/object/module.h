@@ -56,8 +56,8 @@ public:
     }
 
 private:
-    std::shared_ptr<Area> _area;
-    std::shared_ptr<Creature> _pc;
+    Area *_area {nullptr};
+    Creature *_pc {nullptr};
 };
 
 } // namespace game

@@ -217,18 +217,19 @@ void Game::loadModule(const string &name) {
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
 
-    _module = static_pointer_cast<Module>(newModule());
-    _module->setSceneGraph(&scene);
-    _module->load(name);
+    auto &module = static_cast<Module &>(*newModule());
+    module.setSceneGraph(&scene);
+    module.load(name);
+    _module = &module;
 
     // Main camera
 
-    auto &camera = _module->area().mainCamera();
+    auto &camera = module.area().mainCamera();
     scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()));
 
     // Rooms
 
-    for (auto &room : _module->area().rooms()) {
+    for (auto &room : module.area().rooms()) {
         auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
         if (model) {
             scene.addRoot(move(model));
@@ -241,7 +242,7 @@ void Game::loadModule(const string &name) {
 
     // Objects
 
-    for (auto &object : _module->area().objects()) {
+    for (auto &object : module.area().objects()) {
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
         if (model) {
             scene.addRoot(move(model));
@@ -271,7 +272,7 @@ void Game::loadModule(const string &name) {
 
     // Player character
 
-    auto &pc = _module->pc();
+    auto &pc = module.pc();
 
     auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
     scene.addRoot(pcModel);

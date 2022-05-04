@@ -60,17 +60,19 @@ void Module::load(const string &name) {
 
     // Make player character
 
-    _pc = static_pointer_cast<Creature>(_objectFactory.newCreature());
-    _pc->setSceneGraph(_sceneGraph);
-    _pc->setPosition(glm::vec3(entryX, entryY, entryZ));
-    _pc->setFacing(-glm::atan(entryDirX, entryDirY));
-    _pc->loadFromUtc("p_bastilla");
+    auto &pc = static_cast<Creature &>(*_objectFactory.newCreature());
+    pc.setSceneGraph(_sceneGraph);
+    pc.setPosition(glm::vec3(entryX, entryY, entryZ));
+    pc.setFacing(-glm::atan(entryDirX, entryDirY));
+    pc.loadFromUtc("p_bastilla");
+    _pc = &pc;
 
     //
 
-    _area = static_pointer_cast<Area>(_objectFactory.newArea());
-    _area->setSceneGraph(_sceneGraph);
-    _area->load(entryArea);
+    auto &area = static_cast<Area &>(*_objectFactory.newArea());
+    area.setSceneGraph(_sceneGraph);
+    area.load(entryArea);
+    _area = &area;
 }
 
 } // namespace game
