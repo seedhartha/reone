@@ -35,6 +35,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::graphics;
 
 namespace reone {
@@ -48,12 +49,14 @@ ModelSceneNode::ModelSceneNode(
     ModelUsage usage,
     SceneGraph &sceneGraph,
     GraphicsServices &graphicsSvc,
-    IAnimationEventListener *animEventListener) :
-    SceneNode(SceneNodeType::Model, sceneGraph),
+    AudioServices &audioSvc) :
+    SceneNode(
+        SceneNodeType::Model,
+        sceneGraph,
+        graphicsSvc,
+        audioSvc),
     _model(&model),
-    _usage(usage),
-    _graphicsSvc(graphicsSvc),
-    _animEventListener(animEventListener) {
+    _usage(usage) {
 
     buildNodeTree(*_model->rootNode(), *this);
     computeAABB();
@@ -86,7 +89,7 @@ void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
     _nodeByName[node.name()] = sceneNode.get();
 
     if (node.isReference()) {
-        auto model = _sceneGraph.newModel(*node.reference()->model, _usage, _animEventListener);
+        auto model = _sceneGraph.newModel(*node.reference()->model, _usage);
         attach(node.name(), *model);
     }
     for (auto &child : node.children()) {

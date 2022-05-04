@@ -27,8 +27,15 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(SceneGraph &sceneGraph) :
-        SceneNode(SceneNodeType::Camera, sceneGraph) {
+    CameraSceneNode(
+        SceneGraph &sceneGraph,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            SceneNodeType::Camera,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc) {
     }
 
     bool isInFrustum(const SceneNode &other) const;

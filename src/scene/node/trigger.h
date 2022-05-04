@@ -36,10 +36,14 @@ public:
     TriggerSceneNode(
         std::vector<glm::vec3> geometry,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
-        SceneNode(SceneNodeType::Trigger, sceneGraph),
-        _geometry(std::move(geometry)),
-        _graphicsSvc(graphicsSvc) {
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            SceneNodeType::Trigger,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc),
+        _geometry(std::move(geometry)) {
 
         init();
     }
@@ -51,7 +55,6 @@ public:
 
 private:
     std::vector<glm::vec3> _geometry;
-    graphics::GraphicsServices &_graphicsSvc;
 
     std::unique_ptr<graphics::Mesh> _mesh;
 };

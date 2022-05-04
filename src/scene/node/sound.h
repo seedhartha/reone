@@ -23,19 +23,19 @@
 
 namespace reone {
 
-namespace audio {
-
-class AudioPlayer;
-
-}
-
 namespace scene {
 
 class SoundSceneNode : public SceneNode {
 public:
-    SoundSceneNode(SceneGraph &sceneGraph, audio::AudioPlayer &audioPlayer) :
-        SceneNode(SceneNodeType::Sound, sceneGraph),
-        _audioPlayer(audioPlayer) {
+    SoundSceneNode(
+        SceneGraph &sceneGraph,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            SceneNodeType::Sound,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc) {
     }
 
     void update(float dt) override;
@@ -53,8 +53,6 @@ public:
     void setAudible(bool audible);
 
 private:
-    audio::AudioPlayer &_audioPlayer;
-
     int _priority {0};
     float _maxDistance {0.0f};
     bool _audible {false};

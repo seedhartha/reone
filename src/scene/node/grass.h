@@ -44,15 +44,19 @@ public:
         graphics::Texture &texture,
         graphics::ModelNode &aabbNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
-        SceneNode(SceneNodeType::Grass, sceneGraph),
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            SceneNodeType::Grass,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc),
         _density(density),
         _quadSize(quadSize),
         _probabilities(std::move(probabilities)),
         _materials(std::move(materials)),
         _texture(texture),
-        _aabbNode(aabbNode),
-        _graphicsSvc(graphicsSvc) {
+        _aabbNode(aabbNode) {
 
         init();
     }
@@ -73,7 +77,6 @@ private:
     std::set<uint32_t> _materials;
     graphics::Texture &_texture;
     graphics::ModelNode &_aabbNode;
-    graphics::GraphicsServices &_graphicsSvc;
 
     std::vector<int> _grassFaces;
     std::stack<GrassClusterSceneNode *> _clusterPool;                          /**< pre-allocated pool of clusters */

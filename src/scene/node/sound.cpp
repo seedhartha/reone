@@ -18,6 +18,7 @@
 #include "sound.h"
 
 #include "../../audio/player.h"
+#include "../../audio/services.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ void SoundSceneNode::update(float dt) {
 }
 
 void SoundSceneNode::playSound(const string &resRef, float gain, bool positional, bool loop) {
-    _source = _audioPlayer.play(resRef, AudioType::Sound, loop, gain, positional, getOrigin());
+    _source = _audioSvc.player.play(resRef, AudioType::Sound, loop, gain, positional, getOrigin());
 }
 
 bool SoundSceneNode::isSoundPlaying() const {

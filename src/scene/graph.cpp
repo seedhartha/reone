@@ -682,79 +682,43 @@ void SceneGraph::fillLightingUniforms() {
 }
 
 shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
-    auto sceneNode = make_shared<CameraSceneNode>(*this);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<CameraSceneNode>();
 }
 
 shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
-    auto sceneNode = make_shared<DummySceneNode>(modelNode, *this, _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<DummySceneNode, ModelNode &>(modelNode);
+}
+
+shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
+    return newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
 }
 
 shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
-    auto sceneNode = make_shared<WalkmeshSceneNode>(walkmesh, *this, _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<WalkmeshSceneNode, Walkmesh &>(walkmesh);
 }
 
 shared_ptr<SoundSceneNode> SceneGraph::newSound() {
-    auto sceneNode = make_shared<SoundSceneNode>(*this, _audioSvc.player);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
-}
-
-shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage, IAnimationEventListener *animEventListener) {
-    auto sceneNode = make_shared<ModelSceneNode>(
-        model,
-        usage,
-        *this,
-        _graphicsSvc,
-        animEventListener);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<SoundSceneNode>();
 }
 
 shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, ModelNode &modelNode) {
-    auto sceneNode = make_shared<MeshSceneNode>(
-        model,
-        modelNode,
-        *this,
-        _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<MeshSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
 }
 
 shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode &modelNode) {
-    auto sceneNode = make_shared<LightSceneNode>(
-        model,
-        modelNode,
-        *this,
-        _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
-}
-
-shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
-    auto sceneNode = make_shared<EmitterSceneNode>(
-        modelNode,
-        *this,
-        _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
-}
-
-shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
-    auto sceneNode = make_shared<ParticleSceneNode>(emitter, *this);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<LightSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
 }
 
 shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    auto sceneNode = make_shared<TriggerSceneNode>(move(geometry), *this, _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<TriggerSceneNode, vector<glm::vec3>>(move(geometry));
+}
+
+shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
+    return newSceneNode<EmitterSceneNode, ModelNode &>(modelNode);
+}
+
+shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
+    return newSceneNode<ParticleSceneNode, EmitterSceneNode &>(emitter);
 }
 
 shared_ptr<GrassSceneNode> SceneGraph::newGrass(
@@ -764,23 +728,18 @@ shared_ptr<GrassSceneNode> SceneGraph::newGrass(
     set<uint32_t> materials,
     Texture &texture,
     ModelNode &aabbNode) {
-    auto sceneNode = make_shared<GrassSceneNode>(
+
+    return newSceneNode<GrassSceneNode, float, float, glm::vec4, set<uint32_t>, Texture &, ModelNode &>(
         density,
         quadSize,
         move(probabilities),
         move(materials),
         texture,
-        aabbNode,
-        *this,
-        _graphicsSvc);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+        aabbNode);
 }
 
 shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {
-    auto sceneNode = make_shared<GrassClusterSceneNode>(*this);
-    _nodes.insert(sceneNode);
-    return move(sceneNode);
+    return newSceneNode<GrassClusterSceneNode>();
 }
 
 } // namespace scene

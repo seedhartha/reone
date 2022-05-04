@@ -37,7 +37,7 @@ void Room::loadFromLyt(const Layout::Room &lyt) {
     // Model
     auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
-        _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room, nullptr);
+        _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room);
         _sceneNode->setUser(*this);
     }
 

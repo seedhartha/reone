@@ -33,12 +33,14 @@ public:
     EmitterSceneNode(
         graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Emitter,
             sceneGraph,
-            graphicsSvc) {
+            graphicsSvc,
+            audioSvc) {
 
         init();
     }

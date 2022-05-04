@@ -48,7 +48,7 @@ public:
         ModelUsage usage,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        IAnimationEventListener *animEventListener = nullptr);
+        audio::AudioServices &audioSvc);
 
     void update(float dt) override;
 
@@ -134,9 +134,8 @@ private:
 
     graphics::Model *_model;
     ModelUsage _usage;
-    graphics::GraphicsServices &_graphicsSvc;
-    IAnimationEventListener *_animEventListener;
 
+    IAnimationEventListener *_animEventListener {nullptr};
     float _drawDistance {std::numeric_limits<float>::max()};
 
     // Lookups

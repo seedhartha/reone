@@ -23,6 +23,18 @@
 
 namespace reone {
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace audio {
+
+struct AudioServices;
+
+}
+
 namespace scene {
 
 class IUser;
@@ -86,6 +98,8 @@ public:
 protected:
     SceneNodeType _type;
     SceneGraph &_sceneGraph;
+    graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
 
     SceneNode *_parent {nullptr};
     std::unordered_set<SceneNode *> _children;
@@ -111,9 +125,15 @@ protected:
 
     // END Transformations
 
-    SceneNode(SceneNodeType type, SceneGraph &sceneGraph) :
+    SceneNode(
+        SceneNodeType type,
+        SceneGraph &sceneGraph,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
         _type(type),
-        _sceneGraph(sceneGraph) {
+        _sceneGraph(sceneGraph),
+        _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc) {
     }
 
     void computeAbsoluteTransforms();

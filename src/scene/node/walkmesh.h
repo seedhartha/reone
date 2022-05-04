@@ -37,10 +37,14 @@ public:
     WalkmeshSceneNode(
         graphics::Walkmesh &walkmesh,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
-        SceneNode(SceneNodeType::Walkmesh, sceneGraph),
-        _walkmesh(std::move(walkmesh)),
-        _graphicsSvc(graphicsSvc) {
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            SceneNodeType::Walkmesh,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc),
+        _walkmesh(std::move(walkmesh)) {
 
         _point = false;
 
@@ -54,7 +58,6 @@ public:
 
 private:
     graphics::Walkmesh &_walkmesh;
-    graphics::GraphicsServices &_graphicsSvc;
 
     std::shared_ptr<graphics::Mesh> _mesh;
 };

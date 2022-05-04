@@ -24,12 +24,6 @@
 
 namespace reone {
 
-namespace graphics {
-
-struct GraphicsServices;
-
-}
-
 namespace scene {
 
 class ModelNodeSceneNode : public SceneNode {
@@ -41,16 +35,19 @@ public:
 
 protected:
     graphics::ModelNode &_modelNode;
-    graphics::GraphicsServices &_graphicsSvc;
 
     ModelNodeSceneNode(
         graphics::ModelNode &modelNode,
         SceneNodeType type,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
-        SceneNode(type, sceneGraph),
-        _modelNode(modelNode),
-        _graphicsSvc(graphicsSvc) {
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneNode(
+            type,
+            sceneGraph,
+            graphicsSvc,
+            audioSvc),
+        _modelNode(modelNode) {
     }
 };
 

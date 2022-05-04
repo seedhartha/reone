@@ -28,12 +28,14 @@ public:
     DummySceneNode(
         graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
-        graphics::GraphicsServices &graphicsSvc) :
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Dummy,
             sceneGraph,
-            graphicsSvc) {
+            graphicsSvc,
+            audioSvc) {
     }
 };
 

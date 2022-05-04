@@ -164,18 +164,15 @@ public:
     // Factory methods
 
     std::shared_ptr<CameraSceneNode> newCamera();
+    std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage);
     std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh);
     std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
     std::shared_ptr<SoundSceneNode> newSound();
 
-    std::shared_ptr<ModelSceneNode> newModel(
-        graphics::Model &model,
-        ModelUsage usage,
-        IAnimationEventListener *animEventListener = nullptr);
-
     std::shared_ptr<DummySceneNode> newDummy(graphics::ModelNode &modelNode);
     std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, graphics::ModelNode &modelNode);
     std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, graphics::ModelNode &modelNode);
+
     std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode);
     std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter);
 
@@ -279,6 +276,13 @@ private:
     void prepareTransparentLeafs();
 
     std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const;
+
+    template <class T, class... Params>
+    std::shared_ptr<T> newSceneNode(Params... params) {
+        auto node = std::make_shared<T>(params..., *this, _graphicsSvc, _audioSvc);
+        _nodes.insert(node);
+        return std::move(node);
+    }
 };
 
 } // namespace scene
