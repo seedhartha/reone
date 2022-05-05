@@ -191,7 +191,7 @@ protected:
 
     bool _enabled {true};
     bool _flipVertical {false};
-    bool _clickable {false};
+    bool _focusable {false};
     bool _focus {false};
 
     bool isInExtent(float x, float y) const {

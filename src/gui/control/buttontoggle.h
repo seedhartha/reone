@@ -39,7 +39,7 @@ public:
             graphicsSvc,
             resourceSvc) {
 
-        _clickable = true;
+        _focusable = true;
     }
 };
 

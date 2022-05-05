@@ -43,7 +43,7 @@ public:
             graphicsSvc,
             resourceSvc) {
 
-        _clickable = true;
+        _focusable = true;
     }
 
     void load(const resource::Gff &gui, const glm::vec4 &scale) override;

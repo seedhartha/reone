@@ -343,7 +343,7 @@ Control *Control::pickControlAt(int x, int y) {
             return control;
         }
     }
-    if (_clickable && isInExtent(x, y)) {
+    if (_focusable && isInExtent(x, y)) {
         return this;
     }
     return nullptr;
