@@ -80,8 +80,8 @@ void Gui::load(const string &resRef) {
 
 }
 
-shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
-    auto id = gui.getInt("ID", -1);
+shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale, int defaultId) {
+    auto id = gui.getInt("ID", defaultId);
     auto type = static_cast<ControlType>(gui.getInt("CONTROLTYPE"));
 
     shared_ptr<Control> control;
@@ -112,6 +112,10 @@ shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale) {
 }
 
 bool Gui::handle(const SDL_Event &e) {
+    if (_rootControl->handle(e)) {
+        return true;
+    }
+
     if (e.type == SDL_MOUSEMOTION) {
         auto control = pickControlAt(e.motion.x, e.motion.y);
         if (_controlInFocus != control) {
@@ -130,8 +134,19 @@ bool Gui::handle(const SDL_Event &e) {
             if (handleClick(*_controlInFocus)) {
                 return true;
             }
+            if (ListBox::isListBoxItem(*_controlInFocus)) {
+                int listBoxId = ListBox::listBoxIdFromControl(*_controlInFocus);
+                int itemSlotIdx = ListBox::itemSlotIndexFromControl(*_controlInFocus);
+                auto &listBox = static_cast<ListBox &>(*_controls.at(listBoxId));
+                auto &item = listBox.itemBySlotIndex(itemSlotIdx);
+                debug("List box item clicked on: " + to_string(listBoxId) + ":" + to_string(itemSlotIdx) + "[" + item.text + "]", LogChannels::gui);
+                if (handleListBoxItemClick(listBox, item)) {
+                    return true;
+                }
+            }
         }
     }
+
     return false;
 }
 

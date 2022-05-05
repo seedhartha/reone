@@ -27,12 +27,14 @@ class Label : public Control {
 public:
     Label(
         int id,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::Label,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {

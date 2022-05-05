@@ -57,6 +57,8 @@ using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
 
+namespace fs = boost::filesystem;
+
 namespace reone {
 
 namespace game {
@@ -64,6 +66,8 @@ namespace game {
 static const string kCameraHookNodeName = "camerahook";
 
 void Game::init() {
+    loadModuleNames();
+
     auto &scene = _services.scene.graphs.get(kSceneMain);
 
     // Services
@@ -81,7 +85,7 @@ void Game::init() {
 
     // GUI
 
-    _mainMenu = make_unique<MainMenu>(*this, _services.scene, _options.graphics, _services.graphics, _services.resource);
+    _mainMenu = make_unique<MainMenu>(*this, _options.game, _services.scene, _options.graphics, _services.graphics, _services.resource);
     _mainMenu->init();
 
     _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
@@ -107,6 +111,18 @@ void Game::init() {
     //
 
     _services.graphics.window.setEventHandler(this);
+}
+
+void Game::loadModuleNames() {
+    auto modulesPath = getPathIgnoreCase(_options.game.path, "modules");
+    for (auto &entry : fs::directory_iterator(modulesPath)) {
+        auto filename = entry.path().filename().string();
+        if ((!boost::iends_with(filename, ".rim") && !boost::iends_with(filename, ".mod")) ||
+            boost::iends_with(filename, "_s.rim")) {
+            continue;
+        }
+        _moduleNames.push_back(filename.substr(0, filename.find_first_of('.')));
+    }
 }
 
 void Game::run() {
@@ -289,7 +305,11 @@ void Game::loadModule(const string &name) {
 
 void Game::startNewGame() {
     auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
-    loadModule(moduleName);
+    warpToModule(moduleName);
+}
+
+void Game::warpToModule(const string &name) {
+    loadModule(name);
 
     _stage = Stage::World;
 }

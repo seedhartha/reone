@@ -46,6 +46,8 @@ class Gff;
 
 namespace gui {
 
+class IControlFactory;
+
 class Control : boost::noncopyable {
 public:
     enum class TextAlignment {
@@ -80,14 +82,35 @@ public:
         _children.push_back(&child);
     }
 
-    void update(float delta);
-    void render();
+    virtual bool handle(const SDL_Event &e);
+    virtual void update(float delta);
+    virtual void render();
 
     Control *findControlByTag(const std::string &tag);
     Control *pickControlAt(int x, int y);
 
+    bool isInFocus() const {
+        return _focus;
+    }
+
+    bool isInFocusRecursive() const {
+        if (_focus) {
+            return true;
+        }
+        for (auto &child : _children) {
+            if (child->_focus) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     int id() const {
         return _id;
+    }
+
+    ControlType type() const {
+        return _type;
     }
 
     const std::string &tag() const {
@@ -114,6 +137,10 @@ public:
         _text = std::move(text);
     }
 
+    void setText(std::string text) {
+        _text->text = move(text);
+    }
+
     void setSceneGraph(scene::SceneGraph *sceneGraph) {
         _sceneGraph = sceneGraph;
     }
@@ -134,11 +161,13 @@ protected:
     Control(
         int id,
         ControlType type,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         _id(id),
         _type(type),
+        _controlFactory(controlFactory),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc) {
@@ -146,6 +175,7 @@ protected:
 
     int _id;
     ControlType _type;
+    IControlFactory &_controlFactory;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
@@ -164,7 +194,10 @@ protected:
     bool _clickable {false};
     bool _focus {false};
 
-    bool isInExtent(float x, float y) const;
+    bool isInExtent(float x, float y) const {
+        return _extent[0] <= x && x <= _extent[0] + _extent[2] &&
+               _extent[1] <= y && y <= _extent[1] + _extent[3];
+    }
 
     void getTextPlacement(glm::ivec2 &outPosition, graphics::TextGravity &outGravity) const;
 };

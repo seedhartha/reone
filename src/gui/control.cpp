@@ -86,6 +86,18 @@ void Control::load(const Gff &gui, const glm::vec4 &scale) {
     }
 }
 
+bool Control::handle(const SDL_Event &e) {
+    if (!_enabled) {
+        return false;
+    }
+    for (auto &child : _children) {
+        if (child->handle(e)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Control::update(float delta) {
     if (!_enabled) {
         return;
@@ -274,11 +286,6 @@ void Control::render() {
     for (auto &child : _children) {
         child->render();
     }
-}
-
-bool Control::isInExtent(float x, float y) const {
-    return _extent[0] <= x && x <= _extent[0] + _extent[2] &&
-           _extent[1] <= y && y <= _extent[1] + _extent[3];
 }
 
 void Control::getTextPlacement(glm::ivec2 &outPosition, TextGravity &outGravity) const {

@@ -27,12 +27,14 @@ class LabelHilight : public Control {
 public:
     LabelHilight(
         int id,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::LabelHilight,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {

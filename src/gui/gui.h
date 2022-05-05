@@ -18,6 +18,8 @@
 #pragma once
 
 #include "control.h"
+#include "control/factory.h"
+#include "control/listbox.h"
 
 namespace reone {
 
@@ -38,7 +40,7 @@ class Gff;
 
 namespace gui {
 
-class Gui : boost::noncopyable {
+class Gui : public IControlFactory, boost::noncopyable {
 public:
     enum class ScaleMode {
         None,
@@ -60,19 +62,21 @@ public:
     void update(float delta);
     void render();
 
-    // Control creation
+    // IControlFactory
 
-    std::shared_ptr<Control> newPanel(int id);
-    std::shared_ptr<Control> newLabel(int id);
-    std::shared_ptr<Control> newLabelHilight(int id);
-    std::shared_ptr<Control> newButton(int id);
-    std::shared_ptr<Control> newButtonToggle(int id);
-    std::shared_ptr<Control> newSlider(int id);
-    std::shared_ptr<Control> newScrollBar(int id);
-    std::shared_ptr<Control> newProgressBar(int id);
-    std::shared_ptr<Control> newListBox(int id);
+    std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale, int defaultId = -1) override;
 
-    // END Control creation
+    std::shared_ptr<Control> newPanel(int id) override;
+    std::shared_ptr<Control> newLabel(int id) override;
+    std::shared_ptr<Control> newLabelHilight(int id) override;
+    std::shared_ptr<Control> newButton(int id) override;
+    std::shared_ptr<Control> newButtonToggle(int id) override;
+    std::shared_ptr<Control> newSlider(int id) override;
+    std::shared_ptr<Control> newScrollBar(int id) override;
+    std::shared_ptr<Control> newProgressBar(int id) override;
+    std::shared_ptr<Control> newListBox(int id) override;
+
+    // END IControlFactory
 
 protected:
     graphics::GraphicsOptions &_graphicsOpt;
@@ -90,8 +94,6 @@ protected:
 
     // END Controls
 
-    std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale);
-
     Control *findControl(const std::string &tag);
     Control *pickControlAt(int x, int y);
 
@@ -99,6 +101,10 @@ protected:
     void disableControl(const std::string &tag);
 
     virtual bool handleClick(const Control &control) {
+        return false;
+    }
+
+    virtual bool handleListBoxItemClick(const ListBox &listBox, const ListBox::Item &item) {
         return false;
     }
 
@@ -110,7 +116,7 @@ protected:
 private:
     template <class T>
     std::shared_ptr<Control> newControl(int id) {
-        auto control = std::make_shared<T>(id, _graphicsOpt, _graphicsSvc, _resourceSvc);
+        auto control = std::make_shared<T>(id, *this, _graphicsOpt, _graphicsSvc, _resourceSvc);
         _controls[id] = control;
         return move(control);
     }

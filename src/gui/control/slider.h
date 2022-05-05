@@ -27,12 +27,14 @@ class Slider : public Control {
 public:
     Slider(
         int id,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::Slider,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {

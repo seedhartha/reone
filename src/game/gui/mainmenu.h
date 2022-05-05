@@ -49,12 +49,15 @@ struct ResourceServices;
 
 namespace game {
 
+struct GameOptions;
+
 class IGuiGame;
 
 class MainMenu : public gui::Gui {
 public:
     MainMenu(
         IGuiGame &game,
+        GameOptions &gameOpt,
         scene::SceneServices &sceneSvc,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -64,21 +67,44 @@ public:
             graphicsSvc,
             resourceSvc),
         _game(game),
+        _gameOpt(gameOpt),
         _sceneSvc(sceneSvc) {
     }
 
     void init();
 
 private:
+    enum class Stage {
+        Default,
+        Warp
+    };
+
     IGuiGame &_game;
+    GameOptions &_gameOpt;
     scene::SceneServices &_sceneSvc;
 
+    Stage _stage {Stage::Default};
+
     // Binding
+
     gui::Label *_lbl3dView {nullptr};
+    gui::ListBox *_lbModules {nullptr};
+
+    // END Binding
 
     void bindControls();
 
+    void init3dView();
+    void initModules();
+
+    void toggleWarpStage();
+
+    // Gui
+
     bool handleClick(const gui::Control &control) override;
+    bool handleListBoxItemClick(const gui::ListBox &listBox, const gui::ListBox::Item &item) override;
+
+    // END Gui
 };
 
 } // namespace game

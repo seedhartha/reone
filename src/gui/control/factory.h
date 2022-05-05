@@ -21,24 +21,27 @@
 
 namespace reone {
 
+namespace resource {
+
+class Gff;
+
+}
+
 namespace gui {
 
-class Panel : public Control {
+class IControlFactory {
 public:
-    Panel(
-        int id,
-        IControlFactory &controlFactory,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Control(
-            id,
-            ControlType::Panel,
-            controlFactory,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
+    virtual std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale, int defaultId = -1) = 0;
+
+    virtual std::shared_ptr<Control> newPanel(int id) = 0;
+    virtual std::shared_ptr<Control> newLabel(int id) = 0;
+    virtual std::shared_ptr<Control> newLabelHilight(int id) = 0;
+    virtual std::shared_ptr<Control> newButton(int id) = 0;
+    virtual std::shared_ptr<Control> newButtonToggle(int id) = 0;
+    virtual std::shared_ptr<Control> newSlider(int id) = 0;
+    virtual std::shared_ptr<Control> newScrollBar(int id) = 0;
+    virtual std::shared_ptr<Control> newProgressBar(int id) = 0;
+    virtual std::shared_ptr<Control> newListBox(int id) = 0;
 };
 
 } // namespace gui

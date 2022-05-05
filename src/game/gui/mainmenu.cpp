@@ -21,11 +21,13 @@
 #include "../../graphics/services.h"
 #include "../../graphics/types.h"
 #include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"
 
+#include "../options.h"
 #include "../types.h"
 
 #include "game.h"
@@ -43,15 +45,26 @@ namespace game {
 void MainMenu::init() {
     load("mainmenu16x12");
     bindControls();
+    init3dView();
+    initModules();
 
-    disableControl("BTN_WARP");
-    disableControl("LB_MODULES");
+    _lbModules->setEnabled(false);
+
     disableControl("LBL_BW");
     disableControl("LBL_LUCAS");
     disableControl("LBL_NEWCONTENT");
 
-    // Init 3D view
+    if (!_gameOpt.developer) {
+        disableControl("BTN_WARP");
+    }
+}
 
+void MainMenu::bindControls() {
+    _lbl3dView = findControl<Label>("LBL_3DVIEW");
+    _lbModules = findControl<ListBox>("LB_MODULES");
+}
+
+void MainMenu::init3dView() {
     auto &scene = _sceneSvc.graphs.get(kSceneMainMenu);
     float aspect = _lbl3dView->extent()[2] / static_cast<float>(_lbl3dView->extent()[3]);
 
@@ -69,8 +82,12 @@ void MainMenu::init() {
     _lbl3dView->setSceneGraph(&scene);
 }
 
-void MainMenu::bindControls() {
-    _lbl3dView = findControl<Label>("LBL_3DVIEW");
+void MainMenu::initModules() {
+    auto items = vector<ListBox::Item>();
+    for (auto &moduleName : _game.moduleNames()) {
+        items.push_back(ListBox::Item {moduleName});
+    }
+    _lbModules->setItems(move(items));
 }
 
 bool MainMenu::handleClick(const Control &control) {
@@ -80,8 +97,30 @@ bool MainMenu::handleClick(const Control &control) {
     } else if (control.tag() == "BTN_EXIT") {
         _game.quit();
         return true;
+    } else if (control.tag() == "BTN_WARP") {
+        toggleWarpStage();
+        return true;
     }
     return false;
+}
+
+bool MainMenu::handleListBoxItemClick(const ListBox &listBox, const ListBox::Item &item) {
+    _game.warpToModule(item.text);
+    return false;
+}
+
+void MainMenu::toggleWarpStage() {
+    disableControl("LBL_MENUBG");
+    disableControl("LBL_GAMELOGO");
+    disableControl("BTN_NEWGAME");
+    disableControl("BTN_LOADGAME");
+    disableControl("BTN_MOVIES");
+    disableControl("BTN_OPTIONS");
+    disableControl("BTN_EXIT");
+    disableControl("BTN_WARP");
+
+    _lbl3dView->setEnabled(false);
+    _lbModules->setEnabled(true);
 }
 
 } // namespace game

@@ -27,12 +27,14 @@ class ScrollBar : public Control {
 public:
     ScrollBar(
         int id,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::ScrollBar,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {

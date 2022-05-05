@@ -18,6 +18,7 @@ set(GUI_HEADERS
     control/button.h
     control/button.h
     control/buttontoggle.h
+    control/factory.h
     control/label.h
     control/labelhilight.h
     control/listbox.h
@@ -33,6 +34,7 @@ set(GUI_HEADERS
 
 set(GUI_SOURCES
     control.cpp
+    control/listbox.cpp
     gui.cpp
     sceneinitializer.cpp
     textinput.cpp)

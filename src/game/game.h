@@ -65,8 +65,12 @@ public:
     // IGuiGame
 
     void startNewGame() override;
-
+    void warpToModule(const std::string &name) override;
     void quit() override;
+
+    const std::vector<std::string> &moduleNames() const override {
+        return _moduleNames;
+    }
 
     // END IGuiGame
 
@@ -175,6 +179,8 @@ private:
 
     Stage _stage {Stage::MovieLegal};
 
+    std::vector<std::string> _moduleNames;
+
     // Services
 
     std::unique_ptr<PlayerController> _playerController;
@@ -207,6 +213,8 @@ private:
     void handleInput();
     void update();
     void render();
+
+    void loadModuleNames();
 
     void loadModule(const std::string &name);
 

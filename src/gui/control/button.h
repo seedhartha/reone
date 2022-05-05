@@ -27,12 +27,14 @@ class Button : public Control {
 public:
     Button(
         int id,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         Control(
             id,
             ControlType::Button,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
