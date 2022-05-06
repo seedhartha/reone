@@ -52,12 +52,12 @@ public:
 
     void loadFromGit(const resource::Gff &git);
 
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() {
+    scene::WalkmeshSceneNode *walkmesh() {
         return _walkmesh;
     }
 
 private:
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
+scene::WalkmeshSceneNode *_walkmesh {nullptr};
 
     void flushTransform() override;
 };

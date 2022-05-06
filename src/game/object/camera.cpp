@@ -50,7 +50,7 @@ void Camera::loadFromGit(const Gff &git) {
 void Camera::loadFromStyle(const CameraStyle &style) {
     _style = style;
     _aspect = _graphicsOpt.width / static_cast<float>(_graphicsOpt.height);
-    _sceneNode = _sceneGraph->newCamera();
+    _sceneNode = _sceneGraph->newCamera().get();
 
     flushProjection();
 }

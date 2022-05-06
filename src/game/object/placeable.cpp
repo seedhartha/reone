@@ -90,8 +90,8 @@ void Placeable::loadFromGit(const Gff &git) {
     _tag = move(tag);
     _position = glm::vec3(x, y, z);
     _facing = bearing;
-    _sceneNode = move(sceneNode);
-    _walkmesh = move(walkmeshSceneNode);
+    _sceneNode = sceneNode.get();
+    _walkmesh = walkmeshSceneNode.get();
 
     flushTransform();
 }

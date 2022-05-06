@@ -241,16 +241,16 @@ void Game::loadModule(const string &name) {
     // Main camera
 
     auto &camera = module.area().mainCamera();
-    scene.setActiveCamera(static_pointer_cast<CameraSceneNode>(camera.sceneNodePtr()).get());
+    scene.setActiveCamera(static_cast<CameraSceneNode *>(camera.sceneNode()));
 
     // Rooms
 
     for (auto &room : module.area().rooms()) {
-        auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
+        auto model = static_cast<ModelSceneNode *>(room->sceneNode());
         if (model) {
             scene.addRoot(*model);
         }
-        auto walkmesh = room->walkmeshPtr();
+        auto walkmesh = room->walkmesh();
         if (walkmesh) {
             scene.addRoot(*walkmesh);
         }
@@ -259,27 +259,27 @@ void Game::loadModule(const string &name) {
     // Objects
 
     for (auto &object : module.area().objects()) {
-        auto model = static_pointer_cast<ModelSceneNode>(object->sceneNodePtr());
+        auto model = static_cast<ModelSceneNode *>(object->sceneNode());
         if (model) {
             scene.addRoot(*model);
         }
         if (object->type() == ObjectType::Placeable) {
             auto &placeable = static_cast<Placeable &>(*object);
-            auto walkmesh = placeable.walkmeshPtr();
+            auto walkmesh = placeable.walkmesh();
             if (walkmesh) {
                 scene.addRoot(*walkmesh);
             }
         } else if (object->type() == ObjectType::Door) {
             auto &door = static_cast<Door &>(*object);
-            auto walkmeshClosed = door.walkmeshClosedPtr();
+            auto walkmeshClosed = door.walkmeshClosed();
             if (walkmeshClosed) {
                 scene.addRoot(*walkmeshClosed);
             }
-            auto walkmeshOpen1 = door.walkmeshOpen1Ptr();
+            auto walkmeshOpen1 = door.walkmeshOpen1();
             if (walkmeshOpen1) {
                 scene.addRoot(*walkmeshOpen1);
             }
-            auto walkmeshOpen2 = door.walkmeshOpen2Ptr();
+            auto walkmeshOpen2 = door.walkmeshOpen2();
             if (walkmeshOpen2) {
                 scene.addRoot(*walkmeshOpen2);
             }
@@ -290,7 +290,7 @@ void Game::loadModule(const string &name) {
 
     auto &pc = module.pc();
 
-    auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
+    auto pcModel = static_cast<ModelSceneNode *>(pc.sceneNode());
     scene.addRoot(*pcModel);
 
     auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);

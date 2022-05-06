@@ -104,7 +104,7 @@ void Creature::loadFromUtc(const string &templateResRef) {
     //
 
     _tag = move(tag);
-    _sceneNode = move(sceneNode);
+    _sceneNode = sceneNode.get();
 
     flushTransform();
 }

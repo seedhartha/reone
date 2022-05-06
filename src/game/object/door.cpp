@@ -104,10 +104,10 @@ void Door::loadFromGit(const Gff &git) {
     _tag = move(tag);
     _position = glm::vec3(x, y, z);
     _facing = bearing;
-    _sceneNode = move(sceneNode);
-    _walkmeshClosed = move(walkmeshClosedSceneNode);
-    _walkmeshOpen1 = move(walkmeshOpen1SceneNode);
-    _walkmeshOpen2 = move(walkmeshOpen2SceneNode);
+    _sceneNode = sceneNode.get();
+    _walkmeshClosed = walkmeshClosedSceneNode.get();
+    _walkmeshOpen1 = walkmeshOpen1SceneNode.get();
+    _walkmeshOpen2 = walkmeshOpen2SceneNode.get();
 
     flushTransform();
 }

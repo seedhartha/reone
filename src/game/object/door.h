@@ -60,15 +60,15 @@ public:
 
     void handleClick(Object &clicker) override;
 
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosedPtr() {
+    scene::WalkmeshSceneNode *walkmeshClosed() {
         return _walkmeshClosed;
     }
 
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1Ptr() {
+    scene::WalkmeshSceneNode *walkmeshOpen1() {
         return _walkmeshOpen1;
     }
 
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2Ptr() {
+    scene::WalkmeshSceneNode *walkmeshOpen2() {
         return _walkmeshOpen2;
     }
 
@@ -83,9 +83,9 @@ public:
     // END Object
 
 private:
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
+    scene::WalkmeshSceneNode *_walkmeshClosed {nullptr};
+    scene::WalkmeshSceneNode *_walkmeshOpen1 {nullptr};
+    scene::WalkmeshSceneNode *_walkmeshOpen2 {nullptr};
 
     State _state {State::Closed};
 

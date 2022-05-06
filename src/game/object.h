@@ -84,11 +84,7 @@ public:
         return _pitch;
     }
 
-    scene::SceneNode &sceneNode() const {
-        return *_sceneNode;
-    }
-
-    std::shared_ptr<scene::SceneNode> sceneNodePtr() const {
+    scene::SceneNode *sceneNode() {
         return _sceneNode;
     }
 
@@ -115,7 +111,7 @@ public:
         _sceneGraph = sceneGraph;
     }
 
-    void setSceneNode(std::shared_ptr<scene::SceneNode> sceneNode) {
+    void setSceneNode(scene::SceneNode *sceneNode) {
         _sceneNode = std::move(sceneNode);
         flushTransform();
     }
@@ -136,7 +132,7 @@ protected:
     float _pitch {0.0f};
 
     scene::SceneGraph *_sceneGraph {nullptr};
-    std::shared_ptr<scene::SceneNode> _sceneNode;
+    scene::SceneNode *_sceneNode {nullptr};
 
     Object(
         uint32_t id,

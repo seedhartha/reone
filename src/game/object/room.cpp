@@ -37,14 +37,14 @@ void Room::loadFromLyt(const Layout::Room &lyt) {
     // Model
     auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
-        _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room);
+        _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room).get();
         _sceneNode->setUser(*this);
     }
 
     // Walkmesh
     auto walkmesh = _graphicsSvc.walkmeshes.get(lyt.name, ResourceType::Wok);
     if (walkmesh) {
-        _walkmesh = _sceneGraph->newWalkmesh(*walkmesh);
+        _walkmesh = _sceneGraph->newWalkmesh(*walkmesh).get();
         _walkmesh->setUser(*this);
     }
 

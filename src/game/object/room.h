@@ -47,16 +47,12 @@ public:
 
     void loadFromLyt(const Layout::Room &lyt);
 
-    scene::WalkmeshSceneNode &walkmesh() {
-        return *_walkmesh;
-    }
-
-    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshPtr() const {
+    scene::WalkmeshSceneNode *walkmesh() {
         return _walkmesh;
     }
 
 private:
-    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
+    scene::WalkmeshSceneNode *_walkmesh {nullptr};
 };
 
 } // namespace game
