@@ -112,6 +112,9 @@ shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale, int
 }
 
 bool Gui::handle(const SDL_Event &e) {
+    if (!_rootControl) {
+        return false;
+    }
     if (_rootControl->handle(e)) {
         return true;
     }
@@ -151,10 +154,16 @@ bool Gui::handle(const SDL_Event &e) {
 }
 
 void Gui::update(float delta) {
+    if (!_rootControl) {
+        return;
+    }
     _rootControl->update(delta);
 }
 
 void Gui::render() {
+    if (!_rootControl) {
+        return;
+    }
     _graphicsSvc.uniforms.setGeneral([this](auto &u) {
         u.resetGlobals();
         u.projection = _graphicsSvc.window.getOrthoProjection();

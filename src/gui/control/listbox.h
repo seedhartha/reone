@@ -46,20 +46,32 @@ public:
         _focusable = true;
     }
 
-    void load(const resource::Gff &gui, const glm::vec4 &scale) override;
+    void initItemSlots();
 
-    bool handle(const SDL_Event &e) override;
+    void clearItems();
+    void appendItem(Item item, bool scroll = false);
 
     const Item &itemBySlotIndex(int index) const {
         return _items[index + _itemSlotOffset];
     }
 
+    void setProtoItem(Control *protoItem) {
+        _protoItem = protoItem;
+    }
+
     void setItems(std::vector<Item> items) {
         _items = std::move(items);
         _itemSlotOffset = 0;
-
         flushItemSlots();
     }
+
+    // Control
+
+    void load(const resource::Gff &gui, const glm::vec4 &scale) override;
+
+    bool handle(const SDL_Event &e) override;
+
+    // END Control
 
     static int itemControlId(int listBoxId, int slotIdx) {
         return ((listBoxId + 1) << 8) | (slotIdx + 1);
@@ -82,6 +94,7 @@ private:
     int _numItemSlots {0};
     int _itemSlotOffset {0};
 
+    Control *_protoItem {nullptr};
     std::vector<Control *> _itemSlots;
 
     std::vector<Item> _items;

@@ -20,6 +20,7 @@
 #include "../graphics/eventhandler.h"
 #include "../movie/movie.h"
 
+#include "gui/console.h"
 #include "gui/game.h"
 #include "gui/maininterface.h"
 #include "gui/mainmenu.h"
@@ -102,7 +103,8 @@ private:
     enum class Stage {
         MovieLegal,
         MainMenu,
-        World
+        World,
+        Console
     };
 
     class PlayerController : boost::noncopyable {
@@ -207,6 +209,7 @@ private:
 
     std::unique_ptr<MainMenu> _mainMenu;
     std::unique_ptr<MainInterface> _mainInterface;
+    std::unique_ptr<Console> _console;
 
     // END GUI
 

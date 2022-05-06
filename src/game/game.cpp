@@ -91,6 +91,9 @@ void Game::init() {
     _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
     _mainInterface->init();
 
+    _console = make_unique<Console>(_options.graphics, _services.graphics, _services.resource);
+    _console->init();
+
     // Surfaces
 
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
@@ -160,6 +163,18 @@ bool Game::handle(const SDL_Event &e) {
         if (_playerController->handle(e)) {
             return true;
         }
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKQUOTE) {
+            _stage = Stage::Console;
+            return true;
+        }
+    } else if (_stage == Stage::Console) {
+        if (_console->handle(e)) {
+            return true;
+        }
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKQUOTE) {
+            _stage = Stage::World;
+            return true;
+        }
     }
     return false;
 }
@@ -184,7 +199,7 @@ void Game::update() {
     } else if (_stage == Stage::MainMenu) {
         _mainMenu->update(delta);
 
-    } else if (_stage == Stage::World) {
+    } else if (_stage == Stage::World || _stage == Stage::Console) {
         // Update game objects
 
         if (_module) {
@@ -202,7 +217,11 @@ void Game::update() {
 
         // Update GUI
 
-        _mainInterface->update(delta);
+        if (_stage == Stage::World) {
+            _mainInterface->update(delta);
+        } else if (_stage == Stage::Console) {
+            _console->update(delta);
+        }
     }
 }
 
@@ -215,13 +234,17 @@ void Game::render() {
     } else if (_stage == Stage::MainMenu) {
         _mainMenu->render();
 
-    } else if (_stage == Stage::World) {
+    } else if (_stage == Stage::World || _stage == Stage::Console) {
         // Render world
         auto &scene = _services.scene.graphs.get(kSceneMain);
         _worldRenderer->render();
 
         // Render GUI
-        _mainInterface->render();
+        if (_stage == Stage::World) {
+            _mainInterface->render();
+        } else if (_stage == Stage::Console) {
+            _console->render();
+        }
     }
 
     _services.graphics.window.swapBuffers();

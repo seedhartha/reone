@@ -17,32 +17,54 @@
 
 #pragma once
 
-#include "../control.h"
+#include "../../gui/gui.h"
+#include "../../gui/textinput.h"
 
 namespace reone {
 
 namespace gui {
 
-class Label : public Control {
+class Label;
+class ListBox;
+
+} // namespace gui
+
+namespace game {
+
+class Console : public gui::Gui {
 public:
-    Label(
-        int id,
-        IControlFactory &controlFactory,
+    Console(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        Control(
-            id,
-            ControlType::Label,
-            controlFactory,
+        gui::Gui(
             graphicsOpt,
             graphicsSvc,
-            resourceSvc) {
+            resourceSvc),
+        _textInput(gui::TextInputFlags::console) {
     }
 
-    std::shared_ptr<Control> copy(int id) override;
+    void init();
+
+    // Gui
+
+    bool handle(const SDL_Event &e) override;
+
+    // END Gui
+
+private:
+    gui::TextInput _textInput;
+
+    // Binding
+
+    gui::ListBox *_lbLines {nullptr};
+    gui::Label *_lblInput {nullptr};
+
+    // END Binding
+
+    void onEnterCommand(const std::string &command);
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

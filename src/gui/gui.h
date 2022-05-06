@@ -58,9 +58,9 @@ public:
 
     void load(const std::string &resRef);
 
-    bool handle(const SDL_Event &e);
-    void update(float delta);
-    void render();
+    virtual bool handle(const SDL_Event &e);
+    virtual void update(float delta);
+    virtual void render();
 
     // IControlFactory
 

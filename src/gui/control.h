@@ -65,12 +65,12 @@ public:
         std::string edge;
         std::string fill;
         int dimension {0};
-        glm::vec3 color {0.0f};
+        glm::vec3 color {1.0f};
     };
 
     struct Text {
         TextAlignment alignment {TextAlignment::LeftTop};
-        glm::vec3 color {0.0f};
+        glm::vec3 color {1.0f};
         std::string font;
         std::string text;
         int strref {-1};
@@ -121,8 +121,16 @@ public:
         return _extent;
     }
 
+    void setTag(std::string tag) {
+        _tag = std::move(tag);
+    }
+
     void setExtent(glm::ivec4 extent) {
         _extent = std::move(extent);
+    }
+
+    void setAlpha(float alpha) {
+        _alpha = alpha;
     }
 
     void setBorder(std::unique_ptr<Border> border) {
@@ -138,7 +146,9 @@ public:
     }
 
     void setText(std::string text) {
-        _text->text = move(text);
+        if (_text) {
+            _text->text = move(text);
+        }
     }
 
     void setSceneGraph(scene::SceneGraph *sceneGraph) {
@@ -153,8 +163,16 @@ public:
         _flipVertical = flip;
     }
 
+    void setFocusable(bool focusable) {
+        _focusable = focusable;
+    }
+
     void setInFocus(bool focus) {
         _focus = focus;
+    }
+
+    virtual std::shared_ptr<Control> copy(int id) {
+        throw std::logic_error("Cannot copy control of type " + std::to_string(static_cast<int>(_type)));
     }
 
 protected:
@@ -182,9 +200,12 @@ protected:
 
     std::string _tag;
     glm::ivec4 _extent {0};
+    float _alpha {1.0f};
+
     std::unique_ptr<Border> _border;
     std::unique_ptr<Border> _hilight;
     std::unique_ptr<Text> _text;
+
     std::vector<Control *> _children;
 
     scene::SceneGraph *_sceneGraph {nullptr};

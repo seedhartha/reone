@@ -34,6 +34,8 @@ set(GUI_HEADERS
 
 set(GUI_SOURCES
     control.cpp
+    control/button.cpp
+    control/label.cpp
     control/listbox.cpp
     gui.cpp
     sceneinitializer.cpp

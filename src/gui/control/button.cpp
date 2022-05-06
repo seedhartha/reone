@@ -15,33 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "button.h"
 
-#include "../control.h"
+#include "factory.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace gui {
 
-class Label : public Control {
-public:
-    Label(
-        int id,
-        IControlFactory &controlFactory,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Control(
-            id,
-            ControlType::Label,
-            controlFactory,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+shared_ptr<Control> Button::copy(int id) {
+    auto copy = _controlFactory.newButton(id);
+    copy->setTag(_tag);
+    copy->setExtent(_extent);
+    copy->setAlpha(_alpha);
+    if (_border) {
+        copy->setBorder(make_unique<Border>(*_border));
     }
-
-    std::shared_ptr<Control> copy(int id) override;
-};
+    if (_hilight) {
+        copy->setHilight(make_unique<Border>(*_hilight));
+    }
+    if (_text) {
+        copy->setText(make_unique<Text>(*_text));
+    }
+    copy->setEnabled(_enabled);
+    copy->setFlipVertical(_flipVertical);
+    copy->setFocusable(_focusable);
+    return move(copy);
+}
 
 } // namespace gui
 

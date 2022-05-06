@@ -41,6 +41,8 @@ public:
 
         _focusable = true;
     }
+
+    std::shared_ptr<Control> copy(int id) override;
 };
 
 } // namespace gui

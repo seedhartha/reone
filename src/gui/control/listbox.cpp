@@ -36,18 +36,38 @@ void ListBox::load(const Gff &gui, const glm::vec4 &scale) {
 
     auto guiProtoItem = gui.getStruct("PROTOITEM");
     auto protoItem = _controlFactory.loadControl(*guiProtoItem, scale, itemControlId(_id, -1));
-    auto &protoExtent = protoItem->extent();
-    int protoHeightPadded = protoItem->extent()[3] + _padding;
+    _protoItem = protoItem.get();
 
+    initItemSlots();
+}
+
+void ListBox::initItemSlots() {
+    auto &protoExtent = _protoItem->extent();
+    int protoHeightPadded = protoExtent[3] + _padding;
     _numItemSlots = _extent[3] / protoHeightPadded;
+
     for (int i = 0; i < _numItemSlots; ++i) {
-        auto item = _controlFactory.loadControl(*guiProtoItem, scale, itemControlId(_id, i));
+        auto item = _protoItem->copy(itemControlId(_id, i));
         auto extent = glm::vec4(protoExtent[0], protoExtent[1] + i * protoHeightPadded, protoExtent[2], protoExtent[3]);
         item->setEnabled(false);
         item->setExtent(move(extent));
         _itemSlots.push_back(item.get());
         _children.push_back(item.get());
     }
+}
+
+void ListBox::clearItems() {
+    _items.clear();
+    _itemSlotOffset = 0;
+    flushItemSlots();
+}
+
+void ListBox::appendItem(Item item, bool scroll) {
+    _items.push_back(move(item));
+    if (_items.size() > _numItemSlots) {
+        ++_itemSlotOffset;
+    }
+    flushItemSlots();
 }
 
 bool ListBox::handle(const SDL_Event &e) {

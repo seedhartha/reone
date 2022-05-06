@@ -34,19 +34,6 @@ struct SceneServices;
 
 }
 
-namespace graphics {
-
-struct GraphicsServices;
-struct GraphicsOptions;
-
-} // namespace graphics
-
-namespace resource {
-
-struct ResourceServices;
-
-}
-
 namespace game {
 
 struct GameOptions;

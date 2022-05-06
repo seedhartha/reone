@@ -135,6 +135,7 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
+    gui/console.h
     gui/game.h
     gui/maininterface.h
     gui/mainmenu.h
@@ -188,6 +189,7 @@ set(GAME_SOURCES
     format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
+    gui/console.cpp
     gui/maininterface.cpp
     gui/mainmenu.cpp
     guisounds.cpp

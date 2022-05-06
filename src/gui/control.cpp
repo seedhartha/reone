@@ -45,6 +45,7 @@ namespace gui {
 
 void Control::load(const Gff &gui, const glm::vec4 &scale) {
     _tag = gui.getString("TAG");
+    _alpha = gui.getFloat("ALPHA", 1.0f);
 
     auto extent = gui.getStruct("EXTENT");
     if (extent) {
@@ -135,6 +136,7 @@ void Control::render() {
                     glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
             }
             u.color = glm::vec4(border->color, 1.0f);
+            u.alpha = _alpha;
         });
 
         auto blendMode = hasAlphaChannel(fillTexture->pixelFormat()) ? BlendMode::Normal : BlendMode::Additive;

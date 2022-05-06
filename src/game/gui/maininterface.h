@@ -27,19 +27,6 @@ class Button;
 
 }
 
-namespace graphics {
-
-struct GraphicsServices;
-struct GraphicsOptions;
-
-} // namespace graphics
-
-namespace resource {
-
-struct ResourceServices;
-
-}
-
 namespace game {
 
 class MainInterface : public gui::Gui {
