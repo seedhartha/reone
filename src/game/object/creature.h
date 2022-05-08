@@ -70,6 +70,14 @@ public:
     // END Object
 
 private:
+    enum class ModelType : char {
+        FullBody = 'F',
+        BodyOnly = 'B',
+        Critter = 'L',
+        UnarmedCritter = 'S'
+    };
+
+    ModelType _modelType {ModelType::FullBody};
     State _state {State::Pause};
 };
 

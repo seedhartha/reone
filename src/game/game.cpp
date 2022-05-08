@@ -119,7 +119,7 @@ void Game::init() {
 void Game::loadModuleNames() {
     auto modulesPath = getPathIgnoreCase(_options.game.path, "modules");
     for (auto &entry : fs::directory_iterator(modulesPath)) {
-        auto filename = entry.path().filename().string();
+        auto filename = boost::to_lower_copy(entry.path().filename().string());
         if ((!boost::iends_with(filename, ".rim") && !boost::iends_with(filename, ".mod")) ||
             boost::iends_with(filename, "_s.rim")) {
             continue;

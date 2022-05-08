@@ -73,8 +73,11 @@ void Creature::loadFromUtc(const string &templateResRef) {
     if (!appearanceTable) {
         throw ValidationException("appearance 2DA not found");
     }
+
     auto modelType = appearanceTable->getString(appearanceType, "modeltype");
     auto race = appearanceTable->getString(appearanceType, "race");
+
+    _modelType = static_cast<ModelType>(modelType[0]);
 
     // Make scene node
 
@@ -125,13 +128,21 @@ bool Creature::moveForward(float delta) {
 
 void Creature::update(float delta) {
     if (_sceneNode) {
+        string animName;
+        if (_state == State::Pause) {
+            animName = "pause1";
+        } else if (_state == State::Walk) {
+            animName = "walk";
+        } else if (_state == State::Run) {
+            animName = "run";
+        }
+        if (_modelType == ModelType::Critter || _modelType == ModelType::UnarmedCritter) {
+            animName.insert(0, "c");
+        }
         auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
-        if (_state == State::Pause && modelSceneNode.getActiveAnimationName() != "pause1") {
-            modelSceneNode.playAnimation("pause1", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
-        } else if (_state == State::Walk && modelSceneNode.getActiveAnimationName() != "walk") {
-            modelSceneNode.playAnimation("walk", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
-        } else if (_state == State::Run && modelSceneNode.getActiveAnimationName() != "run") {
-            modelSceneNode.playAnimation("run", AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate));
+        if (modelSceneNode.getActiveAnimationName() != animName) {
+            auto animProps = AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate);
+            modelSceneNode.playAnimation(animName, move(animProps));
         }
     }
 }
