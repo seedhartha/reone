@@ -25,11 +25,9 @@ namespace game {
 
 class SurrenderToEnemiesAction : public Action {
 public:
-    SurrenderToEnemiesAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::SurrenderToEnemies) {
+    SurrenderToEnemiesAction() :
+        Action(ActionType::SurrenderToEnemies) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

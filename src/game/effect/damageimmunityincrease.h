@@ -25,17 +25,9 @@ namespace game {
 
 class DamageImmunityIncreaseEffect : public Effect {
 public:
-    DamageImmunityIncreaseEffect(DamageType damageType, int percentImmunity) :
-        Effect(EffectType::DamageImmunityIncrease),
-        _damageType(damageType),
-        _percentImmunity(percentImmunity) {
+    DamageImmunityIncreaseEffect() :
+        Effect(EffectType::DamageImmunityIncrease) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    DamageType _damageType;
-    int _percentImmunity;
 };
 
 } // namespace game

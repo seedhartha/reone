@@ -28,8 +28,6 @@ public:
     FuryEffect() :
         Effect(EffectType::Fury) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

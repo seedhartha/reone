@@ -25,15 +25,9 @@ namespace game {
 
 class ResurrectionEffect : public Effect {
 public:
-    ResurrectionEffect(int hpPercent) :
-        Effect(EffectType::Resurrection),
-        _hpPercent(hpPercent) {
+    ResurrectionEffect() :
+        Effect(EffectType::Resurrection) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _hpPercent;
 };
 
 } // namespace game

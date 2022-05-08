@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../types.h"
-
 #include "../action.h"
 
 namespace reone {
@@ -27,21 +25,9 @@ namespace game {
 
 class PlayAnimationAction : public Action {
 public:
-    PlayAnimationAction(Game &game, ServicesView &services, AnimationType anim, float speed, float durationSeconds) :
-        Action(game, services, ActionType::PlayAnimation),
-        _anim(anim),
-        _speed(speed),
-        _durationSeconds(durationSeconds) {
+    PlayAnimationAction() :
+        Action(ActionType::PlayAnimation) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    AnimationType _anim;
-    float _speed;
-    float _durationSeconds;
-
-    bool _playing {false};
 };
 
 } // namespace game

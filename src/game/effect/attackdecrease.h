@@ -28,8 +28,6 @@ public:
     AttackDecreaseEffect() :
         Effect(EffectType::AttackDecrease) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

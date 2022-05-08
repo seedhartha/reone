@@ -27,17 +27,9 @@ namespace game {
 
 class GiveItemAction : public Action {
 public:
-    GiveItemAction(Game &game, ServicesView &services, std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) :
-        Action(game, services, ActionType::GiveItem),
-        _item(std::move(item)),
-        _giveTo(std::move(giveTo)) {
+    GiveItemAction() :
+        Action(ActionType::GiveItem) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    std::shared_ptr<Item> _item;
-    std::shared_ptr<Object> _giveTo;
 };
 
 } // namespace game

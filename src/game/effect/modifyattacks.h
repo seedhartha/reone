@@ -25,15 +25,9 @@ namespace game {
 
 class ModifyAttacksEffect : public Effect {
 public:
-    ModifyAttacksEffect(int attacks) :
-        Effect(EffectType::ModifyAttacks),
-        _attacks(attacks) {
+    ModifyAttacksEffect() :
+        Effect(EffectType::ModifyAttacks) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _attacks;
 };
 
 } // namespace game

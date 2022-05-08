@@ -17,25 +17,17 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class FollowAction : public ObjectAction {
+class FollowAction : public Action {
 public:
-    FollowAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, float distance) :
-        ObjectAction(game, services, ActionType::Follow, std::move(object)),
-        _distance(distance) {
+    FollowAction() :
+        Action(ActionType::Follow) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-    float distance() const { return _distance; }
-
-private:
-    float _distance {0.0f};
 };
 
 } // namespace game

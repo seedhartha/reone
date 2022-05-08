@@ -23,29 +23,11 @@ namespace reone {
 
 namespace game {
 
-class Creature;
-
 class DamageEffect : public Effect {
 public:
-    DamageEffect(int amount, DamageType type, DamagePower power, std::shared_ptr<Creature> damager) :
-        Effect(EffectType::Damage),
-        _amount(amount),
-        _type(type),
-        _power(power),
-        _damager(std::move(damager)) {
+    DamageEffect() :
+        Effect(EffectType::Damage) {
     }
-
-    void applyTo(Object &object) override;
-
-    int amount() const { return _amount; }
-    DamageType type() const { return _type; }
-    std::shared_ptr<Creature> damager() const { return _damager; }
-
-private:
-    int _amount;
-    DamageType _type;
-    DamagePower _power;
-    std::shared_ptr<Creature> _damager;
 };
 
 } // namespace game

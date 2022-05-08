@@ -28,8 +28,6 @@ public:
     EntangleEffect() :
         Effect(EffectType::Entangle) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

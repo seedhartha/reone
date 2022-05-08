@@ -28,8 +28,6 @@ public:
     StunnedEffect() :
         Effect(EffectType::Stunned) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

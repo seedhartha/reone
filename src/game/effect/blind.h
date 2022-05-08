@@ -26,10 +26,8 @@ namespace game {
 class BlindEffect : public Effect {
 public:
     BlindEffect() :
-        Effect(EffectType::Blindness) {
+        Effect(EffectType::Blind) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

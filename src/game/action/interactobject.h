@@ -26,15 +26,9 @@ namespace game {
 
 class InteractObjectAction : public Action {
 public:
-    InteractObjectAction(Game &game, ServicesView &services, std::shared_ptr<Placeable> placeable) :
-        Action(game, services, ActionType::InteractObject),
-        _placeable(std::move(placeable)) {
+    InteractObjectAction() :
+        Action(ActionType::InteractObject) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    std::shared_ptr<Placeable> _placeable;
 };
 
 } // namespace game

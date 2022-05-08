@@ -28,8 +28,6 @@ public:
     ForceResistedEffect() :
         Effect(EffectType::ForceResisted) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

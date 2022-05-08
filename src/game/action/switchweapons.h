@@ -25,11 +25,9 @@ namespace game {
 
 class SwitchWeaponsAction : public Action {
 public:
-    SwitchWeaponsAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::SwitchWeapons) {
+    SwitchWeaponsAction() :
+        Action(ActionType::SwitchWeapons) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

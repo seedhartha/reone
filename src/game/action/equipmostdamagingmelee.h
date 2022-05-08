@@ -25,17 +25,9 @@ namespace game {
 
 class EquipMostDamagingMeleeAction : public Action {
 public:
-    EquipMostDamagingMeleeAction(Game &game, ServicesView &services, std::shared_ptr<Object> versus, bool offHand) :
-        Action(game, services, ActionType::EquipMostDamagingMelee),
-        _versus(std::move(versus)),
-        _offHand(offHand) {
+    EquipMostDamagingMeleeAction() :
+        Action(ActionType::EquipMostDamagingMelee) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    std::shared_ptr<Object> _versus;
-    bool _offHand;
 };
 
 } // namespace game

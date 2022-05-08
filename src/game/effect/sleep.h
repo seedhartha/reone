@@ -28,8 +28,6 @@ public:
     SleepEffect() :
         Effect(EffectType::Sleep) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

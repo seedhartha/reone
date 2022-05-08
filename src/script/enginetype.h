@@ -22,8 +22,6 @@ namespace reone {
 namespace script {
 
 class EngineType : boost::noncopyable {
-public:
-    virtual ~EngineType() = default;
 };
 
 } // namespace script

@@ -28,8 +28,6 @@ public:
     DroidScrambleEffect() :
         Effect(EffectType::DroidScramble) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

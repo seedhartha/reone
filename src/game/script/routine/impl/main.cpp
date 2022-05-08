@@ -25,7 +25,6 @@
 #include "../../../../script/exception/unsupportedroutine.h"
 #include "../../../../script/executioncontext.h"
 
-#include "../../../action/factory.h"
 #include "../../../event.h"
 #include "../../../game.h"
 #include "../../../location.h"
@@ -664,9 +663,10 @@ Variable signalEvent(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable eventUserDefined(const vector<Variable> &args, const RoutineContext &ctx) {
     int userDefinedEventNumber = getInt(args, 0);
-    auto event = make_shared<Event>(userDefinedEventNumber);
 
-    return Variable::ofEvent(move(event));
+    // TODO: implement
+
+    return Variable::ofEvent(nullptr);
 }
 
 Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -927,9 +927,10 @@ Variable getLocation(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable location(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
-    auto location = make_shared<Location>(move(position), orientation);
 
-    return Variable::ofLocation(location);
+    // TODO: implement
+
+    return Variable::ofLocation(nullptr);
 }
 
 Variable applyEffectAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -977,14 +978,18 @@ Variable getSpellTargetLocation(const vector<Variable> &args, const RoutineConte
 
 Variable getPositionFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationArgument(args, 0);
-    return Variable::ofVector(location->position());
+
+    // TODO: implement
+
+    return Variable::ofVector(glm::vec3(0.0f));
 }
 
 Variable getFacingFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationArgument(args, 0);
-    float result = glm::degrees(location->facing());
 
-    return Variable::ofFloat(result);
+    // TODO: implement
+
+    return Variable::ofFloat(-1.0f);
 }
 
 Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1338,16 +1343,18 @@ Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) 
 
 Variable talentSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     int spell = getInt(args, 0);
-    auto talent = make_shared<Talent>(TalentType::Spell, spell);
 
-    return Variable::ofTalent(move(talent));
+    // TODO: implement
+
+    return Variable::ofTalent(nullptr);
 }
 
 Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     int feat = getInt(args, 0);
-    auto talent = make_shared<Talent>(TalentType::Feat, feat);
 
-    return Variable::ofTalent(move(talent));
+    // TODO: implement
+
+    return Variable::ofTalent(nullptr);
 }
 
 Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &ctx) {

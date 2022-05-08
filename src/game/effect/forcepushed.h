@@ -28,8 +28,6 @@ public:
     ForcePushedEffect() :
         Effect(EffectType::ForcePushed) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

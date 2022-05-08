@@ -28,8 +28,6 @@ public:
     TrueSeeingEffect() :
         Effect(EffectType::TrueSeeing) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

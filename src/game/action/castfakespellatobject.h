@@ -25,24 +25,9 @@ namespace game {
 
 class CastFakeSpellAtObjectAction : public Action {
 public:
-    CastFakeSpellAtObjectAction(
-        Game &game,
-        ServicesView &services,
-        SpellType spell,
-        std::shared_ptr<Object> target,
-        ProjectilePathType projectilePathType) :
-        Action(game, services, ActionType::CastFakeSpellAtObject),
-        _spell(spell),
-        _target(std::move(target)),
-        _projectilePathType(projectilePathType) {
+    CastFakeSpellAtObjectAction() :
+        Action(ActionType::CastFakeSpellAtObject) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    SpellType _spell;
-    std::shared_ptr<Object> _target;
-    ProjectilePathType _projectilePathType;
 };
 
 } // namespace game

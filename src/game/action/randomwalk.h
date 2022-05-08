@@ -25,11 +25,9 @@ namespace game {
 
 class RandomWalkAction : public Action {
 public:
-    RandomWalkAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::RandomWalk) {
+    RandomWalkAction() :
+        Action(ActionType::RandomWalk) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

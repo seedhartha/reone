@@ -28,8 +28,6 @@ public:
     CrushEffect() :
         Effect(EffectType::Crush) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

@@ -18,8 +18,6 @@
 #pragma once
 
 #include "../action.h"
-#include "../object.h"
-#include "../types.h"
 
 namespace reone {
 
@@ -27,36 +25,9 @@ namespace game {
 
 class CastSpellAtObjectAction : public Action {
 public:
-    CastSpellAtObjectAction(
-        Game &game,
-        ServicesView &services,
-        SpellType spell,
-        std::shared_ptr<Object> target,
-        int metaMagic,
-        bool cheat,
-        int domainLevel,
-        ProjectilePathType projectilePathType,
-        bool instantSpell) :
-        Action(game, services, ActionType::CastSpellAtObject),
-        _spell(spell),
-        _target(std::move(target)),
-        _metaMagic(metaMagic),
-        _cheat(cheat),
-        _domainLevel(domainLevel),
-        _projectilePathType(projectilePathType),
-        _instantSpell(instantSpell) {
+    CastSpellAtObjectAction() :
+        Action(ActionType::CastSpellAtObject) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    SpellType _spell;
-    std::shared_ptr<Object> _target;
-    int _metaMagic;
-    bool _cheat;
-    int _domainLevel;
-    ProjectilePathType _projectilePathType;
-    bool _instantSpell;
 };
 
 } // namespace game

@@ -28,8 +28,6 @@ public:
     DroidStunEffect() :
         Effect(EffectType::DroidStun) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

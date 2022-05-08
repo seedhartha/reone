@@ -25,17 +25,9 @@ namespace game {
 
 class VisualEffect : public Effect {
 public:
-    VisualEffect(int visualEffectId, bool missEffect) :
-        Effect(EffectType::Visual),
-        _visualEffectId(visualEffectId),
-        _missEffect(missEffect) {
+    VisualEffect() :
+        Effect(EffectType::Visual) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _visualEffectId;
-    bool _missEffect;
 };
 
 } // namespace game

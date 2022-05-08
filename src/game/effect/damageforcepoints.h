@@ -25,15 +25,9 @@ namespace game {
 
 class DamageForcePointsEffect : public Effect {
 public:
-    DamageForcePointsEffect(int damage) :
-        Effect(EffectType::DamageForcePoints),
-        _damage(damage) {
+    DamageForcePointsEffect() :
+        Effect(EffectType::DamageForcePoints) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _damage;
 };
 
 } // namespace game

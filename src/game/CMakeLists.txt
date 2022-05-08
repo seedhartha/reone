@@ -15,7 +15,7 @@
 
 set(GAME_HEADERS
     action.h
-    action/attack.h
+    action/attackobject.h
     action/barkstring.h
     action/castfakespellatlocation.h
     action/castfakespellatobject.h
@@ -25,7 +25,6 @@ set(GAME_HEADERS
     action/equipitem.h
     action/equipmostdamagingmelee.h
     action/equipmostdamagingranged.h
-    action/factory.h
     action/follow.h
     action/followleader.h
     action/followowner.h
@@ -33,13 +32,11 @@ set(GAME_HEADERS
     action/interactobject.h
     action/jumptolocation.h
     action/jumptoobject.h
-    action/locationaction.h
     action/lockobject.h
     action/moveawayfromobject.h
     action/movetolocation.h
     action/movetoobject.h
     action/movetopoint.h
-    action/objectaction.h
     action/opencontainer.h
     action/opendoor.h
     action/openlock.h
@@ -90,7 +87,6 @@ set(GAME_HEADERS
     effect/droidstun.h
     effect/entangle.h
     effect/factionmodifier.h
-    effect/factory.h
     effect/forcebody.h
     effect/forcefizzle.h
     effect/forcepushed.h

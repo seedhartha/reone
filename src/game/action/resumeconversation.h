@@ -25,11 +25,9 @@ namespace game {
 
 class ResumeConversationAction : public Action {
 public:
-    ResumeConversationAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::ResumeConversation) {
+    ResumeConversationAction() :
+        Action(ActionType::ResumeConversation) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

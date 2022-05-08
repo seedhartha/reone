@@ -25,17 +25,9 @@ namespace game {
 
 class DamageDecreaseEffect : public Effect {
 public:
-    DamageDecreaseEffect(int penalty, AttackBonus modifierType) :
-        Effect(EffectType::DamageDecrease),
-        _penalty(penalty),
-        _modifierType(modifierType) {
+    DamageDecreaseEffect() :
+        Effect(EffectType::DamageDecrease) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _penalty;
-    AttackBonus _modifierType;
 };
 
 } // namespace game

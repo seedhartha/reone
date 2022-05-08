@@ -25,25 +25,9 @@ namespace game {
 
 class BeamEffect : public Effect {
 public:
-    BeamEffect(
-        int beamVisualEffect,
-        std::shared_ptr<Object> effector,
-        BodyNode bodyPart,
-        bool missEffect) :
-        Effect(EffectType::Beam),
-        _beamVisualEffect(beamVisualEffect),
-        _effector(std::move(effector)),
-        _bodyPart(bodyPart),
-        _missEffect(missEffect) {
+    BeamEffect() :
+        Effect(EffectType::Beam) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _beamVisualEffect;
-    std::shared_ptr<Object> _effector;
-    BodyNode _bodyPart;
-    bool _missEffect;
 };
 
 } // namespace game

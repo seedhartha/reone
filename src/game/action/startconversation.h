@@ -17,58 +17,17 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class StartConversationAction : public ObjectAction {
+class StartConversationAction : public Action {
 public:
-    StartConversationAction(
-        Game &game,
-        ServicesView &services,
-        std::shared_ptr<Object> object,
-        std::string dialogResRef,
-        bool privateConversation,
-        ConversationType conversationType,
-        bool ignoreStartRange,
-        std::string nameToIgnore1,
-        std::string nameToIgnore2,
-        std::string nameToIgnore3,
-        std::string nameToIgnore4,
-        std::string nameToIgnore5,
-        std::string nameToIgnore6,
-        bool useLeader,
-        int barkX,
-        int barkY,
-        bool dontClearAllActions) :
-        ObjectAction(game, services, ActionType::StartConversation, std::move(object)),
-        _dialogResRef(std::move(dialogResRef)),
-        _ignoreStartRange(ignoreStartRange) {
+    StartConversationAction() :
+        Action(ActionType::StartConversation) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-    bool isStartRangeIgnored() const { return _ignoreStartRange; }
-
-    const std::string &dialogResRef() const { return _dialogResRef; }
-
-private:
-    std::string _dialogResRef;
-    bool _privateConversation;
-    ConversationType _conversationType;
-    bool _ignoreStartRange;
-    std::string _nameToIgnore1;
-    std::string _nameToIgnore2;
-    std::string _nameToIgnore3;
-    std::string _nameToIgnore4;
-    std::string _nameToIgnore5;
-    std::string _nameToIgnore6;
-    bool _useLeader;
-    int _barkX;
-    int _barkY;
-    bool _dontClearAllActions;
 };
 
 } // namespace game

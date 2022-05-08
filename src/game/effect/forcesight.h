@@ -28,8 +28,6 @@ public:
     ForceSightEffect() :
         Effect(EffectType::ForceSight) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

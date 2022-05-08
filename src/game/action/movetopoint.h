@@ -25,17 +25,9 @@ namespace game {
 
 class MoveToPointAction : public Action {
 public:
-    MoveToPointAction(Game &game, ServicesView &services, glm::vec3 point) :
-        Action(game, services, ActionType::MoveToPoint),
-        _point(std::move(point)) {
+    MoveToPointAction() :
+        Action(ActionType::MoveToPoint) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-    const glm::vec3 &point() const { return _point; }
-
-private:
-    glm::vec3 _point;
 };
 
 } // namespace game

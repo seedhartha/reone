@@ -28,8 +28,6 @@ public:
     ChokeEffect() :
         Effect(EffectType::Choke) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

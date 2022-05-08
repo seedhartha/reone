@@ -25,20 +25,18 @@ namespace reone {
 
 namespace game {
 
-class Object;
-
 class Effect : public script::EngineType {
 public:
-    Effect(EffectType type) :
-        _type(type) {
+    EffectType type() const {
+        return _type;
     }
-
-    virtual void applyTo(Object &object);
-
-    EffectType type() const { return _type; }
 
 protected:
     EffectType _type;
+
+    Effect(EffectType type) :
+        _type(type) {
+    }
 };
 
 } // namespace game

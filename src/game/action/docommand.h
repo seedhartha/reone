@@ -21,27 +21,13 @@
 
 namespace reone {
 
-namespace script {
-
-struct ExecutionContext;
-
-}
-
 namespace game {
 
-class CommandAction : public Action {
+class DoCommandAction : public Action {
 public:
-    CommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> context) :
-        Action(game, services, ActionType::DoCommand),
-        _context(move(context)) {
+    DoCommandAction() :
+        Action(ActionType::DoCommand) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-    std::shared_ptr<script::ExecutionContext> context() const { return _context; }
-
-private:
-    std::shared_ptr<script::ExecutionContext> _context;
 };
 
 } // namespace game

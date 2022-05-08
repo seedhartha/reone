@@ -28,8 +28,6 @@ public:
     BodyFuelEffect() :
         Effect(EffectType::BodyFuel) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

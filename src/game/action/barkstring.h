@@ -25,15 +25,9 @@ namespace game {
 
 class BarkStringAction : public Action {
 public:
-    BarkStringAction(Game &game, ServicesView &services, int strRef) :
-        Action(game, services, ActionType::BarkString),
-        _strRef(strRef) {
+    BarkStringAction() :
+        Action(ActionType::BarkString) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    int _strRef;
 };
 
 } // namespace game

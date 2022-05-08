@@ -28,8 +28,6 @@ public:
     HorrifiedEffect() :
         Effect(EffectType::Horrified) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

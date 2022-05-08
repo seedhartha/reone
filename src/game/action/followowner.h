@@ -25,15 +25,9 @@ namespace game {
 
 class FollowOwnerAction : public Action {
 public:
-    FollowOwnerAction(Game &game, ServicesView &services, float range) :
-        Action(game, services, ActionType::FollowOwner),
-        _range(range) {
+    FollowOwnerAction() :
+        Action(ActionType::FollowOwner) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    float _range;
 };
 
 } // namespace game

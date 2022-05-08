@@ -28,8 +28,6 @@ public:
     DamageIncreaseEffect() :
         Effect(EffectType::DamageIncrease) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

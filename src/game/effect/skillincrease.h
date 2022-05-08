@@ -25,17 +25,9 @@ namespace game {
 
 class SkillIncreaseEffect : public Effect {
 public:
-    SkillIncreaseEffect(SkillType skill, int value) :
-        Effect(EffectType::SkillIncrease),
-        _skill(skill),
-        _value(value) {
+    SkillIncreaseEffect() :
+        Effect(EffectType::SkillIncrease) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    SkillType _skill;
-    int _value;
 };
 
 } // namespace game

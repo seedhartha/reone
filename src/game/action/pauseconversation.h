@@ -25,11 +25,9 @@ namespace game {
 
 class PauseConversationAction : public Action {
 public:
-    PauseConversationAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::PauseConversation) {
+    PauseConversationAction() :
+        Action(ActionType::PauseConversation) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

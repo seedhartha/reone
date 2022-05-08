@@ -26,17 +26,9 @@ namespace game {
 
 class ForcePushTargetedEffect : public Effect {
 public:
-    ForcePushTargetedEffect(std::shared_ptr<Location> centre, bool ignoreTestDirectLine) :
-        Effect(EffectType::ForcePushTargeted),
-        _centre(std::move(centre)),
-        _ignoreTestDirectLine(ignoreTestDirectLine) {
+    ForcePushTargetedEffect() :
+        Effect(EffectType::ForcePushTargeted) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    std::shared_ptr<Location> _centre;
-    bool _ignoreTestDirectLine;
 };
 
 } // namespace game

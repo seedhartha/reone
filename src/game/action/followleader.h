@@ -25,11 +25,9 @@ namespace game {
 
 class FollowLeaderAction : public Action {
 public:
-    FollowLeaderAction(Game &game, ServicesView &services) :
-        Action(game, services, ActionType::FollowLeader) {
+    FollowLeaderAction() :
+        Action(ActionType::FollowLeader) {
     }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

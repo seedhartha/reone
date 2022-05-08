@@ -27,16 +27,16 @@ namespace game {
 
 class Talent : public script::EngineType {
 public:
-    Talent(TalentType type, int value) :
-        _type(type), _value(value) {
+    TalentType type() const {
+        return _type;
     }
 
-    TalentType type() const { return _type; }
-    int value() const { return _value; }
-
-private:
+protected:
     TalentType _type;
-    int _value;
+
+    Talent(TalentType type) :
+        _type(type) {
+    }
 };
 
 } // namespace game

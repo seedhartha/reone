@@ -25,15 +25,9 @@ namespace game {
 
 class TemporaryHitPointsEffect : public Effect {
 public:
-    TemporaryHitPointsEffect(int hitPoints) :
-        Effect(EffectType::TemporaryHitpoints),
-        _hitPoints(hitPoints) {
+    TemporaryHitPointsEffect() :
+        Effect(EffectType::TemporaryHitPoints) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _hitPoints;
 };
 
 } // namespace game

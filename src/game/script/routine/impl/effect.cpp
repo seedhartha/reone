@@ -20,7 +20,6 @@
 #include "../../../../script/exception/notimpl.h"
 
 #include "../../../effect.h"
-#include "../../../effect/factory.h"
 #include "../../../game.h"
 #include "../../../services.h"
 #include "../../../types.h"
@@ -327,7 +326,7 @@ Variable effectForceFizzle(const vector<Variable> &args, const RoutineContext &c
 
 Variable effectAbilityDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     auto ability = getIntAsEnum<Ability>(args, 0);
-    int modifyBy = getInt(args, 1);    
+    int modifyBy = getInt(args, 1);
 
     // TODO: implement
 

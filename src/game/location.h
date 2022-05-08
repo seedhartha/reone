@@ -24,18 +24,6 @@ namespace reone {
 namespace game {
 
 class Location : public script::EngineType {
-public:
-    Location(glm::vec3 position, float facing) :
-        _position(std::move(position)),
-        _facing(facing) {
-    }
-
-    const glm::vec3 &position() const { return _position; }
-    float facing() const { return _facing; }
-
-private:
-    glm::vec3 _position;
-    float _facing;
 };
 
 } // namespace game

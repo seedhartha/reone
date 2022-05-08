@@ -25,19 +25,9 @@ namespace game {
 
 class SavingThrowDecreaseEffect : public Effect {
 public:
-    SavingThrowDecreaseEffect(int save, int value, SavingThrowType savingThrowType) :
-        Effect(EffectType::SavingThrowDecrease),
-        _save(save),
-        _value(value),
-        _savingThrowType(savingThrowType) {
+    SavingThrowDecreaseEffect() :
+        Effect(EffectType::SavingThrowDecrease) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _save;
-    int _value;
-    SavingThrowType _savingThrowType;
 };
 
 } // namespace game

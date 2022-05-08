@@ -28,8 +28,6 @@ public:
     AssuredHitEffect() :
         Effect(EffectType::AssuredHit) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

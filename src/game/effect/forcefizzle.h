@@ -28,8 +28,6 @@ public:
     ForceFizzleEffect() :
         Effect(EffectType::ForceFizzle) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

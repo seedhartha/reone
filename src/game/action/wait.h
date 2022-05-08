@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-
 #include "../action.h"
 
 namespace reone {
@@ -27,24 +25,9 @@ namespace game {
 
 class WaitAction : public Action {
 public:
-    WaitAction(Game &game, ServicesView &services, float seconds) :
-        Action(game, services, ActionType::Wait) {
-        _timer.setTimeout(seconds);
+    WaitAction() :
+        Action(ActionType::Wait) {
     }
-
-    /**
-     * Advances an internal timer.
-     *
-     * @return `true` if timer times out, `false` otherwise
-     */
-    bool advance(float dt) {
-        return _timer.advance(dt);
-    }
-
-    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
-
-private:
-    Timer _timer;
 };
 
 } // namespace game

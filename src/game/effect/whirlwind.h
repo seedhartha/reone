@@ -28,8 +28,6 @@ public:
     WhirlWindEffect() :
         Effect(EffectType::WhirlWind) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

@@ -28,8 +28,6 @@ public:
     ParalyzeEffect() :
         Effect(EffectType::Paralyze) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

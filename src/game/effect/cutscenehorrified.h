@@ -26,10 +26,8 @@ namespace game {
 class CutsceneHorrifiedEffect : public Effect {
 public:
     CutsceneHorrifiedEffect() :
-        Effect(EffectType::CutSceneHorrified) {
+        Effect(EffectType::CutsceneHorrified) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

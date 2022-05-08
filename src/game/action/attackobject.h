@@ -23,21 +23,10 @@ namespace reone {
 
 namespace game {
 
-class Object;
-
-class ObjectAction : public Action {
+class AttackAction : public Action {
 public:
-    std::shared_ptr<Object> object() const { return _object; }
-    float range() const { return _range; }
-
-protected:
-    std::shared_ptr<Object> _object;
-    float _range;
-
-    ObjectAction(Game &game, ServicesView &services, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
-        Action(game, services, type, userAction),
-        _object(std::move(object)),
-        _range(range) {
+    AttackAction() :
+        Action(ActionType::AttackObject) {
     }
 };
 

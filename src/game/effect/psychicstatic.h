@@ -28,8 +28,6 @@ public:
     PsychicStaticEffect() :
         Effect(EffectType::PsychicStatic) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

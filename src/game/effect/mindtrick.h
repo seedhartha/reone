@@ -28,8 +28,6 @@ public:
     MindTrickEffect() :
         Effect(EffectType::MindTrick) {
     }
-
-    void applyTo(Object &object) override;
 };
 
 } // namespace game

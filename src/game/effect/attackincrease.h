@@ -25,17 +25,9 @@ namespace game {
 
 class AttackIncreaseEffect : public Effect {
 public:
-    AttackIncreaseEffect(int bonus, AttackBonus modifierType) :
-        Effect(EffectType::AttackIncrease),
-        _bonus(bonus),
-        _modifierType(modifierType) {
+    AttackIncreaseEffect() :
+        Effect(EffectType::AttackIncrease) {
     }
-
-    void applyTo(Object &object) override;
-
-private:
-    int _bonus;
-    AttackBonus _modifierType;
 };
 
 } // namespace game
