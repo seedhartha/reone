@@ -124,7 +124,7 @@ void Game::loadModuleNames() {
             boost::iends_with(filename, "_s.rim")) {
             continue;
         }
-        _moduleNames.push_back(filename.substr(0, filename.find_first_of('.')));
+        _moduleNames.insert(filename.substr(0, filename.find_first_of('.')));
     }
 }
 

@@ -69,7 +69,7 @@ public:
     void warpToModule(const std::string &name) override;
     void quit() override;
 
-    const std::vector<std::string> &moduleNames() const override {
+    const std::set<std::string> &moduleNames() const override {
         return _moduleNames;
     }
 
@@ -181,7 +181,7 @@ private:
 
     Stage _stage {Stage::MovieLegal};
 
-    std::vector<std::string> _moduleNames;
+    std::set<std::string> _moduleNames;
 
     // Services
 
