@@ -24,6 +24,7 @@
 #include "gui/game.h"
 #include "gui/maininterface.h"
 #include "gui/mainmenu.h"
+#include "location.h"
 #include "object/factory.h"
 #include "object/module.h"
 #include "services.h"
@@ -62,6 +63,42 @@ public:
     void init();
 
     void run();
+
+    // Global variables
+
+    const std::map<std::string, bool> &globalBooleans() const {
+        return _globalBooleans;
+    }
+
+    const std::map<std::string, int> &globalNumbers() const {
+        return _globalNumbers;
+    }
+
+    const std::map<std::string, std::string> &globalStrings() const {
+        return _globalStrings;
+    }
+
+    const std::map<std::string, std::shared_ptr<Location>> &globalLocations() const {
+        return _globalLocations;
+    }
+
+    void setGlobalBoolean(const std::string &key, bool value) {
+        _globalBooleans[key] = value;
+    }
+
+    void setGlobalNumber(const std::string &key, int value) {
+        _globalNumbers[key] = value;
+    }
+
+    void setGlobalString(const std::string &key, std::string value) {
+        _globalStrings[key] = std::move(value);
+    }
+
+    void setGlobalLocation(const std::string &key, std::shared_ptr<Location> value) {
+        _globalLocations[key] = std::move(value);
+    }
+
+    // END Global variables
 
     // IGuiGame
 
@@ -212,6 +249,15 @@ private:
     std::unique_ptr<Console> _console;
 
     // END GUI
+
+    // Global variables
+
+    std::map<std::string, bool> _globalBooleans;
+    std::map<std::string, int> _globalNumbers;
+    std::map<std::string, std::string> _globalStrings;
+    std::map<std::string, std::shared_ptr<Location>> _globalLocations;
+
+    // END Global variables
 
     void handleInput();
     void update();
