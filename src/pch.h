@@ -51,8 +51,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/endian/conversion.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/format.hpp>
-#include <boost/iostreams/stream.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "GL/glew.h"
