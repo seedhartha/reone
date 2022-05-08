@@ -103,12 +103,11 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const fs::path &bi
 
         auto &bifResource = bifResources.at(keyEntry.resIdx);
         auto buffer = ByteArray(bifResource.fileSize, '\0');
-
         bif.seek(bifResource.offset, SeekOrigin::Begin);
         bif.read(&buffer[0], buffer.size());
 
-        auto ext = getExtByResType(keyEntry.resId.type);
         auto resPath = fs::path(destPath);
+        auto &ext = getExtByResType(keyEntry.resId.type);
         resPath.append(keyEntry.resId.resRef + "." + ext);
 
         auto out = fs::ofstream(resPath, ios::binary);

@@ -69,14 +69,14 @@ void RimTool::extract(RimReader &rim, const fs::path &rimPath, const fs::path &d
     for (size_t i = 0; i < rim.resources().size(); ++i) {
         auto &rimResource = rim.resources()[i];
         cout << "Extracting " << rimResource.resId.string() << endl;
-        auto &ext = getExtByResType(rimResource.resId.type);
 
         auto buffer = ByteArray(rimResource.size, '\0');
-
         auto rim = FileInputStream(rimPath, OpenMode::Binary);
+        rim.seek(rimResource.offset, SeekOrigin::Begin);
         rim.read(&buffer[0], buffer.size());
 
         auto resPath = destPath;
+        auto &ext = getExtByResType(rimResource.resId.type);
         resPath.append(rimResource.resId.resRef + "." + ext);
 
         auto res = fs::ofstream(resPath, ios::binary);

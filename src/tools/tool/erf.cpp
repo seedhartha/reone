@@ -72,8 +72,9 @@ void ErfTool::extract(ErfReader &erf, const fs::path &erfPath, const fs::path &d
 
         auto buffer = ByteArray(erfResource.size, '\0');
         auto erf = FileInputStream(erfPath, OpenMode::Binary);
+        erf.seek(erfResource.offset, SeekOrigin::Begin);
         erf.read(&buffer[0], buffer.size());
-    
+
         auto resPath = destPath;
         auto &ext = getExtByResType(key.resId.type);
         resPath.append(key.resId.resRef + "." + ext);
