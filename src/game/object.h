@@ -116,6 +116,26 @@ public:
         flushTransform();
     }
 
+    // Local variables
+
+    const std::map<std::string, bool> &localBooleans() const {
+        return _localBooleans;
+    }
+
+    const std::map<std::string, int> &localNumbers() const {
+        return _localNumbers;
+    }
+
+    void setLocalBoolean(const std::string &key, bool value) {
+        _localBooleans[key] = value;
+    }
+
+    void setLocalNumber(const std::string &key, int value) {
+        _localNumbers[key] = value;
+    }
+
+    // END Local variables
+
 protected:
     uint32_t _id;
     ObjectType _type;
@@ -133,6 +153,13 @@ protected:
 
     scene::SceneGraph *_sceneGraph {nullptr};
     scene::SceneNode *_sceneNode {nullptr};
+
+    // Local variables
+
+    std::map<std::string, bool> _localBooleans;
+    std::map<std::string, int> _localNumbers;
+
+    // END Local variables
 
     Object(
         uint32_t id,
