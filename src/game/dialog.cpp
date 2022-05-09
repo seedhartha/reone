@@ -46,7 +46,7 @@ void Dialog::load(const string &name) {
 }
 
 void Dialog::loadEntries(const Gff &dlg) {
-    auto &dlgEntries = dlg.getList("EntryList");
+    auto dlgEntries = dlg.getList("EntryList");
     for (auto &dlgEntry : dlgEntries) {
         auto textStrRef = dlgEntry->getInt("Text");
         auto text = (textStrRef != -1) ? _resourceSvc.strings.get(textStrRef) : kEmptyText;
@@ -66,7 +66,7 @@ void Dialog::loadEntries(const Gff &dlg) {
 }
 
 void Dialog::loadReplies(const Gff &dlg) {
-    auto &dlgReplies = dlg.getList("ReplyList");
+    auto dlgReplies = dlg.getList("ReplyList");
     for (auto &dlgReply : dlgReplies) {
         auto textStrRef = dlgReply->getInt("Text");
         auto text = (textStrRef != -1) ? _resourceSvc.strings.get(textStrRef) : kEmptyText;
@@ -91,7 +91,7 @@ void Dialog::pickReply(int index) {
     }
     auto &reply = _currentReplies[index];
 
-    _currentEntries.swap(queue<Entry *>());
+    _currentEntries = queue<Entry *>();
     for (auto &entryLink : reply->entries) {
         if (isOutOfRange(_entries, entryLink.index)) {
             throw ValidationException(str(boost::format("Entry out of range: %d/%llu") % entryLink.index % _entries.size()));

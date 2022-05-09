@@ -24,7 +24,7 @@ namespace reone {
 class FileInputStream : public IInputStream {
 public:
     FileInputStream(const boost::filesystem::path &path, OpenMode mode = OpenMode::Text) :
-        _stream(path, mode == OpenMode::Binary ? std::ios::binary : 0) {
+        _stream(path, mode == OpenMode::Binary ? std::ios::binary : static_cast<std::ios::openmode>(0)) {
     }
 
     void seek(int64_t offset, SeekOrigin origin) {

@@ -40,10 +40,11 @@ shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
     if (!data)
         return nullptr;
 
-    NcsReader ncs(resRef);
-    ncs.load(ByteArrayInputStream(*data));
+    auto ncs = ByteArrayInputStream(*data);
+    auto reader = NcsReader(resRef);
+    reader.load(ncs);
 
-    return ncs.program();
+    return reader.program();
 }
 
 } // namespace script

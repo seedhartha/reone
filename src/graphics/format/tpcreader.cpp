@@ -92,10 +92,11 @@ void TpcReader::loadFeatures() {
     }
     _txiData = _reader->getBytes(static_cast<int>(_size - pos));
 
-    TxiReader txi;
-    txi.load(ByteArrayInputStream(_txiData));
+    auto txi = ByteArrayInputStream(_txiData);
+    auto reader = TxiReader();
+    reader.load(txi);
 
-    _features = txi.features();
+    _features = reader.features();
 }
 
 void TpcReader::loadTexture() {

@@ -37,16 +37,18 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
 
     shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
-        Mp3Reader mp3;
-        mp3.load(ByteArrayInputStream(*mp3Data));
-        result = mp3.stream();
+        auto mp3 = ByteArrayInputStream(*mp3Data);
+        auto reader = Mp3Reader();
+        reader.load(mp3);
+        result = reader.stream();
     }
     if (!result) {
         shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
         if (wavData) {
-            WavReader wav;
-            wav.load(ByteArrayInputStream(*wavData));
-            result = wav.stream();
+            auto wav = ByteArrayInputStream(*wavData);
+            auto reader = WavReader();
+            reader.load(wav);
+            result = reader.stream();
         }
     }
 

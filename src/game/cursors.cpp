@@ -103,10 +103,11 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
 shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::Cursor));
 
-    CurReader cur;
-    cur.load(ByteArrayInputStream(*bytes));
+    auto cur = ByteArrayInputStream(*bytes);
+    auto reader = CurReader();
+    reader.load(cur);
 
-    return cur.texture();
+    return reader.texture();
 }
 
 } // namespace game

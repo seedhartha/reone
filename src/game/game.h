@@ -28,6 +28,7 @@
 #include "location.h"
 #include "object/factory.h"
 #include "object/module.h"
+#include "options.h"
 #include "services.h"
 #include "types.h"
 
@@ -48,8 +49,6 @@ struct GraphicsServices;
 } // namespace graphics
 
 namespace game {
-
-struct OptionsView;
 
 class Creature;
 

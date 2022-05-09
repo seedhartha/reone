@@ -39,11 +39,12 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
         return nullptr;
 
     auto result = make_shared<SoundSet>();
+    auto ssf = ByteArrayInputStream(*data);
 
-    SsfReader ssf;
-    ssf.load(ByteArrayInputStream(*data));
+    auto reader = SsfReader();
+    reader.load(ssf);
 
-    vector<uint32_t> sounds(ssf.soundSet());
+    vector<uint32_t> sounds(reader.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
         string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
         shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));

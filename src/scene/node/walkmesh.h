@@ -44,7 +44,7 @@ public:
             sceneGraph,
             graphicsSvc,
             audioSvc),
-        _walkmesh(std::move(walkmesh)) {
+        _walkmesh(walkmesh) {
 
         _point = false;
 

@@ -38,10 +38,11 @@ shared_ptr<LipAnimation> LipAnimations::doGet(string resRef) {
     if (!lipData) {
         return nullptr;
     }
-    LipReader lip(resRef);
-    lip.load(ByteArrayInputStream(*lipData));
+    auto lip = ByteArrayInputStream(*lipData);
+    auto reader = LipReader(resRef);
+    reader.load(lip);
 
-    return lip.animation();
+    return reader.animation();
 }
 
 } // namespace graphics

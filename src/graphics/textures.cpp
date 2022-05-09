@@ -146,16 +146,18 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
 
     auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
-        TgaReader tga(resRef, usage);
-        tga.load(ByteArrayInputStream(*tgaData));
-        texture = tga.texture();
+        auto tga = ByteArrayInputStream(*tgaData);
+        auto tgaReader = TgaReader(resRef, usage);
+        tgaReader.load(tga);
+        texture = tgaReader.texture();
 
         if (texture) {
             auto txiData = _resources.get(resRef, ResourceType::Txi, false);
             if (txiData) {
-                TxiReader txi;
-                txi.load(ByteArrayInputStream(*txiData));
-                texture->setFeatures(txi.features());
+                auto txi = ByteArrayInputStream(*txiData);
+                auto txiReader = TxiReader();
+                txiReader.load(txi);
+                texture->setFeatures(txiReader.features());
             }
         }
     }
@@ -163,9 +165,10 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     if (!texture) {
         auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
         if (tpcData) {
-            TpcReader tpc(resRef, usage);
-            tpc.load(ByteArrayInputStream(*tpcData));
-            texture = tpc.texture();
+            auto tpc = ByteArrayInputStream(*tpcData);
+            auto tpcReader = TpcReader(resRef, usage);
+            tpcReader.load(tpc);
+            texture = tpcReader.texture();
         }
     }
 
