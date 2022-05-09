@@ -31,6 +31,7 @@ public:
 
     ListBox(
         int id,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -38,6 +39,7 @@ public:
         Control(
             id,
             ControlType::ListBox,
+            gui,
             controlFactory,
             graphicsOpt,
             graphicsSvc,

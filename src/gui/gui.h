@@ -20,6 +20,7 @@
 #include "control.h"
 #include "control/factory.h"
 #include "control/listbox.h"
+#include "guiinterface.h"
 
 namespace reone {
 
@@ -40,7 +41,7 @@ class Gff;
 
 namespace gui {
 
-class Gui : public IControlFactory, boost::noncopyable {
+class Gui : public IGui, public IControlFactory, boost::noncopyable {
 public:
     enum class ScaleMode {
         None,
@@ -62,9 +63,13 @@ public:
     virtual void update(float delta);
     virtual void render();
 
-    // IControlFactory
+    // IGui
 
     std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale, int defaultId = -1) override;
+
+    // END IGui
+
+    // IControlFactory
 
     std::shared_ptr<Control> newPanel(int id) override;
     std::shared_ptr<Control> newLabel(int id) override;
@@ -116,7 +121,7 @@ protected:
 private:
     template <class T>
     std::shared_ptr<Control> newControl(int id) {
-        auto control = std::make_shared<T>(id, *this, _graphicsOpt, _graphicsSvc, _resourceSvc);
+        auto control = std::make_shared<T>(id, *this, *this, _graphicsOpt, _graphicsSvc, _resourceSvc);
         _controls[id] = control;
         return move(control);
     }

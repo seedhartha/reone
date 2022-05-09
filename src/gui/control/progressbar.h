@@ -27,6 +27,7 @@ class ProgressBar : public Control {
 public:
     ProgressBar(
         int id,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -34,6 +35,7 @@ public:
         Control(
             id,
             ControlType::ProgressBar,
+            gui,
             controlFactory,
             graphicsOpt,
             graphicsSvc,

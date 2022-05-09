@@ -28,6 +28,7 @@ set(GUI_HEADERS
     control/scrollbar.h
     control/slider.h
     gui.h
+    guiinterface.h
     sceneinitializer.h
     textinput.h
     types.h)

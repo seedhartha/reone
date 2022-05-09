@@ -47,6 +47,7 @@ class Gff;
 namespace gui {
 
 class IControlFactory;
+class IGui;
 
 class Control : boost::noncopyable {
 public:
@@ -179,12 +180,14 @@ protected:
     Control(
         int id,
         ControlType type,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         _id(id),
         _type(type),
+        _gui(gui),
         _controlFactory(controlFactory),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
@@ -193,6 +196,7 @@ protected:
 
     int _id;
     ControlType _type;
+    IGui &_gui;
     IControlFactory &_controlFactory;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;

@@ -77,7 +77,6 @@ void Gui::load(const string &resRef) {
         auto &parentControl = _controls.at(parentId);
         parentControl->append(*control);
     }
-
 }
 
 shared_ptr<Control> Gui::loadControl(const Gff &gui, const glm::vec4 &scale, int defaultId) {
@@ -193,6 +192,8 @@ void Gui::disableControl(const string &tag) {
     }
 }
 
+// IControlFactory
+
 shared_ptr<Control> Gui::newPanel(int id) {
     return newControl<Panel>(id);
 }
@@ -228,6 +229,8 @@ shared_ptr<Control> Gui::newProgressBar(int id) {
 shared_ptr<Control> Gui::newListBox(int id) {
     return newControl<ListBox>(id);
 }
+
+// END IControlFactory
 
 } // namespace gui
 

@@ -27,6 +27,7 @@ class LabelHilight : public Control {
 public:
     LabelHilight(
         int id,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -34,6 +35,7 @@ public:
         Control(
             id,
             ControlType::LabelHilight,
+            gui,
             controlFactory,
             graphicsOpt,
             graphicsSvc,

@@ -19,7 +19,7 @@
 
 #include "../../resource/gff.h"
 
-#include "factory.h"
+#include "../guiinterface.h"
 
 using namespace std;
 
@@ -35,7 +35,7 @@ void ListBox::load(const Gff &gui, const glm::vec4 &scale) {
     _padding = gui.getInt("PADDING");
 
     auto guiProtoItem = gui.getStruct("PROTOITEM");
-    auto protoItem = _controlFactory.loadControl(*guiProtoItem, scale, itemControlId(_id, -1));
+    auto protoItem = _gui.loadControl(*guiProtoItem, scale, itemControlId(_id, -1));
     _protoItem = protoItem.get();
 
     initItemSlots();

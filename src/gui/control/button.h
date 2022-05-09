@@ -27,6 +27,7 @@ class Button : public Control {
 public:
     Button(
         int id,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -34,6 +35,7 @@ public:
         Control(
             id,
             ControlType::Button,
+            gui,
             controlFactory,
             graphicsOpt,
             graphicsSvc,

@@ -17,30 +17,21 @@
 
 #pragma once
 
-#include "../control.h"
+#include "control.h"
 
 namespace reone {
 
+namespace resource {
+
+class Gff;
+
+}
+
 namespace gui {
 
-class Slider : public Control {
+class IGui {
 public:
-    Slider(
-        int id,
-        IGui &gui,
-        IControlFactory &controlFactory,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Control(
-            id,
-            ControlType::Slider,
-            gui,
-            controlFactory,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
+    virtual std::shared_ptr<Control> loadControl(const resource::Gff &gui, const glm::vec4 &scale, int defaultId = -1) = 0;
 };
 
 } // namespace gui

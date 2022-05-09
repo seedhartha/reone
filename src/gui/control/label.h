@@ -27,6 +27,7 @@ class Label : public Control {
 public:
     Label(
         int id,
+        IGui &gui,
         IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
@@ -34,6 +35,7 @@ public:
         Control(
             id,
             ControlType::Label,
+            gui,
             controlFactory,
             graphicsOpt,
             graphicsSvc,
