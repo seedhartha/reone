@@ -44,7 +44,7 @@ namespace gui {
 class Gui : public IGui, public IControlFactory, boost::noncopyable {
 public:
     enum class ScaleMode {
-        None,
+        Manual,
         ToRootControl
     };
 
@@ -97,6 +97,8 @@ protected:
     Control *_rootControl {nullptr};
     Control *_controlInFocus {nullptr};
 
+    int _highestControlId {-1};
+
     // END Controls
 
     Control *findControl(const std::string &tag);
@@ -123,6 +125,7 @@ private:
     std::shared_ptr<Control> newControl(int id) {
         auto control = std::make_shared<T>(id, *this, *this, _graphicsOpt, _graphicsSvc, _resourceSvc);
         _controls[id] = control;
+        _highestControlId = std::max(id, _highestControlId);
         return move(control);
     }
 };

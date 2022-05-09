@@ -31,7 +31,6 @@
 #include "../options.h"
 #include "../types.h"
 
-
 using namespace std;
 
 using namespace reone::graphics;

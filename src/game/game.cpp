@@ -252,7 +252,7 @@ void Game::render() {
         // Render GUI
         if (_stage == Stage::World) {
             _mainInterface->render();
-        } else if (_stage == Stage::Console) {
+        } else if (_stage == Stage::Conversation) {
             _dialogGui->render();
         } else if (_stage == Stage::Console) {
             _console->render();

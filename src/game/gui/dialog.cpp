@@ -17,8 +17,11 @@
 
 #include "dialog.h"
 
+#include "../../graphics/options.h"
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
+
+using namespace std;
 
 using namespace reone::gui;
 
@@ -29,6 +32,28 @@ namespace game {
 void DialogGui::init() {
     load("dialog");
     bindControls();
+
+    // Top bar
+
+    auto topBar = newLabel(_highestControlId + 1);
+    topBar->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, _graphicsOpt.height / 4));
+
+    auto topBarBorder = make_unique<Control::Border>();
+    topBarBorder->fill = "black";
+    topBar->setBorder(move(topBarBorder));
+
+    _rootControl->append(*topBar);
+
+    // Bottom bar
+
+    auto bottomBar = newLabel(_highestControlId + 2);
+    bottomBar->setExtent(glm::ivec4(0, 3 * _graphicsOpt.height / 4, _graphicsOpt.width, _graphicsOpt.height / 4));
+
+    auto bottomBarBorder = make_unique<Control::Border>();
+    bottomBarBorder->fill = "black";
+    bottomBar->setBorder(move(bottomBarBorder));
+
+    _rootControl->append(*bottomBar);
 }
 
 void DialogGui::bindControls() {

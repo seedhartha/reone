@@ -78,8 +78,6 @@ void Console::init() {
     rootControl->setBorder(move(rootBorder));
 
     _rootControl = rootControl.get();
-
-    //
 }
 
 bool Console::handle(const SDL_Event &e) {

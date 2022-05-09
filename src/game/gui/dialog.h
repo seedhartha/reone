@@ -41,7 +41,7 @@ public:
             graphicsSvc,
             resourceSvc) {
 
-        _scaleMode = ScaleMode::None;
+        _scaleMode = ScaleMode::Manual;
     }
 
     void init();
