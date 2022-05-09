@@ -20,8 +20,9 @@
 #include "../graphics/eventhandler.h"
 #include "../movie/movie.h"
 
+#include "gameinterface.h"
 #include "gui/console.h"
-#include "gui/game.h"
+#include "gui/dialog.h"
 #include "gui/maininterface.h"
 #include "gui/mainmenu.h"
 #include "location.h"
@@ -52,7 +53,7 @@ struct OptionsView;
 
 class Creature;
 
-class Game : public IGuiGame, public IObjectFactory, public graphics::IEventHandler, boost::noncopyable {
+class Game : public IGame, public IObjectFactory, public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(GameID id, OptionsView &options, ServicesView &services) :
         _id(id),
@@ -100,17 +101,19 @@ public:
 
     // END Global variables
 
-    // IGuiGame
+    // IGame
 
     void startNewGame() override;
     void warpToModule(const std::string &name) override;
     void quit() override;
 
+    void startConversation(const std::string &name) override;
+
     const std::set<std::string> &moduleNames() const override {
         return _moduleNames;
     }
 
-    // END IGuiGame
+    // END IGame
 
     // IObjectFactory
 
@@ -141,6 +144,7 @@ private:
         MovieLegal,
         MainMenu,
         World,
+        Conversation,
         Console
     };
 
@@ -162,10 +166,13 @@ private:
         Camera *_camera {nullptr};
 
         // Controls
+
         float _forward {0.0f};
         float _left {0.0f};
         float _backward {0.0f};
         float _right {0.0f};
+
+        // END Controls
     };
 
     class SelectionController : boost::noncopyable {
@@ -246,6 +253,7 @@ private:
 
     std::unique_ptr<MainMenu> _mainMenu;
     std::unique_ptr<MainInterface> _mainInterface;
+    std::unique_ptr<DialogGui> _dialogGui;
     std::unique_ptr<Console> _console;
 
     // END GUI
@@ -271,6 +279,7 @@ private:
     inline std::shared_ptr<Object> newObject() {
         auto object = std::make_shared<T>(
             nextObjectId(),
+            *this,
             *this,
             _services.game,
             _options.graphics,

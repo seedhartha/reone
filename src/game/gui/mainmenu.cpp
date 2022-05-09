@@ -27,10 +27,10 @@
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"
 
+#include "../gameinterface.h"
 #include "../options.h"
 #include "../types.h"
 
-#include "game.h"
 
 using namespace std;
 

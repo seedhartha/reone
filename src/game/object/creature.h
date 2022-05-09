@@ -39,6 +39,7 @@ public:
 
     Creature(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -47,6 +48,7 @@ public:
         Object(
             id,
             ObjectType::Creature,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,
@@ -67,6 +69,8 @@ public:
 
     void update(float delta) override;
 
+    void handleClick(Object &clicker) override;
+
     // END Object
 
 private:
@@ -78,6 +82,8 @@ private:
     };
 
     ModelType _modelType {ModelType::FullBody};
+    std::string _conversation;
+
     State _state {State::Pause};
 };
 

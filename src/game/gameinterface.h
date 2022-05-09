@@ -17,41 +17,19 @@
 
 #pragma once
 
-#include "../object.h"
-
 namespace reone {
-
-namespace resource {
-
-class Gff;
-
-}
 
 namespace game {
 
-class Trigger : public Object {
+class IGame {
 public:
-    Trigger(
-        uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Trigger,
-            game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
+    virtual void startNewGame() = 0;
+    virtual void warpToModule(const std::string &name) = 0;
+    virtual void quit() = 0;
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    virtual void startConversation(const std::string &name) = 0;
+
+    virtual const std::set<std::string> &moduleNames() const = 0;
 };
 
 } // namespace game

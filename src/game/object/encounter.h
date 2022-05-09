@@ -33,6 +33,7 @@ class Encounter : public Object {
 public:
     Encounter(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -41,6 +42,7 @@ public:
         Object(
             id,
             ObjectType::Encounter,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,

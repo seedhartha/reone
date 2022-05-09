@@ -38,12 +38,12 @@ namespace game {
 
 struct GameOptions;
 
-class IGuiGame;
+class IGame;
 
 class MainMenu : public gui::Gui {
 public:
     MainMenu(
-        IGuiGame &game,
+        IGame &game,
         GameOptions &gameOpt,
         scene::SceneServices &sceneSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -66,7 +66,7 @@ private:
         Warp
     };
 
-    IGuiGame &_game;
+    IGame &_game;
     GameOptions &_gameOpt;
     scene::SceneServices &_sceneSvc;
 

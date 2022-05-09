@@ -35,6 +35,7 @@
 #include "../scene/services.h"
 
 #include "debug.h"
+#include "dialog.h"
 #include "object/area.h"
 #include "object/camera.h"
 #include "object/creature.h"
@@ -91,6 +92,9 @@ void Game::init() {
     _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
     _mainInterface->init();
 
+    _dialogGui = make_unique<DialogGui>(_options.graphics, _services.graphics, _services.resource);
+    _dialogGui->init();
+
     _console = make_unique<Console>(_options.graphics, _services.graphics, _services.resource);
     _console->init();
 
@@ -136,10 +140,6 @@ void Game::run() {
     }
 }
 
-void Game::handleInput() {
-    _services.graphics.window.processEvents(_finished);
-}
-
 bool Game::handle(const SDL_Event &e) {
     if (_stage == Stage::MovieLegal) {
         if (e.type == SDL_MOUSEBUTTONDOWN) {
@@ -165,6 +165,10 @@ bool Game::handle(const SDL_Event &e) {
         }
         if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKQUOTE) {
             _stage = Stage::Console;
+            return true;
+        }
+    } else if (_stage == Stage::Conversation) {
+        if (_dialogGui->handle(e)) {
             return true;
         }
     } else if (_stage == Stage::Console) {
@@ -199,7 +203,9 @@ void Game::update() {
     } else if (_stage == Stage::MainMenu) {
         _mainMenu->update(delta);
 
-    } else if (_stage == Stage::World || _stage == Stage::Console) {
+    } else if (_stage == Stage::World ||
+               _stage == Stage::Conversation ||
+               _stage == Stage::Console) {
         // Update game objects
 
         if (_module) {
@@ -219,6 +225,8 @@ void Game::update() {
 
         if (_stage == Stage::World) {
             _mainInterface->update(delta);
+        } else if (_stage == Stage::Conversation) {
+            _dialogGui->update(delta);
         } else if (_stage == Stage::Console) {
             _console->update(delta);
         }
@@ -234,7 +242,9 @@ void Game::render() {
     } else if (_stage == Stage::MainMenu) {
         _mainMenu->render();
 
-    } else if (_stage == Stage::World || _stage == Stage::Console) {
+    } else if (_stage == Stage::World ||
+               _stage == Stage::Conversation ||
+               _stage == Stage::Console) {
         // Render world
         auto &scene = _services.scene.graphs.get(kSceneMain);
         _worldRenderer->render();
@@ -242,6 +252,8 @@ void Game::render() {
         // Render GUI
         if (_stage == Stage::World) {
             _mainInterface->render();
+        } else if (_stage == Stage::Console) {
+            _dialogGui->render();
         } else if (_stage == Stage::Console) {
             _console->render();
         }
@@ -326,6 +338,8 @@ void Game::loadModule(const string &name) {
     _selectionController->setPC(&pc);
 }
 
+// IGame
+
 void Game::startNewGame() {
     auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
     warpToModule(moduleName);
@@ -333,13 +347,23 @@ void Game::startNewGame() {
 
 void Game::warpToModule(const string &name) {
     loadModule(name);
-
     _stage = Stage::World;
 }
 
 void Game::quit() {
     _finished = true;
 }
+
+void Game::startConversation(const std::string &name) {
+    auto dialog = Dialog(_services.resource);
+    dialog.load(name);
+
+    _stage = Stage::Conversation;
+}
+
+// END IGame
+
+// IObjectFactory
 
 shared_ptr<Object> Game::newArea() {
     return newObject<Area>();
@@ -392,6 +416,16 @@ shared_ptr<Object> Game::newTrigger() {
 shared_ptr<Object> Game::newWaypoint() {
     return newObject<Waypoint>();
 }
+
+// END IObjectFactory
+
+// IEventHandler
+
+void Game::handleInput() {
+    _services.graphics.window.processEvents(_finished);
+}
+
+// END IEventHandler
 
 bool Game::PlayerController::handle(const SDL_Event &e) {
     if (e.type == SDL_KEYDOWN) {

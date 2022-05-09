@@ -17,21 +17,13 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
-
 namespace reone {
 
-namespace game {
-
-class IGuiGame {
+class NotFoundException : public std::logic_error {
 public:
-    virtual void startNewGame() = 0;
-    virtual void warpToModule(const std::string &name) = 0;
-    virtual void quit() = 0;
-
-    virtual const std::set<std::string> &moduleNames() const = 0;
+    NotFoundException(const std::string &message) :
+        std::logic_error(message) {
+    }
 };
-
-} // namespace game
 
 } // namespace reone

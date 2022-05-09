@@ -27,6 +27,7 @@
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 
+#include "../gameinterface.h"
 #include "../services.h"
 
 using namespace std;
@@ -66,6 +67,10 @@ void Creature::loadFromUtc(const string &templateResRef) {
     }
     auto tag = utc->getString("Tag");
     auto appearanceType = utc->getInt("Appearance_Type");
+    auto conversation = utc->getString("Conversation");
+
+    _tag = move(tag);
+    _conversation = move(conversation);
 
     // From appearance 2DA
 
@@ -73,7 +78,6 @@ void Creature::loadFromUtc(const string &templateResRef) {
     if (!appearanceTable) {
         throw ValidationException("appearance 2DA not found");
     }
-
     auto modelType = appearanceTable->getString(appearanceType, "modeltype");
     auto race = appearanceTable->getString(appearanceType, "race");
 
@@ -106,7 +110,6 @@ void Creature::loadFromUtc(const string &templateResRef) {
 
     //
 
-    _tag = move(tag);
     _sceneNode = sceneNode.get();
 
     flushTransform();
@@ -144,6 +147,12 @@ void Creature::update(float delta) {
             auto animProps = AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate);
             modelSceneNode.playAnimation(animName, move(animProps));
         }
+    }
+}
+
+void Creature::handleClick(Object &clicker) {
+    if (!_conversation.empty()) {
+        _game.startConversation(_conversation);
     }
 }
 

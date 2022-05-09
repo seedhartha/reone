@@ -15,44 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "dialog.h"
 
-#include "../object.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
+using namespace reone::gui;
 
 namespace reone {
 
-namespace resource {
-
-class Gff;
-
-}
-
 namespace game {
 
-class Trigger : public Object {
-public:
-    Trigger(
-        uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Trigger,
-            game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
+void DialogGui::init() {
+    load("dialog");
+    bindControls();
+}
 
-    void loadFromGit(const resource::Gff &git) {
-    }
-};
+void DialogGui::bindControls() {
+    _lblMessage = findControl<Label>("LBL_MESSAGE");
+    _lbReplies = findControl<ListBox>("LB_REPLIES");
+}
 
 } // namespace game
 

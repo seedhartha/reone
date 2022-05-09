@@ -33,6 +33,7 @@ class Waypoint : public Object {
 public:
     Waypoint(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -41,6 +42,7 @@ public:
         Object(
             id,
             ObjectType::Waypoint,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,

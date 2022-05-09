@@ -27,6 +27,7 @@ class Item : public Object {
 public:
     Item(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -35,6 +36,7 @@ public:
         Object(
             id,
             ObjectType::Item,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,

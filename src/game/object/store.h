@@ -33,6 +33,7 @@ class Store : public Object {
 public:
     Store(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -41,6 +42,7 @@ public:
         Object(
             id,
             ObjectType::Store,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,

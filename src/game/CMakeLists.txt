@@ -58,6 +58,7 @@ set(GAME_HEADERS
     camerastyles.h
     cursors.h
     debug.h
+    dialog.h
     effect.h
     effect/abilitydecrease.h
     effect/abilityincrease.h
@@ -131,8 +132,9 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
+    gameinterface.h
     gui/console.h
-    gui/game.h
+    gui/dialog.h
     gui/maininterface.h
     gui/mainmenu.h
     guisounds.h
@@ -178,6 +180,7 @@ set(GAME_SOURCES
     camerastyles.cpp
     cursors.cpp
     debug.cpp
+    dialog.cpp
     footstepsounds.cpp
     format/ltrreader.cpp
     format/lytreader.cpp
@@ -186,6 +189,7 @@ set(GAME_SOURCES
     format/visreader.cpp
     game.cpp
     gui/console.cpp
+    gui/dialog.cpp
     gui/maininterface.cpp
     gui/mainmenu.cpp
     guisounds.cpp

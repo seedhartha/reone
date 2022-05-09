@@ -17,6 +17,8 @@ set(COMMON_HEADERS
     binaryreader.h
     binarywriter.h
     collectionutil.h
+    exception/argument.h
+    exception/notfound.h
     exception/validation.h
     hexutil.h
     logutil.h

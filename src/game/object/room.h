@@ -30,6 +30,7 @@ class Room : public Object {
 public:
     Room(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -38,6 +39,7 @@ public:
         Object(
             id,
             ObjectType::Room,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,

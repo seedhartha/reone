@@ -17,41 +17,44 @@
 
 #pragma once
 
-#include "../object.h"
+#include "../../gui/gui.h"
 
 namespace reone {
 
-namespace resource {
+namespace gui {
 
-class Gff;
+class Label;
+class ListBox;
 
-}
+} // namespace gui
 
 namespace game {
 
-class Trigger : public Object {
+class DialogGui : public gui::Gui {
 public:
-    Trigger(
-        uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
+    DialogGui(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Trigger,
-            game,
-            objectFactory,
-            gameSvc,
+        gui::Gui(
             graphicsOpt,
             graphicsSvc,
             resourceSvc) {
+
+        _scaleMode = ScaleMode::None;
     }
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    void init();
+
+private:
+    // Binding
+
+    gui::Label *_lblMessage {nullptr};
+    gui::ListBox *_lbReplies {nullptr};
+
+    // END Binding
+
+    void bindControls();
 };
 
 } // namespace game

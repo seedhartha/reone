@@ -17,43 +17,13 @@
 
 #pragma once
 
-#include "../object.h"
-
 namespace reone {
 
-namespace resource {
-
-class Gff;
-
-}
-
-namespace game {
-
-class Trigger : public Object {
+class ArgumentException : public std::logic_error {
 public:
-    Trigger(
-        uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        Object(
-            id,
-            ObjectType::Trigger,
-            game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
-
-    void loadFromGit(const resource::Gff &git) {
+    ArgumentException(const std::string &message) :
+        std::logic_error(message) {
     }
 };
-
-} // namespace game
 
 } // namespace reone

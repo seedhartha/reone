@@ -35,6 +35,7 @@ class Placeable : public Object {
 public:
     Placeable(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -43,6 +44,7 @@ public:
         Object(
             id,
             ObjectType::Placeable,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,
@@ -57,7 +59,7 @@ public:
     }
 
 private:
-scene::WalkmeshSceneNode *_walkmesh {nullptr};
+    scene::WalkmeshSceneNode *_walkmesh {nullptr};
 
     void flushTransform() override;
 };

@@ -41,6 +41,7 @@ public:
 
     Door(
         uint32_t id,
+        IGame &game,
         IObjectFactory &objectFactory,
         GameServices &gameSvc,
         graphics::GraphicsOptions &graphicsOpt,
@@ -49,6 +50,7 @@ public:
         Object(
             id,
             ObjectType::Door,
+            game,
             objectFactory,
             gameSvc,
             graphicsOpt,
