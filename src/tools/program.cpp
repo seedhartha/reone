@@ -57,7 +57,8 @@ static const unordered_map<string, Operation> g_operations {
     {"to-lip", Operation::ToLIP},
     {"to-pcode", Operation::ToPCODE},
     {"to-ncs", Operation::ToNCS},
-    {"to-ssf", Operation::ToSSF}};
+    {"to-ssf", Operation::ToSSF},
+    {"to-nss", Operation::ToNSS}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -100,20 +101,22 @@ void Program::initOptions() {
         ("game", po::value<string>(), "path to game directory")                            //
         ("dest", po::value<string>(), "path to destination directory")                     //
         ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
-        ("list", "list file contents")("extract", "extract file contents")                 //
+        ("list", "list file contents")                                                     //
+        ("extract", "extract file contents")                                               //
+        ("unwrap", "unwrap an audio file")                                                 //
+        ("to-rim", "create RIM archive from directory")                                    //
+        ("to-erf", "create ERF archive from directory")                                    //
+        ("to-mod", "create MOD archive from directory")                                    //
         ("to-xml", "convert 2DA, GFF, TLK, LIP or SSF to XML")                             //
-        ("to-tga", "convert TPC image to TGA")                                             //
         ("to-2da", "convert XML to 2DA")                                                   //
         ("to-gff", "convert XML to GFF")                                                   //
         ("to-tlk", "convert XML to TLK")                                                   //
         ("to-lip", "convert XML to LIP")                                                   //
         ("to-ssf", "convert XML to SSF")                                                   //
-        ("to-rim", "create RIM archive from directory")                                    //
-        ("to-erf", "create ERF archive from directory")                                    //
-        ("to-mod", "create MOD archive from directory")                                    //
+        ("to-tga", "convert TPC image to TGA")                                             //
         ("to-pcode", "convert NCS to PCODE")                                               //
         ("to-ncs", "convert PCODE to NCS")                                                 //
-        ("unwrap", "unwrap an audio file")                                                 //
+        ("to-nss", "convert PCODE to NSS")                                                 //
         ("target", po::value<string>(), "target name or path to input file");
 }
 

@@ -22,6 +22,8 @@
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
 #include "../../common/stream/fileinput.h"
+#include "../../common/stream/fileoutput.h"
+#include "../../common/textwriter.h"
 #include "../../game/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
@@ -29,6 +31,8 @@
 #include "../../script/program.h"
 #include "../../script/routine.h"
 #include "../../script/variable.h"
+
+#include "nwscript/program.h"
 
 using namespace std;
 
@@ -371,11 +375,31 @@ private:
     }
 };
 
+class NssWriter {
+public:
+    NssWriter(NwscriptProgram &program) :
+        _program(program) {
+    }
+
+    void save(IOutputStream &stream) {
+        auto writer = TextWriter(stream);
+        for (auto &function : _program.functions()) {
+            auto name = !function.name.empty() ? function.name : str(boost::format("%08x") % function.offset);
+            writer.put(str(boost::format("void %s() {\n}\n") % name));
+        }
+    }
+
+private:
+    NwscriptProgram &_program;
+};
+
 void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToPCODE) {
         toPCODE(target, destPath);
     } else if (operation == Operation::ToNCS) {
         toNCS(target, destPath);
+    } else if (operation == Operation::ToNSS) {
+        toNSS(target, destPath);
     }
 }
 
@@ -411,9 +435,26 @@ void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
     writer.save(ncsPath);
 }
 
+void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
+    auto routines = Routines();
+    initRoutines(_gameId, routines);
+
+    auto ncs = FileInputStream(path, OpenMode::Binary);
+    auto reader = NcsReader("");
+    reader.load(ncs);
+    auto compiledProgram = reader.program();
+    auto program = NwscriptProgram::fromCompiled(*compiledProgram);
+
+    auto nssPath = destPath;
+    nssPath.append(path.filename().string() + ".nss");
+    auto nss = FileOutputStream(nssPath);
+    auto writer = NssWriter(program);
+    writer.save(nss);
+}
+
 bool NcsTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
-           ((target.extension() == ".ncs" && operation == Operation::ToPCODE) ||
+           ((target.extension() == ".ncs" && (operation == Operation::ToPCODE || operation == Operation::ToNSS)) ||
             (target.extension() == ".pcode" && operation == Operation::ToNCS));
 }
 

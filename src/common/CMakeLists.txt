@@ -32,6 +32,7 @@ set(COMMON_HEADERS
     stream/input.h
     stream/output.h
     stringbuilder.h
+    textwriter.h
     timer.h
     types.h
     unicodeutil.h)
@@ -43,6 +44,7 @@ set(COMMON_SOURCES
     logutil.cpp
     pathutil.cpp
     randomutil.cpp
+    textwriter.cpp
     unicodeutil.cpp)
 
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES} ${CLANG_FORMAT_PATH})

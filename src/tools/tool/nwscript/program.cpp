@@ -15,28 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "program.h"
+
+using namespace std;
+
+using namespace reone::script;
 
 namespace reone {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToXML,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToSSF,
-    ToTGA,
-    ToPCODE,
-    ToNCS,
-    ToNSS
-};
+NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled) {
+    auto functions = vector<Function>();
+    functions.push_back(Function {"main", 0, nullptr});
+
+    auto expressions = vector<Expression>();
+
+    return NwscriptProgram(move(functions), move(expressions));
+}
 
 } // namespace reone

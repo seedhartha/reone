@@ -42,6 +42,7 @@ private:
 
     void toPCODE(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toNCS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toNSS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

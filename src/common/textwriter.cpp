@@ -15,28 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "textwriter.h"
+
+using namespace std;
 
 namespace reone {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToXML,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToSSF,
-    ToTGA,
-    ToPCODE,
-    ToNCS,
-    ToNSS
-};
+void TextWriter::put(const string &s) {
+    _stream.write(&s[0], s.length());
+}
+
+void TextWriter::putLine(const string &s) {
+    _stream.write(&s[0], s.length());
+    _stream.writeByte('\n');
+}
 
 } // namespace reone

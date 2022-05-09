@@ -25,6 +25,7 @@ set(TOOLS_HEADERS
     tool/keybif.h
     tool/lip.h
     tool/ncs.h
+    tool/nwscript/program.h
     tool/rim.h
     tool/ssf.h
     tool/tlk.h
@@ -41,6 +42,7 @@ set(TOOLS_SOURCES
     tool/keybif.cpp
     tool/lip.cpp
     tool/ncs.cpp
+    tool/nwscript/program.cpp
     tool/rim.cpp
     tool/ssf.cpp
     tool/tlk.cpp

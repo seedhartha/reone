@@ -17,26 +17,21 @@
 
 #pragma once
 
+#include "stream/output.h"
+
 namespace reone {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToXML,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToSSF,
-    ToTGA,
-    ToPCODE,
-    ToNCS,
-    ToNSS
+class TextWriter : boost::noncopyable {
+public:
+    TextWriter(IOutputStream &stream) :
+        _stream(stream) {
+    }
+
+    void put(const std::string &s);
+    void putLine(const std::string &s);
+
+private:
+    IOutputStream &_stream;
 };
 
 } // namespace reone
