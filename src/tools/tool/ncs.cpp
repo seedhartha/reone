@@ -384,13 +384,51 @@ public:
     void save(IOutputStream &stream) {
         auto writer = TextWriter(stream);
         for (auto &function : _program.functions()) {
-            auto name = !function.name.empty() ? function.name : str(boost::format("%08x") % function.offset);
-            writer.put(str(boost::format("void %s() {\n}\n") % name));
+            writeFunction(*function, writer);
         }
     }
 
 private:
     NwscriptProgram &_program;
+
+    void writeFunction(const NwscriptProgram::Function &function, TextWriter &writer) {
+        auto name = !function.name.empty() ? function.name : str(boost::format("%08x") % function.offset);
+        writer.putLine(str(boost::format("void %s() {") % name));
+
+        for (auto &expression : function.block->expressions) {
+            writeExpression(1, *expression, writer);
+        }
+
+        writer.putLine("}");
+    }
+
+    void writeExpression(int level, const NwscriptProgram::Expression &expression, TextWriter &writer) {
+        if (expression.type == NwscriptProgram::ExpressionType::Constant) {
+            auto &constantExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
+            string type;
+            string name;
+            string value;
+            if (constantExpr.value.type == VariableType::Int) {
+                type = "int";
+                name = str(boost::format("INT_%08x") % constantExpr.offset);
+                value = to_string(constantExpr.value.intValue);
+            } else if (constantExpr.value.type == VariableType::Float) {
+                type = "float";
+                name = str(boost::format("FLOAT_%08x") % constantExpr.offset);
+                value = str(boost::format("%ff") % constantExpr.value.floatValue);
+            } else if (constantExpr.value.type == VariableType::String) {
+                type = "string";
+                name = str(boost::format("STRING_%08x") % constantExpr.offset);
+                value = str(boost::format("\"%s\"") % constantExpr.value.strValue);
+            } else if (constantExpr.value.type == VariableType::Object) {
+                type = "object";
+                name = str(boost::format("OBJECT_%08x") % constantExpr.offset);
+                value = to_string(constantExpr.value.objectId);
+            }
+            auto indent = string(4 * level, ' ');
+            writer.putLine(str(boost::format("%s%s %s = %s;") % indent % type % name % value));
+        }
+    }
 };
 
 void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {

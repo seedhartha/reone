@@ -65,6 +65,7 @@ public:
 
     struct Expression {
         ExpressionType type;
+        uint32_t offset {0};
 
         Expression(ExpressionType type) :
             type(type) {
@@ -154,25 +155,27 @@ public:
     };
 
     NwscriptProgram(
-        std::vector<Function> functions,
-        std::vector<Expression> expressions) :
+        std::vector<std::shared_ptr<Function>> functions,
+        std::vector<std::shared_ptr<Expression>> expressions) :
         _functions(std::move(functions)),
         _expressions(std::move(expressions)) {
     }
 
-    const std::vector<Function> &functions() const {
+    const std::vector<std::shared_ptr<Function>> &functions() const {
         return _functions;
     }
 
-    const std::vector<Expression> &expressions() const {
+    const std::vector<std::shared_ptr<Expression>> &expressions() const {
         return _expressions;
     }
 
     static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled);
 
 private:
-    std::vector<Function> _functions;
-    std::vector<Expression> _expressions;
+    std::vector<std::shared_ptr<Function>> _functions;
+    std::vector<std::shared_ptr<Expression>> _expressions;
+
+    static std::unique_ptr<Expression> expressionFromInstruction(const script::Instruction &instr);
 };
 
 } // namespace reone
