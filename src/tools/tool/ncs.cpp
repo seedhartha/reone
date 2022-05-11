@@ -312,7 +312,7 @@ private:
 
     void writeInstruction(const Instruction &ins, fs::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
         if (jumpOffsets.count(ins.offset) > 0) {
-            string label(str(boost::format("fn_%08x:") % ins.offset));
+            string label(str(boost::format("loc_%08x:") % ins.offset));
             pcode << label << endl;
         }
 
@@ -352,7 +352,7 @@ private:
         case InstructionType::JZ:
         case InstructionType::JNZ: {
             uint32_t jumpAddr = ins.offset + ins.jumpOffset;
-            desc += str(boost::format(" fn_%08x") % jumpAddr);
+            desc += str(boost::format(" loc_%08x") % jumpAddr);
             break;
         }
         case InstructionType::DESTRUCT:
