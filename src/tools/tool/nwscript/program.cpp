@@ -18,6 +18,8 @@
 #include "program.h"
 
 #include "../../../common/exception/argument.h"
+#include "../../../script/routine.h"
+#include "../../../script/routines.h"
 
 using namespace std;
 
@@ -25,13 +27,13 @@ using namespace reone::script;
 
 namespace reone {
 
-NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled) {
-    auto decompilationCtx = DecompilationContext();
+NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
+    auto decompilationCtx = DecompilationContext(compiled, routines);
 
     auto funcMain = make_shared<Function>();
     funcMain->name = "main";
     funcMain->offset = 13;
-    funcMain->block = decompile(13, compiled, decompilationCtx);
+    funcMain->block = decompile(13, decompilationCtx);
 
     decompilationCtx.functions.push_back(move(funcMain));
 
@@ -40,12 +42,12 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled) {
         decompilationCtx.expressions);
 }
 
-NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, const ScriptProgram &compiled, DecompilationContext &ctx) {
+NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
     auto block = make_shared<BlockExpression>();
     block->offset = start;
 
-    for (uint32_t offset = start; offset < compiled.length();) {
-        const Instruction &ins = compiled.getInstruction(offset);
+    for (uint32_t offset = start; offset < ctx.compiled.length();) {
+        const Instruction &ins = ctx.compiled.getInstruction(offset);
 
         if (ins.type == InstructionType::RETN) {
             break;
@@ -57,7 +59,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, con
         } else if (ins.type == InstructionType::JSR) {
             auto sub = make_shared<Function>();
             sub->offset = ins.jumpOffset;
-            sub->block = decompile(ins.offset + ins.jumpOffset, compiled, ctx);
+            sub->block = decompile(ins.offset + ins.jumpOffset, ctx);
 
             auto callExpr = make_shared<CallExpression>();
             callExpr->offset = ins.offset;
@@ -86,18 +88,41 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, con
                 ctx.stack.push(expression.get());
                 ctx.expressions.push_back(move(expression));
             }
+
         } else if (ins.type == InstructionType::ACTION) {
             vector<Expression *> arguments;
             for (int i = 0; i < ins.argCount; ++i) {
                 arguments.push_back(ctx.stack.top());
                 ctx.stack.pop();
             }
-            auto expression = make_shared<ActionExpression>();
-            expression->offset = ins.offset;
-            expression->action = ins.routine;
-            expression->arguments = move(arguments);
-            block->expressions.push_back(expression.get());
-            ctx.expressions.push_back(move(expression));
+
+            auto actionExpr = make_shared<ActionExpression>();
+            actionExpr->offset = ins.offset;
+            actionExpr->action = ins.routine;
+            actionExpr->arguments = move(arguments);
+
+            auto &routine = ctx.routines.get(ins.routine);
+            if (routine.returnType() != VariableType::Void) {
+                auto retValExpr = make_shared<ParameterExpression>();
+                retValExpr->offset = ins.offset;
+                retValExpr->variableType = routine.returnType();
+                block->expressions.push_back(retValExpr.get());
+
+                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                assignExpr->offset = ins.offset;
+                assignExpr->left = retValExpr.get();
+                assignExpr->right = actionExpr.get();
+                block->expressions.push_back(assignExpr.get());
+
+                ctx.stack.push(retValExpr.get());
+                ctx.expressions.push_back(move(retValExpr));
+                ctx.expressions.push_back(move(assignExpr));
+
+            } else {
+                block->expressions.push_back(actionExpr.get());
+            }
+
+            ctx.expressions.push_back(move(actionExpr));
         }
 
         offset = ins.nextOffset;

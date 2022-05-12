@@ -22,6 +22,12 @@
 
 namespace reone {
 
+namespace script {
+
+class IRoutines;
+
+}
+
 class NwscriptProgram {
 public:
     enum ExpressionType {
@@ -95,6 +101,8 @@ public:
     };
 
     struct ParameterExpression : Expression {
+        script::VariableType variableType {script::VariableType::Int};
+
         ParameterExpression() :
             Expression(ExpressionType::Parameter) {
         }
@@ -107,6 +115,9 @@ public:
     };
 
     struct BinaryExpression : Expression {
+        Expression *left {nullptr};
+        Expression *right {nullptr};
+
         BinaryExpression(ExpressionType type) :
             Expression(type) {
         }
@@ -169,19 +180,29 @@ public:
         return _expressions;
     }
 
-    static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled);
+    static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled, const script::IRoutines &routines);
 
 private:
     struct DecompilationContext {
+        const script::ScriptProgram &compiled;
+        const script::IRoutines &routines;
+
         std::stack<Expression *> stack;
         std::vector<std::shared_ptr<Function>> functions;
         std::vector<std::shared_ptr<Expression>> expressions;
+
+        DecompilationContext(
+            const script::ScriptProgram &compiled,
+            const script::IRoutines &routines) :
+            compiled(compiled),
+            routines(routines) {
+        }
     };
 
     std::vector<std::shared_ptr<Function>> _functions;
     std::vector<std::shared_ptr<Expression>> _expressions;
 
-    static BlockExpression *decompile(uint32_t start, const script::ScriptProgram &compiled, DecompilationContext &ctx);
+    static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const script::Instruction &ins);
 };
