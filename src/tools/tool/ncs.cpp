@@ -392,18 +392,24 @@ private:
     NwscriptProgram &_program;
 
     void writeFunction(const NwscriptProgram::Function &function, TextWriter &writer) {
-        auto name = !function.name.empty() ? function.name : str(boost::format("%08x") % function.offset);
-        writer.putLine(str(boost::format("void %s() {") % name));
-
-        for (auto &expression : function.block->expressions) {
-            writeExpression(1, *expression, writer);
-        }
-
-        writer.putLine("}");
+        auto name = describeFunction(function);
+        writer.putLine(str(boost::format("void %s()") % name));
+        writeExpression(0, *function.block, writer);
+        writer.putLine("");
     }
 
     void writeExpression(int level, const NwscriptProgram::Expression &expression, TextWriter &writer) {
-        if (expression.type == NwscriptProgram::ExpressionType::Constant) {
+        auto indent = string(4 * level, ' ');
+
+        if (expression.type == NwscriptProgram::ExpressionType::Block) {
+            auto &blockExpr = static_cast<const NwscriptProgram::BlockExpression &>(expression);
+            writer.putLine(indent + string("{"));
+            for (auto &innerExpr : blockExpr.expressions) {
+                writeExpression(1 + level, *innerExpr, writer);
+            }
+            writer.putLine(indent + string("}"));
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Constant) {
             auto &constantExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
             string type;
             string name;
@@ -425,9 +431,17 @@ private:
                 name = str(boost::format("OBJECT_%08x") % constantExpr.offset);
                 value = to_string(constantExpr.value.objectId);
             }
-            auto indent = string(4 * level, ' ');
             writer.putLine(str(boost::format("%s%s %s = %s;") % indent % type % name % value));
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Call) {
+            auto &callExpr = static_cast<const NwscriptProgram::CallExpression &>(expression);
+            auto name = describeFunction(*callExpr.function);
+            writer.putLine(str(boost::format("%s%s();") % indent % name));
         }
+    }
+
+    std::string describeFunction(const NwscriptProgram::Function &function) {
+        return !function.name.empty() ? function.name : str(boost::format("loc_%08x") % function.offset);
     }
 };
 

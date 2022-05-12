@@ -17,6 +17,8 @@
 
 #include "program.h"
 
+#include "../../../common/exception/argument.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -24,53 +26,96 @@ using namespace reone::script;
 namespace reone {
 
 NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled) {
-    auto functions = vector<shared_ptr<Function>>();
-    auto expressions = vector<shared_ptr<Expression>>();
+    auto decompilationCtx = DecompilationContext();
 
-    // main function
-    auto exprMainBlock = make_unique<BlockExpression>();
-    for (auto &instruction : compiled.instructions()) {
-        auto expression = expressionFromInstruction(instruction);
-        if (!expression) {
-            continue;
-        }
-        exprMainBlock->expressions.push_back(expression.get());
-        expressions.push_back(move(expression));
-    }
-    auto fnMain = make_unique<Function>(Function {"main", 0, nullptr});
-    fnMain->block = exprMainBlock.get();
+    auto funcMain = make_shared<Function>();
+    funcMain->name = "main";
+    funcMain->offset = 13;
+    funcMain->block = decompile(13, compiled, decompilationCtx);
 
-    functions.push_back(move(fnMain));
-    expressions.push_back(move(exprMainBlock));
+    decompilationCtx.functions.push_back(move(funcMain));
 
-    return NwscriptProgram(move(functions), move(expressions));
+    return NwscriptProgram(
+        decompilationCtx.functions,
+        decompilationCtx.expressions);
 }
 
-unique_ptr<NwscriptProgram::Expression> NwscriptProgram::expressionFromInstruction(const Instruction &instr) {
-    unique_ptr<Expression> expression;
-    switch (instr.type) {
+NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, const ScriptProgram &compiled, DecompilationContext &ctx) {
+    auto block = make_shared<BlockExpression>();
+    block->offset = start;
+
+    for (uint32_t offset = start; offset < compiled.length();) {
+        const Instruction &ins = compiled.getInstruction(offset);
+
+        if (ins.type == InstructionType::RETN) {
+            break;
+
+        } else if (ins.type == InstructionType::JMP) {
+            // decompile(ins.jumpOffset, compiled, ctx);
+
+        } else if (ins.type == InstructionType::JSR) {
+            auto sub = make_shared<Function>();
+            sub->offset = ins.jumpOffset;
+            sub->block = decompile(ins.offset + ins.jumpOffset, compiled, ctx);
+
+            auto callExpr = make_shared<CallExpression>();
+            callExpr->offset = ins.offset;
+            callExpr->function = sub.get();
+
+            block->expressions.push_back(callExpr.get());
+
+            ctx.functions.push_back(move(sub));
+            ctx.expressions.push_back(move(callExpr));
+
+        } else if (ins.type == InstructionType::JZ) {
+            // auto ifTrue = decompile(ins.jumpOffset, compiled, ctx);
+            // auto ifFalse = decompile(ins.nextOffset, compiled, ctx);
+
+        } else if (ins.type == InstructionType::JNZ) {
+            // auto ifTrue = decompile(ins.jumpOffset, compiled, ctx);
+            // auto ifFalse = decompile(ins.nextOffset, compiled, ctx);
+
+        } else if (ins.type == InstructionType::CONSTI ||
+                   ins.type == InstructionType::CONSTF ||
+                   ins.type == InstructionType::CONSTS ||
+                   ins.type == InstructionType::CONSTO) {
+            auto expression = constantExpression(ins);
+            if (expression) {
+                block->expressions.push_back(expression.get());
+                ctx.expressions.push_back(move(expression));
+            }
+        }
+
+        offset = ins.nextOffset;
+    }
+
+    ctx.expressions.push_back(block);
+
+    return block.get();
+}
+
+unique_ptr<NwscriptProgram::ConstantExpression> NwscriptProgram::constantExpression(const Instruction &ins) {
+    switch (ins.type) {
     case InstructionType::CONSTI:
     case InstructionType::CONSTF:
     case InstructionType::CONSTS:
     case InstructionType::CONSTO: {
         auto constExpr = make_unique<ConstantExpression>();
-        constExpr->offset = instr.offset;
-        if (instr.type == InstructionType::CONSTI) {
-            constExpr->value = Variable::ofInt(instr.intValue);
-        } else if (instr.type == InstructionType::CONSTF) {
-            constExpr->value = Variable::ofFloat(instr.floatValue);
-        } else if (instr.type == InstructionType::CONSTS) {
-            constExpr->value = Variable::ofString(instr.strValue);
-        } else if (instr.type == InstructionType::CONSTO) {
-            constExpr->value = Variable::ofObject(instr.objectId);
+        constExpr->offset = ins.offset;
+        if (ins.type == InstructionType::CONSTI) {
+            constExpr->value = Variable::ofInt(ins.intValue);
+        } else if (ins.type == InstructionType::CONSTF) {
+            constExpr->value = Variable::ofFloat(ins.floatValue);
+        } else if (ins.type == InstructionType::CONSTS) {
+            constExpr->value = Variable::ofString(ins.strValue);
+        } else if (ins.type == InstructionType::CONSTO) {
+            constExpr->value = Variable::ofObject(ins.objectId);
         }
-        expression = move(constExpr);
-        break;
+        return move(constExpr);
     }
     default:
-        break;
+        throw ArgumentException("Instruction is not of CONSTx type: " + to_string(static_cast<int>(ins.type)));
     }
-    return move(expression);
 }
 
 } // namespace reone

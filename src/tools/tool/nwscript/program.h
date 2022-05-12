@@ -172,10 +172,18 @@ public:
     static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled);
 
 private:
+    struct DecompilationContext {
+        std::stack<Expression *> stack;
+        std::vector<std::shared_ptr<Function>> functions;
+        std::vector<std::shared_ptr<Expression>> expressions;
+    };
+
     std::vector<std::shared_ptr<Function>> _functions;
     std::vector<std::shared_ptr<Expression>> _expressions;
 
-    static std::unique_ptr<Expression> expressionFromInstruction(const script::Instruction &instr);
+    static BlockExpression *decompile(uint32_t start, const script::ScriptProgram &compiled, DecompilationContext &ctx);
+
+    static std::unique_ptr<ConstantExpression> constantExpression(const script::Instruction &ins);
 };
 
 } // namespace reone
