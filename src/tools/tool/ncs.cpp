@@ -20,6 +20,7 @@
 #include <boost/regex.hpp>
 
 #include "../../common/collectionutil.h"
+#include "../../common/exception/argument.h"
 #include "../../common/exception/validation.h"
 #include "../../common/stream/fileinput.h"
 #include "../../common/stream/fileoutput.h"
@@ -377,8 +378,11 @@ private:
 
 class NssWriter {
 public:
-    NssWriter(NwscriptProgram &program) :
-        _program(program) {
+    NssWriter(
+        NwscriptProgram &program,
+        Routines &routines) :
+        _program(program),
+        _routines(routines) {
     }
 
     void save(IOutputStream &stream) {
@@ -390,6 +394,7 @@ public:
 
 private:
     NwscriptProgram &_program;
+    Routines &_routines;
 
     void writeFunction(const NwscriptProgram::Function &function, TextWriter &writer) {
         auto name = describeFunction(function);
@@ -416,19 +421,19 @@ private:
             string value;
             if (constantExpr.value.type == VariableType::Int) {
                 type = "int";
-                name = str(boost::format("INT_%08x") % constantExpr.offset);
+                name = describeExpression(constantExpr);
                 value = to_string(constantExpr.value.intValue);
             } else if (constantExpr.value.type == VariableType::Float) {
                 type = "float";
-                name = str(boost::format("FLOAT_%08x") % constantExpr.offset);
+                name = describeExpression(constantExpr);
                 value = str(boost::format("%ff") % constantExpr.value.floatValue);
             } else if (constantExpr.value.type == VariableType::String) {
                 type = "string";
-                name = str(boost::format("STRING_%08x") % constantExpr.offset);
+                name = describeExpression(constantExpr);
                 value = str(boost::format("\"%s\"") % constantExpr.value.strValue);
             } else if (constantExpr.value.type == VariableType::Object) {
                 type = "object";
-                name = str(boost::format("OBJECT_%08x") % constantExpr.offset);
+                name = describeExpression(constantExpr);
                 value = to_string(constantExpr.value.objectId);
             }
             writer.putLine(str(boost::format("%s%s %s = %s;") % indent % type % name % value));
@@ -437,11 +442,39 @@ private:
             auto &callExpr = static_cast<const NwscriptProgram::CallExpression &>(expression);
             auto name = describeFunction(*callExpr.function);
             writer.putLine(str(boost::format("%s%s();") % indent % name));
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
+            auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
+            auto name = _routines.get(actionExpr.action).name();
+            vector<string> arguments;
+            for (auto &argExpr : actionExpr.arguments) {
+                arguments.push_back(describeExpression(*argExpr));
+            }
+            writer.putLine(str(boost::format("%s%s(%s);") % indent % name % boost::join(arguments, ", ")));
         }
     }
 
     std::string describeFunction(const NwscriptProgram::Function &function) {
         return !function.name.empty() ? function.name : str(boost::format("loc_%08x") % function.offset);
+    }
+
+    std::string describeExpression(const NwscriptProgram::Expression &expression) {
+        if (expression.type == NwscriptProgram::ExpressionType::Constant) {
+            auto &constantExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
+            string prefix;
+            if (constantExpr.value.type == VariableType::Int) {
+                prefix = "INT";
+            } else if (constantExpr.value.type == VariableType::Float) {
+                prefix = "FLOAT";
+            } else if (constantExpr.value.type == VariableType::String) {
+                prefix = "STRING";
+            } else if (constantExpr.value.type == VariableType::Object) {
+                prefix = "OBJECT";
+            }
+            return str(boost::format("%s_%08x") % prefix % constantExpr.offset);
+        } else {
+            throw ArgumentException("Cannot describe expression of type " + to_string(static_cast<int>(expression.type)));
+        }
     }
 };
 
@@ -500,7 +533,7 @@ void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
     auto nssPath = destPath;
     nssPath.append(path.filename().string() + ".nss");
     auto nss = FileOutputStream(nssPath);
-    auto writer = NssWriter(program);
+    auto writer = NssWriter(program, routines);
     writer.save(nss);
 }
 

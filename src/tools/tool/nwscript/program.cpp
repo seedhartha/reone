@@ -51,7 +51,8 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, con
             break;
 
         } else if (ins.type == InstructionType::JMP) {
-            // decompile(ins.jumpOffset, compiled, ctx);
+            offset = ins.offset + ins.jumpOffset;
+            continue;
 
         } else if (ins.type == InstructionType::JSR) {
             auto sub = make_shared<Function>();
@@ -82,8 +83,21 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, con
             auto expression = constantExpression(ins);
             if (expression) {
                 block->expressions.push_back(expression.get());
+                ctx.stack.push(expression.get());
                 ctx.expressions.push_back(move(expression));
             }
+        } else if (ins.type == InstructionType::ACTION) {
+            vector<Expression *> arguments;
+            for (int i = 0; i < ins.argCount; ++i) {
+                arguments.push_back(ctx.stack.top());
+                ctx.stack.pop();
+            }
+            auto expression = make_shared<ActionExpression>();
+            expression->offset = ins.offset;
+            expression->action = ins.routine;
+            expression->arguments = move(arguments);
+            block->expressions.push_back(expression.get());
+            ctx.expressions.push_back(move(expression));
         }
 
         offset = ins.nextOffset;
