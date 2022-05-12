@@ -36,6 +36,7 @@ public:
         Parameter,
         Label,
         Goto,
+        Return,
         Conditional,
         Action,
         Call,
@@ -44,6 +45,8 @@ public:
 
         Negate,
         Not,
+        Zero,
+        NotZero,
 
         // END Unary
 
@@ -109,6 +112,8 @@ public:
     };
 
     struct UnaryExpression : Expression {
+        Expression *operand {nullptr};
+
         UnaryExpression(ExpressionType type) :
             Expression(type) {
         }
@@ -137,10 +142,16 @@ public:
         }
     };
 
+    struct ReturnExpression : Expression {
+        ReturnExpression() :
+            Expression(ExpressionType::Return) {
+        }
+    };
+
     struct ConditionalExpression : Expression {
         Expression *test {nullptr};
-        Expression *ifTrue {nullptr};
-        Expression *ifFalse {nullptr};
+        BlockExpression *ifTrue {nullptr};
+        BlockExpression *ifFalse {nullptr};
 
         ConditionalExpression() :
             Expression(ExpressionType::Conditional) {
@@ -186,16 +197,20 @@ private:
     struct DecompilationContext {
         const script::ScriptProgram &compiled;
         const script::IRoutines &routines;
+        std::vector<std::shared_ptr<Function>> &functions;
+        std::vector<std::shared_ptr<Expression>> &expressions;
 
         std::stack<Expression *> stack;
-        std::vector<std::shared_ptr<Function>> functions;
-        std::vector<std::shared_ptr<Expression>> expressions;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,
-            const script::IRoutines &routines) :
+            const script::IRoutines &routines,
+            std::vector<std::shared_ptr<Function>> &functions,
+            std::vector<std::shared_ptr<Expression>> &expressions) :
             compiled(compiled),
-            routines(routines) {
+            routines(routines),
+            functions(functions),
+            expressions(expressions) {
         }
     };
 

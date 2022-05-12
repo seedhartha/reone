@@ -414,6 +414,9 @@ private:
             }
             writer.putLine(indent + string("}"));
 
+        } else if (expression.type == NwscriptProgram::ExpressionType::Return) {
+            writer.putLine(indent + string("return;"));
+
         } else if (expression.type == NwscriptProgram::ExpressionType::Constant) {
             auto &constExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
             auto type = describeVariableType(constExpr.value.type);
@@ -451,6 +454,14 @@ private:
             auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
             auto description = describeExpression(actionExpr);
             writer.putLine(str(boost::format("%s%s;") % indent % description));
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Conditional) {
+            auto &condExpr = static_cast<const NwscriptProgram::ConditionalExpression &>(expression);
+            auto testDescription = describeExpression(*condExpr.test);
+            writer.putLine(str(boost::format("%sif(%s)") % indent % testDescription));
+            writeExpression(level, *condExpr.ifTrue, writer);
+            writer.putLine(indent + string("else"));
+            writeExpression(level, *condExpr.ifFalse, writer);
         }
     }
 
@@ -462,9 +473,11 @@ private:
         if (expression.type == NwscriptProgram::ExpressionType::Constant) {
             auto &constExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
             return str(boost::format("CONST_%08x") % constExpr.offset);
+
         } else if (expression.type == NwscriptProgram::ExpressionType::Parameter) {
             auto &paramExpr = static_cast<const NwscriptProgram::ParameterExpression &>(expression);
             return str(boost::format("var_%08x") % paramExpr.offset);
+
         } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
             auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
             auto name = _routines.get(actionExpr.action).name();
@@ -473,9 +486,18 @@ private:
                 arguments.push_back(describeExpression(*argExpr));
             }
             return str(boost::format("%s(%s)") % name % boost::join(arguments, ", "));
-        } else {
-            throw ArgumentException("Cannot describe expression of type " + to_string(static_cast<int>(expression.type)));
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Zero ||
+                   expression.type == NwscriptProgram::ExpressionType::NotZero) {
+            auto &unaryExpr = static_cast<const NwscriptProgram::UnaryExpression &>(expression);
+            if (expression.type == NwscriptProgram::ExpressionType::Zero) {
+                return string("!") + describeExpression(*unaryExpr.operand);
+            } else if (expression.type == NwscriptProgram::ExpressionType::NotZero) {
+                return describeExpression(*unaryExpr.operand);
+            }
         }
+
+        throw ArgumentException("Cannot describe expression of type " + to_string(static_cast<int>(expression.type)));
     }
 
     std::string describeVariableType(VariableType type) {

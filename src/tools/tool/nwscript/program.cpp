@@ -28,7 +28,9 @@ using namespace reone::script;
 namespace reone {
 
 NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
-    auto decompilationCtx = DecompilationContext(compiled, routines);
+    auto functions = vector<shared_ptr<Function>>();
+    auto expressions = vector<shared_ptr<Expression>>();
+    auto decompilationCtx = DecompilationContext(compiled, routines, functions, expressions);
 
     auto funcMain = make_shared<Function>();
     funcMain->name = "main";
@@ -50,6 +52,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         const Instruction &ins = ctx.compiled.getInstruction(offset);
 
         if (ins.type == InstructionType::RETN) {
+            auto retExpr = make_shared<ReturnExpression>();
+            block->expressions.push_back(retExpr.get());
+            ctx.expressions.push_back(move(retExpr));
             break;
 
         } else if (ins.type == InstructionType::JMP) {
@@ -58,25 +63,37 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::JSR) {
             auto sub = make_shared<Function>();
-            sub->offset = ins.jumpOffset;
+            sub->offset = ins.offset + ins.jumpOffset;
             sub->block = decompile(ins.offset + ins.jumpOffset, ctx);
 
             auto callExpr = make_shared<CallExpression>();
             callExpr->offset = ins.offset;
             callExpr->function = sub.get();
-
             block->expressions.push_back(callExpr.get());
 
             ctx.functions.push_back(move(sub));
             ctx.expressions.push_back(move(callExpr));
 
-        } else if (ins.type == InstructionType::JZ) {
-            // auto ifTrue = decompile(ins.jumpOffset, compiled, ctx);
-            // auto ifFalse = decompile(ins.nextOffset, compiled, ctx);
+        } else if (ins.type == InstructionType::JZ ||
+                   ins.type == InstructionType::JNZ) {
+            auto operand = ctx.stack.top();
+            ctx.stack.pop();
 
-        } else if (ins.type == InstructionType::JNZ) {
-            // auto ifTrue = decompile(ins.jumpOffset, compiled, ctx);
-            // auto ifFalse = decompile(ins.nextOffset, compiled, ctx);
+            auto testExpr = make_shared<UnaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Zero : ExpressionType::NotZero);
+            testExpr->offset = ins.offset;
+            testExpr->operand = operand;
+
+            auto condExpr = make_shared<ConditionalExpression>();
+            condExpr->test = testExpr.get();
+            auto trueCtx = DecompilationContext(ctx);
+            condExpr->ifTrue = decompile(ins.offset + ins.jumpOffset, trueCtx);
+            auto falseCtx = DecompilationContext(ctx);
+            condExpr->ifFalse = decompile(ins.nextOffset, falseCtx);
+            block->expressions.push_back(condExpr.get());
+
+            ctx.expressions.push_back(move(testExpr));
+            ctx.expressions.push_back(move(condExpr));
+            break;
 
         } else if (ins.type == InstructionType::CONSTI ||
                    ins.type == InstructionType::CONSTF ||
@@ -123,6 +140,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             }
 
             ctx.expressions.push_back(move(actionExpr));
+
+        } else {
+            throw ArgumentException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }
 
         offset = ins.nextOffset;
