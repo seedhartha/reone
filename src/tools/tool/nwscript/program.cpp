@@ -18,6 +18,7 @@
 #include "program.h"
 
 #include "../../../common/exception/argument.h"
+#include "../../../common/exception/notimplemented.h"
 #include "../../../script/routine.h"
 #include "../../../script/routines.h"
 
@@ -58,10 +59,16 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             break;
 
         } else if (ins.type == InstructionType::JMP) {
+            if (ins.jumpOffset < 0) {
+                throw NotImplementedException("Negative jump offsets are not supported yet");
+            }
             offset = ins.offset + ins.jumpOffset;
             continue;
 
         } else if (ins.type == InstructionType::JSR) {
+            if (ins.jumpOffset < 0) {
+                throw NotImplementedException("Negative jump offsets are not supported yet");
+            }
             auto sub = make_shared<Function>();
             sub->offset = ins.offset + ins.jumpOffset;
             sub->block = decompile(ins.offset + ins.jumpOffset, ctx);
@@ -76,6 +83,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::JZ ||
                    ins.type == InstructionType::JNZ) {
+            if (ins.jumpOffset < 0) {
+                throw NotImplementedException("Negative jump offsets are not supported yet");
+            }
             auto operand = ctx.stack.top();
             ctx.stack.pop();
 

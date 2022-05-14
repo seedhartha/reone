@@ -19,6 +19,7 @@ set(COMMON_HEADERS
     collectionutil.h
     exception/argument.h
     exception/notfound.h
+    exception/notimplemented.h
     exception/validation.h
     hexutil.h
     logutil.h
