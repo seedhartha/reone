@@ -45,8 +45,6 @@ public:
 
         Negate,
         Not,
-        Zero,
-        NotZero,
 
         // END Unary
 

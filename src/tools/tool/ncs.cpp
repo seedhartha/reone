@@ -415,12 +415,14 @@ private:
         for (auto &innerExpr : block.expressions) {
             writer.put(innerIndent);
             writeExpression(innerLevel, true, *innerExpr, writer);
-            writer.putLine(";");
+            if (innerExpr->type != NwscriptProgram::ExpressionType::Conditional) {
+                writer.putLine(";");
+            }
         }
         writer.putLine(indent + string("}"));
     }
 
-    void writeExpression(int blockLevel, bool top, const NwscriptProgram::Expression &expression, TextWriter &writer) {
+    void writeExpression(int blockLevel, bool leftmost, const NwscriptProgram::Expression &expression, TextWriter &writer) {
         auto indent = indentAtLevel(blockLevel);
 
         if (expression.type == NwscriptProgram::ExpressionType::Return) {
@@ -434,7 +436,7 @@ private:
         } else if (expression.type == NwscriptProgram::ExpressionType::Parameter) {
             auto &paramExpr = static_cast<const NwscriptProgram::ParameterExpression &>(expression);
             auto name = describeParameter(paramExpr);
-            if (top) {
+            if (leftmost) {
                 auto type = describeVariableType(paramExpr.variableType);
                 writer.put(str(boost::format("%s %s") % type % name));
             } else {
@@ -455,10 +457,20 @@ private:
             }
             writer.put(str(boost::format("%s(%s)") % name % boost::join(arguments, ", ")));
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Assign) {
+        } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
+                   expression.type == NwscriptProgram::ExpressionType::Equal ||
+                   expression.type == NwscriptProgram::ExpressionType::NotEqual) {
             auto &binaryExpr = static_cast<const NwscriptProgram::BinaryExpression &>(expression);
+            string operation;
+            if (expression.type == NwscriptProgram::ExpressionType::Assign) {
+                operation = "=";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Equal) {
+                operation = "==";
+            } else if (expression.type == NwscriptProgram::ExpressionType::NotEqual) {
+                operation = "!=";
+            }
             writeExpression(blockLevel, false, *binaryExpr.left, writer);
-            writer.put(" = ");
+            writer.put(str(boost::format(" %s ") % operation));
             writeExpression(blockLevel, false, *binaryExpr.right, writer);
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Conditional) {
@@ -468,7 +480,7 @@ private:
             writer.putLine(")");
             writeBlock(blockLevel, *condExpr.ifTrue, writer);
             if (condExpr.ifFalse) {
-                writer.putLine(indent);
+                writer.putLine(indent + "else");
                 writeBlock(blockLevel, *condExpr.ifFalse, writer);
             }
 

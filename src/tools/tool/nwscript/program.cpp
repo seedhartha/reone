@@ -87,12 +87,17 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ins.jumpOffset < 0) {
                 throw NotImplementedException("Negative jump offsets are not supported yet");
             }
-            auto operand = ctx.stack.back().first;
+            auto leftExpr = ctx.stack.back().first;
             ctx.stack.pop_back();
 
-            auto testExpr = make_shared<UnaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Zero : ExpressionType::NotZero);
+            auto rightExpr = make_shared<ConstantExpression>();
+            rightExpr->offset = ins.offset;
+            rightExpr->value = Variable::ofInt(0);
+
+            auto testExpr = make_shared<BinaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Equal : ExpressionType::NotEqual);
             testExpr->offset = ins.offset;
-            testExpr->operand = operand;
+            testExpr->left = leftExpr;
+            testExpr->right = rightExpr.get();
 
             auto condExpr = make_shared<ConditionalExpression>();
             condExpr->test = testExpr.get();
@@ -102,6 +107,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             condExpr->ifFalse = decompile(ins.nextOffset, falseCtx);
             block->expressions.push_back(condExpr.get());
 
+            ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
             ctx.expressions.push_back(move(condExpr));
             break;
