@@ -161,7 +161,7 @@ public:
 
     struct ActionExpression : Expression {
         int action {0};
-        std::vector<Expression *> arguments;
+        std::vector<ParameterExpression *> arguments;
 
         ActionExpression() :
             Expression(ExpressionType::Action) {
@@ -201,7 +201,7 @@ private:
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::deque<std::pair<Expression *, int>> stack;
+        std::deque<std::pair<ParameterExpression *, int>> stack;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,

@@ -123,17 +123,30 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::CONSTF ||
                    ins.type == InstructionType::CONSTS ||
                    ins.type == InstructionType::CONSTO) {
-            auto expression = constantExpression(ins);
-            block->expressions.push_back(expression.get());
-            ctx.stack.push_back(make_pair(expression.get(), 0));
-            ctx.expressions.push_back(move(expression));
+            auto constExpr = constantExpression(ins);
+
+            auto paramExpr = make_shared<ParameterExpression>();
+            paramExpr->offset = ins.offset;
+            paramExpr->variableType = constExpr->value.type;
+            block->expressions.push_back(paramExpr.get());
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = paramExpr.get();
+            assignExpr->right = constExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(make_pair(paramExpr.get(), 0));
+            ctx.expressions.push_back(move(constExpr));
+            ctx.expressions.push_back(move(paramExpr));
+            ctx.expressions.push_back(move(assignExpr));
 
         } else if (ins.type == InstructionType::ACTION) {
             auto &routine = ctx.routines.get(ins.routine);
 
-            vector<Expression *> arguments;
+            vector<ParameterExpression *> arguments;
             for (int i = 0; i < ins.argCount; ++i) {
-                Expression *argument;
+                ParameterExpression *argument;
                 auto argType = routine.getArgumentType(i);
                 if (argType == VariableType::Vector) {
                     auto xParam = ctx.stack.back();
