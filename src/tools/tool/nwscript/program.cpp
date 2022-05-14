@@ -19,6 +19,7 @@
 
 #include "../../../common/exception/argument.h"
 #include "../../../common/exception/notimplemented.h"
+#include "../../../common/exception/validation.h"
 #include "../../../script/routine.h"
 #include "../../../script/routines.h"
 
@@ -86,7 +87,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ins.jumpOffset < 0) {
                 throw NotImplementedException("Negative jump offsets are not supported yet");
             }
-            auto operand = ctx.stack.top();
+            auto operand = ctx.stack.top().first;
             ctx.stack.pop();
 
             auto testExpr = make_shared<UnaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Zero : ExpressionType::NotZero);
@@ -105,22 +106,53 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(condExpr));
             break;
 
+        } else if (ins.type == InstructionType::RSADDI ||
+                   ins.type == InstructionType::RSADDF ||
+                   ins.type == InstructionType::RSADDS ||
+                   ins.type == InstructionType::RSADDO ||
+                   ins.type == InstructionType::RSADDEFF ||
+                   ins.type == InstructionType::RSADDEVT ||
+                   ins.type == InstructionType::RSADDLOC ||
+                   ins.type == InstructionType::RSADDTAL) {
+            auto expression = parameterExpression(ins);
+            block->expressions.push_back(expression.get());
+            ctx.stack.push(make_pair(expression.get(), 0));
+            ctx.expressions.push_back(move(expression));
+
         } else if (ins.type == InstructionType::CONSTI ||
                    ins.type == InstructionType::CONSTF ||
                    ins.type == InstructionType::CONSTS ||
                    ins.type == InstructionType::CONSTO) {
             auto expression = constantExpression(ins);
-            if (expression) {
-                block->expressions.push_back(expression.get());
-                ctx.stack.push(expression.get());
-                ctx.expressions.push_back(move(expression));
-            }
+            block->expressions.push_back(expression.get());
+            ctx.stack.push(make_pair(expression.get(), 0));
+            ctx.expressions.push_back(move(expression));
 
         } else if (ins.type == InstructionType::ACTION) {
+            auto &routine = ctx.routines.get(ins.routine);
+
             vector<Expression *> arguments;
             for (int i = 0; i < ins.argCount; ++i) {
-                arguments.push_back(ctx.stack.top());
-                ctx.stack.pop();
+                Expression *argument;
+                auto argType = routine.getArgumentType(i);
+                if (argType == VariableType::Vector) {
+                    auto xParam = ctx.stack.top();
+                    ctx.stack.pop();
+                    auto yParam = ctx.stack.top();
+                    ctx.stack.pop();
+                    auto zParam = ctx.stack.top();
+                    ctx.stack.pop();
+                    if ((xParam.first->type != ExpressionType::Parameter || xParam.second != 0) ||
+                        (yParam.first->type != ExpressionType::Parameter || yParam.second != 1) ||
+                        (zParam.first->type != ExpressionType::Parameter || zParam.second != 2)) {
+                        throw ValidationException("Not a vector on top of the stack");
+                    }
+                    argument = xParam.first;
+                } else {
+                    argument = ctx.stack.top().first;
+                    ctx.stack.pop();
+                }
+                arguments.push_back(argument);
             }
 
             auto actionExpr = make_shared<ActionExpression>();
@@ -128,7 +160,6 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             actionExpr->action = ins.routine;
             actionExpr->arguments = move(arguments);
 
-            auto &routine = ctx.routines.get(ins.routine);
             if (routine.returnType() != VariableType::Void) {
                 auto retValExpr = make_shared<ParameterExpression>();
                 retValExpr->offset = ins.offset;
@@ -141,7 +172,13 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 assignExpr->right = actionExpr.get();
                 block->expressions.push_back(assignExpr.get());
 
-                ctx.stack.push(retValExpr.get());
+                if (routine.returnType() == VariableType::Vector) {
+                    ctx.stack.push(make_pair(retValExpr.get(), 2));
+                    ctx.stack.push(make_pair(retValExpr.get(), 1));
+                    ctx.stack.push(make_pair(retValExpr.get(), 0));
+                } else {
+                    ctx.stack.push(make_pair(retValExpr.get(), 0));
+                }
                 ctx.expressions.push_back(move(retValExpr));
                 ctx.expressions.push_back(move(assignExpr));
 
@@ -150,6 +187,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             }
 
             ctx.expressions.push_back(move(actionExpr));
+
+        } else if (ins.type == InstructionType::CPDOWNSP) {
+
+        } else if (ins.type == InstructionType::CPTOPSP) {
+
+        } else if (ins.type == InstructionType::MOVSP) {
 
         } else {
             throw ArgumentException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
@@ -184,6 +227,42 @@ unique_ptr<NwscriptProgram::ConstantExpression> NwscriptProgram::constantExpress
     }
     default:
         throw ArgumentException("Instruction is not of CONSTx type: " + to_string(static_cast<int>(ins.type)));
+    }
+}
+
+unique_ptr<NwscriptProgram::ParameterExpression> NwscriptProgram::parameterExpression(const Instruction &ins) {
+    switch (ins.type) {
+    case InstructionType::RSADDI:
+    case InstructionType::RSADDF:
+    case InstructionType::RSADDS:
+    case InstructionType::RSADDO:
+    case InstructionType::RSADDEFF:
+    case InstructionType::RSADDEVT:
+    case InstructionType::RSADDLOC:
+    case InstructionType::RSADDTAL: {
+        auto paramExpr = make_unique<ParameterExpression>();
+        paramExpr->offset = ins.offset;
+        if (ins.type == InstructionType::RSADDI) {
+            paramExpr->variableType = VariableType::Int;
+        } else if (ins.type == InstructionType::RSADDF) {
+            paramExpr->variableType = VariableType::Float;
+        } else if (ins.type == InstructionType::RSADDS) {
+            paramExpr->variableType = VariableType::String;
+        } else if (ins.type == InstructionType::RSADDO) {
+            paramExpr->variableType = VariableType::Object;
+        } else if (ins.type == InstructionType::RSADDEFF) {
+            paramExpr->variableType = VariableType::Effect;
+        } else if (ins.type == InstructionType::RSADDEVT) {
+            paramExpr->variableType = VariableType::Event;
+        } else if (ins.type == InstructionType::RSADDLOC) {
+            paramExpr->variableType = VariableType::Location;
+        } else if (ins.type == InstructionType::RSADDTAL) {
+            paramExpr->variableType = VariableType::Talent;
+        }
+        return move(paramExpr);
+    }
+    default:
+        throw ArgumentException("Instruction is not of RSADDx type: " + to_string(static_cast<int>(ins.type)));
     }
 }
 

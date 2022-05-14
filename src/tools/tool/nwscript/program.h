@@ -200,7 +200,7 @@ private:
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::stack<Expression *> stack;
+        std::stack<std::pair<Expression *, int>> stack;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,
@@ -220,6 +220,7 @@ private:
     static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const script::Instruction &ins);
+    static std::unique_ptr<ParameterExpression> parameterExpression(const script::Instruction &ins);
 };
 
 } // namespace reone
