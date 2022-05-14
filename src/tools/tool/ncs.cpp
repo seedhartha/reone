@@ -460,8 +460,10 @@ private:
             auto testDescription = describeExpression(*condExpr.test);
             writer.putLine(str(boost::format("%sif(%s)") % indent % testDescription));
             writeExpression(level, *condExpr.ifTrue, writer);
-            writer.putLine(indent + string("else"));
-            writeExpression(level, *condExpr.ifFalse, writer);
+            if (condExpr.ifFalse) {
+                writer.putLine(indent + string("else"));
+                writeExpression(level, *condExpr.ifFalse, writer);
+            }
         }
     }
 
