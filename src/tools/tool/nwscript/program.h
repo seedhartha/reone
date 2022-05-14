@@ -75,6 +75,7 @@ public:
     struct Expression {
         ExpressionType type;
         uint32_t offset {0};
+        int index {0};
 
         Expression(ExpressionType type) :
             type(type) {
@@ -200,7 +201,7 @@ private:
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::stack<std::pair<Expression *, int>> stack;
+        std::deque<std::pair<Expression *, int>> stack;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,

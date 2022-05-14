@@ -474,11 +474,19 @@ private:
     std::string describeExpression(const NwscriptProgram::Expression &expression) {
         if (expression.type == NwscriptProgram::ExpressionType::Constant) {
             auto &constExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
-            return str(boost::format("CONST_%08x") % constExpr.offset);
+            if (constExpr.index > 0) {
+                return str(boost::format("CONST_%08x_%d") % constExpr.offset % constExpr.index);
+            } else {
+                return str(boost::format("CONST_%08x") % constExpr.offset);
+            }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Parameter) {
             auto &paramExpr = static_cast<const NwscriptProgram::ParameterExpression &>(expression);
-            return str(boost::format("var_%08x") % paramExpr.offset);
+            if (paramExpr.index > 0) {
+                return str(boost::format("var_%08x_%d") % paramExpr.offset % paramExpr.index);
+            } else {
+                return str(boost::format("var_%08x") % paramExpr.offset);
+            }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
             auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
