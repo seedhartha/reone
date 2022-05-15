@@ -47,6 +47,9 @@ public:
         Not,
         OnesComplement,
 
+        Increment,
+        Decrement,
+
         // END Unary
 
         // Binary

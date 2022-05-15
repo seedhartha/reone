@@ -75,7 +75,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         auto &ins = ctx.compiled.getInstruction(offset);
 
-        if (ins.type == InstructionType::RETN) {
+        if (ins.type == InstructionType::NOP ||
+            ins.type == InstructionType::NOP2) {
+
+        } else if (ins.type == InstructionType::RETN) {
             auto retExpr = make_shared<ReturnExpression>();
             if (ctx.callStack.size() == 1ll && !ctx.stack.empty()) {
                 auto retVal = ctx.stack.back().param;
@@ -343,7 +346,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::MOVSP) {
             if (ins.stackOffset >= 0) {
-                throw NotImplementedException("Non-negative stack offsets are not supported yet");
+                throw ValidationException("Non-negative stack offsets are not supported");
             }
             for (int i = 0; i < -ins.stackOffset / 4; ++i) {
                 ctx.stack.pop_back();
@@ -539,6 +542,48 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::RESTOREBP) {
             ctx.numGlobals = ctx.prevNumGlobals;
+
+        } else if (ins.type == InstructionType::DECISP ||
+                   ins.type == InstructionType::DECIBP ||
+                   ins.type == InstructionType::INCISP ||
+                   ins.type == InstructionType::INCIBP) {
+            if (ins.stackOffset >= 0) {
+                throw ValidationException("Non-negative stack offsets are not supported");
+            }
+            auto stackSize = static_cast<int>(ctx.stack.size());
+            auto frameIdx = ((ins.type == InstructionType::DECISP || ins.type == InstructionType::INCISP) ? stackSize : ctx.numGlobals) + (ins.stackOffset / 4);
+            auto &frame = ctx.stack[frameIdx];
+
+            ParameterExpression *destination;
+            auto &csFrame = ctx.callStack.back();
+            if (frame.allocatedBy != csFrame.function) {
+                auto destExpr = make_shared<ParameterExpression>();
+                destExpr->offset = ins.offset;
+                destExpr->variableType = frame.param->variableType;
+                destExpr->locality = ParameterLocality::Output;
+                destExpr->index = csFrame.outputs.size();
+                csFrame.outputs.push_back(frame.param);
+                destination = destExpr.get();
+                ctx.expressions.push_back(move(destExpr));
+            } else {
+                destination = frame.param;
+            }
+
+            ExpressionType type;
+            if (ins.type == InstructionType::DECISP ||
+                ins.type == InstructionType::DECIBP) {
+                type = ExpressionType::Decrement;
+            } else if (ins.type == InstructionType::INCISP ||
+                       ins.type == InstructionType::INCIBP) {
+                type = ExpressionType::Increment;
+            }
+
+            auto unaryExpr = make_shared<UnaryExpression>(type);
+            unaryExpr->offset = ins.offset;
+            unaryExpr->operand = destination;
+            block->expressions.push_back(unaryExpr.get());
+
+            ctx.expressions.push_back(move(unaryExpr));
 
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
