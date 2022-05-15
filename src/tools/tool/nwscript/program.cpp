@@ -789,6 +789,23 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             ctx.expressions.push_back(move(unaryExpr));
 
+        } else if (ins.type == InstructionType::DESTRUCT) {
+            auto numFrames = ins.size / 4;
+            auto startNoDestroy = static_cast<int>(ctx.stack.size()) - numFrames + (ins.stackOffset / 4);
+            auto numFramesNoDestroy = ins.sizeNoDestroy / 4;
+
+            vector<StackFrame> framesNoDestroy;
+            for (int i = 0; i < numFramesNoDestroy; ++i) {
+                auto &frame = ctx.stack[startNoDestroy + i];
+                framesNoDestroy.push_back(frame);
+            }
+            for (int i = 0; i < numFrames - numFramesNoDestroy; ++i) {
+                ctx.stack.pop_back();
+            }
+            for (auto &frame : framesNoDestroy) {
+                ctx.stack.push_back(frame);
+            }
+
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }
