@@ -57,6 +57,7 @@ public:
         Subtract,
         Multiply,
         Divide,
+        Modulo,
 
         LogicalAnd,
         LogicalOr,

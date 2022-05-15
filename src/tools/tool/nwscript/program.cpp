@@ -374,7 +374,25 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(unaryExpr));
             ctx.expressions.push_back(move(assignExpr));
 
-        } else if (ins.type == InstructionType::LOGANDII ||
+        } else if (ins.type == InstructionType::ADDII ||
+                   ins.type == InstructionType::ADDIF ||
+                   ins.type == InstructionType::ADDFI ||
+                   ins.type == InstructionType::ADDFF ||
+                   ins.type == InstructionType::ADDSS ||
+                   ins.type == InstructionType::SUBII ||
+                   ins.type == InstructionType::SUBIF ||
+                   ins.type == InstructionType::SUBFI ||
+                   ins.type == InstructionType::SUBFF ||
+                   ins.type == InstructionType::MULII ||
+                   ins.type == InstructionType::MULIF ||
+                   ins.type == InstructionType::MULFI ||
+                   ins.type == InstructionType::MULFF ||
+                   ins.type == InstructionType::DIVII ||
+                   ins.type == InstructionType::DIVIF ||
+                   ins.type == InstructionType::DIVFI ||
+                   ins.type == InstructionType::DIVFF ||
+                   ins.type == InstructionType::MODII ||
+                   ins.type == InstructionType::LOGANDII ||
                    ins.type == InstructionType::LOGORII ||
                    ins.type == InstructionType::INCORII ||
                    ins.type == InstructionType::EXCORII ||
@@ -416,7 +434,30 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             block->expressions.push_back(resultExpr.get());
 
             ExpressionType type;
-            if (ins.type == InstructionType::LOGANDII) {
+            if (ins.type == InstructionType::ADDII ||
+                ins.type == InstructionType::ADDIF ||
+                ins.type == InstructionType::ADDFI ||
+                ins.type == InstructionType::ADDFF ||
+                ins.type == InstructionType::ADDSS) {
+                type = ExpressionType::Add;
+            } else if (ins.type == InstructionType::SUBII ||
+                       ins.type == InstructionType::SUBIF ||
+                       ins.type == InstructionType::SUBFI ||
+                       ins.type == InstructionType::SUBFF) {
+                type = ExpressionType::Subtract;
+            } else if (ins.type == InstructionType::MULII ||
+                       ins.type == InstructionType::MULIF ||
+                       ins.type == InstructionType::MULFI ||
+                       ins.type == InstructionType::MULFF) {
+                type = ExpressionType::Multiply;
+            } else if (ins.type == InstructionType::DIVII ||
+                       ins.type == InstructionType::DIVIF ||
+                       ins.type == InstructionType::DIVFI ||
+                       ins.type == InstructionType::DIVFF) {
+                type = ExpressionType::Divide;
+            } else if (ins.type == InstructionType::MODII) {
+                type = ExpressionType::Modulo;
+            } else if (ins.type == InstructionType::LOGANDII) {
                 type = ExpressionType::LogicalAnd;
             } else if (ins.type == InstructionType::LOGORII) {
                 type = ExpressionType::LogicalOr;
@@ -476,12 +517,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
-
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto innerCtx = DecompilationContext(ctx);
             auto innerBlock = decompile(ins.offset + 0x10, innerCtx);
             ctx.stack.push_back(StackFrame(ctx.callStack.back().function, innerBlock));
-
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }

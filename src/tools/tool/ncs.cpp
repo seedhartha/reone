@@ -531,6 +531,11 @@ private:
             }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
+                   expression.type == NwscriptProgram::ExpressionType::Add ||
+                   expression.type == NwscriptProgram::ExpressionType::Subtract ||
+                   expression.type == NwscriptProgram::ExpressionType::Multiply ||
+                   expression.type == NwscriptProgram::ExpressionType::Divide ||
+                   expression.type == NwscriptProgram::ExpressionType::Modulo ||
                    expression.type == NwscriptProgram::ExpressionType::LogicalAnd ||
                    expression.type == NwscriptProgram::ExpressionType::LogicalOr ||
                    expression.type == NwscriptProgram::ExpressionType::BitwiseOr ||
@@ -548,6 +553,16 @@ private:
             string operation;
             if (expression.type == NwscriptProgram::ExpressionType::Assign) {
                 operation = "=";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Add) {
+                operation = "+";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Subtract) {
+                operation = "-";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Multiply) {
+                operation = "*";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Divide) {
+                operation = "/";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Modulo) {
+                operation = "%";
             } else if (expression.type == NwscriptProgram::ExpressionType::LogicalAnd) {
                 operation = "&&";
             } else if (expression.type == NwscriptProgram::ExpressionType::LogicalOr) {
