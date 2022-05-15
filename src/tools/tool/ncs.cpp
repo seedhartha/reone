@@ -501,7 +501,9 @@ private:
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
                    expression.type == NwscriptProgram::ExpressionType::Equal ||
-                   expression.type == NwscriptProgram::ExpressionType::NotEqual) {
+                   expression.type == NwscriptProgram::ExpressionType::NotEqual ||
+                   expression.type == NwscriptProgram::ExpressionType::And ||
+                   expression.type == NwscriptProgram::ExpressionType::Or) {
             auto &binaryExpr = static_cast<const NwscriptProgram::BinaryExpression &>(expression);
             string operation;
             if (expression.type == NwscriptProgram::ExpressionType::Assign) {
@@ -510,6 +512,10 @@ private:
                 operation = "==";
             } else if (expression.type == NwscriptProgram::ExpressionType::NotEqual) {
                 operation = "!=";
+            } else if (expression.type == NwscriptProgram::ExpressionType::And) {
+                operation = "&&";
+            } else if (expression.type == NwscriptProgram::ExpressionType::Or) {
+                operation = "||";
             }
             writeExpression(blockLevel, false, *binaryExpr.left, writer);
             writer.put(str(boost::format(" %s ") % operation));

@@ -334,7 +334,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::NEQUALEFFEFF ||
                    ins.type == InstructionType::NEQUALEVTEVT ||
                    ins.type == InstructionType::NEQUALLOCLOC ||
-                   ins.type == InstructionType::NEQUALTALTAL) {
+                   ins.type == InstructionType::NEQUALTALTAL ||
+                   ins.type == InstructionType::LOGANDII ||
+                   ins.type == InstructionType::LOGORII) {
             auto &left = ctx.stack.back();
             ctx.stack.pop_back();
             auto &right = ctx.stack.back();
@@ -364,6 +366,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                        ins.type == InstructionType::NEQUALLOCLOC ||
                        ins.type == InstructionType::NEQUALTALTAL) {
                 type = ExpressionType::NotEqual;
+            } else if (ins.type == InstructionType::LOGANDII) {
+                type = ExpressionType::And;
+            } else if (ins.type == InstructionType::LOGORII) {
+                type = ExpressionType::Or;
             }
             auto compExpr = make_shared<BinaryExpression>(type);
             compExpr->offset = ins.offset;
