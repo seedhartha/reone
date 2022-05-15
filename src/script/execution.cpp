@@ -538,7 +538,7 @@ void ScriptExecution::executeSHRIGHTII(const Instruction &ins) {
 
 void ScriptExecution::executeUSHRIGHTII(const Instruction &ins) {
     withIntsFromStack([this](int left, int right) {
-        _stack.push_back(Variable::ofInt(left >> right));
+        _stack.push_back(Variable::ofInt(static_cast<unsigned int>(left) >> right));
     });
 }
 
