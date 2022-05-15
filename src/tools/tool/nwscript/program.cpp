@@ -689,6 +689,52 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
 
+        } else if (ins.type == InstructionType::EQUALTT ||
+                   ins.type == InstructionType::NEQUALTT) {
+            auto numFrames = ins.size / 4;
+            vector<StackFrame> rightFrames;
+            for (int i = 0; i < numFrames; ++i) {
+                rightFrames.push_back(ctx.stack.back());
+                ctx.stack.pop_back();
+            }
+            vector<StackFrame> leftFrames;
+            for (int i = 0; i < numFrames; ++i) {
+                leftFrames.push_back(ctx.stack.back());
+                ctx.stack.pop_back();
+            }
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = VariableType::Int;
+            block->expressions.push_back(resultExpr.get());
+
+            for (int i = 0; i < numFrames; ++i) {
+                auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
+                auto compExpr = make_shared<BinaryExpression>(firstType);
+                compExpr->offset = ins.offset;
+                compExpr->left = leftFrames[i].param;
+                compExpr->right = rightFrames[i].param;
+
+                auto secondType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::LogicalAnd : ExpressionType::LogicalOr;
+                auto andOrExpression = make_shared<BinaryExpression>(secondType);
+                andOrExpression->offset = ins.offset;
+                andOrExpression->left = resultExpr.get();
+                andOrExpression->right = compExpr.get();
+
+                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                assignExpr->offset = ins.offset;
+                assignExpr->left = resultExpr.get();
+                assignExpr->right = andOrExpression.get();
+                block->expressions.push_back(assignExpr.get());
+
+                ctx.expressions.push_back(move(compExpr));
+                ctx.expressions.push_back(move(andOrExpression));
+                ctx.expressions.push_back(move(assignExpr));
+            }
+
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
+            ctx.expressions.push_back(move(resultExpr));
+
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto innerCtx = DecompilationContext(ctx);
             auto innerBlock = decompile(ins.offset + 0x10, innerCtx);
