@@ -313,6 +313,71 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 ctx.stack.pop_back();
             }
 
+        } else if (ins.type == InstructionType::EQUALII ||
+                   ins.type == InstructionType::EQUALFF ||
+                   ins.type == InstructionType::EQUALSS ||
+                   ins.type == InstructionType::EQUALOO ||
+                   ins.type == InstructionType::EQUALEFFEFF ||
+                   ins.type == InstructionType::EQUALEVTEVT ||
+                   ins.type == InstructionType::EQUALLOCLOC ||
+                   ins.type == InstructionType::EQUALTALTAL ||
+                   ins.type == InstructionType::NEQUALII ||
+                   ins.type == InstructionType::NEQUALFF ||
+                   ins.type == InstructionType::NEQUALSS ||
+                   ins.type == InstructionType::NEQUALOO ||
+                   ins.type == InstructionType::NEQUALEFFEFF ||
+                   ins.type == InstructionType::NEQUALEVTEVT ||
+                   ins.type == InstructionType::NEQUALLOCLOC ||
+                   ins.type == InstructionType::NEQUALTALTAL) {
+            auto &left = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &right = ctx.stack.back();
+            ctx.stack.pop_back();
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = VariableType::Int;
+            block->expressions.push_back(resultExpr.get());
+
+            ExpressionType type;
+            if (ins.type == InstructionType::EQUALII ||
+                ins.type == InstructionType::EQUALFF ||
+                ins.type == InstructionType::EQUALSS ||
+                ins.type == InstructionType::EQUALOO ||
+                ins.type == InstructionType::EQUALEFFEFF ||
+                ins.type == InstructionType::EQUALEVTEVT ||
+                ins.type == InstructionType::EQUALLOCLOC ||
+                ins.type == InstructionType::EQUALTALTAL) {
+                type = ExpressionType::Equal;
+            } else if (ins.type == InstructionType::NEQUALII ||
+                       ins.type == InstructionType::NEQUALFF ||
+                       ins.type == InstructionType::NEQUALSS ||
+                       ins.type == InstructionType::NEQUALOO ||
+                       ins.type == InstructionType::NEQUALEFFEFF ||
+                       ins.type == InstructionType::NEQUALEVTEVT ||
+                       ins.type == InstructionType::NEQUALLOCLOC ||
+                       ins.type == InstructionType::NEQUALTALTAL) {
+                type = ExpressionType::NotEqual;
+            }
+            auto compExpr = make_shared<BinaryExpression>(type);
+            compExpr->offset = ins.offset;
+            compExpr->left = left.param;
+            compExpr->right = right.param;
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = resultExpr.get();
+            assignExpr->right = compExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, resultExpr.get(), 0});
+            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(compExpr));
+            ctx.expressions.push_back(move(assignExpr));
+
+        } else if (ins.type == InstructionType::STORE_STATE) {
+            // TODO: implement
+
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }
