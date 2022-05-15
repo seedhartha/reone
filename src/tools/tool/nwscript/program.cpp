@@ -436,14 +436,31 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::LEQFF ||
                    ins.type == InstructionType::SHLEFTII ||
                    ins.type == InstructionType::SHRIGHTII) {
-            auto &left = ctx.stack.back();
-            ctx.stack.pop_back();
             auto &right = ctx.stack.back();
             ctx.stack.pop_back();
+            auto &left = ctx.stack.back();
+            ctx.stack.pop_back();
 
+            VariableType varType;
+            if (ins.type == InstructionType::ADDIF ||
+                ins.type == InstructionType::ADDFI ||
+                ins.type == InstructionType::ADDFF ||
+                ins.type == InstructionType::SUBIF ||
+                ins.type == InstructionType::SUBFI ||
+                ins.type == InstructionType::SUBFF ||
+                ins.type == InstructionType::MULIF ||
+                ins.type == InstructionType::MULFI ||
+                ins.type == InstructionType::MULFF ||
+                ins.type == InstructionType::DIVIF ||
+                ins.type == InstructionType::DIVFI ||
+                ins.type == InstructionType::DIVFF) {
+                varType = VariableType::Float;
+            } else {
+                varType = VariableType::Int;
+            }
             auto resultExpr = make_shared<ParameterExpression>();
             resultExpr->offset = ins.offset;
-            resultExpr->variableType = VariableType::Int;
+            resultExpr->variableType = varType;
             block->expressions.push_back(resultExpr.get());
 
             ExpressionType type;
@@ -526,6 +543,144 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             assignExpr->right = binaryExpr.get();
             block->expressions.push_back(assignExpr.get());
 
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
+            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(binaryExpr));
+            ctx.expressions.push_back(move(assignExpr));
+
+        } else if (ins.type == InstructionType::ADDVV ||
+                   ins.type == InstructionType::SUBVV) {
+            auto &rightX = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &rightY = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &rightZ = ctx.stack.back();
+            ctx.stack.pop_back();
+            if ((rightX.param->variableType != VariableType::Vector || rightX.component != 0) ||
+                (rightY.param->variableType != VariableType::Vector || rightY.component != 1) ||
+                (rightZ.param->variableType != VariableType::Vector || rightZ.component != 2)) {
+                throw ValidationException("Not a vector on top of the stack");
+            }
+
+            auto &leftX = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &leftY = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &leftZ = ctx.stack.back();
+            ctx.stack.pop_back();
+            if ((leftX.param->variableType != VariableType::Vector || leftX.component != 0) ||
+                (leftY.param->variableType != VariableType::Vector || leftY.component != 1) ||
+                (leftZ.param->variableType != VariableType::Vector || leftZ.component != 2)) {
+                throw ValidationException("Not a vector on top of the stack");
+            }
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = VariableType::Vector;
+            block->expressions.push_back(resultExpr.get());
+
+            auto type = (ins.type == InstructionType::ADDVV) ? ExpressionType::Add : ExpressionType::Subtract;
+            auto binaryExpr = make_shared<BinaryExpression>(type);
+            binaryExpr->offset = ins.offset;
+            binaryExpr->left = leftX.param;
+            binaryExpr->right = rightX.param;
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = resultExpr.get();
+            assignExpr->right = binaryExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 2));
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 1));
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
+            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(binaryExpr));
+            ctx.expressions.push_back(move(assignExpr));
+
+        } else if (ins.type == InstructionType::DIVFV ||
+                   ins.type == InstructionType::MULFV) {
+            auto &rightX = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &rightY = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &rightZ = ctx.stack.back();
+            ctx.stack.pop_back();
+            if ((rightX.param->variableType != VariableType::Vector || rightX.component != 0) ||
+                (rightY.param->variableType != VariableType::Vector || rightY.component != 1) ||
+                (rightZ.param->variableType != VariableType::Vector || rightZ.component != 2)) {
+                throw ValidationException("Not a vector on top of the stack");
+            }
+
+            auto &left = ctx.stack.back();
+            ctx.stack.pop_back();
+            if (left.param->variableType != VariableType::Float) {
+                throw ValidationException("Not a float on top of the stack");
+            }
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = VariableType::Vector;
+            block->expressions.push_back(resultExpr.get());
+
+            auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
+            auto binaryExpr = make_shared<BinaryExpression>(type);
+            binaryExpr->offset = ins.offset;
+            binaryExpr->left = left.param;
+            binaryExpr->right = rightX.param;
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = resultExpr.get();
+            assignExpr->right = binaryExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 2));
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 1));
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
+            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(binaryExpr));
+            ctx.expressions.push_back(move(assignExpr));
+        
+        } else if (ins.type == InstructionType::DIVVF ||
+                   ins.type == InstructionType::MULVF) {
+            auto &right = ctx.stack.back();
+            ctx.stack.pop_back();
+            if (right.param->variableType != VariableType::Float) {
+                throw ValidationException("Not a float on top of the stack");
+            }
+
+            auto &leftX = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &leftY = ctx.stack.back();
+            ctx.stack.pop_back();
+            auto &leftZ = ctx.stack.back();
+            ctx.stack.pop_back();
+            if ((leftX.param->variableType != VariableType::Vector || leftX.component != 0) ||
+                (leftY.param->variableType != VariableType::Vector || leftY.component != 1) ||
+                (leftZ.param->variableType != VariableType::Vector || leftZ.component != 2)) {
+                throw ValidationException("Not a vector on top of the stack");
+            }
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = VariableType::Vector;
+            block->expressions.push_back(resultExpr.get());
+
+            auto type = (ins.type == InstructionType::DIVVF) ? ExpressionType::Divide : ExpressionType::Multiply;
+            auto binaryExpr = make_shared<BinaryExpression>(type);
+            binaryExpr->offset = ins.offset;
+            binaryExpr->left = leftX.param;
+            binaryExpr->right = right.param;
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = resultExpr.get();
+            assignExpr->right = binaryExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 2));
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 1));
             ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
