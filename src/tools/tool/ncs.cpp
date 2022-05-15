@@ -531,7 +531,11 @@ private:
             }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
-                   expression.type == NwscriptProgram::ExpressionType::And ||
+                   expression.type == NwscriptProgram::ExpressionType::LogicalAnd ||
+                   expression.type == NwscriptProgram::ExpressionType::LogicalOr ||
+                   expression.type == NwscriptProgram::ExpressionType::BitwiseOr ||
+                   expression.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr ||
+                   expression.type == NwscriptProgram::ExpressionType::BitwiseAnd ||
                    expression.type == NwscriptProgram::ExpressionType::LeftShift ||
                    expression.type == NwscriptProgram::ExpressionType::RightShift ||
                    expression.type == NwscriptProgram::ExpressionType::Equal ||
@@ -544,10 +548,16 @@ private:
             string operation;
             if (expression.type == NwscriptProgram::ExpressionType::Assign) {
                 operation = "=";
-            } else if (expression.type == NwscriptProgram::ExpressionType::And) {
+            } else if (expression.type == NwscriptProgram::ExpressionType::LogicalAnd) {
                 operation = "&&";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Or) {
+            } else if (expression.type == NwscriptProgram::ExpressionType::LogicalOr) {
                 operation = "||";
+            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseOr) {
+                operation = "|";
+            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr) {
+                operation = "^";
+            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseAnd) {
+                operation = "&";
             } else if (expression.type == NwscriptProgram::ExpressionType::LeftShift) {
                 operation = "<<";
             } else if (expression.type == NwscriptProgram::ExpressionType::RightShift) {

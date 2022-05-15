@@ -58,8 +58,11 @@ public:
         Multiply,
         Divide,
 
-        And,
-        Or,
+        LogicalAnd,
+        LogicalOr,
+        BitwiseOr,
+        BitwiseExlusiveOr,
+        BitwiseAnd,
 
         LeftShift,
         RightShift,

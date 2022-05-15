@@ -376,6 +376,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::LOGANDII ||
                    ins.type == InstructionType::LOGORII ||
+                   ins.type == InstructionType::INCORII ||
+                   ins.type == InstructionType::EXCORII ||
+                   ins.type == InstructionType::BOOLANDII ||
                    ins.type == InstructionType::EQUALII ||
                    ins.type == InstructionType::EQUALFF ||
                    ins.type == InstructionType::EQUALSS ||
@@ -414,9 +417,15 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             ExpressionType type;
             if (ins.type == InstructionType::LOGANDII) {
-                type = ExpressionType::And;
+                type = ExpressionType::LogicalAnd;
             } else if (ins.type == InstructionType::LOGORII) {
-                type = ExpressionType::Or;
+                type = ExpressionType::LogicalOr;
+            } else if (ins.type == InstructionType::INCORII) {
+                type = ExpressionType::BitwiseOr;
+            } else if (ins.type == InstructionType::EXCORII) {
+                type = ExpressionType::BitwiseExlusiveOr;
+            } else if (ins.type == InstructionType::BOOLANDII) {
+                type = ExpressionType::BitwiseAnd;
             } else if (ins.type == InstructionType::EQUALII ||
                        ins.type == InstructionType::EQUALFF ||
                        ins.type == InstructionType::EQUALSS ||
