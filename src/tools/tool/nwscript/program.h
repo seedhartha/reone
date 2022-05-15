@@ -264,6 +264,8 @@ private:
 
         std::vector<CallStackFrame> callStack;
         std::vector<StackFrame> stack;
+        int numGlobals {0};
+        int prevNumGlobals {-1};
 
         DecompilationContext(
             const script::ScriptProgram &compiled,

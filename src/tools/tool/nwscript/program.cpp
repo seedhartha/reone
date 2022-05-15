@@ -39,8 +39,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
     for (auto &ins : compiled.instructions()) {
-        if (ins.type == InstructionType::JMP ||
-            ins.type == InstructionType::JZ ||
+        if (ins.type == InstructionType::JZ ||
             ins.type == InstructionType::JNZ) {
             auto offset = ins.offset + ins.jumpOffset;
             auto label = make_shared<LabelExpression>();
@@ -254,12 +253,13 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             ctx.expressions.push_back(move(actionExpr));
 
-        } else if (ins.type == InstructionType::CPDOWNSP) {
+        } else if (ins.type == InstructionType::CPDOWNSP ||
+                   ins.type == InstructionType::CPDOWNBP) {
             auto stackSize = static_cast<int>(ctx.stack.size());
             if (ins.stackOffset >= 0) {
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
-            auto startIdx = stackSize + (ins.stackOffset / 4);
+            auto startIdx = (ins.type == InstructionType::CPDOWNSP ? stackSize : ctx.numGlobals) + (ins.stackOffset / 4);
             auto numFrames = ins.size / 4;
             for (int i = 0; i < numFrames; ++i) {
                 auto &left = ctx.stack[startIdx + numFrames - i - 1];
@@ -290,12 +290,13 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 ctx.expressions.push_back(move(assignExpr));
             }
 
-        } else if (ins.type == InstructionType::CPTOPSP) {
+        } else if (ins.type == InstructionType::CPTOPSP ||
+                   ins.type == InstructionType::CPTOPBP) {
             auto stackSize = static_cast<int>(ctx.stack.size());
             if (ins.stackOffset >= 0) {
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
-            auto startIdx = stackSize + (ins.stackOffset / 4);
+            auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx.numGlobals) + (ins.stackOffset / 4);
             auto numFrames = ins.size / 4;
             for (int i = 0; i < numFrames; ++i) {
                 auto &frame = ctx.stack[startIdx + numFrames - i - 1];
@@ -517,10 +518,19 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
+
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto innerCtx = DecompilationContext(ctx);
             auto innerBlock = decompile(ins.offset + 0x10, innerCtx);
             ctx.stack.push_back(StackFrame(ctx.callStack.back().function, innerBlock));
+
+        } else if (ins.type == InstructionType::SAVEBP) {
+            ctx.prevNumGlobals = ctx.numGlobals;
+            ctx.numGlobals = static_cast<int>(ctx.stack.size());
+
+        } else if (ins.type == InstructionType::RESTOREBP) {
+            ctx.numGlobals = ctx.prevNumGlobals;
+
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }
