@@ -581,7 +581,8 @@ private:
                 operation = "&";
             } else if (expression.type == NwscriptProgram::ExpressionType::LeftShift) {
                 operation = "<<";
-            } else if (expression.type == NwscriptProgram::ExpressionType::RightShift) {
+            } else if (expression.type == NwscriptProgram::ExpressionType::RightShift ||
+                       expression.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
                 operation = ">>";
             } else if (expression.type == NwscriptProgram::ExpressionType::Equal) {
                 operation = "==";
@@ -595,6 +596,9 @@ private:
                 operation = "<";
             } else if (expression.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
                 operation = "<=";
+            }
+            if (expression.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
+                writer.put("(unsigned int)");
             }
             writeExpression(blockLevel, false, *binaryExpr.left, writer);
             writer.put(str(boost::format(" %s ") % operation));

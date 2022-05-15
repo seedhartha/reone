@@ -70,6 +70,7 @@ public:
 
         LeftShift,
         RightShift,
+        RightShiftUnsigned,
 
         Equal,
         NotEqual,

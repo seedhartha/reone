@@ -435,7 +435,8 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::LEQII ||
                    ins.type == InstructionType::LEQFF ||
                    ins.type == InstructionType::SHLEFTII ||
-                   ins.type == InstructionType::SHRIGHTII) {
+                   ins.type == InstructionType::SHRIGHTII ||
+                   ins.type == InstructionType::USHRIGHTII) {
             auto &right = ctx.stack.back();
             ctx.stack.pop_back();
             auto &left = ctx.stack.back();
@@ -531,6 +532,8 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 type = ExpressionType::LeftShift;
             } else if (ins.type == InstructionType::SHRIGHTII) {
                 type = ExpressionType::RightShift;
+            } else if (ins.type == InstructionType::USHRIGHTII) {
+                type = ExpressionType::RightShiftUnsigned;
             }
             auto binaryExpr = make_shared<BinaryExpression>(type);
             binaryExpr->offset = ins.offset;
