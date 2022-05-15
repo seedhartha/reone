@@ -431,10 +431,18 @@ private:
 
         writer.putLine(indent + string("{"));
         for (auto &innerExpr : block.expressions) {
-            writer.put(innerIndent);
+            if (innerExpr->type == NwscriptProgram::ExpressionType::Label) {
+                writer.put(indent);
+            } else {
+                writer.put(innerIndent);
+            }
             writeExpression(innerLevel, true, *innerExpr, writer);
+            if (innerExpr->type != NwscriptProgram::ExpressionType::Label &&
+                innerExpr->type != NwscriptProgram::ExpressionType::Conditional) {
+                writer.put(";");
+            }
             if (innerExpr->type != NwscriptProgram::ExpressionType::Conditional) {
-                writer.putLine(";");
+                writer.put("\n");
             }
         }
         writer.put(indent + string("}"));
@@ -443,7 +451,17 @@ private:
     void writeExpression(int blockLevel, bool leftmost, const NwscriptProgram::Expression &expression, TextWriter &writer) {
         auto indent = indentAtLevel(blockLevel);
 
-        if (expression.type == NwscriptProgram::ExpressionType::Return) {
+        if (expression.type == NwscriptProgram::ExpressionType::Label) {
+            auto &labelExpr = static_cast<const NwscriptProgram::LabelExpression &>(expression);
+            auto name = describeLabel(labelExpr);
+            writer.put(name + ":");
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Goto) {
+            auto &gotoExpr = static_cast<const NwscriptProgram::GotoExpression &>(expression);
+            auto name = describeLabel(*gotoExpr.label);
+            writer.put("goto " + name);
+
+        } else if (expression.type == NwscriptProgram::ExpressionType::Return) {
             auto &returnExpr = static_cast<const NwscriptProgram::ReturnExpression &>(expression);
             writer.put("return");
             if (returnExpr.value) {
@@ -545,6 +563,10 @@ private:
 
     std::string describeFunction(const NwscriptProgram::Function &function) {
         return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.offset);
+    }
+
+    std::string describeLabel(const NwscriptProgram::LabelExpression &labelExpr) {
+        return str(boost::format("loc_%08x") % labelExpr.offset);
     }
 
     std::string describeConstant(const NwscriptProgram::ConstantExpression &constExpr) {

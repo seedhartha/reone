@@ -250,6 +250,7 @@ private:
     struct DecompilationContext {
         const script::ScriptProgram &compiled;
         const script::IRoutines &routines;
+        const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
@@ -259,10 +260,12 @@ private:
         DecompilationContext(
             const script::ScriptProgram &compiled,
             const script::IRoutines &routines,
+            const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::vector<std::shared_ptr<Function>> &functions,
             std::vector<std::shared_ptr<Expression>> &expressions) :
             compiled(compiled),
             routines(routines),
+            labels(labels),
             functions(functions),
             expressions(expressions) {
         }

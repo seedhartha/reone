@@ -36,7 +36,22 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     auto functions = vector<shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
-    auto ctx = DecompilationContext(compiled, routines, functions, expressions);
+
+    auto labels = unordered_map<uint32_t, LabelExpression *>();
+    for (auto &ins : compiled.instructions()) {
+        if (ins.type == InstructionType::JMP ||
+            ins.type == InstructionType::JZ ||
+            ins.type == InstructionType::JNZ) {
+            auto offset = ins.offset + ins.jumpOffset;
+            auto label = make_shared<LabelExpression>();
+            label->offset = offset;
+            labels[offset] = label.get();
+            expressions.push_back(move(label));
+        }
+    }
+
+    auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions);
+
     ctx.callStack.push_back(CallStackFrame {funcMain.get()});
 
     funcMain->block = decompile(13, ctx);
@@ -53,6 +68,11 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
     block->offset = start;
 
     for (uint32_t offset = start; offset < ctx.compiled.length();) {
+        auto maybeLabel = ctx.labels.find(offset);
+        if (maybeLabel != ctx.labels.end()) {
+            block->expressions.push_back(maybeLabel->second);
+        }
+
         auto &ins = ctx.compiled.getInstruction(offset);
 
         if (ins.type == InstructionType::RETN) {
@@ -68,9 +88,6 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             break;
 
         } else if (ins.type == InstructionType::JMP) {
-            if (ins.jumpOffset < 0) {
-                throw NotImplementedException("Negative jump offsets are not supported yet");
-            }
             offset = ins.offset + ins.jumpOffset;
             continue;
 
@@ -105,9 +122,6 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::JZ ||
                    ins.type == InstructionType::JNZ) {
-            if (ins.jumpOffset < 0) {
-                throw NotImplementedException("Negative jump offsets are not supported yet");
-            }
             auto leftExpr = ctx.stack.back().param;
             ctx.stack.pop_back();
 
@@ -120,18 +134,24 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             testExpr->left = leftExpr;
             testExpr->right = rightExpr.get();
 
+            auto ifTrueGotoExpr = make_shared<GotoExpression>();
+            ifTrueGotoExpr->offset = ins.offset;
+            ifTrueGotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
+
+            auto ifTrueBlockExpr = make_shared<BlockExpression>();
+            ifTrueBlockExpr->offset = ins.offset;
+            ifTrueBlockExpr->expressions.push_back(ifTrueGotoExpr.get());
+
             auto condExpr = make_shared<ConditionalExpression>();
             condExpr->test = testExpr.get();
-            auto trueCtx = DecompilationContext(ctx);
-            condExpr->ifTrue = decompile(ins.offset + ins.jumpOffset, trueCtx);
-            auto falseCtx = DecompilationContext(ctx);
-            condExpr->ifFalse = decompile(ins.nextOffset, falseCtx);
+            condExpr->ifTrue = ifTrueBlockExpr.get();
             block->expressions.push_back(condExpr.get());
 
             ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
+            ctx.expressions.push_back(move(ifTrueGotoExpr));
+            ctx.expressions.push_back(move(ifTrueBlockExpr));
             ctx.expressions.push_back(move(condExpr));
-            break;
 
         } else if (ins.type == InstructionType::RSADDI ||
                    ins.type == InstructionType::RSADDF ||
