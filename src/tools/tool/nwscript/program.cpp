@@ -338,6 +338,41 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             for (int i = 0; i < -ins.stackOffset / 4; ++i) {
                 ctx.stack.pop_back();
             }
+        } else if (ins.type == InstructionType::NEGI ||
+                   ins.type == InstructionType::NEGF ||
+                   ins.type == InstructionType::COMPI ||
+                   ins.type == InstructionType::NOTI) {
+            auto value = ctx.stack.back().param;
+            ctx.stack.pop_back();
+
+            auto resultExpr = make_shared<ParameterExpression>();
+            resultExpr->offset = ins.offset;
+            resultExpr->variableType = value->variableType;
+            block->expressions.push_back(resultExpr.get());
+
+            ExpressionType type;
+            if (ins.type == InstructionType::NEGI ||
+                ins.type == InstructionType::NEGF) {
+                type = ExpressionType::Negate;
+            } else if (ins.type == InstructionType::COMPI) {
+                type = ExpressionType::OnesComplement;
+            } else if (ins.type == InstructionType::NOTI) {
+                type = ExpressionType::Not;
+            }
+            auto unaryExpr = make_shared<UnaryExpression>(type);
+            unaryExpr->offset = ins.offset;
+            unaryExpr->operand = value;
+
+            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+            assignExpr->offset = ins.offset;
+            assignExpr->left = resultExpr.get();
+            assignExpr->right = unaryExpr.get();
+            block->expressions.push_back(assignExpr.get());
+
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
+            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(unaryExpr));
+            ctx.expressions.push_back(move(assignExpr));
 
         } else if (ins.type == InstructionType::LOGANDII ||
                    ins.type == InstructionType::LOGORII ||
@@ -417,20 +452,20 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             } else if (ins.type == InstructionType::SHRIGHTII) {
                 type = ExpressionType::RightShift;
             }
-            auto compExpr = make_shared<BinaryExpression>(type);
-            compExpr->offset = ins.offset;
-            compExpr->left = left.param;
-            compExpr->right = right.param;
+            auto binaryExpr = make_shared<BinaryExpression>(type);
+            binaryExpr->offset = ins.offset;
+            binaryExpr->left = left.param;
+            binaryExpr->right = right.param;
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = resultExpr.get();
-            assignExpr->right = compExpr.get();
+            assignExpr->right = binaryExpr.get();
             block->expressions.push_back(assignExpr.get());
 
             ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
             ctx.expressions.push_back(move(resultExpr));
-            ctx.expressions.push_back(move(compExpr));
+            ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {

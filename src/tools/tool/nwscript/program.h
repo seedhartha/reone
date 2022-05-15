@@ -45,6 +45,7 @@ public:
 
         Negate,
         Not,
+        OnesComplement,
 
         // END Unary
 
@@ -115,7 +116,7 @@ public:
     };
 
     struct UnaryExpression : Expression {
-        Expression *operand {nullptr};
+        ParameterExpression *operand {nullptr};
 
         UnaryExpression(ExpressionType type) :
             Expression(type) {

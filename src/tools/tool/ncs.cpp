@@ -517,6 +517,19 @@ private:
             }
             writer.put(")");
 
+        } else if (expression.type == NwscriptProgram::ExpressionType::Negate ||
+                   expression.type == NwscriptProgram::ExpressionType::OnesComplement ||
+                   expression.type == NwscriptProgram::ExpressionType::Not) {
+            auto &unaryExpr = static_cast<const NwscriptProgram::UnaryExpression &>(expression);
+            auto name = describeParameter(*unaryExpr.operand);
+            if (expression.type == NwscriptProgram::ExpressionType::Negate) {
+                writer.put("-" + name);
+            } else if (expression.type == NwscriptProgram::ExpressionType::OnesComplement) {
+                writer.put("~" + name);
+            } else if (expression.type == NwscriptProgram::ExpressionType::Not) {
+                writer.put("!" + name);
+            }
+
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
                    expression.type == NwscriptProgram::ExpressionType::And ||
                    expression.type == NwscriptProgram::ExpressionType::LeftShift ||
