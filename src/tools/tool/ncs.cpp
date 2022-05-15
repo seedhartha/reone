@@ -388,8 +388,13 @@ public:
 
     void save(IOutputStream &stream) {
         auto writer = TextWriter(stream);
+        auto writtenOffsets = set<uint32_t>();
         for (auto &function : _program.functions()) {
+            if (writtenOffsets.count(function->offset) > 0) {
+                continue;
+            }
             writeFunction(*function, writer);
+            writtenOffsets.insert(function->offset);
         }
     }
 
@@ -416,7 +421,7 @@ private:
 
         writeBlock(0, *function.block, writer);
 
-        writer.putLine("");
+        writer.put("\n\n");
     }
 
     void writeBlock(int level, const NwscriptProgram::BlockExpression &block, TextWriter &writer) {
@@ -432,7 +437,7 @@ private:
                 writer.putLine(";");
             }
         }
-        writer.putLine(indent + string("}"));
+        writer.put(indent + string("}"));
     }
 
     void writeExpression(int blockLevel, bool leftmost, const NwscriptProgram::Expression &expression, TextWriter &writer) {
@@ -474,11 +479,25 @@ private:
         } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
             auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
             auto name = describeAction(actionExpr);
-            auto arguments = vector<string>();
-            for (auto &argExpr : actionExpr.arguments) {
-                arguments.push_back(describeParameter(*argExpr));
+            writer.put(name + "(");
+            for (size_t i = 0; i < actionExpr.arguments.size(); ++i) {
+                if (i > 0) {
+                    writer.put(", ");
+                }
+                auto argExpr = actionExpr.arguments[i];
+                if (argExpr->type == NwscriptProgram::ExpressionType::Parameter) {
+                    auto paramExpr = static_cast<NwscriptProgram::ParameterExpression *>(argExpr);
+                    auto name = describeParameter(*paramExpr);
+                    writer.put(name);
+                } else if (argExpr->type == NwscriptProgram::ExpressionType::Block) {
+                    auto blockExpr = static_cast<NwscriptProgram::BlockExpression *>(argExpr);
+                    writer.putLine("[&]()");
+                    writeBlock(blockLevel, *blockExpr, writer);
+                } else {
+                    throw ValidationException("Action argument is neither parameter nor block expression");
+                }
             }
-            writer.put(str(boost::format("%s(%s)") % name % boost::join(arguments, ", ")));
+            writer.put(")");
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
                    expression.type == NwscriptProgram::ExpressionType::Equal ||
@@ -502,9 +521,11 @@ private:
             writeExpression(blockLevel, false, *condExpr.test, writer);
             writer.putLine(")");
             writeBlock(blockLevel, *condExpr.ifTrue, writer);
+            writer.putLine("");
             if (condExpr.ifFalse) {
                 writer.putLine(indent + "else");
                 writeBlock(blockLevel, *condExpr.ifFalse, writer);
+                writer.putLine("");
             }
 
         } else {

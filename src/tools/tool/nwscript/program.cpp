@@ -143,7 +143,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::RSADDTAL) {
             auto expression = parameterExpression(ins);
             block->expressions.push_back(expression.get());
-            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, expression.get(), 0});
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, expression.get(), 0));
             ctx.expressions.push_back(move(expression));
 
         } else if (ins.type == InstructionType::CONSTI ||
@@ -163,7 +163,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             assignExpr->right = constExpr.get();
             block->expressions.push_back(assignExpr.get());
 
-            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, paramExpr.get(), 0});
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, paramExpr.get(), 0));
             ctx.expressions.push_back(move(constExpr));
             ctx.expressions.push_back(move(paramExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -171,9 +171,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         } else if (ins.type == InstructionType::ACTION) {
             auto &routine = ctx.routines.get(ins.routine);
 
-            vector<ParameterExpression *> arguments;
+            vector<Expression *> arguments;
             for (int i = 0; i < ins.argCount; ++i) {
-                ParameterExpression *argument;
+                Expression *argument;
                 auto argType = routine.getArgumentType(i);
                 if (argType == VariableType::Vector) {
                     auto xParam = ctx.stack.back();
@@ -188,9 +188,15 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                         throw ValidationException("Not a vector on top of the stack");
                     }
                     argument = xParam.param;
+                } else if (argType == VariableType::Action) {
+                    argument = ctx.stack.back().block;
+                    ctx.stack.pop_back();
                 } else {
                     argument = ctx.stack.back().param;
                     ctx.stack.pop_back();
+                }
+                if (!argument) {
+                    throw ValidationException("Unable not extract action argument from stack");
                 }
                 arguments.push_back(argument);
             }
@@ -213,11 +219,11 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 block->expressions.push_back(assignExpr.get());
 
                 if (routine.returnType() == VariableType::Vector) {
-                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 2});
-                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 1});
-                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 0});
+                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValExpr.get(), 2));
+                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValExpr.get(), 1));
+                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValExpr.get(), 0));
                 } else {
-                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 0});
+                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValExpr.get(), 0));
                 }
                 ctx.expressions.push_back(move(retValExpr));
                 ctx.expressions.push_back(move(assignExpr));
@@ -370,13 +376,15 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             assignExpr->right = compExpr.get();
             block->expressions.push_back(assignExpr.get());
 
-            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, resultExpr.get(), 0});
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get(), 0));
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(compExpr));
             ctx.expressions.push_back(move(assignExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {
-            // TODO: implement
+            auto innerCtx = DecompilationContext(ctx);
+            auto innerBlock = decompile(ins.offset + 0x10, innerCtx);
+            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, innerBlock));
 
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));

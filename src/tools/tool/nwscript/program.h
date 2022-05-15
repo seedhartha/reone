@@ -162,7 +162,7 @@ public:
 
     struct ActionExpression : Expression {
         int action {0};
-        std::vector<ParameterExpression *> arguments;
+        std::vector<Expression *> arguments;
 
         ActionExpression() :
             Expression(ExpressionType::Action) {
@@ -214,7 +214,31 @@ private:
     struct StackFrame {
         Function *allocatedBy {nullptr};
         ParameterExpression *param {nullptr};
+        BlockExpression *block {nullptr};
         int component {0}; // XYZ (vector)
+
+        StackFrame(
+            Function *allocatedBy,
+            ParameterExpression *param,
+            int component) :
+            allocatedBy(allocatedBy),
+            param(param),
+            component(component) {
+        }
+
+        StackFrame(
+            Function *allocatedBy,
+            BlockExpression *block) :
+            allocatedBy(allocatedBy),
+            block(block) {
+        }
+
+        StackFrame(const StackFrame &other) {
+            allocatedBy = other.allocatedBy;
+            param = other.param;
+            block = other.block;
+            component = other.component;
+        }
 
         StackFrame withAllocatedBy(Function &allocatedBy) {
             auto copy = StackFrame(*this);
