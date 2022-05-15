@@ -229,8 +229,8 @@ private:
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::deque<CallStackFrame> callStack;
-        std::deque<StackFrame> stack;
+        std::vector<CallStackFrame> callStack;
+        std::vector<StackFrame> stack;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,
