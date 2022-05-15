@@ -519,7 +519,9 @@ private:
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Negate ||
                    expression.type == NwscriptProgram::ExpressionType::OnesComplement ||
-                   expression.type == NwscriptProgram::ExpressionType::Not) {
+                   expression.type == NwscriptProgram::ExpressionType::Not ||
+                   expression.type == NwscriptProgram::ExpressionType::Increment ||
+                   expression.type == NwscriptProgram::ExpressionType::Decrement) {
             auto &unaryExpr = static_cast<const NwscriptProgram::UnaryExpression &>(expression);
             auto name = describeParameter(*unaryExpr.operand);
             if (expression.type == NwscriptProgram::ExpressionType::Negate) {
@@ -528,6 +530,10 @@ private:
                 writer.put("~" + name);
             } else if (expression.type == NwscriptProgram::ExpressionType::Not) {
                 writer.put("!" + name);
+            } else if (expression.type == NwscriptProgram::ExpressionType::Increment) {
+                writer.put(name + "++");
+            } else if (expression.type == NwscriptProgram::ExpressionType::Decrement) {
+                writer.put(name + "--");
             }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
