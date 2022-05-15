@@ -339,7 +339,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 ctx.stack.pop_back();
             }
 
-        } else if (ins.type == InstructionType::EQUALII ||
+        } else if (ins.type == InstructionType::LOGANDII ||
+                   ins.type == InstructionType::LOGORII ||
+                   ins.type == InstructionType::EQUALII ||
                    ins.type == InstructionType::EQUALFF ||
                    ins.type == InstructionType::EQUALSS ||
                    ins.type == InstructionType::EQUALOO ||
@@ -355,8 +357,16 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::NEQUALEVTEVT ||
                    ins.type == InstructionType::NEQUALLOCLOC ||
                    ins.type == InstructionType::NEQUALTALTAL ||
-                   ins.type == InstructionType::LOGANDII ||
-                   ins.type == InstructionType::LOGORII) {
+                   ins.type == InstructionType::GEQII ||
+                   ins.type == InstructionType::GEQFF ||
+                   ins.type == InstructionType::GTII ||
+                   ins.type == InstructionType::GTFF ||
+                   ins.type == InstructionType::LTII ||
+                   ins.type == InstructionType::LTFF ||
+                   ins.type == InstructionType::LEQII ||
+                   ins.type == InstructionType::LEQFF ||
+                   ins.type == InstructionType::SHLEFTII ||
+                   ins.type == InstructionType::SHRIGHTII) {
             auto &left = ctx.stack.back();
             ctx.stack.pop_back();
             auto &right = ctx.stack.back();
@@ -368,14 +378,18 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             block->expressions.push_back(resultExpr.get());
 
             ExpressionType type;
-            if (ins.type == InstructionType::EQUALII ||
-                ins.type == InstructionType::EQUALFF ||
-                ins.type == InstructionType::EQUALSS ||
-                ins.type == InstructionType::EQUALOO ||
-                ins.type == InstructionType::EQUALEFFEFF ||
-                ins.type == InstructionType::EQUALEVTEVT ||
-                ins.type == InstructionType::EQUALLOCLOC ||
-                ins.type == InstructionType::EQUALTALTAL) {
+            if (ins.type == InstructionType::LOGANDII) {
+                type = ExpressionType::And;
+            } else if (ins.type == InstructionType::LOGORII) {
+                type = ExpressionType::Or;
+            } else if (ins.type == InstructionType::EQUALII ||
+                       ins.type == InstructionType::EQUALFF ||
+                       ins.type == InstructionType::EQUALSS ||
+                       ins.type == InstructionType::EQUALOO ||
+                       ins.type == InstructionType::EQUALEFFEFF ||
+                       ins.type == InstructionType::EQUALEVTEVT ||
+                       ins.type == InstructionType::EQUALLOCLOC ||
+                       ins.type == InstructionType::EQUALTALTAL) {
                 type = ExpressionType::Equal;
             } else if (ins.type == InstructionType::NEQUALII ||
                        ins.type == InstructionType::NEQUALFF ||
@@ -386,10 +400,22 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                        ins.type == InstructionType::NEQUALLOCLOC ||
                        ins.type == InstructionType::NEQUALTALTAL) {
                 type = ExpressionType::NotEqual;
-            } else if (ins.type == InstructionType::LOGANDII) {
-                type = ExpressionType::And;
-            } else if (ins.type == InstructionType::LOGORII) {
-                type = ExpressionType::Or;
+            } else if (ins.type == InstructionType::GEQII ||
+                       ins.type == InstructionType::GEQFF) {
+                type = ExpressionType::GreaterThanOrEqual;
+            } else if (ins.type == InstructionType::GTII ||
+                       ins.type == InstructionType::GTFF) {
+                type = ExpressionType::GreaterThan;
+            } else if (ins.type == InstructionType::LTII ||
+                       ins.type == InstructionType::LTFF) {
+                type = ExpressionType::LessThan;
+            } else if (ins.type == InstructionType::LEQII ||
+                       ins.type == InstructionType::LEQFF) {
+                type = ExpressionType::LessThanOrEqual;
+            } else if (ins.type == InstructionType::SHLEFTII) {
+                type = ExpressionType::LeftShift;
+            } else if (ins.type == InstructionType::SHRIGHTII) {
+                type = ExpressionType::RightShift;
             }
             auto compExpr = make_shared<BinaryExpression>(type);
             compExpr->offset = ins.offset;

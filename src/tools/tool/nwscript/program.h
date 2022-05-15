@@ -60,6 +60,9 @@ public:
         And,
         Or,
 
+        LeftShift,
+        RightShift,
+
         Equal,
         NotEqual,
         GreaterThanOrEqual,
