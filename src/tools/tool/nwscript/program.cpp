@@ -39,7 +39,8 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
     for (auto &ins : compiled.instructions()) {
-        if (ins.type == InstructionType::JZ ||
+        if (ins.type == InstructionType::JMP ||
+            ins.type == InstructionType::JZ ||
             ins.type == InstructionType::JNZ) {
             auto offset = ins.offset + ins.jumpOffset;
             auto label = make_shared<LabelExpression>();
@@ -87,8 +88,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             break;
 
         } else if (ins.type == InstructionType::JMP) {
+            auto gotoExpr = make_shared<GotoExpression>();
+            gotoExpr->offset = ins.offset;
+            gotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
             offset = ins.offset + ins.jumpOffset;
-            continue;
 
         } else if (ins.type == InstructionType::JSR) {
             if (ins.jumpOffset < 0) {
@@ -318,6 +321,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
                 auto paramExpr = make_shared<ParameterExpression>();
                 paramExpr->offset = ins.offset;
+                paramExpr->variableType = source->variableType;
                 paramExpr->index = i;
                 block->expressions.push_back(paramExpr.get());
 
@@ -327,7 +331,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 assignExpr->right = source;
                 block->expressions.push_back(assignExpr.get());
 
-                ctx.stack.push_back(frame.withAllocatedBy(*ctx.callStack.back().function));
+                auto frameCopy = StackFrame(frame);
+                frameCopy.allocatedBy = ctx.callStack.back().function;
+                frameCopy.param = paramExpr.get();
+                frameCopy.component = frame.component;
+                ctx.stack.push_back(move(frameCopy));
+
                 ctx.expressions.push_back(move(paramExpr));
                 ctx.expressions.push_back(move(assignExpr));
             }
