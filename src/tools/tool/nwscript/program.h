@@ -70,10 +70,15 @@ public:
         // END Binary
     };
 
+    enum class ParameterLocality {
+        Local,
+        Input,
+        Output
+    };
+
     struct Expression {
         ExpressionType type;
         uint32_t offset {0};
-        int index {0};
 
         Expression(ExpressionType type) :
             type(type) {
@@ -88,12 +93,6 @@ public:
         }
     };
 
-    struct Function {
-        std::string name;
-        uint32_t offset {0};
-        BlockExpression *block {nullptr};
-    };
-
     struct ConstantExpression : Expression {
         script::Variable value;
 
@@ -104,6 +103,8 @@ public:
 
     struct ParameterExpression : Expression {
         script::VariableType variableType {script::VariableType::Int};
+        ParameterLocality locality {ParameterLocality::Local};
+        int index {0};
 
         ParameterExpression() :
             Expression(ExpressionType::Parameter) {
@@ -142,6 +143,8 @@ public:
     };
 
     struct ReturnExpression : Expression {
+        Expression *value {nullptr};
+
         ReturnExpression() :
             Expression(ExpressionType::Return) {
         }
@@ -166,9 +169,18 @@ public:
         }
     };
 
+    struct Function {
+        std::string name;
+        uint32_t offset {0};
+        script::VariableType returnType {script::VariableType::Void};
+        std::vector<script::VariableType> inArgumentTypes;
+        std::vector<script::VariableType> outArgumentTypes;
+        BlockExpression *block {nullptr};
+    };
+
     struct CallExpression : Expression {
         Function *function {nullptr};
-        std::vector<Expression *> arguments;
+        std::vector<ParameterExpression *> arguments;
 
         CallExpression() :
             Expression(ExpressionType::Call) {
@@ -193,13 +205,32 @@ public:
     static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled, const script::IRoutines &routines);
 
 private:
+    struct CallStackFrame {
+        Function *function {nullptr};
+        std::vector<ParameterExpression *> inputs;
+        std::vector<ParameterExpression *> outputs;
+    };
+
+    struct StackFrame {
+        Function *allocatedBy {nullptr};
+        ParameterExpression *param {nullptr};
+        int component {0}; // XYZ (vector)
+
+        StackFrame withAllocatedBy(Function &allocatedBy) {
+            auto copy = StackFrame(*this);
+            copy.allocatedBy = &allocatedBy;
+            return std::move(copy);
+        }
+    };
+
     struct DecompilationContext {
         const script::ScriptProgram &compiled;
         const script::IRoutines &routines;
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::deque<std::pair<ParameterExpression *, int>> stack;
+        std::deque<CallStackFrame> callStack;
+        std::deque<StackFrame> stack;
 
         DecompilationContext(
             const script::ScriptProgram &compiled,

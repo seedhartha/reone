@@ -30,20 +30,22 @@ using namespace reone::script;
 namespace reone {
 
 NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
-    auto functions = vector<shared_ptr<Function>>();
-    auto expressions = vector<shared_ptr<Expression>>();
-    auto decompilationCtx = DecompilationContext(compiled, routines, functions, expressions);
-
     auto funcMain = make_shared<Function>();
     funcMain->name = "main";
     funcMain->offset = 13;
-    funcMain->block = decompile(13, decompilationCtx);
 
-    decompilationCtx.functions.push_back(move(funcMain));
+    auto functions = vector<shared_ptr<Function>>();
+    auto expressions = vector<shared_ptr<Expression>>();
+    auto ctx = DecompilationContext(compiled, routines, functions, expressions);
+    ctx.callStack.push_back(CallStackFrame {funcMain.get()});
+
+    funcMain->block = decompile(13, ctx);
+
+    ctx.functions.push_back(move(funcMain));
 
     return NwscriptProgram(
-        decompilationCtx.functions,
-        decompilationCtx.expressions);
+        ctx.functions,
+        ctx.expressions);
 }
 
 NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
@@ -51,10 +53,16 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
     block->offset = start;
 
     for (uint32_t offset = start; offset < ctx.compiled.length();) {
-        const Instruction &ins = ctx.compiled.getInstruction(offset);
+        auto &ins = ctx.compiled.getInstruction(offset);
 
         if (ins.type == InstructionType::RETN) {
             auto retExpr = make_shared<ReturnExpression>();
+            if (ctx.callStack.size() == 1ll && !ctx.stack.empty()) {
+                auto retVal = ctx.stack.back().param;
+                retExpr->value = retVal;
+                auto funcMain = ctx.callStack.back().function;
+                funcMain->returnType = retVal->variableType;
+            }
             block->expressions.push_back(retExpr.get());
             ctx.expressions.push_back(move(retExpr));
             break;
@@ -72,12 +80,25 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             }
             auto sub = make_shared<Function>();
             sub->offset = ins.offset + ins.jumpOffset;
-            sub->block = decompile(ins.offset + ins.jumpOffset, ctx);
+
+            auto subCtx = DecompilationContext(ctx);
+            subCtx.callStack.push_back(CallStackFrame {sub.get()});
+            sub->block = decompile(ins.offset + ins.jumpOffset, subCtx);
 
             auto callExpr = make_shared<CallExpression>();
             callExpr->offset = ins.offset;
             callExpr->function = sub.get();
             block->expressions.push_back(callExpr.get());
+
+            for (auto &input : subCtx.callStack.back().inputs) {
+                sub->inArgumentTypes.push_back(input->variableType);
+                callExpr->arguments.push_back(input);
+            }
+            for (auto &output : subCtx.callStack.back().outputs) {
+                sub->outArgumentTypes.push_back(output->variableType);
+                callExpr->arguments.push_back(output);
+            }
+            subCtx.callStack.pop_back();
 
             ctx.functions.push_back(move(sub));
             ctx.expressions.push_back(move(callExpr));
@@ -87,7 +108,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ins.jumpOffset < 0) {
                 throw NotImplementedException("Negative jump offsets are not supported yet");
             }
-            auto leftExpr = ctx.stack.back().first;
+            auto leftExpr = ctx.stack.back().param;
             ctx.stack.pop_back();
 
             auto rightExpr = make_shared<ConstantExpression>();
@@ -122,7 +143,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                    ins.type == InstructionType::RSADDTAL) {
             auto expression = parameterExpression(ins);
             block->expressions.push_back(expression.get());
-            ctx.stack.push_back(make_pair(expression.get(), 0));
+            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, expression.get(), 0});
             ctx.expressions.push_back(move(expression));
 
         } else if (ins.type == InstructionType::CONSTI ||
@@ -142,7 +163,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             assignExpr->right = constExpr.get();
             block->expressions.push_back(assignExpr.get());
 
-            ctx.stack.push_back(make_pair(paramExpr.get(), 0));
+            ctx.stack.push_back(StackFrame {ctx.callStack.back().function, paramExpr.get(), 0});
             ctx.expressions.push_back(move(constExpr));
             ctx.expressions.push_back(move(paramExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -161,14 +182,14 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                     ctx.stack.pop_back();
                     auto zParam = ctx.stack.back();
                     ctx.stack.pop_back();
-                    if ((xParam.first->type != ExpressionType::Parameter || xParam.second != 0) ||
-                        (yParam.first->type != ExpressionType::Parameter || yParam.second != 1) ||
-                        (zParam.first->type != ExpressionType::Parameter || zParam.second != 2)) {
+                    if ((xParam.param->type != ExpressionType::Parameter || xParam.component != 0) ||
+                        (yParam.param->type != ExpressionType::Parameter || yParam.component != 1) ||
+                        (zParam.param->type != ExpressionType::Parameter || zParam.component != 2)) {
                         throw ValidationException("Not a vector on top of the stack");
                     }
-                    argument = xParam.first;
+                    argument = xParam.param;
                 } else {
-                    argument = ctx.stack.back().first;
+                    argument = ctx.stack.back().param;
                     ctx.stack.pop_back();
                 }
                 arguments.push_back(argument);
@@ -192,11 +213,11 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 block->expressions.push_back(assignExpr.get());
 
                 if (routine.returnType() == VariableType::Vector) {
-                    ctx.stack.push_back(make_pair(retValExpr.get(), 2));
-                    ctx.stack.push_back(make_pair(retValExpr.get(), 1));
-                    ctx.stack.push_back(make_pair(retValExpr.get(), 0));
+                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 2});
+                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 1});
+                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 0});
                 } else {
-                    ctx.stack.push_back(make_pair(retValExpr.get(), 0));
+                    ctx.stack.push_back(StackFrame {ctx.callStack.back().function, retValExpr.get(), 0});
                 }
                 ctx.expressions.push_back(move(retValExpr));
                 ctx.expressions.push_back(move(assignExpr));
@@ -213,18 +234,33 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
             auto startIdx = stackSize + (ins.stackOffset / 4);
-            auto numItems = ins.size / 4;
-            for (int i = 0; i < numItems; ++i) {
-                auto &left = ctx.stack[startIdx + numItems - i - 1];
+            auto numFrames = ins.size / 4;
+            for (int i = 0; i < numFrames; ++i) {
+                auto &left = ctx.stack[startIdx + numFrames - i - 1];
                 auto &right = ctx.stack[stackSize - i - 1];
+
+                ParameterExpression *destination;
+                auto &csFrame = ctx.callStack.back();
+                if (left.allocatedBy != csFrame.function) {
+                    auto destExpr = make_shared<ParameterExpression>();
+                    destExpr->offset = ins.offset;
+                    destExpr->variableType = left.param->variableType;
+                    destExpr->locality = ParameterLocality::Output;
+                    destExpr->index = csFrame.outputs.size();
+                    csFrame.outputs.push_back(left.param);
+                    destination = destExpr.get();
+                    ctx.expressions.push_back(move(destExpr));
+                } else {
+                    destination = left.param;
+                }
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
-                assignExpr->left = left.first;
-                assignExpr->right = right.first;
+                assignExpr->left = destination;
+                assignExpr->right = right.param;
                 block->expressions.push_back(assignExpr.get());
 
-                left = right;
+                left = right.withAllocatedBy(*left.allocatedBy);
                 ctx.expressions.push_back(move(assignExpr));
             }
 
@@ -234,9 +270,24 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
             auto startIdx = stackSize + (ins.stackOffset / 4);
-            auto numItems = ins.size / 4;
-            for (int i = 0; i < numItems; ++i) {
-                auto &item = ctx.stack[startIdx + numItems - i - 1];
+            auto numFrames = ins.size / 4;
+            for (int i = 0; i < numFrames; ++i) {
+                auto &frame = ctx.stack[startIdx + numFrames - i - 1];
+
+                ParameterExpression *source;
+                auto &csFrame = ctx.callStack.back();
+                if (frame.allocatedBy != csFrame.function) {
+                    auto sourceExpr = make_shared<ParameterExpression>();
+                    sourceExpr->offset = ins.offset;
+                    sourceExpr->variableType = frame.param->variableType;
+                    sourceExpr->locality = ParameterLocality::Input;
+                    sourceExpr->index = csFrame.inputs.size();
+                    csFrame.inputs.push_back(frame.param);
+                    source = sourceExpr.get();
+                    ctx.expressions.push_back(move(sourceExpr));
+                } else {
+                    source = frame.param;
+                }
 
                 auto paramExpr = make_shared<ParameterExpression>();
                 paramExpr->offset = ins.offset;
@@ -246,10 +297,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
                 assignExpr->left = paramExpr.get();
-                assignExpr->right = item.first;
+                assignExpr->right = source;
                 block->expressions.push_back(assignExpr.get());
 
-                ctx.stack.push_back(item);
+                ctx.stack.push_back(frame.withAllocatedBy(*ctx.callStack.back().function));
                 ctx.expressions.push_back(move(paramExpr));
                 ctx.expressions.push_back(move(assignExpr));
             }

@@ -398,8 +398,21 @@ private:
     Routines &_routines;
 
     void writeFunction(const NwscriptProgram::Function &function, TextWriter &writer) {
+        auto returnType = describeVariableType(function.returnType);
         auto name = describeFunction(function);
-        writer.putLine(str(boost::format("void %s()") % name));
+        auto params = vector<string>();
+        int paramIdx;
+        paramIdx = 0;
+        for (auto &paramType : function.inArgumentTypes) {
+            auto type = describeVariableType(paramType);
+            params.push_back(str(boost::format("%s in_%d") % type % (paramIdx++)));
+        }
+        paramIdx = 0;
+        for (auto &paramType : function.outArgumentTypes) {
+            auto type = describeVariableType(paramType);
+            params.push_back(str(boost::format("%s &out_%d") % type % (paramIdx++)));
+        }
+        writer.putLine(str(boost::format("%s %s(%s)") % returnType % name % boost::join(params, ", ")));
 
         writeBlock(0, *function.block, writer);
 
@@ -426,7 +439,12 @@ private:
         auto indent = indentAtLevel(blockLevel);
 
         if (expression.type == NwscriptProgram::ExpressionType::Return) {
+            auto &returnExpr = static_cast<const NwscriptProgram::ReturnExpression &>(expression);
             writer.put("return");
+            if (returnExpr.value) {
+                writer.put(" ");
+                writeExpression(blockLevel, false, *returnExpr.value, writer);
+            }
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Constant) {
             auto &constExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
@@ -446,12 +464,17 @@ private:
         } else if (expression.type == NwscriptProgram::ExpressionType::Call) {
             auto &callExpr = static_cast<const NwscriptProgram::CallExpression &>(expression);
             auto name = describeFunction(*callExpr.function);
-            writer.put(str(boost::format("%s()") % name));
+            auto params = vector<string>();
+            for (auto &param : callExpr.arguments) {
+                auto name = describeParameter(*param);
+                params.push_back(name);
+            }
+            writer.put(str(boost::format("%s(%s)") % name % boost::join(params, ", ")));
 
         } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
             auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
             auto name = describeAction(actionExpr);
-            vector<string> arguments;
+            auto arguments = vector<string>();
             for (auto &argExpr : actionExpr.arguments) {
                 arguments.push_back(describeParameter(*argExpr));
             }
@@ -494,7 +517,7 @@ private:
     }
 
     std::string describeFunction(const NwscriptProgram::Function &function) {
-        return !function.name.empty() ? function.name : str(boost::format("loc_%08x") % function.offset);
+        return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.offset);
     }
 
     std::string describeConstant(const NwscriptProgram::ConstantExpression &constExpr) {
@@ -512,10 +535,18 @@ private:
     }
 
     std::string describeParameter(const NwscriptProgram::ParameterExpression &paramExpr) {
-        if (paramExpr.index > 0) {
-            return str(boost::format("var_%08x_%d") % paramExpr.offset % paramExpr.index);
+        if (paramExpr.locality == NwscriptProgram::ParameterLocality::Local) {
+            if (paramExpr.index > 0) {
+                return str(boost::format("var_%08x_%d") % paramExpr.offset % paramExpr.index);
+            } else {
+                return str(boost::format("var_%08x") % paramExpr.offset);
+            }
+        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Input) {
+            return str(boost::format("in_%d") % paramExpr.index);
+        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Output) {
+            return str(boost::format("out_%d") % paramExpr.index);
         } else {
-            return str(boost::format("var_%08x") % paramExpr.offset);
+            throw ArgumentException("Unsupported parameter locality: " + to_string(static_cast<int>(paramExpr.locality)));
         }
     }
 
@@ -529,6 +560,8 @@ private:
 
     std::string describeVariableType(VariableType type) {
         switch (type) {
+        case VariableType::Void:
+            return "void";
         case VariableType::Int:
             return "int";
         case VariableType::Float:
