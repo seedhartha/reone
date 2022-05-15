@@ -20,6 +20,8 @@
 #include "../../../common/exception/argument.h"
 #include "../../../common/exception/notimplemented.h"
 #include "../../../common/exception/validation.h"
+#include "../../../common/logutil.h"
+#include "../../../script/instrutil.h"
 #include "../../../script/routine.h"
 #include "../../../script/routines.h"
 
@@ -30,9 +32,8 @@ using namespace reone::script;
 namespace reone {
 
 NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
-    auto funcMain = make_shared<Function>();
-    funcMain->name = "main";
-    funcMain->offset = 13;
+    auto startFunc = make_shared<Function>();
+    startFunc->offset = 13;
 
     auto functions = vector<shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
@@ -52,11 +53,12 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions);
 
-    ctx.callStack.push_back(CallStackFrame {funcMain.get()});
+    ctx.callStack.push_back(CallStackFrame {startFunc.get()});
 
-    funcMain->block = decompile(13, ctx);
+    startFunc->block = decompile(13, ctx);
+    startFunc->name = !ctx.stack.empty() ? "StartingConditional" : "main";
 
-    ctx.functions.push_back(move(funcMain));
+    ctx.functions.push_back(move(startFunc));
 
     return NwscriptProgram(
         ctx.functions,
@@ -64,6 +66,8 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 }
 
 NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
+    debug(boost::format("Decompiling block at %08x") % start);
+
     auto block = make_shared<BlockExpression>();
     block->offset = start;
 
@@ -74,6 +78,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         }
 
         auto &ins = ctx.compiled.getInstruction(offset);
+        debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
 
         if (ins.type == InstructionType::NOP ||
             ins.type == InstructionType::NOP2) {
@@ -95,6 +100,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             gotoExpr->offset = ins.offset;
             gotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
             offset = ins.offset + ins.jumpOffset;
+            continue;
 
         } else if (ins.type == InstructionType::JSR) {
             if (ins.jumpOffset < 0) {
@@ -644,7 +650,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
-        
+
         } else if (ins.type == InstructionType::DIVVF ||
                    ins.type == InstructionType::MULVF) {
             auto &right = ctx.stack.back();

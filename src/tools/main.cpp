@@ -25,6 +25,8 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     initLog();
+    setLogLevel(LogLevel::Debug);
+
     try {
         return Program(argc, argv).run();
     } catch (const exception &ex) {
