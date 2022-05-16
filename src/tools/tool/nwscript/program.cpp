@@ -137,6 +137,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                     sub->block->expressions.push_back(expression);
                 }
             }
+            subCtx.branches.clear();
 
             bool isMain = false;
             if (subCtx.callStack.size() == 2ll) {
