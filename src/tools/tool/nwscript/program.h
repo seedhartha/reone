@@ -277,6 +277,8 @@ private:
         int numGlobals {0};
         int prevNumGlobals {-1};
 
+        std::map<uint32_t, BlockExpression *> branches;
+
         DecompilationContext(
             const script::ScriptProgram &compiled,
             const script::IRoutines &routines,
@@ -288,6 +290,19 @@ private:
             labels(labels),
             functions(functions),
             expressions(expressions) {
+        }
+
+        DecompilationContext(const DecompilationContext &other) :
+            compiled(other.compiled),
+            routines(other.routines),
+            labels(other.labels),
+            functions(other.functions),
+            expressions(other.expressions),
+            callStack(other.callStack),
+            stack(other.stack),
+            numGlobals(other.numGlobals),
+            prevNumGlobals(other.prevNumGlobals),
+            branches(other.branches) {
         }
     };
 

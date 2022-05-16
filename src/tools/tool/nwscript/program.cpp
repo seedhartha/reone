@@ -64,7 +64,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 }
 
 NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
-    debug(boost::format("Decompiling block at %08x") % start);
+    debug(boost::format("Begin decompiling block at %08x") % start);
 
     auto block = make_shared<BlockExpression>();
     block->offset = start;
@@ -97,8 +97,13 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             auto gotoExpr = make_shared<GotoExpression>();
             gotoExpr->offset = ins.offset;
             gotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
-            offset = ins.offset + ins.jumpOffset;
-            continue;
+
+            auto branchCtx = DecompilationContext(ctx);
+            ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
+
+            block->expressions.push_back(gotoExpr.get());
+            ctx.expressions.push_back(move(gotoExpr));
+            break;
 
         } else if (ins.type == InstructionType::JSR) {
             if (ins.jumpOffset < 0) {
@@ -109,7 +114,13 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             auto subCtx = DecompilationContext(ctx);
             subCtx.callStack.push_back(CallStackFrame(sub.get()));
+            subCtx.branches.clear();
             sub->block = decompile(ins.offset + ins.jumpOffset, subCtx);
+            for (auto &[branchOffset, branchBlock] : subCtx.branches) {
+                for (auto &expression : branchBlock->expressions) {
+                    sub->block->expressions.push_back(expression);
+                }
+            }
 
             bool isMain = false;
             if (subCtx.callStack.size() == 2ll) {
@@ -169,6 +180,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             condExpr->test = testExpr.get();
             condExpr->ifTrue = ifTrueBlockExpr.get();
             block->expressions.push_back(condExpr.get());
+
+            auto branchCtx = DecompilationContext(ctx);
+            ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
 
             ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
@@ -832,6 +846,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         offset = ins.nextOffset;
     }
 
+    debug(boost::format("End decompiling block at %08x") % start);
     ctx.expressions.push_back(block);
 
     return block.get();
