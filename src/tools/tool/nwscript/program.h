@@ -238,9 +238,6 @@ private:
     struct CallStackFrame {
         Function *function {nullptr};
 
-        std::vector<ParameterExpression *> inputs;
-        std::vector<ParameterExpression *> outputs;
-
         CallStackFrame(Function *function) :
             function(function) {
         }
@@ -286,6 +283,8 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
+        std::vector<ParameterExpression *> *inputs {nullptr};
+        std::vector<ParameterExpression *> *outputs {nullptr};
         std::map<uint32_t, BlockExpression *> *branches {nullptr};
 
         DecompilationContext(
@@ -312,6 +311,8 @@ private:
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
             savedAction(other.savedAction),
+            inputs(other.inputs),
+            outputs(other.outputs),
             branches(other.branches) {
         }
     };

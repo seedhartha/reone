@@ -118,12 +118,6 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
-                for (size_t i = ctx.callStack.back().inputs.size(); i < branchCtx.callStack.back().inputs.size(); ++i) {
-                    ctx.callStack.back().inputs.push_back(branchCtx.callStack.back().inputs[i]);
-                }
-                for (size_t i = ctx.callStack.back().outputs.size(); i < branchCtx.callStack.back().outputs.size(); ++i) {
-                    ctx.callStack.back().outputs.push_back(branchCtx.callStack.back().outputs[i]);
-                }
             }
 
             block->insert(gotoExpr.get());
@@ -138,6 +132,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             auto subCtx = DecompilationContext(ctx);
             subCtx.callStack.push_back(CallStackFrame(sub.get()));
+            auto inputs = vector<ParameterExpression *>();
+            subCtx.inputs = &inputs;
+            auto outputs = vector<ParameterExpression *>();
+            subCtx.outputs = &outputs;
             auto branches = map<uint32_t, BlockExpression *>();
             subCtx.branches = &branches;
 
@@ -162,7 +160,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 isMain = true;
             }
             if (isMain) {
-                sub->name = !subCtx.callStack.back().outputs.empty() ? "StartingConditional" : "main";
+                sub->name = !subCtx.outputs->empty() ? "StartingConditional" : "main";
             }
 
             auto callExpr = make_shared<CallExpression>();
@@ -170,11 +168,11 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             callExpr->function = sub.get();
             block->insert(callExpr.get());
 
-            for (auto &input : subCtx.callStack.back().inputs) {
+            for (auto &input : *subCtx.inputs) {
                 sub->inArgumentTypes.push_back(input->variableType);
                 callExpr->arguments.push_back(input);
             }
-            for (auto &output : subCtx.callStack.back().outputs) {
+            for (auto &output : *subCtx.outputs) {
                 sub->outArgumentTypes.push_back(output->variableType);
                 callExpr->arguments.push_back(output);
             }
@@ -215,12 +213,6 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ctx.branches->count(absJumpOffset) == 0 && absJumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
-                for (size_t i = ctx.callStack.back().inputs.size(); i < branchCtx.callStack.back().inputs.size(); ++i) {
-                    ctx.callStack.back().inputs.push_back(branchCtx.callStack.back().inputs[i]);
-                }
-                for (size_t i = ctx.callStack.back().outputs.size(); i < branchCtx.callStack.back().outputs.size(); ++i) {
-                    ctx.callStack.back().outputs.push_back(branchCtx.callStack.back().outputs[i]);
-                }
             }
 
             ctx.expressions.push_back(move(rightExpr));
@@ -342,14 +334,22 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 auto &right = ctx.stack[stackSize - i - 1];
 
                 ParameterExpression *destination;
-                auto &csFrame = ctx.callStack.back();
-                if (left.allocatedBy != csFrame.function && left.param->locality != ParameterLocality::Global) {
+                if (left.allocatedBy != ctx.callStack.back().function && left.param->locality != ParameterLocality::Global) {
+                    int index = -1;
+                    for (size_t j = 0; j < ctx.outputs->size(); ++j) {
+                        if ((*ctx.outputs)[j] == left.param) {
+                            index = j;
+                        }
+                    }
+                    if (index == -1) {
+                        index = ctx.outputs->size();
+                        ctx.outputs->push_back(left.param);
+                    }
                     auto destExpr = make_shared<ParameterExpression>();
                     destExpr->offset = ins.offset;
                     destExpr->variableType = left.param->variableType;
                     destExpr->locality = ParameterLocality::Output;
-                    destExpr->index = csFrame.outputs.size();
-                    csFrame.outputs.push_back(left.param);
+                    destExpr->index = index;
                     destination = destExpr.get();
                     ctx.expressions.push_back(move(destExpr));
                 } else {
@@ -378,14 +378,22 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                 auto &frame = ctx.stack[startIdx + numFrames - i - 1];
 
                 ParameterExpression *source;
-                auto &csFrame = ctx.callStack.back();
-                if (frame.allocatedBy != csFrame.function && frame.param->locality != ParameterLocality::Global) {
+                if (frame.allocatedBy != ctx.callStack.back().function && frame.param->locality != ParameterLocality::Global) {
+                    int index = -1;
+                    for (size_t j = 0; j < ctx.inputs->size(); ++j) {
+                        if ((*ctx.inputs)[j] == frame.param) {
+                            index = j;
+                        }
+                    }
+                    if (index == -1) {
+                        index = ctx.inputs->size();
+                        ctx.inputs->push_back(frame.param);
+                    }
                     auto sourceExpr = make_shared<ParameterExpression>();
                     sourceExpr->offset = ins.offset;
                     sourceExpr->variableType = frame.param->variableType;
                     sourceExpr->locality = ParameterLocality::Input;
-                    sourceExpr->index = csFrame.inputs.size();
-                    csFrame.inputs.push_back(frame.param);
+                    sourceExpr->index = index;
                     source = sourceExpr.get();
                     ctx.expressions.push_back(move(sourceExpr));
                 } else {
@@ -831,14 +839,22 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             auto &frame = ctx.stack[frameIdx];
 
             ParameterExpression *destination;
-            auto &csFrame = ctx.callStack.back();
-            if (frame.allocatedBy != csFrame.function) {
+            if (frame.allocatedBy != ctx.callStack.back().function) {
+                int index = -1;
+                for (size_t j = 0; j < ctx.outputs->size(); ++j) {
+                    if ((*ctx.outputs)[j] == frame.param) {
+                        index = j;
+                    }
+                }
+                if (index == -1) {
+                    index = ctx.outputs->size();
+                    ctx.outputs->push_back(frame.param);
+                }
                 auto destExpr = make_shared<ParameterExpression>();
                 destExpr->offset = ins.offset;
                 destExpr->variableType = frame.param->variableType;
                 destExpr->locality = ParameterLocality::Output;
-                destExpr->index = csFrame.outputs.size();
-                csFrame.outputs.push_back(frame.param);
+                destExpr->index = index;
                 destination = destExpr.get();
                 ctx.expressions.push_back(move(destExpr));
             } else {
