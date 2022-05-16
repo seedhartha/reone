@@ -239,7 +239,6 @@ private:
     struct StackFrame {
         Function *allocatedBy {nullptr};
         ParameterExpression *param {nullptr};
-        BlockExpression *block {nullptr};
         int component {0}; // XYZ (vector)
 
         StackFrame(
@@ -251,17 +250,9 @@ private:
             component(component) {
         }
 
-        StackFrame(
-            Function *allocatedBy,
-            BlockExpression *block) :
-            allocatedBy(allocatedBy),
-            block(block) {
-        }
-
         StackFrame(const StackFrame &other) {
             allocatedBy = other.allocatedBy;
             param = other.param;
-            block = other.block;
             component = other.component;
         }
 
@@ -278,25 +269,27 @@ private:
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
+        std::map<uint32_t, BlockExpression *> &branches;
 
         std::vector<CallStackFrame> callStack;
         std::vector<StackFrame> stack;
         int numGlobals {0};
         int prevNumGlobals {0};
-
-        std::map<uint32_t, BlockExpression *> branches;
+        BlockExpression *savedAction {nullptr};
 
         DecompilationContext(
             const script::ScriptProgram &compiled,
             const script::IRoutines &routines,
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::vector<std::shared_ptr<Function>> &functions,
-            std::vector<std::shared_ptr<Expression>> &expressions) :
+            std::vector<std::shared_ptr<Expression>> &expressions,
+            std::map<uint32_t, BlockExpression *> &branches) :
             compiled(compiled),
             routines(routines),
             labels(labels),
             functions(functions),
-            expressions(expressions) {
+            expressions(expressions),
+            branches(branches) {
         }
 
         DecompilationContext(const DecompilationContext &other) :
@@ -305,11 +298,12 @@ private:
             labels(other.labels),
             functions(other.functions),
             expressions(other.expressions),
+            branches(other.branches),
             callStack(other.callStack),
             stack(other.stack),
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
-            branches(other.branches) {
+            savedAction(other.savedAction) {
         }
     };
 

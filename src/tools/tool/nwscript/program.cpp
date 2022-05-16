@@ -38,6 +38,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     auto functions = vector<shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
+    auto branches = map<uint32_t, BlockExpression *>();
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
     for (auto &ins : compiled.instructions()) {
@@ -52,7 +53,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
         }
     }
 
-    auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions);
+    auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions, branches);
     ctx.callStack.push_back(CallStackFrame(startFunc.get()));
     startFunc->block = decompile(13, ctx);
 
@@ -112,9 +113,9 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             gotoExpr->offset = ins.offset;
             gotoExpr->label = ctx.labels.at(absJumpOffset);
 
-            if (ctx.branches.count(absJumpOffset) == 0) {
+            if (ctx.branches.count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
-                ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
+                ctx.branches[absJumpOffset] = decompile(absJumpOffset, branchCtx);
             }
 
             block->expressions.push_back(gotoExpr.get());
@@ -200,7 +201,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             if (ctx.branches.count(absJumpOffset) == 0) {
                 auto branchCtx = DecompilationContext(ctx);
-                ctx.branches[ins.offset + ins.jumpOffset] = decompile(absJumpOffset, branchCtx);
+                ctx.branches[absJumpOffset] = decompile(absJumpOffset, branchCtx);
             }
 
             ctx.expressions.push_back(move(rightExpr));
@@ -265,8 +266,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
                     }
                     argument = xParam.param;
                 } else if (argType == VariableType::Action) {
-                    argument = ctx.stack.back().block;
-                    ctx.stack.pop_back();
+                    argument = ctx.savedAction;
                 } else {
                     argument = ctx.stack.back().param;
                     ctx.stack.pop_back();
@@ -788,8 +788,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto innerCtx = DecompilationContext(ctx);
-            auto innerBlock = decompile(ins.offset + 0x10, innerCtx);
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, innerBlock));
+            ctx.savedAction = decompile(ins.offset + 0x10, innerCtx);
 
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx.prevNumGlobals = ctx.numGlobals;
