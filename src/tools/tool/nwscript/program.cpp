@@ -94,12 +94,16 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             break;
 
         } else if (ins.type == InstructionType::JMP) {
+            auto absJumpOffset = ins.offset + ins.jumpOffset;
+
             auto gotoExpr = make_shared<GotoExpression>();
             gotoExpr->offset = ins.offset;
-            gotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
+            gotoExpr->label = ctx.labels.at(absJumpOffset);
 
-            auto branchCtx = DecompilationContext(ctx);
-            ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
+            if (ctx.branches.count(absJumpOffset) == 0) {
+                auto branchCtx = DecompilationContext(ctx);
+                ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
+            }
 
             block->expressions.push_back(gotoExpr.get());
             ctx.expressions.push_back(move(gotoExpr));
@@ -156,6 +160,8 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
         } else if (ins.type == InstructionType::JZ ||
                    ins.type == InstructionType::JNZ) {
+            auto absJumpOffset = ins.offset + ins.jumpOffset;
+
             auto leftExpr = ctx.stack.back().param;
             ctx.stack.pop_back();
 
@@ -170,7 +176,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             auto ifTrueGotoExpr = make_shared<GotoExpression>();
             ifTrueGotoExpr->offset = ins.offset;
-            ifTrueGotoExpr->label = ctx.labels.at(ins.offset + ins.jumpOffset);
+            ifTrueGotoExpr->label = ctx.labels.at(absJumpOffset);
 
             auto ifTrueBlockExpr = make_shared<BlockExpression>();
             ifTrueBlockExpr->offset = ins.offset;
@@ -181,8 +187,10 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             condExpr->ifTrue = ifTrueBlockExpr.get();
             block->expressions.push_back(condExpr.get());
 
-            auto branchCtx = DecompilationContext(ctx);
-            ctx.branches[ins.offset + ins.jumpOffset] = decompile(ins.offset + ins.jumpOffset, branchCtx);
+            if (ctx.branches.count(absJumpOffset) == 0) {
+                auto branchCtx = DecompilationContext(ctx);
+                ctx.branches[ins.offset + ins.jumpOffset] = decompile(absJumpOffset, branchCtx);
+            }
 
             ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
