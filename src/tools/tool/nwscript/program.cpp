@@ -118,6 +118,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
+                for (size_t i = ctx.callStack.back().inputs.size(); i < branchCtx.callStack.back().inputs.size(); ++i) {
+                    ctx.callStack.back().inputs.push_back(branchCtx.callStack.back().inputs[i]);
+                }
+                for (size_t i = ctx.callStack.back().outputs.size(); i < branchCtx.callStack.back().outputs.size(); ++i) {
+                    ctx.callStack.back().outputs.push_back(branchCtx.callStack.back().outputs[i]);
+                }
             }
 
             block->insert(gotoExpr.get());
@@ -209,6 +215,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             if (ctx.branches->count(absJumpOffset) == 0 && absJumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
+                for (size_t i = ctx.callStack.back().inputs.size(); i < branchCtx.callStack.back().inputs.size(); ++i) {
+                    ctx.callStack.back().inputs.push_back(branchCtx.callStack.back().inputs[i]);
+                }
+                for (size_t i = ctx.callStack.back().outputs.size(); i < branchCtx.callStack.back().outputs.size(); ++i) {
+                    ctx.callStack.back().outputs.push_back(branchCtx.callStack.back().outputs[i]);
+                }
             }
 
             ctx.expressions.push_back(move(rightExpr));
