@@ -79,6 +79,15 @@ void Resources::indexExeFile(const fs::path &path) {
     debug("Index executable " + path.string(), LogChannels::resources);
 }
 
+void Resources::indexIniFile(const fs::path &path) {
+    if (!fs::exists(path)) {
+        return;
+    }
+    _iniFile.load(path);
+    debug("Index ini file " + path.string(), LogChannels::resources);
+}
+
+
 void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs::path &path, bool transient) {
     debug(boost::format("Index provider %d at '%s'") % provider->getId() % path.string(), LogChannels::resources);
     if (transient) {

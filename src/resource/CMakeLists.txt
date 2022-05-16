@@ -29,6 +29,7 @@ set(RESOURCE_HEADERS
     format/gffwriter.h
     format/keyreader.h
     format/pereader.h
+    format/inireader.h
     format/rimreader.h
     format/rimwriter.h
     format/tlkreader.h
@@ -59,6 +60,7 @@ set(RESOURCE_SOURCES
     format/gffwriter.cpp
     format/keyreader.cpp
     format/pereader.cpp
+    format/inireader.cpp
     format/rimreader.cpp
     format/rimwriter.cpp
     format/tlkreader.cpp

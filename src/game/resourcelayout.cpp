@@ -58,6 +58,9 @@ static constexpr char kTexturePackFilenameLow[] = "swpc_tex_tpc.erf";
 static constexpr char kExeFilenameKotor[] = "swkotor.exe";
 static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
 
+static constexpr char kIniFilenameKotor[] = "swkotor.ini";
+static constexpr char kIniFilenameTsl[] = "swkotor2.ini";
+
 static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
 static const unordered_map<TextureQuality, string> texPackByQuality {
@@ -96,6 +99,7 @@ void ResourceLayout::initForKotOR() {
 
     _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
     _resourceSvc.resources.indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameKotor));
+    _resourceSvc.resources.indexIniFile(getPathIgnoreCase(_options.game.path, kIniFilenameKotor));
 }
 
 void ResourceLayout::initForTSL() {
@@ -116,6 +120,7 @@ void ResourceLayout::initForTSL() {
 
     _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
     _resourceSvc.resources.indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameTsl));
+    _resourceSvc.resources.indexIniFile(getPathIgnoreCase(_options.game.path, kIniFilenameTsl));
 }
 
 void ResourceLayout::loadModuleResources(const string &moduleName) {

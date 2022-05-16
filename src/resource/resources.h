@@ -20,6 +20,7 @@
 #include "../common/types.h"
 
 #include "format/pereader.h"
+#include "format/inireader.h"
 #include "id.h"
 #include "resourceprovider.h"
 #include "types.h"
@@ -35,6 +36,7 @@ public:
     void indexRimFile(const boost::filesystem::path &path, bool transient = false);
     void indexDirectory(const boost::filesystem::path &path);
     void indexExeFile(const boost::filesystem::path &path);
+    void indexIniFile(const boost::filesystem::path &path);
 
     void invalidate();
     void clearTransientProviders();
@@ -44,6 +46,7 @@ public:
 
 private:
     PEReader _exeFile;
+    INIreader _iniFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
 
