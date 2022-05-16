@@ -868,6 +868,25 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         offset = ins.nextOffset;
     }
 
+    for (size_t i = 0; i < block->expressions.size() - 1;) {
+        if (block->expressions[i]->type != ExpressionType::Parameter ||
+            block->expressions[i + 1]->type != ExpressionType::Assign) {
+            i++;
+            continue;
+        }
+        auto paramExpr = static_cast<ParameterExpression *>(block->expressions[i]);
+        auto assignExpr = static_cast<BinaryExpression *>(block->expressions[i + 1]);
+        if (assignExpr->left != paramExpr) {
+            i++;
+            continue;
+        }
+        assignExpr->declareLeft = true;
+        for (size_t j = i; j < block->expressions.size() - 1; ++j) {
+            block->expressions[j] = block->expressions[j + 1];
+        }
+        block->expressions.pop_back();
+    }
+
     debug(boost::format("End decompiling block at %08x") % start);
     ctx.expressions.push_back(block);
 

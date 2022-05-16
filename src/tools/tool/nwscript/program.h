@@ -135,6 +135,7 @@ public:
     struct BinaryExpression : Expression {
         Expression *left {nullptr};
         Expression *right {nullptr};
+        bool declareLeft {false};
 
         BinaryExpression(ExpressionType type) :
             Expression(type) {

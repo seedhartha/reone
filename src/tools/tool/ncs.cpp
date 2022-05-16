@@ -461,7 +461,7 @@ private:
         writer.put(indent + string("}"));
     }
 
-    void writeExpression(int blockLevel, bool leftmost, const NwscriptProgram::Expression &expression, TextWriter &writer) {
+    void writeExpression(int blockLevel, bool declare, const NwscriptProgram::Expression &expression, TextWriter &writer) {
         auto indent = indentAtLevel(blockLevel);
 
         if (expression.type == NwscriptProgram::ExpressionType::Label) {
@@ -490,7 +490,7 @@ private:
         } else if (expression.type == NwscriptProgram::ExpressionType::Parameter) {
             auto &paramExpr = static_cast<const NwscriptProgram::ParameterExpression &>(expression);
             auto name = describeParameter(paramExpr);
-            if (leftmost) {
+            if (declare) {
                 auto type = describeVariableType(paramExpr.variableType);
                 writer.put(str(boost::format("%s %s") % type % name));
             } else {
@@ -570,50 +570,52 @@ private:
                    expression.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
             auto &binaryExpr = static_cast<const NwscriptProgram::BinaryExpression &>(expression);
             string operation;
-            if (expression.type == NwscriptProgram::ExpressionType::Assign) {
+            bool declareLeft = false;
+            if (binaryExpr.type == NwscriptProgram::ExpressionType::Assign) {
                 operation = "=";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Add) {
+                declareLeft = binaryExpr.declareLeft;
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Add) {
                 operation = "+";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Subtract) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Subtract) {
                 operation = "-";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Multiply) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Multiply) {
                 operation = "*";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Divide) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Divide) {
                 operation = "/";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Modulo) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Modulo) {
                 operation = "%";
-            } else if (expression.type == NwscriptProgram::ExpressionType::LogicalAnd) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LogicalAnd) {
                 operation = "&&";
-            } else if (expression.type == NwscriptProgram::ExpressionType::LogicalOr) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LogicalOr) {
                 operation = "||";
-            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseOr) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseOr) {
                 operation = "|";
-            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr) {
                 operation = "^";
-            } else if (expression.type == NwscriptProgram::ExpressionType::BitwiseAnd) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseAnd) {
                 operation = "&";
-            } else if (expression.type == NwscriptProgram::ExpressionType::LeftShift) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LeftShift) {
                 operation = "<<";
-            } else if (expression.type == NwscriptProgram::ExpressionType::RightShift ||
-                       expression.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::RightShift ||
+                       binaryExpr.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
                 operation = ">>";
-            } else if (expression.type == NwscriptProgram::ExpressionType::Equal) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Equal) {
                 operation = "==";
-            } else if (expression.type == NwscriptProgram::ExpressionType::NotEqual) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::NotEqual) {
                 operation = "!=";
-            } else if (expression.type == NwscriptProgram::ExpressionType::GreaterThanOrEqual) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::GreaterThanOrEqual) {
                 operation = ">=";
-            } else if (expression.type == NwscriptProgram::ExpressionType::GreaterThan) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::GreaterThan) {
                 operation = ">";
-            } else if (expression.type == NwscriptProgram::ExpressionType::LessThan) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LessThan) {
                 operation = "<";
-            } else if (expression.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
+            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
                 operation = "<=";
             }
-            if (expression.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
+            if (binaryExpr.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
                 writer.put("(unsigned int)");
             }
-            writeExpression(blockLevel, false, *binaryExpr.left, writer);
+            writeExpression(blockLevel, declareLeft, *binaryExpr.left, writer);
             writer.put(str(boost::format(" %s ") % operation));
             writeExpression(blockLevel, false, *binaryExpr.right, writer);
 
