@@ -122,16 +122,15 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             break;
 
         } else if (ins.type == InstructionType::JSR) {
-            if (ins.jumpOffset < 0) {
-                throw NotImplementedException("Negative jump offsets are not supported yet");
-            }
+            auto absJumpOffset = ins.offset + ins.jumpOffset;
+
             auto sub = make_shared<Function>();
-            sub->offset = ins.offset + ins.jumpOffset;
+            sub->offset = absJumpOffset;
 
             auto subCtx = DecompilationContext(ctx);
             subCtx.callStack.push_back(CallStackFrame(sub.get()));
             subCtx.branches.clear();
-            sub->block = decompile(ins.offset + ins.jumpOffset, subCtx);
+            sub->block = decompile(absJumpOffset, subCtx);
             for (auto &[branchOffset, branchBlock] : subCtx.branches) {
                 for (auto &expression : branchBlock->expressions) {
                     sub->block->expressions.push_back(expression);
