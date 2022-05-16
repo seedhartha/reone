@@ -219,8 +219,14 @@ public:
 private:
     struct CallStackFrame {
         Function *function {nullptr};
+
         std::vector<ParameterExpression *> inputs;
         std::vector<ParameterExpression *> outputs;
+        bool globals {false};
+
+        CallStackFrame(Function *function) :
+            function(function) {
+        }
     };
 
     struct StackFrame {

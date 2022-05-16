@@ -33,6 +33,7 @@ namespace reone {
 
 NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
     auto startFunc = make_shared<Function>();
+    startFunc->name = "_start";
     startFunc->offset = 13;
 
     auto functions = vector<shared_ptr<Function>>();
@@ -52,11 +53,8 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
     }
 
     auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions);
-
-    ctx.callStack.push_back(CallStackFrame {startFunc.get()});
-
+    ctx.callStack.push_back(CallStackFrame(startFunc.get()));
     startFunc->block = decompile(13, ctx);
-    startFunc->name = !ctx.stack.empty() ? "StartingConditional" : "main";
 
     ctx.functions.push_back(move(startFunc));
 
@@ -110,8 +108,22 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
             sub->offset = ins.offset + ins.jumpOffset;
 
             auto subCtx = DecompilationContext(ctx);
-            subCtx.callStack.push_back(CallStackFrame {sub.get()});
+            subCtx.callStack.push_back(CallStackFrame(sub.get()));
             sub->block = decompile(ins.offset + ins.jumpOffset, subCtx);
+
+            bool isMain = false;
+            if (subCtx.callStack.size() == 2ll) {
+                if (subCtx.callStack.back().globals) {
+                    sub->name = "_globals";
+                } else {
+                    isMain = true;
+                }
+            } else if (subCtx.callStack.size() == 3ll && subCtx.callStack[1].globals) {
+                isMain = true;
+            }
+            if (isMain) {
+                sub->name = !subCtx.callStack.back().outputs.empty() ? "StartingConditional" : "main";
+            }
 
             auto callExpr = make_shared<CallExpression>();
             callExpr->offset = ins.offset;
@@ -749,6 +761,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx.prevNumGlobals = ctx.numGlobals;
             ctx.numGlobals = static_cast<int>(ctx.stack.size());
+            ctx.callStack.back().globals = true;
 
         } else if (ins.type == InstructionType::RESTOREBP) {
             ctx.numGlobals = ctx.prevNumGlobals;
