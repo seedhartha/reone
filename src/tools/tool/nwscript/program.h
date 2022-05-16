@@ -104,6 +104,16 @@ public:
         BlockExpression() :
             Expression(ExpressionType::Block) {
         }
+
+        bool contains(uint32_t offset) {
+            return !expressions.empty() &&
+                   offset >= expressions.front()->offset &&
+                   offset <= expressions.back()->offset;
+        }
+
+        void insert(Expression *e) {
+            expressions.push_back(e);
+        }
     };
 
     struct ConstantExpression : Expression {
@@ -269,7 +279,6 @@ private:
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
-        std::map<uint32_t, BlockExpression *> &branches;
 
         std::vector<CallStackFrame> callStack;
         std::vector<StackFrame> stack;
@@ -277,19 +286,19 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
+        std::map<uint32_t, BlockExpression *> *branches {nullptr};
+
         DecompilationContext(
             const script::ScriptProgram &compiled,
             const script::IRoutines &routines,
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::vector<std::shared_ptr<Function>> &functions,
-            std::vector<std::shared_ptr<Expression>> &expressions,
-            std::map<uint32_t, BlockExpression *> &branches) :
+            std::vector<std::shared_ptr<Expression>> &expressions) :
             compiled(compiled),
             routines(routines),
             labels(labels),
             functions(functions),
-            expressions(expressions),
-            branches(branches) {
+            expressions(expressions) {
         }
 
         DecompilationContext(const DecompilationContext &other) :
@@ -298,12 +307,12 @@ private:
             labels(other.labels),
             functions(other.functions),
             expressions(other.expressions),
-            branches(other.branches),
             callStack(other.callStack),
             stack(other.stack),
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
-            savedAction(other.savedAction) {
+            savedAction(other.savedAction),
+            branches(other.branches) {
         }
     };
 
