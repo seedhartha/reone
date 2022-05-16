@@ -388,6 +388,15 @@ public:
 
     void save(IOutputStream &stream) {
         auto writer = TextWriter(stream);
+
+        if (!_program.globals().empty()) {
+            for (auto &global : _program.globals()) {
+                writeExpression(0, true, *global, writer);
+                writer.putLine(";");
+            }
+            writer.put("\n");
+        }
+
         auto writtenOffsets = set<uint32_t>();
         for (auto &function : _program.functions()) {
             if (writtenOffsets.count(function->offset) > 0) {
@@ -431,6 +440,10 @@ private:
 
         writer.putLine(indent + string("{"));
         for (auto &innerExpr : block.expressions) {
+            if (innerExpr->type == NwscriptProgram::ExpressionType::Parameter &&
+                static_cast<const NwscriptProgram::ParameterExpression *>(innerExpr)->locality == NwscriptProgram::ParameterLocality::Global) {
+                continue;
+            }
             if (innerExpr->type == NwscriptProgram::ExpressionType::Label) {
                 writer.put(indent);
             } else {
@@ -659,6 +672,8 @@ private:
             return str(boost::format("in_%d") % paramExpr.index);
         } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Output) {
             return str(boost::format("out_%d") % paramExpr.index);
+        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Global) {
+            return str(boost::format("glob_%08x") % paramExpr.offset);
         } else {
             throw ArgumentException("Unsupported parameter locality: " + to_string(static_cast<int>(paramExpr.locality)));
         }

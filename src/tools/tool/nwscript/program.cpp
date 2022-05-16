@@ -56,11 +56,23 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
     ctx.callStack.push_back(CallStackFrame(startFunc.get()));
     startFunc->block = decompile(13, ctx);
 
+    auto globals = set<const ParameterExpression *>();
+    for (auto &expression : expressions) {
+        if (expression->type != ExpressionType::Parameter) {
+            continue;
+        }
+        auto paramExpr = static_cast<const ParameterExpression *>(expression.get());
+        if (paramExpr->locality == ParameterLocality::Global) {
+            globals.insert(paramExpr);
+        }
+    }
+
     ctx.functions.push_back(move(startFunc));
 
     return NwscriptProgram(
         ctx.functions,
-        ctx.expressions);
+        ctx.expressions,
+        move(globals));
 }
 
 NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
@@ -128,12 +140,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
             bool isMain = false;
             if (subCtx.callStack.size() == 2ll) {
-                if (subCtx.callStack.back().globals) {
+                if (subCtx.numGlobals > 0) {
                     sub->name = "_globals";
                 } else {
                     isMain = true;
                 }
-            } else if (subCtx.callStack.size() == 3ll && subCtx.callStack[1].globals) {
+            } else if (subCtx.callStack.size() == 3ll && ctx.numGlobals > 0) {
                 isMain = true;
             }
             if (isMain) {
@@ -313,7 +325,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
                 ParameterExpression *destination;
                 auto &csFrame = ctx.callStack.back();
-                if (left.allocatedBy != csFrame.function) {
+                if (left.allocatedBy != csFrame.function && left.param->locality != ParameterLocality::Global) {
                     auto destExpr = make_shared<ParameterExpression>();
                     destExpr->offset = ins.offset;
                     destExpr->variableType = left.param->variableType;
@@ -349,7 +361,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
 
                 ParameterExpression *source;
                 auto &csFrame = ctx.callStack.back();
-                if (frame.allocatedBy != csFrame.function) {
+                if (frame.allocatedBy != csFrame.function && frame.param->locality != ParameterLocality::Global) {
                     auto sourceExpr = make_shared<ParameterExpression>();
                     sourceExpr->offset = ins.offset;
                     sourceExpr->variableType = frame.param->variableType;
@@ -783,10 +795,12 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx.prevNumGlobals = ctx.numGlobals;
             ctx.numGlobals = static_cast<int>(ctx.stack.size());
-            ctx.callStack.back().globals = true;
+            for (int i = 0; i < ctx.numGlobals; ++i) {
+                ctx.stack[i].param->locality = ParameterLocality::Global;
+            }
 
         } else if (ins.type == InstructionType::RESTOREBP) {
-            ctx.numGlobals = ctx.prevNumGlobals;
+            // ctx.numGlobals = ctx.prevNumGlobals;
 
         } else if (ins.type == InstructionType::DECISP ||
                    ins.type == InstructionType::DECIBP ||

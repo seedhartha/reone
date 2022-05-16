@@ -85,7 +85,8 @@ public:
     enum class ParameterLocality {
         Local,
         Input,
-        Output
+        Output,
+        Global
     };
 
     struct Expression {
@@ -201,9 +202,11 @@ public:
 
     NwscriptProgram(
         std::vector<std::shared_ptr<Function>> functions,
-        std::vector<std::shared_ptr<Expression>> expressions) :
+        std::vector<std::shared_ptr<Expression>> expressions,
+        std::set<const ParameterExpression *> globals) :
         _functions(std::move(functions)),
-        _expressions(std::move(expressions)) {
+        _expressions(std::move(expressions)),
+        _globals(std::move(globals)) {
     }
 
     const std::vector<std::shared_ptr<Function>> &functions() const {
@@ -214,6 +217,10 @@ public:
         return _expressions;
     }
 
+    const std::set<const ParameterExpression *> &globals() const {
+        return _globals;
+    }
+
     static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled, const script::IRoutines &routines);
 
 private:
@@ -222,7 +229,6 @@ private:
 
         std::vector<ParameterExpression *> inputs;
         std::vector<ParameterExpression *> outputs;
-        bool globals {false};
 
         CallStackFrame(Function *function) :
             function(function) {
@@ -275,7 +281,7 @@ private:
         std::vector<CallStackFrame> callStack;
         std::vector<StackFrame> stack;
         int numGlobals {0};
-        int prevNumGlobals {-1};
+        int prevNumGlobals {0};
 
         std::map<uint32_t, BlockExpression *> branches;
 
@@ -308,6 +314,7 @@ private:
 
     std::vector<std::shared_ptr<Function>> _functions;
     std::vector<std::shared_ptr<Expression>> _expressions;
+    std::set<const ParameterExpression *> _globals;
 
     static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
 
