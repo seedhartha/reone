@@ -26,6 +26,7 @@ option(BUILD_LAUNCHER "build launcher executable" OFF)
 option(BUILD_TESTS "build tests" OFF)
 
 option(ENABLE_MOVIE "enable movie playback" ON)
+option(ENABLE_ASAN "enable address sanitizer" OFF)
 
 # END Options
 
@@ -66,6 +67,14 @@ if(MSVC)
 endif()
 
 # END Dependencies
+
+# Compile Options
+
+if(ENABLE_ASAN AND MSVC)
+    add_compile_options("/fsanitize=address")
+endif()
+
+# END Compile Options
 
 # Engine libraries
 
