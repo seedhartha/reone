@@ -34,7 +34,6 @@ void NcsReader::onLoad() {
     uint32_t length = readUint32();
 
     _program = make_unique<ScriptProgram>(_resRef);
-    _program->setLength(length);
 
     size_t off = tell();
     while (off < length) {

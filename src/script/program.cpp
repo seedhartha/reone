@@ -17,6 +17,8 @@
 
 #include "program.h"
 
+#include "instrutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -24,8 +26,9 @@ namespace reone {
 namespace script {
 
 void ScriptProgram::add(Instruction instr) {
+    _length += getInstructionSize(instr);
+    _insIdxByOffset.insert(make_pair(instr.offset, static_cast<int>(_instructions.size())));
     _instructions.push_back(move(instr));
-    _insIdxByOffset.insert(make_pair(instr.offset, static_cast<int>(_instructions.size() - 1)));
 }
 
 const Instruction &ScriptProgram::getInstruction(uint32_t offset) const {

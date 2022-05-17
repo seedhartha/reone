@@ -41,6 +41,7 @@ set(TEST_SOURCES
     resource/rimwriter.cpp
     resource/tlkreader.cpp
     resource/tlkwriter.cpp
+    script/expressiontree.cpp
     script/ncsreader.cpp
     script/ncswriter.cpp)
 

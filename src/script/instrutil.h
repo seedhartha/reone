@@ -30,7 +30,10 @@ class IRoutines;
 std::string describeInstruction(const Instruction &ins, const IRoutines &routines);
 
 const std::string &describeInstructionType(InstructionType type);
+
 InstructionType parseInstructionType(const std::string &desc);
+
+int getInstructionSize(const Instruction &ins);
 
 } // namespace script
 

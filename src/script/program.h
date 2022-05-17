@@ -98,7 +98,7 @@ public:
 private:
     std::string _name;
 
-    uint32_t _length {0};
+    uint32_t _length {13};
     std::vector<Instruction> _instructions;
     std::unordered_map<uint32_t, int> _insIdxByOffset;
 };

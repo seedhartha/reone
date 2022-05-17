@@ -206,6 +206,49 @@ InstructionType parseInstructionType(const string &desc) {
     return maybeInstrType->second;
 }
 
+int getInstructionSize(const Instruction &ins) {
+    int result = 2;
+    switch (ins.type) {
+    case InstructionType::CPDOWNSP:
+    case InstructionType::CPTOPSP:
+    case InstructionType::CPDOWNBP:
+    case InstructionType::CPTOPBP:
+    case InstructionType::DESTRUCT:
+        result += 6;
+        break;
+    case InstructionType::CONSTI:
+    case InstructionType::CONSTF:
+    case InstructionType::CONSTO:
+    case InstructionType::MOVSP:
+    case InstructionType::JMP:
+    case InstructionType::JSR:
+    case InstructionType::JZ:
+    case InstructionType::JNZ:
+    case InstructionType::DECISP:
+    case InstructionType::INCISP:
+    case InstructionType::DECIBP:
+    case InstructionType::INCIBP:
+        result += 4;
+        break;
+    case InstructionType::CONSTS:
+        result += 2 + ins.strValue.length();
+        break;
+    case InstructionType::ACTION:
+        result += 3;
+        break;
+    case InstructionType::STORE_STATE:
+        result += 8;
+        break;
+    case InstructionType::EQUALTT:
+    case InstructionType::NEQUALTT:
+        result += 2;
+        break;
+    default:
+        break;
+    };
+    return result;
+}
+
 } // namespace script
 
 } // namespace reone
