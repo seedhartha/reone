@@ -45,8 +45,9 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
     for (auto &ins : program.instructions()) {
         if (ins.type == InstructionType::JMP ||
             ins.type == InstructionType::JZ ||
-            ins.type == InstructionType::JNZ) {
-            auto offset = ins.offset + ins.jumpOffset;
+            ins.type == InstructionType::JNZ ||
+            ins.type == InstructionType::STORE_STATE) {
+            auto offset = ins.offset + (ins.type == InstructionType::STORE_STATE ? 0x10 : ins.jumpOffset);
             auto label = make_shared<LabelExpression>();
             label->offset = offset;
             labels[offset] = label.get();
@@ -833,8 +834,24 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             ctx.expressions.push_back(move(resultExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {
-            auto innerCtx = DecompilationContext(ctx);
-            ctx.savedAction = decompileSafely(ins.offset + 0x10, innerCtx);
+            auto absJumpOffset = ins.offset + 0x10;
+
+            if (ctx.branches->count(absJumpOffset) == 0) {
+                ctx.branches->insert(make_pair(absJumpOffset, DecompilationContext(ctx)));
+            }
+
+            auto gotoExpr = make_shared<GotoExpression>();
+            gotoExpr->offset = ins.offset;
+            gotoExpr->label = ctx.labels.at(absJumpOffset);
+
+            auto innerBlock = make_shared<BlockExpression>();
+            innerBlock->offset = ins.offset;
+            innerBlock->append(gotoExpr.get());
+
+            ctx.savedAction = innerBlock.get();
+
+            ctx.expressions.push_back(move(gotoExpr));
+            ctx.expressions.push_back(move(innerBlock));
 
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx.prevNumGlobals = ctx.numGlobals;
