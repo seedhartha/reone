@@ -335,6 +335,7 @@ private:
     std::set<const ParameterExpression *> _globals;
 
     static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
+    static BlockExpression *decompileSafely(uint32_t start, DecompilationContext &ctx);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const Instruction &ins);
     static std::unique_ptr<ParameterExpression> parameterExpression(const Instruction &ins);

@@ -56,7 +56,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
 
     auto ctx = DecompilationContext(program, routines, labels, functions, expressions);
     ctx.callStack.push_back(CallStackFrame(startFunc.get()));
-    startFunc->block = decompile(13, ctx);
+    startFunc->block = decompileSafely(13, ctx);
 
     auto globals = set<const ParameterExpression *>();
     for (auto &expression : expressions) {
@@ -75,6 +75,17 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
         ctx.functions,
         ctx.expressions,
         move(globals));
+}
+
+ExpressionTree::BlockExpression *ExpressionTree::decompileSafely(uint32_t start, DecompilationContext &ctx) {
+    try {
+        return decompile(start, ctx);
+    } catch (const ValidationException &e) {
+        error(boost::format("Block decompilation failed at %08x: %s") % start % string(e.what()));
+        auto emptyBlock = make_shared<BlockExpression>();
+        ctx.expressions.push_back(emptyBlock);
+        return emptyBlock.get();
+    }
 }
 
 ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, DecompilationContext &ctx) {
@@ -147,7 +158,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto branches = map<uint32_t, BlockExpression *>();
             subCtx.branches = &branches;
 
-            sub->block = decompile(absJumpOffset, subCtx);
+            sub->block = decompileSafely(absJumpOffset, subCtx);
             for (auto &[branchOffset, branchBlock] : branches) {
                 if (sub->block->contains(branchOffset)) {
                     continue;
@@ -220,7 +231,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
             if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
-                ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
+                ctx.branches->insert(make_pair(absJumpOffset, decompileSafely(absJumpOffset, branchCtx)));
             }
 
             ctx.expressions.push_back(move(rightExpr));
@@ -410,6 +421,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
             auto startIdx = (ins.type == InstructionType::CPDOWNSP ? stackSize : ctx.numGlobals) + (ins.stackOffset / 4);
+            if (startIdx < 0) {
+                throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
+            }
             auto numFrames = ins.size / 4;
             for (int i = 0; i < numFrames; ++i) {
                 auto &left = ctx.stack[startIdx + numFrames - i - 1];
@@ -455,6 +469,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 throw ValidationException("Non-negative stack offsets are not supported");
             }
             auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx.numGlobals) + (ins.stackOffset / 4);
+            if (startIdx < 0) {
+                throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
+            }
             auto numFrames = ins.size / 4;
             for (int i = 0; i < numFrames; ++i) {
                 auto &frame = ctx.stack[startIdx + numFrames - i - 1];
@@ -1112,7 +1129,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto innerCtx = DecompilationContext(ctx);
-            ctx.savedAction = decompile(ins.offset + 0x10, innerCtx);
+            ctx.savedAction = decompileSafely(ins.offset + 0x10, innerCtx);
 
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx.prevNumGlobals = ctx.numGlobals;

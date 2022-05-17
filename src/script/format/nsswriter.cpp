@@ -162,12 +162,15 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
                 auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(argExpr);
                 auto name = describeParameter(*paramExpr);
                 writer.put(name);
+            } else if (argExpr->type == ExpressionType::Vector) {
+                auto vecExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
+                writeExpression(blockLevel, false, *vecExpr, writer);
             } else if (argExpr->type == ExpressionType::Block) {
                 auto blockExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
                 writer.putLine("[&]()");
                 writeBlock(blockLevel, *blockExpr, writer);
             } else {
-                throw ValidationException("Action argument is neither parameter nor block expression");
+                throw ValidationException("Action argument is not a parameter, vector or block expression");
             }
         }
         writer.put(")");
