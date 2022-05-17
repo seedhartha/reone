@@ -55,7 +55,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
     }
 
     auto ctx = DecompilationContext(program, routines, labels, functions, expressions);
-    ctx.callStack.push_back(CallStackFrame(startFunc.get()));
+    ctx.pushCallStack(startFunc.get());
     startFunc->block = decompileSafely(13, ctx);
 
     auto globals = set<const ParameterExpression *>();
@@ -100,11 +100,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             block->append(maybeLabel->second);
         }
 
-        //debug(boost::format("Stack: size=%d") % ctx.stack.size());
-        //for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
-        //    auto type = describeVariableType(it->param->variableType);
-        //    debug("    " + type);
-        //}
+        // debug(boost::format("Stack: size=%d") % ctx.stack.size());
+        // for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
+        //     auto type = describeVariableType(it->param->variableType);
+        //     debug("    " + type);
+        // }
 
         auto &ins = ctx.program.getInstruction(offset);
         debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
@@ -119,7 +119,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             if (ctx.callStack.size() == 1ll && !ctx.stack.empty()) {
                 auto retVal = ctx.stack.back().param;
                 retExpr->value = retVal;
-                auto startFunc = ctx.topFunction();
+                auto startFunc = ctx.topCall().function;
                 startFunc->returnType = retVal->variableType;
             }
 
@@ -134,9 +134,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             gotoExpr->offset = ins.offset;
             gotoExpr->label = ctx.labels.at(absJumpOffset);
 
-            if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
+            if (ctx.topCall().branches.count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
-                ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
+                ctx.topCall().branches.insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
             }
 
             block->append(gotoExpr.get());
@@ -150,15 +150,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             sub->offset = absJumpOffset;
 
             auto subCtx = DecompilationContext(ctx);
-            subCtx.callStack.push_back(CallStackFrame(sub.get()));
-            auto inputs = vector<ParameterExpression *>();
-            subCtx.inputs = &inputs;
-            auto outputs = vector<ParameterExpression *>();
-            subCtx.outputs = &outputs;
-            auto branches = map<uint32_t, BlockExpression *>();
-            subCtx.branches = &branches;
-
+            subCtx.pushCallStack(sub.get());
             sub->block = decompileSafely(absJumpOffset, subCtx);
+
+            auto &branches = subCtx.topCall().branches;
             for (auto &[branchOffset, branchBlock] : branches) {
                 if (sub->block->contains(branchOffset)) {
                     continue;
@@ -179,7 +174,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 isMain = true;
             }
             if (isMain) {
-                sub->name = !subCtx.outputs->empty() ? "StartingConditional" : "main";
+                sub->name = !subCtx.topCall().outputs.empty() ? "StartingConditional" : "main";
             }
 
             auto callExpr = make_shared<CallExpression>();
@@ -187,15 +182,14 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             callExpr->function = sub.get();
             block->append(callExpr.get());
 
-            for (auto &input : *subCtx.inputs) {
-                sub->inArgumentTypes.push_back(input->variableType);
-                callExpr->arguments.push_back(input);
+            for (auto &[stackOffset, param] : subCtx.topCall().inputs) {
+                sub->inputs.push_back(FunctionArgument(param->variableType, stackOffset));
+                callExpr->arguments.push_back(param);
             }
-            for (auto &output : *subCtx.outputs) {
-                sub->outArgumentTypes.push_back(output->variableType);
-                callExpr->arguments.push_back(output);
+            for (auto &[stackOffset, param] : subCtx.topCall().outputs) {
+                sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
+                callExpr->arguments.push_back(param);
             }
-            subCtx.callStack.pop_back();
 
             ctx.functions.push_back(move(sub));
             ctx.expressions.push_back(move(callExpr));
@@ -229,10 +223,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             condExpr->ifTrue = ifTrueBlockExpr.get();
             block->append(condExpr.get());
 
-             if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
-                 auto branchCtx = DecompilationContext(ctx);
-                 ctx.branches->insert(make_pair(absJumpOffset, decompileSafely(absJumpOffset, branchCtx)));
-             }
+            if (ctx.topCall().branches.count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
+                auto branchCtx = DecompilationContext(ctx);
+                ctx.topCall().branches.insert(make_pair(absJumpOffset, decompileSafely(absJumpOffset, branchCtx)));
+            }
 
             ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
@@ -250,7 +244,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                    ins.type == InstructionType::RSADDTAL) {
             auto expression = parameterExpression(ins);
             block->append(expression.get());
-            ctx.pushStackFrame(expression.get());
+            ctx.pushStack(expression.get());
             ctx.expressions.push_back(move(expression));
 
         } else if (ins.type == InstructionType::CONSTI ||
@@ -270,7 +264,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = constExpr.get();
             block->append(assignExpr.get());
 
-            ctx.pushStackFrame(paramExpr.get());
+            ctx.pushStack(paramExpr.get());
             ctx.expressions.push_back(move(constExpr));
             ctx.expressions.push_back(move(paramExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -324,11 +318,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                     ParameterExpression *retValY = nullptr;
                     ParameterExpression *retValZ = nullptr;
                     ctx.appendVectorDecompose(ins.offset, *block, *returnValue, retValX, retValY, retValZ);
-                    ctx.pushStackFrame(retValZ);
-                    ctx.pushStackFrame(retValY);
-                    ctx.pushStackFrame(retValX);
+                    ctx.pushStack(retValZ);
+                    ctx.pushStack(retValY);
+                    ctx.pushStack(retValX);
                 } else {
-                    ctx.pushStackFrame(returnValue.get());
+                    ctx.pushStack(returnValue.get());
                 }
                 ctx.expressions.push_back(move(returnValue));
                 ctx.expressions.push_back(move(assignExpr));
@@ -355,22 +349,16 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 auto &right = ctx.stack[stackSize - i - 1];
 
                 ParameterExpression *destination;
-                if (left.allocatedBy != ctx.topFunction() && left.param->locality != ParameterLocality::Global) {
-                    int index = -1;
-                    for (size_t j = 0; j < ctx.outputs->size(); ++j) {
-                        if ((*ctx.outputs)[j] == left.param) {
-                            index = j;
-                        }
-                    }
-                    if (index == -1) {
-                        index = ctx.outputs->size();
-                        ctx.outputs->push_back(left.param);
+                if (left.allocatedBy != ctx.topCall().function && left.param->locality != ParameterLocality::Global) {
+                    auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx.topCall().stackSizeOnEnter) + i;
+                    if (ctx.topCall().outputs.count(stackOffset) == 0) {
+                        ctx.topCall().outputs[stackOffset] = left.param;
                     }
                     auto destExpr = make_shared<ParameterExpression>();
                     destExpr->offset = ins.offset;
                     destExpr->variableType = left.param->variableType;
                     destExpr->locality = ParameterLocality::Output;
-                    destExpr->index = index;
+                    destExpr->stackOffset = stackOffset;
                     destination = destExpr.get();
                     ctx.expressions.push_back(move(destExpr));
                 } else {
@@ -402,22 +390,16 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 auto &frame = ctx.stack[startIdx + numFrames - i - 1];
 
                 ParameterExpression *source;
-                if (frame.allocatedBy != ctx.topFunction() && frame.param->locality != ParameterLocality::Global) {
-                    int index = -1;
-                    for (size_t j = 0; j < ctx.inputs->size(); ++j) {
-                        if ((*ctx.inputs)[j] == frame.param) {
-                            index = j;
-                        }
-                    }
-                    if (index == -1) {
-                        index = ctx.inputs->size();
-                        ctx.inputs->push_back(frame.param);
+                if (frame.allocatedBy != ctx.topCall().function && frame.param->locality != ParameterLocality::Global) {
+                    auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx.topCall().stackSizeOnEnter) + i;
+                    if (ctx.topCall().inputs.count(stackOffset) == 0) {
+                        ctx.topCall().inputs[stackOffset] = frame.param;
                     }
                     auto sourceExpr = make_shared<ParameterExpression>();
                     sourceExpr->offset = ins.offset;
                     sourceExpr->variableType = frame.param->variableType;
                     sourceExpr->locality = ParameterLocality::Input;
-                    sourceExpr->index = index;
+                    sourceExpr->stackOffset = stackOffset;
                     source = sourceExpr.get();
                     ctx.expressions.push_back(move(sourceExpr));
                 } else {
@@ -437,7 +419,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 block->append(assignExpr.get());
 
                 auto frameCopy = StackFrame(frame);
-                frameCopy.allocatedBy = ctx.topFunction();
+                frameCopy.allocatedBy = ctx.topCall().function;
                 frameCopy.param = paramExpr.get();
                 ctx.stack.push_back(move(frameCopy));
 
@@ -483,7 +465,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = unaryExpr.get();
             block->append(assignExpr.get());
 
-            ctx.pushStackFrame(resultExpr.get());
+            ctx.pushStack(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(unaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -647,7 +629,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = binaryExpr.get();
             block->append(assignExpr.get());
 
-            ctx.pushStackFrame(result.get());
+            ctx.pushStack(result.get());
             ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -691,9 +673,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx.pushStackFrame(resultZ);
-            ctx.pushStackFrame(resultY);
-            ctx.pushStackFrame(resultX);
+            ctx.pushStack(resultZ);
+            ctx.pushStack(resultY);
+            ctx.pushStack(resultX);
 
             ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
@@ -733,9 +715,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx.pushStackFrame(resultZ);
-            ctx.pushStackFrame(resultY);
-            ctx.pushStackFrame(resultX);
+            ctx.pushStack(resultZ);
+            ctx.pushStack(resultY);
+            ctx.pushStack(resultX);
 
             ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
@@ -775,9 +757,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx.pushStackFrame(resultZ);
-            ctx.pushStackFrame(resultY);
-            ctx.pushStackFrame(resultX);
+            ctx.pushStack(resultZ);
+            ctx.pushStack(resultY);
+            ctx.pushStack(resultX);
 
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(result));
@@ -826,7 +808,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 ctx.expressions.push_back(move(assignExpr));
             }
 
-            ctx.pushStackFrame(resultExpr.get());
+            ctx.pushStack(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {
@@ -855,22 +837,16 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto &frame = ctx.stack[frameIdx];
 
             ParameterExpression *destination;
-            if (frame.allocatedBy != ctx.topFunction()) {
-                int index = -1;
-                for (size_t j = 0; j < ctx.outputs->size(); ++j) {
-                    if ((*ctx.outputs)[j] == frame.param) {
-                        index = j;
-                    }
-                }
-                if (index == -1) {
-                    index = ctx.outputs->size();
-                    ctx.outputs->push_back(frame.param);
+            if (frame.allocatedBy != ctx.topCall().function) {
+                auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx.topCall().stackSizeOnEnter);
+                if (ctx.topCall().outputs.count(stackOffset) == 0) {
+                    ctx.topCall().outputs[stackOffset] = frame.param;
                 }
                 auto destExpr = make_shared<ParameterExpression>();
                 destExpr->offset = ins.offset;
                 destExpr->variableType = frame.param->variableType;
                 destExpr->locality = ParameterLocality::Output;
-                destExpr->index = index;
+                destExpr->stackOffset = stackOffset;
                 destination = destExpr.get();
                 ctx.expressions.push_back(move(destExpr));
             } else {

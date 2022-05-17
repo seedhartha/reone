@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
 
     auto &startFunc = functions[0];
     BOOST_CHECK_EQUAL("_start", startFunc->name);
-    BOOST_CHECK_EQUAL(1ll, startFunc->block->expressions.size());
-    BOOST_CHECK_EQUAL(0ll, startFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(0ll, startFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, startFunc->inputs.size());
+    BOOST_CHECK_EQUAL(0ll, startFunc->outputs.size());
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(startFunc->returnType));
+    BOOST_CHECK_EQUAL(1ll, startFunc->block->expressions.size());
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
@@ -86,9 +86,9 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
 
     auto startingConditionalFunc = functions[0];
     BOOST_CHECK_EQUAL("StartingConditional", startingConditionalFunc->name);
-    BOOST_CHECK_EQUAL(0ll, startingConditionalFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(1ll, startingConditionalFunc->outArgumentTypes.size());
-    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Int), static_cast<int>(startingConditionalFunc->outArgumentTypes[0]));
+    BOOST_CHECK_EQUAL(0ll, startingConditionalFunc->inputs.size());
+    BOOST_CHECK_EQUAL(1ll, startingConditionalFunc->outputs.size());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Int), static_cast<int>(startingConditionalFunc->outputs[0].type));
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(startingConditionalFunc->returnType));
 
     auto startFunc = functions[1];
@@ -131,8 +131,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
 
     auto mainFunc = functions[0];
     BOOST_CHECK_EQUAL("main", mainFunc->name);
-    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inputs.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outputs.size());
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
 
     auto globalsFunc = functions[1];
@@ -176,8 +176,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
 
     auto mainFunc = functions[0];
     BOOST_CHECK_EQUAL("main", mainFunc->name);
-    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inputs.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outputs.size());
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
     BOOST_CHECK_EQUAL(11, mainFunc->block->expressions.size());
     // loc_jnz:
@@ -283,8 +283,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
 
     auto mainFunc = functions[0];
     BOOST_CHECK_EQUAL("main", mainFunc->name);
-    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inputs.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outputs.size());
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
 
     auto startFunc = functions[1];
@@ -359,8 +359,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
 
     auto mainFunc = functions[0];
     BOOST_CHECK_EQUAL("main", mainFunc->name);
-    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
-    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inputs.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outputs.size());
     BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
     BOOST_CHECK_EQUAL(71ll, mainFunc->block->expressions.size());
     // vector v1 = Vector(1.0f, 2.0f, 3.0f);

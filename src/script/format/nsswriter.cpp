@@ -57,16 +57,13 @@ void NssWriter::writeFunction(const ExpressionTree::Function &function, TextWrit
     auto returnType = describeVariableType(function.returnType);
     auto name = describeFunction(function);
     auto params = vector<string>();
-    int paramIdx;
-    paramIdx = 0;
-    for (auto &paramType : function.inArgumentTypes) {
-        auto type = describeVariableType(paramType);
-        params.push_back(str(boost::format("%s in_%d") % type % (paramIdx++)));
+    for (auto &argument : function.inputs) {
+        auto type = describeVariableType(argument.type);
+        params.push_back(str(boost::format("%s in_%d") % type % (-argument.stackOffset)));
     }
-    paramIdx = 0;
-    for (auto &paramType : function.outArgumentTypes) {
-        auto type = describeVariableType(paramType);
-        params.push_back(str(boost::format("%s &out_%d") % type % (paramIdx++)));
+    for (auto &argument : function.outputs) {
+        auto type = describeVariableType(argument.type);
+        params.push_back(str(boost::format("%s &out_%d") % type % (-argument.stackOffset)));
     }
     writer.putLine(str(boost::format("%s %s(%s)") % returnType % name % boost::join(params, ", ")));
 
@@ -328,9 +325,9 @@ string NssWriter::describeParameter(const ExpressionTree::ParameterExpression &p
             return str(boost::format("var_%08x") % paramExpr.offset);
         }
     } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Input) {
-        return str(boost::format("in_%d") % paramExpr.index);
+        return str(boost::format("in_%d") % (-paramExpr.stackOffset));
     } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Output) {
-        return str(boost::format("out_%d") % paramExpr.index);
+        return str(boost::format("out_%d") % (-paramExpr.stackOffset));
     } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Global) {
         return str(boost::format("glob_%08x") % paramExpr.offset);
     } else {

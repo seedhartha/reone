@@ -127,7 +127,8 @@ public:
     struct ParameterExpression : Expression {
         VariableType variableType {VariableType::Int};
         ParameterLocality locality {ParameterLocality::Local};
-        int index {0};
+        int index {0}; // local
+        int stackOffset {0}; // input/output
 
         ParameterExpression() :
             Expression(ExpressionType::Parameter) {
@@ -193,12 +194,22 @@ public:
         }
     };
 
+    struct FunctionArgument {
+        VariableType type;
+        int stackOffset;
+
+        FunctionArgument(VariableType type, int stackOffset) :
+            type(type),
+            stackOffset(stackOffset) {
+        }
+    };
+
     struct Function {
         std::string name;
         uint32_t offset {0};
+        std::vector<FunctionArgument> inputs;
+        std::vector<FunctionArgument> outputs;
         VariableType returnType {VariableType::Void};
-        std::vector<VariableType> inArgumentTypes;
-        std::vector<VariableType> outArgumentTypes;
         BlockExpression *block {nullptr};
     };
 
@@ -253,16 +264,22 @@ public:
 
 private:
     struct CallStackFrame {
-        Function *function {nullptr};
+        Function *function;
+        int stackSizeOnEnter;
 
-        CallStackFrame(Function *function) :
-            function(function) {
+        std::map<int, ParameterExpression *> inputs;
+        std::map<int, ParameterExpression *> outputs;
+        std::map<uint32_t, BlockExpression *> branches;
+
+        CallStackFrame(Function *function, int stackSizeOnEnter) :
+            function(function),
+            stackSizeOnEnter(stackSizeOnEnter) {
         }
     };
 
     struct StackFrame {
-        ParameterExpression *param {nullptr};
-        Function *allocatedBy {nullptr};
+        ParameterExpression *param;
+        Function *allocatedBy;
 
         StackFrame(
             ParameterExpression *param,
@@ -296,10 +313,6 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
-        std::vector<ParameterExpression *> *inputs {nullptr};
-        std::vector<ParameterExpression *> *outputs {nullptr};
-        std::map<uint32_t, BlockExpression *> *branches {nullptr};
-
         DecompilationContext(
             const ScriptProgram &compiled,
             const IRoutines &routines,
@@ -323,18 +336,19 @@ private:
             stack(other.stack),
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
-            savedAction(other.savedAction),
-            inputs(other.inputs),
-            outputs(other.outputs),
-            branches(other.branches) {
+            savedAction(other.savedAction) {
         }
 
-        Function *topFunction() {
-            return !callStack.empty() ? callStack.back().function : nullptr;
+        void pushCallStack(Function *function) {
+            callStack.push_back(CallStackFrame(function, static_cast<int>(stack.size())));
         }
 
-        void pushStackFrame(ParameterExpression *param) {
-            stack.push_back(StackFrame(param, topFunction()));
+        void pushStack(ParameterExpression *param) {
+            stack.push_back(StackFrame(param, topCall().function));
+        }
+
+        CallStackFrame &topCall() {
+            return callStack.back();
         }
 
         VectorExpression *appendVectorCompose(
