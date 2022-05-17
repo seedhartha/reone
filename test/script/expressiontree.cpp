@@ -243,4 +243,52 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     BOOST_CHECK_EQUAL("_start", startFunc->name);
 }
 
+BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
+    // given
+
+    auto routines = Routines();
+    routines.initForKotOR();
+
+    auto program = ScriptProgram("");
+    program.add(Instruction::newJSR(8));
+    program.add(Instruction(InstructionType::RETN));
+    // int a = 0;
+    program.add(Instruction(InstructionType::RSADDI));
+    program.add(Instruction::newCONSTI(0));
+    program.add(Instruction::newCPDOWNSP(-8, 4));
+    program.add(Instruction::newMOVSP(-4));
+    // loc_loop:
+    // a++;
+    program.add(Instruction::newINCISP(-4));
+    // if(a < 10) { goto loc_loop; }
+    program.add(Instruction::newCONSTI(10));
+    program.add(Instruction::newCPTOPSP(-8, 4));
+    program.add(Instruction(InstructionType::LTII));
+    program.add(Instruction::newJNZ(-22));
+    // return;
+    program.add(Instruction::newMOVSP(-4));
+    program.add(Instruction(InstructionType::RETN));
+
+    // when
+
+    auto tree = ExpressionTree::fromProgram(program, routines);
+
+    // then
+
+    auto &globals = tree.globals();
+    BOOST_CHECK_EQUAL(0ll, globals.size());
+
+    auto &functions = tree.functions();
+    BOOST_CHECK_EQUAL(2ll, functions.size());
+
+    auto mainFunc = functions[0];
+    BOOST_CHECK_EQUAL("main", mainFunc->name);
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
+
+    auto startFunc = functions[1];
+    BOOST_CHECK_EQUAL("_start", startFunc->name);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

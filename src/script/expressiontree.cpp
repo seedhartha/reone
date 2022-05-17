@@ -211,7 +211,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             condExpr->ifTrue = ifTrueBlockExpr.get();
             block->insert(condExpr.get());
 
-            if (ctx.branches->count(absJumpOffset) == 0 && absJumpOffset > 0) {
+            if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                 auto branchCtx = DecompilationContext(ctx);
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
             }
