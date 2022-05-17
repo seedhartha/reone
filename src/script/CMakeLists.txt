@@ -34,7 +34,8 @@ set(SCRIPT_HEADERS
     scripts.h
     services.h
     types.h
-    variable.h)
+    variable.h
+    variableutil.h)
 
 set(SCRIPT_SOURCES
     execution.cpp
@@ -48,7 +49,8 @@ set(SCRIPT_SOURCES
     program.cpp
     routine.cpp
     scripts.cpp
-    variable.cpp)
+    variable.cpp
+    variableutil.cpp)
 
 add_library(script STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(script PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

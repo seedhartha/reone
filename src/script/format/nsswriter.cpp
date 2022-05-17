@@ -24,6 +24,7 @@
 
 #include "../routine.h"
 #include "../routines.h"
+#include "../variableutil.h"
 
 using namespace std;
 
@@ -273,6 +274,18 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
             writer.putLine("");
         }
 
+    } else if (expression.type == ExpressionType::Vector) {
+        auto &vecExpr = static_cast<const ExpressionTree::VectorExpression &>(expression);
+        auto xComp = describeParameter(*vecExpr.components[0]);
+        auto yComp = describeParameter(*vecExpr.components[1]);
+        auto zComp = describeParameter(*vecExpr.components[2]);
+        writer.put(str(boost::format("vector(%s, %s, %s)") % xComp % yComp % zComp));
+
+    } else if (expression.type == ExpressionType::VectorIndex) {
+        auto &indexExpr = static_cast<const ExpressionTree::VectorIndexExpression &>(expression);
+        auto name = describeParameter(*indexExpr.vector);
+        writer.put(str(boost::format("%s[%d]") % name % indexExpr.index));
+
     } else {
         throw NotImplementedException("Cannot write expression of type: " + to_string(static_cast<int>(expression.type)));
     }
@@ -328,35 +341,6 @@ string NssWriter::describeAction(const ExpressionTree::ActionExpression &actionE
         throw ArgumentException(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));
     }
     return _routines.get(actionExpr.action).name();
-}
-
-string NssWriter::describeVariableType(VariableType type) {
-    switch (type) {
-    case VariableType::Void:
-        return "void";
-    case VariableType::Int:
-        return "int";
-    case VariableType::Float:
-        return "float";
-    case VariableType::String:
-        return "string";
-    case VariableType::Vector:
-        return "vector";
-    case VariableType::Object:
-        return "object";
-    case VariableType::Effect:
-        return "effect";
-    case VariableType::Event:
-        return "event";
-    case VariableType::Location:
-        return "location";
-    case VariableType::Talent:
-        return "talent";
-    case VariableType::Action:
-        return "action";
-    default:
-        throw ArgumentException("Cannot describe variable type: " + to_string(static_cast<int>(type)));
-    }
 }
 
 } // namespace script

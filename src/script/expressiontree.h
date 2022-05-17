@@ -36,6 +36,8 @@ enum ExpressionType {
     Conditional,
     Action,
     Call,
+    Vector,
+    VectorIndex,
 
     // Unary
 
@@ -73,7 +75,7 @@ enum ExpressionType {
     GreaterThanOrEqual,
     GreaterThan,
     LessThan,
-    LessThanOrEqual
+    LessThanOrEqual,
 
     // END Binary
 };
@@ -209,6 +211,23 @@ public:
         }
     };
 
+    struct VectorExpression : Expression {
+        std::vector<ParameterExpression *> components;
+
+        VectorExpression() :
+            Expression(ExpressionType::Vector) {
+        }
+    };
+
+    struct VectorIndexExpression : Expression {
+        ParameterExpression *vector {nullptr};
+        int index {0};
+
+        VectorIndexExpression() :
+            Expression(ExpressionType::VectorIndex) {
+        }
+    };
+
     ExpressionTree(
         std::vector<std::shared_ptr<Function>> functions,
         std::vector<std::shared_ptr<Expression>> expressions,
@@ -244,21 +263,17 @@ private:
     struct StackFrame {
         Function *allocatedBy {nullptr};
         ParameterExpression *param {nullptr};
-        int component {0}; // XYZ (vector)
 
         StackFrame(
             Function *allocatedBy,
-            ParameterExpression *param,
-            int component) :
+            ParameterExpression *param) :
             allocatedBy(allocatedBy),
-            param(param),
-            component(component) {
+            param(param) {
         }
 
         StackFrame(const StackFrame &other) {
             allocatedBy = other.allocatedBy;
             param = other.param;
-            component = other.component;
         }
 
         StackFrame withAllocatedBy(Function &allocatedBy) {

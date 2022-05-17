@@ -54,7 +54,6 @@ private:
     std::string describeConstant(const ExpressionTree::ConstantExpression &constExpr);
     std::string describeParameter(const ExpressionTree::ParameterExpression &paramExpr);
     std::string describeAction(const ExpressionTree::ActionExpression &actionExpr);
-    std::string describeVariableType(VariableType type);
 };
 
 } // namespace script
