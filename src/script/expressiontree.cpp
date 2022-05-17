@@ -80,7 +80,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
 ExpressionTree::BlockExpression *ExpressionTree::decompileSafely(uint32_t start, DecompilationContext &ctx) {
     try {
         return decompile(start, ctx);
-    } catch (const ValidationException &e) {
+    } catch (const logic_error &e) {
         error(boost::format("Block decompilation failed at %08x: %s") % start % string(e.what()));
         auto emptyBlock = make_shared<BlockExpression>();
         ctx.expressions.push_back(emptyBlock);
@@ -1099,8 +1099,8 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     auto zAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
     zAssignExpr->offset = offset;
-    zAssignExpr->left = zIndexExpr.get();
-    zAssignExpr->right = zParamExpr.get();
+    zAssignExpr->left = zParamExpr.get();
+    zAssignExpr->right = zIndexExpr.get();
     block.append(zAssignExpr.get());
 
     outZ = zParamExpr.get();
