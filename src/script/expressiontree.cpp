@@ -89,6 +89,12 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             block->insert(maybeLabel->second);
         }
 
+        debug(boost::format("Stack: size=%d") % ctx.stack.size());
+        for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
+            auto type = describeVariableType(it->param->variableType);
+            debug("    " + type);
+        }
+
         auto &ins = ctx.program.getInstruction(offset);
         debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
 
