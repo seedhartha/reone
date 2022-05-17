@@ -261,19 +261,19 @@ private:
     };
 
     struct StackFrame {
-        Function *allocatedBy {nullptr};
         ParameterExpression *param {nullptr};
+        Function *allocatedBy {nullptr};
 
         StackFrame(
-            Function *allocatedBy,
-            ParameterExpression *param) :
-            allocatedBy(allocatedBy),
-            param(param) {
+            ParameterExpression *param,
+            Function *allocatedBy) :
+            param(param),
+            allocatedBy(allocatedBy) {
         }
 
         StackFrame(const StackFrame &other) {
-            allocatedBy = other.allocatedBy;
             param = other.param;
+            allocatedBy = other.allocatedBy;
         }
 
         StackFrame withAllocatedBy(Function &allocatedBy) {
@@ -327,6 +327,14 @@ private:
             inputs(other.inputs),
             outputs(other.outputs),
             branches(other.branches) {
+        }
+
+        Function *topFunction() {
+            return !callStack.empty() ? callStack.back().function : nullptr;
+        }
+
+        void pushStackFrame(ParameterExpression *param) {
+            stack.push_back(StackFrame(param, topFunction()));
         }
     };
 

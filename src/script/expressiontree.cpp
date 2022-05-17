@@ -100,11 +100,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             block->insert(maybeLabel->second);
         }
 
+        /*
         debug(boost::format("Stack: size=%d") % ctx.stack.size());
         for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
             auto type = describeVariableType(it->param->variableType);
             debug("    " + type);
         }
+        */
 
         auto &ins = ctx.program.getInstruction(offset);
         debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
@@ -119,7 +121,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             if (ctx.callStack.size() == 1ll && !ctx.stack.empty()) {
                 auto retVal = ctx.stack.back().param;
                 retExpr->value = retVal;
-                auto startFunc = ctx.callStack.back().function;
+                auto startFunc = ctx.topFunction();
                 startFunc->returnType = retVal->variableType;
             }
 
@@ -229,10 +231,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             condExpr->ifTrue = ifTrueBlockExpr.get();
             block->insert(condExpr.get());
 
-            if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
-                auto branchCtx = DecompilationContext(ctx);
-                ctx.branches->insert(make_pair(absJumpOffset, decompileSafely(absJumpOffset, branchCtx)));
-            }
+             if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
+                 auto branchCtx = DecompilationContext(ctx);
+                 ctx.branches->insert(make_pair(absJumpOffset, decompileSafely(absJumpOffset, branchCtx)));
+             }
 
             ctx.expressions.push_back(move(rightExpr));
             ctx.expressions.push_back(move(testExpr));
@@ -250,7 +252,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                    ins.type == InstructionType::RSADDTAL) {
             auto expression = parameterExpression(ins);
             block->insert(expression.get());
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, expression.get()));
+            ctx.pushStackFrame(expression.get());
             ctx.expressions.push_back(move(expression));
 
         } else if (ins.type == InstructionType::CONSTI ||
@@ -270,7 +272,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = constExpr.get();
             block->insert(assignExpr.get());
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, paramExpr.get()));
+            ctx.pushStackFrame(paramExpr.get());
             ctx.expressions.push_back(move(constExpr));
             ctx.expressions.push_back(move(paramExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -390,9 +392,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
                     //
 
-                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValZExpr.get()));
-                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValYExpr.get()));
-                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValXExpr.get()));
+                    ctx.pushStackFrame(retValZExpr.get());
+                    ctx.pushStackFrame(retValYExpr.get());
+                    ctx.pushStackFrame(retValXExpr.get());
                     ctx.expressions.push_back(move(indexXExpr));
                     ctx.expressions.push_back(move(retValXExpr));
                     ctx.expressions.push_back(move(assignXExpr));
@@ -403,7 +405,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                     ctx.expressions.push_back(move(retValZExpr));
                     ctx.expressions.push_back(move(assignZExpr));
                 } else {
-                    ctx.stack.push_back(StackFrame(ctx.callStack.back().function, retValExpr.get()));
+                    ctx.pushStackFrame(retValExpr.get());
                 }
                 ctx.expressions.push_back(move(retValExpr));
                 ctx.expressions.push_back(move(assignExpr));
@@ -430,7 +432,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 auto &right = ctx.stack[stackSize - i - 1];
 
                 ParameterExpression *destination;
-                if (left.allocatedBy != ctx.callStack.back().function && left.param->locality != ParameterLocality::Global) {
+                if (left.allocatedBy != ctx.topFunction() && left.param->locality != ParameterLocality::Global) {
                     int index = -1;
                     for (size_t j = 0; j < ctx.outputs->size(); ++j) {
                         if ((*ctx.outputs)[j] == left.param) {
@@ -477,7 +479,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 auto &frame = ctx.stack[startIdx + numFrames - i - 1];
 
                 ParameterExpression *source;
-                if (frame.allocatedBy != ctx.callStack.back().function && frame.param->locality != ParameterLocality::Global) {
+                if (frame.allocatedBy != ctx.topFunction() && frame.param->locality != ParameterLocality::Global) {
                     int index = -1;
                     for (size_t j = 0; j < ctx.inputs->size(); ++j) {
                         if ((*ctx.inputs)[j] == frame.param) {
@@ -512,7 +514,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 block->insert(assignExpr.get());
 
                 auto frameCopy = StackFrame(frame);
-                frameCopy.allocatedBy = ctx.callStack.back().function;
+                frameCopy.allocatedBy = ctx.topFunction();
                 frameCopy.param = paramExpr.get();
                 ctx.stack.push_back(move(frameCopy));
 
@@ -558,7 +560,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = unaryExpr.get();
             block->insert(assignExpr.get());
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get()));
+            ctx.pushStackFrame(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(unaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -722,7 +724,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->right = binaryExpr.get();
             block->insert(assignExpr.get());
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get()));
+            ctx.pushStackFrame(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -839,9 +841,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
             //
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultZExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultYExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultXExpr.get()));
+            ctx.pushStackFrame(resultZExpr.get());
+            ctx.pushStackFrame(resultYExpr.get());
+            ctx.pushStackFrame(resultXExpr.get());
             ctx.expressions.push_back(move(rightVecExpr));
             ctx.expressions.push_back(move(leftVecExpr));
             ctx.expressions.push_back(move(resultVecExpr));
@@ -953,9 +955,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
             //
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultZExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultYExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultXExpr.get()));
+            ctx.pushStackFrame(resultZExpr.get());
+            ctx.pushStackFrame(resultYExpr.get());
+            ctx.pushStackFrame(resultXExpr.get());
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -1065,9 +1067,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
             //
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultZExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultYExpr.get()));
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultXExpr.get()));
+            ctx.pushStackFrame(resultZExpr.get());
+            ctx.pushStackFrame(resultYExpr.get());
+            ctx.pushStackFrame(resultXExpr.get());
             ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
@@ -1124,7 +1126,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 ctx.expressions.push_back(move(assignExpr));
             }
 
-            ctx.stack.push_back(StackFrame(ctx.callStack.back().function, resultExpr.get()));
+            ctx.pushStackFrame(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {
@@ -1153,7 +1155,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto &frame = ctx.stack[frameIdx];
 
             ParameterExpression *destination;
-            if (frame.allocatedBy != ctx.callStack.back().function) {
+            if (frame.allocatedBy != ctx.topFunction()) {
                 int index = -1;
                 for (size_t j = 0; j < ctx.outputs->size(); ++j) {
                     if ((*ctx.outputs)[j] == frame.param) {
