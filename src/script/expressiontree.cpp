@@ -97,16 +97,14 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
     for (uint32_t offset = start; offset < ctx.program.length();) {
         auto maybeLabel = ctx.labels.find(offset);
         if (maybeLabel != ctx.labels.end()) {
-            block->insert(maybeLabel->second);
+            block->append(maybeLabel->second);
         }
 
-        /*
-        debug(boost::format("Stack: size=%d") % ctx.stack.size());
-        for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
-            auto type = describeVariableType(it->param->variableType);
-            debug("    " + type);
-        }
-        */
+        //debug(boost::format("Stack: size=%d") % ctx.stack.size());
+        //for (auto it = ctx.stack.rbegin(); it != ctx.stack.rend(); ++it) {
+        //    auto type = describeVariableType(it->param->variableType);
+        //    debug("    " + type);
+        //}
 
         auto &ins = ctx.program.getInstruction(offset);
         debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
@@ -125,7 +123,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 startFunc->returnType = retVal->variableType;
             }
 
-            block->insert(retExpr.get());
+            block->append(retExpr.get());
             ctx.expressions.push_back(move(retExpr));
             break;
 
@@ -141,7 +139,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 ctx.branches->insert(make_pair(absJumpOffset, decompile(absJumpOffset, branchCtx)));
             }
 
-            block->insert(gotoExpr.get());
+            block->append(gotoExpr.get());
             ctx.expressions.push_back(move(gotoExpr));
             break;
 
@@ -166,7 +164,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                     continue;
                 }
                 for (auto &expression : branchBlock->expressions) {
-                    sub->block->insert(expression);
+                    sub->block->append(expression);
                 }
             }
 
@@ -187,7 +185,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto callExpr = make_shared<CallExpression>();
             callExpr->offset = ins.offset;
             callExpr->function = sub.get();
-            block->insert(callExpr.get());
+            block->append(callExpr.get());
 
             for (auto &input : *subCtx.inputs) {
                 sub->inArgumentTypes.push_back(input->variableType);
@@ -224,12 +222,12 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
             auto ifTrueBlockExpr = make_shared<BlockExpression>();
             ifTrueBlockExpr->offset = ins.offset;
-            ifTrueBlockExpr->insert(ifTrueGotoExpr.get());
+            ifTrueBlockExpr->append(ifTrueGotoExpr.get());
 
             auto condExpr = make_shared<ConditionalExpression>();
             condExpr->test = testExpr.get();
             condExpr->ifTrue = ifTrueBlockExpr.get();
-            block->insert(condExpr.get());
+            block->append(condExpr.get());
 
              if (ctx.branches->count(absJumpOffset) == 0 && ins.jumpOffset > 0) {
                  auto branchCtx = DecompilationContext(ctx);
@@ -251,7 +249,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                    ins.type == InstructionType::RSADDLOC ||
                    ins.type == InstructionType::RSADDTAL) {
             auto expression = parameterExpression(ins);
-            block->insert(expression.get());
+            block->append(expression.get());
             ctx.pushStackFrame(expression.get());
             ctx.expressions.push_back(move(expression));
 
@@ -264,13 +262,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto paramExpr = make_shared<ParameterExpression>();
             paramExpr->offset = ins.offset;
             paramExpr->variableType = constExpr->value.type;
-            block->insert(paramExpr.get());
+            block->append(paramExpr.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = paramExpr.get();
             assignExpr->right = constExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
             ctx.pushStackFrame(paramExpr.get());
             ctx.expressions.push_back(move(constExpr));
@@ -285,24 +283,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 Expression *argument;
                 auto argType = routine.getArgumentType(i);
                 if (argType == VariableType::Vector) {
-                    auto xComp = ctx.stack.back().param;
+                    auto argX = ctx.stack.back().param;
                     ctx.stack.pop_back();
-                    auto yComp = ctx.stack.back().param;
+                    auto argY = ctx.stack.back().param;
                     ctx.stack.pop_back();
-                    auto zComp = ctx.stack.back().param;
+                    auto argZ = ctx.stack.back().param;
                     ctx.stack.pop_back();
-                    if (xComp->variableType != VariableType::Float ||
-                        yComp->variableType != VariableType::Float ||
-                        zComp->variableType != VariableType::Float) {
-                        throw ValidationException("Not a vector on top of the stack");
-                    }
-                    auto vecExpr = make_shared<VectorExpression>();
-                    vecExpr->offset = ins.offset;
-                    vecExpr->components.push_back(xComp);
-                    vecExpr->components.push_back(yComp);
-                    vecExpr->components.push_back(zComp);
-                    argument = vecExpr.get();
-                    ctx.expressions.push_back(move(vecExpr));
+                    argument = ctx.appendVectorCompose(ins.offset, *block, *argX, *argY, *argZ);
                 } else if (argType == VariableType::Action) {
                     argument = ctx.savedAction;
                 } else {
@@ -321,97 +308,33 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             actionExpr->arguments = move(arguments);
 
             if (routine.returnType() != VariableType::Void) {
-                auto retValExpr = make_shared<ParameterExpression>();
-                retValExpr->offset = ins.offset;
-                retValExpr->variableType = routine.returnType();
-                block->insert(retValExpr.get());
+                auto returnValue = make_shared<ParameterExpression>();
+                returnValue->offset = ins.offset;
+                returnValue->variableType = routine.returnType();
+                block->append(returnValue.get());
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
-                assignExpr->left = retValExpr.get();
+                assignExpr->left = returnValue.get();
                 assignExpr->right = actionExpr.get();
-                block->insert(assignExpr.get());
+                block->append(assignExpr.get());
 
                 if (routine.returnType() == VariableType::Vector) {
-                    // X
-
-                    auto indexXExpr = make_shared<VectorIndexExpression>();
-                    indexXExpr->offset = ins.offset;
-                    indexXExpr->vector = retValExpr.get();
-                    indexXExpr->index = 0;
-
-                    auto retValXExpr = make_shared<ParameterExpression>();
-                    retValXExpr->offset = ins.offset;
-                    retValXExpr->variableType = VariableType::Float;
-                    retValXExpr->index = 0;
-                    block->insert(retValXExpr.get());
-
-                    auto assignXExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                    assignXExpr->offset = ins.offset;
-                    assignXExpr->left = retValXExpr.get();
-                    assignXExpr->right = indexXExpr.get();
-                    block->insert(assignXExpr.get());
-
-                    // Y
-
-                    auto indexYExpr = make_shared<VectorIndexExpression>();
-                    indexYExpr->offset = ins.offset;
-                    indexYExpr->vector = retValExpr.get();
-                    indexYExpr->index = 1;
-
-                    auto retValYExpr = make_shared<ParameterExpression>();
-                    retValYExpr->offset = ins.offset;
-                    retValYExpr->variableType = VariableType::Float;
-                    retValYExpr->index = 1;
-                    block->insert(retValYExpr.get());
-
-                    auto assignYExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                    assignYExpr->offset = ins.offset;
-                    assignYExpr->left = retValYExpr.get();
-                    assignYExpr->right = indexYExpr.get();
-                    block->insert(assignYExpr.get());
-
-                    // Z
-
-                    auto indexZExpr = make_shared<VectorIndexExpression>();
-                    indexZExpr->offset = ins.offset;
-                    indexZExpr->vector = retValExpr.get();
-                    indexZExpr->index = 2;
-
-                    auto retValZExpr = make_shared<ParameterExpression>();
-                    retValZExpr->offset = ins.offset;
-                    retValZExpr->variableType = VariableType::Float;
-                    retValZExpr->index = 2;
-                    block->insert(retValZExpr.get());
-
-                    auto assignZExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                    assignZExpr->offset = ins.offset;
-                    assignZExpr->left = retValZExpr.get();
-                    assignZExpr->right = indexZExpr.get();
-                    block->insert(assignZExpr.get());
-
-                    //
-
-                    ctx.pushStackFrame(retValZExpr.get());
-                    ctx.pushStackFrame(retValYExpr.get());
-                    ctx.pushStackFrame(retValXExpr.get());
-                    ctx.expressions.push_back(move(indexXExpr));
-                    ctx.expressions.push_back(move(retValXExpr));
-                    ctx.expressions.push_back(move(assignXExpr));
-                    ctx.expressions.push_back(move(indexYExpr));
-                    ctx.expressions.push_back(move(retValYExpr));
-                    ctx.expressions.push_back(move(assignYExpr));
-                    ctx.expressions.push_back(move(indexZExpr));
-                    ctx.expressions.push_back(move(retValZExpr));
-                    ctx.expressions.push_back(move(assignZExpr));
+                    ParameterExpression *retValX = nullptr;
+                    ParameterExpression *retValY = nullptr;
+                    ParameterExpression *retValZ = nullptr;
+                    ctx.appendVectorDecompose(ins.offset, *block, *returnValue, retValX, retValY, retValZ);
+                    ctx.pushStackFrame(retValZ);
+                    ctx.pushStackFrame(retValY);
+                    ctx.pushStackFrame(retValX);
                 } else {
-                    ctx.pushStackFrame(retValExpr.get());
+                    ctx.pushStackFrame(returnValue.get());
                 }
-                ctx.expressions.push_back(move(retValExpr));
+                ctx.expressions.push_back(move(returnValue));
                 ctx.expressions.push_back(move(assignExpr));
 
             } else {
-                block->insert(actionExpr.get());
+                block->append(actionExpr.get());
             }
 
             ctx.expressions.push_back(move(actionExpr));
@@ -458,7 +381,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 assignExpr->offset = ins.offset;
                 assignExpr->left = destination;
                 assignExpr->right = right.param;
-                block->insert(assignExpr.get());
+                block->append(assignExpr.get());
 
                 left = right.withAllocatedBy(*left.allocatedBy);
                 ctx.expressions.push_back(move(assignExpr));
@@ -505,13 +428,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 paramExpr->offset = ins.offset;
                 paramExpr->variableType = source->variableType;
                 paramExpr->index = i;
-                block->insert(paramExpr.get());
+                block->append(paramExpr.get());
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
                 assignExpr->left = paramExpr.get();
                 assignExpr->right = source;
-                block->insert(assignExpr.get());
+                block->append(assignExpr.get());
 
                 auto frameCopy = StackFrame(frame);
                 frameCopy.allocatedBy = ctx.topFunction();
@@ -539,7 +462,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto resultExpr = make_shared<ParameterExpression>();
             resultExpr->offset = ins.offset;
             resultExpr->variableType = value->variableType;
-            block->insert(resultExpr.get());
+            block->append(resultExpr.get());
 
             ExpressionType type;
             if (ins.type == InstructionType::NEGI ||
@@ -558,7 +481,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             assignExpr->offset = ins.offset;
             assignExpr->left = resultExpr.get();
             assignExpr->right = unaryExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
             ctx.pushStackFrame(resultExpr.get());
             ctx.expressions.push_back(move(resultExpr));
@@ -615,32 +538,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                    ins.type == InstructionType::SHLEFTII ||
                    ins.type == InstructionType::SHRIGHTII ||
                    ins.type == InstructionType::USHRIGHTII) {
-            auto &right = ctx.stack.back();
+            auto right = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &left = ctx.stack.back();
+            auto left = ctx.stack.back().param;
             ctx.stack.pop_back();
-
-            VariableType varType;
-            if (ins.type == InstructionType::ADDIF ||
-                ins.type == InstructionType::ADDFI ||
-                ins.type == InstructionType::ADDFF ||
-                ins.type == InstructionType::SUBIF ||
-                ins.type == InstructionType::SUBFI ||
-                ins.type == InstructionType::SUBFF ||
-                ins.type == InstructionType::MULIF ||
-                ins.type == InstructionType::MULFI ||
-                ins.type == InstructionType::MULFF ||
-                ins.type == InstructionType::DIVIF ||
-                ins.type == InstructionType::DIVFI ||
-                ins.type == InstructionType::DIVFF) {
-                varType = VariableType::Float;
-            } else {
-                varType = VariableType::Int;
-            }
-            auto resultExpr = make_shared<ParameterExpression>();
-            resultExpr->offset = ins.offset;
-            resultExpr->variableType = varType;
-            block->insert(resultExpr.get());
 
             ExpressionType type;
             if (ins.type == InstructionType::ADDII ||
@@ -715,373 +616,172 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             }
             auto binaryExpr = make_shared<BinaryExpression>(type);
             binaryExpr->offset = ins.offset;
-            binaryExpr->left = left.param;
-            binaryExpr->right = right.param;
+            binaryExpr->left = left;
+            binaryExpr->right = right;
+
+            VariableType varType;
+            if (ins.type == InstructionType::ADDIF ||
+                ins.type == InstructionType::ADDFI ||
+                ins.type == InstructionType::ADDFF ||
+                ins.type == InstructionType::SUBIF ||
+                ins.type == InstructionType::SUBFI ||
+                ins.type == InstructionType::SUBFF ||
+                ins.type == InstructionType::MULIF ||
+                ins.type == InstructionType::MULFI ||
+                ins.type == InstructionType::MULFF ||
+                ins.type == InstructionType::DIVIF ||
+                ins.type == InstructionType::DIVFI ||
+                ins.type == InstructionType::DIVFF) {
+                varType = VariableType::Float;
+            } else {
+                varType = VariableType::Int;
+            }
+            auto result = make_shared<ParameterExpression>();
+            result->offset = ins.offset;
+            result->variableType = varType;
+            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
-            assignExpr->left = resultExpr.get();
+            assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
-            ctx.pushStackFrame(resultExpr.get());
-            ctx.expressions.push_back(move(resultExpr));
+            ctx.pushStackFrame(result.get());
+            ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
 
         } else if (ins.type == InstructionType::ADDVV ||
                    ins.type == InstructionType::SUBVV) {
-            auto &rightX = ctx.stack.back().param;
+            auto rightX = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &rightY = ctx.stack.back().param;
+            auto rightY = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &rightZ = ctx.stack.back().param;
+            auto rightZ = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if ((rightX->variableType != VariableType::Float) ||
-                (rightY->variableType != VariableType::Float) ||
-                (rightZ->variableType != VariableType::Float)) {
-                throw ValidationException("Not a vector on top of the stack");
-            }
-            auto rightVecExpr = make_shared<VectorExpression>();
-            rightVecExpr->offset = ins.offset;
-            rightVecExpr->components.push_back(rightX);
-            rightVecExpr->components.push_back(rightY);
-            rightVecExpr->components.push_back(rightZ);
+            auto right = ctx.appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
-            auto &leftX = ctx.stack.back().param;
+            auto leftX = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &leftY = ctx.stack.back().param;
+            auto leftY = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &leftZ = ctx.stack.back().param;
+            auto leftZ = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if ((leftX->variableType != VariableType::Float) ||
-                (leftY->variableType != VariableType::Float) ||
-                (leftZ->variableType != VariableType::Float)) {
-                throw ValidationException("Not a vector on top of the stack");
-            }
-            auto leftVecExpr = make_shared<VectorExpression>();
-            leftVecExpr->offset = ins.offset;
-            leftVecExpr->components.push_back(leftX);
-            leftVecExpr->components.push_back(leftY);
-            leftVecExpr->components.push_back(leftZ);
-
-            auto resultVecExpr = make_shared<ParameterExpression>();
-            resultVecExpr->offset = ins.offset;
-            resultVecExpr->variableType = VariableType::Vector;
-            block->insert(resultVecExpr.get());
+            auto left = ctx.appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
             auto type = (ins.type == InstructionType::ADDVV) ? ExpressionType::Add : ExpressionType::Subtract;
             auto binaryExpr = make_shared<BinaryExpression>(type);
             binaryExpr->offset = ins.offset;
-            binaryExpr->left = leftVecExpr.get();
-            binaryExpr->right = rightVecExpr.get();
+            binaryExpr->left = left;
+            binaryExpr->right = right;
+
+            auto result = make_shared<ParameterExpression>();
+            result->offset = ins.offset;
+            result->variableType = VariableType::Vector;
+            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
-            assignExpr->left = resultVecExpr.get();
+            assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
-            // X
+            ParameterExpression *resultX = nullptr;
+            ParameterExpression *resultY = nullptr;
+            ParameterExpression *resultZ = nullptr;
+            ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+            ctx.pushStackFrame(resultZ);
+            ctx.pushStackFrame(resultY);
+            ctx.pushStackFrame(resultX);
 
-            auto indexXExpr = make_shared<VectorIndexExpression>();
-            indexXExpr->offset = ins.offset;
-            indexXExpr->vector = resultVecExpr.get();
-            indexXExpr->index = 0;
-
-            auto resultXExpr = make_shared<ParameterExpression>();
-            resultXExpr->offset = ins.offset;
-            resultXExpr->variableType = VariableType::Float;
-            resultXExpr->index = 0;
-            block->insert(resultXExpr.get());
-
-            auto assignXExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignXExpr->offset = ins.offset;
-            assignXExpr->left = resultXExpr.get();
-            assignXExpr->right = indexXExpr.get();
-            block->insert(assignXExpr.get());
-
-            // Y
-
-            auto indexYExpr = make_shared<VectorIndexExpression>();
-            indexYExpr->offset = ins.offset;
-            indexYExpr->vector = resultVecExpr.get();
-            indexYExpr->index = 1;
-
-            auto resultYExpr = make_shared<ParameterExpression>();
-            resultYExpr->offset = ins.offset;
-            resultYExpr->variableType = VariableType::Float;
-            resultYExpr->index = 1;
-            block->insert(resultYExpr.get());
-
-            auto assignYExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignYExpr->offset = ins.offset;
-            assignYExpr->left = resultYExpr.get();
-            assignYExpr->right = indexYExpr.get();
-            block->insert(assignYExpr.get());
-
-            // Z
-
-            auto indexZExpr = make_shared<VectorIndexExpression>();
-            indexZExpr->offset = ins.offset;
-            indexZExpr->vector = resultVecExpr.get();
-            indexZExpr->index = 2;
-
-            auto resultZExpr = make_shared<ParameterExpression>();
-            resultZExpr->offset = ins.offset;
-            resultZExpr->variableType = VariableType::Float;
-            resultZExpr->index = 2;
-            block->insert(resultZExpr.get());
-
-            auto assignZExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignZExpr->offset = ins.offset;
-            assignZExpr->left = indexZExpr.get();
-            assignZExpr->right = resultZExpr.get();
-            block->insert(assignZExpr.get());
-
-            //
-
-            ctx.pushStackFrame(resultZExpr.get());
-            ctx.pushStackFrame(resultYExpr.get());
-            ctx.pushStackFrame(resultXExpr.get());
-            ctx.expressions.push_back(move(rightVecExpr));
-            ctx.expressions.push_back(move(leftVecExpr));
-            ctx.expressions.push_back(move(resultVecExpr));
+            ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
-            ctx.expressions.push_back(move(indexXExpr));
-            ctx.expressions.push_back(move(resultXExpr));
-            ctx.expressions.push_back(move(assignXExpr));
-            ctx.expressions.push_back(move(indexYExpr));
-            ctx.expressions.push_back(move(resultYExpr));
-            ctx.expressions.push_back(move(assignYExpr));
-            ctx.expressions.push_back(move(indexZExpr));
-            ctx.expressions.push_back(move(resultZExpr));
-            ctx.expressions.push_back(move(assignZExpr));
 
         } else if (ins.type == InstructionType::DIVFV ||
                    ins.type == InstructionType::MULFV) {
-            auto &rightX = ctx.stack.back();
+            auto rightX = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &rightY = ctx.stack.back();
+            auto rightY = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &rightZ = ctx.stack.back();
+            auto rightZ = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if ((rightX.param->variableType != VariableType::Float) ||
-                (rightY.param->variableType != VariableType::Float) ||
-                (rightZ.param->variableType != VariableType::Float)) {
-                throw ValidationException("Not a vector on top of the stack");
-            }
+            auto right = ctx.appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
-            auto &left = ctx.stack.back();
+            auto left = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if (left.param->variableType != VariableType::Float) {
-                throw ValidationException("Not a float on top of the stack");
-            }
-
-            auto resultExpr = make_shared<ParameterExpression>();
-            resultExpr->offset = ins.offset;
-            resultExpr->variableType = VariableType::Vector;
-            block->insert(resultExpr.get());
 
             auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
             auto binaryExpr = make_shared<BinaryExpression>(type);
             binaryExpr->offset = ins.offset;
-            binaryExpr->left = left.param;
-            binaryExpr->right = rightX.param;
+            binaryExpr->left = left;
+            binaryExpr->right = right;
+
+            auto result = make_shared<ParameterExpression>();
+            result->offset = ins.offset;
+            result->variableType = VariableType::Vector;
+            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
-            assignExpr->left = resultExpr.get();
+            assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
-            // X
+            ParameterExpression *resultX = nullptr;
+            ParameterExpression *resultY = nullptr;
+            ParameterExpression *resultZ = nullptr;
+            ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+            ctx.pushStackFrame(resultZ);
+            ctx.pushStackFrame(resultY);
+            ctx.pushStackFrame(resultX);
 
-            auto indexXExpr = make_shared<VectorIndexExpression>();
-            indexXExpr->offset = ins.offset;
-            indexXExpr->vector = resultExpr.get();
-            indexXExpr->index = 0;
-
-            auto resultXExpr = make_shared<ParameterExpression>();
-            resultXExpr->offset = ins.offset;
-            resultXExpr->variableType = VariableType::Float;
-            resultXExpr->index = 0;
-            block->insert(resultXExpr.get());
-
-            auto assignXExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignXExpr->offset = ins.offset;
-            assignXExpr->left = resultXExpr.get();
-            assignXExpr->right = indexXExpr.get();
-            block->insert(assignXExpr.get());
-
-            // Y
-
-            auto indexYExpr = make_shared<VectorIndexExpression>();
-            indexYExpr->offset = ins.offset;
-            indexYExpr->vector = resultExpr.get();
-            indexYExpr->index = 1;
-
-            auto resultYExpr = make_shared<ParameterExpression>();
-            resultYExpr->offset = ins.offset;
-            resultYExpr->variableType = VariableType::Float;
-            resultYExpr->index = 1;
-            block->insert(resultYExpr.get());
-
-            auto assignYExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignYExpr->offset = ins.offset;
-            assignYExpr->left = resultYExpr.get();
-            assignYExpr->right = indexYExpr.get();
-            block->insert(assignYExpr.get());
-
-            // Z
-
-            auto indexZExpr = make_shared<VectorIndexExpression>();
-            indexZExpr->offset = ins.offset;
-            indexZExpr->vector = resultExpr.get();
-            indexZExpr->index = 2;
-
-            auto resultZExpr = make_shared<ParameterExpression>();
-            resultZExpr->offset = ins.offset;
-            resultZExpr->variableType = VariableType::Float;
-            resultZExpr->index = 2;
-            block->insert(resultZExpr.get());
-
-            auto assignZExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignZExpr->offset = ins.offset;
-            assignZExpr->left = indexZExpr.get();
-            assignZExpr->right = resultZExpr.get();
-            block->insert(assignZExpr.get());
-
-            //
-
-            ctx.pushStackFrame(resultZExpr.get());
-            ctx.pushStackFrame(resultYExpr.get());
-            ctx.pushStackFrame(resultXExpr.get());
-            ctx.expressions.push_back(move(resultExpr));
+            ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(binaryExpr));
             ctx.expressions.push_back(move(assignExpr));
-            ctx.expressions.push_back(move(indexXExpr));
-            ctx.expressions.push_back(move(resultXExpr));
-            ctx.expressions.push_back(move(assignXExpr));
-            ctx.expressions.push_back(move(indexYExpr));
-            ctx.expressions.push_back(move(resultYExpr));
-            ctx.expressions.push_back(move(assignYExpr));
-            ctx.expressions.push_back(move(indexZExpr));
-            ctx.expressions.push_back(move(resultZExpr));
-            ctx.expressions.push_back(move(assignZExpr));
 
         } else if (ins.type == InstructionType::DIVVF ||
                    ins.type == InstructionType::MULVF) {
-            auto &right = ctx.stack.back();
+            auto right = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if (right.param->variableType != VariableType::Float) {
-                throw ValidationException("Not a float on top of the stack");
-            }
 
-            auto &leftX = ctx.stack.back();
+            auto leftX = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &leftY = ctx.stack.back();
+            auto leftY = ctx.stack.back().param;
             ctx.stack.pop_back();
-            auto &leftZ = ctx.stack.back();
+            auto leftZ = ctx.stack.back().param;
             ctx.stack.pop_back();
-            if ((leftX.param->variableType != VariableType::Float) ||
-                (leftY.param->variableType != VariableType::Float) ||
-                (leftZ.param->variableType != VariableType::Float)) {
-                throw ValidationException("Not a vector on top of the stack");
-            }
-
-            auto resultExpr = make_shared<ParameterExpression>();
-            resultExpr->offset = ins.offset;
-            resultExpr->variableType = VariableType::Vector;
-            block->insert(resultExpr.get());
+            auto left = ctx.appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
             auto type = (ins.type == InstructionType::DIVVF) ? ExpressionType::Divide : ExpressionType::Multiply;
             auto binaryExpr = make_shared<BinaryExpression>(type);
             binaryExpr->offset = ins.offset;
-            binaryExpr->left = leftX.param;
-            binaryExpr->right = right.param;
+            binaryExpr->left = left;
+            binaryExpr->right = right;
+
+            auto result = make_shared<ParameterExpression>();
+            result->offset = ins.offset;
+            result->variableType = VariableType::Vector;
+            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
-            assignExpr->left = resultExpr.get();
+            assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
-            block->insert(assignExpr.get());
+            block->append(assignExpr.get());
 
-            // X
+            ParameterExpression *resultX = nullptr;
+            ParameterExpression *resultY = nullptr;
+            ParameterExpression *resultZ = nullptr;
+            ctx.appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+            ctx.pushStackFrame(resultZ);
+            ctx.pushStackFrame(resultY);
+            ctx.pushStackFrame(resultX);
 
-            auto indexXExpr = make_shared<VectorIndexExpression>();
-            indexXExpr->offset = ins.offset;
-            indexXExpr->vector = resultExpr.get();
-            indexXExpr->index = 0;
-
-            auto resultXExpr = make_shared<ParameterExpression>();
-            resultXExpr->offset = ins.offset;
-            resultXExpr->variableType = VariableType::Float;
-            resultXExpr->index = 0;
-            block->insert(resultXExpr.get());
-
-            auto assignXExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignXExpr->offset = ins.offset;
-            assignXExpr->left = resultXExpr.get();
-            assignXExpr->right = indexXExpr.get();
-            block->insert(assignXExpr.get());
-
-            // Y
-
-            auto indexYExpr = make_shared<VectorIndexExpression>();
-            indexYExpr->offset = ins.offset;
-            indexYExpr->vector = resultExpr.get();
-            indexYExpr->index = 1;
-
-            auto resultYExpr = make_shared<ParameterExpression>();
-            resultYExpr->offset = ins.offset;
-            resultYExpr->variableType = VariableType::Float;
-            resultYExpr->index = 1;
-            block->insert(resultYExpr.get());
-
-            auto assignYExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignYExpr->offset = ins.offset;
-            assignYExpr->left = resultYExpr.get();
-            assignYExpr->right = indexYExpr.get();
-            block->insert(assignYExpr.get());
-
-            // Z
-
-            auto indexZExpr = make_shared<VectorIndexExpression>();
-            indexZExpr->offset = ins.offset;
-            indexZExpr->vector = resultExpr.get();
-            indexZExpr->index = 2;
-
-            auto resultZExpr = make_shared<ParameterExpression>();
-            resultZExpr->offset = ins.offset;
-            resultZExpr->variableType = VariableType::Float;
-            resultZExpr->index = 2;
-            block->insert(resultZExpr.get());
-
-            auto assignZExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignZExpr->offset = ins.offset;
-            assignZExpr->left = indexZExpr.get();
-            assignZExpr->right = resultZExpr.get();
-            block->insert(assignZExpr.get());
-
-            //
-
-            ctx.pushStackFrame(resultZExpr.get());
-            ctx.pushStackFrame(resultYExpr.get());
-            ctx.pushStackFrame(resultXExpr.get());
-            ctx.expressions.push_back(move(resultExpr));
             ctx.expressions.push_back(move(binaryExpr));
+            ctx.expressions.push_back(move(result));
             ctx.expressions.push_back(move(assignExpr));
-            ctx.expressions.push_back(move(indexXExpr));
-            ctx.expressions.push_back(move(resultXExpr));
-            ctx.expressions.push_back(move(assignXExpr));
-            ctx.expressions.push_back(move(indexYExpr));
-            ctx.expressions.push_back(move(resultYExpr));
-            ctx.expressions.push_back(move(assignYExpr));
-            ctx.expressions.push_back(move(indexZExpr));
-            ctx.expressions.push_back(move(resultZExpr));
-            ctx.expressions.push_back(move(assignZExpr));
 
         } else if (ins.type == InstructionType::EQUALTT ||
                    ins.type == InstructionType::NEQUALTT) {
@@ -1100,7 +800,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto resultExpr = make_shared<ParameterExpression>();
             resultExpr->offset = ins.offset;
             resultExpr->variableType = VariableType::Int;
-            block->insert(resultExpr.get());
+            block->append(resultExpr.get());
 
             for (int i = 0; i < numFrames; ++i) {
                 auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
@@ -1119,7 +819,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
                 assignExpr->offset = ins.offset;
                 assignExpr->left = resultExpr.get();
                 assignExpr->right = andOrExpression.get();
-                block->insert(assignExpr.get());
+                block->append(assignExpr.get());
 
                 ctx.expressions.push_back(move(compExpr));
                 ctx.expressions.push_back(move(andOrExpression));
@@ -1189,7 +889,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             auto unaryExpr = make_shared<UnaryExpression>(type);
             unaryExpr->offset = ins.offset;
             unaryExpr->operand = destination;
-            block->insert(unaryExpr.get());
+            block->append(unaryExpr.get());
 
             ctx.expressions.push_back(move(unaryExpr));
 
@@ -1300,6 +1000,114 @@ unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpress
     default:
         throw ArgumentException("Instruction is not of RSADDx type: " + to_string(static_cast<int>(ins.type)));
     }
+}
+
+ExpressionTree::VectorExpression *ExpressionTree::DecompilationContext::appendVectorCompose(
+    uint32_t offset,
+    BlockExpression &block,
+    ParameterExpression &x,
+    ParameterExpression &y,
+    ParameterExpression &z) {
+
+    if ((x.variableType != VariableType::Float) ||
+        (y.variableType != VariableType::Float) ||
+        (z.variableType != VariableType::Float)) {
+        throw ArgumentException("Cannot compose a vector of non-floats");
+    }
+
+    auto vecExpr = make_shared<VectorExpression>();
+    vecExpr->offset = offset;
+    vecExpr->components.push_back(&x);
+    vecExpr->components.push_back(&y);
+    vecExpr->components.push_back(&y);
+
+    expressions.push_back(vecExpr);
+
+    return vecExpr.get();
+}
+
+void ExpressionTree::DecompilationContext::appendVectorDecompose(
+    uint32_t offset,
+    BlockExpression &block,
+    ParameterExpression &vec,
+    ParameterExpression *&outX,
+    ParameterExpression *&outY,
+    ParameterExpression *&outZ) {
+
+    // X
+
+    auto xIndexExpr = make_shared<VectorIndexExpression>();
+    xIndexExpr->offset = offset;
+    xIndexExpr->vector = &vec;
+    xIndexExpr->index = 0;
+
+    auto xParamExpr = make_shared<ParameterExpression>();
+    xParamExpr->offset = offset;
+    xParamExpr->variableType = VariableType::Float;
+    xParamExpr->index = 0;
+    block.append(xParamExpr.get());
+
+    auto xAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    xAssignExpr->offset = offset;
+    xAssignExpr->left = xParamExpr.get();
+    xAssignExpr->right = xIndexExpr.get();
+    block.append(xAssignExpr.get());
+
+    outX = xParamExpr.get();
+
+    expressions.push_back(move(xParamExpr));
+    expressions.push_back(move(xIndexExpr));
+    expressions.push_back(move(xAssignExpr));
+
+    // Y
+
+    auto yIndexExpr = make_shared<VectorIndexExpression>();
+    yIndexExpr->offset = offset;
+    yIndexExpr->vector = &vec;
+    yIndexExpr->index = 1;
+
+    auto yParamExpr = make_shared<ParameterExpression>();
+    yParamExpr->offset = offset;
+    yParamExpr->variableType = VariableType::Float;
+    yParamExpr->index = 1;
+    block.append(yParamExpr.get());
+
+    auto yAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    yAssignExpr->offset = offset;
+    yAssignExpr->left = yParamExpr.get();
+    yAssignExpr->right = yIndexExpr.get();
+    block.append(yAssignExpr.get());
+
+    outY = yParamExpr.get();
+
+    expressions.push_back(move(yParamExpr));
+    expressions.push_back(move(yIndexExpr));
+    expressions.push_back(move(yAssignExpr));
+
+    // Z
+
+    auto zIndexExpr = make_shared<VectorIndexExpression>();
+    zIndexExpr->offset = offset;
+    zIndexExpr->vector = &vec;
+    zIndexExpr->index = 2;
+
+    auto zParamExpr = make_shared<ParameterExpression>();
+    zParamExpr->offset = offset;
+    zParamExpr->variableType = VariableType::Float;
+    zParamExpr->index = 2;
+    block.append(zParamExpr.get());
+
+    auto zAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    zAssignExpr->offset = offset;
+    zAssignExpr->left = zIndexExpr.get();
+    zAssignExpr->right = zParamExpr.get();
+    block.append(zAssignExpr.get());
+
+    outZ = zParamExpr.get();
+
+    expressions.push_back(move(zParamExpr));
+    expressions.push_back(move(zIndexExpr));
+    expressions.push_back(move(zAssignExpr));
 }
 
 } // namespace script

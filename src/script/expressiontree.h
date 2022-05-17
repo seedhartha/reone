@@ -111,7 +111,7 @@ public:
                    offset <= expressions.back()->offset;
         }
 
-        void insert(Expression *e) {
+        void append(Expression *e) {
             expressions.push_back(e);
         }
     };
@@ -336,6 +336,21 @@ private:
         void pushStackFrame(ParameterExpression *param) {
             stack.push_back(StackFrame(param, topFunction()));
         }
+
+        VectorExpression *appendVectorCompose(
+            uint32_t offset,
+            BlockExpression &block,
+            ParameterExpression &x,
+            ParameterExpression &y,
+            ParameterExpression &z);
+
+        void appendVectorDecompose(
+            uint32_t offset,
+            BlockExpression &block,
+            ParameterExpression &vec,
+            ParameterExpression *&outX,
+            ParameterExpression *&outY,
+            ParameterExpression *&outZ);
     };
 
     std::vector<std::shared_ptr<Function>> _functions;
