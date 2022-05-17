@@ -15,15 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "program.h"
+#include "expressiontree.h"
 
-#include "../../../common/exception/argument.h"
-#include "../../../common/exception/notimplemented.h"
-#include "../../../common/exception/validation.h"
-#include "../../../common/logutil.h"
-#include "../../../script/instrutil.h"
-#include "../../../script/routine.h"
-#include "../../../script/routines.h"
+#include "../common/exception/argument.h"
+#include "../common/exception/notimplemented.h"
+#include "../common/exception/validation.h"
+#include "../common/logutil.h"
+
+#include "instrutil.h"
+#include "routine.h"
+#include "routines.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ using namespace reone::script;
 
 namespace reone {
 
-NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, const IRoutines &routines) {
+ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const IRoutines &routines) {
     auto startFunc = make_shared<Function>();
     startFunc->name = "_start";
     startFunc->offset = 13;
@@ -40,7 +41,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
     auto expressions = vector<shared_ptr<Expression>>();
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
-    for (auto &ins : compiled.instructions()) {
+    for (auto &ins : program.instructions()) {
         if (ins.type == InstructionType::JMP ||
             ins.type == InstructionType::JZ ||
             ins.type == InstructionType::JNZ) {
@@ -52,7 +53,7 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
         }
     }
 
-    auto ctx = DecompilationContext(compiled, routines, labels, functions, expressions);
+    auto ctx = DecompilationContext(program, routines, labels, functions, expressions);
     ctx.callStack.push_back(CallStackFrame(startFunc.get()));
     startFunc->block = decompile(13, ctx);
 
@@ -69,13 +70,13 @@ NwscriptProgram NwscriptProgram::fromCompiled(const ScriptProgram &compiled, con
 
     ctx.functions.push_back(move(startFunc));
 
-    return NwscriptProgram(
+    return ExpressionTree(
         ctx.functions,
         ctx.expressions,
         move(globals));
 }
 
-NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, DecompilationContext &ctx) {
+ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, DecompilationContext &ctx) {
     debug(boost::format("Begin decompiling block at %08x") % start);
 
     auto block = make_shared<BlockExpression>();
@@ -926,7 +927,7 @@ NwscriptProgram::BlockExpression *NwscriptProgram::decompile(uint32_t start, Dec
     return block.get();
 }
 
-unique_ptr<NwscriptProgram::ConstantExpression> NwscriptProgram::constantExpression(const Instruction &ins) {
+unique_ptr<ExpressionTree::ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::CONSTI:
     case InstructionType::CONSTF:
@@ -950,7 +951,7 @@ unique_ptr<NwscriptProgram::ConstantExpression> NwscriptProgram::constantExpress
     }
 }
 
-unique_ptr<NwscriptProgram::ParameterExpression> NwscriptProgram::parameterExpression(const Instruction &ins) {
+unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::RSADDI:
     case InstructionType::RSADDF:

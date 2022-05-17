@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../script/program.h"
-#include "../../../script/variable.h"
+#include "program.h"
+#include "variable.h"
 
 namespace reone {
 
@@ -28,7 +28,7 @@ class IRoutines;
 
 }
 
-class NwscriptProgram {
+class ExpressionTree {
 public:
     enum ExpressionType {
         Block,
@@ -211,7 +211,7 @@ public:
         }
     };
 
-    NwscriptProgram(
+    ExpressionTree(
         std::vector<std::shared_ptr<Function>> functions,
         std::vector<std::shared_ptr<Expression>> expressions,
         std::set<const ParameterExpression *> globals) :
@@ -232,7 +232,7 @@ public:
         return _globals;
     }
 
-    static NwscriptProgram fromCompiled(const script::ScriptProgram &compiled, const script::IRoutines &routines);
+    static ExpressionTree fromProgram(const script::ScriptProgram &program, const script::IRoutines &routines);
 
 private:
     struct CallStackFrame {

@@ -27,14 +27,13 @@
 #include "../../common/stream/fileoutput.h"
 #include "../../common/textwriter.h"
 #include "../../game/script/routines.h"
+#include "../../script/expressiontree.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"
 #include "../../script/program.h"
 #include "../../script/routine.h"
 #include "../../script/variable.h"
-
-#include "nwscript/program.h"
 
 using namespace std;
 
@@ -380,7 +379,7 @@ private:
 class NssWriter {
 public:
     NssWriter(
-        NwscriptProgram &program,
+        ExpressionTree &program,
         Routines &routines) :
         _program(program),
         _routines(routines) {
@@ -408,10 +407,10 @@ public:
     }
 
 private:
-    NwscriptProgram &_program;
+    ExpressionTree &_program;
     Routines &_routines;
 
-    void writeFunction(const NwscriptProgram::Function &function, TextWriter &writer) {
+    void writeFunction(const ExpressionTree::Function &function, TextWriter &writer) {
         auto returnType = describeVariableType(function.returnType);
         auto name = describeFunction(function);
         auto params = vector<string>();
@@ -433,62 +432,62 @@ private:
         writer.put("\n\n");
     }
 
-    void writeBlock(int level, const NwscriptProgram::BlockExpression &block, TextWriter &writer) {
+    void writeBlock(int level, const ExpressionTree::BlockExpression &block, TextWriter &writer) {
         auto innerLevel = 1 + level;
         auto indent = indentAtLevel(level);
         auto innerIndent = indentAtLevel(innerLevel);
 
         writer.putLine(indent + string("{"));
         for (auto &innerExpr : block.expressions) {
-            if (innerExpr->type == NwscriptProgram::ExpressionType::Parameter &&
-                static_cast<const NwscriptProgram::ParameterExpression *>(innerExpr)->locality == NwscriptProgram::ParameterLocality::Global) {
+            if (innerExpr->type == ExpressionTree::ExpressionType::Parameter &&
+                static_cast<const ExpressionTree::ParameterExpression *>(innerExpr)->locality == ExpressionTree::ParameterLocality::Global) {
                 continue;
             }
-            if (innerExpr->type == NwscriptProgram::ExpressionType::Label) {
+            if (innerExpr->type == ExpressionTree::ExpressionType::Label) {
                 writer.put(indent);
             } else {
                 writer.put(innerIndent);
             }
             writeExpression(innerLevel, true, *innerExpr, writer);
-            if (innerExpr->type != NwscriptProgram::ExpressionType::Label &&
-                innerExpr->type != NwscriptProgram::ExpressionType::Conditional) {
+            if (innerExpr->type != ExpressionTree::ExpressionType::Label &&
+                innerExpr->type != ExpressionTree::ExpressionType::Conditional) {
                 writer.put(";");
             }
-            if (innerExpr->type != NwscriptProgram::ExpressionType::Conditional) {
+            if (innerExpr->type != ExpressionTree::ExpressionType::Conditional) {
                 writer.put("\n");
             }
         }
         writer.put(indent + string("}"));
     }
 
-    void writeExpression(int blockLevel, bool declare, const NwscriptProgram::Expression &expression, TextWriter &writer) {
+    void writeExpression(int blockLevel, bool declare, const ExpressionTree::Expression &expression, TextWriter &writer) {
         auto indent = indentAtLevel(blockLevel);
 
-        if (expression.type == NwscriptProgram::ExpressionType::Label) {
-            auto &labelExpr = static_cast<const NwscriptProgram::LabelExpression &>(expression);
+        if (expression.type == ExpressionTree::ExpressionType::Label) {
+            auto &labelExpr = static_cast<const ExpressionTree::LabelExpression &>(expression);
             auto name = describeLabel(labelExpr);
             writer.put(name + ":");
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Goto) {
-            auto &gotoExpr = static_cast<const NwscriptProgram::GotoExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Goto) {
+            auto &gotoExpr = static_cast<const ExpressionTree::GotoExpression &>(expression);
             auto name = describeLabel(*gotoExpr.label);
             writer.put("goto " + name);
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Return) {
-            auto &returnExpr = static_cast<const NwscriptProgram::ReturnExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Return) {
+            auto &returnExpr = static_cast<const ExpressionTree::ReturnExpression &>(expression);
             writer.put("return");
             if (returnExpr.value) {
                 writer.put(" ");
                 writeExpression(blockLevel, false, *returnExpr.value, writer);
             }
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Constant) {
-            auto &constExpr = static_cast<const NwscriptProgram::ConstantExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Constant) {
+            auto &constExpr = static_cast<const ExpressionTree::ConstantExpression &>(expression);
             auto value = describeConstant(constExpr);
             writer.put(value);
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Parameter) {
-            auto &paramExpr = static_cast<const NwscriptProgram::ParameterExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Parameter) {
+            auto &paramExpr = static_cast<const ExpressionTree::ParameterExpression &>(expression);
             auto name = describeParameter(paramExpr);
             if (declare) {
                 auto type = describeVariableType(paramExpr.variableType);
@@ -497,8 +496,8 @@ private:
                 writer.put(name);
             }
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Call) {
-            auto &callExpr = static_cast<const NwscriptProgram::CallExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Call) {
+            auto &callExpr = static_cast<const ExpressionTree::CallExpression &>(expression);
             auto name = describeFunction(*callExpr.function);
             auto params = vector<string>();
             for (auto &param : callExpr.arguments) {
@@ -507,8 +506,8 @@ private:
             }
             writer.put(str(boost::format("%s(%s)") % name % boost::join(params, ", ")));
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Action) {
-            auto &actionExpr = static_cast<const NwscriptProgram::ActionExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Action) {
+            auto &actionExpr = static_cast<const ExpressionTree::ActionExpression &>(expression);
             auto name = describeAction(actionExpr);
             writer.put(name + "(");
             for (size_t i = 0; i < actionExpr.arguments.size(); ++i) {
@@ -516,12 +515,12 @@ private:
                     writer.put(", ");
                 }
                 auto argExpr = actionExpr.arguments[i];
-                if (argExpr->type == NwscriptProgram::ExpressionType::Parameter) {
-                    auto paramExpr = static_cast<NwscriptProgram::ParameterExpression *>(argExpr);
+                if (argExpr->type == ExpressionTree::ExpressionType::Parameter) {
+                    auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(argExpr);
                     auto name = describeParameter(*paramExpr);
                     writer.put(name);
-                } else if (argExpr->type == NwscriptProgram::ExpressionType::Block) {
-                    auto blockExpr = static_cast<NwscriptProgram::BlockExpression *>(argExpr);
+                } else if (argExpr->type == ExpressionTree::ExpressionType::Block) {
+                    auto blockExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
                     writer.putLine("[&]()");
                     writeBlock(blockLevel, *blockExpr, writer);
                 } else {
@@ -530,97 +529,97 @@ private:
             }
             writer.put(")");
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Negate ||
-                   expression.type == NwscriptProgram::ExpressionType::OnesComplement ||
-                   expression.type == NwscriptProgram::ExpressionType::Not ||
-                   expression.type == NwscriptProgram::ExpressionType::Increment ||
-                   expression.type == NwscriptProgram::ExpressionType::Decrement) {
-            auto &unaryExpr = static_cast<const NwscriptProgram::UnaryExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Negate ||
+                   expression.type == ExpressionTree::ExpressionType::OnesComplement ||
+                   expression.type == ExpressionTree::ExpressionType::Not ||
+                   expression.type == ExpressionTree::ExpressionType::Increment ||
+                   expression.type == ExpressionTree::ExpressionType::Decrement) {
+            auto &unaryExpr = static_cast<const ExpressionTree::UnaryExpression &>(expression);
             auto name = describeParameter(*unaryExpr.operand);
-            if (expression.type == NwscriptProgram::ExpressionType::Negate) {
+            if (expression.type == ExpressionTree::ExpressionType::Negate) {
                 writer.put("-" + name);
-            } else if (expression.type == NwscriptProgram::ExpressionType::OnesComplement) {
+            } else if (expression.type == ExpressionTree::ExpressionType::OnesComplement) {
                 writer.put("~" + name);
-            } else if (expression.type == NwscriptProgram::ExpressionType::Not) {
+            } else if (expression.type == ExpressionTree::ExpressionType::Not) {
                 writer.put("!" + name);
-            } else if (expression.type == NwscriptProgram::ExpressionType::Increment) {
+            } else if (expression.type == ExpressionTree::ExpressionType::Increment) {
                 writer.put(name + "++");
-            } else if (expression.type == NwscriptProgram::ExpressionType::Decrement) {
+            } else if (expression.type == ExpressionTree::ExpressionType::Decrement) {
                 writer.put(name + "--");
             }
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Assign ||
-                   expression.type == NwscriptProgram::ExpressionType::Add ||
-                   expression.type == NwscriptProgram::ExpressionType::Subtract ||
-                   expression.type == NwscriptProgram::ExpressionType::Multiply ||
-                   expression.type == NwscriptProgram::ExpressionType::Divide ||
-                   expression.type == NwscriptProgram::ExpressionType::Modulo ||
-                   expression.type == NwscriptProgram::ExpressionType::LogicalAnd ||
-                   expression.type == NwscriptProgram::ExpressionType::LogicalOr ||
-                   expression.type == NwscriptProgram::ExpressionType::BitwiseOr ||
-                   expression.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr ||
-                   expression.type == NwscriptProgram::ExpressionType::BitwiseAnd ||
-                   expression.type == NwscriptProgram::ExpressionType::LeftShift ||
-                   expression.type == NwscriptProgram::ExpressionType::RightShift ||
-                   expression.type == NwscriptProgram::ExpressionType::Equal ||
-                   expression.type == NwscriptProgram::ExpressionType::NotEqual ||
-                   expression.type == NwscriptProgram::ExpressionType::GreaterThanOrEqual ||
-                   expression.type == NwscriptProgram::ExpressionType::GreaterThan ||
-                   expression.type == NwscriptProgram::ExpressionType::LessThan ||
-                   expression.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
-            auto &binaryExpr = static_cast<const NwscriptProgram::BinaryExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Assign ||
+                   expression.type == ExpressionTree::ExpressionType::Add ||
+                   expression.type == ExpressionTree::ExpressionType::Subtract ||
+                   expression.type == ExpressionTree::ExpressionType::Multiply ||
+                   expression.type == ExpressionTree::ExpressionType::Divide ||
+                   expression.type == ExpressionTree::ExpressionType::Modulo ||
+                   expression.type == ExpressionTree::ExpressionType::LogicalAnd ||
+                   expression.type == ExpressionTree::ExpressionType::LogicalOr ||
+                   expression.type == ExpressionTree::ExpressionType::BitwiseOr ||
+                   expression.type == ExpressionTree::ExpressionType::BitwiseExlusiveOr ||
+                   expression.type == ExpressionTree::ExpressionType::BitwiseAnd ||
+                   expression.type == ExpressionTree::ExpressionType::LeftShift ||
+                   expression.type == ExpressionTree::ExpressionType::RightShift ||
+                   expression.type == ExpressionTree::ExpressionType::Equal ||
+                   expression.type == ExpressionTree::ExpressionType::NotEqual ||
+                   expression.type == ExpressionTree::ExpressionType::GreaterThanOrEqual ||
+                   expression.type == ExpressionTree::ExpressionType::GreaterThan ||
+                   expression.type == ExpressionTree::ExpressionType::LessThan ||
+                   expression.type == ExpressionTree::ExpressionType::LessThanOrEqual) {
+            auto &binaryExpr = static_cast<const ExpressionTree::BinaryExpression &>(expression);
             string operation;
             bool declareLeft = false;
-            if (binaryExpr.type == NwscriptProgram::ExpressionType::Assign) {
+            if (binaryExpr.type == ExpressionTree::ExpressionType::Assign) {
                 operation = "=";
                 declareLeft = binaryExpr.declareLeft;
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Add) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Add) {
                 operation = "+";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Subtract) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Subtract) {
                 operation = "-";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Multiply) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Multiply) {
                 operation = "*";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Divide) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Divide) {
                 operation = "/";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Modulo) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Modulo) {
                 operation = "%";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LogicalAnd) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::LogicalAnd) {
                 operation = "&&";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LogicalOr) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::LogicalOr) {
                 operation = "||";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseOr) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseOr) {
                 operation = "|";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseExlusiveOr) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseExlusiveOr) {
                 operation = "^";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::BitwiseAnd) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseAnd) {
                 operation = "&";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LeftShift) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::LeftShift) {
                 operation = "<<";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::RightShift ||
-                       binaryExpr.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::RightShift ||
+                       binaryExpr.type == ExpressionTree::ExpressionType::RightShiftUnsigned) {
                 operation = ">>";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::Equal) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::Equal) {
                 operation = "==";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::NotEqual) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::NotEqual) {
                 operation = "!=";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::GreaterThanOrEqual) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::GreaterThanOrEqual) {
                 operation = ">=";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::GreaterThan) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::GreaterThan) {
                 operation = ">";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LessThan) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::LessThan) {
                 operation = "<";
-            } else if (binaryExpr.type == NwscriptProgram::ExpressionType::LessThanOrEqual) {
+            } else if (binaryExpr.type == ExpressionTree::ExpressionType::LessThanOrEqual) {
                 operation = "<=";
             }
-            if (binaryExpr.type == NwscriptProgram::ExpressionType::RightShiftUnsigned) {
+            if (binaryExpr.type == ExpressionTree::ExpressionType::RightShiftUnsigned) {
                 writer.put("(unsigned int)");
             }
             writeExpression(blockLevel, declareLeft, *binaryExpr.left, writer);
             writer.put(str(boost::format(" %s ") % operation));
             writeExpression(blockLevel, false, *binaryExpr.right, writer);
 
-        } else if (expression.type == NwscriptProgram::ExpressionType::Conditional) {
-            auto &condExpr = static_cast<const NwscriptProgram::ConditionalExpression &>(expression);
+        } else if (expression.type == ExpressionTree::ExpressionType::Conditional) {
+            auto &condExpr = static_cast<const ExpressionTree::ConditionalExpression &>(expression);
             writer.put("if(");
             writeExpression(blockLevel, false, *condExpr.test, writer);
             writer.putLine(")");
@@ -641,15 +640,15 @@ private:
         return string(4 * level, ' ');
     }
 
-    std::string describeFunction(const NwscriptProgram::Function &function) {
+    std::string describeFunction(const ExpressionTree::Function &function) {
         return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.offset);
     }
 
-    std::string describeLabel(const NwscriptProgram::LabelExpression &labelExpr) {
+    std::string describeLabel(const ExpressionTree::LabelExpression &labelExpr) {
         return str(boost::format("loc_%08x") % labelExpr.offset);
     }
 
-    std::string describeConstant(const NwscriptProgram::ConstantExpression &constExpr) {
+    std::string describeConstant(const ExpressionTree::ConstantExpression &constExpr) {
         if (constExpr.value.type == VariableType::Int) {
             return to_string(constExpr.value.intValue);
         } else if (constExpr.value.type == VariableType::Float) {
@@ -663,25 +662,25 @@ private:
         }
     }
 
-    std::string describeParameter(const NwscriptProgram::ParameterExpression &paramExpr) {
-        if (paramExpr.locality == NwscriptProgram::ParameterLocality::Local) {
+    std::string describeParameter(const ExpressionTree::ParameterExpression &paramExpr) {
+        if (paramExpr.locality == ExpressionTree::ParameterLocality::Local) {
             if (paramExpr.index > 0) {
                 return str(boost::format("var_%08x_%d") % paramExpr.offset % paramExpr.index);
             } else {
                 return str(boost::format("var_%08x") % paramExpr.offset);
             }
-        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Input) {
+        } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Input) {
             return str(boost::format("in_%d") % paramExpr.index);
-        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Output) {
+        } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Output) {
             return str(boost::format("out_%d") % paramExpr.index);
-        } else if (paramExpr.locality == NwscriptProgram::ParameterLocality::Global) {
+        } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Global) {
             return str(boost::format("glob_%08x") % paramExpr.offset);
         } else {
             throw ArgumentException("Unsupported parameter locality: " + to_string(static_cast<int>(paramExpr.locality)));
         }
     }
 
-    std::string describeAction(const NwscriptProgram::ActionExpression &actionExpr) {
+    std::string describeAction(const ExpressionTree::ActionExpression &actionExpr) {
         auto numRoutines = _routines.getNumRoutines();
         if (actionExpr.action >= numRoutines) {
             throw ArgumentException(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));
@@ -769,7 +768,7 @@ void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
     auto reader = NcsReader("");
     reader.load(ncs);
     auto compiledProgram = reader.program();
-    auto program = NwscriptProgram::fromCompiled(*compiledProgram, routines);
+    auto program = ExpressionTree::fromProgram(*compiledProgram, routines);
 
     auto nssPath = destPath;
     nssPath.append(path.filename().string() + ".nss");
