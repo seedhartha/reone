@@ -48,21 +48,66 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
 
     auto &functions = tree.functions();
     BOOST_CHECK_EQUAL(1ll, functions.size());
-    BOOST_CHECK_EQUAL("_start", functions[0]->name);
-    BOOST_CHECK_EQUAL(1ll, functions[0]->block->expressions.size());
-    BOOST_CHECK(functions[0]->inArgumentTypes.empty());
-    BOOST_CHECK(functions[0]->outArgumentTypes.empty());
-    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(functions[0]->returnType));
 
-    auto &startFunc = functions[0]->block;
-    BOOST_CHECK_EQUAL(static_cast<int>(ExpressionType::Return), static_cast<int>(startFunc->expressions[0]->type));
+    auto &startFunc = functions[0];
+    BOOST_CHECK_EQUAL("_start", startFunc->name);
+    BOOST_CHECK_EQUAL(1ll, startFunc->block->expressions.size());
+    BOOST_CHECK_EQUAL(0ll, startFunc->inArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, startFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(startFunc->returnType));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
     // given
 
     auto program = ScriptProgram("");
-    program.add(Instruction::newJSR(6));
+    program.add(Instruction(InstructionType::RSADDI));
+    program.add(Instruction::newJSR(8));
+    program.add(Instruction(InstructionType::RETN));
+    program.add(Instruction::newCONSTI(1));
+    program.add(Instruction::newCPDOWNSP(-8, 4));
+    program.add(Instruction::newMOVSP(-4));
+    program.add(Instruction(InstructionType::RETN));
+
+    auto routines = Routines();
+    routines.initForKotOR();
+
+    // when
+
+    auto tree = ExpressionTree::fromProgram(program, routines);
+
+    // then
+
+    auto &globals = tree.globals();
+    BOOST_CHECK_EQUAL(0ll, globals.size());
+
+    auto &functions = tree.functions();
+    BOOST_CHECK_EQUAL(2ll, functions.size());
+
+    auto startingConditionalFunc = functions[0];
+    BOOST_CHECK_EQUAL("StartingConditional", startingConditionalFunc->name);
+    BOOST_CHECK_EQUAL(0ll, startingConditionalFunc->inArgumentTypes.size());
+    BOOST_CHECK_EQUAL(1ll, startingConditionalFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Int), static_cast<int>(startingConditionalFunc->outArgumentTypes[0]));
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(startingConditionalFunc->returnType));
+
+    auto startFunc = functions[1];
+    BOOST_CHECK_EQUAL("_start", startFunc->name);
+}
+
+BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
+    // given
+
+    auto program = ScriptProgram("");
+    program.add(Instruction::newJSR(8));
+    program.add(Instruction(InstructionType::RETN));
+    program.add(Instruction(InstructionType::RSADDI));
+    program.add(Instruction::newCONSTI(1));
+    program.add(Instruction::newCPDOWNSP(-8, 4));
+    program.add(Instruction::newMOVSP(-4));
+    program.add(Instruction(InstructionType::SAVEBP));
+    program.add(Instruction::newJSR(8));
+    program.add(Instruction(InstructionType::RESTOREBP));
     program.add(Instruction(InstructionType::RETN));
     program.add(Instruction(InstructionType::RETN));
 
@@ -76,15 +121,22 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
     // then
 
     auto &globals = tree.globals();
+    BOOST_CHECK_EQUAL(1ll, globals.size());
+
     auto &functions = tree.functions();
-}
+    BOOST_CHECK_EQUAL(3ll, functions.size());
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
-    // given
+    auto mainFunc = functions[0];
+    BOOST_CHECK_EQUAL("main", mainFunc->name);
+    BOOST_CHECK_EQUAL(0ll, mainFunc->inArgumentTypes.size());
+    BOOST_CHECK_EQUAL(0ll, mainFunc->outArgumentTypes.size());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(mainFunc->returnType));
 
-    // when
+    auto globalsFunc = functions[1];
+    BOOST_CHECK_EQUAL("_globals", globalsFunc->name);
 
-    // then
+    auto startFunc = functions[2];
+    BOOST_CHECK_EQUAL("_start", startFunc->name);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
