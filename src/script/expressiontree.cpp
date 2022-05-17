@@ -38,7 +38,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
     startFunc->name = "_start";
     startFunc->offset = 13;
 
-    auto functions = vector<shared_ptr<Function>>();
+    auto functions = map<uint32_t, shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
@@ -69,10 +69,15 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const I
         }
     }
 
-    ctx.functions.push_back(move(startFunc));
+    ctx.functions[startFunc->offset] = move(startFunc);
+
+    auto functionsVec = vector<shared_ptr<Function>>();
+    for (auto it = ctx.functions.rbegin(); it != ctx.functions.rend(); ++it) {
+        functionsVec.push_back(it->second);
+    }
 
     return ExpressionTree(
-        ctx.functions,
+        move(functionsVec),
         ctx.expressions,
         move(globals));
 }
@@ -144,40 +149,55 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
 
         } else if (ins.type == InstructionType::JSR) {
             auto absJumpOffset = ins.offset + ins.jumpOffset;
+            shared_ptr<Function> sub;
 
-            auto sub = make_shared<Function>();
-            sub->offset = absJumpOffset;
+            if (ctx.functions.count(absJumpOffset) == 0) {
+                sub = make_shared<Function>();
+                sub->offset = absJumpOffset;
 
-            auto inputs = map<int, ParameterExpression *>();
-            auto outputs = map<int, ParameterExpression *>();
-            auto branches = map<uint32_t, DecompilationContext>();
+                auto inputs = map<int, ParameterExpression *>();
+                auto outputs = map<int, ParameterExpression *>();
+                auto branches = map<uint32_t, DecompilationContext>();
 
-            auto subCtx = DecompilationContext(ctx);
-            subCtx.inputs = &inputs;
-            subCtx.outputs = &outputs;
-            subCtx.branches = &branches;
-            subCtx.pushCallStack(sub.get());
-            sub->block = decompileSafely(absJumpOffset, subCtx);
+                auto subCtx = DecompilationContext(ctx);
+                subCtx.inputs = &inputs;
+                subCtx.outputs = &outputs;
+                subCtx.branches = &branches;
+                subCtx.pushCallStack(sub.get());
+                sub->block = decompileSafely(absJumpOffset, subCtx);
 
-            for (auto &[branchOffset, branchCtx] : branches) {
-                auto branchBlock = decompileSafely(branchOffset, branchCtx);
-                for (auto &expression : branchBlock->expressions) {
-                    sub->block->append(expression);
+                for (auto &[branchOffset, branchCtx] : branches) {
+                    auto branchBlock = decompileSafely(branchOffset, branchCtx);
+                    for (auto &expression : branchBlock->expressions) {
+                        sub->block->append(expression);
+                    }
                 }
-            }
 
-            bool isMain = false;
-            if (subCtx.callStack.size() == 2ll) {
-                if (subCtx.numGlobals > 0) {
-                    sub->name = "_globals";
-                } else {
+                bool isMain = false;
+                if (subCtx.callStack.size() == 2ll) {
+                    if (subCtx.numGlobals > 0) {
+                        sub->name = "_globals";
+                    } else {
+                        isMain = true;
+                    }
+                } else if (subCtx.callStack.size() == 3ll && ctx.numGlobals > 0) {
                     isMain = true;
                 }
-            } else if (subCtx.callStack.size() == 3ll && ctx.numGlobals > 0) {
-                isMain = true;
-            }
-            if (isMain) {
-                sub->name = !subCtx.outputs->empty() ? "StartingConditional" : "main";
+                if (isMain) {
+                    sub->name = !subCtx.outputs->empty() ? "StartingConditional" : "main";
+                }
+
+                for (auto &[stackOffset, param] : inputs) {
+                    sub->inputs.push_back(FunctionArgument(param->variableType, stackOffset));
+                }
+                for (auto &[stackOffset, param] : outputs) {
+                    sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
+                }
+
+                ctx.functions[sub->offset] = sub;
+            
+            } else {
+                sub = ctx.functions.at(absJumpOffset);
             }
 
             auto callExpr = make_shared<CallExpression>();
@@ -185,16 +205,15 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
             callExpr->function = sub.get();
             block->append(callExpr.get());
 
-            for (auto &[stackOffset, param] : inputs) {
-                sub->inputs.push_back(FunctionArgument(param->variableType, stackOffset));
+            for (auto &argument : sub->inputs) {
+                auto param = ctx.stack[ctx.stack.size() + argument.stackOffset].param;
                 callExpr->arguments.push_back(param);
             }
-            for (auto &[stackOffset, param] : outputs) {
-                sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
+            for (auto &argument : sub->outputs) {
+                auto param = ctx.stack[ctx.stack.size() + argument.stackOffset].param;
                 callExpr->arguments.push_back(param);
             }
 
-            ctx.functions.push_back(move(sub));
             ctx.expressions.push_back(move(callExpr));
 
         } else if (ins.type == InstructionType::JZ ||

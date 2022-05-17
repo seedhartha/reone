@@ -300,7 +300,7 @@ private:
         const ScriptProgram &program;
         const IRoutines &routines;
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
-        std::vector<std::shared_ptr<Function>> &functions;
+        std::map<uint32_t, std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
         std::vector<CallStackFrame> callStack;
@@ -317,7 +317,7 @@ private:
             const ScriptProgram &compiled,
             const IRoutines &routines,
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
-            std::vector<std::shared_ptr<Function>> &functions,
+            std::map<uint32_t, std::shared_ptr<Function>> &functions,
             std::vector<std::shared_ptr<Expression>> &expressions) :
             program(compiled),
             routines(routines),

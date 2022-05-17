@@ -117,6 +117,15 @@ inline V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, std:
 }
 
 template <class K, class V>
+inline std::vector<V> mapToValues(const std::map<K, V> &map) {
+    std::vector<V> values;
+    for (auto &pair : map) {
+        values.push_back(pair.second);
+    }
+    return std::move(values);
+}
+
+template <class K, class V>
 inline std::vector<V> mapToValues(const std::unordered_map<K, V> &map) {
     std::vector<V> values;
     for (auto &pair : map) {
