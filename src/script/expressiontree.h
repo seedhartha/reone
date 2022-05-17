@@ -26,60 +26,60 @@ namespace script {
 
 class IRoutines;
 
+enum ExpressionType {
+    Block,
+    Constant,
+    Parameter,
+    Label,
+    Goto,
+    Return,
+    Conditional,
+    Action,
+    Call,
+
+    // Unary
+
+    Negate,
+    Not,
+    OnesComplement,
+
+    Increment,
+    Decrement,
+
+    // END Unary
+
+    // Binary
+
+    Assign,
+
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Modulo,
+
+    LogicalAnd,
+    LogicalOr,
+    BitwiseOr,
+    BitwiseExlusiveOr,
+    BitwiseAnd,
+
+    LeftShift,
+    RightShift,
+    RightShiftUnsigned,
+
+    Equal,
+    NotEqual,
+    GreaterThanOrEqual,
+    GreaterThan,
+    LessThan,
+    LessThanOrEqual
+
+    // END Binary
+};
+
 class ExpressionTree {
 public:
-    enum ExpressionType {
-        Block,
-        Constant,
-        Parameter,
-        Label,
-        Goto,
-        Return,
-        Conditional,
-        Action,
-        Call,
-
-        // Unary
-
-        Negate,
-        Not,
-        OnesComplement,
-
-        Increment,
-        Decrement,
-
-        // END Unary
-
-        // Binary
-
-        Assign,
-
-        Add,
-        Subtract,
-        Multiply,
-        Divide,
-        Modulo,
-
-        LogicalAnd,
-        LogicalOr,
-        BitwiseOr,
-        BitwiseExlusiveOr,
-        BitwiseAnd,
-
-        LeftShift,
-        RightShift,
-        RightShiftUnsigned,
-
-        Equal,
-        NotEqual,
-        GreaterThanOrEqual,
-        GreaterThan,
-        LessThan,
-        LessThanOrEqual
-
-        // END Binary
-    };
-
     enum class ParameterLocality {
         Local,
         Input,
@@ -269,7 +269,7 @@ private:
     };
 
     struct DecompilationContext {
-        const ScriptProgram &compiled;
+        const ScriptProgram &program;
         const IRoutines &routines;
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::vector<std::shared_ptr<Function>> &functions;
@@ -291,7 +291,7 @@ private:
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::vector<std::shared_ptr<Function>> &functions,
             std::vector<std::shared_ptr<Expression>> &expressions) :
-            compiled(compiled),
+            program(compiled),
             routines(routines),
             labels(labels),
             functions(functions),
@@ -299,7 +299,7 @@ private:
         }
 
         DecompilationContext(const DecompilationContext &other) :
-            compiled(other.compiled),
+            program(other.program),
             routines(other.routines),
             labels(other.labels),
             functions(other.functions),

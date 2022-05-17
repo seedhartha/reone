@@ -81,21 +81,21 @@ void NssWriter::writeBlock(int level, const ExpressionTree::BlockExpression &blo
 
     writer.putLine(indent + string("{"));
     for (auto &innerExpr : block.expressions) {
-        if (innerExpr->type == ExpressionTree::ExpressionType::Parameter &&
+        if (innerExpr->type == ExpressionType::Parameter &&
             static_cast<const ExpressionTree::ParameterExpression *>(innerExpr)->locality == ExpressionTree::ParameterLocality::Global) {
             continue;
         }
-        if (innerExpr->type == ExpressionTree::ExpressionType::Label) {
+        if (innerExpr->type == ExpressionType::Label) {
             writer.put(indent);
         } else {
             writer.put(innerIndent);
         }
         writeExpression(innerLevel, true, *innerExpr, writer);
-        if (innerExpr->type != ExpressionTree::ExpressionType::Label &&
-            innerExpr->type != ExpressionTree::ExpressionType::Conditional) {
+        if (innerExpr->type != ExpressionType::Label &&
+            innerExpr->type != ExpressionType::Conditional) {
             writer.put(";");
         }
-        if (innerExpr->type != ExpressionTree::ExpressionType::Conditional) {
+        if (innerExpr->type != ExpressionType::Conditional) {
             writer.put("\n");
         }
     }
@@ -105,17 +105,17 @@ void NssWriter::writeBlock(int level, const ExpressionTree::BlockExpression &blo
 void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTree::Expression &expression, TextWriter &writer) {
     auto indent = indentAtLevel(blockLevel);
 
-    if (expression.type == ExpressionTree::ExpressionType::Label) {
+    if (expression.type == ExpressionType::Label) {
         auto &labelExpr = static_cast<const ExpressionTree::LabelExpression &>(expression);
         auto name = describeLabel(labelExpr);
         writer.put(name + ":");
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Goto) {
+    } else if (expression.type == ExpressionType::Goto) {
         auto &gotoExpr = static_cast<const ExpressionTree::GotoExpression &>(expression);
         auto name = describeLabel(*gotoExpr.label);
         writer.put("goto " + name);
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Return) {
+    } else if (expression.type == ExpressionType::Return) {
         auto &returnExpr = static_cast<const ExpressionTree::ReturnExpression &>(expression);
         writer.put("return");
         if (returnExpr.value) {
@@ -123,12 +123,12 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
             writeExpression(blockLevel, false, *returnExpr.value, writer);
         }
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Constant) {
+    } else if (expression.type == ExpressionType::Constant) {
         auto &constExpr = static_cast<const ExpressionTree::ConstantExpression &>(expression);
         auto value = describeConstant(constExpr);
         writer.put(value);
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Parameter) {
+    } else if (expression.type == ExpressionType::Parameter) {
         auto &paramExpr = static_cast<const ExpressionTree::ParameterExpression &>(expression);
         auto name = describeParameter(paramExpr);
         if (declare) {
@@ -138,7 +138,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
             writer.put(name);
         }
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Call) {
+    } else if (expression.type == ExpressionType::Call) {
         auto &callExpr = static_cast<const ExpressionTree::CallExpression &>(expression);
         auto name = describeFunction(*callExpr.function);
         auto params = vector<string>();
@@ -148,7 +148,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         }
         writer.put(str(boost::format("%s(%s)") % name % boost::join(params, ", ")));
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Action) {
+    } else if (expression.type == ExpressionType::Action) {
         auto &actionExpr = static_cast<const ExpressionTree::ActionExpression &>(expression);
         auto name = describeAction(actionExpr);
         writer.put(name + "(");
@@ -157,11 +157,11 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
                 writer.put(", ");
             }
             auto argExpr = actionExpr.arguments[i];
-            if (argExpr->type == ExpressionTree::ExpressionType::Parameter) {
+            if (argExpr->type == ExpressionType::Parameter) {
                 auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(argExpr);
                 auto name = describeParameter(*paramExpr);
                 writer.put(name);
-            } else if (argExpr->type == ExpressionTree::ExpressionType::Block) {
+            } else if (argExpr->type == ExpressionType::Block) {
                 auto blockExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
                 writer.putLine("[&]()");
                 writeBlock(blockLevel, *blockExpr, writer);
@@ -171,96 +171,96 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         }
         writer.put(")");
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Negate ||
-               expression.type == ExpressionTree::ExpressionType::OnesComplement ||
-               expression.type == ExpressionTree::ExpressionType::Not ||
-               expression.type == ExpressionTree::ExpressionType::Increment ||
-               expression.type == ExpressionTree::ExpressionType::Decrement) {
+    } else if (expression.type == ExpressionType::Negate ||
+               expression.type == ExpressionType::OnesComplement ||
+               expression.type == ExpressionType::Not ||
+               expression.type == ExpressionType::Increment ||
+               expression.type == ExpressionType::Decrement) {
         auto &unaryExpr = static_cast<const ExpressionTree::UnaryExpression &>(expression);
         auto name = describeParameter(*unaryExpr.operand);
-        if (expression.type == ExpressionTree::ExpressionType::Negate) {
+        if (expression.type == ExpressionType::Negate) {
             writer.put("-" + name);
-        } else if (expression.type == ExpressionTree::ExpressionType::OnesComplement) {
+        } else if (expression.type == ExpressionType::OnesComplement) {
             writer.put("~" + name);
-        } else if (expression.type == ExpressionTree::ExpressionType::Not) {
+        } else if (expression.type == ExpressionType::Not) {
             writer.put("!" + name);
-        } else if (expression.type == ExpressionTree::ExpressionType::Increment) {
+        } else if (expression.type == ExpressionType::Increment) {
             writer.put(name + "++");
-        } else if (expression.type == ExpressionTree::ExpressionType::Decrement) {
+        } else if (expression.type == ExpressionType::Decrement) {
             writer.put(name + "--");
         }
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Assign ||
-               expression.type == ExpressionTree::ExpressionType::Add ||
-               expression.type == ExpressionTree::ExpressionType::Subtract ||
-               expression.type == ExpressionTree::ExpressionType::Multiply ||
-               expression.type == ExpressionTree::ExpressionType::Divide ||
-               expression.type == ExpressionTree::ExpressionType::Modulo ||
-               expression.type == ExpressionTree::ExpressionType::LogicalAnd ||
-               expression.type == ExpressionTree::ExpressionType::LogicalOr ||
-               expression.type == ExpressionTree::ExpressionType::BitwiseOr ||
-               expression.type == ExpressionTree::ExpressionType::BitwiseExlusiveOr ||
-               expression.type == ExpressionTree::ExpressionType::BitwiseAnd ||
-               expression.type == ExpressionTree::ExpressionType::LeftShift ||
-               expression.type == ExpressionTree::ExpressionType::RightShift ||
-               expression.type == ExpressionTree::ExpressionType::Equal ||
-               expression.type == ExpressionTree::ExpressionType::NotEqual ||
-               expression.type == ExpressionTree::ExpressionType::GreaterThanOrEqual ||
-               expression.type == ExpressionTree::ExpressionType::GreaterThan ||
-               expression.type == ExpressionTree::ExpressionType::LessThan ||
-               expression.type == ExpressionTree::ExpressionType::LessThanOrEqual) {
+    } else if (expression.type == ExpressionType::Assign ||
+               expression.type == ExpressionType::Add ||
+               expression.type == ExpressionType::Subtract ||
+               expression.type == ExpressionType::Multiply ||
+               expression.type == ExpressionType::Divide ||
+               expression.type == ExpressionType::Modulo ||
+               expression.type == ExpressionType::LogicalAnd ||
+               expression.type == ExpressionType::LogicalOr ||
+               expression.type == ExpressionType::BitwiseOr ||
+               expression.type == ExpressionType::BitwiseExlusiveOr ||
+               expression.type == ExpressionType::BitwiseAnd ||
+               expression.type == ExpressionType::LeftShift ||
+               expression.type == ExpressionType::RightShift ||
+               expression.type == ExpressionType::Equal ||
+               expression.type == ExpressionType::NotEqual ||
+               expression.type == ExpressionType::GreaterThanOrEqual ||
+               expression.type == ExpressionType::GreaterThan ||
+               expression.type == ExpressionType::LessThan ||
+               expression.type == ExpressionType::LessThanOrEqual) {
         auto &binaryExpr = static_cast<const ExpressionTree::BinaryExpression &>(expression);
         string operation;
         bool declareLeft = false;
-        if (binaryExpr.type == ExpressionTree::ExpressionType::Assign) {
+        if (binaryExpr.type == ExpressionType::Assign) {
             operation = "=";
             declareLeft = binaryExpr.declareLeft;
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Add) {
+        } else if (binaryExpr.type == ExpressionType::Add) {
             operation = "+";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Subtract) {
+        } else if (binaryExpr.type == ExpressionType::Subtract) {
             operation = "-";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Multiply) {
+        } else if (binaryExpr.type == ExpressionType::Multiply) {
             operation = "*";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Divide) {
+        } else if (binaryExpr.type == ExpressionType::Divide) {
             operation = "/";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Modulo) {
+        } else if (binaryExpr.type == ExpressionType::Modulo) {
             operation = "%";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::LogicalAnd) {
+        } else if (binaryExpr.type == ExpressionType::LogicalAnd) {
             operation = "&&";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::LogicalOr) {
+        } else if (binaryExpr.type == ExpressionType::LogicalOr) {
             operation = "||";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseOr) {
+        } else if (binaryExpr.type == ExpressionType::BitwiseOr) {
             operation = "|";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseExlusiveOr) {
+        } else if (binaryExpr.type == ExpressionType::BitwiseExlusiveOr) {
             operation = "^";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::BitwiseAnd) {
+        } else if (binaryExpr.type == ExpressionType::BitwiseAnd) {
             operation = "&";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::LeftShift) {
+        } else if (binaryExpr.type == ExpressionType::LeftShift) {
             operation = "<<";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::RightShift ||
-                   binaryExpr.type == ExpressionTree::ExpressionType::RightShiftUnsigned) {
+        } else if (binaryExpr.type == ExpressionType::RightShift ||
+                   binaryExpr.type == ExpressionType::RightShiftUnsigned) {
             operation = ">>";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::Equal) {
+        } else if (binaryExpr.type == ExpressionType::Equal) {
             operation = "==";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::NotEqual) {
+        } else if (binaryExpr.type == ExpressionType::NotEqual) {
             operation = "!=";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::GreaterThanOrEqual) {
+        } else if (binaryExpr.type == ExpressionType::GreaterThanOrEqual) {
             operation = ">=";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::GreaterThan) {
+        } else if (binaryExpr.type == ExpressionType::GreaterThan) {
             operation = ">";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::LessThan) {
+        } else if (binaryExpr.type == ExpressionType::LessThan) {
             operation = "<";
-        } else if (binaryExpr.type == ExpressionTree::ExpressionType::LessThanOrEqual) {
+        } else if (binaryExpr.type == ExpressionType::LessThanOrEqual) {
             operation = "<=";
         }
-        if (binaryExpr.type == ExpressionTree::ExpressionType::RightShiftUnsigned) {
+        if (binaryExpr.type == ExpressionType::RightShiftUnsigned) {
             writer.put("(unsigned int)");
         }
         writeExpression(blockLevel, declareLeft, *binaryExpr.left, writer);
         writer.put(str(boost::format(" %s ") % operation));
         writeExpression(blockLevel, false, *binaryExpr.right, writer);
 
-    } else if (expression.type == ExpressionTree::ExpressionType::Conditional) {
+    } else if (expression.type == ExpressionType::Conditional) {
         auto &condExpr = static_cast<const ExpressionTree::ConditionalExpression &>(expression);
         writer.put("if(");
         writeExpression(blockLevel, false, *condExpr.test, writer);

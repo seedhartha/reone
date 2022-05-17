@@ -82,13 +82,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, Decom
     auto block = make_shared<BlockExpression>();
     block->offset = start;
 
-    for (uint32_t offset = start; offset < ctx.compiled.length();) {
+    for (uint32_t offset = start; offset < ctx.program.length();) {
         auto maybeLabel = ctx.labels.find(offset);
         if (maybeLabel != ctx.labels.end()) {
             block->insert(maybeLabel->second);
         }
 
-        auto &ins = ctx.compiled.getInstruction(offset);
+        auto &ins = ctx.program.getInstruction(offset);
         debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
 
         if (ins.type == InstructionType::NOP ||

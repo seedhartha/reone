@@ -28,11 +28,11 @@ using namespace reone::script;
 
 BOOST_AUTO_TEST_SUITE(expression_tree)
 
-BOOST_AUTO_TEST_CASE(should_decompile_program) {
+BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     // given
 
     auto program = ScriptProgram("");
-    program.add(Instruction(13, InstructionType::RETN));
+    program.add(Instruction(InstructionType::RETN));
 
     auto routines = Routines();
     routines.initForKotOR();
@@ -49,6 +49,42 @@ BOOST_AUTO_TEST_CASE(should_decompile_program) {
     auto &functions = tree.functions();
     BOOST_CHECK_EQUAL(1ll, functions.size());
     BOOST_CHECK_EQUAL("_start", functions[0]->name);
+    BOOST_CHECK_EQUAL(1ll, functions[0]->block->expressions.size());
+    BOOST_CHECK(functions[0]->inArgumentTypes.empty());
+    BOOST_CHECK(functions[0]->outArgumentTypes.empty());
+    BOOST_CHECK_EQUAL(static_cast<int>(VariableType::Void), static_cast<int>(functions[0]->returnType));
+
+    auto &startFunc = functions[0]->block;
+    BOOST_CHECK_EQUAL(static_cast<int>(ExpressionType::Return), static_cast<int>(startFunc->expressions[0]->type));
+}
+
+BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
+    // given
+
+    auto program = ScriptProgram("");
+    program.add(Instruction::newJSR(6));
+    program.add(Instruction(InstructionType::RETN));
+    program.add(Instruction(InstructionType::RETN));
+
+    auto routines = Routines();
+    routines.initForKotOR();
+
+    // when
+
+    auto tree = ExpressionTree::fromProgram(program, routines);
+
+    // then
+
+    auto &globals = tree.globals();
+    auto &functions = tree.functions();
+}
+
+BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
+    // given
+
+    // when
+
+    // then
 }
 
 BOOST_AUTO_TEST_SUITE_END()
