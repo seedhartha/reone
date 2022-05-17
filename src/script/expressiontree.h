@@ -127,7 +127,7 @@ public:
     struct ParameterExpression : Expression {
         VariableType variableType {VariableType::Int};
         ParameterLocality locality {ParameterLocality::Local};
-        int index {0}; // local
+        int index {0};       // local
         int stackOffset {0}; // input/output
 
         ParameterExpression() :
@@ -267,10 +267,6 @@ private:
         Function *function;
         int stackSizeOnEnter;
 
-        std::map<int, ParameterExpression *> inputs;
-        std::map<int, ParameterExpression *> outputs;
-        std::map<uint32_t, BlockExpression *> branches;
-
         CallStackFrame(Function *function, int stackSizeOnEnter) :
             function(function),
             stackSizeOnEnter(stackSizeOnEnter) {
@@ -313,6 +309,10 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
+        std::map<int, ParameterExpression *> *inputs {nullptr};
+        std::map<int, ParameterExpression *> *outputs {nullptr};
+        std::map<uint32_t, DecompilationContext> *branches {nullptr};
+
         DecompilationContext(
             const ScriptProgram &compiled,
             const IRoutines &routines,
@@ -336,7 +336,10 @@ private:
             stack(other.stack),
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
-            savedAction(other.savedAction) {
+            savedAction(other.savedAction),
+            inputs(other.inputs),
+            outputs(other.outputs),
+            branches(other.branches) {
         }
 
         void pushCallStack(Function *function) {
