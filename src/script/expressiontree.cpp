@@ -28,9 +28,9 @@
 
 using namespace std;
 
-using namespace reone::script;
-
 namespace reone {
+
+namespace script {
 
 ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const IRoutines &routines) {
     auto startFunc = make_shared<Function>();
@@ -986,5 +986,7 @@ unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpress
         throw ArgumentException("Instruction is not of RSADDx type: " + to_string(static_cast<int>(ins.type)));
     }
 }
+
+} // namespace script
 
 } // namespace reone

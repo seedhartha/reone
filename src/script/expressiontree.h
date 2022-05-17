@@ -26,8 +26,6 @@ namespace script {
 
 class IRoutines;
 
-}
-
 class ExpressionTree {
 public:
     enum ExpressionType {
@@ -117,7 +115,7 @@ public:
     };
 
     struct ConstantExpression : Expression {
-        script::Variable value;
+        Variable value;
 
         ConstantExpression() :
             Expression(ExpressionType::Constant) {
@@ -125,7 +123,7 @@ public:
     };
 
     struct ParameterExpression : Expression {
-        script::VariableType variableType {script::VariableType::Int};
+        VariableType variableType {VariableType::Int};
         ParameterLocality locality {ParameterLocality::Local};
         int index {0};
 
@@ -196,9 +194,9 @@ public:
     struct Function {
         std::string name;
         uint32_t offset {0};
-        script::VariableType returnType {script::VariableType::Void};
-        std::vector<script::VariableType> inArgumentTypes;
-        std::vector<script::VariableType> outArgumentTypes;
+        VariableType returnType {VariableType::Void};
+        std::vector<VariableType> inArgumentTypes;
+        std::vector<VariableType> outArgumentTypes;
         BlockExpression *block {nullptr};
     };
 
@@ -232,7 +230,7 @@ public:
         return _globals;
     }
 
-    static ExpressionTree fromProgram(const script::ScriptProgram &program, const script::IRoutines &routines);
+    static ExpressionTree fromProgram(const ScriptProgram &program, const IRoutines &routines);
 
 private:
     struct CallStackFrame {
@@ -271,8 +269,8 @@ private:
     };
 
     struct DecompilationContext {
-        const script::ScriptProgram &compiled;
-        const script::IRoutines &routines;
+        const ScriptProgram &compiled;
+        const IRoutines &routines;
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::vector<std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
@@ -288,8 +286,8 @@ private:
         std::map<uint32_t, BlockExpression *> *branches {nullptr};
 
         DecompilationContext(
-            const script::ScriptProgram &compiled,
-            const script::IRoutines &routines,
+            const ScriptProgram &compiled,
+            const IRoutines &routines,
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::vector<std::shared_ptr<Function>> &functions,
             std::vector<std::shared_ptr<Expression>> &expressions) :
@@ -323,8 +321,10 @@ private:
 
     static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
 
-    static std::unique_ptr<ConstantExpression> constantExpression(const script::Instruction &ins);
-    static std::unique_ptr<ParameterExpression> parameterExpression(const script::Instruction &ins);
+    static std::unique_ptr<ConstantExpression> constantExpression(const Instruction &ins);
+    static std::unique_ptr<ParameterExpression> parameterExpression(const Instruction &ins);
 };
+
+} // namespace script
 
 } // namespace reone
