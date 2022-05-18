@@ -311,7 +311,7 @@ private:
 
         std::map<int, ParameterExpression *> *inputs {nullptr};
         std::map<int, ParameterExpression *> *outputs {nullptr};
-        std::map<uint32_t, DecompilationContext> *branches {nullptr};
+        std::map<uint32_t, std::shared_ptr<DecompilationContext>> *branches {nullptr};
 
         DecompilationContext(
             const ScriptProgram &compiled,
@@ -374,8 +374,8 @@ private:
     std::vector<std::shared_ptr<Expression>> _expressions;
     std::set<const ParameterExpression *> _globals;
 
-    static BlockExpression *decompile(uint32_t start, DecompilationContext &ctx);
-    static BlockExpression *decompileSafely(uint32_t start, DecompilationContext &ctx);
+    static BlockExpression *decompile(uint32_t start, std::shared_ptr<DecompilationContext> ctx);
+    static BlockExpression *decompileSafely(uint32_t start, std::shared_ptr<DecompilationContext> ctx);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const Instruction &ins);
     static std::unique_ptr<ParameterExpression> parameterExpression(const Instruction &ins);
