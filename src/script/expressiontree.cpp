@@ -156,6 +156,8 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 sub = make_shared<Function>();
                 sub->offset = absJumpOffset;
 
+                ctx->functions[sub->offset] = sub;
+
                 auto inputs = map<int, ParameterExpression *>();
                 auto outputs = map<int, ParameterExpression *>();
                 auto branches = map<uint32_t, shared_ptr<DecompilationContext>>();
@@ -194,8 +196,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 for (auto &[stackOffset, param] : outputs) {
                     sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
                 }
-
-                ctx->functions[sub->offset] = sub;
             
             } else {
                 sub = ctx->functions.at(absJumpOffset);
