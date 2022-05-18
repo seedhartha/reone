@@ -574,7 +574,10 @@ void ScriptExecution::executeADDSS(const Instruction &ins) {
 
 void ScriptExecution::executeADDVV(const Instruction &ins) {
     withVectorsFromStack([this](auto &left, auto &right) {
-        _stack.push_back(Variable::ofVector(left + right));
+        auto result = left + right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
@@ -604,7 +607,10 @@ void ScriptExecution::executeSUBFF(const Instruction &ins) {
 
 void ScriptExecution::executeSUBVV(const Instruction &ins) {
     withVectorsFromStack([this](auto &left, auto &right) {
-        _stack.push_back(Variable::ofVector(left - right));
+        auto result = left - right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
@@ -634,13 +640,19 @@ void ScriptExecution::executeMULFF(const Instruction &ins) {
 
 void ScriptExecution::executeMULVF(const Instruction &ins) {
     withVectorFloatFromStack([this](auto &left, float right) {
-        _stack.push_back(Variable::ofVector(left * right));
+        auto result = left * right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
 void ScriptExecution::executeMULFV(const Instruction &ins) {
     withFloatVectorFromStack([this](float left, auto &right) {
-        _stack.push_back(Variable::ofVector(left * right));
+        auto result = left * right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
@@ -670,13 +682,19 @@ void ScriptExecution::executeDIVFF(const Instruction &ins) {
 
 void ScriptExecution::executeDIVVF(const Instruction &ins) {
     withVectorFloatFromStack([this](auto &left, float right) {
-        _stack.push_back(Variable::ofVector(left / right));
+        auto result = left / right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
 void ScriptExecution::executeDIVFV(const Instruction &ins) {
     withFloatVectorFromStack([this](float left, auto &right) {
-        _stack.push_back(Variable::ofVector(left / right));
+        auto result = left / right;
+        _stack.push_back(Variable::ofFloat(result.x));
+        _stack.push_back(Variable::ofFloat(result.y));
+        _stack.push_back(Variable::ofFloat(result.z));
     });
 }
 
@@ -935,27 +953,24 @@ void ScriptExecution::withTalentsFromStack(const function<void(const shared_ptr<
 }
 
 void ScriptExecution::withFloatVectorFromStack(const function<void(float, const glm::vec3 &)> &fn) {
-    withStackVariables([this, &fn](auto &left, auto &right) {
-        throwIfInvalidType(VariableType::Float, left.type);
-        throwIfInvalidType(VariableType::Vector, right.type);
-        fn(left.floatValue, right.vecValue);
-    });
+    auto right = getVectorFromStack();
+    auto left = getFloatFromStack();
+
+    fn(left, right);
 }
 
 void ScriptExecution::withVectorFloatFromStack(const function<void(const glm::vec3 &, float)> &fn) {
-    withStackVariables([this, &fn](auto &left, auto &right) {
-        throwIfInvalidType(VariableType::Vector, left.type);
-        throwIfInvalidType(VariableType::Float, right.type);
-        fn(left.vecValue, right.floatValue);
-    });
+    auto right = getFloatFromStack();
+    auto left = getVectorFromStack();
+
+    fn(left, right);
 }
 
 void ScriptExecution::withVectorsFromStack(const function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
-    withStackVariables([this, &fn](auto &left, auto &right) {
-        throwIfInvalidType(VariableType::Vector, left.type);
-        throwIfInvalidType(VariableType::Vector, right.type);
-        fn(left.vecValue, right.vecValue);
-    });
+    auto right = getVectorFromStack();
+    auto left = getVectorFromStack();
+
+    fn(left, right);
 }
 
 void ScriptExecution::throwIfInvalidType(VariableType expected, VariableType actual) {
