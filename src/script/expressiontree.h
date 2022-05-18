@@ -127,7 +127,7 @@ public:
     struct ParameterExpression : Expression {
         VariableType variableType {VariableType::Int};
         ParameterLocality locality {ParameterLocality::Local};
-        int index {0};       // local
+        std::string suffix;
         int stackOffset {0}; // input/output
 
         ParameterExpression() :

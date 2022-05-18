@@ -319,8 +319,8 @@ string NssWriter::describeConstant(const ExpressionTree::ConstantExpression &con
 
 string NssWriter::describeParameter(const ExpressionTree::ParameterExpression &paramExpr) {
     if (paramExpr.locality == ExpressionTree::ParameterLocality::Local) {
-        if (paramExpr.index > 0) {
-            return str(boost::format("var_%08x_%d") % paramExpr.offset % paramExpr.index);
+        if (!paramExpr.suffix.empty()) {
+            return str(boost::format("var_%08x_%s") % paramExpr.offset % paramExpr.suffix);
         } else {
             return str(boost::format("var_%08x") % paramExpr.offset);
         }

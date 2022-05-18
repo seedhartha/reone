@@ -431,7 +431,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 auto paramExpr = make_shared<ParameterExpression>();
                 paramExpr->offset = ins.offset;
                 paramExpr->variableType = source->variableType;
-                paramExpr->index = i;
+                paramExpr->suffix = to_string(i);
                 block->append(paramExpr.get());
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
@@ -1058,7 +1058,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     auto xParamExpr = make_shared<ParameterExpression>();
     xParamExpr->offset = offset;
     xParamExpr->variableType = VariableType::Float;
-    xParamExpr->index = 0;
+    xParamExpr->suffix = "x";
     block.append(xParamExpr.get());
 
     auto xAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
@@ -1083,7 +1083,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     auto yParamExpr = make_shared<ParameterExpression>();
     yParamExpr->offset = offset;
     yParamExpr->variableType = VariableType::Float;
-    yParamExpr->index = 1;
+    yParamExpr->suffix = "y";
     block.append(yParamExpr.get());
 
     auto yAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
@@ -1108,7 +1108,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     auto zParamExpr = make_shared<ParameterExpression>();
     zParamExpr->offset = offset;
     zParamExpr->variableType = VariableType::Float;
-    zParamExpr->index = 2;
+    zParamExpr->suffix = "z";
     block.append(zParamExpr.get());
 
     auto zAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
