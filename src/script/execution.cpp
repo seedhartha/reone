@@ -302,9 +302,9 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     case VariableType::Void:
         break;
     case VariableType::Vector:
-        _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
-        _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
         _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
         break;
     default:
         _stack.push_back(retValue);
@@ -837,9 +837,9 @@ float ScriptExecution::getFloatFromStack() {
 }
 
 glm::vec3 ScriptExecution::getVectorFromStack() {
-    float x = getFloatFromStack();
-    float y = getFloatFromStack();
     float z = getFloatFromStack();
+    float y = getFloatFromStack();
+    float x = getFloatFromStack();
 
     return glm::vec3(x, y, z);
 }

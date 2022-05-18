@@ -299,11 +299,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 Expression *argument;
                 auto argType = routine.getArgumentType(i);
                 if (argType == VariableType::Vector) {
-                    auto argX = ctx->stack.back().param;
+                    auto argZ = ctx->stack.back().param;
                     ctx->stack.pop_back();
                     auto argY = ctx->stack.back().param;
                     ctx->stack.pop_back();
-                    auto argZ = ctx->stack.back().param;
+                    auto argX = ctx->stack.back().param;
                     ctx->stack.pop_back();
                     argument = ctx->appendVectorCompose(ins.offset, *block, *argX, *argY, *argZ);
                 } else if (argType == VariableType::Action) {
@@ -340,9 +340,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                     ParameterExpression *retValY = nullptr;
                     ParameterExpression *retValZ = nullptr;
                     ctx->appendVectorDecompose(ins.offset, *block, *returnValue, retValX, retValY, retValZ);
-                    ctx->pushStack(retValZ);
-                    ctx->pushStack(retValY);
                     ctx->pushStack(retValX);
+                    ctx->pushStack(retValY);
+                    ctx->pushStack(retValZ);
                 } else {
                     ctx->pushStack(returnValue.get());
                 }
@@ -658,19 +658,19 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
 
         } else if (ins.type == InstructionType::ADDVV ||
                    ins.type == InstructionType::SUBVV) {
-            auto rightX = ctx->stack.back().param;
+            auto rightZ = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto rightY = ctx->stack.back().param;
             ctx->stack.pop_back();
-            auto rightZ = ctx->stack.back().param;
+            auto rightX = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
-            auto leftX = ctx->stack.back().param;
+            auto leftZ = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto leftY = ctx->stack.back().param;
             ctx->stack.pop_back();
-            auto leftZ = ctx->stack.back().param;
+            auto leftX = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
@@ -695,9 +695,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultZ);
-            ctx->pushStack(resultY);
             ctx->pushStack(resultX);
+            ctx->pushStack(resultY);
+            ctx->pushStack(resultZ);
 
             ctx->expressions.push_back(move(result));
             ctx->expressions.push_back(move(binaryExpr));
@@ -705,11 +705,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
 
         } else if (ins.type == InstructionType::DIVFV ||
                    ins.type == InstructionType::MULFV) {
-            auto rightX = ctx->stack.back().param;
+            auto rightZ = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto rightY = ctx->stack.back().param;
             ctx->stack.pop_back();
-            auto rightZ = ctx->stack.back().param;
+            auto rightX = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
@@ -737,9 +737,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultZ);
-            ctx->pushStack(resultY);
             ctx->pushStack(resultX);
+            ctx->pushStack(resultY);
+            ctx->pushStack(resultZ);
 
             ctx->expressions.push_back(move(result));
             ctx->expressions.push_back(move(binaryExpr));
@@ -750,11 +750,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto right = ctx->stack.back().param;
             ctx->stack.pop_back();
 
-            auto leftX = ctx->stack.back().param;
+            auto leftZ = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto leftY = ctx->stack.back().param;
             ctx->stack.pop_back();
-            auto leftZ = ctx->stack.back().param;
+            auto leftX = ctx->stack.back().param;
             ctx->stack.pop_back();
             auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
@@ -779,9 +779,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ParameterExpression *resultY = nullptr;
             ParameterExpression *resultZ = nullptr;
             ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultZ);
-            ctx->pushStack(resultY);
             ctx->pushStack(resultX);
+            ctx->pushStack(resultY);
+            ctx->pushStack(resultZ);
 
             ctx->expressions.push_back(move(binaryExpr));
             ctx->expressions.push_back(move(result));
@@ -1033,7 +1033,7 @@ ExpressionTree::VectorExpression *ExpressionTree::DecompilationContext::appendVe
     vecExpr->offset = offset;
     vecExpr->components.push_back(&x);
     vecExpr->components.push_back(&y);
-    vecExpr->components.push_back(&y);
+    vecExpr->components.push_back(&z);
 
     expressions.push_back(vecExpr);
 
