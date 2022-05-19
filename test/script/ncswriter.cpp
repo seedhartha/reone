@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
     program.add(Instruction::newCONSTF(1.0f));
     program.add(Instruction::newCONSTS("Aa"));
     program.add(Instruction::newCONSTO(2));
-    program.add(Instruction::newACTION( 1, 2));
+    program.add(Instruction::newACTION(1, 2));
     program.add(Instruction::newMOVSP(-4));
     program.add(Instruction::newJMP(1));
     program.add(Instruction::newJSR(2));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/binarywriter.h"
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/common/stringbuilder.h"
 #include "../../src/resource/format/gffwriter.h"
 #include "../../src/resource/gff.h"
+
 
 #include "../checkutil.h"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 
 #include "lipwriter.h"
 
-#include "../../common/stream/fileoutput.h"
 #include "../../common/binarywriter.h"
+#include "../../common/stream/fileoutput.h"
+
 
 namespace fs = boost::filesystem;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int fireForget = 2;
 
-    static constexpr int blend = 4;     /**< blend previous animation into the next one */
-    static constexpr int overlay = 8;   /**< overlay next animation on top of the previous one */
+    static constexpr int blend = 4;   /**< blend previous animation into the next one */
+    static constexpr int overlay = 8; /**< overlay next animation on top of the previous one */
 
     static constexpr int propagate = 0x10; /**< propagate animation to attached models */
 

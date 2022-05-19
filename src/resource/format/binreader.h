@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ protected:
 
     size_t _size {0};
 
-    BinaryResourceReader(boost::endian::order endianess = boost::endian::order::little) : _endianess(endianess) {
+    BinaryResourceReader(boost::endian::order endianess = boost::endian::order::little) :
+        _endianess(endianess) {
     }
 
     virtual void onLoad() = 0;

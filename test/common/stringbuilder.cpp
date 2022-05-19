@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ BOOST_AUTO_TEST_CASE(should_build_a_string) {
 
     // when
     auto str = StringBuilder()
-        .append("He")
-        .repeat('l', 2)
-        .append("o, world!")
-        .build();
+                   .append("He")
+                   .repeat('l', 2)
+                   .append("o, world!")
+                   .build();
 
     // then
     BOOST_TEST((expectedStr == str), notEqualMessage(expectedStr, str));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 
 #include "nsswriter.h"
 
-#include "../../common/textwriter.h"
 #include "../../common/exception/argument.h"
 #include "../../common/exception/notimplemented.h"
 #include "../../common/exception/validation.h"
+#include "../../common/textwriter.h"
+
 
 #include "../routine.h"
 #include "../routines.h"

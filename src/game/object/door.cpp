@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +22,12 @@
 #include "../../graphics/services.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../resource/2das.h"
-#include "../../resource/gffs.h"
 #include "../../resource/gff.h"
+#include "../../resource/gffs.h"
 #include "../../resource/services.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
+
 
 #include "../services.h"
 

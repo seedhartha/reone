@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 The reone project contributors
+ * Copyright (c) 2020-2022 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 for (auto &[stackOffset, param] : outputs) {
                     sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
                 }
-            
+
             } else {
                 sub = ctx->functions.at(absJumpOffset);
             }
