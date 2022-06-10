@@ -39,6 +39,10 @@ public:
         _stream.write(data, length);
     }
 
+    void close() {
+        _stream.close();
+    }
+
     size_t position() override {
         return _stream.tellp();
     }

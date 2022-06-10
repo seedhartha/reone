@@ -50,6 +50,10 @@ public:
         return _stream.gcount();
     }
 
+    void close() {
+        _stream.close();
+    }
+
     size_t position() override {
         return static_cast<size_t>(_stream.tellg());
     }

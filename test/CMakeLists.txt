@@ -24,6 +24,8 @@ set(TEST_SOURCES
     common/bytearrayinputstream.cpp
     common/bytearrayoutputstream.cpp
     common/collectionutil.cpp
+    common/fileinputstream.cpp
+    common/fileoutputstream.cpp
     common/hexutil.cpp
     common/stringbuilder.cpp
     common/unicodeutil.cpp
