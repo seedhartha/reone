@@ -16,6 +16,10 @@
 find_package(Boost COMPONENTS regex REQUIRED)
 
 set(TOOLSLIB_HEADERS
+    script/expressiontree.h
+    script/format/nsswriter.h
+    script/format/pcodereader.h
+    script/format/pcodewriter.h
     tool.h
     tool/2da.h
     tool/audio.h
@@ -31,6 +35,10 @@ set(TOOLSLIB_HEADERS
     types.h)
 
 set(TOOLSLIB_SOURCES
+    script/expressiontree.cpp
+    script/format/nsswriter.cpp
+    script/format/pcodereader.cpp
+    script/format/pcodewriter.cpp
     tool/2da.cpp
     tool/audio.cpp
     tool/erf.cpp

@@ -21,12 +21,8 @@ set(SCRIPT_HEADERS
     execution.h
     executioncontext.h
     executionstate.h
-    expressiontree.h
     format/ncsreader.h
     format/ncswriter.h
-    format/nsswriter.h
-    format/pcodereader.h
-    format/pcodewriter.h
     instrutil.h
     program.h
     routine.h
@@ -39,12 +35,8 @@ set(SCRIPT_HEADERS
 
 set(SCRIPT_SOURCES
     execution.cpp
-    expressiontree.cpp
     format/ncsreader.cpp
     format/ncswriter.cpp
-    format/nsswriter.cpp
-    format/pcodereader.cpp
-    format/pcodewriter.cpp
     instrutil.cpp
     program.cpp
     routine.cpp

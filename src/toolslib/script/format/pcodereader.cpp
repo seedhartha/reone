@@ -20,9 +20,8 @@
 #include <boost/regex.hpp>
 
 #include "../../common/exception/validation.h"
-
-#include "../instrutil.h"
-#include "../routines.h"
+#include "../../script/instrutil.h"
+#include "../../script/routines.h"
 
 using namespace std;
 

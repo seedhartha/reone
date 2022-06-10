@@ -49,6 +49,6 @@ add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_compile_definitions(reone-tests PRIVATE BOOST_TEST_DYN_LINK)
 target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(reone-tests PRIVATE game ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(reone-tests PRIVATE toolslib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 add_test(NAME UnitTests COMMAND reone-tests)

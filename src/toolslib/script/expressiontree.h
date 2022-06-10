@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "program.h"
-#include "variable.h"
+#include "../../script/program.h"
+#include "../../script/variable.h"
 
 namespace reone {
 

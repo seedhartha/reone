@@ -21,11 +21,9 @@
 #include "../../common/exception/notimplemented.h"
 #include "../../common/exception/validation.h"
 #include "../../common/textwriter.h"
-
-
-#include "../routine.h"
-#include "../routines.h"
-#include "../variableutil.h"
+#include "../../script/routine.h"
+#include "../../script/routines.h"
+#include "../../script/variableutil.h"
 
 using namespace std;
 

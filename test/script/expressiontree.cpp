@@ -18,7 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/game/script/routines.h"
-#include "../../src/script/expressiontree.h"
+#include "../../src/toolslib/script/expressiontree.h"
 
 using namespace std;
 

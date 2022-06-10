@@ -17,9 +17,9 @@
 
 #include "pcodewriter.h"
 
-#include "../instrutil.h"
-#include "../routine.h"
-#include "../routines.h"
+#include "../../script/instrutil.h"
+#include "../../script/routine.h"
+#include "../../script/routines.h"
 
 using namespace std;
 

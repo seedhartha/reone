@@ -17,15 +17,14 @@
 
 #include "expressiontree.h"
 
-#include "../common/exception/argument.h"
-#include "../common/exception/notimplemented.h"
-#include "../common/exception/validation.h"
-#include "../common/logutil.h"
-
-#include "instrutil.h"
-#include "routine.h"
-#include "routines.h"
-#include "variableutil.h"
+#include "../../common/exception/argument.h"
+#include "../../common/exception/notimplemented.h"
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
+#include "../../script/instrutil.h"
+#include "../../script/routine.h"
+#include "../../script/routines.h"
+#include "../../script/variableutil.h"
 
 using namespace std;
 

@@ -22,12 +22,13 @@
 #include "../../common/stream/fileinput.h"
 #include "../../common/stream/fileoutput.h"
 #include "../../game/script/routines.h"
-#include "../../script/expressiontree.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
-#include "../../script/format/nsswriter.h"
-#include "../../script/format/pcodereader.h"
-#include "../../script/format/pcodewriter.h"
+
+#include "../script/expressiontree.h"
+#include "../script/format/nsswriter.h"
+#include "../script/format/pcodereader.h"
+#include "../script/format/pcodewriter.h"
 
 using namespace std;
 
