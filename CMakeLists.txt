@@ -93,8 +93,9 @@ add_subdirectory(src/game) # game static library
 add_subdirectory(src/engine) # reone executable
 
 if(BUILD_TOOLS)
-    add_subdirectory(src/tools) # reone-tools executable
     add_subdirectory(src/external/tinyxml2) # tinyxml2 static library
+    add_subdirectory(src/toolslib) # tools static library
+    add_subdirectory(src/tools) # reone-tools executable
 endif()
 
 if(BUILD_LAUNCHER)
@@ -113,6 +114,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio scene movie script game DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio scene movie script gui game toolslib DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ## END Installation

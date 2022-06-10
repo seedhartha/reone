@@ -19,18 +19,17 @@
 
 #include "../common/pathutil.h"
 #include "../resource/types.h"
-
-#include "tool/2da.h"
-#include "tool/audio.h"
-#include "tool/erf.h"
-#include "tool/gff.h"
-#include "tool/keybif.h"
-#include "tool/lip.h"
-#include "tool/ncs.h"
-#include "tool/rim.h"
-#include "tool/ssf.h"
-#include "tool/tlk.h"
-#include "tool/tpc.h"
+#include "../toolslib/tool/2da.h"
+#include "../toolslib/tool/audio.h"
+#include "../toolslib/tool/erf.h"
+#include "../toolslib/tool/gff.h"
+#include "../toolslib/tool/keybif.h"
+#include "../toolslib/tool/lip.h"
+#include "../toolslib/tool/ncs.h"
+#include "../toolslib/tool/rim.h"
+#include "../toolslib/tool/ssf.h"
+#include "../toolslib/tool/tlk.h"
+#include "../toolslib/tool/tpc.h"
 
 using namespace std;
 

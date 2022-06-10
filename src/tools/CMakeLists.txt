@@ -13,42 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-find_package(Boost COMPONENTS regex REQUIRED)
-
 set(TOOLS_HEADERS
-    program.h
-    tool.h
-    tool/2da.h
-    tool/audio.h
-    tool/erf.h
-    tool/gff.h
-    tool/keybif.h
-    tool/lip.h
-    tool/ncs.h
-    tool/rim.h
-    tool/ssf.h
-    tool/tlk.h
-    tool/tpc.h
-    types.h)
+    program.h)
 
 set(TOOLS_SOURCES
     main.cpp
-    program.cpp
-    tool/2da.cpp
-    tool/audio.cpp
-    tool/erf.cpp
-    tool/gff.cpp
-    tool/keybif.cpp
-    tool/lip.cpp
-    tool/ncs.cpp
-    tool/rim.cpp
-    tool/ssf.cpp
-    tool/tlk.cpp
-    tool/tpc.cpp)
+    program.cpp)
 
 add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone-tools PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(reone-tools PRIVATE game tinyxml2 ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(reone-tools PRIVATE toolslib ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone-tools)
