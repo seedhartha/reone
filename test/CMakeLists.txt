@@ -41,9 +41,9 @@ set(TEST_SOURCES
     resource/rimwriter.cpp
     resource/tlkreader.cpp
     resource/tlkwriter.cpp
-    script/expressiontree.cpp
     script/ncsreader.cpp
-    script/ncswriter.cpp)
+    script/ncswriter.cpp
+    toolslib/expressiontree.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
