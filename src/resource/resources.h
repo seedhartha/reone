@@ -31,25 +31,31 @@ namespace resource {
 
 class Resources : boost::noncopyable {
 public:
+    typedef std::vector<std::unique_ptr<IResourceProvider>> ProviderList;
+
     void indexKeyFile(const boost::filesystem::path &path);
     void indexErfFile(const boost::filesystem::path &path, bool transient = false);
     void indexRimFile(const boost::filesystem::path &path, bool transient = false);
     void indexDirectory(const boost::filesystem::path &path);
     void indexExeFile(const boost::filesystem::path &path);
 
+    void clearAllProviders();
     void clearTransientProviders();
 
     std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
+    const ProviderList &providers() const { return _providers; }
+    const ProviderList &transientProviders() const { return _transientProviders; }
+
 private:
     boost::filesystem::path _exePath;
-    std::vector<std::unique_ptr<IResourceProvider>> _providers;
-    std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
+    ProviderList _providers;
+    ProviderList _transientProviders; /**< transient providers are replaced when switching between modules */
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
-    std::shared_ptr<ByteArray> getFromProviders(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers);
+    std::shared_ptr<ByteArray> getFromProviders(const ResourceId &id, const ProviderList &providers);
 };
 
 } // namespace resource

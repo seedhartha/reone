@@ -234,6 +234,7 @@ LauncherFrame::LauncherFrame() :
     // Logging
 
     wxArrayString logLevelChoices;
+    logLevelChoices.Add("None");
     logLevelChoices.Add("Error");
     logLevelChoices.Add("Warning");
     logLevelChoices.Add("Info");

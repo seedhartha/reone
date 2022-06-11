@@ -31,6 +31,7 @@ enum class OpenMode {
 };
 
 enum class LogLevel {
+    None,
     Error,
     Warn,
     Info,

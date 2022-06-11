@@ -90,6 +90,11 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
     }
 }
 
+void Resources::clearAllProviders() {
+    _transientProviders.clear();
+    _providers.clear();
+}
+
 void Resources::clearTransientProviders() {
     for (auto &provider : _transientProviders) {
         debug("Remove provider " + to_string(provider->id()), LogChannels::resources);
