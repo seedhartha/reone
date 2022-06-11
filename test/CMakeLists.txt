@@ -27,6 +27,7 @@ set(TEST_SOURCES
     common/fileinputstream.cpp
     common/fileoutputstream.cpp
     common/hexutil.cpp
+    common/pathutil.cpp
     common/stringbuilder.cpp
     common/unicodeutil.cpp
     game/game.cpp
