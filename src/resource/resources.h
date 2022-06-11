@@ -39,6 +39,8 @@ public:
     void indexDirectory(const boost::filesystem::path &path);
     void indexExeFile(const boost::filesystem::path &path);
 
+    void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
+
     void clearAllProviders();
     void clearTransientProviders();
 
@@ -52,8 +54,6 @@ private:
     boost::filesystem::path _exePath;
     ProviderList _providers;
     ProviderList _transientProviders; /**< transient providers are replaced when switching between modules */
-
-    void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
     std::shared_ptr<ByteArray> getFromProviders(const ResourceId &id, const ProviderList &providers);
 };
