@@ -29,6 +29,7 @@ set(TEST_SOURCES
     common/hexutil.cpp
     common/pathutil.cpp
     common/stringbuilder.cpp
+    common/textwriter.cpp
     common/unicodeutil.cpp
     game/game.cpp
     main.cpp
