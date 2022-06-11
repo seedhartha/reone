@@ -17,18 +17,71 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../src/common/stream/bytearrayoutput.h"
 #include "../../src/resource/gffs.h"
+#include "../../src/resource/resources.h"
 
 using namespace std;
+
+using namespace reone;
+using namespace reone::resource;
+
+class StubProvider : public IResourceProvider {
+public:
+    void add(ResourceId id, shared_ptr<ByteArray> res) {
+        _resources.insert(make_pair(id, move(res)));
+    }
+
+    shared_ptr<ByteArray> find(const ResourceId &id) override { return _resources.at(id); }
+
+    int id() const override { return 0; };
+
+private:
+    unordered_map<ResourceId, shared_ptr<ByteArray>, ResourceIdHasher> _resources;
+};
 
 BOOST_AUTO_TEST_SUITE(gffs)
 
 BOOST_AUTO_TEST_CASE(should_get_gff_with_caching) {
     // given
 
+    auto resBytes = make_shared<ByteArray>();
+    auto res = ByteArrayOutputStream(*resBytes);
+    res.write("GFF V3.2");
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+    res.write("\x00\x00\x00\x00", 4);
+
+    auto provider = make_unique<StubProvider>();
+    provider->add(ResourceId("sample", ResourceType::Gff), resBytes);
+
+    auto resources = Resources();
+    resources.indexProvider(move(provider), "[stub]", false);
+
+    auto gffs = Gffs(resources);
+
     // when
 
+    auto gff1 = gffs.get("sample", ResourceType::Gff);
+
+    resources.clearAllProviders();
+
+    auto gff2 = gffs.get("sample", ResourceType::Gff);
+
     // then
+
+    BOOST_CHECK(static_cast<bool>(gff1));
+    BOOST_CHECK(static_cast<bool>(gff2));
+    BOOST_CHECK_EQUAL(gff1.get(), gff2.get());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
