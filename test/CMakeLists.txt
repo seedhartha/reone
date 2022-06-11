@@ -34,15 +34,19 @@ set(TEST_SOURCES
     game/game.cpp
     main.cpp
     resource/2dareader.cpp
+    resource/2das.cpp
     resource/2dawriter.cpp
     resource/bifreader.cpp
     resource/erfreader.cpp
     resource/erfwriter.cpp
     resource/gffreader.cpp
+    resource/gffs.cpp
     resource/gffwriter.cpp
     resource/keyreader.cpp
+    resource/resources.cpp
     resource/rimreader.cpp
     resource/rimwriter.cpp
+    resource/strings.cpp
     resource/tlkreader.cpp
     resource/tlkwriter.cpp
     script/ncsreader.cpp
