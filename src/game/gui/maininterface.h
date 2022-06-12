@@ -63,6 +63,10 @@ private:
 
     // Binding
 
+    gui::Label *_lblNameBg {nullptr};
+    gui::Label *_lblName {nullptr};
+    gui::Label *_lblHealthBg {nullptr};
+
     gui::Button *_btnActionDown0 {nullptr};
     gui::Button *_btnActionDown1 {nullptr};
     gui::Button *_btnActionDown2 {nullptr};

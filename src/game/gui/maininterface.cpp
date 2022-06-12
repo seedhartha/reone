@@ -100,15 +100,16 @@ void MainInterface::init() {
     disableControl("LBL_COMBATBG1");
     disableControl("LBL_COMBATBG2");
     disableControl("LBL_COMBATBG3");
-    disableControl("LBL_HEALTHBG");
-    disableControl("LBL_NAME");
-    disableControl("LBL_NAMEBG");
     disableControl("LBL_TARGET0");
     disableControl("LBL_TARGET1");
     disableControl("LBL_TARGET2");
 }
 
 void MainInterface::bindControls() {
+    _lblNameBg = findControl<Label>("LBL_NAMEBG");
+    _lblName = findControl<Label>("LBL_NAME");
+    _lblHealthBg = findControl<Label>("LBL_HEALTHBG");
+
     _btnActionDown0 = findControl<Button>("BTN_ACTIONDOWN0");
     _btnActionDown1 = findControl<Button>("BTN_ACTIONDOWN1");
     _btnActionDown2 = findControl<Button>("BTN_ACTIONDOWN2");
@@ -144,9 +145,19 @@ void MainInterface::update(float delta) {
 
     if (_selectedTarget) {
         auto screenCoords = _selectedTarget->targetScreenCoords();
+        _lblHealthBg->setEnabled(true);
+        _lblHealthBg->setPosition(screenCoords.x - _lblHealthBg->extent()[2] / 2, screenCoords.y - kTargetReticleSize / 2 - _lblHealthBg->extent()[3]);
+        _lblNameBg->setEnabled(true);
+        _lblNameBg->setPosition(screenCoords.x - _lblNameBg->extent()[2] / 2, _lblHealthBg->extent()[1] - _lblNameBg->extent()[3] - 1);
+        _lblName->setEnabled(true);
+        _lblName->setPosition(screenCoords.x - _lblName->extent()[2] / 2, _lblHealthBg->extent()[1] - _lblName->extent()[3] - 1);
+        _lblName->setText(_selectedTarget->name());
         _lblTargetReticle2->setEnabled(screenCoords.z < 1.0f);
         _lblTargetReticle2->setPosition(screenCoords.x - kTargetReticleSize / 2, screenCoords.y - kTargetReticleSize / 2);
     } else {
+        _lblNameBg->setEnabled(false);
+        _lblName->setEnabled(false);
+        _lblHealthBg->setEnabled(false);
         _lblTargetReticle2->setEnabled(false);
     }
 }

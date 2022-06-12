@@ -23,6 +23,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
+#include "../../resource/strings.h"
 #include "../../scene/collision.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
@@ -66,10 +67,12 @@ void Creature::loadFromUtc(const string &templateResRef) {
         throw ValidationException("UTC not found: " + templateResRef);
     }
     auto tag = utc->getString("Tag");
+    auto firstName = _resourceSvc.strings.get(utc->getInt("FirstName"));
     auto appearanceType = utc->getInt("Appearance_Type");
     auto conversation = utc->getString("Conversation");
 
     _tag = move(tag);
+    _name = move(firstName);
     _conversation = move(conversation);
 
     // From appearance 2DA
@@ -161,9 +164,9 @@ glm::vec3 Creature::targetWorldCoords() const {
         return _position;
     }
     auto model = static_cast<ModelSceneNode *>(_sceneNode);
-    auto talkDummy = model->getNodeByName("talkdummy");
-    if (talkDummy) {
-        return talkDummy->getOrigin();
+    auto headHook = model->getNodeByName("headhook");
+    if (headHook) {
+        return headHook->getOrigin();
     } else {
         return model->getWorldCenterOfAABB();
     }

@@ -73,6 +73,10 @@ public:
         return _tag;
     }
 
+    const std::string &name() const {
+        return _name;
+    }
+
     const glm::vec3 &position() const {
         return _position;
     }
@@ -152,6 +156,7 @@ protected:
     resource::ResourceServices &_resourceSvc;
 
     std::string _tag;
+    std::string _name;
 
     glm::vec3 _position {0.0f};
     float _facing {0.0f};

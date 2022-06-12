@@ -25,10 +25,10 @@
 #include "../../resource/gff.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
+#include "../../resource/strings.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 #include "../../scene/node/walkmesh.h"
-
 
 #include "../services.h"
 
@@ -58,6 +58,7 @@ void Placeable::loadFromGit(const Gff &git) {
         throw ValidationException("UTP not found: " + templateResRef);
     }
     auto tag = utp->getString("Tag");
+    auto locName = _resourceSvc.strings.get(utp->getInt("LocName"));
     auto appearance = utp->getInt("Appearance");
 
     // From placeables 2DA
@@ -89,6 +90,7 @@ void Placeable::loadFromGit(const Gff &git) {
     //
 
     _tag = move(tag);
+    _name = move(locName);
     _position = glm::vec3(x, y, z);
     _facing = bearing;
     _sceneNode = sceneNode.get();
