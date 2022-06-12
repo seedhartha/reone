@@ -89,6 +89,8 @@ public:
         return _sceneNode;
     }
 
+    glm::ivec3 screenCoords() const;
+
     void setTag(std::string tag) {
         _tag = std::move(tag);
     }

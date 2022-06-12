@@ -84,15 +84,36 @@ BOOST_AUTO_TEST_CASE(should_reset_hovered_target_on_mouse_motion_when_no_object_
 BOOST_AUTO_TEST_CASE(should_set_selected_target_on_mouse_click) {
     // given
     auto creature = mockCreature(2);
-    auto creatureModel = mockModelSceneNode(creature.get());
-
     auto mainInterface = MockMainInterface();
-
     auto sceneGraph = MockSceneGraph();
-    sceneGraph.whenPickModelAtThenReturn(creatureModel.get());
 
     auto sut = SelectionController(mainInterface, sceneGraph);
     sut.setHoveredObject(creature.get());
+
+    auto evt = SDL_Event();
+    evt.type = SDL_MOUSEBUTTONDOWN;
+    evt.button.x = 1;
+    evt.button.y = 2;
+
+    // when
+    auto handled = sut.handle(evt);
+
+    // then
+    BOOST_CHECK(handled);
+    BOOST_CHECK_EQUAL(0, creature->numHandleClickInvocations());
+    BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
+    BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
+}
+
+BOOST_AUTO_TEST_CASE(should_call_handle_click_in_selected_object_on_second_mouse_click) {
+    // given
+    auto creature = mockCreature(2);
+    auto mainInterface = MockMainInterface();
+    auto sceneGraph = MockSceneGraph();
+
+    auto sut = SelectionController(mainInterface, sceneGraph);
+    sut.setHoveredObject(creature.get());
+    sut.setSelectedObject(creature.get());
 
     auto evt = SDL_Event();
     evt.type = SDL_MOUSEBUTTONDOWN;

@@ -24,12 +24,18 @@ namespace reone {
 namespace gui {
 
 class Button;
+class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
+class Object;
+
 class IMainInterface {
+public:
+    virtual void setHoveredTarget(Object *target) = 0;
+    virtual void setSelectedTarget(Object *target) = 0;
 };
 
 class MainInterface : public IMainInterface, public gui::Gui {
@@ -46,11 +52,26 @@ public:
 
     void init();
 
+    void update(float delta) override;
+
+    void setHoveredTarget(Object *target) override;
+    void setSelectedTarget(Object *target) override;
+
 private:
+    Object *_hoveredTarget {nullptr};
+    Object *_selectedTarget {nullptr};
+
+    // Binding
+
     gui::Button *_btnActionDown0 {nullptr};
     gui::Button *_btnActionDown1 {nullptr};
     gui::Button *_btnActionDown2 {nullptr};
     gui::Button *_btnActionDown3 {nullptr};
+
+    gui::Label *_lblTargetReticle {nullptr};
+    gui::Label *_lblTargetReticle2 {nullptr};
+
+    // END Binding
 
     void bindControls();
 };

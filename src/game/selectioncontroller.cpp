@@ -22,6 +22,7 @@
 
 #include "object.h"
 #include "object/creature.h"
+#include "gui/maininterface.h"
 
 using namespace std;
 
@@ -38,19 +39,23 @@ bool SelectionController::handle(const SDL_Event &e) {
         } else {
             _hoveredObject = nullptr;
         }
+        _mainInterface.setHoveredTarget(_hoveredObject);
         return true;
     }
     if (e.type == SDL_MOUSEBUTTONDOWN) {
         if (_hoveredObject) {
-            _selectedObject = _hoveredObject;
-            debug("Object selected: " + to_string(_selectedObject->id()) + "[" + _selectedObject->tag() + "]");
-            _selectedObject->handleClick(*_pc);
-            return true;
+            if (_selectedObject == _hoveredObject) {
+                _selectedObject->handleClick(*_pc);
+            } else {
+                _selectedObject = _hoveredObject;
+                debug("Object selected: " + to_string(_selectedObject->id()) + "[" + _selectedObject->tag() + "]");
+            }
         } else {
             _selectedObject = nullptr;
             debug("Object selection reset");
-            return true;
         }
+        _mainInterface.setSelectedTarget(_selectedObject);
+        return true;
     }
     return false;
 }

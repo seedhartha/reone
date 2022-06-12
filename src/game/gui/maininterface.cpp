@@ -17,13 +17,19 @@
 
 #include "maininterface.h"
 
+#include "../../graphics/options.h"
 #include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+
+#include "../object.h"
 
 using namespace reone::gui;
 
 namespace reone {
 
 namespace game {
+
+static const int kTargetReticleSize = 64;
 
 void MainInterface::init() {
     load("mipc28x6");
@@ -107,6 +113,56 @@ void MainInterface::bindControls() {
     _btnActionDown1 = findControl<Button>("BTN_ACTIONDOWN1");
     _btnActionDown2 = findControl<Button>("BTN_ACTIONDOWN2");
     _btnActionDown3 = findControl<Button>("BTN_ACTIONDOWN3");
+
+    // Object selection
+
+    auto lblTargetReticle = newLabel(_highestControlId + 1);
+    _lblTargetReticle = static_cast<Label *>(lblTargetReticle.get());
+    _lblTargetReticle->setExtent(glm::ivec4(0, 0, kTargetReticleSize, kTargetReticleSize));
+    _lblTargetReticle->setBorderFill("friendlyreticle");
+    _rootControl->append(*_lblTargetReticle);
+
+    auto lblTargetReticle2 = newLabel(_highestControlId + 1);
+    _lblTargetReticle2 = static_cast<Label *>(lblTargetReticle2.get());
+    _lblTargetReticle2->setExtent(glm::ivec4(0, 0, kTargetReticleSize, kTargetReticleSize));
+    _lblTargetReticle2->setBorderFill("friendlyreticle2");
+    _rootControl->append(*_lblTargetReticle2);
+
+    //
+}
+
+void MainInterface::update(float delta) {
+    Gui::update(delta);
+
+    if (_hoveredTarget) {
+        auto screenCoords = _hoveredTarget->screenCoords();
+        _lblTargetReticle->setEnabled(screenCoords.z < 1.0f);
+        _lblTargetReticle->setPosition(screenCoords.x - kTargetReticleSize / 2, screenCoords.y - kTargetReticleSize / 2);
+    } else {
+        _lblTargetReticle->setEnabled(false);
+    }
+
+    if (_selectedTarget) {
+        auto screenCoords = _selectedTarget->screenCoords();
+        _lblTargetReticle2->setEnabled(screenCoords.z < 1.0f);
+        _lblTargetReticle2->setPosition(screenCoords.x - kTargetReticleSize / 2, screenCoords.y - kTargetReticleSize / 2);
+    } else {
+        _lblTargetReticle2->setEnabled(false);
+    }
+}
+
+void MainInterface::setHoveredTarget(Object *target) {
+    if (_hoveredTarget == target) {
+        return;
+    }
+    _hoveredTarget = target;
+}
+
+void MainInterface::setSelectedTarget(Object *target) {
+    if (_selectedTarget == target) {
+        return;
+    }
+    _selectedTarget = target;
 }
 
 } // namespace game

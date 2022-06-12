@@ -68,12 +68,14 @@ public:
     CameraType type() const { return _type; }
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }
+    const glm::mat4 &viewInv() const { return _viewInv; }
     const glm::vec3 &position() { return _position; }
     float zNear() const { return _zNear; }
     float zFar() const { return _zFar; }
 
     void setView(glm::mat4 view) {
-        _position = glm::inverse(view)[3];
+        _viewInv = glm::inverse(view);
+        _position = _viewInv[3];
         _view = std::move(view);
         updateFrustumPlanes();
     }
@@ -81,6 +83,7 @@ public:
 protected:
     glm::mat4 _projection {1.0f};
     glm::mat4 _view {1.0f};
+    glm::mat4 _viewInv {1.0f};
     glm::vec3 _position {0.0f};
     float _zNear {0.0f};
     float _zFar {0.0f};

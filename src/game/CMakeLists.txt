@@ -195,6 +195,7 @@ set(GAME_SOURCES
     gui/mainmenu.cpp
     guisounds.cpp
     layouts.cpp
+    object.cpp
     object/area.cpp
     object/camera.cpp
     object/creature.cpp

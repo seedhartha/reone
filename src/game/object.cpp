@@ -15,20 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../game/gui/maininterface.h"
+#include "object.h"
+
+#include "../graphics/services.h"
+#include "../graphics/window.h"
+#include "../scene/graph.h"
+
+#include "options.h"
 
 namespace reone {
 
 namespace game {
 
-class MockMainInterface : public IMainInterface {
-public:
-    void setHoveredTarget(Object *target) override {
-    }
+glm::ivec3 Object::screenCoords() const {
+    auto camera = _sceneGraph->activeCamera();
+    auto viewport = glm::ivec4(0, 0, _graphicsOpt.width, _graphicsOpt.height);
+    auto screenCoords = glm::project(
+        _position,
+        camera->camera()->view(),
+        camera->camera()->projection(),
+        viewport);
 
-    void setSelectedTarget(Object *target) override {
-    }
-};
+    return glm::ivec3(screenCoords.x, _graphicsOpt.height - screenCoords.y, screenCoords.z);
+}
 
 } // namespace game
 

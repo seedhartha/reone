@@ -130,12 +130,24 @@ public:
         _extent = std::move(extent);
     }
 
+    void setPosition(int x, int y) {
+        _extent.x = x;
+        _extent.y = y;
+    }
+
     void setAlpha(float alpha) {
         _alpha = alpha;
     }
 
     void setBorder(std::unique_ptr<Border> border) {
         _border = std::move(border);
+    }
+
+    void setBorderFill(std::string fill) {
+        if (!_border) {
+            _border = std::make_unique<Border>();
+        }
+        _border->fill = std::move(fill);
     }
 
     void setHilight(std::unique_ptr<Border> hilight) {
