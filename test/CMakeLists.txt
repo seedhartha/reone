@@ -38,6 +38,11 @@ set(TEST_SOURCES
     game/astar.cpp
     game/game.cpp
     game/selectioncontroller.cpp
+    graphics/bwmreader.cpp
+    graphics/mdlreader.cpp
+    graphics/tgareader.cpp
+    graphics/tpcreader.cpp
+    graphics/txireader.cpp
     main.cpp
     resource/2dareader.cpp
     resource/2das.cpp
