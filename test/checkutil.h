@@ -28,6 +28,16 @@ inline std::string describe(const std::u16string &s) {
     return reone::hexify(s);
 }
 
+inline std::string describe(const glm::vec2 &v) {
+    std::ostringstream ss;
+    ss << "[";
+    ss << v.x;
+    ss << ", ";
+    ss << v.y;
+    ss << "]";
+    return ss.str();
+}
+
 inline std::string describe(const glm::vec3 &v) {
     std::ostringstream ss;
     ss << "[";

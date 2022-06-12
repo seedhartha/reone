@@ -35,6 +35,7 @@ set(TEST_SOURCES
     common/stringbuilder.cpp
     common/textwriter.cpp
     common/unicodeutil.cpp
+    game/astar.cpp
     game/game.cpp
     game/selectioncontroller.cpp
     main.cpp

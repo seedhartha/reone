@@ -54,6 +54,7 @@ set(GAME_HEADERS
     action/useskill.h
     action/usetalentonobject.h
     action/wait.h
+    astar.h
     camerastyle.h
     camerastyles.h
     cursors.h
@@ -178,6 +179,7 @@ set(GAME_HEADERS
     visibilities.h)
 
 set(GAME_SOURCES
+    astar.cpp
     camerastyles.cpp
     cursors.cpp
     debug.cpp
