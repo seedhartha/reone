@@ -62,6 +62,7 @@ set(TEST_SOURCES
     resource/strings.cpp
     resource/tlkreader.cpp
     resource/tlkwriter.cpp
+    script/execution.cpp
     script/ncsreader.cpp
     script/ncswriter.cpp
     toolslib/expressiontree.cpp)
