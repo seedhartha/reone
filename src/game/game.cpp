@@ -71,12 +71,6 @@ void Game::init() {
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
 
-    // Services
-
-    _playerController = make_unique<PlayerController>();
-    _selectionController = make_unique<SelectionController>(scene);
-    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
-
     // Movies
 
     auto legalBikPath = getPathIgnoreCase(_options.game.path, "movies/legal.bik");
@@ -97,6 +91,12 @@ void Game::init() {
 
     _console = make_unique<Console>(_options.graphics, _services.graphics, _services.resource);
     _console->init();
+
+    // Services
+
+    _playerController = make_unique<PlayerController>();
+    _selectionController = make_unique<SelectionController>(*_mainInterface, scene);
+    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
     // Surfaces
 

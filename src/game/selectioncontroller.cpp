@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2020-2022 The reone project contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "selectioncontroller.h"
+
+#include "../common/logutil.h"
+#include "../scene/graph.h"
+
+#include "object.h"
+#include "object/creature.h"
+
+using namespace std;
+
+namespace reone {
+
+namespace game {
+
+bool SelectionController::handle(const SDL_Event &e) {
+    if (e.type == SDL_MOUSEMOTION) {
+        auto hoveredSceneNode = _sceneGraph.pickModelAt(e.motion.x, e.motion.y, _pc);
+        if (hoveredSceneNode) {
+            _hoveredObject = static_cast<Object *>(hoveredSceneNode->user());
+            // debug("Mouse hovered at object: " + to_string(_hoveredObject->id()) + "[" + _hoveredObject->tag() + "]");
+        } else {
+            _hoveredObject = nullptr;
+        }
+        return true;
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN) {
+        if (_hoveredObject) {
+            _selectedObject = _hoveredObject;
+            debug("Object selected: " + to_string(_selectedObject->id()) + "[" + _selectedObject->tag() + "]");
+            _selectedObject->handleClick(*_pc);
+            return true;
+        } else {
+            _selectedObject = nullptr;
+            debug("Object selection reset");
+            return true;
+        }
+    }
+    return false;
+}
+
+} // namespace game
+
+} // namespace reone

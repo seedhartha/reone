@@ -15,46 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "../../gui/gui.h"
+#include "../../scene/node/model.h"
 
 namespace reone {
 
-namespace gui {
+namespace scene {
 
-class Button;
+class MockModelSceneNode : public ModelSceneNode {
+public:
+    MockModelSceneNode(IUser *user) :
+        ModelSceneNode(
+            *static_cast<graphics::Model *>(nullptr),
+            ModelUsage::Creature,
+            *static_cast<SceneGraph *>(nullptr),
+            *static_cast<graphics::GraphicsServices *>(nullptr),
+            *static_cast<audio::AudioServices *>(nullptr)) {
 
+        _user = user;
+    }
+};
+
+std::unique_ptr<MockModelSceneNode> mockModelSceneNode(IUser *user = nullptr) {
+    return std::make_unique<MockModelSceneNode>(user);
 }
 
-namespace game {
-
-class IMainInterface {
-};
-
-class MainInterface : public IMainInterface, public gui::Gui {
-public:
-    MainInterface(
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
-
-    void init();
-
-private:
-    gui::Button *_btnActionDown0 {nullptr};
-    gui::Button *_btnActionDown1 {nullptr};
-    gui::Button *_btnActionDown2 {nullptr};
-    gui::Button *_btnActionDown3 {nullptr};
-
-    void bindControls();
-};
-
-} // namespace game
+} // namespace scene
 
 } // namespace reone

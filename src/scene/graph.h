@@ -54,7 +54,12 @@ struct Collision;
 
 class IAnimationEventListener;
 
-class SceneGraph : public graphics::IScene, boost::noncopyable {
+class ISceneGraph {
+public:
+    virtual ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const = 0;
+};
+
+class SceneGraph : public ISceneGraph, public graphics::IScene, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
@@ -153,7 +158,7 @@ public:
     bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const;
     bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
 
-    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const;
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const override;
 
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }

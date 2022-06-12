@@ -15,44 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "../../gui/gui.h"
+#include "../../game/gui/maininterface.h"
 
 namespace reone {
 
-namespace gui {
-
-class Button;
-
-}
-
 namespace game {
 
-class IMainInterface {
-};
-
-class MainInterface : public IMainInterface, public gui::Gui {
-public:
-    MainInterface(
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
-    }
-
-    void init();
-
-private:
-    gui::Button *_btnActionDown0 {nullptr};
-    gui::Button *_btnActionDown1 {nullptr};
-    gui::Button *_btnActionDown2 {nullptr};
-    gui::Button *_btnActionDown3 {nullptr};
-
-    void bindControls();
+class MockMainInterface : public IMainInterface {
 };
 
 } // namespace game

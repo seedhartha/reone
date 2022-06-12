@@ -16,7 +16,11 @@
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 set(TEST_HEADERS
-    checkutil.h)
+    checkutil.h
+    fixtures/gameobject.h
+    fixtures/maininterface.h
+    fixtures/scenegraph.h
+    fixtures/scenenode.h)
 
 set(TEST_SOURCES
     common/binaryreader.cpp

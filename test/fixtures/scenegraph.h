@@ -15,46 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "../../gui/gui.h"
+#include "../../scene/graph.h"
 
 namespace reone {
 
-namespace gui {
+namespace scene {
 
-class Button;
-
-}
-
-namespace game {
-
-class IMainInterface {
-};
-
-class MainInterface : public IMainInterface, public gui::Gui {
+class MockSceneGraph : public ISceneGraph {
 public:
-    MainInterface(
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const {
+        return _pickModelAtReturnValue;
     }
 
-    void init();
+    void whenPickModelAtThenReturn(ModelSceneNode *value) {
+        _pickModelAtReturnValue = value;
+    }
 
 private:
-    gui::Button *_btnActionDown0 {nullptr};
-    gui::Button *_btnActionDown1 {nullptr};
-    gui::Button *_btnActionDown2 {nullptr};
-    gui::Button *_btnActionDown3 {nullptr};
-
-    void bindControls();
+    ModelSceneNode *_pickModelAtReturnValue;
 };
 
-} // namespace game
+} // namespace scene
 
 } // namespace reone

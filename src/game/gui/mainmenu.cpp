@@ -69,6 +69,7 @@ void MainMenu::init3dView() {
 
     auto model = _graphicsSvc.models.get("mainmenu");
     auto modelSceneNode = shared_ptr<ModelSceneNode>(scene.newModel(*model, ModelUsage::GUI));
+    modelSceneNode->init();
 
     SceneInitializer(scene)
         .aspect(aspect)

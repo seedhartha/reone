@@ -690,7 +690,9 @@ shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
 }
 
 shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
-    return newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
+    auto sceneNode = newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
+    sceneNode->init();
+    return move(sceneNode);
 }
 
 shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {

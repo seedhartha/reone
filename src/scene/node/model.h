@@ -50,6 +50,8 @@ public:
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc);
 
+    void init();
+
     void update(float dt) override;
 
     void drawLeafs(const std::vector<SceneNode *> &leafs) override;
