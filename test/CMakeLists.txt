@@ -32,6 +32,7 @@ set(TEST_SOURCES
     common/textwriter.cpp
     common/unicodeutil.cpp
     game/game.cpp
+    game/selectioncontroller.cpp
     main.cpp
     resource/2dareader.cpp
     resource/2das.cpp
