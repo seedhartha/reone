@@ -28,7 +28,7 @@ using namespace reone::game;
 
 BOOST_AUTO_TEST_SUITE(a_star)
 
-BOOST_AUTO_TEST_CASE(should_find_path) {
+BOOST_AUTO_TEST_CASE(should_plot_path) {
     // Points:
     // 0 1 2 3
     // 4 5 6 7
@@ -69,6 +69,42 @@ BOOST_AUTO_TEST_CASE(should_find_path) {
 
     // when
     auto actualPath = aStar.plotPath(glm::vec2(-0.6f, -1.0f), glm::vec2(1.0f, 0.6f));
+
+    // then
+    BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
+    for (auto i = 0; i < expectedPath.size() && i < actualPath.size(); ++i) {
+        BOOST_TEST((expectedPath[i] == actualPath[i]), notEqualMessage(expectedPath[i], actualPath[i]));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(should_plot_path__no_points) {
+    // given
+    auto path = Path();
+    auto aStar = AStar(path);
+    auto expectedPath = vector<glm::vec2> {glm::vec2(1.0f, 1.0f)};
+
+    // when
+    auto actualPath = aStar.plotPath(glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, 1.0f));
+
+    // then
+    BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
+    for (auto i = 0; i < expectedPath.size() && i < actualPath.size(); ++i) {
+        BOOST_TEST((expectedPath[i] == actualPath[i]), notEqualMessage(expectedPath[i], actualPath[i]));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(should_plot_path__unreachable_destination) {
+    // given
+    auto path = Path();
+    path.points.push_back(Path::Point {glm::vec2(-1.0f, -1.0f), vector<int> {1}}); // 0
+    path.points.push_back(Path::Point {glm::vec2(0.0f, 0.0f), vector<int> {0}});  // 1
+    path.points.push_back(Path::Point {glm::vec2(1.0f, 1.0f), vector<int> {}});  // 2
+
+    auto aStar = AStar(path);
+    auto expectedPath = vector<glm::vec2> {glm::vec2(0.9f, 0.9f)};
+
+    // when
+    auto actualPath = aStar.plotPath(glm::vec2(-0.9f, -0.9f), glm::vec2(0.9f, 0.9f));
 
     // then
     BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
