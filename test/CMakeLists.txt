@@ -23,6 +23,8 @@ set(TEST_HEADERS
     fixtures/scenenode.h)
 
 set(TEST_SOURCES
+    audio/mp3reader.cpp
+    audio/wavreader.cpp
     common/binaryreader.cpp
     common/binarywriter.cpp
     common/bytearrayinputstream.cpp
