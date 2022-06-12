@@ -89,7 +89,9 @@ public:
         return _sceneNode;
     }
 
-    glm::ivec3 screenCoords() const;
+    virtual glm::vec3 targetWorldCoords() const;
+
+    glm::ivec3 targetScreenCoords() const;
 
     void setTag(std::string tag) {
         _tag = std::move(tag);

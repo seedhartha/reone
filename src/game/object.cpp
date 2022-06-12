@@ -27,11 +27,18 @@ namespace reone {
 
 namespace game {
 
-glm::ivec3 Object::screenCoords() const {
+glm::vec3 Object::targetWorldCoords() const {
+    if (!_sceneNode) {
+        return _position;
+    }
+    return _sceneNode->getWorldCenterOfAABB();
+}
+
+glm::ivec3 Object::targetScreenCoords() const {
     auto camera = _sceneGraph->activeCamera();
     auto viewport = glm::ivec4(0, 0, _graphicsOpt.width, _graphicsOpt.height);
     auto screenCoords = glm::project(
-        _position,
+        targetWorldCoords(),
         camera->camera()->view(),
         camera->camera()->projection(),
         viewport);

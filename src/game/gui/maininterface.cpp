@@ -135,7 +135,7 @@ void MainInterface::update(float delta) {
     Gui::update(delta);
 
     if (_hoveredTarget) {
-        auto screenCoords = _hoveredTarget->screenCoords();
+        auto screenCoords = _hoveredTarget->targetScreenCoords();
         _lblTargetReticle->setEnabled(screenCoords.z < 1.0f);
         _lblTargetReticle->setPosition(screenCoords.x - kTargetReticleSize / 2, screenCoords.y - kTargetReticleSize / 2);
     } else {
@@ -143,7 +143,7 @@ void MainInterface::update(float delta) {
     }
 
     if (_selectedTarget) {
-        auto screenCoords = _selectedTarget->screenCoords();
+        auto screenCoords = _selectedTarget->targetScreenCoords();
         _lblTargetReticle2->setEnabled(screenCoords.z < 1.0f);
         _lblTargetReticle2->setPosition(screenCoords.x - kTargetReticleSize / 2, screenCoords.y - kTargetReticleSize / 2);
     } else {

@@ -156,6 +156,19 @@ void Creature::handleClick(Object &clicker) {
     }
 }
 
+glm::vec3 Creature::targetWorldCoords() const {
+    if (!_sceneNode) {
+        return _position;
+    }
+    auto model = static_cast<ModelSceneNode *>(_sceneNode);
+    auto talkDummy = model->getNodeByName("talkdummy");
+    if (talkDummy) {
+        return talkDummy->getOrigin();
+    } else {
+        return model->getWorldCenterOfAABB();
+    }
+}
+
 } // namespace game
 
 } // namespace reone

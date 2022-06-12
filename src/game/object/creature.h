@@ -71,6 +71,8 @@ public:
 
     void handleClick(Object &clicker) override;
 
+    glm::vec3 targetWorldCoords() const override;
+
     // END Object
 
 private:
