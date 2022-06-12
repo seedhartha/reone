@@ -484,26 +484,6 @@ void Game::PlayerController::update(float delta) {
     _creature->moveForward(delta);
 }
 
-bool Game::SelectionController::handle(const SDL_Event &e) {
-    if (e.type == SDL_MOUSEMOTION) {
-        auto hoveredSceneNode = _sceneGraph.pickModelAt(e.motion.x, e.motion.y, _pc);
-        if (hoveredSceneNode) {
-            _hoveredObject = static_cast<Object *>(hoveredSceneNode->user());
-            // debug("Object hovered on: " + to_string(_hoveredObject->id()) + "[" + _hoveredObject->tag() + "]");
-        } else {
-            _hoveredObject = nullptr;
-        }
-        return true;
-    }
-    if (e.type == SDL_MOUSEBUTTONDOWN && _hoveredObject) {
-        _clickedObject = _hoveredObject;
-        debug("Object clicked on: " + to_string(_clickedObject->id()) + "[" + _clickedObject->tag() + "]");
-        _clickedObject->handleClick(*_pc);
-        return true;
-    }
-    return false;
-}
-
 void Game::WorldRenderer::render() {
     auto output = _graphicsSvc.pipeline.draw(_sceneGraph, glm::ivec2(_graphicsOptions.width, _graphicsOptions.height));
     if (!output) {

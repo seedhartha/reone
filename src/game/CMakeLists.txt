@@ -162,6 +162,7 @@ set(GAME_HEADERS
     portrait.h
     portraits.h
     resourcelayout.h
+    selectioncontroller.h
     script/routine/argutil.h
     script/routine/context.h
     script/routine/declarations.h
@@ -210,6 +211,7 @@ set(GAME_SOURCES
     paths.cpp
     portraits.cpp
     resourcelayout.cpp
+    selectioncontroller.cpp
     script/routine/argutil.cpp
     script/routine/impl/action.cpp
     script/routine/impl/effect.cpp

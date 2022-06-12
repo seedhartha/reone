@@ -29,6 +29,7 @@
 #include "object/factory.h"
 #include "object/module.h"
 #include "options.h"
+#include "selectioncontroller.h"
 #include "services.h"
 #include "types.h"
 
@@ -172,27 +173,6 @@ private:
         float _right {0.0f};
 
         // END Controls
-    };
-
-    class SelectionController : boost::noncopyable {
-    public:
-        SelectionController(scene::SceneGraph &sceneGraph) :
-            _sceneGraph(sceneGraph) {
-        }
-
-        bool handle(const SDL_Event &e);
-
-        void setPC(Creature *pc) {
-            _pc = pc;
-        }
-
-    private:
-        scene::SceneGraph &_sceneGraph;
-
-        Creature *_pc {nullptr};
-
-        Object *_hoveredObject {nullptr};
-        Object *_clickedObject {nullptr};
     };
 
     class WorldRenderer : boost::noncopyable {
