@@ -41,18 +41,18 @@ BOOST_AUTO_TEST_CASE(should_find_path) {
 
     // given
     auto path = Path();
-    path.points.push_back(Path::Point {-1.0f, -1.0f, vector<int> {1, 4}}); // 0
-    path.points.push_back(Path::Point {0.0f, -1.0f, vector<int> {0, 5}});  // 1
-    path.points.push_back(Path::Point {1.0f, -1.0f, vector<int> {3, 6}});  // 2
-    path.points.push_back(Path::Point {2.0f, -1.0f, vector<int> {2, 7}});  // 3
-    path.points.push_back(Path::Point {-1.0f, 0.0f, vector<int> {0, 9}});  // 4
-    path.points.push_back(Path::Point {0.0f, 0.0f, vector<int> {1}});      // 5
-    path.points.push_back(Path::Point {1.0f, 0.0f, vector<int> {2, 9}});   // 6
-    path.points.push_back(Path::Point {2.0f, 0.0f, vector<int> {3, 11}});  // 7
-    path.points.push_back(Path::Point {-1.0f, 1.0f, vector<int> {}});      // 8
-    path.points.push_back(Path::Point {0.0f, 1.0f, vector<int> {4, 6}});   // 9
-    path.points.push_back(Path::Point {1.0f, 1.0f, vector<int> {11}});     // 10
-    path.points.push_back(Path::Point {2.0f, 1.0f, vector<int> {7, 10}});  // 11
+    path.points.push_back(Path::Point {glm::vec2(-1.0f, -1.0f), vector<int> {1, 4}}); // 0
+    path.points.push_back(Path::Point {glm::vec2(0.0f, -1.0f), vector<int> {0, 5}});  // 1
+    path.points.push_back(Path::Point {glm::vec2(1.0f, -1.0f), vector<int> {3, 6}});  // 2
+    path.points.push_back(Path::Point {glm::vec2(2.0f, -1.0f), vector<int> {2, 7}});  // 3
+    path.points.push_back(Path::Point {glm::vec2(-1.0f, 0.0f), vector<int> {0, 9}});  // 4
+    path.points.push_back(Path::Point {glm::vec2(0.0f, 0.0f), vector<int> {1}});      // 5
+    path.points.push_back(Path::Point {glm::vec2(1.0f, 0.0f), vector<int> {2, 9}});   // 6
+    path.points.push_back(Path::Point {glm::vec2(2.0f, 0.0f), vector<int> {3, 11}});  // 7
+    path.points.push_back(Path::Point {glm::vec2(-1.0f, 1.0f), vector<int> {}});      // 8
+    path.points.push_back(Path::Point {glm::vec2(0.0f, 1.0f), vector<int> {4, 6}});   // 9
+    path.points.push_back(Path::Point {glm::vec2(1.0f, 1.0f), vector<int> {11}});     // 10
+    path.points.push_back(Path::Point {glm::vec2(2.0f, 1.0f), vector<int> {7, 10}});  // 11
 
     auto aStar = AStar(path);
     auto expectedPath = vector<glm::vec2> {
@@ -65,8 +65,7 @@ BOOST_AUTO_TEST_CASE(should_find_path) {
         glm::vec2(2.0f, 0.0f),
         glm::vec2(2.0f, 1.0f),
         glm::vec2(1.0f, 1.0f),
-        glm::vec2(1.0f, 0.6f)
-    };
+        glm::vec2(1.0f, 0.6f)};
 
     // when
     auto actualPath = aStar.plotPath(glm::vec2(-0.6f, -1.0f), glm::vec2(1.0f, 0.6f));

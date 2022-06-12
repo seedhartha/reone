@@ -23,12 +23,28 @@ namespace game {
 
 struct Path {
     struct Point {
-        float x {0.0f};
-        float y {0.0f};
+        glm::vec2 coords {0.0f};
         std::vector<int> adjPoints;
     };
 
     std::vector<Point> points;
+
+    int indexOfClosestPoint(const glm::vec2 &to) const {
+        int closestIdx = -1;
+        float closestDist = std::numeric_limits<float>::max();
+        for (int i = 0; i < static_cast<int>(points.size()); ++i) {
+            float dist = glm::distance2(points[i].coords, to);
+            if (dist < closestDist) {
+                closestIdx = i;
+                closestDist = dist;
+            }
+        }
+        return closestIdx;
+    }
+
+    float squareDistanceBetween(int leftIdx, int rightIdx) const {
+        return glm::distance2(points[leftIdx].coords, points[rightIdx].coords);
+    }
 };
 
 } // namespace game

@@ -50,8 +50,7 @@ unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
         float y = pointGffs->getFloat("Y");
 
         Path::Point point;
-        point.x = x;
-        point.y = y;
+        point.coords = glm::vec2(x, y);
 
         for (int i = 0; i < connectionCount; ++i) {
             int connectionIdx = firstConnection + i;
