@@ -179,6 +179,7 @@ set(GAME_HEADERS
     visibilities.h)
 
 set(GAME_SOURCES
+    action.cpp
     action/movetoobject.cpp
     astar.cpp
     camerastyles.cpp

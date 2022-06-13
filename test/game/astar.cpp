@@ -54,7 +54,9 @@ BOOST_AUTO_TEST_CASE(should_plot_path) {
     path.points.push_back(Path::Point {glm::vec2(1.0f, 1.0f), vector<int> {11}});     // 10
     path.points.push_back(Path::Point {glm::vec2(2.0f, 1.0f), vector<int> {7, 10}});  // 11
 
-    auto aStar = AStar(path);
+    auto aStar = AStar();
+    aStar.setPath(path);
+
     auto expectedPath = vector<glm::vec2> {
         glm::vec2(-1.0f, -1.0f),
         glm::vec2(-1.0f, 0.0f),
@@ -80,7 +82,10 @@ BOOST_AUTO_TEST_CASE(should_plot_path) {
 BOOST_AUTO_TEST_CASE(should_plot_path__no_points) {
     // given
     auto path = Path();
-    auto aStar = AStar(path);
+
+    auto aStar = AStar();
+    aStar.setPath(path);
+
     auto expectedPath = vector<glm::vec2> {glm::vec2(1.0f, 1.0f)};
 
     // when
@@ -100,7 +105,9 @@ BOOST_AUTO_TEST_CASE(should_plot_path__unreachable_destination) {
     path.points.push_back(Path::Point {glm::vec2(0.0f, 0.0f), vector<int> {0}});  // 1
     path.points.push_back(Path::Point {glm::vec2(1.0f, 1.0f), vector<int> {}});  // 2
 
-    auto aStar = AStar(path);
+    auto aStar = AStar();
+    aStar.setPath(path);
+
     auto expectedPath = vector<glm::vec2> {glm::vec2(0.9f, 0.9f)};
 
     // when

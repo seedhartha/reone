@@ -37,25 +37,23 @@ vector<glm::vec2> AStar::plotPath(const glm::vec2 &from, const glm::vec2 &to) co
     auto cameFrom = map<int, int>();
 
     auto gScore = map<int, float>();
-    gScore[startPointIdx] = 0.0f;
-
     auto fScore = map<int, float>();
-    fScore[startPointIdx] = _path.squareDistanceBetween(startPointIdx, endPointIdx);
-
-    for (int i = 1; i < static_cast<int>(_path.points.size()); ++i) {
+    for (int i = 0; i < static_cast<int>(_path.points.size()); ++i) {
         gScore[i] = numeric_limits<float>::max();
         fScore[i] = numeric_limits<float>::max();
     }
+    gScore[startPointIdx] = 0.0f;
+    fScore[startPointIdx] = _path.squareDistanceBetween(startPointIdx, endPointIdx);
 
     while (!openSet.empty()) {
         // Find point in openSet having the lowest fScore
         // TODO: optimize
-        vector<pair<int, float>> openToFScore;
+        auto openToFScore = vector<pair<int, float>>();
         for (auto &pointIdx : openSet) {
             openToFScore.push_back(make_pair(pointIdx, fScore.at(pointIdx)));
         }
         sort(openToFScore.begin(), openToFScore.end(), [](const auto &l, const auto &r) { return l.second < r.second; });        
-        int currentPointIdx = openToFScore.begin()->first;
+        int currentPointIdx = openToFScore.front().first;
 
         // Reconstruct path and return
         if (currentPointIdx == endPointIdx) {

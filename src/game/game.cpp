@@ -34,6 +34,7 @@
 #include "../scene/node/model.h"
 #include "../scene/services.h"
 
+#include "astar.h"
 #include "cursors.h"
 #include "debug.h"
 #include "dialog.h"
@@ -374,6 +375,15 @@ void Game::loadModule(const string &name) {
     _playerController->setCamera(&camera);
 
     _selectionController->setPC(&pc);
+
+    // Path
+
+    auto path = module.area().path();
+    if (path) {
+        _services.game.aStar.setPath(*path);
+    } else {
+        _services.game.aStar.setPath(Path());
+    }
 }
 
 // IGame

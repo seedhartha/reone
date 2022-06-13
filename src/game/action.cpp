@@ -15,28 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "movetoobject.h"
-
-#include "../../common/exception/validation.h"
-
-#include "../object.h"
-#include "../object/creature.h"
-
-using namespace std;
+#include "action.h"
 
 namespace reone {
 
 namespace game {
-
-void MoveToObjectAction::execute(Object &executor, float delta) {
-    if (executor.type() != ObjectType::Creature) {
-        throw ValidationException("Executor must be of creature type");
-    }
-    auto &executorCreature = static_cast<Creature &>(executor);
-    if (executorCreature.moveTo(_moveTo, _run, _range, delta)) {
-        complete();
-    }
-}
 
 } // namespace game
 

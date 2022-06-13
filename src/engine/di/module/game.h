@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../game/astar.h"
 #include "../../game/camerastyles.h"
 #include "../../game/cursors.h"
 #include "../../game/footstepsounds.h"
@@ -78,6 +79,7 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
+    std::unique_ptr<game::AStar> _aStar;
     std::unique_ptr<game::CameraStyles> _cameraStyles;
     std::unique_ptr<game::Cursors> _cursors;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;

@@ -59,6 +59,16 @@ public:
     void loadFromGit(const resource::Gff &git);
     void loadFromUtc(const std::string &templateResRef);
 
+    /**
+     * @return true if destination had been reached
+     */
+    bool moveTo(Object &other, bool run, float range, float delta);
+
+    /**
+     * @return true if destination had been reached
+     */
+    bool moveTo(const glm::vec2 &destination, bool run, float range, float delta);
+
     bool moveForward(float delta);
 
     void setState(State state) {
@@ -82,6 +92,12 @@ private:
         Critter = 'L',
         UnarmedCritter = 'S'
     };
+
+    struct PlottedPath {
+        glm::vec2 destination {0.0f};
+        std::queue<glm::vec2> points;
+        float duration {0.0f};
+    } _plottedPath;
 
     ModelType _modelType {ModelType::FullBody};
     std::string _conversation;

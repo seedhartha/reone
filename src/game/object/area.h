@@ -35,6 +35,8 @@ class Gff;
 
 namespace game {
 
+class Path;
+
 class Area : public Object {
 public:
     Area(
@@ -74,6 +76,10 @@ public:
         return *_mainCamera;
     }
 
+    const Path *path() const {
+        return _path;
+    }
+
     const scene::FogProperties &fog() const {
         return _fog;
     }
@@ -83,6 +89,7 @@ private:
     std::vector<Object *> _objects;
     Camera *_mainCamera {nullptr};
 
+    Path *_path {nullptr};
     scene::FogProperties _fog;
 };
 

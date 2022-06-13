@@ -39,7 +39,11 @@ void Object::update(float delta) {
 }
 
 void Object::face(Object &other) {
-    auto dir = glm::normalize(glm::vec2(other._position - _position));
+    face(glm::vec2(other._position));
+}
+
+void Object::face(const glm::vec2 &point) {
+    auto dir = glm::normalize(point - glm::vec2(_position));
     setFacing(-glm::atan(dir.x, dir.y));
 }
 

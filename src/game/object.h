@@ -61,6 +61,7 @@ public:
     virtual void update(float delta);
 
     void face(Object &other);
+    void face(const glm::vec2 &point);
 
     virtual void handleClick(Object &clicker) {
     }
@@ -99,6 +100,10 @@ public:
 
     float square2dDistanceTo(Object &other) const {
         return glm::distance2(glm::vec2(_position), glm::vec2(other._position));
+    }
+
+    float square2dDistanceTo(const glm::vec2 &point) const {
+        return glm::distance2(glm::vec2(_position), point);
     }
 
     virtual glm::vec3 targetWorldCoords() const;

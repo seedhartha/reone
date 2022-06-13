@@ -51,6 +51,7 @@ struct ScriptServices;
 
 namespace game {
 
+class AStar;
 class CameraStyles;
 class Cursors;
 class Dialogs;
@@ -65,6 +66,7 @@ class Surfaces;
 class Visibilities;
 
 struct GameServices {
+    AStar &aStar;
     CameraStyles &cameraStyles;
     Cursors &cursors;
     FootstepSounds &footstepSounds;
@@ -78,6 +80,7 @@ struct GameServices {
     Visibilities &visibilities;
 
     GameServices(
+        AStar &aStar,
         CameraStyles &cameraStyles,
         Cursors &cursors,
         FootstepSounds &footstepSounds,
@@ -89,6 +92,7 @@ struct GameServices {
         SoundSets &soundSets,
         Surfaces &surfaces,
         Visibilities &visibilities) :
+        aStar(aStar),
         cameraStyles(cameraStyles),
         cursors(cursors),
         footstepSounds(footstepSounds),

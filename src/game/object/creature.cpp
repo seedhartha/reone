@@ -28,6 +28,7 @@
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 
+#include "../astar.h"
 #include "../gameinterface.h"
 #include "../services.h"
 
@@ -42,6 +43,7 @@ namespace reone {
 namespace game {
 
 static constexpr float kCreatureRunSpeed = 3.96f;
+static constexpr float kPlottedPathDuration = 1.0f; // seconds
 
 static const string kHeadHookNodeName = "headhook";
 
@@ -116,6 +118,56 @@ void Creature::loadFromUtc(const string &templateResRef) {
     _sceneNode = sceneNode.get();
 
     flushTransform();
+}
+
+bool Creature::moveTo(Object &other, bool run, float range, float delta) {
+    return moveTo(glm::vec2(other.position()), run, range, delta);
+}
+
+bool Creature::moveTo(const glm::vec2 &destination, bool run, float range, float delta) {
+    auto dist = square2dDistanceTo(destination);
+    if (dist < range * range) {
+        setState(Creature::State::Pause);
+        return true;
+    }
+
+    auto point = destination;
+
+    bool sameDestination = _plottedPath.destination == destination;
+    if (sameDestination || _plottedPath.duration > 0.0f) {
+        do {
+            point = _plottedPath.points.front();
+            if (square2dDistanceTo(point) < 1.0f) {
+                _plottedPath.points.pop();
+            } else {
+                break;
+            }
+        } while (!_plottedPath.points.empty());
+        if (sameDestination) {
+            _plottedPath.duration = kPlottedPathDuration;
+        } else {
+            _plottedPath.duration = glm::max(0.0f, _plottedPath.duration - delta);
+        }
+    } else {
+        auto start = glm::vec2(_position);
+        if (!_plottedPath.points.empty()) {
+            start = _plottedPath.points.front();
+        }
+        auto aStarPoints = _gameSvc.aStar.plotPath(start, destination);
+        auto points = queue<glm::vec2>();
+        for (auto &point : aStarPoints) {
+            points.push(point);
+        }
+        _plottedPath.destination = destination;
+        _plottedPath.points.swap(points);
+        _plottedPath.duration = kPlottedPathDuration;
+    }
+
+    face(point);
+    setState(run ? Creature::State::Run : Creature::State::Walk);
+    moveForward(delta);
+
+    return false;
 }
 
 bool Creature::moveForward(float delta) {

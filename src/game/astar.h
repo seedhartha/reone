@@ -23,12 +23,13 @@ namespace reone {
 
 namespace game {
 
-class AStar {
+class AStar : boost::noncopyable {
 public:
-    AStar(Path path) : _path(std::move(path)) {
-    }
-
     std::vector<glm::vec2> plotPath(const glm::vec2 &from, const glm::vec2 &to) const;
+
+    void setPath(Path path) {
+        _path = std::move(path);
+    }
 
 private:
     Path _path;

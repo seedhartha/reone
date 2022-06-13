@@ -29,6 +29,7 @@
 
 #include "../camerastyles.h"
 #include "../layouts.h"
+#include "../paths.h"
 #include "../services.h"
 #include "../surfaces.h"
 
@@ -51,7 +52,7 @@ namespace game {
 void Area::load(const string &name) {
     info("Loading area " + name);
 
-    // ARE, GIT, LYT
+    // ARE, GIT, LYT, PTH
 
     auto are = _resourceSvc.gffs.get(name, ResourceType::Are);
     if (!are) {
@@ -67,6 +68,12 @@ void Area::load(const string &name) {
     if (!layout) {
         throw ValidationException("LYT not found: " + name);
     }
+
+    auto path = _gameSvc.paths.get(name);
+    if (!path) {
+        warn("PTH not found: " + name);
+    }
+    _path = path.get();
 
     // Grass
 

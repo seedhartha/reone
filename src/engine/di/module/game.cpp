@@ -32,6 +32,7 @@ namespace reone {
 namespace engine {
 
 void GameModule::init() {
+    _aStar = make_unique<AStar>();
     _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.graphicsContext(), _graphics.meshes(), _graphics.shaders(), _graphics.textures(), _graphics.uniforms(), _graphics.window(), _resource.resources());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
@@ -45,6 +46,7 @@ void GameModule::init() {
     _visibilities = make_unique<Visibilities>(_resource.resources());
 
     _services = make_unique<GameServices>(
+        *_aStar,
         *_cameraStyles,
         *_cursors,
         *_footstepSounds,
