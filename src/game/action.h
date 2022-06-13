@@ -25,12 +25,25 @@ namespace game {
 
 class Action : boost::noncopyable {
 public:
+    virtual void execute(float delta) {
+        _completed = true;
+    }
+
+    void complete() {
+        _completed = true;
+    }
+
+    bool isCompleted() {
+        return _completed;
+    }
+
     ActionType type() const {
         return _type;
     }
 
 protected:
     ActionType _type;
+    bool _completed {false};
 
     Action(ActionType type) :
         _type(type) {

@@ -21,6 +21,7 @@
 #include "../scene/user.h"
 #include "../script/types.h"
 
+#include "action.h"
 #include "types.h"
 
 namespace reone {
@@ -55,8 +56,9 @@ class IObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
-    virtual void update(float delta) {
-    }
+    typedef std::queue<std::shared_ptr<Action>> ActionQueue;
+
+    virtual void update(float delta);
 
     virtual void handleClick(Object &clicker) {
     }
@@ -125,6 +127,23 @@ public:
         flushTransform();
     }
 
+    // Actions
+
+    void clearAllActions() {
+        auto empty = ActionQueue();
+        _actions.swap(empty);
+    }
+
+    void enqueue(std::shared_ptr<Action> action) {
+        _actions.push(std::move(action));
+    }
+
+    const ActionQueue &actions() const {
+        return _actions;
+    }
+
+    // END Actions
+
     // Local variables
 
     const std::map<std::string, bool> &localBooleans() const {
@@ -157,6 +176,8 @@ protected:
 
     std::string _tag;
     std::string _name;
+
+    ActionQueue _actions;
 
     glm::vec3 _position {0.0f};
     float _facing {0.0f};

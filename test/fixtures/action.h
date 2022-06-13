@@ -17,20 +17,38 @@
 
 #pragma once
 
-#include "../../game/gui/maininterface.h"
+#include "../../game/action.h"
 
 namespace reone {
 
 namespace game {
 
-class MockMainInterface : public IMainInterface {
+class MockAction : public Action {
 public:
-    void setHoveredTarget(Object *target) override {
+    MockAction(ActionType type) : Action(type) {
     }
 
-    void setSelectedTarget(Object *target) override {
+    void execute(float delta) override {
+        if (_completeOnExecute) {
+            complete();
+        }
+        _executeInvocations.push_back(delta);
     }
+
+    const std::vector<float> &executeInvocations() const {
+        return _executeInvocations;
+    }
+
+    void setCompleteOnExecute(bool complete) {
+        _completeOnExecute = complete;
+    }
+
+private:
+    bool _completeOnExecute {true};
+    std::vector<float> _executeInvocations;
 };
+
+std::shared_ptr<MockAction> mockAction(ActionType type);
 
 } // namespace game
 

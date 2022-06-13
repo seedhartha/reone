@@ -15,11 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "../../game/object/creature.h"
+
+#include "../../game/object.h"
 
 namespace reone {
 
 namespace game {
+
+class MockObject : public Object {
+public:
+    MockObject(uint32_t id, ObjectType type) :
+        Object(
+            id,
+            type,
+            *static_cast<IGame *>(nullptr),
+            *static_cast<IObjectFactory *>(nullptr),
+            *static_cast<GameServices *>(nullptr),
+            *static_cast<graphics::GraphicsOptions *>(nullptr),
+            *static_cast<graphics::GraphicsServices *>(nullptr),
+            *static_cast<resource::ResourceServices *>(nullptr)) {
+    }
+};
 
 class MockCreature : public Creature {
 public:
@@ -35,20 +54,19 @@ public:
     }
 
     void handleClick(Object &clicker) override {
-        ++_numHandleClickInvocations;
+        _handleClickInvocations.push_back(&clicker);
     }
 
-    int numHandleClickInvocations() const {
-        return _numHandleClickInvocations;
+    const std::vector<Object *> &handleClickInvocations() const {
+        return _handleClickInvocations;
     }
 
 private:
-    int _numHandleClickInvocations {0};
+    std::vector<Object *> _handleClickInvocations;
 };
 
-std::unique_ptr<MockCreature> mockCreature(uint32_t id) {
-    return std::make_unique<MockCreature>(id);
-}
+std::unique_ptr<MockObject> mockObject(uint32_t id, ObjectType type);
+std::unique_ptr<MockCreature> mockCreature(uint32_t id);
 
 } // namespace game
 

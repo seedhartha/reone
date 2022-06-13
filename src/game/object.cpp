@@ -27,6 +27,17 @@ namespace reone {
 
 namespace game {
 
+void Object::update(float delta) {
+    if (_actions.empty()) {
+        return;
+    }
+    auto action = _actions.front();
+    action->execute(delta);
+    if (action->isCompleted()) {
+        _actions.pop();
+    }
+}
+
 glm::vec3 Object::targetWorldCoords() const {
     if (!_sceneNode) {
         return _position;

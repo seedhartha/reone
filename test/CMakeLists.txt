@@ -17,6 +17,7 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 set(TEST_HEADERS
     checkutil.h
+    fixtures/action.h
     fixtures/game.h
     fixtures/gameobject.h
     fixtures/maininterface.h
@@ -38,8 +39,11 @@ set(TEST_SOURCES
     common/stringbuilder.cpp
     common/textwriter.cpp
     common/unicodeutil.cpp
+    fixtures/action.cpp
+    fixtures/gameobject.cpp
     game/astar.cpp
     game/game.cpp
+    game/object.cpp
     game/selectioncontroller.cpp
     graphics/bwmreader.cpp
     graphics/mdlreader.cpp

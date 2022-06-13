@@ -133,6 +133,8 @@ bool Creature::moveForward(float delta) {
 }
 
 void Creature::update(float delta) {
+    Object::update(delta);
+
     if (_sceneNode) {
         string animName;
         if (_state == State::Pause) {

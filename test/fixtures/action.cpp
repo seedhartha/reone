@@ -15,21 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "action.h"
 
-#include "../../game/gui/maininterface.h"
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-class MockMainInterface : public IMainInterface {
-public:
-    void setHoveredTarget(Object *target) override {
-    }
-
-    void setSelectedTarget(Object *target) override {
-    }
+shared_ptr<MockAction> mockAction(ActionType type) {
+    return make_unique<MockAction>(type);
 };
 
 } // namespace game

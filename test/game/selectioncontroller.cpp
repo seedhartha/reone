@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(should_set_hovered_target_on_mouse_motion) {
     BOOST_CHECK(handled);
     BOOST_CHECK_EQUAL(1ll, game.changeCursorInvocations().size());
     BOOST_CHECK_EQUAL(static_cast<int>(CursorType::Target), static_cast<int>(game.changeCursorInvocations()[0]));
-    BOOST_CHECK_EQUAL(0, creature->numHandleClickInvocations());
+    BOOST_CHECK(creature->handleClickInvocations().empty());
     BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
     BOOST_CHECK_EQUAL(nullptr, sut.selectedObject());
 }
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(should_reset_hovered_target_on_mouse_motion_when_no_object_
     BOOST_CHECK(handled);
     BOOST_CHECK_EQUAL(1ll, game.changeCursorInvocations().size());
     BOOST_CHECK_EQUAL(static_cast<int>(CursorType::Default), static_cast<int>(game.changeCursorInvocations()[0]));
-    BOOST_CHECK_EQUAL(0, creature->numHandleClickInvocations());
+    BOOST_CHECK(creature->handleClickInvocations().empty());
     BOOST_CHECK_EQUAL(nullptr, sut.hoveredObject());
     BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
 }
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(should_set_selected_target_on_mouse_click) {
     // then
     BOOST_CHECK(handled);
     BOOST_CHECK_EQUAL(0ll, game.changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(0, creature->numHandleClickInvocations());
+    BOOST_CHECK(creature->handleClickInvocations().empty());
     BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
     BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
 }
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(should_call_handle_click_in_selected_object_on_second_mouse
     // then
     BOOST_CHECK(handled);
     BOOST_CHECK_EQUAL(0ll, game.changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(1, creature->numHandleClickInvocations());
+    BOOST_CHECK_EQUAL(1ll, creature->handleClickInvocations().size());
     BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
     BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
 }
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(should_reset_selected_target_on_mouse_click_when_no_object_
     // then
     BOOST_CHECK(handled);
     BOOST_CHECK_EQUAL(0ll, game.changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(0, creature->numHandleClickInvocations());
+    BOOST_CHECK(creature->handleClickInvocations().empty());
     BOOST_CHECK_EQUAL(nullptr, sut.hoveredObject());
     BOOST_CHECK_EQUAL(nullptr, sut.selectedObject());
 }
