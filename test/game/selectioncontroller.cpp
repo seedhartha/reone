@@ -20,10 +20,7 @@
 #include "../../game/selectioncontroller.h"
 
 #include "../fixtures/game.h"
-#include "../fixtures/gameobject.h"
-#include "../fixtures/maininterface.h"
-#include "../fixtures/scenegraph.h"
-#include "../fixtures/scenenode.h"
+#include "../fixtures/scene.h"
 
 using namespace reone::game;
 using namespace reone::scene;

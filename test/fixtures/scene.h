@@ -17,11 +17,26 @@
 
 #pragma once
 
+#include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 
 namespace reone {
 
 namespace scene {
+
+class MockSceneGraph : public ISceneGraph {
+public:
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const {
+        return _pickModelAtReturnValue;
+    }
+
+    void whenPickModelAtThenReturn(ModelSceneNode *value) {
+        _pickModelAtReturnValue = value;
+    }
+
+private:
+    ModelSceneNode *_pickModelAtReturnValue;
+};
 
 class MockModelSceneNode : public ModelSceneNode {
 public:
@@ -37,9 +52,7 @@ public:
     }
 };
 
-std::unique_ptr<MockModelSceneNode> mockModelSceneNode(IUser *user = nullptr) {
-    return std::make_unique<MockModelSceneNode>(user);
-}
+std::unique_ptr<MockModelSceneNode> mockModelSceneNode(IUser *user = nullptr);
 
 } // namespace scene
 

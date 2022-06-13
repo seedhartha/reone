@@ -17,7 +17,11 @@
 
 #pragma once
 
+#include "../../game/action.h"
 #include "../../game/game.h"
+#include "../../game/gui/maininterface.h"
+#include "../../game/object.h"
+#include "../../game/object/creature.h"
 
 namespace reone {
 
@@ -53,6 +57,85 @@ private:
     std::set<std::string> _moduleNames;
     std::vector<CursorType> _changeCursorInvocations;
 };
+
+class MockMainInterface : public IMainInterface {
+public:
+    void setHoveredTarget(Object *target) override {
+    }
+
+    void setSelectedTarget(Object *target) override {
+    }
+};
+
+class MockObject : public Object {
+public:
+    MockObject(uint32_t id, ObjectType type) :
+        Object(
+            id,
+            type,
+            *static_cast<IGame *>(nullptr),
+            *static_cast<IObjectFactory *>(nullptr),
+            *static_cast<GameServices *>(nullptr),
+            *static_cast<graphics::GraphicsOptions *>(nullptr),
+            *static_cast<graphics::GraphicsServices *>(nullptr),
+            *static_cast<resource::ResourceServices *>(nullptr)) {
+    }
+};
+
+class MockCreature : public Creature {
+public:
+    MockCreature(uint32_t id) :
+        Creature(
+            id,
+            *static_cast<IGame *>(nullptr),
+            *static_cast<IObjectFactory *>(nullptr),
+            *static_cast<GameServices *>(nullptr),
+            *static_cast<graphics::GraphicsOptions *>(nullptr),
+            *static_cast<graphics::GraphicsServices *>(nullptr),
+            *static_cast<resource::ResourceServices *>(nullptr)) {
+    }
+
+    void handleClick(Object &clicker) override {
+        _handleClickInvocations.push_back(&clicker);
+    }
+
+    const std::vector<Object *> &handleClickInvocations() const {
+        return _handleClickInvocations;
+    }
+
+private:
+    std::vector<Object *> _handleClickInvocations;
+};
+
+class MockAction : public Action {
+public:
+    MockAction(ActionType type) :
+        Action(type) {
+    }
+
+    void execute(float delta) override {
+        if (_completeOnExecute) {
+            complete();
+        }
+        _executeInvocations.push_back(delta);
+    }
+
+    const std::vector<float> &executeInvocations() const {
+        return _executeInvocations;
+    }
+
+    void setCompleteOnExecute(bool complete) {
+        _completeOnExecute = complete;
+    }
+
+private:
+    bool _completeOnExecute {true};
+    std::vector<float> _executeInvocations;
+};
+
+std::unique_ptr<MockObject> mockObject(uint32_t id, ObjectType type);
+std::unique_ptr<MockCreature> mockCreature(uint32_t id);
+std::shared_ptr<MockAction> mockAction(ActionType type);
 
 } // namespace game
 

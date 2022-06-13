@@ -15,23 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "scene.h"
 
-#include "../../game/gui/maininterface.h"
+using namespace std;
 
 namespace reone {
 
-namespace game {
+namespace scene {
 
-class MockMainInterface : public IMainInterface {
-public:
-    void setHoveredTarget(Object *target) override {
-    }
+unique_ptr<MockModelSceneNode> mockModelSceneNode(IUser *user) {
+    return make_unique<MockModelSceneNode>(user);
+}
 
-    void setSelectedTarget(Object *target) override {
-    }
-};
-
-} // namespace game
+} // namespace scene
 
 } // namespace reone

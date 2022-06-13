@@ -19,8 +19,7 @@
 
 #include "../../src/game/object.h"
 
-#include "../fixtures/action.h"
-#include "../fixtures/gameobject.h"
+#include "../fixtures/game.h"
 
 using namespace reone::game;
 

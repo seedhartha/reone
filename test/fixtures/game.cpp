@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gameobject.h"
+#include "game.h"
 
 using namespace std;
 
@@ -30,6 +30,10 @@ unique_ptr<MockObject> mockObject(uint32_t id, ObjectType type) {
 unique_ptr<MockCreature> mockCreature(uint32_t id) {
     return make_unique<MockCreature>(id);
 }
+
+shared_ptr<MockAction> mockAction(ActionType type) {
+    return make_unique<MockAction>(type);
+};
 
 } // namespace game
 
