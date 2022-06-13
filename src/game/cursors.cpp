@@ -36,10 +36,11 @@ namespace game {
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::Default, {1, 2}},
     {CursorType::Talk, {11, 12}},
-    {CursorType::Door, {23, 24}},
+    {CursorType::OpenDoor, {23, 24}},
     {CursorType::Pickup, {25, 26}},
     {CursorType::DisableMine, {33, 34}},
     {CursorType::RecoverMine, {37, 38}},
+    {CursorType::Target, {45, 46}},
     {CursorType::Attack, {51, 52}}};
 
 void Cursors::deinit() {

@@ -34,6 +34,7 @@
 #include "../scene/node/model.h"
 #include "../scene/services.h"
 
+#include "cursors.h"
 #include "debug.h"
 #include "dialog.h"
 #include "object/area.h"
@@ -95,7 +96,7 @@ void Game::init() {
     // Services
 
     _playerController = make_unique<PlayerController>();
-    _selectionController = make_unique<SelectionController>(*_mainInterface, scene);
+    _selectionController = make_unique<SelectionController>(*this, *_mainInterface, scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
     // Surfaces
@@ -118,6 +119,8 @@ void Game::init() {
     //
 
     _services.graphics.window.setEventHandler(this);
+
+    changeCursor(CursorType::Default);
 }
 
 void Game::loadModuleNames() {
@@ -231,6 +234,17 @@ void Game::update() {
             _console->update(delta);
         }
     }
+
+    // Update cursor
+
+    if (_stage != Stage::MovieLegal && _cursor) {
+        int x, y;
+        uint32_t state = SDL_GetMouseState(&x, &y);
+        bool pressed = state & SDL_BUTTON(1);
+
+        _cursor->setPosition(glm::ivec2(x, y));
+        _cursor->setPressed(pressed);
+    }
 }
 
 void Game::render() {
@@ -257,6 +271,11 @@ void Game::render() {
         } else if (_stage == Stage::Console) {
             _console->render();
         }
+    }
+
+    // Render cursor
+    if (_stage != Stage::MovieLegal && _cursor) {
+        _cursor->draw();
     }
 
     _services.graphics.window.swapBuffers();
@@ -359,6 +378,21 @@ void Game::startConversation(const std::string &name) {
     dialog.load(name);
 
     _stage = Stage::Conversation;
+}
+
+void Game::changeCursor(CursorType type) {
+    if (_cursorType == type) {
+        return;
+    }
+    auto cursor = _services.game.cursors.get(type);
+    if (cursor) {
+        _cursor = cursor.get();
+        SDL_ShowCursor(SDL_DISABLE);
+    } else {
+        _cursor = nullptr;
+        SDL_ShowCursor(SDL_ENABLE);
+    }
+    _cursorType = type;
 }
 
 // END IGame

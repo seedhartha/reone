@@ -59,8 +59,9 @@ enum class BackgroundType {
 enum class CursorType {
     None,
     Default,
+    Target,
     Attack,
-    Door,
+    OpenDoor,
     Talk,
     Pickup,
     DisableMine,

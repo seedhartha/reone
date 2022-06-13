@@ -15,25 +15,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "types.h"
+#include "../../game/game.h"
 
 namespace reone {
 
 namespace game {
 
-class IGame {
+class MockGame : public IGame {
 public:
-    virtual void startNewGame() = 0;
-    virtual void warpToModule(const std::string &name) = 0;
-    virtual void quit() = 0;
+    void startNewGame() override {
+    }
 
-    virtual void startConversation(const std::string &name) = 0;
+    void warpToModule(const std::string &name) override {
+    }
 
-    virtual void changeCursor(CursorType type) = 0;
+    void quit() override {
+    }
 
-    virtual const std::set<std::string> &moduleNames() const = 0;
+    void changeCursor(CursorType type) override {
+        _changeCursorInvocations.push_back(type);
+    }
+
+    void startConversation(const std::string &name) override {
+    }
+
+    const std::set<std::string> &moduleNames() const override {
+        return _moduleNames;
+    }
+
+    const std::vector<CursorType> &changeCursorInvocations() const {
+        return _changeCursorInvocations;
+    }
+
+private:
+    std::set<std::string> _moduleNames;
+    std::vector<CursorType> _changeCursorInvocations;
 };
 
 } // namespace game

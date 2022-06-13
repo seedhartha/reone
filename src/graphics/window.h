@@ -40,7 +40,6 @@ public:
 
     void processEvents(bool &quit);
 
-    void drawCursor() const;
     void swapBuffers() const;
 
     bool isInFocus() const { return _focus; }
@@ -49,7 +48,6 @@ public:
 
     void setEventHandler(IEventHandler *eventHandler) { _eventHandler = eventHandler; }
     void setRelativeMouseMode(bool enabled);
-    void setCursor(const std::shared_ptr<Cursor> &cursor);
 
 private:
     GraphicsOptions &_options;
@@ -59,7 +57,6 @@ private:
     SDL_Window *_window {nullptr};
     SDL_GLContext _context {nullptr};
     bool _relativeMouseMode {false};
-    std::shared_ptr<Cursor> _cursor;
     bool _focus {true};
 
     bool handleEvent(const SDL_Event &event, bool &quit);

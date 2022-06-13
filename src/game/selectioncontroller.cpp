@@ -20,9 +20,10 @@
 #include "../common/logutil.h"
 #include "../scene/graph.h"
 
+#include "gameinterface.h"
+#include "gui/maininterface.h"
 #include "object.h"
 #include "object/creature.h"
-#include "gui/maininterface.h"
 
 using namespace std;
 
@@ -40,6 +41,11 @@ bool SelectionController::handle(const SDL_Event &e) {
             _hoveredObject = nullptr;
         }
         _mainInterface.setHoveredTarget(_hoveredObject);
+        if (_hoveredObject) {
+            _game.changeCursor(CursorType::Target);
+        } else {
+            _game.changeCursor(CursorType::Default);
+        }
         return true;
     }
     if (e.type == SDL_MOUSEBUTTONDOWN) {

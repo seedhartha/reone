@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../graphics/cursor.h"
 #include "../graphics/eventhandler.h"
 #include "../movie/movie.h"
 
@@ -108,6 +109,8 @@ public:
     void quit() override;
 
     void startConversation(const std::string &name) override;
+
+    void changeCursor(CursorType type) override;
 
     const std::set<std::string> &moduleNames() const override {
         return _moduleNames;
@@ -245,6 +248,13 @@ private:
     std::map<std::string, std::shared_ptr<Location>> _globalLocations;
 
     // END Global variables
+
+    // Cursor
+    
+    graphics::Cursor *_cursor {nullptr};
+    CursorType _cursorType {CursorType::None};
+
+    // END Cursor
 
     void handleInput();
     void update();

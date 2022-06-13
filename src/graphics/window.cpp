@@ -19,7 +19,6 @@
 
 #include "SDL2/SDL.h"
 
-#include "cursor.h"
 #include "eventhandler.h"
 
 using namespace std;
@@ -123,19 +122,6 @@ bool Window::handleWindowEvent(const SDL_WindowEvent &event) {
     }
 }
 
-void Window::drawCursor() const {
-    if (_relativeMouseMode || !_cursor) {
-        return;
-    }
-    int x, y;
-    uint32_t state = SDL_GetMouseState(&x, &y);
-    bool pressed = state & SDL_BUTTON(1);
-
-    _cursor->setPosition({x, y});
-    _cursor->setPressed(pressed);
-    _cursor->draw();
-}
-
 void Window::swapBuffers() const {
     SDL_GL_SwapWindow(_window);
 }
@@ -145,13 +131,11 @@ glm::mat4 Window::getOrthoProjection(float near, float far) const {
 }
 
 void Window::setRelativeMouseMode(bool enabled) {
+    if (_relativeMouseMode == enabled) {
+        return;
+    }
     SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
     _relativeMouseMode = enabled;
-}
-
-void Window::setCursor(const shared_ptr<Cursor> &cursor) {
-    _cursor = cursor;
-    SDL_ShowCursor(!static_cast<bool>(cursor));
 }
 
 } // namespace graphics

@@ -27,6 +27,7 @@ class ISceneGraph;
 
 namespace game {
 
+class IGame;
 class IMainInterface;
 
 class Creature;
@@ -35,8 +36,10 @@ class Object;
 class SelectionController : boost::noncopyable {
 public:
     SelectionController(
+        IGame &game,
         IMainInterface &mainInterface,
         scene::ISceneGraph &sceneGraph) :
+        _game(game),
         _mainInterface(mainInterface),
         _sceneGraph(sceneGraph) {
     }
@@ -64,6 +67,7 @@ public:
     }
 
 private:
+    IGame &_game;
     IMainInterface &_mainInterface;
     scene::ISceneGraph &_sceneGraph;
 
