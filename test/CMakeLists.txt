@@ -37,6 +37,7 @@ set(TEST_SOURCES
     common/unicodeutil.cpp
     fixtures/game.cpp
     fixtures/scene.cpp
+    game/action/movetoobject.cpp
     game/astar.cpp
     game/game.cpp
     game/object.cpp

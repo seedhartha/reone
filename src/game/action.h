@@ -23,9 +23,11 @@ namespace reone {
 
 namespace game {
 
+class Object;
+
 class Action : boost::noncopyable {
 public:
-    virtual void execute(float delta) {
+    virtual void execute(Object &executor, float delta) {
         _completed = true;
     }
 

@@ -17,11 +17,16 @@
 
 #include "console.h"
 
+#include "../../common/exception/validation.h"
+#include "../../common/exception/validation.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/options.h"
 #include "../../graphics/services.h"
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
+
+#include "../action/movetoobject.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -98,11 +103,52 @@ bool Console::handle(const SDL_Event &e) {
 }
 
 void Console::onEnterCommand(const string &command) {
-    if (command == "clear") {
+    vector<string> tokens;
+    boost::split(tokens, command, boost::is_space(), boost::token_compress_on);
+
+    if (tokens[0] == "clear") {
         _lbLines->clearItems();
     } else {
-        _lbLines->appendItem(ListBox::Item {command}, true);
+        auto arguments = vector<string>(tokens.begin() + 1, tokens.end());
+        try {
+            if (tokens[0] == "actionmovetoobject") {
+                executeActionMoveToObject(move(arguments));
+            }
+        } catch (const ValidationException &ex) {
+            _lbLines->appendItem(ListBox::Item {tokens[0] + ": " + string(ex.what())}, true);
+        }
     }
+}
+
+void Console::executeActionMoveToObject(vector<string> arguments) {
+    if (arguments.size() < 2ll) {
+        throw ValidationException("Command requires at least 2 arguments");
+    }
+    auto subjectTag = arguments[0];
+    auto subject = _game.getObjectByTag(subjectTag);
+    if (!subject) {
+        throw ValidationException("Invalid subject: " + subjectTag);
+    }
+
+    auto moveToTag = arguments[1];
+    auto moveTo = _game.getObjectByTag(moveToTag);
+    if (!moveTo) {
+        throw ValidationException("Invalid moveTo: " + moveToTag);
+    }
+
+    bool run = false;
+    if (arguments.size() >= 3) {
+        run = stoi(arguments[2]) != 0;
+    }
+
+    float range = 1.0f;
+    if (arguments.size() >= 4) {
+        range = stof(arguments[3]);
+    }
+
+    auto action = make_shared<MoveToObjectAction>(*moveTo, run, range);
+    subject->clearAllActions();
+    subject->enqueue(move(action));
 }
 
 } // namespace game

@@ -112,6 +112,8 @@ public:
 
     void changeCursor(CursorType type) override;
 
+    Object *getObjectByTag(const std::string &tag, int nth = 0) override;
+
     const std::set<std::string> &moduleNames() const override {
         return _moduleNames;
     }

@@ -31,9 +31,12 @@ class ListBox;
 
 namespace game {
 
+class IGame;
+
 class Console : public gui::Gui {
 public:
     Console(
+        IGame &game,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
@@ -41,6 +44,7 @@ public:
             graphicsOpt,
             graphicsSvc,
             resourceSvc),
+        _game(game),
         _textInput(gui::TextInputFlags::console) {
     }
 
@@ -53,6 +57,7 @@ public:
     // END Gui
 
 private:
+    IGame &_game;
     gui::TextInput _textInput;
 
     // Binding
@@ -63,6 +68,8 @@ private:
     // END Binding
 
     void onEnterCommand(const std::string &command);
+
+    void executeActionMoveToObject(std::vector<std::string> arguments);
 };
 
 } // namespace game

@@ -38,11 +38,15 @@ public:
     void quit() override {
     }
 
+    void startConversation(const std::string &name) override {
+    }
+
     void changeCursor(CursorType type) override {
         _changeCursorInvocations.push_back(type);
     }
 
-    void startConversation(const std::string &name) override {
+    Object *getObjectByTag(const std::string &tag, int nth = 0) override {
+        return nullptr;
     }
 
     const std::set<std::string> &moduleNames() const override {
@@ -113,14 +117,14 @@ public:
         Action(type) {
     }
 
-    void execute(float delta) override {
+    void execute(Object &executor, float delta) override {
         if (_completeOnExecute) {
             complete();
         }
-        _executeInvocations.push_back(delta);
+        _executeInvocations.push_back(std::make_pair(&executor, delta));
     }
 
-    const std::vector<float> &executeInvocations() const {
+    const std::vector<std::pair<Object *, float>> &executeInvocations() const {
         return _executeInvocations;
     }
 
@@ -130,7 +134,7 @@ public:
 
 private:
     bool _completeOnExecute {true};
-    std::vector<float> _executeInvocations;
+    std::vector<std::pair<Object *, float>> _executeInvocations;
 };
 
 std::unique_ptr<MockObject> mockObject(uint32_t id, ObjectType type);

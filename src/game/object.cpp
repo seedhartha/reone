@@ -32,10 +32,15 @@ void Object::update(float delta) {
         return;
     }
     auto action = _actions.front();
-    action->execute(delta);
+    action->execute(*this, delta);
     if (action->isCompleted()) {
         _actions.pop();
     }
+}
+
+void Object::face(Object &other) {
+    auto dir = glm::normalize(glm::vec2(other._position - _position));
+    setFacing(-glm::atan(dir.x, dir.y));
 }
 
 glm::vec3 Object::targetWorldCoords() const {

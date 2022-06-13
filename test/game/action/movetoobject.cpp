@@ -15,33 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <boost/test/unit_test.hpp>
 
-#include "../action.h"
+#include "../../../src/game/action/movetoobject.h"
 
-namespace reone {
+#include "../../fixtures/game.h"
+#include "../../checkutil.h"
 
-namespace game {
+using namespace std;
 
-class Object;
+using namespace reone::game;
 
-class MoveToObjectAction : public Action {
-public:
-    MoveToObjectAction(Object &moveTo, bool run = false, float range = 1.0f) :
-        Action(ActionType::MoveToObject),
-        _moveTo(moveTo),
-        _run(run),
-        _range(range) {
-    }
+BOOST_AUTO_TEST_SUITE(move_to_object_action)
 
-    void execute(Object &executor, float delta) override;
+BOOST_AUTO_TEST_CASE(should_execute) {
+    // given
+    auto creature1 = mockCreature(2);
+    auto creature2 = mockCreature(2);
+    auto action = MoveToObjectAction(*creature2, true, 1.0f);
 
-private:
-    Object &_moveTo;
-    bool _run {false};
-    float _range {1.0f};
-};
+    // when
+    action.execute(*creature1, 1.0f);
 
-} // namespace game
+    // then
+}
 
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()

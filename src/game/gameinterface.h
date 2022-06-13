@@ -23,6 +23,8 @@ namespace reone {
 
 namespace game {
 
+class Object;
+
 class IGame {
 public:
     virtual void startNewGame() = 0;
@@ -32,6 +34,8 @@ public:
     virtual void startConversation(const std::string &name) = 0;
 
     virtual void changeCursor(CursorType type) = 0;
+
+    virtual Object *getObjectByTag(const std::string &tag, int nth = 0) = 0;
 
     virtual const std::set<std::string> &moduleNames() const = 0;
 };

@@ -15,32 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "movetoobject.h"
 
-#include "../action.h"
+#include "../../common/exception/validation.h"
+
+#include "../object.h"
+#include "../object/creature.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-class Object;
+void MoveToObjectAction::execute(Object &executor, float delta) {
+    if (executor.type() != ObjectType::Creature) {
+        throw ValidationException("Executor must be of creature type");
+    }
+    auto &executorCreature = static_cast<Creature &>(executor);
 
-class MoveToObjectAction : public Action {
-public:
-    MoveToObjectAction(Object &moveTo, bool run = false, float range = 1.0f) :
-        Action(ActionType::MoveToObject),
-        _moveTo(moveTo),
-        _run(run),
-        _range(range) {
+    auto dist = executorCreature.square2dDistanceTo(_moveTo);
+    if (dist < _range * _range) {
+        executorCreature.setState(Creature::State::Pause);
+        complete();
+        return;
     }
 
-    void execute(Object &executor, float delta) override;
-
-private:
-    Object &_moveTo;
-    bool _run {false};
-    float _range {1.0f};
-};
+    executorCreature.face(_moveTo);
+    executorCreature.setState(_run ? Creature::State::Run : Creature::State::Walk);
+    executorCreature.moveForward(delta);
+}
 
 } // namespace game
 

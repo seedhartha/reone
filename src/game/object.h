@@ -60,6 +60,8 @@ public:
 
     virtual void update(float delta);
 
+    void face(Object &other);
+
     virtual void handleClick(Object &clicker) {
     }
 
@@ -93,6 +95,10 @@ public:
 
     scene::SceneNode *sceneNode() {
         return _sceneNode;
+    }
+
+    float square2dDistanceTo(Object &other) const {
+        return glm::distance2(glm::vec2(_position), glm::vec2(other._position));
     }
 
     virtual glm::vec3 targetWorldCoords() const;

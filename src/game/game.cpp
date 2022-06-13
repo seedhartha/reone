@@ -90,7 +90,7 @@ void Game::init() {
     _dialogGui = make_unique<DialogGui>(_options.graphics, _services.graphics, _services.resource);
     _dialogGui->init();
 
-    _console = make_unique<Console>(_options.graphics, _services.graphics, _services.resource);
+    _console = make_unique<Console>(*this, _options.graphics, _services.graphics, _services.resource);
     _console->init();
 
     // Services
@@ -121,6 +121,19 @@ void Game::init() {
     _services.graphics.window.setEventHandler(this);
 
     changeCursor(CursorType::Default);
+}
+
+Object *Game::getObjectByTag(const string &tag, int nth) {
+    int match = 0;
+    for (auto &object : _objects) {
+        if (object.second->tag() != tag) {
+            continue;
+        }
+        if (match++ == nth) {
+            return object.second.get();
+        }
+    }
+    return nullptr;
 }
 
 void Game::loadModuleNames() {
