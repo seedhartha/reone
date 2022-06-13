@@ -24,6 +24,7 @@
 #include "../../resource/gff.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
+#include "../../scene/fogproperties.h"
 #include "../../scene/graph.h"
 
 #include "../camerastyles.h"
@@ -75,15 +76,22 @@ void Area::load(const string &name) {
         grassTexture = _graphicsSvc.textures.get(grassTexName, TextureUsage::Diffuse);
     }
 
-    auto grassProperties = GrassProperties();
-    grassProperties.density = are->getFloat("Grass_Density");
-    grassProperties.quadSize = are->getFloat("Grass_QuadSize");
-    grassProperties.probabilities[0] = are->getFloat("Grass_Prob_UL");
-    grassProperties.probabilities[1] = are->getFloat("Grass_Prob_UR");
-    grassProperties.probabilities[2] = are->getFloat("Grass_Prob_LL");
-    grassProperties.probabilities[3] = are->getFloat("Grass_Prob_LR");
-    grassProperties.materials = _gameSvc.surfaces.getGrassSurfaces();
-    grassProperties.texture = grassTexture.get();
+    auto grass = GrassProperties();
+    grass.density = are->getFloat("Grass_Density");
+    grass.quadSize = are->getFloat("Grass_QuadSize");
+    grass.probabilities[0] = are->getFloat("Grass_Prob_UL");
+    grass.probabilities[1] = are->getFloat("Grass_Prob_UR");
+    grass.probabilities[2] = are->getFloat("Grass_Prob_LL");
+    grass.probabilities[3] = are->getFloat("Grass_Prob_LR");
+    grass.materials = _gameSvc.surfaces.getGrassSurfaces();
+    grass.texture = grassTexture.get();
+
+    // Fog
+
+    _fog.enabled = are->getBool("SunFogOn");
+    _fog.nearPlane = are->getFloat("SunFogNear");
+    _fog.farPlane = are->getFloat("SunFogFar");
+    _fog.color = are->getColor("SunFogColor");
 
     // Rooms
 
@@ -96,7 +104,7 @@ void Area::load(const string &name) {
         }
         auto &room = static_cast<Room &>(*_objectFactory.newRoom());
         room.setSceneGraph(_sceneGraph);
-        room.loadFromLyt(*lytRoom, grassProperties);
+        room.loadFromLyt(*lytRoom, grass);
         _rooms.push_back(&room);
     }
 

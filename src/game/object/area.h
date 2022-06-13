@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../common/logutil.h"
+#include "../../scene/fogproperties.h"
 
 #include "../object.h"
 
@@ -73,10 +74,16 @@ public:
         return *_mainCamera;
     }
 
+    const scene::FogProperties &fog() const {
+        return _fog;
+    }
+
 private:
     std::vector<Room *> _rooms;
     std::vector<Object *> _objects;
     Camera *_mainCamera {nullptr};
+
+    scene::FogProperties _fog;
 };
 
 } // namespace game

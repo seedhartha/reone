@@ -19,6 +19,7 @@
 
 #include "../graphics/scene.h"
 
+#include "fogproperties.h"
 #include "node/camera.h"
 #include "node/dummy.h"
 #include "node/emitter.h"
@@ -128,16 +129,25 @@ public:
 
     // Fog
 
-    bool isFogEnabled() const override { return _fogEnabled; }
+    bool isFogEnabled() const {
+        return _fog.enabled;
+    }
 
-    float fogNear() const override { return _fogNear; }
-    float fogFar() const override { return _fogFar; }
-    const glm::vec3 &fogColor() const override { return _fogColor; }
+    float fogNear() const {
+        return _fog.nearPlane;
+    }
 
-    void setFogEnabled(bool enabled) { _fogEnabled = enabled; }
-    void setFogNear(float near) { _fogNear = near; }
-    void setFogFar(float far) { _fogFar = far; }
-    void setFogColor(glm::vec3 color) { _fogColor = std::move(color); }
+    float fogFar() const {
+        return _fog.farPlane;
+    }
+
+    const glm::vec3 &fogColor() const {
+        return _fog.color;
+    }
+
+    void setFog(FogProperties fog) {
+        _fog = std::move(fog);
+    }
 
     // END Fog
 
@@ -245,10 +255,7 @@ private:
 
     // Fog
 
-    bool _fogEnabled {false};
-    float _fogNear {0.0f};
-    float _fogFar {0.0f};
-    glm::vec3 _fogColor {0.0f};
+    FogProperties _fog;
 
     // END Fog
 

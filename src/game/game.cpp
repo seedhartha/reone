@@ -305,6 +305,8 @@ void Game::loadModule(const string &name) {
     module.load(name);
     _module = &module;
 
+    scene.setFog(module.area().fog());
+
     // Main camera
 
     auto &camera = module.area().mainCamera();

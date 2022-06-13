@@ -17,6 +17,7 @@ set(SCENE_HEADERS
     animeventlistener.h
     animproperties.h
     collision.h
+    fogproperties.h
     graph.h
     graphs.h
     grassproperties.h
