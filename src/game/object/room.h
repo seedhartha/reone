@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../scene/node/grass.h"
 #include "../../scene/node/walkmesh.h"
 
 #include "../layout.h"
@@ -47,14 +48,23 @@ public:
             resourceSvc) {
     }
 
-    void loadFromLyt(const Layout::Room &lyt);
+    void loadFromLyt(const Layout::Room &lyt, scene::GrassProperties grassProperties = scene::GrassProperties());
 
     scene::WalkmeshSceneNode *walkmesh() {
         return _walkmesh;
     }
 
+    scene::GrassSceneNode *grass() {
+        return _grass;
+    }
+
 private:
+    scene::GrassProperties _grassProperties;
+
     scene::WalkmeshSceneNode *_walkmesh {nullptr};
+    scene::GrassSceneNode *_grass {nullptr};
+
+    void flushTransform() override;
 };
 
 } // namespace game

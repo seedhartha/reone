@@ -33,12 +33,19 @@ namespace reone {
 
 namespace game {
 
-void Room::loadFromLyt(const Layout::Room &lyt) {
+void Room::loadFromLyt(const Layout::Room &lyt, GrassProperties grassProperties) {
     // Model
     auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
         _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room).get();
         _sceneNode->setUser(*this);
+
+        // Grass
+        auto aabbNode = model->getAABBNode();
+        if (aabbNode && grassProperties.texture) {
+            auto grass = _sceneGraph->newGrass(grassProperties, *aabbNode);
+            _grass = grass.get();
+        }
     }
 
     // Walkmesh
@@ -50,6 +57,22 @@ void Room::loadFromLyt(const Layout::Room &lyt) {
 
     _position = lyt.position;
     flushTransform();
+}
+
+void Room::flushTransform() {
+    if (!_sceneNode) {
+        return;
+    }
+    auto transform = glm::translate(_position);
+    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    _sceneNode->setLocalTransform(transform);
+
+    if (_grass) {
+        auto model = static_cast<ModelSceneNode *>(_sceneNode);
+        _grass->setLocalTransform(transform * model->model().getAABBNode()->absoluteTransform());
+    }
 }
 
 } // namespace game

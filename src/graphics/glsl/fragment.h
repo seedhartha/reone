@@ -636,7 +636,7 @@ void main() {
     float lightmapped = step(0.0001, lightmapSample.a);
 
     float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
-    float fog = mix(0.0, getFog(worldPos), featuresSample.g);
+    float fog = mix(0.0, getFog(worldPos), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
 
     float shadowLM = smoothstep(0.0, 1.0, 1.0 - rgbToLuma(lightmapSample.rgb));
     shadowLM = max(shadow, mix(0.0, shadowLM, lightmapped));

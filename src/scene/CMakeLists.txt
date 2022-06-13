@@ -19,6 +19,7 @@ set(SCENE_HEADERS
     collision.h
     graph.h
     graphs.h
+    grassproperties.h
     node.h
     node/camera.h
     node/dummy.h

@@ -304,6 +304,10 @@ void Game::loadModule(const string &name) {
         if (model) {
             scene.addRoot(*model);
         }
+        auto grass = room->grass();
+        if (grass) {
+            scene.addRoot(*grass);
+        }
         auto walkmesh = room->walkmesh();
         if (walkmesh) {
             scene.addRoot(*walkmesh);

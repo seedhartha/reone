@@ -181,14 +181,7 @@ public:
     std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode);
     std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter);
 
-    std::shared_ptr<GrassSceneNode> newGrass(
-        float density,
-        float quadSize,
-        glm::vec4 probabilities,
-        std::set<uint32_t> materials,
-        graphics::Texture &texture,
-        graphics::ModelNode &aabbNode);
-
+    std::shared_ptr<GrassSceneNode> newGrass(GrassProperties properties, graphics::ModelNode &aabbNode);
     std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass);
 
     // END Factory methods

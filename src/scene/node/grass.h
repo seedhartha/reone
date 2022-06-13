@@ -20,6 +20,7 @@
 #include "../../graphics/modelnode.h"
 #include "../../graphics/types.h"
 
+#include "../grassproperties.h"
 #include "../node.h"
 
 #include "grasscluster.h"
@@ -37,11 +38,7 @@ namespace scene {
 class GrassSceneNode : public SceneNode {
 public:
     GrassSceneNode(
-        float density,
-        float quadSize,
-        glm::vec4 probabilities,
-        std::set<uint32_t> materials,
-        graphics::Texture &texture,
+        GrassProperties properties,
         graphics::ModelNode &aabbNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
@@ -51,11 +48,7 @@ public:
             sceneGraph,
             graphicsSvc,
             audioSvc),
-        _density(density),
-        _quadSize(quadSize),
-        _probabilities(std::move(probabilities)),
-        _materials(std::move(materials)),
-        _texture(texture),
+        _properties(std::move(properties)),
         _aabbNode(aabbNode) {
 
         init();
@@ -71,11 +64,7 @@ public:
     int getRandomGrassVariant() const;
 
 private:
-    float _density;
-    float _quadSize;
-    glm::vec4 _probabilities;
-    std::set<uint32_t> _materials;
-    graphics::Texture &_texture;
+    GrassProperties _properties;
     graphics::ModelNode &_aabbNode;
 
     std::vector<int> _grassFaces;

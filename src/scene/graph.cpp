@@ -723,21 +723,10 @@ shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter)
     return newSceneNode<ParticleSceneNode, EmitterSceneNode &>(emitter);
 }
 
-shared_ptr<GrassSceneNode> SceneGraph::newGrass(
-    float density,
-    float quadSize,
-    glm::vec4 probabilities,
-    set<uint32_t> materials,
-    Texture &texture,
-    ModelNode &aabbNode) {
-
-    return newSceneNode<GrassSceneNode, float, float, glm::vec4, set<uint32_t>, Texture &, ModelNode &>(
-        density,
-        quadSize,
-        move(probabilities),
-        move(materials),
-        texture,
-        aabbNode);
+shared_ptr<GrassSceneNode> SceneGraph::newGrass(GrassProperties properties, ModelNode &aabbNode) {
+    auto grass = newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
+    grass->init();
+    return move(grass);
 }
 
 shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {

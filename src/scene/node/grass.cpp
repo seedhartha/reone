@@ -51,7 +51,7 @@ void GrassSceneNode::init() {
     auto faces = _aabbNode.mesh()->mesh->faces();
     for (size_t faceIdx = 0; faceIdx < faces.size(); ++faceIdx) {
         auto &face = faces[faceIdx];
-        if (_materials.count(face.material) == 0) {
+        if (_properties.materials.count(face.material) == 0) {
             continue;
         }
         _grassFaces.push_back(static_cast<int>(faceIdx));
@@ -105,7 +105,7 @@ void GrassSceneNode::update(float dt) {
     multimap<float, int> closestFaces;
     for (size_t faceIdx = 0; faceIdx < faces.size(); ++faceIdx) {
         auto &face = faces[faceIdx];
-        if (_materials.count(face.material) == 0) {
+        if (_properties.materials.count(face.material) == 0) {
             continue;
         }
         float distance2 = glm::distance2(face.centroid, meshSpaceCameraPos);
@@ -145,7 +145,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.textures.bind(_texture);
+    _graphicsSvc.textures.bind(*_properties.texture);
     _graphicsSvc.uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
@@ -157,7 +157,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     _graphicsSvc.uniforms.setGrass([this, &leafs](auto &grass) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
-            grass.quadSize = glm::vec2(_quadSize);
+            grass.quadSize = glm::vec2(_properties.quadSize);
             grass.radius = kMaxClusterDistance;
             grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
             grass.clusters[i].lightmapUV = cluster->lightmapUV();
@@ -168,15 +168,15 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {
-    return static_cast<int>(glm::round(kGrassDensityFactor * _density * area));
+    return static_cast<int>(glm::round(kGrassDensityFactor * _properties.density * area));
 }
 
 int GrassSceneNode::getRandomGrassVariant() const {
-    float sum = _probabilities[0] + _probabilities[1] + _probabilities[2] + _probabilities[3];
+    float sum = _properties.probabilities[0] + _properties.probabilities[1] + _properties.probabilities[2] + _properties.probabilities[3];
     float val = random(0.0f, 1.0f) * sum;
     float upper = 0.0f;
     for (int i = 0; i < 3; ++i) {
-        upper += _probabilities[i];
+        upper += _properties.probabilities[i];
         if (val < upper) {
             return i;
         }

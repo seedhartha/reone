@@ -19,6 +19,8 @@
 
 #include "../../common/exception/validation.h"
 #include "../../graphics/options.h"
+#include "../../graphics/services.h"
+#include "../../graphics/textures.h"
 #include "../../resource/gff.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
@@ -27,6 +29,7 @@
 #include "../camerastyles.h"
 #include "../layouts.h"
 #include "../services.h"
+#include "../surfaces.h"
 
 #include "creature.h"
 #include "door.h"
@@ -36,8 +39,9 @@
 
 using namespace std;
 
-using namespace reone::scene;
+using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -63,6 +67,24 @@ void Area::load(const string &name) {
         throw ValidationException("LYT not found: " + name);
     }
 
+    // Grass
+
+    auto grassTexture = shared_ptr<Texture>();
+    auto grassTexName = are->getString("Grass_TexName");
+    if (!grassTexName.empty()) {
+        grassTexture = _graphicsSvc.textures.get(grassTexName, TextureUsage::Diffuse);
+    }
+
+    auto grassProperties = GrassProperties();
+    grassProperties.density = are->getFloat("Grass_Density");
+    grassProperties.quadSize = are->getFloat("Grass_QuadSize");
+    grassProperties.probabilities[0] = are->getFloat("Grass_Prob_UL");
+    grassProperties.probabilities[1] = are->getFloat("Grass_Prob_UR");
+    grassProperties.probabilities[2] = are->getFloat("Grass_Prob_LL");
+    grassProperties.probabilities[3] = are->getFloat("Grass_Prob_LR");
+    grassProperties.materials = _gameSvc.surfaces.getGrassSurfaces();
+    grassProperties.texture = grassTexture.get();
+
     // Rooms
 
     auto areRooms = are->getList("Rooms");
@@ -74,7 +96,7 @@ void Area::load(const string &name) {
         }
         auto &room = static_cast<Room &>(*_objectFactory.newRoom());
         room.setSceneGraph(_sceneGraph);
-        room.loadFromLyt(*lytRoom);
+        room.loadFromLyt(*lytRoom, grassProperties);
         _rooms.push_back(&room);
     }
 
