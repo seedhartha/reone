@@ -158,6 +158,15 @@ void Game::run() {
 }
 
 bool Game::handle(const SDL_Event &e) {
+    if (e.type == SDL_KEYDOWN) {
+        if (e.key.keysym.scancode == SDL_SCANCODE_MINUS) {
+            _deltaMultiplier = glm::max(1.0f, _deltaMultiplier - 1.0f);
+            return true;
+        } else if (e.key.keysym.scancode == SDL_SCANCODE_EQUALS) {
+            _deltaMultiplier = glm::min(8.0f, _deltaMultiplier + 1.0f);
+            return true;
+        }
+    }
     if (_stage == Stage::MovieLegal) {
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             _stage = Stage::MainMenu;
@@ -208,7 +217,7 @@ void Game::update() {
         then = _prevFrameTicks = SDL_GetTicks();
     }
     auto now = SDL_GetTicks();
-    float delta = (now - then) / 1000.0f;
+    float delta = _deltaMultiplier * (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
     if (_stage == Stage::MovieLegal) {

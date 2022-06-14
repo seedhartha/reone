@@ -205,6 +205,7 @@ private:
 
     bool _finished {false};
     uint32_t _prevFrameTicks {0};
+    float _deltaMultiplier {1.0f};
     uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
 
     Stage _stage {Stage::MovieLegal};
