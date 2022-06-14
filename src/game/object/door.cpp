@@ -74,6 +74,7 @@ void Door::loadFromGit(const Gff &git) {
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph->newModel(*model, ModelUsage::Door);
+        sceneNode->init();
         sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);

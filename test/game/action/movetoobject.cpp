@@ -19,19 +19,24 @@
 
 #include "../../../src/game/action/movetoobject.h"
 
-#include "../../fixtures/game.h"
 #include "../../checkutil.h"
+#include "../../fixtures/functional.h"
+#include "../../fixtures/game.h"
 
 using namespace std;
 
+using namespace reone;
 using namespace reone::game;
 
 BOOST_AUTO_TEST_SUITE(move_to_object_action)
 
 BOOST_AUTO_TEST_CASE(should_execute) {
     // given
-    auto creature1 = mockCreature(2);
-    auto creature2 = mockCreature(2);
+    auto test = FunctionalTest();
+    auto game = test.mockGame();
+
+    auto creature1 = game->mockCreature();
+    auto creature2 = game->mockCreature();
     auto action = MoveToObjectAction(*creature2, true, 1.0f);
 
     // when

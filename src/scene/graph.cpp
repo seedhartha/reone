@@ -690,9 +690,7 @@ shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
 }
 
 shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
-    auto sceneNode = newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
-    sceneNode->init();
-    return move(sceneNode);
+    return newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
 }
 
 shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
@@ -724,9 +722,7 @@ shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter)
 }
 
 shared_ptr<GrassSceneNode> SceneGraph::newGrass(GrassProperties properties, ModelNode &aabbNode) {
-    auto grass = newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
-    grass->init();
-    return move(grass);
+    return newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
 }
 
 shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {

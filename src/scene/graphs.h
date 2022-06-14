@@ -36,7 +36,7 @@ struct AudioServices;
 
 namespace scene {
 
-class SceneGraphs {
+class SceneGraphs : boost::noncopyable {
 public:
     SceneGraphs(
         graphics::GraphicsOptions &graphicsOpt,
@@ -47,13 +47,13 @@ public:
         _audioSvc(audioSvc) {
     }
 
-    void add(std::string name);
+    virtual void reserve(std::string name);
 
     SceneGraph &get(const std::string &name);
 
     const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const { return _scenes; }
 
-private:
+protected:
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;

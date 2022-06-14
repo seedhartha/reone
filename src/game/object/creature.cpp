@@ -94,6 +94,7 @@ void Creature::loadFromUtc(const string &templateResRef) {
     auto model = _graphicsSvc.models.get(race);
     if (model) {
         sceneNode = _sceneGraph->newModel(*model, ModelUsage::Creature);
+        sceneNode->init();
         if (modelType == "B") {
             auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
             auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
@@ -105,6 +106,7 @@ void Creature::loadFromUtc(const string &templateResRef) {
             auto headModel = _graphicsSvc.models.get(head);
             if (headModel) {
                 auto headSceneNode = _sceneGraph->newModel(*headModel, ModelUsage::Creature);
+                headSceneNode->init();
                 sceneNode->attach(kHeadHookNodeName, *headSceneNode);
             }
         }

@@ -24,9 +24,21 @@ namespace reone {
 
 namespace scene {
 
-class MockSceneGraph : public ISceneGraph {
+class MockSceneGraph : public SceneGraph {
 public:
-    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const {
+    MockSceneGraph(
+        std::string name,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneGraph(
+            name,
+            graphicsOpt,
+            graphicsSvc,
+            audioSvc) {
+    }
+
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const override {
         return _pickModelAtReturnValue;
     }
 
@@ -35,24 +47,34 @@ public:
     }
 
 private:
-    ModelSceneNode *_pickModelAtReturnValue;
+    ModelSceneNode *_pickModelAtReturnValue {nullptr};
 };
 
-class MockModelSceneNode : public ModelSceneNode {
+class MockSceneGraphs : public SceneGraphs {
 public:
-    MockModelSceneNode(IUser *user) :
-        ModelSceneNode(
-            *static_cast<graphics::Model *>(nullptr),
-            ModelUsage::Creature,
-            *static_cast<SceneGraph *>(nullptr),
-            *static_cast<graphics::GraphicsServices *>(nullptr),
-            *static_cast<audio::AudioServices *>(nullptr)) {
+    MockSceneGraphs(
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc) :
+        SceneGraphs(
+            graphicsOpt,
+            graphicsSvc,
+            audioSvc) {
+    }
 
-        _user = user;
+    void reserve(std::string name) override {
+        if (_scenes.count(name) > 0) {
+            return;
+        }
+        auto scene = std::make_unique<MockSceneGraph>(
+            name,
+            _graphicsOpt,
+            _graphicsSvc,
+            _audioSvc);
+
+        _scenes.insert(make_pair(name, move(scene)));
     }
 };
-
-std::unique_ptr<MockModelSceneNode> mockModelSceneNode(IUser *user = nullptr);
 
 } // namespace scene
 

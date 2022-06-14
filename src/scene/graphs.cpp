@@ -23,7 +23,7 @@ namespace reone {
 
 namespace scene {
 
-void SceneGraphs::add(string name) {
+void SceneGraphs::reserve(string name) {
     if (_scenes.count(name) > 0) {
         return;
     }

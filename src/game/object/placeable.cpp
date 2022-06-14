@@ -75,6 +75,7 @@ void Placeable::loadFromGit(const Gff &git) {
     auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph->newModel(*model, ModelUsage::Placeable);
+        sceneNode->init();
         sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);

@@ -27,41 +27,6 @@ namespace reone {
 
 namespace game {
 
-class MockGame : public IGame {
-public:
-    void startNewGame() override {
-    }
-
-    void warpToModule(const std::string &name) override {
-    }
-
-    void quit() override {
-    }
-
-    void startConversation(const std::string &name) override {
-    }
-
-    void changeCursor(CursorType type) override {
-        _changeCursorInvocations.push_back(type);
-    }
-
-    Object *getObjectByTag(const std::string &tag, int nth = 0) override {
-        return nullptr;
-    }
-
-    const std::set<std::string> &moduleNames() const override {
-        return _moduleNames;
-    }
-
-    const std::vector<CursorType> &changeCursorInvocations() const {
-        return _changeCursorInvocations;
-    }
-
-private:
-    std::set<std::string> _moduleNames;
-    std::vector<CursorType> _changeCursorInvocations;
-};
-
 class MockMainInterface : public IMainInterface {
 public:
     void setHoveredTarget(Object *target) override {
@@ -71,32 +36,24 @@ public:
     }
 };
 
-class MockObject : public Object {
-public:
-    MockObject(uint32_t id, ObjectType type) :
-        Object(
-            id,
-            type,
-            *static_cast<IGame *>(nullptr),
-            *static_cast<IObjectFactory *>(nullptr),
-            *static_cast<GameServices *>(nullptr),
-            *static_cast<graphics::GraphicsOptions *>(nullptr),
-            *static_cast<graphics::GraphicsServices *>(nullptr),
-            *static_cast<resource::ResourceServices *>(nullptr)) {
-    }
-};
-
 class MockCreature : public Creature {
 public:
-    MockCreature(uint32_t id) :
+    MockCreature(
+        uint32_t id,
+        IGame &game,
+        IObjectFactory &objectFactory,
+        GameServices &gameSvc,
+        graphics::GraphicsOptions &graphicsOpt,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
         Creature(
             id,
-            *static_cast<IGame *>(nullptr),
-            *static_cast<IObjectFactory *>(nullptr),
-            *static_cast<GameServices *>(nullptr),
-            *static_cast<graphics::GraphicsOptions *>(nullptr),
-            *static_cast<graphics::GraphicsServices *>(nullptr),
-            *static_cast<resource::ResourceServices *>(nullptr)) {
+            game,
+            objectFactory,
+            gameSvc,
+            graphicsOpt,
+            graphicsSvc,
+            resourceSvc) {
     }
 
     void handleClick(Object &clicker) override {
@@ -137,9 +94,35 @@ private:
     std::vector<std::pair<Object *, float>> _executeInvocations;
 };
 
-std::unique_ptr<MockObject> mockObject(uint32_t id, ObjectType type);
-std::unique_ptr<MockCreature> mockCreature(uint32_t id);
-std::shared_ptr<MockAction> mockAction(ActionType type);
+class MockGame : public Game {
+public:
+    MockGame(GameID gameId, OptionsView &options, ServicesView &services) :
+        Game(gameId, options, services) {
+    }
+
+    void changeCursor(CursorType type) override {
+        _changeCursorInvocations.push_back(type);
+    }
+
+    const std::vector<std::tuple<CursorType>> &changeCursorInvocations() const {
+        return _changeCursorInvocations;
+    }
+
+    std::shared_ptr<Object> newCreature() override {
+        return newObject<MockCreature>();
+    }
+
+    std::shared_ptr<MockCreature> mockCreature() {
+        return std::static_pointer_cast<MockCreature>(newCreature());
+    }
+
+    std::shared_ptr<MockAction> mockAction(ActionType type) {
+        return std::make_shared<MockAction>(type);
+    }
+
+private:
+    std::vector<std::tuple<CursorType>> _changeCursorInvocations;
+};
 
 } // namespace game
 

@@ -36,14 +36,14 @@ void SceneModule::init() {
     _services = make_unique<SceneServices>(*_sceneGraphs);
 
     // Init scenes
-    _sceneGraphs->add(kSceneMain);
-    _sceneGraphs->add(kSceneMainMenu);
-    _sceneGraphs->add(kSceneCharGen);
+    _sceneGraphs->reserve(kSceneMain);
+    _sceneGraphs->reserve(kSceneMainMenu);
+    _sceneGraphs->reserve(kSceneCharGen);
     for (int i = 0; i < kNumClasses; ++i) {
-        _sceneGraphs->add(str(boost::format("%s.%d") % kSceneClassSelect % i));
+        _sceneGraphs->reserve(str(boost::format("%s.%d") % kSceneClassSelect % i));
     }
-    _sceneGraphs->add(kScenePortraitSelect);
-    _sceneGraphs->add(kSceneCharacter);
+    _sceneGraphs->reserve(kScenePortraitSelect);
+    _sceneGraphs->reserve(kSceneCharacter);
 }
 
 void SceneModule::deinit() {

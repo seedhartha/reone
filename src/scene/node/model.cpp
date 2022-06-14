@@ -92,6 +92,7 @@ void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
 
     if (node.isReference()) {
         auto model = _sceneGraph.newModel(*node.reference()->model, _usage);
+        model->init();
         attach(node.name(), *model);
     }
     for (auto &child : node.children()) {

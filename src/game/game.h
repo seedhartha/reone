@@ -144,7 +144,7 @@ public:
 
     // END IEventHandler
 
-private:
+protected:
     enum class Stage {
         MovieLegal,
         MainMenu,

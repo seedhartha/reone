@@ -21,7 +21,7 @@ namespace reone {
 
 namespace scene {
 
-class ISceneGraph;
+class SceneGraph;
 
 }
 
@@ -38,7 +38,7 @@ public:
     SelectionController(
         IGame &game,
         IMainInterface &mainInterface,
-        scene::ISceneGraph &sceneGraph) :
+        scene::SceneGraph &sceneGraph) :
         _game(game),
         _mainInterface(mainInterface),
         _sceneGraph(sceneGraph) {
@@ -69,7 +69,7 @@ public:
 private:
     IGame &_game;
     IMainInterface &_mainInterface;
-    scene::ISceneGraph &_sceneGraph;
+    scene::SceneGraph &_sceneGraph;
 
     Creature *_pc {nullptr};
 

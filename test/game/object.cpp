@@ -19,21 +19,26 @@
 
 #include "../../src/game/object.h"
 
+#include "../fixtures/functional.h"
 #include "../fixtures/game.h"
 
+using namespace reone;
 using namespace reone::game;
 
 BOOST_AUTO_TEST_SUITE(game_object)
 
 BOOST_AUTO_TEST_CASE(should_execute_queued_actions_one_per_frame) {
     // given
-    auto action1 = mockAction(ActionType::StartConversation);
-    auto action2 = mockAction(ActionType::OpenDoor);
+    auto test = FunctionalTest();
+    auto game = test.mockGame();
 
-    auto action3 = mockAction(ActionType::FollowLeader);
+    auto action1 = game->mockAction(ActionType::StartConversation);
+    auto action2 = game->mockAction(ActionType::OpenDoor);
+
+    auto action3 = game->mockAction(ActionType::FollowLeader);
     action3->setCompleteOnExecute(false);
 
-    auto creature = mockObject(2, ObjectType::Creature);
+    auto creature = game->mockCreature();
     creature->enqueue(action1);
     creature->enqueue(action2);
     creature->enqueue(action3);

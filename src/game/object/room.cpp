@@ -37,13 +37,16 @@ void Room::loadFromLyt(const Layout::Room &lyt, GrassProperties grassProperties)
     // Model
     auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
-        _sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room).get();
-        _sceneNode->setUser(*this);
+        auto sceneNode = _sceneGraph->newModel(*model, ModelUsage::Room);
+        sceneNode->init();
+        sceneNode->setUser(*this);
+        _sceneNode = sceneNode.get();
 
         // Grass
         auto aabbNode = model->getAABBNode();
         if (aabbNode && grassProperties.texture) {
             auto grass = _sceneGraph->newGrass(grassProperties, *aabbNode);
+            grass->init();
             _grass = grass.get();
         }
     }
