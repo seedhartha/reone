@@ -60,12 +60,28 @@ public:
         _handleClickInvocations.push_back(&clicker);
     }
 
-    const std::vector<Object *> &handleClickInvocations() const {
+    bool moveTo(Object &other, bool run, float range, float delta) override {
+        _moveToInvocations.push_back(std::make_tuple(&other, run, range, delta));
+        return _moveToReturnValue;
+    }
+
+    const std::vector<std::tuple<Object *>> &handleClickInvocations() const {
         return _handleClickInvocations;
     }
 
+    const std::vector<std::tuple<Object *, bool, float, float>> &moveToInvocations() const {
+        return _moveToInvocations;
+    }
+
+    void whenMoveToThenReturn(bool value) {
+        _moveToReturnValue = value;
+    }
+
 private:
-    std::vector<Object *> _handleClickInvocations;
+    bool _moveToReturnValue {false};
+
+    std::vector<std::tuple<Object *>> _handleClickInvocations;
+    std::vector<std::tuple<Object *, bool, float, float>> _moveToInvocations;
 };
 
 class MockAction : public Action {

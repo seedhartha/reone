@@ -62,12 +62,12 @@ public:
     /**
      * @return true if destination had been reached
      */
-    bool moveTo(Object &other, bool run, float range, float delta);
+    virtual bool moveTo(Object &other, bool run, float range, float delta);
 
     /**
      * @return true if destination had been reached
      */
-    bool moveTo(const glm::vec2 &destination, bool run, float range, float delta);
+    virtual bool moveTo(const glm::vec2 &destination, bool run, float range, float delta);
 
     bool moveForward(float delta);
 

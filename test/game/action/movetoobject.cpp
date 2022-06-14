@@ -30,12 +30,13 @@ using namespace reone::game;
 
 BOOST_AUTO_TEST_SUITE(move_to_object_action)
 
-BOOST_AUTO_TEST_CASE(should_execute) {
+BOOST_AUTO_TEST_CASE(should_complete_when_destination_is_reached) {
     // given
     auto test = FunctionalTest();
     auto game = test.mockGame();
 
     auto creature1 = game->mockCreature();
+    creature1->whenMoveToThenReturn(true);
     auto creature2 = game->mockCreature();
     auto action = MoveToObjectAction(*creature2, true, 1.0f);
 
@@ -43,6 +44,26 @@ BOOST_AUTO_TEST_CASE(should_execute) {
     action.execute(*creature1, 1.0f);
 
     // then
+    BOOST_CHECK_EQUAL(1ll, creature1->moveToInvocations().size());
+    BOOST_CHECK(action.isCompleted());
+}
+
+BOOST_AUTO_TEST_CASE(should_not_complete_when_destination_is_not_reached) {
+    // given
+    auto test = FunctionalTest();
+    auto game = test.mockGame();
+
+    auto creature1 = game->mockCreature();
+    creature1->whenMoveToThenReturn(false);
+    auto creature2 = game->mockCreature();
+    auto action = MoveToObjectAction(*creature2, true, 1.0f);
+
+    // when
+    action.execute(*creature1, 1.0f);
+
+    // then
+    BOOST_CHECK_EQUAL(1ll, creature1->moveToInvocations().size());
+    BOOST_CHECK(!action.isCompleted());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
