@@ -32,6 +32,9 @@
 #include "../gameinterface.h"
 #include "../services.h"
 
+#include "factory.h"
+#include "item.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -73,9 +76,22 @@ void Creature::loadFromUtc(const string &templateResRef) {
     auto appearanceType = utc->getInt("Appearance_Type");
     auto conversation = utc->getString("Conversation");
 
-    _tag = move(tag);
-    _name = move(firstName);
-    _conversation = move(conversation);
+    auto itemList = utc->getList("ItemList");
+    for (auto &utcItem : itemList) {
+        auto inventoryRes = utcItem->getString("InventoryRes");
+        auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+        item->loadFromUti(inventoryRes);
+        _items.push_back(item.get());
+    }
+
+    auto equipItemList = utc->getList("Equip_ItemList");
+    for (auto &utcItem : equipItemList) {
+        auto equippedRes = utcItem->getString("EquippedRes");
+        auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+        item->loadFromUti(equippedRes);
+        // TODO: equip
+        // _equipment[InventorySlot::rightWeapon] = item.get();
+    }
 
     // From appearance 2DA
 
@@ -85,8 +101,6 @@ void Creature::loadFromUtc(const string &templateResRef) {
     }
     auto modelType = appearanceTable->getString(appearanceType, "modeltype");
     auto race = appearanceTable->getString(appearanceType, "race");
-
-    _modelType = static_cast<ModelType>(modelType[0]);
 
     // Make scene node
 
@@ -117,6 +131,10 @@ void Creature::loadFromUtc(const string &templateResRef) {
 
     //
 
+    _tag = move(tag);
+    _name = move(firstName);
+    _conversation = move(conversation);
+    _modelType = static_cast<ModelType>(modelType[0]);
     _sceneNode = sceneNode.get();
 
     flushTransform();
@@ -226,6 +244,22 @@ glm::vec3 Creature::targetWorldCoords() const {
     } else {
         return model->getWorldCenterOfAABB();
     }
+}
+
+void Creature::equip(int slot, IItem &item) {
+    auto oldItem = _equipment.find(slot);
+    if (oldItem != _equipment.end()) {
+        _items.push_back(oldItem->second);
+    }
+    _equipment[slot] = &item;
+}
+
+void Creature::unequip(int slot) {
+    auto item = _equipment.find(slot);
+    if (item != _equipment.end()) {
+        _items.push_back(item->second);
+    }
+    _equipment.erase(slot);
 }
 
 } // namespace game

@@ -49,7 +49,7 @@ public:
         return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
-private:
+protected:
     std::function<std::shared_ptr<V>(K)> _compute;
 
     std::unordered_map<K, std::shared_ptr<V>> _objects;

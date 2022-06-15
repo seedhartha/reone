@@ -29,6 +29,8 @@ class Gff;
 
 namespace game {
 
+class IItem;
+
 class Creature : public Object {
 public:
     enum class State {
@@ -85,6 +87,13 @@ public:
 
     // END Object
 
+    // Equipment
+
+    void equip(int slot, IItem &item);
+    void unequip(int slot);
+
+    // END Equipment
+
 private:
     enum class ModelType : char {
         FullBody = 'F',
@@ -99,10 +108,12 @@ private:
         float duration {0.0f};
     } _plottedPath;
 
+    State _state {State::Pause};
+
     ModelType _modelType {ModelType::FullBody};
     std::string _conversation;
 
-    State _state {State::Pause};
+    std::map<int, IItem *> _equipment;
 };
 
 } // namespace game

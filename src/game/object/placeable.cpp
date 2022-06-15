@@ -32,6 +32,9 @@
 
 #include "../services.h"
 
+#include "factory.h"
+#include "item.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -60,6 +63,17 @@ void Placeable::loadFromGit(const Gff &git) {
     auto tag = utp->getString("Tag");
     auto locName = _resourceSvc.strings.get(utp->getInt("LocName"));
     auto appearance = utp->getInt("Appearance");
+
+    auto hasInventory = utp->getBool("HasInventory");
+    if (hasInventory) {
+        auto itemList = utp->getList("ItemList");
+        for (auto &utpItem : itemList) {
+            auto inventoryRes = utpItem->getString("InventoryRes");
+            auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+            item->loadFromUti(inventoryRes);
+            _items.push_back(item.get());
+        }
+    }
 
     // From placeables 2DA
 

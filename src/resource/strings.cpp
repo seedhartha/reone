@@ -35,27 +35,27 @@ void Strings::init(const fs::path &gameDir) {
     if (tlkPath.empty()) {
         throw ValidationException("dialog.tlk file not found");
     }
-    auto stream = FileInputStream(tlkPath, OpenMode::Binary);
-    _tlk.load(stream);
+    auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
+    auto tlkReader = TlkReader();
+    tlkReader.load(tlk);
+    _table = tlkReader.table();
 }
 
 string Strings::get(int strRef) {
-    shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef < 0 || strRef >= table->getStringCount())
+    if (!_table || strRef < 0 || strRef >= _table->getStringCount())
         return "";
 
-    string text(table->getString(strRef).text);
+    string text(_table->getString(strRef).text);
     process(text);
 
     return move(text);
 }
 
 string Strings::getSound(int strRef) {
-    shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef < 0 || strRef >= table->getStringCount())
+    if (!_table || strRef < 0 || strRef >= _table->getStringCount())
         return "";
 
-    return table->getString(strRef).soundResRef;
+    return _table->getString(strRef).soundResRef;
 }
 
 void Strings::process(string &str) {

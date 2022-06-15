@@ -31,6 +31,10 @@ class TwoDas : public MemoryCache<std::string, TwoDa> {
 public:
     TwoDas(Resources &resources);
 
+    void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
+        _objects[resRef] = std::move(twoDa);
+    }
+
 private:
     Resources &_resources;
 

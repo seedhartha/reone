@@ -52,11 +52,13 @@ namespace game {
 struct GameServices;
 
 class IGame;
+class IItem;
 class IObjectFactory;
 
 class Object : public scene::IUser, boost::noncopyable {
 public:
     typedef std::queue<std::shared_ptr<Action>> ActionQueue;
+    typedef std::vector<IItem *> ItemList;
 
     virtual void update(float delta);
 
@@ -155,6 +157,25 @@ public:
 
     // END Actions
 
+    // Items
+
+    void add(IItem &item) {
+        _items.push_back(&item);
+    }
+
+    void remove(IItem &item) {
+        auto it = std::find(_items.begin(), _items.end(), &item);
+        if (it != _items.end()) {
+            _items.erase(it);
+        }
+    }
+
+    const ItemList &items() const {
+        return _items;
+    }
+
+    // END Items
+
     // Local variables
 
     const std::map<std::string, bool> &localBooleans() const {
@@ -189,6 +210,7 @@ protected:
     std::string _name;
 
     ActionQueue _actions;
+    ItemList _items;
 
     glm::vec3 _position {0.0f};
     float _facing {0.0f};

@@ -74,19 +74,18 @@ public:
     }
 
     std::unique_ptr<game::MockGame> mockGame() {
-        if (!_inited) {
-            initServices();
-            _inited = true;
-        }
+        initOnce();
         return std::make_unique<game::MockGame>(_gameId, _options, *_services);
     }
 
     scene::MockSceneGraph &sceneMockByName(const std::string &name) {
-        if (!_inited) {
-            initServices();
-            _inited = true;
-        }
+        initOnce();
         return static_cast<scene::MockSceneGraph &>(_sceneGraphs->get(name));
+    }
+
+    game::ServicesView &services() {
+        initOnce();
+        return *_services;
     }
 
 private:
@@ -153,7 +152,36 @@ private:
 
     // END Services
 
+    void initOnce() {
+        if (!_inited) {
+            initServices();
+            _inited = true;
+        }
+    }
+
+    void initServices() {
+        initResourceServices();
+        initGraphicsServices();
+        initAudioServices();
+        initSceneServices();
+        initScriptServices();
+        initGameServices();
+
+        _services = std::make_unique<game::ServicesView>(
+            *_gameSvc,
+            *_audioSvc,
+            *_graphicsSvc,
+            *_sceneSvc,
+            *_scriptSvc,
+            *_resourceSvc);
+    }
+
     void initResourceServices() {
+        _resources = std::make_unique<resource::Resources>();
+        _strings = std::make_unique<resource::Strings>();
+        _gffs = std::make_unique<resource::Gffs>(*_resources);
+        _twoDas = std::make_unique<resource::TwoDas>(*_resources);
+
         _resourceSvc = std::make_unique<resource::ResourceServices>(
             *_gffs,
             *_resources,
@@ -162,6 +190,10 @@ private:
     }
 
     void initGraphicsServices() {
+        _textures = std::make_unique<graphics::Textures>(_graphicsOpt, *_resources);
+        _models = std::make_unique<graphics::Models>(*_textures, *_resources);
+        _walkmeshes = std::make_unique<graphics::Walkmeshes>(*_resources);
+
         _graphicsSvc = std::make_unique<graphics::GraphicsServices>(
             *_fonts,
             *_graphicsContext,
@@ -214,23 +246,6 @@ private:
             *_soundSets,
             *_surfaces,
             *_visibilities);
-    }
-
-    void initServices() {
-        initResourceServices();
-        initGraphicsServices();
-        initAudioServices();
-        initSceneServices();
-        initScriptServices();
-        initGameServices();
-
-        _services = std::make_unique<game::ServicesView>(
-            *_gameSvc,
-            *_audioSvc,
-            *_graphicsSvc,
-            *_sceneSvc,
-            *_scriptSvc,
-            *_resourceSvc);
     }
 };
 

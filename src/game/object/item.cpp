@@ -17,10 +17,15 @@
 
 #include "item.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
+void Item::loadFromUti(const string &templateResRef) {
 }
+
+} // namespace game
 
 } // namespace reone

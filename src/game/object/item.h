@@ -23,7 +23,10 @@ namespace reone {
 
 namespace game {
 
-class Item : public Object {
+class IItem {
+};
+
+class Item : public IItem, public Object {
 public:
     Item(
         uint32_t id,
@@ -43,6 +46,8 @@ public:
             graphicsSvc,
             resourceSvc) {
     }
+
+    void loadFromUti(const std::string &templateResRef);
 };
 
 } // namespace game

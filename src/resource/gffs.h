@@ -39,6 +39,10 @@ public:
 
     std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type);
 
+    void add(ResourceId resId, std::shared_ptr<Gff> gff) {
+        _cache[resId] = std::move(gff);
+    }
+
 private:
     Resources &_resources;
 

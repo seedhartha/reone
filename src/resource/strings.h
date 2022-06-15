@@ -46,7 +46,7 @@ public:
     std::string getSound(int strRef);
 
 private:
-    TlkReader _tlk;
+    std::shared_ptr<TalkTable> _table;
 
     void process(std::string &str);
     void stripDeveloperNotes(std::string &str);
