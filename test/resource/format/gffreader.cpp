@@ -17,13 +17,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/binarywriter.h"
-#include "../../src/common/stream/bytearrayinput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/resource/format/gffreader.h"
+#include "../../../src/common/binarywriter.h"
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/resource/format/gffreader.h"
 
-
-#include "../checkutil.h"
+#include "../../checkutil.h"
 
 using namespace std;
 

@@ -17,10 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayinput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/script/format/ncsreader.h"
-#include "../../src/script/program.h"
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/script/format/ncsreader.h"
+#include "../../../src/script/program.h"
 
 using namespace std;
 

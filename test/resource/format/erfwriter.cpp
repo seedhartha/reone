@@ -17,12 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayoutput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/resource/format/erfwriter.h"
+#include "../../../src/common/stream/bytearrayoutput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/resource/format/erfwriter.h"
 
-
-#include "../checkutil.h"
+#include "../../checkutil.h"
 
 using namespace std;
 

@@ -17,13 +17,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/binarywriter.h"
-#include "../../src/common/stream/bytearrayoutput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/resource/2da.h"
-#include "../../src/resource/format/2dawriter.h"
+#include "../../../src/common/binarywriter.h"
+#include "../../../src/common/stream/bytearrayoutput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/resource/2da.h"
+#include "../../../src/resource/format/2dawriter.h"
 
-#include "../checkutil.h"
+#include "../../checkutil.h"
 
 using namespace std;
 

@@ -22,17 +22,17 @@ set(TEST_HEADERS
     fixtures/scene.h)
 
 set(TEST_SOURCES
-    audio/mp3reader.cpp
-    audio/wavreader.cpp
+    audio/format/mp3reader.cpp
+    audio/format/wavreader.cpp
     common/binaryreader.cpp
     common/binarywriter.cpp
-    common/bytearrayinputstream.cpp
-    common/bytearrayoutputstream.cpp
     common/collectionutil.cpp
-    common/fileinputstream.cpp
-    common/fileoutputstream.cpp
     common/hexutil.cpp
     common/pathutil.cpp
+    common/stream/bytearrayinput.cpp
+    common/stream/bytearrayoutput.cpp
+    common/stream/fileinput.cpp
+    common/stream/fileoutput.cpp
     common/stringbuilder.cpp
     common/textwriter.cpp
     common/unicodeutil.cpp
@@ -44,31 +44,31 @@ set(TEST_SOURCES
     game/object/item.cpp
     game/object/placeable.cpp
     game/selectioncontroller.cpp
-    graphics/bwmreader.cpp
-    graphics/mdlreader.cpp
-    graphics/tgareader.cpp
-    graphics/tpcreader.cpp
-    graphics/txireader.cpp
+    graphics/format/bwmreader.cpp
+    graphics/format/mdlreader.cpp
+    graphics/format/tgareader.cpp
+    graphics/format/tpcreader.cpp
+    graphics/format/txireader.cpp
     main.cpp
-    resource/2dareader.cpp
     resource/2das.cpp
-    resource/2dawriter.cpp
-    resource/bifreader.cpp
-    resource/erfreader.cpp
-    resource/erfwriter.cpp
-    resource/gffreader.cpp
+    resource/format/2dareader.cpp
+    resource/format/2dawriter.cpp
+    resource/format/bifreader.cpp
+    resource/format/erfreader.cpp
+    resource/format/erfwriter.cpp
+    resource/format/gffreader.cpp
+    resource/format/gffwriter.cpp
+    resource/format/keyreader.cpp
+    resource/format/rimreader.cpp
+    resource/format/rimwriter.cpp
+    resource/format/tlkreader.cpp
+    resource/format/tlkwriter.cpp
     resource/gffs.cpp
-    resource/gffwriter.cpp
-    resource/keyreader.cpp
     resource/resources.cpp
-    resource/rimreader.cpp
-    resource/rimwriter.cpp
     resource/strings.cpp
-    resource/tlkreader.cpp
-    resource/tlkwriter.cpp
     script/execution.cpp
-    script/ncsreader.cpp
-    script/ncswriter.cpp
+    script/format/ncsreader.cpp
+    script/format/ncswriter.cpp
     toolslib/expressiontree.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})

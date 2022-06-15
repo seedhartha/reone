@@ -17,33 +17,24 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/fileinput.h"
+#include "../../../src/common/stream/bytearrayinput.h"
 
-#include "../checkutil.h"
+#include "../../checkutil.h"
 
 using namespace std;
 
 using namespace reone;
 
-namespace fs = boost::filesystem;
+BOOST_AUTO_TEST_SUITE(byte_array_input_stream)
 
-BOOST_AUTO_TEST_SUITE(file_input_stream)
-
-BOOST_AUTO_TEST_CASE(should_read_from_file) {
+BOOST_AUTO_TEST_CASE(should_read_from_byte_array) {
     // given
-
-    auto tmpPath = fs::temp_directory_path();
-    tmpPath.append("reone_test_file_input");
-    auto tmpFile = fs::ofstream(tmpPath);
-    tmpFile.write("Hello, world!", 13);
-    tmpFile.close();
-
-    auto stream = FileInputStream(tmpPath);
+    auto bytes = ByteArray("Hello, world!");
+    auto stream = ByteArrayInputStream(bytes);
     auto buf = ByteArray(16, '\0');
     auto expectedContents = string("Hello, world!");
 
     // when
-
     stream.seek(0, SeekOrigin::End);
     size_t position1 = stream.position();
     stream.seek(0, SeekOrigin::Begin);
@@ -54,10 +45,8 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
     auto contents = buf.substr(0, 13);
     int readByteResult2 = stream.readByte();
     bool eof = stream.eof();
-    stream.close();
 
     // then
-
     BOOST_CHECK_EQUAL(13ll, position1);
     BOOST_CHECK_EQUAL('H', readByteResult1);
     BOOST_CHECK_EQUAL(0ll, position2);
@@ -66,10 +55,6 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
     BOOST_TEST((expectedContents == contents), notEqualMessage(expectedContents, contents));
     BOOST_CHECK_EQUAL(-1, readByteResult2);
     BOOST_CHECK_EQUAL(true, eof);
-
-    // cleanup
-
-    fs::remove(tmpPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

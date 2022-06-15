@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayinput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/resource/format/bifreader.h"
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/resource/format/bifreader.h"
 
 using namespace std;
 

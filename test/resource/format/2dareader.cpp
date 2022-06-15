@@ -17,12 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/binarywriter.h"
-#include "../../src/common/stream/bytearrayinput.h"
-#include "../../src/common/stringbuilder.h"
-#include "../../src/resource/2da.h"
-#include "../../src/resource/format/2dareader.h"
-
+#include "../../../src/common/binarywriter.h"
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/resource/2da.h"
+#include "../../../src/resource/format/2dareader.h"
 
 using namespace std;
 

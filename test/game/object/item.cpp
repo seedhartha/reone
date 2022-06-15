@@ -17,33 +17,16 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayoutput.h"
+#include "../../../src/game/object/item.h"
 
-#include "../checkutil.h"
+BOOST_AUTO_TEST_SUITE(item)
 
-using namespace std;
-
-using namespace reone;
-
-BOOST_AUTO_TEST_SUITE(byte_array_output_stream)
-
-BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
+BOOST_AUTO_TEST_CASE(should_load_from_uti) {
     // given
-    auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
-    auto bytesToWrite = ByteArray("Hello, world!");
-    auto expectedOutput = ByteArray("Hello, world!\nHello, world!");
 
     // when
-    stream.write(bytesToWrite);
-    auto position = stream.position();
-    stream.writeByte('\n');
-    stream.writeByte('H');
-    stream.write(&bytesToWrite[1], 12);
 
     // then
-    BOOST_CHECK_EQUAL(13ll, position);
-    BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
