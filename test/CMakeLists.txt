@@ -40,6 +40,9 @@ set(TEST_SOURCES
     game/astar.cpp
     game/game.cpp
     game/object.cpp
+    game/object/creature.cpp
+    game/object/item.cpp
+    game/object/placeable.cpp
     game/selectioncontroller.cpp
     graphics/bwmreader.cpp
     graphics/mdlreader.cpp
