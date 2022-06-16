@@ -17,6 +17,8 @@
 
 #include "wavreader.h"
 
+#include "../../common/stream/bytearrayinput.h"
+
 #include "../stream.h"
 
 #include "mp3reader.h"
@@ -93,11 +95,10 @@ void WavReader::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
         size_t pos = tell();
         ByteArray data(_reader->getBytes(static_cast<int>(_size - pos)));
-
-        Mp3Reader mp3;
-        mp3.load(move(data));
-        _stream = mp3.stream();
-
+        auto mp3 = ByteArrayInputStream(data);
+        auto mp3Reader = _mp3ReaderFactory.create();
+        mp3Reader->load(mp3);
+        _stream = mp3Reader->stream();
         return;
     }
 

@@ -46,7 +46,7 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
         shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
         if (wavData) {
             auto wav = ByteArrayInputStream(*wavData);
-            auto reader = WavReader();
+            auto reader = WavReader(Mp3ReaderFactory());
             reader.load(wav);
             result = reader.stream();
         }

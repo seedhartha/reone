@@ -47,14 +47,9 @@ void Mp3Reader::load(IInputStream &stream) {
     size_t size = stream.position();
 
     ByteArray data(size, '\0');
-
     stream.seek(0, SeekOrigin::Begin);
     stream.read(&data[0], size);
 
-    load(move(data));
-}
-
-void Mp3Reader::load(ByteArray &&data) {
     _input = data;
     _stream = make_shared<AudioStream>();
 

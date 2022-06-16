@@ -17,6 +17,7 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 set(TEST_HEADERS
     checkutil.h
+    fixtures/audio.h
     fixtures/functional.h
     fixtures/game.h
     fixtures/scene.h)

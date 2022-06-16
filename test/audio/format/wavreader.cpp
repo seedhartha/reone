@@ -17,10 +17,13 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../../src/audio/format/mp3reader.h"
 #include "../../../src/audio/format/wavreader.h"
 #include "../../../src/audio/stream.h"
 #include "../../../src/common/stream/bytearrayinput.h"
 #include "../../../src/common/stringbuilder.h"
+
+#include "../../fixtures/audio.h"
 
 using namespace std;
 
@@ -52,7 +55,7 @@ BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
                         .append("\xff\x7f", 2)
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
-    auto reader = WavReader();
+    auto reader = WavReader(MockMp3ReaderFactory());
 
     // when
     reader.load(wav);
@@ -93,7 +96,7 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
                         .append("\x00\x00\x03\x00\x12\x34\x56\x78", 8)
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
-    auto reader = WavReader();
+    auto reader = WavReader(MockMp3ReaderFactory());
 
     // when
     reader.load(wav);
@@ -115,6 +118,40 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
     BOOST_CHECK_EQUAL(62, samples[5]);
     BOOST_CHECK_EQUAL(60, samples[6]);
     BOOST_CHECK_EQUAL(99, samples[7]);
+}
+
+BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
+    // given
+    auto wavBytes = StringBuilder()
+                        // Header
+                        .append("RIFF")                // signature
+                        .append("\x00\x00\x00\x00", 4) // chunk size
+                        .append("WAVE")                // format
+                        // Fmt Chunk
+                        .append("fmt ")                // chunk id
+                        .append("\x10\x00\x00\x00", 4) // chunk size
+                        .append("\x01\x00", 2)         // audio format
+                        .append("\x01\x00", 2)         // number of channels
+                        .append("\x22\x56\x00\x00", 4) // sample rate
+                        .append("\x00\x00\x00\x00", 4) // byte rate
+                        .append("\x00\x00", 2)         // block align
+                        .append("\x08\x00", 2)         // bits per sample
+                        // Data Chunk
+                        .append("data")                // chunk id
+                        .append("\x00\x00\x00\x00", 4) // chunk size
+                        // MP3
+                        .append("\x00", 1)
+                        .build();
+    auto wav = ByteArrayInputStream(wavBytes);
+    auto mp3Reader = make_shared<MockMp3Reader>();
+    auto mp3ReaderFactory = MockMp3ReaderFactory(mp3Reader);
+    auto reader = WavReader(mp3ReaderFactory);
+
+    // when
+    reader.load(wav);
+
+    // then
+    BOOST_CHECK_EQUAL(1ll, mp3Reader->loadInvocations().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

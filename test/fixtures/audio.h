@@ -17,44 +17,42 @@
 
 #pragma once
 
-#include "mad.h"
-
-#include "../../common/types.h"
+#include "../../../src/audio/format/mp3reader.h"
 
 namespace reone {
 
-class IInputStream;
-
 namespace audio {
 
-class AudioStream;
-
-class Mp3Reader : boost::noncopyable {
+class MockMp3Reader : public Mp3Reader {
 public:
-    virtual void load(IInputStream &stream);
+    void load(IInputStream &stream) override {
+        _loadInvocations.push_back(std::make_tuple(&stream));
+    }
 
-    std::shared_ptr<AudioStream> stream() const { return _stream; }
+    const std::vector<std::tuple<IInputStream *>> &loadInvocations() const {
+        return _loadInvocations;
+    }
 
 private:
-    ByteArray _input;
-    std::shared_ptr<AudioStream> _stream;
-    bool _done {false};
-
-    static mad_flow inputFunc(void *playbuf, mad_stream *stream);
-    static mad_flow headerFunc(void *playbuf, mad_header const *header);
-    static mad_flow outputFunc(void *playbuf, mad_header const *header, mad_pcm *pcm);
+    std::vector<std::tuple<IInputStream *>> _loadInvocations;
 };
 
-class IMp3ReaderFactory {
+class MockMp3ReaderFactory : public IMp3ReaderFactory {
 public:
-    virtual std::shared_ptr<Mp3Reader> create() = 0;
-};
-
-class Mp3ReaderFactory : public IMp3ReaderFactory {
-public:
-    std::shared_ptr<Mp3Reader> create() override {
-        return std::make_shared<Mp3Reader>();
+    MockMp3ReaderFactory() :
+        _instance(std::make_shared<MockMp3Reader>()) {
     }
+
+    MockMp3ReaderFactory(std::shared_ptr<Mp3Reader> instance) :
+        _instance(std::move(instance)) {
+    }
+
+    std::shared_ptr<Mp3Reader> create() override {
+        return _instance;
+    }
+
+private:
+    std::shared_ptr<Mp3Reader> _instance;
 };
 
 } // namespace audio

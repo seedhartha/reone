@@ -30,10 +30,16 @@ enum class WavAudioFormat {
     IMAADPCM = 0x11
 };
 
+class IMp3ReaderFactory;
+
 class AudioStream;
 
 class WavReader : public resource::BinaryResourceReader {
 public:
+    WavReader(IMp3ReaderFactory &mp3ReaderFactory) :
+        _mp3ReaderFactory(mp3ReaderFactory) {
+    }
+
     std::shared_ptr<AudioStream> stream() const { return _stream; }
 
 private:
@@ -47,12 +53,15 @@ private:
         int16_t stepIndex {0};
     };
 
+    IMp3ReaderFactory &_mp3ReaderFactory;
+
     WavAudioFormat _audioFormat {WavAudioFormat::PCM};
     uint16_t _channelCount {0};
     uint32_t _sampleRate {0};
     uint16_t _blockAlign {0};
     uint16_t _bitsPerSample {0};
     IMA _ima[2];
+
     std::shared_ptr<AudioStream> _stream;
 
     void onLoad() override;
