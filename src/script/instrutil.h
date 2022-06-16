@@ -27,7 +27,7 @@ struct Instruction;
 
 class IRoutines;
 
-std::string describeInstruction(const Instruction &ins, const IRoutines &routines);
+std::string describeInstruction(const Instruction &ins, IRoutines &routines);
 
 const std::string &describeInstructionType(InstructionType type);
 

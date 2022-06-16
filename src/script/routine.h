@@ -41,7 +41,7 @@ public:
         _func(std::move(fn)) {
     }
 
-    Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) const;
+    virtual Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx);
 
     int getArgumentCount() const;
     VariableType getArgumentType(int index) const;

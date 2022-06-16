@@ -55,7 +55,8 @@ BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
                         .append("\xff\x7f", 2)
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
-    auto reader = WavReader(MockMp3ReaderFactory());
+    auto mp3ReaderFactory = MockMp3ReaderFactory();
+    auto reader = WavReader(mp3ReaderFactory);
 
     // when
     reader.load(wav);
@@ -96,7 +97,8 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
                         .append("\x00\x00\x03\x00\x12\x34\x56\x78", 8)
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
-    auto reader = WavReader(MockMp3ReaderFactory());
+    auto mp3ReaderFactory = MockMp3ReaderFactory();
+    auto reader = WavReader(mp3ReaderFactory);
 
     // when
     reader.load(wav);

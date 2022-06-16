@@ -1733,7 +1733,7 @@ void Routines::initForTSL() {
     add("RebuildPartyTable", R_VOID, {}, &routine::rebuildPartyTable);
 }
 
-const Routine &Routines::get(int index) const {
+Routine &Routines::get(int index) {
     if (isOutOfRange(_routines, index)) {
         throw out_of_range("index is out of range");
     }

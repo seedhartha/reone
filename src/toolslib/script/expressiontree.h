@@ -260,7 +260,7 @@ public:
         return _globals;
     }
 
-    static ExpressionTree fromProgram(const ScriptProgram &program, const IRoutines &routines);
+    static ExpressionTree fromProgram(const ScriptProgram &program, IRoutines &routines);
 
 private:
     struct CallStackFrame {
@@ -298,7 +298,7 @@ private:
 
     struct DecompilationContext {
         const ScriptProgram &program;
-        const IRoutines &routines;
+        IRoutines &routines;
         const std::unordered_map<uint32_t, LabelExpression *> &labels;
         std::map<uint32_t, std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
@@ -315,7 +315,7 @@ private:
 
         DecompilationContext(
             const ScriptProgram &compiled,
-            const IRoutines &routines,
+            IRoutines &routines,
             const std::unordered_map<uint32_t, LabelExpression *> &labels,
             std::map<uint32_t, std::shared_ptr<Function>> &functions,
             std::vector<std::shared_ptr<Expression>> &expressions) :

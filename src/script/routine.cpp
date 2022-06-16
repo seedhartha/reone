@@ -29,7 +29,7 @@ namespace reone {
 
 namespace script {
 
-Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
+Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) {
     try {
         return _func(args, ctx);
     } catch (const NotImplementedException &ex) {

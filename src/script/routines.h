@@ -28,7 +28,7 @@ public:
     virtual ~IRoutines() {
     }
 
-    virtual const Routine &get(int index) const = 0;
+    virtual Routine &get(int index) = 0;
 
     virtual int getNumRoutines() const = 0;
     virtual int getIndexByName(const std::string &name) const = 0;

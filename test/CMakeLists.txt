@@ -20,7 +20,8 @@ set(TEST_HEADERS
     fixtures/audio.h
     fixtures/functional.h
     fixtures/game.h
-    fixtures/scene.h)
+    fixtures/scene.h
+    fixtures/script.h)
 
 set(TEST_SOURCES
     audio/format/wavreader.cpp

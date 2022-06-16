@@ -32,7 +32,7 @@ namespace reone {
 
 namespace script {
 
-ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, const IRoutines &routines) {
+ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutines &routines) {
     auto startFunc = make_shared<Function>();
     startFunc->name = "_start";
     startFunc->offset = 13;

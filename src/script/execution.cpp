@@ -34,6 +34,7 @@ namespace reone {
 namespace script {
 
 static constexpr int kStartInstructionOffset = 13;
+static constexpr float kFloatTolerance = 1e-5;
 
 ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) :
     _context(move(context)),
@@ -259,7 +260,7 @@ void ScriptExecution::executeCONSTO(const Instruction &ins) {
 }
 
 void ScriptExecution::executeACTION(const Instruction &ins) {
-    const Routine &routine = _context->routines->get(ins.routine);
+    auto &routine = _context->routines->get(ins.routine);
     if (ins.argCount > routine.getArgumentCount()) {
         throw runtime_error("Too many routine arguments");
     }
@@ -350,7 +351,7 @@ void ScriptExecution::executeEQUALII(const Instruction &ins) {
 
 void ScriptExecution::executeEQUALFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
-        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+        _stack.push_back(Variable::ofInt(static_cast<int>(fabs(left - right) < kFloatTolerance)));
     });
 }
 
@@ -664,7 +665,7 @@ void ScriptExecution::executeDIVII(const Instruction &ins) {
 
 void ScriptExecution::executeDIVIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
-        _stack.push_back(Variable::ofFloat(left / right));
+        _stack.push_back(Variable::ofFloat(left / max(kFloatTolerance, right)));
     });
 }
 
@@ -676,7 +677,7 @@ void ScriptExecution::executeDIVFI(const Instruction &ins) {
 
 void ScriptExecution::executeDIVFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
-        _stack.push_back(Variable::ofFloat(left / right));
+        _stack.push_back(Variable::ofFloat(left / max(kFloatTolerance, right)));
     });
 }
 
