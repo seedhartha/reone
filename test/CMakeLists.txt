@@ -22,7 +22,6 @@ set(TEST_HEADERS
     fixtures/scene.h)
 
 set(TEST_SOURCES
-    audio/format/mp3reader.cpp
     audio/format/wavreader.cpp
     common/binaryreader.cpp
     common/binarywriter.cpp

@@ -17,14 +17,104 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../../src/audio/format/wavreader.h"
+#include "../../../src/audio/stream.h"
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+
+using namespace std;
+
+using namespace reone;
+using namespace reone::audio;
+
 BOOST_AUTO_TEST_SUITE(wav_reader)
 
-BOOST_AUTO_TEST_CASE(should_load_wav) {
+BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
     // given
+    auto wavBytes = StringBuilder()
+                        // Header
+                        .append("RIFF")                // signature
+                        .append("\x00\x00\x00\x00", 4) // chunk size
+                        .append("WAVE")                // format
+                        // Fmt Chunk
+                        .append("fmt ")                // chunk id
+                        .append("\x10\x00\x00\x00", 4) // chunk size
+                        .append("\x01\x00", 2)         // audio format
+                        .append("\x01\x00", 2)         // number of channels
+                        .append("\x22\x56\x00\x00", 4) // sample rate
+                        .append("\x00\x00\x00\x00", 4) // byte rate
+                        .append("\x00\x00", 2)         // block align
+                        .append("\x08\x00", 2)         // bits per sample
+                        // Data Chunk
+                        .append("data")                // chunk id
+                        .append("\x02\x00\x00\x00", 4) // chunk size
+                        // Samples
+                        .append("\xff\x7f", 2)
+                        .build();
+    auto wav = ByteArrayInputStream(wavBytes);
+    auto reader = WavReader();
 
     // when
+    reader.load(wav);
 
     // then
+    auto stream = reader.stream();
+    BOOST_CHECK(static_cast<bool>(stream));
+    BOOST_CHECK_EQUAL(1, stream->getFrameCount());
+    auto frame = stream->getFrame(0);
+    BOOST_CHECK_EQUAL(static_cast<int>(AudioFormat::Mono8), static_cast<int>(frame.format));
+    BOOST_CHECK_EQUAL(22050, frame.sampleRate);
+    auto samples = reinterpret_cast<int16_t *>(frame.samples.data());
+    BOOST_CHECK_EQUAL(32767, samples[0]);
+}
+
+BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
+    // given
+    auto wavBytes = StringBuilder()
+                        // Header
+                        .append("\xff\xf3\x60\xc4", 4) // fake signature
+                        .repeat('\x00', 466)           // padding
+                        .append("RIFF")                // real signature
+                        .append("\x00\x00\x00\x00", 4) // chunk size
+                        .append("WAVE")                // format
+                        // Fmt Chunk
+                        .append("fmt ")                // chunk id
+                        .append("\x10\x00\x00\x00", 4) // chunk size
+                        .append("\x11\x00", 2)         // audio format
+                        .append("\x01\x00", 2)         // number of channels
+                        .append("\x22\x56\x00\x00", 4) // sample rate
+                        .append("\x00\x00\x00\x00", 4) // byte rate
+                        .append("\x08\x00", 2)         // block align
+                        .append("\x04\x00", 2)         // bits per sample
+                        // Data Chunk
+                        .append("data")                // chunk id
+                        .append("\x08\x00\x00\x00", 4) // chunk size
+                        // IMA Blocks
+                        .append("\x00\x00\x03\x00\x12\x34\x56\x78", 8)
+                        .build();
+    auto wav = ByteArrayInputStream(wavBytes);
+    auto reader = WavReader();
+
+    // when
+    reader.load(wav);
+
+    // then
+    auto stream = reader.stream();
+    BOOST_CHECK(static_cast<bool>(stream));
+    BOOST_CHECK_EQUAL(1, stream->getFrameCount());
+    auto frame = stream->getFrame(0);
+    BOOST_CHECK_EQUAL(static_cast<int>(AudioFormat::Mono16), static_cast<int>(frame.format));
+    BOOST_CHECK_EQUAL(22050, frame.sampleRate);
+    BOOST_CHECK_EQUAL(16ll, frame.samples.size());
+    auto samples = reinterpret_cast<uint16_t *>(frame.samples.data());
+    BOOST_CHECK_EQUAL(6, samples[0]);
+    BOOST_CHECK_EQUAL(9, samples[1]);
+    BOOST_CHECK_EQUAL(18, samples[2]);
+    BOOST_CHECK_EQUAL(26, samples[3]);
+    BOOST_CHECK_EQUAL(40, samples[4]);
+    BOOST_CHECK_EQUAL(62, samples[5]);
+    BOOST_CHECK_EQUAL(60, samples[6]);
+    BOOST_CHECK_EQUAL(99, samples[7]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
