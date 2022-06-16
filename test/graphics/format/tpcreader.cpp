@@ -17,14 +17,47 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/graphics/format/tpcreader.h"
+
+using namespace std;
+
+using namespace reone;
+using namespace reone::graphics;
+
 BOOST_AUTO_TEST_SUITE(tpc_reader)
 
 BOOST_AUTO_TEST_CASE(should_load_tpc) {
     // given
+    auto tpcBytes = StringBuilder()
+                        // Header
+                        .append("\x00\x00\x00\x00", 4) // data size
+                        .append("\x00\x00\x00\x00", 4) // unknown
+                        .append("\x01\x00", 2)         // width
+                        .append("\x01\x00", 2)         // height
+                        .append("\x01\x00", 2)         // encoding
+                        .append("\x01\x00", 2)         // number of mip maps
+                        .repeat('\x00', 112)           // padding
+                        // Mip Map 1
+                        .append("\xff", 1)
+                        .build();
+    auto tpc = ByteArrayInputStream(tpcBytes);
+    auto reader = TpcReader("some_texture", TextureUsage::Default);
 
     // when
+    reader.load(tpc);
 
     // then
+    auto texture = reader.texture();
+    BOOST_CHECK(static_cast<bool>(texture));
+    BOOST_CHECK_EQUAL(string("some_texture"), texture->name());
+    BOOST_CHECK_EQUAL(1, texture->width());
+    BOOST_CHECK_EQUAL(1, texture->height());
+    BOOST_CHECK_EQUAL(1ll, texture->layers().size());
+    BOOST_CHECK(static_cast<bool>(texture->layers()[0].pixels));
+    auto pixels = reinterpret_cast<unsigned char *>(texture->layers()[0].pixels->data());
+    BOOST_CHECK_EQUAL(255, pixels[0]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

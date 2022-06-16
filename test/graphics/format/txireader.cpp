@@ -17,14 +17,31 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../../src/common/stream/bytearrayinput.h"
+#include "../../../src/common/stringbuilder.h"
+#include "../../../src/graphics/format/txireader.h"
+
+using namespace std;
+
+using namespace reone;
+using namespace reone::graphics;
+
 BOOST_AUTO_TEST_SUITE(txi_reader)
 
 BOOST_AUTO_TEST_CASE(should_load_txi) {
     // given
+    auto txiBytes = StringBuilder()
+                        .append("blending additive")
+                        .build();
+    auto txi = ByteArrayInputStream(txiBytes);
+    auto reader = TxiReader();
 
     // when
+    reader.load(txi);
 
     // then
+    auto features = reader.features();
+    BOOST_CHECK_EQUAL(static_cast<int>(Texture::Blending::Additive), static_cast<int>(features.blending));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
