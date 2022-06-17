@@ -19,6 +19,8 @@
 
 #include "aabb.h"
 #include "animatedproperty.h"
+#include "mesh.h"
+#include "texture.h"
 
 #define R_ANIMPROP(a, b, c)                             \
     const AnimatedProperty<a> &b() const { return c; }; \
@@ -28,9 +30,7 @@ namespace reone {
 
 namespace graphics {
 
-class Mesh;
 class Model;
-class Texture;
 
 /**
  * Model or animation node. Can be specialized to represent a triangle mesh, a
@@ -177,7 +177,7 @@ public:
         glm::vec3 restPosition,
         glm::quat restOrientation,
         bool animated,
-        const ModelNode *parent = nullptr);
+        ModelNode *parent = nullptr);
 
     void init();
 
@@ -301,7 +301,7 @@ public:
 private:
     uint16_t _number;
     std::string _name;
-    const ModelNode *_parent;
+    ModelNode *_parent;
     bool _animated;
 
     uint16_t _flags {0};

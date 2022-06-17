@@ -153,7 +153,7 @@ void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
     }
 }
 
-shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, const ModelNode *parent, bool animated, bool animNode) {
+shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode) {
     seek(kMdlDataOffset + offset);
     if (!animated && offset == _offAnimRoot) {
         animated = true;

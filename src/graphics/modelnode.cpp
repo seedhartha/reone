@@ -34,7 +34,7 @@ ModelNode::ModelNode(
     glm::vec3 restPosition,
     glm::quat restOrientation,
     bool animated,
-    const ModelNode *parent) :
+    ModelNode *parent) :
     _number(number),
     _name(move(name)),
     _restPosition(move(restPosition)),

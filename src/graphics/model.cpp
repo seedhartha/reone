@@ -67,8 +67,8 @@ void Model::computeAABB() {
     _aabb.reset();
 
     for (auto &node : _nodeByNumber) {
-        shared_ptr<ModelNode::TriangleMesh> mesh(node.second->mesh());
-        if (mesh) {
+        auto mesh = node.second->mesh();
+        if (mesh && mesh->mesh) {
             _aabb.expand(mesh->mesh->aabb() * node.second->absoluteTransform());
         }
     }

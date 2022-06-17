@@ -91,9 +91,12 @@ void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
     _nodeByName[node.name()] = sceneNode.get();
 
     if (node.isReference()) {
-        auto model = _sceneGraph.newModel(*node.reference()->model, _usage);
-        model->init();
-        attach(node.name(), *model);
+        auto reference = node.reference();
+        if (reference->model) {
+            auto model = _sceneGraph.newModel(*reference->model, _usage);
+            model->init();
+            attach(node.name(), *model);
+        }
     }
     for (auto &child : node.children()) {
         buildNodeTree(*child, *sceneNode);
@@ -135,10 +138,15 @@ void ModelSceneNode::computeAABB() {
     for (auto &node : _nodeByNumber) {
         if (node.second->type() == SceneNodeType::Mesh) {
             auto &modelNode = node.second->modelNode();
-            AABB modelSpaceAABB(modelNode.mesh()->mesh->aabb() * modelNode.absoluteTransform());
+            auto mesh = modelNode.mesh();
+            if (!mesh || !mesh->mesh) {
+                continue;
+            }
+            auto modelSpaceAABB = mesh->mesh->aabb() * modelNode.absoluteTransform();
             _aabb.expand(modelSpaceAABB);
         }
     }
+
     for (auto &attachment : _attachments) {
         if (attachment.second->type() == SceneNodeType::Model) {
             AABB modelSpaceAABB(attachment.second->aabb() * attachment.second->absoluteTransform() * _absTransformInv);

@@ -79,7 +79,7 @@ private:
 
     ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);
-    std::shared_ptr<graphics::ModelNode> readNodes(uint32_t offset, const ModelNode *parent, bool animated, bool animNode = false);
+    std::shared_ptr<graphics::ModelNode> readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode = false);
     std::vector<std::shared_ptr<graphics::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<graphics::Animation> readAnimation(uint32_t offset);
     void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, graphics::ModelNode &node);
