@@ -187,10 +187,47 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
     BOOST_CHECK_EQUAL(42, result);
 }
 
-// TODO: finish
-BOOST_AUTO_TEST_CASE(should_run_script_program__vectors) {
+BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTF(1.0f));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTF(3.0f));
+    program->add(Instruction::newCONSTF(4.0f));
+    program->add(Instruction::newCONSTF(5.0f));
+    program->add(Instruction::newCONSTF(6.0f));
+    program->add(Instruction(InstructionType::ADDVV)); // [5.0, 7.0, 9.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 5.0, 16.0
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0
+    program->add(Instruction::newCONSTF(7.0f));
+    program->add(Instruction::newCONSTF(8.0f));
+    program->add(Instruction::newCONSTF(9.0f));
+    program->add(Instruction::newCONSTF(3.0f));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTF(1.0f));
+    program->add(Instruction(InstructionType::SUBVV)); // 21.0, [4.0, 6.0, 8.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 4.0, 14.0
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 18.0
+    program->add(Instruction(InstructionType::ADDFF)); // 39.0
+    program->add(Instruction::newCONSTF(4.0f));
+    program->add(Instruction::newCONSTF(5.0f));
+    program->add(Instruction::newCONSTF(6.0f));
+    program->add(Instruction(InstructionType::MULFV)); // [156.0, 195.0, 234.0]
+    program->add(Instruction::newCONSTF(7.0f));
+    program->add(Instruction(InstructionType::MULVF)); // [1092.0, 1365.0, 1638.0]
+    program->add(Instruction(InstructionType::SUBFF)); // 1092.0, -273.0
+    program->add(Instruction(InstructionType::ADDFF)); // 819.0
+    program->add(Instruction::newCONSTF(1.0f));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTF(3.0f));
+    program->add(Instruction(InstructionType::DIVFV)); // [819.0, 409.5, 273.0]
+    program->add(Instruction::newCONSTF(0.5f));
+    program->add(Instruction(InstructionType::DIVVF)); // [1638.0, 819.0, 546.0]
+    program->add(Instruction(InstructionType::SUBFF)); // 1638.0, 273.0
+    program->add(Instruction(InstructionType::SUBFF)); // 1365.0
+    program->add(Instruction::newCONSTF(1365.0f));
+    program->add(Instruction(InstructionType::EQUALFF));
+
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
 
@@ -198,7 +235,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vectors) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(1, result);
 }
 
 // TODO: finish

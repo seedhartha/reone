@@ -38,6 +38,10 @@ public:
 
     int run();
 
+    void stackPush(Variable var) {
+        _stack.push_back(std::move(var));
+    }
+
     int getStackSize() const;
     const Variable &getStackVariable(int index) const;
 
