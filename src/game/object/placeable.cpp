@@ -70,6 +70,7 @@ void Placeable::loadFromGit(const Gff &git) {
         for (auto &utpItem : itemList) {
             auto inventoryRes = utpItem->getString("InventoryRes");
             auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+            item->setSceneGraph(_sceneGraph);
             item->loadFromUti(inventoryRes);
             _items.push_back(item.get());
         }

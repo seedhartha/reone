@@ -27,7 +27,7 @@ namespace resource {
 
 class Resources;
 
-class TwoDas : public MemoryCache<std::string, TwoDa> {
+class TwoDas : public MemoryCache<std::string, TwoDa>, boost::noncopyable {
 public:
     TwoDas(Resources &resources);
 

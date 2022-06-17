@@ -18,8 +18,10 @@
 #include "creature.h"
 
 #include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 #include "../../graphics/models.h"
 #include "../../graphics/services.h"
+#include "../../graphics/textures.h"
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
@@ -49,6 +51,8 @@ static constexpr float kCreatureRunSpeed = 3.96f;
 static constexpr float kPlottedPathDuration = 1.0f; // seconds
 
 static const string kHeadHookNodeName = "headhook";
+static const string kRightHandNodeName = "rhand";
+static const string kLeftHandNodeName = "lhand";
 
 void Creature::loadFromGit(const Gff &git) {
     auto xPosition = git.getFloat("XPosition");
@@ -75,11 +79,14 @@ void Creature::loadFromUtc(const string &templateResRef) {
     auto firstName = _resourceSvc.strings.get(utc->getInt("FirstName"));
     auto appearanceType = utc->getInt("Appearance_Type");
     auto conversation = utc->getString("Conversation");
+    auto bodyVariation = utc->getInt("BodyVariation", 1);
+    auto textureVar = utc->getInt("TextureVar", 1);
 
     auto itemList = utc->getList("ItemList");
     for (auto &utcItem : itemList) {
         auto inventoryRes = utcItem->getString("InventoryRes");
         auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+        item->setSceneGraph(_sceneGraph);
         item->loadFromUti(inventoryRes);
         _items.push_back(item.get());
     }
@@ -88,9 +95,11 @@ void Creature::loadFromUtc(const string &templateResRef) {
     for (auto &utcItem : equipItemList) {
         auto equippedRes = utcItem->getString("EquippedRes");
         auto item = static_pointer_cast<Item>(_objectFactory.newItem());
+        item->setSceneGraph(_sceneGraph);
         item->loadFromUti(equippedRes);
-        // TODO: equip
-        // _equipment[InventorySlot::rightWeapon] = item.get();
+        if (!equip(*item)) {
+            _items.push_back(item.get());
+        }
     }
 
     // From appearance 2DA
@@ -101,14 +110,40 @@ void Creature::loadFromUtc(const string &templateResRef) {
     }
     auto modelType = appearanceTable->getString(appearanceType, "modeltype");
     auto race = appearanceTable->getString(appearanceType, "race");
+    auto raceTex = appearanceTable->getString(appearanceType, "racetex");
+    auto modelName = race;
+    auto textureName = raceTex;
+    if (modelType == "B") {
+        string modelColumn = "model";
+        string textureColumn = "tex";
+        auto bodyEquipment = _equipment.find(InventorySlot::body);
+        if (bodyEquipment != _equipment.end()) {
+            auto itemImpl = static_cast<Item *>(bodyEquipment->second);
+            modelColumn += 'a' + itemImpl->bodyVariation() - 1;
+            textureColumn += 'a' + itemImpl->bodyVariation() - 1;
+        } else {
+            modelColumn += 'a' + bodyVariation - 1;
+            textureColumn += 'a' + bodyVariation - 1;
+        }
+        modelName = appearanceTable->getString(appearanceType, modelColumn);
+        textureName = appearanceTable->getString(appearanceType, textureColumn);
+        if (bodyEquipment != _equipment.end()) {
+            auto itemImpl = static_cast<Item *>(bodyEquipment->second);
+            textureName += str(boost::format("%02d") % itemImpl->textureVar());
+        } else {
+            textureName += str(boost::format("%02d") % textureVar);
+        }
+    }
 
     // Make scene node
 
     shared_ptr<ModelSceneNode> sceneNode;
-    auto model = _graphicsSvc.models.get(race);
+    auto model = _graphicsSvc.models.get(modelName);
     if (model) {
         sceneNode = _sceneGraph->newModel(*model, ModelUsage::Creature);
         sceneNode->init();
+
+        // Head
         if (modelType == "B") {
             auto normalHead = appearanceTable->getInt(appearanceType, "normalhead");
             auto backupHead = appearanceTable->getInt(appearanceType, "backuphead");
@@ -124,6 +159,24 @@ void Creature::loadFromUtc(const string &templateResRef) {
                 sceneNode->attach(kHeadHookNodeName, *headSceneNode);
             }
         }
+
+        // Weapons
+        auto rhandEquipment = _equipment.find(InventorySlot::rightWeapon);
+        if (rhandEquipment != _equipment.end()) {
+            auto itemImpl = static_cast<Item *>(rhandEquipment->second);
+            sceneNode->attach(kRightHandNodeName, *itemImpl->sceneNode());
+        }
+        auto lhandEquipment = _equipment.find(InventorySlot::leftWeapon);
+        if (lhandEquipment != _equipment.end()) {
+            auto itemImpl = static_cast<Item *>(lhandEquipment->second);
+            sceneNode->attach(kLeftHandNodeName, *itemImpl->sceneNode());
+        }
+
+        auto texture = _graphicsSvc.textures.get(textureName);
+        if (texture) {
+            sceneNode->setDiffuseMap(texture.get());
+        }
+
         sceneNode->setUser(*this);
         sceneNode->setCullable(true);
         sceneNode->setPickable(true);
@@ -246,12 +299,43 @@ glm::vec3 Creature::targetWorldCoords() const {
     }
 }
 
-void Creature::equip(int slot, IItem &item) {
+bool Creature::equip(IItem &item) {
+    auto &itemImpl = static_cast<Item &>(item);
+    auto slots = set<int> {
+        InventorySlot::head,
+        InventorySlot::body,
+        InventorySlot::hands,
+        InventorySlot::rightWeapon,
+        InventorySlot::leftWeapon,
+        InventorySlot::leftArm,
+        InventorySlot::rightArm,
+        InventorySlot::implant,
+        InventorySlot::belt,
+        InventorySlot::cWeaponL,
+        InventorySlot::cWeaponR,
+        InventorySlot::cWeaponB,
+        InventorySlot::cArmour,
+        InventorySlot::rightWeapon2,
+        InventorySlot::leftWeapon2};
+    for (auto &slot : slots) {
+        if (itemImpl.isEquipable(slot) && _equipment.count(slot) == 0) {
+            return equip(slot, item);
+        }
+    }
+    return false;
+}
+
+bool Creature::equip(int slot, IItem &item) {
+    auto &itemImpl = static_cast<Item &>(item);
+    if (!itemImpl.isEquipable(slot)) {
+        return false;
+    }
     auto oldItem = _equipment.find(slot);
     if (oldItem != _equipment.end()) {
         _items.push_back(oldItem->second);
     }
     _equipment[slot] = &item;
+    return true;
 }
 
 void Creature::unequip(int slot) {

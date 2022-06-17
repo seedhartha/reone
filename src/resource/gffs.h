@@ -27,7 +27,7 @@ namespace resource {
 
 class Resources;
 
-class Gffs {
+class Gffs : boost::noncopyable {
 public:
     Gffs(Resources &resources) :
         _resources(resources) {

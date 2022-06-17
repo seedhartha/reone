@@ -57,10 +57,19 @@ BOOST_AUTO_TEST_CASE(should_load_from_git) {
                         vector<Gff::Field> {
                             Gff::Field::newResRef("InventoryRes", "some_item")})})});
 
-    auto appearanceTwoDa = make_shared<TwoDa>(vector<string>(), vector<TwoDa::Row>());
-    test.services().resource.twoDas.add("appearance", appearanceTwoDa);
+    auto uti = make_shared<Gff>(
+        2,
+        vector<Gff::Field> {});
 
-    test.services().resource.gffs.add(ResourceId("some_creature", ResourceType::Utc), utc);
+    auto &gffs = test.services().resource.gffs;
+    gffs.add(ResourceId("some_creature", ResourceType::Utc), utc);
+    gffs.add(ResourceId("some_item", ResourceType::Uti), uti);
+
+    auto appearanceTwoDa = make_shared<TwoDa>(vector<string>(), vector<TwoDa::Row>());
+    auto baseItemsTwoDa = make_shared<TwoDa>(vector<string>(), vector<TwoDa::Row>());
+    auto &twoDas = test.services().resource.twoDas;
+    twoDas.add("appearance", appearanceTwoDa);
+    twoDas.add("baseitems", baseItemsTwoDa);
 
     // when
     creature->loadFromGit(*git);

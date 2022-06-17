@@ -23,7 +23,7 @@ namespace reone {
  * Generic in-memory cache.
  */
 template <class K, class V>
-class MemoryCache : boost::noncopyable {
+class MemoryCache {
 public:
     /**
      * @param compute function used to lazily compute a value by key

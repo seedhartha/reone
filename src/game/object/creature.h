@@ -89,7 +89,9 @@ public:
 
     // Equipment
 
-    void equip(int slot, IItem &item);
+    bool equip(IItem &item);
+    bool equip(int slot, IItem &item);
+
     void unequip(int slot);
 
     // END Equipment

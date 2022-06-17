@@ -48,6 +48,27 @@ public:
     }
 
     void loadFromUti(const std::string &templateResRef);
+
+    bool isEquipable(int slot) const {
+        return (_equipableSlots & (1 << slot)) != 0;
+    }
+
+    int equipableSlots() const {
+        return _equipableSlots;
+    }
+    
+    int bodyVariation() const {
+        return _bodyVariation;
+    }
+
+    int textureVar() const {
+        return _textureVar;
+    }
+
+private:
+    int _equipableSlots {0};
+    int _bodyVariation {1};
+    int _textureVar {1};
 };
 
 } // namespace game
