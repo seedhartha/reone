@@ -19,14 +19,49 @@
 
 #include "../../src/graphics/aabb.h"
 
+using namespace std;
+
+using namespace reone;
+using namespace reone::graphics;
+
 BOOST_AUTO_TEST_SUITE(aabb)
 
-BOOST_AUTO_TEST_CASE(should_find_ray_box_intersection) {
+BOOST_AUTO_TEST_CASE(should_find_ray_box_intersection__from_within) {
     // given
+    auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
     // when
+    float distance = -1.0f;
+    bool intersected = aabb.raycast(glm::vec3(0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), numeric_limits<float>::max(), distance);
 
     // then
+    BOOST_REQUIRE(intersected);
+    BOOST_CHECK_CLOSE(0.0f, distance, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(should_find_ray_box_intersection__from_close) {
+    // given
+    auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
+
+    // when
+    float distance = -1.0f;
+    bool intersected = aabb.raycast(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, distance);
+
+    // then
+    BOOST_REQUIRE(intersected);
+    BOOST_CHECK_CLOSE(1.0f, distance, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(should_find_ray_box_intersection__from_far) {
+    // given
+    auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
+
+    // when
+    float distance = -1.0f;
+    bool intersected = aabb.raycast(glm::vec3(-20.0f, 0.0f, 0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, distance);
+
+    // then
+    BOOST_REQUIRE(!intersected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

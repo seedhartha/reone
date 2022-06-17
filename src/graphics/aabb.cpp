@@ -147,10 +147,10 @@ bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDi
     float tz1 = (_min.z - origin.z) * invDir.z;
     float tz2 = (_max.z - origin.z) * invDir.z;
 
-    tmin = glm::max(tmin, glm::min(tz1, tz2));
+    tmin = glm::max(0.0f, glm::max(tmin, glm::min(tz1, tz2)));
     tmax = glm::min(tmax, glm::max(tz1, tz2));
 
-    if (tmax < glm::max(0.0f, tmin)) {
+    if (tmax < tmin) {
         return false;
     }
     if (tmin >= maxDistance) {
