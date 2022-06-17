@@ -17,10 +17,62 @@
 
 #include "trigger.h"
 
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
+#include "../../resource/gff.h"
+#include "../../resource/gffs.h"
+#include "../../resource/services.h"
+#include "../../scene/graph.h"
+
+using namespace std;
+
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
 
+void Trigger::loadFromGit(const Gff &git) {
+    // From GIT
+    auto templateResRef = git.getString("TemplateResRef");
+    auto xPosition = git.getFloat("XPosition");
+    auto yPosition = git.getFloat("YPosition");
+    auto zPosition = git.getFloat("ZPosition");
+    auto geometry = git.getList("Geometry");
+    for (auto &point : geometry) {
+        auto pointX = point->getFloat("PointX");
+        auto pointY = point->getFloat("PointY");
+        auto pointZ = point->getFloat("PointZ");
+        _geometry.push_back(glm::vec3(pointX, pointY, pointZ));
+    }
+
+    // From UTT
+    auto utt = _resourceSvc.gffs.get(templateResRef, ResourceType::Utt);
+    if (!utt) {
+        throw ValidationException("UTT not found: " + templateResRef);
+    }
+    auto tag = utt->getString("Tag");
+    auto scriptOnEnter = utt->getString("ScriptOnEnter");
+
+    // Make scene node
+    if (_geometry.size() >= 3ll) {
+        auto triggerSceneNode = _sceneGraph->newTrigger(_geometry);
+        triggerSceneNode->init();
+        _sceneNode = triggerSceneNode.get();
+    } else {
+        warn("Invalid number of trigger points: " + to_string(_geometry.size()));
+    }
+
+    _tag = move(tag);
+    _position = glm::vec3(xPosition, yPosition, zPosition);
+
+    _scriptOnEnter = move(scriptOnEnter);
+
+    //
+
+    flushTransform();
 }
+
+} // namespace game
 
 } // namespace reone

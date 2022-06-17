@@ -50,8 +50,11 @@ public:
             resourceSvc) {
     }
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    void loadFromGit(const resource::Gff &git);
+
+private:
+    std::vector<glm::vec3> _geometry;
+    std::string _scriptOnEnter;
 };
 
 } // namespace game

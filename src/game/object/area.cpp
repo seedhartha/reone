@@ -38,6 +38,7 @@
 #include "factory.h"
 #include "placeable.h"
 #include "room.h"
+#include "trigger.h"
 
 using namespace std;
 
@@ -153,6 +154,16 @@ void Area::load(const string &name) {
         door.setSceneGraph(_sceneGraph);
         door.loadFromGit(*gitDoor);
         _objects.push_back(&door);
+    }
+
+    // Triggers
+
+    auto gitTriggers = git->getList("TriggerList");
+    for (auto &gitTrigger : gitTriggers) {
+        auto &trigger = static_cast<Trigger &>(*_objectFactory.newTrigger());
+        trigger.setSceneGraph(_sceneGraph);
+        trigger.loadFromGit(*gitTrigger);
+        _objects.push_back(&trigger);
     }
 }
 

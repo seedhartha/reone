@@ -342,9 +342,13 @@ void Game::loadModule(const string &name) {
     // Objects
 
     for (auto &object : module.area().objects()) {
-        auto model = static_cast<ModelSceneNode *>(object->sceneNode());
-        if (model) {
+        auto sceneNode = object->sceneNode();
+        if (sceneNode->type() == SceneNodeType::Model) {
+            auto model = static_cast<ModelSceneNode *>(sceneNode);
             scene.addRoot(*model);
+        } else if (sceneNode->type() == SceneNodeType::Trigger) {
+            auto trigger = static_cast<TriggerSceneNode *>(sceneNode);
+            scene.addRoot(*trigger);
         }
         if (object->type() == ObjectType::Placeable) {
             auto &placeable = static_cast<Placeable &>(*object);
