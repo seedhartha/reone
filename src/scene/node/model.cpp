@@ -286,22 +286,6 @@ ModelSceneNode::AnimationBlendMode ModelSceneNode::getAnimationBlendMode(int fla
 }
 
 void ModelSceneNode::updateAnimations(float dt) {
-    if (_animChannels.empty()) {
-        playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
-        return;
-    }
-
-    for (auto &channel : _animChannels) {
-        if (!channel.freeze) {
-            updateAnimationChannel(channel, dt);
-        }
-    }
-
-    // Apply states and compute bone transforms only when this model is not culled
-    if (!_culled) {
-        applyAnimationStates(*_model->rootNode());
-    }
-
     // Erase finished channels
     switch (_animBlendMode) {
     case AnimationBlendMode::Single:
@@ -320,6 +304,22 @@ void ModelSceneNode::updateAnimations(float dt) {
         break;
     default:
         break;
+    }
+
+    if (_animChannels.empty()) {
+        playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
+        return;
+    }
+
+    for (auto &channel : _animChannels) {
+        if (!channel.freeze) {
+            updateAnimationChannel(channel, dt);
+        }
+    }
+
+    // Apply states and compute bone transforms only when this model is not culled
+    if (!_culled) {
+        applyAnimationStates(*_model->rootNode());
     }
 }
 
@@ -343,21 +343,21 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
         }
     }
 
-    // Loop or finish playing the animation
-    if (channel.time == length) {
+    // Compute animation states only when this model is not culled
+    if (!_culled) {
+        float time = channel.transition ? channel.anim->transitionTime() : channel.time;
+        channel.stateByNodeNumber.clear();
+        computeAnimationStates(channel, time, *_model->rootNode());
+    }
+
+    bool lastFrame = channel.time == length;
+    if (lastFrame) {
         bool loop = channel.properties.flags & AnimationFlags::loop;
         if (loop) {
             channel.time = 0.0f;
         } else {
             channel.finished = true;
         }
-    }
-
-    // Compute animation states only when this model is not culled
-    if (!_culled) {
-        float time = channel.transition ? channel.anim->transitionTime() : channel.time;
-        channel.stateByNodeNumber.clear();
-        computeAnimationStates(channel, time, *_model->rootNode());
     }
 }
 
@@ -551,7 +551,7 @@ bool ModelSceneNode::isAnimationFinished() const {
     return _animChannels.empty() || _animChannels.front().finished;
 }
 
-string ModelSceneNode::getActiveAnimationName() const {
+string ModelSceneNode::activeAnimationName() const {
     if (_animChannels.empty()) {
         return "";
     }

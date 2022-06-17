@@ -126,11 +126,11 @@ void Door::update(float delta) {
     if (_sceneNode) {
         auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
         if (_state == State::Closed) {
-            if (modelSceneNode.getActiveAnimationName() != "closed") {
+            if (modelSceneNode.activeAnimationName() != "closed") {
                 modelSceneNode.playAnimation("closed");
             }
         } else if (_state == State::Opening) {
-            auto animName = modelSceneNode.getActiveAnimationName();
+            auto animName = modelSceneNode.activeAnimationName();
             if (animName == "opening1" && modelSceneNode.isAnimationFinished()) {
                 _state = State::Open;
                 _walkmeshClosed->setEnabled(false);
@@ -139,7 +139,7 @@ void Door::update(float delta) {
                 modelSceneNode.playAnimation("opening1");
             }
         } else if (_state == State::Open) {
-            if (modelSceneNode.getActiveAnimationName() != "open1") {
+            if (modelSceneNode.activeAnimationName() != "open1") {
                 modelSceneNode.playAnimation("open1");
             }
         }

@@ -43,6 +43,44 @@ namespace scene {
 
 class ModelSceneNode : public SceneNode {
 public:
+    enum class AnimationBlendMode {
+        Single,
+        Blend,
+        Overlay
+    };
+
+    struct AnimationStateFlags {
+        static constexpr int transform = 1;
+        static constexpr int alpha = 2;
+        static constexpr int selfIllumColor = 4;
+        static constexpr int color = 8;
+    };
+
+    struct AnimationState {
+        int flags {0};
+        glm::mat4 transform {1.0f};
+        float alpha {0.0f};
+        glm::vec3 selfIllumColor {0.0f};
+        glm::vec3 color {0.0f};
+    };
+
+    struct AnimationChannel {
+        graphics::Animation *anim;
+        graphics::LipAnimation *lipAnim;
+        AnimationProperties properties;
+        float time {0.0f};
+        std::unordered_map<uint16_t, AnimationState> stateByNodeNumber;
+        bool freeze {false};     /**< channel time is not to be updated */
+        bool transition {false}; /**< when computing states, use animation transition time as channel time */
+        bool finished {false};   /**< finished channels will be erased from the queue */
+
+        AnimationChannel(graphics::Animation &anim, graphics::LipAnimation *lipAnim, AnimationProperties properties) :
+            anim(&anim),
+            lipAnim(lipAnim),
+            properties(std::move(properties)) {
+        }
+    };
+
     ModelSceneNode(
         graphics::Model &model,
         ModelUsage usage,
@@ -83,7 +121,11 @@ public:
 
     bool isAnimationFinished() const;
 
-    std::string getActiveAnimationName() const;
+    std::string activeAnimationName() const;
+
+    const std::deque<AnimationChannel> &animationChannels() const {
+        return _animChannels;
+    }
 
     // END Animation
 
@@ -96,44 +138,6 @@ public:
     // END Attachments
 
 private:
-    enum class AnimationBlendMode {
-        Single,
-        Blend,
-        Overlay
-    };
-
-    struct AnimationStateFlags {
-        static constexpr int transform = 1;
-        static constexpr int alpha = 2;
-        static constexpr int selfIllumColor = 4;
-        static constexpr int color = 8;
-    };
-
-    struct AnimationState {
-        int flags {0};
-        glm::mat4 transform {1.0f};
-        float alpha {0.0f};
-        glm::vec3 selfIllumColor {0.0f};
-        glm::vec3 color {0.0f};
-    };
-
-    struct AnimationChannel {
-        graphics::Animation *anim;
-        graphics::LipAnimation *lipAnim;
-        AnimationProperties properties;
-        float time {0.0f};
-        std::unordered_map<uint16_t, AnimationState> stateByNodeNumber;
-        bool freeze {false};     /**< channel time is not to be updated */
-        bool transition {false}; /**< when computing states, use animation transition time as channel time */
-        bool finished {false};   /**< finished channels will be erased from the queue */
-
-        AnimationChannel(graphics::Animation &anim, graphics::LipAnimation *lipAnim, AnimationProperties properties) :
-            anim(&anim),
-            lipAnim(lipAnim),
-            properties(std::move(properties)) {
-        }
-    };
-
     graphics::Model *_model;
     ModelUsage _usage;
 

@@ -220,7 +220,7 @@ void Creature::update(float delta) {
             animName.insert(0, "c");
         }
         auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
-        if (modelSceneNode.getActiveAnimationName() != animName) {
+        if (modelSceneNode.activeAnimationName() != animName) {
             auto animProps = AnimationProperties::fromFlags(AnimationFlags::loop | AnimationFlags::propagate);
             modelSceneNode.playAnimation(animName, move(animProps));
         }
