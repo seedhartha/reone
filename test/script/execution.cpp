@@ -118,8 +118,6 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     program->add(Instruction(InstructionType::DIVIF));     // 28.8, 2.0
     program->add(Instruction(InstructionType::DIVFF));     // 14.4
     program->add(Instruction(InstructionType::NEGF));      // -14.4
-    program->add(Instruction::newCONSTF(-14.4f));          // -14.4, -14.4
-    program->add(Instruction(InstructionType::EQUALFF));   // 1
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
@@ -128,7 +126,9 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(1, result);
+    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(1, execution.getStackSize());
+    BOOST_CHECK_CLOSE(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
@@ -242,10 +242,6 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     program->add(Instruction::newCONSTF(3.0f));
     program->add(Instruction::newCONSTF(4.0f));
     program->add(Instruction::newACTION(0, 2));
-    program->add(Instruction(InstructionType::MULFF));
-    program->add(Instruction(InstructionType::ADDFF));
-    program->add(Instruction::newCONSTF(37.0f));
-    program->add(Instruction(InstructionType::EQUALFF));
 
     auto routine = make_shared<MockRoutine>(
         "SomeAction",
@@ -265,7 +261,11 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(1, result);
+    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(3, execution.getStackSize());
+    BOOST_CHECK_CLOSE(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
+    BOOST_CHECK_CLOSE(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
+    BOOST_CHECK_CLOSE(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
     BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
     auto inVecValue = get<0>(invocation[0])[0].vecValue;
@@ -363,8 +363,6 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     program->add(Instruction(InstructionType::DIVVF));   // [8190.0, 4095.0, 2730.0]
     program->add(Instruction(InstructionType::ADDFF));   // 8190.0, 6825.0
     program->add(Instruction(InstructionType::ADDFF));   // 15015.0
-    program->add(Instruction::newCONSTF(15015.0f));      // 15015.0, 15015.0
-    program->add(Instruction(InstructionType::EQUALFF)); // 1
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
@@ -373,7 +371,9 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(1, result);
+    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(1, execution.getStackSize());
+    BOOST_CHECK_CLOSE(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
@@ -399,10 +399,8 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTF(3.0f));
     program->add(Instruction::newNEQUALTT(8)); // 1, 1, 1
-    program->add(Instruction(InstructionType::ADDII));
-    program->add(Instruction(InstructionType::ADDII));
-    program->add(Instruction::newCONSTI(3));
-    program->add(Instruction(InstructionType::EQUALII));
+    program->add(Instruction(InstructionType::LOGORII));
+    program->add(Instruction(InstructionType::LOGORII));
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
