@@ -46,37 +46,41 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
 BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
-    program->add(Instruction::newCONSTI(-3));
-    program->add(Instruction(InstructionType::NEGI));
-    program->add(Instruction::newCONSTI(2));
-    program->add(Instruction(InstructionType::MODII)); // 1
-    program->add(Instruction::newCONSTF(2.0f));
-    program->add(Instruction(InstructionType::ADDIF)); // 3.0
-    program->add(Instruction::newCONSTI(3));
-    program->add(Instruction(InstructionType::ADDFI)); // 6.0
-    program->add(Instruction::newCONSTF(4.0f));
-    program->add(Instruction(InstructionType::ADDFF)); // 10.0
-    program->add(Instruction::newCONSTI(5));
-    program->add(Instruction::newCONSTI(6));
-    program->add(Instruction(InstructionType::SUBII)); // 10.0, -1
-    program->add(Instruction(InstructionType::SUBFI)); // 11.0
-    program->add(Instruction::newCONSTF(7.0f));
-    program->add(Instruction(InstructionType::SUBFF)); // 4.0
-    program->add(Instruction::newCONSTI(8));
-    program->add(Instruction::newCONSTI(9));
-    program->add(Instruction(InstructionType::MULII)); // 4.0, 72
-    program->add(Instruction::newCONSTF(0.1f));
-    program->add(Instruction(InstructionType::MULIF)); // 4.0, 7.2
-    program->add(Instruction(InstructionType::MULFF)); // 28.8
-    program->add(Instruction::newCONSTI(4));
-    program->add(Instruction::newCONSTI(2));
-    program->add(Instruction(InstructionType::DIVII)); // 28.8, 2
-    program->add(Instruction::newCONSTF(1.0f));
-    program->add(Instruction(InstructionType::DIVIF)); // 28.8, 2.0
-    program->add(Instruction(InstructionType::DIVFF)); // 14.4
-    program->add(Instruction(InstructionType::NEGF));  // -14.4
-    program->add(Instruction::newCONSTF(-14.4f));
-    program->add(Instruction(InstructionType::EQUALFF));
+    program->add(Instruction::newCONSTI(-7));              // -7
+    program->add(Instruction(InstructionType::NEGI));      // 7
+    program->add(Instruction::newCONSTI(1));               // 7, 1
+    program->add(Instruction(InstructionType::SHRIGHTII)); // 3
+    program->add(Instruction::newCONSTI(1));               // 3, 1
+    program->add(Instruction::newCONSTI(1));               // 3, 1, 1
+    program->add(Instruction(InstructionType::SHLEFTII));  // 3, 2
+    program->add(Instruction(InstructionType::MODII));     // 1
+    program->add(Instruction::newCONSTF(2.0f));            // 1, 2.0
+    program->add(Instruction(InstructionType::ADDIF));     // 3.0
+    program->add(Instruction::newCONSTI(3));               // 3.0, 3
+    program->add(Instruction(InstructionType::ADDFI));     // 6.0
+    program->add(Instruction::newCONSTF(4.0f));            // 6.0, 4.0
+    program->add(Instruction(InstructionType::ADDFF));     // 10.0
+    program->add(Instruction::newCONSTI(5));               // 10.0, 5
+    program->add(Instruction::newCONSTI(6));               // 10.0, 5, 6
+    program->add(Instruction(InstructionType::SUBII));     // 10.0, -1
+    program->add(Instruction(InstructionType::SUBFI));     // 11.0
+    program->add(Instruction::newCONSTF(7.0f));            // 11.0, 7.0
+    program->add(Instruction(InstructionType::SUBFF));     // 4.0
+    program->add(Instruction::newCONSTI(8));               // 4.0, 8
+    program->add(Instruction::newCONSTI(9));               // 4.0, 8, 9
+    program->add(Instruction(InstructionType::MULII));     // 4.0, 72
+    program->add(Instruction::newCONSTF(0.1f));            // 4.0, 72, 0.1
+    program->add(Instruction(InstructionType::MULIF));     // 4.0, 7.2
+    program->add(Instruction(InstructionType::MULFF));     // 28.8
+    program->add(Instruction::newCONSTI(4));               // 28.8, 4
+    program->add(Instruction::newCONSTI(2));               // 28.8, 4, 2
+    program->add(Instruction(InstructionType::DIVII));     // 28.8, 2
+    program->add(Instruction::newCONSTF(1.0f));            // 28.8, 2, 1.0
+    program->add(Instruction(InstructionType::DIVIF));     // 28.8, 2.0
+    program->add(Instruction(InstructionType::DIVFF));     // 14.4
+    program->add(Instruction(InstructionType::NEGF));      // -14.4
+    program->add(Instruction::newCONSTF(-14.4f));          // -14.4, -14.4
+    program->add(Instruction(InstructionType::EQUALFF));   // 1
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
@@ -285,43 +289,43 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
 BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
-    program->add(Instruction::newCONSTF(1.0f));
-    program->add(Instruction::newCONSTF(2.0f));
-    program->add(Instruction::newCONSTF(3.0f));
-    program->add(Instruction::newCONSTF(4.0f));
-    program->add(Instruction::newCONSTF(5.0f));
-    program->add(Instruction::newCONSTF(6.0f));
-    program->add(Instruction(InstructionType::ADDVV)); // [5.0, 7.0, 9.0]
-    program->add(Instruction(InstructionType::ADDFF)); // 5.0, 16.0
-    program->add(Instruction(InstructionType::ADDFF)); // 21.0
-    program->add(Instruction::newCONSTF(7.0f));
-    program->add(Instruction::newCONSTF(8.0f));
-    program->add(Instruction::newCONSTF(9.0f));
-    program->add(Instruction::newCONSTF(3.0f));
-    program->add(Instruction::newCONSTF(2.0f));
-    program->add(Instruction::newCONSTF(1.0f));
-    program->add(Instruction(InstructionType::SUBVV)); // 21.0, [4.0, 6.0, 8.0]
-    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 4.0, 14.0
-    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 18.0
-    program->add(Instruction(InstructionType::ADDFF)); // 39.0
-    program->add(Instruction::newCONSTF(4.0f));
-    program->add(Instruction::newCONSTF(5.0f));
-    program->add(Instruction::newCONSTF(6.0f));
-    program->add(Instruction(InstructionType::MULFV)); // [156.0, 195.0, 234.0]
-    program->add(Instruction::newCONSTF(7.0f));
-    program->add(Instruction(InstructionType::MULVF)); // [1092.0, 1365.0, 1638.0]
-    program->add(Instruction(InstructionType::ADDFF)); // 1092.0, 3003.0
-    program->add(Instruction(InstructionType::ADDFF)); // 4095.0
-    program->add(Instruction::newCONSTF(1.0f));
-    program->add(Instruction::newCONSTF(2.0f));
-    program->add(Instruction::newCONSTF(3.0f));
-    program->add(Instruction(InstructionType::DIVFV)); // [4095.0, 2047.5, 1365.0]
-    program->add(Instruction::newCONSTF(0.5f));
-    program->add(Instruction(InstructionType::DIVVF)); // [8190.0, 4095.0, 2730.0]
-    program->add(Instruction(InstructionType::ADDFF)); // 8190.0, 6825.0
-    program->add(Instruction(InstructionType::ADDFF)); // 15015.0
-    program->add(Instruction::newCONSTF(15015.0f));
-    program->add(Instruction(InstructionType::EQUALFF));
+    program->add(Instruction::newCONSTF(1.0f));          // 1.0
+    program->add(Instruction::newCONSTF(2.0f));          // 1.0, 2.0
+    program->add(Instruction::newCONSTF(3.0f));          // [1.0, 2.0, 3.0]
+    program->add(Instruction::newCONSTF(4.0f));          // [1.0, 2.0, 3.0], 4.0
+    program->add(Instruction::newCONSTF(5.0f));          // [1.0, 2.0, 3.0], 4.0, 5.0
+    program->add(Instruction::newCONSTF(6.0f));          // [1.0, 2.0, 3.0], [4.0, 5.0, 6.0]
+    program->add(Instruction(InstructionType::ADDVV));   // [5.0, 7.0, 9.0]
+    program->add(Instruction(InstructionType::ADDFF));   // 5.0, 16.0
+    program->add(Instruction(InstructionType::ADDFF));   // 21.0
+    program->add(Instruction::newCONSTF(7.0f));          // 21.0, 7.0
+    program->add(Instruction::newCONSTF(8.0f));          // 21.0, 7.0, 8.0
+    program->add(Instruction::newCONSTF(9.0f));          // 21.0, [7.0, 8.0, 9.0]
+    program->add(Instruction::newCONSTF(3.0f));          // 21.0, [7.0, 8.0, 9.0], 3.0
+    program->add(Instruction::newCONSTF(2.0f));          // 21.0, [7.0, 8.0, 9.0], 3.0, 2.0
+    program->add(Instruction::newCONSTF(1.0f));          // 21.0, [7.0, 8.0, 9.0], [3.0, 2.0, 1.0]
+    program->add(Instruction(InstructionType::SUBVV));   // 21.0, [4.0, 6.0, 8.0]
+    program->add(Instruction(InstructionType::ADDFF));   // 21.0, 4.0, 14.0
+    program->add(Instruction(InstructionType::ADDFF));   // 21.0, 18.0
+    program->add(Instruction(InstructionType::ADDFF));   // 39.0
+    program->add(Instruction::newCONSTF(4.0f));          // 39.0, 4.0
+    program->add(Instruction::newCONSTF(5.0f));          // 39.0, 4.0, 5.0
+    program->add(Instruction::newCONSTF(6.0f));          // 39.0, [4.0, 5.0, 6.0]
+    program->add(Instruction(InstructionType::MULFV));   // [156.0, 195.0, 234.0]
+    program->add(Instruction::newCONSTF(7.0f));          // [156.0, 195.0, 234.0], 7.0
+    program->add(Instruction(InstructionType::MULVF));   // [1092.0, 1365.0, 1638.0]
+    program->add(Instruction(InstructionType::ADDFF));   // 1092.0, 3003.0
+    program->add(Instruction(InstructionType::ADDFF));   // 4095.0
+    program->add(Instruction::newCONSTF(1.0f));          // 4095.0, 1.0
+    program->add(Instruction::newCONSTF(2.0f));          // 4095.0, 1.0, 2.0
+    program->add(Instruction::newCONSTF(3.0f));          // 4095.0, 1.0, 2.0, 3.0
+    program->add(Instruction(InstructionType::DIVFV));   // [4095.0, 2047.5, 1365.0]
+    program->add(Instruction::newCONSTF(0.5f));          // [4095.0, 2047.5, 1365.0], 0.5
+    program->add(Instruction(InstructionType::DIVVF));   // [8190.0, 4095.0, 2730.0]
+    program->add(Instruction(InstructionType::ADDFF));   // 8190.0, 6825.0
+    program->add(Instruction(InstructionType::ADDFF));   // 15015.0
+    program->add(Instruction::newCONSTF(15015.0f));      // 15015.0, 15015.0
+    program->add(Instruction(InstructionType::EQUALFF)); // 1
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
