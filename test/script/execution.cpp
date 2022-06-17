@@ -43,6 +43,45 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
     BOOST_CHECK_EQUAL(-1, result);
 }
 
+BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
+    // given
+    auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTI(0));              // 0
+    program->add(Instruction::newCONSTI(0));              // 0, 0
+    program->add(Instruction(InstructionType::LOGANDII)); // 0
+    program->add(Instruction::newCONSTI(0));              // 0, 0
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1
+    program->add(Instruction(InstructionType::LOGANDII)); // 0, 0
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 1
+    program->add(Instruction(InstructionType::LOGANDII)); // 0, 0, 1
+    program->add(Instruction::newCONSTI(0));              // 0, 0, 1, 0
+    program->add(Instruction::newCONSTI(0));              // 0, 0, 1, 0, 0
+    program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0
+    program->add(Instruction::newCONSTI(0));              // 0, 0, 1, 0, 0
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 0, 1
+    program->add(Instruction(InstructionType::LOGORII)); // 0, 0, 1, 0, 1
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 1, 1
+    program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 1, 1, 1
+    program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1, 1
+
+    auto context = make_unique<ExecutionContext>();
+    auto execution = ScriptExecution(program, move(context));
+
+    // when
+    auto result = execution.run();
+
+    // then
+    BOOST_CHECK_EQUAL(1, result);
+    BOOST_CHECK_EQUAL(6, execution.getStackSize());
+    BOOST_CHECK_EQUAL(0, execution.getStackVariable(0).intValue);
+    BOOST_CHECK_EQUAL(0, execution.getStackVariable(1).intValue);
+    BOOST_CHECK_EQUAL(1, execution.getStackVariable(2).intValue);
+    BOOST_CHECK_EQUAL(0, execution.getStackVariable(3).intValue);
+    BOOST_CHECK_EQUAL(1, execution.getStackVariable(4).intValue);
+    BOOST_CHECK_EQUAL(1, execution.getStackVariable(5).intValue);
+}
+
 BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
