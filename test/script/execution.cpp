@@ -46,7 +46,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
 BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
-    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTI(-3));
+    program->add(Instruction(InstructionType::NEGI));
+    program->add(Instruction::newCONSTI(2));
+    program->add(Instruction(InstructionType::MODII)); // 1
     program->add(Instruction::newCONSTF(2.0f));
     program->add(Instruction(InstructionType::ADDIF)); // 3.0
     program->add(Instruction::newCONSTI(3));
@@ -71,7 +74,8 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     program->add(Instruction::newCONSTF(1.0f));
     program->add(Instruction(InstructionType::DIVIF)); // 28.8, 2.0
     program->add(Instruction(InstructionType::DIVFF)); // 14.4
-    program->add(Instruction::newCONSTF(14.4f));
+    program->add(Instruction(InstructionType::NEGF)); // -14.4
+    program->add(Instruction::newCONSTF(-14.4f));
     program->add(Instruction(InstructionType::EQUALFF));
 
     auto context = make_unique<ExecutionContext>();
@@ -299,8 +303,14 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     program->add(Instruction::newDESTRUCT(16, 4, 8));
     program->add(Instruction::newCONSTO(3));
     program->add(Instruction::newEQUALTT(16)); // 1, 1
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTF(3.0f));
+    program->add(Instruction::newNEQUALTT(8)); // 1, 1, 1
     program->add(Instruction(InstructionType::ADDII));
-    program->add(Instruction::newCONSTI(2));
+    program->add(Instruction(InstructionType::ADDII));
+    program->add(Instruction::newCONSTI(3));
     program->add(Instruction(InstructionType::EQUALII));
 
     auto context = make_unique<ExecutionContext>();
