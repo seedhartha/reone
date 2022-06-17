@@ -19,6 +19,7 @@
 
 #include "../../script/execution.h"
 #include "../../script/executioncontext.h"
+#include "../../script/executionstate.h"
 #include "../../script/program.h"
 
 #include "../fixtures/script.h"
@@ -60,7 +61,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0
     program->add(Instruction::newCONSTI(0));              // 0, 0, 1, 0, 0
     program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 0, 1
-    program->add(Instruction(InstructionType::LOGORII)); // 0, 0, 1, 0, 1
+    program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1
     program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 1, 1
     program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 1, 1, 1
     program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1, 1
@@ -275,6 +276,54 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     BOOST_CHECK_EQUAL(1, get<0>(invocation[0])[1].intValue);
 }
 
+BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
+    // given
+    auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTI(2));
+    program->add(Instruction::newCONSTI(3));
+    program->add(Instruction(InstructionType::SAVEBP));
+    program->add(Instruction::newCONSTI(4));
+    program->add(Instruction::newCONSTI(5));
+    program->add(Instruction::newSTORE_STATE(8, 4));
+    program->add(Instruction::newJMP(13));
+    program->add(Instruction::newACTION(1, 1));
+    program->add(Instruction(InstructionType::RETN));
+    program->add(Instruction::newACTION(0, 1));
+    program->add(Instruction::newMOVSP(-24));
+
+    auto routine = make_shared<MockRoutine>(
+        "SomeAction",
+        VariableType::Void,
+        Variable(),
+        vector<VariableType> {VariableType::Action});
+
+    auto routines = MockRoutines();
+    routines.add(0, routine);
+
+    auto context = make_unique<ExecutionContext>();
+    context->routines = &routines;
+
+    auto execution = ScriptExecution(program, move(context));
+
+    // when
+    auto result = execution.run();
+
+    // then
+    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(0, execution.getStackSize());
+    BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
+    auto &routineInvocation = routine->invokeInvocations()[0];
+    auto &actionContext = get<0>(routineInvocation)[0].context;
+    BOOST_CHECK(static_cast<bool>(actionContext));
+    BOOST_CHECK(static_cast<bool>(actionContext->savedState));
+    BOOST_CHECK_EQUAL(2, actionContext->savedState->globals.size());
+    BOOST_CHECK_EQUAL(2, actionContext->savedState->globals[0].intValue);
+    BOOST_CHECK_EQUAL(3, actionContext->savedState->globals[1].intValue);
+    BOOST_CHECK_EQUAL(1, actionContext->savedState->locals.size());
+    BOOST_CHECK_EQUAL(5, actionContext->savedState->locals[0].intValue);
+}
+
 BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
@@ -328,41 +377,41 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
 BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
-    program->add(Instruction::newCONSTF(1.0f));          // 1.0
-    program->add(Instruction::newCONSTF(2.0f));          // 1.0, 2.0
-    program->add(Instruction::newCONSTF(3.0f));          // [1.0, 2.0, 3.0]
-    program->add(Instruction::newCONSTF(4.0f));          // [1.0, 2.0, 3.0], 4.0
-    program->add(Instruction::newCONSTF(5.0f));          // [1.0, 2.0, 3.0], 4.0, 5.0
-    program->add(Instruction::newCONSTF(6.0f));          // [1.0, 2.0, 3.0], [4.0, 5.0, 6.0]
-    program->add(Instruction(InstructionType::ADDVV));   // [5.0, 7.0, 9.0]
-    program->add(Instruction(InstructionType::ADDFF));   // 5.0, 16.0
-    program->add(Instruction(InstructionType::ADDFF));   // 21.0
-    program->add(Instruction::newCONSTF(7.0f));          // 21.0, 7.0
-    program->add(Instruction::newCONSTF(8.0f));          // 21.0, 7.0, 8.0
-    program->add(Instruction::newCONSTF(9.0f));          // 21.0, [7.0, 8.0, 9.0]
-    program->add(Instruction::newCONSTF(3.0f));          // 21.0, [7.0, 8.0, 9.0], 3.0
-    program->add(Instruction::newCONSTF(2.0f));          // 21.0, [7.0, 8.0, 9.0], 3.0, 2.0
-    program->add(Instruction::newCONSTF(1.0f));          // 21.0, [7.0, 8.0, 9.0], [3.0, 2.0, 1.0]
-    program->add(Instruction(InstructionType::SUBVV));   // 21.0, [4.0, 6.0, 8.0]
-    program->add(Instruction(InstructionType::ADDFF));   // 21.0, 4.0, 14.0
-    program->add(Instruction(InstructionType::ADDFF));   // 21.0, 18.0
-    program->add(Instruction(InstructionType::ADDFF));   // 39.0
-    program->add(Instruction::newCONSTF(4.0f));          // 39.0, 4.0
-    program->add(Instruction::newCONSTF(5.0f));          // 39.0, 4.0, 5.0
-    program->add(Instruction::newCONSTF(6.0f));          // 39.0, [4.0, 5.0, 6.0]
-    program->add(Instruction(InstructionType::MULFV));   // [156.0, 195.0, 234.0]
-    program->add(Instruction::newCONSTF(7.0f));          // [156.0, 195.0, 234.0], 7.0
-    program->add(Instruction(InstructionType::MULVF));   // [1092.0, 1365.0, 1638.0]
-    program->add(Instruction(InstructionType::ADDFF));   // 1092.0, 3003.0
-    program->add(Instruction(InstructionType::ADDFF));   // 4095.0
-    program->add(Instruction::newCONSTF(1.0f));          // 4095.0, 1.0
-    program->add(Instruction::newCONSTF(2.0f));          // 4095.0, 1.0, 2.0
-    program->add(Instruction::newCONSTF(3.0f));          // 4095.0, 1.0, 2.0, 3.0
-    program->add(Instruction(InstructionType::DIVFV));   // [4095.0, 2047.5, 1365.0]
-    program->add(Instruction::newCONSTF(0.5f));          // [4095.0, 2047.5, 1365.0], 0.5
-    program->add(Instruction(InstructionType::DIVVF));   // [8190.0, 4095.0, 2730.0]
-    program->add(Instruction(InstructionType::ADDFF));   // 8190.0, 6825.0
-    program->add(Instruction(InstructionType::ADDFF));   // 15015.0
+    program->add(Instruction::newCONSTF(1.0f));        // 1.0
+    program->add(Instruction::newCONSTF(2.0f));        // 1.0, 2.0
+    program->add(Instruction::newCONSTF(3.0f));        // [1.0, 2.0, 3.0]
+    program->add(Instruction::newCONSTF(4.0f));        // [1.0, 2.0, 3.0], 4.0
+    program->add(Instruction::newCONSTF(5.0f));        // [1.0, 2.0, 3.0], 4.0, 5.0
+    program->add(Instruction::newCONSTF(6.0f));        // [1.0, 2.0, 3.0], [4.0, 5.0, 6.0]
+    program->add(Instruction(InstructionType::ADDVV)); // [5.0, 7.0, 9.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 5.0, 16.0
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0
+    program->add(Instruction::newCONSTF(7.0f));        // 21.0, 7.0
+    program->add(Instruction::newCONSTF(8.0f));        // 21.0, 7.0, 8.0
+    program->add(Instruction::newCONSTF(9.0f));        // 21.0, [7.0, 8.0, 9.0]
+    program->add(Instruction::newCONSTF(3.0f));        // 21.0, [7.0, 8.0, 9.0], 3.0
+    program->add(Instruction::newCONSTF(2.0f));        // 21.0, [7.0, 8.0, 9.0], 3.0, 2.0
+    program->add(Instruction::newCONSTF(1.0f));        // 21.0, [7.0, 8.0, 9.0], [3.0, 2.0, 1.0]
+    program->add(Instruction(InstructionType::SUBVV)); // 21.0, [4.0, 6.0, 8.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 4.0, 14.0
+    program->add(Instruction(InstructionType::ADDFF)); // 21.0, 18.0
+    program->add(Instruction(InstructionType::ADDFF)); // 39.0
+    program->add(Instruction::newCONSTF(4.0f));        // 39.0, 4.0
+    program->add(Instruction::newCONSTF(5.0f));        // 39.0, 4.0, 5.0
+    program->add(Instruction::newCONSTF(6.0f));        // 39.0, [4.0, 5.0, 6.0]
+    program->add(Instruction(InstructionType::MULFV)); // [156.0, 195.0, 234.0]
+    program->add(Instruction::newCONSTF(7.0f));        // [156.0, 195.0, 234.0], 7.0
+    program->add(Instruction(InstructionType::MULVF)); // [1092.0, 1365.0, 1638.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 1092.0, 3003.0
+    program->add(Instruction(InstructionType::ADDFF)); // 4095.0
+    program->add(Instruction::newCONSTF(1.0f));        // 4095.0, 1.0
+    program->add(Instruction::newCONSTF(2.0f));        // 4095.0, 1.0, 2.0
+    program->add(Instruction::newCONSTF(3.0f));        // 4095.0, 1.0, 2.0, 3.0
+    program->add(Instruction(InstructionType::DIVFV)); // [4095.0, 2047.5, 1365.0]
+    program->add(Instruction::newCONSTF(0.5f));        // [4095.0, 2047.5, 1365.0], 0.5
+    program->add(Instruction(InstructionType::DIVVF)); // [8190.0, 4095.0, 2730.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 8190.0, 6825.0
+    program->add(Instruction(InstructionType::ADDFF)); // 15015.0
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
