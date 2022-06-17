@@ -215,17 +215,17 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     program->add(Instruction(InstructionType::MULFV)); // [156.0, 195.0, 234.0]
     program->add(Instruction::newCONSTF(7.0f));
     program->add(Instruction(InstructionType::MULVF)); // [1092.0, 1365.0, 1638.0]
-    program->add(Instruction(InstructionType::SUBFF)); // 1092.0, -273.0
-    program->add(Instruction(InstructionType::ADDFF)); // 819.0
+    program->add(Instruction(InstructionType::ADDFF)); // 1092.0, 3003.0
+    program->add(Instruction(InstructionType::ADDFF)); // 4095.0
     program->add(Instruction::newCONSTF(1.0f));
     program->add(Instruction::newCONSTF(2.0f));
     program->add(Instruction::newCONSTF(3.0f));
-    program->add(Instruction(InstructionType::DIVFV)); // [819.0, 409.5, 273.0]
+    program->add(Instruction(InstructionType::DIVFV)); // [4095.0, 2047.5, 1365.0]
     program->add(Instruction::newCONSTF(0.5f));
-    program->add(Instruction(InstructionType::DIVVF)); // [1638.0, 819.0, 546.0]
-    program->add(Instruction(InstructionType::SUBFF)); // 1638.0, 273.0
-    program->add(Instruction(InstructionType::SUBFF)); // 1365.0
-    program->add(Instruction::newCONSTF(1365.0f));
+    program->add(Instruction(InstructionType::DIVVF)); // [8190.0, 4095.0, 2730.0]
+    program->add(Instruction(InstructionType::ADDFF)); // 8190.0, 6825.0
+    program->add(Instruction(InstructionType::ADDFF)); // 15015.0
+    program->add(Instruction::newCONSTF(15015.0f));
     program->add(Instruction(InstructionType::EQUALFF));
 
     auto context = make_unique<ExecutionContext>();
@@ -238,10 +238,28 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     BOOST_CHECK_EQUAL(1, result);
 }
 
-// TODO: finish
 BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTS("some_resref"));
+    program->add(Instruction::newCONSTO(3));
+    program->add(Instruction::newCPTOPSP(-16, 16));
+    program->add(Instruction::newEQUALTT(16)); // 1
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTS("some_resref"));
+    program->add(Instruction::newCONSTO(3));
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCPTOPSP(-20, 16));
+    program->add(Instruction::newDESTRUCT(16, 4, 8));
+    program->add(Instruction::newCONSTO(3));
+    program->add(Instruction::newEQUALTT(16)); // 1, 1
+    program->add(Instruction(InstructionType::ADDII));
+    program->add(Instruction::newCONSTI(2));
+    program->add(Instruction(InstructionType::EQUALII));
+
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
 
@@ -249,7 +267,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_CHECK_EQUAL(1, result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
