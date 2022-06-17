@@ -53,6 +53,7 @@ static constexpr float kPlottedPathDuration = 1.0f; // seconds
 static const string kHeadHookNodeName = "headhook";
 static const string kRightHandNodeName = "rhand";
 static const string kLeftHandNodeName = "lhand";
+static const string kGoggleHookNodeName = "gogglehook";
 
 void Creature::loadFromGit(const Gff &git) {
     auto xPosition = git.getFloat("XPosition");
@@ -157,6 +158,16 @@ void Creature::loadFromUtc(const string &templateResRef) {
                 auto headSceneNode = _sceneGraph->newModel(*headModel, ModelUsage::Creature);
                 headSceneNode->init();
                 sceneNode->attach(kHeadHookNodeName, *headSceneNode);
+
+                // Mask
+                auto headEquipment = _equipment.find(InventorySlot::head);
+                if (headEquipment != _equipment.end()) {
+                    auto itemImpl = static_cast<Item *>(headEquipment->second);
+                    auto maskSceneNode = itemImpl->sceneNode();
+                    if (maskSceneNode) {
+                        headSceneNode->attach(kGoggleHookNodeName, *maskSceneNode);
+                    }
+                }
             }
         }
 
@@ -164,12 +175,18 @@ void Creature::loadFromUtc(const string &templateResRef) {
         auto rhandEquipment = _equipment.find(InventorySlot::rightWeapon);
         if (rhandEquipment != _equipment.end()) {
             auto itemImpl = static_cast<Item *>(rhandEquipment->second);
-            sceneNode->attach(kRightHandNodeName, *itemImpl->sceneNode());
+            auto rhandSceneNode = itemImpl->sceneNode();
+            if (rhandSceneNode) {
+                sceneNode->attach(kRightHandNodeName, *rhandSceneNode);
+            }
         }
         auto lhandEquipment = _equipment.find(InventorySlot::leftWeapon);
         if (lhandEquipment != _equipment.end()) {
             auto itemImpl = static_cast<Item *>(lhandEquipment->second);
-            sceneNode->attach(kLeftHandNodeName, *itemImpl->sceneNode());
+            auto lhandSceneNode = itemImpl->sceneNode();
+            if (lhandSceneNode) {
+                sceneNode->attach(kLeftHandNodeName, *lhandSceneNode);
+            }
         }
 
         auto texture = _graphicsSvc.textures.get(textureName);

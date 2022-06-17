@@ -169,9 +169,9 @@ void ModelSceneNode::signalEvent(const string &name) {
 
 void ModelSceneNode::attach(const string &parentName, SceneNode &node) {
     auto maybeParent = _nodeByName.find(parentName);
-    if (maybeParent == _nodeByName.end())
+    if (maybeParent == _nodeByName.end()) {
         return;
-
+    }
     auto parent = maybeParent->second;
     parent->addChild(node);
 
