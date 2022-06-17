@@ -31,14 +31,14 @@ public:
     MockRoutine(
         std::string name,
         VariableType retType,
-        Variable defRetValue,
+        Variable retValue,
         std::vector<VariableType> argTypes) :
         Routine(
             std::move(name),
             retType,
-            std::move(defRetValue),
+            retValue,
             std::move(argTypes),
-            [](auto &args, auto &ctx) { return Variable(); }) {
+            [retValue](auto &args, auto &ctx) { return retValue; }) {
     }
 
     Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) override {

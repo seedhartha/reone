@@ -303,9 +303,9 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     case VariableType::Void:
         break;
     case VariableType::Vector:
-        _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
-        _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
         _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
         break;
     default:
         _stack.push_back(retValue);

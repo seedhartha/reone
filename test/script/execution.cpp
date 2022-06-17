@@ -110,14 +110,16 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
 BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
-    program->add(Instruction(InstructionType::RSADDI));
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTS("some_tag"));
     program->add(Instruction::newACTION(0, 2));
-    program->add(Instruction::newCPDOWNSP(-8, 4));
-    program->add(Instruction::newMOVSP(-4));
 
-    auto routine = make_shared<MockRoutine>("SomeAction", VariableType::Object, Variable::ofObject(kObjectInvalid), vector<VariableType> {VariableType::String, VariableType::Int});
+    auto routine = make_shared<MockRoutine>(
+        "SomeAction",
+        VariableType::Object,
+        Variable::ofObject(kObjectInvalid),
+        vector<VariableType> {VariableType::String, VariableType::Int});
+
     auto routines = MockRoutines();
     routines.add(0, routine);
 
@@ -132,8 +134,49 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     // then
     BOOST_CHECK_EQUAL(-1, result);
     BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
-    auto invocation = routine->invokeInvocations();
+    auto &invocation = routine->invokeInvocations();
     BOOST_CHECK_EQUAL(string("some_tag"), get<0>(invocation[0])[0].strValue);
+    BOOST_CHECK_EQUAL(1, get<0>(invocation[0])[1].intValue);
+}
+
+BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
+    // given
+    auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTI(1));
+    program->add(Instruction::newCONSTF(2.0f));
+    program->add(Instruction::newCONSTF(3.0f));
+    program->add(Instruction::newCONSTF(4.0f));
+    program->add(Instruction::newACTION(0, 2));
+    program->add(Instruction(InstructionType::MULFF));
+    program->add(Instruction(InstructionType::ADDFF));
+    program->add(Instruction::newCONSTF(37.0f));
+    program->add(Instruction(InstructionType::EQUALFF));
+
+    auto routine = make_shared<MockRoutine>(
+        "SomeAction",
+        VariableType::Vector,
+        Variable::ofVector(glm::vec3(5.0f, 6.0f, 7.0f)),
+        vector<VariableType> {VariableType::Vector, VariableType::Int});
+
+    auto routines = MockRoutines();
+    routines.add(0, routine);
+
+    auto context = make_unique<ExecutionContext>();
+    context->routines = &routines;
+
+    auto execution = ScriptExecution(program, move(context));
+
+    // when
+    auto result = execution.run();
+
+    // then
+    BOOST_CHECK_EQUAL(1, result);
+    BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
+    auto &invocation = routine->invokeInvocations();
+    auto inVecValue = get<0>(invocation[0])[0].vecValue;
+    BOOST_CHECK_CLOSE(2.0f, inVecValue.x, 1e-5);
+    BOOST_CHECK_CLOSE(3.0f, inVecValue.y, 1e-5);
+    BOOST_CHECK_CLOSE(4.0f, inVecValue.z, 1e-5);
     BOOST_CHECK_EQUAL(1, get<0>(invocation[0])[1].intValue);
 }
 
