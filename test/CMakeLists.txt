@@ -45,11 +45,13 @@ set(TEST_SOURCES
     game/object/item.cpp
     game/object/placeable.cpp
     game/selectioncontroller.cpp
+    graphics/aabb.cpp
     graphics/format/bwmreader.cpp
     graphics/format/mdlreader.cpp
     graphics/format/tgareader.cpp
     graphics/format/tpcreader.cpp
     graphics/format/txireader.cpp
+    graphics/walkmesh.cpp
     main.cpp
     resource/2das.cpp
     resource/format/2dareader.cpp
@@ -67,6 +69,7 @@ set(TEST_SOURCES
     resource/gffs.cpp
     resource/resources.cpp
     resource/strings.cpp
+    scene/model.cpp
     script/execution.cpp
     script/format/ncsreader.cpp
     script/format/ncswriter.cpp
