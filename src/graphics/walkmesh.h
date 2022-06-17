@@ -38,8 +38,8 @@ public:
     struct AABB {
         graphics::AABB value;
         int faceIdx {-1};
-        std::shared_ptr<AABB> child1;
-        std::shared_ptr<AABB> child2;
+        std::shared_ptr<AABB> left;
+        std::shared_ptr<AABB> right;
     };
 
     /**
@@ -55,6 +55,14 @@ public:
     bool isAreaWalkmesh() const { return _area; }
 
     const std::vector<Face> &faces() const { return _faces; }
+
+    void add(Face &&face) {
+        _faces.push_back(face);
+    }
+
+    void setRootAABB(std::shared_ptr<AABB> aabb) {
+        _rootAabb = std::move(aabb);
+    }
 
 private:
     std::vector<Face> _faces;

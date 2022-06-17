@@ -164,8 +164,8 @@ void BwmReader::loadAABB() {
         }
         uint32_t childIdx1 = aabbChildren[i].first;
         uint32_t childIdx2 = aabbChildren[i].second;
-        aabbs[i]->child1 = aabbs[childIdx1];
-        aabbs[i]->child2 = aabbs[childIdx2];
+        aabbs[i]->left = aabbs[childIdx1];
+        aabbs[i]->right = aabbs[childIdx2];
     }
 
     _walkmesh->_rootAabb = aabbs[0];

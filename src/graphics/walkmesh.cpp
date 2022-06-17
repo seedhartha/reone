@@ -82,11 +82,11 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
         }
 
         // Find intersection with child AABB nodes
-        if (aabb->child1) {
-            aabbs.push(aabb->child1.get());
+        if (aabb->left) {
+            aabbs.push(aabb->left.get());
         }
-        if (aabb->child2) {
-            aabbs.push(aabb->child2.get());
+        if (aabb->right) {
+            aabbs.push(aabb->right.get());
         }
     }
 
