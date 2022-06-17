@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     program->add(Instruction::newCONSTF(1.0f));
     program->add(Instruction(InstructionType::DIVIF)); // 28.8, 2.0
     program->add(Instruction(InstructionType::DIVFF)); // 14.4
-    program->add(Instruction(InstructionType::NEGF)); // -14.4
+    program->add(Instruction(InstructionType::NEGF));  // -14.4
     program->add(Instruction::newCONSTF(-14.4f));
     program->add(Instruction(InstructionType::EQUALFF));
 
@@ -88,6 +88,55 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     BOOST_CHECK_EQUAL(1, result);
 }
 
+BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
+    // given
+    auto program = make_shared<ScriptProgram>("some_program");
+    program->add(Instruction::newCONSTI(2));           // 2
+    program->add(Instruction::newCONSTI(2));           // 2, 2
+    program->add(Instruction::newCONSTI(3));           // 2, 2, 3
+    program->add(Instruction::newCONSTI(2));           // 2, 2, 3, 2
+    program->add(Instruction::newCPTOPSP(-16, 8));     // 2, 2, 3, 2, 2, 2
+    program->add(Instruction(InstructionType::GEQII)); // 2, 2, 3, 2, 1
+    program->add(Instruction::newCPTOPSP(-12, 8));     // 2, 2, 3, 2, 1, 3, 2
+    program->add(Instruction(InstructionType::GTII));  // 2, 2, 3, 2, 1, 1
+    program->add(Instruction::newCPTOPSP(-20, 8));     // 2, 2, 3, 2, 1, 1, 2, 3
+    program->add(Instruction(InstructionType::LTII));  // 2, 2, 3, 2, 1, 1, 1
+    program->add(Instruction::newCPTOPSP(-28, 8));     // 2, 2, 3, 2, 1, 1, 1, 2, 2
+    program->add(Instruction(InstructionType::LEQII)); // 2, 2, 3, 2, 1, 1, 1, 1
+    program->add(Instruction::newCPDOWNSP(-32, 16));   // 1, 1, 1, 1, 1, 1, 1, 1
+    program->add(Instruction::newMOVSP(-16));          // 1, 1, 1, 1
+    program->add(Instruction(InstructionType::ADDII)); // 1, 1, 2
+    program->add(Instruction(InstructionType::ADDII)); // 1, 3
+    program->add(Instruction(InstructionType::ADDII)); // 4
+    program->add(Instruction::newCONSTF(2.0f));        // 4, 2.0
+    program->add(Instruction::newCONSTF(2.0f));        // 4, 2.0, 2.0
+    program->add(Instruction::newCONSTF(3.0f));        // 4, 2.0, 2.0, 3.0
+    program->add(Instruction::newCONSTF(2.0f));        // 4, 2.0, 2.0, 3.0, 2.0
+    program->add(Instruction::newCPTOPSP(-16, 8));     // 4, 2.0, 2.0, 3.0, 2.0, 2.0, 2.0
+    program->add(Instruction(InstructionType::GEQFF)); // 4, 2.0, 2.0, 3.0, 2.0, 1
+    program->add(Instruction::newCPTOPSP(-12, 8));     // 4, 2.0, 2.0, 3.0, 2.0, 1, 3.0, 2.0
+    program->add(Instruction(InstructionType::GTFF));  // 4, 2.0, 2.0, 3.0, 2.0, 1, 1
+    program->add(Instruction::newCPTOPSP(-20, 8));     // 4, 2.0, 2.0, 3.0, 2.0, 1, 1, 2.0, 3.0
+    program->add(Instruction(InstructionType::LTFF));  // 4, 2.0, 2.0, 3.0, 2.0, 1, 1, 1
+    program->add(Instruction::newCPTOPSP(-28, 8));     // 4, 2.0, 2.0, 3.0, 2.0, 1, 1, 1, 2.0, 2.0
+    program->add(Instruction(InstructionType::LEQFF)); // 4, 2.0, 2.0, 3.0, 2.0, 1, 1, 1, 1
+    program->add(Instruction::newCPDOWNSP(-32, 16));   // 4, 1, 1, 1, 1, 1, 1, 1, 1
+    program->add(Instruction::newMOVSP(-16));          // 4, 1, 1, 1, 1
+    program->add(Instruction(InstructionType::ADDII)); // 4, 1, 1, 2
+    program->add(Instruction(InstructionType::ADDII)); // 4, 1, 3
+    program->add(Instruction(InstructionType::ADDII)); // 4, 4
+    program->add(Instruction(InstructionType::ADDII)); // 8
+
+    auto context = make_unique<ExecutionContext>();
+    auto execution = ScriptExecution(program, move(context));
+
+    // when
+    auto result = execution.run();
+
+    // then
+    BOOST_CHECK_EQUAL(8, result);
+}
+
 BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
@@ -99,7 +148,6 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     program->add(Instruction::newINCISP(-8));
     program->add(Instruction::newJMP(-22));
     program->add(Instruction::newMOVSP(-4));
-    program->add(Instruction(InstructionType::RETN));
 
     auto context = make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, move(context));
