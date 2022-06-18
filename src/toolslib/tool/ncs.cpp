@@ -40,14 +40,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-static void initRoutines(GameID gameId, Routines &routines) {
-    if (gameId == GameID::TSL) {
-        routines.initForTSL();
-    } else {
-        routines.initForKotOR();
-    }
-}
-
 void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToPCODE) {
         toPCODE(target, destPath);
@@ -59,8 +51,8 @@ void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
-    Routines routines;
-    initRoutines(_gameId, routines);
+    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
+    routines.init();
 
     auto stream = FileInputStream(path, OpenMode::Binary);
 
@@ -75,8 +67,8 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 }
 
 void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
-    Routines routines;
-    initRoutines(_gameId, routines);
+    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
+    routines.init();
 
     PcodeReader pcode(path, routines);
     pcode.load();
@@ -91,8 +83,8 @@ void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
 }
 
 void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
-    auto routines = Routines();
-    initRoutines(_gameId, routines);
+    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
+    routines.init();
 
     auto ncs = FileInputStream(path, OpenMode::Binary);
     auto reader = NcsReader("");

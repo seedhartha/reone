@@ -20,6 +20,8 @@
 #include "../../script/routine.h"
 #include "../../script/routines.h"
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
@@ -31,15 +33,13 @@ class Game;
 
 class Routines : public script::IRoutines {
 public:
-    Routines() = default;
-
-    Routines(Game &game, ServicesView &services) :
-        _game(&game),
-        _services(&services) {
+    Routines(GameID gameId, Game &game, ServicesView &services) :
+        _gameId(gameId),
+        _game(game),
+        _services(services) {
     }
 
-    void initForKotOR();
-    void initForTSL();
+    void init();
 
     script::Routine &get(int index) override;
 
@@ -47,10 +47,14 @@ public:
     int getIndexByName(const std::string &name) const override;
 
 private:
-    Game *_game {nullptr};
-    ServicesView *_services {nullptr};
+    GameID _gameId;
+    Game &_game;
+    ServicesView &_services;
 
     std::vector<script::Routine> _routines;
+
+    void initForKotOR();
+    void initForTSL();
 
     void add(
         std::string name,

@@ -100,6 +100,9 @@ void Game::init() {
     _selectionController = make_unique<SelectionController>(*this, *_mainInterface, scene);
     _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
+    _routines = make_unique<Routines>(_id, *this, _services);
+    _routines->init();
+
     // Surfaces
 
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();

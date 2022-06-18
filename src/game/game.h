@@ -30,6 +30,7 @@
 #include "object/factory.h"
 #include "object/module.h"
 #include "options.h"
+#include "script/routines.h"
 #include "selectioncontroller.h"
 #include "services.h"
 #include "types.h"
@@ -217,6 +218,7 @@ protected:
     std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
+    std::unique_ptr<Routines> _routines;
 
     // END Services
 
@@ -253,7 +255,7 @@ protected:
     // END Global variables
 
     // Cursor
-    
+
     graphics::Cursor *_cursor {nullptr};
     CursorType _cursorType {CursorType::None};
 

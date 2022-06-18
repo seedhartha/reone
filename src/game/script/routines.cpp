@@ -48,6 +48,14 @@ namespace game {
 
 static constexpr int kBaseItemInvalid = 256;
 
+void Routines::init() {
+    if (_gameId == GameID::TSL) {
+        initForTSL();
+    } else {
+        initForKotOR();
+    }
+}
+
 void Routines::initForKotOR() {
     add("Random", R_INT, {R_INT}, &routine::random);
     add("PrintString", R_VOID, {R_STRING}, &routine::printString);
@@ -1774,7 +1782,7 @@ void Routines::add(
         move(defRetValue),
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
-            RoutineContext ctx(*_game, *_services, execution);
+            RoutineContext ctx(_game, _services, execution);
             return fn(args, std::move(ctx));
         });
 }
@@ -1792,7 +1800,7 @@ void Routines::add(
         move(defRetValue),
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
-            RoutineContext ctx(*_game, *_services, execution);
+            RoutineContext ctx(_game, _services, execution);
             return fn(args, std::move(ctx));
         });
 }
