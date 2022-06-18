@@ -19,9 +19,11 @@
 
 #include "../../common/binarywriter.h"
 #include "../../common/hexutil.h"
+#include "../../common/pathutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/format/gffwriter.h"
+#include "../../resource/strings.h"
 #include "../../resource/typeutil.h"
 
 #include "tinyxml2.h"
@@ -39,7 +41,7 @@ namespace reone {
 void GffTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     switch (operation) {
     case Operation::ToXML:
-        toXML(target, destPath);
+        toXML(target, gamePath, destPath);
         break;
     case Operation::ToGFF:
         toGFF(target, destPath);
@@ -55,7 +57,7 @@ static string sanitizeXmlElementName(const std::string &s) {
     return move(sanitized);
 }
 
-static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1) {
+static void printStructToXml(const Gff &gff, XMLPrinter &printer, Strings &strings, int index = -1) {
     printer.OpenElement("struct");
     printer.PushAttribute("type", gff.type());
     if (index != -1) {
@@ -72,19 +74,24 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1
         printer.PushAttribute("type", static_cast<int>(field.type));
 
         switch (field.type) {
-        case Gff::FieldType::CExoLocString:
+        case Gff::FieldType::CExoLocString: {
             printer.PushAttribute("strref", field.intValue);
             printer.PushAttribute("substring", field.strValue.c_str());
+            auto external = strings.get(field.intValue);
+            if (!external.empty()) {
+                printer.PushAttribute("external", external.c_str());
+            }
             break;
+        }
         case Gff::FieldType::Void:
             printer.PushAttribute("data", hexify(field.data, "").c_str());
             break;
         case Gff::FieldType::Struct:
-            printStructToXml(*field.children[0], printer);
+            printStructToXml(*field.children[0], printer, strings);
             break;
         case Gff::FieldType::List:
             for (size_t i = 0; i < field.children.size(); ++i) {
-                printStructToXml(*field.children[i], printer, i);
+                printStructToXml(*field.children[i], printer, strings, i);
             }
             break;
         case Gff::FieldType::Orientation:
@@ -109,7 +116,15 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1
     printer.CloseElement();
 }
 
-void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
+void GffTool::toXML(const fs::path &path, const fs::path &gamePath, const fs::path &destPath) {
+    auto strings = Strings();
+    if (!gamePath.empty()) {
+        auto tlkPath = getPathIgnoreCase(gamePath, "dialog.tlk", false);
+        if (!tlkPath.empty()) {
+            strings.init(gamePath);
+        }
+    }
+
     auto stream = FileInputStream(path, OpenMode::Binary);
 
     auto reader = GffReader();
@@ -123,7 +138,7 @@ void GffTool::toXML(const fs::path &path, const fs::path &destPath) {
 
     auto printer = XMLPrinter(fp);
     printer.PushHeader(false, true);
-    printStructToXml(*gff, printer);
+    printStructToXml(*gff, printer, strings);
 
     fclose(fp);
 }
