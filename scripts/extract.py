@@ -179,7 +179,7 @@ def extract_modules():
 def extract_textures():
     global game_dir, extract_dir, tools_exe
 
-    TEXTURE_PACKS = ["swpc_tex_gui.erf", "swpc_tex_tpa.erf"]
+    TEXTURE_PACKS = ["swpc_tex_gui", "swpc_tex_tpa"]
 
     # Create destination directory if it does not exist
     data_dir = get_or_create_dir(extract_dir, "data")
@@ -190,11 +190,12 @@ def extract_textures():
     if texture_packs_dir is None:
         return
     for f in os.listdir(texture_packs_dir):
-        if f in TEXTURE_PACKS:
+        filename, _ = os.path.splitext(f)
+        if filename in TEXTURE_PACKS:
             texture_pack_dir = os.path.join(texture_packs_dir, f)
+            inner_dest_dir = get_or_create_dir(dest_dir, filename)
             print("Extracting {}...".format(texture_pack_dir))
-            run_subprocess(
-                [tools_exe, "--extract", texture_pack_dir, "--dest", dest_dir])
+            run_subprocess([tools_exe, "--extract", texture_pack_dir, "--dest", inner_dest_dir])
 
 
 def extract_dialog():
