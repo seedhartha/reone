@@ -17,6 +17,7 @@
 
 #include "gffreader.h"
 
+#include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 
 using namespace std;
@@ -143,7 +144,7 @@ Gff::Field GffReader::readField(int idx) {
         field.intValue = readStrRefFieldData(dataOrDataOffset);
         break;
     default:
-        throw runtime_error("Unsupported field type: " + to_string(type));
+        throw ValidationException("Unsupported field type: " + to_string(type));
     }
 
     return move(field);

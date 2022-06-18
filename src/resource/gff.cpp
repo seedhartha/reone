@@ -17,6 +17,7 @@
 
 #include "gff.h"
 
+#include "../common/exception/validation.h"
 #include "../common/logutil.h"
 
 using namespace std;
@@ -180,7 +181,7 @@ string Gff::Field::toString() const {
     case FieldType::ResRef:
         return strValue;
     default:
-        throw logic_error("Unsupported field type: " + to_string(static_cast<int>(type)));
+        throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(type)));
     }
 }
 

@@ -65,7 +65,9 @@ static fs::path getOutputDir(const po::variables_map &vars) {
         result = vars["dest"].as<string>();
     } else if (vars.count("input") > 0) {
         auto input = vars["input"].as<vector<string>>();
-        result = fs::path(input[0]).parent_path();
+        if (input.size() == 1ll) {
+            result = fs::path(input[0]).parent_path();
+        }
     } else {
         result = fs::current_path();
     }

@@ -17,6 +17,7 @@
 
 #include "gffwriter.h"
 
+#include "../../common/exception/validation.h"
 #include "../../common/stream/fileoutput.h"
 
 #include "../gff.h"
@@ -177,7 +178,7 @@ static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simpl
         return FieldClassification::Complex;
     }
     default:
-        throw logic_error("Unsupported field type: " + to_string(static_cast<int>(field.type)));
+        throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(field.type)));
     }
 }
 

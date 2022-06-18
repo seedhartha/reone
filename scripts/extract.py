@@ -267,16 +267,48 @@ def is_convertible_to_xml(path):
     return extension.lower() in CONVERTIBLE_EXT
 
 
+def is_gff(path):
+    GFF_EXT = [
+        ".gui",
+        ".ifo", ".are", ".git",
+        ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
+        ".dlg",
+        ".pth",
+    ]
+    _, extension = os.path.splitext(path)
+    return extension.lower() in GFF_EXT
+
+
+def partition(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
+
+
 def convert_to_xml():
     global game_dir, extract_dir, tools_exe
 
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
-        if is_convertible_to_xml(f):
-            xml_path = f + ".xml"
-            if os.path.exists(xml_path):
-                continue
-            print("Converting {} to XML...".format(f))
-            run_subprocess([tools_exe, "--game", game_dir, "--to-xml", f])
+        if not is_convertible_to_xml(f) or is_gff(f):
+            continue
+        xml_path = f + ".xml"
+        if os.path.exists(xml_path):
+            continue
+        print("Converting {} to XML...".format(f))
+        run_subprocess([tools_exe, "--game", game_dir, "--to-xml", f], silent=False)
+
+    # Batch-convert GFFs
+    gffs = []
+    for f in glob.glob("{}/**".format(extract_dir), recursive=True):
+        if not is_gff(f):
+            continue
+        xml_path = f + ".xml"
+        if os.path.exists(xml_path):
+            continue
+        gffs.append(f)
+        print("Enqueued {} for GFF to XML conversion".format(f))
+    gff_chunks = partition(gffs, 100)
+    for chunk in gff_chunks:
+        run_subprocess([tools_exe, "--game", game_dir, "--to-xml", *chunk], silent=False)
 
 
 def convert_to_tga():
@@ -295,7 +327,6 @@ def disassemble_scripts():
     global game_tsl, extract_dir, tools_exe
 
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
-        filename, _ = os.path.splitext(f)
         pcode_path = f + ".pcode"
         if os.path.exists(pcode_path):
             continue

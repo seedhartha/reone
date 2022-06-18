@@ -18,7 +18,9 @@
 #include "gff.h"
 
 #include "../../common/binarywriter.h"
+#include "../../common/exception/validation.h"
 #include "../../common/hexutil.h"
+#include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../resource/format/gffreader.h"
@@ -60,15 +62,23 @@ void GffTool::invokeAll(
         }
     }
     for (auto &path : input) {
-        switch (operation) {
-        case Operation::ToXML:
-            toXML(path, outputDir, strings);
-            break;
-        case Operation::ToGFF:
-            toGFF(path, outputDir);
-            break;
-        default:
-            break;
+        auto outDir = outputDir;
+        if (outDir.empty()) {
+            outDir = path.parent_path();
+        }
+        try {
+            switch (operation) {
+            case Operation::ToXML:
+                toXML(path, outDir, strings);
+                break;
+            case Operation::ToGFF:
+                toGFF(path, outDir);
+                break;
+            default:
+                break;
+            }
+        } catch (const ValidationException &e) {
+            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
         }
     }
 }
@@ -227,7 +237,7 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
                 fieldElement->FloatAttribute("z"));
             break;
         default:
-            throw logic_error("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
+            throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
         }
 
         fields.push_back(move(field));
