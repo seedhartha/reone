@@ -268,7 +268,7 @@ def is_convertible_to_xml(path):
 
 
 def convert_to_xml():
-    global extract_dir, tools_exe
+    global game_dir, extract_dir, tools_exe
 
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         if is_convertible_to_xml(f):
@@ -276,7 +276,7 @@ def convert_to_xml():
             if os.path.exists(xml_path):
                 continue
             print("Converting {} to XML...".format(f))
-            run_subprocess([tools_exe, "--to-xml", f])
+            run_subprocess([tools_exe, "--game", game_dir, "--to-xml", f])
 
 
 def convert_to_tga():
@@ -355,6 +355,7 @@ for step in steps:
             extract_lips()
 
         if step[0] == "convert_to_xml":
+            configure_game_dir()
             configure_tools_dir()
             convert_to_xml()
 
