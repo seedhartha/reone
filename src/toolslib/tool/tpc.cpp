@@ -17,6 +17,8 @@
 
 #include "tpc.h"
 
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/format/tpcreader.h"
@@ -29,9 +31,33 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TpcTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
-    if (operation == Operation::ToTGA) {
-        toTGA(input, outputDir);
+void TpcTool::invoke(
+    Operation operation,
+    const fs::path &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+}
+
+void TpcTool::invokeAll(
+    Operation operation,
+    const std::vector<fs::path> &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    for (auto &path : input) {
+        auto outDir = outputDir;
+        if (outDir.empty()) {
+            outDir = path.parent_path();
+        }
+        try {
+            if (operation == Operation::ToTGA) {
+                toTGA(path, outputDir);
+            }
+        } catch (const ValidationException &e) {
+            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
+        }
     }
 }
 
