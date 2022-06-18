@@ -53,7 +53,7 @@ void TpcTool::invokeAll(
         }
         try {
             if (operation == Operation::ToTGA) {
-                toTGA(path, outputDir);
+                toTGA(path, outDir);
             }
         } catch (const ValidationException &e) {
             error(boost::format("Error while processing '%s': %s") % path % string(e.what()));

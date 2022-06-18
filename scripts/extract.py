@@ -179,23 +179,22 @@ def extract_modules():
 def extract_textures():
     global game_dir, extract_dir, tools_exe
 
+    out_texpacks_dir = get_or_create_dir(extract_dir, "texturepacks")
+
+    in_texpacks_dir = find_path_ignore_case(game_dir, "texturepacks")
+    if in_texpacks_dir is None:
+        return
+
     TEXTURE_PACKS = ["swpc_tex_gui", "swpc_tex_tpa"]
 
-    # Create destination directory if it does not exist
-    data_dir = get_or_create_dir(extract_dir, "data")
-    dest_dir = get_or_create_dir(data_dir, "textures")
-
-    # Extract textures packs
-    texture_packs_dir = find_path_ignore_case(game_dir, "texturepacks")
-    if texture_packs_dir is None:
-        return
-    for f in os.listdir(texture_packs_dir):
+    for f in os.listdir(in_texpacks_dir):
         filename, _ = os.path.splitext(f)
-        if filename in TEXTURE_PACKS:
-            texture_pack_dir = os.path.join(texture_packs_dir, f)
-            inner_dest_dir = get_or_create_dir(dest_dir, filename)
-            print("Extracting {}...".format(texture_pack_dir))
-            run_subprocess([tools_exe, "--extract", texture_pack_dir, "--dest", inner_dest_dir])
+        if not filename in TEXTURE_PACKS:
+            continue
+        texpack = os.path.join(in_texpacks_dir, f)
+        texpack_dir = get_or_create_dir(out_texpacks_dir, filename)
+        print("Extracting {}...".format(texpack))
+        run_subprocess([tools_exe, "--extract", texpack, "--dest", texpack_dir])
 
 
 def extract_dialog():
@@ -315,13 +314,18 @@ def convert_to_xml():
 def convert_to_tga():
     global extract_dir, tools_exe
 
+    # Batch-convert TPCs
+    tpcs = []
     for f in glob.glob("{}/**/*.tpc".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         tga_path = os.path.join(os.path.dirname(f), filename + ".tga")
         if os.path.exists(tga_path):
             continue
-        print("Converting {} to TGA/TXI...".format(f))
-        run_subprocess([tools_exe, "--to-tga", f], check_retcode=False)
+        tpcs.append(f)
+        print("Enqueued {} for TPC to TGA/TXI conversion".format(f))
+    tpc_chunks = partition(tpcs, 100)
+    for chunk in tpc_chunks:
+        run_subprocess([tools_exe, "--to-tga", *chunk], silent=False, check_retcode=False)
 
 
 def disassemble_scripts():
