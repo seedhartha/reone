@@ -23,6 +23,12 @@
 
 namespace reone {
 
+namespace game {
+
+class Routines;
+
+}
+
 class NcsTool : public ITool {
 public:
     NcsTool(game::GameID gameId) :
@@ -35,14 +41,20 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
+    void invokeAll(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
     game::GameID _gameId;
 
-    void toPCODE(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void toNCS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void toNSS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
 };
 
 } // namespace reone

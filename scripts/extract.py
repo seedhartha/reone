@@ -326,16 +326,20 @@ def convert_to_tga():
 def disassemble_scripts():
     global game_tsl, extract_dir, tools_exe
 
+    ncs_files = []
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
         pcode_path = f + ".pcode"
         if os.path.exists(pcode_path):
             continue
-        print("Disassembling {}...".format(f))
-
-        args = [tools_exe, "--to-pcode", f]
+        ncs_files.append(f)
+        print("Enqueued {} for disassembly".format(f))
+    ncs_chunks = partition(ncs_files, 100)
+    for chunk in ncs_chunks:
+        args = [tools_exe]
         if game_tsl:
             args.append("--tsl=1")
-
+        args.append("--to-pcode")
+        args.extend(chunk)
         run_subprocess(args, silent=False)
 
 

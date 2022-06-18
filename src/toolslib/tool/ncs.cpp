@@ -19,6 +19,8 @@
 
 #include <boost/regex.hpp>
 
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../common/stream/fileoutput.h"
 #include "../../game/script/routines.h"
@@ -40,61 +42,83 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void NcsTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
-    if (operation == Operation::ToPCODE) {
-        toPCODE(input, outputDir);
-    } else if (operation == Operation::ToNCS) {
-        toNCS(input, outputDir);
-    } else if (operation == Operation::ToNSS) {
-        toNSS(input, outputDir);
-    }
+void NcsTool::invoke(
+    Operation operation,
+    const fs::path &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
+void NcsTool::invokeAll(
+    Operation operation,
+    const std::vector<fs::path> &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
     auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
     routines.init();
 
-    auto stream = FileInputStream(path, OpenMode::Binary);
+    for (auto &path : input) {
+        auto outDir = outputDir;
+        if (outDir.empty()) {
+            outDir = path.parent_path();
+        }
+        try {
+            if (operation == Operation::ToPCODE) {
+                toPCODE(path, outDir, routines);
+            } else if (operation == Operation::ToNCS) {
+                toNCS(path, outDir, routines);
+            } else if (operation == Operation::ToNSS) {
+                toNSS(path, outDir, routines);
+            }
+        } catch (const ValidationException &e) {
+            error(boost::format("Error while converting '%s': %s") % path % string(e.what()));
+        }
+    }
+}
+
+void NcsTool::toPCODE(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+    auto stream = FileInputStream(input, OpenMode::Binary);
 
     NcsReader ncs("");
     ncs.load(stream);
 
-    fs::path pcodePath(destPath);
-    pcodePath.append(path.filename().string() + ".pcode");
+    fs::path pcodePath(outputDir);
+    pcodePath.append(input.filename().string() + ".pcode");
 
     PcodeWriter pcode(*ncs.program(), routines);
     pcode.save(pcodePath);
 }
 
-void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
-    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.init();
-
-    PcodeReader pcode(path, routines);
+void NcsTool::toNCS(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+    PcodeReader pcode(input, routines);
     pcode.load();
     auto program = pcode.program();
 
-    fs::path ncsPath(destPath);
-    ncsPath.append(path.filename().string());
+    fs::path ncsPath(outputDir);
+    ncsPath.append(input.filename().string());
     ncsPath.replace_extension(); // drop .pcode
 
     NcsWriter writer(*program);
     writer.save(ncsPath);
 }
 
-void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
-    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.init();
+void NcsTool::toNSS(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+    auto ncs = FileInputStream(input, OpenMode::Binary);
 
-    auto ncs = FileInputStream(path, OpenMode::Binary);
     auto reader = NcsReader("");
     reader.load(ncs);
+
     auto compiledProgram = reader.program();
     auto program = ExpressionTree::fromProgram(*compiledProgram, routines);
 
-    auto nssPath = destPath;
-    nssPath.append(path.filename().string() + ".nss");
+    auto nssPath = outputDir;
+    nssPath.append(input.filename().string() + ".nss");
+
     auto nss = FileOutputStream(nssPath);
+
     auto writer = NssWriter(program, routines);
     writer.save(nss);
 }
