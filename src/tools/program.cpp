@@ -88,7 +88,7 @@ int Program::run() {
         auto tool = getTool();
         if (tool) {
             if (_input.size() > 1ll) {
-                tool->invokeAll(_operation, _input, _outputDir, _gamePath);
+                tool->invokeBatch(_operation, _input, _outputDir, _gamePath);
             } else {
                 tool->invoke(_operation, _input[0], _outputDir, _gamePath);
             }
@@ -182,10 +182,14 @@ void Program::loadTools() {
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
-shared_ptr<ITool> Program::getTool() const {
+shared_ptr<Tool> Program::getTool() const {
     for (auto &tool : _tools) {
-        if (tool->supportsAll(_operation, _input))
-            return tool;
+        for (auto &path : _input) {
+            if (!tool->supports(_operation, path)) {
+                break;
+            }
+        }
+        return tool;
     }
     return nullptr;
 }

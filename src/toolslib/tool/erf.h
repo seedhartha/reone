@@ -23,7 +23,7 @@
 
 namespace reone {
 
-class ErfTool : public ITool {
+class ErfTool : public Tool {
 public:
     void invoke(
         Operation operation,

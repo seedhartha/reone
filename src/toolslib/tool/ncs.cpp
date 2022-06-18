@@ -48,10 +48,10 @@ void NcsTool::invoke(
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void NcsTool::invokeAll(
+void NcsTool::invokeBatch(
     Operation operation,
     const std::vector<fs::path> &input,
     const fs::path &outputDir,
@@ -60,23 +60,15 @@ void NcsTool::invokeAll(
     auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
     routines.init();
 
-    for (auto &path : input) {
-        auto outDir = outputDir;
-        if (outDir.empty()) {
-            outDir = path.parent_path();
+    return doInvokeBatch(input, outputDir, [this, &operation, &routines](auto &path, auto &outDir) {
+        if (operation == Operation::ToPCODE) {
+            toPCODE(path, outDir, routines);
+        } else if (operation == Operation::ToNCS) {
+            toNCS(path, outDir, routines);
+        } else if (operation == Operation::ToNSS) {
+            toNSS(path, outDir, routines);
         }
-        try {
-            if (operation == Operation::ToPCODE) {
-                toPCODE(path, outDir, routines);
-            } else if (operation == Operation::ToNCS) {
-                toNCS(path, outDir, routines);
-            } else if (operation == Operation::ToNSS) {
-                toNSS(path, outDir, routines);
-            }
-        } catch (const ValidationException &e) {
-            error(boost::format("Error while converting '%s': %s") % path % string(e.what()));
-        }
-    }
+    });
 }
 
 void NcsTool::toPCODE(const fs::path &input, const fs::path &outputDir, Routines &routines) {

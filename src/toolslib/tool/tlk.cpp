@@ -42,30 +42,22 @@ void TlkTool::invoke(
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void TlkTool::invokeAll(
+void TlkTool::invokeBatch(
     Operation operation,
     const std::vector<fs::path> &input,
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    for (auto &path : input) {
-        auto outDir = outputDir;
-        if (outDir.empty()) {
-            outDir = path.parent_path();
-        }
+    return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
             toXML(path, outDir);
         } else if (operation == Operation::ToTLK) {
             toTLK(path, outDir);
         }
-        try {
-        } catch (const ValidationException &e) {
-            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
-        }
-    }
+    });
 }
 
 void TlkTool::toXML(const fs::path &path, const fs::path &destPath) {

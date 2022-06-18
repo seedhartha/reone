@@ -45,10 +45,10 @@ void GffTool::invoke(Operation operation,
                      const fs::path &outputDir,
                      const fs::path &gamePath) {
 
-    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void GffTool::invokeAll(
+void GffTool::invokeBatch(
     Operation operation,
     const vector<fs::path> &input,
     const fs::path &outputDir,
@@ -61,26 +61,18 @@ void GffTool::invokeAll(
             strings.init(gamePath);
         }
     }
-    for (auto &path : input) {
-        auto outDir = outputDir;
-        if (outDir.empty()) {
-            outDir = path.parent_path();
+    return doInvokeBatch(input, outputDir, [this, &operation, &strings](auto &path, auto &outDir) {
+        switch (operation) {
+        case Operation::ToXML:
+            toXML(path, outDir, strings);
+            break;
+        case Operation::ToGFF:
+            toGFF(path, outDir);
+            break;
+        default:
+            break;
         }
-        try {
-            switch (operation) {
-            case Operation::ToXML:
-                toXML(path, outDir, strings);
-                break;
-            case Operation::ToGFF:
-                toGFF(path, outDir);
-                break;
-            default:
-                break;
-            }
-        } catch (const ValidationException &e) {
-            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
-        }
-    }
+    });
 }
 
 static string sanitizeXmlElementName(const std::string &s) {

@@ -20,10 +20,12 @@
 #include "types.h"
 
 #include "../../common/exception/notimplemented.h"
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 
 namespace reone {
 
-class ITool {
+class Tool {
 public:
     virtual void invoke(
         Operation operation,
@@ -31,24 +33,34 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) = 0;
 
-    virtual void invokeAll(
+    virtual void invokeBatch(
         Operation operation,
         const std::vector<boost::filesystem::path> &input,
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) {
-    
+
         throw NotImplementedException("Batch tool invocation not implemented");
     }
 
     virtual bool supports(Operation operation, const boost::filesystem::path &input) const = 0;
 
-    bool supportsAll(Operation operation, const std::vector<boost::filesystem::path> &input) const {
+protected:
+    void doInvokeBatch(
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        std::function<void(const boost::filesystem::path &, const boost::filesystem::path &)> block) {
+
         for (auto &path : input) {
-            if (!supports(operation, path)) {
-                return false;
+            auto outDir = outputDir;
+            if (outDir.empty()) {
+                outDir = path.parent_path();
+            }
+            try {
+                block(path, outputDir);
+            } catch (const ValidationException &e) {
+                error(boost::format("Error while processing '%s': %s") % path % std::string(e.what()));
             }
         }
-        return true;
     }
 };
 

@@ -24,7 +24,7 @@
 
 namespace reone {
 
-class KeyBifTool : public ITool {
+class KeyBifTool : public Tool {
 public:
     void invoke(
         Operation operation,

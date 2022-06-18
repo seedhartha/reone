@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class AudioTool : public ITool {
+class AudioTool : public Tool {
     void invoke(
         Operation operation,
         const boost::filesystem::path &input,

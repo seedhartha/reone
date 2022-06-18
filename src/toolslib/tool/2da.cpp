@@ -43,30 +43,22 @@ void TwoDaTool::invoke(
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void TwoDaTool::invokeAll(
+void TwoDaTool::invokeBatch(
     Operation operation,
     const std::vector<fs::path> &input,
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    for (auto &path : input) {
-        auto outDir = outputDir;
-        if (outDir.empty()) {
-            outDir = path.parent_path();
+    return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
+        if (operation == Operation::ToXML) {
+            toXML(path, outDir);
+        } else {
+            to2DA(path, outDir);
         }
-        try {
-            if (operation == Operation::ToXML) {
-                toXML(path, outDir);
-            } else {
-                to2DA(path, outDir);
-            }
-        } catch (const ValidationException &e) {
-            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
-        }
-    }
+    });
 }
 
 void TwoDaTool::toXML(const fs::path &input, const fs::path &outputDir) {

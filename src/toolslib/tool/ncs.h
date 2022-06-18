@@ -29,7 +29,7 @@ class Routines;
 
 }
 
-class NcsTool : public ITool {
+class NcsTool : public Tool {
 public:
     NcsTool(game::GameID gameId) :
         _gameId(gameId) {
@@ -41,7 +41,7 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
-    void invokeAll(
+    void invokeBatch(
         Operation operation,
         const std::vector<boost::filesystem::path> &input,
         const boost::filesystem::path &outputDir,

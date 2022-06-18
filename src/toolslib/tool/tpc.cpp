@@ -37,28 +37,20 @@ void TpcTool::invoke(
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void TpcTool::invokeAll(
+void TpcTool::invokeBatch(
     Operation operation,
     const std::vector<fs::path> &input,
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    for (auto &path : input) {
-        auto outDir = outputDir;
-        if (outDir.empty()) {
-            outDir = path.parent_path();
+    return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
+        if (operation == Operation::ToTGA) {
+            toTGA(path, outDir);
         }
-        try {
-            if (operation == Operation::ToTGA) {
-                toTGA(path, outDir);
-            }
-        } catch (const ValidationException &e) {
-            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
-        }
-    }
+    });
 }
 
 void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {

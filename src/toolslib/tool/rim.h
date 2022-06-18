@@ -23,7 +23,7 @@
 
 namespace reone {
 
-class RimTool : public ITool {
+class RimTool : public Tool {
 public:
     void invoke(
         Operation operation,

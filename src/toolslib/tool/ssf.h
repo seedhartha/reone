@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class SsfTool : public ITool {
+class SsfTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -29,7 +29,7 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
-    void invokeAll(
+    void invokeBatch(
         Operation operation,
         const std::vector<boost::filesystem::path> &input,
         const boost::filesystem::path &outputDir,
