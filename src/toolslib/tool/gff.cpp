@@ -38,16 +38,38 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void GffTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    switch (operation) {
-    case Operation::ToXML:
-        toXML(target, gamePath, destPath);
-        break;
-    case Operation::ToGFF:
-        toGFF(target, destPath);
-        break;
-    default:
-        break;
+void GffTool::invoke(Operation operation,
+                     const fs::path &input,
+                     const fs::path &outputDir,
+                     const fs::path &gamePath) {
+
+    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+}
+
+void GffTool::invokeAll(
+    Operation operation,
+    const vector<fs::path> &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    auto strings = Strings();
+    if (!gamePath.empty()) {
+        auto tlkPath = getPathIgnoreCase(gamePath, "dialog.tlk", false);
+        if (!tlkPath.empty()) {
+            strings.init(gamePath);
+        }
+    }
+    for (auto &path : input) {
+        switch (operation) {
+        case Operation::ToXML:
+            toXML(path, outputDir, strings);
+            break;
+        case Operation::ToGFF:
+            toGFF(path, outputDir);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -116,24 +138,16 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, Strings &strin
     printer.CloseElement();
 }
 
-void GffTool::toXML(const fs::path &path, const fs::path &gamePath, const fs::path &destPath) {
-    auto strings = Strings();
-    if (!gamePath.empty()) {
-        auto tlkPath = getPathIgnoreCase(gamePath, "dialog.tlk", false);
-        if (!tlkPath.empty()) {
-            strings.init(gamePath);
-        }
-    }
-
-    auto stream = FileInputStream(path, OpenMode::Binary);
+void GffTool::toXML(const fs::path &input, const fs::path &outputDir, Strings &strings) {
+    auto stream = FileInputStream(input, OpenMode::Binary);
 
     auto reader = GffReader();
     reader.load(stream);
 
     auto gff = reader.root();
 
-    auto xmlPath = destPath;
-    xmlPath.append(path.filename().string() + ".xml");
+    auto xmlPath = outputDir;
+    xmlPath.append(input.filename().string() + ".xml");
     auto fp = fopen(xmlPath.string().c_str(), "wb");
 
     auto printer = XMLPrinter(fp);
@@ -222,8 +236,8 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
     return make_unique<Gff>(structType, move(fields));
 }
 
-static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
-    auto fp = fopen(path.string().c_str(), "rb");
+static void convertXmlToGff(const fs::path &input, const fs::path &outputDir) {
+    auto fp = fopen(input.string().c_str(), "rb");
 
     auto document = XMLDocument();
     document.LoadFile(fp);
@@ -236,27 +250,27 @@ static void convertXmlToGff(const fs::path &path, const fs::path &destPath) {
         return;
     }
 
-    auto extensionless = path;
+    auto extensionless = input;
     extensionless.replace_extension();
     auto resType = getResTypeByExt(extensionless.extension().string().substr(1));
 
-    auto gffPath = destPath;
+    auto gffPath = outputDir;
     gffPath.append(extensionless.filename().string());
 
     auto writer = GffWriter(resType, elementToGff(*rootElement));
     writer.save(gffPath);
 }
 
-void GffTool::toGFF(const fs::path &path, const fs::path &destPath) {
-    if (path.extension() == ".xml") {
-        convertXmlToGff(path, destPath);
+void GffTool::toGFF(const fs::path &input, const fs::path &outputDir) {
+    if (input.extension() == ".xml") {
+        convertXmlToGff(input, outputDir);
     } else {
         cerr << "Input file must have XML extension" << endl;
     }
 }
 
-bool GffTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
+bool GffTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
            (operation == Operation::ToXML || operation == Operation::ToGFF);
 }
 

@@ -29,10 +29,10 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
-    bool isKey = target.extension() == ".key";
+void KeyBifTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
+    bool isKey = input.extension() == ".key";
     if (isKey) {
-        auto stream = FileInputStream(target, OpenMode::Binary);
+        auto stream = FileInputStream(input, OpenMode::Binary);
 
         KeyReader key;
         key.load(stream);
@@ -48,7 +48,7 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
 
         int bifIdx = -1;
         for (size_t i = 0; i < keyReader.files().size(); ++i) {
-            if (boost::iends_with(keyReader.files()[i].filename, target.filename().string())) {
+            if (boost::iends_with(keyReader.files()[i].filename, input.filename().string())) {
                 bifIdx = static_cast<int>(i);
                 break;
             }
@@ -60,7 +60,7 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
         if (operation == Operation::List) {
             listBIF(keyReader, bifIdx);
         } else if (operation == Operation::Extract) {
-            extractBIF(keyReader, bifIdx, target, destPath);
+            extractBIF(keyReader, bifIdx, input, outputDir);
         }
     }
 }
@@ -115,12 +115,12 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const fs::path &bi
     }
 }
 
-bool KeyBifTool::supports(Operation operation, const fs::path &target) const {
-    if (fs::is_directory(target))
+bool KeyBifTool::supports(Operation operation, const fs::path &input) const {
+    if (fs::is_directory(input))
         return false;
 
-    bool key = target.extension() == ".key";
-    bool bif = target.extension() == ".bif";
+    bool key = input.extension() == ".key";
+    bool bif = input.extension() == ".bif";
 
     if (key) {
         return operation == Operation::List;

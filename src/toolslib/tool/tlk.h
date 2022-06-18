@@ -25,11 +25,11 @@ class TlkTool : public ITool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &target,
-        const boost::filesystem::path &gamePath,
-        const boost::filesystem::path &destPath) override;
+        const boost::filesystem::path &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+    bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
     void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);

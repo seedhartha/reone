@@ -20,16 +20,15 @@
 #include "../../common/binaryreader.h"
 #include "../../common/stream/fileinput.h"
 
-
 using namespace std;
 
 namespace fs = boost::filesystem;
 
 namespace reone {
 
-void AudioTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void AudioTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::Unwrap) {
-        unwrap(target, destPath);
+        unwrap(input, outputDir);
     }
 }
 
@@ -77,9 +76,9 @@ void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
     unwrapped.write(&data[0], data.size());
 }
 
-bool AudioTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           target.extension() == ".wav" &&
+bool AudioTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           input.extension() == ".wav" &&
            operation == Operation::Unwrap;
 }
 

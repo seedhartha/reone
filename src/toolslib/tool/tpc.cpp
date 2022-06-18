@@ -29,9 +29,9 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TpcTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void TpcTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToTGA) {
-        toTGA(target, destPath);
+        toTGA(input, outputDir);
     }
 }
 
@@ -63,9 +63,9 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     }
 }
 
-bool TpcTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           target.extension() == ".tpc" &&
+bool TpcTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           input.extension() == ".tpc" &&
            operation == Operation::ToTGA;
 }
 

@@ -19,17 +19,37 @@
 
 #include "types.h"
 
+#include "../../common/exception/notimplemented.h"
+
 namespace reone {
 
 class ITool {
 public:
     virtual void invoke(
         Operation operation,
-        const boost::filesystem::path &target,
-        const boost::filesystem::path &gamePath,
-        const boost::filesystem::path &destPath) = 0;
+        const boost::filesystem::path &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) = 0;
 
-    virtual bool supports(Operation operation, const boost::filesystem::path &target) const = 0;
+    virtual void invokeAll(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) {
+    
+        throw NotImplementedException("Batch tool invocation not implemented");
+    }
+
+    virtual bool supports(Operation operation, const boost::filesystem::path &input) const = 0;
+
+    bool supportsAll(Operation operation, const std::vector<boost::filesystem::path> &input) const {
+        for (auto &path : input) {
+            if (!supports(operation, path)) {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 } // namespace reone

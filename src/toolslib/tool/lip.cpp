@@ -33,11 +33,11 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void LipTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void LipTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToXML) {
-        toXML(target, destPath);
+        toXML(input, outputDir);
     } else if (operation == Operation::ToLIP) {
-        toLIP(target, destPath);
+        toLIP(input, outputDir);
     }
 }
 
@@ -104,10 +104,10 @@ void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
     writer.save(lipPath);
 }
 
-bool LipTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           ((target.extension() == ".lip" && operation == Operation::ToXML) ||
-            (target.extension() == ".xml" && operation == Operation::ToLIP));
+bool LipTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           ((input.extension() == ".lip" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::ToLIP));
 }
 
 } // namespace reone

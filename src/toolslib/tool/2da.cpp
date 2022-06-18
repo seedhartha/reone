@@ -35,11 +35,11 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TwoDaTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void TwoDaTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToXML) {
-        toXML(target, destPath);
+        toXML(input, outputDir);
     } else {
-        to2DA(target, destPath);
+        to2DA(input, outputDir);
     }
 }
 
@@ -126,10 +126,10 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
     writer.save(twoDaPath);
 }
 
-bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           ((target.extension() == ".2da" && operation == Operation::ToXML) ||
-            (target.extension() == ".xml" && operation == Operation::To2DA));
+bool TwoDaTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           ((input.extension() == ".2da" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::To2DA));
 }
 
 } // namespace reone

@@ -41,9 +41,10 @@ private:
     boost::program_options::options_description _optsCmdLine {"Usage"};
     boost::program_options::variables_map _variables;
 
+    std::vector<boost::filesystem::path> _input;
+    boost::filesystem::path _outputDir;
     boost::filesystem::path _gamePath;
-    boost::filesystem::path _destPath;
-    std::string _target;
+
     game::GameID _gameId {game::GameID::KotOR};
     Operation _operation {Operation::None};
     std::vector<std::shared_ptr<ITool>> _tools;

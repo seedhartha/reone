@@ -29,15 +29,15 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void ErfTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto stream = FileInputStream(target, OpenMode::Binary);
+        auto stream = FileInputStream(input, OpenMode::Binary);
         ErfReader erf;
         erf.load(stream);
         if (operation == Operation::Extract) {
-            extract(erf, target, destPath);
+            extract(erf, input, outputDir);
         } else {
             list(erf);
         }
@@ -45,7 +45,7 @@ void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path
     }
     case Operation::ToERF:
     case Operation::ToMOD:
-        toERF(operation, target);
+        toERF(operation, input);
         break;
     }
 }
@@ -133,17 +133,17 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
     erf.save(type, erfPath);
 }
 
-bool ErfTool::supports(Operation operation, const fs::path &target) const {
+bool ErfTool::supports(Operation operation, const fs::path &input) const {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        string ext(target.extension().string());
-        return !fs::is_directory(target) &&
+        string ext(input.extension().string());
+        return !fs::is_directory(input) &&
                (ext == ".erf" || ext == ".mod" || ext == ".sav");
     }
     case Operation::ToERF:
     case Operation::ToMOD:
-        return fs::is_directory(target);
+        return fs::is_directory(input);
 
     default:
         return false;

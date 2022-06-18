@@ -40,13 +40,13 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void NcsTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToPCODE) {
-        toPCODE(target, destPath);
+        toPCODE(input, outputDir);
     } else if (operation == Operation::ToNCS) {
-        toNCS(target, destPath);
+        toNCS(input, outputDir);
     } else if (operation == Operation::ToNSS) {
-        toNSS(target, destPath);
+        toNSS(input, outputDir);
     }
 }
 
@@ -99,10 +99,10 @@ void NcsTool::toNSS(const fs::path &path, const fs::path &destPath) {
     writer.save(nss);
 }
 
-bool NcsTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           ((target.extension() == ".ncs" && (operation == Operation::ToPCODE || operation == Operation::ToNSS)) ||
-            (target.extension() == ".pcode" && operation == Operation::ToNCS));
+bool NcsTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           ((input.extension() == ".ncs" && (operation == Operation::ToPCODE || operation == Operation::ToNSS)) ||
+            (input.extension() == ".pcode" && operation == Operation::ToNCS));
 }
 
 } // namespace reone

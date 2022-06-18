@@ -34,11 +34,11 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void TlkTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToXML) {
-        toXML(target, destPath);
+        toXML(input, outputDir);
     } else if (operation == Operation::ToTLK) {
-        toTLK(target, destPath);
+        toTLK(input, outputDir);
     }
 }
 
@@ -104,10 +104,10 @@ void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
     writer.save(tlkPath);
 }
 
-bool TlkTool::supports(Operation operation, const fs::path &target) const {
-    return !fs::is_directory(target) &&
-           ((target.extension() == ".tlk" && operation == Operation::ToXML) ||
-            (target.extension() == ".xml" && operation == Operation::ToTLK));
+bool TlkTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           ((input.extension() == ".tlk" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::ToTLK));
 }
 
 } // namespace reone

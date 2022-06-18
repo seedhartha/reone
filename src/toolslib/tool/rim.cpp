@@ -29,22 +29,22 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void RimTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto rim = FileInputStream(target, OpenMode::Binary);
+        auto rim = FileInputStream(input, OpenMode::Binary);
         auto rimReader = RimReader();
         rimReader.load(rim);
         if (operation == Operation::List) {
             list(rimReader);
         } else if (operation == Operation::Extract) {
-            extract(rimReader, target, destPath);
+            extract(rimReader, input, outputDir);
         }
         break;
     }
     case Operation::ToRIM:
-        toRIM(target);
+        toRIM(input);
         break;
     default:
         break;
@@ -122,13 +122,13 @@ void RimTool::toRIM(const fs::path &target) {
     rim.save(rimPath);
 }
 
-bool RimTool::supports(Operation operation, const fs::path &target) const {
+bool RimTool::supports(Operation operation, const fs::path &input) const {
     switch (operation) {
     case Operation::List:
     case Operation::Extract:
-        return !fs::is_directory(target) && target.extension() == ".rim";
+        return !fs::is_directory(input) && input.extension() == ".rim";
     case Operation::ToRIM:
-        return fs::is_directory(target);
+        return fs::is_directory(input);
     default:
         return false;
     }

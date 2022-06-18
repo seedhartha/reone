@@ -33,11 +33,11 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void SsfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
+void SsfTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     if (operation == Operation::ToXML) {
-        toXML(target, destPath);
+        toXML(input, outputDir);
     } else if (operation == Operation::ToSSF) {
-        toSSF(target, destPath);
+        toSSF(input, outputDir);
     }
 }
 
@@ -100,9 +100,9 @@ void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
     writer.save(ssfPath);
 }
 
-bool SsfTool::supports(Operation operation, const fs::path &target) const {
-    return (operation == Operation::ToXML && target.extension() == ".ssf") ||
-           (operation == Operation::ToSSF && target.extension() == ".xml");
+bool SsfTool::supports(Operation operation, const fs::path &input) const {
+    return (operation == Operation::ToXML && input.extension() == ".ssf") ||
+           (operation == Operation::ToSSF && input.extension() == ".xml");
 }
 
 } // namespace reone

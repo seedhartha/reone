@@ -21,19 +21,31 @@
 
 namespace reone {
 
+namespace resource {
+
+class Strings;
+
+}
+
 class GffTool : public ITool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &target,
-        const boost::filesystem::path &gamePath,
-        const boost::filesystem::path &destPath) override;
+        const boost::filesystem::path &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+    void invokeAll(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &gamePath, const boost::filesystem::path &destPath);
-    void toGFF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, resource::Strings &strings);
+    void toGFF(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
 };
 
 } // namespace reone

@@ -59,16 +59,17 @@ static const unordered_map<string, Operation> g_operations {
     {"to-ssf", Operation::ToSSF},
     {"to-nss", Operation::ToNSS}};
 
-static fs::path getDestination(const po::variables_map &vars) {
+static fs::path getOutputDir(const po::variables_map &vars) {
     fs::path result;
     if (vars.count("dest") > 0) {
         result = vars["dest"].as<string>();
-    } else if (vars.count("target") > 0) {
-        result = fs::path(vars["target"].as<string>()).parent_path();
+    } else if (vars.count("input") > 0) {
+        auto input = vars["input"].as<vector<string>>();
+        result = fs::path(input[0]).parent_path();
     } else {
         result = fs::current_path();
     }
-    return move(result);
+    return result;
 }
 
 int Program::run() {
@@ -84,7 +85,11 @@ int Program::run() {
     default: {
         auto tool = getTool();
         if (tool) {
-            tool->invoke(_operation, _target, _gamePath, _destPath);
+            if (_input.size() > 1ll) {
+                tool->invokeAll(_operation, _input, _outputDir, _gamePath);
+            } else {
+                tool->invoke(_operation, _input[0], _outputDir, _gamePath);
+            }
         } else {
             cout << "Unable to choose a tool for the specified operation" << endl;
         }
@@ -96,32 +101,32 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _optsCmdLine.add_options()                                                             //
-        ("game", po::value<string>(), "path to game directory")                            //
-        ("dest", po::value<string>(), "path to destination directory")                     //
-        ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
-        ("list", "list file contents")                                                     //
-        ("extract", "extract file contents")                                               //
-        ("unwrap", "unwrap an audio file")                                                 //
-        ("to-rim", "create RIM archive from directory")                                    //
-        ("to-erf", "create ERF archive from directory")                                    //
-        ("to-mod", "create MOD archive from directory")                                    //
-        ("to-xml", "convert 2DA, GFF, TLK, LIP or SSF to XML")                             //
-        ("to-2da", "convert XML to 2DA")                                                   //
-        ("to-gff", "convert XML to GFF")                                                   //
-        ("to-tlk", "convert XML to TLK")                                                   //
-        ("to-lip", "convert XML to LIP")                                                   //
-        ("to-ssf", "convert XML to SSF")                                                   //
-        ("to-tga", "convert TPC image to TGA")                                             //
-        ("to-pcode", "convert NCS to PCODE")                                               //
-        ("to-ncs", "convert PCODE to NCS")                                                 //
-        ("to-nss", "convert PCODE to NSS")                                                 //
-        ("target", po::value<string>(), "target name or path to input file");
+    _optsCmdLine.add_options()                                                                    //
+        ("game", po::value<string>(), "path to game directory")                                   //
+        ("dest", po::value<string>(), "path to destination directory")                            //
+        ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?")        //
+        ("list", "list file contents")                                                            //
+        ("extract", "extract file contents")                                                      //
+        ("unwrap", "unwrap an audio file")                                                        //
+        ("to-rim", "create RIM archive from directory")                                           //
+        ("to-erf", "create ERF archive from directory")                                           //
+        ("to-mod", "create MOD archive from directory")                                           //
+        ("to-xml", "convert 2DA, GFF, TLK, LIP or SSF to XML")                                    //
+        ("to-2da", "convert XML to 2DA")                                                          //
+        ("to-gff", "convert XML to GFF")                                                          //
+        ("to-tlk", "convert XML to TLK")                                                          //
+        ("to-lip", "convert XML to LIP")                                                          //
+        ("to-ssf", "convert XML to SSF")                                                          //
+        ("to-tga", "convert TPC image to TGA")                                                    //
+        ("to-pcode", "convert NCS to PCODE")                                                      //
+        ("to-ncs", "convert PCODE to NCS")                                                        //
+        ("to-nss", "convert PCODE to NSS")                                                        //
+        ("input", po::value<vector<string>>()->multitoken(), "paths to input files/directories"); //
 }
 
 void Program::parseOptions() {
     po::positional_options_description positional;
-    positional.add("target", 1);
+    positional.add("input", -1);
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
                                                .options(_optsCmdLine)
@@ -134,9 +139,13 @@ void Program::parseOptions() {
 }
 
 void Program::loadOptions() {
+    if (_variables.count("input") > 0) {
+        for (auto &path : _variables["input"].as<vector<string>>()) {
+            _input.push_back(fs::path(path));
+        }
+    }
+    _outputDir = getOutputDir(_variables);
     _gamePath = _variables.count("game") > 0 ? _variables["game"].as<string>() : fs::current_path();
-    _destPath = getDestination(_variables);
-    _target = _variables.count("target") > 0 ? _variables["target"].as<string>() : "";
 
     if (_variables["tsl"].as<bool>()) {
         _gameId = GameID::TSL;
@@ -173,7 +182,7 @@ void Program::loadTools() {
 
 shared_ptr<ITool> Program::getTool() const {
     for (auto &tool : _tools) {
-        if (tool->supports(_operation, _target))
+        if (tool->supportsAll(_operation, _input))
             return tool;
     }
     return nullptr;
