@@ -29,11 +29,17 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
+    void invokeAll(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
+    void to2DA(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
 };
 
 } // namespace reone

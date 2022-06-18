@@ -29,6 +29,12 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
+    void invokeAll(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:

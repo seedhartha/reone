@@ -18,6 +18,8 @@
 #include "2da.h"
 
 #include "../../common/binarywriter.h"
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../resource/2da.h"
 #include "../../resource/format/2dareader.h"
@@ -35,24 +37,48 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TwoDaTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
-    if (operation == Operation::ToXML) {
-        toXML(input, outputDir);
-    } else {
-        to2DA(input, outputDir);
+void TwoDaTool::invoke(
+    Operation operation,
+    const fs::path &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+}
+
+void TwoDaTool::invokeAll(
+    Operation operation,
+    const std::vector<fs::path> &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    for (auto &path : input) {
+        auto outDir = outputDir;
+        if (outDir.empty()) {
+            outDir = path.parent_path();
+        }
+        try {
+            if (operation == Operation::ToXML) {
+                toXML(path, outDir);
+            } else {
+                to2DA(path, outDir);
+            }
+        } catch (const ValidationException &e) {
+            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
+        }
     }
 }
 
-void TwoDaTool::toXML(const fs::path &path, const fs::path &destPath) {
-    auto stream = FileInputStream(path, OpenMode::Binary);
+void TwoDaTool::toXML(const fs::path &input, const fs::path &outputDir) {
+    auto stream = FileInputStream(input, OpenMode::Binary);
 
     auto reader = TwoDaReader();
     reader.load(stream);
 
     auto table = reader.twoDa();
 
-    auto xmlPath = destPath;
-    xmlPath.append(path.filename().string() + ".xml");
+    auto xmlPath = outputDir;
+    xmlPath.append(input.filename().string() + ".xml");
     auto fp = fopen(xmlPath.string().c_str(), "wb");
 
     auto printer = XMLPrinter(fp);

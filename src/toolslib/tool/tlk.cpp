@@ -17,6 +17,8 @@
 
 #include "tlk.h"
 
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
 #include "../../common/stream/fileinput.h"
 #include "../../resource/format/tlkreader.h"
 #include "../../resource/format/tlkwriter.h"
@@ -34,11 +36,35 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void TlkTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
-    if (operation == Operation::ToXML) {
-        toXML(input, outputDir);
-    } else if (operation == Operation::ToTLK) {
-        toTLK(input, outputDir);
+void TlkTool::invoke(
+    Operation operation,
+    const fs::path &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    return invokeAll(operation, vector<fs::path> {input}, outputDir, gamePath);
+}
+
+void TlkTool::invokeAll(
+    Operation operation,
+    const std::vector<fs::path> &input,
+    const fs::path &outputDir,
+    const fs::path &gamePath) {
+
+    for (auto &path : input) {
+        auto outDir = outputDir;
+        if (outDir.empty()) {
+            outDir = path.parent_path();
+        }
+        if (operation == Operation::ToXML) {
+            toXML(path, outDir);
+        } else if (operation == Operation::ToTLK) {
+            toTLK(path, outDir);
+        }
+        try {
+        } catch (const ValidationException &e) {
+            error(boost::format("Error while processing '%s': %s") % path % string(e.what()));
+        }
     }
 }
 

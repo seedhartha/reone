@@ -118,6 +118,11 @@ def get_or_create_dir(parent, name):
     return path
 
 
+def partition(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
+
+
 def run_subprocess(args, silent=True, check_retcode=True):
     stdout = subprocess.DEVNULL if silent else None
     process = subprocess.run(args, stdout=stdout)
@@ -251,64 +256,49 @@ def extract_lips():
                 [tools_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
-def is_convertible_to_xml(path):
-    CONVERTIBLE_EXT = [
-        ".gui",
-        ".ifo", ".are", ".git",
-        ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
-        ".dlg",
-        ".pth",
-        ".2da",
-        ".tlk",
-        ".lip",
-        ".ssf",
-    ]
-    _, extension = os.path.splitext(path)
-    return extension.lower() in CONVERTIBLE_EXT
-
-
-def is_gff(path):
-    GFF_EXT = [
-        ".gui",
-        ".ifo", ".are", ".git",
-        ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
-        ".dlg",
-        ".pth",
-    ]
-    _, extension = os.path.splitext(path)
-    return extension.lower() in GFF_EXT
-
-
-def partition(lst, n):
-    for i in range(0, len(lst), n):
-        yield lst[i:i+n]
-
-
 def convert_to_xml():
     global game_dir, extract_dir, tools_exe
 
-    for f in glob.glob("{}/**".format(extract_dir), recursive=True):
-        if not is_convertible_to_xml(f) or is_gff(f):
-            continue
-        xml_path = f + ".xml"
-        if os.path.exists(xml_path):
-            continue
-        print("Converting {} to XML...".format(f))
-        run_subprocess([tools_exe, "--game", game_dir, "--to-xml", f], silent=False)
+    CONVERTIBLE_TYPES = {
+        "GFF": [
+            ".gui",
+            ".ifo", ".are", ".git",
+            ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
+            ".dlg",
+            ".pth"],
+        "2DA": [".2da"],
+        "TLK": [".tlk"],
+        "LIP": [".lip"],
+        "SSF": [".ssf"]
+        }
 
-    # Batch-convert GFFs
-    gffs = []
+    convertibles = {}
+
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
-        if not is_gff(f):
+        _, ext = os.path.splitext(f)
+        ext = ext.lower()
+
+        convertible_type = None
+        for typ, extensions in CONVERTIBLE_TYPES.items():
+            if ext in extensions:
+                convertible_type = typ
+                break
+        if not convertible_type:
             continue
+
         xml_path = f + ".xml"
         if os.path.exists(xml_path):
             continue
-        gffs.append(f)
-        print("Enqueued {} for GFF to XML conversion".format(f))
-    gff_chunks = partition(gffs, 100)
-    for chunk in gff_chunks:
-        run_subprocess([tools_exe, "--game", game_dir, "--to-xml", *chunk], silent=False)
+
+        if not convertible_type in convertibles:
+            convertibles[convertible_type] = list()
+        convertibles[convertible_type].append(f)
+        print("Enqueued {} for {} to XML conversion".format(f, convertible_type))
+
+    for convertible_type, files in convertibles.items():
+        chunks = partition(files, 100)
+        for chunk in chunks:
+            run_subprocess([tools_exe, "--game", game_dir, "--to-xml", *chunk], silent=False)
 
 
 def convert_to_tga():
