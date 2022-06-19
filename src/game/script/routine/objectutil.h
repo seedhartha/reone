@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<Object> &object) {
+inline uint32_t getObjectIdOrInvalid(Object *object) {
     return object ? object->id() : script::kObjectInvalid;
 }
 

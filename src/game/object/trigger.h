@@ -52,9 +52,19 @@ public:
 
     void loadFromGit(const resource::Gff &git);
 
+    void update(float delta) override;
+
 private:
     std::vector<glm::vec3> _geometry;
+
+    std::set<Object *> _objectsInside;
+
+    // Scripts
+
     std::string _scriptOnEnter;
+    std::string _scriptOnExit;
+
+    // END Scripts
 };
 
 } // namespace game

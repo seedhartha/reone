@@ -31,6 +31,7 @@
 #include "object/module.h"
 #include "options.h"
 #include "script/routines.h"
+#include "script/runner.h"
 #include "selectioncontroller.h"
 #include "services.h"
 #include "types.h"
@@ -113,7 +114,11 @@ public:
 
     void changeCursor(CursorType type) override;
 
-    Object *getObjectByTag(const std::string &tag, int nth = 0) override;
+    void runScript(const std::string &name, Object &caller, Object *triggerrer = nullptr) override;
+
+    Object *objectById(uint32_t id) override;
+    Object *objectByTag(const std::string &tag, int nth = 0) override;
+    std::set<Object *> objectsInRadius(const glm::vec2 &origin, float radius, int typeMask = static_cast<int>(ObjectType::All)) override;
 
     const std::set<std::string> &moduleNames() const override {
         return _moduleNames;
@@ -219,6 +224,7 @@ protected:
     std::unique_ptr<SelectionController> _selectionController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
     std::unique_ptr<Routines> _routines;
+    std::unique_ptr<ScriptRunner> _scriptRunner;
 
     // END Services
 

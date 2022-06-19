@@ -17,6 +17,7 @@
 
 #include "game.h"
 
+#include "../common/collectionutil.h"
 #include "../common/pathutil.h"
 #include "../graphics/context.h"
 #include "../graphics/meshes.h"
@@ -33,6 +34,7 @@
 #include "../scene/node/camera.h"
 #include "../scene/node/model.h"
 #include "../scene/services.h"
+#include "../script/services.h"
 
 #include "astar.h"
 #include "cursors.h"
@@ -59,6 +61,7 @@ using namespace std;
 using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -103,6 +106,8 @@ void Game::init() {
     _routines = make_unique<Routines>(_id, *this, _services);
     _routines->init();
 
+    _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
+
     // Surfaces
 
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
@@ -125,19 +130,6 @@ void Game::init() {
     _services.graphics.window.setEventHandler(this);
 
     changeCursor(CursorType::Default);
-}
-
-Object *Game::getObjectByTag(const string &tag, int nth) {
-    int match = 0;
-    for (auto &object : _objects) {
-        if (object.second->tag() != tag) {
-            continue;
-        }
-        if (match++ == nth) {
-            return object.second.get();
-        }
-    }
-    return nullptr;
 }
 
 void Game::loadModuleNames() {
@@ -346,12 +338,14 @@ void Game::loadModule(const string &name) {
 
     for (auto &object : module.area().objects()) {
         auto sceneNode = object->sceneNode();
-        if (sceneNode->type() == SceneNodeType::Model) {
-            auto model = static_cast<ModelSceneNode *>(sceneNode);
-            scene.addRoot(*model);
-        } else if (sceneNode->type() == SceneNodeType::Trigger) {
-            auto trigger = static_cast<TriggerSceneNode *>(sceneNode);
-            scene.addRoot(*trigger);
+        if (sceneNode) {
+            if (sceneNode->type() == SceneNodeType::Model) {
+                auto model = static_cast<ModelSceneNode *>(sceneNode);
+                scene.addRoot(*model);
+            } else if (sceneNode->type() == SceneNodeType::Trigger) {
+                auto trigger = static_cast<TriggerSceneNode *>(sceneNode);
+                scene.addRoot(*trigger);
+            }
         }
         if (object->type() == ObjectType::Placeable) {
             auto &placeable = static_cast<Placeable &>(*object);
@@ -438,6 +432,45 @@ void Game::changeCursor(CursorType type) {
         SDL_ShowCursor(SDL_ENABLE);
     }
     _cursorType = type;
+}
+
+void Game::runScript(const string &name, Object &caller, Object *triggerrer) {
+    _scriptRunner->run(name, caller.id(), triggerrer ? triggerrer->id() : kObjectInvalid);
+}
+
+Object *Game::objectById(uint32_t id) {
+    if (id == kObjectSelf || id == kObjectInvalid) {
+        return nullptr;
+    }
+    auto object = getFromLookupOrNull(_objects, id);
+    return object.get();
+}
+
+Object *Game::objectByTag(const string &tag, int nth) {
+    int match = 0;
+    for (auto &object : _objects) {
+        if (object.second->tag() != tag) {
+            continue;
+        }
+        if (match++ == nth) {
+            return object.second.get();
+        }
+    }
+    return nullptr;
+}
+
+set<Object *> Game::objectsInRadius(const glm::vec2 &origin, float radius, int typeMask) {
+    auto objects = set<Object *>();
+    float radius2 = radius * radius;
+    for (auto &object : _objects) {
+        if ((typeMask & static_cast<int>(object.second->type())) == 0) {
+            continue;
+        }
+        if (object.second->square2dDistanceTo(origin) < radius2) {
+            objects.insert(object.second.get());
+        }
+    }
+    return objects;
 }
 
 // END IGame

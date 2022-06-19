@@ -91,6 +91,10 @@ void TriggerSceneNode::init() {
 
     _mesh = make_unique<Mesh>(move(vertices), move(faces), move(spec));
     _mesh->init();
+
+    for (auto &point : _geometry) {
+        _aabb.expand(point);
+    }
 }
 
 void TriggerSceneNode::draw() {

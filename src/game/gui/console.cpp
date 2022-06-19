@@ -125,13 +125,13 @@ void Console::executeActionMoveToObject(vector<string> arguments) {
         throw ValidationException("Command requires at least 2 arguments");
     }
     auto subjectTag = arguments[0];
-    auto subject = _game.getObjectByTag(subjectTag);
+    auto subject = _game.objectByTag(subjectTag);
     if (!subject) {
         throw ValidationException("Invalid subject: " + subjectTag);
     }
 
     auto moveToTag = arguments[1];
-    auto moveTo = _game.getObjectByTag(moveToTag);
+    auto moveTo = _game.objectByTag(moveToTag);
     if (!moveTo) {
         throw ValidationException("Invalid moveTo: " + moveToTag);
     }

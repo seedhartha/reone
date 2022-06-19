@@ -46,18 +46,18 @@ class Placeable;
 class Sound;
 class Talent;
 
-std::shared_ptr<Object> getCaller(const RoutineContext &ctx);
-std::shared_ptr<Object> getTriggerrer(const RoutineContext &ctx);
+Object *getCaller(const RoutineContext &ctx);
+Object *getTriggerrer(const RoutineContext &ctx);
 
 int getInt(const std::vector<script::Variable> &args, int index);
 float getFloat(const std::vector<script::Variable> &args, int index);
 std::string getString(const std::vector<script::Variable> &args, int index);
 glm::vec3 getVector(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Effect> getEffect(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Event> getEvent(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Location> getLocationArgument(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Talent> getTalent(const std::vector<script::Variable> &args, int index);
+Object *getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Effect *getEffect(const std::vector<script::Variable> &args, int index);
+Event *getEvent(const std::vector<script::Variable> &args, int index);
+Location *getLocationArgument(const std::vector<script::Variable> &args, int index);
+Talent *getTalent(const std::vector<script::Variable> &args, int index);
 std::shared_ptr<script::ExecutionContext> getAction(const std::vector<script::Variable> &args, int index);
 
 int getIntOrElse(const std::vector<script::Variable> &args, int index, int defValue);
@@ -68,24 +68,24 @@ glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, 
 bool getIntAsBool(const std::vector<script::Variable> &args, int index);
 bool getIntAsBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
 
-std::shared_ptr<Object> getObjectOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Object *getObjectOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Object *getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx);
-std::shared_ptr<Creature> getObjectAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Creature> getObjectOrCallerAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Creature *getCallerAsCreature(const RoutineContext &ctx);
+Creature *getObjectAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Creature *getObjectOrCallerAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Door> getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Door *getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Placeable> getObjectAsPlaceable(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Placeable *getObjectAsPlaceable(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Item> getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Item> getObjectAsItemOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Item *getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Item *getObjectAsItemOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Sound> getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Sound *getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Area> getObjectAsArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Area> getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Area *getObjectAsArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+Area *getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {
     if (isOutOfRange(args, index)) {

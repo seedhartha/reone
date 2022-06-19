@@ -24,9 +24,12 @@
 #include "../../resource/services.h"
 #include "../../scene/graph.h"
 
+#include "../gameinterface.h"
+
 using namespace std;
 
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -53,6 +56,7 @@ void Trigger::loadFromGit(const Gff &git) {
     }
     auto tag = utt->getString("Tag");
     auto scriptOnEnter = utt->getString("ScriptOnEnter");
+    auto scriptOnExit = utt->getString("ScriptOnExit");
 
     // Make scene node
     if (_geometry.size() >= 3ll) {
@@ -67,10 +71,46 @@ void Trigger::loadFromGit(const Gff &git) {
     _position = glm::vec3(xPosition, yPosition, zPosition);
 
     _scriptOnEnter = move(scriptOnEnter);
+    _scriptOnExit = move(scriptOnExit);
 
     //
 
     flushTransform();
+}
+
+void Trigger::update(float delta) {
+    Object::update(delta);
+
+    if (!_sceneNode) {
+        return;
+    }
+
+    auto objectsInside = set<Object *>();
+
+    auto sceneNode = static_cast<TriggerSceneNode *>(_sceneNode);
+    auto aabbSize = sceneNode->aabb().size();
+    auto objectsInRadius = _game.objectsInRadius(
+        glm::vec2(sceneNode->getWorldCenterOfAABB()),
+        0.5f * glm::max(aabbSize.x, aabbSize.y),
+        static_cast<int>(ObjectType::Creature));
+
+    for (auto &object : objectsInRadius) {
+        if (!sceneNode->isIn(glm::vec2(object->position()))) {
+            continue;
+        }
+        objectsInside.insert(object);
+        if (_objectsInside.count(object) == 0) {
+            _game.runScript(_scriptOnEnter, *this, object);
+        }
+    }
+
+    for (auto &object : _objectsInside) {
+        if (objectsInside.count(object) == 0) {
+            _game.runScript(_scriptOnExit, *this, object);
+        }
+    }
+
+    _objectsInside.swap(objectsInside);
 }
 
 } // namespace game

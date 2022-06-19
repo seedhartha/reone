@@ -35,7 +35,11 @@ public:
 
     virtual void changeCursor(CursorType type) = 0;
 
-    virtual Object *getObjectByTag(const std::string &tag, int nth = 0) = 0;
+    virtual void runScript(const std::string &name, Object &caller, Object *triggerrer = nullptr) = 0;
+
+    virtual Object *objectById(uint32_t id) = 0;
+    virtual Object *objectByTag(const std::string &tag, int nth = 0) = 0;
+    virtual std::set<Object *> objectsInRadius(const glm::vec2 &origin, float radius, int typeMask = static_cast<int>(ObjectType::All)) = 0;
 
     virtual const std::set<std::string> &moduleNames() const = 0;
 };
