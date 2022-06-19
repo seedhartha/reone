@@ -114,6 +114,10 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio scene movie script gui game toolslib DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio scene movie script gui game DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+if(BUILD_TOOLS)
+    install(TARGETS toolslib DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
 
 ## END Installation
