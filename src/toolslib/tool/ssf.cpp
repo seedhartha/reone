@@ -76,7 +76,7 @@ void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
     printer.OpenElement("soundset");
     for (size_t i = 0; i < soundSet.size(); ++i) {
         printer.OpenElement("sound");
-        printer.PushAttribute("index", i);
+        printer.PushAttribute("index", static_cast<int>(i));
         printer.PushAttribute("strref", soundSet[i]);
         printer.CloseElement();
     }

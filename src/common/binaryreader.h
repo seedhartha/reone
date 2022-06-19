@@ -46,7 +46,6 @@ public:
     double getDouble();
     std::string getString(int len);
     std::string getNullTerminatedString();
-    std::u16string getNullTerminatedStringUTF16();
     ByteArray getBytes(int count);
 
     bool eof() const;

@@ -39,18 +39,6 @@ BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
     BOOST_CHECK_EQUAL(expectedOutput, output);
 }
 
-BOOST_AUTO_TEST_CASE(should_hexify_utf16_string) {
-    // given
-    auto input = u16string(u"Hello, world!");
-    auto expectedOutput = string("0048 0065 006c 006c 006f 002c 0020 0077 006f 0072 006c 0064 0021 ");
-
-    // when
-    auto output = hexify(input, " ");
-
-    // then
-    BOOST_CHECK_EQUAL(expectedOutput, output);
-}
-
 BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
     // given
     auto input = ByteArray("Hello, world!", 13);

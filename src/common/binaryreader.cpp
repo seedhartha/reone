@@ -118,20 +118,6 @@ string BinaryReader::getNullTerminatedString() {
     return ss.str();
 }
 
-u16string BinaryReader::getNullTerminatedStringUTF16() {
-    basic_ostringstream<char16_t> ss;
-
-    char16_t ch;
-    do {
-        ch = getUint16();
-        if (ch) {
-            ss << ch;
-        }
-    } while (ch);
-
-    return ss.str();
-}
-
 ByteArray BinaryReader::getBytes(int count) {
     ByteArray buffer;
     buffer.resize(count);

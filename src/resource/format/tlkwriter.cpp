@@ -63,7 +63,7 @@ void TlkWriter::save(IOutputStream &out) {
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable.getStringCount());
-    writer.putUint32(20 + _talkTable.getStringCount() * sizeof(StringDataElement)); // offset to string entries
+    writer.putUint32(20 + 40 * _talkTable.getStringCount()); // offset to string entries
 
     for (int i = 0; i < _talkTable.getStringCount(); ++i) {
         const StringDataElement &strDataElem = strData[i];

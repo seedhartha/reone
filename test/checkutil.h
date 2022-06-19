@@ -21,11 +21,7 @@
 #include "../src/common/types.h"
 
 inline std::string describe(const std::string &s) {
-    return reone::hexify(s);
-}
-
-inline std::string describe(const std::u16string &s) {
-    return reone::hexify(s);
+    return str(boost::format("%s (%d)") % reone::hexify(s) % s.length());
 }
 
 inline std::string describe(const glm::vec2 &v) {
@@ -66,5 +62,5 @@ inline std::string describe(const glm::quat &q) {
 
 template <class T>
 inline std::string notEqualMessage(const T &l, const T &r) {
-    return describe(l) + " != " + describe(r);
+    return str(boost::format("expected:\n%s\nbut was:\n%s") % describe(l) % describe(r));
 }

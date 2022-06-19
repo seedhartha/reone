@@ -36,7 +36,6 @@ set(TEST_SOURCES
     common/stream/fileoutput.cpp
     common/stringbuilder.cpp
     common/textwriter.cpp
-    common/unicodeutil.cpp
     game/action/movetoobject.cpp
     game/astar.cpp
     game/game.cpp

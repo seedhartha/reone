@@ -28,6 +28,7 @@
 #ifdef R_ENABLE_MOVIE
 
 extern "C" {
+#include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "libswresample/swresample.h"
@@ -159,7 +160,7 @@ private:
 
     void openCodec(int streamIdx, AVCodecContext **codecCtx) {
         AVCodecParameters *codecParams = _formatCtx->streams[streamIdx]->codecpar;
-        AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
+        const AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
         if (!codec) {
             throw runtime_error("BIK codec not found");
         }

@@ -60,7 +60,6 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
                      .append("\x00\x00\x00\x00\x00\x00\xf0\x3f", 8)
                      .append("Hello, world!")
                      .append("Hello, world!\x00", 14)
-                     .append("\x48\x00\x65\x00\x6c\x00\x6c\x00\x6f\x00\x2c\x00\x20\x00\x77\x00\x6f\x00\x72\x00\x6c\x00\x64\x00\x21\x00\x00\x00", 28)
                      .append("\x01\x02\x03\x04", 4)
                      .build();
     auto inputBytes = ByteArray();
@@ -79,7 +78,6 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     auto expectedDouble = 1.0;
     auto expectedStr = string("Hello, world!");
     auto expectedCStr = string("Hello, world!");
-    auto expectedU16CStr = u16string(u"Hello, world!");
     auto expectedBytes = ByteArray({0x01, 0x02, 0x03, 0x04});
 
     // when
@@ -94,7 +92,6 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     auto actualDouble = reader.getDouble();
     auto actualStr = reader.getString(13);
     auto actualCStr = reader.getNullTerminatedString();
-    auto actualU16CStr = reader.getNullTerminatedStringUTF16();
     auto actualBytes = reader.getBytes(4);
 
     // then
@@ -109,7 +106,6 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     BOOST_CHECK_EQUAL(expectedDouble, actualDouble);
     BOOST_TEST((expectedStr == actualStr), notEqualMessage(expectedStr, actualStr));
     BOOST_TEST((expectedCStr == actualCStr), notEqualMessage(expectedCStr, actualCStr));
-    BOOST_TEST((expectedU16CStr == actualU16CStr), notEqualMessage(expectedU16CStr, actualU16CStr));
     BOOST_TEST((expectedBytes == actualBytes), notEqualMessage(expectedBytes, actualBytes));
 }
 

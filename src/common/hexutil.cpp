@@ -29,14 +29,6 @@ string hexify(const string &s, string separator) {
     return ss.str();
 }
 
-string hexify(const u16string &s, string separator) {
-    ostringstream ss;
-    for (auto &ch : s) {
-        ss << hex << setw(4) << setfill('0') << static_cast<int>(ch & 0xffff) << separator;
-    }
-    return ss.str();
-}
-
 ByteArray unhexify(const string &s) {
     auto bytes = ByteArray();
     for (size_t i = 0; i < s.size(); i += 2) {
