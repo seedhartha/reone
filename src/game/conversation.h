@@ -29,7 +29,7 @@ class Gff;
 
 namespace game {
 
-class Dialog : boost::noncopyable {
+class Conversation : boost::noncopyable {
 public:
     struct EntryReplyLink {
         int index {0};
@@ -49,7 +49,7 @@ public:
         std::vector<ReplyEntryLink> entries;
     };
 
-    Dialog(resource::ResourceServices &resourceSvc) :
+    Conversation(resource::ResourceServices &resourceSvc) :
         _resourceSvc(resourceSvc) {
     }
 
@@ -63,6 +63,14 @@ public:
 
     const std::vector<Reply *> &currentReplies() const {
         return _currentReplies;
+    }
+
+    const std::vector<Entry> &entries() const {
+        return _entries;
+    }
+
+    const std::vector<Reply> &replies() const {
+        return _replies;
     }
 
 private:

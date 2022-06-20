@@ -17,41 +17,31 @@
 
 #pragma once
 
+#include "../../resource/provider.h"
+
 namespace reone {
 
 namespace resource {
 
-class TalkTable : boost::noncopyable {
+class MockResourceProvider : public IResourceProvider {
 public:
-    struct String {
-        std::string text;
-        std::string soundResRef;
-    };
-
-    class Builder {
-    public:
-        Builder &string(std::string text, std::string soundResRef = "") {
-            _strings.push_back(String {std::move(text), std::move(soundResRef)});
-            return *this;
-        }
-
-        std::shared_ptr<TalkTable> build() {
-            return std::make_shared<TalkTable>(_strings);
-        }
-
-    private:
-        std::vector<String> _strings;
-    };
-
-    TalkTable(std::vector<String> strings) :
-        _strings(std::move(strings)) {
+    MockResourceProvider(int id) : _id(id) {
     }
 
-    int getStringCount() const;
-    const String &getString(int index) const;
+    void add(ResourceId id, std::shared_ptr<ByteArray> res) {
+        _resources[id] = std::move(res);
+    }
+
+    std::shared_ptr<ByteArray> find(const ResourceId &id) override {
+    }
+
+    int id() const override {
+        return _id;
+    }
 
 private:
-    std::vector<String> _strings;
+    int _id;
+    std::map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _resources;
 };
 
 } // namespace resource

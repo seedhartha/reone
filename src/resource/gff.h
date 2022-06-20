@@ -94,6 +94,27 @@ public:
         static Field newStrRef(std::string label, int32_t val);
     };
 
+    class Builder {
+    public:
+        Builder &type(uint32_t type) {
+            _type = type;
+            return *this;
+        }
+
+        Builder &field(Field field) {
+            _fields.push_back(std::move(field));
+            return *this;
+        }
+
+        std::shared_ptr<Gff> build() {
+            return std::make_shared<Gff>(_type, _fields);
+        }
+
+    private:
+        uint32_t _type {0};
+        std::vector<Field> _fields;
+    };
+
     Gff(uint32_t type, std::vector<Field> fields) :
         _type(type), _fields(std::move(fields)) {
     }

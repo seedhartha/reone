@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dialog.h"
+#include "conversation.h"
 
 #include "../common/collectionutil.h"
 #include "../common/exception/argument.h"
@@ -36,7 +36,7 @@ namespace game {
 
 static const string kEmptyText = "empty";
 
-void Dialog::load(const string &name) {
+void Conversation::load(const string &name) {
     auto dlg = _resourceSvc.gffs.get(name, ResourceType::Dlg);
     if (!dlg) {
         throw NotFoundException("DLG not found: " + name);
@@ -45,7 +45,7 @@ void Dialog::load(const string &name) {
     loadReplies(*dlg);
 }
 
-void Dialog::loadEntries(const Gff &dlg) {
+void Conversation::loadEntries(const Gff &dlg) {
     auto dlgEntries = dlg.getList("EntryList");
     for (auto &dlgEntry : dlgEntries) {
         auto textStrRef = dlgEntry->getInt("Text");
@@ -65,7 +65,7 @@ void Dialog::loadEntries(const Gff &dlg) {
     }
 }
 
-void Dialog::loadReplies(const Gff &dlg) {
+void Conversation::loadReplies(const Gff &dlg) {
     auto dlgReplies = dlg.getList("ReplyList");
     for (auto &dlgReply : dlgReplies) {
         auto textStrRef = dlgReply->getInt("Text");
@@ -85,7 +85,7 @@ void Dialog::loadReplies(const Gff &dlg) {
     }
 }
 
-void Dialog::pickReply(int index) {
+void Conversation::pickReply(int index) {
     if (isOutOfRange(_currentReplies, index)) {
         throw ArgumentException(str(boost::format("Reply out of range: %d/%llu") % index % _currentReplies.size()));
     }

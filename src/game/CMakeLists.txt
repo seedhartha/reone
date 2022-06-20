@@ -57,9 +57,9 @@ set(GAME_HEADERS
     astar.h
     camerastyle.h
     camerastyles.h
+    conversation.h
     cursors.h
     debug.h
-    dialog.h
     effect.h
     effect/abilitydecrease.h
     effect/abilityincrease.h
@@ -183,9 +183,9 @@ set(GAME_SOURCES
     action/movetoobject.cpp
     astar.cpp
     camerastyles.cpp
+    conversation.cpp
     cursors.cpp
     debug.cpp
-    dialog.cpp
     footstepsounds.cpp
     format/ltrreader.cpp
     format/lytreader.cpp

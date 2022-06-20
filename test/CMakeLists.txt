@@ -20,6 +20,7 @@ set(TEST_HEADERS
     fixtures/audio.h
     fixtures/functional.h
     fixtures/game.h
+    fixtures/resource.h
     fixtures/scene.h
     fixtures/script.h)
 
@@ -38,6 +39,7 @@ set(TEST_SOURCES
     common/textwriter.cpp
     game/action/movetoobject.cpp
     game/astar.cpp
+    game/conversation.cpp
     game/game.cpp
     game/object.cpp
     game/object/creature.cpp

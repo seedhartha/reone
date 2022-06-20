@@ -37,9 +37,9 @@
 #include "../script/services.h"
 
 #include "astar.h"
+#include "conversation.h"
 #include "cursors.h"
 #include "debug.h"
-#include "dialog.h"
 #include "object/area.h"
 #include "object/camera.h"
 #include "object/creature.h"
@@ -413,8 +413,8 @@ void Game::quit() {
 }
 
 void Game::startConversation(const std::string &name) {
-    auto dialog = Dialog(_services.resource);
-    dialog.load(name);
+    auto conversation = Conversation(_services.resource);
+    conversation.load(name);
 
     _stage = Stage::Conversation;
 }

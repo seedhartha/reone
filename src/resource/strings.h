@@ -45,6 +45,10 @@ public:
      */
     std::string getSound(int strRef);
 
+    void setTalkTable(std::shared_ptr<TalkTable> table) {
+        _table = std::move(table);
+    }
+
 private:
     std::shared_ptr<TalkTable> _table;
 
