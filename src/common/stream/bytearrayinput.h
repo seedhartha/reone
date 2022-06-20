@@ -27,7 +27,7 @@ public:
         _bytes(bytes) {
     }
 
-    void seek(int64_t offset, SeekOrigin origin) {
+    void seek(int64_t offset, SeekOrigin origin) override {
         if (origin == SeekOrigin::Begin) {
             _position = offset;
         } else if (origin == SeekOrigin::Current) {

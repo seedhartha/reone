@@ -27,7 +27,7 @@ public:
         _stream(path, mode == OpenMode::Binary ? std::ios::binary : static_cast<std::ios::openmode>(0)) {
     }
 
-    void seek(int64_t offset, SeekOrigin origin) {
+    void seek(int64_t offset, SeekOrigin origin) override {
         _stream.clear();
         if (origin == SeekOrigin::Begin) {
             _stream.seekg(offset, std::ios::beg);

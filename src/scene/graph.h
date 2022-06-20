@@ -124,19 +124,19 @@ public:
 
     // Fog
 
-    bool isFogEnabled() const {
+    bool isFogEnabled() const override {
         return _fog.enabled;
     }
 
-    float fogNear() const {
+    float fogNear() const override {
         return _fog.nearPlane;
     }
 
-    float fogFar() const {
+    float fogFar() const override {
         return _fog.farPlane;
     }
 
-    const glm::vec3 &fogColor() const {
+    const glm::vec3 &fogColor() const override {
         return _fog.color;
     }
 
