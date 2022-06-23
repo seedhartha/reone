@@ -26,10 +26,12 @@
 #include "gui/dialog.h"
 #include "gui/maininterface.h"
 #include "gui/mainmenu.h"
+#include "gui/profiler.h"
 #include "location.h"
 #include "object/factory.h"
 #include "object/module.h"
 #include "options.h"
+#include "profiler.h"
 #include "script/routines.h"
 #include "script/runner.h"
 #include "selectioncontroller.h"
@@ -248,6 +250,7 @@ protected:
     std::unique_ptr<MainInterface> _mainInterface;
     std::unique_ptr<DialogGui> _dialogGui;
     std::unique_ptr<Console> _console;
+    std::unique_ptr<ProfilerGui> _profilerGui;
 
     // END GUI
 
@@ -266,6 +269,12 @@ protected:
     CursorType _cursorType {CursorType::None};
 
     // END Cursor
+
+    // Profiling
+
+    Profiler _profiler;
+
+    // END Profiling
 
     void handleInput();
     void update();

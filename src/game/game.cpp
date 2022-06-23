@@ -97,6 +97,9 @@ void Game::init() {
     _console = make_unique<Console>(*this, _options.graphics, _services.graphics, _services.resource);
     _console->init();
 
+    _profilerGui = make_unique<ProfilerGui>(_profiler, _options.graphics, _services.graphics, _services.resource);
+    _profilerGui->init();
+
     // Services
 
     _playerController = make_unique<PlayerController>();
@@ -130,6 +133,8 @@ void Game::init() {
     _services.graphics.window.setEventHandler(this);
 
     changeCursor(CursorType::Default);
+
+    _profiler.init();
 }
 
 void Game::loadModuleNames() {
@@ -146,9 +151,21 @@ void Game::loadModuleNames() {
 
 void Game::run() {
     while (!_finished) {
+        _profiler.startFrame();
+
+        _profiler.startInput();
         handleInput();
+        _profiler.endInput();
+
+        _profiler.startUpdate();
         update();
+        _profiler.endUpdate();
+
+        _profiler.startRender();
         render();
+        _profiler.endRender();
+
+        _profiler.endFrame();
     }
 }
 
@@ -159,6 +176,9 @@ bool Game::handle(const SDL_Event &e) {
             return true;
         } else if (e.key.keysym.scancode == SDL_SCANCODE_EQUALS) {
             _deltaMultiplier = glm::min(8.0f, _deltaMultiplier + 1.0f);
+            return true;
+        } else if (e.key.keysym.scancode == SDL_SCANCODE_F5) {
+            _profilerGui->setEnabled(!_profilerGui->isEnabled());
             return true;
         }
     }
@@ -263,6 +283,12 @@ void Game::update() {
         _cursor->setPosition(glm::ivec2(x, y));
         _cursor->setPressed(pressed);
     }
+
+    // Update profiler GUI
+
+    if (_profilerGui->isEnabled()) {
+        _profilerGui->update(delta);
+    }
 }
 
 void Game::render() {
@@ -294,6 +320,11 @@ void Game::render() {
     // Render cursor
     if (_stage != Stage::MovieLegal && _cursor) {
         _cursor->draw();
+    }
+
+    // Render profiler GUI
+    if (_profilerGui->isEnabled()) {
+        _profilerGui->render();
     }
 
     _services.graphics.window.swapBuffers();

@@ -138,6 +138,7 @@ set(GAME_HEADERS
     gui/dialog.h
     gui/maininterface.h
     gui/mainmenu.h
+    gui/profiler.h
     guisounds.h
     layout.h
     layouts.h
@@ -162,6 +163,7 @@ set(GAME_HEADERS
     paths.h
     portrait.h
     portraits.h
+    profiler.h  
     resourcelayout.h
     selectioncontroller.h
     script/routine/argutil.h
@@ -197,6 +199,7 @@ set(GAME_SOURCES
     gui/dialog.cpp
     gui/maininterface.cpp
     gui/mainmenu.cpp
+    gui/profiler.cpp
     guisounds.cpp
     layouts.cpp
     object.cpp
