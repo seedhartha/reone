@@ -43,6 +43,7 @@ void Shaders::init() {
     auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
     auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
     auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_vsText});
+    auto vsPoints = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslPointsUniforms, g_vsPoints});
     auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsPointLightShadows});
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsDirectionalLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsColor});
@@ -75,6 +76,7 @@ void Shaders::init() {
     _spSimpleTexture = initShaderProgram({vsClipSpace, fsTexture});
     _spGUI = initShaderProgram({vsClipSpace, fsGUI});
     _spText = initShaderProgram({vsText, fsText});
+    _spPoints = initShaderProgram({vsPoints, fsColor});
     _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spModelOpaque = initShaderProgram({vsModel, fsModelOpaque});
@@ -108,6 +110,7 @@ void Shaders::deinit() {
     _spSimpleTexture.reset();
     _spGUI.reset();
     _spText.reset();
+    _spPoints.reset();
     _spPointLightShadows.reset();
     _spDirectionalLightShadows.reset();
     _spModelOpaque.reset();
@@ -179,6 +182,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
     program->bindUniformBlock("SSAO", UniformBlockBindingPoints::ssao);
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
+    program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
 
     return move(program);
 }

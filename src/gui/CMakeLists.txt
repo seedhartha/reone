@@ -23,6 +23,7 @@ set(GUI_HEADERS
     control/labelhilight.h
     control/listbox.h
     control/panel.h
+    control/plotter.h
     control/progressbar.h
     control/progressbar.h
     control/scrollbar.h
@@ -38,6 +39,7 @@ set(GUI_SOURCES
     control/button.cpp
     control/label.cpp
     control/listbox.cpp
+    control/plotter.cpp
     gui.cpp
     sceneinitializer.cpp
     textinput.cpp)

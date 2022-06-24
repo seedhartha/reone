@@ -32,6 +32,7 @@
 #include "control/labelhilight.h"
 #include "control/listbox.h"
 #include "control/panel.h"
+#include "control/plotter.h"
 #include "control/progressbar.h"
 #include "control/scrollbar.h"
 #include "control/slider.h"
@@ -228,6 +229,10 @@ shared_ptr<Control> Gui::newProgressBar(int id) {
 
 shared_ptr<Control> Gui::newListBox(int id) {
     return newControl<ListBox>(id);
+}
+
+shared_ptr<Control> Gui::newPlotter(int id) {
+    return newControl<Plotter>(id);
 }
 
 // END IControlFactory

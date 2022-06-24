@@ -37,6 +37,7 @@ public:
     ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
     ShaderProgram &gui() const { return *_spGUI; }
     ShaderProgram &text() const { return *_spText; }
+    ShaderProgram &points() const { return *_spPoints; }
 
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
@@ -71,6 +72,7 @@ private:
     std::shared_ptr<ShaderProgram> _spSimpleTexture;
     std::shared_ptr<ShaderProgram> _spGUI;
     std::shared_ptr<ShaderProgram> _spText;
+    std::shared_ptr<ShaderProgram> _spPoints;
 
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;

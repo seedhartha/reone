@@ -80,6 +80,7 @@ public:
     std::shared_ptr<Control> newScrollBar(int id) override;
     std::shared_ptr<Control> newProgressBar(int id) override;
     std::shared_ptr<Control> newListBox(int id) override;
+    std::shared_ptr<Control> newPlotter(int id) override;
 
     // END IControlFactory
 

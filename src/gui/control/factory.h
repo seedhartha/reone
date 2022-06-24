@@ -42,6 +42,7 @@ public:
     virtual std::shared_ptr<Control> newScrollBar(int id) = 0;
     virtual std::shared_ptr<Control> newProgressBar(int id) = 0;
     virtual std::shared_ptr<Control> newListBox(int id) = 0;
+    virtual std::shared_ptr<Control> newPlotter(int id) = 0;
 };
 
 } // namespace gui

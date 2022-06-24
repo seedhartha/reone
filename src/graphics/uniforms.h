@@ -188,6 +188,10 @@ struct WalkmeshUniforms {
     glm::vec4 materials[kMaxWalkmeshMaterials] {glm::vec4(1.0f)};
 };
 
+struct PointsUniforms {
+    glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
+};
+
 class Uniforms : boost::noncopyable {
 public:
     ~Uniforms() { deinit(); }
@@ -203,6 +207,7 @@ public:
     void setGrass(const std::function<void(GrassUniforms &)> &block);
     void setSSAO(const std::function<void(SSAOUniforms &)> &block);
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block);
+    void setPoints(const std::function<void(PointsUniforms &)> &block);
 
 private:
     bool _inited {false};
@@ -217,6 +222,7 @@ private:
     GrassUniforms _grass;
     SSAOUniforms _ssao;
     WalkmeshUniforms _walkmesh;
+    PointsUniforms _points;
 
     // END Uniforms
 
@@ -230,6 +236,7 @@ private:
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubSSAO;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;
+    std::shared_ptr<UniformBuffer> _ubPoints;
 
     // END Uniform Buffers
 

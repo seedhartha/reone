@@ -17,60 +17,55 @@
 
 #pragma once
 
-#include "../../gui/gui.h"
+#include "../control.h"
 
 namespace reone {
 
 namespace gui {
 
-class ListBox;
-class Plotter;
-
-}
-
-namespace game {
-
-class Profiler;
-
-class ProfilerGui : public gui::Gui {
+class Plotter : public Control {
 public:
-    ProfilerGui(
-        Profiler &profiler,
+    struct Figure {
+        glm::vec3 color {1.0f};
+        std::vector<glm::vec2> points;
+    };
+
+    Plotter(
+        int id,
+        IGui &gui,
+        IControlFactory &controlFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
-        gui::Gui(
+        Control(
+            id,
+            ControlType::Plotter,
+            gui,
+            controlFactory,
             graphicsOpt,
             graphicsSvc,
-            resourceSvc),
-        _profiler(profiler) {
+            resourceSvc) {
     }
 
-    void init();
+    void render() override;
 
-    void update(float delta) override;
-
-    bool isEnabled() const {
-        return _enabled;
+    void clearFigures() {
+        _figures.clear();
     }
 
-    void setEnabled(bool enabled) {
-        _enabled = enabled;
+    void addFigure(Figure figure) {
+        _figures.push_back(std::move(figure));
+    }
+
+    void setAxes(glm::vec4 axes) {
+        _axes = std::move(axes);
     }
 
 private:
-    Profiler &_profiler;
-
-    bool _enabled {false};
-
-    // Binding
-
-    gui::ListBox *_lbText;
-    gui::Plotter *_pltFrameTimes;
-
-    // END Binding
+    glm::vec4 _axes {0.0f};
+    std::vector<Figure> _figures;
 };
 
-} // namespace game
+} // namespace gui
 
 } // namespace reone

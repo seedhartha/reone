@@ -174,6 +174,14 @@ layout(std140) uniform Walkmesh {
 };
 )END";
 
+const std::string g_glslPointsUniforms = R"END(
+const int MAX_POINTS = 128;
+
+layout(std140) uniform Points {
+    vec4 uPoints[MAX_POINTS];
+};
+)END";
+
 const std::string g_glslMath = R"END(
 const float PI = radians(180.0);
 )END";

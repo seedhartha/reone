@@ -36,6 +36,7 @@ void Uniforms::init() {
     static GrassUniforms defaultsGrass;
     static SSAOUniforms defaultsSSAO;
     static WalkmeshUniforms defaultsWalkmesh;
+    static PointsUniforms defaultsPoints;
 
     _ubGeneral = initBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
     _ubText = initBuffer(&defaultsText, sizeof(TextUniforms));
@@ -45,6 +46,7 @@ void Uniforms::init() {
     _ubGrass = initBuffer(&defaultsGrass, sizeof(GrassUniforms));
     _ubSSAO = initBuffer(&defaultsSSAO, sizeof(SSAOUniforms));
     _ubWalkmesh = initBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
+    _ubPoints = initBuffer(&defaultsPoints, sizeof(PointsUniforms));
 
     _inited = true;
 }
@@ -61,6 +63,8 @@ void Uniforms::deinit() {
     _ubParticles.reset();
     _ubGrass.reset();
     _ubSSAO.reset();
+    _ubWalkmesh.reset();
+    _ubPoints.reset();
 
     _inited = false;
 }
@@ -103,6 +107,11 @@ void Uniforms::setSSAO(const function<void(SSAOUniforms &)> &block) {
 void Uniforms::setWalkmesh(const function<void(WalkmeshUniforms &)> &block) {
     block(_walkmesh);
     refreshBuffer(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh, &_walkmesh, sizeof(WalkmeshUniforms));
+}
+
+void Uniforms::setPoints(const function<void(PointsUniforms &)> &block) {
+    block(_points);
+    refreshBuffer(*_ubPoints, UniformBlockBindingPoints::points, &_points, sizeof(PointsUniforms));
 }
 
 unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {

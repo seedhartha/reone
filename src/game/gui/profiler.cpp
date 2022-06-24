@@ -22,6 +22,7 @@
 #include "../../graphics/services.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
+#include "../../gui/control/plotter.h"
 
 #include "../profiler.h"
 
@@ -33,8 +34,8 @@ namespace reone {
 
 namespace game {
 
-static constexpr int kPanelWidth = 200;
-static constexpr float kFlushInterval = 1.0f;
+static constexpr int kPanelWidth = 206; // 2 * 100 + 6
+static constexpr int kPlotterHeight = 200;
 
 static const string kFontResRef = "fnt_console";
 
@@ -43,15 +44,22 @@ void ProfilerGui::init() {
 
     // Text list box
 
-    auto lbTextProtoItem = newLabel(ListBox::itemControlId(0, -1));
-    lbTextProtoItem->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, font->height()));
+    auto lbTextProtoItem = newLabel(ListBox::itemControlId(1, -1));
+    lbTextProtoItem->setExtent(glm::ivec4(3 + _graphicsOpt.width - kPanelWidth, 3, kPanelWidth - 6, font->height()));
     lbTextProtoItem->setFont(kFontResRef);
 
-    auto lbText = static_pointer_cast<ListBox>(newListBox(0));
-    lbText->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, _graphicsOpt.height));
+    auto lbText = static_pointer_cast<ListBox>(newListBox(1));
+    lbText->setExtent(glm::ivec4(3 + _graphicsOpt.width - kPanelWidth, 3, kPanelWidth - 6, 3 * font->height()));
     lbText->setProtoItem(lbTextProtoItem.get());
     lbText->initItemSlots();
     _lbText = lbText.get();
+
+    // Frame times plotter
+
+    auto pltFrameTimes = static_pointer_cast<Plotter>(newPlotter(0));
+    pltFrameTimes->setExtent(glm::ivec4(3 + _graphicsOpt.width - kPanelWidth, 6 + 3 * font->height(), kPanelWidth - 6, kPlotterHeight));
+    pltFrameTimes->setAxes(glm::vec4(0.0f, 0.0042f, 100.0f, 0.025f));
+    _pltFrameTimes = pltFrameTimes.get();
 
     // Root control
 
@@ -59,6 +67,7 @@ void ProfilerGui::init() {
     rootControl->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, _graphicsOpt.height));
     rootControl->setBorderFill("black");
     rootControl->setAlpha(0.5f);
+    rootControl->append(*_pltFrameTimes);
     rootControl->append(*_lbText);
     _rootControl = rootControl.get();
 }
@@ -67,15 +76,57 @@ void ProfilerGui::update(float delta) {
     if (!_enabled) {
         return;
     }
+
+    _pltFrameTimes->clearFigures();
+
+    // Frame times
+
+    auto &frameTimes = _profiler.frameTimes();
+    auto frameTimesFigure = Plotter::Figure();
+    frameTimesFigure.color = glm::vec3(1.0f, 1.0f, 1.0f);
+    for (auto &time : frameTimes) {
+        auto &points = frameTimesFigure.points;
+        points.push_back(glm::vec2(static_cast<float>(points.size()), time));
+    }
+    _pltFrameTimes->addFigure(move(frameTimesFigure));
+
+    // Input times
+
+    auto &inputTimes = _profiler.inputTimes();
+    auto inputTimesFigure = Plotter::Figure();
+    inputTimesFigure.color = glm::vec3(0.0f, 0.0f, 1.0f);
+    for (auto &time : inputTimes) {
+        auto &points = inputTimesFigure.points;
+        points.push_back(glm::vec2(static_cast<float>(points.size()), time));
+    }
+    _pltFrameTimes->addFigure(move(inputTimesFigure));
+
+    // Update times
+
+    auto &updateTimes = _profiler.updateTimes();
+    auto updateTimesFigure = Plotter::Figure();
+    updateTimesFigure.color = glm::vec3(0.0f, 1.0f, 0.0f);
+    for (auto &time : updateTimes) {
+        auto &points = updateTimesFigure.points;
+        points.push_back(glm::vec2(static_cast<float>(points.size()), time));
+    }
+    _pltFrameTimes->addFigure(move(updateTimesFigure));
+
+    // Render times
+
+    auto &renderTimes = _profiler.renderTimes();
+    auto renderTimesFigure = Plotter::Figure();
+    renderTimesFigure.color = glm::vec3(1.0f, 0.0f, 0.0f);
+    for (auto &time : renderTimes) {
+        auto &points = renderTimesFigure.points;
+        points.push_back(glm::vec2(static_cast<float>(points.size()), time));
+    }
+    _pltFrameTimes->addFigure(move(renderTimesFigure));
+
     auto strings = vector<string>();
     strings.push_back("FPS:");
     strings.push_back("avg " + to_string(_profiler.averageFps()));
     strings.push_back("0.1% low " + to_string(_profiler.onePercentLowFps()));
-    strings.push_back("");
-    strings.push_back("Frame time:");
-    strings.push_back(str(boost::format("input %.04f") % _profiler.inputTimes().back()));
-    strings.push_back(str(boost::format("update %.04f") % _profiler.updateTimes().back()));
-    strings.push_back(str(boost::format("render %.04f") % _profiler.renderTimes().back()));
     _lbText->clearItems();
     for (auto &s : strings) {
         _lbText->appendItem(ListBox::Item {s});
