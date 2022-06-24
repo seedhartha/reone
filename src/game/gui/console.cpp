@@ -36,8 +36,9 @@ namespace reone {
 
 namespace game {
 
-static const string kFontResRef = "fnt_console";
 static constexpr int kNumLines = 20;
+
+static const string kFontResRef = "fnt_console";
 
 void Console::init() {
     auto font = _graphicsSvc.fonts.get(kFontResRef);
@@ -46,10 +47,7 @@ void Console::init() {
 
     auto lbLinesProtoItem = newLabel(ListBox::itemControlId(0, -1));
     lbLinesProtoItem->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, font->height()));
-
-    auto protoText = make_unique<Control::Text>();
-    protoText->font = kFontResRef;
-    lbLinesProtoItem->setText(move(protoText));
+    lbLinesProtoItem->setFont(kFontResRef);
 
     auto lbLines = static_pointer_cast<ListBox>(newListBox(0));
     lbLines->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, static_cast<int>(kNumLines * font->height())));
@@ -74,13 +72,10 @@ void Console::init() {
 
     auto rootControl = newLabel(-1);
     rootControl->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, static_cast<int>((kNumLines + 1) * font->height())));
+    rootControl->setBorderFill("black");
     rootControl->setAlpha(0.5f);
     rootControl->append(*lbLines);
     rootControl->append(*lblInput);
-
-    auto rootBorder = make_unique<Control::Border>();
-    rootBorder->fill = "black";
-    rootControl->setBorder(move(rootBorder));
 
     _rootControl = rootControl.get();
 }

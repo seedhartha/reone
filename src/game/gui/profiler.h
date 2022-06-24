@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-
 #include "../../gui/gui.h"
 
 namespace reone {
+
+namespace gui {
+
+class ListBox;
+
+}
 
 namespace game {
 
@@ -56,9 +60,13 @@ public:
 private:
     Profiler &_profiler;
 
-    Timer _flushTimer;
-
     bool _enabled {false};
+
+    // Binding
+
+    gui::ListBox *_lbText;
+
+    // END Binding
 };
 
 } // namespace game

@@ -17,29 +17,68 @@
 
 #include "profiler.h"
 
-#include "../../common/logutil.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/options.h"
+#include "../../graphics/services.h"
+#include "../../gui/control/listbox.h"
+#include "../../gui/control/panel.h"
 
 #include "../profiler.h"
+
+using namespace std;
+
+using namespace reone::gui;
 
 namespace reone {
 
 namespace game {
 
+static constexpr int kPanelWidth = 200;
 static constexpr float kFlushInterval = 1.0f;
 
+static const string kFontResRef = "fnt_console";
+
 void ProfilerGui::init() {
+    auto font = _graphicsSvc.fonts.get(kFontResRef);
+
+    // Text list box
+
+    auto lbTextProtoItem = newLabel(ListBox::itemControlId(0, -1));
+    lbTextProtoItem->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, font->height()));
+    lbTextProtoItem->setFont(kFontResRef);
+
+    auto lbText = static_pointer_cast<ListBox>(newListBox(0));
+    lbText->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, _graphicsOpt.height));
+    lbText->setProtoItem(lbTextProtoItem.get());
+    lbText->initItemSlots();
+    _lbText = lbText.get();
+
+    // Root control
+
+    auto rootControl = static_pointer_cast<Panel>(newPanel(-1));
+    rootControl->setExtent(glm::ivec4(_graphicsOpt.width - kPanelWidth, 0, kPanelWidth, _graphicsOpt.height));
+    rootControl->setBorderFill("black");
+    rootControl->setAlpha(0.5f);
+    rootControl->append(*_lbText);
+    _rootControl = rootControl.get();
 }
 
 void ProfilerGui::update(float delta) {
-    if (_flushTimer.advance(delta)) {
-        debug(boost::format("FPS: average=%u, 0.1%%=%u") % _profiler.averageFps() % _profiler.onePercentLowFps());
-    
-        auto &inputTimes = _profiler.inputTimes();
-        auto &updateTimes = _profiler.updateTimes();
-        auto &renderTimes = _profiler.renderTimes();
-        debug(boost::format("Last frame times: input=%.04f, update=%.04f, render=%.04f") % inputTimes.back() % updateTimes.back() % renderTimes.back());
-
-        _flushTimer.setTimeout(kFlushInterval);
+    if (!_enabled) {
+        return;
+    }
+    auto strings = vector<string>();
+    strings.push_back("FPS:");
+    strings.push_back("avg " + to_string(_profiler.averageFps()));
+    strings.push_back("0.1% low " + to_string(_profiler.onePercentLowFps()));
+    strings.push_back("");
+    strings.push_back("Frame time:");
+    strings.push_back(str(boost::format("input %.04f") % _profiler.inputTimes().back()));
+    strings.push_back(str(boost::format("update %.04f") % _profiler.updateTimes().back()));
+    strings.push_back(str(boost::format("render %.04f") % _profiler.renderTimes().back()));
+    _lbText->clearItems();
+    for (auto &s : strings) {
+        _lbText->appendItem(ListBox::Item {s});
     }
 }
 

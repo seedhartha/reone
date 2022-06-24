@@ -159,9 +159,17 @@ public:
     }
 
     void setText(std::string text) {
-        if (_text) {
-            _text->text = move(text);
+        if (!_text) {
+            _text = std::make_unique<Text>();
         }
+        _text->text = move(text);
+    }
+
+    void setFont(std::string font) {
+        if (!_text) {
+            _text = std::make_unique<Text>();
+        }
+        _text->font = font;
     }
 
     void setSceneGraph(scene::SceneGraph *sceneGraph) {

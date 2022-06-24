@@ -34,6 +34,11 @@ public:
         return *this;
     }
 
+    StringBuilder &append(const std::string &s) {
+        _stream << s;
+        return *this;
+    }
+
     StringBuilder &repeat(char ch, int times) {
         _stream << std::string(times, ch);
         return *this;
