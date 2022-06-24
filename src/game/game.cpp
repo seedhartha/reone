@@ -372,6 +372,7 @@ void Game::loadModule(const string &name) {
         if (sceneNode) {
             if (sceneNode->type() == SceneNodeType::Model) {
                 auto model = static_cast<ModelSceneNode *>(sceneNode);
+                model->setDrawDistance(_options.graphics.drawDistance);
                 scene.addRoot(*model);
             } else if (sceneNode->type() == SceneNodeType::Trigger) {
                 auto trigger = static_cast<TriggerSceneNode *>(sceneNode);
