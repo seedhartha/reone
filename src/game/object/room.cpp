@@ -18,6 +18,7 @@
 #include "room.h"
 
 #include "../../graphics/models.h"
+#include "../../graphics/options.h"
 #include "../../graphics/services.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../scene/graph.h"
@@ -43,11 +44,13 @@ void Room::loadFromLyt(const Layout::Room &lyt, GrassProperties grassProperties)
         _sceneNode = sceneNode.get();
 
         // Grass
-        auto aabbNode = model->getAABBNode();
-        if (aabbNode && grassProperties.texture) {
-            auto grass = _sceneGraph->newGrass(grassProperties, *aabbNode);
-            grass->init();
-            _grass = grass.get();
+        if (_graphicsOpt.grass && grassProperties.texture) {
+            auto aabbNode = model->getAABBNode();
+            if (aabbNode && grassProperties.texture) {
+                auto grass = _sceneGraph->newGrass(grassProperties, *aabbNode);
+                grass->init();
+                _grass = grass.get();
+            }
         }
     }
 
