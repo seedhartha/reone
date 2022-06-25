@@ -50,6 +50,15 @@ public:
 
     void loadFromLyt(const Layout::Room &lyt, scene::GrassProperties grassProperties = scene::GrassProperties());
 
+    void update(float delta) override;
+
+    void show() override;
+    void hide() override;
+
+    const std::string &name() const {
+        return _name;
+    }
+
     scene::WalkmeshSceneNode *walkmesh() {
         return _walkmesh;
     }
@@ -58,11 +67,18 @@ public:
         return _grass;
     }
 
+    const std::set<Object *> &objectsInside() const {
+        return _objectsInside;
+    }
+
 private:
+    std::string _name;
     scene::GrassProperties _grassProperties;
 
     scene::WalkmeshSceneNode *_walkmesh {nullptr};
     scene::GrassSceneNode *_grass {nullptr};
+
+    std::set<Object *> _objectsInside;
 
     void flushTransform() override;
 };

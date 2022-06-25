@@ -55,18 +55,23 @@ class IGame;
 class IItem;
 class IObjectFactory;
 
+class Room;
+
 class Object : public scene::IUser, boost::noncopyable {
 public:
     typedef std::queue<std::shared_ptr<Action>> ActionQueue;
     typedef std::vector<IItem *> ItemList;
+
+    virtual void handleClick(Object &clicker) {
+    }
 
     virtual void update(float delta);
 
     void face(Object &other);
     void face(const glm::vec2 &point);
 
-    virtual void handleClick(Object &clicker) {
-    }
+    virtual void show();
+    virtual void hide();
 
     uint32_t id() const {
         return _id;
@@ -98,6 +103,10 @@ public:
 
     scene::SceneNode *sceneNode() {
         return _sceneNode;
+    }
+
+    const Room *room() const {
+        return _room;
     }
 
     float square2dDistanceTo(Object &other) const {
@@ -138,6 +147,10 @@ public:
     void setSceneNode(scene::SceneNode *sceneNode) {
         _sceneNode = std::move(sceneNode);
         flushTransform();
+    }
+
+    void setRoom(Room *room) {
+        _room = room;
     }
 
     // Actions
@@ -218,6 +231,8 @@ protected:
 
     scene::SceneGraph *_sceneGraph {nullptr};
     scene::SceneNode *_sceneNode {nullptr};
+
+    Room *_room {nullptr};
 
     // Local variables
 

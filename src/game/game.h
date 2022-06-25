@@ -121,6 +121,7 @@ public:
     Object *objectById(uint32_t id) override;
     Object *objectByTag(const std::string &tag, int nth = 0) override;
     std::set<Object *> objectsInRadius(const glm::vec2 &origin, float radius, int typeMask = static_cast<int>(ObjectType::All)) override;
+    std::set<Object *> objectsSatisfying(std::function<bool(const Object &)> pred) override;
 
     const std::set<std::string> &moduleNames() const override {
         return _moduleNames;

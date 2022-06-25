@@ -21,6 +21,7 @@
 #include "../../scene/fogproperties.h"
 
 #include "../object.h"
+#include "../types.h"
 
 #include "camera.h"
 #include "room.h"
@@ -80,6 +81,10 @@ public:
         return _path;
     }
 
+    const Visibility &visibility() const {
+        return _visibility;
+    }
+
     const scene::FogProperties &fog() const {
         return _fog;
     }
@@ -90,6 +95,7 @@ private:
     Camera *_mainCamera {nullptr};
 
     Path *_path {nullptr};
+    Visibility _visibility;
     scene::FogProperties _fog;
 };
 

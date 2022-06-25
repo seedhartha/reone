@@ -32,6 +32,7 @@
 #include "../paths.h"
 #include "../services.h"
 #include "../surfaces.h"
+#include "../visibilities.h"
 
 #include "creature.h"
 #include "door.h"
@@ -53,7 +54,7 @@ namespace game {
 void Area::load(const string &name) {
     info("Loading area " + name);
 
-    // ARE, GIT, LYT, PTH
+    // ARE, GIT, LYT, PTH, VIS
 
     auto are = _resourceSvc.gffs.get(name, ResourceType::Are);
     if (!are) {
@@ -75,6 +76,13 @@ void Area::load(const string &name) {
         warn("PTH not found: " + name);
     }
     _path = path.get();
+
+    auto visibility = _gameSvc.visibilities.get(name);
+    if (visibility) {
+        _visibility = *visibility;
+    } else {
+        warn("VIS not found: " + name);
+    }
 
     // Grass
 

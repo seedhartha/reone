@@ -47,6 +47,20 @@ void Object::face(const glm::vec2 &point) {
     setFacing(-glm::atan(dir.x, dir.y));
 }
 
+void Object::show() {
+    if (!_sceneNode) {
+        return;
+    }
+    _sceneNode->setEnabled(true);
+}
+
+void Object::hide() {
+    if (!_sceneNode) {
+        return;
+    }
+    _sceneNode->setEnabled(false);
+}
+
 glm::vec3 Object::targetWorldCoords() const {
     if (!_sceneNode) {
         return _position;

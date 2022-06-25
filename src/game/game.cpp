@@ -19,6 +19,7 @@
 
 #include "../common/collectionutil.h"
 #include "../common/pathutil.h"
+#include "../graphics/aabb.h"
 #include "../graphics/context.h"
 #include "../graphics/meshes.h"
 #include "../graphics/pipeline.h"
@@ -58,6 +59,7 @@
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -247,14 +249,53 @@ void Game::update() {
     } else if (_stage == Stage::World ||
                _stage == Stage::Conversation ||
                _stage == Stage::Console) {
-        // Update game objects
-
         if (_module) {
-            for (auto &object : _module->area().objects()) {
+            auto &area = _module->area();
+            auto &pc = _module->pc();
+
+            // Update rooms
+            for (auto &room : area.rooms()) {
+                room->update(delta);
+            }
+
+            // Update game objects
+            for (auto &object : area.objects()) {
                 object->update(delta);
             }
+
+            // Update visibility
+            auto pcRoom = pc.room();
+            if (pcRoom) {
+                auto visibleRooms = set<string>();
+                visibleRooms.insert(pcRoom->name());
+                auto range = area.visibility().equal_range(pcRoom->name());
+                for (auto it = range.first; it != range.second; ++it) {
+                    visibleRooms.insert(it->second);
+                }
+                for (auto &room : area.rooms()) {
+                    if (visibleRooms.count(room->name()) > 0) {
+                        room->show();
+                    } else {
+                        room->hide();
+                    }
+                }
+                for (auto &object : area.objects()) {
+                    auto objectRoom = object->room();
+                    if (!objectRoom || visibleRooms.count(objectRoom->name()) > 0) {
+                        object->show();
+                    } else {
+                        object->hide();
+                    }
+                }
+            } else {
+                for (auto &object : area.objects()) {
+                    object->show();
+                }
+            }
+
             _module->area().mainCamera().update(delta);
         }
+
         _playerController->update(delta);
 
         // Update scene
@@ -479,28 +520,59 @@ Object *Game::objectById(uint32_t id) {
 }
 
 Object *Game::objectByTag(const string &tag, int nth) {
+    if (!_module) {
+        return nullptr;
+    }
     int match = 0;
-    for (auto &object : _objects) {
-        if (object.second->tag() != tag) {
+    for (auto object : _module->area().objects()) {
+        if (object->tag() != tag) {
             continue;
         }
         if (match++ == nth) {
-            return object.second.get();
+            return object;
         }
+    }
+    auto &pc = _module->pc();
+    if (pc.tag() == tag) {
+        return &pc;
     }
     return nullptr;
 }
 
 set<Object *> Game::objectsInRadius(const glm::vec2 &origin, float radius, int typeMask) {
+    if (!_module) {
+        return set<Object *>();
+    }
     auto objects = set<Object *>();
     float radius2 = radius * radius;
-    for (auto &object : _objects) {
-        if ((typeMask & static_cast<int>(object.second->type())) == 0) {
+    for (auto object : _module->area().objects()) {
+        if ((typeMask & static_cast<int>(object->type())) == 0) {
             continue;
         }
-        if (object.second->square2dDistanceTo(origin) < radius2) {
-            objects.insert(object.second.get());
+        if (object->square2dDistanceTo(origin) < radius2) {
+            objects.insert(object);
         }
+    }
+    auto &pc = _module->pc();
+    if ((typeMask & static_cast<int>(ObjectType::Creature)) != 0 && pc.square2dDistanceTo(origin) < radius2) {
+        objects.insert(&pc);
+    }
+    return objects;
+}
+
+std::set<Object *> Game::objectsSatisfying(std::function<bool(const Object &)> pred) {
+    if (!_module) {
+        return set<Object *>();
+    }
+    auto objects = set<Object *>();
+    for (auto object : _module->area().objects()) {
+        if (pred(*object)) {
+            objects.insert(object);
+        }
+    }
+    auto &pc = _module->pc();
+    if (pred(pc)) {
+        objects.insert(&pc);
     }
     return objects;
 }

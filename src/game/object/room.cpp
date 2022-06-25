@@ -25,6 +25,8 @@
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"
 
+#include "../gameinterface.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -35,6 +37,8 @@ namespace reone {
 namespace game {
 
 void Room::loadFromLyt(const Layout::Room &lyt, GrassProperties grassProperties) {
+    _name = lyt.name;
+
     // Model
     auto model = _graphicsSvc.models.get(lyt.name);
     if (model) {
@@ -63,6 +67,39 @@ void Room::loadFromLyt(const Layout::Room &lyt, GrassProperties grassProperties)
 
     _position = lyt.position;
     flushTransform();
+}
+
+void Room::update(float delta) {
+    if (_walkmesh) {
+        auto &walkmesh = _walkmesh->walkmesh();
+        auto objectsInside = _game.objectsSatisfying([&walkmesh](auto &object) {
+            return walkmesh.contains(glm::vec2(object.position()));
+        });
+        for (auto &object : objectsInside) {
+            object->setRoom(this);
+        }
+        _objectsInside.swap(objectsInside);
+    }
+}
+
+void Room::show() {
+    if (!_sceneNode) {
+        return;
+    }
+    _sceneNode->setEnabled(true);
+    if (_grass) {
+        _grass->setEnabled(true);
+    }
+}
+
+void Room::hide() {
+    if (!_sceneNode) {
+        return;
+    }
+    _sceneNode->setEnabled(false);
+    if (_grass) {
+        _grass->setEnabled(false);
+    }
 }
 
 void Room::flushTransform() {

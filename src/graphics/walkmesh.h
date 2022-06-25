@@ -52,6 +52,8 @@ public:
         float maxDistance,
         float &outDistance) const;
 
+    bool contains(const glm::vec2 &point) const;
+
     bool isAreaWalkmesh() const { return _area; }
 
     const std::vector<Face> &faces() const { return _faces; }

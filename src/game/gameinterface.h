@@ -21,6 +21,12 @@
 
 namespace reone {
 
+namespace graphics {
+
+class AABB;
+
+}
+
 namespace game {
 
 class Object;
@@ -40,6 +46,7 @@ public:
     virtual Object *objectById(uint32_t id) = 0;
     virtual Object *objectByTag(const std::string &tag, int nth = 0) = 0;
     virtual std::set<Object *> objectsInRadius(const glm::vec2 &origin, float radius, int typeMask = static_cast<int>(ObjectType::All)) = 0;
+    virtual std::set<Object *> objectsSatisfying(std::function<bool(const Object &)> pred) = 0;
 
     virtual const std::set<std::string> &moduleNames() const = 0;
 };

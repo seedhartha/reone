@@ -120,6 +120,13 @@ bool Walkmesh::raycastFace(
     return false;
 }
 
+bool Walkmesh::contains(const glm::vec2 &point) const {
+    if (!_rootAabb) {
+        return false;
+    }
+    return _rootAabb->value.contains(point);
+}
+
 } // namespace graphics
 
 } // namespace reone
