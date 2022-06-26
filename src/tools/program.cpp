@@ -184,12 +184,16 @@ void Program::loadTools() {
 
 shared_ptr<Tool> Program::getTool() const {
     for (auto &tool : _tools) {
+        bool supported = true;
         for (auto &path : _input) {
             if (!tool->supports(_operation, path)) {
+                supported = false;
                 break;
             }
         }
-        return tool;
+        if (supported) {
+            return tool;
+        }
     }
     return nullptr;
 }
