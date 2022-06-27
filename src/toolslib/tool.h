@@ -56,7 +56,7 @@ protected:
                 outDir = path.parent_path();
             }
             try {
-                block(path, outputDir);
+                block(path, outDir);
             } catch (const ValidationException &e) {
                 error(boost::format("Error while processing '%s': %s") % path % std::string(e.what()));
             }
