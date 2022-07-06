@@ -164,6 +164,8 @@ def extract_patch():
 
 
 def extract_modules():
+    ARCHIVE_EXT = [".rim", ".erf", ".mod"]
+
     global game_dir, extract_dir, tools_exe
 
     # Create destination directory if it does not exist
@@ -174,12 +176,14 @@ def extract_modules():
     if modules_dir is None:
         return
     for f in os.listdir(modules_dir):
-        if f.lower().endswith(".rim") or f.lower().endswith(".erf"):
-            dest_dir = get_or_create_dir(dest_dir_base, f[:-4])
-            print("Extracting {}...".format(f))
-            rim_path = os.path.join(modules_dir, f)
-            run_subprocess(
-                [tools_exe, "--extract", rim_path, "--dest", dest_dir])
+        flc = f.lower()
+        if all((not flc.endswith(ext)) for ext in ARCHIVE_EXT):
+            continue
+        dest_dir = get_or_create_dir(dest_dir_base, flc)
+        print("Extracting {}...".format(flc))
+        archive_path = os.path.join(modules_dir, f)
+        run_subprocess(
+            [tools_exe, "--extract", archive_path, "--dest", dest_dir])
 
 
 def extract_textures():
