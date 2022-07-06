@@ -42,6 +42,7 @@ steps = [
     ["extract_textures", "Extract texture packs (y/n)?"],
     ["extract_voices", "Extract streamwaves/streamvoices (y/n)?"],
     ["extract_lips", "Extract LIP files (y/n)?"],
+    ["extract_override", "Extract override (y/n)?"],
     ["convert_to_xml", "Convert 2DA, GFF, TLK, LIP and SSF to XML (y/n)?"],
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
@@ -199,7 +200,8 @@ def extract_textures():
         texpack = os.path.join(in_texpacks_dir, f)
         texpack_dir = get_or_create_dir(out_texpacks_dir, filename)
         print("Extracting {}...".format(texpack))
-        run_subprocess([tools_exe, "--extract", texpack, "--dest", texpack_dir])
+        run_subprocess(
+            [tools_exe, "--extract", texpack, "--dest", texpack_dir])
 
 
 def extract_dialog():
@@ -256,6 +258,21 @@ def extract_lips():
                 [tools_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
+def extract_override():
+    global game_dir, extract_dir
+
+    override_dir = find_path_ignore_case(game_dir, "override")
+    dest_dir = get_or_create_dir(extract_dir, "override")
+
+    for f in os.listdir(override_dir):
+        from_path = os.path.join(override_dir, f)
+        to_path = os.path.join(dest_dir, f)
+        try:
+            shutil.copyfile(from_path, to_path)
+        except PermissionError:
+            pass
+
+
 def convert_to_xml():
     global game_dir, extract_dir, tools_exe
 
@@ -270,7 +287,7 @@ def convert_to_xml():
         "TLK": [".tlk"],
         "LIP": [".lip"],
         "SSF": [".ssf"]
-        }
+    }
 
     convertibles = {}
 
@@ -298,7 +315,8 @@ def convert_to_xml():
     for convertible_type, files in convertibles.items():
         chunks = partition(files, 100)
         for chunk in chunks:
-            run_subprocess([tools_exe, "--game", game_dir, "--to-xml", *chunk], silent=False)
+            run_subprocess([tools_exe, "--game", game_dir,
+                           "--to-xml", *chunk], silent=False)
 
 
 def convert_to_tga():
@@ -315,7 +333,8 @@ def convert_to_tga():
         print("Enqueued {} for TPC to TGA/TXI conversion".format(f))
     tpc_chunks = partition(tpcs, 100)
     for chunk in tpc_chunks:
-        run_subprocess([tools_exe, "--to-tga", *chunk], silent=False, check_retcode=False)
+        run_subprocess([tools_exe, "--to-tga", *chunk],
+                       silent=False, check_retcode=False)
 
 
 def disassemble_scripts():
@@ -383,6 +402,10 @@ for step in steps:
             configure_game_dir()
             configure_tools_dir()
             extract_lips()
+
+        if step[0] == "extract_override":
+            configure_game_dir()
+            extract_override()
 
         if step[0] == "convert_to_xml":
             configure_game_dir()
