@@ -154,7 +154,9 @@ void main() {
         0.0,
         0.0);
     vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
+    eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = diffuseColor;
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
@@ -255,7 +257,9 @@ layout(location = 6) out vec4 fragEyeNormal;
 
 void main() {
     vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
+    eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = vec4(1.0);
     fragLightmapColor = vec4(0.0);
@@ -282,7 +286,9 @@ layout(location = 6) out vec4 fragEyeNormal;
 
 void main() {
     vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
+    eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = vec4(uWalkmeshMaterials[fragMaterial].rgb, 1.0);
     fragLightmapColor = vec4(0.0);
@@ -378,7 +384,9 @@ void main() {
     hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
 
     vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
+    eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = mainTexSample;
 
@@ -411,6 +419,8 @@ void main() {
     vec3 posM = texture(sEyePos, uvM).rgb;
 
     vec3 normal = texture(sEyeNormal, uvM).rgb;
+    normal = normalize(2.0 * normal - 1.0);
+
     vec3 randomVec = vec3(texture(sNoise, uvM * uScreenResolution * NOISE_SCALE).rg, 0.0);
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
@@ -557,7 +567,10 @@ void main() {
 
     vec3 fragPosVS = texture(sEyePos, fragUV1).rgb;
     vec3 I = normalize(fragPosVS);
-    vec3 N = normalize(texture(sEyeNormal, fragUV1).rgb);
+
+    vec3 N = texture(sEyeNormal, fragUV1).rgb;
+    N = normalize(2.0 * N - 1.0);
+
     vec3 R = reflect(I, N);
 
     ivec2 c = ivec2(gl_FragCoord.xy);
@@ -630,6 +643,8 @@ void main() {
     vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).rgb;
 
     vec3 eyeNormal = texture(sEyeNormal, uv).rgb;
+    eyeNormal = normalize(2.0 * eyeNormal - 1.0);
+
     vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).rgb;
 
     float envmapped = step(0.0001, envmapSample.a);

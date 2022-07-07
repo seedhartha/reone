@@ -263,7 +263,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.cbGBufferEyePos->init();
 
     attachments.cbGBufferEyeNormal = make_unique<Texture>("gbuffer_color_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB16F);
+    attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB8);
     attachments.cbGBufferEyeNormal->init();
 
     attachments.dbGBuffer = make_shared<Renderbuffer>();
