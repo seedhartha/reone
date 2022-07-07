@@ -17,10 +17,13 @@
 
 #include "shaders.h"
 
+#include "../common/stringbuilder.h"
+
 #include "glsl/common.h"
 #include "glsl/fragment.h"
 #include "glsl/geometry.h"
 #include "glsl/vertex.h"
+#include "options.h"
 
 using namespace std;
 
@@ -34,42 +37,42 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vsObjectSpace = initShader(ShaderType::Vertex, {g_glslHeader, g_vsObjectSpace});
-    auto vsClipSpace = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsClipSpace});
-    auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsShadows});
-    auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslSkeletalUniforms, g_vsModel});
-    auto vsWalkmesh = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_vsWalkmesh});
-    auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsBillboard});
-    auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
-    auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
-    auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_vsText});
-    auto vsPoints = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslPointsUniforms, g_vsPoints});
-    auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsPointLightShadows});
-    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsDirectionalLightShadows});
-    auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsColor});
-    auto fsTexture = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsTexture});
-    auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGUI});
-    auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
-    auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsPointLightShadows});
-    auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
-    auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslHash, g_glslHashedAlphaTest, g_glslEnvironmentMapping, g_glslNormalMapping, g_fsModelOpaque});
-    auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslEnvironmentMapping, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
-    auto fsAABB = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsAABB});
-    auto fsWalkmesh = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_fsWalkmesh});
-    auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
-    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
-    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
-    auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_fsSSAO});
-    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslMath, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
-    auto fsCombineGeometry = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineGeometry});
-    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBoxBlur4});
-    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
-    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
-    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
-    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
-    auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
-    auto fsSharpen = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSharpen});
+    auto vsObjectSpace = initShader(ShaderType::Vertex, {g_vsObjectSpace});
+    auto vsClipSpace = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_vsClipSpace});
+    auto vsShadows = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_vsShadows});
+    auto vsModel = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslSkeletalUniforms, g_vsModel});
+    auto vsWalkmesh = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_vsWalkmesh});
+    auto vsBillboard = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_vsBillboard});
+    auto vsParticle = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
+    auto vsGrass = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
+    auto vsText = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslTextUniforms, g_vsText});
+    auto vsPoints = initShader(ShaderType::Vertex, {g_glslGeneralUniforms, g_glslPointsUniforms, g_vsPoints});
+    auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslGeneralUniforms, g_gsPointLightShadows});
+    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslGeneralUniforms, g_gsDirectionalLightShadows});
+    auto fsColor = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsColor});
+    auto fsTexture = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsTexture});
+    auto fsGUI = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsGUI});
+    auto fsText = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
+    auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsPointLightShadows});
+    auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_fsDirectionalLightShadows});
+    auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslMath, g_glslHash, g_glslHashedAlphaTest, g_glslEnvironmentMapping, g_glslNormalMapping, g_fsModelOpaque});
+    auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslMath, g_glslEnvironmentMapping, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
+    auto fsAABB = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsAABB});
+    auto fsWalkmesh = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_fsWalkmesh});
+    auto fsBillboard = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsBillboard});
+    auto fsParticle = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
+    auto fsSSAO = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslSSAOUniforms, g_fsSSAO});
+    auto fsSSR = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsSSR});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslLightingUniforms, g_glslMath, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineGeometry = initShader(ShaderType::Fragment, {g_fsCombineGeometry});
+    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsBoxBlur4});
+    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsGaussianBlur9});
+    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsGaussianBlur13});
+    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsMedianFilter3});
+    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsMedianFilter5});
+    auto fsFXAA = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
+    auto fsSharpen = initShader(ShaderType::Fragment, {g_glslGeneralUniforms, g_fsSharpen});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsClipSpace, fsColor});
@@ -142,7 +145,20 @@ void Shaders::use(ShaderProgram &program) {
     }
 }
 
-shared_ptr<Shader> Shaders::initShader(ShaderType type, vector<string> sources) {
+shared_ptr<Shader> Shaders::initShader(ShaderType type, list<string> sources) {
+    auto defines = StringBuilder();
+    defines.append("\n");
+    if (_options.ssr) {
+        defines.append("#define R_SSR\n");
+    }
+    if (_options.ssao) {
+        defines.append("#define R_SSAO\n");
+    }
+    defines.append("\n");
+    sources.push_front(defines.build());
+
+    sources.push_front(g_glslHeader);
+
     auto shader = make_unique<Shader>(type, move(sources));
     shader->init();
     return move(shader);

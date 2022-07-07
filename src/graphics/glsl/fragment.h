@@ -609,8 +609,12 @@ uniform sampler2D sSelfIllumColor;
 uniform sampler2D sFeatures;
 uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
+#ifdef R_SSAO
 uniform sampler2D sSSAO;
+#endif
+#ifdef R_SSR
 uniform sampler2D sSSR;
+#endif
 uniform samplerCube sShadowMapCube;
 uniform sampler2DArray sShadowMap;
 
@@ -636,8 +640,12 @@ void main() {
     vec4 envmapSample = texture(sEnvmapColor, uv);
     vec4 selfIllumSample = texture(sSelfIllumColor, uv);
     vec4 featuresSample = texture(sFeatures, uv);
+#ifdef R_SSAO
     vec4 ssaoSample = texture(sSSAO, uv);
+#endif
+#ifdef R_SSR
     vec4 ssrSample = texture(sSSR, uv);
+#endif
 
     vec3 eyePos = texture(sEyePos, uv).rgb;
     vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).rgb;
@@ -657,9 +665,17 @@ void main() {
     shadowLM = max(shadow, mix(0.0, shadowLM, lightmapped));
 
     vec3 albedo = mainTexSample.rgb;
+#ifdef R_SSR
     vec3 environment = mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a);
+#else
+    vec3 environment = envmapSample.rgb;
+#endif
     vec3 emission = selfIllumSample.rgb;
+#ifdef R_SSAO
     float ao = ssaoSample.r;
+#else
+    float ao = 1.0;
+#endif
 
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.01, 0.99);

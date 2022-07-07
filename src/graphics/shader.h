@@ -25,7 +25,7 @@ namespace graphics {
 
 class Shader : boost::noncopyable {
 public:
-    Shader(ShaderType type, std::vector<std::string> sources) :
+    Shader(ShaderType type, std::list<std::string> sources) :
         _type(type),
         _sources(std::move(sources)) {
     }
@@ -39,7 +39,7 @@ public:
 
 private:
     ShaderType _type;
-    std::vector<std::string> _sources;
+    std::list<std::string> _sources;
 
     bool _inited {false};
 

@@ -24,8 +24,14 @@ namespace reone {
 
 namespace graphics {
 
+struct GraphicsOptions;
+
 class Shaders : boost::noncopyable {
 public:
+    Shaders(GraphicsOptions &options) :
+        _options(options) {
+    }
+
     ~Shaders() { deinit(); }
 
     void init();
@@ -62,6 +68,8 @@ public:
     ShaderProgram &sharpen() const { return *_spSharpen; }
 
 private:
+    GraphicsOptions &_options;
+
     bool _inited {false};
 
     ShaderProgram *_usedProgram {nullptr};
@@ -98,7 +106,7 @@ private:
 
     // END Shader Programs
 
-    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sources);
+    std::shared_ptr<Shader> initShader(ShaderType type, std::list<std::string> sources);
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
 };
 
