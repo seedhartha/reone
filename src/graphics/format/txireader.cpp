@@ -50,6 +50,10 @@ static Texture::ProcedureType parseProcedureType(const string &str) {
     Texture::ProcedureType result = Texture::ProcedureType::Invalid;
     if (str == "cycle") {
         result = Texture::ProcedureType::Cycle;
+    } else if (str == "arturo") {
+        result = Texture::ProcedureType::Arturo;
+    } else if (str == "water") {
+        result = Texture::ProcedureType::Water;
     } else {
         warn("TXI: invalid procedure type: " + str);
     }
@@ -127,15 +131,17 @@ void TxiReader::processLine(const vector<string> &tokens) {
 }
 
 Texture::Blending TxiReader::parseBlending(const string &s) const {
-    auto result = Texture::Blending::None;
-    if (s == "additive") {
-        result = Texture::Blending::Additive;
-    } else if (s == "punchthrough") {
-        result = Texture::Blending::PunchThrough;
+    auto lc = boost::to_lower_copy(s);
+    if (lc == "default") {
+        return Texture::Blending::Default;
+    } else if (lc == "additive") {
+        return Texture::Blending::Additive;
+    } else if (lc == "punchthrough") {
+        return Texture::Blending::PunchThrough;
     } else {
-        debug("TXI: unsupported blending: " + s);
+        warn("TXI: unsupported blending: " + lc);
+        return Texture::Blending::None;
     }
-    return result;
 }
 
 } // namespace graphics

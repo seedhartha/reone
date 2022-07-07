@@ -45,13 +45,16 @@ public:
 
     enum class Blending {
         None,
+        Default,
         Additive,
         PunchThrough
     };
 
     enum class ProcedureType {
         Invalid,
-        Cycle
+        Cycle,
+        Arturo,
+        Water
     };
 
     struct Properties {
