@@ -24,6 +24,16 @@ using namespace std;
 using namespace reone;
 using namespace reone::engine;
 
+extern "C" {
+#ifdef _WIN32
+#define R_DECLSPEC __declspec(dllexport)
+#else
+#define R_DECLSPEC
+#endif
+R_DECLSPEC uint32_t NvOptimusEnablement = 0x00000001;
+R_DECLSPEC uint32_t AmdPowerXpressRequestHighPerformance = 1;
+}
+
 int main(int argc, char **argv) {
     initLog();
     try {
