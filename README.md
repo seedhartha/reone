@@ -7,7 +7,7 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 - Play KotOR and TSL from beginning to end
 - Create mods that drastically change the gameplay or improve the visuals
 
-The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) and [Kanban board](https://github.com/seedhartha/reone/projects/3) for our long-term and short-term goals respectively.
+The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) for our long-term plans.
 
 **I am in the process of rewriting the game logic with memory safety, testability and behavior-rich models in mind. Use [stable](https://github.com/seedhartha/reone/tree/stable) branch in order to access the previous iteration.**
 
