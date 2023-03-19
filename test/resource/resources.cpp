@@ -45,12 +45,12 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
     keyPath.append("sample.key");
     auto key = FileOutputStream(keyPath, OpenMode::Binary);
     key.write("KEY V1  ");
-    key.write("\x00\x00\x00\x00");
-    key.write("\x00\x00\x00\x00");
-    key.write("\x00\x00\x00\x00");
-    key.write("\x00\x00\x00\x00");
-    key.write("\x00\x00\x00\x00");
-    key.write("\x00\x00\x00\x00");
+    key.write("\x00\x00\x00\x00", 4);
+    key.write("\x00\x00\x00\x00", 4);
+    key.write("\x00\x00\x00\x00", 4);
+    key.write("\x00\x00\x00\x00", 4);
+    key.write("\x00\x00\x00\x00", 4);
+    key.write("\x00\x00\x00\x00", 4);
     key.write(ByteArray(32, '\0'));
     key.close();
 
@@ -58,15 +58,15 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
     erfPath.append("sample.erf");
     auto erf = FileOutputStream(erfPath, OpenMode::Binary);
     erf.write("ERF V1.0");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
-    erf.write("\x00\x00\x00\x00");
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
+    erf.write("\x00\x00\x00\x00", 4);
     erf.write(ByteArray(116, '\0'));
     erf.close();
 
@@ -74,9 +74,9 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
     rimPath.append("sample.rim");
     auto rim = FileOutputStream(rimPath, OpenMode::Binary);
     rim.write("RIM V1.0");
-    rim.write("\x00\x00\x00\x00");
-    rim.write("\x00\x00\x00\x00");
-    rim.write("\x00\x00\x00\x00");
+    rim.write("\x00\x00\x00\x00", 4);
+    rim.write("\x00\x00\x00\x00", 4);
+    rim.write("\x00\x00\x00\x00", 4);
     rim.close();
 
     auto overridePath = tmpDirPath;
