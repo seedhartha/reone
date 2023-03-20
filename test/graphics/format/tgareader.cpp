@@ -52,14 +52,14 @@ BOOST_AUTO_TEST_CASE(should_load_tga) {
 
     // then
     auto texture = reader.texture();
-    BOOST_CHECK(static_cast<bool>(texture));
-    BOOST_CHECK_EQUAL(string("some_texture"), texture->name());
-    BOOST_CHECK_EQUAL(1, texture->width());
-    BOOST_CHECK_EQUAL(1, texture->height());
-    BOOST_CHECK_EQUAL(1ll, texture->layers().size());
-    BOOST_CHECK(static_cast<bool>(texture->layers()[0].pixels));
+    BOOST_TEST(static_cast<bool>(texture));
+    BOOST_TEST(string("some_texture") == texture->name());
+    BOOST_TEST(1 == texture->width());
+    BOOST_TEST(1 == texture->height());
+    BOOST_TEST(1ll == texture->layers().size());
+    BOOST_TEST(static_cast<bool>(texture->layers()[0].pixels));
     auto pixels = reinterpret_cast<unsigned char *>(texture->layers()[0].pixels->data());
-    BOOST_CHECK_EQUAL(255, pixels[0]);
+    BOOST_TEST(255 == pixels[0]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

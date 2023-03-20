@@ -65,14 +65,14 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
 
     // then
 
-    BOOST_CHECK_EQUAL(1, reader.keys().size());
-    BOOST_CHECK_EQUAL(1, reader.resources().size());
+    BOOST_TEST(1 == reader.keys().size());
+    BOOST_TEST(1 == reader.resources().size());
     auto &key = reader.keys().front();
-    BOOST_CHECK_EQUAL("aa", key.resId.resRef);
-    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(key.resId.type));
+    BOOST_TEST("aa" == key.resId.resRef);
+    BOOST_TEST(static_cast<int>(ResourceType::Txi) == static_cast<int>(key.resId.type));
     auto &resource = reader.resources().front();
-    BOOST_CHECK_EQUAL(192, resource.offset);
-    BOOST_CHECK_EQUAL(2, resource.size);
+    BOOST_TEST(192 == resource.offset);
+    BOOST_TEST(2 == resource.size);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

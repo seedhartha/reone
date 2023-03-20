@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(should_plot_path) {
     auto actualPath = aStar.plotPath(glm::vec2(-0.6f, -1.0f), glm::vec2(1.0f, 0.6f));
 
     // then
-    BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
+    BOOST_TEST(expectedPath.size() == actualPath.size());
     for (auto i = 0; i < expectedPath.size() && i < actualPath.size(); ++i) {
         BOOST_TEST((expectedPath[i] == actualPath[i]), notEqualMessage(expectedPath[i], actualPath[i]));
     }
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(should_plot_path__no_points) {
     auto actualPath = aStar.plotPath(glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, 1.0f));
 
     // then
-    BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
+    BOOST_TEST(expectedPath.size() == actualPath.size());
     for (auto i = 0; i < expectedPath.size() && i < actualPath.size(); ++i) {
         BOOST_TEST((expectedPath[i] == actualPath[i]), notEqualMessage(expectedPath[i], actualPath[i]));
     }
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(should_plot_path__unreachable_destination) {
     auto actualPath = aStar.plotPath(glm::vec2(-0.9f, -0.9f), glm::vec2(0.9f, 0.9f));
 
     // then
-    BOOST_CHECK_EQUAL(expectedPath.size(), actualPath.size());
+    BOOST_TEST(expectedPath.size() == actualPath.size());
     for (auto i = 0; i < expectedPath.size() && i < actualPath.size(); ++i) {
         BOOST_TEST((expectedPath[i] == actualPath[i]), notEqualMessage(expectedPath[i], actualPath[i]));
     }

@@ -59,8 +59,8 @@ BOOST_AUTO_TEST_CASE(should_write_to_file) {
     tmpFile.read(&bytes[0], tmpSize);
     tmpFile.close();
 
-    BOOST_CHECK_EQUAL(13ll, position);
-    BOOST_CHECK_EQUAL(27ll, tmpSize);
+    BOOST_TEST(13ll == position);
+    BOOST_TEST(27ll == tmpSize);
     BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
 
     // cleanup

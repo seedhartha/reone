@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
     auto output = hexify(input, " ");
 
     // then
-    BOOST_CHECK_EQUAL(expectedOutput, output);
+    BOOST_TEST(expectedOutput == output);
 }
 
 BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
     auto output = hexify(input, " ");
 
     // then
-    BOOST_CHECK_EQUAL(expectedOutput, output);
+    BOOST_TEST(expectedOutput == output);
 }
 
 BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
     auto output = unhexify(input);
 
     // then
-    BOOST_CHECK((expectedOutput == output));
+    BOOST_TEST((expectedOutput == output));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

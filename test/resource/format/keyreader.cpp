@@ -77,20 +77,20 @@ BOOST_AUTO_TEST_CASE(should_read_key) {
 
     // then
 
-    BOOST_CHECK_EQUAL(2ll, files.size());
-    BOOST_CHECK_EQUAL(128, files[0].fileSize);
-    BOOST_CHECK_EQUAL("Aa", files[0].filename);
-    BOOST_CHECK_EQUAL(256, files[1].fileSize);
-    BOOST_CHECK_EQUAL("Bb", files[1].filename);
-    BOOST_CHECK_EQUAL(2ll, keys.size());
-    BOOST_CHECK_EQUAL("cc", keys[0].resId.resRef);
-    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::TwoDa), static_cast<int>(keys[0].resId.type));
-    BOOST_CHECK_EQUAL(12, keys[0].bifIdx);
-    BOOST_CHECK_EQUAL(2003, keys[0].resIdx);
-    BOOST_CHECK_EQUAL("dd", keys[1].resId.resRef);
-    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Gff), static_cast<int>(keys[1].resId.type));
-    BOOST_CHECK_EQUAL(12, keys[1].bifIdx);
-    BOOST_CHECK_EQUAL(2003, keys[1].resIdx);
+    BOOST_TEST(2ll == files.size());
+    BOOST_TEST(128 == files[0].fileSize);
+    BOOST_TEST("Aa" == files[0].filename);
+    BOOST_TEST(256 == files[1].fileSize);
+    BOOST_TEST("Bb" == files[1].filename);
+    BOOST_TEST(2ll == keys.size());
+    BOOST_TEST("cc" == keys[0].resId.resRef);
+    BOOST_TEST(static_cast<int>(ResourceType::TwoDa) == static_cast<int>(keys[0].resId.type));
+    BOOST_TEST(12 == keys[0].bifIdx);
+    BOOST_TEST(2003 == keys[0].resIdx);
+    BOOST_TEST("dd" == keys[1].resId.resRef);
+    BOOST_TEST(static_cast<int>(ResourceType::Gff) == static_cast<int>(keys[1].resId.type));
+    BOOST_TEST(12 == keys[1].bifIdx);
+    BOOST_TEST(2003 == keys[1].resIdx);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -63,13 +63,13 @@ BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
 
     // then
     auto stream = reader.stream();
-    BOOST_CHECK(static_cast<bool>(stream));
-    BOOST_CHECK_EQUAL(1, stream->getFrameCount());
+    BOOST_TEST(static_cast<bool>(stream));
+    BOOST_TEST(1 == stream->getFrameCount());
     auto frame = stream->getFrame(0);
-    BOOST_CHECK_EQUAL(static_cast<int>(AudioFormat::Mono8), static_cast<int>(frame.format));
-    BOOST_CHECK_EQUAL(22050, frame.sampleRate);
+    BOOST_TEST(static_cast<int>(AudioFormat::Mono8) == static_cast<int>(frame.format));
+    BOOST_TEST(22050 == frame.sampleRate);
     auto samples = reinterpret_cast<int16_t *>(frame.samples.data());
-    BOOST_CHECK_EQUAL(32767, samples[0]);
+    BOOST_TEST(32767 == samples[0]);
 }
 
 BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
@@ -105,21 +105,21 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
 
     // then
     auto stream = reader.stream();
-    BOOST_CHECK(static_cast<bool>(stream));
-    BOOST_CHECK_EQUAL(1, stream->getFrameCount());
+    BOOST_TEST(static_cast<bool>(stream));
+    BOOST_TEST(1 == stream->getFrameCount());
     auto frame = stream->getFrame(0);
-    BOOST_CHECK_EQUAL(static_cast<int>(AudioFormat::Mono16), static_cast<int>(frame.format));
-    BOOST_CHECK_EQUAL(22050, frame.sampleRate);
-    BOOST_CHECK_EQUAL(16ll, frame.samples.size());
+    BOOST_TEST(static_cast<int>(AudioFormat::Mono16) == static_cast<int>(frame.format));
+    BOOST_TEST(22050 == frame.sampleRate);
+    BOOST_TEST(16ll == frame.samples.size());
     auto samples = reinterpret_cast<uint16_t *>(frame.samples.data());
-    BOOST_CHECK_EQUAL(6, samples[0]);
-    BOOST_CHECK_EQUAL(9, samples[1]);
-    BOOST_CHECK_EQUAL(18, samples[2]);
-    BOOST_CHECK_EQUAL(26, samples[3]);
-    BOOST_CHECK_EQUAL(40, samples[4]);
-    BOOST_CHECK_EQUAL(62, samples[5]);
-    BOOST_CHECK_EQUAL(60, samples[6]);
-    BOOST_CHECK_EQUAL(99, samples[7]);
+    BOOST_TEST(6 == samples[0]);
+    BOOST_TEST(9 == samples[1]);
+    BOOST_TEST(18 == samples[2]);
+    BOOST_TEST(26 == samples[3]);
+    BOOST_TEST(40 == samples[4]);
+    BOOST_TEST(62 == samples[5]);
+    BOOST_TEST(60 == samples[6]);
+    BOOST_TEST(99 == samples[7]);
 }
 
 BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
     reader.load(wav);
 
     // then
-    BOOST_CHECK_EQUAL(1ll, mp3Reader->loadInvocations().size());
+    BOOST_TEST(1ll == mp3Reader->loadInvocations().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

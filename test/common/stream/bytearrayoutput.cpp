@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
     stream.write(&bytesToWrite[1], 12);
 
     // then
-    BOOST_CHECK_EQUAL(13ll, position);
+    BOOST_TEST(13ll == position);
     BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
 }
 

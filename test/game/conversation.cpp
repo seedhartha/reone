@@ -105,23 +105,23 @@ BOOST_AUTO_TEST_CASE(should_load) {
 
     // then
     auto &entries = conversation.entries();
-    BOOST_REQUIRE_EQUAL(2ll, entries.size());
-    BOOST_CHECK_EQUAL(string("Entry 1"), entries[0].text);
-    BOOST_REQUIRE_EQUAL(2ll, entries[0].replies.size());
-    BOOST_CHECK_EQUAL(0, entries[0].replies[0].index);
-    BOOST_CHECK_EQUAL(1, entries[0].replies[1].index);
-    BOOST_CHECK_EQUAL(string("Entry 2"), entries[1].text);
-    BOOST_REQUIRE_EQUAL(1ll, entries[1].replies.size());
-    BOOST_CHECK_EQUAL(2, entries[1].replies[0].index);
+    BOOST_TEST(2ll == entries.size());
+    BOOST_TEST(string("Entry 1") == entries[0].text);
+    BOOST_TEST(2ll == entries[0].replies.size());
+    BOOST_TEST(0 == entries[0].replies[0].index);
+    BOOST_TEST(1 == entries[0].replies[1].index);
+    BOOST_TEST(string("Entry 2") == entries[1].text);
+    BOOST_TEST(1ll == entries[1].replies.size());
+    BOOST_TEST(2 == entries[1].replies[0].index);
     auto &replies = conversation.replies();
-    BOOST_REQUIRE_EQUAL(3ll, replies.size());
-    BOOST_CHECK_EQUAL(string("Reply 1"), replies[0].text);
-    BOOST_CHECK_EQUAL(1ll, replies[0].entries.size());
-    BOOST_CHECK_EQUAL(1, replies[0].entries[0].index);
-    BOOST_CHECK_EQUAL(string("Reply 2"), replies[1].text);
-    BOOST_REQUIRE_EQUAL(0ll, replies[1].entries.size());
-    BOOST_CHECK_EQUAL(string("Reply 3"), replies[2].text);
-    BOOST_REQUIRE_EQUAL(0ll, replies[2].entries.size());
+    BOOST_TEST(3ll == replies.size());
+    BOOST_TEST(string("Reply 1") == replies[0].text);
+    BOOST_TEST(1ll == replies[0].entries.size());
+    BOOST_TEST(1 == replies[0].entries[0].index);
+    BOOST_TEST(string("Reply 2") == replies[1].text);
+    BOOST_TEST(0ll == replies[1].entries.size());
+    BOOST_TEST(string("Reply 3") == replies[2].text);
+    BOOST_TEST(0ll == replies[2].entries.size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

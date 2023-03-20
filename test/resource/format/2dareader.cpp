@@ -60,12 +60,12 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
     // then
 
     auto twoDa = reader.twoDa();
-    BOOST_CHECK_EQUAL(twoDa->getColumnCount(), 2);
-    BOOST_CHECK_EQUAL(twoDa->getRowCount(), 2);
-    BOOST_CHECK_EQUAL(string("unique"), twoDa->getString(0, "key"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(0, "value"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "key"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "value"));
+    BOOST_TEST(twoDa->getColumnCount() == 2);
+    BOOST_TEST(twoDa->getRowCount() == 2);
+    BOOST_TEST(string("unique") == twoDa->getString(0, "key"));
+    BOOST_TEST(string("same") == twoDa->getString(0, "value"));
+    BOOST_TEST(string("same") == twoDa->getString(1, "key"));
+    BOOST_TEST(string("same") == twoDa->getString(1, "value"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

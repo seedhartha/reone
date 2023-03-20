@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__intersection_from_cl
 
     // then
     BOOST_REQUIRE(static_cast<bool>(face));
-    BOOST_CHECK_EQUAL(0, face->index);
+    BOOST_TEST(0 == face->index);
     BOOST_CHECK_CLOSE(1.0f, distance, 1e-5);
 }
 

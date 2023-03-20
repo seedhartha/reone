@@ -56,11 +56,11 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
     // then
 
     auto &resources = reader.resources();
-    BOOST_CHECK_EQUAL(1ll, resources.size());
-    BOOST_CHECK_EQUAL(0, resources[0].id);
-    BOOST_CHECK_EQUAL(36, resources[0].offset);
-    BOOST_CHECK_EQUAL(13, resources[0].fileSize);
-    BOOST_CHECK_EQUAL(2022, resources[0].resType);
+    BOOST_TEST(1ll == resources.size());
+    BOOST_TEST(0 == resources[0].id);
+    BOOST_TEST(36 == resources[0].offset);
+    BOOST_TEST(13 == resources[0].fileSize);
+    BOOST_TEST(2022 == resources[0].resType);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

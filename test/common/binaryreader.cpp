@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
     auto actualPos = reader.tell();
 
     // then
-    BOOST_CHECK_EQUAL(expectedPos, actualPos);
+    BOOST_TEST(expectedPos == actualPos);
 }
 
 BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
@@ -95,15 +95,15 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     auto actualBytes = reader.getBytes(4);
 
     // then
-    BOOST_CHECK_EQUAL(expectedByte, actualByte);
-    BOOST_CHECK_EQUAL(expectedUint16, actualUint16);
-    BOOST_CHECK_EQUAL(expectedUint32, actualUint32);
-    BOOST_CHECK_EQUAL(expectedUint64, actualUint64);
-    BOOST_CHECK_EQUAL(expectedInt16, actualInt16);
-    BOOST_CHECK_EQUAL(expectedInt32, actualInt32);
-    BOOST_CHECK_EQUAL(expectedInt64, actualInt64);
-    BOOST_CHECK_EQUAL(expectedFloat, actualFloat);
-    BOOST_CHECK_EQUAL(expectedDouble, actualDouble);
+    BOOST_TEST(expectedByte == actualByte);
+    BOOST_TEST(expectedUint16 == actualUint16);
+    BOOST_TEST(expectedUint32 == actualUint32);
+    BOOST_TEST(expectedUint64 == actualUint64);
+    BOOST_TEST(expectedInt16 == actualInt16);
+    BOOST_TEST(expectedInt32 == actualInt32);
+    BOOST_TEST(expectedInt64 == actualInt64);
+    BOOST_TEST(expectedFloat == actualFloat);
+    BOOST_TEST(expectedDouble == actualDouble);
     BOOST_TEST((expectedStr == actualStr), notEqualMessage(expectedStr, actualStr));
     BOOST_TEST((expectedCStr == actualCStr), notEqualMessage(expectedCStr, actualCStr));
     BOOST_TEST((expectedBytes == actualBytes), notEqualMessage(expectedBytes, actualBytes));
@@ -146,14 +146,14 @@ BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
     auto actualDouble = reader.getDouble();
 
     // then
-    BOOST_CHECK_EQUAL(expectedUint16, actualUint16);
-    BOOST_CHECK_EQUAL(expectedUint32, actualUint32);
-    BOOST_CHECK_EQUAL(expectedUint64, actualUint64);
-    BOOST_CHECK_EQUAL(expectedInt16, actualInt16);
-    BOOST_CHECK_EQUAL(expectedInt32, actualInt32);
-    BOOST_CHECK_EQUAL(expectedInt64, actualInt64);
-    BOOST_CHECK_EQUAL(expectedFloat, actualFloat);
-    BOOST_CHECK_EQUAL(expectedDouble, actualDouble);
+    BOOST_TEST(expectedUint16 == actualUint16);
+    BOOST_TEST(expectedUint32 == actualUint32);
+    BOOST_TEST(expectedUint64 == actualUint64);
+    BOOST_TEST(expectedInt16 == actualInt16);
+    BOOST_TEST(expectedInt32 == actualInt32);
+    BOOST_TEST(expectedInt64 == actualInt64);
+    BOOST_TEST(expectedFloat == actualFloat);
+    BOOST_TEST(expectedDouble == actualDouble);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

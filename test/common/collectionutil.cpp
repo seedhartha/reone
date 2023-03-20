@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(should_transform) {
     auto output = transform<Item, int>(input, [](auto &item) { return item.value; });
 
     // then
-    BOOST_CHECK_EQUAL(3ll, output.size());
-    BOOST_CHECK_EQUAL(2, output[0]);
-    BOOST_CHECK_EQUAL(3, output[1]);
-    BOOST_CHECK_EQUAL(5, output[2]);
+    BOOST_TEST(3ll == output.size());
+    BOOST_TEST(2 == output[0]);
+    BOOST_TEST(3 == output[1]);
+    BOOST_TEST(5 == output[2]);
 }
 
 BOOST_AUTO_TEST_CASE(should_group_by_key) {
@@ -52,11 +52,11 @@ BOOST_AUTO_TEST_CASE(should_group_by_key) {
     auto output = groupBy<int, Item>(input, [](auto &item) { return item.key; });
 
     // then
-    BOOST_CHECK_EQUAL(2ll, output.at(1).size());
-    BOOST_CHECK_EQUAL(2, output.at(1)[0].value);
-    BOOST_CHECK_EQUAL(3, output.at(1)[1].value);
-    BOOST_CHECK_EQUAL(1ll, output.at(4).size());
-    BOOST_CHECK_EQUAL(5, output.at(4)[0].value);
+    BOOST_TEST(2ll == output.at(1).size());
+    BOOST_TEST(2 == output.at(1)[0].value);
+    BOOST_TEST(3 == output.at(1)[1].value);
+    BOOST_TEST(1ll == output.at(4).size());
+    BOOST_TEST(5 == output.at(4)[0].value);
 }
 
 BOOST_AUTO_TEST_CASE(should_group_by_key_and_map_value) {
@@ -70,11 +70,11 @@ BOOST_AUTO_TEST_CASE(should_group_by_key_and_map_value) {
         [](auto &item) { return item.value; });
 
     // then
-    BOOST_CHECK_EQUAL(2ll, output.at(1).size());
-    BOOST_CHECK_EQUAL(2, output.at(1)[0]);
-    BOOST_CHECK_EQUAL(3, output.at(1)[1]);
-    BOOST_CHECK_EQUAL(1ll, output.at(4).size());
-    BOOST_CHECK_EQUAL(5, output.at(4)[0]);
+    BOOST_TEST(2ll == output.at(1).size());
+    BOOST_TEST(2 == output.at(1)[0]);
+    BOOST_TEST(3 == output.at(1)[1]);
+    BOOST_TEST(1ll == output.at(4).size());
+    BOOST_TEST(5 == output.at(4)[0]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

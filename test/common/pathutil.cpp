@@ -44,9 +44,9 @@ BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     auto superPath = getPathIgnoreCase(tmpDirPath, "MiXeDs", false);
 
     // then
-    BOOST_CHECK_EQUAL(tmpFilePath, lowerPath);
-    BOOST_CHECK(upperPath.empty());
-    BOOST_CHECK(superPath.empty());
+    BOOST_TEST(tmpFilePath == lowerPath);
+    BOOST_TEST(upperPath.empty());
+    BOOST_TEST(superPath.empty());
 
     // cleanup
     fs::remove_all(tmpDirPath);

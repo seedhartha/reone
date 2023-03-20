@@ -111,11 +111,11 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
 
     // then
 
-    BOOST_CHECK_EQUAL(3ll, numProviders);
-    BOOST_CHECK_EQUAL(1ll, numTransientProviders);
-    BOOST_CHECK(static_cast<bool>(actualResData1));
+    BOOST_TEST(3ll == numProviders);
+    BOOST_TEST(1ll == numTransientProviders);
+    BOOST_TEST(static_cast<bool>(actualResData1));
     BOOST_TEST((expectedResData == (*actualResData1)), notEqualMessage(expectedResData, *actualResData1));
-    BOOST_CHECK(!static_cast<bool>(actualResData2));
+    BOOST_TEST(!static_cast<bool>(actualResData2));
 
     // cleanup
 

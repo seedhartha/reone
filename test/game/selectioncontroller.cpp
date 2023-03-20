@@ -55,12 +55,12 @@ BOOST_AUTO_TEST_CASE(should_set_hovered_target_on_mouse_motion) {
     auto handled = sut.handle(evt);
 
     // then
-    BOOST_CHECK(handled);
-    BOOST_CHECK_EQUAL(1ll, game->changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(static_cast<int>(CursorType::Target), static_cast<int>(get<0>(game->changeCursorInvocations()[0])));
-    BOOST_CHECK(creature->handleClickInvocations().empty());
-    BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
-    BOOST_CHECK_EQUAL(nullptr, sut.selectedObject());
+    BOOST_TEST(handled);
+    BOOST_TEST(1ll == game->changeCursorInvocations().size());
+    BOOST_TEST(static_cast<int>(CursorType::Target) == static_cast<int>(get<0>(game->changeCursorInvocations()[0])));
+    BOOST_TEST(creature->handleClickInvocations().empty());
+    BOOST_TEST(creature.get() == sut.hoveredObject());
+    BOOST_TEST(nullptr == sut.selectedObject());
 }
 
 BOOST_AUTO_TEST_CASE(should_reset_hovered_target_on_mouse_motion_when_no_object_at_mouse_position) {
@@ -84,12 +84,12 @@ BOOST_AUTO_TEST_CASE(should_reset_hovered_target_on_mouse_motion_when_no_object_
     auto handled = sut.handle(evt);
 
     // then
-    BOOST_CHECK(handled);
-    BOOST_CHECK_EQUAL(1ll, game->changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(static_cast<int>(CursorType::Default), static_cast<int>(get<0>(game->changeCursorInvocations()[0])));
-    BOOST_CHECK(creature->handleClickInvocations().empty());
-    BOOST_CHECK_EQUAL(nullptr, sut.hoveredObject());
-    BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
+    BOOST_TEST(handled);
+    BOOST_TEST(1ll == game->changeCursorInvocations().size());
+    BOOST_TEST(static_cast<int>(CursorType::Default) == static_cast<int>(get<0>(game->changeCursorInvocations()[0])));
+    BOOST_TEST(creature->handleClickInvocations().empty());
+    BOOST_TEST(nullptr == sut.hoveredObject());
+    BOOST_TEST(creature.get() == sut.selectedObject());
 }
 
 BOOST_AUTO_TEST_CASE(should_set_selected_target_on_mouse_click) {
@@ -112,11 +112,11 @@ BOOST_AUTO_TEST_CASE(should_set_selected_target_on_mouse_click) {
     auto handled = sut.handle(evt);
 
     // then
-    BOOST_CHECK(handled);
-    BOOST_CHECK_EQUAL(0ll, game->changeCursorInvocations().size());
-    BOOST_CHECK(creature->handleClickInvocations().empty());
-    BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
-    BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
+    BOOST_TEST(handled);
+    BOOST_TEST(0ll == game->changeCursorInvocations().size());
+    BOOST_TEST(creature->handleClickInvocations().empty());
+    BOOST_TEST(creature.get() == sut.hoveredObject());
+    BOOST_TEST(creature.get() == sut.selectedObject());
 }
 
 BOOST_AUTO_TEST_CASE(should_call_handle_click_in_selected_object_on_second_mouse_click) {
@@ -140,11 +140,11 @@ BOOST_AUTO_TEST_CASE(should_call_handle_click_in_selected_object_on_second_mouse
     auto handled = sut.handle(evt);
 
     // then
-    BOOST_CHECK(handled);
-    BOOST_CHECK_EQUAL(0ll, game->changeCursorInvocations().size());
-    BOOST_CHECK_EQUAL(1ll, creature->handleClickInvocations().size());
-    BOOST_CHECK_EQUAL(creature.get(), sut.hoveredObject());
-    BOOST_CHECK_EQUAL(creature.get(), sut.selectedObject());
+    BOOST_TEST(handled);
+    BOOST_TEST(0ll == game->changeCursorInvocations().size());
+    BOOST_TEST(1ll == creature->handleClickInvocations().size());
+    BOOST_TEST(creature.get() == sut.hoveredObject());
+    BOOST_TEST(creature.get() == sut.selectedObject());
 }
 
 BOOST_AUTO_TEST_CASE(should_reset_selected_target_on_mouse_click_when_no_object_at_mouse_position) {
@@ -167,11 +167,11 @@ BOOST_AUTO_TEST_CASE(should_reset_selected_target_on_mouse_click_when_no_object_
     auto handled = sut.handle(evt);
 
     // then
-    BOOST_CHECK(handled);
-    BOOST_CHECK_EQUAL(0ll, game->changeCursorInvocations().size());
-    BOOST_CHECK(creature->handleClickInvocations().empty());
-    BOOST_CHECK_EQUAL(nullptr, sut.hoveredObject());
-    BOOST_CHECK_EQUAL(nullptr, sut.selectedObject());
+    BOOST_TEST(handled);
+    BOOST_TEST(0ll == game->changeCursorInvocations().size());
+    BOOST_TEST(creature->handleClickInvocations().empty());
+    BOOST_TEST(nullptr == sut.hoveredObject());
+    BOOST_TEST(nullptr == sut.selectedObject());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

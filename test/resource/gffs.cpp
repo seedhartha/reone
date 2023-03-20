@@ -79,9 +79,9 @@ BOOST_AUTO_TEST_CASE(should_get_gff_with_caching) {
 
     // then
 
-    BOOST_CHECK(static_cast<bool>(gff1));
-    BOOST_CHECK(static_cast<bool>(gff2));
-    BOOST_CHECK_EQUAL(gff1.get(), gff2.get());
+    BOOST_TEST(static_cast<bool>(gff1));
+    BOOST_TEST(static_cast<bool>(gff2));
+    BOOST_TEST(gff1.get() == gff2.get());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
 
     // then
 
-    BOOST_CHECK_EQUAL(expectedText, text);
-    BOOST_CHECK_EQUAL(expectedSound, sound);
+    BOOST_TEST(expectedText == text);
+    BOOST_TEST(expectedSound == sound);
 
     // cleanup
 

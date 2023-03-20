@@ -71,9 +71,9 @@ BOOST_AUTO_TEST_CASE(should_get_2da_with_caching) {
 
     // then
 
-    BOOST_CHECK(static_cast<bool>(twoDa1));
-    BOOST_CHECK(static_cast<bool>(twoDa2));
-    BOOST_CHECK_EQUAL(twoDa1.get(), twoDa2.get());
+    BOOST_TEST(static_cast<bool>(twoDa1));
+    BOOST_TEST(static_cast<bool>(twoDa2));
+    BOOST_TEST(twoDa1.get() == twoDa2.get());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

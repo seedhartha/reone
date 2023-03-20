@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE(should_execute_queued_actions_one_per_frame) {
     creature->update(1.0f);
 
     // then
-    BOOST_CHECK_EQUAL(1ll, creature->actions().size());
-    BOOST_CHECK_EQUAL(static_cast<int>(ActionType::FollowLeader), static_cast<int>(creature->actions().front()->type()));
-    BOOST_CHECK_EQUAL(1ll, action1->executeInvocations().size());
-    BOOST_CHECK_EQUAL(1ll, action2->executeInvocations().size());
-    BOOST_CHECK_EQUAL(2ll, action3->executeInvocations().size());
+    BOOST_TEST(1ll == creature->actions().size());
+    BOOST_TEST(static_cast<int>(ActionType::FollowLeader) == static_cast<int>(creature->actions().front()->type()));
+    BOOST_TEST(1ll == action1->executeInvocations().size());
+    BOOST_TEST(1ll == action2->executeInvocations().size());
+    BOOST_TEST(2ll == action3->executeInvocations().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

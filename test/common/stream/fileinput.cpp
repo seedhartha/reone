@@ -58,14 +58,14 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
 
     // then
 
-    BOOST_CHECK_EQUAL(13ll, position1);
-    BOOST_CHECK_EQUAL('H', readByteResult1);
-    BOOST_CHECK_EQUAL(0ll, position2);
-    BOOST_CHECK_EQUAL(13, readResult);
-    BOOST_CHECK_EQUAL(16ll, buf.size());
+    BOOST_TEST(13ll == position1);
+    BOOST_TEST('H' == readByteResult1);
+    BOOST_TEST(0ll == position2);
+    BOOST_TEST(13 == readResult);
+    BOOST_TEST(16ll == buf.size());
     BOOST_TEST((expectedContents == contents), notEqualMessage(expectedContents, contents));
-    BOOST_CHECK_EQUAL(-1, readByteResult2);
-    BOOST_CHECK_EQUAL(true, eof);
+    BOOST_TEST(-1 == readByteResult2);
+    BOOST_TEST(true == eof);
 
     // cleanup
 

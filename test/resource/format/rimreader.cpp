@@ -58,11 +58,11 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
     // then
 
     auto resources = reader.resources();
-    BOOST_CHECK_EQUAL(1ll, resources.size());
-    BOOST_CHECK_EQUAL("aa", resources.front().resId.resRef);
-    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(resources.front().resId.type));
-    BOOST_CHECK_EQUAL(152, resources.front().offset);
-    BOOST_CHECK_EQUAL(2, resources.front().size);
+    BOOST_TEST(1ll == resources.size());
+    BOOST_TEST("aa" == resources.front().resId.resRef);
+    BOOST_TEST(static_cast<int>(ResourceType::Txi) == static_cast<int>(resources.front().resId.type));
+    BOOST_TEST(152 == resources.front().offset);
+    BOOST_TEST(2 == resources.front().size);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

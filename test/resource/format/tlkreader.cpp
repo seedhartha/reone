@@ -69,11 +69,11 @@ BOOST_AUTO_TEST_CASE(should_read_tlk) {
     // then
 
     auto table = reader.table();
-    BOOST_CHECK_EQUAL(2, table->getStringCount());
-    BOOST_CHECK_EQUAL("John", table->getString(0).text);
-    BOOST_CHECK_EQUAL("", table->getString(0).soundResRef);
-    BOOST_CHECK_EQUAL("Jane", table->getString(1).text);
-    BOOST_CHECK_EQUAL("jane", table->getString(1).soundResRef);
+    BOOST_TEST(2 == table->getStringCount());
+    BOOST_TEST("John" == table->getString(0).text);
+    BOOST_TEST("" == table->getString(0).soundResRef);
+    BOOST_TEST("Jane" == table->getString(1).text);
+    BOOST_TEST("jane" == table->getString(1).soundResRef);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

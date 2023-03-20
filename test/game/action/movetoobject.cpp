@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(should_complete_when_destination_is_reached) {
     action.execute(*creature1, 1.0f);
 
     // then
-    BOOST_CHECK_EQUAL(1ll, creature1->moveToInvocations().size());
-    BOOST_CHECK(action.isCompleted());
+    BOOST_TEST(1ll == creature1->moveToInvocations().size());
+    BOOST_TEST(action.isCompleted());
 }
 
 BOOST_AUTO_TEST_CASE(should_not_complete_when_destination_is_not_reached) {
@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE(should_not_complete_when_destination_is_not_reached) {
     action.execute(*creature1, 1.0f);
 
     // then
-    BOOST_CHECK_EQUAL(1ll, creature1->moveToInvocations().size());
-    BOOST_CHECK(!action.isCompleted());
+    BOOST_TEST(1ll == creature1->moveToInvocations().size());
+    BOOST_TEST(!action.isCompleted());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -112,10 +112,10 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
 
     // then
     auto model = reader.model();
-    BOOST_CHECK(static_cast<bool>(model));
-    BOOST_CHECK_EQUAL(string("some_model"), model->name());
+    BOOST_TEST(static_cast<bool>(model));
+    BOOST_TEST(string("some_model") == model->name());
     auto rootNode = model->rootNode();
-    BOOST_CHECK_EQUAL(string("root_node"), rootNode->name());
+    BOOST_TEST(string("root_node") == rootNode->name());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

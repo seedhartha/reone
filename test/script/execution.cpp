@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
+    BOOST_TEST(-1 == result);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
@@ -73,14 +73,14 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(1, result);
-    BOOST_CHECK_EQUAL(6, execution.getStackSize());
-    BOOST_CHECK_EQUAL(0, execution.getStackVariable(0).intValue);
-    BOOST_CHECK_EQUAL(0, execution.getStackVariable(1).intValue);
-    BOOST_CHECK_EQUAL(1, execution.getStackVariable(2).intValue);
-    BOOST_CHECK_EQUAL(0, execution.getStackVariable(3).intValue);
-    BOOST_CHECK_EQUAL(1, execution.getStackVariable(4).intValue);
-    BOOST_CHECK_EQUAL(1, execution.getStackVariable(5).intValue);
+    BOOST_TEST(1 == result);
+    BOOST_TEST(6 == execution.getStackSize());
+    BOOST_TEST(0 == execution.getStackVariable(0).intValue);
+    BOOST_TEST(0 == execution.getStackVariable(1).intValue);
+    BOOST_TEST(1 == execution.getStackVariable(2).intValue);
+    BOOST_TEST(0 == execution.getStackVariable(3).intValue);
+    BOOST_TEST(1 == execution.getStackVariable(4).intValue);
+    BOOST_TEST(1 == execution.getStackVariable(5).intValue);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
@@ -127,8 +127,8 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
-    BOOST_CHECK_EQUAL(1, execution.getStackSize());
+    BOOST_TEST(-1 == result);
+    BOOST_TEST(1 == execution.getStackSize());
     BOOST_CHECK_CLOSE(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(8, result);
+    BOOST_TEST(8 == result);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(10, result);
+    BOOST_TEST(10 == result);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
@@ -228,11 +228,11 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
-    BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
+    BOOST_TEST(-1 == result);
+    BOOST_TEST(1ll == routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
-    BOOST_CHECK_EQUAL(string("some_tag"), get<0>(invocation[0])[0].strValue);
-    BOOST_CHECK_EQUAL(1, get<0>(invocation[0])[1].intValue);
+    BOOST_TEST(string("some_tag") == get<0>(invocation[0])[0].strValue);
+    BOOST_TEST(1 == get<0>(invocation[0])[1].intValue);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
@@ -262,18 +262,18 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
-    BOOST_CHECK_EQUAL(3, execution.getStackSize());
+    BOOST_TEST(-1 == result);
+    BOOST_TEST(3 == execution.getStackSize());
     BOOST_CHECK_CLOSE(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
     BOOST_CHECK_CLOSE(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
     BOOST_CHECK_CLOSE(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
-    BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
+    BOOST_TEST(1ll == routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
     auto inVecValue = get<0>(invocation[0])[0].vecValue;
     BOOST_CHECK_CLOSE(2.0f, inVecValue.x, 1e-5);
     BOOST_CHECK_CLOSE(3.0f, inVecValue.y, 1e-5);
     BOOST_CHECK_CLOSE(4.0f, inVecValue.z, 1e-5);
-    BOOST_CHECK_EQUAL(1, get<0>(invocation[0])[1].intValue);
+    BOOST_TEST(1 == get<0>(invocation[0])[1].intValue);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
@@ -310,18 +310,18 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
-    BOOST_CHECK_EQUAL(0, execution.getStackSize());
-    BOOST_CHECK_EQUAL(1ll, routine->invokeInvocations().size());
+    BOOST_TEST(-1 == result);
+    BOOST_TEST(0 == execution.getStackSize());
+    BOOST_TEST(1ll == routine->invokeInvocations().size());
     auto &routineInvocation = routine->invokeInvocations()[0];
     auto &actionContext = get<0>(routineInvocation)[0].context;
-    BOOST_CHECK(static_cast<bool>(actionContext));
-    BOOST_CHECK(static_cast<bool>(actionContext->savedState));
-    BOOST_CHECK_EQUAL(2, actionContext->savedState->globals.size());
-    BOOST_CHECK_EQUAL(2, actionContext->savedState->globals[0].intValue);
-    BOOST_CHECK_EQUAL(3, actionContext->savedState->globals[1].intValue);
-    BOOST_CHECK_EQUAL(1, actionContext->savedState->locals.size());
-    BOOST_CHECK_EQUAL(5, actionContext->savedState->locals[0].intValue);
+    BOOST_TEST(static_cast<bool>(actionContext));
+    BOOST_TEST(static_cast<bool>(actionContext->savedState));
+    BOOST_TEST(2 == actionContext->savedState->globals.size());
+    BOOST_TEST(2 == actionContext->savedState->globals[0].intValue);
+    BOOST_TEST(3 == actionContext->savedState->globals[1].intValue);
+    BOOST_TEST(1 == actionContext->savedState->locals.size());
+    BOOST_TEST(5 == actionContext->savedState->locals[0].intValue);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(42, result);
+    BOOST_TEST(42 == result);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(42, result);
+    BOOST_TEST(42 == result);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
@@ -420,8 +420,8 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(-1, result);
-    BOOST_CHECK_EQUAL(1, execution.getStackSize());
+    BOOST_TEST(-1 == result);
+    BOOST_TEST(1 == execution.getStackSize());
     BOOST_CHECK_CLOSE(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
@@ -458,7 +458,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     auto result = execution.run();
 
     // then
-    BOOST_CHECK_EQUAL(1, result);
+    BOOST_TEST(1 == result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

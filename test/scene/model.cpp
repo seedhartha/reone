@@ -63,25 +63,25 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
     modelSceneNode->init();
 
     // then
-    BOOST_CHECK_EQUAL(1ll, modelSceneNode->children().size());
+    BOOST_TEST(1ll == modelSceneNode->children().size());
 
     auto rootNodeSceneNode = modelSceneNode->getNodeByName("root_node");
     BOOST_REQUIRE(static_cast<bool>(rootNodeSceneNode));
-    BOOST_CHECK_EQUAL(static_cast<int>(SceneNodeType::Dummy), static_cast<int>(rootNodeSceneNode->type()));
+    BOOST_TEST(static_cast<int>(SceneNodeType::Dummy) == static_cast<int>(rootNodeSceneNode->type()));
 
-    BOOST_CHECK_EQUAL(3ll, rootNodeSceneNode->children().size());
+    BOOST_TEST(3ll == rootNodeSceneNode->children().size());
 
     auto meshSceneNode = modelSceneNode->getNodeByName("mesh_node");
     BOOST_REQUIRE(static_cast<bool>(meshSceneNode));
-    BOOST_CHECK_EQUAL(static_cast<int>(SceneNodeType::Mesh), static_cast<int>(meshSceneNode->type()));
+    BOOST_TEST(static_cast<int>(SceneNodeType::Mesh) == static_cast<int>(meshSceneNode->type()));
 
     auto lightSceneNode = modelSceneNode->getNodeByName("light_node");
     BOOST_REQUIRE(static_cast<bool>(lightSceneNode));
-    BOOST_CHECK_EQUAL(static_cast<int>(SceneNodeType::Light), static_cast<int>(lightSceneNode->type()));
+    BOOST_TEST(static_cast<int>(SceneNodeType::Light) == static_cast<int>(lightSceneNode->type()));
 
     auto emitterSceneNode = modelSceneNode->getNodeByName("emitter_node");
     BOOST_REQUIRE(static_cast<bool>(emitterSceneNode));
-    BOOST_CHECK_EQUAL(static_cast<int>(SceneNodeType::Emitter), static_cast<int>(emitterSceneNode->type()));
+    BOOST_TEST(static_cast<int>(SceneNodeType::Emitter) == static_cast<int>(emitterSceneNode->type()));
 }
 
 BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
@@ -109,9 +109,9 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_CHECK_EQUAL(1ll, channels.size());
-    BOOST_CHECK_EQUAL(1.0f, channels[0].time);
-    BOOST_CHECK(channels[0].finished);
+    BOOST_TEST(1ll == channels.size());
+    BOOST_TEST(1.0f == channels[0].time);
+    BOOST_TEST(channels[0].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
     BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
@@ -145,9 +145,9 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_CHECK_EQUAL(1ll, channels.size());
+    BOOST_TEST(1ll == channels.size());
     BOOST_CHECK_CLOSE(0.0f, channels[0].time, 1e-5);
-    BOOST_CHECK(!channels[0].finished);
+    BOOST_TEST(!channels[0].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
     BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
@@ -191,11 +191,11 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_CHECK_EQUAL(2ll, channels.size());
+    BOOST_TEST(2ll == channels.size());
     BOOST_CHECK_CLOSE(1.25f, channels[0].time, 1e-5);
     BOOST_CHECK_CLOSE(0.0f, channels[1].time, 1e-5);
-    BOOST_CHECK(!channels[0].finished);
-    BOOST_CHECK(!channels[1].finished);
+    BOOST_TEST(!channels[0].finished);
+    BOOST_TEST(!channels[1].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
     BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
@@ -241,11 +241,11 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_CHECK_EQUAL(2ll, channels.size());
+    BOOST_TEST(2ll == channels.size());
     BOOST_CHECK_CLOSE(1.5f, channels[0].time, 1e-5);
     BOOST_CHECK_CLOSE(0.0f, channels[1].time, 1e-5);
-    BOOST_CHECK(!channels[0].finished);
-    BOOST_CHECK(!channels[1].finished);
+    BOOST_TEST(!channels[0].finished);
+    BOOST_TEST(!channels[1].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
     BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];

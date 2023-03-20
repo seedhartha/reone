@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(should_load_txi) {
 
     // then
     auto features = reader.features();
-    BOOST_CHECK_EQUAL(static_cast<int>(Texture::Blending::Additive), static_cast<int>(features.blending));
+    BOOST_TEST(static_cast<int>(Texture::Blending::Additive) == static_cast<int>(features.blending));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

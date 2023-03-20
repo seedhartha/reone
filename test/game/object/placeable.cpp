@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(should_load_from_git) {
 
     // then
     auto &items = placeable->items();
-    BOOST_CHECK_EQUAL(1ll, items.size());
+    BOOST_TEST(1ll == items.size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
