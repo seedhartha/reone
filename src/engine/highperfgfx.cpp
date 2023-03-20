@@ -15,24 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../common/logutil.h"
+#pragma once
 
-#include "engine.h"
-
-using namespace std;
-
-using namespace reone;
-using namespace reone::engine;
-
-int main(int argc, char **argv) {
-    initLog();
-    try {
-        return Engine(argc, argv).run();
-    } catch (const exception &ex) {
-        try {
-            error("Program terminated exceptionally: " + string(ex.what()));
-        } catch (...) {
-        }
-        return 1;
-    }
+extern "C" {
+#ifdef _WIN32
+#define R_DECLSPEC __declspec(dllexport)
+#else
+#define R_DECLSPEC
+#endif
+R_DECLSPEC uint32_t NvOptimusEnablement = 0x00000001;
+R_DECLSPEC uint32_t AmdPowerXpressRequestHighPerformance = 1;
 }

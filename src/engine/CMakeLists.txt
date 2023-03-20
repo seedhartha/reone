@@ -36,6 +36,7 @@ set(REONE_SOURCES
     di/services.cpp
     engine.cpp
     gameprobe.cpp
+    highperfgfx.cpp
     main.cpp
     optionsparser.cpp)
 
