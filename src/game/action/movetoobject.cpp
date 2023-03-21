@@ -28,12 +28,12 @@ namespace reone {
 
 namespace game {
 
-void MoveToObjectAction::execute(Object &executor, float delta) {
-    if (executor.type() != ObjectType::Creature) {
-        throw ValidationException("Executor must be of creature type");
+void MoveToObjectAction::execute(Object &actor, float delta) {
+    if (actor.type() != ObjectType::Creature) {
+        throw ValidationException("Actor must be of creature type");
     }
-    auto &executorCreature = static_cast<Creature &>(executor);
-    if (executorCreature.moveTo(_moveTo, _run, _range, delta)) {
+    auto &creatureActor = static_cast<Creature &>(actor);
+    if (creatureActor.moveTo(_moveTo, _run, _range, delta)) {
         complete();
     }
 }

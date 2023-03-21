@@ -34,7 +34,7 @@ public:
         _range(range) {
     }
 
-    void execute(Object &executor, float delta) override;
+    void execute(Object &actor, float delta) override;
 
 private:
     Object &_moveTo;

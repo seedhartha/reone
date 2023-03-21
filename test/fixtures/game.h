@@ -90,11 +90,11 @@ public:
         Action(type) {
     }
 
-    void execute(Object &executor, float delta) override {
+    void execute(Object &actor, float delta) override {
         if (_completeOnExecute) {
             complete();
         }
-        _executeInvocations.push_back(std::make_pair(&executor, delta));
+        _executeInvocations.push_back(std::make_pair(&actor, delta));
     }
 
     const std::vector<std::pair<Object *, float>> &executeInvocations() const {

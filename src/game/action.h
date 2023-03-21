@@ -27,7 +27,7 @@ class Object;
 
 class Action : boost::noncopyable {
 public:
-    virtual void execute(Object &executor, float delta) {
+    virtual void execute(Object &actor, float delta) {
         _completed = true;
     }
 
