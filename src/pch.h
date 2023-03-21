@@ -53,6 +53,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/format.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "GL/glew.h"

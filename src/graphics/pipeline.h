@@ -64,8 +64,10 @@ private:
 
     struct Vec2Hasher {
         size_t operator()(const glm::ivec2 &dim) const {
-            std::hash<int> intHash;
-            return intHash(dim.x) ^ intHash(dim.y);
+            size_t seed = 0;
+            boost::hash_combine(seed, dim.x);
+            boost::hash_combine(seed, dim.y);
+            return seed;
         }
     };
 

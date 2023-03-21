@@ -46,7 +46,10 @@ struct ResourceId {
 
 struct ResourceIdHasher {
     size_t operator()(const ResourceId &id) const {
-        return std::hash<std::string>()(id.resRef) ^ std::hash<ResourceType>()(id.type);
+        size_t seed = 0;
+        boost::hash_combine(seed, id.resRef);
+        boost::hash_combine(seed, id.type);
+        return seed;
     }
 };
 
