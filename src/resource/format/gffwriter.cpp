@@ -75,12 +75,6 @@ void GffWriter::save(IOutputStream &out) {
     writeListIndices();
 }
 
-/**
- * @param field field to process
- * @param simple[out] field's data if it is of simple type
- * @param complex[out] field's data if it is of complex type
- * @return field classification
- */
 static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simple, ByteArray &complex) {
     switch (field.type) {
     case Gff::FieldType::Byte:

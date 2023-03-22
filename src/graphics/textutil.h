@@ -23,10 +23,6 @@ namespace graphics {
 
 class Font;
 
-/**
- * Breaks the specified text into multiple strings to not exceed the maximum
- * width, when rendering using the specified font.
- */
 std::vector<std::string> breakText(const std::string &text, Font &font, int maxWidth);
 
 } // namespace graphics

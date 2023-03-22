@@ -23,9 +23,6 @@ namespace resource {
 
 class TwoDaReader;
 
-/**
- * Two-dimensional array, similar to a database table.
- */
 class TwoDa : boost::noncopyable {
 public:
     struct Row {
@@ -38,12 +35,12 @@ public:
     }
 
     /**
-     * @return index of the first 2DA row, whose cell value equals the specified value, -1 otherwise
+     * @return row index or -1 when not found
      */
     int indexByCellValue(const std::string &column, const std::string &value) const;
 
     /**
-     * @return index of the first 2DA row, whose cell values equal the specified values, -1 otherwise
+     * @return row index or -1 when not found
      */
     int indexByCellValues(const std::vector<std::pair<std::string, std::string>> &values) const;
 

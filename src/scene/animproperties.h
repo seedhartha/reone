@@ -21,14 +21,11 @@ namespace reone {
 
 namespace scene {
 
-/**
- * @see AnimationFlags
- */
 struct AnimationProperties {
     int flags {0};
     float speed {1.0f};
-    float scale {0.0f};     /**< animation scale; 0.0 to use the models scale */
-    float duration {-1.0f}; /**< duration in seconds; -1.0 is infinity */
+    float scale {0.0f};     /**< 0.0 to use the model scale */
+    float duration {-1.0f}; /**< -1.0 is infinity */
 
     bool operator==(const AnimationProperties &other) const {
         return flags == other.flags &&

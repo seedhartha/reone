@@ -32,16 +32,12 @@ public:
     void init(const boost::filesystem::path &gameDir);
 
     /**
-     * Searches for a string in the global talktable by StrRef.
-     *
-     * @return string from the global talktable if found, empty string otherwise
+     * @return string or empty string when not found
      */
     std::string get(int strRef);
 
     /**
-     * Searches for a sound in the global talktable by StrRef.
-     *
-     * @return ResRef of a sound from the global talktable if found, empty string otherwise
+     * @return ResRef or empty string when not found
      */
     std::string getSound(int strRef);
 

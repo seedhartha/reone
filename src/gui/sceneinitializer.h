@@ -39,9 +39,6 @@ class SceneGraph;
 
 namespace gui {
 
-/**
- * Utility class for initialization of 3D controls.
- */
 class SceneInitializer {
 public:
     SceneInitializer(scene::SceneGraph &sceneGraph) :

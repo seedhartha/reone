@@ -20,12 +20,14 @@
 namespace reone {
 
 /**
- * @return random integer between `min` and `max` (inclusive).
+ * @param min lower bound (inclusive)
+ * @param max upper bound (inclusive)
  */
 int random(int min, int max);
 
 /**
- * @return random floating point number between `min` and `max` (inclusive).
+ * @param min lower bound (inclusive)
+ * @param max upper bound (inclusive)
  */
 float random(float min, float max);
 

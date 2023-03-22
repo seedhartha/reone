@@ -62,12 +62,12 @@ public:
     void loadFromUtc(const std::string &templateResRef);
 
     /**
-     * @return true if destination had been reached
+     * @return true when destination have been reached
      */
     virtual bool moveTo(Object &other, bool run, float range, float delta);
 
     /**
-     * @return true if destination had been reached
+     * @return true when destination have been reached
      */
     virtual bool moveTo(const glm::vec2 &destination, bool run, float range, float delta);
 

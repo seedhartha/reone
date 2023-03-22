@@ -38,9 +38,6 @@ constexpr int kMaxGrassClusters = 256;
 constexpr int kMaxWalkmeshMaterials = 64;
 constexpr int kMaxPoints = 128;
 
-/**
- * This is a hint to the engine when configuring texture properties.
- */
 enum class TextureUsage {
     Default,
     ColorBuffer,

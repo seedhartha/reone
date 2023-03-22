@@ -43,7 +43,7 @@ public:
     };
 
     /**
-     * @return pointer to intersected face or nullptr, when no intersection
+     * @return pointer to intersected face or nullptr when no intersection
      */
     const Walkmesh::Face *raycast(
         std::set<uint32_t> walkcheckSurfaces,

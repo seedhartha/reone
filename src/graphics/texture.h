@@ -65,9 +65,6 @@ public:
         float anisotropy {1.0f};
     };
 
-    /**
-     * TXI properties container.
-     */
     struct Features {
         Blending blending {Blending::None};
         float waterAlpha {-1.0f};

@@ -19,15 +19,9 @@
 
 namespace reone {
 
-/**
- * Generic in-memory cache.
- */
 template <class K, class V>
 class MemoryCache {
 public:
-    /**
-     * @param compute function used to lazily compute a value by key
-     */
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) :
         _compute(std::move(compute)) {
     }
@@ -36,10 +30,6 @@ public:
         _objects.clear();
     }
 
-    /**
-     * @return cached value
-     * @note if given key is not found in this cache, then value will be computed
-     */
     std::shared_ptr<V> get(K key) {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {

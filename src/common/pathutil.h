@@ -20,9 +20,7 @@
 namespace reone {
 
 /**
- * @param basePath parent directory path
- * @param relPath relative path to a file or a directory (case-insensitive)
- * @return absolute path to a file or a directory, or empty string if not found
+ * @return path to a file or directory, or empty path when not found
  */
 boost::filesystem::path getPathIgnoreCase(
     const boost::filesystem::path &basePath,

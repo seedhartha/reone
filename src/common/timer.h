@@ -22,18 +22,13 @@ namespace reone {
 class Timer {
 public:
     /**
-     * Advances this timer by a given amount of seconds.
-     *
-     * @return `true` if timer times out, `false` otherwise
+     * @return true when timer have timed out
      */
-    bool advance(float secs) {
-        _timeout = std::max(0.0f, _timeout - secs);
+    bool advance(float seconds) {
+        _timeout = std::max(0.0f, _timeout - seconds);
         return isTimedOut();
     }
 
-    /**
-     * Cancels this timer, putting it in timed out state.
-     */
     void cancel() {
         _timeout = 0.0f;
     }

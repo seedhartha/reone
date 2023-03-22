@@ -32,16 +32,12 @@ namespace graphics {
 
 class Model;
 
-/**
- * Model or animation node. Can be specialized to represent a triangle mesh, a
- * light, an emitter and etc.
- */
 class ModelNode : boost::noncopyable {
 public:
     struct Skin {
-        std::vector<uint32_t> boneSerial;     /**< node index per bone (DFS ordering) */
+        std::vector<uint32_t> boneSerial;     /**< node index per bone in depth-first order */
         std::vector<uint16_t> boneNodeNumber; /**< node number per bone */
-        std::vector<float> boneMap;           /**< bone index per node (DFS ordering) */
+        std::vector<float> boneMap;           /**< bone index per node in depth-first order */
         std::vector<glm::mat4> boneMatrices;  /**< each matrix is inverse of bone transform in this node space */
     };
 

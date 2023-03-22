@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  Implementation of routines for mini-games.
- */
-
 #include "../declarations.h"
 
 #include "../../../../script/exception/notimpl.h"

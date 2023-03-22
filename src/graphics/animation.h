@@ -51,7 +51,7 @@ public:
 private:
     std::string _name;
     float _length {0.0f};
-    float _transitionTime {0.0f}; /**< time in seconds where this animation overlaps with other animations */
+    float _transitionTime {0.0f};
     std::string _root;
     std::shared_ptr<ModelNode> _rootNode;
     std::vector<Event> _events;

@@ -67,9 +67,9 @@ private:
     std::unordered_map<uint32_t, ControllerFn> _emitterControllers;
 
     std::unique_ptr<BinaryReader> _mdxReader;
-    bool _tsl {false}; /**< is this a TSL model? */
+    bool _tsl {false};
     std::vector<std::string> _nodeNames;
-    std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in read order (DFS) */
+    std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in depth-first order */
     std::map<uint16_t, uint16_t> _nodeFlags;
     std::shared_ptr<graphics::Model> _model;
     std::string _modelName;

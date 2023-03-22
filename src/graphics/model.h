@@ -26,12 +26,6 @@ namespace graphics {
 class Animation;
 class ModelNode;
 
-/**
- * 3D model, a tree-like data structure. Contains model nodes and animations.
- *
- * @see ModelNode
- * @see Animation
- */
 class Model : boost::noncopyable {
 public:
     Model(
@@ -77,7 +71,7 @@ private:
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
-    float _animationScale; /**< scales supermodel animations */
+    float _animationScale;
 
     AABB _aabb;
     bool _affectedByFog;

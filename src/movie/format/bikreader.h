@@ -35,11 +35,6 @@ namespace movie {
 
 class Movie;
 
-/**
- * Encapsulates loading Bink Video files using FFmpeg.
- *
- * http://dranger.com/ffmpeg/ffmpeg.html
- */
 class BikReader {
 public:
     BikReader(

@@ -23,9 +23,6 @@ namespace resource {
 
 constexpr int kDefaultProviderId = -1;
 
-/**
- * Used together with a ResRef to locate game resources.
- */
 enum class ResourceType : uint16_t {
     Res = 0,
     Bmp = 1,

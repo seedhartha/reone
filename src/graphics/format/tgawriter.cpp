@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  TGA writer. Implementation adapted from libtga by Matthias Brueckner.
- */
-
 #include "tgawriter.h"
 
 #include "../dxtutil.h"

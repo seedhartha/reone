@@ -25,7 +25,7 @@ class LipAnimation {
 public:
     struct Keyframe {
         float time {0.0f};
-        uint8_t shape {0}; /**< an index into the keyframes of the "talk" animation  */
+        uint8_t shape {0}; /**< an index into keyframes of the "talk" animation  */
     };
 
     LipAnimation(std::string name, float length, std::vector<Keyframe> keyframes) :

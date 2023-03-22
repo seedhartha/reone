@@ -25,11 +25,6 @@ namespace script {
 
 class ScriptProgram;
 
-/**
- * Parses compiled script program.
- *
- * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
- */
 class NcsReader : public resource::BinaryResourceReader {
 public:
     NcsReader(std::string resRef) :

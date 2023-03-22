@@ -38,9 +38,6 @@ enum class LogLevel {
     Debug
 };
 
-/**
- * Bit flags corresponding to different log channels.
- */
 struct LogChannels {
     static constexpr int general = 1;
     static constexpr int resources = 2;
