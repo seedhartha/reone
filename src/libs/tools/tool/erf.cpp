@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "rim.h"
+#include "reone/tools/tool/erf.h"
 
 #include "reone/common/stream/fileinput.h"
-#include "reone/resource/format/rimwriter.h"
+#include "reone/resource/format/erfwriter.h"
 #include "reone/resource/typeutil.h"
 
 using namespace std;
@@ -29,35 +29,34 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-void RimTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
+void ErfTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto rim = FileInputStream(input, OpenMode::Binary);
-        auto rimReader = RimReader();
-        rimReader.load(rim);
-        if (operation == Operation::List) {
-            list(rimReader);
-        } else if (operation == Operation::Extract) {
-            extract(rimReader, input, outputDir);
+        auto stream = FileInputStream(input, OpenMode::Binary);
+        ErfReader erf;
+        erf.load(stream);
+        if (operation == Operation::Extract) {
+            extract(erf, input, outputDir);
+        } else {
+            list(erf);
         }
         break;
     }
-    case Operation::ToRIM:
-        toRIM(input);
-        break;
-    default:
+    case Operation::ToERF:
+    case Operation::ToMOD:
+        toERF(operation, input);
         break;
     }
 }
 
-void RimTool::list(const RimReader &rim) {
-    for (auto &res : rim.resources()) {
-        cout << res.resId.string() << endl;
+void ErfTool::list(const ErfReader &erf) {
+    for (auto &key : erf.keys()) {
+        cout << key.resId.string() << endl;
     }
 }
 
-void RimTool::extract(RimReader &rim, const fs::path &rimPath, const fs::path &destPath) {
+void ErfTool::extract(ErfReader &erf, const fs::path &erfPath, const fs::path &destPath) {
     if (!fs::exists(destPath)) {
         // Create destination directory if it does not exist
         fs::create_directory(destPath);
@@ -66,26 +65,27 @@ void RimTool::extract(RimReader &rim, const fs::path &rimPath, const fs::path &d
         return;
     }
 
-    for (size_t i = 0; i < rim.resources().size(); ++i) {
-        auto &rimResource = rim.resources()[i];
-        cout << "Extracting " << rimResource.resId.string() << endl;
+    for (size_t i = 0; i < erf.keys().size(); ++i) {
+        auto &key = erf.keys()[i];
+        auto &erfResource = erf.resources()[i];
+        cout << "Extracting " << key.resId.string() << endl;
 
-        auto buffer = ByteArray(rimResource.size, '\0');
-        auto rim = FileInputStream(rimPath, OpenMode::Binary);
-        rim.seek(rimResource.offset, SeekOrigin::Begin);
-        rim.read(&buffer[0], buffer.size());
+        auto buffer = ByteArray(erfResource.size, '\0');
+        auto erf = FileInputStream(erfPath, OpenMode::Binary);
+        erf.seek(erfResource.offset, SeekOrigin::Begin);
+        erf.read(&buffer[0], buffer.size());
 
         auto resPath = destPath;
-        auto &ext = getExtByResType(rimResource.resId.type);
-        resPath.append(rimResource.resId.resRef + "." + ext);
+        auto &ext = getExtByResType(key.resId.type);
+        resPath.append(key.resId.resRef + "." + ext);
 
         auto res = fs::ofstream(resPath, ios::binary);
         res.write(&buffer[0], buffer.size());
     }
 }
 
-void RimTool::toRIM(const fs::path &target) {
-    RimWriter rim;
+void ErfTool::toERF(Operation operation, const fs::path &target) {
+    ErfWriter erf;
 
     for (auto &entry : fs::directory_iterator(target)) {
         fs::path path(entry);
@@ -109,26 +109,42 @@ void RimTool::toRIM(const fs::path &target) {
         fs::path resRef(path.filename());
         resRef.replace_extension("");
 
-        RimWriter::Resource res;
+        ErfWriter::Resource res;
         res.resRef = resRef.string();
         res.resType = resType;
         res.data = move(data);
 
-        rim.add(move(res));
+        erf.add(move(res));
     }
 
-    fs::path rimPath(target.parent_path());
-    rimPath.append(target.filename().string() + ".rim");
-    rim.save(rimPath);
+    ErfWriter::FileType type;
+    string ext;
+
+    if (operation == Operation::ToMOD) {
+        type = ErfWriter::FileType::MOD;
+        ext = ".mod";
+    } else {
+        type = ErfWriter::FileType::ERF;
+        ext = ".erf";
+    }
+
+    fs::path erfPath(target.parent_path());
+    erfPath.append(target.filename().string() + ext);
+    erf.save(type, erfPath);
 }
 
-bool RimTool::supports(Operation operation, const fs::path &input) const {
+bool ErfTool::supports(Operation operation, const fs::path &input) const {
     switch (operation) {
     case Operation::List:
-    case Operation::Extract:
-        return !fs::is_directory(input) && input.extension() == ".rim";
-    case Operation::ToRIM:
+    case Operation::Extract: {
+        string ext(input.extension().string());
+        return !fs::is_directory(input) &&
+               (ext == ".erf" || ext == ".mod" || ext == ".sav");
+    }
+    case Operation::ToERF:
+    case Operation::ToMOD:
         return fs::is_directory(input);
+
     default:
         return false;
     }

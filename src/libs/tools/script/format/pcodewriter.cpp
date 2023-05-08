@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pcodewriter.h"
+#include "reone/tools/script/format/pcodewriter.h"
 
 #include "reone/script/instrutil.h"
 #include "reone/script/routine.h"

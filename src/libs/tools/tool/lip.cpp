@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lip.h"
+#include "reone/tools/tool/lip.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"

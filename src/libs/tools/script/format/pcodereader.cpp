@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pcodereader.h"
+#include "reone/tools/script/format/pcodereader.h"
 
 #include <boost/regex.hpp>
 

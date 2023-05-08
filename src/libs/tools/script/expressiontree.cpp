@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "expressiontree.h"
+#include "reone/tools/script/expressiontree.h"
 
 #include "reone/common/exception/argument.h"
 #include "reone/common/exception/notimplemented.h"

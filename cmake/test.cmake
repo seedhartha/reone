@@ -76,7 +76,7 @@ set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/script/execution.cpp
     ${TEST_SOURCE_DIR}/script/format/ncsreader.cpp
     ${TEST_SOURCE_DIR}/script/format/ncswriter.cpp
-    ${TEST_SOURCE_DIR}/toolslib/expressiontree.cpp)
+    ${TEST_SOURCE_DIR}/tools/expressiontree.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

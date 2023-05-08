@@ -15,13 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssf.h"
+#include "reone/tools/tool/tlk.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
 #include "reone/common/stream/fileinput.h"
-#include "reone/game/format/ssfreader.h"
-#include "reone/game/format/ssfwriter.h"
+#include "reone/resource/format/tlkreader.h"
+#include "reone/resource/format/tlkwriter.h"
+#include "reone/resource/talktable.h"
 
 #include "tinyxml2.h"
 
@@ -29,13 +30,13 @@ using namespace std;
 
 using namespace tinyxml2;
 
-using namespace reone::game;
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 
 namespace reone {
 
-void SsfTool::invoke(
+void TlkTool::invoke(
     Operation operation,
     const fs::path &input,
     const fs::path &outputDir,
@@ -44,7 +45,7 @@ void SsfTool::invoke(
     return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
 }
 
-void SsfTool::invokeBatch(
+void TlkTool::invokeBatch(
     Operation operation,
     const std::vector<fs::path> &input,
     const fs::path &outputDir,
@@ -53,19 +54,19 @@ void SsfTool::invokeBatch(
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
             toXML(path, outDir);
-        } else if (operation == Operation::ToSSF) {
-            toSSF(path, outDir);
+        } else if (operation == Operation::ToTLK) {
+            toTLK(path, outDir);
         }
     });
 }
 
-void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
+void TlkTool::toXML(const fs::path &path, const fs::path &destPath) {
     auto stream = FileInputStream(path, OpenMode::Binary);
 
-    auto reader = SsfReader();
+    auto reader = TlkReader();
     reader.load(stream);
 
-    auto soundSet = reader.soundSet();
+    auto table = reader.table();
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
@@ -73,11 +74,12 @@ void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
 
     auto printer = XMLPrinter(fp);
     printer.PushHeader(false, true);
-    printer.OpenElement("soundset");
-    for (size_t i = 0; i < soundSet.size(); ++i) {
-        printer.OpenElement("sound");
-        printer.PushAttribute("index", static_cast<int>(i));
-        printer.PushAttribute("strref", soundSet[i]);
+    printer.OpenElement("strings");
+    for (int i = 0; i < table->getStringCount(); ++i) {
+        printer.OpenElement("string");
+        printer.PushAttribute("index", i);
+        printer.PushAttribute("text", table->getString(i).text.c_str());
+        printer.PushAttribute("soundResRef", table->getString(i).soundResRef.c_str());
         printer.CloseElement();
     }
     printer.CloseElement();
@@ -85,7 +87,7 @@ void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
     fclose(fp);
 }
 
-void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
+void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -98,11 +100,13 @@ void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
         return;
     }
 
-    auto soundSet = vector<uint32_t>();
+    auto strings = vector<TalkTable::String>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
-        auto strref = element->UnsignedAttribute("strref");
-        soundSet.push_back(strref);
+        strings.push_back(TalkTable::String {
+            element->Attribute("text"),
+            element->Attribute("soundResRef")});
     }
+    auto table = TalkTable(move(strings));
 
     vector<string> tokens;
     boost::split(
@@ -111,16 +115,17 @@ void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto ssfPath = fs::path(destPath);
-    ssfPath.append(tokens[0] + ".ssf");
+    auto tlkPath = fs::path(destPath);
+    tlkPath.append(tokens[0] + ".tlk");
 
-    auto writer = SsfWriter(move(soundSet));
-    writer.save(ssfPath);
+    auto writer = TlkWriter(table);
+    writer.save(tlkPath);
 }
 
-bool SsfTool::supports(Operation operation, const fs::path &input) const {
-    return (operation == Operation::ToXML && input.extension() == ".ssf") ||
-           (operation == Operation::ToSSF && input.extension() == ".xml");
+bool TlkTool::supports(Operation operation, const fs::path &input) const {
+    return !fs::is_directory(input) &&
+           ((input.extension() == ".tlk" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::ToTLK));
 }
 
 } // namespace reone

@@ -18,7 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "reone/game/script/routines.h"
-#include "../../src/toolslib/script/expressiontree.h"
+#include "reone/tools/script/expressiontree.h"
 
 using namespace std;
 

@@ -15,26 +15,27 @@
 
 find_package(Boost COMPONENTS regex REQUIRED)
 
-set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/toolslib)
+set(TOOLSLIB_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/tools)
+set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
 
 set(TOOLSLIB_HEADERS
-    ${TOOLSLIB_SOURCE_DIR}/script/expressiontree.h
-    ${TOOLSLIB_SOURCE_DIR}/script/format/nsswriter.h
-    ${TOOLSLIB_SOURCE_DIR}/script/format/pcodereader.h
-    ${TOOLSLIB_SOURCE_DIR}/script/format/pcodewriter.h
-    ${TOOLSLIB_SOURCE_DIR}/tool.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/2da.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/audio.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/erf.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/gff.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/keybif.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/lip.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/ncs.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/rim.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/ssf.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/tlk.h
-    ${TOOLSLIB_SOURCE_DIR}/tool/tpc.h
-    ${TOOLSLIB_SOURCE_DIR}/types.h)
+    ${TOOLSLIB_INCLUDE_DIR}/script/expressiontree.h
+    ${TOOLSLIB_INCLUDE_DIR}/script/format/nsswriter.h
+    ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodereader.h
+    ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodewriter.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/2da.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/audio.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/erf.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/gff.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/keybif.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/lip.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/ncs.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/rim.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/ssf.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/tlk.h
+    ${TOOLSLIB_INCLUDE_DIR}/tool/tpc.h
+    ${TOOLSLIB_INCLUDE_DIR}/types.h)
 
 set(TOOLSLIB_SOURCES
     ${TOOLSLIB_SOURCE_DIR}/script/expressiontree.cpp

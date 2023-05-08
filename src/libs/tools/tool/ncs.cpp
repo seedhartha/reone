@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ncs.h"
+#include "reone/tools/tool/ncs.h"
 
 #include <boost/regex.hpp>
 
@@ -27,10 +27,10 @@
 #include "reone/script/format/ncsreader.h"
 #include "reone/script/format/ncswriter.h"
 
-#include "../script/expressiontree.h"
-#include "../script/format/nsswriter.h"
-#include "../script/format/pcodereader.h"
-#include "../script/format/pcodewriter.h"
+#include "reone/tools/script/expressiontree.h"
+#include "reone/tools/script/format/nsswriter.h"
+#include "reone/tools/script/format/pcodereader.h"
+#include "reone/tools/script/format/pcodewriter.h"
 
 using namespace std;
 

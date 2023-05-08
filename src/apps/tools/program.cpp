@@ -19,17 +19,17 @@
 
 #include "reone/common/pathutil.h"
 #include "reone/resource/types.h"
-#include "../toolslib/tool/2da.h"
-#include "../toolslib/tool/audio.h"
-#include "../toolslib/tool/erf.h"
-#include "../toolslib/tool/gff.h"
-#include "../toolslib/tool/keybif.h"
-#include "../toolslib/tool/lip.h"
-#include "../toolslib/tool/ncs.h"
-#include "../toolslib/tool/rim.h"
-#include "../toolslib/tool/ssf.h"
-#include "../toolslib/tool/tlk.h"
-#include "../toolslib/tool/tpc.h"
+#include "reone/tools/tool/2da.h"
+#include "reone/tools/tool/audio.h"
+#include "reone/tools/tool/erf.h"
+#include "reone/tools/tool/gff.h"
+#include "reone/tools/tool/keybif.h"
+#include "reone/tools/tool/lip.h"
+#include "reone/tools/tool/ncs.h"
+#include "reone/tools/tool/rim.h"
+#include "reone/tools/tool/ssf.h"
+#include "reone/tools/tool/tlk.h"
+#include "reone/tools/tool/tpc.h"
 
 using namespace std;
 
