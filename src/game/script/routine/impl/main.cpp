@@ -21,9 +21,9 @@
 #include "reone/common/randomutil.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/exception/unsupportedroutine.h"
-#include "../../../../script/executioncontext.h"
+#include "reone/script/exception/notimpl.h"
+#include "reone/script/exception/unsupportedroutine.h"
+#include "reone/script/executioncontext.h"
 
 #include "../../../event.h"
 #include "../../../game.h"

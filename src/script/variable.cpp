@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "variable.h"
+#include "reone/script/variable.h"
 
 using namespace std;
 

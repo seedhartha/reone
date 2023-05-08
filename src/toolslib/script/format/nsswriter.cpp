@@ -21,9 +21,9 @@
 #include "reone/common/exception/notimplemented.h"
 #include "reone/common/exception/validation.h"
 #include "reone/common/textwriter.h"
-#include "../../script/routine.h"
-#include "../../script/routines.h"
-#include "../../script/variableutil.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
+#include "reone/script/variableutil.h"
 
 using namespace std;
 

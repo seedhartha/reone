@@ -17,7 +17,7 @@
 
 #include "../declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
+#include "reone/script/exception/notimpl.h"
 
 #include "../../../effect.h"
 #include "../../../game.h"

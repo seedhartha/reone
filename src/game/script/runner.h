@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../script/types.h"
+#include "reone/script/types.h"
 
 namespace reone {
 

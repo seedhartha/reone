@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "instrutil.h"
+#include "reone/script/instrutil.h"
 
 #include "reone/common/collectionutil.h"
 
-#include "program.h"
-#include "routine.h"
-#include "routines.h"
+#include "reone/script/program.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
 
 using namespace std;
 

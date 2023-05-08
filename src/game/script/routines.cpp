@@ -18,7 +18,7 @@
 #include "routines.h"
 
 #include "reone/common/collectionutil.h"
-#include "../../script/variable.h"
+#include "reone/script/variable.h"
 
 #include "../services.h"
 #include "../types.h"

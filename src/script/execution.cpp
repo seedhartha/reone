@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "execution.h"
+#include "reone/script/execution.h"
 
 #include "reone/common/logutil.h"
 
-#include "executioncontext.h"
-#include "instrutil.h"
-#include "program.h"
-#include "routine.h"
-#include "routines.h"
-#include "variable.h"
+#include "reone/script/executioncontext.h"
+#include "reone/script/instrutil.h"
+#include "reone/script/program.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
+#include "reone/script/variable.h"
 
 using namespace std;
 using namespace std::placeholders;

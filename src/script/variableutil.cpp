@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "variableutil.h"
+#include "reone/script/variableutil.h"
 
 #include "reone/common/exception/argument.h"
 

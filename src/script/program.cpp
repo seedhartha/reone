@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "program.h"
+#include "reone/script/program.h"
 
-#include "instrutil.h"
+#include "reone/script/instrutil.h"
 
 using namespace std;
 

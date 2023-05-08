@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../src/script/routine.h"
-#include "../../../src/script/routines.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
 
 namespace reone {
 

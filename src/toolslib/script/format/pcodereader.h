@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../script/program.h"
+#include "reone/script/program.h"
 
 namespace reone {
 

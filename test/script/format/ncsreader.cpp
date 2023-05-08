@@ -19,8 +19,8 @@
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/script/format/ncsreader.h"
-#include "../../../src/script/program.h"
+#include "reone/script/format/ncsreader.h"
+#include "reone/script/program.h"
 
 using namespace std;
 

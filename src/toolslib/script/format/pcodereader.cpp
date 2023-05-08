@@ -20,8 +20,8 @@
 #include <boost/regex.hpp>
 
 #include "reone/common/exception/validation.h"
-#include "../../script/instrutil.h"
-#include "../../script/routines.h"
+#include "reone/script/instrutil.h"
+#include "reone/script/routines.h"
 
 using namespace std;
 

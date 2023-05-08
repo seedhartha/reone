@@ -56,8 +56,8 @@
 #include "reone/resource/strings.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/services.h"
-#include "../../script/scripts.h"
-#include "../../script/services.h"
+#include "reone/script/scripts.h"
+#include "reone/script/services.h"
 
 #include "game.h"
 #include "scene.h"

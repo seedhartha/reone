@@ -15,15 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "bikreader.h"
+#include "reone/movie/format/bikreader.h"
 
 #include "reone/audio/stream.h"
 #include "reone/common/binaryreader.h"
 #include "reone/common/logutil.h"
 
-
-#include "../movie.h"
-#include "../videostream.h"
+#include "reone/movie/movie.h"
+#include "reone/movie/videostream.h"
 
 #ifdef R_ENABLE_MOVIE
 

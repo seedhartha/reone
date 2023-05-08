@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../script/routine.h"
-#include "../../script/routines.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
 
 #include "../types.h"
 

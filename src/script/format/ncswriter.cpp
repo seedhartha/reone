@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ncswriter.h"
+#include "reone/script/format/ncswriter.h"
 
 #include "reone/common/binarywriter.h"
 #include "reone/common/collectionutil.h"
@@ -23,8 +23,7 @@
 #include "reone/common/stream/bytearrayoutput.h"
 #include "reone/common/stream/fileoutput.h"
 
-
-#include "../program.h"
+#include "reone/script/program.h"
 
 using namespace std;
 

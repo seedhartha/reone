@@ -18,9 +18,9 @@
 #pragma once
 
 #include "reone/common/collectionutil.h"
-#include "../../../script/exception/argument.h"
-#include "../../../script/types.h"
-#include "../../../script/variable.h"
+#include "reone/script/exception/argument.h"
+#include "reone/script/types.h"
+#include "reone/script/variable.h"
 
 namespace reone {
 

@@ -17,10 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../script/execution.h"
-#include "../../script/executioncontext.h"
-#include "../../script/executionstate.h"
-#include "../../script/program.h"
+#include "reone/script/execution.h"
+#include "reone/script/executioncontext.h"
+#include "reone/script/executionstate.h"
+#include "reone/script/program.h"
 
 #include "../fixtures/script.h"
 

@@ -17,10 +17,10 @@
 
 #include "runner.h"
 
-#include "../../script/execution.h"
-#include "../../script/executioncontext.h"
-#include "../../script/routines.h"
-#include "../../script/scripts.h"
+#include "reone/script/execution.h"
+#include "reone/script/executioncontext.h"
+#include "reone/script/routines.h"
+#include "reone/script/scripts.h"
 
 #include "../game.h"
 

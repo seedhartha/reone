@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ncsreader.h"
+#include "reone/script/format/ncsreader.h"
 
 #include "reone/common/logutil.h"
 
-#include "../program.h"
+#include "reone/script/program.h"
 
 using namespace std;
 

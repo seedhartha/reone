@@ -13,25 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(SCRIPT_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/script)
+
 set(SCRIPT_HEADERS
-    enginetype.h
-    exception/argument.h
-    exception/notimpl.h
-    exception/unsupportedroutine.h
-    execution.h
-    executioncontext.h
-    executionstate.h
-    format/ncsreader.h
-    format/ncswriter.h
-    instrutil.h
-    program.h
-    routine.h
-    routines.h
-    scripts.h
-    services.h
-    types.h
-    variable.h
-    variableutil.h)
+    ${SCRIPT_INCLUDE_DIR}/enginetype.h
+    ${SCRIPT_INCLUDE_DIR}/exception/argument.h
+    ${SCRIPT_INCLUDE_DIR}/exception/notimpl.h
+    ${SCRIPT_INCLUDE_DIR}/exception/unsupportedroutine.h
+    ${SCRIPT_INCLUDE_DIR}/execution.h
+    ${SCRIPT_INCLUDE_DIR}/executioncontext.h
+    ${SCRIPT_INCLUDE_DIR}/executionstate.h
+    ${SCRIPT_INCLUDE_DIR}/format/ncsreader.h
+    ${SCRIPT_INCLUDE_DIR}/format/ncswriter.h
+    ${SCRIPT_INCLUDE_DIR}/instrutil.h
+    ${SCRIPT_INCLUDE_DIR}/program.h
+    ${SCRIPT_INCLUDE_DIR}/routine.h
+    ${SCRIPT_INCLUDE_DIR}/routines.h
+    ${SCRIPT_INCLUDE_DIR}/scripts.h
+    ${SCRIPT_INCLUDE_DIR}/services.h
+    ${SCRIPT_INCLUDE_DIR}/types.h
+    ${SCRIPT_INCLUDE_DIR}/variable.h
+    ${SCRIPT_INCLUDE_DIR}/variableutil.h)
 
 set(SCRIPT_SOURCES
     execution.cpp

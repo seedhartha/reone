@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "routine.h"
+#include "reone/script/routine.h"
 
 #include "reone/common/logutil.h"
-#include "../script/exception/argument.h"
-#include "../script/exception/notimpl.h"
+#include "reone/script/exception/argument.h"
+#include "reone/script/exception/notimpl.h"
 
-#include "variable.h"
+#include "reone/script/variable.h"
 
 using namespace std;
 

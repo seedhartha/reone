@@ -19,7 +19,7 @@
 
 #include "reone/scene/node.h"
 #include "reone/scene/user.h"
-#include "../script/types.h"
+#include "reone/script/types.h"
 
 #include "action.h"
 #include "types.h"

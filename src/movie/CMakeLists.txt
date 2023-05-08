@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(MOVIE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/movie)
+
 set(MOVIE_HEADERS
-    format/bikreader.h
-    movie.h
-    videostream.h)
+    ${MOVIE_INCLUDE_DIR}/format/bikreader.h
+    ${MOVIE_INCLUDE_DIR}/movie.h
+    ${MOVIE_INCLUDE_DIR}/videostream.h)
 
 set(MOVIE_SOURCES
     format/bikreader.cpp

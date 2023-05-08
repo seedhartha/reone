@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../script/enginetype.h"
+#include "reone/script/enginetype.h"
 
 #include "types.h"
 

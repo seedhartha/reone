@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "scripts.h"
+#include "reone/script/scripts.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 
-#include "format/ncsreader.h"
+#include "reone/script/format/ncsreader.h"
 
 using namespace std;
 using namespace std::placeholders;

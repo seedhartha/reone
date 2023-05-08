@@ -24,8 +24,8 @@
 #include "reone/common/stream/fileinput.h"
 #include "reone/common/stream/fileoutput.h"
 #include "../../game/script/routines.h"
-#include "../../script/format/ncsreader.h"
-#include "../../script/format/ncswriter.h"
+#include "reone/script/format/ncsreader.h"
+#include "reone/script/format/ncswriter.h"
 
 #include "../script/expressiontree.h"
 #include "../script/format/nsswriter.h"

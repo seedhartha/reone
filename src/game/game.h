@@ -19,7 +19,7 @@
 
 #include "reone/graphics/cursor.h"
 #include "reone/graphics/eventhandler.h"
-#include "../movie/movie.h"
+#include "reone/movie/movie.h"
 
 #include "gameinterface.h"
 #include "gui/console.h"

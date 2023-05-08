@@ -19,8 +19,8 @@
 
 #include "reone/common/stream/bytearrayoutput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/script/format/ncswriter.h"
-#include "../../../src/script/program.h"
+#include "reone/script/format/ncswriter.h"
+#include "reone/script/program.h"
 
 #include "../../checkutil.h"
 

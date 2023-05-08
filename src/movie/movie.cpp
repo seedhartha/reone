@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "movie.h"
+#include "reone/movie/movie.h"
 
 #include "reone/audio/player.h"
 #include "reone/audio/services.h"
