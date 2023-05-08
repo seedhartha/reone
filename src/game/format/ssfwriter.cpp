@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssfwriter.h"
+#include "reone/game/format/ssfwriter.h"
 
 #include "reone/common/binarywriter.h"
 #include "reone/common/stream/fileoutput.h"

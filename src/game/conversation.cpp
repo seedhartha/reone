@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "conversation.h"
+#include "reone/game/conversation.h"
 
 #include "reone/common/collectionutil.h"
 #include "reone/common/exception/argument.h"

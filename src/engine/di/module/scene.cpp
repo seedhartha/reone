@@ -17,7 +17,7 @@
 
 #include "scene.h"
 
-#include "../../game/types.h"
+#include "reone/game/types.h"
 
 #include "audio.h"
 #include "graphics.h"

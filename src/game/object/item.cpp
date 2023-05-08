@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "item.h"
+#include "reone/game/object/item.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/graphics/models.h"

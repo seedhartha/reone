@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../declarations.h"
+#include "reone/game/script/routine/declarations.h"
 
 #include "reone/common/logutil.h"
 #include "reone/common/randomutil.h"
@@ -25,18 +25,18 @@
 #include "reone/script/exception/unsupportedroutine.h"
 #include "reone/script/executioncontext.h"
 
-#include "../../../event.h"
-#include "../../../game.h"
-#include "../../../location.h"
-#include "../../../object.h"
-#include "../../../object/door.h"
-#include "../../../script/runner.h"
-#include "../../../services.h"
-#include "../../../talent.h"
+#include "reone/game/event.h"
+#include "reone/game/game.h"
+#include "reone/game/location.h"
+#include "reone/game/object.h"
+#include "reone/game/object/door.h"
+#include "reone/game/script/runner.h"
+#include "reone/game/services.h"
+#include "reone/game/talent.h"
 
-#include "../argutil.h"
-#include "../context.h"
-#include "../objectutil.h"
+#include "reone/game/script/routine/argutil.h"
+#include "reone/game/script/routine/context.h"
+#include "reone/game/script/routine/objectutil.h"
 
 #define R_FALSE 0
 #define R_TRUE 1

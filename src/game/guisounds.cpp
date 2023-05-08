@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "guisounds.h"
+#include "reone/game/guisounds.h"
 
 #include "reone/audio/files.h"
 #include "reone/resource/2das.h"

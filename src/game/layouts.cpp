@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "layouts.h"
+#include "reone/game/layouts.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
-#include "format/lytreader.h"
+#include "reone/game/format/lytreader.h"
 
 using namespace std;
 

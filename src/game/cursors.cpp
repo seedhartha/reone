@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cursors.h"
+#include "reone/game/cursors.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/graphics/cursor.h"

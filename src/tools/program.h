@@ -19,7 +19,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "../game/types.h"
+#include "reone/game/types.h"
 #include "../toolslib/types.h"
 
 namespace reone {

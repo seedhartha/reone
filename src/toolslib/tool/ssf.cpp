@@ -20,8 +20,8 @@
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
 #include "reone/common/stream/fileinput.h"
-#include "../../game/format/ssfreader.h"
-#include "../../game/format/ssfwriter.h"
+#include "reone/game/format/ssfreader.h"
+#include "reone/game/format/ssfwriter.h"
 
 #include "tinyxml2.h"
 

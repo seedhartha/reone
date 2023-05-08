@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "resourcelayout.h"
+#include "reone/game/resourcelayout.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/pathutil.h"
@@ -25,8 +25,8 @@
 #include "reone/resource/resources.h"
 #include "reone/resource/services.h"
 
-#include "options.h"
-#include "types.h"
+#include "reone/game/options.h"
+#include "reone/game/types.h"
 
 using namespace std;
 

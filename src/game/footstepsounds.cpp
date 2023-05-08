@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "footstepsounds.h"
+#include "reone/game/footstepsounds.h"
 
 #include "reone/audio/files.h"
 #include "reone/resource/2da.h"

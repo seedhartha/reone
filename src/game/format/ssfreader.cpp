@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssfreader.h"
+#include "reone/game/format/ssfreader.h"
 
 using namespace std;
 

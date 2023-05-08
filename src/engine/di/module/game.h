@@ -17,21 +17,21 @@
 
 #pragma once
 
-#include "../../game/astar.h"
-#include "../../game/camerastyles.h"
-#include "../../game/cursors.h"
-#include "../../game/footstepsounds.h"
-#include "../../game/game.h"
-#include "../../game/guisounds.h"
-#include "../../game/layouts.h"
-#include "../../game/paths.h"
-#include "../../game/portraits.h"
-#include "../../game/resourcelayout.h"
-#include "../../game/services.h"
-#include "../../game/soundsets.h"
-#include "../../game/surfaces.h"
-#include "../../game/types.h"
-#include "../../game/visibilities.h"
+#include "reone/game/astar.h"
+#include "reone/game/camerastyles.h"
+#include "reone/game/cursors.h"
+#include "reone/game/footstepsounds.h"
+#include "reone/game/game.h"
+#include "reone/game/guisounds.h"
+#include "reone/game/layouts.h"
+#include "reone/game/paths.h"
+#include "reone/game/portraits.h"
+#include "reone/game/resourcelayout.h"
+#include "reone/game/services.h"
+#include "reone/game/soundsets.h"
+#include "reone/game/surfaces.h"
+#include "reone/game/types.h"
+#include "reone/game/visibilities.h"
 
 namespace reone {
 

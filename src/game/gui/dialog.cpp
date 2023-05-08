@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dialog.h"
+#include "reone/game/gui/dialog.h"
 
 #include "reone/graphics/options.h"
 #include "reone/gui/control/label.h"

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "creature.h"
+#include "reone/game/object/creature.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
@@ -30,12 +30,12 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/model.h"
 
-#include "../astar.h"
-#include "../gameinterface.h"
-#include "../services.h"
+#include "reone/game/astar.h"
+#include "reone/game/gameinterface.h"
+#include "reone/game/services.h"
 
-#include "factory.h"
-#include "item.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/object/item.h"
 
 using namespace std;
 

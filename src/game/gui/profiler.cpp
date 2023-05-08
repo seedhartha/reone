@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "profiler.h"
+#include "reone/game/gui/profiler.h"
 
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/options.h"
@@ -24,7 +24,7 @@
 #include "reone/gui/control/panel.h"
 #include "reone/gui/control/plotter.h"
 
-#include "../profiler.h"
+#include "reone/game/profiler.h"
 
 using namespace std;
 

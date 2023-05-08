@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camera.h"
+#include "reone/game/object/camera.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/graphics/options.h"
@@ -25,8 +25,8 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/camera.h"
 
-#include "../camerastyles.h"
-#include "../services.h"
+#include "reone/game/camerastyles.h"
+#include "reone/game/services.h"
 
 using namespace std;
 

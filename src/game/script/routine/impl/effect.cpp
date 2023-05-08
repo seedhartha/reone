@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../declarations.h"
+#include "reone/game/script/routine/declarations.h"
 
 #include "reone/script/exception/notimpl.h"
 
-#include "../../../effect.h"
-#include "../../../game.h"
-#include "../../../services.h"
-#include "../../../types.h"
+#include "reone/game/effect.h"
+#include "reone/game/game.h"
+#include "reone/game/services.h"
+#include "reone/game/types.h"
 
-#include "../argutil.h"
-#include "../context.h"
+#include "reone/game/script/routine/argutil.h"
+#include "reone/game/script/routine/context.h"
 
 using namespace std;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "placeable.h"
+#include "reone/game/object/placeable.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/graphics/models.h"
@@ -30,10 +30,10 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/node/walkmesh.h"
 
-#include "../services.h"
+#include "reone/game/services.h"
 
-#include "factory.h"
-#include "item.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/object/item.h"
 
 using namespace std;
 

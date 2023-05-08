@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "surfaces.h"
+#include "reone/game/surfaces.h"
 
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"

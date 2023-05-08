@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/game/object/placeable.h"
+#include "reone/game/object/placeable.h"
 #include "reone/resource/gff.h"
 
 #include "../../fixtures/functional.h"

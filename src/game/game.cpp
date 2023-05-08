@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
+#include "reone/game/game.h"
 
 #include "reone/common/collectionutil.h"
 #include "reone/common/pathutil.h"
@@ -37,25 +37,25 @@
 #include "reone/scene/services.h"
 #include "reone/script/services.h"
 
-#include "astar.h"
-#include "conversation.h"
-#include "cursors.h"
-#include "debug.h"
-#include "object/area.h"
-#include "object/camera.h"
-#include "object/creature.h"
-#include "object/door.h"
-#include "object/encounter.h"
-#include "object/item.h"
-#include "object/placeable.h"
-#include "object/room.h"
-#include "object/sound.h"
-#include "object/store.h"
-#include "object/trigger.h"
-#include "object/waypoint.h"
-#include "options.h"
-#include "resourcelayout.h"
-#include "surfaces.h"
+#include "reone/game/astar.h"
+#include "reone/game/conversation.h"
+#include "reone/game/cursors.h"
+#include "reone/game/debug.h"
+#include "reone/game/object/area.h"
+#include "reone/game/object/camera.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/object/door.h"
+#include "reone/game/object/encounter.h"
+#include "reone/game/object/item.h"
+#include "reone/game/object/placeable.h"
+#include "reone/game/object/room.h"
+#include "reone/game/object/sound.h"
+#include "reone/game/object/store.h"
+#include "reone/game/object/trigger.h"
+#include "reone/game/object/waypoint.h"
+#include "reone/game/options.h"
+#include "reone/game/resourcelayout.h"
+#include "reone/game/surfaces.h"
 
 using namespace std;
 

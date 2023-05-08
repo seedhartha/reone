@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "sound.h"
+#include "reone/game/object/sound.h"
 
 namespace reone {
 

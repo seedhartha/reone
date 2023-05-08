@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "movetoobject.h"
+#include "reone/game/action/movetoobject.h"
 
 #include "reone/common/exception/validation.h"
 
-#include "../object.h"
-#include "../object/creature.h"
+#include "reone/game/object.h"
+#include "reone/game/object/creature.h"
 
 using namespace std;
 

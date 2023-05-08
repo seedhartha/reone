@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "debug.h"
+#include "reone/game/debug.h"
 
 namespace reone {
 

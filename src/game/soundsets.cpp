@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "soundsets.h"
+#include "reone/game/soundsets.h"
 
 #include "reone/audio/files.h"
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
 
-#include "format/ssfreader.h"
+#include "reone/game/format/ssfreader.h"
 
 using namespace std;
 

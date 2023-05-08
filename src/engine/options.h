@@ -19,7 +19,7 @@
 
 #include "reone/audio/options.h"
 #include "reone/common/types.h"
-#include "../../game/options.h"
+#include "reone/game/options.h"
 #include "reone/graphics/options.h"
 
 namespace reone {

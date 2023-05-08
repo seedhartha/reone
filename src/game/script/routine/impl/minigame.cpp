@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../declarations.h"
+#include "reone/game/script/routine/declarations.h"
 
 #include "reone/script/exception/notimpl.h"
 
-#include "../context.h"
+#include "reone/game/script/routine/context.h"
 
 using namespace std;
 

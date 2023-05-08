@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../game/selectioncontroller.h"
+#include "reone/game/selectioncontroller.h"
 
 #include "../fixtures/functional.h"
 #include "../fixtures/game.h"

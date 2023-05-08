@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "selectioncontroller.h"
+#include "reone/game/selectioncontroller.h"
 
 #include "reone/common/logutil.h"
 #include "reone/scene/graph.h"
 
-#include "gameinterface.h"
-#include "gui/maininterface.h"
-#include "object.h"
-#include "object/creature.h"
+#include "reone/game/gameinterface.h"
+#include "reone/game/gui/maininterface.h"
+#include "reone/game/object.h"
+#include "reone/game/object/creature.h"
 
 using namespace std;
 

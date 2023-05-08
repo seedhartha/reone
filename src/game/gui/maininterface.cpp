@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "maininterface.h"
+#include "reone/game/gui/maininterface.h"
 
 #include "reone/graphics/options.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 
-#include "../object.h"
+#include "reone/game/object.h"
 
 using namespace reone::gui;
 

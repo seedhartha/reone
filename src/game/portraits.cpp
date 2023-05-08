@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "portraits.h"
+#include "reone/game/portraits.h"
 
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 
-#include "portrait.h"
+#include "reone/game/portrait.h"
 
 using namespace std;
 

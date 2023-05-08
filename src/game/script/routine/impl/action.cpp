@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../declarations.h"
+#include "reone/game/script/routine/declarations.h"
 
 #include "reone/common/logutil.h"
 
-#include "../../../game.h"
-#include "../../../object/creature.h"
+#include "reone/game/game.h"
+#include "reone/game/object/creature.h"
 
-#include "../argutil.h"
-#include "../context.h"
+#include "reone/game/script/routine/argutil.h"
+#include "reone/game/script/routine/context.h"
 
 using namespace std;
 

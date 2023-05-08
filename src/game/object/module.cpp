@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
+#include "reone/game/object/module.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
@@ -27,9 +27,9 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/model.h"
 
-#include "../services.h"
+#include "reone/game/services.h"
 
-#include "factory.h"
+#include "reone/game/object/factory.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/game/action/movetoobject.h"
+#include "reone/game/action/movetoobject.h"
 
 #include "../../checkutil.h"
 #include "../../fixtures/functional.h"

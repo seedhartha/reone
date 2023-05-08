@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "store.h"
+#include "reone/game/object/store.h"
 
 namespace reone {
 

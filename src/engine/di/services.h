@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../game/options.h"
-#include "../../game/types.h"
+#include "reone/game/options.h"
+#include "reone/game/types.h"
 
 #include "module/audio.h"
 #include "module/game.h"

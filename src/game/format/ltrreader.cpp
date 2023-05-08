@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ltrreader.h"
+#include "reone/game/format/ltrreader.h"
 
 #include "reone/common/randomutil.h"
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lytreader.h"
+#include "reone/game/format/lytreader.h"
 
 #include "reone/common/stream/fileinput.h"
 

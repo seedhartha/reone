@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "trigger.h"
+#include "reone/game/object/trigger.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
@@ -24,7 +24,7 @@
 #include "reone/resource/services.h"
 #include "reone/scene/graph.h"
 
-#include "../gameinterface.h"
+#include "reone/game/gameinterface.h"
 
 using namespace std;
 

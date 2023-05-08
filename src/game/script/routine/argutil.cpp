@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "argutil.h"
+#include "reone/game/script/routine/argutil.h"
 
 #include "reone/script/executioncontext.h"
 
-#include "../../effect.h"
-#include "../../event.h"
-#include "../../game.h"
-#include "../../location.h"
-#include "../../object/creature.h"
-#include "../../object/door.h"
-#include "../../object/item.h"
-#include "../../object/placeable.h"
-#include "../../object/sound.h"
-#include "../../talent.h"
+#include "reone/game/effect.h"
+#include "reone/game/event.h"
+#include "reone/game/game.h"
+#include "reone/game/location.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/object/door.h"
+#include "reone/game/object/item.h"
+#include "reone/game/object/placeable.h"
+#include "reone/game/object/sound.h"
+#include "reone/game/talent.h"
 
-#include "context.h"
+#include "reone/game/script/routine/context.h"
 
 using namespace std;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "area.h"
+#include "reone/game/object/area.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/graphics/options.h"
@@ -27,19 +27,19 @@
 #include "reone/scene/fogproperties.h"
 #include "reone/scene/graph.h"
 
-#include "../camerastyles.h"
-#include "../layouts.h"
-#include "../paths.h"
-#include "../services.h"
-#include "../surfaces.h"
-#include "../visibilities.h"
+#include "reone/game/camerastyles.h"
+#include "reone/game/layouts.h"
+#include "reone/game/paths.h"
+#include "reone/game/services.h"
+#include "reone/game/surfaces.h"
+#include "reone/game/visibilities.h"
 
-#include "creature.h"
-#include "door.h"
-#include "factory.h"
-#include "placeable.h"
-#include "room.h"
-#include "trigger.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/object/door.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/object/placeable.h"
+#include "reone/game/object/room.h"
+#include "reone/game/object/trigger.h"
 
 using namespace std;
 

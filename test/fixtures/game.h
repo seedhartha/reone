@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../../game/action.h"
-#include "../../game/game.h"
-#include "../../game/gui/maininterface.h"
-#include "../../game/object.h"
-#include "../../game/object/creature.h"
+#include "reone/game/action.h"
+#include "reone/game/game.h"
+#include "reone/game/gui/maininterface.h"
+#include "reone/game/object.h"
+#include "reone/game/object/creature.h"
 
 namespace reone {
 

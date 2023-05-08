@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/game/object/creature.h"
-#include "../../../src/game/services.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/services.h"
 #include "reone/resource/gff.h"
 
 #include "../../fixtures/functional.h"

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "visibilities.h"
+#include "reone/game/visibilities.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
-#include "format/visreader.h"
+#include "reone/game/format/visreader.h"
 
 using namespace std;
 

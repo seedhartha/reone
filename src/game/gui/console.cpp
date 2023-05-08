@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "console.h"
+#include "reone/game/gui/console.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/exception/validation.h"
@@ -25,8 +25,8 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 
-#include "../action/movetoobject.h"
-#include "../game.h"
+#include "reone/game/action/movetoobject.h"
+#include "reone/game/game.h"
 
 using namespace std;
 

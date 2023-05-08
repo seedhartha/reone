@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/game/astar.h"
-#include "../../src/game/path.h"
+#include "reone/game/astar.h"
+#include "reone/game/path.h"
 
 #include "../checkutil.h"
 

@@ -23,7 +23,7 @@
 #include "reone/common/logutil.h"
 #include "reone/common/stream/fileinput.h"
 #include "reone/common/stream/fileoutput.h"
-#include "../../game/script/routines.h"
+#include "reone/game/script/routines.h"
 #include "reone/script/format/ncsreader.h"
 #include "reone/script/format/ncswriter.h"
 

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "routines.h"
+#include "reone/game/script/routines.h"
 
 #include "reone/common/collectionutil.h"
 #include "reone/script/variable.h"
 
-#include "../services.h"
-#include "../types.h"
+#include "reone/game/services.h"
+#include "reone/game/types.h"
 
-#include "routine/context.h"
-#include "routine/declarations.h"
+#include "reone/game/script/routine/context.h"
+#include "reone/game/script/routine/declarations.h"
 
 using namespace std;
 

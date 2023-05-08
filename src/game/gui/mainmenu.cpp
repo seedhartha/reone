@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mainmenu.h"
+#include "reone/game/gui/mainmenu.h"
 
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
@@ -27,9 +27,9 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/services.h"
 
-#include "../gameinterface.h"
-#include "../options.h"
-#include "../types.h"
+#include "reone/game/gameinterface.h"
+#include "reone/game/options.h"
+#include "reone/game/types.h"
 
 using namespace std;
 

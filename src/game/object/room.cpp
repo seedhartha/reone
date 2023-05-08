@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "room.h"
+#include "reone/game/object/room.h"
 
 #include "reone/graphics/models.h"
 #include "reone/graphics/options.h"
@@ -25,7 +25,7 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/services.h"
 
-#include "../gameinterface.h"
+#include "reone/game/gameinterface.h"
 
 using namespace std;
 

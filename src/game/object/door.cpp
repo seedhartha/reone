@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "door.h"
+#include "reone/game/object/door.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/graphics/models.h"
@@ -29,7 +29,7 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/model.h"
 
-#include "../services.h"
+#include "reone/game/services.h"
 
 using namespace std;
 

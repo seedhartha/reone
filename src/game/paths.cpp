@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "paths.h"
+#include "reone/game/paths.h"
 
 #include "reone/resource/gffs.h"
 
