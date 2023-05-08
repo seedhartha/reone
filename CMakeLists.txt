@@ -32,7 +32,7 @@ option(ENABLE_ASAN "enable address sanitizer" OFF)
 
 # Dependencies
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules	)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options regex system OPTIONAL_COMPONENTS unit_test_framework)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -50,7 +50,7 @@ else()
 endif()
 
 set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm ${CMAKE_SOURCE_DIR}/src/external/tinyxml2 ${REONE_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/extern/glm ${CMAKE_SOURCE_DIR}/extern/tinyxml2 ${REONE_INCLUDE_DIR})
 
 if(ENABLE_MOVIE)
     if(MSVC)
