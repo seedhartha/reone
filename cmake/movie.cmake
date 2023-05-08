@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(MOVIE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/movie)
+set(MOVIE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/movie)
 
 set(MOVIE_HEADERS
     ${MOVIE_INCLUDE_DIR}/format/bikreader.h
@@ -21,8 +22,8 @@ set(MOVIE_HEADERS
     ${MOVIE_INCLUDE_DIR}/videostream.h)
 
 set(MOVIE_SOURCES
-    format/bikreader.cpp
-    movie.cpp)
+    ${MOVIE_SOURCE_DIR}/format/bikreader.cpp
+    ${MOVIE_SOURCE_DIR}/movie.cpp)
 
 add_library(movie STATIC ${MOVIE_HEADERS} ${MOVIE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(movie PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

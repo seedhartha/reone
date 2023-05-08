@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(AUDIO_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/audio)
+set(AUDIO_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/audio)
 
 set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/context.h
@@ -28,13 +29,13 @@ set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/types.h)
 
 set(AUDIO_SOURCES
-    context.cpp
-    files.cpp
-    format/mp3reader.cpp
-    format/wavreader.cpp
-    player.cpp
-    source.cpp
-    stream.cpp)
+    ${AUDIO_SOURCE_DIR}/context.cpp
+    ${AUDIO_SOURCE_DIR}/files.cpp
+    ${AUDIO_SOURCE_DIR}/format/mp3reader.cpp
+    ${AUDIO_SOURCE_DIR}/format/wavreader.cpp
+    ${AUDIO_SOURCE_DIR}/player.cpp
+    ${AUDIO_SOURCE_DIR}/source.cpp
+    ${AUDIO_SOURCE_DIR}/stream.cpp)
 
 add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(audio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

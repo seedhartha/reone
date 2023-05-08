@@ -16,13 +16,15 @@
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 
+    set(LAUNCHER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/launcher)
+
     set(LAUNCHER_HEADERS
-        app.h
-        frame.h)
+        ${LAUNCHER_SOURCE_DIR}/app.h
+        ${LAUNCHER_SOURCE_DIR}/frame.h)
 
     set(LAUNCHER_SOURCES
-        app.cpp
-        frame.cpp)
+        ${LAUNCHER_SOURCE_DIR}/app.cpp
+        ${LAUNCHER_SOURCE_DIR}/frame.cpp)
 
     if(WIN32)
         list(APPEND LAUNCHER_SOURCES ${CMAKE_SOURCE_DIR}/assets/reone.rc)

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GAME_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/game)
+set(GAME_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/game)
 
 set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action.h
@@ -183,55 +184,55 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/visibilities.h)
 
 set(GAME_SOURCES
-    action.cpp
-    action/movetoobject.cpp
-    astar.cpp
-    camerastyles.cpp
-    conversation.cpp
-    cursors.cpp
-    debug.cpp
-    footstepsounds.cpp
-    format/ltrreader.cpp
-    format/lytreader.cpp
-    format/ssfreader.cpp
-    format/ssfwriter.cpp
-    format/visreader.cpp
-    game.cpp
-    gui/console.cpp
-    gui/dialog.cpp
-    gui/maininterface.cpp
-    gui/mainmenu.cpp
-    gui/profiler.cpp
-    guisounds.cpp
-    layouts.cpp
-    object.cpp
-    object/area.cpp
-    object/camera.cpp
-    object/creature.cpp
-    object/door.cpp
-    object/encounter.cpp
-    object/item.cpp
-    object/module.cpp
-    object/placeable.cpp
-    object/room.cpp
-    object/sound.cpp
-    object/store.cpp
-    object/trigger.cpp
-    object/waypoint.cpp
-    paths.cpp
-    portraits.cpp
-    resourcelayout.cpp
-    selectioncontroller.cpp
-    script/routine/argutil.cpp
-    script/routine/impl/action.cpp
-    script/routine/impl/effect.cpp
-    script/routine/impl/main.cpp
-    script/routine/impl/minigame.cpp
-    script/routines.cpp
-    script/runner.cpp
-    soundsets.cpp
-    surfaces.cpp
-    visibilities.cpp)
+    ${GAME_SOURCE_DIR}/action.cpp
+    ${GAME_SOURCE_DIR}/action/movetoobject.cpp
+    ${GAME_SOURCE_DIR}/astar.cpp
+    ${GAME_SOURCE_DIR}/camerastyles.cpp
+    ${GAME_SOURCE_DIR}/conversation.cpp
+    ${GAME_SOURCE_DIR}/cursors.cpp
+    ${GAME_SOURCE_DIR}/debug.cpp
+    ${GAME_SOURCE_DIR}/footstepsounds.cpp
+    ${GAME_SOURCE_DIR}/format/ltrreader.cpp
+    ${GAME_SOURCE_DIR}/format/lytreader.cpp
+    ${GAME_SOURCE_DIR}/format/ssfreader.cpp
+    ${GAME_SOURCE_DIR}/format/ssfwriter.cpp
+    ${GAME_SOURCE_DIR}/format/visreader.cpp
+    ${GAME_SOURCE_DIR}/game.cpp
+    ${GAME_SOURCE_DIR}/gui/console.cpp
+    ${GAME_SOURCE_DIR}/gui/dialog.cpp
+    ${GAME_SOURCE_DIR}/gui/maininterface.cpp
+    ${GAME_SOURCE_DIR}/gui/mainmenu.cpp
+    ${GAME_SOURCE_DIR}/gui/profiler.cpp
+    ${GAME_SOURCE_DIR}/guisounds.cpp
+    ${GAME_SOURCE_DIR}/layouts.cpp
+    ${GAME_SOURCE_DIR}/object.cpp
+    ${GAME_SOURCE_DIR}/object/area.cpp
+    ${GAME_SOURCE_DIR}/object/camera.cpp
+    ${GAME_SOURCE_DIR}/object/creature.cpp
+    ${GAME_SOURCE_DIR}/object/door.cpp
+    ${GAME_SOURCE_DIR}/object/encounter.cpp
+    ${GAME_SOURCE_DIR}/object/item.cpp
+    ${GAME_SOURCE_DIR}/object/module.cpp
+    ${GAME_SOURCE_DIR}/object/placeable.cpp
+    ${GAME_SOURCE_DIR}/object/room.cpp
+    ${GAME_SOURCE_DIR}/object/sound.cpp
+    ${GAME_SOURCE_DIR}/object/store.cpp
+    ${GAME_SOURCE_DIR}/object/trigger.cpp
+    ${GAME_SOURCE_DIR}/object/waypoint.cpp
+    ${GAME_SOURCE_DIR}/paths.cpp
+    ${GAME_SOURCE_DIR}/portraits.cpp
+    ${GAME_SOURCE_DIR}/resourcelayout.cpp
+    ${GAME_SOURCE_DIR}/selectioncontroller.cpp
+    ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
+    ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp
+    ${GAME_SOURCE_DIR}/script/routine/impl/effect.cpp
+    ${GAME_SOURCE_DIR}/script/routine/impl/main.cpp
+    ${GAME_SOURCE_DIR}/script/routine/impl/minigame.cpp
+    ${GAME_SOURCE_DIR}/script/routines.cpp
+    ${GAME_SOURCE_DIR}/script/runner.cpp
+    ${GAME_SOURCE_DIR}/soundsets.cpp
+    ${GAME_SOURCE_DIR}/surfaces.cpp
+    ${GAME_SOURCE_DIR}/visibilities.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

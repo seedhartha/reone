@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(RESOURCE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/resource)
+set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/resource)
 
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
@@ -48,32 +49,32 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/typeutil.h)
 
 set(RESOURCE_SOURCES
-    2da.cpp
-    2das.cpp
-    gff.cpp
-    gffs.cpp
-    format/2dareader.cpp
-    format/2dawriter.cpp
-    format/bifreader.cpp
-    format/binreader.cpp
-    format/erfreader.cpp
-    format/erfwriter.cpp
-    format/gffreader.cpp
-    format/gffwriter.cpp
-    format/keyreader.cpp
-    format/pereader.cpp
-    format/rimreader.cpp
-    format/rimwriter.cpp
-    format/tlkreader.cpp
-    format/tlkwriter.cpp
-    provider/erf.cpp
-    provider/folder.cpp
-    provider/keybif.cpp
-    provider/rim.cpp
-    resources.cpp
-    strings.cpp
-    talktable.cpp
-    typeutil.cpp)
+    ${RESOURCE_SOURCE_DIR}/2da.cpp
+    ${RESOURCE_SOURCE_DIR}/2das.cpp
+    ${RESOURCE_SOURCE_DIR}/gff.cpp
+    ${RESOURCE_SOURCE_DIR}/gffs.cpp
+    ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/binreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/erfreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/erfwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/gffreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/gffwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/erf.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/folder.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/keybif.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/rim.cpp
+    ${RESOURCE_SOURCE_DIR}/resources.cpp
+    ${RESOURCE_SOURCE_DIR}/strings.cpp
+    ${RESOURCE_SOURCE_DIR}/talktable.cpp
+    ${RESOURCE_SOURCE_DIR}/typeutil.cpp)
 
 add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

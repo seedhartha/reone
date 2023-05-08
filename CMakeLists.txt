@@ -32,7 +32,7 @@ option(ENABLE_ASAN "enable address sanitizer" OFF)
 
 # Dependencies
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules	)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options regex system OPTIONAL_COMPONENTS unit_test_framework)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -79,33 +79,33 @@ endif()
 
 # Engine libraries
 
-add_subdirectory(src/common) # common static library
-add_subdirectory(src/resource) # resource static library
-add_subdirectory(src/graphics) # graphics static library
-add_subdirectory(src/audio) # audio static library
-add_subdirectory(src/gui) # gui static library
-add_subdirectory(src/scene) # scene static library
-add_subdirectory(src/movie) # movie static library
-add_subdirectory(src/script) # script static library
-add_subdirectory(src/game) # game static library
+include(cmake/common.cmake) # common static library
+include(cmake/resource.cmake) # resource static library
+include(cmake/graphics.cmake) # graphics static library
+include(cmake/audio.cmake) # audio static library
+include(cmake/gui.cmake) # gui static library
+include(cmake/scene.cmake) # scene static library
+include(cmake/movie.cmake) # movie static library
+include(cmake/script.cmake) # script static library
+include(cmake/game.cmake) # game static library
 
 # END Engine libraries
 
-add_subdirectory(src/engine) # reone executable
+include(cmake/engine.cmake) # reone executable
 
 if(BUILD_TOOLS)
-    add_subdirectory(src/external/tinyxml2) # tinyxml2 static library
-    add_subdirectory(src/toolslib) # tools static library
-    add_subdirectory(src/tools) # reone-tools executable
+    include(cmake/tinyxml2.cmake) # tinyxml2 static library
+    include(cmake/toolslib.cmake) # tools static library
+    include(cmake/tools.cmake) # reone-tools executable
 endif()
 
 if(BUILD_LAUNCHER)
-    add_subdirectory(src/launcher) # reone-launcher executable
+    include(cmake/launcher.cmake) # reone-launcher executable
 endif()
 
 if(BUILD_TESTS)
     enable_testing()
-    add_subdirectory(test) # reone-tests executable
+    include(cmake/test.cmake) # reone-tests executable
 endif()
 
 ## Installation

@@ -13,32 +13,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(ENGINE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/engine)
+
 set(REONE_HEADERS
-    di/module/audio.h
-    di/module/game.h
-    di/module/graphics.h
-    di/module/resource.h
-    di/module/scene.h
-    di/module/script.h
-    di/services.h
-    engine.h
-    gameprobe.h
-    options.h
-    optionsparser.h)
+    ${ENGINE_SOURCE_DIR}/di/module/audio.h
+    ${ENGINE_SOURCE_DIR}/di/module/game.h
+    ${ENGINE_SOURCE_DIR}/di/module/graphics.h
+    ${ENGINE_SOURCE_DIR}/di/module/resource.h
+    ${ENGINE_SOURCE_DIR}/di/module/scene.h
+    ${ENGINE_SOURCE_DIR}/di/module/script.h
+    ${ENGINE_SOURCE_DIR}/di/services.h
+    ${ENGINE_SOURCE_DIR}/engine.h
+    ${ENGINE_SOURCE_DIR}/gameprobe.h
+    ${ENGINE_SOURCE_DIR}/options.h
+    ${ENGINE_SOURCE_DIR}/optionsparser.h)
 
 set(REONE_SOURCES
-    di/module/audio.cpp
-    di/module/game.cpp
-    di/module/graphics.cpp
-    di/module/resource.cpp
-    di/module/scene.cpp
-    di/module/script.cpp
-    di/services.cpp
-    engine.cpp
-    gameprobe.cpp
-    highperfgfx.cpp
-    main.cpp
-    optionsparser.cpp)
+    ${ENGINE_SOURCE_DIR}/di/module/audio.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/game.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/graphics.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/resource.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/scene.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/script.cpp
+    ${ENGINE_SOURCE_DIR}/di/services.cpp
+    ${ENGINE_SOURCE_DIR}/engine.cpp
+    ${ENGINE_SOURCE_DIR}/gameprobe.cpp
+    ${ENGINE_SOURCE_DIR}/highperfgfx.cpp
+    ${ENGINE_SOURCE_DIR}/main.cpp
+    ${ENGINE_SOURCE_DIR}/optionsparser.cpp)
 
 if(WIN32)
     list(APPEND REONE_SOURCES ${CMAKE_SOURCE_DIR}/assets/reone.rc)

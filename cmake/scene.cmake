@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(SCENE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/scene)
+set(SCENE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/scene)
 
 set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/animeventlistener.h
@@ -42,20 +43,20 @@ set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/user.h)
 
 set(SCENE_SOURCES
-    graph.cpp
-    graphs.cpp
-    node.cpp
-    node/camera.cpp
-    node/emitter.cpp
-    node/grass.cpp
-    node/light.cpp
-    node/mesh.cpp
-    node/model.cpp
-    node/modelnode.cpp
-    node/particle.cpp
-    node/sound.cpp
-    node/trigger.cpp
-    node/walkmesh.cpp)
+    ${SCENE_SOURCE_DIR}/graph.cpp
+    ${SCENE_SOURCE_DIR}/graphs.cpp
+    ${SCENE_SOURCE_DIR}/node.cpp
+    ${SCENE_SOURCE_DIR}/node/camera.cpp
+    ${SCENE_SOURCE_DIR}/node/emitter.cpp
+    ${SCENE_SOURCE_DIR}/node/grass.cpp
+    ${SCENE_SOURCE_DIR}/node/light.cpp
+    ${SCENE_SOURCE_DIR}/node/mesh.cpp
+    ${SCENE_SOURCE_DIR}/node/model.cpp
+    ${SCENE_SOURCE_DIR}/node/modelnode.cpp
+    ${SCENE_SOURCE_DIR}/node/particle.cpp
+    ${SCENE_SOURCE_DIR}/node/sound.cpp
+    ${SCENE_SOURCE_DIR}/node/trigger.cpp
+    ${SCENE_SOURCE_DIR}/node/walkmesh.cpp)
 
 add_library(scene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(scene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

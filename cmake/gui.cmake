@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GUI_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/gui)
+set(GUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/gui)
 
 set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/control.h
@@ -37,14 +38,14 @@ set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/types.h)
 
 set(GUI_SOURCES
-    control.cpp
-    control/button.cpp
-    control/label.cpp
-    control/listbox.cpp
-    control/plotter.cpp
-    gui.cpp
-    sceneinitializer.cpp
-    textinput.cpp)
+    ${GUI_SOURCE_DIR}/control.cpp
+    ${GUI_SOURCE_DIR}/control/button.cpp
+    ${GUI_SOURCE_DIR}/control/label.cpp
+    ${GUI_SOURCE_DIR}/control/listbox.cpp
+    ${GUI_SOURCE_DIR}/control/plotter.cpp
+    ${GUI_SOURCE_DIR}/gui.cpp
+    ${GUI_SOURCE_DIR}/sceneinitializer.cpp
+    ${GUI_SOURCE_DIR}/textinput.cpp)
 
 add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(gui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

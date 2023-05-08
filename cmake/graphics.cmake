@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GRAPHICS_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/graphics)
+set(GRAPHICS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/graphics)
 
 set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/aabb.h
@@ -74,45 +75,45 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/window.h)
 
 set(GRAPHICS_SOURCES
-    aabb.cpp
-    animation.cpp
-    context.cpp
-    cursor.cpp
-    dxtutil.cpp
-    font.cpp
-    fonts.cpp
-    format/bwmreader.cpp
-    format/curreader.cpp
-    format/lipreader.cpp
-    format/lipwriter.cpp
-    format/mdlreader.cpp
-    format/tgareader.cpp
-    format/tgawriter.cpp
-    format/tpcreader.cpp
-    format/txireader.cpp
-    framebuffer.cpp
-    lipanimation.cpp
-    lipanimations.cpp
-    mesh.cpp
-    meshes.cpp
-    model.cpp
-    modelnode.cpp
-    models.cpp
-    pipeline.cpp
-    pixelutil.cpp
-    renderbuffer.cpp
-    shader.cpp
-    shaderprogram.cpp
-    shaders.cpp
-    texture.cpp
-    textures.cpp
-    textureutil.cpp
-    textutil.cpp
-    uniformbuffer.cpp
-    uniforms.cpp
-    walkmesh.cpp
-    walkmeshes.cpp
-    window.cpp)
+    ${GRAPHICS_SOURCE_DIR}/aabb.cpp
+    ${GRAPHICS_SOURCE_DIR}/animation.cpp
+    ${GRAPHICS_SOURCE_DIR}/context.cpp
+    ${GRAPHICS_SOURCE_DIR}/cursor.cpp
+    ${GRAPHICS_SOURCE_DIR}/dxtutil.cpp
+    ${GRAPHICS_SOURCE_DIR}/font.cpp
+    ${GRAPHICS_SOURCE_DIR}/fonts.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/bwmreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/curreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/lipreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/lipwriter.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/mdlreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tgareader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tgawriter.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tpcreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/txireader.cpp
+    ${GRAPHICS_SOURCE_DIR}/framebuffer.cpp
+    ${GRAPHICS_SOURCE_DIR}/lipanimation.cpp
+    ${GRAPHICS_SOURCE_DIR}/lipanimations.cpp
+    ${GRAPHICS_SOURCE_DIR}/mesh.cpp
+    ${GRAPHICS_SOURCE_DIR}/meshes.cpp
+    ${GRAPHICS_SOURCE_DIR}/model.cpp
+    ${GRAPHICS_SOURCE_DIR}/modelnode.cpp
+    ${GRAPHICS_SOURCE_DIR}/models.cpp
+    ${GRAPHICS_SOURCE_DIR}/pipeline.cpp
+    ${GRAPHICS_SOURCE_DIR}/pixelutil.cpp
+    ${GRAPHICS_SOURCE_DIR}/renderbuffer.cpp
+    ${GRAPHICS_SOURCE_DIR}/shader.cpp
+    ${GRAPHICS_SOURCE_DIR}/shaderprogram.cpp
+    ${GRAPHICS_SOURCE_DIR}/shaders.cpp
+    ${GRAPHICS_SOURCE_DIR}/texture.cpp
+    ${GRAPHICS_SOURCE_DIR}/textures.cpp
+    ${GRAPHICS_SOURCE_DIR}/textureutil.cpp
+    ${GRAPHICS_SOURCE_DIR}/textutil.cpp
+    ${GRAPHICS_SOURCE_DIR}/uniformbuffer.cpp
+    ${GRAPHICS_SOURCE_DIR}/uniforms.cpp
+    ${GRAPHICS_SOURCE_DIR}/walkmesh.cpp
+    ${GRAPHICS_SOURCE_DIR}/walkmeshes.cpp
+    ${GRAPHICS_SOURCE_DIR}/window.cpp)
 
 add_library(graphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(graphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

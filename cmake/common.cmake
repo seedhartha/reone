@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/common)
+set(COMMON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/common)
 
 set(COMMON_HEADERS
     ${COMMON_INCLUDE_DIR}/binaryreader.h
@@ -40,13 +41,13 @@ set(COMMON_HEADERS
     ${COMMON_INCLUDE_DIR}/types.h)
 
 set(COMMON_SOURCES
-    binaryreader.cpp
-    binarywriter.cpp
-    hexutil.cpp
-    logutil.cpp
-    pathutil.cpp
-    randomutil.cpp
-    textwriter.cpp)
+    ${COMMON_SOURCE_DIR}/binaryreader.cpp
+    ${COMMON_SOURCE_DIR}/binarywriter.cpp
+    ${COMMON_SOURCE_DIR}/hexutil.cpp
+    ${COMMON_SOURCE_DIR}/logutil.cpp
+    ${COMMON_SOURCE_DIR}/pathutil.cpp
+    ${COMMON_SOURCE_DIR}/randomutil.cpp
+    ${COMMON_SOURCE_DIR}/textwriter.cpp)
 
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(common PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

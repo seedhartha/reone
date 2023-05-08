@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(SCRIPT_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/script)
+set(SCRIPT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/script)
 
 set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/enginetype.h
@@ -36,15 +37,15 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/variableutil.h)
 
 set(SCRIPT_SOURCES
-    execution.cpp
-    format/ncsreader.cpp
-    format/ncswriter.cpp
-    instrutil.cpp
-    program.cpp
-    routine.cpp
-    scripts.cpp
-    variable.cpp
-    variableutil.cpp)
+    ${SCRIPT_SOURCE_DIR}/execution.cpp
+    ${SCRIPT_SOURCE_DIR}/format/ncsreader.cpp
+    ${SCRIPT_SOURCE_DIR}/format/ncswriter.cpp
+    ${SCRIPT_SOURCE_DIR}/instrutil.cpp
+    ${SCRIPT_SOURCE_DIR}/program.cpp
+    ${SCRIPT_SOURCE_DIR}/routine.cpp
+    ${SCRIPT_SOURCE_DIR}/scripts.cpp
+    ${SCRIPT_SOURCE_DIR}/variable.cpp
+    ${SCRIPT_SOURCE_DIR}/variableutil.cpp)
 
 add_library(script STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(script PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

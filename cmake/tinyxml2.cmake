@@ -13,16 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set(TOOLS_HEADERS
-    program.h)
+set(TINYXML2_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/external/tinyxml2)
 
-set(TOOLS_SOURCES
-    main.cpp
-    program.cpp)
-
-add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
-target_precompile_headers(reone-tools PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(reone-tools PRIVATE toolslib ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-list(APPEND InstallTargets reone-tools)
+add_library(tinyxml2 STATIC ${TINYXML2_SOURCE_DIR}/tinyxml2.h ${TINYXML2_SOURCE_DIR}/tinyxml2.cpp)
+set_target_properties(tinyxml2 PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
+set_target_properties(tinyxml2 PROPERTIES DEBUG_POSTFIX "d")
