@@ -74,6 +74,6 @@ set(RESOURCE_SOURCES
     typeutil.cpp)
 
 add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(resource PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(resource PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)

@@ -45,7 +45,7 @@ if(WIN32)
 endif()
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(reone PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(reone PRIVATE game ${Boost_PROGRAM_OPTIONS_LIBRARY})
 

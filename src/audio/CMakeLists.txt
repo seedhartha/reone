@@ -35,7 +35,7 @@ set(AUDIO_SOURCES
     stream.cpp)
 
 add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(audio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_target_properties(audio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(audio PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(audio PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(audio PUBLIC ${MAD_LIBRARY})
