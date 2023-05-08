@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "erf.h"
+#include "reone/resource/provider/erf.h"
 
-#include "../../common/stream/fileinput.h"
+#include "reone/common/stream/fileinput.h"
 
-#include "../format/erfreader.h"
+#include "reone/resource/format/erfreader.h"
 
 using namespace std;
 

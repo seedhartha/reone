@@ -18,9 +18,9 @@
 
 #include "lipanimations.h"
 
-#include "../../common/stream/bytearrayinput.h"
+#include "reone/common/stream/bytearrayinput.h"
 
-#include "../resource/resources.h"
+#include "reone/resource/resources.h"
 
 #include "format/lipreader.h"
 

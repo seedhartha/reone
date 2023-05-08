@@ -17,13 +17,13 @@
 
 #include "module.h"
 
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 #include "../../graphics/models.h"
 #include "../../graphics/services.h"
-#include "../../resource/gff.h"
-#include "../../resource/gffs.h"
-#include "../../resource/services.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 

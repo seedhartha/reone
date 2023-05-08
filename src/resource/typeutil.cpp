@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../common/logutil.h"
+#include "reone/common/logutil.h"
 
-#include "types.h"
+#include "reone/resource/types.h"
 
 using namespace std;
 

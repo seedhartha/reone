@@ -17,11 +17,11 @@
 
 #include "ncswriter.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/collectionutil.h"
-#include "../../common/exception/validation.h"
-#include "../../common/stream/bytearrayoutput.h"
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/common/stream/fileoutput.h"
 
 
 #include "../program.h"

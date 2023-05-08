@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../common/randomutil.h"
+#include "reone/common/randomutil.h"
 
 namespace reone {
 

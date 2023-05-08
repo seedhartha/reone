@@ -17,7 +17,7 @@
 
 #include "listbox.h"
 
-#include "../../resource/gff.h"
+#include "reone/resource/gff.h"
 
 #include "../guiinterface.h"
 

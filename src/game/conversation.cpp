@@ -17,14 +17,14 @@
 
 #include "conversation.h"
 
-#include "../common/collectionutil.h"
-#include "../common/exception/argument.h"
-#include "../common/exception/notfound.h"
-#include "../common/exception/validation.h"
-#include "../resource/gff.h"
-#include "../resource/gffs.h"
-#include "../resource/services.h"
-#include "../resource/strings.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/exception/argument.h"
+#include "reone/common/exception/notfound.h"
+#include "reone/common/exception/validation.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
+#include "reone/resource/strings.h"
 
 using namespace std;
 

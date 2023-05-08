@@ -17,10 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/stream/bytearrayoutput.h"
-#include "../../../src/common/stringbuilder.h"
-#include "../../../src/resource/format/tlkwriter.h"
-#include "../../../src/resource/talktable.h"
+#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/common/stringbuilder.h"
+#include "reone/resource/format/tlkwriter.h"
+#include "reone/resource/talktable.h"
 
 #include "../../checkutil.h"
 

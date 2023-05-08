@@ -17,11 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/binarywriter.h"
-#include "../../../src/common/stream/bytearrayoutput.h"
-#include "../../../src/common/stringbuilder.h"
-#include "../../../src/resource/2da.h"
-#include "../../../src/resource/format/2dawriter.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/common/stringbuilder.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/format/2dawriter.h"
 
 #include "../../checkutil.h"
 

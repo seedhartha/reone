@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "folder.h"
+#include "reone/resource/provider/folder.h"
 
-#include "../typeutil.h"
+#include "reone/resource/typeutil.h"
 
 using namespace std;
 

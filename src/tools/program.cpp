@@ -17,8 +17,8 @@
 
 #include "program.h"
 
-#include "../common/pathutil.h"
-#include "../resource/types.h"
+#include "reone/common/pathutil.h"
+#include "reone/resource/types.h"
 #include "../toolslib/tool/2da.h"
 #include "../toolslib/tool/audio.h"
 #include "../toolslib/tool/erf.h"

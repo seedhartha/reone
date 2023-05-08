@@ -17,8 +17,8 @@
 
 #include "mesh.h"
 
-#include "../../common/logutil.h"
-#include "../../common/randomutil.h"
+#include "reone/common/logutil.h"
+#include "reone/common/randomutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/lumautil.h"
 #include "../../graphics/mesh.h"

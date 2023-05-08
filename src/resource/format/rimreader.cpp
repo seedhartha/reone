@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "rimreader.h"
+#include "reone/resource/format/rimreader.h"
 
 using namespace std;
 

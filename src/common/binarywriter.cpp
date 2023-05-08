@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "binarywriter.h"
+#include "reone/common/binarywriter.h"
 
 using namespace std;
 

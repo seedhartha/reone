@@ -13,29 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(COMMON_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/common)
+
 set(COMMON_HEADERS
-    binaryreader.h
-    binarywriter.h
-    collectionutil.h
-    exception/argument.h
-    exception/notfound.h
-    exception/notimplemented.h
-    exception/validation.h
-    hexutil.h
-    logutil.h
-    memorycache.h
-    pathutil.h
-    randomutil.h
-    stream/bytearrayinput.h
-    stream/bytearrayoutput.h
-    stream/fileinput.h
-    stream/fileoutput.h
-    stream/input.h
-    stream/output.h
-    stringbuilder.h
-    textwriter.h
-    timer.h
-    types.h)
+    ${COMMON_INCLUDE_DIR}/binaryreader.h
+    ${COMMON_INCLUDE_DIR}/binarywriter.h
+    ${COMMON_INCLUDE_DIR}/collectionutil.h
+    ${COMMON_INCLUDE_DIR}/exception/argument.h
+    ${COMMON_INCLUDE_DIR}/exception/notfound.h
+    ${COMMON_INCLUDE_DIR}/exception/notimplemented.h
+    ${COMMON_INCLUDE_DIR}/exception/validation.h
+    ${COMMON_INCLUDE_DIR}/hexutil.h
+    ${COMMON_INCLUDE_DIR}/logutil.h
+    ${COMMON_INCLUDE_DIR}/memorycache.h
+    ${COMMON_INCLUDE_DIR}/pathutil.h
+    ${COMMON_INCLUDE_DIR}/randomutil.h
+    ${COMMON_INCLUDE_DIR}/stream/bytearrayinput.h
+    ${COMMON_INCLUDE_DIR}/stream/bytearrayoutput.h
+    ${COMMON_INCLUDE_DIR}/stream/fileinput.h
+    ${COMMON_INCLUDE_DIR}/stream/fileoutput.h
+    ${COMMON_INCLUDE_DIR}/stream/input.h
+    ${COMMON_INCLUDE_DIR}/stream/output.h
+    ${COMMON_INCLUDE_DIR}/stringbuilder.h
+    ${COMMON_INCLUDE_DIR}/textwriter.h
+    ${COMMON_INCLUDE_DIR}/timer.h
+    ${COMMON_INCLUDE_DIR}/types.h)
 
 set(COMMON_SOURCES
     binaryreader.cpp

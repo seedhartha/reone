@@ -17,10 +17,10 @@
 
 #include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../common/randomutil.h"
-#include "../../../../resource/services.h"
-#include "../../../../resource/strings.h"
+#include "reone/common/logutil.h"
+#include "reone/common/randomutil.h"
+#include "reone/resource/services.h"
+#include "reone/resource/strings.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/exception/unsupportedroutine.h"
 #include "../../../../script/executioncontext.h"

@@ -17,7 +17,7 @@
 
 #include "movetoobject.h"
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 
 #include "../object.h"
 #include "../object/creature.h"

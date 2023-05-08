@@ -17,8 +17,8 @@
 
 #include "camerastyles.h"
 
-#include "../../resource/2da.h"
-#include "../../resource/2das.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/2das.h"
 
 using namespace std;
 

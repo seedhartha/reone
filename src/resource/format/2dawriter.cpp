@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "2dawriter.h"
+#include "reone/resource/format/2dawriter.h"
 
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/stream/fileoutput.h"
 
-#include "../2da.h"
+#include "reone/resource/2da.h"
 
 using namespace std;
 

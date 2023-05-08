@@ -49,7 +49,8 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm ${CMAKE_SOURCE_DIR}/src/external/tinyxml2)
+set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm ${CMAKE_SOURCE_DIR}/src/external/tinyxml2 ${REONE_INCLUDE_DIR})
 
 if(ENABLE_MOVIE)
     if(MSVC)

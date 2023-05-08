@@ -17,11 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/binarywriter.h"
-#include "../../../src/common/stream/bytearrayoutput.h"
-#include "../../../src/common/stringbuilder.h"
-#include "../../../src/resource/format/gffwriter.h"
-#include "../../../src/resource/gff.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/common/stringbuilder.h"
+#include "reone/resource/format/gffwriter.h"
+#include "reone/resource/gff.h"
 
 #include "../../checkutil.h"
 

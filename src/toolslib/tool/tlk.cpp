@@ -17,12 +17,12 @@
 
 #include "tlk.h"
 
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
-#include "../../common/stream/fileinput.h"
-#include "../../resource/format/tlkreader.h"
-#include "../../resource/format/tlkwriter.h"
-#include "../../resource/talktable.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/format/tlkreader.h"
+#include "reone/resource/format/tlkwriter.h"
+#include "reone/resource/talktable.h"
 
 #include "tinyxml2.h"
 

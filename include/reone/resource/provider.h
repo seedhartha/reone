@@ -17,33 +17,23 @@
 
 #pragma once
 
-#include "../../common/binarywriter.h"
+#include "reone/common/types.h"
+
+#include "id.h"
+#include "types.h"
 
 namespace reone {
 
-class IOutputStream;
-
 namespace resource {
 
-class TwoDa;
-
-class TwoDaWriter {
+class IResourceProvider {
 public:
-    TwoDaWriter(TwoDa &twoDa) :
-        _twoDa(twoDa) {
+    virtual ~IResourceProvider() {
     }
 
-    void save(const boost::filesystem::path &path);
-    void save(IOutputStream &out);
+    virtual std::shared_ptr<ByteArray> find(const ResourceId &id) = 0;
 
-private:
-    TwoDa &_twoDa;
-
-    std::unique_ptr<BinaryWriter> _writer;
-
-    void writeHeaders();
-    void writeLabels();
-    void writeData();
+    virtual int id() const = 0;
 };
 
 } // namespace resource

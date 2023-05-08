@@ -19,7 +19,7 @@
 
 #include "../../../src/game/object/creature.h"
 #include "../../../src/game/services.h"
-#include "../../../src/resource/gff.h"
+#include "reone/resource/gff.h"
 
 #include "../../fixtures/functional.h"
 #include "../../fixtures/game.h"

@@ -17,9 +17,9 @@
 
 #include "rim.h"
 
-#include "../../common/stream/fileinput.h"
-#include "../../resource/format/rimwriter.h"
-#include "../../resource/typeutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/format/rimwriter.h"
+#include "reone/resource/typeutil.h"
 
 using namespace std;
 

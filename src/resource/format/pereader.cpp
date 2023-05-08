@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pereader.h"
+#include "reone/resource/format/pereader.h"
 
-#include "../../common/logutil.h"
+#include "reone/common/logutil.h"
 
 using namespace std;
 

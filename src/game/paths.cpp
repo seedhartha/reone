@@ -17,7 +17,7 @@
 
 #include "paths.h"
 
-#include "../../resource/gffs.h"
+#include "reone/resource/gffs.h"
 
 using namespace std;
 

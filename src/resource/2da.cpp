@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "2da.h"
+#include "reone/resource/2da.h"
 
-#include "../common/collectionutil.h"
-#include "../common/logutil.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/logutil.h"
 
 using namespace std;
 

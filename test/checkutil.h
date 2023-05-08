@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../src/common/hexutil.h"
-#include "../src/common/types.h"
+#include "reone/common/hexutil.h"
+#include "reone/common/types.h"
 
 inline std::string describe(const std::string &s) {
     return str(boost::format("%s (%d)") % reone::hexify(s) % s.length());

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "strings.h"
+#include "reone/resource/strings.h"
 
-#include "../common/exception/validation.h"
-#include "../common/pathutil.h"
-#include "../common/stream/fileinput.h"
-#include "../resource/talktable.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/pathutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/talktable.h"
 
 using namespace std;
 

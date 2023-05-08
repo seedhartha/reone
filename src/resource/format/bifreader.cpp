@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "bifreader.h"
+#include "reone/resource/format/bifreader.h"
 
 using namespace std;
 

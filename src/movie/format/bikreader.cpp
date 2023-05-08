@@ -18,8 +18,8 @@
 #include "bikreader.h"
 
 #include "../../audio/stream.h"
-#include "../../common/binaryreader.h"
-#include "../../common/logutil.h"
+#include "reone/common/binaryreader.h"
+#include "reone/common/logutil.h"
 
 
 #include "../movie.h"

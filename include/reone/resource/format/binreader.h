@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../common/binaryreader.h"
-#include "../../common/types.h"
+#include "reone/common/binaryreader.h"
+#include "reone/common/types.h"
 
 namespace reone {
 

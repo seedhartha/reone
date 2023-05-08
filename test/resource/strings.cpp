@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/logutil.h"
-#include "../../src/common/stream/fileoutput.h"
-#include "../../src/resource/strings.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/fileoutput.h"
+#include "reone/resource/strings.h"
 
 using namespace std;
 

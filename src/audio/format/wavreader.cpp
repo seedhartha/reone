@@ -17,7 +17,7 @@
 
 #include "wavreader.h"
 
-#include "../../common/stream/bytearrayinput.h"
+#include "reone/common/stream/bytearrayinput.h"
 
 #include "../stream.h"
 

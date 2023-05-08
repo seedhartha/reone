@@ -17,10 +17,10 @@
 
 #include "camera.h"
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 #include "../../graphics/options.h"
 #include "../../graphics/services.h"
-#include "../../resource/gff.h"
+#include "reone/resource/gff.h"
 #include "../../scene/collision.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/camera.h"

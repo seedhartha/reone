@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "2dareader.h"
+#include "reone/resource/format/2dareader.h"
 
-#include "../2da.h"
+#include "reone/resource/2da.h"
 
 using namespace std;
 

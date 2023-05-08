@@ -17,13 +17,13 @@
 
 #include "area.h"
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 #include "../../graphics/options.h"
 #include "../../graphics/services.h"
 #include "../../graphics/textures.h"
-#include "../../resource/gff.h"
-#include "../../resource/gffs.h"
-#include "../../resource/services.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
 #include "../../scene/fogproperties.h"
 #include "../../scene/graph.h"
 

@@ -17,31 +17,28 @@
 
 #pragma once
 
-#include "../../common/types.h"
+#include "reone/common/memorycache.h"
 
-#include "../types.h"
+#include "2da.h"
 
 namespace reone {
 
-class IOutputStream;
-
 namespace resource {
 
-class RimWriter {
+class Resources;
+
+class TwoDas : public MemoryCache<std::string, TwoDa>, boost::noncopyable {
 public:
-    struct Resource {
-        std::string resRef;
-        ResourceType resType {ResourceType::Invalid};
-        ByteArray data;
-    };
+    TwoDas(Resources &resources);
 
-    void add(Resource &&res);
-
-    void save(const boost::filesystem::path &path);
-    void save(IOutputStream &out);
+    void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
+        _objects[resRef] = std::move(twoDa);
+    }
 
 private:
-    std::vector<Resource> _resources;
+    Resources &_resources;
+
+    std::shared_ptr<TwoDa> doGet(const std::string &resRef);
 };
 
 } // namespace resource

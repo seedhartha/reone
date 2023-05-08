@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
+#include "reone/common/memorycache.h"
 
 #include "font.h"
 

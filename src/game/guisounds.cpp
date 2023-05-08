@@ -18,8 +18,8 @@
 #include "guisounds.h"
 
 #include "../audio/files.h"
-#include "../resource/2das.h"
-#include "../resource/format/2dareader.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/format/2dareader.h"
 
 using namespace std;
 

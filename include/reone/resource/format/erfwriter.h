@@ -17,28 +17,36 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
+#include "reone/common/types.h"
 
-#include "2da.h"
+#include "../types.h"
 
 namespace reone {
 
+class IOutputStream;
+
 namespace resource {
 
-class Resources;
-
-class TwoDas : public MemoryCache<std::string, TwoDa>, boost::noncopyable {
+class ErfWriter {
 public:
-    TwoDas(Resources &resources);
+    enum class FileType {
+        ERF,
+        MOD
+    };
 
-    void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
-        _objects[resRef] = std::move(twoDa);
-    }
+    struct Resource {
+        std::string resRef;
+        ResourceType resType {ResourceType::Invalid};
+        ByteArray data;
+    };
+
+    void add(Resource &&res);
+
+    void save(FileType type, const boost::filesystem::path &path);
+    void save(FileType type, IOutputStream &out);
 
 private:
-    Resources &_resources;
-
-    std::shared_ptr<TwoDa> doGet(const std::string &resRef);
+    std::vector<Resource> _resources;
 };
 
 } // namespace resource

@@ -17,16 +17,16 @@
 
 #include "gff.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/exception/validation.h"
-#include "../../common/hexutil.h"
-#include "../../common/logutil.h"
-#include "../../common/pathutil.h"
-#include "../../common/stream/fileinput.h"
-#include "../../resource/format/gffreader.h"
-#include "../../resource/format/gffwriter.h"
-#include "../../resource/strings.h"
-#include "../../resource/typeutil.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/hexutil.h"
+#include "reone/common/logutil.h"
+#include "reone/common/pathutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/format/gffreader.h"
+#include "reone/resource/format/gffwriter.h"
+#include "reone/resource/strings.h"
+#include "reone/resource/typeutil.h"
 
 #include "tinyxml2.h"
 

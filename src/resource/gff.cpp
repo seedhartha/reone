@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gff.h"
+#include "reone/resource/gff.h"
 
-#include "../common/exception/validation.h"
-#include "../common/logutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 
 using namespace std;
 

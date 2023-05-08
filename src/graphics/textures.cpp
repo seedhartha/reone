@@ -17,10 +17,10 @@
 
 #include "textures.h"
 
-#include "../common/logutil.h"
-#include "../common/randomutil.h"
-#include "../common/stream/bytearrayinput.h"
-#include "../resource/resources.h"
+#include "reone/common/logutil.h"
+#include "reone/common/randomutil.h"
+#include "reone/common/stream/bytearrayinput.h"
+#include "reone/resource/resources.h"
 
 #include "format/curreader.h"
 #include "format/tgareader.h"

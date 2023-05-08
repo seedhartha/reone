@@ -17,7 +17,7 @@
 
 #include "ltrreader.h"
 
-#include "../../common/randomutil.h"
+#include "reone/common/randomutil.h"
 
 using namespace std;
 

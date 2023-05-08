@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../../resource/2das.h"
-#include "../../resource/gffs.h"
-#include "../../resource/resources.h"
-#include "../../resource/services.h"
-#include "../../resource/strings.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/services.h"
+#include "reone/resource/strings.h"
 
 namespace reone {
 

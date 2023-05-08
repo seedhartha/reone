@@ -17,8 +17,8 @@
 
 #include "txireader.h"
 
-#include "../../common/logutil.h"
-#include "../../common/stream/input.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/input.h"
 
 using namespace std;
 

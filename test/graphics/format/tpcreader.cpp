@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/stream/bytearrayinput.h"
-#include "../../../src/common/stringbuilder.h"
+#include "reone/common/stream/bytearrayinput.h"
+#include "reone/common/stringbuilder.h"
 #include "../../../src/graphics/format/tpcreader.h"
 
 using namespace std;

@@ -17,14 +17,14 @@
 
 #include "item.h"
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 #include "../../graphics/models.h"
 #include "../../graphics/services.h"
 #include "../../graphics/textures.h"
-#include "../../resource/2das.h"
-#include "../../resource/gffs.h"
-#include "../../resource/services.h"
-#include "../../resource/strings.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
+#include "reone/resource/strings.h"
 #include "../../scene/graph.h"
 
 using namespace std;

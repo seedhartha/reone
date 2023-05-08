@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/pathutil.h"
+#include "reone/common/pathutil.h"
 
 using namespace std;
 

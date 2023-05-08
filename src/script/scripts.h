@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-#include "../resource/resources.h"
+#include "reone/common/memorycache.h"
+#include "reone/resource/resources.h"
 
 #include "program.h"
 

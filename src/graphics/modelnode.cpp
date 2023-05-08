@@ -17,7 +17,7 @@
 
 #include "modelnode.h"
 
-#include "../common/logutil.h"
+#include "reone/common/logutil.h"
 
 #include "mesh.h"
 #include "texture.h"

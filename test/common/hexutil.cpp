@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/hexutil.h"
+#include "reone/common/hexutil.h"
 
 #include "../checkutil.h"
 

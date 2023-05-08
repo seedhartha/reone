@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/format/rimreader.h"
+#include "reone/resource/format/rimreader.h"
 
 #include "../tool.h"
 

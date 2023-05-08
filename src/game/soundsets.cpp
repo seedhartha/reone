@@ -18,9 +18,9 @@
 #include "soundsets.h"
 
 #include "../../audio/files.h"
-#include "../../common/stream/bytearrayinput.h"
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
+#include "reone/common/stream/bytearrayinput.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/strings.h"
 
 #include "format/ssfreader.h"
 

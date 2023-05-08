@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stringbuilder.h"
+#include "reone/common/stringbuilder.h"
 
 #include "../checkutil.h"
 

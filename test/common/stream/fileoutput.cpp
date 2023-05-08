@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/stream/fileoutput.h"
+#include "reone/common/stream/fileoutput.h"
 
 #include "../../checkutil.h"
 

@@ -17,13 +17,13 @@
 
 #include "resourcelayout.h"
 
-#include "../common/exception/validation.h"
-#include "../common/pathutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/pathutil.h"
 #include "../graphics/types.h"
-#include "../resource/2das.h"
-#include "../resource/gffs.h"
-#include "../resource/resources.h"
-#include "../resource/services.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/services.h"
 
 #include "options.h"
 #include "types.h"

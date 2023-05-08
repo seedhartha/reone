@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/stream/bytearrayinput.h"
+#include "reone/common/stream/bytearrayinput.h"
 
 #include "../../checkutil.h"
 

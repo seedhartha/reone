@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/format/binreader.h"
+#include "reone/resource/format/binreader.h"
 
 #include "../texture.h"
 

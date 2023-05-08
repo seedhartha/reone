@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "stream/output.h"
-#include "types.h"
+#include "reone/common/stream/output.h"
+#include "reone/common/types.h"
 
 namespace reone {
 

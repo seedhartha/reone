@@ -19,10 +19,10 @@
 
 #include <boost/regex.hpp>
 
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
-#include "../../common/stream/fileinput.h"
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/common/stream/fileoutput.h"
 #include "../../game/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"

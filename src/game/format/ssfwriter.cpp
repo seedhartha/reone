@@ -17,8 +17,8 @@
 
 #include "ssfwriter.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/stream/fileoutput.h"
 
 
 using namespace std;

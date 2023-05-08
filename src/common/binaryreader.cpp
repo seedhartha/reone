@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "binaryreader.h"
+#include "reone/common/binaryreader.h"
 
 using namespace std;
 

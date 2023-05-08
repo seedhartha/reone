@@ -17,11 +17,11 @@
 
 #include "cursors.h"
 
-#include "../common/stream/bytearrayinput.h"
+#include "reone/common/stream/bytearrayinput.h"
 #include "../graphics/cursor.h"
 #include "../graphics/format/curreader.h"
 #include "../graphics/texture.h"
-#include "../resource/resources.h"
+#include "reone/resource/resources.h"
 
 using namespace std;
 

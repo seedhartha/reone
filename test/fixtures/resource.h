@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/provider.h"
+#include "reone/resource/provider.h"
 
 namespace reone {
 

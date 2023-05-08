@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "hexutil.h"
+#include "reone/common/hexutil.h"
 
 using namespace std;
 

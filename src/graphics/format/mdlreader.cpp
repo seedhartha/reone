@@ -17,9 +17,9 @@
 
 #include "mdlreader.h"
 
-#include "../../common/collectionutil.h"
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 
 #include "../animation.h"
 #include "../mesh.h"

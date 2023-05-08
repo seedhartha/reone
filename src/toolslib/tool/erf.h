@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/format/erfreader.h"
+#include "reone/resource/format/erfreader.h"
 
 #include "../tool.h"
 

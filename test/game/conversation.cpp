@@ -18,7 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../src/game/conversation.h"
-#include "../../src/resource/talktable.h"
+#include "reone/resource/talktable.h"
 
 #include "../fixtures/functional.h"
 

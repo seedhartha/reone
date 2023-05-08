@@ -17,10 +17,10 @@
 
 #include "expressiontree.h"
 
-#include "../../common/exception/argument.h"
-#include "../../common/exception/notimplemented.h"
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
+#include "reone/common/exception/argument.h"
+#include "reone/common/exception/notimplemented.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 #include "../../script/instrutil.h"
 #include "../../script/routine.h"
 #include "../../script/routines.h"

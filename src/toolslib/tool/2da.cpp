@@ -17,13 +17,13 @@
 
 #include "2da.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
-#include "../../common/stream/fileinput.h"
-#include "../../resource/2da.h"
-#include "../../resource/format/2dareader.h"
-#include "../../resource/format/2dawriter.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/format/2dareader.h"
+#include "reone/resource/format/2dawriter.h"
 
 #include "tinyxml2.h"
 

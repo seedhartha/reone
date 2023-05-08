@@ -17,23 +17,31 @@
 
 #pragma once
 
-#include "../common/types.h"
+#include "reone/common/types.h"
 
-#include "id.h"
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 
+class IOutputStream;
+
 namespace resource {
 
-class IResourceProvider {
+class RimWriter {
 public:
-    virtual ~IResourceProvider() {
-    }
+    struct Resource {
+        std::string resRef;
+        ResourceType resType {ResourceType::Invalid};
+        ByteArray data;
+    };
 
-    virtual std::shared_ptr<ByteArray> find(const ResourceId &id) = 0;
+    void add(Resource &&res);
 
-    virtual int id() const = 0;
+    void save(const boost::filesystem::path &path);
+    void save(IOutputStream &out);
+
+private:
+    std::vector<Resource> _resources;
 };
 
 } // namespace resource

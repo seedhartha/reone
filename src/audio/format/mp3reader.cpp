@@ -17,7 +17,7 @@
 
 #include "mp3reader.h"
 
-#include "../../common/stream/input.h"
+#include "reone/common/stream/input.h"
 
 #include "../stream.h"
 

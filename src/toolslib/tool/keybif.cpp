@@ -17,9 +17,9 @@
 
 #include "keybif.h"
 
-#include "../../common/pathutil.h"
-#include "../../common/stream/fileinput.h"
-#include "../../resource/typeutil.h"
+#include "reone/common/pathutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/typeutil.h"
 
 using namespace std;
 

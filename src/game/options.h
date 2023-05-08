@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../audio/options.h"
-#include "../../common/types.h"
+#include "reone/common/types.h"
 #include "../../graphics/options.h"
 
 namespace reone {

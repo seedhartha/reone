@@ -17,10 +17,10 @@
 
 #include "models.h"
 
-#include "../common/exception/validation.h"
-#include "../common/logutil.h"
-#include "../common/stream/bytearrayinput.h"
-#include "../resource/resources.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
+#include "reone/common/stream/bytearrayinput.h"
+#include "reone/resource/resources.h"
 
 #include "format/mdlreader.h"
 #include "model.h"

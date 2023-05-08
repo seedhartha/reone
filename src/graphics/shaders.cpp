@@ -17,7 +17,7 @@
 
 #include "shaders.h"
 
-#include "../common/stringbuilder.h"
+#include "reone/common/stringbuilder.h"
 
 #include "glsl/common.h"
 #include "glsl/fragment.h"

@@ -17,8 +17,8 @@
 
 #include "console.h"
 
-#include "../../common/exception/validation.h"
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/options.h"
 #include "../../graphics/services.h"

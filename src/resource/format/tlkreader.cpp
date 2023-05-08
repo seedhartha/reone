@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tlkreader.h"
+#include "reone/resource/format/tlkreader.h"
 
-#include "../talktable.h"
+#include "reone/resource/talktable.h"
 
 using namespace std;
 

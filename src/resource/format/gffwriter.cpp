@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gffwriter.h"
+#include "reone/resource/format/gffwriter.h"
 
-#include "../../common/exception/validation.h"
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/stream/fileoutput.h"
 
-#include "../gff.h"
+#include "reone/resource/gff.h"
 
 using namespace std;
 

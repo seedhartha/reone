@@ -19,7 +19,7 @@
 
 #include <boost/regex.hpp>
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 #include "../../script/instrutil.h"
 #include "../../script/routines.h"
 

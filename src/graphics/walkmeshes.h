@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../resource/types.h"
+#include "reone/resource/types.h"
 
 #include "types.h"
 

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "rim.h"
+#include "reone/resource/provider/rim.h"
 
-#include "../../common/stream/fileinput.h"
+#include "reone/common/stream/fileinput.h"
 
-#include "../format/rimreader.h"
+#include "reone/resource/format/rimreader.h"
 
 using namespace std;
 

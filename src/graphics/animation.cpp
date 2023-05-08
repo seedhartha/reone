@@ -17,7 +17,7 @@
 
 #include "animation.h"
 
-#include "../common/collectionutil.h"
+#include "reone/common/collectionutil.h"
 
 #include "modelnode.h"
 

@@ -17,14 +17,14 @@
 
 #include "gui.h"
 
-#include "../common/exception/validation.h"
-#include "../common/logutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 #include "../graphics/options.h"
 #include "../graphics/services.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
-#include "../resource/gffs.h"
-#include "../resource/services.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
 
 #include "control/button.h"
 #include "control/buttontoggle.h"

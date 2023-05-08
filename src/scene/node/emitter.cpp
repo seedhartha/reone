@@ -17,7 +17,7 @@
 
 #include "emitter.h"
 
-#include "../../common/randomutil.h"
+#include "reone/common/randomutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"

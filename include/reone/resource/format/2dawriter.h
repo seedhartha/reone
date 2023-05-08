@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "../../common/types.h"
-
-#include "../types.h"
+#include "reone/common/binarywriter.h"
 
 namespace reone {
 
@@ -27,26 +25,25 @@ class IOutputStream;
 
 namespace resource {
 
-class ErfWriter {
+class TwoDa;
+
+class TwoDaWriter {
 public:
-    enum class FileType {
-        ERF,
-        MOD
-    };
+    TwoDaWriter(TwoDa &twoDa) :
+        _twoDa(twoDa) {
+    }
 
-    struct Resource {
-        std::string resRef;
-        ResourceType resType {ResourceType::Invalid};
-        ByteArray data;
-    };
-
-    void add(Resource &&res);
-
-    void save(FileType type, const boost::filesystem::path &path);
-    void save(FileType type, IOutputStream &out);
+    void save(const boost::filesystem::path &path);
+    void save(IOutputStream &out);
 
 private:
-    std::vector<Resource> _resources;
+    TwoDa &_twoDa;
+
+    std::unique_ptr<BinaryWriter> _writer;
+
+    void writeHeaders();
+    void writeLabels();
+    void writeData();
 };
 
 } // namespace resource

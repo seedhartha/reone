@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/collectionutil.h"
+#include "reone/common/collectionutil.h"
 
 using namespace std;
 

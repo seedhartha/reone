@@ -17,7 +17,7 @@
 
 #include "ncsreader.h"
 
-#include "../../common/logutil.h"
+#include "reone/common/logutil.h"
 
 #include "../program.h"
 

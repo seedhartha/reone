@@ -17,10 +17,10 @@
 
 #include "nsswriter.h"
 
-#include "../../common/exception/argument.h"
-#include "../../common/exception/notimplemented.h"
-#include "../../common/exception/validation.h"
-#include "../../common/textwriter.h"
+#include "reone/common/exception/argument.h"
+#include "reone/common/exception/notimplemented.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/textwriter.h"
 #include "../../script/routine.h"
 #include "../../script/routines.h"
 #include "../../script/variableutil.h"

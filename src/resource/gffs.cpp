@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gffs.h"
+#include "reone/resource/gffs.h"
 
-#include "../common/stream/bytearrayinput.h"
+#include "reone/common/stream/bytearrayinput.h"
 
-#include "format/gffreader.h"
-#include "resources.h"
+#include "reone/resource/format/gffreader.h"
+#include "reone/resource/resources.h"
 
 using namespace std;
 

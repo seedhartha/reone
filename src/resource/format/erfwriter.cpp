@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "erfwriter.h"
+#include "reone/resource/format/erfwriter.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/stream/fileoutput.h"
-
+#include "reone/common/binarywriter.h"
+#include "reone/common/stream/fileoutput.h"
 
 using namespace std;
 

@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "resources.h"
+#include "reone/resource/resources.h"
 
-#include "../common/logutil.h"
-#include "../common/pathutil.h"
-#include "../common/stream/fileinput.h"
+#include "reone/common/logutil.h"
+#include "reone/common/pathutil.h"
+#include "reone/common/stream/fileinput.h"
 
-#include "format/bifreader.h"
-#include "format/erfreader.h"
-#include "format/rimreader.h"
-#include "provider/erf.h"
-#include "provider/folder.h"
-#include "provider/keybif.h"
-#include "provider/rim.h"
+#include "reone/resource/format/bifreader.h"
+#include "reone/resource/format/erfreader.h"
+#include "reone/resource/format/rimreader.h"
+#include "reone/resource/provider/erf.h"
+#include "reone/resource/provider/folder.h"
+#include "reone/resource/provider/keybif.h"
+#include "reone/resource/provider/rim.h"
 
 using namespace std;
 

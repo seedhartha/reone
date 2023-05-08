@@ -17,7 +17,7 @@
 
 #include "../declarations.h"
 
-#include "../../../../common/logutil.h"
+#include "reone/common/logutil.h"
 
 #include "../../../game.h"
 #include "../../../object/creature.h"

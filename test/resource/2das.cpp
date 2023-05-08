@@ -17,10 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/stream/bytearrayoutput.h"
-#include "../../src/resource/2da.h"
-#include "../../src/resource/2das.h"
-#include "../../src/resource/resources.h"
+#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/resources.h"
 
 using namespace std;
 

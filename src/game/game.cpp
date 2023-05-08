@@ -17,8 +17,8 @@
 
 #include "game.h"
 
-#include "../common/collectionutil.h"
-#include "../common/pathutil.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/pathutil.h"
 #include "../graphics/aabb.h"
 #include "../graphics/context.h"
 #include "../graphics/meshes.h"
@@ -29,8 +29,8 @@
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../movie/format/bikreader.h"
-#include "../resource/gffs.h"
-#include "../resource/services.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/services.h"
 #include "../scene/graphs.h"
 #include "../scene/node/camera.h"
 #include "../scene/node/model.h"

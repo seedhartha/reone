@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "erfreader.h"
+#include "reone/resource/format/erfreader.h"
 
-#include "../../common/exception/validation.h"
+#include "reone/common/exception/validation.h"
 
 using namespace std;
 

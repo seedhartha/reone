@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../common/binarywriter.h"
-#include "../../common/types.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/types.h"
 
 #include "../types.h"
 

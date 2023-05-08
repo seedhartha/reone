@@ -15,13 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tlkwriter.h"
+#include "reone/resource/format/tlkwriter.h"
 
-#include "../../common/binarywriter.h"
-#include "../../common/stream/fileoutput.h"
+#include "reone/common/binarywriter.h"
+#include "reone/common/stream/fileoutput.h"
 
-
-#include "../talktable.h"
+#include "reone/resource/talktable.h"
 
 using namespace std;
 

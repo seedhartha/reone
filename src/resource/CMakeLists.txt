@@ -13,37 +13,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(RESOURCE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/resource)
+
 set(RESOURCE_HEADERS
-    2da.h
-    2das.h
-    gff.h
-    gffs.h
-    format/2dareader.h
-    format/2dawriter.h
-    format/bifreader.h
-    format/binreader.h
-    format/erfreader.h
-    format/erfwriter.h
-    format/gffreader.h
-    format/gffwriter.h
-    format/keyreader.h
-    format/pereader.h
-    format/rimreader.h
-    format/rimwriter.h
-    format/tlkreader.h
-    format/tlkwriter.h
-    id.h
-    provider.h
-    provider/erf.h
-    provider/folder.h
-    provider/keybif.h
-    provider/rim.h
-    resources.h
-    services.h
-    strings.h
-    talktable.h
-    types.h
-    typeutil.h)
+    ${RESOURCE_INCLUDE_DIR}/2da.h
+    ${RESOURCE_INCLUDE_DIR}/2das.h
+    ${RESOURCE_INCLUDE_DIR}/gff.h
+    ${RESOURCE_INCLUDE_DIR}/gffs.h
+    ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
+    ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/binreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/erfreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/erfwriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/gffreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/gffwriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/pereader.h
+    ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
+    ${RESOURCE_INCLUDE_DIR}/id.h
+    ${RESOURCE_INCLUDE_DIR}/provider.h
+    ${RESOURCE_INCLUDE_DIR}/provider/erf.h
+    ${RESOURCE_INCLUDE_DIR}/provider/folder.h
+    ${RESOURCE_INCLUDE_DIR}/provider/keybif.h
+    ${RESOURCE_INCLUDE_DIR}/provider/rim.h
+    ${RESOURCE_INCLUDE_DIR}/resources.h
+    ${RESOURCE_INCLUDE_DIR}/services.h
+    ${RESOURCE_INCLUDE_DIR}/strings.h
+    ${RESOURCE_INCLUDE_DIR}/talktable.h
+    ${RESOURCE_INCLUDE_DIR}/types.h
+    ${RESOURCE_INCLUDE_DIR}/typeutil.h)
 
 set(RESOURCE_SOURCES
     2da.cpp

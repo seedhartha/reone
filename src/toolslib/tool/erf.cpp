@@ -17,9 +17,9 @@
 
 #include "erf.h"
 
-#include "../../common/stream/fileinput.h"
-#include "../../resource/format/erfwriter.h"
-#include "../../resource/typeutil.h"
+#include "reone/common/stream/fileinput.h"
+#include "reone/resource/format/erfwriter.h"
+#include "reone/resource/typeutil.h"
 
 using namespace std;
 

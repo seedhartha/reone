@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../common/stream/input.h"
+#include "reone/common/stream/input.h"
 
 #include "../layout.h"
 

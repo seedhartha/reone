@@ -17,7 +17,7 @@
 
 #include "selectioncontroller.h"
 
-#include "../common/logutil.h"
+#include "reone/common/logutil.h"
 #include "../scene/graph.h"
 
 #include "gameinterface.h"

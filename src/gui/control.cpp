@@ -17,7 +17,7 @@
 
 #include "control.h"
 
-#include "../common/logutil.h"
+#include "reone/common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/fonts.h"
 #include "../graphics/meshes.h"
@@ -29,9 +29,9 @@
 #include "../graphics/textureutil.h"
 #include "../graphics/uniforms.h"
 #include "../graphics/window.h"
-#include "../resource/gff.h"
-#include "../resource/services.h"
-#include "../resource/strings.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/services.h"
+#include "reone/resource/strings.h"
 #include "../scene/graph.h"
 
 using namespace std;

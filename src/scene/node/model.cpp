@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../common/collectionutil.h"
-#include "../../common/logutil.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/logutil.h"
 #include "../../graphics/animation.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"

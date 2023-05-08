@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/common/stream/fileinput.h"
+#include "reone/common/stream/fileinput.h"
 
 #include "../../checkutil.h"
 

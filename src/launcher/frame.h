@@ -23,7 +23,7 @@
 #include <wx/wx.h>
 #endif
 
-#include "../common/types.h"
+#include "reone/common/types.h"
 
 namespace reone {
 
