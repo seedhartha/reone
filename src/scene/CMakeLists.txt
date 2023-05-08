@@ -13,31 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(SCENE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/scene)
+
 set(SCENE_HEADERS
-    animeventlistener.h
-    animproperties.h
-    collision.h
-    fogproperties.h
-    graph.h
-    graphs.h
-    grassproperties.h
-    node.h
-    node/camera.h
-    node/dummy.h
-    node/emitter.h
-    node/grass.h
-    node/grasscluster.h
-    node/light.h
-    node/mesh.h
-    node/model.h
-    node/modelnode.h
-    node/particle.h
-    node/sound.h
-    node/trigger.h
-    node/walkmesh.h
-    services.h
-    types.h
-    user.h)
+    ${SCENE_INCLUDE_DIR}/animeventlistener.h
+    ${SCENE_INCLUDE_DIR}/animproperties.h
+    ${SCENE_INCLUDE_DIR}/collision.h
+    ${SCENE_INCLUDE_DIR}/fogproperties.h
+    ${SCENE_INCLUDE_DIR}/graph.h
+    ${SCENE_INCLUDE_DIR}/graphs.h
+    ${SCENE_INCLUDE_DIR}/grassproperties.h
+    ${SCENE_INCLUDE_DIR}/node.h
+    ${SCENE_INCLUDE_DIR}/node/camera.h
+    ${SCENE_INCLUDE_DIR}/node/dummy.h
+    ${SCENE_INCLUDE_DIR}/node/emitter.h
+    ${SCENE_INCLUDE_DIR}/node/grass.h
+    ${SCENE_INCLUDE_DIR}/node/grasscluster.h
+    ${SCENE_INCLUDE_DIR}/node/light.h
+    ${SCENE_INCLUDE_DIR}/node/mesh.h
+    ${SCENE_INCLUDE_DIR}/node/model.h
+    ${SCENE_INCLUDE_DIR}/node/modelnode.h
+    ${SCENE_INCLUDE_DIR}/node/particle.h
+    ${SCENE_INCLUDE_DIR}/node/sound.h
+    ${SCENE_INCLUDE_DIR}/node/trigger.h
+    ${SCENE_INCLUDE_DIR}/node/walkmesh.h
+    ${SCENE_INCLUDE_DIR}/services.h
+    ${SCENE_INCLUDE_DIR}/types.h
+    ${SCENE_INCLUDE_DIR}/user.h)
 
 set(SCENE_SOURCES
     graph.cpp

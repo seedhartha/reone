@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "textinput.h"
+#include "reone/gui/textinput.h"
 
 using namespace std;
 

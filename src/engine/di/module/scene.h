@@ -18,8 +18,8 @@
 #pragma once
 
 #include "reone/graphics/options.h"
-#include "../../scene/graphs.h"
-#include "../../scene/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/scene/services.h"
 
 namespace reone {
 

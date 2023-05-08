@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "grass.h"
+#include "reone/scene/node/grass.h"
 
 #include "reone/graphics/barycentricutil.h"
 #include "reone/graphics/context.h"
@@ -28,9 +28,9 @@
 #include "reone/graphics/triangleutil.h"
 #include "reone/graphics/uniforms.h"
 
-#include "../graph.h"
+#include "reone/scene/graph.h"
 
-#include "grasscluster.h"
+#include "reone/scene/node/grasscluster.h"
 
 using namespace std;
 

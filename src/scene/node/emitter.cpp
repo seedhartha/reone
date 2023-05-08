@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "emitter.h"
+#include "reone/scene/node/emitter.h"
 
 #include "reone/common/randomutil.h"
 #include "reone/graphics/context.h"
@@ -27,10 +27,10 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 
-#include "../graph.h"
+#include "reone/scene/graph.h"
 
-#include "camera.h"
-#include "particle.h"
+#include "reone/scene/node/camera.h"
+#include "reone/scene/node/particle.h"
 
 using namespace std;
 

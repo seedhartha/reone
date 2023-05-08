@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/common/logutil.h"
-#include "../../scene/fogproperties.h"
+#include "reone/scene/fogproperties.h"
 
 #include "../object.h"
 #include "../types.h"

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../scene/graph.h"
-#include "../../scene/node/model.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/model.h"
 
 namespace reone {
 

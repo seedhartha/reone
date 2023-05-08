@@ -18,8 +18,8 @@
 #include "dialog.h"
 
 #include "reone/graphics/options.h"
-#include "../../gui/control/label.h"
-#include "../../gui/control/listbox.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
 
 using namespace std;
 

@@ -25,7 +25,7 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "../../scene/graph.h"
+#include "reone/scene/graph.h"
 
 using namespace std;
 

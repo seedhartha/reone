@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "button.h"
+#include "reone/gui/control/button.h"
 
-#include "factory.h"
+#include "reone/gui/control/factory.h"
 
 using namespace std;
 

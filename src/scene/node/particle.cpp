@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "particle.h"
+#include "reone/scene/node/particle.h"
 
 #include "reone/graphics/modelnode.h"
 
-#include "emitter.h"
+#include "reone/scene/node/emitter.h"
 
 using namespace std;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "plotter.h"
+#include "reone/gui/control/plotter.h"
 
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/services.h"

@@ -18,8 +18,8 @@
 #include "maininterface.h"
 
 #include "reone/graphics/options.h"
-#include "../../gui/control/button.h"
-#include "../../gui/control/label.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
 
 #include "../object.h"
 

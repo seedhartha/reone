@@ -20,9 +20,9 @@
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/options.h"
 #include "reone/graphics/services.h"
-#include "../../gui/control/listbox.h"
-#include "../../gui/control/panel.h"
-#include "../../gui/control/plotter.h"
+#include "reone/gui/control/listbox.h"
+#include "reone/gui/control/panel.h"
+#include "reone/gui/control/plotter.h"
 
 #include "../profiler.h"
 

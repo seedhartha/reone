@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../scene/node/walkmesh.h"
+#include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
 

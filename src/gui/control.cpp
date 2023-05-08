@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "control.h"
+#include "reone/gui/control.h"
 
 #include "reone/common/logutil.h"
 #include "reone/graphics/context.h"
@@ -32,7 +32,7 @@
 #include "reone/resource/gff.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "../scene/graph.h"
+#include "reone/scene/graph.h"
 
 using namespace std;
 

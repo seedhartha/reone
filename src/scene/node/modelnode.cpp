@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "modelnode.h"
+#include "reone/scene/node/modelnode.h"
 
 using namespace std;
 

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "listbox.h"
+#include "reone/gui/control/listbox.h"
 
 #include "reone/resource/gff.h"
 
-#include "../guiinterface.h"
+#include "reone/gui/guiinterface.h"
 
 using namespace std;
 

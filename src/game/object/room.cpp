@@ -21,9 +21,9 @@
 #include "reone/graphics/options.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/walkmeshes.h"
-#include "../../scene/graph.h"
-#include "../../scene/node/model.h"
-#include "../../scene/services.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/model.h"
+#include "reone/scene/services.h"
 
 #include "../gameinterface.h"
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gui.h"
+#include "reone/gui/gui.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
@@ -26,17 +26,17 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"
 
-#include "control/button.h"
-#include "control/buttontoggle.h"
-#include "control/label.h"
-#include "control/labelhilight.h"
-#include "control/listbox.h"
-#include "control/panel.h"
-#include "control/plotter.h"
-#include "control/progressbar.h"
-#include "control/scrollbar.h"
-#include "control/slider.h"
-#include "types.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/buttontoggle.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/labelhilight.h"
+#include "reone/gui/control/listbox.h"
+#include "reone/gui/control/panel.h"
+#include "reone/gui/control/plotter.h"
+#include "reone/gui/control/progressbar.h"
+#include "reone/gui/control/scrollbar.h"
+#include "reone/gui/control/slider.h"
+#include "reone/gui/types.h"
 
 using namespace std;
 

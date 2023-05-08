@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mesh.h"
+#include "reone/scene/node/mesh.h"
 
 #include "reone/common/logutil.h"
 #include "reone/common/randomutil.h"
@@ -29,11 +29,11 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 
-#include "../graph.h"
+#include "reone/scene/graph.h"
 
-#include "camera.h"
-#include "light.h"
-#include "model.h"
+#include "reone/scene/node/camera.h"
+#include "reone/scene/node/light.h"
+#include "reone/scene/node/model.h"
 
 using namespace std;
 

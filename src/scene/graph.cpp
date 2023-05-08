@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "graph.h"
+#include "reone/scene/graph.h"
 
 #include "reone/audio/services.h"
 #include "reone/graphics/context.h"
@@ -26,18 +26,18 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmesh.h"
 
-#include "collision.h"
-#include "node/camera.h"
-#include "node/emitter.h"
-#include "node/grass.h"
-#include "node/grasscluster.h"
-#include "node/light.h"
-#include "node/mesh.h"
-#include "node/model.h"
-#include "node/particle.h"
-#include "node/sound.h"
-#include "node/trigger.h"
-#include "node/walkmesh.h"
+#include "reone/scene/collision.h"
+#include "reone/scene/node/camera.h"
+#include "reone/scene/node/emitter.h"
+#include "reone/scene/node/grass.h"
+#include "reone/scene/node/grasscluster.h"
+#include "reone/scene/node/light.h"
+#include "reone/scene/node/mesh.h"
+#include "reone/scene/node/model.h"
+#include "reone/scene/node/particle.h"
+#include "reone/scene/node/sound.h"
+#include "reone/scene/node/trigger.h"
+#include "reone/scene/node/walkmesh.h"
 
 using namespace std;
 

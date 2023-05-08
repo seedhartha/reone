@@ -19,8 +19,8 @@
 
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
-#include "../../src/scene/node/model.h"
-#include "../../src/scene/node/modelnode.h"
+#include "reone/scene/node/model.h"
+#include "reone/scene/node/modelnode.h"
 
 #include "../fixtures/functional.h"
 

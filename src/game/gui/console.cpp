@@ -22,8 +22,8 @@
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/options.h"
 #include "reone/graphics/services.h"
-#include "../../gui/control/label.h"
-#include "../../gui/control/listbox.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
 
 #include "../action/movetoobject.h"
 #include "../game.h"

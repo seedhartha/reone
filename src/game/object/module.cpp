@@ -24,8 +24,8 @@
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"
-#include "../../scene/graph.h"
-#include "../../scene/node/model.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/model.h"
 
 #include "../services.h"
 

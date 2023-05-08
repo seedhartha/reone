@@ -24,8 +24,8 @@
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"
-#include "../../scene/fogproperties.h"
-#include "../../scene/graph.h"
+#include "reone/scene/fogproperties.h"
+#include "reone/scene/graph.h"
 
 #include "../camerastyles.h"
 #include "../layouts.h"

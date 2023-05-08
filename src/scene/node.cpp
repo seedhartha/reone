@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "node.h"
+#include "reone/scene/node.h"
 
 using namespace std;
 

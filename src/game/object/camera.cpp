@@ -21,9 +21,9 @@
 #include "reone/graphics/options.h"
 #include "reone/graphics/services.h"
 #include "reone/resource/gff.h"
-#include "../../scene/collision.h"
-#include "../../scene/graph.h"
-#include "../../scene/node/camera.h"
+#include "reone/scene/collision.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/camera.h"
 
 #include "../camerastyles.h"
 #include "../services.h"

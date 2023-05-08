@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "trigger.h"
+#include "reone/scene/node/trigger.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"

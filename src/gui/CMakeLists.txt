@@ -13,26 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(GUI_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/gui)
+
 set(GUI_HEADERS
-    control.h
-    control/button.h
-    control/button.h
-    control/buttontoggle.h
-    control/factory.h
-    control/label.h
-    control/labelhilight.h
-    control/listbox.h
-    control/panel.h
-    control/plotter.h
-    control/progressbar.h
-    control/progressbar.h
-    control/scrollbar.h
-    control/slider.h
-    gui.h
-    guiinterface.h
-    sceneinitializer.h
-    textinput.h
-    types.h)
+    ${GUI_INCLUDE_DIR}/control.h
+    ${GUI_INCLUDE_DIR}/control/button.h
+    ${GUI_INCLUDE_DIR}/control/button.h
+    ${GUI_INCLUDE_DIR}/control/buttontoggle.h
+    ${GUI_INCLUDE_DIR}/control/factory.h
+    ${GUI_INCLUDE_DIR}/control/label.h
+    ${GUI_INCLUDE_DIR}/control/labelhilight.h
+    ${GUI_INCLUDE_DIR}/control/listbox.h
+    ${GUI_INCLUDE_DIR}/control/panel.h
+    ${GUI_INCLUDE_DIR}/control/plotter.h
+    ${GUI_INCLUDE_DIR}/control/progressbar.h
+    ${GUI_INCLUDE_DIR}/control/progressbar.h
+    ${GUI_INCLUDE_DIR}/control/scrollbar.h
+    ${GUI_INCLUDE_DIR}/control/slider.h
+    ${GUI_INCLUDE_DIR}/gui.h
+    ${GUI_INCLUDE_DIR}/guiinterface.h
+    ${GUI_INCLUDE_DIR}/sceneinitializer.h
+    ${GUI_INCLUDE_DIR}/textinput.h
+    ${GUI_INCLUDE_DIR}/types.h)
 
 set(GUI_SOURCES
     control.cpp

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "sceneinitializer.h"
+#include "reone/gui/sceneinitializer.h"
 
-#include "../scene/graph.h"
-#include "../scene/node/camera.h"
-#include "../scene/node/mesh.h"
-#include "../scene/node/model.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/camera.h"
+#include "reone/scene/node/mesh.h"
+#include "reone/scene/node/model.h"
 
 using namespace std;
 

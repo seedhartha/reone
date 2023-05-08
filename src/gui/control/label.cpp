@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "label.h"
+#include "reone/gui/control/label.h"
 
-#include "factory.h"
+#include "reone/gui/control/factory.h"
 
 using namespace std;
 

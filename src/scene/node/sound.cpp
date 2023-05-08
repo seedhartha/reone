@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "sound.h"
+#include "reone/scene/node/sound.h"
 
 #include "reone/audio/player.h"
 #include "reone/audio/services.h"

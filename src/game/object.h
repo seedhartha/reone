@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../scene/node.h"
-#include "../scene/user.h"
+#include "reone/scene/node.h"
+#include "reone/scene/user.h"
 #include "../script/types.h"
 
 #include "action.h"

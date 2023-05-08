@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camera.h"
+#include "reone/scene/node/camera.h"
 
 #include "reone/graphics/camera/orthographic.h"
 #include "reone/graphics/camera/perspective.h"

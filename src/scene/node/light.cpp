@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "light.h"
+#include "reone/scene/node/light.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
@@ -27,9 +27,9 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 
-#include "../graph.h"
+#include "reone/scene/graph.h"
 
-#include "camera.h"
+#include "reone/scene/node/camera.h"
 
 using namespace std;
 

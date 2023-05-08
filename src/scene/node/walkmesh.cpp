@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "walkmesh.h"
+#include "reone/scene/node/walkmesh.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 
-#include "../graph.h"
+#include "reone/scene/graph.h"
 
 using namespace std;
 
