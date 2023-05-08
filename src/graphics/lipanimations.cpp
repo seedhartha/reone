@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lipanimations.h"
+#include "reone/graphics/lipanimations.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 
 #include "reone/resource/resources.h"
 
-#include "format/lipreader.h"
+#include "reone/graphics/format/lipreader.h"
 
 using namespace std;
 using namespace std::placeholders;

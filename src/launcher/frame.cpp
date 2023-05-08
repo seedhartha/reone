@@ -19,7 +19,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "../graphics/types.h"
+#include "reone/graphics/types.h"
 
 using namespace std;
 

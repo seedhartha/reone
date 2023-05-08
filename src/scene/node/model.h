@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../graphics/lipanimation.h"
-#include "../../graphics/model.h"
-#include "../../graphics/types.h"
+#include "reone/graphics/lipanimation.h"
+#include "reone/graphics/model.h"
+#include "reone/graphics/types.h"
 
 #include "../animeventlistener.h"
 #include "../animproperties.h"

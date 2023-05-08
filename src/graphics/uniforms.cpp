@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "uniforms.h"
+#include "reone/graphics/uniforms.h"
 
 using namespace std;
 

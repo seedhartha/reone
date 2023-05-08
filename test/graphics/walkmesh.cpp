@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/graphics/walkmesh.h"
+#include "reone/graphics/walkmesh.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/graphics/format/tpcreader.h"
+#include "reone/graphics/format/tpcreader.h"
 
 using namespace std;
 

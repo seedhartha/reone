@@ -19,9 +19,9 @@
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/exception/validation.h"
-#include "../../graphics/fonts.h"
-#include "../../graphics/options.h"
-#include "../../graphics/services.h"
+#include "reone/graphics/fonts.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 

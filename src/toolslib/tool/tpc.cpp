@@ -20,8 +20,8 @@
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
 #include "reone/common/stream/fileinput.h"
-#include "../../graphics/format/tgawriter.h"
-#include "../../graphics/format/tpcreader.h"
+#include "reone/graphics/format/tgawriter.h"
+#include "reone/graphics/format/tpcreader.h"
 
 using namespace std;
 

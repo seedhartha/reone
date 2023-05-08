@@ -17,8 +17,8 @@
 
 #include "camera.h"
 
-#include "../../graphics/camera/orthographic.h"
-#include "../../graphics/camera/perspective.h"
+#include "reone/graphics/camera/orthographic.h"
+#include "reone/graphics/camera/perspective.h"
 
 using namespace std;
 

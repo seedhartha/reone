@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "shaders.h"
+#include "reone/graphics/shaders.h"
 
 #include "reone/common/stringbuilder.h"
 
-#include "glsl/common.h"
-#include "glsl/fragment.h"
-#include "glsl/geometry.h"
-#include "glsl/vertex.h"
-#include "options.h"
+#include "reone/graphics/glsl/common.h"
+#include "reone/graphics/glsl/fragment.h"
+#include "reone/graphics/glsl/geometry.h"
+#include "reone/graphics/glsl/vertex.h"
+#include "reone/graphics/options.h"
 
 using namespace std;
 

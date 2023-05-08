@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../../audio/context.h"
-#include "../../audio/files.h"
-#include "../../audio/options.h"
-#include "../../audio/player.h"
-#include "../../audio/services.h"
+#include "reone/audio/context.h"
+#include "reone/audio/files.h"
+#include "reone/audio/options.h"
+#include "reone/audio/player.h"
+#include "reone/audio/services.h"
 
 namespace reone {
 

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "animation.h"
+#include "reone/graphics/animation.h"
 
 #include "reone/common/collectionutil.h"
 
-#include "modelnode.h"
+#include "reone/graphics/modelnode.h"
 
 using namespace std;
 

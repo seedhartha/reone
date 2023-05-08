@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../audio/source.h"
+#include "reone/audio/source.h"
 
 #include "../node.h"
 

@@ -19,7 +19,7 @@
 
 #include "reone/resource/format/binreader.h"
 
-#include "../types.h"
+#include "reone/audio/types.h"
 
 namespace reone {
 

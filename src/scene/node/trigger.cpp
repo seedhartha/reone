@@ -17,11 +17,11 @@
 
 #include "trigger.h"
 
-#include "../../graphics/context.h"
-#include "../../graphics/mesh.h"
-#include "../../graphics/services.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/uniforms.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/uniforms.h"
 
 using namespace std;
 

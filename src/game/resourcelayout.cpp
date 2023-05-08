@@ -19,7 +19,7 @@
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/pathutil.h"
-#include "../graphics/types.h"
+#include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/camera.h"
+#include "reone/graphics/camera.h"
 
 #include "../node.h"
 

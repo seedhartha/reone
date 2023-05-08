@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "bwmreader.h"
+#include "reone/graphics/format/bwmreader.h"
 
-#include "../walkmesh.h"
+#include "reone/graphics/walkmesh.h"
 
 using namespace std;
 

@@ -19,9 +19,9 @@
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
-#include "../../graphics/models.h"
-#include "../../graphics/services.h"
-#include "../../graphics/textures.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/textures.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"

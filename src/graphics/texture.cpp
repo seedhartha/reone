@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "texture.h"
+#include "reone/graphics/texture.h"
 
-#include "pixelutil.h"
-#include "textureutil.h"
+#include "reone/graphics/pixelutil.h"
+#include "reone/graphics/textureutil.h"
 
 using namespace std;
 

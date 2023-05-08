@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "txireader.h"
+#include "reone/graphics/format/txireader.h"
 
 #include "reone/common/logutil.h"
 #include "reone/common/stream/input.h"

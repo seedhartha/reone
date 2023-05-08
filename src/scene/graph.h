@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../graphics/scene.h"
+#include "reone/graphics/scene.h"
 
 #include "fogproperties.h"
 #include "node/camera.h"

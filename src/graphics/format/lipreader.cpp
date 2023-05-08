@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lipreader.h"
+#include "reone/graphics/format/lipreader.h"
 
-#include "../lipanimation.h"
+#include "reone/graphics/lipanimation.h"
 
 using namespace std;
 

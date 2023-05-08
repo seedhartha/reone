@@ -19,7 +19,7 @@
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/graphics/format/txireader.h"
+#include "reone/graphics/format/txireader.h"
 
 using namespace std;
 

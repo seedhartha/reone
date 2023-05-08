@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../graphics/modelnode.h"
-#include "../../graphics/types.h"
+#include "reone/graphics/modelnode.h"
+#include "reone/graphics/types.h"
 
 #include "../grassproperties.h"
 #include "../node.h"

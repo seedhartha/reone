@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "source.h"
+#include "reone/audio/source.h"
 
-#include "stream.h"
+#include "reone/audio/stream.h"
 
 using namespace std;
 

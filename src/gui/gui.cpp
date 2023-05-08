@@ -19,10 +19,10 @@
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
-#include "../graphics/options.h"
-#include "../graphics/services.h"
-#include "../graphics/uniforms.h"
-#include "../graphics/window.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/window.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"
 

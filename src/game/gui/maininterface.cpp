@@ -17,7 +17,7 @@
 
 #include "maininterface.h"
 
-#include "../../graphics/options.h"
+#include "reone/graphics/options.h"
 #include "../../gui/control/button.h"
 #include "../../gui/control/label.h"
 

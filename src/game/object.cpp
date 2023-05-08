@@ -17,8 +17,8 @@
 
 #include "object.h"
 
-#include "../graphics/services.h"
-#include "../graphics/window.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/window.h"
 #include "../scene/graph.h"
 
 #include "options.h"

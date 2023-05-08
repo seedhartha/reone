@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/graphics/animation.h"
-#include "../../src/graphics/mesh.h"
+#include "reone/graphics/animation.h"
+#include "reone/graphics/mesh.h"
 #include "../../src/scene/node/model.h"
 #include "../../src/scene/node/modelnode.h"
 

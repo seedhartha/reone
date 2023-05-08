@@ -17,9 +17,9 @@
 
 #include "profiler.h"
 
-#include "../../graphics/fonts.h"
-#include "../../graphics/options.h"
-#include "../../graphics/services.h"
+#include "reone/graphics/fonts.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
 #include "../../gui/control/plotter.h"

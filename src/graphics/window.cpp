@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "window.h"
+#include "reone/graphics/window.h"
 
 #include "SDL2/SDL.h"
 
-#include "eventhandler.h"
+#include "reone/graphics/eventhandler.h"
 
 using namespace std;
 

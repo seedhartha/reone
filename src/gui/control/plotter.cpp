@@ -17,10 +17,10 @@
 
 #include "plotter.h"
 
-#include "../../graphics/meshes.h"
-#include "../../graphics/services.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/uniforms.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/uniforms.h"
 
 using namespace reone::graphics;
 

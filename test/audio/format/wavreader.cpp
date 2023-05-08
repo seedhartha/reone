@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/audio/format/mp3reader.h"
-#include "../../../src/audio/format/wavreader.h"
-#include "../../../src/audio/stream.h"
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
+#include "reone/audio/stream.h"
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
 

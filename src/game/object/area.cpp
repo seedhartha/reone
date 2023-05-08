@@ -18,9 +18,9 @@
 #include "area.h"
 
 #include "reone/common/exception/validation.h"
-#include "../../graphics/options.h"
-#include "../../graphics/services.h"
-#include "../../graphics/textures.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/textures.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/services.h"

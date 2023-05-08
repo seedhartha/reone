@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tpcreader.h"
+#include "reone/graphics/format/tpcreader.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 
-#include "../textureutil.h"
+#include "reone/graphics/textureutil.h"
 
-#include "txireader.h"
+#include "reone/graphics/format/txireader.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/graphics/format/bwmreader.h"
+#include "reone/graphics/format/bwmreader.h"
 
 using namespace reone;
 using namespace reone::graphics;

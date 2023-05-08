@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mesh.h"
+#include "reone/graphics/mesh.h"
 
-#include "barycentricutil.h"
-#include "triangleutil.h"
+#include "reone/graphics/barycentricutil.h"
+#include "reone/graphics/triangleutil.h"
 
 using namespace std;
 

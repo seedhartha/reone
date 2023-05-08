@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "fonts.h"
+#include "reone/graphics/fonts.h"
 
-#include "context.h"
-#include "meshes.h"
-#include "shaders.h"
-#include "textures.h"
-#include "window.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/textures.h"
+#include "reone/graphics/window.h"
 
 using namespace std;
 using namespace std::placeholders;

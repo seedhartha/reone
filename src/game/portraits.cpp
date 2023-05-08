@@ -17,7 +17,7 @@
 
 #include "portraits.h"
 
-#include "../../graphics/textures.h"
+#include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 

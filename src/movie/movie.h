@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../audio/source.h"
+#include "reone/audio/source.h"
 #include "reone/common/types.h"
-#include "../graphics/texture.h"
+#include "reone/graphics/texture.h"
 
 #include "videostream.h"
 

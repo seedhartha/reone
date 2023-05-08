@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "textutil.h"
+#include "reone/graphics/textutil.h"
 
-#include "font.h"
+#include "reone/graphics/font.h"
 
 using namespace std;
 

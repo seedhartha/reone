@@ -17,8 +17,8 @@
 
 #include "sound.h"
 
-#include "../../audio/player.h"
-#include "../../audio/services.h"
+#include "reone/audio/player.h"
+#include "reone/audio/services.h"
 
 using namespace std;
 

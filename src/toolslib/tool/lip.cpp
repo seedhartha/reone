@@ -20,8 +20,8 @@
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
 #include "reone/common/stream/fileinput.h"
-#include "../../graphics/format/lipreader.h"
-#include "../../graphics/format/lipwriter.h"
+#include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/format/lipwriter.h"
 
 #include "tinyxml2.h"
 

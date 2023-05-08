@@ -17,7 +17,7 @@
 
 #include "footstepsounds.h"
 
-#include "../../audio/files.h"
+#include "reone/audio/files.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 

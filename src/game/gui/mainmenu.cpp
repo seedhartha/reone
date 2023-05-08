@@ -17,9 +17,9 @@
 
 #include "mainmenu.h"
 
-#include "../../graphics/models.h"
-#include "../../graphics/services.h"
-#include "../../graphics/types.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/types.h"
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/sceneinitializer.h"

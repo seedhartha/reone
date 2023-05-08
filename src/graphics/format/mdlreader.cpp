@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mdlreader.h"
+#include "reone/graphics/format/mdlreader.h"
 
 #include "reone/common/collectionutil.h"
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
 
-#include "../animation.h"
-#include "../mesh.h"
-#include "../model.h"
-#include "../models.h"
-#include "../textures.h"
+#include "reone/graphics/animation.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/model.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/textures.h"
 
 using namespace std;
 

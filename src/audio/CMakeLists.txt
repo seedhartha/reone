@@ -13,17 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+set(AUDIO_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/audio)
+
 set(AUDIO_HEADERS
-    context.h
-    files.h
-    format/mp3reader.h
-    format/wavreader.h
-    options.h
-    player.h
-    services.h
-    source.h
-    stream.h
-    types.h)
+    ${AUDIO_INCLUDE_DIR}/context.h
+    ${AUDIO_INCLUDE_DIR}/files.h
+    ${AUDIO_INCLUDE_DIR}/format/mp3reader.h
+    ${AUDIO_INCLUDE_DIR}/format/wavreader.h
+    ${AUDIO_INCLUDE_DIR}/options.h
+    ${AUDIO_INCLUDE_DIR}/player.h
+    ${AUDIO_INCLUDE_DIR}/services.h
+    ${AUDIO_INCLUDE_DIR}/source.h
+    ${AUDIO_INCLUDE_DIR}/stream.h
+    ${AUDIO_INCLUDE_DIR}/types.h)
 
 set(AUDIO_SOURCES
     context.cpp

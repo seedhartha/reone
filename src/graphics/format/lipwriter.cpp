@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lipwriter.h"
+#include "reone/graphics/format/lipwriter.h"
 
 #include "reone/common/binarywriter.h"
 #include "reone/common/stream/fileoutput.h"
-
 
 namespace fs = boost::filesystem;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dxtutil.h"
+#include "reone/graphics/dxtutil.h"
 
 namespace reone {
 

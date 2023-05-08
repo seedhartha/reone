@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tgareader.h"
+#include "reone/graphics/format/tgareader.h"
 
 #include "reone/common/logutil.h"
 
-#include "../texture.h"
-#include "../textureutil.h"
+#include "reone/graphics/texture.h"
+#include "reone/graphics/textureutil.h"
 
 using namespace std;
 

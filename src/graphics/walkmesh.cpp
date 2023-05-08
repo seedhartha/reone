@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "walkmesh.h"
+#include "reone/graphics/walkmesh.h"
 
 using namespace std;
 

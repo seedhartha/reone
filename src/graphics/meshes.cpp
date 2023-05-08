@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "meshes.h"
+#include "reone/graphics/meshes.h"
 
-#include "mesh.h"
+#include "reone/graphics/mesh.h"
 
 using namespace std;
 

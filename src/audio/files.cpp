@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "files.h"
+#include "reone/audio/files.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
-#include "format/mp3reader.h"
-#include "format/wavreader.h"
-#include "stream.h"
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
+#include "reone/audio/stream.h"
 
 using namespace std;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pixelutil.h"
+#include "reone/graphics/pixelutil.h"
 
 using namespace std;
 

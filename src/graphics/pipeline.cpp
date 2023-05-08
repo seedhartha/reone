@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "pipeline.h"
+#include "reone/graphics/pipeline.h"
 
 #include "reone/common/randomutil.h"
 #include "../scene/node/light.h"
 
-#include "camera/perspective.h"
-#include "context.h"
-#include "format/tgawriter.h"
-#include "mesh.h"
-#include "meshes.h"
-#include "renderbuffer.h"
-#include "scene.h"
-#include "shaders.h"
-#include "texture.h"
-#include "textures.h"
-#include "textureutil.h"
-#include "uniforms.h"
-#include "window.h"
+#include "reone/graphics/camera/perspective.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/format/tgawriter.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/renderbuffer.h"
+#include "reone/graphics/scene.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/texture.h"
+#include "reone/graphics/textures.h"
+#include "reone/graphics/textureutil.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/window.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #include "soundsets.h"
 
-#include "../../audio/files.h"
+#include "reone/audio/files.h"
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "renderbuffer.h"
+#include "reone/graphics/renderbuffer.h"
 
-#include "pixelutil.h"
+#include "reone/graphics/pixelutil.h"
 
 namespace reone {
 

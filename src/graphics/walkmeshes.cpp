@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "walkmeshes.h"
+#include "reone/graphics/walkmeshes.h"
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
-#include "format/bwmreader.h"
+#include "reone/graphics/format/bwmreader.h"
 
 using namespace std;
 

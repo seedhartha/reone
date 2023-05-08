@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/mesh.h"
+#include "reone/graphics/mesh.h"
 
 #include "../node.h"
 

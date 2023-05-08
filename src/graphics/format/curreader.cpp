@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "curreader.h"
+#include "reone/graphics/format/curreader.h"
 
-#include "../texture.h"
-#include "../textureutil.h"
+#include "reone/graphics/texture.h"
+#include "reone/graphics/textureutil.h"
 
 using namespace std;
 

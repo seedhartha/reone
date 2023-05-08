@@ -18,8 +18,8 @@
 #include "camera.h"
 
 #include "reone/common/exception/validation.h"
-#include "../../graphics/options.h"
-#include "../../graphics/services.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
 #include "reone/resource/gff.h"
 #include "../../scene/collision.h"
 #include "../../scene/graph.h"

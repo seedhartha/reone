@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../graphics/options.h"
+#include "reone/graphics/options.h"
 
 namespace reone {
 

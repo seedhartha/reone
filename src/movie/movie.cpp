@@ -17,16 +17,16 @@
 
 #include "movie.h"
 
-#include "../audio/player.h"
-#include "../audio/services.h"
-#include "../graphics/context.h"
-#include "../graphics/mesh.h"
-#include "../graphics/meshes.h"
-#include "../graphics/services.h"
-#include "../graphics/shaders.h"
-#include "../graphics/textures.h"
-#include "../graphics/textureutil.h"
-#include "../graphics/uniforms.h"
+#include "reone/audio/player.h"
+#include "reone/audio/services.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/textures.h"
+#include "reone/graphics/textureutil.h"
+#include "reone/graphics/uniforms.h"
 
 using namespace std;
 

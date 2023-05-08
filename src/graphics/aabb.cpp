@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "aabb.h"
+#include "reone/graphics/aabb.h"
 
 using namespace std;
 

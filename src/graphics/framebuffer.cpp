@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "framebuffer.h"
+#include "reone/graphics/framebuffer.h"
 
-#include "renderbuffer.h"
-#include "texture.h"
+#include "reone/graphics/renderbuffer.h"
+#include "reone/graphics/texture.h"
 
 using namespace std;
 

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "textureutil.h"
+#include "reone/graphics/textureutil.h"
 
-#include "dxtutil.h"
+#include "reone/graphics/dxtutil.h"
 
 using namespace std;
 

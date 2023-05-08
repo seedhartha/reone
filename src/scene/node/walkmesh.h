@@ -19,8 +19,8 @@
 
 #include "../node.h"
 
-#include "../../graphics/mesh.h"
-#include "../../graphics/walkmesh.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/walkmesh.h"
 
 namespace reone {
 

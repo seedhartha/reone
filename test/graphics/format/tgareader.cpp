@@ -19,8 +19,8 @@
 
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
-#include "../../../src/graphics/format/tgareader.h"
-#include "../../../src/graphics/texture.h"
+#include "reone/graphics/format/tgareader.h"
+#include "reone/graphics/texture.h"
 
 using namespace std;
 

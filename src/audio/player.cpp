@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "player.h"
+#include "reone/audio/player.h"
 
-#include "files.h"
+#include "reone/audio/files.h"
 
 using namespace std;
 

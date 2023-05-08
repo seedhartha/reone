@@ -17,14 +17,14 @@
 
 #include "graph.h"
 
-#include "../audio/services.h"
-#include "../graphics/context.h"
-#include "../graphics/mesh.h"
-#include "../graphics/meshes.h"
-#include "../graphics/services.h"
-#include "../graphics/shaders.h"
-#include "../graphics/uniforms.h"
-#include "../graphics/walkmesh.h"
+#include "reone/audio/services.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/walkmesh.h"
 
 #include "collision.h"
 #include "node/camera.h"

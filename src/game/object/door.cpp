@@ -18,9 +18,9 @@
 #include "door.h"
 
 #include "reone/common/exception/validation.h"
-#include "../../graphics/models.h"
-#include "../../graphics/services.h"
-#include "../../graphics/walkmeshes.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"

@@ -17,7 +17,7 @@
 
 #include "guisounds.h"
 
-#include "../audio/files.h"
+#include "reone/audio/files.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/format/2dareader.h"
 

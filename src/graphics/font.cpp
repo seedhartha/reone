@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "font.h"
+#include "reone/graphics/font.h"
 
-#include "context.h"
-#include "mesh.h"
-#include "meshes.h"
-#include "shaders.h"
-#include "texture.h"
-#include "textures.h"
-#include "uniforms.h"
-#include "window.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/texture.h"
+#include "reone/graphics/textures.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/window.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/graphics/aabb.h"
+#include "reone/graphics/aabb.h"
 
 using namespace std;
 

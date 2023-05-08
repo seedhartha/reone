@@ -15,21 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "textures.h"
+#include "reone/graphics/textures.h"
 
 #include "reone/common/logutil.h"
 #include "reone/common/randomutil.h"
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
-#include "format/curreader.h"
-#include "format/tgareader.h"
-#include "format/tpcreader.h"
-#include "format/txireader.h"
-#include "options.h"
-#include "texture.h"
-#include "textureutil.h"
-#include "types.h"
+#include "reone/graphics/format/curreader.h"
+#include "reone/graphics/format/tgareader.h"
+#include "reone/graphics/format/tpcreader.h"
+#include "reone/graphics/format/txireader.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/texture.h"
+#include "reone/graphics/textureutil.h"
+#include "reone/graphics/types.h"
 
 using namespace std;
 

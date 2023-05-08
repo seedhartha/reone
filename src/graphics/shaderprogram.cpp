@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "shaderprogram.h"
+#include "reone/graphics/shaderprogram.h"
 
-#include "types.h"
+#include "reone/graphics/types.h"
 
 using namespace std;
 

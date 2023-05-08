@@ -17,10 +17,10 @@
 
 #include "room.h"
 
-#include "../../graphics/models.h"
-#include "../../graphics/options.h"
-#include "../../graphics/services.h"
-#include "../../graphics/walkmeshes.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/walkmeshes.h"
 #include "../../scene/graph.h"
 #include "../../scene/node/model.h"
 #include "../../scene/services.h"

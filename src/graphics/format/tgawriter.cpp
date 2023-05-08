@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tgawriter.h"
+#include "reone/graphics/format/tgawriter.h"
 
-#include "../dxtutil.h"
-#include "../texture.h"
+#include "reone/graphics/dxtutil.h"
+#include "reone/graphics/texture.h"
 
 using namespace std;
 

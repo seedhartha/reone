@@ -17,7 +17,7 @@
 
 #include "particle.h"
 
-#include "../../graphics/modelnode.h"
+#include "reone/graphics/modelnode.h"
 
 #include "emitter.h"
 

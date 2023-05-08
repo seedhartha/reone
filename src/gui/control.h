@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../graphics/types.h"
+#include "reone/graphics/types.h"
 
 #include "types.h"
 

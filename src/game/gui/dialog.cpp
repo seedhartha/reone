@@ -17,7 +17,7 @@
 
 #include "dialog.h"
 
-#include "../../graphics/options.h"
+#include "reone/graphics/options.h"
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 

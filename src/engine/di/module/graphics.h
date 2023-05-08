@@ -17,19 +17,19 @@
 
 #pragma once
 
-#include "../../graphics/context.h"
-#include "../../graphics/fonts.h"
-#include "../../graphics/lipanimations.h"
-#include "../../graphics/meshes.h"
-#include "../../graphics/models.h"
-#include "../../graphics/options.h"
-#include "../../graphics/pipeline.h"
-#include "../../graphics/services.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/textures.h"
-#include "../../graphics/uniforms.h"
-#include "../../graphics/walkmeshes.h"
-#include "../../graphics/window.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/fonts.h"
+#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/meshes.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/pipeline.h"
+#include "reone/graphics/services.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/textures.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/walkmeshes.h"
+#include "reone/graphics/window.h"
 
 namespace reone {
 

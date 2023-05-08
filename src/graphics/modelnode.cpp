@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "modelnode.h"
+#include "reone/graphics/modelnode.h"
 
 #include "reone/common/logutil.h"
 
-#include "mesh.h"
-#include "texture.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/texture.h"
 
 using namespace std;
 
