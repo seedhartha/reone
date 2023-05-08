@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GUI_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/gui)
-set(GUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/gui)
+set(GUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/gui)
 
 set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/control.h

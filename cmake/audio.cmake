@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(AUDIO_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/audio)
-set(AUDIO_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/audio)
+set(AUDIO_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/audio)
 
 set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/context.h

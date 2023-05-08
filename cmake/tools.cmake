@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set(TOOLS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/tools)
+set(TOOLS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/tools)
 
 set(TOOLS_HEADERS
     ${TOOLS_SOURCE_DIR}/program.h)

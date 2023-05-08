@@ -16,7 +16,7 @@
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 
-    set(LAUNCHER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/launcher)
+    set(LAUNCHER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/launcher)
 
     set(LAUNCHER_HEADERS
         ${LAUNCHER_SOURCE_DIR}/app.h

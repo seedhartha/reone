@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GRAPHICS_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/graphics)
-set(GRAPHICS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/graphics)
+set(GRAPHICS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/graphics)
 
 set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/aabb.h

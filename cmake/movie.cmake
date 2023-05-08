@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(MOVIE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/movie)
-set(MOVIE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/movie)
+set(MOVIE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/movie)
 
 set(MOVIE_HEADERS
     ${MOVIE_INCLUDE_DIR}/format/bikreader.h

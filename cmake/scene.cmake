@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(SCENE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/scene)
-set(SCENE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/scene)
+set(SCENE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/scene)
 
 set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/animeventlistener.h

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(RESOURCE_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/resource)
-set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/resource)
+set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/common)
-set(COMMON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/common)
+set(COMMON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/common)
 
 set(COMMON_HEADERS
     ${COMMON_INCLUDE_DIR}/binaryreader.h

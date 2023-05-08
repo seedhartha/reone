@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set(ENGINE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/engine)
+set(ENGINE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/engine)
 
 set(REONE_HEADERS
     ${ENGINE_SOURCE_DIR}/di/module/audio.h

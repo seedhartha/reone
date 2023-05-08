@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(SCRIPT_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/script)
-set(SCRIPT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/script)
+set(SCRIPT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/script)
 
 set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/enginetype.h

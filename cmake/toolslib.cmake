@@ -15,7 +15,7 @@
 
 find_package(Boost COMPONENTS regex REQUIRED)
 
-set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/toolslib)
+set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/toolslib)
 
 set(TOOLSLIB_HEADERS
     ${TOOLSLIB_SOURCE_DIR}/script/expressiontree.h
