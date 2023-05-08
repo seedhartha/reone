@@ -53,5 +53,6 @@ set(TOOLSLIB_SOURCES
 
 add_library(toolslib ${TOOLSLIB_HEADERS} ${TOOLSLIB_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(toolslib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_target_properties(toolslib PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(toolslib PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(toolslib PUBLIC game tinyxml2 ${Boost_REGEX_LIBRARY})

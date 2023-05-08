@@ -15,3 +15,4 @@
 
 add_library(tinyxml2 STATIC tinyxml2.h tinyxml2.cpp)
 set_target_properties(tinyxml2 PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_target_properties(tinyxml2 PROPERTIES DEBUG_POSTFIX "d")

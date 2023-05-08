@@ -46,5 +46,6 @@ set(SCRIPT_SOURCES
 
 add_library(script STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(script PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_target_properties(script PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(script PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(script PUBLIC ${Boost_REGEX_LIBRARY})
