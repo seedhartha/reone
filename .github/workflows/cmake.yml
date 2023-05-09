@@ -1,9 +1,6 @@
 name: CMake
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 env:
   BUILD_TYPE: Release
