@@ -42,17 +42,17 @@ set(TOOLSLIB_SOURCES
     ${TOOLSLIB_SOURCE_DIR}/script/format/nsswriter.cpp
     ${TOOLSLIB_SOURCE_DIR}/script/format/pcodereader.cpp
     ${TOOLSLIB_SOURCE_DIR}/script/format/pcodewriter.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/2da.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/audio.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/erf.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/gff.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/keybif.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/lip.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/ncs.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/rim.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/ssf.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/tlk.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tool/tpc.cpp)
+    ${TOOLSLIB_SOURCE_DIR}/2da.cpp
+    ${TOOLSLIB_SOURCE_DIR}/audio.cpp
+    ${TOOLSLIB_SOURCE_DIR}/erf.cpp
+    ${TOOLSLIB_SOURCE_DIR}/gff.cpp
+    ${TOOLSLIB_SOURCE_DIR}/keybif.cpp
+    ${TOOLSLIB_SOURCE_DIR}/lip.cpp
+    ${TOOLSLIB_SOURCE_DIR}/ncs.cpp
+    ${TOOLSLIB_SOURCE_DIR}/rim.cpp
+    ${TOOLSLIB_SOURCE_DIR}/ssf.cpp
+    ${TOOLSLIB_SOURCE_DIR}/tlk.cpp
+    ${TOOLSLIB_SOURCE_DIR}/tpc.cpp)
 
 add_library(toolslib ${TOOLSLIB_HEADERS} ${TOOLSLIB_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(toolslib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
