@@ -49,7 +49,7 @@ int Engine::run() {
     auto services = Services(gameId, optionsView);
     services.init();
 
-    auto game = Game(GameID::KotOR, optionsView, services.view());
+    auto game = Game(gameId == GameID::TSL, options.game.path, optionsView, services.view());
     game.init();
     game.run();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,19 @@ namespace game {
 
 class DeathEffect : public Effect {
 public:
-    DeathEffect() :
-        Effect(EffectType::Death) {
+    DeathEffect(bool spectacularDeath, bool displayFeedback, bool noFadeAway) :
+        Effect(EffectType::Death),
+        _spectacularDeath(spectacularDeath),
+        _displayFeedback(displayFeedback),
+        _noFadeAway(noFadeAway) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    bool _spectacularDeath;
+    bool _displayFeedback;
+    bool _noFadeAway;
 };
 
 } // namespace game

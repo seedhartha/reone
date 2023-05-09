@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ namespace game {
 
 class FollowOwnerAction : public Action {
 public:
-    FollowOwnerAction() :
-        Action(ActionType::FollowOwner) {
+    FollowOwnerAction(Game &game, ServicesView &services, float range) :
+        Action(game, services, ActionType::FollowOwner),
+        _range(range) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    float _range;
 };
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,69 +17,153 @@
 
 #include "reone/game/object/item.h"
 
-#include "reone/common/exception/validation.h"
+#include "reone/audio/files.h"
+#include "reone/audio/player.h"
+#include "reone/audio/services.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/textures.h"
+#include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "reone/scene/graph.h"
+
+#include "reone/game/game.h"
+#include "reone/game/services.h"
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
-using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-void Item::loadFromUti(const string &templateResRef) {
-    // From UTI
-    auto uti = _resourceSvc.gffs.get(templateResRef, ResourceType::Uti);
-    if (!uti) {
-        throw ValidationException("UTC not found: " + templateResRef);
+void Item::loadFromBlueprint(const string &resRef) {
+    shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
+    if (uti) {
+        loadUTI(*uti);
     }
-    auto tag = uti->getString("Tag");
-    auto name = _resourceSvc.strings.get(uti->getInt("LocalizedName"));
-    auto baseItem = uti->getInt("BaseItem");
-    auto modelVariation = uti->getInt("ModelVariation", 1);
-    auto bodyVariation = uti->getInt("BodyVariation", 1);
-    auto textureVar = uti->getInt("TextureVar", 1);
+}
 
-    // From baseitems 2DA
-    auto baseItems = _resourceSvc.twoDas.get("baseitems");
-    if (!baseItems) {
-        throw ValidationException("baseitems 2DA not found");
+void Item::update(float dt) {
+    if (_audioSource) {
+        _audioSource->update();
     }
-    auto equipableSlots = baseItems->getUint(baseItem, "equipableslots");
-    auto modelType = baseItems->getInt(baseItem, "modeltype");
-    auto itemClass = boost::to_lower_copy(baseItems->getString(baseItem, "itemclass"));
-    auto defaultModel = boost::to_lower_copy(baseItems->getString(baseItem, "defaultmodel"));
-    auto weaponWield = baseItems->getInt(baseItem, "weaponwield");
-    auto weaponType = baseItems->getInt(baseItem, "weapontype");
+}
 
-    if (modelType == 0 && defaultModel != "i_null") {
-        auto modelResRef = str(boost::format("%s_%03d") % itemClass % modelVariation);
-        auto model = _graphicsSvc.models.get(modelResRef);
-        if (!model) {
-            model = _graphicsSvc.models.get(defaultModel);
-        }
-        if (model) {
-            auto modelSceneNode = _sceneGraph->newModel(*model, ModelUsage::Equipment);
-            modelSceneNode->init();
-            _sceneNode = modelSceneNode.get();
-        }
+void Item::playShotSound(int variant, glm::vec3 position) {
+    if (!_ammunitionType) {
+        return;
     }
+    shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
+    if (sound) {
+        _audioSource = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+    }
+}
 
-    _tag = move(tag);
-    _name = move(name);
-    _equipableSlots = equipableSlots;
-    _bodyVariation = bodyVariation;
-    _textureVar = textureVar;
+void Item::playImpactSound(int variant, glm::vec3 position) {
+    if (!_ammunitionType) {
+        return;
+    }
+    shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+    if (sound) {
+        _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+    }
+}
+
+bool Item::isEquippable() const {
+    return _equipableSlots != 0;
+}
+
+bool Item::isEquippable(int slot) const {
+    return (_equipableSlots >> slot) & 1;
+}
+
+void Item::setDropable(bool dropable) {
+    _dropable = dropable;
+}
+
+void Item::setStackSize(int stackSize) {
+    _stackSize = stackSize;
+}
+
+void Item::setIdentified(bool value) {
+    _identified = value;
+}
+
+void Item::setEquipped(bool equipped) {
+    _equipped = equipped;
+}
+
+void Item::loadUTI(const Gff &uti) {
+    _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
+    _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
+    _localizedName = _services.resource.strings.get(uti.getInt("LocalizedName"));
+    _description = _services.resource.strings.get(uti.getInt("Description"));
+    _descIdentified = _services.resource.strings.get(uti.getInt("DescIdentified"));
+    _tag = boost::to_lower_copy(uti.getString("Tag"));
+    _charges = uti.getInt("Charges");
+    _cost = uti.getInt("Cost");
+    _stolen = uti.getBool("Stolen");
+    _stackSize = uti.getInt("StackSize");
+    _plot = uti.getBool("Plot");
+    _addCost = uti.getInt("AddCost");
+    _identified = uti.getInt("Identified");
+    _modelVariation = uti.getInt("ModelVariation", 1);
+    _textureVariation = uti.getInt("TextureVar", 1);
+    _bodyVariation = uti.getInt("BodyVariation", 1);
+
+    shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
+    _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
+    _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
+    _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
+    _damageFlags = baseItems->getInt(_baseItem, "damageflags");
+    _dieToRoll = baseItems->getInt(_baseItem, "dietoroll");
+    _equipableSlots = baseItems->getUint(_baseItem, "equipableslots", 0);
+    _itemClass = boost::to_lower_copy(baseItems->getString(_baseItem, "itemclass"));
+    _numDice = baseItems->getInt(_baseItem, "numdice");
+    _weaponType = static_cast<WeaponType>(baseItems->getInt(_baseItem, "weapontype"));
+    _weaponWield = static_cast<WeaponWield>(baseItems->getInt(_baseItem, "weaponwield"));
+
+    string iconResRef;
+    if (isEquippable(InventorySlot::body)) {
+        _baseBodyVariation = boost::to_lower_copy(baseItems->getString(_baseItem, "bodyvar"));
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _textureVariation);
+    } else if (isEquippable(InventorySlot::rightWeapon)) {
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
+    } else {
+        iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
+    }
+    _icon = _services.graphics.textures.get(iconResRef, TextureUsage::GUI);
+
+    loadAmmunitionType();
+
+    // TODO: load properties
+
+    // Unused fields:
+    //
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
+void Item::loadAmmunitionType() {
+    shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
+
+    int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
+    if (ammunitionIdx != -1) {
+        shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
+        _ammunitionType = make_shared<Item::AmmunitionType>();
+        _ammunitionType->model = _services.graphics.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
+        _ammunitionType->shotSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
+        _ammunitionType->shotSound2 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
+        _ammunitionType->impactSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
+        _ammunitionType->impactSound2 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
+    }
 }
 
 } // namespace game

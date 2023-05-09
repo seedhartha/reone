@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 
-#include "../types.h"
-
 namespace reone {
 
 namespace game {
@@ -33,13 +31,15 @@ class Game;
 
 class Routines : public script::IRoutines {
 public:
-    Routines(GameID gameId, Game &game, ServicesView &services) :
-        _gameId(gameId),
-        _game(game),
-        _services(services) {
+    Routines() = default;
+
+    Routines(Game &game, ServicesView &services) :
+        _game(&game),
+        _services(&services) {
     }
 
-    void init();
+    void initForKotOR();
+    void initForTSL();
 
     script::Routine &get(int index) override;
 
@@ -47,14 +47,10 @@ public:
     int getIndexByName(const std::string &name) const override;
 
 private:
-    GameID _gameId;
-    Game &_game;
-    ServicesView &_services;
+    Game *_game {nullptr};
+    ServicesView *_services {nullptr};
 
     std::vector<script::Routine> _routines;
-
-    void initForKotOR();
-    void initForTSL();
 
     void add(
         std::string name,

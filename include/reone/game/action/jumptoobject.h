@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,23 @@
 
 #pragma once
 
-#include "../action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class JumpToObjectAction : public Action {
+class JumpToObjectAction : public ObjectAction {
 public:
-    JumpToObjectAction() :
-        Action(ActionType::JumpToObject) {
+    JumpToObjectAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, bool walkStraightLine) :
+        ObjectAction(game, services, ActionType::JumpToObject, std::move(object)),
+        _walkStraightLine(walkStraightLine) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    bool _walkStraightLine;
 };
 
 } // namespace game

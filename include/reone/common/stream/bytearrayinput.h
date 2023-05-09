@@ -50,8 +50,29 @@ public:
         size_t available = _bytes.size() - _position;
         size_t toRead = std::min(available, static_cast<size_t>(length));
         std::memcpy(outData, &_bytes[_position], toRead);
-        _position += toRead;
+        if (toRead < length) {
+            _position = _bytes.size();
+        } else {
+            _position += length;
+        }
         return toRead;
+    }
+
+    void readLine(char *outData, int maxLen) override {
+        auto available = _bytes.size() - _position;
+        auto toRead = std::min(available, static_cast<size_t>(maxLen));
+        std::memcpy(outData, &_bytes[_position], toRead);
+        if (toRead < maxLen - 1) {
+            outData[toRead + 1] = '\0';
+        } else {
+            outData[maxLen - 1] = '\0';
+        }
+        char *pch;
+        for (pch = outData; *pch && *pch != '\n'; ++pch)
+            ;
+        auto lineLen = pch - outData;
+        outData[lineLen] = '\0';
+        _position = std::min(_bytes.size(), _position + lineLen + 2);
     }
 
     size_t position() override {

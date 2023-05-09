@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,36 +27,12 @@ namespace reone {
 
 namespace game {
 
-void LytReader::load(const shared_ptr<IInputStream> &in) {
-    if (!in) {
-        throw invalid_argument("LYT: invalid input stream");
-    }
-    _in = in;
-
-    load();
-}
-
-void LytReader::load(const fs::path &path) {
-    if (!fs::exists(path)) {
-        throw runtime_error("LYT: file not found: " + path.string());
-    }
-    _in = make_shared<FileInputStream>(path);
-    _path = path;
-
-    load();
-}
-
-void LytReader::load() {
+void LytReader::load(IInputStream &in) {
     char buf[256];
     do {
-        char *pch = buf;
-        int ch;
-        do {
-            ch = _in->readByte();
-            *(pch++) = ch;
-        } while (ch != -1 && ch != '\n');
-        processLine(string(buf, pch - buf - 1));
-    } while (!_in->eof());
+        in.readLine(buf, sizeof(buf));
+        processLine(string(buf));
+    } while (!in.eof());
 }
 
 void LytReader::processLine(const string &line) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,53 +17,65 @@
 
 #include "reone/game/game.h"
 
+#include "reone/audio/context.h"
+#include "reone/audio/files.h"
+#include "reone/audio/player.h"
+#include "reone/audio/services.h"
 #include "reone/common/collectionutil.h"
+#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
 #include "reone/common/pathutil.h"
-#include "reone/graphics/aabb.h"
+#include "reone/common/binarywriter.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/format/tgawriter.h"
+#include "reone/graphics/lipanimations.h"
 #include "reone/graphics/meshes.h"
+#include "reone/graphics/models.h"
 #include "reone/graphics/pipeline.h"
+#include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
+#include "reone/gui/gui.h"
 #include "reone/movie/format/bikreader.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/format/erfreader.h"
+#include "reone/resource/format/erfwriter.h"
+#include "reone/resource/format/gffwriter.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
 #include "reone/resource/services.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/node/camera.h"
-#include "reone/scene/node/model.h"
 #include "reone/scene/services.h"
+#include "reone/script/scripts.h"
 #include "reone/script/services.h"
 
-#include "reone/game/astar.h"
-#include "reone/game/conversation.h"
+#include "reone/game/combat.h"
 #include "reone/game/cursors.h"
 #include "reone/game/debug.h"
-#include "reone/game/object/area.h"
-#include "reone/game/object/camera.h"
-#include "reone/game/object/creature.h"
-#include "reone/game/object/door.h"
-#include "reone/game/object/encounter.h"
-#include "reone/game/object/item.h"
-#include "reone/game/object/placeable.h"
-#include "reone/game/object/room.h"
-#include "reone/game/object/sound.h"
-#include "reone/game/object/store.h"
-#include "reone/game/object/trigger.h"
-#include "reone/game/object/waypoint.h"
-#include "reone/game/options.h"
+#include "reone/game/dialogs.h"
+#include "reone/game/location.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/party.h"
 #include "reone/game/resourcelayout.h"
+#include "reone/game/script/routines.h"
+#include "reone/game/services.h"
+#include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 
 using namespace std;
 
+using namespace reone::audio;
+using namespace reone::gui;
 using namespace reone::graphics;
-using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
+using namespace reone::movie;
 
 namespace fs = boost::filesystem;
 
@@ -71,50 +83,17 @@ namespace reone {
 
 namespace game {
 
-static const string kCameraHookNodeName = "camerahook";
+static constexpr char kModulesDirectoryName[] = "modules";
+
+static constexpr char kBlueprintResRefCarth[] = "p_carth";
+static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
+static constexpr char kBlueprintResRefAtton[] = "p_atton";
+static constexpr char kBlueprintResRefKreia[] = "p_kreia";
+
+static bool g_conversationsEnabled = true;
 
 void Game::init() {
-    loadModuleNames();
-
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-
-    // Movies
-
-    auto legalBikPath = getPathIgnoreCase(_options.game.path, "movies/legal.bik");
-    auto bikReader = BikReader(legalBikPath, _services.graphics, _services.audio);
-    bikReader.load();
-    _movieLegal = bikReader.movie();
-
-    // GUI
-
-    _mainMenu = make_unique<MainMenu>(*this, _options.game, _services.scene, _options.graphics, _services.graphics, _services.resource);
-    _mainMenu->init();
-
-    _mainInterface = make_unique<MainInterface>(_options.graphics, _services.graphics, _services.resource);
-    _mainInterface->init();
-
-    _dialogGui = make_unique<DialogGui>(_options.graphics, _services.graphics, _services.resource);
-    _dialogGui->init();
-
-    _console = make_unique<Console>(*this, _options.graphics, _services.graphics, _services.resource);
-    _console->init();
-
-    _profilerGui = make_unique<ProfilerGui>(_profiler, _options.graphics, _services.graphics, _services.resource);
-    _profilerGui->init();
-
-    // Services
-
-    _playerController = make_unique<PlayerController>();
-    _selectionController = make_unique<SelectionController>(*this, *_mainInterface, scene);
-    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
-
-    _routines = make_unique<Routines>(_id, *this, _services);
-    _routines->init();
-
-    _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
-
     // Surfaces
-
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
@@ -124,594 +103,862 @@ void Game::init() {
         scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
     }
 
-    // Debugging
+    loadModuleNames();
+    setCursorType(CursorType::Default);
 
-    scene.setDrawAABB(isShowAABBEnabled());
-    scene.setDrawWalkmeshes(isShowWalkmeshEnabled());
-    scene.setDrawTriggers(isShowTriggersEnabled());
+    auto routines = make_unique<Routines>(*this, _services);
+    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.scripts);
 
-    //
+    auto map = make_unique<Map>(*this, _services);
+    auto console = make_unique<Console>(*this, _services);
+    auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
+
+    console->init();
+    profileOverlay->init();
+
+    if (_tsl) {
+        _mainMenuMusicResRef = "mus_sion";
+        _charGenMusicResRef = "mus_main";
+        _charGenLoadScreenResRef = "load_default";
+
+        _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
+        _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
+        _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
+
+        routines->initForTSL();
+        map->setArrowResRef("mm_barrow_p");
+
+    } else {
+        _mainMenuMusicResRef = "mus_theme_cult";
+        _charGenMusicResRef = "mus_theme_rep";
+        _charGenLoadScreenResRef = "load_chargen";
+
+        _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+        _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+        _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+
+        routines->initForKotOR();
+        map->setArrowResRef("mm_barrow");
+    }
+
+    _screen = GameScreen::MainMenu;
+
+    _routines = move(routines);
+    _map = move(map);
+    _console = move(console);
+    _profileOverlay = move(profileOverlay);
 
     _services.graphics.window.setEventHandler(this);
-
-    changeCursor(CursorType::Default);
-
-    _profiler.init();
 }
 
-void Game::loadModuleNames() {
-    auto modulesPath = getPathIgnoreCase(_options.game.path, "modules");
-    for (auto &entry : fs::directory_iterator(modulesPath)) {
-        auto filename = boost::to_lower_copy(entry.path().filename().string());
-        if ((!boost::iends_with(filename, ".rim") && !boost::iends_with(filename, ".mod")) ||
-            boost::iends_with(filename, "_s.rim")) {
+int Game::run() {
+    start();
+    runMainLoop();
+    return 0;
+}
+
+void Game::runMainLoop() {
+    _ticks = SDL_GetTicks();
+    while (!_quit) {
+        _services.graphics.window.processEvents(_quit);
+        if (!_services.graphics.window.isInFocus()) {
             continue;
         }
-        _moduleNames.insert(filename.substr(0, filename.find_first_of('.')));
-    }
-}
-
-void Game::run() {
-    while (!_finished) {
-        _profiler.startFrame();
-
-        _profiler.startInput();
-        handleInput();
-        _profiler.endInput();
-
-        _profiler.startUpdate();
         update();
-        _profiler.endUpdate();
-
-        _profiler.startRender();
-        render();
-        _profiler.endRender();
-
-        _profiler.endFrame();
+        drawAll();
     }
-}
-
-bool Game::handle(const SDL_Event &e) {
-    if (e.type == SDL_KEYDOWN) {
-        if (e.key.keysym.scancode == SDL_SCANCODE_MINUS) {
-            _deltaMultiplier = glm::max(1.0f, _deltaMultiplier - 1.0f);
-            return true;
-        } else if (e.key.keysym.scancode == SDL_SCANCODE_EQUALS) {
-            _deltaMultiplier = glm::min(8.0f, _deltaMultiplier + 1.0f);
-            return true;
-        } else if (e.key.keysym.scancode == SDL_SCANCODE_F5) {
-            _profilerGui->setEnabled(!_profilerGui->isEnabled());
-            return true;
-        }
-    }
-    if (_stage == Stage::MovieLegal) {
-        if (e.type == SDL_MOUSEBUTTONDOWN) {
-            _stage = Stage::MainMenu;
-            return true;
-        }
-    } else if (_stage == Stage::MainMenu) {
-        if (_mainMenu->handle(e)) {
-            return true;
-        }
-    } else if (_stage == Stage::World) {
-        if (_mainInterface->handle(e)) {
-            return true;
-        }
-        if (_module && _module->area().mainCamera().handle(e)) {
-            return true;
-        }
-        if (_selectionController->handle(e)) {
-            return true;
-        }
-        if (_playerController->handle(e)) {
-            return true;
-        }
-        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKQUOTE) {
-            _stage = Stage::Console;
-            return true;
-        }
-    } else if (_stage == Stage::Conversation) {
-        if (_dialogGui->handle(e)) {
-            return true;
-        }
-    } else if (_stage == Stage::Console) {
-        if (_console->handle(e)) {
-            return true;
-        }
-        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKQUOTE) {
-            _stage = Stage::World;
-            return true;
-        }
-    }
-    return false;
 }
 
 void Game::update() {
-    // Calculate delta time
+    float dt = measureFrameTime();
 
-    auto then = _prevFrameTicks;
-    if (then == 0) {
-        then = _prevFrameTicks = SDL_GetTicks();
+    if (_movie) {
+        updateMovie(dt);
+    } else {
+        updateMusic();
     }
-    auto now = SDL_GetTicks();
-    float delta = _deltaMultiplier * (now - then) / 1000.0f;
-    _prevFrameTicks = now;
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    updateCamera(dt);
 
-    if (_stage == Stage::MovieLegal) {
-        _movieLegal->update(delta);
-        if (_movieLegal->isFinished()) {
-            _stage = Stage::MainMenu;
-        }
-
-    } else if (_stage == Stage::MainMenu) {
-        _mainMenu->update(delta);
-
-    } else if (_stage == Stage::World ||
-               _stage == Stage::Conversation ||
-               _stage == Stage::Console) {
-        if (_module) {
-            auto &area = _module->area();
-            auto &pc = _module->pc();
-
-            // Update rooms
-            for (auto &room : area.rooms()) {
-                room->update(delta);
-            }
-
-            // Update game objects
-            for (auto &object : area.objects()) {
-                object->update(delta);
-            }
-
-            // Update visibility
-            auto pcRoom = pc.room();
-            if (pcRoom) {
-                auto visibleRooms = set<string>();
-                visibleRooms.insert(pcRoom->name());
-                auto range = area.visibility().equal_range(pcRoom->name());
-                for (auto it = range.first; it != range.second; ++it) {
-                    visibleRooms.insert(it->second);
-                }
-                for (auto &room : area.rooms()) {
-                    if (visibleRooms.count(room->name()) > 0) {
-                        room->show();
-                    } else {
-                        room->hide();
-                    }
-                }
-                for (auto &object : area.objects()) {
-                    auto objectRoom = object->room();
-                    if (!objectRoom || visibleRooms.count(objectRoom->name()) > 0) {
-                        object->show();
-                    } else {
-                        object->hide();
-                    }
-                }
-            } else {
-                for (auto &object : area.objects()) {
-                    object->show();
-                }
-            }
-
-            _module->area().mainCamera().update(delta);
-        }
-
-        _playerController->update(delta);
-
-        // Update scene
-
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        scene.update(delta);
-
-        // Update GUI
-
-        if (_stage == Stage::World) {
-            _mainInterface->update(delta);
-        } else if (_stage == Stage::Conversation) {
-            _dialogGui->update(delta);
-        } else if (_stage == Stage::Console) {
-            _console->update(delta);
-        }
+    bool updModule = !_movie && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
+    if (updModule && !_paused) {
+        _module->update(dt);
+        _combat.update(dt);
     }
 
-    // Update cursor
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->update(dt);
+    }
+    updateSceneGraph(dt);
 
-    if (_stage != Stage::MovieLegal && _cursor) {
-        int x, y;
-        uint32_t state = SDL_GetMouseState(&x, &y);
-        bool pressed = state & SDL_BUTTON(1);
+    _profileOverlay->update(dt);
 
+    int x, y;
+    auto state = SDL_GetMouseState(&x, &y);
+    auto pressed = state & SDL_BUTTON(1);
+    if (_cursor) {
         _cursor->setPosition(glm::ivec2(x, y));
         _cursor->setPressed(pressed);
     }
-
-    // Update profiler GUI
-
-    if (_profilerGui->isEnabled()) {
-        _profilerGui->update(delta);
-    }
 }
 
-void Game::render() {
+void Game::drawAll() {
     _services.graphics.context.clearColorDepth();
 
-    if (_stage == Stage::MovieLegal) {
-        _movieLegal->render();
-
-    } else if (_stage == Stage::MainMenu) {
-        _mainMenu->render();
-
-    } else if (_stage == Stage::World ||
-               _stage == Stage::Conversation ||
-               _stage == Stage::Console) {
-        // Render world
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        _worldRenderer->render();
-
-        // Render GUI
-        if (_stage == Stage::World) {
-            _mainInterface->render();
-        } else if (_stage == Stage::Conversation) {
-            _dialogGui->render();
-        } else if (_stage == Stage::Console) {
-            _console->render();
-        }
-    }
-
-    // Render cursor
-    if (_stage != Stage::MovieLegal && _cursor) {
+    if (_movie) {
+        _movie->render();
+    } else {
+        drawWorld();
+        drawGUI();
         _cursor->draw();
     }
 
-    // Render profiler GUI
-    if (_profilerGui->isEnabled()) {
-        _profilerGui->render();
-    }
-
+    _profileOverlay->draw();
     _services.graphics.window.swapBuffers();
 }
 
-void Game::loadModule(const string &name) {
-    _services.game.resourceLayout.loadModuleResources(name);
+void Game::loadModule(const string &name, string entry) {
+    info("Load module '" + name + "'");
 
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    scene.clear();
+    withLoadingScreen("load_" + name, [this, &name, &entry]() {
+        loadInGameMenus();
 
-    auto &module = static_cast<Module &>(*newModule());
-    module.setSceneGraph(&scene);
-    module.load(name);
-    _module = &module;
+        /*
+        _services.game.soundSets.invalidate();
+        _services.graphics.textures.invalidate();
+        _services.graphics.models.invalidate();
+        _services.graphics.walkmeshes.invalidate();
+        _services.graphics.lipAnimations.invalidate();
+        _services.audio.files.invalidate();
+        _services.script.scripts.invalidate();
+        */
 
-    scene.setFog(module.area().fog());
+        try {
+            if (_module) {
+                _module->area()->runOnExitScript();
+                _module->area()->unloadParty();
+            }
 
-    // Main camera
+            loadModuleResources(name);
+            if (_loadScreen) {
+                _loadScreen->setProgress(50);
+            }
+            drawAll();
 
-    auto &camera = module.area().mainCamera();
-    scene.setActiveCamera(static_cast<CameraSceneNode *>(camera.sceneNode()));
+            _services.scene.graphs.get(kSceneMain).clear();
 
-    // Rooms
+            auto maybeModule = _loadedModules.find(name);
+            if (maybeModule != _loadedModules.end()) {
+                _module = maybeModule->second;
+            } else {
+                _module = _objectFactory.newModule();
 
-    for (auto &room : module.area().rooms()) {
-        auto model = static_cast<ModelSceneNode *>(room->sceneNode());
-        if (model) {
-            scene.addRoot(*model);
+                shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
+                if (!ifo) {
+                    throw ValidationException("Module IFO file not found");
+                }
+
+                _module->load(name, *ifo);
+                _loadedModules.insert(make_pair(name, _module));
+            }
+
+            if (_party.isEmpty()) {
+                loadDefaultParty();
+            }
+
+            _module->loadParty(entry);
+
+            info("Module '" + name + "' loaded successfully");
+
+            if (_loadScreen) {
+                _loadScreen->setProgress(100);
+            }
+            drawAll();
+
+            string musicName(_module->area()->music());
+            playMusic(musicName);
+
+            _ticks = SDL_GetTicks();
+            openInGame();
+        } catch (const ValidationException &e) {
+            error("Failed loading module '" + name + "': " + string(e.what()));
         }
-        auto grass = room->grass();
-        if (grass) {
-            scene.addRoot(*grass);
-        }
-        auto walkmesh = room->walkmesh();
-        if (walkmesh) {
-            scene.addRoot(*walkmesh);
-        }
+    });
+}
+
+void Game::loadDefaultParty() {
+    string member1, member2, member3;
+    getDefaultPartyMembers(member1, member2, member3);
+
+    if (!member1.empty()) {
+        shared_ptr<Creature> player(_objectFactory.newCreature());
+        player->loadFromBlueprint(member1);
+        player->setTag(kObjectTagPlayer);
+        player->setImmortal(true);
+        _party.addMember(kNpcPlayer, player);
+        _party.setPlayer(player);
     }
-
-    // Objects
-
-    for (auto &object : module.area().objects()) {
-        auto sceneNode = object->sceneNode();
-        if (sceneNode) {
-            if (sceneNode->type() == SceneNodeType::Model) {
-                auto model = static_cast<ModelSceneNode *>(sceneNode);
-                model->setDrawDistance(_options.graphics.drawDistance);
-                scene.addRoot(*model);
-            } else if (sceneNode->type() == SceneNodeType::Trigger) {
-                auto trigger = static_cast<TriggerSceneNode *>(sceneNode);
-                scene.addRoot(*trigger);
-            }
-        }
-        if (object->type() == ObjectType::Placeable) {
-            auto &placeable = static_cast<Placeable &>(*object);
-            auto walkmesh = placeable.walkmesh();
-            if (walkmesh) {
-                scene.addRoot(*walkmesh);
-            }
-        } else if (object->type() == ObjectType::Door) {
-            auto &door = static_cast<Door &>(*object);
-            auto walkmeshClosed = door.walkmeshClosed();
-            if (walkmeshClosed) {
-                scene.addRoot(*walkmeshClosed);
-            }
-            auto walkmeshOpen1 = door.walkmeshOpen1();
-            if (walkmeshOpen1) {
-                scene.addRoot(*walkmeshOpen1);
-            }
-            auto walkmeshOpen2 = door.walkmeshOpen2();
-            if (walkmeshOpen2) {
-                scene.addRoot(*walkmeshOpen2);
-            }
-        }
+    if (!member2.empty()) {
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        companion->loadFromBlueprint(member2);
+        companion->setImmortal(true);
+        _party.addMember(0, companion);
     }
-
-    // Player character
-
-    auto &pc = module.pc();
-
-    auto pcModel = static_cast<ModelSceneNode *>(pc.sceneNode());
-    scene.addRoot(*pcModel);
-
-    auto pcCameraHook = pcModel->getNodeByName(kCameraHookNodeName);
-    camera.setMode(Camera::Mode::ThirdPerson);
-    camera.setThirdPersonHook(pcCameraHook);
-
-    _playerController->setCreature(&pc);
-    _playerController->setCamera(&camera);
-
-    _selectionController->setPC(&pc);
-
-    // Path
-
-    auto path = module.area().path();
-    if (path) {
-        _services.game.aStar.setPath(*path);
-    } else {
-        _services.game.aStar.setPath(Path());
+    if (!member3.empty()) {
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        companion->loadFromBlueprint(member3);
+        companion->setImmortal(true);
+        _party.addMember(1, companion);
     }
 }
 
-// IGame
-
-void Game::startNewGame() {
-    auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
-    warpToModule(moduleName);
-}
-
-void Game::warpToModule(const string &name) {
-    loadModule(name);
-    _stage = Stage::World;
-}
-
-void Game::quit() {
-    _finished = true;
-}
-
-void Game::startConversation(const std::string &name) {
-    auto conversation = Conversation(_services.resource);
-    conversation.load(name);
-
-    _stage = Stage::Conversation;
-}
-
-void Game::changeCursor(CursorType type) {
+void Game::setCursorType(CursorType type) {
     if (_cursorType == type) {
         return;
     }
-    auto cursor = _services.game.cursors.get(type);
-    if (cursor) {
-        _cursor = cursor.get();
-        SDL_ShowCursor(SDL_DISABLE);
-    } else {
-        _cursor = nullptr;
+    if (type == CursorType::None) {
+        _cursor.reset();
         SDL_ShowCursor(SDL_ENABLE);
+    } else {
+        _cursor = _services.game.cursors.get(type);
+        SDL_ShowCursor(SDL_DISABLE);
     }
     _cursorType = type;
+    
 }
 
-void Game::runScript(const string &name, Object &caller, Object *triggerrer) {
-    _scriptRunner->run(name, caller.id(), triggerrer ? triggerrer->id() : kObjectInvalid);
-}
-
-Object *Game::objectById(uint32_t id) {
-    if (id == kObjectSelf || id == kObjectInvalid) {
-        return nullptr;
-    }
-    auto object = getFromLookupOrNull(_objects, id);
-    return object.get();
-}
-
-Object *Game::objectByTag(const string &tag, int nth) {
-    if (!_module) {
-        return nullptr;
-    }
-    int match = 0;
-    for (auto object : _module->area().objects()) {
-        if (object->tag() != tag) {
-            continue;
-        }
-        if (match++ == nth) {
-            return object;
-        }
-    }
-    auto &pc = _module->pc();
-    if (pc.tag() == tag) {
-        return &pc;
-    }
-    return nullptr;
-}
-
-set<Object *> Game::objectsInRadius(const glm::vec2 &origin, float radius, int typeMask) {
-    if (!_module) {
-        return set<Object *>();
-    }
-    auto objects = set<Object *>();
-    float radius2 = radius * radius;
-    for (auto object : _module->area().objects()) {
-        if ((typeMask & static_cast<int>(object->type())) == 0) {
-            continue;
-        }
-        if (object->square2dDistanceTo(origin) < radius2) {
-            objects.insert(object);
-        }
-    }
-    auto &pc = _module->pc();
-    if ((typeMask & static_cast<int>(ObjectType::Creature)) != 0 && pc.square2dDistanceTo(origin) < radius2) {
-        objects.insert(&pc);
-    }
-    return objects;
-}
-
-std::set<Object *> Game::objectsSatisfying(std::function<bool(const Object &)> pred) {
-    if (!_module) {
-        return set<Object *>();
-    }
-    auto objects = set<Object *>();
-    for (auto object : _module->area().objects()) {
-        if (pred(*object)) {
-            objects.insert(object);
-        }
-    }
-    auto &pc = _module->pc();
-    if (pred(pc)) {
-        objects.insert(&pc);
-    }
-    return objects;
-}
-
-// END IGame
-
-// IObjectFactory
-
-shared_ptr<Object> Game::newArea() {
-    return newObject<Area>();
-}
-
-shared_ptr<Object> Game::newCamera() {
-    return newObject<Camera>();
-}
-
-shared_ptr<Object> Game::newCreature() {
-    return newObject<Creature>();
-}
-
-shared_ptr<Object> Game::newDoor() {
-    return newObject<Door>();
-}
-
-shared_ptr<Object> Game::newEncounter() {
-    return newObject<Encounter>();
-}
-
-shared_ptr<Object> Game::newItem() {
-    return newObject<Item>();
-}
-
-shared_ptr<Object> Game::newModule() {
-    return newObject<Module>();
-}
-
-shared_ptr<Object> Game::newPlaceable() {
-    return newObject<Placeable>();
-}
-
-shared_ptr<Object> Game::newRoom() {
-    return newObject<Room>();
-}
-
-shared_ptr<Object> Game::newSound() {
-    return newObject<Sound>();
-}
-
-shared_ptr<Object> Game::newStore() {
-    return newObject<Store>();
-}
-
-shared_ptr<Object> Game::newTrigger() {
-    return newObject<Trigger>();
-}
-
-shared_ptr<Object> Game::newWaypoint() {
-    return newObject<Waypoint>();
-}
-
-// END IObjectFactory
-
-// IEventHandler
-
-void Game::handleInput() {
-    _services.graphics.window.processEvents(_finished);
-}
-
-// END IEventHandler
-
-bool Game::PlayerController::handle(const SDL_Event &e) {
-    if (e.type == SDL_KEYDOWN) {
-        if (e.key.keysym.sym == SDLK_w) {
-            _forward = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_z) {
-            _left = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_s) {
-            _backward = 1.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_c) {
-            _right = 1.0f;
-            return true;
-        }
-    } else if (e.type == SDL_KEYUP) {
-        if (e.key.keysym.sym == SDLK_w) {
-            _forward = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_z) {
-            _left = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_s) {
-            _backward = 0.0f;
-            return true;
-        } else if (e.key.keysym.sym == SDLK_c) {
-            _right = 0.0f;
-            return true;
-        }
-    }
-    return false;
-}
-
-void Game::PlayerController::update(float delta) {
-    _creature->update(delta);
-
-    if (!_camera) {
+void Game::playVideo(const string &name) {
+    fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
+    if (path.empty()) {
         return;
     }
-    float facing;
-    if (_forward != 0.0f && _backward == 0.0f) {
-        facing = _camera->facing();
-    } else if (_forward == 0.0f && _backward != 0.0f) {
-        facing = glm::mod(_camera->facing() + glm::pi<float>(), glm::two_pi<float>());
-    } else if (_left != 0.0f && _right == 0.0f) {
-        facing = glm::mod(_camera->facing() + glm::half_pi<float>(), glm::two_pi<float>());
-    } else if (_left == 0.0f && _right != 0.0f) {
-        facing = glm::mod(_camera->facing() - glm::half_pi<float>(), glm::two_pi<float>());
-    } else {
-        _creature->setState(Creature::State::Pause);
+
+    BikReader bik(path, _services.graphics, _services.audio);
+    bik.load();
+
+    _movie = bik.movie();
+    if (!_movie) {
         return;
     }
-    _creature->setFacing(facing);
-    _creature->setState(Creature::State::Run);
-    _creature->moveForward(delta);
+
+    if (_music) {
+        _music->stop();
+        _music.reset();
+    }
 }
 
-void Game::WorldRenderer::render() {
-    auto output = _graphicsSvc.pipeline.draw(_sceneGraph, glm::ivec2(_graphicsOptions.width, _graphicsOptions.height));
+void Game::playMusic(const string &resRef) {
+    if (_musicResRef == resRef) {
+        return;
+    }
+    if (_music) {
+        _music->stop();
+        _music.reset();
+    }
+    _musicResRef = resRef;
+}
+
+void Game::drawWorld() {
+    auto &scene = _services.scene.graphs.get(kSceneMain);
+    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
     }
-    _graphicsSvc.uniforms.setGeneral([](auto &general) {
+    _services.graphics.uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.simpleTexture());
-    _graphicsSvc.textures.bind(*output);
-    _graphicsSvc.meshes.quadNDC().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
+    _services.graphics.textures.bind(*output);
+    _services.graphics.meshes.quadNDC().draw();
+}
+
+void Game::toggleInGameCameraType() {
+    switch (_cameraType) {
+    case CameraType::FirstPerson:
+        if (_party.getLeader()) {
+            _cameraType = CameraType::ThirdPerson;
+        }
+        break;
+    case CameraType::ThirdPerson: {
+        _module->player().stopMovement();
+        shared_ptr<Area> area(_module->area());
+        auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
+        auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
+        firstPerson.setPosition(thirdPerson.sceneNode()->getOrigin());
+        firstPerson.setFacing(thirdPerson.facing());
+        _cameraType = CameraType::FirstPerson;
+        break;
+    }
+    default:
+        break;
+    }
+
+    setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
+
+    _module->area()->updateRoomVisibility();
+}
+
+Camera *Game::getActiveCamera() const {
+    if (!_module) {
+        return nullptr;
+    }
+    shared_ptr<Area> area(_module->area());
+    if (!area) {
+        return nullptr;
+    }
+    return &area->getCamera(_cameraType);
+}
+
+shared_ptr<Object> Game::getObjectById(uint32_t id) const {
+    switch (id) {
+    case kObjectSelf:
+        throw invalid_argument("id is invalid");
+    case kObjectInvalid:
+        return nullptr;
+    default:
+        return _objectFactory.getObjectById(id);
+    }
+}
+
+void Game::drawGUI() {
+    switch (_screen) {
+    case GameScreen::InGame:
+        if (_cameraType == CameraType::ThirdPerson) {
+            drawHUD();
+        }
+        if (_console->isOpen()) {
+            _console->draw();
+        }
+        break;
+
+    default: {
+        GUI *gui = getScreenGUI();
+        if (gui) {
+            gui->draw();
+        }
+        break;
+    }
+    }
+}
+
+void Game::updateMovie(float dt) {
+    _movie->update(dt);
+
+    if (_movie->isFinished()) {
+        _movie.reset();
+    }
+}
+
+void Game::updateMusic() {
+    if (_musicResRef.empty()) {
+        return;
+    }
+    if (_music && _music->isPlaying()) {
+        _music->update();
+    } else {
+        _music = _services.audio.player.play(_musicResRef, AudioType::Music);
+    }
+}
+
+void Game::loadNextModule() {
+    loadModule(_nextModule, _nextEntry);
+
+    _nextModule.clear();
+    _nextEntry.clear();
+}
+
+float Game::measureFrameTime() {
+    uint32_t ticks = SDL_GetTicks();
+    float dt = (ticks - _ticks) / 1000.0f;
+    _ticks = ticks;
+
+    return dt * _gameSpeed;
+}
+
+void Game::quit() {
+    _quit = true;
+}
+
+void Game::stopMovement() {
+    getActiveCamera()->stopMovement();
+    _module->player().stopMovement();
+}
+
+void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
+    _nextModule = moduleName;
+    _nextEntry = entry;
+}
+
+void Game::updateCamera(float dt) {
+    switch (_screen) {
+    case GameScreen::Conversation: {
+        int cameraId;
+        CameraType cameraType = getConversationCamera(cameraId);
+        if (cameraType == CameraType::Static) {
+            _module->area()->setStaticCamera(cameraId);
+        }
+        _cameraType = cameraType;
+        break;
+    }
+    case GameScreen::InGame:
+        if (_cameraType != CameraType::FirstPerson && _cameraType != CameraType::ThirdPerson) {
+            _cameraType = CameraType::ThirdPerson;
+        }
+        break;
+    default:
+        break;
+    }
+    Camera *camera = getActiveCamera();
+    if (camera) {
+        camera->update(dt);
+
+        glm::vec3 listenerPosition;
+        if (_cameraType == CameraType::ThirdPerson) {
+            shared_ptr<Creature> partyLeader(_party.getLeader());
+            if (partyLeader) {
+                listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
+            }
+        } else {
+            listenerPosition = camera->sceneNode()->getOrigin();
+        }
+        _services.audio.context.setListenerPosition(move(listenerPosition));
+    }
+}
+
+void Game::updateSceneGraph(float dt) {
+    const Camera *camera = getActiveCamera();
+    if (!camera) {
+        return;
+    }
+    auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
+    sceneGraph.setActiveCamera(camera->sceneNode().get());
+    sceneGraph.setUpdateRoots(!_paused);
+    sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
+    sceneGraph.setDrawTriggers(isShowTriggersEnabled());
+    sceneGraph.update(dt);
+}
+
+bool Game::handle(const SDL_Event &event) {
+    if (_profileOverlay->handle(event))
+        return true;
+
+    if (!_movie) {
+        GUI *gui = getScreenGUI();
+        if (gui && gui->handle(event)) {
+            return true;
+        }
+        switch (_screen) {
+        case GameScreen::InGame: {
+            if (_console->handle(event)) {
+                return true;
+            }
+            if (_party.handle(event)) {
+                return true;
+            }
+            Camera *camera = getActiveCamera();
+            if (camera && camera->handle(event)) {
+                return true;
+            }
+            if (_module->handle(event)) {
+                return true;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    switch (event.type) {
+    case SDL_MOUSEBUTTONDOWN:
+        if (handleMouseButtonDown(event.button))
+            return true;
+        break;
+    case SDL_KEYDOWN:
+        if (handleKeyDown(event.key))
+            return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
+}
+
+bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    if (event.button != SDL_BUTTON_LEFT)
+        return false;
+
+    if (_movie) {
+        _movie->finish();
+        return true;
+    }
+
+    return false;
+}
+
+bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
+    if (event.repeat)
+        return false;
+
+    switch (event.keysym.sym) {
+    case SDLK_MINUS:
+        if (_options.game.developer && _gameSpeed > 1.0f) {
+            _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+            return true;
+        }
+        break;
+
+    case SDLK_EQUALS:
+        if (_options.game.developer && _gameSpeed < 8.0f) {
+            _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
+            return true;
+        }
+        break;
+
+    case SDLK_v:
+        if (_options.game.developer && _screen == GameScreen::InGame) {
+            toggleInGameCameraType();
+            return true;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return false;
+}
+
+bool Game::getGlobalBoolean(const string &name) const {
+    return getFromLookupOrElse(_globalBooleans, name, false);
+}
+
+int Game::getGlobalNumber(const string &name) const {
+    return getFromLookupOrElse(_globalNumbers, name, 0);
+}
+
+string Game::getGlobalString(const string &name) const {
+    static string empty;
+    return getFromLookupOrElse(_globalStrings, name, empty);
+}
+
+shared_ptr<Location> Game::getGlobalLocation(const string &name) const {
+    return getFromLookupOrNull(_globalLocations, name);
+}
+
+void Game::setGlobalBoolean(const string &name, bool value) {
+    _globalBooleans[name] = value;
+}
+
+void Game::setGlobalNumber(const string &name, int value) {
+    _globalNumbers[name] = value;
+}
+
+void Game::setGlobalString(const string &name, const string &value) {
+    _globalStrings[name] = value;
+}
+
+void Game::setGlobalLocation(const string &name, const shared_ptr<Location> &location) {
+    _globalLocations[name] = location;
+}
+
+void Game::setPaused(bool paused) {
+    _paused = paused;
+}
+
+void Game::setRelativeMouseMode(bool relative) {
+    _services.graphics.window.setRelativeMouseMode(relative);
+}
+
+void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
+    if (!_loadScreen) {
+        loadLoadingScreen();
+    }
+    if (_loadScreen) {
+        _loadScreen->setImage(imageResRef);
+        _loadScreen->setProgress(0);
+    }
+    changeScreen(GameScreen::Loading);
+    drawAll();
+    block();
+}
+
+void Game::openMainMenu() {
+    if (!_mainMenu) {
+        loadMainMenu();
+    }
+    if (!_saveLoad) {
+        loadSaveLoad();
+    }
+    playMusic(_mainMenuMusicResRef);
+    changeScreen(GameScreen::MainMenu);
+}
+
+void Game::openInGame() {
+    changeScreen(GameScreen::InGame);
+}
+
+void Game::openInGameMenu(InGameMenuTab tab) {
+    setCursorType(CursorType::Default);
+    switch (tab) {
+    case InGameMenuTab::Equipment:
+        _inGame->openEquipment();
+        break;
+    case InGameMenuTab::Inventory:
+        _inGame->openInventory();
+        break;
+    case InGameMenuTab::Character:
+        _inGame->openCharacter();
+        break;
+    case InGameMenuTab::Abilities:
+        _inGame->openAbilities();
+        break;
+    case InGameMenuTab::Messages:
+        _inGame->openMessages();
+        break;
+    case InGameMenuTab::Journal:
+        _inGame->openJournal();
+        break;
+    case InGameMenuTab::Map:
+        _inGame->openMap();
+        break;
+    case InGameMenuTab::Options:
+        _inGame->openOptions();
+        break;
+    default:
+        break;
+    }
+    changeScreen(GameScreen::InGameMenu);
+}
+
+void Game::openContainer(const shared_ptr<Object> &container) {
+    stopMovement();
+    setRelativeMouseMode(false);
+    setCursorType(CursorType::Default);
+    _container->open(container);
+    changeScreen(GameScreen::Container);
+}
+
+void Game::openPartySelection(const PartySelectionContext &ctx) {
+    stopMovement();
+    setRelativeMouseMode(false);
+    setCursorType(CursorType::Default);
+    _partySelect->prepare(ctx);
+    changeScreen(GameScreen::PartySelection);
+}
+
+void Game::openSaveLoad(SaveLoadMode mode) {
+    setRelativeMouseMode(false);
+    setCursorType(CursorType::Default);
+    _saveLoad->setMode(mode);
+    _saveLoad->refresh();
+    changeScreen(GameScreen::SaveLoad);
+}
+
+void Game::openLevelUp() {
+    setRelativeMouseMode(false);
+    setCursorType(CursorType::Default);
+    _charGen->startLevelUp();
+    changeScreen(GameScreen::CharacterGeneration);
+}
+
+void Game::startCharacterGeneration() {
+    withLoadingScreen(_charGenLoadScreenResRef, [this]() {
+        if (!_charGen) {
+            loadCharacterGeneration();
+        }
+        _loadScreen->setProgress(100);
+        drawAll();
+        playMusic(_charGenMusicResRef);
+        changeScreen(GameScreen::CharacterGeneration);
+    });
+}
+
+void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
+    if (!g_conversationsEnabled)
+        return;
+
+    shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
+    if (!dlg) {
+        warn("Game: conversation not found: " + resRef);
+        return;
+    }
+
+    stopMovement();
+    setRelativeMouseMode(false);
+    setCursorType(CursorType::Default);
+    changeScreen(GameScreen::Conversation);
+
+    auto dialog = _services.game.dialogs.get(resRef);
+    bool computerConversation = dialog->conversationType == ConversationType::Computer;
+    _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
+    _conversation->start(dialog, owner);
+}
+
+void Game::resumeConversation() {
+    _conversation->resume();
+}
+
+void Game::pauseConversation() {
+    _conversation->pause();
+}
+
+void Game::loadInGameMenus() {
+    if (!_hud) {
+        loadHUD();
+    }
+    if (!_inGame) {
+        loadInGame();
+    }
+    if (!_dialog) {
+        loadDialog();
+    }
+    if (!_computer) {
+        loadComputer();
+    }
+    if (!_container) {
+        loadContainer();
+    }
+    if (!_partySelect) {
+        loadPartySelection();
+    }
+}
+
+void Game::loadMainMenu() {
+    _mainMenu = make_unique<MainMenu>(*this, _services);
+    _mainMenu->load();
+}
+
+void Game::loadHUD() {
+    _hud = make_unique<HUD>(*this, _services);
+    _hud->load();
+}
+
+void Game::loadDialog() {
+    _dialog = make_unique<DialogGUI>(*this, _services);
+    _dialog->load();
+}
+
+void Game::loadComputer() {
+    _computer = make_unique<ComputerGUI>(*this, _services);
+    _computer->load();
+}
+
+void Game::loadContainer() {
+    _container = make_unique<ContainerGUI>(*this, _services);
+    _container->load();
+}
+
+void Game::loadPartySelection() {
+    _partySelect = make_unique<PartySelection>(*this, _services);
+    _partySelect->load();
+}
+
+void Game::loadSaveLoad() {
+    _saveLoad = make_unique<SaveLoad>(*this, _services);
+    _saveLoad->load();
+}
+
+void Game::loadLoadingScreen() {
+    _loadScreen = make_unique<LoadingScreen>(*this, _services);
+    static_cast<LoadingScreen *>(_loadScreen.get())->load();
+}
+
+void Game::loadCharacterGeneration() {
+    _charGen = make_unique<CharacterGeneration>(*this, _services);
+    _charGen->load();
+}
+
+void Game::loadInGame() {
+    _inGame = make_unique<InGameMenu>(*this, _services);
+    _inGame->load();
+}
+
+void Game::changeScreen(GameScreen screen) {
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->resetFocus();
+    }
+    _screen = screen;
+}
+
+GUI *Game::getScreenGUI() const {
+    switch (_screen) {
+    case GameScreen::MainMenu:
+        return _mainMenu.get();
+    case GameScreen::Loading:
+        return static_cast<LoadingScreen *>(_loadScreen.get());
+    case GameScreen::CharacterGeneration:
+        return _charGen.get();
+    case GameScreen::InGame:
+        return _cameraType == game::CameraType::ThirdPerson ? _hud.get() : nullptr;
+    case GameScreen::InGameMenu:
+        return _inGame.get();
+    case GameScreen::Conversation:
+        return _conversation;
+    case GameScreen::Container:
+        return _container.get();
+    case GameScreen::PartySelection:
+        return _partySelect.get();
+    case GameScreen::SaveLoad:
+        return _saveLoad.get();
+    default:
+        return nullptr;
+    }
+}
+
+void Game::setBarkBubbleText(string text, float duration) {
+    _hud->barkBubble().setBarkText(text, duration);
+}
+
+void Game::loadModuleNames() {
+    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+    if (modules.empty()) {
+        throw ValidationException("Modules directory not found");
+    }
+    for (auto &entry : fs::directory_iterator(modules)) {
+        string filename(boost::to_lower_copy(entry.path().filename().string()));
+        if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
+            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
+            _moduleNames.insert(move(moduleName));
+        }
+    }
+}
+
+void Game::start() {
+    playVideo("legal");
+    openMainMenu();
+}
+
+void Game::loadModuleResources(const string &moduleName) {
+    _services.game.resourceLayout.loadModuleResources(moduleName);
+}
+
+void Game::onModuleSelected(const string &module) {
+    _mainMenu->onModuleSelected(module);
+}
+
+void Game::drawHUD() {
+    _hud->draw();
+}
+
+CameraType Game::getConversationCamera(int &cameraId) const {
+    return _conversation->getCamera(cameraId);
+}
+
+void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
+    if (_tsl) {
+        member1 = kBlueprintResRefAtton;
+        member2 = kBlueprintResRefKreia;
+    } else {
+        member1 = kBlueprintResRefCarth;
+        member2 = kBlueprintResRefBastila;
+    }
+    member3.clear();
 }
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,29 +29,75 @@ class Gff;
 
 namespace game {
 
+class Game;
+
 class Sound : public Object {
 public:
     Sound(
         uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Sound,
+            std::move(sceneName),
             game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            services) {
     }
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromBlueprint(const std::string &resRef);
+
+    void update(float dt) override;
+
+    bool isActive() const { return _active; }
+
+    glm::vec3 getPosition() const;
+
+    int priority() const { return _priority; }
+    float maxDistance() const { return _maxDistance; }
+    float minDistance() const { return _minDistance; }
+    bool continuous() const { return _continuous; }
+    float elevation() const { return _elevation; }
+    bool looping() const { return _looping; }
+    bool positional() const { return _positional; }
+
+    void setActive(bool active);
+
+private:
+    bool _active {false};
+    int _priority {0};
+    int _soundIdx {-1};
+    float _timeout {0.0f};
+    float _maxDistance {0.0f};
+    float _minDistance {0.0f};
+    bool _continuous {false};
+    float _elevation {0.0f};
+    bool _looping {false};
+    bool _positional {false};
+    int _interval {0};
+    int _volume {0};
+    bool _randomPosition {false};
+    int _random {0};
+    float _randomRangeX {0.0f};
+    float _randomRangeY {0.0f};
+    int _intervalVrtn {0};
+    float _pitchVariation {0.0f};
+    int _volumeVrtn {0};
+
+    std::vector<std::string> _sounds;
+
+    void loadTransformFromGIT(const resource::Gff &gffs);
+
+    void updateTransform() override;
+
+    // Blueprint
+
+    void loadUTS(const resource::Gff &uts);
+    void loadPriorityFromUTS(const resource::Gff &uts);
+
+    // END Blueprint
 };
 
 } // namespace game

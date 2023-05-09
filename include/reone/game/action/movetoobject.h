@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,29 @@
 
 #pragma once
 
-#include "../action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class Object;
-
-class MoveToObjectAction : public Action {
+class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(Object &moveTo, bool run = false, float range = 1.0f) :
-        Action(ActionType::MoveToObject),
-        _moveTo(moveTo),
+    MoveToObjectAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, bool run, float range, float timeout, bool force) :
+        ObjectAction(game, services, ActionType::MoveToObject, std::move(object), range),
         _run(run),
-        _range(range) {
+        _timeout(timeout),
+        _force(force) {
     }
 
-    void execute(Object &actor, float delta) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+    bool isRun() const { return _run; }
 
 private:
-    Object &_moveTo;
-    bool _run {false};
-    float _range {1.0f};
+    bool _run;
+    float _timeout;
+    bool _force;
 };
 
 } // namespace game

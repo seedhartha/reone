@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,15 +32,15 @@ namespace reone {
 namespace gui {
 
 void SceneInitializer::invoke() {
-    auto model = _modelSupplier(_sceneGraph);
+    shared_ptr<ModelSceneNode> model(_modelSupplier(_sceneGraph));
     if (!model) {
         throw logic_error("model is null");
     }
     _sceneGraph.clear();
-    _sceneGraph.addRoot(*model);
+    _sceneGraph.addRoot(model);
     _sceneGraph.setAmbientLightColor(_ambientLightColor);
 
-    auto cameraNode = _sceneGraph.newCamera();
+    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera());
     cameraNode->setOrthographicProjection(
         -_aspect * _modelScale + _modelOffset.x,
         _aspect * _modelScale + _modelOffset.x,

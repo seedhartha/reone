@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,11 @@
 
 #pragma once
 
+#include "reone/resource/gff.h"
+
 #include "../object.h"
 
 namespace reone {
-
-namespace resource {
-
-class Gff;
-
-}
 
 namespace game {
 
@@ -33,25 +29,60 @@ class Encounter : public Object {
 public:
     Encounter(
         uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Encounter,
+            std::move(sceneName),
             game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            services) {
     }
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    void loadFromGIT(const resource::Gff &gffs);
+
+private:
+    struct SpawnPoint {
+        glm::vec3 position {0.0f};
+        glm::quat orientation {1.0f, 0.0f, 0.0f, 0.0f};
+    };
+
+    struct EncounterCreature {
+        int _appearance {0};
+        float _cr {0.0f};
+        std::string _resRef;
+        bool _singleSpawn {false};
+    };
+
+    bool _active {false};
+    int _difficultyIndex {0};
+    Faction _faction {Faction::Invalid};
+    int _maxCreatures {0};
+    bool _playerOnly {false};
+    int _recCreatures {0};
+    bool _reset {false};
+    int _resetTime {0};
+    int _respawns {0};
+    std::vector<EncounterCreature> _creatures;
+    std::vector<glm::vec3> _geometry;
+    std::vector<SpawnPoint> _spawnPoints;
+
+    // Scripts
+
+    std::string _onEntered;
+    std::string _onExit;
+    std::string _onExhausted;
+
+    // END Scripts
+
+    void loadFromBlueprint(const std::string &blueprintResRef);
+    void loadPositionFromGIT(const resource::Gff &gffs);
+    void loadGeometryFromGIT(const resource::Gff &gffs);
+    void loadSpawnPointsFromGIT(const resource::Gff &gffs);
+
+    void loadUTE(const resource::Gff &ute);
+    void loadCreaturesFromUTE(const resource::Gff &ute);
 };
 
 } // namespace game

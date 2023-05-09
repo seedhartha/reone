@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 #pragma once
 
 #include "reone/common/stream/input.h"
-
-#include "../types.h"
+#include "../../game/types.h"
 
 namespace reone {
 
@@ -27,7 +26,7 @@ namespace game {
 
 class VisReader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<IInputStream> &in);
+    void load(IInputStream &in);
 
     const game::Visibility &visibility() const { return _visibility; }
 

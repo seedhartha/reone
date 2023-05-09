@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,16 +35,16 @@ namespace game {
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     auto data = _resources.get(resRef, ResourceType::Ssf);
-    if (!data)
+    if (!data) {
         return nullptr;
-
+    }
+    auto stream = ByteArrayInputStream(*data);
     auto result = make_shared<SoundSet>();
-    auto ssf = ByteArrayInputStream(*data);
 
-    auto reader = SsfReader();
-    reader.load(ssf);
+    SsfReader ssf;
+    ssf.load(stream);
 
-    vector<uint32_t> sounds(reader.soundSet());
+    vector<uint32_t> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
         string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
         shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));

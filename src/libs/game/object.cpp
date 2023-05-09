@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,67 +17,396 @@
 
 #include "reone/game/object.h"
 
-#include "reone/graphics/services.h"
-#include "reone/graphics/window.h"
-#include "reone/scene/graph.h"
+#include "reone/common/collectionutil.h"
+#include "reone/common/logutil.h"
 
-#include "reone/game/options.h"
+#include "reone/game/game.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/object/item.h"
+#include "reone/game/room.h"
+#include "reone/game/services.h"
+
+using namespace std;
+
+using namespace reone::graphics;
+using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-void Object::update(float delta) {
+static constexpr float kKeepPathDuration = 1000.0f;
+static constexpr float kDefaultMaxObjectDistance = 2.0f;
+static constexpr float kMaxConversationDistance = 4.0f;
+static constexpr float kDistanceWalk = 4.0f;
+
+void Object::update(float dt) {
+    updateActions(dt);
+    updateEffects(dt);
+
+    if (!_dead) {
+        executeActions(dt);
+    }
+    if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
+        static_pointer_cast<ModelSceneNode>(_sceneNode)->setPickable(isSelectable());
+    }
+}
+
+bool Object::getLocalBoolean(int index) const {
+    return getFromLookupOrElse(_localBooleans, index, false);
+}
+
+int Object::getLocalNumber(int index) const {
+    return getFromLookupOrElse(_localNumbers, index, 0);
+}
+
+void Object::setLocalBoolean(int index, bool value) {
+    _localBooleans[index] = value;
+}
+
+void Object::setLocalNumber(int index, int value) {
+    _localNumbers[index] = value;
+}
+
+void Object::clearAllActions() {
+    while (!_actions.empty()) {
+        _actions.pop_front();
+    }
+}
+
+void Object::addAction(unique_ptr<Action> action) {
+    _actions.push_back(move(action));
+}
+
+void Object::addActionOnTop(unique_ptr<Action> action) {
+    _actions.push_front(move(action));
+}
+
+void Object::delayAction(unique_ptr<Action> action, float seconds) {
+    DelayedAction delayed;
+    delayed.action = move(action);
+    delayed.timer.setTimeout(seconds);
+    _delayed.push_back(move(delayed));
+}
+
+void Object::updateActions(float dt) {
+    removeCompletedActions();
+    updateDelayedActions(dt);
+}
+
+void Object::removeCompletedActions() {
+    while (true) {
+        shared_ptr<Action> action(getCurrentAction());
+        if (!action || !action->isCompleted())
+            return;
+
+        _actions.pop_front();
+    }
+}
+
+void Object::updateDelayedActions(float dt) {
+    for (auto &delayed : _delayed) {
+        delayed.timer.advance(dt);
+        if (delayed.timer.isTimedOut()) {
+            _actions.push_back(move(delayed.action));
+        }
+    }
+    auto delayedToRemove = remove_if(
+        _delayed.begin(),
+        _delayed.end(),
+        [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
+
+    _delayed.erase(delayedToRemove, _delayed.end());
+}
+
+void Object::executeActions(float dt) {
     if (_actions.empty()) {
         return;
     }
-    auto action = _actions.front();
-    action->execute(*this, delta);
-    if (action->isCompleted()) {
-        _actions.pop();
+    shared_ptr<Action> action(_actions.front());
+    action->execute(action, *this, dt);
+}
+
+bool Object::hasUserActionsPending() const {
+    // TODO: must only work during combat
+    for (auto &action : _actions) {
+        if (action->isUserAction())
+            return true;
+    }
+    return false;
+}
+
+shared_ptr<Action> Object::getCurrentAction() const {
+    return _actions.empty() ? nullptr : _actions.front();
+}
+
+shared_ptr<Item> Object::addItem(const string &resRef, int stackSize, bool dropable) {
+    shared_ptr<Item> result;
+
+    auto maybeItem = find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
+        return item->blueprintResRef() == resRef;
+    });
+    if (maybeItem != _items.end()) {
+        result = *maybeItem;
+        int prevStackSize = result->stackSize();
+        result->setStackSize(prevStackSize + stackSize);
+
+    } else {
+        result = _game.objectFactory().newItem();
+        result->loadFromBlueprint(resRef);
+        result->setStackSize(stackSize);
+        result->setDropable(dropable);
+
+        _items.push_back(result);
+    }
+
+    return move(result);
+}
+
+void Object::addItem(const shared_ptr<Item> &item) {
+    auto maybeItem = find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
+    if (maybeItem != _items.end()) {
+        (*maybeItem)->setStackSize((*maybeItem)->stackSize() + 1);
+    } else {
+        _items.push_back(item);
     }
 }
 
-void Object::face(Object &other) {
-    face(glm::vec2(other._position));
+bool Object::removeItem(const shared_ptr<Item> &item, bool &last) {
+    auto maybeItem = find(_items.begin(), _items.end(), item);
+    if (maybeItem == _items.end())
+        return false;
+
+    last = false;
+
+    int stackSize = (*maybeItem)->stackSize();
+    if (stackSize > 1) {
+        (*maybeItem)->setStackSize(stackSize - 1);
+    } else {
+        last = true;
+        _items.erase(maybeItem);
+    }
+
+    return true;
 }
 
-void Object::face(const glm::vec2 &point) {
-    auto dir = glm::normalize(point - glm::vec2(_position));
-    setFacing(-glm::atan(dir.x, dir.y));
+float Object::getDistanceTo(const glm::vec2 &point) const {
+    return glm::distance(glm::vec2(_position), point);
 }
 
-void Object::show() {
-    if (!_sceneNode) {
+float Object::getSquareDistanceTo(const glm::vec2 &point) const {
+    return glm::distance2(glm::vec2(_position), point);
+}
+
+float Object::getDistanceTo(const glm::vec3 &point) const {
+    return glm::distance(_position, point);
+}
+
+float Object::getSquareDistanceTo(const glm::vec3 &point) const {
+    return glm::distance2(_position, point);
+}
+
+float Object::getDistanceTo(const Object &other) const {
+    return glm::distance(_position, other._position);
+}
+
+float Object::getSquareDistanceTo(const Object &other) const {
+    return glm::distance2(_position, other._position);
+}
+
+bool Object::contains(const glm::vec3 &point) const {
+    if (!_sceneNode)
+        return false;
+
+    const AABB &aabb = _sceneNode->aabb();
+
+    return (aabb * _transform).contains(point);
+}
+
+void Object::face(const Object &other) {
+    if (_id != other._id) {
+        face(other._position);
+    }
+}
+
+void Object::face(const glm::vec3 &point) {
+    if (point == _position)
         return;
-    }
-    _sceneNode->setEnabled(true);
+
+    glm::vec2 dir(glm::normalize(point - _position));
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
+    updateTransform();
 }
 
-void Object::hide() {
-    if (!_sceneNode) {
+void Object::faceAwayFrom(const Object &other) {
+    if (_id == other._id || _position == other.position())
         return;
-    }
-    _sceneNode->setEnabled(false);
+
+    glm::vec2 dir(glm::normalize(_position - other.position()));
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
+    updateTransform();
 }
 
-glm::vec3 Object::targetWorldCoords() const {
-    if (!_sceneNode) {
-        return _position;
+void Object::moveDropableItemsTo(Object &other) {
+    for (auto it = _items.begin(); it != _items.end();) {
+        if ((*it)->isDropable()) {
+            other._items.push_back(*it);
+            it = _items.erase(it);
+        } else {
+            ++it;
+        }
     }
-    return _sceneNode->getWorldCenterOfAABB();
 }
 
-glm::ivec3 Object::targetScreenCoords() const {
-    auto camera = _sceneGraph->activeCamera();
-    auto viewport = glm::ivec4(0, 0, _graphicsOpt.width, _graphicsOpt.height);
-    auto screenCoords = glm::project(
-        targetWorldCoords(),
-        camera->camera()->view(),
-        camera->camera()->projection(),
-        viewport);
+void Object::applyEffect(const shared_ptr<Effect> &effect, DurationType durationType, float duration) {
+    if (durationType == DurationType::Instant) {
+        applyInstantEffect(*effect);
+    } else {
+        AppliedEffect appliedEffect;
+        appliedEffect.effect = effect;
+        appliedEffect.durationType = durationType;
+        appliedEffect.duration = duration;
+        _effects.push_back(move(appliedEffect));
+    }
+}
 
-    return glm::ivec3(screenCoords.x, _graphicsOpt.height - screenCoords.y, screenCoords.z);
+void Object::applyInstantEffect(Effect &effect) {
+    effect.applyTo(*this);
+}
+
+void Object::updateEffects(float dt) {
+    for (auto it = _effects.begin(); it != _effects.end();) {
+        AppliedEffect &effect = *it;
+        bool temporary = effect.durationType == DurationType::Temporary;
+        if (temporary) {
+            effect.duration = glm::max(0.0f, effect.duration - dt);
+        }
+        if (temporary && effect.duration == 0.0f) {
+            applyInstantEffect(*effect.effect);
+            it = _effects.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void Object::playAnimation(AnimationType animation, AnimationProperties properties) {
+}
+
+bool Object::isSelectable() const {
+    return false;
+}
+
+glm::vec3 Object::getSelectablePosition() const {
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    return model ? model->getWorldCenterOfAABB() : _position;
+}
+
+void Object::setRoom(Room *room) {
+    if (_room) {
+        _room->removeTenant(this);
+    }
+    _room = room;
+
+    if (_room) {
+        _room->addTenant(this);
+    }
+}
+
+void Object::setPosition(const glm::vec3 &position) {
+    _position = position;
+    updateTransform();
+}
+
+void Object::updateTransform() {
+    _transform = glm::translate(glm::mat4(1.0f), _position);
+    _transform *= glm::mat4_cast(_orientation);
+
+    if (_sceneNode && !_stunt) {
+        _sceneNode->setLocalTransform(_transform);
+    }
+}
+
+void Object::setFacing(float facing) {
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, facing));
+    updateTransform();
+}
+
+void Object::setVisible(bool visible) {
+    if (_visible == visible)
+        return;
+
+    _visible = visible;
+
+    if (_sceneNode) {
+        _sceneNode->setEnabled(visible);
+    }
+}
+
+shared_ptr<Item> Object::getFirstItem() {
+    _itemIndex = 0;
+    return getNextItem();
+}
+
+shared_ptr<Item> Object::getNextItem() {
+    int itemCount = static_cast<int>(_items.size());
+    if (itemCount > _itemIndex) {
+        return _items[_itemIndex++];
+    }
+    return nullptr;
+}
+
+shared_ptr<Item> Object::getItemByTag(const string &tag) {
+    for (auto &item : _items) {
+        if (item->tag() == tag)
+            return item;
+    }
+    return nullptr;
+}
+
+void Object::clearAllEffects() {
+    _effects.clear();
+}
+
+void Object::die() {
+}
+
+void Object::startStuntMode() {
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(glm::mat4(1.0f));
+        _sceneNode->setCullable(false);
+    }
+    _stunt = true;
+}
+
+void Object::stopStuntMode() {
+    if (!_stunt)
+        return;
+
+    if (_sceneNode) {
+        _sceneNode->setLocalTransform(_transform);
+        _sceneNode->setCullable(true);
+    }
+    _stunt = false;
+}
+
+shared_ptr<Effect> Object::getFirstEffect() {
+    _effectIndex = 1;
+    return !_effects.empty() ? _effects[0].effect : nullptr;
+}
+
+shared_ptr<Effect> Object::getNextEffect() {
+    return (_effectIndex < _effects.size()) ? _effects[_effectIndex++].effect : nullptr;
+}
+
+bool Object::isInLineOfSight(const Object &other, float fov) const {
+    if (other._position == _position) {
+        return true;
+    }
+    auto normal = _orientation * glm::vec3(0.0f, 1.0f, 0.0f);
+    auto dir = glm::normalize(glm::vec3(glm::vec2(other._position - _position), 0.0f));
+    float dot = glm::dot(normal, dir);
+    return dot > 0.0f && glm::acos(dot) < fov;
 }
 
 } // namespace game

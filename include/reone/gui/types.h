@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,7 @@ enum class ControlType {
     Slider = 8,
     ScrollBar = 9,
     ProgressBar = 10,
-    ListBox = 11,
-
-    Plotter = 20
+    ListBox = 11
 };
 
 } // namespace gui

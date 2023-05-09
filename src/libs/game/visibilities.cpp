@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 
 #include "reone/game/visibilities.h"
 
-#include "reone/common/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
 #include "reone/game/format/visreader.h"
+
+#include "reone/common/stream/bytearrayinput.h"
 
 using namespace std;
 
@@ -35,9 +36,11 @@ shared_ptr<Visibility> Visibilities::doGet(string resRef) {
     if (!data) {
         return nullptr;
     }
-    auto stream = make_shared<ByteArrayInputStream>(*data);
+    auto stream = ByteArrayInputStream(*data);
+
     VisReader vis;
     vis.load(stream);
+
     return make_shared<Visibility>(vis.visibility());
 }
 

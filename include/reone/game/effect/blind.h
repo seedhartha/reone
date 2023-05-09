@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@ namespace game {
 class BlindEffect : public Effect {
 public:
     BlindEffect() :
-        Effect(EffectType::Blind) {
+        Effect(EffectType::Blindness) {
     }
+
+    void applyTo(Object &object) override;
 };
 
 } // namespace game

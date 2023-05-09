@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ namespace game {
 
 class BarkStringAction : public Action {
 public:
-    BarkStringAction() :
-        Action(ActionType::BarkString) {
+    BarkStringAction(Game &game, ServicesView &services, int strRef) :
+        Action(game, services, ActionType::BarkString),
+        _strRef(strRef) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    int _strRef;
 };
 
 } // namespace game

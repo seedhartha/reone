@@ -57,8 +57,12 @@ void NcsTool::invokeBatch(
     const fs::path &outputDir,
     const fs::path &gamePath) {
 
-    auto routines = Routines(_gameId, *static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.init();
+    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
+    if (_gameId == GameID::KotOR) {
+        routines.initForKotOR();
+    } else {
+        routines.initForTSL();
+    }
 
     return doInvokeBatch(input, outputDir, [this, &operation, &routines](auto &path, auto &outDir) {
         if (operation == Operation::ToPCODE) {

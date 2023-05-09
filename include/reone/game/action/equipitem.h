@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,23 @@ namespace reone {
 
 namespace game {
 
+class Item;
+
 class EquipItemAction : public Action {
 public:
-    EquipItemAction() :
-        Action(ActionType::EquipItem) {
+    EquipItemAction(Game &game, ServicesView &services, std::shared_ptr<Item> item, int inventorySlot, bool instant) :
+        Action(game, services, ActionType::EquipItem),
+        _item(std::move(item)),
+        _inventorySlot(inventorySlot),
+        _instant(instant) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Item> _item;
+    int _inventorySlot;
+    bool _instant;
 };
 
 } // namespace game

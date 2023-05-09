@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,17 @@ namespace game {
 
 class LinkEffectsEffect : public Effect {
 public:
-    LinkEffectsEffect() :
-        Effect(EffectType::LinkEffects) {
+    LinkEffectsEffect(std::shared_ptr<Effect> childEffect, std::shared_ptr<Effect> parentEffect) :
+        Effect(EffectType::LinkEffects),
+        _childEffect(std::move(childEffect)),
+        _parentEffect(std::move(parentEffect)) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    std::shared_ptr<Effect> _childEffect;
+    std::shared_ptr<Effect> _parentEffect;
 };
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,37 @@
 
 #pragma once
 
-#include "../action.h"
+#include "../object/item.h"
+
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class UseSkillAction : public Action {
+class UseSkillAction : public ObjectAction {
 public:
-    UseSkillAction() :
-        Action(ActionType::UseSkill) {
+    UseSkillAction(
+        Game &game,
+        ServicesView &services,
+        std::shared_ptr<Object> object,
+        SkillType skill,
+        int subSkill,
+        std::shared_ptr<Item> itemUsed) :
+        ObjectAction(game, services, ActionType::UseSkill, std::move(object)),
+        _skill(skill),
+        _subSkill(subSkill),
+        _itemUsed(std::move(itemUsed)) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+    SkillType skill() const { return _skill; }
+
+private:
+    SkillType _skill;
+    int _subSkill;
+    std::shared_ptr<Item> _itemUsed;
 };
 
 } // namespace game

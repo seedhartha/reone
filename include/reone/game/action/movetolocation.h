@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,29 @@
 
 #pragma once
 
-#include "action.h"
+#include "locationaction.h"
 
 namespace reone {
 
 namespace game {
 
-class MoveToLocationAction : public Action {
+class MoveToLocationAction : public LocationAction {
 public:
-    MoveToLocationAction() :
-        Action(ActionType::MoveToLocation) {
+    MoveToLocationAction(Game &game, ServicesView &services, std::shared_ptr<Location> destination, bool run, float timeout, bool force) :
+        LocationAction(game, services, ActionType::MoveToLocation, std::move(destination)),
+        _run(run),
+        _timeout(timeout),
+        _force(force) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+    bool isRun() const { return _run; }
+
+private:
+    bool _run;
+    float _timeout;
+    bool _force;
 };
 
 } // namespace game

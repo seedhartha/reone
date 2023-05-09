@@ -17,15 +17,20 @@
 
 #pragma once
 
-#include "reone/game/astar.h"
 #include "reone/game/camerastyles.h"
 #include "reone/game/cursors.h"
+#include "reone/game/d20/classes.h"
+#include "reone/game/d20/feats.h"
+#include "reone/game/d20/skills.h"
+#include "reone/game/d20/spells.h"
+#include "reone/game/dialogs.h"
 #include "reone/game/footstepsounds.h"
 #include "reone/game/game.h"
 #include "reone/game/guisounds.h"
 #include "reone/game/layouts.h"
 #include "reone/game/paths.h"
 #include "reone/game/portraits.h"
+#include "reone/game/reputes.h"
 #include "reone/game/resourcelayout.h"
 #include "reone/game/services.h"
 #include "reone/game/soundsets.h"
@@ -79,16 +84,21 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<game::AStar> _aStar;
     std::unique_ptr<game::CameraStyles> _cameraStyles;
+    std::unique_ptr<game::Classes> _classes;
     std::unique_ptr<game::Cursors> _cursors;
+    std::unique_ptr<game::Dialogs> _dialogs;
+    std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;
     std::unique_ptr<game::GUISounds> _guiSounds;
     std::unique_ptr<game::Layouts> _layouts;
     std::unique_ptr<game::Paths> _paths;
     std::unique_ptr<game::Portraits> _portraits;
+    std::unique_ptr<game::Reputes> _reputes;
     std::unique_ptr<game::ResourceLayout> _resourceLayout;
+    std::unique_ptr<game::Skills> _skills;
     std::unique_ptr<game::SoundSets> _soundSets;
+    std::unique_ptr<game::Spells> _spells;
     std::unique_ptr<game::Surfaces> _surfaces;
     std::unique_ptr<game::Visibilities> _visibilities;
 

@@ -19,30 +19,26 @@ set(GUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/gui)
 set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/control.h
     ${GUI_INCLUDE_DIR}/control/button.h
-    ${GUI_INCLUDE_DIR}/control/button.h
-    ${GUI_INCLUDE_DIR}/control/buttontoggle.h
-    ${GUI_INCLUDE_DIR}/control/factory.h
+    ${GUI_INCLUDE_DIR}/control/imagebutton.h
     ${GUI_INCLUDE_DIR}/control/label.h
-    ${GUI_INCLUDE_DIR}/control/labelhilight.h
     ${GUI_INCLUDE_DIR}/control/listbox.h
     ${GUI_INCLUDE_DIR}/control/panel.h
-    ${GUI_INCLUDE_DIR}/control/plotter.h
-    ${GUI_INCLUDE_DIR}/control/progressbar.h
     ${GUI_INCLUDE_DIR}/control/progressbar.h
     ${GUI_INCLUDE_DIR}/control/scrollbar.h
     ${GUI_INCLUDE_DIR}/control/slider.h
+    ${GUI_INCLUDE_DIR}/control/togglebutton.h
     ${GUI_INCLUDE_DIR}/gui.h
-    ${GUI_INCLUDE_DIR}/guiinterface.h
     ${GUI_INCLUDE_DIR}/sceneinitializer.h
     ${GUI_INCLUDE_DIR}/textinput.h
     ${GUI_INCLUDE_DIR}/types.h)
 
 set(GUI_SOURCES
     ${GUI_SOURCE_DIR}/control.cpp
-    ${GUI_SOURCE_DIR}/control/button.cpp
-    ${GUI_SOURCE_DIR}/control/label.cpp
+    ${GUI_SOURCE_DIR}/control/imagebutton.cpp
     ${GUI_SOURCE_DIR}/control/listbox.cpp
-    ${GUI_SOURCE_DIR}/control/plotter.cpp
+    ${GUI_SOURCE_DIR}/control/progressbar.cpp
+    ${GUI_SOURCE_DIR}/control/scrollbar.cpp
+    ${GUI_SOURCE_DIR}/control/togglebutton.cpp
     ${GUI_SOURCE_DIR}/gui.cpp
     ${GUI_SOURCE_DIR}/sceneinitializer.cpp
     ${GUI_SOURCE_DIR}/textinput.cpp)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,49 +17,92 @@
 
 #pragma once
 
-#include "../object.h"
+#include "reone/graphics/types.h"
+#include "reone/resource/format/gffreader.h"
+#include "reone/resource/types.h"
 
+#include "../contextaction.h"
+#include "../player.h"
+
+#include "../object.h"
 #include "area.h"
-#include "creature.h"
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace game {
+
+struct ModuleInfo {
+    std::string entryArea;
+    glm::vec3 entryPosition {0.0f};
+    float entryFacing {0.0f};
+};
+
+class Door;
+class Game;
+class ObjectFactory;
+class Placeable;
 
 class Module : public Object {
 public:
     Module(
         uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        Game &game,
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Module,
+            "",
             game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            services) {
     }
 
-    void load(const std::string &name);
+    void load(std::string name, const resource::Gff &ifo, bool fromSave = false);
+    void loadParty(const std::string &entry = "", bool fromSave = false);
 
-    Area &area() const {
-        return *_area;
-    }
+    bool handle(const SDL_Event &event);
+    void update(float dt);
 
-    Creature &pc() const {
-        return *_pc;
-    }
+    std::vector<ContextAction> getContextActions(const std::shared_ptr<Object> &object) const;
+
+    const std::string &name() const { return _name; }
+    const ModuleInfo &info() const { return _info; }
+    std::shared_ptr<Area> area() const { return _area; }
+    Player &player() { return *_player; }
 
 private:
-    Area *_area {nullptr};
-    Creature *_pc {nullptr};
+    std::string _name;
+    ModuleInfo _info;
+    std::shared_ptr<Area> _area;
+    std::unique_ptr<Player> _player;
+
+    void onCreatureClick(const std::shared_ptr<Creature> &creature);
+    void onDoorClick(const std::shared_ptr<Door> &door);
+    void onObjectClick(const std::shared_ptr<Object> &object);
+    void onPlaceableClick(const std::shared_ptr<Placeable> &placeable);
+
+    void getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &facing) const;
+
+    // Loading
+
+    void loadInfo(const resource::Gff &ifo);
+    void loadArea(const resource::Gff &ifo, bool fromSave = false);
+    void loadPlayer();
+
+    // END Loading
+
+    // User input
+
+    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
+
+    // END User input
 };
 
 } // namespace game

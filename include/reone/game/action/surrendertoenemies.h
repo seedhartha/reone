@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@ namespace game {
 
 class SurrenderToEnemiesAction : public Action {
 public:
-    SurrenderToEnemiesAction() :
-        Action(ActionType::SurrenderToEnemies) {
+    SurrenderToEnemiesAction(Game &game, ServicesView &services) :
+        Action(game, services, ActionType::SurrenderToEnemies) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

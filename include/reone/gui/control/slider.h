@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,20 +26,30 @@ namespace gui {
 class Slider : public Control {
 public:
     Slider(
-        int id,
-        IGui &gui,
-        IControlFactory &controlFactory,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        GUI &gui,
+        scene::SceneGraphs &sceneGraphs,
+        graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
+        graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Uniforms &uniforms,
+        graphics::Window &window,
+        resource::Strings &strings) :
         Control(
-            id,
-            ControlType::Slider,
             gui,
-            controlFactory,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            ControlType::Slider,
+            sceneGraphs,
+            fonts,
+            graphicsContext,
+            meshes,
+            pipeline,
+            shaders,
+            textures,
+            uniforms,
+            window,
+            strings) {
     }
 };
 

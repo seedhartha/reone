@@ -70,28 +70,28 @@ void SceneGraph::clear() {
     _activeLights.clear();
 }
 
-void SceneGraph::addRoot(ModelSceneNode &node) {
-    _modelRoots.insert(&node);
+void SceneGraph::addRoot(shared_ptr<ModelSceneNode> node) {
+    _modelRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(WalkmeshSceneNode &node) {
-    if (node.walkmesh().isAreaWalkmesh()) {
-        _walkmeshRoots.push_back(&node);
+void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
+    if (node->walkmesh().isAreaWalkmesh()) {
+        _walkmeshRoots.push_back(node);
     } else {
-        _walkmeshRoots.push_front(&node);
+        _walkmeshRoots.push_front(node);
     }
 }
 
-void SceneGraph::addRoot(TriggerSceneNode &node) {
-    _triggerRoots.insert(&node);
+void SceneGraph::addRoot(shared_ptr<TriggerSceneNode> node) {
+    _triggerRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(GrassSceneNode &node) {
-    _grassRoots.insert(&node);
+void SceneGraph::addRoot(shared_ptr<GrassSceneNode> node) {
+    _grassRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(SoundSceneNode &node) {
-    _soundRoots.insert(&node);
+void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
+    _soundRoots.push_back(node);
 }
 
 void SceneGraph::removeRoot(ModelSceneNode &node) {
@@ -103,23 +103,43 @@ void SceneGraph::removeRoot(ModelSceneNode &node) {
         }
     }
 
-    _modelRoots.erase(&node);
+    auto it = std::remove_if(
+        _modelRoots.begin(),
+        _modelRoots.end(),
+        [&node](auto &root) { return root.get() == &node; });
+    _modelRoots.erase(it, _modelRoots.end());
 }
 
 void SceneGraph::removeRoot(WalkmeshSceneNode &node) {
-    _walkmeshRoots.remove(&node);
+    auto it = std::remove_if(
+        _walkmeshRoots.begin(),
+        _walkmeshRoots.end(),
+        [&node](auto &root) { return root.get() == &node; });
+    _walkmeshRoots.erase(it, _walkmeshRoots.end());
 }
 
 void SceneGraph::removeRoot(TriggerSceneNode &node) {
-    _triggerRoots.erase(&node);
+    auto it = std::remove_if(
+        _triggerRoots.begin(),
+        _triggerRoots.end(),
+        [&node](auto &root) { return root.get() == &node; });
+    _triggerRoots.erase(it, _triggerRoots.end());
 }
 
 void SceneGraph::removeRoot(GrassSceneNode &node) {
-    _grassRoots.erase(&node);
+    auto it = std::remove_if(
+        _grassRoots.begin(),
+        _grassRoots.end(),
+        [&node](auto &root) { return root.get() == &node; });
+    _grassRoots.erase(it, _grassRoots.end());
 }
 
 void SceneGraph::removeRoot(SoundSceneNode &node) {
-    _soundRoots.erase(&node);
+    auto it = std::remove_if(
+        _soundRoots.begin(),
+        _soundRoots.end(),
+        [&node](auto &root) { return root.get() == &node; });
+    _soundRoots.erase(it, _soundRoots.end());
 }
 
 void SceneGraph::update(float dt) {
@@ -247,7 +267,7 @@ void SceneGraph::updateSounds() {
         if (dist2 > maxDist2) {
             continue;
         }
-        distances.push_back(make_pair(root, dist2));
+        distances.push_back(make_pair(root.get(), dist2));
     }
 
     // Take up to N most closest sounds to the camera
@@ -349,13 +369,13 @@ void SceneGraph::prepareOpaqueLeafs() {
                 continue;
             }
             if (bucket.size() >= kMaxGrassClusters) {
-                _opaqueLeafs.push_back(make_pair(grass, bucket));
+                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
                 bucket.clear();
             }
             bucket.push_back(cluster);
         }
         if (!bucket.empty()) {
-            _opaqueLeafs.push_back(make_pair(grass, bucket));
+            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
             bucket.clear();
         }
     }
@@ -655,7 +675,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
             if (testLineOfSight(start, start + distance * dir, collision) && collision.user != model->user()) {
                 continue;
             }
-            distances.push_back(make_pair(model, distance));
+            distances.push_back(make_pair(model.get(), distance));
         }
     }
     if (distances.empty()) {

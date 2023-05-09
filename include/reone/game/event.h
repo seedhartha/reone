@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,15 @@ namespace reone {
 namespace game {
 
 class Event : public script::EngineType {
+public:
+    Event(int number) :
+        _number(number) {
+    }
+
+    int number() const { return _number; }
+
+private:
+    int _number;
 };
 
 } // namespace game

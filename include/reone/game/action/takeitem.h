@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../action.h"
+#include "../object.h"
+#include "../object/item.h"
 
 namespace reone {
 
@@ -25,9 +27,17 @@ namespace game {
 
 class TakeItemAction : public Action {
 public:
-    TakeItemAction() :
-        Action(ActionType::TakeItem) {
+    TakeItemAction(Game &game, ServicesView &services, std::shared_ptr<Item> item, std::shared_ptr<Object> takeFrom) :
+        Action(game, services, ActionType::TakeItem),
+        _item(std::move(item)),
+        _takeFrom(std::move(takeFrom)) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Item> _item;
+    std::shared_ptr<Object> _takeFrom;
 };
 
 } // namespace game

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *  Implementation of effect factory routines.
+ */
+
 #include "reone/game/script/routine/declarations.h"
 
 #include "reone/script/exception/notimpl.h"
 
 #include "reone/game/effect.h"
+#include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
 #include "reone/game/services.h"
 #include "reone/game/types.h"
@@ -40,17 +45,15 @@ namespace routine {
 static constexpr int kAcVsDamageTypeAll = 8199;
 
 Variable effectAssuredHit(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newAssuredHit();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectHeal(const vector<Variable> &args, const RoutineContext &ctx) {
     int damageToHeal = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newHeal(damageToHeal);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamage(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -58,18 +61,18 @@ Variable effectDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     auto damageType = getIntAsEnumOrElse(args, 1, DamageType::Universal);
     auto damagePower = getIntAsEnumOrElse(args, 2, DamagePower::Normal);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newDamage(damageAmount, damageType, damagePower, nullptr);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     auto abilityToIncrease = getIntAsEnum<Ability>(args, 0);
     int modifyBy = getInt(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newAbilityIncrease(abilityToIncrease, modifyBy);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageResistance(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -77,17 +80,16 @@ Variable effectDamageResistance(const vector<Variable> &args, const RoutineConte
     int amount = getInt(args, 1);
     int limit = getIntOrElse(args, 2, 0);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newDamageResistance(damageType, amount, limit);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectResurrection(const vector<Variable> &args, const RoutineContext &ctx) {
     int hpPercent = getIntOrElse(args, 0, 0);
+    auto effect = ctx.game.effectFactory().newResurrection(hpPercent);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectACIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -95,9 +97,9 @@ Variable effectACIncrease(const vector<Variable> &args, const RoutineContext &ct
     auto modifyType = getIntAsEnumOrElse(args, 1, ACBonus::Dodge);
     int damageType = getIntOrElse(args, 2, kAcVsDamageTypeAll);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newACIncrease(value, modifyType, damageType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -105,30 +107,28 @@ Variable effectSavingThrowIncrease(const vector<Variable> &args, const RoutineCo
     int value = getInt(args, 1);
     auto saveType = getIntAsEnumOrElse(args, 2, SavingThrowType::All);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newSavingThrowIncrease(save, value, saveType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int bonus = getInt(args, 0);
     auto modifierType = getIntAsEnumOrElse(args, 1, AttackBonus::Misc);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newAttackIncrease(bonus, modifierType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newDamageIncrease();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectEntangle(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newEntangle();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDeath(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -136,76 +136,71 @@ Variable effectDeath(const vector<Variable> &args, const RoutineContext &ctx) {
     bool displayFeedback = getIntAsBoolOrElse(args, 1, true);
     bool noFadeAway = getIntAsBoolOrElse(args, 2, false);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newDeath(spectacularDeath, displayFeedback, noFadeAway);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(std::move(effect));
 }
 
 Variable effectParalyze(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newParalyze();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectSleep(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newSleep();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int tempForce = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newTemporaryForcePoints(tempForce);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectChoke(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newChoke();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectStunned(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newStunned();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectRegenerate(const vector<Variable> &args, const RoutineContext &ctx) {
     int amount = getInt(args, 0);
     float intervalSeconds = getFloat(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newRegenerate(amount, intervalSeconds);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int newSpeedPercent = getInt(args, 0);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newMovementSpeedIncrease(newSpeedPercent);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectVisualEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     int visualEffectId = getInt(args, 0);
     bool missEffect = getIntAsBoolOrElse(args, 1, false);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newVisual(visualEffectId, missEffect);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectLinkEffects(const vector<Variable> &args, const RoutineContext &ctx) {
     auto childEffect = getEffect(args, 0);
     auto parentEffect = getEffect(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newLinkEffects(move(childEffect), move(parentEffect));
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectBeam(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -214,138 +209,126 @@ Variable effectBeam(const vector<Variable> &args, const RoutineContext &ctx) {
     auto bodyPart = getIntAsEnum<BodyNode>(args, 2);
     bool missEffect = getIntAsBoolOrElse(args, 3, false);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newBeam(beamVisualEffect, std::move(effector), bodyPart, missEffect);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResistanceIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newForceResistanceIncrease(value);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectBodyFuel(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newBodyFuel();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectPoison(const vector<Variable> &args, const RoutineContext &ctx) {
     auto poisonType = getIntAsEnum<Poison>(args, 0);
+    auto effect = ctx.game.effectFactory().newPoison(poisonType);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushTargeted(const vector<Variable> &args, const RoutineContext &ctx) {
     auto centre = getLocationArgument(args, 0);
     bool ignoreTestDirectLine = getIntAsBoolOrElse(args, 1, false);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newForcePushTargeted(centre, ignoreTestDirectLine);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectImmunity(const vector<Variable> &args, const RoutineContext &ctx) {
     auto immunityType = getIntAsEnum<ImmunityType>(args, 0);
+    auto effect = ctx.game.effectFactory().newImmunity(immunityType);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageImmunityIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     auto damageType = getIntAsEnum<DamageType>(args, 0);
     int percentImmunity = getInt(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newDamageImmunityIncrease(damageType, percentImmunity);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryHitpoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int hitPoints = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newTemporaryHitPoints(hitPoints);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectSkillIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     auto skill = getIntAsEnum<SkillType>(args, 0);
     int value = getInt(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newSkillIncrease(skill, value);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int damage = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newDamageForcePoints(damage);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectHealForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int heal = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newHealForcePoints(heal);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidStun(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newDroidStun();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushed(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newForcePushed();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResisted(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newForceResisted();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceFizzle(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newForceFizzle();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     auto ability = getIntAsEnum<Ability>(args, 0);
     int modifyBy = getInt(args, 1);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newAbilityDecrease(ability, modifyBy);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newAttackDecrease();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int penalty = getInt(args, 0);
     auto modifierType = getIntAsEnumOrElse(args, 1, AttackBonus::Misc);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newDamageDecrease(penalty, modifierType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectACDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -353,17 +336,17 @@ Variable effectACDecrease(const vector<Variable> &args, const RoutineContext &ct
     auto modifyType = getIntAsEnumOrElse(args, 1, ACBonus::Dodge);
     int damageType = getIntOrElse(args, 2, kAcVsDamageTypeAll);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newACDecrease(value, modifyType, damageType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int percentChange = getInt(args, 0);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newMovementSpeedDecrease(percentChange);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -371,67 +354,59 @@ Variable effectSavingThrowDecrease(const vector<Variable> &args, const RoutineCo
     int value = getInt(args, 1);
     auto saveType = getIntAsEnumOrElse(args, 2, SavingThrowType::All);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newSavingThrowDecrease(save, value, saveType);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectInvisibility(const vector<Variable> &args, const RoutineContext &ctx) {
     auto invisibilityType = getIntAsEnum<InvisibilityType>(args, 0);
+    auto effect = ctx.game.effectFactory().newInvisibility(invisibilityType);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceShield(const vector<Variable> &args, const RoutineContext &ctx) {
     int shield = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newForceShield(shield);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDisguise(const vector<Variable> &args, const RoutineContext &ctx) {
     int disguiseAppearance = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newDisguise(disguiseAppearance);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectTrueSeeing(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newTrueSeeing();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlasterDeflectionIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int change = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newBlasterDeflectionIncrease(change);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectHorrified(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newHorrified();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectModifyAttacks(const vector<Variable> &args, const RoutineContext &ctx) {
     int attacks = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newModifyAttacks(attacks);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectPsychicStatic(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newPsychicStatic();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectLightsaberThrow(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -440,95 +415,82 @@ Variable effectLightsaberThrow(const vector<Variable> &args, const RoutineContex
     auto target3 = getObjectOrNull(args, 2, ctx);
     int advancedDamage = getInt(args, 3);
 
-    // TODO: implement
+    auto effect = ctx.game.effectFactory().newLightsaberThrow(move(target1), move(target2), move(target3), advancedDamage);
 
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectWhirlWind(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newWhirlWind();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneHorrified(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newCutsceneHorrified();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneParalyze(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newCutsceneParalyze();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneStunned(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newCutsceneStunned();
+    return Variable::ofEffect(move(effect));
 }
 
 // TSL
 
 Variable effectForceBody(const vector<Variable> &args, const RoutineContext &ctx) {
     int level = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newForceBody(level);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectFury(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newFury();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlind(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newBlind();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectVPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     int percent = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newVPRegenModifier(percent);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectCrush(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newCrush();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceSight(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newForceSight();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectMindTrick(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newMindTrick();
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectFactionModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     int newFaction = getInt(args, 0);
+    auto effect = ctx.game.effectFactory().newFactionModifier(newFaction);
 
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidScramble(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: implement
-
-    return Variable::ofEffect(nullptr);
+    auto effect = ctx.game.effectFactory().newDroidScramble();
+    return Variable::ofEffect(move(effect));
 }
 
 // END TSL

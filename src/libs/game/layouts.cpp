@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,9 @@ shared_ptr<Layout> Layouts::doGet(string resRef) {
     if (!data) {
         return nullptr;
     }
+    auto stream = ByteArrayInputStream(*data);
     LytReader lyt;
-    lyt.load(make_shared<ByteArrayInputStream>(*data));
+    lyt.load(stream);
     return make_shared<Layout>(lyt.layout());
 }
 

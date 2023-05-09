@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,25 @@ namespace game {
 
 class BeamEffect : public Effect {
 public:
-    BeamEffect() :
-        Effect(EffectType::Beam) {
+    BeamEffect(
+        int beamVisualEffect,
+        std::shared_ptr<Object> effector,
+        BodyNode bodyPart,
+        bool missEffect) :
+        Effect(EffectType::Beam),
+        _beamVisualEffect(beamVisualEffect),
+        _effector(std::move(effector)),
+        _bodyPart(bodyPart),
+        _missEffect(missEffect) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _beamVisualEffect;
+    std::shared_ptr<Object> _effector;
+    BodyNode _bodyPart;
+    bool _missEffect;
 };
 
 } // namespace game

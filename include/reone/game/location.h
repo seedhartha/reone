@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,25 +30,12 @@ public:
         _facing(facing) {
     }
 
-    const glm::vec3 &position() const {
-        return _position;
-    }
-
-    float facing() const {
-        return _facing;
-    }
-
-    bool operator==(const Location &other) const {
-        return _position == other._position && _facing == other._facing;
-    }
-
-    bool operator!=(const Location &other) const {
-        return _position != other._position || _facing != other._facing;
-    }
+    const glm::vec3 &position() const { return _position; }
+    float facing() const { return _facing; }
 
 private:
-    glm::vec3 _position {0.0f};
-    float _facing {0.0f};
+    glm::vec3 _position;
+    float _facing;
 };
 
 } // namespace game

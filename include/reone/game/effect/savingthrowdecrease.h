@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,19 @@ namespace game {
 
 class SavingThrowDecreaseEffect : public Effect {
 public:
-    SavingThrowDecreaseEffect() :
-        Effect(EffectType::SavingThrowDecrease) {
+    SavingThrowDecreaseEffect(int save, int value, SavingThrowType savingThrowType) :
+        Effect(EffectType::SavingThrowDecrease),
+        _save(save),
+        _value(value),
+        _savingThrowType(savingThrowType) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _save;
+    int _value;
+    SavingThrowType _savingThrowType;
 };
 
 } // namespace game

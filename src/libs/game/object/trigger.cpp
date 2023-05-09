@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,22 @@
 
 #include "reone/game/object/trigger.h"
 
-#include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"
-#include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
 #include "reone/resource/services.h"
-#include "reone/scene/graph.h"
+#include "reone/resource/strings.h"
+#include "reone/scene/graphs.h"
+#include "reone/scene/node/trigger.h"
+#include "reone/scene/services.h"
 
-#include "reone/game/gameinterface.h"
+#include "reone/game/game.h"
+#include "reone/game/script/runner.h"
+#include "reone/game/services.h"
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 
@@ -35,82 +40,113 @@ namespace reone {
 
 namespace game {
 
-void Trigger::loadFromGit(const Gff &git) {
-    // From GIT
-    auto templateResRef = git.getString("TemplateResRef");
-    auto xPosition = git.getFloat("XPosition");
-    auto yPosition = git.getFloat("YPosition");
-    auto zPosition = git.getFloat("ZPosition");
-    auto geometry = git.getList("Geometry");
-    for (auto &point : geometry) {
-        auto pointX = point->getFloat("PointX");
-        auto pointY = point->getFloat("PointY");
-        auto pointZ = point->getFloat("PointZ");
-        _geometry.push_back(glm::vec3(pointX, pointY, pointZ));
-    }
+void Trigger::loadFromGIT(const Gff &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
-    // From UTT
-    auto utt = _resourceSvc.gffs.get(templateResRef, ResourceType::Utt);
-    if (!utt) {
-        throw ValidationException("UTT not found: " + templateResRef);
-    }
-    auto tag = utt->getString("Tag");
-    auto scriptOnEnter = utt->getString("ScriptOnEnter");
-    auto scriptOnExit = utt->getString("ScriptOnExit");
+    // _tag = boost::to_lower_copy(gffs.getString("Tag"));
+    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToFlags = gffs.getInt("LinkedToFlags");
 
-    // Make scene node
-    if (_geometry.size() >= 3ll) {
-        auto triggerSceneNode = _sceneGraph->newTrigger(_geometry);
-        triggerSceneNode->init();
-        _sceneNode = triggerSceneNode.get();
-    } else {
-        warn("Invalid number of trigger points: " + to_string(_geometry.size()));
-    }
+    loadTransformFromGIT(gffs);
+    loadGeometryFromGIT(gffs);
 
-    _tag = move(tag);
-    _position = glm::vec3(xPosition, yPosition, zPosition);
-
-    _scriptOnEnter = move(scriptOnEnter);
-    _scriptOnExit = move(scriptOnExit);
-
-    //
-
-    flushTransform();
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    _sceneNode = sceneGraph.newTrigger(_geometry);
+    _sceneNode->setLocalTransform(glm::translate(_position));
 }
 
-void Trigger::update(float delta) {
-    Object::update(delta);
+void Trigger::loadTransformFromGIT(const Gff &gffs) {
+    _position.x = gffs.getFloat("XPosition");
+    _position.y = gffs.getFloat("YPosition");
+    _position.z = gffs.getFloat("ZPosition");
 
-    if (!_sceneNode) {
-        return;
+    // Orientation is ignored as per Bioware specification
+
+    updateTransform();
+}
+
+void Trigger::loadGeometryFromGIT(const Gff &gffs) {
+    for (auto &child : gffs.getList("Geometry")) {
+        float x = child->getFloat("PointX");
+        float y = child->getFloat("PointY");
+        float z = child->getFloat("PointZ");
+        _geometry.push_back(glm::vec3(x, y, z));
     }
+}
 
-    auto objectsInside = set<Object *>();
+void Trigger::loadFromBlueprint(const string &resRef) {
+    shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
+    if (utt) {
+        loadUTT(*utt);
+    }
+}
 
-    auto sceneNode = static_cast<TriggerSceneNode *>(_sceneNode);
-    auto aabbSize = sceneNode->aabb().size();
-    auto objectsInRadius = _game.objectsInRadius(
-        glm::vec2(sceneNode->getWorldCenterOfAABB()),
-        0.5f * glm::max(aabbSize.x, aabbSize.y),
-        static_cast<int>(ObjectType::Creature));
-
-    for (auto &object : objectsInRadius) {
-        if (!sceneNode->isIn(glm::vec2(object->position()))) {
-            continue;
+void Trigger::update(float dt) {
+    set<shared_ptr<Object>> tenantsToRemove;
+    for (auto &tenant : _tenants) {
+        if (tenant) {
+            glm::vec2 position2d(tenant->position());
+            if (isIn(position2d))
+                continue;
         }
-        objectsInside.insert(object);
-        if (_objectsInside.count(object) == 0) {
-            _game.runScript(_scriptOnEnter, *this, object);
+        tenantsToRemove.insert(tenant);
+    }
+    for (auto &tenant : tenantsToRemove) {
+        _tenants.erase(tenant);
+        if (!_onExit.empty()) {
+            _game.scriptRunner().run(_onExit, _id, tenant->id());
         }
     }
+}
 
-    for (auto &object : _objectsInside) {
-        if (objectsInside.count(object) == 0) {
-            _game.runScript(_scriptOnExit, *this, object);
-        }
-    }
+void Trigger::addTenant(const std::shared_ptr<Object> &object) {
+    _tenants.insert(object);
+}
 
-    _objectsInside.swap(objectsInside);
+bool Trigger::isIn(const glm::vec2 &point) const {
+    return static_cast<TriggerSceneNode *>(_sceneNode.get())->isIn(point);
+}
+
+bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
+    auto maybeTenant = find(_tenants.begin(), _tenants.end(), object);
+    return maybeTenant != _tenants.end();
+}
+
+void Trigger::loadUTT(const Gff &utt) {
+    _tag = boost::to_lower_copy(utt.getString("Tag"));
+    _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
+    _name = _services.resource.strings.get(utt.getInt("LocalizedName"));
+    _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
+    _faction = utt.getEnum("Faction", Faction::Invalid);
+    _keyName = utt.getString("KeyName");
+    _triggerType = utt.getInt("Type"); // could be Generic, Area Transition or Trap
+    _trapDetectable = utt.getBool("TrapDetectable");
+    _trapDetectDC = utt.getInt("TrapDetectDC");
+    _trapDisarmable = utt.getBool("TrapDisarmable");
+    _disarmDC = utt.getInt("DisarmDC");
+    _trapFlag = utt.getBool("TrapFlag");
+    _trapType = utt.getInt("TrapType"); // index into traps.2da
+
+    _onDisarm = boost::to_lower_copy(utt.getString("OnDisarm"));               // always empty, but could be useful
+    _onTrapTriggered = boost::to_lower_copy(utt.getString("OnTrapTriggered")); // always empty, but could be useful
+    _onHeartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
+    _onEnter = boost::to_lower_copy(utt.getString("ScriptOnEnter"));
+    _onExit = boost::to_lower_copy(utt.getString("ScriptOnExit"));
+    _onUserDefined = boost::to_lower_copy(utt.getString("ScriptUserDefine"));
+
+    // Unused fields:
+    //
+    // - Cursor (not applicable)
+    // - HighlightHeight (not applicable)
+    // - LoadScreenID (always 0)
+    // - PortraitId (not applicable, always 0)
+    // - TrapOneShot (always 1)
+    // - OnClick (not applicable)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
 }
 
 } // namespace game

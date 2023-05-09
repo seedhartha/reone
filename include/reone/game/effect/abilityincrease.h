@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,17 @@ namespace game {
 
 class AbilityIncreaseEffect : public Effect {
 public:
-    AbilityIncreaseEffect() :
-        Effect(EffectType::AbilityIncrease) {
+    AbilityIncreaseEffect(Ability abilityToIncrease, int modifyBy) :
+        Effect(EffectType::AbilityIncrease),
+        _abilityToIncrease(abilityToIncrease),
+        _modifyBy(modifyBy) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    Ability _abilityToIncrease;
+    int _modifyBy;
 };
 
 } // namespace game

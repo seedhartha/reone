@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/common/timer.h"
+
 #include "../action.h"
 
 namespace reone {
@@ -25,9 +27,24 @@ namespace game {
 
 class WaitAction : public Action {
 public:
-    WaitAction() :
-        Action(ActionType::Wait) {
+    WaitAction(Game &game, ServicesView &services, float seconds) :
+        Action(game, services, ActionType::Wait) {
+        _timer.setTimeout(seconds);
     }
+
+    /**
+     * Advances an internal timer.
+     *
+     * @return `true` if timer times out, `false` otherwise
+     */
+    bool advance(float dt) {
+        return _timer.advance(dt);
+    }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    Timer _timer;
 };
 
 } // namespace game

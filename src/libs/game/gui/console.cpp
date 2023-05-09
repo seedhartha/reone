@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,133 +17,476 @@
 
 #include "reone/game/gui/console.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/exception/validation.h"
+#include "reone/common/logutil.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/font.h"
 #include "reone/graphics/fonts.h"
-#include "reone/graphics/options.h"
+#include "reone/graphics/mesh.h"
+#include "reone/graphics/meshes.h"
 #include "reone/graphics/services.h"
-#include "reone/gui/control/label.h"
-#include "reone/gui/control/listbox.h"
+#include "reone/graphics/shaders.h"
+#include "reone/graphics/uniforms.h"
+#include "reone/graphics/window.h"
+#include "reone/resource/resources.h"
+#include "reone/scene/types.h"
+#include "reone/script/executioncontext.h"
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
+#include "reone/script/variable.h"
 
-#include "reone/game/action/movetoobject.h"
+#include "reone/game/debug.h"
+#include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
+#include "reone/game/location.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/party.h"
+#include "reone/game/services.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::gui;
+using namespace reone::graphics;
+using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-static constexpr int kNumLines = 20;
+static constexpr int kMaxOutputLineCount = 100;
+static constexpr int kVisibleLineCount = 15;
 
-static const string kFontResRef = "fnt_console";
+static constexpr float kTextOffset = 3.0f;
 
 void Console::init() {
-    auto font = _graphicsSvc.fonts.get(kFontResRef);
+    _font = _services.graphics.fonts.get("fnt_console");
 
-    // Lines list box
+    addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
+    addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
+    addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, _1, _2));
+    addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, _1, _2));
+    addCommand("runscript", "rs", "run script", bind(&Console::cmdRunScript, this, _1, _2));
+    addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
+    addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
+    addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
+    addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
+    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
+    addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
+    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", bind(&Console::cmdShowWalkmesh, this, _1, _2));
+    addCommand("showtriggers", "st", "toggle rendering triggers", bind(&Console::cmdShowTriggers, this, _1, _2));
 
-    auto lbLinesProtoItem = newLabel(ListBox::itemControlId(0, -1));
-    lbLinesProtoItem->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, font->height()));
-    lbLinesProtoItem->setFont(kFontResRef);
-
-    auto lbLines = static_pointer_cast<ListBox>(newListBox(0));
-    lbLines->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, static_cast<int>(kNumLines * font->height())));
-    lbLines->setProtoItem(lbLinesProtoItem.get());
-    lbLines->initItemSlots();
-
-    _lbLines = lbLines.get();
-
-    // Input label
-
-    auto lblInput = static_pointer_cast<Label>(newLabel(1));
-    lblInput->setExtent(glm::ivec4(0, lbLines->extent()[1] + lbLines->extent()[3], _graphicsOpt.width, font->height()));
-
-    auto inputText = make_unique<Control::Text>();
-    inputText->font = kFontResRef;
-    inputText->text = "> ";
-    lblInput->setText(move(inputText));
-
-    _lblInput = lblInput.get();
-
-    // Root control
-
-    auto rootControl = newLabel(-1);
-    rootControl->setExtent(glm::ivec4(0, 0, _graphicsOpt.width, static_cast<int>((kNumLines + 1) * font->height())));
-    rootControl->setBorderFill("black");
-    rootControl->setAlpha(0.5f);
-    rootControl->append(*lbLines);
-    rootControl->append(*lblInput);
-
-    _rootControl = rootControl.get();
+    addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, _1, _2));
 }
 
-bool Console::handle(const SDL_Event &e) {
-    if (_textInput.handle(e)) {
-        _lblInput->setText("> " + _textInput.text());
+void Console::addCommand(string name, string alias, string description, CommandHandler handler) {
+    Command cmd;
+    cmd.name = move(name);
+    cmd.alias = move(alias);
+    cmd.description = move(description);
+    cmd.handler = move(handler);
+
+    _commands.push_back(cmd);
+    _commandByName.insert(make_pair(cmd.name, cmd));
+
+    if (!cmd.alias.empty()) {
+        _commandByAlias.insert(make_pair(cmd.alias, cmd));
+    }
+}
+
+bool Console::handle(const SDL_Event &event) {
+    if (_open && _input.handle(event)) {
         return true;
     }
-    if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_RETURN) {
-        auto command = _textInput.text();
-        if (!command.empty()) {
-            _textInput.clear();
-            _lblInput->setText("> ");
-            onEnterCommand(command);
+    switch (event.type) {
+    case SDL_MOUSEWHEEL:
+        return handleMouseWheel(event.wheel);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    default:
+        return false;
+    }
+}
+
+bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+    bool up = event.y < 0;
+    if (up) {
+        if (_outputOffset > 0) {
+            --_outputOffset;
         }
-        return true;
-    }
-    return false;
-}
-
-void Console::onEnterCommand(const string &command) {
-    vector<string> tokens;
-    boost::split(tokens, command, boost::is_space(), boost::token_compress_on);
-
-    if (tokens[0] == "clear") {
-        _lbLines->clearItems();
     } else {
-        auto arguments = vector<string>(tokens.begin() + 1, tokens.end());
-        try {
-            if (tokens[0] == "actionmovetoobject") {
-                executeActionMoveToObject(move(arguments));
+        if (_outputOffset < static_cast<int>(_output.size()) - kVisibleLineCount + 1) {
+            ++_outputOffset;
+        }
+    }
+    return true;
+}
+
+bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
+    if (_open) {
+        switch (event.keysym.sym) {
+        case SDLK_BACKQUOTE:
+            _open = false;
+            return true;
+
+        case SDLK_RETURN: {
+            string text(_input.text());
+            if (!text.empty()) {
+                executeInputText();
+                _history.push(_input.text());
+                _input.clear();
             }
-        } catch (const ValidationException &ex) {
-            _lbLines->appendItem(ListBox::Item {tokens[0] + ": " + string(ex.what())}, true);
+            return true;
+        }
+        case SDLK_UP:
+            if (!_history.empty()) {
+                _input.setText(_history.top());
+                _history.pop();
+            }
+            return true;
+        default:
+            return false;
+        }
+    } else {
+        switch (event.keysym.sym) {
+        case SDLK_BACKQUOTE:
+            _open = true;
+            return true;
+
+        default:
+            return false;
         }
     }
 }
 
-void Console::executeActionMoveToObject(vector<string> arguments) {
-    if (arguments.size() < 2ll) {
-        throw ValidationException("Command requires at least 2 arguments");
+void Console::executeInputText() {
+    vector<string> tokens;
+    boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
+    if (tokens.empty()) {
+        return;
     }
-    auto subjectTag = arguments[0];
-    auto subject = _game.objectByTag(subjectTag);
-    if (!subject) {
-        throw ValidationException("Invalid subject: " + subjectTag);
+    CommandHandler handler;
+    auto maybeCmdByName = _commandByName.find(tokens[0]);
+    if (maybeCmdByName != _commandByName.end()) {
+        handler = maybeCmdByName->second.handler;
+    } else {
+        auto maybeCmdByAlias = _commandByAlias.find(tokens[0]);
+        if (maybeCmdByAlias != _commandByAlias.end()) {
+            handler = maybeCmdByAlias->second.handler;
+        }
+    }
+    if (handler) {
+        try {
+            handler(_input.text(), move(tokens));
+        } catch (const invalid_argument &) {
+            print("Invalid argument");
+        }
+    } else {
+        print("Unknown command");
+    }
+}
+
+void Console::draw() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
+        drawBackground();
+        drawLines();
+    });
+}
+
+void Console::drawBackground() {
+    float height = kVisibleLineCount * _font->height();
+
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
+
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
+        general.resetLocals();
+        general.projection = _services.graphics.window.getOrthoProjection();
+        general.model = move(transform);
+        general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        general.alpha = 0.5f;
+    });
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.meshes.quad().draw();
+}
+
+void Console::drawLines() {
+    float height = kVisibleLineCount * _font->height();
+
+    glm::vec3 position(kTextOffset, height - 0.5f * _font->height(), 0.0f);
+
+    // Input
+
+    string text("> " + _input.text());
+    _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
+
+    // Output
+
+    for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
+        const string &line = _output[static_cast<size_t>(i) + _outputOffset];
+        position.y -= _font->height();
+        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
+    }
+}
+
+void Console::cmdClear(string input, vector<string> tokens) {
+    _output.clear();
+    _outputOffset = 0;
+}
+
+void Console::cmdInfo(string input, vector<string> tokens) {
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        print("No object is selected");
+        return;
+    }
+    glm::vec3 position(object->position());
+
+    stringstream ss;
+    ss << setprecision(2) << fixed
+       << "id=" << object->id()
+       << " "
+       << "tag=\"" << object->tag() << "\""
+       << " "
+       << "tpl=\"" << object->blueprintResRef() << "\""
+       << " "
+       << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
+
+    switch (object->type()) {
+    case ObjectType::Creature: {
+        auto creature = static_pointer_cast<Creature>(object);
+        ss << " "
+           << "app=" << creature->appearance()
+           << " "
+           << "fac=" << static_cast<int>(creature->faction());
+        break;
+    }
+    case ObjectType::Placeable: {
+        auto placeable = static_pointer_cast<Placeable>(object);
+        ss << " "
+           << "app=" << placeable->appearance();
+        break;
+    }
+    default:
+        break;
     }
 
-    auto moveToTag = arguments[1];
-    auto moveTo = _game.objectByTag(moveToTag);
-    if (!moveTo) {
-        throw ValidationException("Invalid moveTo: " + moveToTag);
+    print(ss.str());
+}
+
+void Console::cmdListGlobals(string input, vector<string> tokens) {
+    auto &strings = _game.globalStrings();
+    for (auto &var : strings) {
+        print(var.first + " = " + var.second);
     }
 
-    bool run = false;
-    if (arguments.size() >= 3) {
-        run = stoi(arguments[2]) != 0;
+    auto &booleans = _game.globalBooleans();
+    for (auto &var : booleans) {
+        print(var.first + " = " + (var.second ? "true" : "false"));
     }
 
-    float range = 1.0f;
-    if (arguments.size() >= 4) {
-        range = stof(arguments[3]);
+    auto &numbers = _game.globalNumbers();
+    for (auto &var : numbers) {
+        print(var.first + " = " + to_string(var.second));
     }
 
-    auto action = make_shared<MoveToObjectAction>(*moveTo, run, range);
-    subject->clearAllActions();
-    subject->enqueue(move(action));
+    auto &locations = _game.globalLocations();
+    for (auto &var : locations) {
+        print(str(boost::format("%s = (%.04f, %.04f, %.04f, %.04f") %
+                  var.first %
+                  var.second->position().x %
+                  var.second->position().y %
+                  var.second->position().z %
+                  var.second->facing()));
+    }
+}
+
+void Console::cmdListLocals(string input, vector<string> tokens) {
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        print("No object is selected");
+        return;
+    }
+
+    auto &booleans = object->localBooleans();
+    for (auto &var : booleans) {
+        print(to_string(var.first) + " -> " + (var.second ? "true" : "false"));
+    }
+
+    auto &numbers = object->localNumbers();
+    for (auto &var : numbers) {
+        print(to_string(var.first) + " -> " + to_string(var.second));
+    }
+}
+
+void Console::cmdListAnim(string input, vector<string> tokens) {
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        object = _game.party().getLeader();
+        if (!object) {
+            print("No object is selected");
+            return;
+        }
+    }
+
+    string substr;
+    if (static_cast<int>(tokens.size()) > 1) {
+        substr = tokens[1];
+    }
+
+    auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
+    vector<string> anims(model->model().getAnimationNames());
+    sort(anims.begin(), anims.end());
+
+    for (auto &anim : anims) {
+        if (substr.empty() || boost::contains(anim, substr)) {
+            print(anim);
+        }
+    }
+}
+
+void Console::cmdPlayAnim(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: playanim anim_name");
+        return;
+    }
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        object = _game.party().getLeader();
+        if (!object) {
+            print("No object is selected");
+            return;
+        }
+    }
+    auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
+    model->playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
+}
+
+void Console::cmdKill(string input, vector<string> tokens) {
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        print("No object is selected");
+        return;
+    }
+    auto effect = _game.effectFactory().newDamage(100000, DamageType::Universal, DamagePower::Normal, nullptr);
+    object->applyEffect(move(effect), DurationType::Instant);
+}
+
+void Console::cmdAddItem(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: additem item_tpl [size]");
+        return;
+    }
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        object = _game.party().getLeader();
+        if (!object) {
+            print("No object is selected");
+            return;
+        }
+    }
+    int stackSize = static_cast<int>(tokens.size()) > 2 ? stoi(tokens[2]) : 1;
+    object->addItem(tokens[1], stackSize);
+}
+
+void Console::cmdGiveXP(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: givexp amount");
+        return;
+    }
+
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        object = _game.party().getLeader();
+    }
+    if (!object || object->type() != ObjectType::Creature) {
+        print("No creature is selected");
+        return;
+    }
+
+    int amount = stoi(tokens[1]);
+    static_pointer_cast<Creature>(object)->giveXP(amount);
+}
+
+void Console::cmdWarp(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: warp module");
+        return;
+    }
+    _game.loadModule(tokens[1]);
+}
+
+void Console::cmdRunScript(string input, vector<string> tokens) {
+    if (tokens.size() < 3) {
+        print("Usage: runscript resref caller_id [triggerrer_id [event_number [script_var]]], e.g. runscript k_ai_master 1 2 3 4");
+        return;
+    }
+
+    string resRef = tokens[1];
+    auto callerId = static_cast<uint32_t>(stoi(tokens[2]));
+    auto triggerrerId = tokens.size() > 3 ? static_cast<uint32_t>(stoi(tokens[3])) : kObjectInvalid;
+    int eventNumber = tokens.size() > 4 ? stoi(tokens[4]) : -1;
+    int scriptVar = tokens.size() > 5 ? stoi(tokens[5]) : -1;
+
+    int result = _game.scriptRunner().run(resRef, callerId, triggerrerId, eventNumber, scriptVar);
+    print(str(boost::format("%s -> %d") % resRef % result));
+}
+
+void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: showwalkmesh 1|0");
+        return;
+    }
+    bool show = stoi(tokens[1]);
+    setShowWalkmesh(show);
+}
+
+void Console::cmdShowTriggers(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: showtriggers 1|0");
+        return;
+    }
+    bool show = stoi(tokens[1]);
+    setShowTriggers(show);
+}
+
+void Console::cmdHelp(string input, vector<string> tokens) {
+    for (auto &cmd : _commands) {
+        auto text = cmd.name;
+        if (!cmd.alias.empty()) {
+            text += " (" + cmd.alias + ")";
+        }
+        text += ": " + cmd.description;
+        print(text);
+    }
+}
+
+void Console::print(const string &text) {
+    float maxWidth = _game.options().graphics.width - 2.0f * kTextOffset;
+
+    ostringstream ss;
+    for (size_t i = 0; i < text.length(); ++i) {
+        ss << text[i];
+        string s = ss.str();
+        float w = _font->measure(s);
+        if (w >= maxWidth) {
+            _output.push_front(s.substr(0, s.length() - 1));
+            ss.str("");
+            ss << text[i];
+        }
+    }
+    if (ss.tellp() > 0) {
+        _output.push_front(ss.str());
+    }
+
+    trimOutput();
+    _outputOffset = 0;
+}
+
+void Console::trimOutput() {
+    for (int i = static_cast<int>(_output.size()) - kMaxOutputLineCount; i > 0; --i) {
+        _output.pop_back();
+    }
 }
 
 } // namespace game
