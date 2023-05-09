@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/erf.h"
+#include "reone/tools/erf.h"
 
 #include "reone/common/stream/fileinput.h"
 #include "reone/resource/format/erfwriter.h"

@@ -17,24 +17,12 @@
 
 #pragma once
 
-#include "reone/game/types.h"
-
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-namespace game {
-
-class Routines;
-
-}
-
-class NcsTool : public Tool {
+class TwoDaTool : public Tool {
 public:
-    NcsTool(game::GameID gameId) :
-        _gameId(gameId) {
-    }
-
     void invoke(
         Operation operation,
         const boost::filesystem::path &input,
@@ -50,11 +38,8 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    game::GameID _gameId;
-
-    void toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
-    void toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
-    void toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
+    void to2DA(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
 };
 
 } // namespace reone

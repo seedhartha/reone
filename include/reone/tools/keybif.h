@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "reone/resource/format/rimreader.h"
+#include "reone/resource/format/bifreader.h"
+#include "reone/resource/format/keyreader.h"
 
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-class RimTool : public Tool {
+class KeyBifTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -34,9 +35,9 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void list(const resource::RimReader &rim);
-    void extract(resource::RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath);
-    void toRIM(const boost::filesystem::path &target);
+    void listKEY(const resource::KeyReader &key);
+    void listBIF(const resource::KeyReader &key, int bifIdx);
+    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

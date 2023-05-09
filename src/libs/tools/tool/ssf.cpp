@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/ssf.h"
+#include "reone/tools/ssf.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"

@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-class TpcTool : public Tool {
+class SsfTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -38,7 +38,8 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

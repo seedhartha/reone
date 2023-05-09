@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/2da.h"
+#include "reone/tools/2da.h"
 
 #include "reone/common/binarywriter.h"
 #include "reone/common/exception/validation.h"

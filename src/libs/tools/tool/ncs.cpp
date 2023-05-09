@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/ncs.h"
+#include "reone/tools/ncs.h"
 
 #include <boost/regex.hpp>
 

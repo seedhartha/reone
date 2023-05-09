@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/rim.h"
+#include "reone/tools/rim.h"
 
 #include "reone/common/stream/fileinput.h"
 #include "reone/resource/format/rimwriter.h"

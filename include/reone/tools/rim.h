@@ -17,11 +17,13 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "reone/resource/format/rimreader.h"
+
+#include "tool.h"
 
 namespace reone {
 
-class TwoDaTool : public Tool {
+class RimTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -29,17 +31,12 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
-    void invokeBatch(
-        Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
-
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
-    void to2DA(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
+    void list(const resource::RimReader &rim);
+    void extract(resource::RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath);
+    void toRIM(const boost::filesystem::path &target);
 };
 
 } // namespace reone

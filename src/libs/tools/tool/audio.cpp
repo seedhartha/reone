@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/audio.h"
+#include "reone/tools/audio.h"
 
 #include "reone/common/binaryreader.h"
 #include "reone/common/stream/fileinput.h"

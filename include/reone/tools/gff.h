@@ -17,14 +17,17 @@
 
 #pragma once
 
-#include "reone/resource/format/bifreader.h"
-#include "reone/resource/format/keyreader.h"
-
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-class KeyBifTool : public Tool {
+namespace resource {
+
+class Strings;
+
+}
+
+class GffTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -32,12 +35,17 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
+    void invokeBatch(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void listKEY(const resource::KeyReader &key);
-    void listBIF(const resource::KeyReader &key, int bifIdx);
-    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
+    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, resource::Strings &strings);
+    void toGFF(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
 };
 
 } // namespace reone

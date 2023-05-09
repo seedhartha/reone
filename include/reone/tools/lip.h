@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 

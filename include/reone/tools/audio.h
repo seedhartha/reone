@@ -17,29 +17,21 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-class SsfTool : public Tool {
-public:
+class AudioTool : public Tool {
     void invoke(
         Operation operation,
         const boost::filesystem::path &input,
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
-    void invokeBatch(
-        Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
-
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/tpc.h"
+#include "reone/tools/tpc.h"
 
 #include "reone/common/exception/validation.h"
 #include "reone/common/logutil.h"

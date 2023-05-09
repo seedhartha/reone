@@ -19,22 +19,22 @@ set(TOOLSLIB_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/tools)
 set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
 
 set(TOOLSLIB_HEADERS
+    ${TOOLSLIB_INCLUDE_DIR}/2da.h
+    ${TOOLSLIB_INCLUDE_DIR}/audio.h
+    ${TOOLSLIB_INCLUDE_DIR}/erf.h
+    ${TOOLSLIB_INCLUDE_DIR}/gff.h
+    ${TOOLSLIB_INCLUDE_DIR}/keybif.h
+    ${TOOLSLIB_INCLUDE_DIR}/lip.h
+    ${TOOLSLIB_INCLUDE_DIR}/ncs.h
+    ${TOOLSLIB_INCLUDE_DIR}/rim.h
     ${TOOLSLIB_INCLUDE_DIR}/script/expressiontree.h
     ${TOOLSLIB_INCLUDE_DIR}/script/format/nsswriter.h
     ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodereader.h
     ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodewriter.h
+    ${TOOLSLIB_INCLUDE_DIR}/ssf.h
+    ${TOOLSLIB_INCLUDE_DIR}/tlk.h
     ${TOOLSLIB_INCLUDE_DIR}/tool.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/2da.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/audio.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/erf.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/gff.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/keybif.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/lip.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/ncs.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/rim.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/ssf.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/tlk.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool/tpc.h
+    ${TOOLSLIB_INCLUDE_DIR}/tpc.h
     ${TOOLSLIB_INCLUDE_DIR}/types.h)
 
 set(TOOLSLIB_SOURCES

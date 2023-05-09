@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tool/keybif.h"
+#include "reone/tools/keybif.h"
 
 #include "reone/common/pathutil.h"
 #include "reone/common/stream/fileinput.h"

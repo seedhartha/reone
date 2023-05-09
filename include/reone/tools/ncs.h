@@ -17,21 +17,44 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "reone/game/types.h"
+
+#include "tool.h"
 
 namespace reone {
 
-class AudioTool : public Tool {
+namespace game {
+
+class Routines;
+
+}
+
+class NcsTool : public Tool {
+public:
+    NcsTool(game::GameID gameId) :
+        _gameId(gameId) {
+    }
+
     void invoke(
         Operation operation,
         const boost::filesystem::path &input,
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) override;
 
+    void invokeBatch(
+        Operation operation,
+        const std::vector<boost::filesystem::path> &input,
+        const boost::filesystem::path &outputDir,
+        const boost::filesystem::path &gamePath) override;
+
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    game::GameID _gameId;
+
+    void toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
 };
 
 } // namespace reone

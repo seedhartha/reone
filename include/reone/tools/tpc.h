@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../tool.h"
+#include "tool.h"
 
 namespace reone {
 
-class TlkTool : public Tool {
+class TpcTool : public Tool {
 public:
     void invoke(
         Operation operation,
@@ -38,8 +38,7 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
 private:
-    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void toTLK(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone
