@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,19 @@
 
 #pragma once
 
-#include "../action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class OpenContainerAction : public Action {
+class OpenContainerAction : public ObjectAction {
 public:
-    OpenContainerAction() :
-        Action(ActionType::OpenContainer) {
+    OpenContainerAction(Game &game, ServicesView &services, std::shared_ptr<Object> object) :
+        ObjectAction(game, services, ActionType::OpenContainer, std::move(object)) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

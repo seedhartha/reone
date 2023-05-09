@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,59 +17,97 @@
 
 #pragma once
 
-#include "reone/gui/gui.h"
+#include "reone/graphics/font.h"
+#include "reone/graphics/options.h"
+#include "reone/graphics/types.h"
 #include "reone/gui/textinput.h"
 
 namespace reone {
 
-namespace gui {
-
-class Label;
-class ListBox;
-
-} // namespace gui
-
 namespace game {
 
-class IGame;
+struct ServicesView;
 
-class Console : public gui::Gui {
+class Game;
+
+class Console {
 public:
     Console(
-        IGame &game,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc),
+        Game &game,
+        ServicesView &services) :
         _game(game),
-        _textInput(gui::TextInputFlags::console) {
+        _services(services),
+        _input(gui::TextInputFlags::console) {
+
+        init();
     }
 
     void init();
+    bool handle(const SDL_Event &event);
+    void draw();
 
-    // Gui
-
-    bool handle(const SDL_Event &e) override;
-
-    // END Gui
+    bool isOpen() const { return _open; }
 
 private:
-    IGame &_game;
-    gui::TextInput _textInput;
+    typedef std::function<void(std::string, std::vector<std::string>)> CommandHandler;
 
-    // Binding
+    struct Command {
+        std::string name;
+        std::string alias;
+        std::string description;
+        CommandHandler handler;
+    };
 
-    gui::ListBox *_lbLines {nullptr};
-    gui::Label *_lblInput {nullptr};
+    Game &_game;
+    ServicesView &_services;
 
-    // END Binding
+    std::shared_ptr<graphics::Font> _font;
+    bool _open {false};
+    gui::TextInput _input;
+    std::deque<std::string> _output;
+    int _outputOffset {0};
+    std::stack<std::string> _history;
 
-    void onEnterCommand(const std::string &command);
+    // Commands
 
-    void executeActionMoveToObject(std::vector<std::string> arguments);
+    std::vector<Command> _commands;
+    std::unordered_map<std::string, Command> _commandByName;
+    std::unordered_map<std::string, Command> _commandByAlias;
+
+    // END Commands
+
+    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
+    bool handleKeyUp(const SDL_KeyboardEvent &event);
+
+    void executeInputText();
+    void print(const std::string &text);
+    void trimOutput();
+
+    void drawBackground();
+    void drawLines();
+
+    // Commands
+
+    void initCommands();
+
+    void addCommand(std::string name, std::string alias, std::string description, CommandHandler handler);
+
+    void cmdClear(std::string input, std::vector<std::string> tokens);
+    void cmdInfo(std::string input, std::vector<std::string> tokens);
+    void cmdListGlobals(std::string input, std::vector<std::string> tokens);
+    void cmdListLocals(std::string input, std::vector<std::string> tokens);
+    void cmdListAnim(std::string input, std::vector<std::string> tokens);
+    void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
+    void cmdRunScript(std::string input, std::vector<std::string> tokens);
+    void cmdWarp(std::string input, std::vector<std::string> tokens);
+    void cmdKill(std::string input, std::vector<std::string> tokens);
+    void cmdAddItem(std::string input, std::vector<std::string> tokens);
+    void cmdGiveXP(std::string input, std::vector<std::string> tokens);
+    void cmdShowWalkmesh(std::string input, std::vector<std::string> tokens);
+    void cmdShowTriggers(std::string input, std::vector<std::string> tokens);
+    void cmdHelp(std::string input, std::vector<std::string> tokens);
+
+    // END Commands
 };
 
 } // namespace game

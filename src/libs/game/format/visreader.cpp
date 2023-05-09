@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,27 @@
 
 #include "reone/game/format/visreader.h"
 
+#include "reone/common/stream/input.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void VisReader::load(const shared_ptr<IInputStream> &in) {
-    if (!in) {
-        throw invalid_argument("Invalid input stream");
-    }
+void VisReader::load(IInputStream &in) {
     char buf[32];
     do {
-        char *pch = buf;
-        int ch;
-        do {
-            ch = in->readByte();
-            *(pch++) = ch;
-        } while (ch != -1 && ch != '\n');
+        in.readLine(buf, sizeof(buf));
 
-        string line(buf, pch - buf - 1);
+        string line(buf);
         boost::trim(line);
 
         if (line.empty())
             continue;
 
         processLine(line);
-    } while (!in->eof());
+    } while (!in.eof());
 }
 
 void VisReader::processLine(const string &line) {

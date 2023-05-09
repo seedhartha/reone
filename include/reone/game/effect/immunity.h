@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ namespace game {
 
 class ImmunityEffect : public Effect {
 public:
-    ImmunityEffect() :
-        Effect(EffectType::Immunity) {
+    ImmunityEffect(ImmunityType immunityType) :
+        Effect(EffectType::Immunity),
+        _immunityType(immunityType) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    ImmunityType _immunityType;
 };
 
 } // namespace game

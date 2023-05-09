@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 
 #include "reone/game/action/movetoobject.h"
 
-#include "reone/common/exception/validation.h"
-
+#include "reone/game/game.h"
 #include "reone/game/object.h"
-#include "reone/game/object/creature.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/services.h"
 
 using namespace std;
 
@@ -28,12 +28,12 @@ namespace reone {
 
 namespace game {
 
-void MoveToObjectAction::execute(Object &actor, float delta) {
-    if (actor.type() != ObjectType::Creature) {
-        throw ValidationException("Actor must be of creature type");
-    }
-    auto &creatureActor = static_cast<Creature &>(actor);
-    if (creatureActor.moveTo(_moveTo, _run, _range, delta)) {
+void MoveToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+    auto dest = _object->position();
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+
+    bool reached = creatureActor->navigateTo(dest, _run, _range, dt);
+    if (reached) {
         complete();
     }
 }

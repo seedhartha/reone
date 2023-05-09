@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,17 @@ namespace game {
 
 class RegenerateEffect : public Effect {
 public:
-    RegenerateEffect() :
-        Effect(EffectType::Regenerate) {
+    RegenerateEffect(int amount, float intervalSeconds) :
+        Effect(EffectType::Regenerate),
+        _amount(amount),
+        _intervalSeconds(intervalSeconds) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _amount;
+    float _intervalSeconds;
 };
 
 } // namespace game

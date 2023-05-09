@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-inline uint32_t getObjectIdOrInvalid(Object *object) {
+inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<Object> &object) {
     return object ? object->id() : script::kObjectInvalid;
 }
 

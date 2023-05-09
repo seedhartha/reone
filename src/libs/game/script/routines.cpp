@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,14 +47,6 @@ namespace reone {
 namespace game {
 
 static constexpr int kBaseItemInvalid = 256;
-
-void Routines::init() {
-    if (_gameId == GameID::TSL) {
-        initForTSL();
-    } else {
-        initForKotOR();
-    }
-}
 
 void Routines::initForKotOR() {
     add("Random", R_INT, {R_INT}, &routine::random);
@@ -1782,7 +1774,7 @@ void Routines::add(
         move(defRetValue),
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
-            RoutineContext ctx(_game, _services, execution);
+            RoutineContext ctx(*_game, *_services, execution);
             return fn(args, std::move(ctx));
         });
 }
@@ -1800,7 +1792,7 @@ void Routines::add(
         move(defRetValue),
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
-            RoutineContext ctx(_game, _services, execution);
+            RoutineContext ctx(*_game, *_services, execution);
             return fn(args, std::move(ctx));
         });
 }

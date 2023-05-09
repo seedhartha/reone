@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,16 +27,16 @@ namespace game {
 
 class Talent : public script::EngineType {
 public:
-    TalentType type() const {
-        return _type;
+    Talent(TalentType type, int value) :
+        _type(type), _value(value) {
     }
 
-protected:
+    TalentType type() const { return _type; }
+    int value() const { return _value; }
+
+private:
     TalentType _type;
-
-    Talent(TalentType type) :
-        _type(type) {
-    }
+    int _value;
 };
 
 } // namespace game

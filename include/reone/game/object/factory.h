@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,69 @@
 
 #pragma once
 
-#include "../object.h"
+#include "reone/graphics/types.h"
+#include "reone/resource/types.h"
+
+#include "../types.h"
+
+#include "area.h"
+#include "creature.h"
+#include "door.h"
+#include "encounter.h"
+#include "module.h"
+#include "placeable.h"
+#include "placeablecamera.h"
+#include "sound.h"
+#include "trigger.h"
+#include "waypoint.h"
 
 namespace reone {
 
 namespace game {
 
-class IObjectFactory {
+struct ServicesView;
+
+class ObjectFactory {
 public:
-    virtual std::shared_ptr<Object> newArea() = 0;
-    virtual std::shared_ptr<Object> newCamera() = 0;
-    virtual std::shared_ptr<Object> newCreature() = 0;
-    virtual std::shared_ptr<Object> newDoor() = 0;
-    virtual std::shared_ptr<Object> newEncounter() = 0;
-    virtual std::shared_ptr<Object> newItem() = 0;
-    virtual std::shared_ptr<Object> newModule() = 0;
-    virtual std::shared_ptr<Object> newPlaceable() = 0;
-    virtual std::shared_ptr<Object> newRoom() = 0;
-    virtual std::shared_ptr<Object> newSound() = 0;
-    virtual std::shared_ptr<Object> newStore() = 0;
-    virtual std::shared_ptr<Object> newTrigger() = 0;
-    virtual std::shared_ptr<Object> newWaypoint() = 0;
+    ObjectFactory(Game &game, ServicesView &services) :
+        _game(game),
+        _services(services) {
+    }
+
+    std::shared_ptr<Module> newModule();
+    std::shared_ptr<Item> newItem();
+
+    std::shared_ptr<Area> newArea(std::string sceneName = kSceneMain);
+    std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneMain);
+    std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain);
+    std::shared_ptr<Door> newDoor(std::string sceneName = kSceneMain);
+    std::shared_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain);
+    std::shared_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain);
+    std::shared_ptr<Sound> newSound(std::string sceneName = kSceneMain);
+    std::shared_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain);
+    std::shared_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain);
+
+    std::shared_ptr<Object> getObjectById(uint32_t id) const;
+
+    template <class T>
+    std::shared_ptr<T> getObjectById(uint32_t id) const {
+        return std::dynamic_pointer_cast<T>(getObjectById(id));
+    }
+
+private:
+    Game &_game;
+    ServicesView &_services;
+
+    uint32_t _counter {2}; // ids 0 and 1 are reserved
+    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
+
+    template <class T, class... Args>
+    std::shared_ptr<T> newObject(Args &&...args) {
+        uint32_t id = _counter++;
+        std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));
+        _objectById.insert(std::make_pair(id, object));
+        return move(object);
+    }
 };
 
 } // namespace game

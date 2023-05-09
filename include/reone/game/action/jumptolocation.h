@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "action.h"
+#include "locationaction.h"
 
 namespace reone {
 
@@ -25,9 +25,11 @@ namespace game {
 
 class JumpToLocationAction : public LocationAction {
 public:
-    JumpToLocationAction() :
-        Action(ActionType::JumpToLocation) {
+    JumpToLocationAction(Game &game, ServicesView &services, std::shared_ptr<Location> location) :
+        LocationAction(game, services, ActionType::JumpToLocation, std::move(location)) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

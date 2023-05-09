@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,81 +17,102 @@
 
 #pragma once
 
+#include "reone/resource/format/gffreader.h"
 #include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
 
 namespace reone {
 
-namespace resource {
-
-class Gff;
-
-}
-
 namespace game {
 
 class Door : public Object {
 public:
-    enum class State {
-        Closed,
-        Opening,
-        Open
-    };
-
     Door(
         uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Door,
+            std::move(sceneName),
             game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            services) {
     }
 
-    void loadFromGit(const resource::Gff &git);
+    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromBlueprint(const std::string &resRef);
 
-    void handleClick(Object &clicker) override;
+    bool isSelectable() const override;
 
-    scene::WalkmeshSceneNode *walkmeshClosed() {
-        return _walkmeshClosed;
-    }
+    void open(const std::shared_ptr<Object> &triggerrer);
+    void close(const std::shared_ptr<Object> &triggerrer);
 
-    scene::WalkmeshSceneNode *walkmeshOpen1() {
-        return _walkmeshOpen1;
-    }
+    bool isLocked() const { return _locked; }
+    bool isStatic() const { return _static; }
+    bool isKeyRequired() const { return _keyRequired; }
 
-    scene::WalkmeshSceneNode *walkmeshOpen2() {
-        return _walkmeshOpen2;
-    }
+    const std::string &getOnOpen() const { return _onOpen; }
+    const std::string &getOnFailToOpen() const { return _onFailToOpen; }
 
-    void setState(State state) {
-        _state = state;
-    }
+    int genericType() const { return _genericType; }
+    const std::string &linkedToModule() const { return _linkedToModule; }
+    const std::string &linkedTo() const { return _linkedTo; }
+    const std::string &transitionDestin() const { return _transitionDestin; }
 
-    // Object
+    void setLocked(bool locked);
 
-    void update(float delta) override;
+    // Walkmeshes
 
-    // END Object
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1() const { return _walkmeshOpen1; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2() const { return _walkmeshOpen2; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosed() const { return _walkmeshClosed; }
+
+    // END Walkmeshes
 
 private:
-    scene::WalkmeshSceneNode *_walkmeshClosed {nullptr};
-    scene::WalkmeshSceneNode *_walkmeshOpen1 {nullptr};
-    scene::WalkmeshSceneNode *_walkmeshOpen2 {nullptr};
+    bool _locked {false};
+    int _genericType {0};
+    bool _static {false};
+    bool _keyRequired {false};
+    std::string _linkedToModule;
+    std::string _linkedTo;
+    int _linkedToFlags {0};
+    std::string _transitionDestin;
+    Faction _faction {Faction::Invalid};
+    int _openLockDC {0};
+    int _hardness {0};
+    int _fortitude {0};
+    bool _lockable {false};
+    std::string _keyName;
 
-    State _state {State::Closed};
+    // Walkmeshes
 
-    void flushTransform() override;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
+
+    // END Walkmeshes
+
+    // Scripts
+
+    std::string _onOpen;
+    std::string _onFailToOpen;
+    std::string _onClick;
+    std::string _onClosed;
+    std::string _onDamaged;
+    std::string _onLock;
+    std::string _onUnlock;
+    std::string _onMeleeAttacked;
+    std::string _onSpellCastAt;
+
+    // END Scripts
+
+    void loadUTD(const resource::Gff &utd);
+    void loadTransformFromGIT(const resource::Gff &gffs);
+
+    void updateTransform() override;
 };
 
 } // namespace game

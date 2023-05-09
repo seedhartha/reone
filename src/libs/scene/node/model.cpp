@@ -58,9 +58,14 @@ ModelSceneNode::ModelSceneNode(
         audioSvc),
     _model(&model),
     _usage(usage) {
+
+    init();
 }
 
 void ModelSceneNode::init() {
+    if (!_nodeByNumber.empty()) {
+        return;
+    }
     buildNodeTree(*_model->rootNode(), *this);
     computeAABB();
     _point = _aabb.isEmpty();

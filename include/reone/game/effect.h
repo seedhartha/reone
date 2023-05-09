@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,18 +25,20 @@ namespace reone {
 
 namespace game {
 
+class Object;
+
 class Effect : public script::EngineType {
 public:
-    EffectType type() const {
-        return _type;
-    }
-
-protected:
-    EffectType _type;
-
     Effect(EffectType type) :
         _type(type) {
     }
+
+    virtual void applyTo(Object &object);
+
+    EffectType type() const { return _type; }
+
+protected:
+    EffectType _type;
 };
 
 } // namespace game

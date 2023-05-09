@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,11 +36,10 @@ namespace game {
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::Default, {1, 2}},
     {CursorType::Talk, {11, 12}},
-    {CursorType::OpenDoor, {23, 24}},
+    {CursorType::Door, {23, 24}},
     {CursorType::Pickup, {25, 26}},
     {CursorType::DisableMine, {33, 34}},
     {CursorType::RecoverMine, {37, 38}},
-    {CursorType::Target, {45, 46}},
     {CursorType::Attack, {51, 52}}};
 
 void Cursors::deinit() {
@@ -81,13 +80,13 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
 }
 
 vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
-    shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::CursorGroup));
+    auto bytes = _resources.getFromExe(name, PEResourceType::CursorGroup);
     if (!bytes) {
         return vector<uint32_t>();
     }
-
     auto stream = ByteArrayInputStream(*bytes);
-    BinaryReader reader(stream);
+    auto reader = BinaryReader(stream);
+
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();
 
@@ -102,13 +101,13 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
 }
 
 shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
-    shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::Cursor));
+    auto bytes = _resources.getFromExe(name, PEResourceType::Cursor);
+    auto stream = ByteArrayInputStream(*bytes);
 
-    auto cur = ByteArrayInputStream(*bytes);
-    auto reader = CurReader();
-    reader.load(cur);
+    CurReader cur;
+    cur.load(stream);
 
-    return reader.texture();
+    return cur.texture();
 }
 
 } // namespace game

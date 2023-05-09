@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,11 @@
 
 #pragma once
 
+#include "reone/resource/format/gffreader.h"
+
 #include "../object.h"
 
 namespace reone {
-
-namespace resource {
-
-class Gff;
-
-}
 
 namespace game {
 
@@ -33,25 +29,33 @@ class Waypoint : public Object {
 public:
     Waypoint(
         uint32_t id,
-        IGame &game,
-        IObjectFactory &objectFactory,
-        GameServices &gameSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Waypoint,
+            std::move(sceneName),
             game,
-            objectFactory,
-            gameSvc,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            services) {
     }
 
-    void loadFromGit(const resource::Gff &git) {
-    }
+    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromBlueprint(const std::string &resRef);
+
+    bool isMapNoteEnabled() const { return _mapNoteEnabled; }
+
+    const std::string &mapNote() const { return _mapNote; }
+
+private:
+    int _appearance {0};
+    bool _hasMapNote {false};
+    std::string _mapNote;
+    bool _mapNoteEnabled {false};
+
+    void loadTransformFromGIT(const resource::Gff &gffs);
+
+    void loadUTW(const resource::Gff &utw);
 };
 
 } // namespace game

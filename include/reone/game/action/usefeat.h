@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,25 @@
 
 #pragma once
 
-#include "../action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class UseFeatAction : public Action {
+class UseFeatAction : public ObjectAction {
 public:
-    UseFeatAction() :
-        Action(ActionType::UseFeat) {
+    UseFeatAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, FeatType feat) :
+        ObjectAction(game, services, ActionType::UseFeat, std::move(object)),
+        _feat(feat) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+    FeatType feat() const { return _feat; }
+
+private:
+    FeatType _feat;
 };
 
 } // namespace game

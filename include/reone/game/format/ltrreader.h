@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,11 @@ namespace reone {
 
 namespace game {
 
+/**
+ * Encapsulates the LTR file format, used to generate random names.
+ */
 class LtrReader : public resource::BinaryResourceReader {
 public:
-    LtrReader();
-
     std::string getRandomName(int maxLength) const;
 
 private:

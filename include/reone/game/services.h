@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,57 +51,76 @@ struct ScriptServices;
 
 namespace game {
 
-class AStar;
 class CameraStyles;
+class Classes;
 class Cursors;
 class Dialogs;
+class Feats;
 class FootstepSounds;
 class GUISounds;
 class Layouts;
 class Paths;
 class Portraits;
+class Reputes;
 class ResourceLayout;
+class Skills;
 class SoundSets;
+class Spells;
 class Surfaces;
 class Visibilities;
 
 struct GameServices {
-    AStar &aStar;
     CameraStyles &cameraStyles;
+    Classes &classes;
     Cursors &cursors;
+    Dialogs &dialogs;
+    Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
     Layouts &layouts;
     Paths &paths;
     Portraits &portraits;
+    Reputes &reputes;
     ResourceLayout &resourceLayout;
+    Skills &skills;
     SoundSets &soundSets;
+    Spells &spells;
     Surfaces &surfaces;
     Visibilities &visibilities;
 
     GameServices(
-        AStar &aStar,
         CameraStyles &cameraStyles,
+        Classes &classes,
         Cursors &cursors,
+        Dialogs &dialogs,
+        Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
         Layouts &layouts,
         Paths &paths,
         Portraits &portraits,
+        Reputes &reputes,
         ResourceLayout &resourceLayout,
+        Skills &skills,
         SoundSets &soundSets,
+        Spells &spells,
         Surfaces &surfaces,
         Visibilities &visibilities) :
-        aStar(aStar),
         cameraStyles(cameraStyles),
+        classes(classes),
         cursors(cursors),
+        dialogs(dialogs),
+        feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
         layouts(layouts),
         paths(paths),
         portraits(portraits),
+        reputes(reputes),
         resourceLayout(resourceLayout),
+        skills(skills),
         soundSets(soundSets),
+        spells(spells),
         surfaces(surfaces),
         visibilities(visibilities) {
     }

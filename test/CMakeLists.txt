@@ -20,8 +20,6 @@ set(TEST_SOURCE_DIR ${CMAKE_SOURCE_DIR}/test)
 set(TEST_HEADERS
     ${TEST_SOURCE_DIR}/checkutil.h
     ${TEST_SOURCE_DIR}/fixtures/audio.h
-    ${TEST_SOURCE_DIR}/fixtures/functional.h
-    ${TEST_SOURCE_DIR}/fixtures/game.h
     ${TEST_SOURCE_DIR}/fixtures/resource.h
     ${TEST_SOURCE_DIR}/fixtures/scene.h
     ${TEST_SOURCE_DIR}/fixtures/script.h)
@@ -39,15 +37,6 @@ set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/common/stream/fileoutput.cpp
     ${TEST_SOURCE_DIR}/common/stringbuilder.cpp
     ${TEST_SOURCE_DIR}/common/textwriter.cpp
-    ${TEST_SOURCE_DIR}/game/action/movetoobject.cpp
-    ${TEST_SOURCE_DIR}/game/astar.cpp
-    ${TEST_SOURCE_DIR}/game/conversation.cpp
-    ${TEST_SOURCE_DIR}/game/game.cpp
-    ${TEST_SOURCE_DIR}/game/object.cpp
-    ${TEST_SOURCE_DIR}/game/object/creature.cpp
-    ${TEST_SOURCE_DIR}/game/object/item.cpp
-    ${TEST_SOURCE_DIR}/game/object/placeable.cpp
-    ${TEST_SOURCE_DIR}/game/selectioncontroller.cpp
     ${TEST_SOURCE_DIR}/graphics/aabb.cpp
     ${TEST_SOURCE_DIR}/graphics/format/bwmreader.cpp
     ${TEST_SOURCE_DIR}/graphics/format/mdlreader.cpp
@@ -79,7 +68,7 @@ set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/tools/expressiontree.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_compile_definitions(reone-tests PRIVATE BOOST_TEST_DYN_LINK)
 target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(reone-tests PRIVATE toolslib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

@@ -50,6 +50,10 @@ public:
         return _stream.gcount();
     }
 
+    void readLine(char *outData, int maxLen) override {
+        throw std::logic_error("Method not implemented");
+    }
+
     void close() {
         _stream.close();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ namespace game {
 
 class FactionModifierEffect : public Effect {
 public:
-    FactionModifierEffect() :
-        Effect(EffectType::FactionModifier) {
+    FactionModifierEffect(int newFaction) :
+        Effect(EffectType::FactionModifier),
+        _newFaction(newFaction) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _newFaction;
 };
 
 } // namespace game

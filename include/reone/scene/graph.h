@@ -98,11 +98,11 @@ public:
 
     void clear();
 
-    void addRoot(ModelSceneNode &node);
-    void addRoot(WalkmeshSceneNode &node);
-    void addRoot(TriggerSceneNode &node);
-    void addRoot(GrassSceneNode &node);
-    void addRoot(SoundSceneNode &node);
+    void addRoot(std::shared_ptr<ModelSceneNode> node);
+    void addRoot(std::shared_ptr<WalkmeshSceneNode> node);
+    void addRoot(std::shared_ptr<TriggerSceneNode> node);
+    void addRoot(std::shared_ptr<GrassSceneNode> node);
+    void addRoot(std::shared_ptr<SoundSceneNode> node);
 
     void removeRoot(ModelSceneNode &node);
     void removeRoot(WalkmeshSceneNode &node);
@@ -210,11 +210,11 @@ private:
 
     // Roots
 
-    std::set<ModelSceneNode *> _modelRoots;
-    std::list<WalkmeshSceneNode *> _walkmeshRoots;
-    std::set<TriggerSceneNode *> _triggerRoots;
-    std::set<GrassSceneNode *> _grassRoots;
-    std::set<SoundSceneNode *> _soundRoots;
+    std::list<std::shared_ptr<ModelSceneNode>> _modelRoots;
+    std::list<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
+    std::list<std::shared_ptr<TriggerSceneNode>> _triggerRoots;
+    std::list<std::shared_ptr<GrassSceneNode>> _grassRoots;
+    std::list<std::shared_ptr<SoundSceneNode>> _soundRoots;
 
     // END Roots
 

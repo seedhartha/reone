@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,22 @@
 
 #include "reone/game/object/door.h"
 
-#include "reone/common/exception/validation.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/walkmeshes.h"
+#include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
-#include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "reone/scene/graph.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
+#include "reone/scene/services.h"
+#include "reone/scene/types.h"
+#include "reone/script/scripts.h"
 
+#include "reone/game/game.h"
 #include "reone/game/services.h"
 
 using namespace std;
@@ -36,131 +40,189 @@ using namespace std;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-void Door::loadFromGit(const Gff &git) {
-    // From GIT
+void Door::loadFromGIT(const Gff &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
 
-    auto templateResRef = git.getString("TemplateResRef");
-    auto tag = git.getString("Tag");
-    auto x = git.getFloat("X");
-    auto y = git.getFloat("Y");
-    auto z = git.getFloat("Z");
-    auto bearing = git.getFloat("Bearing");
+    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
+    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
+    _linkedToFlags = gffs.getInt("LinkedToFlags");
+    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
 
-    // From UTD
+    loadTransformFromGIT(gffs);
+}
 
-    auto utd = _resourceSvc.gffs.get(templateResRef, ResourceType::Utd);
+void Door::loadFromBlueprint(const string &resRef) {
+    shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
     if (!utd) {
-        throw ValidationException("UTD not found: " + templateResRef);
+        return;
     }
-    auto genericType = utd->getInt("GenericType");
-    auto locName = _resourceSvc.strings.get(utd->getInt("LocName"));
+    loadUTD(*utd);
+    shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
+    string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    // From doortypes 2DA
-
-    auto genericDoorsTable = _resourceSvc.twoDas.get("genericdoors");
-    if (!genericDoorsTable) {
-        throw ValidationException("genericdoors 2DA not found");
+    auto model = _services.graphics.models.get(modelName);
+    if (!model) {
+        return;
     }
-    auto modelName = genericDoorsTable->getString(genericType, "modelname");
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
-    // Make scene nodes
+    auto modelSceneNode = sceneGraph.newModel(*model, ModelUsage::Door);
+    modelSceneNode->setUser(*this);
+    modelSceneNode->setCullable(true);
+    // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
+    _sceneNode = move(modelSceneNode);
 
-    shared_ptr<ModelSceneNode> sceneNode;
-    auto model = _graphicsSvc.models.get(modelName);
-    if (model) {
-        sceneNode = _sceneGraph->newModel(*model, ModelUsage::Door);
-        sceneNode->init();
-        sceneNode->setUser(*this);
-        sceneNode->setCullable(true);
-        sceneNode->setPickable(true);
-    }
-
-    shared_ptr<WalkmeshSceneNode> walkmeshClosedSceneNode;
-    auto walkmeshClosed = _graphicsSvc.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResourceType::Dwk);
     if (walkmeshClosed) {
-        walkmeshClosedSceneNode = _sceneGraph->newWalkmesh(*walkmeshClosed);
-        walkmeshClosedSceneNode->setUser(*this);
+        _walkmeshClosed = sceneGraph.newWalkmesh(*walkmeshClosed);
+        _walkmeshClosed->setUser(*this);
     }
 
-    shared_ptr<WalkmeshSceneNode> walkmeshOpen1SceneNode;
-    auto walkmeshOpen1 = _graphicsSvc.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen1) {
-        walkmeshOpen1SceneNode = _sceneGraph->newWalkmesh(*walkmeshOpen1);
-        walkmeshOpen1SceneNode->setUser(*this);
-        walkmeshOpen1SceneNode->setEnabled(false);
+        _walkmeshOpen1 = sceneGraph.newWalkmesh(*walkmeshOpen1);
+        _walkmeshOpen1->setUser(*this);
+        _walkmeshOpen1->setEnabled(false);
     }
 
-    shared_ptr<WalkmeshSceneNode> walkmeshOpen2SceneNode;
-    auto walkmeshOpen2 = _graphicsSvc.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResourceType::Dwk);
     if (walkmeshOpen2) {
-        walkmeshOpen2SceneNode = _sceneGraph->newWalkmesh(*walkmeshOpen2);
-        walkmeshOpen2SceneNode->setEnabled(false);
-    }
-
-    //
-
-    _tag = move(tag);
-    _name = move(locName);
-    _position = glm::vec3(x, y, z);
-    _facing = bearing;
-    _sceneNode = sceneNode.get();
-    _walkmeshClosed = walkmeshClosedSceneNode.get();
-    _walkmeshOpen1 = walkmeshOpen1SceneNode.get();
-    _walkmeshOpen2 = walkmeshOpen2SceneNode.get();
-
-    flushTransform();
-}
-
-void Door::handleClick(Object &clicker) {
-    if (_state == State::Closed) {
-        _state = State::Opening;
+        _walkmeshOpen2 = sceneGraph.newWalkmesh(*walkmeshOpen2);
+        _walkmeshOpen2->setUser(*this);
+        _walkmeshOpen2->setEnabled(false);
     }
 }
 
-void Door::update(float delta) {
-    if (_sceneNode) {
-        auto &modelSceneNode = static_cast<ModelSceneNode &>(*_sceneNode);
-        if (_state == State::Closed) {
-            if (modelSceneNode.activeAnimationName() != "closed") {
-                modelSceneNode.playAnimation("closed");
-            }
-        } else if (_state == State::Opening) {
-            auto animName = modelSceneNode.activeAnimationName();
-            if (animName == "opening1" && modelSceneNode.isAnimationFinished()) {
-                _state = State::Open;
-                _walkmeshClosed->setEnabled(false);
-                _walkmeshOpen1->setEnabled(true);
-            } else if (animName != "opening1") {
-                modelSceneNode.playAnimation("opening1");
-            }
-        } else if (_state == State::Open) {
-            if (modelSceneNode.activeAnimationName() != "open1") {
-                modelSceneNode.playAnimation("open1");
-            }
-        }
-    }
+void Door::loadTransformFromGIT(const Gff &gffs) {
+    _position[0] = gffs.getFloat("X");
+    _position[1] = gffs.getFloat("Y");
+    _position[2] = gffs.getFloat("Z");
+
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
+
+    updateTransform();
 }
 
-void Door::flushTransform() {
-    Object::flushTransform();
+bool Door::isSelectable() const {
+    return !_static && !_open;
+}
 
-    auto transform = glm::translate(_position);
-    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-
-    if (_walkmeshClosed) {
-        _walkmeshClosed->setLocalTransform(transform);
+void Door::open(const shared_ptr<Object> &triggerrer) {
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    if (model) {
+        // model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->playAnimation("opening1");
     }
     if (_walkmeshOpen1) {
-        _walkmeshOpen1->setLocalTransform(transform);
+        _walkmeshOpen1->setEnabled(true);
     }
     if (_walkmeshOpen2) {
-        _walkmeshOpen2->setLocalTransform(transform);
+        _walkmeshOpen2->setEnabled(false);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setEnabled(false);
+    }
+    _open = true;
+}
+
+void Door::close(const shared_ptr<Object> &triggerrer) {
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    if (model) {
+        // model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->playAnimation("closing1");
+    }
+    if (_walkmeshOpen1) {
+        _walkmeshOpen1->setEnabled(false);
+    }
+    if (_walkmeshOpen2) {
+        _walkmeshOpen2->setEnabled(false);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setEnabled(true);
+    }
+    _open = false;
+}
+
+void Door::setLocked(bool locked) {
+    _locked = locked;
+}
+
+void Door::loadUTD(const Gff &utd) {
+    _tag = boost::to_lower_copy(utd.getString("Tag"));
+    _name = _services.resource.strings.get(utd.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
+    _autoRemoveKey = utd.getBool("AutoRemoveKey");
+    _conversation = boost::to_lower_copy(utd.getString("Conversation"));
+    _interruptable = utd.getBool("Interruptable");
+    _faction = utd.getEnum("Faction", Faction::Invalid);
+    _plot = utd.getBool("Plot");
+    _minOneHP = utd.getBool("Min1HP");
+    _keyRequired = utd.getBool("KeyRequired");
+    _lockable = utd.getBool("Lockable");
+    _locked = utd.getBool("Locked");
+    _openLockDC = utd.getInt("OpenLockDC");
+    _keyName = utd.getString("KeyName");
+    _hitPoints = utd.getInt("HP");
+    _currentHitPoints = utd.getInt("CurrentHP");
+    _hardness = utd.getInt("Hardness");
+    _fortitude = utd.getInt("Fort");
+    _genericType = utd.getInt("GenericType");
+    _static = utd.getBool("Static");
+
+    _onClosed = utd.getString("OnClosed");   // always empty, but could be useful
+    _onDamaged = utd.getString("OnDamaged"); // always empty, but could be useful
+    _onDeath = utd.getString("OnDeath");
+    _onHeartbeat = utd.getString("OnHeartbeat");
+    _onLock = utd.getString("OnLock");                   // always empty, but could be useful
+    _onMeleeAttacked = utd.getString("OnMeleeAttacked"); // always empty, but could be useful
+    _onOpen = utd.getString("OnOpen");
+    _onSpellCastAt = utd.getString("OnSpellCastAt"); // always empty, but could be useful
+    _onUnlock = utd.getString("OnUnlock");           // always empty, but could be useful
+    _onUserDefined = utd.getString("OnUserDefined");
+    _onClick = utd.getString("OnClick");
+    _onFailToOpen = utd.getString("OnFailToOpen");
+
+    // Unused fields:
+    //
+    // - Description (always -1)
+    // - CloseLockDC (always 0)
+    // - PortraitId (not applicable, mostly 0)
+    // - TrapDetectable (not applicable, always 1)
+    // - TrapDetectDC (not applicable, always 0)
+    // - TrapDisarmable (not applicable, always 1)
+    // - DisarmDC (not applicable, mostly 28)
+    // - TrapFlag (not applicable, always 0)
+    // - TrapOneShot (not applicable, always 1)
+    // - TrapType (not applicable)
+    // - AnimationState (always 0)
+    // - Appearance (always 0)
+    // - Ref (always 0)
+    // - Will (always 0)
+    // - OnDisarm (not applicable, always empty)
+    // - OnTrapTriggered (not applicable, always empty)
+    // - LoadScreenID (always 0)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
+void Door::updateTransform() {
+    Object::updateTransform();
+
+    if (_walkmeshOpen1) {
+        _walkmeshOpen1->setLocalTransform(_transform);
+    }
+    if (_walkmeshOpen2) {
+        _walkmeshOpen2->setLocalTransform(_transform);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setLocalTransform(_transform);
     }
 }
 

@@ -17,8 +17,7 @@ set(GAME_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/game)
 set(GAME_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/game)
 
 set(GAME_HEADERS
-    ${GAME_INCLUDE_DIR}/action.h
-    ${GAME_INCLUDE_DIR}/action/attackobject.h
+    ${GAME_INCLUDE_DIR}/action/attack.h
     ${GAME_INCLUDE_DIR}/action/barkstring.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatlocation.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatobject.h
@@ -28,6 +27,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/equipitem.h
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingmelee.h
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingranged.h
+    ${GAME_INCLUDE_DIR}/action/factory.h
     ${GAME_INCLUDE_DIR}/action/follow.h
     ${GAME_INCLUDE_DIR}/action/followleader.h
     ${GAME_INCLUDE_DIR}/action/followowner.h
@@ -35,11 +35,13 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/interactobject.h
     ${GAME_INCLUDE_DIR}/action/jumptolocation.h
     ${GAME_INCLUDE_DIR}/action/jumptoobject.h
+    ${GAME_INCLUDE_DIR}/action/locationaction.h
     ${GAME_INCLUDE_DIR}/action/lockobject.h
     ${GAME_INCLUDE_DIR}/action/moveawayfromobject.h
     ${GAME_INCLUDE_DIR}/action/movetolocation.h
     ${GAME_INCLUDE_DIR}/action/movetoobject.h
     ${GAME_INCLUDE_DIR}/action/movetopoint.h
+    ${GAME_INCLUDE_DIR}/action/objectaction.h
     ${GAME_INCLUDE_DIR}/action/opencontainer.h
     ${GAME_INCLUDE_DIR}/action/opendoor.h
     ${GAME_INCLUDE_DIR}/action/openlock.h
@@ -57,13 +59,33 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/useskill.h
     ${GAME_INCLUDE_DIR}/action/usetalentonobject.h
     ${GAME_INCLUDE_DIR}/action/wait.h
-    ${GAME_INCLUDE_DIR}/astar.h
+    ${GAME_INCLUDE_DIR}/action.h
+    ${GAME_INCLUDE_DIR}/animationutil.h
+    ${GAME_INCLUDE_DIR}/camera/animated.h
+    ${GAME_INCLUDE_DIR}/camera/dialog.h
+    ${GAME_INCLUDE_DIR}/camera/firstperson.h
+    ${GAME_INCLUDE_DIR}/camera/static.h
+    ${GAME_INCLUDE_DIR}/camera/thirdperson.h
+    ${GAME_INCLUDE_DIR}/camera.h
     ${GAME_INCLUDE_DIR}/camerastyle.h
     ${GAME_INCLUDE_DIR}/camerastyles.h
-    ${GAME_INCLUDE_DIR}/conversation.h
+    ${GAME_INCLUDE_DIR}/character.h
+    ${GAME_INCLUDE_DIR}/combat.h
+    ${GAME_INCLUDE_DIR}/contextaction.h
     ${GAME_INCLUDE_DIR}/cursors.h
+    ${GAME_INCLUDE_DIR}/d20/attributes.h
+    ${GAME_INCLUDE_DIR}/d20/class.h
+    ${GAME_INCLUDE_DIR}/d20/classes.h
+    ${GAME_INCLUDE_DIR}/d20/feat.h
+    ${GAME_INCLUDE_DIR}/d20/feats.h
+    ${GAME_INCLUDE_DIR}/d20/savingthrows.h
+    ${GAME_INCLUDE_DIR}/d20/skill.h
+    ${GAME_INCLUDE_DIR}/d20/skills.h
+    ${GAME_INCLUDE_DIR}/d20/spell.h
+    ${GAME_INCLUDE_DIR}/d20/spells.h
     ${GAME_INCLUDE_DIR}/debug.h
-    ${GAME_INCLUDE_DIR}/effect.h
+    ${GAME_INCLUDE_DIR}/dialog.h
+    ${GAME_INCLUDE_DIR}/dialogs.h
     ${GAME_INCLUDE_DIR}/effect/abilitydecrease.h
     ${GAME_INCLUDE_DIR}/effect/abilityincrease.h
     ${GAME_INCLUDE_DIR}/effect/acdecrease.h
@@ -92,6 +114,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/droidstun.h
     ${GAME_INCLUDE_DIR}/effect/entangle.h
     ${GAME_INCLUDE_DIR}/effect/factionmodifier.h
+    ${GAME_INCLUDE_DIR}/effect/factory.h
     ${GAME_INCLUDE_DIR}/effect/forcebody.h
     ${GAME_INCLUDE_DIR}/effect/forcefizzle.h
     ${GAME_INCLUDE_DIR}/effect/forcepushed.h
@@ -128,6 +151,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/visual.h
     ${GAME_INCLUDE_DIR}/effect/vpregenmodifier.h
     ${GAME_INCLUDE_DIR}/effect/whirlwind.h
+    ${GAME_INCLUDE_DIR}/effect.h
     ${GAME_INCLUDE_DIR}/event.h
     ${GAME_INCLUDE_DIR}/footstepsounds.h
     ${GAME_INCLUDE_DIR}/format/ltrreader.h
@@ -136,19 +160,46 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/format/ssfwriter.h
     ${GAME_INCLUDE_DIR}/format/visreader.h
     ${GAME_INCLUDE_DIR}/game.h
-    ${GAME_INCLUDE_DIR}/gameinterface.h
+    ${GAME_INCLUDE_DIR}/gui/barkbubble.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/abilities.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/classselect.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/custom.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/feats.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/levelup.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/nameentry.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/portraitselect.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/quick.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/quickorcustom.h
+    ${GAME_INCLUDE_DIR}/gui/chargen/skills.h
+    ${GAME_INCLUDE_DIR}/gui/chargen.h
+    ${GAME_INCLUDE_DIR}/gui/computer.h
     ${GAME_INCLUDE_DIR}/gui/console.h
+    ${GAME_INCLUDE_DIR}/gui/container.h
+    ${GAME_INCLUDE_DIR}/gui/conversation.h
     ${GAME_INCLUDE_DIR}/gui/dialog.h
-    ${GAME_INCLUDE_DIR}/gui/maininterface.h
+    ${GAME_INCLUDE_DIR}/gui/hud.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/abilities.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/character.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/equip.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/inventory.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/journal.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/map.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/messages.h
+    ${GAME_INCLUDE_DIR}/gui/ingame/options.h
+    ${GAME_INCLUDE_DIR}/gui/ingame.h
+    ${GAME_INCLUDE_DIR}/gui/loadscreen.h
     ${GAME_INCLUDE_DIR}/gui/mainmenu.h
-    ${GAME_INCLUDE_DIR}/gui/profiler.h
+    ${GAME_INCLUDE_DIR}/gui/map.h
+    ${GAME_INCLUDE_DIR}/gui/partyselect.h
+    ${GAME_INCLUDE_DIR}/gui/profileoverlay.h
+    ${GAME_INCLUDE_DIR}/gui/saveload.h
+    ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
+    ${GAME_INCLUDE_DIR}/gui.h
     ${GAME_INCLUDE_DIR}/guisounds.h
     ${GAME_INCLUDE_DIR}/layout.h
     ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
-    ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
-    ${GAME_INCLUDE_DIR}/object/camera.h
     ${GAME_INCLUDE_DIR}/object/creature.h
     ${GAME_INCLUDE_DIR}/object/door.h
     ${GAME_INCLUDE_DIR}/object/encounter.h
@@ -156,19 +207,23 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/item.h
     ${GAME_INCLUDE_DIR}/object/module.h
     ${GAME_INCLUDE_DIR}/object/placeable.h
-    ${GAME_INCLUDE_DIR}/object/room.h
+    ${GAME_INCLUDE_DIR}/object/placeablecamera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
-    ${GAME_INCLUDE_DIR}/object/store.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
+    ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/options.h
+    ${GAME_INCLUDE_DIR}/party.h
     ${GAME_INCLUDE_DIR}/path.h
+    ${GAME_INCLUDE_DIR}/pathfinder.h
     ${GAME_INCLUDE_DIR}/paths.h
+    ${GAME_INCLUDE_DIR}/player.h
     ${GAME_INCLUDE_DIR}/portrait.h
     ${GAME_INCLUDE_DIR}/portraits.h
-    ${GAME_INCLUDE_DIR}/profiler.h  
+    ${GAME_INCLUDE_DIR}/reputes.h
     ${GAME_INCLUDE_DIR}/resourcelayout.h
-    ${GAME_INCLUDE_DIR}/selectioncontroller.h
+    ${GAME_INCLUDE_DIR}/room.h
+    ${GAME_INCLUDE_DIR}/savedgame.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
     ${GAME_INCLUDE_DIR}/script/routine/context.h
     ${GAME_INCLUDE_DIR}/script/routine/declarations.h
@@ -184,13 +239,129 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/visibilities.h)
 
 set(GAME_SOURCES
-    ${GAME_SOURCE_DIR}/action.cpp
+    ${GAME_SOURCE_DIR}/action/attack.cpp
+    ${GAME_SOURCE_DIR}/action/barkstring.cpp
+    ${GAME_SOURCE_DIR}/action/castfakespellatlocation.cpp
+    ${GAME_SOURCE_DIR}/action/castfakespellatobject.cpp
+    ${GAME_SOURCE_DIR}/action/castspellatobject.cpp
+    ${GAME_SOURCE_DIR}/action/closedoor.cpp
+    ${GAME_SOURCE_DIR}/action/docommand.cpp
+    ${GAME_SOURCE_DIR}/action/equipitem.cpp
+    ${GAME_SOURCE_DIR}/action/equipmostdamagingmelee.cpp
+    ${GAME_SOURCE_DIR}/action/equipmostdamagingranged.cpp
+    ${GAME_SOURCE_DIR}/action/follow.cpp
+    ${GAME_SOURCE_DIR}/action/followleader.cpp
+    ${GAME_SOURCE_DIR}/action/followowner.cpp
+    ${GAME_SOURCE_DIR}/action/giveitem.cpp
+    ${GAME_SOURCE_DIR}/action/interactobject.cpp
+    ${GAME_SOURCE_DIR}/action/jumptolocation.cpp
+    ${GAME_SOURCE_DIR}/action/jumptoobject.cpp
+    ${GAME_SOURCE_DIR}/action/lockobject.cpp
+    ${GAME_SOURCE_DIR}/action/moveawayfromobject.cpp
+    ${GAME_SOURCE_DIR}/action/movetolocation.cpp
     ${GAME_SOURCE_DIR}/action/movetoobject.cpp
-    ${GAME_SOURCE_DIR}/astar.cpp
+    ${GAME_SOURCE_DIR}/action/movetopoint.cpp
+    ${GAME_SOURCE_DIR}/action/opencontainer.cpp
+    ${GAME_SOURCE_DIR}/action/opendoor.cpp
+    ${GAME_SOURCE_DIR}/action/openlock.cpp
+    ${GAME_SOURCE_DIR}/action/pauseconversation.cpp
+    ${GAME_SOURCE_DIR}/action/playanimation.cpp
+    ${GAME_SOURCE_DIR}/action/randomwalk.cpp
+    ${GAME_SOURCE_DIR}/action/resumeconversation.cpp
+    ${GAME_SOURCE_DIR}/action/startconversation.cpp
+    ${GAME_SOURCE_DIR}/action/surrendertoenemies.cpp
+    ${GAME_SOURCE_DIR}/action/switchweapons.cpp
+    ${GAME_SOURCE_DIR}/action/takeitem.cpp
+    ${GAME_SOURCE_DIR}/action/unequipitem.cpp
+    ${GAME_SOURCE_DIR}/action/unlockobject.cpp
+    ${GAME_SOURCE_DIR}/action/usefeat.cpp
+    ${GAME_SOURCE_DIR}/action/useskill.cpp
+    ${GAME_SOURCE_DIR}/action/usetalentonobject.cpp
+    ${GAME_SOURCE_DIR}/action/wait.cpp
+    ${GAME_SOURCE_DIR}/action.cpp
+    ${GAME_SOURCE_DIR}/animationutil.cpp
+    ${GAME_SOURCE_DIR}/camera/animated.cpp
+    ${GAME_SOURCE_DIR}/camera/dialog.cpp
+    ${GAME_SOURCE_DIR}/camera/firstperson.cpp
+    ${GAME_SOURCE_DIR}/camera/static.cpp
+    ${GAME_SOURCE_DIR}/camera/thirdperson.cpp
+    ${GAME_SOURCE_DIR}/camera.cpp
     ${GAME_SOURCE_DIR}/camerastyles.cpp
-    ${GAME_SOURCE_DIR}/conversation.cpp
+    ${GAME_SOURCE_DIR}/combat.cpp
     ${GAME_SOURCE_DIR}/cursors.cpp
+    ${GAME_SOURCE_DIR}/d20/attributes.cpp
+    ${GAME_SOURCE_DIR}/d20/class.cpp
+    ${GAME_SOURCE_DIR}/d20/classes.cpp
+    ${GAME_SOURCE_DIR}/d20/feats.cpp
+    ${GAME_SOURCE_DIR}/d20/skills.cpp
+    ${GAME_SOURCE_DIR}/d20/spells.cpp
     ${GAME_SOURCE_DIR}/debug.cpp
+    ${GAME_SOURCE_DIR}/dialogs.cpp
+    ${GAME_SOURCE_DIR}/effect/abilitydecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/abilityincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/acdecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/acincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/assuredhit.cpp
+    ${GAME_SOURCE_DIR}/effect/attackdecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/attackincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/beam.cpp
+    ${GAME_SOURCE_DIR}/effect/blasterdeflectionincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/blind.cpp
+    ${GAME_SOURCE_DIR}/effect/bodyfuel.cpp
+    ${GAME_SOURCE_DIR}/effect/choke.cpp
+    ${GAME_SOURCE_DIR}/effect/crush.cpp
+    ${GAME_SOURCE_DIR}/effect/cutscenehorrified.cpp
+    ${GAME_SOURCE_DIR}/effect/cutsceneparalyze.cpp
+    ${GAME_SOURCE_DIR}/effect/cutscenestunned.cpp
+    ${GAME_SOURCE_DIR}/effect/damage.cpp
+    ${GAME_SOURCE_DIR}/effect/damagedecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/damageforcepoints.cpp
+    ${GAME_SOURCE_DIR}/effect/damageimmunityincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/damageincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/damageresistance.cpp
+    ${GAME_SOURCE_DIR}/effect/death.cpp
+    ${GAME_SOURCE_DIR}/effect/disguise.cpp
+    ${GAME_SOURCE_DIR}/effect/droidscramble.cpp
+    ${GAME_SOURCE_DIR}/effect/droidstun.cpp
+    ${GAME_SOURCE_DIR}/effect/entangle.cpp
+    ${GAME_SOURCE_DIR}/effect/factionmodifier.cpp
+    ${GAME_SOURCE_DIR}/effect/forcebody.cpp
+    ${GAME_SOURCE_DIR}/effect/forcefizzle.cpp
+    ${GAME_SOURCE_DIR}/effect/forcepushed.cpp
+    ${GAME_SOURCE_DIR}/effect/forcepushtargeted.cpp
+    ${GAME_SOURCE_DIR}/effect/forceresistanceincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/forceresisted.cpp
+    ${GAME_SOURCE_DIR}/effect/forceshield.cpp
+    ${GAME_SOURCE_DIR}/effect/forcesight.cpp
+    ${GAME_SOURCE_DIR}/effect/fury.cpp
+    ${GAME_SOURCE_DIR}/effect/heal.cpp
+    ${GAME_SOURCE_DIR}/effect/healforcepoints.cpp
+    ${GAME_SOURCE_DIR}/effect/horrified.cpp
+    ${GAME_SOURCE_DIR}/effect/immunity.cpp
+    ${GAME_SOURCE_DIR}/effect/invisibility.cpp
+    ${GAME_SOURCE_DIR}/effect/lightsaberthrow.cpp
+    ${GAME_SOURCE_DIR}/effect/linkeffects.cpp
+    ${GAME_SOURCE_DIR}/effect/mindtrick.cpp
+    ${GAME_SOURCE_DIR}/effect/modifyattacks.cpp
+    ${GAME_SOURCE_DIR}/effect/movementspeeddecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/movementspeedincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/paralyze.cpp
+    ${GAME_SOURCE_DIR}/effect/poison.cpp
+    ${GAME_SOURCE_DIR}/effect/psychicstatic.cpp
+    ${GAME_SOURCE_DIR}/effect/regenerate.cpp
+    ${GAME_SOURCE_DIR}/effect/resurrection.cpp
+    ${GAME_SOURCE_DIR}/effect/savingthrowdecrease.cpp
+    ${GAME_SOURCE_DIR}/effect/savingthrowincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/skillincrease.cpp
+    ${GAME_SOURCE_DIR}/effect/sleep.cpp
+    ${GAME_SOURCE_DIR}/effect/stunned.cpp
+    ${GAME_SOURCE_DIR}/effect/temporaryforcepoints.cpp
+    ${GAME_SOURCE_DIR}/effect/temporaryhitpoints.cpp
+    ${GAME_SOURCE_DIR}/effect/trueseeing.cpp
+    ${GAME_SOURCE_DIR}/effect/visual.cpp
+    ${GAME_SOURCE_DIR}/effect/vpregenmodifier.cpp
+    ${GAME_SOURCE_DIR}/effect/whirlwind.cpp
+    ${GAME_SOURCE_DIR}/effect.cpp
     ${GAME_SOURCE_DIR}/footstepsounds.cpp
     ${GAME_SOURCE_DIR}/format/ltrreader.cpp
     ${GAME_SOURCE_DIR}/format/lytreader.cpp
@@ -198,31 +369,64 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/format/ssfwriter.cpp
     ${GAME_SOURCE_DIR}/format/visreader.cpp
     ${GAME_SOURCE_DIR}/game.cpp
+    ${GAME_SOURCE_DIR}/gui/barkbubble.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/abilities.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/classselect.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/custom.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/feats.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/levelup.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/nameentry.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/portraitselect.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/quick.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/quickorcustom.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen/skills.cpp
+    ${GAME_SOURCE_DIR}/gui/chargen.cpp
+    ${GAME_SOURCE_DIR}/gui/computer.cpp
     ${GAME_SOURCE_DIR}/gui/console.cpp
+    ${GAME_SOURCE_DIR}/gui/container.cpp
+    ${GAME_SOURCE_DIR}/gui/conversation.cpp
     ${GAME_SOURCE_DIR}/gui/dialog.cpp
-    ${GAME_SOURCE_DIR}/gui/maininterface.cpp
+    ${GAME_SOURCE_DIR}/gui/hud.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/abilities.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/character.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/equip.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/inventory.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/journal.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/map.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/messages.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame/options.cpp
+    ${GAME_SOURCE_DIR}/gui/ingame.cpp
+    ${GAME_SOURCE_DIR}/gui/loadscreen.cpp
     ${GAME_SOURCE_DIR}/gui/mainmenu.cpp
-    ${GAME_SOURCE_DIR}/gui/profiler.cpp
+    ${GAME_SOURCE_DIR}/gui/map.cpp
+    ${GAME_SOURCE_DIR}/gui/partyselect.cpp
+    ${GAME_SOURCE_DIR}/gui/profileoverlay.cpp
+    ${GAME_SOURCE_DIR}/gui/saveload.cpp
+    ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
+    ${GAME_SOURCE_DIR}/gui.cpp
     ${GAME_SOURCE_DIR}/guisounds.cpp
     ${GAME_SOURCE_DIR}/layouts.cpp
-    ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
-    ${GAME_SOURCE_DIR}/object/camera.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp
     ${GAME_SOURCE_DIR}/object/encounter.cpp
+    ${GAME_SOURCE_DIR}/object/factory.cpp
     ${GAME_SOURCE_DIR}/object/item.cpp
     ${GAME_SOURCE_DIR}/object/module.cpp
     ${GAME_SOURCE_DIR}/object/placeable.cpp
-    ${GAME_SOURCE_DIR}/object/room.cpp
+    ${GAME_SOURCE_DIR}/object/placeablecamera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
-    ${GAME_SOURCE_DIR}/object/store.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp
+    ${GAME_SOURCE_DIR}/object.cpp
+    ${GAME_SOURCE_DIR}/party.cpp
+    ${GAME_SOURCE_DIR}/pathfinder.cpp
     ${GAME_SOURCE_DIR}/paths.cpp
+    ${GAME_SOURCE_DIR}/player.cpp
     ${GAME_SOURCE_DIR}/portraits.cpp
+    ${GAME_SOURCE_DIR}/reputes.cpp
     ${GAME_SOURCE_DIR}/resourcelayout.cpp
-    ${GAME_SOURCE_DIR}/selectioncontroller.cpp
+    ${GAME_SOURCE_DIR}/room.cpp
     ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/effect.cpp

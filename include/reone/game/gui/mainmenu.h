@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,81 +17,59 @@
 
 #pragma once
 
-#include "reone/gui/gui.h"
+#include "../../game/types.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
+#include "reone/resource/types.h"
+#include "reone/scene/graph.h"
+#include "reone/scene/node/model.h"
+
+#include "../gui.h"
 
 namespace reone {
 
-namespace gui {
-
-class Button;
-class Label;
-
-} // namespace gui
-
-namespace scene {
-
-struct SceneServices;
-
-}
-
 namespace game {
 
-struct GameOptions;
-
-class IGame;
-
-class MainMenu : public gui::Gui {
+class MainMenu : public GameGUI {
 public:
-    MainMenu(
-        IGame &game,
-        GameOptions &gameOpt,
-        scene::SceneServices &sceneSvc,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc),
-        _game(game),
-        _gameOpt(gameOpt),
-        _sceneSvc(sceneSvc) {
-    }
+    MainMenu(Game &game, ServicesView &services);
 
-    void init();
+    void load() override;
+
+    void onModuleSelected(const std::string &name);
 
 private:
-    enum class Stage {
-        Default,
-        Warp
-    };
+    struct Binding {
+        std::shared_ptr<gui::ListBox> lbModules;
+        std::shared_ptr<gui::Label> lbl3dView;
+        std::shared_ptr<gui::Label> lblGameLogo;
+        std::shared_ptr<gui::Label> lblBw;
+        std::shared_ptr<gui::Label> lblLucas;
+        std::shared_ptr<gui::Button> btnLoadGame;
+        std::shared_ptr<gui::Button> btnNewGame;
+        std::shared_ptr<gui::Button> btnMovies;
+        std::shared_ptr<gui::Button> btnOptions;
+        std::shared_ptr<gui::Label> lblNewContent;
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnWarp;
 
-    IGame &_game;
-    GameOptions &_gameOpt;
-    scene::SceneServices &_sceneSvc;
-
-    Stage _stage {Stage::Default};
-
-    // Binding
-
-    gui::Label *_lbl3dView {nullptr};
-    gui::ListBox *_lbModules {nullptr};
-
-    // END Binding
+        // TSL only
+        std::shared_ptr<gui::Label> lblMenuBg;
+        std::shared_ptr<gui::Button> btnMusic;
+        std::shared_ptr<gui::Button> btnMoreGames;
+        std::shared_ptr<gui::Button> btnTslrcm;
+        // END TSL only
+    } _binding;
 
     void bindControls();
+    void configureButtons();
+    void setup3DView();
+    void setButtonColors(gui::Control &control);
+    void startModuleSelection();
+    void loadModuleNames();
 
-    void init3dView();
-    void initModules();
-
-    void toggleWarpStage();
-
-    // Gui
-
-    bool handleClick(const gui::Control &control) override;
-    bool handleListBoxItemClick(const gui::ListBox &listBox, const gui::ListBox::Item &item) override;
-
-    // END Gui
+    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
 };
 
 } // namespace game

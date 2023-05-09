@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,32 +23,45 @@ namespace reone {
 
 namespace game {
 
+struct ServicesView;
+
+class Creature;
+class Game;
 class Object;
 
 class Action : boost::noncopyable {
 public:
-    virtual void execute(Object &actor, float delta) {
-        _completed = true;
-    }
+    virtual ~Action() = default;
 
-    void complete() {
-        _completed = true;
-    }
+    virtual void execute(std::shared_ptr<Action> self, Object &actor, float dt);
 
-    bool isCompleted() {
-        return _completed;
-    }
+    void complete() { _completed = true; }
 
-    ActionType type() const {
-        return _type;
-    }
+    bool isCompleted() const { return _completed; }
+    bool isUserAction() const { return _userAction; }
+
+    ActionType type() const { return _type; }
 
 protected:
+    const float kDefaultMaxObjectDistance = 2.0f;
+    const float kDistanceWalk = 4.0f;
+
+    Game &_game;
+    ServicesView &_services;
     ActionType _type;
+    bool _userAction;
+
     bool _completed {false};
 
-    Action(ActionType type) :
-        _type(type) {
+    Action(
+        Game &game,
+        ServicesView &services,
+        ActionType type,
+        bool userAction = false) :
+        _game(game),
+        _services(services),
+        _type(type),
+        _userAction(userAction) {
     }
 };
 

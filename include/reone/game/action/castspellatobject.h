@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../action.h"
+#include "../object.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -25,9 +27,36 @@ namespace game {
 
 class CastSpellAtObjectAction : public Action {
 public:
-    CastSpellAtObjectAction() :
-        Action(ActionType::CastSpellAtObject) {
+    CastSpellAtObjectAction(
+        Game &game,
+        ServicesView &services,
+        SpellType spell,
+        std::shared_ptr<Object> target,
+        int metaMagic,
+        bool cheat,
+        int domainLevel,
+        ProjectilePathType projectilePathType,
+        bool instantSpell) :
+        Action(game, services, ActionType::CastSpellAtObject),
+        _spell(spell),
+        _target(std::move(target)),
+        _metaMagic(metaMagic),
+        _cheat(cheat),
+        _domainLevel(domainLevel),
+        _projectilePathType(projectilePathType),
+        _instantSpell(instantSpell) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    SpellType _spell;
+    std::shared_ptr<Object> _target;
+    int _metaMagic;
+    bool _cheat;
+    int _domainLevel;
+    ProjectilePathType _projectilePathType;
+    bool _instantSpell;
 };
 
 } // namespace game

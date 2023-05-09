@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,44 +17,74 @@
 
 #pragma once
 
-#include "reone/gui/gui.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
+
+#include "../../game/camera/dialog.h"
+#include "../../game/object/creature.h"
+
+#include "conversation.h"
 
 namespace reone {
 
-namespace gui {
-
-class Label;
-class ListBox;
-
-} // namespace gui
-
 namespace game {
 
-class DialogGui : public gui::Gui {
+class DialogGUI : public Conversation {
 public:
-    DialogGui(
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        gui::Gui(
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+    DialogGUI(Game &game, ServicesView &services);
 
-        _scaleMode = ScaleMode::Manual;
-    }
-
-    void init();
+    void load() override;
+    void update(float dt) override;
 
 private:
-    // Binding
+    struct Participant {
+        std::shared_ptr<graphics::Model> model;
+        std::shared_ptr<Creature> creature;
+    };
 
-    gui::Label *_lblMessage {nullptr};
-    gui::ListBox *_lbReplies {nullptr};
+    struct Binding {
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbReplies;
+    } _binding;
 
-    // END Binding
+    std::shared_ptr<Object> _currentSpeaker;
+    std::map<std::string, Participant> _participantByTag;
 
     void bindControls();
+    void addFrame(std::string tag, int top, int height);
+    void configureMessage();
+    void configureReplies();
+    void repositionMessage();
+
+    void updateCamera();
+    void updateParticipantAnimations();
+
+    glm::vec3 getTalkPosition(const Object &object) const;
+    DialogCamera::Variant getRandomCameraVariant() const;
+    std::string getStuntAnimationName(int ordinal) const;
+    AnimationType getStuntAnimationType(int ordinal) const;
+
+    void setMessage(std::string message) override;
+    void setReplyLines(std::vector<std::string> lines) override;
+
+    void onStart() override;
+    void onFinish() override;
+    void onLoadEntry() override;
+    void onEntryEnded() override;
+
+    // Loading
+
+    void loadFrames();
+    void loadCurrentSpeaker();
+
+    // END Loading
+
+    // Participants
+
+    void loadStuntParticipants();
+    void releaseStuntParticipants();
+
+    // END Participants
 };
 
 } // namespace game

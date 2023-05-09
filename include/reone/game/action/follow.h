@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,25 @@
 
 #pragma once
 
-#include "../action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class FollowAction : public Action {
+class FollowAction : public ObjectAction {
 public:
-    FollowAction() :
-        Action(ActionType::Follow) {
+    FollowAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, float distance) :
+        ObjectAction(game, services, ActionType::Follow, std::move(object)),
+        _distance(distance) {
     }
+
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+    float distance() const { return _distance; }
+
+private:
+    float _distance {0.0f};
 };
 
 } // namespace game

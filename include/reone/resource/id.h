@@ -42,6 +42,10 @@ struct ResourceId {
     bool operator==(const ResourceId &other) const {
         return resRef == other.resRef && type == other.type;
     }
+
+    bool operator!=(const ResourceId &other) const {
+        return !operator==(other);
+    }
 };
 
 struct ResourceIdHasher {

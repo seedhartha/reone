@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 #pragma once
 
 #include "reone/common/stream/input.h"
-
-#include "../layout.h"
+#include "../../game/layout.h"
 
 namespace reone {
 
@@ -27,8 +26,7 @@ namespace game {
 
 class LytReader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<IInputStream> &in);
-    void load(const boost::filesystem::path &path);
+    void load(IInputStream &in);
 
     const Layout &layout() const { return _layout; }
 
@@ -39,14 +37,12 @@ private:
         Rooms
     };
 
-    std::shared_ptr<IInputStream> _in;
     boost::filesystem::path _path;
     State _state {State::None};
     int _roomCount {0};
 
     Layout _layout;
 
-    void load();
     void processLine(const std::string &line);
 
     void appendRoom(const std::vector<std::string> &tokens);

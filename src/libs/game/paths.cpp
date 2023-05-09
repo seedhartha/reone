@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
         float y = pointGffs->getFloat("Y");
 
         Path::Point point;
-        point.coords = glm::vec2(x, y);
+        point.x = x;
+        point.y = y;
 
         for (int i = 0; i < connectionCount; ++i) {
             int connectionIdx = firstConnection + i;

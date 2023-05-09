@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ namespace game {
 
 class TemporaryForcePointsEffect : public Effect {
 public:
-    TemporaryForcePointsEffect() :
-        Effect(EffectType::TemporaryForcePoints) {
+    TemporaryForcePointsEffect(int tempForce) :
+        Effect(EffectType::TemporaryForcePoints),
+        _tempForce(tempForce) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _tempForce;
 };
 
 } // namespace game

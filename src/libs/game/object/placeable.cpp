@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,113 +17,163 @@
 
 #include "reone/game/object/placeable.h"
 
-#include "reone/common/exception/validation.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/walkmeshes.h"
+#include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
-#include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
-#include "reone/scene/graph.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-#include "reone/scene/node/walkmesh.h"
+#include "reone/scene/services.h"
+#include "reone/script/types.h"
 
+#include "reone/game/game.h"
+#include "reone/game/script/runner.h"
 #include "reone/game/services.h"
-
-#include "reone/game/object/factory.h"
-#include "reone/game/object/item.h"
 
 using namespace std;
 
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-void Placeable::loadFromGit(const Gff &git) {
-    // From GIT
-
-    auto templateResRef = git.getString("TemplateResRef");
-    auto x = git.getFloat("X");
-    auto y = git.getFloat("Y");
-    auto z = git.getFloat("Z");
-    auto bearing = git.getFloat("Bearing");
-
-    // From UTP
-
-    auto utp = _resourceSvc.gffs.get(templateResRef, ResourceType::Utp);
-    if (!utp) {
-        throw ValidationException("UTP not found: " + templateResRef);
-    }
-    auto tag = utp->getString("Tag");
-    auto locName = _resourceSvc.strings.get(utp->getInt("LocName"));
-    auto appearance = utp->getInt("Appearance");
-
-    auto hasInventory = utp->getBool("HasInventory");
-    if (hasInventory) {
-        auto itemList = utp->getList("ItemList");
-        for (auto &utpItem : itemList) {
-            auto inventoryRes = utpItem->getString("InventoryRes");
-            auto item = static_pointer_cast<Item>(_objectFactory.newItem());
-            item->setSceneGraph(_sceneGraph);
-            item->loadFromUti(inventoryRes);
-            _items.push_back(item.get());
-        }
-    }
-
-    // From placeables 2DA
-
-    auto placeablesTable = _resourceSvc.twoDas.get("placeables");
-    if (!placeablesTable) {
-        throw ValidationException("placeables 2DA not found");
-    }
-    auto modelName = placeablesTable->getString(appearance, "modelname");
-
-    // Make scene nodes
-
-    shared_ptr<ModelSceneNode> sceneNode;
-    auto model = _graphicsSvc.models.get(modelName);
-    if (model) {
-        sceneNode = _sceneGraph->newModel(*model, ModelUsage::Placeable);
-        sceneNode->init();
-        sceneNode->setUser(*this);
-        sceneNode->setCullable(true);
-        sceneNode->setPickable(true);
-    }
-
-    shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-    auto walkmesh = _graphicsSvc.walkmeshes.get(modelName, ResourceType::Pwk);
-    if (walkmesh) {
-        walkmeshSceneNode = _sceneGraph->newWalkmesh(*walkmesh);
-        walkmeshSceneNode->setUser(*this);
-    }
-
-    //
-
-    _tag = move(tag);
-    _name = move(locName);
-    _position = glm::vec3(x, y, z);
-    _facing = bearing;
-    _sceneNode = sceneNode.get();
-    _walkmesh = walkmeshSceneNode.get();
-
-    flushTransform();
+void Placeable::loadFromGIT(const Gff &gffs) {
+    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    loadFromBlueprint(templateResRef);
+    loadTransformFromGIT(gffs);
 }
 
-void Placeable::flushTransform() {
-    Object::flushTransform();
+void Placeable::loadFromBlueprint(const string &resRef) {
+    shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
+    if (!utp) {
+        return;
+    }
+    loadUTP(*utp);
+    shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
+    string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto transform = glm::translate(_position);
-    transform *= glm::rotate(_facing, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+    auto model = _services.graphics.models.get(modelName);
+    if (!model) {
+        return;
+    }
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+
+    auto sceneNode = sceneGraph.newModel(*model, ModelUsage::Placeable);
+    sceneNode->setUser(*this);
+    sceneNode->setCullable(true);
+    sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
+    _sceneNode = move(sceneNode);
+
+    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
+    if (walkmesh) {
+        _walkmesh = sceneGraph.newWalkmesh(*walkmesh);
+    }
+}
+
+void Placeable::loadTransformFromGIT(const Gff &gffs) {
+    _position[0] = gffs.getFloat("X");
+    _position[1] = gffs.getFloat("Y");
+    _position[2] = gffs.getFloat("Z");
+
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
+
+    updateTransform();
+}
+
+void Placeable::runOnUsed(shared_ptr<Object> usedBy) {
+    if (!_onUsed.empty()) {
+        _game.scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+    }
+}
+
+void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
+    if (!_onInvDisturbed.empty()) {
+        _game.scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+    }
+}
+
+void Placeable::loadUTP(const Gff &utp) {
+    _tag = boost::to_lower_copy(utp.getString("Tag"));
+    _name = _services.resource.strings.get(utp.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
+    _conversation = boost::to_lower_copy(utp.getString("Conversation"));
+    _interruptable = utp.getBool("Interruptable");
+    _faction = utp.getEnum("Faction", Faction::Invalid);
+    _plot = utp.getBool("Plot");
+    _minOneHP = utp.getBool("Min1HP");
+    _keyRequired = utp.getBool("KeyRequired");
+    _lockable = utp.getBool("Lockable");
+    _locked = utp.getBool("Locked");
+    _openLockDC = utp.getInt("OpenLockDC");
+    _animationState = utp.getInt("AnimationState");
+    _appearance = utp.getInt("Appearance");
+    _hitPoints = utp.getInt("HP");
+    _currentHitPoints = utp.getInt("CurrentHP");
+    _hardness = utp.getInt("Hardness");
+    _fortitude = utp.getInt("Fort");
+    _hasInventory = utp.getBool("HasInventory");
+    _partyInteract = utp.getBool("PartyInteract");
+    _static = utp.getBool("Static");
+    _usable = utp.getBool("Useable");
+
+    _onClosed = boost::to_lower_copy(utp.getString("OnClosed"));
+    _onDamaged = boost::to_lower_copy(utp.getString("OnDamaged")); // always empty, but could be useful
+    _onDeath = boost::to_lower_copy(utp.getString("OnDeath"));
+    _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
+    _onLock = boost::to_lower_copy(utp.getString("OnLock"));                   // always empty, but could be useful
+    _onMeleeAttacked = boost::to_lower_copy(utp.getString("OnMeleeAttacked")); // always empty, but could be useful
+    _onOpen = boost::to_lower_copy(utp.getString("OnOpen"));
+    _onSpellCastAt = boost::to_lower_copy(utp.getString("OnSpellCastAt"));
+    _onUnlock = boost::to_lower_copy(utp.getString("OnUnlock")); // always empty, but could be useful
+    _onUserDefined = boost::to_lower_copy(utp.getString("OnUserDefined"));
+    _onEndDialogue = boost::to_lower_copy(utp.getString("OnEndDialogue"));
+    _onInvDisturbed = boost::to_lower_copy(utp.getString("OnInvDisturbed"));
+    _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
+
+    for (auto &itemGffs : utp.getList("ItemList")) {
+        string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
+        addItem(resRef, 1, true);
+    }
+
+    // These fields are ignored as being most likely unused:
+    //
+    // - Description (not applicable, mostly -1)
+    // - AutoRemoveKey (not applicable, always 0)
+    // - CloseLockDC (not applicable, always 0)
+    // - PortraitId (not applicable, always 0)
+    // - TrapDetectable (not applicable, always 1)
+    // - TrapDetectDC (not applicable, always 0)
+    // - TrapDisarmable (not applicable, always 1)
+    // - DisarmDC (not applicable)
+    // - TrapFlag (not applicable, always 0)
+    // - TrapOneShot (not applicable, always 1)
+    // - TrapType (not applicable, mostly 0)
+    // - KeyName (not applicable, always empty)
+    // - Ref (not applicable, always 0)
+    // - Will (not applicable, always 0)
+    // - Type (obsolete, always 0)
+    // - OnDisarm (not applicable, always empty)
+    // - OnTrapTriggered (not applicable, always empty)
+    // - BodyBag (not applicable, always 0)
+    // - Type (obsolete, always 0)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
+void Placeable::updateTransform() {
+    Object::updateTransform();
 
     if (_walkmesh) {
-        _walkmesh->setLocalTransform(_sceneNode->localTransform());
+        _walkmesh->setLocalTransform(_transform);
     }
 }
 

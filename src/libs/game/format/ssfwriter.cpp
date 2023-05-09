@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "reone/common/binarywriter.h"
 #include "reone/common/stream/fileoutput.h"
 
-
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -31,7 +30,7 @@ namespace game {
 
 void SsfWriter::save(const fs::path &path) {
     auto stream = FileOutputStream(path, OpenMode::Binary);
-    BinaryWriter writer(stream);
+    auto writer = BinaryWriter(stream);
 
     writer.putString("SSF V1.1");
     writer.putUint32(12); // offset to entries

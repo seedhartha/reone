@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,85 +23,108 @@ namespace reone {
 
 namespace gui {
 
+constexpr int kDefaultSlotCount = 6;
+
 class ListBox : public Control {
 public:
+    enum class SelectionMode {
+        OnHover,
+        OnClick
+    };
+
     struct Item {
+        std::string tag;
         std::string text;
+        std::string iconText;
+        std::shared_ptr<graphics::Texture> iconTexture;
+        std::shared_ptr<graphics::Texture> iconFrame;
+
+        std::vector<std::string> _textLines;
     };
 
     ListBox(
-        int id,
-        IGui &gui,
-        IControlFactory &controlFactory,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
+        GUI &gui,
+        scene::SceneGraphs &sceneGraphs,
+        graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
+        graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Uniforms &uniforms,
+        graphics::Window &window,
+        resource::Strings &strings) :
         Control(
-            id,
-            ControlType::ListBox,
             gui,
-            controlFactory,
-            graphicsOpt,
-            graphicsSvc,
-            resourceSvc) {
+            ControlType::ListBox,
+            sceneGraphs,
+            fonts,
+            graphicsContext,
+            meshes,
+            pipeline,
+            shaders,
+            textures,
+            uniforms,
+            window,
+            strings) {
 
-        _focusable = true;
+        _clickable = true;
     }
-
-    void initItemSlots();
 
     void clearItems();
-    void appendItem(Item item, bool scroll = false);
+    void addItem(Item &&item);
+    void addTextLinesAsItems(const std::string &text);
 
-    const Item &itemBySlotIndex(int index) const {
-        return _items[index + _itemSlotOffset];
-    }
+    void clearSelection();
 
-    void setProtoItem(Control *protoItem) {
-        _protoItem = protoItem;
-    }
+    void load(const resource::Gff &gffs) override;
+    bool handleMouseMotion(int x, int y) override;
+    bool handleMouseWheel(int x, int y) override;
+    bool handleClick(int x, int y) override;
+    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void stretch(float x, float y, int mask) override;
 
-    void setItems(std::vector<Item> items) {
-        _items = std::move(items);
-        _itemSlotOffset = 0;
-        flushItemSlots();
-    }
+    void setFocus(bool focus) override;
+    void setExtent(Extent extent) override;
+    void setExtentHeight(int height) override;
+    void setProtoItemType(ControlType type);
+    void setSelectionMode(SelectionMode mode);
+    void setProtoMatchContent(bool match);
 
-    // Control
+    int getItemCount() const;
+    const Item &getItemAt(int index) const;
 
-    void load(const resource::Gff &gui, const glm::vec4 &scale) override;
+    Control &protoItem() const { return *_protoItem; }
+    Control &scrollBar() const { return *_scrollBar; }
+    int selectedItemIndex() const { return _selectedItemIndex; }
 
-    bool handle(const SDL_Event &e) override;
+    // Event listeners
 
-    // END Control
+    void setOnItemClick(std::function<void(const std::string &)> fn) { _onItemClick = std::move(fn); }
 
-    static int itemControlId(int listBoxId, int slotIdx) {
-        return ((listBoxId + 1) << 8) | (slotIdx + 1);
-    }
-
-    static bool isListBoxItem(Control &control) {
-        return control.id() & 0xff00;
-    }
-
-    static int listBoxIdFromControl(Control &control) {
-        return ((control.id() & 0xff00) >> 8) - 1;
-    }
-
-    static int itemSlotIndexFromControl(Control &control) {
-        return (control.id() & 0xff) - 1;
-    }
+    // END Event listeners
 
 private:
-    int _padding {0};
-    int _numItemSlots {0};
-    int _itemSlotOffset {0};
-
-    Control *_protoItem {nullptr};
-    std::vector<Control *> _itemSlots;
-
+    SelectionMode _selectionMode {SelectionMode::OnHover};
+    ControlType _protoItemType {ControlType::Invalid};
+    std::shared_ptr<Control> _protoItem;
+    std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;
+    int _slotCount {0};
+    int _itemOffset {0};
+    int _selectedItemIndex {-1};
+    int _itemMargin {0};
+    bool _protoMatchContent {false}; /**< proto item height must match its content */
 
-    void flushItemSlots();
+    // Event listeners
+
+    std::function<void(const std::string &)> _onItemClick;
+
+    // END Event listeners
+
+    void updateItemSlots();
+
+    int getItemIndex(int y) const;
 };
 
 } // namespace gui

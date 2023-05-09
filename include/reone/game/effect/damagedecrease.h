@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 The reone project contributors
+ * Copyright (c) 2020-2021 The reone project contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,17 @@ namespace game {
 
 class DamageDecreaseEffect : public Effect {
 public:
-    DamageDecreaseEffect() :
-        Effect(EffectType::DamageDecrease) {
+    DamageDecreaseEffect(int penalty, AttackBonus modifierType) :
+        Effect(EffectType::DamageDecrease),
+        _penalty(penalty),
+        _modifierType(modifierType) {
     }
+
+    void applyTo(Object &object) override;
+
+private:
+    int _penalty;
+    AttackBonus _modifierType;
 };
 
 } // namespace game
