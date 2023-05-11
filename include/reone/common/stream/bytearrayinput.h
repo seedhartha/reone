@@ -72,7 +72,7 @@ public:
             ;
         auto lineLen = pch - outData;
         outData[lineLen] = '\0';
-        _position = std::min(_bytes.size(), _position + lineLen + 2);
+        _position = std::min(_bytes.size(), _position + lineLen + 1);
     }
 
     size_t position() override {
