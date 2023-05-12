@@ -39,6 +39,7 @@ set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/common/stream/fileoutput.cpp
     ${TEST_SOURCE_DIR}/common/stringbuilder.cpp
     ${TEST_SOURCE_DIR}/common/textwriter.cpp
+    ${TEST_SOURCE_DIR}/game/game.cpp
     ${TEST_SOURCE_DIR}/graphics/aabb.cpp
     ${TEST_SOURCE_DIR}/graphics/format/bwmreader.cpp
     ${TEST_SOURCE_DIR}/graphics/format/mdlreader.cpp

@@ -38,7 +38,7 @@ private:
     std::vector<std::tuple<IInputStream *>> _loadInvocations;
 };
 
-class MockMp3ReaderFactory : public IMp3ReaderFactory {
+class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
 public:
     MockMp3ReaderFactory() :
         _instance(std::make_shared<MockMp3Reader>()) {
@@ -56,26 +56,39 @@ private:
     std::shared_ptr<Mp3Reader> _instance;
 };
 
-class MockAudioContext : public IAudioContext {
+class MockAudioContext : public IAudioContext, boost::noncopyable {
 };
 
-class MockAudioFiles : public IAudioFiles {
+class MockAudioFiles : public IAudioFiles, boost::noncopyable {
 };
 
-class MockAudioPlayer : public IAudioPlayer {
+class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
 };
 
-inline std::unique_ptr<AudioServices> mockAudioServices() {
-    // TODO: free automatically
-    auto context = new MockAudioContext();
-    auto files = new MockAudioFiles();
-    auto player = new MockAudioPlayer();
+class AudioModule : boost::noncopyable {
+public:
+    void init() {
+        _context = std::make_unique<MockAudioContext>();
+        _files = std::make_unique<MockAudioFiles>();
+        _player = std::make_unique<MockAudioPlayer>();
 
-    return std::make_unique<AudioServices>(
-        *context,
-        *files,
-        *player);
-}
+        _services = std::make_unique<AudioServices>(
+            *_context,
+            *_files,
+            *_player);
+    }
+
+    AudioServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<MockAudioContext> _context;
+    std::unique_ptr<MockAudioFiles> _files;
+    std::unique_ptr<MockAudioPlayer> _player;
+
+    std::unique_ptr<AudioServices> _services;
+};
 
 } // namespace audio
 

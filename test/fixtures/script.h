@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/script/executioncontext.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/services.h"
@@ -43,7 +44,7 @@ public:
     }
 
     Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) override {
-        _invokeInvocations.push_back(make_tuple(args, ctx));
+        _invokeInvocations.push_back(std::make_tuple(args, ctx));
         return Routine::invoke(args, ctx);
     }
 
@@ -55,7 +56,7 @@ private:
     std::vector<InvokeInvocation> _invokeInvocations;
 };
 
-class MockRoutines : public IRoutines {
+class MockRoutines : public IRoutines, boost::noncopyable {
 public:
     Routine &get(int index) override {
         if (_routines.count(index) == 0) {
@@ -85,15 +86,26 @@ private:
     std::map<int, std::shared_ptr<Routine>> _routines;
 };
 
-class MockScripts : public IScripts {
+class MockScripts : public IScripts, boost::noncopyable {
 };
 
-inline std::unique_ptr<ScriptServices> mockScriptServices() {
-    // TODO: free automatically
-    auto scripts = new MockScripts();
+class SceneModule : boost::noncopyable {
+public:
+    void init() {
+        _scripts = std::make_unique<MockScripts>();
 
-    return std::make_unique<ScriptServices>(*scripts);
-}
+        _services = std::make_unique<ScriptServices>(*_scripts);
+    }
+
+    ScriptServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<MockScripts> _scripts;
+
+    std::unique_ptr<ScriptServices> _services;
+};
 
 } // namespace script
 

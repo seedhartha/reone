@@ -15,35 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <boost/test/unit_test.hpp>
 
-#include "reone/scene/services.h"
+#include "reone/game/game.h"
 
-namespace reone {
+#include "../fixtures/audio.h"
+#include "../fixtures/game.h"
+#include "../fixtures/graphics.h"
+#include "../fixtures/resource.h"
+#include "../fixtures/scene.h"
+#include "../fixtures/script.h"
 
-namespace scene {
+using namespace std;
 
-class MockSceneGraphs : public ISceneGraphs, boost::noncopyable {
-};
+using namespace reone;
+using namespace reone::game;
 
-class SceneModule : boost::noncopyable {
-public:
-    void init() {
-        _graphs = std::make_unique<MockSceneGraphs>();
+BOOST_AUTO_TEST_SUITE(game)
 
-        _services = std::make_unique<SceneServices>(*_graphs);
-    }
-
-    SceneServices &services() {
-        return *_services;
-    }
-
-private:
-    std::unique_ptr<MockSceneGraphs> _graphs;
-
-    std::unique_ptr<SceneServices> _services;
-};
-
-} // namespace scene
-
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()

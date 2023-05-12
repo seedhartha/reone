@@ -23,95 +23,123 @@ namespace reone {
 
 namespace game {
 
-class MockCameraStyles : public ICameraStyles {
+class MockCameraStyles : public ICameraStyles, boost::noncopyable {
 };
 
-class MockClasses : public IClasses {
+class MockClasses : public IClasses, boost::noncopyable {
 };
 
-class MockCursors : public ICursors {
+class MockCursors : public ICursors, boost::noncopyable {
 };
 
-class MockDialogs : public IDialogs {
+class MockDialogs : public IDialogs, boost::noncopyable {
 };
 
-class MockFeats : public IFeats {
+class MockFeats : public IFeats, boost::noncopyable {
 };
 
-class MockFootstepSounds : public IFootstepSounds {
+class MockFootstepSounds : public IFootstepSounds, boost::noncopyable {
 };
 
-class MockGUISounds : public IGUISounds {
+class MockGUISounds : public IGUISounds, boost::noncopyable {
 };
 
-class MockLayouts : public ILayouts {
+class MockLayouts : public ILayouts, boost::noncopyable {
 };
 
-class MockPaths : public IPaths {
+class MockPaths : public IPaths, boost::noncopyable {
 };
 
-class MockPortraits : public IPortraits {
+class MockPortraits : public IPortraits, boost::noncopyable {
 };
 
-class MockReputes : public IReputes {
+class MockReputes : public IReputes, boost::noncopyable {
 };
 
-class MockResourceLayout : public IResourceLayout {
+class MockResourceLayout : public IResourceLayout, boost::noncopyable {
 };
 
-class MockSkills : public ISkills {
+class MockSkills : public ISkills, boost::noncopyable {
 };
 
-class MockSoundSets : public ISoundSets {
+class MockSoundSets : public ISoundSets, boost::noncopyable {
 };
 
-class MockSpells : public ISpells {
+class MockSpells : public ISpells, boost::noncopyable {
 };
 
-class MockSurfaces : public ISurfaces {
+class MockSurfaces : public ISurfaces, boost::noncopyable {
 };
 
-class MockVisiblities : public IVisibilities {
+class MockVisiblities : public IVisibilities, boost::noncopyable {
 };
 
-inline std::unique_ptr<GameServices> mockGameServices() {
-    // TODO: free automatically
-    auto cameraStyles = new MockCameraStyles();
-    auto classes = new MockClasses();
-    auto cursors = new MockCursors();
-    auto dialogs = new MockDialogs();
-    auto feats = new MockFeats();
-    auto footstepSounds = new MockFootstepSounds();
-    auto guiSounds = new MockGUISounds();
-    auto layouts = new MockLayouts();
-    auto paths = new MockPaths();
-    auto portraits = new MockPortraits();
-    auto reputes = new MockReputes();
-    auto resourceLayout = new MockResourceLayout();
-    auto skills = new MockSkills();
-    auto soundSets = new MockSoundSets();
-    auto spells = new MockSpells();
-    auto surfaces = new MockSurfaces();
-    auto visibilities = new MockVisiblities();
+class GameModule : boost::noncopyable {
+public:
+    void init() {
+        _cameraStyles = std::make_unique<MockCameraStyles>();
+        _classes = std::make_unique<MockClasses>();
+        _cursors = std::make_unique<MockCursors>();
+        _dialogs = std::make_unique<MockDialogs>();
+        _feats = std::make_unique<MockFeats>();
+        _footstepSounds = std::make_unique<MockFootstepSounds>();
+        _guiSounds = std::make_unique<MockGUISounds>();
+        _layouts = std::make_unique<MockLayouts>();
+        _paths = std::make_unique<MockPaths>();
+        _portraits = std::make_unique<MockPortraits>();
+        _reputes = std::make_unique<MockReputes>();
+        _resourceLayout = std::make_unique<MockResourceLayout>();
+        _skills = std::make_unique<MockSkills>();
+        _soundSets = std::make_unique<MockSoundSets>();
+        _spells = std::make_unique<MockSpells>();
+        _surfaces = std::make_unique<MockSurfaces>();
+        _visibilities = std::make_unique<MockVisiblities>();
 
-    return std::make_unique<GameServices>(
-        *cameraStyles,
-        *classses,
-        *cursors,
-        *dialogs,
-        *feats,
-        *footstepSounds,
-        *guiSounds,
-        *layouts,
-        *paths,
-        *portraits,
-        *reputes,
-        *resourceLayout,
-        *skills,
-        *soundSets,
-        *spells,
-        *visibilities);
-}
+        _services = std::make_unique<GameServices>(
+            *_cameraStyles,
+            *_classes,
+            *_cursors,
+            *_dialogs,
+            *_feats,
+            *_footstepSounds,
+            *_guiSounds,
+            *_layouts,
+            *_paths,
+            *_portraits,
+            *_reputes,
+            *_resourceLayout,
+            *_skills,
+            *_soundSets,
+            *_spells,
+            *_surfaces,
+            *_visibilities);
+    }
+
+    GameServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<MockCameraStyles> _cameraStyles;
+    std::unique_ptr<MockClasses> _classes;
+    std::unique_ptr<MockCursors> _cursors;
+    std::unique_ptr<MockDialogs> _dialogs;
+    std::unique_ptr<MockFeats> _feats;
+    std::unique_ptr<MockFootstepSounds> _footstepSounds;
+    std::unique_ptr<MockGUISounds> _guiSounds;
+    std::unique_ptr<MockLayouts> _layouts;
+    std::unique_ptr<MockPaths> _paths;
+    std::unique_ptr<MockPortraits> _portraits;
+    std::unique_ptr<MockReputes> _reputes;
+    std::unique_ptr<MockResourceLayout> _resourceLayout;
+    std::unique_ptr<MockSkills> _skills;
+    std::unique_ptr<MockSoundSets> _soundSets;
+    std::unique_ptr<MockSpells> _spells;
+    std::unique_ptr<MockSurfaces> _surfaces;
+    std::unique_ptr<MockVisiblities> _visibilities;
+
+    std::unique_ptr<GameServices> _services;
+};
 
 } // namespace game
 

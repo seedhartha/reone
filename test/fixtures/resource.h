@@ -17,60 +17,51 @@
 
 #pragma once
 
-#include "reone/resource/provider.h"
 #include "reone/resource/services.h"
 
 namespace reone {
 
 namespace resource {
 
-class MockResourceProvider : public IResourceProvider {
+class MockGffs : public IGffs, boost::noncopyable {
+};
+
+class MockResources : public IResources, boost::noncopyable {
+};
+
+class MockStrings : public IStrings, boost::noncopyable {
+};
+
+class MockTwoDas : public ITwoDas, boost::noncopyable {
+};
+
+class ResourceModule : boost::noncopyable {
 public:
-    MockResourceProvider(int id) :
-        _id(id) {
+    void init() {
+        _gffs = std::make_unique<MockGffs>();
+        _resources = std::make_unique<MockResources>();
+        _strings = std::make_unique<MockStrings>();
+        _twoDas = std::make_unique<MockTwoDas>();
+
+        _services = std::make_unique<ResourceServices>(
+            *_gffs,
+            *_resources,
+            *_strings,
+            *_twoDas);
     }
 
-    void add(ResourceId id, std::shared_ptr<ByteArray> res) {
-        _resources[id] = std::move(res);
-    }
-
-    std::shared_ptr<ByteArray> find(const ResourceId &id) override {
-    }
-
-    int id() const override {
-        return _id;
+    ResourceServices &services() {
+        return *_services;
     }
 
 private:
-    int _id;
-    std::map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _resources;
+    std::unique_ptr<MockGffs> _gffs;
+    std::unique_ptr<MockResources> _resources;
+    std::unique_ptr<MockStrings> _strings;
+    std::unique_ptr<MockTwoDas> _twoDas;
+
+    std::unique_ptr<ResourceServices> _services;
 };
-
-class MockGffs : public IGffs {
-};
-
-class MockResources : public IResources {
-};
-
-class MockStrings : public IStrings {
-};
-
-class MockTwoDas : public ITwoDas {
-};
-
-inline std::unique_ptr<ResourceServices> mockResourceServices() {
-    // TODO: free automatically
-    auto gffs = new MockGffs();
-    auto resources = new MockResources();
-    auto strings = new MockStrings();
-    auto twoDas = new MockTwoDas();
-
-    return std::make_unique<ResourceServices>(
-        *gffs,
-        *resources,
-        *strings,
-        *twoDas);
-}
 
 } // namespace resource
 
