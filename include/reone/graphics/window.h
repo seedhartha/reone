@@ -54,6 +54,9 @@ public:
     void setEventHandler(IEventHandler *eventHandler) { _eventHandler = eventHandler; }
     void setRelativeMouseMode(bool enabled);
 
+    uint32_t mouseState(int *x, int *y);
+    void showCursor(bool show);
+
 private:
     GraphicsOptions &_options;
 

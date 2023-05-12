@@ -196,7 +196,7 @@ void Game::update() {
     _profileOverlay->update(dt);
 
     int x, y;
-    auto state = SDL_GetMouseState(&x, &y);
+    auto state = _services.graphics.defaultWindow().mouseState(&x, &y);
     auto pressed = state & SDL_BUTTON(1);
     if (_cursor) {
         _cursor->setPosition(glm::ivec2(x, y));
@@ -320,10 +320,10 @@ void Game::setCursorType(CursorType type) {
     }
     if (type == CursorType::None) {
         _cursor.reset();
-        SDL_ShowCursor(SDL_ENABLE);
+        _services.graphics.defaultWindow().showCursor(true);
     } else {
         _cursor = _services.game.defaultCursors().get(type);
-        SDL_ShowCursor(SDL_DISABLE);
+        _services.graphics.defaultWindow().showCursor(false);
     }
     _cursorType = type;
 }

@@ -138,6 +138,14 @@ void Window::setRelativeMouseMode(bool enabled) {
     _relativeMouseMode = enabled;
 }
 
+uint32_t Window::mouseState(int *x, int *y) {
+    return SDL_GetMouseState(x, y);
+}
+
+void Window::showCursor(bool show) {
+    SDL_ShowCursor(show ? SDL_ENABLE : SDL_DISABLE);
+}
+
 } // namespace graphics
 
 } // namespace reone
