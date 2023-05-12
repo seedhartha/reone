@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../game/contextaction.h"
+#include "../contextaction.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/texture.h"
 

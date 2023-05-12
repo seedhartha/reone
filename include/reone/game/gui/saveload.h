@@ -21,8 +21,7 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 
-#include "../../game/savedgame.h"
-
+#include "../savedgame.h"
 #include "../gui.h"
 
 namespace reone {

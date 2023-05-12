@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../../game/types.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
@@ -26,6 +25,7 @@
 #include "reone/scene/node/model.h"
 
 #include "../gui.h"
+#include "../types.h"
 
 namespace reone {
 

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/common/stream/input.h"
-#include "../../game/layout.h"
+#include "../layout.h"
 
 namespace reone {
 

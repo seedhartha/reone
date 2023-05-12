@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/common/stream/input.h"
-#include "../../game/types.h"
+#include "../types.h"
 
 namespace reone {
 

@@ -19,9 +19,9 @@
 
 #include "reone/audio/source.h"
 #include "reone/common/timer.h"
-#include "../../game/dialog.h"
-#include "../../game/object.h"
-#include "../../game/types.h"
+#include "../dialog.h"
+#include "../object.h"
+#include "../types.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/graphics/model.h"
 
