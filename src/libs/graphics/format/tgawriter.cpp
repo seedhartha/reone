@@ -22,8 +22,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace graphics {
@@ -222,8 +220,8 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
     }
 }
 
-void TgaWriter::save(const fs::path &path, bool compress) {
-    fs::ofstream tga(path, ios::binary);
+void TgaWriter::save(const boost::filesystem::path &path, bool compress) {
+    boost::filesystem::ofstream tga(path, ios::binary);
     save(tga, compress);
 }
 

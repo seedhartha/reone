@@ -36,8 +36,6 @@ extern "C" {
 
 #endif
 
-namespace fs = boost::filesystem;
-
 using namespace std;
 
 using namespace reone::audio;
@@ -50,7 +48,7 @@ namespace movie {
 
 class BinkVideoDecoder : public VideoStream {
 public:
-    BinkVideoDecoder(fs::path path) :
+    BinkVideoDecoder(boost::filesystem::path path) :
         _path(move(path)) {
     }
 
@@ -118,7 +116,7 @@ public:
     std::shared_ptr<audio::AudioStream> audioStream() const { return _audioStream; }
 
 private:
-    fs::path _path;
+    boost::filesystem::path _path;
 
     int _videoStreamIdx {-1};
     int _audioStreamIdx {-1};
@@ -320,7 +318,7 @@ private:
 
 void BikReader::load() {
 #ifdef R_ENABLE_MOVIE
-    if (!fs::exists(_path)) {
+    if (!boost::filesystem::exists(_path)) {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
 

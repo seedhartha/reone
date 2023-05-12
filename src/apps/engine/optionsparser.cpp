@@ -21,12 +21,11 @@
 
 using namespace std;
 
+using namespace boost::program_options;
+
 using namespace reone::engine;
 using namespace reone::game;
 using namespace reone::graphics;
-
-namespace fs = boost::filesystem;
-namespace po = boost::program_options;
 
 namespace reone {
 
@@ -39,47 +38,47 @@ Options OptionsParser::parse() {
 
     // Initialize options description
 
-    po::options_description descCommon;
-    descCommon.add_options()                                                                                                       //
-        ("game", po::value<string>(), "path to game directory")                                                                    //
-        ("dev", po::value<bool>()->default_value(options.game.developer), "enable developer mode")                                 //
-        ("neo", po::value<bool>()->default_value(false), "use new game logic (experimental)")                                      //
-        ("width", po::value<int>()->default_value(options.graphics.width), "window width")                                         //
-        ("height", po::value<int>()->default_value(options.graphics.height), "window height")                                      //
-        ("fullscreen", po::value<bool>()->default_value(options.graphics.fullscreen), "enable fullscreen")                         //
-        ("vsync", po::value<bool>()->default_value(options.graphics.vsync), "enable v-sync")                                       //
-        ("grass", po::value<bool>()->default_value(options.graphics.grass), "enable grass")                                        //
-        ("ssao", po::value<bool>()->default_value(options.graphics.ssao), "enable screen-space ambient occlusion")                 //
-        ("ssr", po::value<bool>()->default_value(options.graphics.ssr), "enable screen-space reflections")                         //
-        ("fxaa", po::value<bool>()->default_value(options.graphics.fxaa), "enable anti-aliasing")                                  //
-        ("sharpen", po::value<bool>()->default_value(options.graphics.sharpen), "enable image sharpening")                         //
-        ("texquality", po::value<int>()->default_value(static_cast<int>(options.graphics.textureQuality)), "texture quality")      //
-        ("shadowres", po::value<int>()->default_value(glm::log2(options.graphics.shadowResolution) - 10), "shadow map resolution") //
-        ("anisofilter", po::value<int>()->default_value(options.graphics.anisotropicFiltering), "anisotropic filtering")           //
-        ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance")               //
-        ("musicvol", po::value<int>()->default_value(options.audio.musicVolume), "music volume in percents")                       //
-        ("voicevol", po::value<int>()->default_value(options.audio.voiceVolume), "voice volume in percents")                       //
-        ("soundvol", po::value<int>()->default_value(options.audio.soundVolume), "sound volume in percents")                       //
-        ("movievol", po::value<int>()->default_value(options.audio.movieVolume), "movie volume in percents")                       //
-        ("loglevel", po::value<int>()->default_value(static_cast<int>(options.logging.level)), "log level")                        //
-        ("logch", po::value<int>()->default_value(options.logging.channels), "log channel mask")                                   //
-        ("logfile", po::value<bool>()->default_value(options.logging.logToFile), "log to file");                                   //
+    options_description descCommon;
+    descCommon.add_options()                                                                                                   //
+        ("game", value<string>(), "path to game directory")                                                                    //
+        ("dev", value<bool>()->default_value(options.game.developer), "enable developer mode")                                 //
+        ("neo", value<bool>()->default_value(false), "use new game logic (experimental)")                                      //
+        ("width", value<int>()->default_value(options.graphics.width), "window width")                                         //
+        ("height", value<int>()->default_value(options.graphics.height), "window height")                                      //
+        ("fullscreen", value<bool>()->default_value(options.graphics.fullscreen), "enable fullscreen")                         //
+        ("vsync", value<bool>()->default_value(options.graphics.vsync), "enable v-sync")                                       //
+        ("grass", value<bool>()->default_value(options.graphics.grass), "enable grass")                                        //
+        ("ssao", value<bool>()->default_value(options.graphics.ssao), "enable screen-space ambient occlusion")                 //
+        ("ssr", value<bool>()->default_value(options.graphics.ssr), "enable screen-space reflections")                         //
+        ("fxaa", value<bool>()->default_value(options.graphics.fxaa), "enable anti-aliasing")                                  //
+        ("sharpen", value<bool>()->default_value(options.graphics.sharpen), "enable image sharpening")                         //
+        ("texquality", value<int>()->default_value(static_cast<int>(options.graphics.textureQuality)), "texture quality")      //
+        ("shadowres", value<int>()->default_value(glm::log2(options.graphics.shadowResolution) - 10), "shadow map resolution") //
+        ("anisofilter", value<int>()->default_value(options.graphics.anisotropicFiltering), "anisotropic filtering")           //
+        ("drawdist", value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance")               //
+        ("musicvol", value<int>()->default_value(options.audio.musicVolume), "music volume in percents")                       //
+        ("voicevol", value<int>()->default_value(options.audio.voiceVolume), "voice volume in percents")                       //
+        ("soundvol", value<int>()->default_value(options.audio.soundVolume), "sound volume in percents")                       //
+        ("movievol", value<int>()->default_value(options.audio.movieVolume), "movie volume in percents")                       //
+        ("loglevel", value<int>()->default_value(static_cast<int>(options.logging.level)), "log level")                        //
+        ("logch", value<int>()->default_value(options.logging.channels), "log channel mask")                                   //
+        ("logfile", value<bool>()->default_value(options.logging.logToFile), "log to file");                                   //
 
-    po::options_description descCmdLine {"Usage"};
+    options_description descCmdLine {"Usage"};
     descCmdLine.add(descCommon);
 
     // Parse command line and configuration file
 
-    po::variables_map vars;
-    po::store(po::parse_command_line(_argc, _argv, descCmdLine), vars);
-    if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, descCommon, true), vars);
+    variables_map vars;
+    store(parse_command_line(_argc, _argv, descCmdLine), vars);
+    if (boost::filesystem::exists(kConfigFilename)) {
+        store(parse_config_file<char>(kConfigFilename, descCommon, true), vars);
     }
-    po::notify(vars);
+    notify(vars);
 
     // Convert Boost options to game options
 
-    options.game.path = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
+    options.game.path = vars.count("game") > 0 ? vars["game"].as<string>() : boost::filesystem::current_path();
     options.game.developer = vars["dev"].as<bool>();
     options.game.neo = vars["neo"].as<bool>();
     options.graphics.width = vars["width"].as<int>();

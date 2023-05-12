@@ -31,14 +31,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-void Resources::indexKeyFile(const fs::path &path) {
-    if (!fs::exists(path)) {
+void Resources::indexKeyFile(const boost::filesystem::path &path) {
+    if (!boost::filesystem::exists(path)) {
         return;
     }
     auto keyBif = make_unique<KeyBifResourceProvider>(path, static_cast<int>(_providers.size()));
@@ -46,8 +44,8 @@ void Resources::indexKeyFile(const fs::path &path) {
     indexProvider(move(keyBif), path);
 }
 
-void Resources::indexErfFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path)) {
+void Resources::indexErfFile(const boost::filesystem::path &path, bool transient) {
+    if (!boost::filesystem::exists(path)) {
         return;
     }
     auto erf = make_unique<ErfResourceProvider>(path, static_cast<int>(_providers.size()));
@@ -55,8 +53,8 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
     indexProvider(move(erf), path, transient);
 }
 
-void Resources::indexRimFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path)) {
+void Resources::indexRimFile(const boost::filesystem::path &path, bool transient) {
+    if (!boost::filesystem::exists(path)) {
         return;
     }
     auto rim = make_unique<RimResourceProvider>(path, static_cast<int>(_providers.size()));
@@ -64,8 +62,8 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
     indexProvider(move(rim), path, transient);
 }
 
-void Resources::indexDirectory(const fs::path &path) {
-    if (!fs::exists(path)) {
+void Resources::indexDirectory(const boost::filesystem::path &path) {
+    if (!boost::filesystem::exists(path)) {
         return;
     }
     auto folder = make_unique<Folder>(path, static_cast<int>(_providers.size()));
@@ -73,15 +71,15 @@ void Resources::indexDirectory(const fs::path &path) {
     indexProvider(move(folder), path);
 }
 
-void Resources::indexExeFile(const fs::path &path) {
-    if (!fs::exists(path)) {
+void Resources::indexExeFile(const boost::filesystem::path &path) {
+    if (!boost::filesystem::exists(path)) {
         return;
     }
     _exePath = path;
     debug("Index executable " + path.string(), LogChannels::resources);
 }
 
-void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs::path &path, bool transient) {
+void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient) {
     debug(boost::format("Index provider %d at '%s'") % provider->id() % path.string(), LogChannels::resources);
     if (transient) {
         _transientProviders.push_back(move(provider));

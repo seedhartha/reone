@@ -22,13 +22,11 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace game {
 
-void SsfWriter::save(const fs::path &path) {
+void SsfWriter::save(const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path, OpenMode::Binary);
     auto writer = BinaryWriter(stream);
 

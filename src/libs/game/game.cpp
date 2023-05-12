@@ -77,8 +77,6 @@ using namespace reone::scene;
 using namespace reone::script;
 using namespace reone::movie;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace game {
@@ -331,7 +329,7 @@ void Game::setCursorType(CursorType type) {
 }
 
 void Game::playVideo(const string &name) {
-    fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
+    boost::filesystem::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
     if (path.empty()) {
         return;
     }
@@ -916,11 +914,11 @@ void Game::setBarkBubbleText(string text, float duration) {
 }
 
 void Game::loadModuleNames() {
-    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+    boost::filesystem::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modules.empty()) {
         throw ValidationException("Modules directory not found");
     }
-    for (auto &entry : fs::directory_iterator(modules)) {
+    for (auto &entry : boost::filesystem::directory_iterator(modules)) {
         string filename(boost::to_lower_copy(entry.path().filename().string()));
         if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
             string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));

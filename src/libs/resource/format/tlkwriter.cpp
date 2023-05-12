@@ -24,8 +24,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
@@ -36,7 +34,7 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-void TlkWriter::save(const fs::path &path) {
+void TlkWriter::save(const boost::filesystem::path &path) {
     auto tlk = FileOutputStream(path, OpenMode::Binary);
     save(tlk);
 }

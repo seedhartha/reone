@@ -23,15 +23,13 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
 
-void TwoDaWriter::save(const fs::path &path) {
+void TwoDaWriter::save(const boost::filesystem::path &path) {
     auto out = FileOutputStream(path, OpenMode::Binary);
     save(out);
 }

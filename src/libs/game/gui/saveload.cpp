@@ -27,8 +27,6 @@
 
 #include "reone/game/game.h"
 
-namespace fs = boost::filesystem;
-
 using namespace std;
 
 using namespace reone::audio;
@@ -171,8 +169,8 @@ void SaveLoad::refresh() {
     refreshSavedGames();
 }
 
-static fs::path getSavesPath() {
-    fs::path savesPath(fs::current_path());
+static boost::filesystem::path getSavesPath() {
+    boost::filesystem::path savesPath(boost::filesystem::current_path());
     savesPath.append(kSavesDirectoryName);
     return move(savesPath);
 }
@@ -180,12 +178,12 @@ static fs::path getSavesPath() {
 void SaveLoad::refreshSavedGames() {
     _saves.clear();
 
-    fs::path savesPath(getSavesPath());
-    if (!fs::exists(savesPath)) {
-        fs::create_directory(savesPath);
+    boost::filesystem::path savesPath(getSavesPath());
+    if (!boost::filesystem::exists(savesPath)) {
+        boost::filesystem::create_directory(savesPath);
     }
-    for (auto &entry : fs::directory_iterator(savesPath)) {
-        if (fs::is_regular_file(entry) && boost::to_lower_copy(entry.path().extension().string()) == ".sav") {
+    for (auto &entry : boost::filesystem::directory_iterator(savesPath)) {
+        if (boost::filesystem::is_regular_file(entry) && boost::to_lower_copy(entry.path().extension().string()) == ".sav") {
             indexSavedGame(entry);
         }
     }
@@ -200,7 +198,7 @@ void SaveLoad::refreshSavedGames() {
     }
 }
 
-static SavedGame peekSavedGame(const fs::path &path) {
+static SavedGame peekSavedGame(const boost::filesystem::path &path) {
     auto erfResourceProvider = ErfResourceProvider(path);
 
     auto nfoData = erfResourceProvider.find(ResourceId("savenfo", ResourceType::Res));
@@ -224,9 +222,9 @@ static SavedGame peekSavedGame(const fs::path &path) {
     return move(result);
 }
 
-void SaveLoad::indexSavedGame(fs::path path) {
+void SaveLoad::indexSavedGame(boost::filesystem::path path) {
     try {
-        fs::path basename(path.filename());
+        boost::filesystem::path basename(path.filename());
         basename.replace_extension();
         int number = stoi(basename.string());
 
@@ -262,8 +260,8 @@ int SaveLoad::getNewSaveNumber() const {
     return number + 1;
 }
 
-static fs::path getSaveGamePath(int number) {
-    fs::path result(getSavesPath());
+static boost::filesystem::path getSaveGamePath(int number) {
+    boost::filesystem::path result(getSavesPath());
     result.append(str(boost::format("%06d") % number) + ".sav");
     return move(result);
 }
@@ -271,7 +269,7 @@ static fs::path getSaveGamePath(int number) {
 void SaveLoad::deleteGame(int number) {
     auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
     if (maybeSave != _saves.end()) {
-        fs::remove(maybeSave->path);
+        boost::filesystem::remove(maybeSave->path);
         refresh();
     }
 }

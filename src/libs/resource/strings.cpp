@@ -24,14 +24,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
 
-void Strings::init(const fs::path &gameDir) {
-    fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
+void Strings::init(const boost::filesystem::path &gameDir) {
+    boost::filesystem::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
     if (tlkPath.empty()) {
         throw ValidationException("dialog.tlk file not found");
     }

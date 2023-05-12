@@ -36,23 +36,21 @@ using namespace tinyxml2;
 
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void GffTool::invoke(Operation operation,
-                     const fs::path &input,
-                     const fs::path &outputDir,
-                     const fs::path &gamePath) {
+                     const boost::filesystem::path &input,
+                     const boost::filesystem::path &outputDir,
+                     const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void GffTool::invokeBatch(
     Operation operation,
-    const vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     auto strings = Strings();
     if (!gamePath.empty()) {
@@ -140,7 +138,7 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, Strings &strin
     printer.CloseElement();
 }
 
-void GffTool::toXML(const fs::path &input, const fs::path &outputDir, Strings &strings) {
+void GffTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Strings &strings) {
     auto stream = FileInputStream(input, OpenMode::Binary);
 
     auto reader = GffReader();
@@ -238,7 +236,7 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
     return make_unique<Gff>(structType, move(fields));
 }
 
-static void convertXmlToGff(const fs::path &input, const fs::path &outputDir) {
+static void convertXmlToGff(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
     auto fp = fopen(input.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -263,7 +261,7 @@ static void convertXmlToGff(const fs::path &input, const fs::path &outputDir) {
     writer.save(gffPath);
 }
 
-void GffTool::toGFF(const fs::path &input, const fs::path &outputDir) {
+void GffTool::toGFF(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
     if (input.extension() == ".xml") {
         convertXmlToGff(input, outputDir);
     } else {
@@ -271,8 +269,8 @@ void GffTool::toGFF(const fs::path &input, const fs::path &outputDir) {
     }
 }
 
-bool GffTool::supports(Operation operation, const fs::path &input) const {
-    return !fs::is_directory(input) &&
+bool GffTool::supports(Operation operation, const boost::filesystem::path &input) const {
+    return !boost::filesystem::is_directory(input) &&
            (operation == Operation::ToXML || operation == Operation::ToGFF);
 }
 

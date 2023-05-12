@@ -27,24 +27,22 @@ using namespace std;
 
 using namespace reone::graphics;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void TpcTool::invoke(
     Operation operation,
-    const fs::path &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const boost::filesystem::path &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
-    invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TpcTool::invokeBatch(
     Operation operation,
-    const std::vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const std::vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToTGA) {
@@ -53,7 +51,7 @@ void TpcTool::invokeBatch(
     });
 }
 
-void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
+void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     // Read TPC
 
     auto stream = FileInputStream(path, OpenMode::Binary);
@@ -63,7 +61,7 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
 
     // Write TGA
 
-    fs::path tgaPath(destPath);
+    boost::filesystem::path tgaPath(destPath);
     tgaPath.append(path.filename().string());
     tgaPath.replace_extension("tga");
 
@@ -73,16 +71,16 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Write TXI
 
     if (!tpc.txiData().empty()) {
-        fs::path txiPath(tgaPath);
+        boost::filesystem::path txiPath(tgaPath);
         txiPath.replace_extension("txi");
 
-        fs::ofstream txi(txiPath, ios::binary);
+        boost::filesystem::ofstream txi(txiPath, ios::binary);
         txi.write(tpc.txiData().data(), tpc.txiData().size());
     }
 }
 
-bool TpcTool::supports(Operation operation, const fs::path &input) const {
-    return !fs::is_directory(input) &&
+bool TpcTool::supports(Operation operation, const boost::filesystem::path &input) const {
+    return !boost::filesystem::is_directory(input) &&
            input.extension() == ".tpc" &&
            operation == Operation::ToTGA;
 }

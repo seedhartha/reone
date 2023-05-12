@@ -32,8 +32,6 @@ using namespace std;
 
 using namespace reone::graphics;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace game {
@@ -79,7 +77,7 @@ void ResourceLayout::initForKotOR() {
     _resourceSvc.defaultResources().indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
     _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(_options.game.path, kPatchFilename));
 
-    fs::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
+    boost::filesystem::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
     _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
     auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
@@ -89,7 +87,7 @@ void ResourceLayout::initForKotOR() {
     _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
     _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kWavesDirectoryName));
 
-    fs::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
+    boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
     for (auto &filename : g_nonTransientLipFiles) {
         _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, filename));
     }
@@ -101,7 +99,7 @@ void ResourceLayout::initForKotOR() {
 void ResourceLayout::initForTSL() {
     _resourceSvc.defaultResources().indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
 
-    fs::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
+    boost::filesystem::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
     _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
     auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
@@ -111,7 +109,7 @@ void ResourceLayout::initForTSL() {
     _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
     _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kVoiceDirectoryName));
 
-    fs::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
+    boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
     _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
     _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
@@ -123,12 +121,12 @@ void ResourceLayout::loadModuleResources(const string &moduleName) {
     _resourceSvc.defaultGffs().invalidate();
     _resourceSvc.defaultResources().clearTransientProviders();
 
-    fs::path modulesPath(getPathIgnoreCase(_options.game.path, kModulesDirectoryName));
+    boost::filesystem::path modulesPath(getPathIgnoreCase(_options.game.path, kModulesDirectoryName));
     if (modulesPath.empty()) {
         throw ValidationException("Modules directory not found");
     }
 
-    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
+    boost::filesystem::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     if (!modPath.empty()) {
         _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {
@@ -136,7 +134,7 @@ void ResourceLayout::loadModuleResources(const string &moduleName) {
         _resourceSvc.defaultResources().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
     }
 
-    fs::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
+    boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
     if (!lipsPath.empty()) {
         _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
     }

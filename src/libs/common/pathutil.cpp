@@ -21,15 +21,13 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
-fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath, bool logNotFound) {
+boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const string &relPath, bool logNotFound) {
     vector<string> tokens;
     boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
 
-    for (auto &entry : fs::directory_iterator(basePath)) {
+    for (auto &entry : boost::filesystem::directory_iterator(basePath)) {
         string filename(entry.path().filename().string());
         boost::to_lower(filename);
 
@@ -43,7 +41,7 @@ fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath, bool
         }
     }
     if (logNotFound) {
-        fs::path path(basePath);
+        boost::filesystem::path path(basePath);
         path.append(relPath);
         debug(boost::format("Path not found: %s") % path.string());
     }

@@ -21,8 +21,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
@@ -31,10 +29,10 @@ void Folder::init() {
     loadDirectory(_path);
 }
 
-void Folder::loadDirectory(const fs::path &path) {
-    for (auto &entry : fs::directory_iterator(path)) {
-        const fs::path &childPath = entry.path();
-        if (fs::is_directory(childPath)) {
+void Folder::loadDirectory(const boost::filesystem::path &path) {
+    for (auto &entry : boost::filesystem::directory_iterator(path)) {
+        const boost::filesystem::path &childPath = entry.path();
+        if (boost::filesystem::is_directory(childPath)) {
             loadDirectory(childPath);
             continue;
         }
@@ -54,7 +52,7 @@ void Folder::loadDirectory(const fs::path &path) {
 }
 
 shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
-    fs::path path;
+    boost::filesystem::path path;
     for (auto &res : _resources) {
         if (res.first == id.resRef && res.second.type == id.type) {
             path = res.second.path;
@@ -64,7 +62,7 @@ shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     if (path.empty()) {
         return shared_ptr<ByteArray>();
     }
-    fs::ifstream in(path, ios::binary);
+    boost::filesystem::ifstream in(path, ios::binary);
 
     in.seekg(0, ios::end);
     size_t size = in.tellg();

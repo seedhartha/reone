@@ -23,21 +23,19 @@ using namespace std;
 
 using namespace reone::game;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace engine {
 
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
-    fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
+    boost::filesystem::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
     if (!exePathK1.empty()) {
         return GameID::KotOR;
     }
 
     // If there is a TSL executable then game is TSL
-    fs::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
+    boost::filesystem::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
     if (!exePathK2.empty()) {
         return GameID::TSL;
     }

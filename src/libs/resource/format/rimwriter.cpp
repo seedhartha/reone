@@ -22,8 +22,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
@@ -32,7 +30,7 @@ void RimWriter::add(Resource &&res) {
     _resources.push_back(res);
 }
 
-void RimWriter::save(const fs::path &path) {
+void RimWriter::save(const boost::filesystem::path &path) {
     auto rim = FileOutputStream(path, OpenMode::Binary);
     save(rim);
 }

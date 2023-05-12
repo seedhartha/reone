@@ -25,11 +25,9 @@ using namespace std;
 
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
-void ErfTool::invoke(Operation operation, const fs::path &input, const fs::path &outputDir, const fs::path &gamePath) {
+void ErfTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
@@ -56,11 +54,11 @@ void ErfTool::list(const ErfReader &erf) {
     }
 }
 
-void ErfTool::extract(ErfReader &erf, const fs::path &erfPath, const fs::path &destPath) {
-    if (!fs::exists(destPath)) {
+void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, const boost::filesystem::path &destPath) {
+    if (!boost::filesystem::exists(destPath)) {
         // Create destination directory if it does not exist
-        fs::create_directory(destPath);
-    } else if (!fs::is_directory(destPath)) {
+        boost::filesystem::create_directory(destPath);
+    } else if (!boost::filesystem::is_directory(destPath)) {
         // Return if destination exists, but is not a directory
         return;
     }
@@ -79,17 +77,17 @@ void ErfTool::extract(ErfReader &erf, const fs::path &erfPath, const fs::path &d
         auto &ext = getExtByResType(key.resId.type);
         resPath.append(key.resId.resRef + "." + ext);
 
-        auto res = fs::ofstream(resPath, ios::binary);
+        auto res = boost::filesystem::ofstream(resPath, ios::binary);
         res.write(&buffer[0], buffer.size());
     }
 }
 
-void ErfTool::toERF(Operation operation, const fs::path &target) {
+void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) {
     ErfWriter erf;
 
-    for (auto &entry : fs::directory_iterator(target)) {
-        fs::path path(entry);
-        if (fs::is_directory(path))
+    for (auto &entry : boost::filesystem::directory_iterator(target)) {
+        boost::filesystem::path path(entry);
+        if (boost::filesystem::is_directory(path))
             continue;
 
         string ext(path.extension().string());
@@ -99,14 +97,14 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
         if (resType == ResourceType::Invalid)
             continue;
 
-        fs::ifstream in(path, ios::binary);
+        boost::filesystem::ifstream in(path, ios::binary);
         in.seekg(0, ios::end);
         size_t size = in.tellg();
         ByteArray data(size, '\0');
         in.seekg(0);
         in.read(&data[0], size);
 
-        fs::path resRef(path.filename());
+        boost::filesystem::path resRef(path.filename());
         resRef.replace_extension("");
 
         ErfWriter::Resource res;
@@ -128,22 +126,22 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
         ext = ".erf";
     }
 
-    fs::path erfPath(target.parent_path());
+    boost::filesystem::path erfPath(target.parent_path());
     erfPath.append(target.filename().string() + ext);
     erf.save(type, erfPath);
 }
 
-bool ErfTool::supports(Operation operation, const fs::path &input) const {
+bool ErfTool::supports(Operation operation, const boost::filesystem::path &input) const {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
         string ext(input.extension().string());
-        return !fs::is_directory(input) &&
+        return !boost::filesystem::is_directory(input) &&
                (ext == ".erf" || ext == ".mod" || ext == ".sav");
     }
     case Operation::ToERF:
     case Operation::ToMOD:
-        return fs::is_directory(input);
+        return boost::filesystem::is_directory(input);
 
     default:
         return false;

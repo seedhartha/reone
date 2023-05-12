@@ -27,14 +27,11 @@
 
 using namespace std;
 
-namespace endian = boost::endian;
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace script {
 
-void NcsWriter::save(const fs::path &path) {
+void NcsWriter::save(const boost::filesystem::path &path) {
     auto ncs = make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(ncs);
 }
@@ -42,7 +39,7 @@ void NcsWriter::save(const fs::path &path) {
 void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
-    BinaryWriter writer(stream, endian::order::big);
+    BinaryWriter writer(stream, boost::endian::order::big);
 
     for (auto &ins : _program.instructions()) {
         auto pos = 13 + static_cast<uint32_t>(writer.tell());
@@ -112,7 +109,7 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
         }
     }
 
-    BinaryWriter ncsWriter(*out, endian::order::big);
+    BinaryWriter ncsWriter(*out, boost::endian::order::big);
 
     ncsWriter.putString(string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);

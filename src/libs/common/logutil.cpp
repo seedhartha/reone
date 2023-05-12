@@ -21,8 +21,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 static constexpr char kLogFilename[] = "reone.log";
@@ -33,7 +31,7 @@ static int g_channels = LogChannels::general;
 static LogLevel g_level = LogLevel::Info;
 
 static bool g_logToFile = false;
-static unique_ptr<fs::ofstream> g_logFile;
+static unique_ptr<boost::filesystem::ofstream> g_logFile;
 
 static const unordered_map<LogLevel, string> g_nameByLogLevel {
     {LogLevel::Error, "ERR"},
@@ -63,9 +61,9 @@ static void log(LogLevel level, const string &s, int channel) {
         throw logic_error("Must not log outside the main thread");
     }
     if (g_logToFile && !g_logFile) {
-        fs::path path(fs::current_path());
+        boost::filesystem::path path(boost::filesystem::current_path());
         path.append(kLogFilename);
-        g_logFile = make_unique<fs::ofstream>(path);
+        g_logFile = make_unique<boost::filesystem::ofstream>(path);
     }
     auto &out = g_logToFile ? *g_logFile : cout;
     log(out, level, s, channel);

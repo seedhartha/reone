@@ -38,24 +38,22 @@ using namespace reone::game;
 using namespace reone::resource;
 using namespace reone::script;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void NcsTool::invoke(
     Operation operation,
-    const fs::path &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const boost::filesystem::path &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
-    invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void NcsTool::invokeBatch(
     Operation operation,
-    const std::vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const std::vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
     if (_gameId == GameID::KotOR) {
@@ -75,25 +73,25 @@ void NcsTool::invokeBatch(
     });
 }
 
-void NcsTool::toPCODE(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+void NcsTool::toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
     auto stream = FileInputStream(input, OpenMode::Binary);
 
     NcsReader ncs("");
     ncs.load(stream);
 
-    fs::path pcodePath(outputDir);
+    boost::filesystem::path pcodePath(outputDir);
     pcodePath.append(input.filename().string() + ".pcode");
 
     PcodeWriter pcode(*ncs.program(), routines);
     pcode.save(pcodePath);
 }
 
-void NcsTool::toNCS(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
     PcodeReader pcode(input, routines);
     pcode.load();
     auto program = pcode.program();
 
-    fs::path ncsPath(outputDir);
+    boost::filesystem::path ncsPath(outputDir);
     ncsPath.append(input.filename().string());
     ncsPath.replace_extension(); // drop .pcode
 
@@ -101,7 +99,7 @@ void NcsTool::toNCS(const fs::path &input, const fs::path &outputDir, Routines &
     writer.save(ncsPath);
 }
 
-void NcsTool::toNSS(const fs::path &input, const fs::path &outputDir, Routines &routines) {
+void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
     auto ncs = FileInputStream(input, OpenMode::Binary);
 
     auto reader = NcsReader("");
@@ -119,8 +117,8 @@ void NcsTool::toNSS(const fs::path &input, const fs::path &outputDir, Routines &
     writer.save(nss);
 }
 
-bool NcsTool::supports(Operation operation, const fs::path &input) const {
-    return !fs::is_directory(input) &&
+bool NcsTool::supports(Operation operation, const boost::filesystem::path &input) const {
+    return !boost::filesystem::is_directory(input) &&
            ((input.extension() == ".ncs" && (operation == Operation::ToPCODE || operation == Operation::ToNSS)) ||
             (input.extension() == ".pcode" && operation == Operation::ToNCS));
 }

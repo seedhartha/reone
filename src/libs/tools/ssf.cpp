@@ -31,24 +31,22 @@ using namespace tinyxml2;
 
 using namespace reone::game;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void SsfTool::invoke(
     Operation operation,
-    const fs::path &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const boost::filesystem::path &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void SsfTool::invokeBatch(
     Operation operation,
-    const std::vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const std::vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -59,7 +57,7 @@ void SsfTool::invokeBatch(
     });
 }
 
-void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
+void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto stream = FileInputStream(path, OpenMode::Binary);
 
     auto reader = SsfReader();
@@ -85,7 +83,7 @@ void SsfTool::toXML(const fs::path &path, const fs::path &destPath) {
     fclose(fp);
 }
 
-void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
+void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -111,14 +109,14 @@ void SsfTool::toSSF(const fs::path &path, const fs::path &destPath) {
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto ssfPath = fs::path(destPath);
+    auto ssfPath = boost::filesystem::path(destPath);
     ssfPath.append(tokens[0] + ".ssf");
 
     auto writer = SsfWriter(move(soundSet));
     writer.save(ssfPath);
 }
 
-bool SsfTool::supports(Operation operation, const fs::path &input) const {
+bool SsfTool::supports(Operation operation, const boost::filesystem::path &input) const {
     return (operation == Operation::ToXML && input.extension() == ".ssf") ||
            (operation == Operation::ToSSF && input.extension() == ".xml");
 }

@@ -26,8 +26,6 @@ using namespace std;
 using namespace reone;
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 BOOST_AUTO_TEST_SUITE(strings)
 
 BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
@@ -35,9 +33,9 @@ BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
 
     setLogLevel(LogLevel::None);
 
-    auto tmpDirPath = fs::temp_directory_path();
+    auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_strings");
-    fs::create_directory(tmpDirPath);
+    boost::filesystem::create_directory(tmpDirPath);
 
     auto tlkPath = tmpDirPath;
     tlkPath.append("dialog.tlk");
@@ -77,7 +75,7 @@ BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
 
     // cleanup
 
-    fs::remove_all(tmpDirPath);
+    boost::filesystem::remove_all(tmpDirPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

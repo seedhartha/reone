@@ -28,8 +28,6 @@ using namespace std;
 using namespace reone;
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 BOOST_AUTO_TEST_SUITE(resources)
 
 BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
@@ -37,9 +35,9 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
 
     setLogLevel(LogLevel::None);
 
-    auto tmpDirPath = fs::temp_directory_path();
+    auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_resources");
-    fs::create_directory(tmpDirPath);
+    boost::filesystem::create_directory(tmpDirPath);
 
     auto keyPath = tmpDirPath;
     keyPath.append("sample.key");
@@ -81,7 +79,7 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
 
     auto overridePath = tmpDirPath;
     overridePath.append("override");
-    fs::create_directory(overridePath);
+    boost::filesystem::create_directory(overridePath);
 
     auto resPath = overridePath;
     resPath.append("sample.txt");
@@ -119,7 +117,7 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
 
     // cleanup
 
-    fs::remove_all(tmpDirPath);
+    boost::filesystem::remove_all(tmpDirPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

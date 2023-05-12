@@ -25,16 +25,14 @@ using namespace std;
 
 using namespace reone;
 
-namespace fs = boost::filesystem;
-
 BOOST_AUTO_TEST_SUITE(file_input_stream)
 
 BOOST_AUTO_TEST_CASE(should_read_from_file) {
     // given
 
-    auto tmpPath = fs::temp_directory_path();
+    auto tmpPath = boost::filesystem::temp_directory_path();
     tmpPath.append("reone_test_file_input");
-    auto tmpFile = fs::ofstream(tmpPath);
+    auto tmpFile = boost::filesystem::ofstream(tmpPath);
     tmpFile.write("Hello, world!", 13);
     tmpFile.close();
 
@@ -69,7 +67,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
 
     // cleanup
 
-    fs::remove(tmpPath);
+    boost::filesystem::remove(tmpPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

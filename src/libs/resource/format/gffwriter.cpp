@@ -24,8 +24,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
@@ -56,7 +54,7 @@ static const unordered_map<ResourceType, string> g_signatures {
     {ResourceType::Utw, "UTW"},
     {ResourceType::Pth, "PTH"}};
 
-void GffWriter::save(const fs::path &path) {
+void GffWriter::save(const boost::filesystem::path &path) {
     auto out = FileOutputStream(path, OpenMode::Binary);
     save(out);
 }

@@ -33,24 +33,22 @@ using namespace tinyxml2;
 
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void TwoDaTool::invoke(
     Operation operation,
-    const fs::path &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const boost::filesystem::path &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TwoDaTool::invokeBatch(
     Operation operation,
-    const std::vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const std::vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -61,7 +59,7 @@ void TwoDaTool::invokeBatch(
     });
 }
 
-void TwoDaTool::toXML(const fs::path &input, const fs::path &outputDir) {
+void TwoDaTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
     auto stream = FileInputStream(input, OpenMode::Binary);
 
     auto reader = TwoDaReader();
@@ -91,7 +89,7 @@ void TwoDaTool::toXML(const fs::path &input, const fs::path &outputDir) {
     fclose(fp);
 }
 
-void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
+void TwoDaTool::to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -137,15 +135,15 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto twoDaPath = fs::path(destPath);
+    auto twoDaPath = boost::filesystem::path(destPath);
     twoDaPath.append(tokens[0] + ".2da");
 
     auto writer = TwoDaWriter(twoDa);
     writer.save(twoDaPath);
 }
 
-bool TwoDaTool::supports(Operation operation, const fs::path &input) const {
-    return !fs::is_directory(input) &&
+bool TwoDaTool::supports(Operation operation, const boost::filesystem::path &input) const {
+    return !boost::filesystem::is_directory(input) &&
            ((input.extension() == ".2da" && operation == Operation::ToXML) ||
             (input.extension() == ".xml" && operation == Operation::To2DA));
 }

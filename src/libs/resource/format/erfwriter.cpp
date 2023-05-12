@@ -22,8 +22,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace resource {
@@ -35,7 +33,7 @@ void ErfWriter::add(Resource &&res) {
     _resources.push_back(res);
 }
 
-void ErfWriter::save(FileType type, const fs::path &path) {
+void ErfWriter::save(FileType type, const boost::filesystem::path &path) {
     auto out = FileOutputStream(path, OpenMode::Binary);
     save(type, out);
 }

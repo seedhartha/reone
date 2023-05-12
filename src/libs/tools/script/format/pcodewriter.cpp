@@ -23,14 +23,12 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace script {
 
-void PcodeWriter::save(const fs::path &path) {
-    fs::ofstream pcode(path);
+void PcodeWriter::save(const boost::filesystem::path &path) {
+    boost::filesystem::ofstream pcode(path);
     try {
         set<uint32_t> jumpOffsets;
         for (auto &instr : _program.instructions()) {
@@ -49,12 +47,12 @@ void PcodeWriter::save(const fs::path &path) {
             writeInstruction(instr, pcode, jumpOffsets);
         }
     } catch (const exception &e) {
-        fs::remove(path);
+        boost::filesystem::remove(path);
         throw runtime_error(e.what());
     }
 }
 
-void PcodeWriter::writeInstruction(const Instruction &ins, fs::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
+void PcodeWriter::writeInstruction(const Instruction &ins, boost::filesystem::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
     if (jumpOffsets.count(ins.offset) > 0) {
         string label(str(boost::format("loc_%08x:") % ins.offset));
         pcode << label << endl;

@@ -23,18 +23,16 @@ using namespace std;
 
 using namespace reone;
 
-namespace fs = boost::filesystem;
-
 BOOST_AUTO_TEST_SUITE(path_util)
 
 BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     // given
-    auto tmpDirPath = fs::temp_directory_path();
+    auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_path_util");
     auto tmpFilePath = tmpDirPath;
     tmpFilePath.append("MiXeD");
-    fs::create_directory(tmpDirPath);
-    auto tmpFile = fs::ofstream(tmpFilePath, ios::binary);
+    boost::filesystem::create_directory(tmpDirPath);
+    auto tmpFile = boost::filesystem::ofstream(tmpFilePath, ios::binary);
     tmpFile.flush();
     tmpFile.close();
 
@@ -49,7 +47,7 @@ BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     BOOST_TEST(superPath.empty());
 
     // cleanup
-    fs::remove_all(tmpDirPath);
+    boost::filesystem::remove_all(tmpDirPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

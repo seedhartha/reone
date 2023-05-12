@@ -23,10 +23,9 @@
 
 using namespace std;
 
-using namespace reone::graphics;
+using namespace boost::program_options;
 
-namespace fs = boost::filesystem;
-namespace po = boost::program_options;
+using namespace reone::graphics;
 
 namespace reone {
 
@@ -301,38 +300,38 @@ LauncherFrame::LauncherFrame() :
 }
 
 void LauncherFrame::LoadConfiguration() {
-    po::options_description options;
-    options.add_options()                                                     //
-        ("game", po::value<string>()->default_value(_config.gameDir))         //
-        ("dev", po::value<bool>()->default_value(_config.devMode))            //
-        ("width", po::value<int>()->default_value(_config.width))             //
-        ("height", po::value<int>()->default_value(_config.height))           //
-        ("fullscreen", po::value<bool>()->default_value(_config.fullscreen))  //
-        ("vsync", po::value<bool>()->default_value(_config.vsync))            //
-        ("grass", po::value<bool>()->default_value(_config.grass))            //
-        ("ssao", po::value<bool>()->default_value(_config.ssao))              //
-        ("ssr", po::value<bool>()->default_value(_config.ssr))                //
-        ("fxaa", po::value<bool>()->default_value(_config.fxaa))              //
-        ("sharpen", po::value<bool>()->default_value(_config.sharpen))        //
-        ("texquality", po::value<int>()->default_value(_config.texQuality))   //
-        ("anisofilter", po::value<int>()->default_value(_config.anisofilter)) //
-        ("shadowres", po::value<int>()->default_value(_config.shadowres))     //
-        ("drawdist", po::value<int>()->default_value(_config.drawdist))       //
-        ("musicvol", po::value<int>()->default_value(_config.musicvol))       //
-        ("voicevol", po::value<int>()->default_value(_config.voicevol))       //
-        ("soundvol", po::value<int>()->default_value(_config.soundvol))       //
-        ("movievol", po::value<int>()->default_value(_config.movievol))       //
-        ("loglevel", po::value<int>()->default_value(_config.loglevel))       //
-        ("logch", po::value<int>()->default_value(_config.logch))             //
-        ("logfile", po::value<bool>()->default_value(_config.logfile));
+    options_description options;
+    options.add_options()                                                 //
+        ("game", value<string>()->default_value(_config.gameDir))         //
+        ("dev", value<bool>()->default_value(_config.devMode))            //
+        ("width", value<int>()->default_value(_config.width))             //
+        ("height", value<int>()->default_value(_config.height))           //
+        ("fullscreen", value<bool>()->default_value(_config.fullscreen))  //
+        ("vsync", value<bool>()->default_value(_config.vsync))            //
+        ("grass", value<bool>()->default_value(_config.grass))            //
+        ("ssao", value<bool>()->default_value(_config.ssao))              //
+        ("ssr", value<bool>()->default_value(_config.ssr))                //
+        ("fxaa", value<bool>()->default_value(_config.fxaa))              //
+        ("sharpen", value<bool>()->default_value(_config.sharpen))        //
+        ("texquality", value<int>()->default_value(_config.texQuality))   //
+        ("anisofilter", value<int>()->default_value(_config.anisofilter)) //
+        ("shadowres", value<int>()->default_value(_config.shadowres))     //
+        ("drawdist", value<int>()->default_value(_config.drawdist))       //
+        ("musicvol", value<int>()->default_value(_config.musicvol))       //
+        ("voicevol", value<int>()->default_value(_config.voicevol))       //
+        ("soundvol", value<int>()->default_value(_config.soundvol))       //
+        ("movievol", value<int>()->default_value(_config.movievol))       //
+        ("loglevel", value<int>()->default_value(_config.loglevel))       //
+        ("logch", value<int>()->default_value(_config.logch))             //
+        ("logfile", value<bool>()->default_value(_config.logfile));
 
-    po::variables_map vars;
-    if (!fs::exists(kConfigFilename)) {
+    variables_map vars;
+    if (!boost::filesystem::exists(kConfigFilename)) {
         return;
     }
 
-    po::store(po::parse_config_file<char>(kConfigFilename, options, true), vars);
-    po::notify(vars);
+    store(parse_config_file<char>(kConfigFilename, options, true), vars);
+    notify(vars);
 
     _config.gameDir = vars["game"].as<string>();
     _config.devMode = vars["dev"].as<bool>();
@@ -460,7 +459,7 @@ void LauncherFrame::SaveConfiguration() {
 
     vector<string> lines;
 
-    fs::ifstream in(kConfigFilename);
+    boost::filesystem::ifstream in(kConfigFilename);
     for (string line; getline(in, line);) {
         bool add = true;
         for (auto &opt : recognized) {
@@ -474,7 +473,7 @@ void LauncherFrame::SaveConfiguration() {
         }
     }
 
-    fs::ofstream config(kConfigFilename);
+    boost::filesystem::ofstream config(kConfigFilename);
     config << "game=" << _config.gameDir << endl;
     config << "dev=" << (_config.devMode ? 1 : 0) << endl;
     config << "width=" << _config.width << endl;

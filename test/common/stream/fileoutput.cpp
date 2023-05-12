@@ -25,14 +25,12 @@ using namespace std;
 
 using namespace reone;
 
-namespace fs = boost::filesystem;
-
 BOOST_AUTO_TEST_SUITE(file_output_stream)
 
 BOOST_AUTO_TEST_CASE(should_write_to_file) {
     // given
 
-    auto tmpPath = fs::temp_directory_path();
+    auto tmpPath = boost::filesystem::temp_directory_path();
     tmpPath.append("reone_test_file_output");
 
     auto stream = FileOutputStream(tmpPath, OpenMode::Binary);
@@ -50,7 +48,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_file) {
 
     // then
 
-    auto tmpFile = fs::ifstream(tmpPath, ios::binary);
+    auto tmpFile = boost::filesystem::ifstream(tmpPath, ios::binary);
     tmpFile.seekg(0, ios::end);
     auto tmpSize = tmpFile.tellg();
     auto bytes = ByteArray();
@@ -65,7 +63,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_file) {
 
     // cleanup
 
-    fs::remove(tmpPath);
+    boost::filesystem::remove(tmpPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

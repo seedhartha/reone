@@ -25,8 +25,6 @@
 
 using namespace std;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 namespace script {
@@ -36,7 +34,7 @@ void PcodeReader::load() {
     map<int, string> labelByLineIdx;
     map<int, uint32_t> addrByLineIdx;
 
-    fs::ifstream pcode(_path);
+    boost::filesystem::ifstream pcode(_path);
     string line;
     boost::smatch what;
     boost::regex re("^([_\\d\\w]+):$");
@@ -56,7 +54,7 @@ void PcodeReader::load() {
         insLines.push_back(line);
     }
 
-    fs::path filename(_path.filename());
+    boost::filesystem::path filename(_path.filename());
     filename.replace_extension(); // drop .pcode
     filename.replace_extension(); // drop .ncs
 

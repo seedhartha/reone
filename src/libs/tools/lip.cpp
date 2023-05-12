@@ -31,24 +31,22 @@ using namespace tinyxml2;
 
 using namespace reone::graphics;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void LipTool::invoke(
     Operation operation,
-    const fs::path &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const boost::filesystem::path &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<fs::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void LipTool::invokeBatch(
     Operation operation,
-    const std::vector<fs::path> &input,
-    const fs::path &outputDir,
-    const fs::path &gamePath) {
+    const std::vector<boost::filesystem::path> &input,
+    const boost::filesystem::path &outputDir,
+    const boost::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -59,7 +57,7 @@ void LipTool::invokeBatch(
     });
 }
 
-void LipTool::toXML(const fs::path &path, const fs::path &destPath) {
+void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto stream = FileInputStream(path, OpenMode::Binary);
 
     auto reader = LipReader("");
@@ -86,7 +84,7 @@ void LipTool::toXML(const fs::path &path, const fs::path &destPath) {
     fclose(fp);
 }
 
-void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
+void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -115,15 +113,15 @@ void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto lipPath = fs::path(destPath);
+    auto lipPath = boost::filesystem::path(destPath);
     lipPath.append(tokens[0] + ".lip");
 
     auto writer = LipWriter(move(animation));
     writer.save(lipPath);
 }
 
-bool LipTool::supports(Operation operation, const fs::path &input) const {
-    return !fs::is_directory(input) &&
+bool LipTool::supports(Operation operation, const boost::filesystem::path &input) const {
+    return !boost::filesystem::is_directory(input) &&
            ((input.extension() == ".lip" && operation == Operation::ToXML) ||
             (input.extension() == ".xml" && operation == Operation::ToLIP));
 }
