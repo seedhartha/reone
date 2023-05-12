@@ -24,7 +24,12 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext : boost::noncopyable {
+class IGraphicsContext {
+public:
+    virtual ~IGraphicsContext() = default;
+};
+
+class GraphicsContext : public IGraphicsContext, boost::noncopyable {
 public:
     GraphicsContext(GraphicsOptions &options) :
         _options(options) {

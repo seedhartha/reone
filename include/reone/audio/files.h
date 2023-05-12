@@ -31,7 +31,12 @@ namespace audio {
 
 class AudioStream;
 
-class AudioFiles : public MemoryCache<std::string, AudioStream> {
+class IAudioFiles {
+public:
+    virtual ~IAudioFiles() = default;
+};
+
+class AudioFiles : public IAudioFiles, public MemoryCache<std::string, AudioStream> {
 public:
     AudioFiles(resource::Resources &resources) :
         MemoryCache(std::bind(&AudioFiles::doGet, this, std::placeholders::_1)),

@@ -36,7 +36,12 @@ struct AudioServices;
 
 namespace scene {
 
-class SceneGraphs : boost::noncopyable {
+class ISceneGraphs {
+public:
+    virtual ~ISceneGraphs() = default;
+};
+
+class SceneGraphs : public ISceneGraphs, boost::noncopyable {
 public:
     SceneGraphs(
         graphics::GraphicsOptions &graphicsOpt,
@@ -47,7 +52,7 @@ public:
         _audioSvc(audioSvc) {
     }
 
-    virtual void reserve(std::string name);
+    void reserve(std::string name);
 
     SceneGraph &get(const std::string &name);
 

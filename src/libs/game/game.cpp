@@ -97,7 +97,7 @@ void Game::init() {
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
-    for (auto &scene : _services.scene.graphs.scenes()) {
+    for (auto &scene : _services.scene.defaultGraphs().scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
         scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
@@ -107,7 +107,7 @@ void Game::init() {
     setCursorType(CursorType::Default);
 
     auto routines = make_unique<Routines>(*this, _services);
-    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.scripts);
+    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.defaultScripts());
 
     auto map = make_unique<Map>(*this, _services);
     auto console = make_unique<Console>(*this, _services);
@@ -148,7 +148,7 @@ void Game::init() {
     _console = move(console);
     _profileOverlay = move(profileOverlay);
 
-    _services.graphics.window.setEventHandler(this);
+    _services.graphics.defaultWindow().setEventHandler(this);
 }
 
 int Game::run() {
@@ -160,8 +160,8 @@ int Game::run() {
 void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
     while (!_quit) {
-        _services.graphics.window.processEvents(_quit);
-        if (!_services.graphics.window.isInFocus()) {
+        _services.graphics.defaultWindow().processEvents(_quit);
+        if (!_services.graphics.defaultWindow().isInFocus()) {
             continue;
         }
         update();
@@ -206,7 +206,7 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    _services.graphics.context.clearColorDepth();
+    _services.graphics.defaultContext().clearColorDepth();
 
     if (_movie) {
         _movie->render();
@@ -217,7 +217,7 @@ void Game::drawAll() {
     }
 
     _profileOverlay->draw();
-    _services.graphics.window.swapBuffers();
+    _services.graphics.defaultWindow().swapBuffers();
 }
 
 void Game::loadModule(const string &name, string entry) {
@@ -228,11 +228,11 @@ void Game::loadModule(const string &name, string entry) {
 
         /*
         _services.game.soundSets.invalidate();
-        _services.graphics.textures.invalidate();
+        _services.graphics.defaultTextures().invalidate();
         _services.graphics.models.invalidate();
-        _services.graphics.walkmeshes.invalidate();
-        _services.graphics.lipAnimations.invalidate();
-        _services.audio.files.invalidate();
+        _services.graphics.defaultWalkmeshes().invalidate();
+        _services.graphics.defaultLipAnimations().invalidate();
+        _services.audio.defaultFiles().invalidate();
         _services.script.scripts.invalidate();
         */
 
@@ -248,7 +248,7 @@ void Game::loadModule(const string &name, string entry) {
             }
             drawAll();
 
-            _services.scene.graphs.get(kSceneMain).clear();
+            _services.scene.defaultGraphs().get(kSceneMain).clear();
 
             auto maybeModule = _loadedModules.find(name);
             if (maybeModule != _loadedModules.end()) {
@@ -256,7 +256,7 @@ void Game::loadModule(const string &name, string entry) {
             } else {
                 _module = _objectFactory.newModule();
 
-                shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
+                shared_ptr<Gff> ifo(_services.resource.defaultGffs().get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }
@@ -362,18 +362,18 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
+    auto &scene = _services.scene.defaultGraphs().get(kSceneMain);
+    auto output = _services.graphics.defaultPipeline().draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
     }
-    _services.graphics.uniforms.setGeneral([](auto &general) {
+    _services.graphics.defaultUniforms().setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
-    _services.graphics.textures.bind(*output);
-    _services.graphics.meshes.quadNDC().draw();
+    _services.graphics.defaultShaders().use(_services.graphics.defaultShaders().simpleTexture());
+    _services.graphics.defaultTextures().bind(*output);
+    _services.graphics.defaultMeshes().quadNDC().draw();
 }
 
 void Game::toggleInGameCameraType() {
@@ -460,7 +460,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.audio.player.play(_musicResRef, AudioType::Music);
+        _music = _services.audio.defaultPlayer().play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -525,7 +525,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->getOrigin();
         }
-        _services.audio.context.setListenerPosition(move(listenerPosition));
+        _services.audio.defaultContext().setListenerPosition(move(listenerPosition));
     }
 }
 
@@ -534,7 +534,7 @@ void Game::updateSceneGraph(float dt) {
     if (!camera) {
         return;
     }
-    auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode().get());
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
@@ -671,7 +671,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _services.graphics.window.setRelativeMouseMode(relative);
+    _services.graphics.defaultWindow().setRelativeMouseMode(relative);
 }
 
 void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
@@ -782,7 +782,7 @@ void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     if (!g_conversationsEnabled)
         return;
 
-    shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
+    shared_ptr<Gff> dlg(_services.resource.defaultGffs().get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;

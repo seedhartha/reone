@@ -27,7 +27,12 @@ namespace resource {
 
 class Resources;
 
-class Gffs : boost::noncopyable {
+class IGffs {
+public:
+    virtual ~IGffs() = default;
+};
+
+class Gffs : public IGffs, boost::noncopyable {
 public:
     Gffs(Resources &resources) :
         _resources(resources) {

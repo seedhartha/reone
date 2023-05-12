@@ -17,64 +17,21 @@
 
 #pragma once
 
-#include "reone/scene/graph.h"
-#include "reone/scene/node/model.h"
+#include "reone/scene/services.h"
 
 namespace reone {
 
 namespace scene {
 
-class MockSceneGraph : public SceneGraph {
-public:
-    MockSceneGraph(
-        std::string name,
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
-        SceneGraph(
-            name,
-            graphicsOpt,
-            graphicsSvc,
-            audioSvc) {
-    }
-
-    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const override {
-        return _pickModelAtReturnValue;
-    }
-
-    void whenPickModelAtThenReturn(ModelSceneNode *value) {
-        _pickModelAtReturnValue = value;
-    }
-
-private:
-    ModelSceneNode *_pickModelAtReturnValue {nullptr};
+class MockSceneGraphs : public ISceneGraphs {
 };
 
-class MockSceneGraphs : public SceneGraphs {
-public:
-    MockSceneGraphs(
-        graphics::GraphicsOptions &graphicsOpt,
-        graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
-        SceneGraphs(
-            graphicsOpt,
-            graphicsSvc,
-            audioSvc) {
-    }
+inline std::unique_ptr<SceneServices> mockSceneServices() {
+    // TODO: free automatically
+    auto graphs = new MockSceneGraphs();
 
-    void reserve(std::string name) override {
-        if (_scenes.count(name) > 0) {
-            return;
-        }
-        auto scene = std::make_unique<MockSceneGraph>(
-            name,
-            _graphicsOpt,
-            _graphicsSvc,
-            _audioSvc);
-
-        _scenes.insert(make_pair(name, move(scene)));
-    }
-};
+    return std::make_unique<SceneServices>(*graphs);
+}
 
 } // namespace scene
 

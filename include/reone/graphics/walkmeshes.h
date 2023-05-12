@@ -33,7 +33,12 @@ namespace graphics {
 
 class Walkmesh;
 
-class Walkmeshes : boost::noncopyable {
+class IWalkmeshes {
+public:
+    virtual ~IWalkmeshes() = default;
+};
+
+class Walkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
     Walkmeshes(resource::Resources &resources);
 

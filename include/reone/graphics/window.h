@@ -27,7 +27,12 @@ namespace graphics {
 class Cursor;
 class IEventHandler;
 
-class Window : boost::noncopyable {
+class IWindow {
+public:
+    virtual ~IWindow() = default;
+};
+
+class Window : public IWindow, boost::noncopyable {
 public:
     Window(GraphicsOptions &options) :
         _options(options) {

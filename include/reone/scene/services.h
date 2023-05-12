@@ -17,17 +17,25 @@
 
 #pragma once
 
+#include "reone/scene/graphs.h"
+
 namespace reone {
 
 namespace scene {
 
-class SceneGraphs;
-
 struct SceneServices {
-    SceneGraphs &graphs;
+    ISceneGraphs &graphs;
 
-    SceneServices(SceneGraphs &sceneGraphs) :
-        graphs(sceneGraphs) {
+    SceneServices(ISceneGraphs &graphs) :
+        graphs(graphs) {
+    }
+
+    SceneGraphs &defaultGraphs() {
+        auto casted = dynamic_cast<SceneGraphs *>(&graphs);
+        if (!casted) {
+            throw std::logic_error("Illegal SceneGraphs implementation");
+        }
+        return *casted;
     }
 };
 

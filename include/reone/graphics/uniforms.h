@@ -192,7 +192,12 @@ struct PointsUniforms {
     glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
 };
 
-class Uniforms : boost::noncopyable {
+class IUniforms {
+public:
+    virtual ~IUniforms() = default;
+};
+
+class Uniforms : public IUniforms, boost::noncopyable {
 public:
     ~Uniforms() { deinit(); }
 

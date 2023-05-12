@@ -17,26 +17,50 @@
 
 #pragma once
 
+#include "context.h"
+#include "files.h"
+#include "player.h"
+
 namespace reone {
 
 namespace audio {
 
-class AudioContext;
-class AudioFiles;
-class AudioPlayer;
-
 struct AudioServices {
-    AudioContext &context;
-    AudioFiles &files;
-    AudioPlayer &player;
+    IAudioContext &context;
+    IAudioFiles &files;
+    IAudioPlayer &player;
 
     AudioServices(
-        AudioContext &context,
-        AudioFiles &files,
-        AudioPlayer &player) :
+        IAudioContext &context,
+        IAudioFiles &files,
+        IAudioPlayer &player) :
         context(context),
         files(files),
         player(player) {
+    }
+
+    AudioContext &defaultContext() {
+        auto casted = dynamic_cast<AudioContext *>(&context);
+        if (!casted) {
+            throw std::logic_error("Illegal AudioContext implementation");
+        }
+        return *casted;
+    }
+
+    AudioFiles &defaultFiles() {
+        auto casted = dynamic_cast<AudioFiles *>(&files);
+        if (!casted) {
+            throw std::logic_error("Illegal AudioFiles implementation");
+        }
+        return *casted;
+    }
+
+    AudioPlayer &defaultPlayer() {
+        auto casted = dynamic_cast<AudioPlayer *>(&player);
+        if (!casted) {
+            throw std::logic_error("Illegal AudioPlayer implementation");
+        }
+        return *casted;
     }
 };
 

@@ -149,7 +149,7 @@ void MainMenu::setup3DView() {
         return;
     }
 
-    auto &sceneGraph = _services.scene.graphs.get(kSceneMainMenu);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(kSceneMainMenu);
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 

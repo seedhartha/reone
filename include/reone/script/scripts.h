@@ -26,7 +26,12 @@ namespace reone {
 
 namespace script {
 
-class Scripts : public MemoryCache<std::string, ScriptProgram> {
+class IScripts {
+public:
+    virtual ~IScripts() = default;
+};
+
+class Scripts : public IScripts, public MemoryCache<std::string, ScriptProgram> {
 public:
     Scripts(resource::Resources &resources);
 

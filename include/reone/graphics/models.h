@@ -32,13 +32,21 @@ namespace graphics {
 class Model;
 class Textures;
 
-class Models : boost::noncopyable {
+class IModels {
+public:
+    virtual ~IModels() {
+    }
+
+    virtual std::shared_ptr<Model> get(const std::string &resRef) = 0;
+};
+
+class Models : public IModels, boost::noncopyable {
 public:
     Models(Textures &textures, resource::Resources &resources);
 
     void invalidate();
 
-    std::shared_ptr<Model> get(const std::string &resRef);
+    std::shared_ptr<Model> get(const std::string &resRef) override;
 
 private:
     Textures &_textures;

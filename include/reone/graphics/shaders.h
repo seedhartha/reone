@@ -26,7 +26,12 @@ namespace graphics {
 
 struct GraphicsOptions;
 
-class Shaders : boost::noncopyable {
+class IShaders {
+public:
+    virtual ~IShaders() = default;
+};
+
+class Shaders : public IShaders, boost::noncopyable {
 public:
     Shaders(GraphicsOptions &options) :
         _options(options) {

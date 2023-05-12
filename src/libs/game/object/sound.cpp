@@ -49,7 +49,7 @@ void Sound::loadFromGIT(const Gff &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
+    shared_ptr<Gff> uts(_services.resource.defaultGffs().get(resRef, ResourceType::Uts));
     if (!uts) {
         return;
     }
@@ -58,7 +58,7 @@ void Sound::loadFromBlueprint(const string &resRef) {
 
 void Sound::loadUTS(const Gff &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
-    _name = _services.resource.strings.get(uts.getInt("LocName"));
+    _name = _services.resource.defaultStrings().get(uts.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
@@ -92,7 +92,7 @@ void Sound::loadUTS(const Gff &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const Gff &uts) {
-    shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
+    shared_ptr<TwoDa> priorityGroups(_services.resource.defaultTwoDas().get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }
@@ -104,7 +104,7 @@ void Sound::loadTransformFromGIT(const Gff &gffs) {
 
     updateTransform();
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto sceneNode = sceneGraph.newSound();
     sceneNode->setEnabled(_active);
     sceneNode->setPriority(_priority);

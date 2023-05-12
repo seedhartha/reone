@@ -31,7 +31,12 @@ class Resources;
 
 namespace graphics {
 
-class LipAnimations : public MemoryCache<std::string, LipAnimation> {
+class ILipAnimations {
+public:
+    virtual ~ILipAnimations() = default;
+};
+
+class LipAnimations : public ILipAnimations, public MemoryCache<std::string, LipAnimation> {
 public:
     LipAnimations(resource::Resources &resources) :
         MemoryCache(std::bind(&LipAnimations::doGet, this, std::placeholders::_1)),

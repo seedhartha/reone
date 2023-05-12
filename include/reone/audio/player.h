@@ -28,7 +28,12 @@ namespace audio {
 class AudioFiles;
 class AudioStream;
 
-class AudioPlayer : boost::noncopyable {
+class IAudioPlayer {
+public:
+    virtual ~IAudioPlayer() = default;
+};
+
+class AudioPlayer : public IAudioPlayer, boost::noncopyable {
 public:
     AudioPlayer(AudioOptions &options, AudioFiles &audioFiles) :
         _options(options),

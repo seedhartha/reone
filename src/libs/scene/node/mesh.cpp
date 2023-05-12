@@ -72,12 +72,12 @@ void MeshSceneNode::refreshAdditionalTextures() {
     }
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.envmapTexture, TextureUsage::EnvironmentMap).get();
+        _nodeTextures.envmap = _graphicsSvc.defaultTextures().get(features.envmapTexture, TextureUsage::EnvironmentMap).get();
     } else if (!features.bumpyShinyTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap).get();
+        _nodeTextures.envmap = _graphicsSvc.defaultTextures().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap).get();
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _graphicsSvc.textures.get(features.bumpmapTexture, TextureUsage::BumpMap).get();
+        _nodeTextures.bumpmap = _graphicsSvc.defaultTextures().get(features.bumpmapTexture, TextureUsage::BumpMap).get();
     }
 }
 
@@ -176,7 +176,7 @@ void MeshSceneNode::draw() {
     }
     bool transparent = isTransparent();
 
-    _graphicsSvc.uniforms.setGeneral([this, &mesh](auto &general) {
+    _graphicsSvc.defaultUniforms().setGeneral([this, &mesh](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
         general.modelInv = _absTransformInv;
@@ -187,7 +187,7 @@ void MeshSceneNode::draw() {
         general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
         general.alpha = _alpha;
 
-        _graphicsSvc.textures.bind(*_nodeTextures.diffuse);
+        _graphicsSvc.defaultTextures().bind(*_nodeTextures.diffuse);
         switch (_nodeTextures.diffuse->features().blending) {
         case Texture::Blending::PunchThrough:
             general.featureMask |= UniformsFeatureFlags::hashedalphatest;
@@ -208,15 +208,15 @@ void MeshSceneNode::draw() {
 
         if (_nodeTextures.lightmap) {
             general.featureMask |= UniformsFeatureFlags::lightmap;
-            _graphicsSvc.textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
+            _graphicsSvc.defaultTextures().bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
         }
         if (_nodeTextures.envmap) {
             general.featureMask |= UniformsFeatureFlags::envmap;
             if (_nodeTextures.envmap->isCubemap()) {
                 general.featureMask |= UniformsFeatureFlags::envmapcube;
-                _graphicsSvc.textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
+                _graphicsSvc.defaultTextures().bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
             } else {
-                _graphicsSvc.textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
+                _graphicsSvc.defaultTextures().bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
             }
         }
         if (_nodeTextures.bumpmap) {
@@ -245,7 +245,7 @@ void MeshSceneNode::draw() {
             } else {
                 general.featureMask |= UniformsFeatureFlags::normalmap;
             }
-            _graphicsSvc.textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
+            _graphicsSvc.defaultTextures().bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
         }
         if (mesh->skin) {
             general.featureMask |= UniformsFeatureFlags::skeletal;
@@ -261,7 +261,7 @@ void MeshSceneNode::draw() {
 
     auto &skin = mesh->skin;
     if (skin) {
-        _graphicsSvc.uniforms.setSkeletal([this, &skin](auto &skeletal) {
+        _graphicsSvc.defaultUniforms().setSkeletal([this, &skin](auto &skeletal) {
             for (size_t i = 0; i < kMaxBones; ++i) {
                 if (i >= skin->boneNodeNumber.size()) {
                     break;
@@ -282,8 +282,8 @@ void MeshSceneNode::draw() {
         });
     }
 
-    _graphicsSvc.shaders.use(transparent ? _graphicsSvc.shaders.modelTransparent() : _graphicsSvc.shaders.modelOpaque());
-    _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [&mesh]() {
+    _graphicsSvc.defaultShaders().use(transparent ? _graphicsSvc.defaultShaders().modelTransparent() : _graphicsSvc.defaultShaders().modelOpaque());
+    _graphicsSvc.defaultContext().withFaceCulling(CullFaceMode::Back, [&mesh]() {
         mesh->mesh->draw();
     });
 }
@@ -293,13 +293,13 @@ void MeshSceneNode::drawShadow() {
     if (!mesh) {
         return;
     }
-    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
+    _graphicsSvc.defaultUniforms().setGeneral([this](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
         general.modelInv = _absTransformInv;
         general.alpha = _alpha;
     });
-    _graphicsSvc.shaders.use(_sceneGraph.isShadowLightDirectional() ? _graphicsSvc.shaders.directionalLightShadows() : _graphicsSvc.shaders.pointLightShadows());
+    _graphicsSvc.defaultShaders().use(_sceneGraph.isShadowLightDirectional() ? _graphicsSvc.defaultShaders().directionalLightShadows() : _graphicsSvc.defaultShaders().pointLightShadows());
     mesh->mesh->draw();
 }
 

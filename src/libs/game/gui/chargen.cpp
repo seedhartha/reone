@@ -399,7 +399,7 @@ void CharacterGeneration::setCharacter(Character character) {
 }
 
 void CharacterGeneration::reloadCharacterModel() {
-    auto &sceneGraph = _services.scene.graphs.get(kSceneCharGen);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(kSceneCharGen);
     const Control::Extent &extent = _binding.modelLbl->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 

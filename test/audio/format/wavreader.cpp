@@ -65,10 +65,10 @@ BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
     auto stream = reader.stream();
     BOOST_TEST(static_cast<bool>(stream));
     BOOST_TEST(1 == stream->getFrameCount());
-    auto frame = stream->getFrame(0);
+    auto &frame = stream->getFrame(0);
     BOOST_TEST(static_cast<int>(AudioFormat::Mono8) == static_cast<int>(frame.format));
     BOOST_TEST(22050 == frame.sampleRate);
-    auto samples = reinterpret_cast<int16_t *>(frame.samples.data());
+    auto samples = reinterpret_cast<const int16_t *>(frame.samples.data());
     BOOST_TEST(32767 == samples[0]);
 }
 
@@ -107,11 +107,11 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
     auto stream = reader.stream();
     BOOST_TEST(static_cast<bool>(stream));
     BOOST_TEST(1 == stream->getFrameCount());
-    auto frame = stream->getFrame(0);
+    auto &frame = stream->getFrame(0);
     BOOST_TEST(static_cast<int>(AudioFormat::Mono16) == static_cast<int>(frame.format));
     BOOST_TEST(22050 == frame.sampleRate);
     BOOST_TEST(16ll == frame.samples.size());
-    auto samples = reinterpret_cast<uint16_t *>(frame.samples.data());
+    auto samples = reinterpret_cast<const uint16_t *>(frame.samples.data());
     BOOST_TEST(6 == samples[0]);
     BOOST_TEST(9 == samples[1]);
     BOOST_TEST(18 == samples[2]);

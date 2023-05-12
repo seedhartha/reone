@@ -124,7 +124,7 @@ void PortraitSelection::setButtonColors(Control &control) {
 }
 
 void PortraitSelection::loadHeadModel() {
-    auto &sceneGraph = _services.scene.graphs.get(kScenePortraitSelect);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(kScenePortraitSelect);
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
     SceneInitializer(sceneGraph)

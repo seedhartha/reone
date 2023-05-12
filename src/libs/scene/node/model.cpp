@@ -125,16 +125,16 @@ void ModelSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 }
 
 void ModelSceneNode::drawAABB() {
-    _graphicsSvc.context.withPolygonMode(PolygonMode::Line, [this]() {
-        _graphicsSvc.uniforms.setGeneral([this](auto &u) {
+    _graphicsSvc.defaultContext().withPolygonMode(PolygonMode::Line, [this]() {
+        _graphicsSvc.defaultUniforms().setGeneral([this](auto &u) {
             u.resetLocals();
             u.model = _absTransform;
             u.model *= glm::translate(_aabb.center());
             u.model *= glm::scale(0.5f * _aabb.size());
             u.modelInv = glm::inverse(u.model);
         });
-        _graphicsSvc.shaders.use(_graphicsSvc.shaders.aabb());
-        _graphicsSvc.meshes.box().draw();
+        _graphicsSvc.defaultShaders().use(_graphicsSvc.defaultShaders().aabb());
+        _graphicsSvc.defaultMeshes().box().draw();
     });
 }
 

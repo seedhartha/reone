@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/resource/provider.h"
+#include "reone/resource/services.h"
 
 namespace reone {
 
@@ -25,7 +26,8 @@ namespace resource {
 
 class MockResourceProvider : public IResourceProvider {
 public:
-    MockResourceProvider(int id) : _id(id) {
+    MockResourceProvider(int id) :
+        _id(id) {
     }
 
     void add(ResourceId id, std::shared_ptr<ByteArray> res) {
@@ -43,6 +45,32 @@ private:
     int _id;
     std::map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _resources;
 };
+
+class MockGffs : public IGffs {
+};
+
+class MockResources : public IResources {
+};
+
+class MockStrings : public IStrings {
+};
+
+class MockTwoDas : public ITwoDas {
+};
+
+inline std::unique_ptr<ResourceServices> mockResourceServices() {
+    // TODO: free automatically
+    auto gffs = new MockGffs();
+    auto resources = new MockResources();
+    auto strings = new MockStrings();
+    auto twoDas = new MockTwoDas();
+
+    return std::make_unique<ResourceServices>(
+        *gffs,
+        *resources,
+        *strings,
+        *twoDas);
+}
 
 } // namespace resource
 

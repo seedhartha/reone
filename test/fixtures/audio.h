@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/audio/format/mp3reader.h"
+#include "reone/audio/services.h"
 
 namespace reone {
 
@@ -54,6 +55,27 @@ public:
 private:
     std::shared_ptr<Mp3Reader> _instance;
 };
+
+class MockAudioContext : public IAudioContext {
+};
+
+class MockAudioFiles : public IAudioFiles {
+};
+
+class MockAudioPlayer : public IAudioPlayer {
+};
+
+inline std::unique_ptr<AudioServices> mockAudioServices() {
+    // TODO: free automatically
+    auto context = new MockAudioContext();
+    auto files = new MockAudioFiles();
+    auto player = new MockAudioPlayer();
+
+    return std::make_unique<AudioServices>(
+        *context,
+        *files,
+        *player);
+}
 
 } // namespace audio
 

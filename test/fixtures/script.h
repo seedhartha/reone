@@ -19,6 +19,7 @@
 
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
+#include "reone/script/services.h"
 
 namespace reone {
 
@@ -83,6 +84,16 @@ public:
 private:
     std::map<int, std::shared_ptr<Routine>> _routines;
 };
+
+class MockScripts : public IScripts {
+};
+
+inline std::unique_ptr<ScriptServices> mockScriptServices() {
+    // TODO: free automatically
+    auto scripts = new MockScripts();
+
+    return std::make_unique<ScriptServices>(*scripts);
+}
 
 } // namespace script
 

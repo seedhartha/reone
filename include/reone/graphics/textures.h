@@ -32,7 +32,15 @@ namespace graphics {
 class GraphicsOptions;
 class Texture;
 
-class Textures : boost::noncopyable {
+class ITextures {
+public:
+    virtual ~ITextures() {
+    }
+
+    virtual std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default) = 0;
+};
+
+class Textures : public ITextures, boost::noncopyable {
 public:
     Textures(GraphicsOptions &options, resource::Resources &resources) :
         _options(options),
@@ -45,7 +53,7 @@ public:
     void bind(Texture &texture, int unit = TextureUnits::mainTex);
     void bindBuiltIn();
 
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default) override;
 
     // Built-in
 

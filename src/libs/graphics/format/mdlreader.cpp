@@ -53,7 +53,7 @@ struct EmitterFlags {
     static constexpr int flag13 = 0x1000;
 };
 
-MdlReader::MdlReader(Models &models, Textures &textures) :
+MdlReader::MdlReader(IModels &models, ITextures &textures) :
     _models(models),
     _textures(textures) {
 

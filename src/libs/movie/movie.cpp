@@ -46,7 +46,7 @@ void Movie::init() {
         _texture->init();
     }
     if (!_audioSource && _audioStream) {
-        _audioSource = _audioSvc.player.play(_audioStream, AudioType::Movie);
+        _audioSource = _audioSvc.defaultPlayer().play(_audioStream, AudioType::Movie);
     }
 }
 
@@ -83,10 +83,10 @@ void Movie::update(float dt) {
 void Movie::render() {
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
-        _graphicsSvc.textures.bind(*_texture);
+        _graphicsSvc.defaultTextures().bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    _graphicsSvc.uniforms.setGeneral([](auto &general) {
+    _graphicsSvc.defaultUniforms().setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.uv = glm::mat3x4(
@@ -94,8 +94,8 @@ void Movie::render() {
             glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
-    _graphicsSvc.meshes.quadNDC().draw();
+    _graphicsSvc.defaultShaders().use(_graphicsSvc.defaultShaders().gui());
+    _graphicsSvc.defaultMeshes().quadNDC().draw();
 }
 
 } // namespace movie

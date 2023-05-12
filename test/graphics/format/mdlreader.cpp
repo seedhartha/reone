@@ -20,6 +20,9 @@
 #include "reone/common/stream/bytearrayinput.h"
 #include "reone/common/stringbuilder.h"
 #include "reone/graphics/format/mdlreader.h"
+#include "reone/graphics/model.h"
+
+#include "../../fixtures/graphics.h"
 
 using namespace std;
 
@@ -28,11 +31,8 @@ using namespace reone::graphics;
 
 BOOST_AUTO_TEST_SUITE(mdl_reader)
 
-// TODO: un-comment
-/*
 BOOST_AUTO_TEST_CASE(should_load_mdl) {
     // given
-    auto test = FunctionalTest();
     auto mdlBytes = StringBuilder()
                         // File Header (0)
                         .append("\x00\x00\x00\x00", 4) // unknown
@@ -104,7 +104,9 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
     auto mdl = ByteArrayInputStream(mdlBytes);
     auto mdxBytes = StringBuilder().build();
     auto mdx = ByteArrayInputStream(mdxBytes);
-    auto reader = MdlReader(test.services().graphics.models, test.services().graphics.textures);
+    auto models = make_unique<MockModels>();
+    auto textures = make_unique<MockTextures>();
+    auto reader = MdlReader(*models, *textures);
 
     // when
     reader.load(mdl, mdx);
@@ -116,6 +118,5 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
     auto rootNode = model->rootNode();
     BOOST_TEST(string("root_node") == rootNode->name());
 }
-*/
 
 BOOST_AUTO_TEST_SUITE_END()

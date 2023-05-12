@@ -45,7 +45,7 @@ void Trigger::loadFromGIT(const Gff &gffs) {
     loadFromBlueprint(templateResRef);
 
     // _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _services.resource.defaultStrings().get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -53,7 +53,7 @@ void Trigger::loadFromGIT(const Gff &gffs) {
     loadTransformFromGIT(gffs);
     loadGeometryFromGIT(gffs);
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     _sceneNode = sceneGraph.newTrigger(_geometry);
     _sceneNode->setLocalTransform(glm::translate(_position));
 }
@@ -78,7 +78,7 @@ void Trigger::loadGeometryFromGIT(const Gff &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
+    shared_ptr<Gff> utt(_services.resource.defaultGffs().get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -118,7 +118,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
 void Trigger::loadUTT(const Gff &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _services.resource.strings.get(utt.getInt("LocalizedName"));
+    _name = _services.resource.defaultStrings().get(utt.getInt("LocalizedName"));
     _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
     _faction = utt.getEnum("Faction", Faction::Invalid);
     _keyName = utt.getString("KeyName");

@@ -53,19 +53,19 @@ void Placeable::loadFromGIT(const Gff &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
+    shared_ptr<Gff> utp(_services.resource.defaultGffs().get(resRef, ResourceType::Utp));
     if (!utp) {
         return;
     }
     loadUTP(*utp);
-    shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
+    shared_ptr<TwoDa> placeables(_services.resource.defaultTwoDas().get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);
     if (!model) {
         return;
     }
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     auto sceneNode = sceneGraph.newModel(*model, ModelUsage::Placeable);
     sceneNode->setUser(*this);
@@ -73,7 +73,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(sceneNode);
 
-    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
+    auto walkmesh = _services.graphics.defaultWalkmeshes().get(modelName, ResourceType::Pwk);
     if (walkmesh) {
         _walkmesh = sceneGraph.newWalkmesh(*walkmesh);
     }
@@ -103,7 +103,7 @@ void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
 
 void Placeable::loadUTP(const Gff &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _services.resource.strings.get(utp.getInt("LocName"));
+    _name = _services.resource.defaultStrings().get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
     _interruptable = utp.getBool("Interruptable");

@@ -17,17 +17,25 @@
 
 #pragma once
 
+#include "scripts.h"
+
 namespace reone {
 
 namespace script {
 
-class Scripts;
-
 struct ScriptServices {
-    Scripts &scripts;
+    IScripts &scripts;
 
-    ScriptServices(Scripts &scripts) :
+    ScriptServices(IScripts &scripts) :
         scripts(scripts) {
+    }
+
+    Scripts &defaultScripts() {
+        auto casted = dynamic_cast<Scripts *>(&scripts);
+        if (!casted) {
+            throw std::logic_error("Illegal Scripts implementation");
+        }
+        return *casted;
     }
 };
 

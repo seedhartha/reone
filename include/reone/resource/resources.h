@@ -29,7 +29,12 @@ namespace reone {
 
 namespace resource {
 
-class Resources : boost::noncopyable {
+class IResources {
+public:
+    virtual ~IResources() = default;
+};
+
+class Resources : public IResources, boost::noncopyable {
 public:
     typedef std::vector<std::unique_ptr<IResourceProvider>> ProviderList;
 

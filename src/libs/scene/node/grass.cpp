@@ -145,16 +145,16 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.textures.bind(*_properties.texture);
-    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
+    _graphicsSvc.defaultTextures().bind(*_properties.texture);
+    _graphicsSvc.defaultUniforms().setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (_aabbNode.mesh()->lightmap) {
-            _graphicsSvc.textures.bind(*_aabbNode.mesh()->lightmap, TextureUnits::lightmap);
+            _graphicsSvc.defaultTextures().bind(*_aabbNode.mesh()->lightmap, TextureUnits::lightmap);
             general.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });
-    _graphicsSvc.uniforms.setGrass([this, &leafs](auto &grass) {
+    _graphicsSvc.defaultUniforms().setGrass([this, &leafs](auto &grass) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
             grass.quadSize = glm::vec2(_properties.quadSize);
@@ -163,8 +163,8 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             grass.clusters[i].lightmapUV = cluster->lightmapUV();
         }
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.grass());
-    _graphicsSvc.meshes.grass().drawInstanced(leafs.size());
+    _graphicsSvc.defaultShaders().use(_graphicsSvc.defaultShaders().grass());
+    _graphicsSvc.defaultMeshes().grass().drawInstanced(leafs.size());
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {

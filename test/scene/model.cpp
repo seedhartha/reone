@@ -17,24 +17,32 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/game/types.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
+#include "reone/graphics/options.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
 #include "reone/scene/node/modelnode.h"
+
+#include "../fixtures/audio.h"
+#include "../fixtures/graphics.h"
 
 using namespace std;
 
 using namespace reone;
+using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::scene;
 
 BOOST_AUTO_TEST_SUITE(model_scene_node)
 
-// TODO: un-comment
-/*
 BOOST_AUTO_TEST_CASE(should_build_from_model) {
     // given
-    auto test = FunctionalTest();
+    auto graphicsOpt = GraphicsOptions();
+    auto graphicsSvc = mockGraphicsServices();
+    auto audioSvc = mockAudioServices();
+    auto scene = make_unique<SceneGraph>("test", graphicsOpt, *graphicsSvc, *audioSvc);
 
     auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -54,9 +62,12 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
     rootNode->addChild(emitterNode);
 
     auto model = Model("some_model", 0, rootNode, vector<shared_ptr<Animation>>(), nullptr, 1.0f);
-
-    auto &scene = test.sceneMockByName(kSceneMain);
-    auto modelSceneNode = scene.newModel(model, ModelUsage::Creature);
+    auto modelSceneNode = make_shared<ModelSceneNode>(
+        model,
+        ModelUsage::Creature,
+        *scene,
+        *graphicsSvc,
+        *audioSvc);
 
     // when
     modelSceneNode->init();
@@ -85,7 +96,10 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
 
 BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
     // given
-    auto test = FunctionalTest();
+    auto graphicsOpt = GraphicsOptions();
+    auto graphicsSvc = mockGraphicsServices();
+    auto audioSvc = mockAudioServices();
+    auto scene = make_unique<SceneGraph>("test", graphicsOpt, *graphicsSvc, *audioSvc);
 
     auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -98,8 +112,12 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
 
-    auto &scene = test.sceneMockByName(kSceneMain);
-    auto modelSceneNode = scene.newModel(model, ModelUsage::Creature);
+    auto modelSceneNode = make_shared<ModelSceneNode>(
+        model,
+        ModelUsage::Creature,
+        *scene,
+        *graphicsSvc,
+        *audioSvc);
 
     // when
     modelSceneNode->init();
@@ -121,7 +139,10 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
 
 BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
     // given
-    auto test = FunctionalTest();
+    auto graphicsOpt = GraphicsOptions();
+    auto graphicsSvc = mockGraphicsServices();
+    auto audioSvc = mockAudioServices();
+    auto scene = make_unique<SceneGraph>("test", graphicsOpt, *graphicsSvc, *audioSvc);
 
     auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -133,9 +154,12 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
         make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-
-    auto &scene = test.sceneMockByName(kSceneMain);
-    auto modelSceneNode = scene.newModel(model, ModelUsage::Creature);
+    auto modelSceneNode = make_shared<ModelSceneNode>(
+        model,
+        ModelUsage::Creature,
+        *scene,
+        *graphicsSvc,
+        *audioSvc);
 
     // when
     modelSceneNode->init();
@@ -157,7 +181,10 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
 
 BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
     // given
-    auto test = FunctionalTest();
+    auto graphicsOpt = GraphicsOptions();
+    auto graphicsSvc = mockGraphicsServices();
+    auto audioSvc = mockAudioServices();
+    auto scene = make_unique<SceneGraph>("test", graphicsOpt, *graphicsSvc, *audioSvc);
 
     auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
     auto dummyNode = make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
@@ -178,9 +205,12 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
         make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-
-    auto &scene = test.sceneMockByName(kSceneMain);
-    auto modelSceneNode = scene.newModel(model, ModelUsage::Creature);
+    auto modelSceneNode = make_shared<ModelSceneNode>(
+        model,
+        ModelUsage::Creature,
+        *scene,
+        *graphicsSvc,
+        *audioSvc);
 
     // when
     modelSceneNode->init();
@@ -211,7 +241,10 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
 
 BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
     // given
-    auto test = FunctionalTest();
+    auto graphicsOpt = GraphicsOptions();
+    auto graphicsSvc = mockGraphicsServices();
+    auto audioSvc = mockAudioServices();
+    auto scene = make_unique<SceneGraph>("test", graphicsOpt, *graphicsSvc, *audioSvc);
 
     auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -228,9 +261,12 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
         make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-
-    auto &scene = test.sceneMockByName(kSceneMain);
-    auto modelSceneNode = scene.newModel(model, ModelUsage::Creature);
+    auto modelSceneNode = make_shared<ModelSceneNode>(
+        model,
+        ModelUsage::Creature,
+        *scene,
+        *graphicsSvc,
+        *audioSvc);
 
     // when
     modelSceneNode->init();
@@ -252,6 +288,5 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
     BOOST_CHECK_CLOSE(3.75f, rootPosition.y, 1e-5);
     BOOST_CHECK_CLOSE(4.5f, rootPosition.z, 1e-5);
 }
-*/
 
 BOOST_AUTO_TEST_SUITE_END()

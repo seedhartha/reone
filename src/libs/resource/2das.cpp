@@ -29,11 +29,6 @@ namespace reone {
 
 namespace resource {
 
-TwoDas::TwoDas(Resources &resources) :
-    MemoryCache(bind(&TwoDas::doGet, this, _1)),
-    _resources(resources) {
-}
-
 shared_ptr<TwoDa> TwoDas::doGet(const string &resRef) {
     auto raw = _resources.get(resRef, ResourceType::TwoDa);
     if (!raw) {

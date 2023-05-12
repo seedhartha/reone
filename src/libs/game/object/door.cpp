@@ -53,25 +53,25 @@ void Door::loadFromGIT(const Gff &gffs) {
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
-    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _services.resource.defaultStrings().get(gffs.getInt("TransitionDestin"));
 
     loadTransformFromGIT(gffs);
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
+    shared_ptr<Gff> utd(_services.resource.defaultGffs().get(resRef, ResourceType::Utd));
     if (!utd) {
         return;
     }
     loadUTD(*utd);
-    shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
+    shared_ptr<TwoDa> doors(_services.resource.defaultTwoDas().get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);
     if (!model) {
         return;
     }
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     auto modelSceneNode = sceneGraph.newModel(*model, ModelUsage::Door);
     modelSceneNode->setUser(*this);
@@ -79,20 +79,20 @@ void Door::loadFromBlueprint(const string &resRef) {
     // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(modelSceneNode);
 
-    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    auto walkmeshClosed = _services.graphics.defaultWalkmeshes().get(modelName + "0", ResourceType::Dwk);
     if (walkmeshClosed) {
         _walkmeshClosed = sceneGraph.newWalkmesh(*walkmeshClosed);
         _walkmeshClosed->setUser(*this);
     }
 
-    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    auto walkmeshOpen1 = _services.graphics.defaultWalkmeshes().get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen1) {
         _walkmeshOpen1 = sceneGraph.newWalkmesh(*walkmeshOpen1);
         _walkmeshOpen1->setUser(*this);
         _walkmeshOpen1->setEnabled(false);
     }
 
-    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    auto walkmeshOpen2 = _services.graphics.defaultWalkmeshes().get(modelName + "2", ResourceType::Dwk);
     if (walkmeshOpen2) {
         _walkmeshOpen2 = sceneGraph.newWalkmesh(*walkmeshOpen2);
         _walkmeshOpen2->setUser(*this);
@@ -156,7 +156,7 @@ void Door::setLocked(bool locked) {
 
 void Door::loadUTD(const Gff &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
-    _name = _services.resource.strings.get(utd.getInt("LocName"));
+    _name = _services.resource.defaultStrings().get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
     _autoRemoveKey = utd.getBool("AutoRemoveKey");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));

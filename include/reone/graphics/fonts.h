@@ -32,7 +32,12 @@ class Textures;
 class Uniforms;
 class Window;
 
-class Fonts : public MemoryCache<std::string, Font> {
+class IFonts {
+public:
+    virtual ~IFonts() = default;
+};
+
+class Fonts : public IFonts, public MemoryCache<std::string, Font> {
 public:
     Fonts(
         GraphicsContext &graphicsContext,

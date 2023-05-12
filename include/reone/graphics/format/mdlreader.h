@@ -28,13 +28,13 @@ class IInputStream;
 namespace graphics {
 
 class Animation;
+class IModels;
+class ITextures;
 class Model;
-class Models;
-class Textures;
 
 class MdlReader : public resource::BinaryResourceReader {
 public:
-    MdlReader(Models &models, Textures &textures);
+    MdlReader(IModels &models, ITextures &textures);
 
     void load(IInputStream &mdl, IInputStream &mdx);
 
@@ -58,8 +58,8 @@ private:
     typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
     typedef std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)> ControllerFn;
 
-    Models &_models;
-    Textures &_textures;
+    IModels &_models;
+    ITextures &_textures;
 
     std::unordered_map<uint32_t, ControllerFn> _genericControllers;
     std::unordered_map<uint32_t, ControllerFn> _meshControllers;

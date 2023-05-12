@@ -42,18 +42,18 @@ namespace game {
 GameGUI::GameGUI(Game &game, ServicesView &services) :
     GUI(
         game.options().graphics,
-        services.scene.graphs,
-        services.graphics.fonts,
-        services.graphics.context,
-        services.graphics.meshes,
-        services.graphics.pipeline,
-        services.graphics.shaders,
-        services.graphics.textures,
-        services.graphics.uniforms,
-        services.graphics.window,
-        services.resource.gffs,
-        services.resource.resources,
-        services.resource.strings),
+        services.scene.defaultGraphs(),
+        services.graphics.defaultFonts(),
+        services.graphics.defaultContext(),
+        services.graphics.defaultMeshes(),
+        services.graphics.defaultPipeline(),
+        services.graphics.defaultShaders(),
+        services.graphics.defaultTextures(),
+        services.graphics.defaultUniforms(),
+        services.graphics.defaultWindow(),
+        services.resource.defaultGffs(),
+        services.resource.defaultResources(),
+        services.resource.defaultStrings()),
     _game(game),
     _services(services) {
 }
@@ -124,12 +124,12 @@ string GameGUI::getResRef(const string &base) const {
 }
 
 void GameGUI::onClick(const string &control) {
-    _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
+    _audioSource = _services.audio.defaultPlayer().play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
+        _audioSource = _services.audio.defaultPlayer().play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

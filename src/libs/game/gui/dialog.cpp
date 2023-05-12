@@ -311,7 +311,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDa> animations(_services.resource.twoDas.get("dialoganimations"));
+    shared_ptr<TwoDa> animations(_services.resource.defaultTwoDas().get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

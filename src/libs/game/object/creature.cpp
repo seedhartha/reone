@@ -86,7 +86,7 @@ void Creature::loadFromGIT(const Gff &gffs) {
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utc(_services.resource.gffs.get(resRef, ResourceType::Utc));
+    shared_ptr<Gff> utc(_services.resource.defaultGffs().get(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
@@ -94,7 +94,7 @@ void Creature::loadFromBlueprint(const string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    shared_ptr<TwoDa> appearances(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearances(_services.resource.defaultTwoDas().get("appearance"));
     if (!appearances) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -482,13 +482,13 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
         return;
     }
     glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.audio.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    _audioSourceVoice = _services.audio.defaultPlayer().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = _services.resource.strings.get(kStrRefRemains);
+    _name = _services.resource.defaultStrings().get(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag);
 
@@ -697,7 +697,7 @@ void Creature::onEventSignalled(const string &name) {
     }
     shared_ptr<AudioStream> sound(materialSounds[index]);
     if (sound) {
-        _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
+        _audioSourceFootstep = _services.audio.defaultPlayer().play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 
@@ -1053,7 +1053,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!model) {
         return nullptr;
     }
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto sceneNode = sceneGraph.newModel(*model, ModelUsage::Creature);
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
@@ -1062,20 +1062,20 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 }
 
 void Creature::finalizeModel(ModelSceneNode &body) {
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     // Body texture
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(_services.graphics.textures.defaultCubemapRGB().get());
+            body.setEnvironmentMap(_services.graphics.defaultTextures().defaultCubemapRGB().get());
         } else {
-            body.setEnvironmentMap(_services.graphics.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
+            body.setEnvironmentMap(_services.graphics.defaultTextures().get(_envmap, TextureUsage::EnvironmentMap).get());
         }
     }
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(_services.graphics.textures.get(bodyTextureName, TextureUsage::Diffuse));
+        shared_ptr<Texture> texture(_services.graphics.defaultTextures().get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             body.setDiffuseMap(texture.get());
         }
@@ -1145,7 +1145,7 @@ string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.defaultTwoDas().get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1173,7 +1173,7 @@ string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.defaultTwoDas().get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1186,7 +1186,7 @@ string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            shared_ptr<Texture> texture(_services.graphics.textures.get(tmp, TextureUsage::Diffuse));
+            shared_ptr<Texture> texture(_services.graphics.defaultTextures().get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = move(tmp);
                 texFound = true;
@@ -1204,7 +1204,7 @@ string Creature::getHeadModelName() const {
     if (_modelType != Creature::ModelType::Character) {
         return "";
     }
-    shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
+    shared_ptr<TwoDa> appearance(_services.resource.defaultTwoDas().get("appearance"));
     if (!appearance) {
         throw ValidationException("appearance 2DA is not found");
     }
@@ -1212,7 +1212,7 @@ string Creature::getHeadModelName() const {
     if (headIdx == -1) {
         return "";
     }
-    shared_ptr<TwoDa> heads(_services.resource.twoDas.get("heads"));
+    shared_ptr<TwoDa> heads(_services.resource.defaultTwoDas().get("heads"));
     if (!heads) {
         throw ValidationException("heads 2DA is not found");
     }
@@ -1322,8 +1322,8 @@ void Creature::loadUTC(const Gff &utc) {
 }
 
 void Creature::loadNameFromUTC(const Gff &utc) {
-    string firstName(_services.resource.strings.get(utc.getInt("FirstName")));
-    string lastName(_services.resource.strings.get(utc.getInt("LastName")));
+    string firstName(_services.resource.defaultStrings().get(utc.getInt("FirstName")));
+    string lastName(_services.resource.defaultStrings().get(utc.getInt("LastName")));
     if (!firstName.empty() && !lastName.empty()) {
         _name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
@@ -1336,7 +1336,7 @@ void Creature::loadSoundSetFromUTC(const Gff &utc) {
     if (soundSetIdx == 0xffff) {
         return;
     }
-    shared_ptr<TwoDa> soundSetTable(_services.resource.twoDas.get("soundset"));
+    shared_ptr<TwoDa> soundSetTable(_services.resource.defaultTwoDas().get("soundset"));
     if (!soundSetTable) {
         return;
     }
@@ -1347,12 +1347,12 @@ void Creature::loadSoundSetFromUTC(const Gff &utc) {
 }
 
 void Creature::loadBodyBagFromUTC(const Gff &utc) {
-    shared_ptr<TwoDa> bodyBags(_services.resource.twoDas.get("bodybag"));
+    shared_ptr<TwoDa> bodyBags(_services.resource.defaultTwoDas().get("bodybag"));
     if (!bodyBags) {
         return;
     }
     int bodyBag = utc.getInt("BodyBag");
-    _bodyBag.name = _services.resource.strings.get(bodyBags->getInt(bodyBag, "name"));
+    _bodyBag.name = _services.resource.defaultStrings().get(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
@@ -1389,7 +1389,7 @@ void Creature::loadAttributesFromUTC(const Gff &utc) {
 }
 
 void Creature::loadPerceptionRangeFromUTC(const Gff &utc) {
-    shared_ptr<TwoDa> ranges(_services.resource.twoDas.get("ranges"));
+    shared_ptr<TwoDa> ranges(_services.resource.defaultTwoDas().get("ranges"));
     if (!ranges) {
         return;
     }

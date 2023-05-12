@@ -82,12 +82,12 @@ void Module::loadArea(const Gff &ifo, bool fromSave) {
 
     _area = _game.objectFactory().newArea();
 
-    shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
+    shared_ptr<Gff> are(_services.resource.defaultGffs().get(_info.entryArea, ResourceType::Are));
     if (!are) {
         throw ValidationException("Area ARE file not found");
     }
 
-    shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
+    shared_ptr<Gff> git(_services.resource.defaultGffs().get(_info.entryArea, ResourceType::Git));
     if (!git) {
         throw ValidationException("Area GIT file not found");
     }

@@ -25,7 +25,12 @@ namespace reone {
 
 namespace resource {
 
-class Strings {
+class IStrings {
+public:
+    virtual ~IStrings() = default;
+};
+
+class Strings : public IStrings {
 public:
     Strings() = default;
 

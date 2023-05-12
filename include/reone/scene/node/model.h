@@ -23,6 +23,7 @@
 
 #include "../animeventlistener.h"
 #include "../animproperties.h"
+#include "../node.h"
 #include "../types.h"
 
 #include "dummy.h"

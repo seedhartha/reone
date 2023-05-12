@@ -27,9 +27,17 @@ namespace resource {
 
 class Resources;
 
-class TwoDas : public MemoryCache<std::string, TwoDa>, boost::noncopyable {
+class ITwoDas {
 public:
-    TwoDas(Resources &resources);
+    virtual ~ITwoDas() = default;
+};
+
+class TwoDas : public ITwoDas, public MemoryCache<std::string, TwoDa>, boost::noncopyable {
+public:
+    TwoDas(Resources &resources) :
+        MemoryCache(bind(&TwoDas::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
+    }
 
     void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
         _objects[resRef] = std::move(twoDa);

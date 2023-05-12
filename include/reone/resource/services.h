@@ -17,30 +17,62 @@
 
 #pragma once
 
+#include "2das.h"
+#include "gffs.h"
+#include "resources.h"
+#include "strings.h"
+
 namespace reone {
 
 namespace resource {
 
-class Gffs;
-class Resources;
-class Strings;
-class TwoDas;
-
 struct ResourceServices {
-    Gffs &gffs;
-    Resources &resources;
-    Strings &strings;
-    TwoDas &twoDas;
+    IGffs &gffs;
+    IResources &resources;
+    IStrings &strings;
+    ITwoDas &twoDas;
 
     ResourceServices(
-        Gffs &gffs,
-        Resources &resources,
-        Strings &strings,
-        TwoDas &twoDas) :
+        IGffs &gffs,
+        IResources &resources,
+        IStrings &strings,
+        ITwoDas &twoDas) :
         gffs(gffs),
         resources(resources),
         strings(strings),
         twoDas(twoDas) {
+    }
+
+    Gffs &defaultGffs() {
+        auto casted = dynamic_cast<Gffs *>(&gffs);
+        if (!casted) {
+            throw std::logic_error("Illegal Gffs implementation");
+        }
+        return *casted;
+    }
+
+    Resources &defaultResources() {
+        auto casted = dynamic_cast<Resources *>(&resources);
+        if (!casted) {
+            throw std::logic_error("Illegal Resources implementation");
+        }
+        return *casted;
+    }
+
+    Strings &defaultStrings() {
+        auto casted = dynamic_cast<Strings *>(&strings);
+        if (!casted) {
+            throw std::logic_error("Illegal Strings implementation");
+        }
+        return *casted;
+    }
+
+    TwoDas &defaultTwoDas() {
+        auto casted = dynamic_cast<TwoDas *>(&twoDas);
+        if (!casted) {
+            throw std::logic_error("Illegal TwoDas implementation");
+        }
+        return *casted;
     }
 };
 

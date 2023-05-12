@@ -129,7 +129,7 @@ void Area::load(string name, const Gff &are, const Gff &git, bool fromSave) {
 }
 
 void Area::loadARE(const Gff &are) {
-    _localizedName = _services.resource.strings.get(are.getInt("Name"));
+    _localizedName = _services.resource.defaultStrings().get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -162,7 +162,7 @@ void Area::loadCameraStyle(const Gff &are) {
 void Area::loadAmbientColor(const Gff &are) {
     _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     sceneGraph.setAmbientLightColor(_ambientColor);
 }
 
@@ -191,7 +191,7 @@ void Area::loadStealthXP(const Gff &are) {
 void Area::loadGrass(const Gff &are) {
     string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
-        _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.graphics.defaultTextures().get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
@@ -209,7 +209,7 @@ void Area::loadFog(const Gff &are) {
     _fogFar = are.getFloat("SunFogFar");
     _fogColor = are.getColor("SunFogColor");
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto fogProperties = FogProperties();
     fogProperties.enabled = _fogEnabled;
     fogProperties.nearPlane = _fogNear;
@@ -238,7 +238,7 @@ void Area::loadProperties(const Gff &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
+        shared_ptr<TwoDa> musicTable(_services.resource.defaultTwoDas().get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
@@ -313,7 +313,7 @@ void Area::loadLYT() {
     if (!layout) {
         throw ValidationException("Area LYT file not found");
     }
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     for (auto &lytRoom : layout->rooms) {
         auto model = _services.graphics.models.get(lytRoom.name);
         if (!model) {
@@ -333,7 +333,7 @@ void Area::loadLYT() {
 
         // Walkmesh
         shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResourceType::Wok);
+        auto walkmesh = _services.graphics.defaultWalkmeshes().get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(*walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);
@@ -386,7 +386,7 @@ void Area::loadPTH() {
     }
     unordered_map<int, float> pointZ;
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     for (size_t i = 0; i < path->points.size(); ++i) {
         const Path::Point &point = path->points[i];
@@ -405,7 +405,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(glm::radians(kDefaultFieldOfView), _cameraAspect, sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -427,7 +427,7 @@ void Area::add(const shared_ptr<Object> &object) {
 
     determineObjectRoom(*object);
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         if (sceneNode->type() == SceneNodeType::Model) {
@@ -464,7 +464,7 @@ void Area::add(const shared_ptr<Object> &object) {
 void Area::determineObjectRoom(Object &object) {
     Room *room = nullptr;
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     Collision collision;
     if (sceneGraph.testElevation(object.position(), collision)) {
         room = dynamic_cast<Room *>(collision.user);
@@ -490,7 +490,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         room->removeTenant(object.get());
     }
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         if (sceneNode->type() == SceneNodeType::Model) {
@@ -560,7 +560,7 @@ shared_ptr<Object> Area::getObjectByTag(const string &tag, int nth) const {
 }
 
 void Area::landObject(Object &object) {
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     glm::vec3 position(object.position());
     Collision collision;
 
@@ -641,7 +641,7 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     static glm::vec3 up {0.0f, 0.0f, 1.0f};
     static glm::vec3 zOffset {0.0f, 0.0f, 0.1f};
 
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     Collision collision;
 
     // Set creature facing
@@ -707,7 +707,7 @@ bool Area::isObjectSeen(const Creature &subject, const Object &object) const {
     if (!subject.isInLineOfSight(object, kLineOfSightFOV)) {
         return false;
     }
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
 
     glm::vec3 origin(subject.position());
     origin.z += kLineOfSightHeight;
@@ -983,7 +983,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 }
 
 void Area::updateObjectSelection() {
-    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
     auto cameraPos = _game.getActiveCamera()->sceneNode()->getOrigin();
 
     if (_hilightedObject) {
@@ -1208,7 +1208,7 @@ Object *Area::getObjectAt(int x, int y) const {
     if (!partyLeader) {
         return nullptr;
     }
-    auto &scene = _services.scene.graphs.get(kSceneMain);
+    auto &scene = _services.scene.defaultGraphs().get(kSceneMain);
     auto model = scene.pickModelAt(x, y, partyLeader.get());
     if (!model) {
         return nullptr;

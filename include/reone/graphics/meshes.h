@@ -23,7 +23,12 @@ namespace reone {
 
 namespace graphics {
 
-class Meshes : boost::noncopyable {
+class IMeshes {
+public:
+    virtual ~IMeshes() = default;
+};
+
+class Meshes : public IMeshes, boost::noncopyable {
 public:
     ~Meshes() { deinit(); }
 

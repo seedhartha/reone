@@ -33,7 +33,12 @@ class Shaders;
 class Textures;
 class Uniforms;
 
-class Pipeline : boost::noncopyable {
+class IPipeline {
+public:
+    virtual ~IPipeline() = default;
+};
+
+class Pipeline : public IPipeline, boost::noncopyable {
 public:
     Pipeline(
         GraphicsOptions &options,
