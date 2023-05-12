@@ -36,7 +36,12 @@ class Textures;
 
 namespace game {
 
-class Portraits : boost::noncopyable {
+class IPortraits {
+public:
+    virtual ~IPortraits() = default;
+};
+
+class Portraits : public IPortraits, boost::noncopyable {
 public:
     Portraits(graphics::Textures &textures, resource::TwoDas &twoDas) :
         _textures(textures), _twoDas(twoDas) {

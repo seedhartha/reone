@@ -38,7 +38,12 @@ class Textures;
 
 namespace game {
 
-class Skills : boost::noncopyable {
+class ISkills {
+public:
+    virtual ~ISkills() = default;
+};
+
+class Skills : public ISkills, boost::noncopyable {
 public:
     Skills(
         graphics::Textures &textures,

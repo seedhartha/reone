@@ -34,7 +34,12 @@ class TwoDas;
 
 namespace game {
 
-class Classes : public MemoryCache<ClassType, CreatureClass> {
+class IClasses {
+public:
+    virtual ~IClasses() = default;
+};
+
+class Classes : public IClasses, public MemoryCache<ClassType, CreatureClass> {
 public:
     Classes(resource::Strings &strings, resource::TwoDas &twoDas) :
         MemoryCache(std::bind(&Classes::doGet, this, std::placeholders::_1)),

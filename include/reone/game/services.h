@@ -17,6 +17,24 @@
 
 #pragma once
 
+#include "camerastyles.h"
+#include "cursors.h"
+#include "d20/classes.h"
+#include "d20/feats.h"
+#include "d20/skills.h"
+#include "d20/spells.h"
+#include "dialogs.h"
+#include "footstepsounds.h"
+#include "guisounds.h"
+#include "layouts.h"
+#include "paths.h"
+#include "portraits.h"
+#include "reputes.h"
+#include "resourcelayout.h"
+#include "soundsets.h"
+#include "surfaces.h"
+#include "visibilities.h"
+
 namespace reone {
 
 namespace resource {
@@ -51,61 +69,43 @@ struct ScriptServices;
 
 namespace game {
 
-class CameraStyles;
-class Classes;
-class Cursors;
-class Dialogs;
-class Feats;
-class FootstepSounds;
-class GUISounds;
-class Layouts;
-class Paths;
-class Portraits;
-class Reputes;
-class ResourceLayout;
-class Skills;
-class SoundSets;
-class Spells;
-class Surfaces;
-class Visibilities;
-
 struct GameServices {
-    CameraStyles &cameraStyles;
-    Classes &classes;
-    Cursors &cursors;
-    Dialogs &dialogs;
-    Feats &feats;
-    FootstepSounds &footstepSounds;
-    GUISounds &guiSounds;
-    Layouts &layouts;
-    Paths &paths;
-    Portraits &portraits;
-    Reputes &reputes;
-    ResourceLayout &resourceLayout;
-    Skills &skills;
-    SoundSets &soundSets;
-    Spells &spells;
-    Surfaces &surfaces;
-    Visibilities &visibilities;
+    ICameraStyles &cameraStyles;
+    IClasses &classes;
+    ICursors &cursors;
+    IDialogs &dialogs;
+    IFeats &feats;
+    IFootstepSounds &footstepSounds;
+    IGUISounds &guiSounds;
+    ILayouts &layouts;
+    IPaths &paths;
+    IPortraits &portraits;
+    IReputes &reputes;
+    IResourceLayout &resourceLayout;
+    ISkills &skills;
+    ISoundSets &soundSets;
+    ISpells &spells;
+    ISurfaces &surfaces;
+    IVisibilities &visibilities;
 
     GameServices(
-        CameraStyles &cameraStyles,
-        Classes &classes,
-        Cursors &cursors,
-        Dialogs &dialogs,
-        Feats &feats,
-        FootstepSounds &footstepSounds,
-        GUISounds &guiSounds,
-        Layouts &layouts,
-        Paths &paths,
-        Portraits &portraits,
-        Reputes &reputes,
-        ResourceLayout &resourceLayout,
-        Skills &skills,
-        SoundSets &soundSets,
-        Spells &spells,
-        Surfaces &surfaces,
-        Visibilities &visibilities) :
+        ICameraStyles &cameraStyles,
+        IClasses &classes,
+        ICursors &cursors,
+        IDialogs &dialogs,
+        IFeats &feats,
+        IFootstepSounds &footstepSounds,
+        IGUISounds &guiSounds,
+        ILayouts &layouts,
+        IPaths &paths,
+        IPortraits &portraits,
+        IReputes &reputes,
+        IResourceLayout &resourceLayout,
+        ISkills &skills,
+        ISoundSets &soundSets,
+        ISpells &spells,
+        ISurfaces &surfaces,
+        IVisibilities &visibilities) :
         cameraStyles(cameraStyles),
         classes(classes),
         cursors(cursors),
@@ -123,6 +123,142 @@ struct GameServices {
         spells(spells),
         surfaces(surfaces),
         visibilities(visibilities) {
+    }
+
+    CameraStyles &defaultCameraStyles() {
+        auto casted = dynamic_cast<CameraStyles *>(&cameraStyles);
+        if (!casted) {
+            throw std::logic_error("Illegal CameraStyles implementation");
+        }
+        return *casted;
+    }
+
+    Classes &defaultClasses() {
+        auto casted = dynamic_cast<Classes *>(&classes);
+        if (!casted) {
+            throw std::logic_error("Illegal Classes implementation");
+        }
+        return *casted;
+    }
+
+    Cursors &defaultCursors() {
+        auto casted = dynamic_cast<Cursors *>(&cursors);
+        if (!casted) {
+            throw std::logic_error("Illegal Cursors implementation");
+        }
+        return *casted;
+    }
+
+    Dialogs &defaultDialogs() {
+        auto casted = dynamic_cast<Dialogs *>(&dialogs);
+        if (!casted) {
+            throw std::logic_error("Illegal Dialogs implementation");
+        }
+        return *casted;
+    }
+
+    Feats &defaultFeats() {
+        auto casted = dynamic_cast<Feats *>(&feats);
+        if (!casted) {
+            throw std::logic_error("Illegal Feats implementation");
+        }
+        return *casted;
+    }
+
+    FootstepSounds &defaultFootstepSounds() {
+        auto casted = dynamic_cast<FootstepSounds *>(&footstepSounds);
+        if (!casted) {
+            throw std::logic_error("Illegal FootstepSounds implementation");
+        }
+        return *casted;
+    }
+
+    GUISounds &defaultGUISounds() {
+        auto casted = dynamic_cast<GUISounds *>(&guiSounds);
+        if (!casted) {
+            throw std::logic_error("Illegal GUISounds implementation");
+        }
+        return *casted;
+    }
+
+    Layouts &defaultLayouts() {
+        auto casted = dynamic_cast<Layouts *>(&layouts);
+        if (!casted) {
+            throw std::logic_error("Illegal Layouts implementation");
+        }
+        return *casted;
+    }
+
+    Paths &defaultPaths() {
+        auto casted = dynamic_cast<Paths *>(&paths);
+        if (!casted) {
+            throw std::logic_error("Illegal Paths implementation");
+        }
+        return *casted;
+    }
+
+    Portraits &defaultPortraits() {
+        auto casted = dynamic_cast<Portraits *>(&portraits);
+        if (!casted) {
+            throw std::logic_error("Illegal Portraits implementation");
+        }
+        return *casted;
+    }
+
+    Reputes &defaultReputes() {
+        auto casted = dynamic_cast<Reputes *>(&reputes);
+        if (!casted) {
+            throw std::logic_error("Illegal Reputes implementation");
+        }
+        return *casted;
+    }
+
+    ResourceLayout &defaultResourceLayout() {
+        auto casted = dynamic_cast<ResourceLayout *>(&resourceLayout);
+        if (!casted) {
+            throw std::logic_error("Illegal ResourceLayout implementation");
+        }
+        return *casted;
+    }
+
+    Skills &defaultSkills() {
+        auto casted = dynamic_cast<Skills *>(&skills);
+        if (!casted) {
+            throw std::logic_error("Illegal Skills implementation");
+        }
+        return *casted;
+    }
+
+    SoundSets &defaultSoundSets() {
+        auto casted = dynamic_cast<SoundSets *>(&soundSets);
+        if (!casted) {
+            throw std::logic_error("Illegal SoundSets implementation");
+        }
+        return *casted;
+    }
+
+    Spells &defaultSpells() {
+        auto casted = dynamic_cast<Spells *>(&spells);
+        if (!casted) {
+            throw std::logic_error("Illegal Spells implementation");
+        }
+        return *casted;
+    }
+
+    Surfaces &defaultSurfaces() {
+        auto casted = dynamic_cast<Surfaces *>(&surfaces);
+        if (!casted) {
+            throw std::logic_error("Illegal Surfaces implementation");
+        }
+        return *casted;
+    }
+
+    Visibilities &defaultVisibilities() {
+        auto casted = dynamic_cast<Visibilities *>(&visibilities);
+        if (!casted) {
+            throw std::logic_error("Illegal Visibilities implementation");
+        }
+        return *casted;
     }
 };
 

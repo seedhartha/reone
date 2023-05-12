@@ -35,7 +35,12 @@ class AudioStream;
 
 namespace game {
 
-class GUISounds : boost::noncopyable {
+class IGUISounds {
+public:
+    virtual ~IGUISounds() = default;
+};
+
+class GUISounds : public IGUISounds, boost::noncopyable {
 public:
     GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
         _audioFiles(audioFiles),

@@ -31,7 +31,12 @@ class Resources;
 
 namespace game {
 
-class Visibilities : public MemoryCache<std::string, Visibility> {
+class IVisibilities {
+public:
+    virtual ~IVisibilities() = default;
+};
+
+class Visibilities : public IVisibilities, public MemoryCache<std::string, Visibility> {
 public:
     Visibilities(resource::Resources &resources) :
         MemoryCache(std::bind(&Visibilities::doGet, this, std::placeholders::_1)),

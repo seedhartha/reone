@@ -38,7 +38,12 @@ class Textures;
 
 namespace game {
 
-class Spells : boost::noncopyable {
+class ISpells {
+public:
+    virtual ~ISpells() = default;
+};
+
+class Spells : public ISpells, boost::noncopyable {
 public:
     Spells(
         graphics::Textures &textures,

@@ -1031,7 +1031,7 @@ Variable getIsEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
 
-    bool result = ctx.services.game.reputes.getIsEnemy(*target, *source);
+    bool result = ctx.services.game.defaultReputes().getIsEnemy(*target, *source);
 
     return Variable::ofInt(static_cast<int>(result));
 }
@@ -1040,7 +1040,7 @@ Variable getIsFriend(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
 
-    bool result = ctx.services.game.reputes.getIsFriend(*target, *source);
+    bool result = ctx.services.game.defaultReputes().getIsFriend(*target, *source);
 
     return Variable::ofInt(static_cast<int>(result));
 }
@@ -1049,7 +1049,7 @@ Variable getIsNeutral(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
 
-    bool result = ctx.services.game.reputes.getIsNeutral(*target, *source);
+    bool result = ctx.services.game.defaultReputes().getIsNeutral(*target, *source);
 
     return Variable::ofInt(static_cast<int>(result));
 }

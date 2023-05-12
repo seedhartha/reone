@@ -32,7 +32,12 @@ class Gff;
 
 namespace game {
 
-class Paths : public MemoryCache<std::string, Path> {
+class IPaths {
+public:
+    virtual ~IPaths() = default;
+};
+
+class Paths : public IPaths, public MemoryCache<std::string, Path> {
 public:
     Paths(resource::Gffs &gffs) :
         MemoryCache(std::bind(&Paths::doGet, this, std::placeholders::_1)),

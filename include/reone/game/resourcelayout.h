@@ -31,7 +31,12 @@ namespace game {
 
 struct OptionsView;
 
-class ResourceLayout : boost::noncopyable {
+class IResourceLayout {
+public:
+    virtual ~IResourceLayout() = default;
+};
+
+class ResourceLayout : public IResourceLayout, boost::noncopyable {
 public:
     ResourceLayout(GameID gameId, OptionsView &options, resource::ResourceServices &resourceSvc) :
         _gameId(gameId),

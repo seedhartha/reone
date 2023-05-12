@@ -29,7 +29,12 @@ class TwoDas;
 
 namespace game {
 
-class Surfaces : boost::noncopyable {
+class ISurfaces {
+public:
+    virtual ~ISurfaces() = default;
+};
+
+class Surfaces : public ISurfaces, boost::noncopyable {
 public:
     Surfaces(resource::TwoDas &twoDas) :
         _twoDas(twoDas) {

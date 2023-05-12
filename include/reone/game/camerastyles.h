@@ -29,7 +29,12 @@ class TwoDas;
 
 namespace game {
 
-class CameraStyles : boost::noncopyable {
+class ICameraStyles {
+public:
+    virtual ~ICameraStyles() = default;
+};
+
+class CameraStyles : public ICameraStyles, boost::noncopyable {
 public:
     CameraStyles(resource::TwoDas &twoDas) :
         _twoDas(twoDas) {

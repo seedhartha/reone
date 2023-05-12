@@ -219,7 +219,7 @@ string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid)
         return "";
 
-    return _services.game.classes.get(clazz)->name();
+    return _services.game.defaultClasses().get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {

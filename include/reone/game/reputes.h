@@ -29,7 +29,12 @@ namespace game {
 
 class Creature;
 
-class Reputes : boost::noncopyable {
+class IReputes {
+public:
+    virtual ~IReputes() = default;
+};
+
+class Reputes : public IReputes, boost::noncopyable {
 public:
     Reputes(resource::TwoDas &twoDas) :
         _twoDas(twoDas) {

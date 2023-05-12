@@ -490,7 +490,7 @@ void HUD::refreshActionQueueItems() const {
                 break;
             case ActionType::UseFeat: {
                 auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                shared_ptr<Feat> feat(_services.game.feats.get(featAction->feat()));
+                shared_ptr<Feat> feat(_services.game.defaultFeats().get(featAction->feat()));
                 if (feat) {
                     item.setBorderFill(feat->icon);
                 }

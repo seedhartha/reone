@@ -42,7 +42,12 @@ class Window;
 
 namespace game {
 
-class Cursors : boost::noncopyable {
+class ICursors {
+public:
+    virtual ~ICursors() = default;
+};
+
+class Cursors : public ICursors, boost::noncopyable {
 public:
     Cursors(
         graphics::GraphicsContext &graphicsContext,

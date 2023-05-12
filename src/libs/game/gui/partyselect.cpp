@@ -245,10 +245,10 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = _services.game.portraits.getTextureByIndex(portraitId);
+                portrait = _services.game.defaultPortraits().getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = _services.game.portraits.getTextureByAppearance(appearance);
+                portrait = _services.game.defaultPortraits().getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));

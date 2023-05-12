@@ -31,7 +31,12 @@ class Resources;
 
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
+class ILayouts {
+public:
+    virtual ~ILayouts() = default;
+};
+
+class Layouts : public ILayouts, public MemoryCache<std::string, Layout> {
 public:
     Layouts(resource::Resources &resources) :
         MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),

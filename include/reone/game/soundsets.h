@@ -38,7 +38,12 @@ class AudioFiles;
 
 namespace game {
 
-class SoundSets : public MemoryCache<std::string, SoundSet> {
+class ISoundSets {
+public:
+    virtual ~ISoundSets() = default;
+};
+
+class SoundSets : public ISoundSets, public MemoryCache<std::string, SoundSet> {
 public:
     SoundSets(
         audio::AudioFiles &audioFiles,

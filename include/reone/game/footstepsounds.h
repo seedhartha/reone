@@ -47,7 +47,12 @@ struct FootstepTypeSounds {
     std::vector<std::shared_ptr<audio::AudioStream>> leaves;
 };
 
-class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
+class IFootstepSounds {
+public:
+    virtual ~IFootstepSounds() = default;
+};
+
+class FootstepSounds : public IFootstepSounds, public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
     FootstepSounds(
         audio::AudioFiles &audioFiles,

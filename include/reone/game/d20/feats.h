@@ -38,7 +38,12 @@ class Textures;
 
 namespace game {
 
-class Feats : boost::noncopyable {
+class IFeats {
+public:
+    virtual ~IFeats() = default;
+};
+
+class Feats : public IFeats, boost::noncopyable {
 public:
     Feats(
         graphics::Textures &textures,

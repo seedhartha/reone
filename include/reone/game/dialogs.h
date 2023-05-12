@@ -33,7 +33,12 @@ class Strings;
 
 namespace game {
 
-class Dialogs : public MemoryCache<std::string, Dialog> {
+class IDialogs {
+public:
+    virtual ~IDialogs() = default;
+};
+
+class Dialogs : public IDialogs, public MemoryCache<std::string, Dialog> {
 public:
     Dialogs(resource::Gffs &gffs, resource::Strings &strings) :
         MemoryCache(std::bind(&Dialogs::doGet, this, std::placeholders::_1)),

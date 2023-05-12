@@ -94,9 +94,9 @@ static bool g_conversationsEnabled = true;
 
 void Game::init() {
     // Surfaces
-    auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
-    auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
-    auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
+    auto walkableSurfaces = _services.game.defaultSurfaces().getWalkableSurfaces();
+    auto walkcheckSurfaces = _services.game.defaultSurfaces().getWalkcheckSurfaces();
+    auto lineOfSightSurfaces = _services.game.defaultSurfaces().getLineOfSightSurfaces();
     for (auto &scene : _services.scene.defaultGraphs().scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
@@ -227,7 +227,7 @@ void Game::loadModule(const string &name, string entry) {
         loadInGameMenus();
 
         /*
-        _services.game.soundSets.invalidate();
+        _services.game.defaultSoundSets().invalidate();
         _services.graphics.defaultTextures().invalidate();
         _services.graphics.models.invalidate();
         _services.graphics.defaultWalkmeshes().invalidate();
@@ -323,7 +323,7 @@ void Game::setCursorType(CursorType type) {
         _cursor.reset();
         SDL_ShowCursor(SDL_ENABLE);
     } else {
-        _cursor = _services.game.cursors.get(type);
+        _cursor = _services.game.defaultCursors().get(type);
         SDL_ShowCursor(SDL_DISABLE);
     }
     _cursorType = type;
@@ -793,7 +793,7 @@ void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = _services.game.dialogs.get(resRef);
+    auto dialog = _services.game.defaultDialogs().get(resRef);
     bool computerConversation = dialog->conversationType == ConversationType::Computer;
     _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
     _conversation->start(dialog, owner);
@@ -935,7 +935,7 @@ void Game::start() {
 }
 
 void Game::loadModuleResources(const string &moduleName) {
-    _services.game.resourceLayout.loadModuleResources(moduleName);
+    _services.game.defaultResourceLayout().loadModuleResources(moduleName);
 }
 
 void Game::onModuleSelected(const string &module) {
