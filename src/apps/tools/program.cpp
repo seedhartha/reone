@@ -17,7 +17,7 @@
 
 #include "program.h"
 
-#include "reone/common/pathutil.h"
+#include "reone/system/pathutil.h"
 #include "reone/resource/types.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/audio.h"

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/common/stream/input.h"
-#include "reone/common/types.h"
+#include "reone/system/stream/input.h"
+#include "reone/system/types.h"
 
 namespace reone {
 

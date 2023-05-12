@@ -17,7 +17,7 @@
 
 #include "reone/tools/erf.h"
 
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/typeutil.h"
 

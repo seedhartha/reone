@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 
 using namespace std;
 

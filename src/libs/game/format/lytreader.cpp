@@ -17,7 +17,7 @@
 
 #include "reone/game/format/lytreader.h"
 
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/stream/fileinput.h"
 
 using namespace std;
 

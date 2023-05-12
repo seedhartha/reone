@@ -79,7 +79,7 @@ endif()
 
 # Engine libraries
 
-add_subdirectory(src/libs/common) # common static library
+add_subdirectory(src/libs/system) # system static library
 add_subdirectory(src/libs/resource) # resource static library
 add_subdirectory(src/libs/graphics) # graphics static library
 add_subdirectory(src/libs/audio) # audio static library
@@ -115,7 +115,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio scene movie script gui game DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS system resource graphics audio scene movie script gui game DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(BUILD_TOOLS)
     install(TARGETS toolslib DESTINATION ${CMAKE_INSTALL_LIBDIR})

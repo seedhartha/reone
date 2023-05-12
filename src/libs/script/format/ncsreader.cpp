@@ -17,7 +17,7 @@
 
 #include "reone/script/format/ncsreader.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/script/program.h"
 

@@ -17,7 +17,7 @@
 
 #include "gameprobe.h"
 
-#include "reone/common/pathutil.h"
+#include "reone/system/pathutil.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/binarywriter.h"
+#include "reone/system/binarywriter.h"
 
 namespace reone {
 

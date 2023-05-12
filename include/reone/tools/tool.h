@@ -19,9 +19,9 @@
 
 #include "types.h"
 
-#include "reone/common/exception/notimplemented.h"
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
+#include "reone/system/exception/notimplemented.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 

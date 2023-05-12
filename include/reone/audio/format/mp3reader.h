@@ -19,7 +19,7 @@
 
 #include "mad.h"
 
-#include "reone/common/types.h"
+#include "reone/system/types.h"
 
 namespace reone {
 

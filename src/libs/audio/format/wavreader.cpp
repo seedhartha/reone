@@ -17,7 +17,7 @@
 
 #include "reone/audio/format/wavreader.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/audio/stream.h"
 

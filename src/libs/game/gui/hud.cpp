@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/hud.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"

@@ -17,8 +17,8 @@
 
 #include "reone/game/resourcelayout.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/pathutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/pathutil.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"

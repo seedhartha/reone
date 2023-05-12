@@ -17,37 +17,33 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/pathutil.h"
+#include "reone/system/stream/bytearrayoutput.h"
+
+#include "../../checkutil.h"
 
 using namespace std;
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(path_util)
+BOOST_AUTO_TEST_SUITE(byte_array_output_stream)
 
-BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
+BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
     // given
-    auto tmpDirPath = boost::filesystem::temp_directory_path();
-    tmpDirPath.append("reone_test_path_util");
-    auto tmpFilePath = tmpDirPath;
-    tmpFilePath.append("MiXeD");
-    boost::filesystem::create_directory(tmpDirPath);
-    auto tmpFile = boost::filesystem::ofstream(tmpFilePath, ios::binary);
-    tmpFile.flush();
-    tmpFile.close();
+    auto bytes = ByteArray();
+    auto stream = ByteArrayOutputStream(bytes);
+    auto bytesToWrite = ByteArray("Hello, world!");
+    auto expectedOutput = ByteArray("Hello, world!\nHello, world!");
 
     // when
-    auto lowerPath = getPathIgnoreCase(tmpDirPath, "mixed", false);
-    auto upperPath = getPathIgnoreCase(tmpDirPath, "MIXED", false);
-    auto superPath = getPathIgnoreCase(tmpDirPath, "MiXeDs", false);
+    stream.write(bytesToWrite);
+    auto position = stream.position();
+    stream.writeByte('\n');
+    stream.writeByte('H');
+    stream.write(&bytesToWrite[1], 12);
 
     // then
-    BOOST_TEST(tmpFilePath == lowerPath);
-    BOOST_TEST(upperPath.empty());
-    BOOST_TEST(superPath.empty());
-
-    // cleanup
-    boost::filesystem::remove_all(tmpDirPath);
+    BOOST_TEST(13ll == position);
+    BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

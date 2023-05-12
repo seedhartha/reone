@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/binreader.h"
 
-#include "reone/common/exception/validation.h"
+#include "reone/system/exception/validation.h"
 
 using namespace std;
 

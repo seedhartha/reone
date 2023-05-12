@@ -17,7 +17,7 @@
 
 #include "reone/gui/control/listbox.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"

@@ -18,7 +18,7 @@
 
 #include "reone/graphics/lipanimations.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/resource/resources.h"
 

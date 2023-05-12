@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/pereader.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 using namespace std;
 

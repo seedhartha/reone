@@ -19,7 +19,7 @@
 
 #include "reone/audio/source.h"
 #include "reone/audio/stream.h"
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"

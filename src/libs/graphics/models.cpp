@@ -17,9 +17,9 @@
 
 #include "reone/graphics/models.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
 #include "reone/graphics/format/mdlreader.h"

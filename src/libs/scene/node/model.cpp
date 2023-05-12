@@ -17,8 +17,8 @@
 
 #include "reone/scene/node/model.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/logutil.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"

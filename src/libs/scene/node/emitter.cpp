@@ -17,7 +17,7 @@
 
 #include "reone/scene/node/emitter.h"
 
-#include "reone/common/randomutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"

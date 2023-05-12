@@ -17,9 +17,9 @@
 
 #include "reone/game/object/area.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"

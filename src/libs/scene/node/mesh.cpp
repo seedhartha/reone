@@ -17,8 +17,8 @@
 
 #include "reone/scene/node/mesh.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/lumautil.h"
 #include "reone/graphics/mesh.h"

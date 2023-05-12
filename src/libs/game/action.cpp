@@ -17,7 +17,7 @@
 
 #include "reone/game/action.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 using namespace std;
 

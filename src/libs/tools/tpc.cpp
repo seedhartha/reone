@@ -17,9 +17,9 @@
 
 #include "reone/tools/tpc.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/format/tpcreader.h"
 

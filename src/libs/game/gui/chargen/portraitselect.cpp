@@ -17,8 +17,8 @@
 
 #include "reone/game/gui/chargen/portraitselect.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/graphics/textures.h"

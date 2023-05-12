@@ -15,19 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/common/textwriter.h"
+#include <boost/test/unit_test.hpp>
+
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/textwriter.h"
+
+#include "../checkutil.h"
 
 using namespace std;
 
-namespace reone {
+using namespace reone;
 
-void TextWriter::put(const string &s) {
-    _stream.write(&s[0], s.length());
+BOOST_AUTO_TEST_SUITE(text_writer)
+
+BOOST_AUTO_TEST_CASE(should_write_text) {
+    // given
+    auto expectedBytes = ByteArray("Hello, world!\nHello, world!");
+
+    // when
+    auto bytes = ByteArray();
+    auto stream = ByteArrayOutputStream(bytes);
+    auto text = TextWriter(stream);
+    text.putLine("Hello, world!");
+    text.put("Hello, world!");
+
+    // then
+    BOOST_TEST((expectedBytes == bytes), notEqualMessage(expectedBytes, bytes));
 }
 
-void TextWriter::putLine(const string &s) {
-    _stream.write(&s[0], s.length());
-    _stream.writeByte('\n');
-}
-
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()

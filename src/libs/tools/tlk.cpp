@@ -17,9 +17,9 @@
 
 #include "reone/tools/tlk.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"

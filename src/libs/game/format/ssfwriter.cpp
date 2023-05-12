@@ -17,8 +17,8 @@
 
 #include "reone/game/format/ssfwriter.h"
 
-#include "reone/common/binarywriter.h"
-#include "reone/common/stream/fileoutput.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/stream/fileoutput.h"
 
 using namespace std;
 

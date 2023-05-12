@@ -17,31 +17,37 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayinput.h"
-#include "reone/system/stringbuilder.h"
-#include "reone/graphics/format/txireader.h"
+#include "reone/system/pathutil.h"
 
 using namespace std;
 
 using namespace reone;
-using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(txi_reader)
+BOOST_AUTO_TEST_SUITE(path_util)
 
-BOOST_AUTO_TEST_CASE(should_load_txi) {
+BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     // given
-    auto txiBytes = StringBuilder()
-                        .append("blending additive")
-                        .build();
-    auto txi = ByteArrayInputStream(txiBytes);
-    auto reader = TxiReader();
+    auto tmpDirPath = boost::filesystem::temp_directory_path();
+    tmpDirPath.append("reone_test_path_util");
+    auto tmpFilePath = tmpDirPath;
+    tmpFilePath.append("MiXeD");
+    boost::filesystem::create_directory(tmpDirPath);
+    auto tmpFile = boost::filesystem::ofstream(tmpFilePath, ios::binary);
+    tmpFile.flush();
+    tmpFile.close();
 
     // when
-    reader.load(txi);
+    auto lowerPath = getPathIgnoreCase(tmpDirPath, "mixed", false);
+    auto upperPath = getPathIgnoreCase(tmpDirPath, "MIXED", false);
+    auto superPath = getPathIgnoreCase(tmpDirPath, "MiXeDs", false);
 
     // then
-    auto features = reader.features();
-    BOOST_TEST(static_cast<int>(Texture::Blending::Additive) == static_cast<int>(features.blending));
+    BOOST_TEST(tmpFilePath == lowerPath);
+    BOOST_TEST(upperPath.empty());
+    BOOST_TEST(superPath.empty());
+
+    // cleanup
+    boost::filesystem::remove_all(tmpDirPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

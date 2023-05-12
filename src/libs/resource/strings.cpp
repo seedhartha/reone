@@ -17,9 +17,9 @@
 
 #include "reone/resource/strings.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/pathutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/pathutil.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/resource/talktable.h"
 
 using namespace std;

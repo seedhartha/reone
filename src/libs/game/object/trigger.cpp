@@ -17,7 +17,7 @@
 
 #include "reone/game/object/trigger.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/services.h"

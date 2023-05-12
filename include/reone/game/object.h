@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 #include "reone/scene/animproperties.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node.h"

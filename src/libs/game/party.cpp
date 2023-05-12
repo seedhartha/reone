@@ -17,8 +17,8 @@
 
 #include "reone/game/party.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/game/action/follow.h"
 #include "reone/game/game.h"

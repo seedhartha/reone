@@ -15,32 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "reone/common/stream/bytearrayoutput.h"
-#include "reone/common/textwriter.h"
-
-#include "../checkutil.h"
+#include "reone/system/randomutil.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(text_writer)
+static default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
 
-BOOST_AUTO_TEST_CASE(should_write_text) {
-    // given
-    auto expectedBytes = ByteArray("Hello, world!\nHello, world!");
-
-    // when
-    auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
-    auto text = TextWriter(stream);
-    text.putLine("Hello, world!");
-    text.put("Hello, world!");
-
-    // then
-    BOOST_TEST((expectedBytes == bytes), notEqualMessage(expectedBytes, bytes));
+int random(int min, int max) {
+    uniform_int_distribution<int> dist(min, max);
+    return dist(g_generator);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+float random(float min, float max) {
+    uniform_real_distribution<float> distr(min, max);
+    return distr(g_generator);
+}
+
+} // namespace reone

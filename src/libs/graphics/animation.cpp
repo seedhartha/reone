@@ -17,7 +17,7 @@
 
 #include "reone/graphics/animation.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 
 #include "reone/graphics/modelnode.h"
 

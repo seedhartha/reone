@@ -17,8 +17,8 @@
 
 #include "reone/game/object.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/logutil.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"

@@ -28,17 +28,17 @@ set(TEST_HEADERS
 
 set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/audio/format/wavreader.cpp
-    ${TEST_SOURCE_DIR}/common/binaryreader.cpp
-    ${TEST_SOURCE_DIR}/common/binarywriter.cpp
-    ${TEST_SOURCE_DIR}/common/collectionutil.cpp
-    ${TEST_SOURCE_DIR}/common/hexutil.cpp
-    ${TEST_SOURCE_DIR}/common/pathutil.cpp
-    ${TEST_SOURCE_DIR}/common/stream/bytearrayinput.cpp
-    ${TEST_SOURCE_DIR}/common/stream/bytearrayoutput.cpp
-    ${TEST_SOURCE_DIR}/common/stream/fileinput.cpp
-    ${TEST_SOURCE_DIR}/common/stream/fileoutput.cpp
-    ${TEST_SOURCE_DIR}/common/stringbuilder.cpp
-    ${TEST_SOURCE_DIR}/common/textwriter.cpp
+    ${TEST_SOURCE_DIR}/system/binaryreader.cpp
+    ${TEST_SOURCE_DIR}/system/binarywriter.cpp
+    ${TEST_SOURCE_DIR}/system/collectionutil.cpp
+    ${TEST_SOURCE_DIR}/system/hexutil.cpp
+    ${TEST_SOURCE_DIR}/system/pathutil.cpp
+    ${TEST_SOURCE_DIR}/system/stream/bytearrayinput.cpp
+    ${TEST_SOURCE_DIR}/system/stream/bytearrayoutput.cpp
+    ${TEST_SOURCE_DIR}/system/stream/fileinput.cpp
+    ${TEST_SOURCE_DIR}/system/stream/fileoutput.cpp
+    ${TEST_SOURCE_DIR}/system/stringbuilder.cpp
+    ${TEST_SOURCE_DIR}/system/textwriter.cpp
     ${TEST_SOURCE_DIR}/game/game.cpp
     ${TEST_SOURCE_DIR}/graphics/aabb.cpp
     ${TEST_SOURCE_DIR}/graphics/format/bwmreader.cpp

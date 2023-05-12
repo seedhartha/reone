@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 #include "reone/script/exception/argument.h"
 #include "reone/script/types.h"
 #include "reone/script/variable.h"

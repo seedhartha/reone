@@ -17,9 +17,9 @@
 
 #include "reone/graphics/textures.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
 #include "reone/graphics/format/curreader.h"

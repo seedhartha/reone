@@ -17,7 +17,7 @@
 
 #include "reone/game/script/routines.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 #include "reone/script/variable.h"
 
 #include "reone/game/services.h"

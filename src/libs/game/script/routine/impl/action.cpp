@@ -21,7 +21,7 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/action/factory.h"
 #include "reone/game/game.h"

@@ -17,7 +17,7 @@
 
 #include "reone/game/d20/attributes.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 
 #include "reone/game/d20/class.h"
 

@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/stream/bytearrayoutput.h"
-#include "reone/common/stringbuilder.h"
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stringbuilder.h"
 #include "reone/resource/format/erfwriter.h"
 
 #include "../../checkutil.h"

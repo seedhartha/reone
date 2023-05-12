@@ -17,7 +17,7 @@
 
 #include "reone/script/variableutil.h"
 
-#include "reone/common/exception/argument.h"
+#include "reone/system/exception/argument.h"
 
 using namespace std;
 

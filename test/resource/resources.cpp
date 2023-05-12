@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/logutil.h"
-#include "reone/common/stream/fileoutput.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/fileoutput.h"
 #include "reone/resource/resources.h"
 
 #include "../checkutil.h"

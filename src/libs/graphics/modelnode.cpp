@@ -17,7 +17,7 @@
 
 #include "reone/graphics/modelnode.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/texture.h"

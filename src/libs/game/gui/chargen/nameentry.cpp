@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/chargen/nameentry.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/gui/control/button.h"
 #include "reone/resource/resources.h"
 

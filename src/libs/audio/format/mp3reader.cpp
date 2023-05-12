@@ -17,7 +17,7 @@
 
 #include "reone/audio/format/mp3reader.h"
 
-#include "reone/common/stream/input.h"
+#include "reone/system/stream/input.h"
 
 #include "reone/audio/stream.h"
 

@@ -17,8 +17,8 @@
 
 #include "reone/game/object/module.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/services.h"

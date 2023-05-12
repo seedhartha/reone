@@ -17,9 +17,9 @@
 
 #include "reone/resource/provider/keybif.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/pathutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/pathutil.h"
+#include "reone/system/stream/fileinput.h"
 
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/keyreader.h"

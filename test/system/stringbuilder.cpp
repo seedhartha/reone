@@ -15,28 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/common/hexutil.h"
+#include <boost/test/unit_test.hpp>
+
+#include "reone/system/stringbuilder.h"
+
+#include "../checkutil.h"
 
 using namespace std;
 
-namespace reone {
+using namespace reone;
 
-string hexify(const string &s, string separator) {
-    ostringstream ss;
-    for (auto &ch : s) {
-        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << separator;
-    }
-    return ss.str();
+BOOST_AUTO_TEST_SUITE(string_builder)
+
+BOOST_AUTO_TEST_CASE(should_build_a_string) {
+    // given
+    auto expectedStr = string("Hello, world!");
+
+    // when
+    auto str = StringBuilder()
+                   .append("He")
+                   .repeat('l', 2)
+                   .append("o, world!")
+                   .build();
+
+    // then
+    BOOST_TEST((expectedStr == str), notEqualMessage(expectedStr, str));
 }
 
-ByteArray unhexify(const string &s) {
-    auto bytes = ByteArray();
-    for (size_t i = 0; i < s.size(); i += 2) {
-        uint8_t byte;
-        sscanf(&s[i], "%02hhx", &byte);
-        bytes.push_back(static_cast<char>(byte));
-    }
-    return move(bytes);
-}
-
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()

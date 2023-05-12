@@ -17,7 +17,7 @@
 
 #include "engine.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/game/game.h"
 
 #include "di/services.h"

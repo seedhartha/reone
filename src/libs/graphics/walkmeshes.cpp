@@ -17,7 +17,7 @@
 
 #include "reone/graphics/walkmeshes.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
 #include "reone/graphics/format/bwmreader.h"

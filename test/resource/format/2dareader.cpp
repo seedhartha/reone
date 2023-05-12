@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/binarywriter.h"
-#include "reone/common/stream/bytearrayinput.h"
-#include "reone/common/stringbuilder.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stringbuilder.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dareader.h"
 

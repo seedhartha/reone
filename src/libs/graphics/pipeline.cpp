@@ -17,7 +17,7 @@
 
 #include "reone/graphics/pipeline.h"
 
-#include "reone/common/randomutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/scene/node/light.h"
 
 #include "reone/graphics/camera/perspective.h"

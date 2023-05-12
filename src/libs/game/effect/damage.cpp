@@ -17,7 +17,7 @@
 
 #include "reone/game/effect/damage.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/object.h"
 

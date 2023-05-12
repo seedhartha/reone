@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/map.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/services.h"

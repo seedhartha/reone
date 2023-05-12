@@ -15,35 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "reone/common/stream/bytearrayoutput.h"
-
-#include "../../checkutil.h"
+#include "reone/system/hexutil.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(byte_array_output_stream)
-
-BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
-    // given
-    auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
-    auto bytesToWrite = ByteArray("Hello, world!");
-    auto expectedOutput = ByteArray("Hello, world!\nHello, world!");
-
-    // when
-    stream.write(bytesToWrite);
-    auto position = stream.position();
-    stream.writeByte('\n');
-    stream.writeByte('H');
-    stream.write(&bytesToWrite[1], 12);
-
-    // then
-    BOOST_TEST(13ll == position);
-    BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
+string hexify(const string &s, string separator) {
+    ostringstream ss;
+    for (auto &ch : s) {
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << separator;
+    }
+    return ss.str();
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+ByteArray unhexify(const string &s) {
+    auto bytes = ByteArray();
+    for (size_t i = 0; i < s.size(); i += 2) {
+        uint8_t byte;
+        sscanf(&s[i], "%02hhx", &byte);
+        bytes.push_back(static_cast<char>(byte));
+    }
+    return move(bytes);
+}
+
+} // namespace reone

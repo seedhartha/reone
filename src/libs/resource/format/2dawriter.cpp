@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/2dawriter.h"
 
-#include "reone/common/stream/fileoutput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "reone/resource/2da.h"
 

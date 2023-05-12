@@ -20,7 +20,7 @@
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
 #include "reone/audio/services.h"
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/lipanimations.h"
 #include "reone/graphics/models.h"

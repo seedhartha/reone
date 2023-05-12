@@ -17,7 +17,7 @@
 
 #include "reone/game/cursors.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/graphics/cursor.h"
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/texture.h"

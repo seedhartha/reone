@@ -17,11 +17,11 @@
 
 #include "reone/script/format/ncswriter.h"
 
-#include "reone/common/binarywriter.h"
-#include "reone/common/collectionutil.h"
-#include "reone/common/exception/validation.h"
-#include "reone/common/stream/bytearrayoutput.h"
-#include "reone/common/stream/fileoutput.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "reone/script/program.h"
 

@@ -17,7 +17,7 @@
 
 #include "reone/game/format/ltrreader.h"
 
-#include "reone/common/randomutil.h"
+#include "reone/system/randomutil.h"
 
 using namespace std;
 

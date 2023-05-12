@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 
 #include "../action.h"
 

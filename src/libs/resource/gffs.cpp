@@ -17,7 +17,7 @@
 
 #include "reone/resource/gffs.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/resources.h"

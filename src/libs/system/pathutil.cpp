@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/common/pathutil.h"
+#include "reone/system/pathutil.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 using namespace std;
 

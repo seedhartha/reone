@@ -17,7 +17,7 @@
 
 #include "reone/script/instrutil.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 
 #include "reone/script/program.h"
 #include "reone/script/routine.h"

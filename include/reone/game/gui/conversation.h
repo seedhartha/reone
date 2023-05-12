@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/audio/source.h"
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 #include "../dialog.h"
 #include "../object.h"
 #include "../types.h"

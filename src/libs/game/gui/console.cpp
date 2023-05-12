@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/console.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/fonts.h"

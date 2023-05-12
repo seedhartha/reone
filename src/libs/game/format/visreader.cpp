@@ -17,7 +17,7 @@
 
 #include "reone/game/format/visreader.h"
 
-#include "reone/common/stream/input.h"
+#include "reone/system/stream/input.h"
 
 using namespace std;
 

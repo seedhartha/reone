@@ -21,7 +21,7 @@
 
 #include "reone/game/format/visreader.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 using namespace std;
 

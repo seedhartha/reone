@@ -17,7 +17,7 @@
 
 #include "reone/script/execution.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/script/executioncontext.h"
 #include "reone/script/instrutil.h"

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/resource/types.h"
 

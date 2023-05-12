@@ -17,7 +17,7 @@
 
 #include "reone/game/gui/chargen/classselect.h"
 
-#include "reone/common/randomutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/gui/control/button.h"

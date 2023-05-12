@@ -17,8 +17,8 @@
 
 #include "reone/graphics/format/txireader.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/stream/input.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/input.h"
 
 using namespace std;
 

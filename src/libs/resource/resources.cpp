@@ -17,9 +17,9 @@
 
 #include "reone/resource/resources.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/pathutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/logutil.h"
+#include "reone/system/pathutil.h"
+#include "reone/system/stream/fileinput.h"
 
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"

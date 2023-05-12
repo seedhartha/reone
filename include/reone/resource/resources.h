@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/common/stream/fileinput.h"
-#include "reone/common/types.h"
+#include "reone/system/stream/fileinput.h"
+#include "reone/system/types.h"
 
 #include "format/pereader.h"
 #include "id.h"

@@ -19,7 +19,7 @@
 
 #include "../gui.h"
 
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 #include "reone/gui/control/label.h"
 
 namespace reone {

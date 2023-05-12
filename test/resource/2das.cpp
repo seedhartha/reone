@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/stream/bytearrayoutput.h"
+#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/resources.h"

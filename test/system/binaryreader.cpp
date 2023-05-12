@@ -17,9 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/common/binaryreader.h"
-#include "reone/common/stream/bytearrayinput.h"
-#include "reone/common/stringbuilder.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stringbuilder.h"
 
 
 #include "../checkutil.h"

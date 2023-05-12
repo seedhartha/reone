@@ -17,8 +17,8 @@
 
 #include "reone/resource/format/gffwriter.h"
 
-#include "reone/common/exception/validation.h"
-#include "reone/common/stream/fileoutput.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "reone/resource/gff.h"
 

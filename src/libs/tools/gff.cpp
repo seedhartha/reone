@@ -17,12 +17,12 @@
 
 #include "reone/tools/gff.h"
 
-#include "reone/common/binarywriter.h"
-#include "reone/common/exception/validation.h"
-#include "reone/common/hexutil.h"
-#include "reone/common/logutil.h"
-#include "reone/common/pathutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/hexutil.h"
+#include "reone/system/logutil.h"
+#include "reone/system/pathutil.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/strings.h"

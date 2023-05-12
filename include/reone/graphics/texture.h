@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/types.h"
+#include "reone/system/types.h"
 
 #include "attachment.h"
 #include "types.h"

@@ -17,8 +17,8 @@
 
 #include "reone/game/combat.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/services.h"
 

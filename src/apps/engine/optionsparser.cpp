@@ -17,7 +17,7 @@
 
 #include "optionsparser.h"
 
-#include "reone/common/types.h"
+#include "reone/system/types.h"
 
 using namespace std;
 

@@ -17,10 +17,10 @@
 
 #include "reone/tools/2da.h"
 
-#include "reone/common/binarywriter.h"
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/fileinput.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/2dawriter.h"

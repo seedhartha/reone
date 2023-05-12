@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/common/timer.h"
+#include "reone/system/timer.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/format/gffreader.h"

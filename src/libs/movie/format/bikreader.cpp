@@ -18,8 +18,8 @@
 #include "reone/movie/format/bikreader.h"
 
 #include "reone/audio/stream.h"
-#include "reone/common/binaryreader.h"
-#include "reone/common/logutil.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/logutil.h"
 
 #include "reone/movie/movie.h"
 #include "reone/movie/videostream.h"

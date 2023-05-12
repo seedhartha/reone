@@ -17,7 +17,7 @@
 
 #include "reone/graphics/format/tpcreader.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/graphics/textureutil.h"
 

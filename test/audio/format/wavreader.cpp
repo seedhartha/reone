@@ -20,8 +20,8 @@
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/audio/stream.h"
-#include "reone/common/stream/bytearrayinput.h"
-#include "reone/common/stringbuilder.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stringbuilder.h"
 
 #include "../../fixtures/audio.h"
 

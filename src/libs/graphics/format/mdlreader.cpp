@@ -17,9 +17,9 @@
 
 #include "reone/graphics/format/mdlreader.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/exception/validation.h"
-#include "reone/common/logutil.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"

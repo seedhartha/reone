@@ -17,8 +17,8 @@
 
 #include "reone/tools/audio.h"
 
-#include "reone/common/binaryreader.h"
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/fileinput.h"
 
 using namespace std;
 

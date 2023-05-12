@@ -18,7 +18,7 @@
 #include "reone/game/gui/mainmenu.h"
 
 #include "reone/audio/player.h"
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/services.h"
 #include "reone/gui/sceneinitializer.h"

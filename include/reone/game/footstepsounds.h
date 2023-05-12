@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/audio/stream.h"
-#include "reone/common/memorycache.h"
+#include "reone/system/memorycache.h"
 
 namespace reone {
 

@@ -17,7 +17,7 @@
 
 #include "reone/graphics/shaders.h"
 
-#include "reone/common/stringbuilder.h"
+#include "reone/system/stringbuilder.h"
 
 #include "reone/graphics/glsl/common.h"
 #include "reone/graphics/glsl/fragment.h"

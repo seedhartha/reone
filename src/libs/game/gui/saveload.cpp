@@ -17,8 +17,8 @@
 
 #include "reone/game/gui/saveload.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/graphics/format/tgareader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"

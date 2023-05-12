@@ -17,7 +17,7 @@
 
 #include "reone/resource/provider/erf.h"
 
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/stream/fileinput.h"
 
 #include "reone/resource/format/erfreader.h"
 

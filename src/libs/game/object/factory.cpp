@@ -17,7 +17,7 @@
 
 #include "reone/game/object/factory.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 
 using namespace std;
 

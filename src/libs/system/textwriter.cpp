@@ -15,31 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "reone/common/stringbuilder.h"
-
-#include "../checkutil.h"
+#include "reone/system/textwriter.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(string_builder)
-
-BOOST_AUTO_TEST_CASE(should_build_a_string) {
-    // given
-    auto expectedStr = string("Hello, world!");
-
-    // when
-    auto str = StringBuilder()
-                   .append("He")
-                   .repeat('l', 2)
-                   .append("o, world!")
-                   .build();
-
-    // then
-    BOOST_TEST((expectedStr == str), notEqualMessage(expectedStr, str));
+void TextWriter::put(const string &s) {
+    _stream.write(&s[0], s.length());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+void TextWriter::putLine(const string &s) {
+    _stream.write(&s[0], s.length());
+    _stream.writeByte('\n');
+}
+
+} // namespace reone

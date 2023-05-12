@@ -17,7 +17,7 @@
 
 #include "reone/script/scripts.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/script/format/ncsreader.h"
 

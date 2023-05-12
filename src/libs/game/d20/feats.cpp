@@ -17,7 +17,7 @@
 
 #include "reone/game/d20/feats.h"
 
-#include "reone/common/collectionutil.h"
+#include "reone/system/collectionutil.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"

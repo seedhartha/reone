@@ -17,8 +17,8 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/common/logutil.h"
-#include "reone/common/randomutil.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 #include "reone/resource/services.h"
 #include "reone/resource/strings.h"
 #include "reone/script/exception/notimpl.h"

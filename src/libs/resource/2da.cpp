@@ -17,8 +17,8 @@
 
 #include "reone/resource/2da.h"
 
-#include "reone/common/collectionutil.h"
-#include "reone/common/logutil.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/logutil.h"
 
 using namespace std;
 

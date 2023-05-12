@@ -17,7 +17,7 @@
 
 #include "reone/audio/files.h"
 
-#include "reone/common/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 
 #include "reone/audio/format/mp3reader.h"

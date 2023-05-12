@@ -17,7 +17,7 @@
 
 #include "reone/game/action/openlock.h"
 
-#include "reone/common/logutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/game.h"
 #include "reone/game/object/door.h"

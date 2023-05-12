@@ -17,7 +17,7 @@
 
 #include "reone/resource/provider/rim.h"
 
-#include "reone/common/stream/fileinput.h"
+#include "reone/system/stream/fileinput.h"
 
 #include "reone/resource/format/rimreader.h"
 
