@@ -26,6 +26,7 @@
 #include "module/resource.h"
 #include "module/scene.h"
 #include "module/script.h"
+#include "module/system.h"
 
 namespace reone {
 
@@ -49,6 +50,7 @@ private:
     game::GameID _gameId;
     game::OptionsView &_options;
 
+    std::unique_ptr<SystemModule> _system;
     std::unique_ptr<ResourceModule> _resource;
     std::unique_ptr<GraphicsModule> _graphics;
     std::unique_ptr<AudioModule> _audio;

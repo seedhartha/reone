@@ -19,6 +19,7 @@ set(SYSTEM_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/system)
 set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/binaryreader.h
     ${SYSTEM_INCLUDE_DIR}/binarywriter.h
+    ${SYSTEM_INCLUDE_DIR}/clock.h
     ${SYSTEM_INCLUDE_DIR}/collectionutil.h
     ${SYSTEM_INCLUDE_DIR}/exception/argument.h
     ${SYSTEM_INCLUDE_DIR}/exception/notfound.h
@@ -29,6 +30,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/memorycache.h
     ${SYSTEM_INCLUDE_DIR}/pathutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
+    ${SYSTEM_INCLUDE_DIR}/services.h
     ${SYSTEM_INCLUDE_DIR}/stream/bytearrayinput.h
     ${SYSTEM_INCLUDE_DIR}/stream/bytearrayoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileinput.h
@@ -43,6 +45,7 @@ set(SYSTEM_HEADERS
 set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/binaryreader.cpp
     ${SYSTEM_SOURCE_DIR}/binarywriter.cpp
+    ${SYSTEM_SOURCE_DIR}/clock.cpp
     ${SYSTEM_SOURCE_DIR}/hexutil.cpp
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
     ${SYSTEM_SOURCE_DIR}/pathutil.cpp

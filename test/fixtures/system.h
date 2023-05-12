@@ -15,23 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#pragma once
 
-#include "reone/game/game.h"
+#include "reone/system/services.h"
 
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+namespace reone {
 
-using namespace std;
+class MockClock : public IClock, boost::noncopyable {
+};
 
-using namespace reone;
-using namespace reone::game;
+class SystemModule : boost::noncopyable {
+public:
+    void init() {
+        _clock = std::make_unique<MockClock>();
 
-BOOST_AUTO_TEST_SUITE(game)
+        _services = std::make_unique<SystemServices>(*_clock);
+    }
 
-BOOST_AUTO_TEST_SUITE_END()
+    SystemServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<MockClock> _clock;
+
+    std::unique_ptr<SystemServices> _services;
+};
+
+} // namespace reone

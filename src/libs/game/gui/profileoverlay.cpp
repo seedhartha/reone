@@ -25,6 +25,7 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/window.h"
+#include "reone/system/services.h"
 
 #include "reone/game/services.h"
 
@@ -45,7 +46,7 @@ static constexpr int kFrameWidth = 125;
 static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
-    _frequency = SDL_GetPerformanceFrequency();
+    _frequency = _services.system.defaultClock().performanceFrequency();
     _font = _services.graphics.defaultFonts().get(kFontResRef);
 }
 
@@ -53,7 +54,7 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
         _enabled = !_enabled;
         if (_enabled) {
-            _counter = SDL_GetPerformanceCounter();
+            _counter = _services.system.defaultClock().performanceCounter();
             _refreshTimer.setTimeout(kRefreshDelay);
         }
         return true;
@@ -70,7 +71,7 @@ void ProfileOverlay::update(float dt) {
     ++_numFrames;
 
     if (_refreshTimer.advance(dt)) {
-        uint64_t counter = SDL_GetPerformanceCounter();
+        uint64_t counter = _services.system.defaultClock().performanceCounter();
         _fps = static_cast<int>(_numFrames * _frequency / (counter - _counter));
         _numFrames = 0;
         _counter = counter;

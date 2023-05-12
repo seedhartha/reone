@@ -15,23 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include "reone/system/clock.h"
 
-#include "reone/game/game.h"
+namespace reone {
 
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+uint32_t Clock::ticks() const {
+    return SDL_GetTicks();
+}
 
-using namespace std;
+uint64_t Clock::performanceFrequency() const {
+    return SDL_GetPerformanceFrequency();
+}
 
-using namespace reone;
-using namespace reone::game;
+uint64_t Clock::performanceCounter() const {
+    return SDL_GetPerformanceCounter();
+}
 
-BOOST_AUTO_TEST_SUITE(game)
-
-BOOST_AUTO_TEST_SUITE_END()
+} // namespace reone

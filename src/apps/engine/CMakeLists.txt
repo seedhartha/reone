@@ -22,6 +22,7 @@ set(REONE_HEADERS
     ${ENGINE_SOURCE_DIR}/di/module/resource.h
     ${ENGINE_SOURCE_DIR}/di/module/scene.h
     ${ENGINE_SOURCE_DIR}/di/module/script.h
+    ${ENGINE_SOURCE_DIR}/di/module/system.h
     ${ENGINE_SOURCE_DIR}/di/services.h
     ${ENGINE_SOURCE_DIR}/engine.h
     ${ENGINE_SOURCE_DIR}/gameprobe.h
@@ -35,6 +36,7 @@ set(REONE_SOURCES
     ${ENGINE_SOURCE_DIR}/di/module/resource.cpp
     ${ENGINE_SOURCE_DIR}/di/module/scene.cpp
     ${ENGINE_SOURCE_DIR}/di/module/script.cpp
+    ${ENGINE_SOURCE_DIR}/di/module/system.cpp
     ${ENGINE_SOURCE_DIR}/di/services.cpp
     ${ENGINE_SOURCE_DIR}/engine.cpp
     ${ENGINE_SOURCE_DIR}/gameprobe.cpp

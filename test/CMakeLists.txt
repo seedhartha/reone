@@ -24,7 +24,8 @@ set(TEST_HEADERS
     ${TEST_SOURCE_DIR}/fixtures/graphics.h
     ${TEST_SOURCE_DIR}/fixtures/resource.h
     ${TEST_SOURCE_DIR}/fixtures/scene.h
-    ${TEST_SOURCE_DIR}/fixtures/script.h)
+    ${TEST_SOURCE_DIR}/fixtures/script.h
+    ${TEST_SOURCE_DIR}/fixtures/system.h)
 
 set(TEST_SOURCES
     ${TEST_SOURCE_DIR}/audio/format/wavreader.cpp

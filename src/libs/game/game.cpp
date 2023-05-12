@@ -21,11 +21,6 @@
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
 #include "reone/audio/services.h"
-#include "reone/system/collectionutil.h"
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-#include "reone/system/pathutil.h"
-#include "reone/system/binarywriter.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/lipanimations.h"
@@ -53,6 +48,12 @@
 #include "reone/scene/services.h"
 #include "reone/script/scripts.h"
 #include "reone/script/services.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/pathutil.h"
+#include "reone/system/services.h"
 
 #include "reone/game/combat.h"
 #include "reone/game/cursors.h"
@@ -156,7 +157,7 @@ int Game::run() {
 }
 
 void Game::runMainLoop() {
-    _ticks = SDL_GetTicks();
+    _ticks = _services.system.defaultClock().ticks();
     while (!_quit) {
         _services.graphics.defaultWindow().processEvents(_quit);
         if (!_services.graphics.defaultWindow().isInFocus()) {
@@ -279,7 +280,7 @@ void Game::loadModule(const string &name, string entry) {
             string musicName(_module->area()->music());
             playMusic(musicName);
 
-            _ticks = SDL_GetTicks();
+            _ticks = _services.system.defaultClock().ticks();
             openInGame();
         } catch (const ValidationException &e) {
             error("Failed loading module '" + name + "': " + string(e.what()));
@@ -325,7 +326,6 @@ void Game::setCursorType(CursorType type) {
         SDL_ShowCursor(SDL_DISABLE);
     }
     _cursorType = type;
-    
 }
 
 void Game::playVideo(const string &name) {
@@ -470,7 +470,7 @@ void Game::loadNextModule() {
 }
 
 float Game::measureFrameTime() {
-    uint32_t ticks = SDL_GetTicks();
+    uint32_t ticks = _services.system.defaultClock().ticks();
     float dt = (ticks - _ticks) / 1000.0f;
     _ticks = ticks;
 

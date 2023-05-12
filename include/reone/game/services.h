@@ -37,6 +37,8 @@
 
 namespace reone {
 
+struct SystemServices;
+
 namespace resource {
 
 struct ResourceServices;
@@ -269,6 +271,7 @@ struct ServicesView {
     scene::SceneServices &scene;
     script::ScriptServices &script;
     resource::ResourceServices &resource;
+    SystemServices &system;
 
     ServicesView(
         GameServices &game,
@@ -276,13 +279,15 @@ struct ServicesView {
         graphics::GraphicsServices &graphics,
         scene::SceneServices &scene,
         script::ScriptServices &script,
-        resource::ResourceServices &resource) :
+        resource::ResourceServices &resource,
+        SystemServices &system) :
         game(game),
         audio(audio),
         graphics(graphics),
         scene(scene),
         script(script),
-        resource(resource) {
+        resource(resource),
+        system(system) {
     }
 };
 

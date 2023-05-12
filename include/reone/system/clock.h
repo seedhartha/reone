@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#pragma once
 
-#include "reone/game/game.h"
+namespace reone {
 
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+class IClock {
+public:
+    virtual ~IClock() = default;
+};
 
-using namespace std;
+class Clock : public IClock, boost::noncopyable {
+public:
+    uint32_t ticks() const;
 
-using namespace reone;
-using namespace reone::game;
+    uint64_t performanceFrequency() const;
+    uint64_t performanceCounter() const;
+};
 
-BOOST_AUTO_TEST_SUITE(game)
-
-BOOST_AUTO_TEST_SUITE_END()
+} // namespace reone

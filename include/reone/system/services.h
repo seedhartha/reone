@@ -15,23 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#pragma once
 
-#include "reone/game/game.h"
+#include "clock.h"
 
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+namespace reone {
 
-using namespace std;
+struct SystemServices {
+    IClock &clock;
 
-using namespace reone;
-using namespace reone::game;
+    SystemServices(IClock &clock) :
+        clock(clock) {
+    }
 
-BOOST_AUTO_TEST_SUITE(game)
+    Clock &defaultClock() {
+        auto casted = dynamic_cast<Clock *>(&clock);
+        if (!casted) {
+            throw std::logic_error("Illegal Clock implementation");
+        }
+        return *casted;
+    }
+};
 
-BOOST_AUTO_TEST_SUITE_END()
+} // namespace reone

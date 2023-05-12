@@ -15,23 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "reone/game/game.h"
-
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+#include "system.h"
 
 using namespace std;
 
-using namespace reone;
-using namespace reone::game;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(game)
+namespace engine {
 
-BOOST_AUTO_TEST_SUITE_END()
+void SystemModule::init() {
+    _clock = make_unique<Clock>();
+    _services = make_unique<SystemServices>(*_clock);
+}
+
+} // namespace engine
+
+} // namespace reone

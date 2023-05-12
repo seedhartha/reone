@@ -26,6 +26,7 @@ namespace reone {
 namespace engine {
 
 void Services::init() {
+    _system = make_unique<SystemModule>();
     _resource = make_unique<ResourceModule>(_options.game.path);
     _graphics = make_unique<GraphicsModule>(_options.graphics, *_resource);
     _audio = make_unique<AudioModule>(_options.audio, *_resource);
@@ -33,6 +34,7 @@ void Services::init() {
     _script = make_unique<ScriptModule>(*_resource);
     _game = make_unique<GameModule>(_gameId, _options, *_resource, *_graphics, *_audio, *_scene, *_script);
 
+    _system->init();
     _resource->init();
     _graphics->init();
     _audio->init();
@@ -46,7 +48,8 @@ void Services::init() {
         _graphics->services(),
         _scene->services(),
         _script->services(),
-        _resource->services());
+        _resource->services(),
+        _system->services());
 }
 
 void Services::deinit() {
@@ -58,6 +61,7 @@ void Services::deinit() {
     _audio.reset();
     _graphics.reset();
     _resource.reset();
+    _system.reset();
 }
 
 } // namespace engine
