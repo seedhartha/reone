@@ -52,6 +52,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
     ${SYSTEM_SOURCE_DIR}/pathutil.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
+    ${SYSTEM_SOURCE_DIR}/stream/bytearrayinput.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})

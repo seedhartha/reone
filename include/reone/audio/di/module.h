@@ -39,9 +39,9 @@ public:
     void init();
     void deinit();
 
-    AudioContext &audioContext() { return *_audioContext; }
-    AudioFiles &audioFiles() { return *_audioFiles; }
-    AudioPlayer &audioPlayer() { return *_audioPlayer; }
+    AudioContext &context() { return *_context; }
+    AudioFiles &files() { return *_files; }
+    AudioPlayer &player() { return *_player; }
 
     AudioServices &services() { return *_services; }
 
@@ -49,9 +49,9 @@ private:
     AudioOptions &_options;
     resource::ResourceModule &_resource;
 
-    std::unique_ptr<AudioContext> _audioContext;
-    std::unique_ptr<AudioFiles> _audioFiles;
-    std::unique_ptr<AudioPlayer> _audioPlayer;
+    std::unique_ptr<AudioContext> _context;
+    std::unique_ptr<AudioFiles> _files;
+    std::unique_ptr<AudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;
 };

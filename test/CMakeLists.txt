@@ -40,6 +40,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
     ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/system/timer.cpp
     ${TESTS_SOURCE_DIR}/game/game.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp

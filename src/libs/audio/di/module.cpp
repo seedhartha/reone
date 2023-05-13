@@ -24,21 +24,21 @@ namespace reone {
 namespace audio {
 
 void AudioModule::init() {
-    _audioFiles = make_unique<AudioFiles>(_resource.resources());
-    _audioContext = make_unique<AudioContext>();
-    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
+    _files = make_unique<AudioFiles>(_resource.resources());
+    _context = make_unique<AudioContext>();
+    _player = make_unique<AudioPlayer>(_options, *_files);
 
-    _services = make_unique<AudioServices>(*_audioContext, *_audioFiles, *_audioPlayer);
+    _context->init();
 
-    _audioContext->init();
+    _services = make_unique<AudioServices>(*_context, *_files, *_player);
 }
 
 void AudioModule::deinit() {
     _services.reset();
 
-    _audioPlayer.reset();
-    _audioContext.reset();
-    _audioFiles.reset();
+    _player.reset();
+    _context.reset();
+    _files.reset();
 }
 
 } // namespace audio

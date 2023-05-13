@@ -21,7 +21,6 @@
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stringbuilder.h"
 
-
 #include "../checkutil.h"
 
 using namespace std;

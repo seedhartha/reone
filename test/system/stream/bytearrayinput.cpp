@@ -57,4 +57,26 @@ BOOST_AUTO_TEST_CASE(should_read_from_byte_array) {
     BOOST_TEST(true == eof);
 }
 
+BOOST_AUTO_TEST_CASE(should_read_lines_from_byte_array) {
+    // given
+    auto bytes = ByteArray("line1\r\nline2\nlongline");
+    auto stream = ByteArrayInputStream(bytes);
+    char buf[8];
+
+    // expect
+    stream.readLine(buf, sizeof(buf));
+    BOOST_TEST(string(buf) == string("line1"));
+
+    stream.readLine(buf, sizeof(buf));
+    BOOST_TEST(string(buf) == string("line2"));
+
+    stream.readLine(buf, 7);
+    BOOST_TEST(string(buf, 7) == string("longlin"));
+    BOOST_TEST(!stream.eof());
+
+    stream.readLine(buf, sizeof(buf));
+    BOOST_TEST(string(buf) == string("e"));
+    BOOST_TEST(stream.eof());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

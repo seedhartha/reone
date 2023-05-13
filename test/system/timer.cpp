@@ -15,35 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <boost/test/unit_test.hpp>
 
-#include "input.h"
+#include "reone/system/timer.h"
 
-namespace reone {
+using namespace std;
 
-class ByteArrayInputStream : public IInputStream {
-public:
-    ByteArrayInputStream(ByteArray &bytes) :
-        _bytes(bytes) {
-    }
+using namespace reone;
 
-    void seek(int64_t offset, SeekOrigin origin) override;
+BOOST_AUTO_TEST_SUITE(timer)
 
-    int readByte() override;
-    int read(char *outData, int length) override;
-    void readLine(char *outData, int maxLen) override;
+BOOST_AUTO_TEST_CASE(should_advance_and_time_out) {
+    // given
+    auto timer = Timer();
+    timer.setTimeout(1.0f);
 
-    size_t position() override {
-        return _position;
-    }
+    // expect
+    BOOST_TEST(timer.isSet());
+    BOOST_TEST(!timer.isTimedOut());
 
-    bool eof() override {
-        return _position >= _bytes.size();
-    }
+    timer.advance(0.5f);
+    BOOST_TEST(timer.isSet());
+    BOOST_TEST(!timer.isTimedOut());
 
-private:
-    ByteArray &_bytes;
-    size_t _position {0};
-};
+    timer.advance(0.5f);
+    BOOST_TEST(!timer.isSet());
+    BOOST_TEST(timer.isTimedOut());
+}
 
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()
