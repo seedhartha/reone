@@ -241,7 +241,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<Gff> utc(_services.resource.defaultGffs().get(blueprintResRef, ResourceType::Utc));
+            shared_ptr<Gff> utc(_services.resource.gffs.get(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {

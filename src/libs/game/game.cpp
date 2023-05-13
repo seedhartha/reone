@@ -255,7 +255,7 @@ void Game::loadModule(const string &name, string entry) {
             } else {
                 _module = _objectFactory.newModule();
 
-                shared_ptr<Gff> ifo(_services.resource.defaultGffs().get("module", ResourceType::Ifo));
+                shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }
@@ -780,7 +780,7 @@ void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     if (!g_conversationsEnabled)
         return;
 
-    shared_ptr<Gff> dlg(_services.resource.defaultGffs().get(resRef, ResourceType::Dlg));
+    shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;

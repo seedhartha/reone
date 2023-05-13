@@ -62,9 +62,9 @@ GUI::GUI(
     Textures &textures,
     Uniforms &uniforms,
     Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings) :
+    IGffs &gffs,
+    IResources &resources,
+    IStrings &strings) :
     _options(options),
     _sceneGraphs(sceneGraphs),
     _fonts(fonts),

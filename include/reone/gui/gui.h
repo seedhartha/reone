@@ -25,10 +25,10 @@ namespace reone {
 
 namespace resource {
 
-class Gffs;
 class Gff;
-class Resources;
-class Strings;
+class IGffs;
+class IResources;
+class IStrings;
 
 } // namespace resource
 
@@ -107,9 +107,9 @@ protected:
     graphics::Uniforms &_uniforms;
     graphics::Window &_window;
 
-    resource::Gffs &_gffs;
-    resource::Resources &_resources;
-    resource::Strings &_strings;
+    resource::IGffs &_gffs;
+    resource::IResources &_resources;
+    resource::IStrings &_strings;
 
     // END Services
 
@@ -124,9 +124,9 @@ protected:
         graphics::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::Window &window,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings);
+        resource::IGffs &gffs,
+        resource::IResources &resources,
+        resource::IStrings &strings);
 
     void loadControl(const resource::Gff &gffs);
     virtual void preloadControl(Control &control);

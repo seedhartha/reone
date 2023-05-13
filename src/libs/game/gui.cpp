@@ -51,9 +51,9 @@ GameGUI::GameGUI(Game &game, ServicesView &services) :
         services.graphics.defaultTextures(),
         services.graphics.defaultUniforms(),
         services.graphics.defaultWindow(),
-        services.resource.defaultGffs(),
-        services.resource.defaultResources(),
-        services.resource.defaultStrings()),
+        services.resource.gffs,
+        services.resource.resources,
+        services.resource.strings),
     _game(game),
     _services(services) {
 }

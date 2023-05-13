@@ -74,52 +74,52 @@ void ResourceLayout::init() {
 }
 
 void ResourceLayout::initForKotOR() {
-    _resourceSvc.defaultResources().indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(_options.game.path, kPatchFilename));
+    _resourceSvc.resources.indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(_options.game.path, kPatchFilename));
 
     boost::filesystem::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
-    auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
+    auto &texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kMusicDirectoryName));
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kWavesDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kMusicDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kWavesDirectoryName));
 
     boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
     for (auto &filename : g_nonTransientLipFiles) {
-        _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, filename));
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
     }
 
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
-    _resourceSvc.defaultResources().indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameKotor));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
+    _resourceSvc.resources.indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameKotor));
 }
 
 void ResourceLayout::initForTSL() {
-    _resourceSvc.defaultResources().indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
+    _resourceSvc.resources.indexKeyFile(getPathIgnoreCase(_options.game.path, kKeyFilename));
 
     boost::filesystem::path texPacksPath(getPathIgnoreCase(_options.game.path, kTexturePackDirectoryName));
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
-    auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
+    auto &texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kMusicDirectoryName));
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kVoiceDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kMusicDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kSoundsDirectoryName));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kVoiceDirectoryName));
 
     boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
-    _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    _resourceSvc.defaultResources().indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
-    _resourceSvc.defaultResources().indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameTsl));
+    _resourceSvc.resources.indexDirectory(getPathIgnoreCase(_options.game.path, kOverrideDirectoryName));
+    _resourceSvc.resources.indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameTsl));
 }
 
 void ResourceLayout::loadModuleResources(const string &moduleName) {
-    _resourceSvc.defaultTwoDas().invalidate();
-    _resourceSvc.defaultGffs().invalidate();
-    _resourceSvc.defaultResources().clearTransientProviders();
+    _resourceSvc.twoDas.invalidate();
+    _resourceSvc.gffs.invalidate();
+    _resourceSvc.resources.clearTransientProviders();
 
     boost::filesystem::path modulesPath(getPathIgnoreCase(_options.game.path, kModulesDirectoryName));
     if (modulesPath.empty()) {
@@ -128,19 +128,19 @@ void ResourceLayout::loadModuleResources(const string &moduleName) {
 
     boost::filesystem::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     if (!modPath.empty()) {
-        _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {
-        _resourceSvc.defaultResources().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-        _resourceSvc.defaultResources().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
     }
 
     boost::filesystem::path lipsPath(getPathIgnoreCase(_options.game.path, kLipsDirectoryName));
     if (!lipsPath.empty()) {
-        _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
     }
 
     if (_gameId == GameID::TSL) {
-        _resourceSvc.defaultResources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
     }
 }
 

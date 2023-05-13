@@ -32,24 +32,34 @@ namespace resource {
 class IResources {
 public:
     virtual ~IResources() = default;
+
+    virtual void clearTransientProviders() = 0;
+
+    virtual void indexKeyFile(const boost::filesystem::path &path) = 0;
+    virtual void indexErfFile(const boost::filesystem::path &path, bool transient = false) = 0;
+    virtual void indexRimFile(const boost::filesystem::path &path, bool transient = false) = 0;
+    virtual void indexDirectory(const boost::filesystem::path &path) = 0;
+    virtual void indexExeFile(const boost::filesystem::path &path) = 0;
+
+    virtual std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) = 0;
 };
 
 class Resources : public IResources, boost::noncopyable {
 public:
     typedef std::vector<std::unique_ptr<IResourceProvider>> ProviderList;
 
-    void indexKeyFile(const boost::filesystem::path &path);
-    void indexErfFile(const boost::filesystem::path &path, bool transient = false);
-    void indexRimFile(const boost::filesystem::path &path, bool transient = false);
-    void indexDirectory(const boost::filesystem::path &path);
-    void indexExeFile(const boost::filesystem::path &path);
+    void indexKeyFile(const boost::filesystem::path &path) override;
+    void indexErfFile(const boost::filesystem::path &path, bool transient = false) override;
+    void indexRimFile(const boost::filesystem::path &path, bool transient = false) override;
+    void indexDirectory(const boost::filesystem::path &path) override;
+    void indexExeFile(const boost::filesystem::path &path) override;
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
     void clearAllProviders();
-    void clearTransientProviders();
+    void clearTransientProviders() override;
 
-    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
+    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override;
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
     const ProviderList &providers() const { return _providers; }

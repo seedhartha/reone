@@ -41,7 +41,7 @@ void Waypoint::loadFromGIT(const Gff &gffs) {
 
     _tag = gffs.getString("Tag");
     _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = _services.resource.defaultStrings().get(gffs.getInt("MapNote"));
+    _mapNote = _services.resource.strings.get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
 
@@ -49,7 +49,7 @@ void Waypoint::loadFromGIT(const Gff &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utw(_services.resource.defaultGffs().get(resRef, ResourceType::Utw));
+    shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }
@@ -71,9 +71,9 @@ void Waypoint::loadUTW(const Gff &utw) {
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));
-    _name = _services.resource.defaultStrings().get(utw.getInt("LocalizedName"));
+    _name = _services.resource.strings.get(utw.getInt("LocalizedName"));
     _hasMapNote = utw.getBool("HasMapNote");
-    _mapNote = _services.resource.defaultStrings().get(utw.getInt("MapNote"));
+    _mapNote = _services.resource.strings.get(utw.getInt("MapNote"));
     _mapNoteEnabled = utw.getInt("MapNoteEnabled");
 
     // Unused fields:

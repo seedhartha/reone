@@ -129,7 +129,7 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDa> skills(_services.resource.defaultTwoDas().get("skills"));
+    shared_ptr<TwoDa> skills(_services.resource.twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 

@@ -1061,7 +1061,7 @@ Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
-    string result = ctx.services.resource.defaultStrings().get(strRef);
+    string result = ctx.services.resource.strings.get(strRef);
 
     return Variable::ofString(move(result));
 }

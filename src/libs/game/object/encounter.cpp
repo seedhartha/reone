@@ -43,7 +43,7 @@ void Encounter::loadFromGIT(const Gff &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<Gff> ute(_services.resource.defaultGffs().get(blueprintResRef, ResourceType::Ute));
+    shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }
@@ -82,7 +82,7 @@ void Encounter::loadSpawnPointsFromGIT(const Gff &gffs) {
 
 void Encounter::loadUTE(const Gff &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
-    _name = _services.resource.defaultStrings().get(ute.getInt("LocalizedName"));
+    _name = _services.resource.strings.get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
     _active = ute.getBool("Active");
     _difficultyIndex = ute.getInt("DifficultyIndex"); // index into encdifficulty.2da

@@ -24,15 +24,48 @@ namespace reone {
 namespace resource {
 
 class MockGffs : public IGffs, boost::noncopyable {
+public:
+    void invalidate() {
+    }
+
+    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) {
+        return nullptr;
+    }
 };
 
 class MockResources : public IResources, boost::noncopyable {
+public:
+    void clearTransientProviders() override {}
+
+    void indexKeyFile(const boost::filesystem::path &path) override {}
+    void indexErfFile(const boost::filesystem::path &path, bool transient = false) override {}
+    void indexRimFile(const boost::filesystem::path &path, bool transient = false) override {}
+    void indexDirectory(const boost::filesystem::path &path) override {}
+    void indexExeFile(const boost::filesystem::path &path) override {}
+
+    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override {
+        return nullptr;
+    }
 };
 
 class MockStrings : public IStrings, boost::noncopyable {
+public:
+    std::string get(int strRef) override {
+        return "";
+    }
+
+    std::string getSound(int strRef) override {
+        return "";
+    }
 };
 
 class MockTwoDas : public ITwoDas, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<TwoDa> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class TestResourceModule : boost::noncopyable {

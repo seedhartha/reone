@@ -129,7 +129,7 @@ void Area::load(string name, const Gff &are, const Gff &git, bool fromSave) {
 }
 
 void Area::loadARE(const Gff &are) {
-    _localizedName = _services.resource.defaultStrings().get(are.getInt("Name"));
+    _localizedName = _services.resource.strings.get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -238,7 +238,7 @@ void Area::loadProperties(const Gff &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDa> musicTable(_services.resource.defaultTwoDas().get("ambientmusic"));
+        shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }

@@ -42,38 +42,6 @@ struct ResourceServices {
         strings(strings),
         twoDas(twoDas) {
     }
-
-    Gffs &defaultGffs() {
-        auto casted = dynamic_cast<Gffs *>(&gffs);
-        if (!casted) {
-            throw std::logic_error("Illegal Gffs implementation");
-        }
-        return *casted;
-    }
-
-    Resources &defaultResources() {
-        auto casted = dynamic_cast<Resources *>(&resources);
-        if (!casted) {
-            throw std::logic_error("Illegal Resources implementation");
-        }
-        return *casted;
-    }
-
-    Strings &defaultStrings() {
-        auto casted = dynamic_cast<Strings *>(&strings);
-        if (!casted) {
-            throw std::logic_error("Illegal Strings implementation");
-        }
-        return *casted;
-    }
-
-    TwoDas &defaultTwoDas() {
-        auto casted = dynamic_cast<TwoDas *>(&twoDas);
-        if (!casted) {
-            throw std::logic_error("Illegal TwoDas implementation");
-        }
-        return *casted;
-    }
 };
 
 } // namespace resource

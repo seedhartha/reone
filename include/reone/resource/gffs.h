@@ -30,6 +30,10 @@ class Resources;
 class IGffs {
 public:
     virtual ~IGffs() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) = 0;
 };
 
 class Gffs : public IGffs, boost::noncopyable {
@@ -38,11 +42,11 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _cache.clear();
     }
 
-    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type);
+    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) override;
 
     void add(ResourceId resId, std::shared_ptr<Gff> gff) {
         _cache[resId] = std::move(gff);

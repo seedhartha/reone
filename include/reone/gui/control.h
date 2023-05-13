@@ -27,7 +27,7 @@ namespace reone {
 namespace resource {
 
 class Gff;
-class Strings;
+class IStrings;
 
 } // namespace resource
 
@@ -217,7 +217,7 @@ protected:
     graphics::Textures &_textures;
     graphics::Uniforms &_uniforms;
     graphics::Window &_window;
-    resource::Strings &_strings;
+    resource::IStrings &_strings;
     scene::SceneGraphs &_sceneGraphs;
 
     // END Services
@@ -241,7 +241,7 @@ protected:
         graphics::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::Window &window,
-        resource::Strings &strings) :
+        resource::IStrings &strings) :
         _gui(gui),
         _type(type),
         _sceneGraphs(sceneGraphs),

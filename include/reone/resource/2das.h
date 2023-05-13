@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "2da.h"
 
 namespace reone {
@@ -30,21 +28,39 @@ class Resources;
 class ITwoDas {
 public:
     virtual ~ITwoDas() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<TwoDa> get(const std::string &key) = 0;
 };
 
-class TwoDas : public ITwoDas, public MemoryCache<std::string, TwoDa>, boost::noncopyable {
+class TwoDas : public ITwoDas, boost::noncopyable {
 public:
     TwoDas(Resources &resources) :
-        MemoryCache(bind(&TwoDas::doGet, this, std::placeholders::_1)),
         _resources(resources) {
+    }
+
+    void invalidate() override {
+        _objects.clear();
     }
 
     void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
         _objects[resRef] = std::move(twoDa);
     }
 
+    std::shared_ptr<TwoDa> get(const std::string &key) override {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
+    }
+
 private:
     Resources &_resources;
+
+    std::unordered_map<std::string, std::shared_ptr<TwoDa>> _objects;
 
     std::shared_ptr<TwoDa> doGet(const std::string &resRef);
 };

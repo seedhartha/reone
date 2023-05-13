@@ -36,7 +36,7 @@ public:
         graphics::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::Window &window,
-        resource::Strings &strings) :
+        resource::IStrings &strings) :
         Control(
             gui,
             ControlType::Slider,

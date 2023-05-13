@@ -28,6 +28,9 @@ namespace resource {
 class IStrings {
 public:
     virtual ~IStrings() = default;
+
+    virtual std::string get(int strRef) = 0;
+    virtual std::string getSound(int strRef) = 0;
 };
 
 class Strings : public IStrings {
@@ -36,15 +39,8 @@ public:
 
     void init(const boost::filesystem::path &gameDir);
 
-    /**
-     * @return string or empty string when not found
-     */
-    std::string get(int strRef);
-
-    /**
-     * @return ResRef or empty string when not found
-     */
-    std::string getSound(int strRef);
+    std::string get(int strRef) override;
+    std::string getSound(int strRef) override;
 
     void setTalkTable(std::shared_ptr<TalkTable> table) {
         _table = std::move(table);
