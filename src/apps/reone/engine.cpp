@@ -20,7 +20,6 @@
 #include "reone/game/game.h"
 #include "reone/system/logutil.h"
 
-#include "di/services.h"
 #include "gameprobe.h"
 #include "optionsparser.h"
 
@@ -30,27 +29,71 @@ using namespace reone::game;
 
 namespace reone {
 
+void Engine::init() {
+    _options = OptionsParser(_argc, _argv).parse();
+    _optionsView = _options->toView();
+
+    setLogLevel(_options->logging.level);
+    setLogChannels(_options->logging.channels);
+    setLogToFile(_options->logging.logToFile);
+
+    auto gameId = GameProbe(_options->game.path).probe();
+
+    _systemModule = make_unique<SystemModule>();
+    _resourceModule = make_unique<ResourceModule>(_options->game.path);
+    _graphicsModule = make_unique<GraphicsModule>(_options->graphics, *_resourceModule);
+    _audioModule = make_unique<AudioModule>(_options->audio, *_resourceModule);
+    _sceneModule = make_unique<SceneModule>(_options->graphics, *_audioModule, *_graphicsModule);
+    _scriptModule = make_unique<ScriptModule>(*_resourceModule);
+
+    _gameModule = make_unique<GameModule>(
+        gameId,
+        *_optionsView,
+        *_resourceModule,
+        *_graphicsModule,
+        *_audioModule,
+        *_sceneModule,
+        *_scriptModule);
+
+    _systemModule->init();
+    _resourceModule->init();
+    _graphicsModule->init();
+    _audioModule->init();
+    _sceneModule->init();
+    _scriptModule->init();
+    _gameModule->init();
+
+    _services = make_unique<ServicesView>(
+        _gameModule->services(),
+        _audioModule->services(),
+        _graphicsModule->services(),
+        _sceneModule->services(),
+        _scriptModule->services(),
+        _resourceModule->services(),
+        _systemModule->services());
+
+    _game = make_unique<Game>(gameId == GameID::TSL, _options->game.path, *_optionsView, *_services);
+    _game->init();
+}
+
+void Engine::deinit() {
+    _game.reset();
+    _services.reset();
+
+    _gameModule.reset();
+    _scriptModule.reset();
+    _sceneModule.reset();
+    _audioModule.reset();
+    _graphicsModule.reset();
+    _resourceModule.reset();
+    _systemModule.reset();
+
+    _optionsView.reset();
+    _options.reset();
+}
+
 int Engine::run() {
-    auto optionsParser = OptionsParser(_argc, _argv);
-    auto options = optionsParser.parse();
-
-    setLogLevel(options.logging.level);
-    setLogChannels(options.logging.channels);
-    setLogToFile(options.logging.logToFile);
-
-    auto gameProbe = GameProbe(options.game.path);
-    auto gameId = gameProbe.probe();
-
-    auto optionsView = options.toView();
-
-    auto services = Services(gameId, optionsView);
-    services.init();
-
-    auto game = Game(gameId == GameID::TSL, options.game.path, optionsView, services.view());
-    game.init();
-    game.run();
-
-    return 0;
+    return _game->run();
 }
 
 } // namespace reone

@@ -16,32 +16,30 @@
 set(REONE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/reone)
 
 set(REONE_HEADERS
-    ${REONE_SOURCE_DIR}/di/module/audio.h
-    ${REONE_SOURCE_DIR}/di/module/game.h
-    ${REONE_SOURCE_DIR}/di/module/graphics.h
-    ${REONE_SOURCE_DIR}/di/module/resource.h
-    ${REONE_SOURCE_DIR}/di/module/scene.h
-    ${REONE_SOURCE_DIR}/di/module/script.h
-    ${REONE_SOURCE_DIR}/di/module/system.h
-    ${REONE_SOURCE_DIR}/di/services.h
     ${REONE_SOURCE_DIR}/engine.h
     ${REONE_SOURCE_DIR}/gameprobe.h
+    ${REONE_SOURCE_DIR}/module/audio.h
+    ${REONE_SOURCE_DIR}/module/game.h
+    ${REONE_SOURCE_DIR}/module/graphics.h
+    ${REONE_SOURCE_DIR}/module/resource.h
+    ${REONE_SOURCE_DIR}/module/scene.h
+    ${REONE_SOURCE_DIR}/module/script.h
+    ${REONE_SOURCE_DIR}/module/system.h
     ${REONE_SOURCE_DIR}/options.h
     ${REONE_SOURCE_DIR}/optionsparser.h)
 
 set(REONE_SOURCES
-    ${REONE_SOURCE_DIR}/di/module/audio.cpp
-    ${REONE_SOURCE_DIR}/di/module/game.cpp
-    ${REONE_SOURCE_DIR}/di/module/graphics.cpp
-    ${REONE_SOURCE_DIR}/di/module/resource.cpp
-    ${REONE_SOURCE_DIR}/di/module/scene.cpp
-    ${REONE_SOURCE_DIR}/di/module/script.cpp
-    ${REONE_SOURCE_DIR}/di/module/system.cpp
-    ${REONE_SOURCE_DIR}/di/services.cpp
     ${REONE_SOURCE_DIR}/engine.cpp
     ${REONE_SOURCE_DIR}/gameprobe.cpp
     ${REONE_SOURCE_DIR}/highperfgfx.cpp
     ${REONE_SOURCE_DIR}/main.cpp
+    ${REONE_SOURCE_DIR}/module/audio.cpp
+    ${REONE_SOURCE_DIR}/module/game.cpp
+    ${REONE_SOURCE_DIR}/module/graphics.cpp
+    ${REONE_SOURCE_DIR}/module/resource.cpp
+    ${REONE_SOURCE_DIR}/module/scene.cpp
+    ${REONE_SOURCE_DIR}/module/script.cpp
+    ${REONE_SOURCE_DIR}/module/system.cpp
     ${REONE_SOURCE_DIR}/optionsparser.cpp)
 
 if(WIN32)

@@ -38,8 +38,8 @@ struct Options {
 
     Logging logging;
 
-    game::OptionsView toView() {
-        return game::OptionsView(game, graphics, audio);
+    std::unique_ptr<game::OptionsView> toView() {
+        return std::make_unique<game::OptionsView>(game, graphics, audio);
     }
 };
 

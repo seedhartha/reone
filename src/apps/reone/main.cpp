@@ -25,8 +25,10 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     initLog();
+    auto engine = Engine(argc, argv);
     try {
-        return Engine(argc, argv).run();
+        engine.init();
+        return engine.run();
     } catch (const exception &ex) {
         try {
             error("Program terminated exceptionally: " + string(ex.what()));

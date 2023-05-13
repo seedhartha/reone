@@ -30,7 +30,7 @@ public:
         _argv(argv) {
     }
 
-    Options parse();
+    std::unique_ptr<Options> parse();
 
 private:
     int _argc;
