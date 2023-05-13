@@ -15,47 +15,47 @@
 
 find_package(Boost COMPONENTS regex REQUIRED)
 
-set(TOOLSLIB_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/tools)
-set(TOOLSLIB_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
+set(TOOLS_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/tools)
+set(TOOLS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
 
-set(TOOLSLIB_HEADERS
-    ${TOOLSLIB_INCLUDE_DIR}/2da.h
-    ${TOOLSLIB_INCLUDE_DIR}/audio.h
-    ${TOOLSLIB_INCLUDE_DIR}/erf.h
-    ${TOOLSLIB_INCLUDE_DIR}/gff.h
-    ${TOOLSLIB_INCLUDE_DIR}/keybif.h
-    ${TOOLSLIB_INCLUDE_DIR}/lip.h
-    ${TOOLSLIB_INCLUDE_DIR}/ncs.h
-    ${TOOLSLIB_INCLUDE_DIR}/rim.h
-    ${TOOLSLIB_INCLUDE_DIR}/script/expressiontree.h
-    ${TOOLSLIB_INCLUDE_DIR}/script/format/nsswriter.h
-    ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodereader.h
-    ${TOOLSLIB_INCLUDE_DIR}/script/format/pcodewriter.h
-    ${TOOLSLIB_INCLUDE_DIR}/ssf.h
-    ${TOOLSLIB_INCLUDE_DIR}/tlk.h
-    ${TOOLSLIB_INCLUDE_DIR}/tool.h
-    ${TOOLSLIB_INCLUDE_DIR}/tpc.h
-    ${TOOLSLIB_INCLUDE_DIR}/types.h)
+set(TOOLS_HEADERS
+    ${TOOLS_INCLUDE_DIR}/2da.h
+    ${TOOLS_INCLUDE_DIR}/audio.h
+    ${TOOLS_INCLUDE_DIR}/erf.h
+    ${TOOLS_INCLUDE_DIR}/gff.h
+    ${TOOLS_INCLUDE_DIR}/keybif.h
+    ${TOOLS_INCLUDE_DIR}/lip.h
+    ${TOOLS_INCLUDE_DIR}/ncs.h
+    ${TOOLS_INCLUDE_DIR}/rim.h
+    ${TOOLS_INCLUDE_DIR}/script/expressiontree.h
+    ${TOOLS_INCLUDE_DIR}/script/format/nsswriter.h
+    ${TOOLS_INCLUDE_DIR}/script/format/pcodereader.h
+    ${TOOLS_INCLUDE_DIR}/script/format/pcodewriter.h
+    ${TOOLS_INCLUDE_DIR}/ssf.h
+    ${TOOLS_INCLUDE_DIR}/tlk.h
+    ${TOOLS_INCLUDE_DIR}/tool.h
+    ${TOOLS_INCLUDE_DIR}/tpc.h
+    ${TOOLS_INCLUDE_DIR}/types.h)
 
-set(TOOLSLIB_SOURCES
-    ${TOOLSLIB_SOURCE_DIR}/script/expressiontree.cpp
-    ${TOOLSLIB_SOURCE_DIR}/script/format/nsswriter.cpp
-    ${TOOLSLIB_SOURCE_DIR}/script/format/pcodereader.cpp
-    ${TOOLSLIB_SOURCE_DIR}/script/format/pcodewriter.cpp
-    ${TOOLSLIB_SOURCE_DIR}/2da.cpp
-    ${TOOLSLIB_SOURCE_DIR}/audio.cpp
-    ${TOOLSLIB_SOURCE_DIR}/erf.cpp
-    ${TOOLSLIB_SOURCE_DIR}/gff.cpp
-    ${TOOLSLIB_SOURCE_DIR}/keybif.cpp
-    ${TOOLSLIB_SOURCE_DIR}/lip.cpp
-    ${TOOLSLIB_SOURCE_DIR}/ncs.cpp
-    ${TOOLSLIB_SOURCE_DIR}/rim.cpp
-    ${TOOLSLIB_SOURCE_DIR}/ssf.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tlk.cpp
-    ${TOOLSLIB_SOURCE_DIR}/tpc.cpp)
+set(TOOLS_SOURCES
+    ${TOOLS_SOURCE_DIR}/script/expressiontree.cpp
+    ${TOOLS_SOURCE_DIR}/script/format/nsswriter.cpp
+    ${TOOLS_SOURCE_DIR}/script/format/pcodereader.cpp
+    ${TOOLS_SOURCE_DIR}/script/format/pcodewriter.cpp
+    ${TOOLS_SOURCE_DIR}/2da.cpp
+    ${TOOLS_SOURCE_DIR}/audio.cpp
+    ${TOOLS_SOURCE_DIR}/erf.cpp
+    ${TOOLS_SOURCE_DIR}/gff.cpp
+    ${TOOLS_SOURCE_DIR}/keybif.cpp
+    ${TOOLS_SOURCE_DIR}/lip.cpp
+    ${TOOLS_SOURCE_DIR}/ncs.cpp
+    ${TOOLS_SOURCE_DIR}/rim.cpp
+    ${TOOLS_SOURCE_DIR}/ssf.cpp
+    ${TOOLS_SOURCE_DIR}/tlk.cpp
+    ${TOOLS_SOURCE_DIR}/tpc.cpp)
 
-add_library(toolslib ${TOOLSLIB_HEADERS} ${TOOLSLIB_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(toolslib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
-set_target_properties(toolslib PROPERTIES DEBUG_POSTFIX "d")
-target_precompile_headers(toolslib PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(toolslib PRIVATE game tinyxml2 ${Boost_REGEX_LIBRARY})
+add_library(tools ${TOOLS_HEADERS} ${TOOLS_SOURCES} ${CLANG_FORMAT_PATH})
+set_target_properties(tools PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
+set_target_properties(tools PROPERTIES DEBUG_POSTFIX "d")
+target_precompile_headers(tools PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
+target_link_libraries(tools PRIVATE game tinyxml2 ${Boost_REGEX_LIBRARY})

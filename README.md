@@ -27,7 +27,7 @@ Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.
 
 ## Usage
 
-Use reone-launcher application to choose a game directory and launch reone. Alternatively, reone can be started from the command line: `reone --game GAME_DIR`
+Use launcher application to choose a game directory and launch reone. Alternatively, reone can be started from the command line: `reone --game GAME_DIR`
 
 ## Configuration
 

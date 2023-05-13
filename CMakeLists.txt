@@ -21,8 +21,8 @@ set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 
 # Options
 
-option(BUILD_TOOLS "build tools executable" ON)
-option(BUILD_LAUNCHER "build launcher executable" ON)
+option(BUILD_TOOLS "build toolkit application" ON)
+option(BUILD_LAUNCHER "build launcher application" ON)
 option(BUILD_TESTS "build tests" ON)
 
 option(ENABLE_MOVIE "enable movie playback" ON)
@@ -91,21 +91,21 @@ add_subdirectory(src/libs/game) # game static library
 
 # END Engine libraries
 
-add_subdirectory(src/apps/engine) # reone executable
+add_subdirectory(src/apps/reone) # reone application
 
 if(BUILD_TOOLS)
     add_subdirectory(extern/tinyxml2) # tinyxml2 static library
     add_subdirectory(src/libs/tools) # tools static library
-    add_subdirectory(src/apps/tools) # reone-tools executable
+    add_subdirectory(src/apps/toolkit) # toolkit application
 endif()
 
 if(BUILD_LAUNCHER)
-    add_subdirectory(src/apps/launcher) # reone-launcher executable
+    add_subdirectory(src/apps/launcher) # launcher application
 endif()
 
 if(BUILD_TESTS)
     enable_testing()
-    add_subdirectory(test) # reone-tests executable
+    add_subdirectory(test) # tests executable
 endif()
 
 ## Installation
@@ -118,7 +118,7 @@ install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS system resource graphics audio scene movie script gui game DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(BUILD_TOOLS)
-    install(TARGETS toolslib DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS tools DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 ## END Installation

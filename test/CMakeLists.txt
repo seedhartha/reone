@@ -15,66 +15,66 @@
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
-set(TEST_SOURCE_DIR ${CMAKE_SOURCE_DIR}/test)
+set(TESTS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/test)
 
-set(TEST_HEADERS
-    ${TEST_SOURCE_DIR}/checkutil.h
-    ${TEST_SOURCE_DIR}/fixtures/audio.h
-    ${TEST_SOURCE_DIR}/fixtures/game.h
-    ${TEST_SOURCE_DIR}/fixtures/graphics.h
-    ${TEST_SOURCE_DIR}/fixtures/resource.h
-    ${TEST_SOURCE_DIR}/fixtures/scene.h
-    ${TEST_SOURCE_DIR}/fixtures/script.h
-    ${TEST_SOURCE_DIR}/fixtures/system.h)
+set(TESTS_HEADERS
+    ${TESTS_SOURCE_DIR}/checkutil.h
+    ${TESTS_SOURCE_DIR}/fixtures/audio.h
+    ${TESTS_SOURCE_DIR}/fixtures/game.h
+    ${TESTS_SOURCE_DIR}/fixtures/graphics.h
+    ${TESTS_SOURCE_DIR}/fixtures/resource.h
+    ${TESTS_SOURCE_DIR}/fixtures/scene.h
+    ${TESTS_SOURCE_DIR}/fixtures/script.h
+    ${TESTS_SOURCE_DIR}/fixtures/system.h)
 
-set(TEST_SOURCES
-    ${TEST_SOURCE_DIR}/audio/format/wavreader.cpp
-    ${TEST_SOURCE_DIR}/system/binaryreader.cpp
-    ${TEST_SOURCE_DIR}/system/binarywriter.cpp
-    ${TEST_SOURCE_DIR}/system/collectionutil.cpp
-    ${TEST_SOURCE_DIR}/system/hexutil.cpp
-    ${TEST_SOURCE_DIR}/system/pathutil.cpp
-    ${TEST_SOURCE_DIR}/system/stream/bytearrayinput.cpp
-    ${TEST_SOURCE_DIR}/system/stream/bytearrayoutput.cpp
-    ${TEST_SOURCE_DIR}/system/stream/fileinput.cpp
-    ${TEST_SOURCE_DIR}/system/stream/fileoutput.cpp
-    ${TEST_SOURCE_DIR}/system/stringbuilder.cpp
-    ${TEST_SOURCE_DIR}/system/textwriter.cpp
-    ${TEST_SOURCE_DIR}/game/game.cpp
-    ${TEST_SOURCE_DIR}/graphics/aabb.cpp
-    ${TEST_SOURCE_DIR}/graphics/format/bwmreader.cpp
-    ${TEST_SOURCE_DIR}/graphics/format/mdlreader.cpp
-    ${TEST_SOURCE_DIR}/graphics/format/tgareader.cpp
-    ${TEST_SOURCE_DIR}/graphics/format/tpcreader.cpp
-    ${TEST_SOURCE_DIR}/graphics/format/txireader.cpp
-    ${TEST_SOURCE_DIR}/graphics/walkmesh.cpp
-    ${TEST_SOURCE_DIR}/main.cpp
-    ${TEST_SOURCE_DIR}/resource/2das.cpp
-    ${TEST_SOURCE_DIR}/resource/format/2dareader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/2dawriter.cpp
-    ${TEST_SOURCE_DIR}/resource/format/bifreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/erfreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/erfwriter.cpp
-    ${TEST_SOURCE_DIR}/resource/format/gffreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/gffwriter.cpp
-    ${TEST_SOURCE_DIR}/resource/format/keyreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/rimreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/rimwriter.cpp
-    ${TEST_SOURCE_DIR}/resource/format/tlkreader.cpp
-    ${TEST_SOURCE_DIR}/resource/format/tlkwriter.cpp
-    ${TEST_SOURCE_DIR}/resource/gffs.cpp
-    ${TEST_SOURCE_DIR}/resource/resources.cpp
-    ${TEST_SOURCE_DIR}/resource/strings.cpp
-    ${TEST_SOURCE_DIR}/scene/model.cpp
-    ${TEST_SOURCE_DIR}/script/execution.cpp
-    ${TEST_SOURCE_DIR}/script/format/ncsreader.cpp
-    ${TEST_SOURCE_DIR}/script/format/ncswriter.cpp
-    ${TEST_SOURCE_DIR}/tools/expressiontree.cpp)
+set(TESTS_SOURCES
+    ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
+    ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
+    ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
+    ${TESTS_SOURCE_DIR}/system/collectionutil.cpp
+    ${TESTS_SOURCE_DIR}/system/hexutil.cpp
+    ${TESTS_SOURCE_DIR}/system/pathutil.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/bytearrayinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/bytearrayoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
+    ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/game/game.cpp
+    ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/mdlreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/tgareader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/tpcreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/txireader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/walkmesh.cpp
+    ${TESTS_SOURCE_DIR}/main.cpp
+    ${TESTS_SOURCE_DIR}/resource/2das.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/2dareader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/2dawriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/bifreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/erfreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/erfwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/gffreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/gffwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/keyreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/rimreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/rimwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/tlkreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/tlkwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/gffs.cpp
+    ${TESTS_SOURCE_DIR}/resource/resources.cpp
+    ${TESTS_SOURCE_DIR}/resource/strings.cpp
+    ${TESTS_SOURCE_DIR}/scene/model.cpp
+    ${TESTS_SOURCE_DIR}/script/execution.cpp
+    ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
+    ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
+    ${TESTS_SOURCE_DIR}/tools/expressiontree.cpp)
 
-add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
-set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
-target_compile_definitions(reone-tests PRIVATE BOOST_TEST_DYN_LINK)
-target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(reone-tests PRIVATE toolslib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES} ${CLANG_FORMAT_PATH})
+set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
+target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
+target_precompile_headers(tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
+target_link_libraries(tests PRIVATE tools ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-add_test(NAME UnitTests COMMAND reone-tests)
+add_test(NAME UnitTests COMMAND tests)

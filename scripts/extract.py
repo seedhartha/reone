@@ -30,8 +30,8 @@ import tkinter.filedialog
 
 game_dir = os.getenv("REONE_GAME_DIR")
 game_tsl = None
-tools_dir = os.getenv("REONE_TOOLS_DIR")
-tools_exe = None
+toolkit_dir = os.getenv("REONE_TOOLKIT_DIR")
+toolkit_exe = None
 extract_dir = os.getenv("REONE_EXTRACT_DIR")
 
 steps = [
@@ -78,26 +78,26 @@ def configure_game_dir():
     game_tsl = find_path_ignore_case(game_dir, "swkotor2.exe") is not None
 
 
-def is_valid_tools_dir(dir):
+def is_valid_toolkit_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
-    if find_path_ignore_case(dir, "reone-tools") is not None:
+    if find_path_ignore_case(dir, "toolkit") is not None:
         return True
-    if find_path_ignore_case(dir, "reone-tools.exe") is not None:
+    if find_path_ignore_case(dir, "toolkit.exe") is not None:
         return True
-    print("Tools directory does not contain a tools executable")
+    print("Tools directory does not contain toolkit executable")
     return False
 
 
-def configure_tools_dir():
-    global tools_dir, tools_exe
-    if not is_valid_tools_dir(tools_dir):
-        tools_dir = choose_directory("Choose a tools directory")
-        if not is_valid_tools_dir(tools_dir):
+def configure_toolkit_dir():
+    global toolkit_dir, toolkit_exe
+    if not is_valid_toolkit_dir(toolkit_dir):
+        toolkit_dir = choose_directory("Choose toolkit directory")
+        if not is_valid_toolkit_dir(toolkit_dir):
             exit(1)
-    tools_exe = find_path_ignore_case(tools_dir, "reone-tools")
-    if tools_exe is None:
-        tools_exe = find_path_ignore_case(tools_dir, "reone-tools.exe")
+    toolkit_exe = find_path_ignore_case(toolkit_dir, "toolkit")
+    if toolkit_exe is None:
+        toolkit_exe = find_path_ignore_case(toolkit_dir, "toolkit.exe")
 
 
 def is_valid_extract_dir(dir):
@@ -132,7 +132,7 @@ def run_subprocess(args, silent=True, check_retcode=True):
 
 
 def extract_bifs():
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     # Create destination directory if it does not exist
     dest_dir = get_or_create_dir(extract_dir, "data")
@@ -145,12 +145,12 @@ def extract_bifs():
         if f.lower().endswith(".bif"):
             print("Extracting {}...".format(f))
             bif_path = os.path.join(data_dir, f)
-            run_subprocess([tools_exe, "--game", game_dir,
+            run_subprocess([toolkit_exe, "--game", game_dir,
                            "--extract", bif_path, "--dest", dest_dir])
 
 
 def extract_patch():
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     # Create destination directory if it does not exist
     dest_dir = get_or_create_dir(extract_dir, "patch")
@@ -160,13 +160,13 @@ def extract_patch():
     if patch_path is None:
         return
     print("Extracting patch.erf")
-    run_subprocess([tools_exe, "--extract", patch_path, "--dest", dest_dir])
+    run_subprocess([toolkit_exe, "--extract", patch_path, "--dest", dest_dir])
 
 
 def extract_modules():
     ARCHIVE_EXT = [".rim", ".erf", ".mod"]
 
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     # Create destination directory if it does not exist
     dest_dir_base = get_or_create_dir(extract_dir, "modules")
@@ -183,11 +183,11 @@ def extract_modules():
         print("Extracting {}...".format(flc))
         archive_path = os.path.join(modules_dir, f)
         run_subprocess(
-            [tools_exe, "--extract", archive_path, "--dest", dest_dir])
+            [toolkit_exe, "--extract", archive_path, "--dest", dest_dir])
 
 
 def extract_textures():
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     out_texpacks_dir = get_or_create_dir(extract_dir, "texturepacks")
 
@@ -205,7 +205,7 @@ def extract_textures():
         texpack_dir = get_or_create_dir(out_texpacks_dir, filename)
         print("Extracting {}...".format(texpack))
         run_subprocess(
-            [tools_exe, "--extract", texpack, "--dest", texpack_dir])
+            [toolkit_exe, "--extract", texpack, "--dest", texpack_dir])
 
 
 def extract_dialog():
@@ -244,7 +244,7 @@ def extract_voices():
 
 
 def extract_lips():
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     # Create destination directory if it does not exist
     dest_dir = get_or_create_dir(extract_dir, "lips")
@@ -259,7 +259,7 @@ def extract_lips():
             mod_path = os.path.join(lips_dir, f)
             print("Extracting {}...".format(mod_path))
             run_subprocess(
-                [tools_exe, "--extract", mod_path, "--dest", dest_dir])
+                [toolkit_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
 def extract_override():
@@ -278,7 +278,7 @@ def extract_override():
 
 
 def convert_to_xml():
-    global game_dir, extract_dir, tools_exe
+    global game_dir, extract_dir, toolkit_exe
 
     CONVERTIBLE_TYPES = {
         "GFF": [
@@ -319,12 +319,12 @@ def convert_to_xml():
     for convertible_type, files in convertibles.items():
         chunks = partition(files, 100)
         for chunk in chunks:
-            run_subprocess([tools_exe, "--game", game_dir,
+            run_subprocess([toolkit_exe, "--game", game_dir,
                            "--to-xml", *chunk], silent=False)
 
 
 def convert_to_tga():
-    global extract_dir, tools_exe
+    global extract_dir, toolkit_exe
 
     # Batch-convert TPCs
     tpcs = []
@@ -337,12 +337,12 @@ def convert_to_tga():
         print("Enqueued {} for TPC to TGA/TXI conversion".format(f))
     tpc_chunks = partition(tpcs, 100)
     for chunk in tpc_chunks:
-        run_subprocess([tools_exe, "--to-tga", *chunk],
+        run_subprocess([toolkit_exe, "--to-tga", *chunk],
                        silent=False, check_retcode=False)
 
 
 def disassemble_scripts():
-    global game_tsl, extract_dir, tools_exe
+    global game_tsl, extract_dir, toolkit_exe
 
     ncs_files = []
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
@@ -353,7 +353,7 @@ def disassemble_scripts():
         print("Enqueued {} for disassembly".format(f))
     ncs_chunks = partition(ncs_files, 100)
     for chunk in ncs_chunks:
-        args = [tools_exe]
+        args = [toolkit_exe]
         if game_tsl:
             args.append("--tsl=1")
         args.append("--to-pcode")
@@ -374,37 +374,37 @@ for step in steps:
     if run:
         if step[0] == "extract_bifs":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_bifs()
 
         if step[0] == "extract_patch":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_patch()
 
         if step[0] == "extract_modules":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_modules()
 
         if step[0] == "extract_textures":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_textures()
 
         if step[0] == "extract_dialog":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_dialog()
 
         if step[0] == "extract_voices":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_voices()
 
         if step[0] == "extract_lips":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             extract_lips()
 
         if step[0] == "extract_override":
@@ -413,14 +413,14 @@ for step in steps:
 
         if step[0] == "convert_to_xml":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             convert_to_xml()
 
         if step[0] == "convert_to_tga":
-            configure_tools_dir()
+            configure_toolkit_dir()
             convert_to_tga()
 
         if step[0] == "disassemble_scripts":
             configure_game_dir()
-            configure_tools_dir()
+            configure_toolkit_dir()
             disassemble_scripts()
