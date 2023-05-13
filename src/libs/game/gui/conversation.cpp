@@ -19,18 +19,18 @@
 
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
-#include "reone/audio/services.h"
+#include "reone/audio/di/services.h"
 #include "reone/system/logutil.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/lipanimations.h"
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/resources.h"
 
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

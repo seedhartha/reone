@@ -20,7 +20,7 @@
 #include "reone/graphics/textures.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/script/types.h"
 
@@ -30,7 +30,7 @@
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

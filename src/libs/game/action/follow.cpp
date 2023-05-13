@@ -19,7 +19,7 @@
 
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

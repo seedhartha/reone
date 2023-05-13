@@ -17,47 +17,41 @@
 
 #pragma once
 
-#include "reone/resource/module.h"
-
-#include "context.h"
-#include "files.h"
-#include "options.h"
-#include "player.h"
 #include "services.h"
 
 namespace reone {
 
-namespace audio {
+namespace resource {
 
-class AudioModule : boost::noncopyable {
+class ResourceModule : boost::noncopyable {
 public:
-    AudioModule(AudioOptions &options, resource::ResourceModule &resource) :
-        _options(options),
-        _resource(resource) {
+    ResourceModule(boost::filesystem::path gamePath) :
+        _gamePath(std::move(gamePath)) {
     }
 
-    ~AudioModule() { deinit(); }
+    ~ResourceModule() { deinit(); }
 
     void init();
     void deinit();
 
-    AudioContext &audioContext() { return *_audioContext; }
-    AudioFiles &audioFiles() { return *_audioFiles; }
-    AudioPlayer &audioPlayer() { return *_audioPlayer; }
+    Gffs &gffs() { return *_gffs; }
+    Resources &resources() { return *_resources; }
+    Strings &strings() { return *_strings; }
+    TwoDas &twoDas() { return *_twoDas; }
 
-    AudioServices &services() { return *_services; }
+    ResourceServices &services() { return *_services; }
 
 private:
-    AudioOptions &_options;
-    resource::ResourceModule &_resource;
+    boost::filesystem::path _gamePath;
 
-    std::unique_ptr<AudioContext> _audioContext;
-    std::unique_ptr<AudioFiles> _audioFiles;
-    std::unique_ptr<AudioPlayer> _audioPlayer;
+    std::unique_ptr<Gffs> _gffs;
+    std::unique_ptr<Resources> _resources;
+    std::unique_ptr<Strings> _strings;
+    std::unique_ptr<TwoDas> _twoDas;
 
-    std::unique_ptr<AudioServices> _services;
+    std::unique_ptr<ResourceServices> _services;
 };
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

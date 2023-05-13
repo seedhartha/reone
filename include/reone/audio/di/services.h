@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "context.h"
-#include "files.h"
-#include "player.h"
+#include "../context.h"
+#include "../files.h"
+#include "../player.h"
 
 namespace reone {
 

@@ -23,7 +23,7 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 
 #include "reone/game/options.h"
 #include "reone/game/types.h"

@@ -17,24 +17,28 @@
 
 #pragma once
 
-#include "clock.h"
+#include "../scripts.h"
 
 namespace reone {
 
-struct SystemServices {
-    IClock &clock;
+namespace script {
 
-    SystemServices(IClock &clock) :
-        clock(clock) {
+struct ScriptServices {
+    IScripts &scripts;
+
+    ScriptServices(IScripts &scripts) :
+        scripts(scripts) {
     }
 
-    Clock &defaultClock() {
-        auto casted = dynamic_cast<Clock *>(&clock);
+    Scripts &defaultScripts() {
+        auto casted = dynamic_cast<Scripts *>(&scripts);
         if (!casted) {
-            throw std::logic_error("Illegal Clock implementation");
+            throw std::logic_error("Illegal Scripts implementation");
         }
         return *casted;
     }
 };
+
+} // namespace script
 
 } // namespace reone

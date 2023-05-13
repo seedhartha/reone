@@ -18,7 +18,7 @@
 #pragma once
 
 #include "reone/audio/format/mp3reader.h"
-#include "reone/audio/services.h"
+#include "reone/audio/di/services.h"
 
 namespace reone {
 

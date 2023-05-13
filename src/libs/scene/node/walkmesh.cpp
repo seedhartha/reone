@@ -18,7 +18,7 @@
 #include "reone/scene/node/walkmesh.h"
 
 #include "reone/graphics/context.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 

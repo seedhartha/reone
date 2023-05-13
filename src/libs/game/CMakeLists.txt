@@ -17,6 +17,7 @@ set(GAME_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/game)
 set(GAME_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/game)
 
 set(GAME_HEADERS
+    ${GAME_INCLUDE_DIR}/action.h
     ${GAME_INCLUDE_DIR}/action/attack.h
     ${GAME_INCLUDE_DIR}/action/barkstring.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatlocation.h
@@ -59,14 +60,13 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/useskill.h
     ${GAME_INCLUDE_DIR}/action/usetalentonobject.h
     ${GAME_INCLUDE_DIR}/action/wait.h
-    ${GAME_INCLUDE_DIR}/action.h
     ${GAME_INCLUDE_DIR}/animationutil.h
+    ${GAME_INCLUDE_DIR}/camera.h
     ${GAME_INCLUDE_DIR}/camera/animated.h
     ${GAME_INCLUDE_DIR}/camera/dialog.h
     ${GAME_INCLUDE_DIR}/camera/firstperson.h
     ${GAME_INCLUDE_DIR}/camera/static.h
     ${GAME_INCLUDE_DIR}/camera/thirdperson.h
-    ${GAME_INCLUDE_DIR}/camera.h
     ${GAME_INCLUDE_DIR}/camerastyle.h
     ${GAME_INCLUDE_DIR}/camerastyles.h
     ${GAME_INCLUDE_DIR}/character.h
@@ -84,8 +84,11 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/d20/spell.h
     ${GAME_INCLUDE_DIR}/d20/spells.h
     ${GAME_INCLUDE_DIR}/debug.h
+    ${GAME_INCLUDE_DIR}/di/module.h
+    ${GAME_INCLUDE_DIR}/di/services.h
     ${GAME_INCLUDE_DIR}/dialog.h
     ${GAME_INCLUDE_DIR}/dialogs.h
+    ${GAME_INCLUDE_DIR}/effect.h
     ${GAME_INCLUDE_DIR}/effect/abilitydecrease.h
     ${GAME_INCLUDE_DIR}/effect/abilityincrease.h
     ${GAME_INCLUDE_DIR}/effect/acdecrease.h
@@ -151,7 +154,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/visual.h
     ${GAME_INCLUDE_DIR}/effect/vpregenmodifier.h
     ${GAME_INCLUDE_DIR}/effect/whirlwind.h
-    ${GAME_INCLUDE_DIR}/effect.h
     ${GAME_INCLUDE_DIR}/event.h
     ${GAME_INCLUDE_DIR}/footstepsounds.h
     ${GAME_INCLUDE_DIR}/format/ltrreader.h
@@ -160,7 +162,9 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/format/ssfwriter.h
     ${GAME_INCLUDE_DIR}/format/visreader.h
     ${GAME_INCLUDE_DIR}/game.h
+    ${GAME_INCLUDE_DIR}/gui.h
     ${GAME_INCLUDE_DIR}/gui/barkbubble.h
+    ${GAME_INCLUDE_DIR}/gui/chargen.h
     ${GAME_INCLUDE_DIR}/gui/chargen/abilities.h
     ${GAME_INCLUDE_DIR}/gui/chargen/classselect.h
     ${GAME_INCLUDE_DIR}/gui/chargen/custom.h
@@ -171,13 +175,13 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/chargen/quick.h
     ${GAME_INCLUDE_DIR}/gui/chargen/quickorcustom.h
     ${GAME_INCLUDE_DIR}/gui/chargen/skills.h
-    ${GAME_INCLUDE_DIR}/gui/chargen.h
     ${GAME_INCLUDE_DIR}/gui/computer.h
     ${GAME_INCLUDE_DIR}/gui/console.h
     ${GAME_INCLUDE_DIR}/gui/container.h
     ${GAME_INCLUDE_DIR}/gui/conversation.h
     ${GAME_INCLUDE_DIR}/gui/dialog.h
     ${GAME_INCLUDE_DIR}/gui/hud.h
+    ${GAME_INCLUDE_DIR}/gui/ingame.h
     ${GAME_INCLUDE_DIR}/gui/ingame/abilities.h
     ${GAME_INCLUDE_DIR}/gui/ingame/character.h
     ${GAME_INCLUDE_DIR}/gui/ingame/equip.h
@@ -186,7 +190,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/ingame/map.h
     ${GAME_INCLUDE_DIR}/gui/ingame/messages.h
     ${GAME_INCLUDE_DIR}/gui/ingame/options.h
-    ${GAME_INCLUDE_DIR}/gui/ingame.h
     ${GAME_INCLUDE_DIR}/gui/loadscreen.h
     ${GAME_INCLUDE_DIR}/gui/mainmenu.h
     ${GAME_INCLUDE_DIR}/gui/map.h
@@ -194,12 +197,11 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/profileoverlay.h
     ${GAME_INCLUDE_DIR}/gui/saveload.h
     ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
-    ${GAME_INCLUDE_DIR}/gui.h
     ${GAME_INCLUDE_DIR}/guisounds.h
     ${GAME_INCLUDE_DIR}/layout.h
     ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
-    ${GAME_INCLUDE_DIR}/module.h
+    ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
     ${GAME_INCLUDE_DIR}/object/creature.h
     ${GAME_INCLUDE_DIR}/object/door.h
@@ -212,7 +214,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/sound.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
-    ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/options.h
     ${GAME_INCLUDE_DIR}/party.h
     ${GAME_INCLUDE_DIR}/path.h
@@ -231,7 +232,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
     ${GAME_INCLUDE_DIR}/script/routines.h
     ${GAME_INCLUDE_DIR}/script/runner.h
-    ${GAME_INCLUDE_DIR}/services.h
     ${GAME_INCLUDE_DIR}/soundsets.h
     ${GAME_INCLUDE_DIR}/surface.h
     ${GAME_INCLUDE_DIR}/surfaces.h
@@ -297,6 +297,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/d20/skills.cpp
     ${GAME_SOURCE_DIR}/d20/spells.cpp
     ${GAME_SOURCE_DIR}/debug.cpp
+    ${GAME_SOURCE_DIR}/di/module.cpp
     ${GAME_SOURCE_DIR}/dialogs.cpp
     ${GAME_SOURCE_DIR}/effect/abilitydecrease.cpp
     ${GAME_SOURCE_DIR}/effect/abilityincrease.cpp
@@ -407,7 +408,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui.cpp
     ${GAME_SOURCE_DIR}/guisounds.cpp
     ${GAME_SOURCE_DIR}/layouts.cpp
-    ${GAME_SOURCE_DIR}/module.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp

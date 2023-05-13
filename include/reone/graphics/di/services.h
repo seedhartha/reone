@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "context.h"
-#include "fonts.h"
-#include "lipanimations.h"
-#include "meshes.h"
-#include "models.h"
-#include "pipeline.h"
-#include "shaders.h"
-#include "textures.h"
-#include "uniforms.h"
-#include "walkmeshes.h"
-#include "window.h"
+#include "../context.h"
+#include "../fonts.h"
+#include "../lipanimations.h"
+#include "../meshes.h"
+#include "../models.h"
+#include "../pipeline.h"
+#include "../shaders.h"
+#include "../textures.h"
+#include "../uniforms.h"
+#include "../walkmeshes.h"
+#include "../window.h"
 
 namespace reone {
 

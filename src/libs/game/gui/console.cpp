@@ -23,7 +23,7 @@
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -40,7 +40,7 @@
 #include "reone/game/location.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 using namespace std::placeholders;

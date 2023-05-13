@@ -20,7 +20,7 @@
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
-#include "reone/script/services.h"
+#include "reone/script/di/services.h"
 
 namespace reone {
 

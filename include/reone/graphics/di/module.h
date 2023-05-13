@@ -17,21 +17,9 @@
 
 #pragma once
 
-#include "reone/resource/module.h"
+#include "reone/resource/di/module.h"
 
-#include "context.h"
-#include "fonts.h"
-#include "lipanimations.h"
-#include "meshes.h"
-#include "models.h"
-#include "options.h"
-#include "pipeline.h"
 #include "services.h"
-#include "shaders.h"
-#include "textures.h"
-#include "uniforms.h"
-#include "walkmeshes.h"
-#include "window.h"
 
 namespace reone {
 

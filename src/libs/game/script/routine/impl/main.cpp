@@ -19,7 +19,7 @@
 
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/script/exception/notimpl.h"
 #include "reone/script/exception/unsupportedroutine.h"
@@ -35,7 +35,7 @@
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 #include "reone/game/talent.h"
 
 #include "reone/game/script/routine/argutil.h"

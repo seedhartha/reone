@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/module.h"
+#include "reone/graphics/di/module.h"
 
 using namespace std;
 

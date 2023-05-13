@@ -26,6 +26,7 @@
 #include "action/factory.h"
 #include "camera.h"
 #include "combat.h"
+#include "di/services.h"
 #include "effect/factory.h"
 #include "gui/chargen.h"
 #include "gui/computer.h"
@@ -46,7 +47,6 @@
 #include "options.h"
 #include "party.h"
 #include "script/runner.h"
-#include "services.h"
 
 namespace reone {
 

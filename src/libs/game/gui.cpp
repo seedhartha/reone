@@ -18,15 +18,15 @@
 #include "reone/game/gui.h"
 
 #include "reone/audio/player.h"
-#include "reone/audio/services.h"
-#include "reone/graphics/services.h"
+#include "reone/audio/di/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
-#include "reone/resource/services.h"
-#include "reone/scene/services.h"
+#include "reone/resource/di/services.h"
+#include "reone/scene/di/services.h"
 
 #include "reone/game/game.h"
 #include "reone/game/guisounds.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

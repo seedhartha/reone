@@ -24,7 +24,7 @@
 
 #include "reone/game/d20/classes.h"
 #include "reone/game/game.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 #include "reone/game/gui/chargen.h"
 

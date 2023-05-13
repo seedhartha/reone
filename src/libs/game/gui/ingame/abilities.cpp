@@ -23,13 +23,13 @@
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

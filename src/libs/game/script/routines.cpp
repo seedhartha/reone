@@ -20,7 +20,7 @@
 #include "reone/system/collectionutil.h"
 #include "reone/script/variable.h"
 
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 #include "reone/game/types.h"
 
 #include "reone/game/script/routine/context.h"

@@ -23,14 +23,14 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/sound.h"
-#include "reone/scene/services.h"
+#include "reone/scene/di/services.h"
 
 #include "reone/game/game.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

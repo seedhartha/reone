@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/module.h"
+#include "reone/game/di/module.h"
 
 using namespace std;
 

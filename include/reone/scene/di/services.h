@@ -15,24 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/script/module.h"
+#pragma once
 
-using namespace std;
+#include "../graphs.h"
 
 namespace reone {
 
-namespace script {
+namespace scene {
 
-void ScriptModule::init() {
-    _scripts = make_unique<Scripts>(_resource.resources());
-    _services = make_unique<ScriptServices>(*_scripts);
-}
+struct SceneServices {
+    ISceneGraphs &graphs;
 
-void ScriptModule::deinit() {
-    _services.reset();
-    _scripts.reset();
-}
+    SceneServices(ISceneGraphs &graphs) :
+        graphs(graphs) {
+    }
 
-} // namespace script
+    SceneGraphs &defaultGraphs() {
+        auto casted = dynamic_cast<SceneGraphs *>(&graphs);
+        if (!casted) {
+            throw std::logic_error("Illegal SceneGraphs implementation");
+        }
+        return *casted;
+    }
+};
+
+} // namespace scene
 
 } // namespace reone

@@ -20,11 +20,12 @@ set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/animeventlistener.h
     ${SCENE_INCLUDE_DIR}/animproperties.h
     ${SCENE_INCLUDE_DIR}/collision.h
+    ${SCENE_INCLUDE_DIR}/di/module.h
+    ${SCENE_INCLUDE_DIR}/di/services.h
     ${SCENE_INCLUDE_DIR}/fogproperties.h
     ${SCENE_INCLUDE_DIR}/graph.h
     ${SCENE_INCLUDE_DIR}/graphs.h
     ${SCENE_INCLUDE_DIR}/grassproperties.h
-    ${SCENE_INCLUDE_DIR}/module.h
     ${SCENE_INCLUDE_DIR}/node.h
     ${SCENE_INCLUDE_DIR}/node/camera.h
     ${SCENE_INCLUDE_DIR}/node/dummy.h
@@ -39,14 +40,13 @@ set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/node/sound.h
     ${SCENE_INCLUDE_DIR}/node/trigger.h
     ${SCENE_INCLUDE_DIR}/node/walkmesh.h
-    ${SCENE_INCLUDE_DIR}/services.h
     ${SCENE_INCLUDE_DIR}/types.h
     ${SCENE_INCLUDE_DIR}/user.h)
 
 set(SCENE_SOURCES
+    ${SCENE_SOURCE_DIR}/di/module.cpp
     ${SCENE_SOURCE_DIR}/graph.cpp
     ${SCENE_SOURCE_DIR}/graphs.cpp
-    ${SCENE_SOURCE_DIR}/module.cpp
     ${SCENE_SOURCE_DIR}/node.cpp
     ${SCENE_SOURCE_DIR}/node/camera.cpp
     ${SCENE_SOURCE_DIR}/node/emitter.cpp

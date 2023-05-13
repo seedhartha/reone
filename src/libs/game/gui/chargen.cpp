@@ -18,19 +18,19 @@
 #include "reone/game/gui/chargen.h"
 
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/resource/resources.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/services.h"
+#include "reone/scene/di/services.h"
 
 #include "reone/game/d20/classes.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/portraits.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 #include "reone/game/types.h"
 
 using namespace std;

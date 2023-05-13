@@ -18,16 +18,16 @@
 #include "reone/game/gui/ingame/character.h"
 
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/services.h"
+#include "reone/scene/di/services.h"
 
 #include "reone/game/d20/classes.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 #include "reone/game/types.h"
 
 #include "reone/game/gui/ingame.h"

@@ -18,7 +18,7 @@
 #include "reone/scene/node/sound.h"
 
 #include "reone/audio/player.h"
-#include "reone/audio/services.h"
+#include "reone/audio/di/services.h"
 
 using namespace std;
 

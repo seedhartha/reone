@@ -20,7 +20,7 @@
 #include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
@@ -28,7 +28,7 @@
 #include "reone/resource/gff.h"
 
 #include "reone/game/game.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

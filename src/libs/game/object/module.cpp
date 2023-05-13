@@ -21,7 +21,7 @@
 #include "reone/system/logutil.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 
 #include "reone/game/action/attack.h"
 #include "reone/game/action/factory.h"
@@ -31,7 +31,7 @@
 #include "reone/game/game.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 #include "reone/game/object/factory.h"
 

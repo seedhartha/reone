@@ -29,7 +29,7 @@
 #include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
 
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 
 namespace reone {
 

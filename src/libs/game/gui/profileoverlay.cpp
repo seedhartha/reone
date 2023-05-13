@@ -21,13 +21,13 @@
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/window.h"
-#include "reone/system/services.h"
+#include "reone/system/di/services.h"
 
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

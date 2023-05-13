@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/scene/services.h"
+#include "reone/scene/di/services.h"
 
 namespace reone {
 

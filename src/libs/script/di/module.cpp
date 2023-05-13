@@ -15,32 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/module.h"
+#include "reone/script/di/module.h"
 
 using namespace std;
 
 namespace reone {
 
-namespace audio {
+namespace script {
 
-void AudioModule::init() {
-    _audioFiles = make_unique<AudioFiles>(_resource.resources());
-    _audioContext = make_unique<AudioContext>();
-    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
-
-    _services = make_unique<AudioServices>(*_audioContext, *_audioFiles, *_audioPlayer);
-
-    _audioContext->init();
+void ScriptModule::init() {
+    _scripts = make_unique<Scripts>(_resource.resources());
+    _services = make_unique<ScriptServices>(*_scripts);
 }
 
-void AudioModule::deinit() {
+void ScriptModule::deinit() {
     _services.reset();
-
-    _audioPlayer.reset();
-    _audioContext.reset();
-    _audioFiles.reset();
+    _scripts.reset();
 }
 
-} // namespace audio
+} // namespace script
 
 } // namespace reone

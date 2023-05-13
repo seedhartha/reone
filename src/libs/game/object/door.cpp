@@ -18,22 +18,22 @@
 #include "reone/game/object/door.h"
 
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-#include "reone/scene/services.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/types.h"
 #include "reone/script/scripts.h"
 
 #include "reone/game/game.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

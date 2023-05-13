@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "reone/audio/module.h"
-#include "reone/game/module.h"
-#include "reone/graphics/module.h"
-#include "reone/resource/module.h"
-#include "reone/scene/module.h"
-#include "reone/script/module.h"
-#include "reone/system/module.h"
+#include "reone/audio/di/module.h"
+#include "reone/game/di/module.h"
+#include "reone/game/game.h"
+#include "reone/graphics/di/module.h"
+#include "reone/resource/di/module.h"
+#include "reone/scene/di/module.h"
+#include "reone/script/di/module.h"
+#include "reone/system/di/module.h"
 
 #include "options.h"
 

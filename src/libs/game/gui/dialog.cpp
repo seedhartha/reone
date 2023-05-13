@@ -23,17 +23,17 @@
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/gui/control/panel.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
-#include "reone/resource/services.h"
+#include "reone/resource/di/services.h"
 #include "reone/scene/types.h"
 #include "reone/script/execution.h"
 
 #include "reone/game/game.h"
 #include "reone/game/party.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 
 using namespace std;
 

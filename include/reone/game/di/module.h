@@ -17,32 +17,15 @@
 
 #pragma once
 
-#include "reone/audio/module.h"
-#include "reone/graphics/module.h"
-#include "reone/resource/module.h"
-#include "reone/scene/module.h"
-#include "reone/script/module.h"
+#include "reone/audio/di/module.h"
+#include "reone/graphics/di/module.h"
+#include "reone/resource/di/module.h"
+#include "reone/scene/di/module.h"
+#include "reone/script/di/module.h"
 
-#include "camerastyles.h"
-#include "cursors.h"
-#include "d20/classes.h"
-#include "d20/feats.h"
-#include "d20/skills.h"
-#include "d20/spells.h"
-#include "dialogs.h"
-#include "footstepsounds.h"
-#include "game.h"
-#include "guisounds.h"
-#include "layouts.h"
-#include "paths.h"
-#include "portraits.h"
-#include "reputes.h"
-#include "resourcelayout.h"
+#include "../types.h"
+
 #include "services.h"
-#include "soundsets.h"
-#include "surfaces.h"
-#include "types.h"
-#include "visibilities.h"
 
 namespace reone {
 

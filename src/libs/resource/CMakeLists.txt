@@ -19,8 +19,8 @@ set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
     ${RESOURCE_INCLUDE_DIR}/2das.h
-    ${RESOURCE_INCLUDE_DIR}/gff.h
-    ${RESOURCE_INCLUDE_DIR}/gffs.h
+    ${RESOURCE_INCLUDE_DIR}/di/module.h
+    ${RESOURCE_INCLUDE_DIR}/di/services.h
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
@@ -35,15 +35,15 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
+    ${RESOURCE_INCLUDE_DIR}/gff.h
+    ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
-    ${RESOURCE_INCLUDE_DIR}/module.h
     ${RESOURCE_INCLUDE_DIR}/provider.h
     ${RESOURCE_INCLUDE_DIR}/provider/erf.h
     ${RESOURCE_INCLUDE_DIR}/provider/folder.h
     ${RESOURCE_INCLUDE_DIR}/provider/keybif.h
     ${RESOURCE_INCLUDE_DIR}/provider/rim.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
-    ${RESOURCE_INCLUDE_DIR}/services.h
     ${RESOURCE_INCLUDE_DIR}/strings.h
     ${RESOURCE_INCLUDE_DIR}/talktable.h
     ${RESOURCE_INCLUDE_DIR}/types.h
@@ -52,8 +52,7 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/2da.cpp
     ${RESOURCE_SOURCE_DIR}/2das.cpp
-    ${RESOURCE_SOURCE_DIR}/gff.cpp
-    ${RESOURCE_SOURCE_DIR}/gffs.cpp
+    ${RESOURCE_SOURCE_DIR}/di/module.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
@@ -68,7 +67,8 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
-    ${RESOURCE_SOURCE_DIR}/module.cpp
+    ${RESOURCE_SOURCE_DIR}/gff.cpp
+    ${RESOURCE_SOURCE_DIR}/gffs.cpp
     ${RESOURCE_SOURCE_DIR}/provider/erf.cpp
     ${RESOURCE_SOURCE_DIR}/provider/folder.cpp
     ${RESOURCE_SOURCE_DIR}/provider/keybif.cpp

@@ -17,6 +17,8 @@ set(SCRIPT_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/script)
 set(SCRIPT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/script)
 
 set(SCRIPT_HEADERS
+    ${SCRIPT_INCLUDE_DIR}/di/module.h
+    ${SCRIPT_INCLUDE_DIR}/di/services.h
     ${SCRIPT_INCLUDE_DIR}/enginetype.h
     ${SCRIPT_INCLUDE_DIR}/exception/argument.h
     ${SCRIPT_INCLUDE_DIR}/exception/notimpl.h
@@ -27,22 +29,20 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/format/ncsreader.h
     ${SCRIPT_INCLUDE_DIR}/format/ncswriter.h
     ${SCRIPT_INCLUDE_DIR}/instrutil.h
-    ${SCRIPT_INCLUDE_DIR}/module.h
     ${SCRIPT_INCLUDE_DIR}/program.h
     ${SCRIPT_INCLUDE_DIR}/routine.h
     ${SCRIPT_INCLUDE_DIR}/routines.h
     ${SCRIPT_INCLUDE_DIR}/scripts.h
-    ${SCRIPT_INCLUDE_DIR}/services.h
     ${SCRIPT_INCLUDE_DIR}/types.h
     ${SCRIPT_INCLUDE_DIR}/variable.h
     ${SCRIPT_INCLUDE_DIR}/variableutil.h)
 
 set(SCRIPT_SOURCES
+    ${SCRIPT_SOURCE_DIR}/di/module.cpp
     ${SCRIPT_SOURCE_DIR}/execution.cpp
     ${SCRIPT_SOURCE_DIR}/format/ncsreader.cpp
     ${SCRIPT_SOURCE_DIR}/format/ncswriter.cpp
     ${SCRIPT_SOURCE_DIR}/instrutil.cpp
-    ${SCRIPT_SOURCE_DIR}/module.cpp
     ${SCRIPT_SOURCE_DIR}/program.cpp
     ${SCRIPT_SOURCE_DIR}/routine.cpp
     ${SCRIPT_SOURCE_DIR}/scripts.cpp

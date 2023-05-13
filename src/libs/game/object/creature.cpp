@@ -17,36 +17,36 @@
 
 #include "reone/game/object/creature.h"
 
+#include "reone/audio/di/services.h"
 #include "reone/audio/player.h"
-#include "reone/audio/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/models.h"
-#include "reone/graphics/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/services.h"
 #include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/services.h"
 #include "reone/scene/types.h"
 #include "reone/script/types.h"
+#include "reone/system/di/services.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-#include "reone/system/services.h"
 #include "reone/system/timer.h"
 
 #include "reone/game/action/objectaction.h"
 #include "reone/game/animationutil.h"
 #include "reone/game/d20/classes.h"
+#include "reone/game/di/services.h"
 #include "reone/game/footstepsounds.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/services.h"
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 
@@ -611,7 +611,7 @@ shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
 int Creature::getAttackBonus(bool offHand) const {
     auto rightWeapon(getEquippedItem(InventorySlot::rightWeapon));
     auto leftWeapon(getEquippedItem(InventorySlot::leftWeapon));
-    auto weapon = offHand ? leftWeapon : rightWeapon;
+    auto &weapon = offHand ? leftWeapon : rightWeapon;
 
     int modifier;
     if (weapon && weapon->isRanged()) {

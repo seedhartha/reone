@@ -17,47 +17,37 @@
 
 #pragma once
 
-#include "reone/audio/module.h"
-#include "reone/graphics/module.h"
-#include "reone/graphics/options.h"
+#include "reone/resource/di/module.h"
 
-#include "graphs.h"
 #include "services.h"
 
 namespace reone {
 
-namespace scene {
+namespace script {
 
-class SceneModule : boost::noncopyable {
+class ScriptModule : boost::noncopyable {
 public:
-    SceneModule(
-        graphics::GraphicsOptions &graphicsOpt,
-        audio::AudioModule &audio,
-        graphics::GraphicsModule &graphics) :
-        _graphicsOpt(graphicsOpt),
-        _audio(audio),
-        _graphics(graphics) {
+    ScriptModule(resource::ResourceModule &resource) :
+        _resource(resource) {
     }
 
-    ~SceneModule() { deinit(); }
+    ~ScriptModule() { deinit(); }
 
     void init();
     void deinit();
 
-    SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
+    Scripts &scripts() { return *_scripts; }
 
-    SceneServices &services() { return *_services; }
+    ScriptServices &services() { return *_services; }
 
 private:
-    graphics::GraphicsOptions &_graphicsOpt;
-    graphics::GraphicsModule &_graphics;
-    audio::AudioModule &_audio;
+    resource::ResourceModule &_resource;
 
-    std::unique_ptr<SceneGraphs> _sceneGraphs;
+    std::unique_ptr<Scripts> _scripts;
 
-    std::unique_ptr<SceneServices> _services;
+    std::unique_ptr<ScriptServices> _services;
 };
 
-} // namespace scene
+} // namespace script
 
 } // namespace reone

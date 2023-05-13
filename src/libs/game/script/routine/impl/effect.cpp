@@ -26,7 +26,7 @@
 #include "reone/game/effect.h"
 #include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
-#include "reone/game/services.h"
+#include "reone/game/di/services.h"
 #include "reone/game/types.h"
 
 #include "reone/game/script/routine/argutil.h"

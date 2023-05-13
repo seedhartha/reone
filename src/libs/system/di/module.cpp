@@ -15,34 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/module.h"
+#include "reone/system/di/module.h"
 
 using namespace std;
 
 namespace reone {
 
-namespace resource {
-
-void ResourceModule::init() {
-    _resources = make_unique<Resources>();
-    _strings = make_unique<Strings>();
-    _twoDas = make_unique<TwoDas>(*_resources);
-    _gffs = make_unique<Gffs>(*_resources);
-
-    _services = make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
-
-    _strings->init(_gamePath);
+void SystemModule::init() {
+    _clock = make_unique<Clock>();
+    _services = make_unique<SystemServices>(*_clock);
 }
-
-void ResourceModule::deinit() {
-    _services.reset();
-
-    _gffs.reset();
-    _twoDas.reset();
-    _strings.reset();
-    _resources.reset();
-}
-
-} // namespace resource
 
 } // namespace reone

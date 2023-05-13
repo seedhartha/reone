@@ -18,11 +18,11 @@
 #include "reone/movie/movie.h"
 
 #include "reone/audio/player.h"
-#include "reone/audio/services.h"
+#include "reone/audio/di/services.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/services.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"

@@ -15,30 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/audio/di/module.h"
 
-#include "reone/scene/graphs.h"
+using namespace std;
 
 namespace reone {
 
-namespace scene {
+namespace audio {
 
-struct SceneServices {
-    ISceneGraphs &graphs;
+void AudioModule::init() {
+    _audioFiles = make_unique<AudioFiles>(_resource.resources());
+    _audioContext = make_unique<AudioContext>();
+    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
 
-    SceneServices(ISceneGraphs &graphs) :
-        graphs(graphs) {
-    }
+    _services = make_unique<AudioServices>(*_audioContext, *_audioFiles, *_audioPlayer);
 
-    SceneGraphs &defaultGraphs() {
-        auto casted = dynamic_cast<SceneGraphs *>(&graphs);
-        if (!casted) {
-            throw std::logic_error("Illegal SceneGraphs implementation");
-        }
-        return *casted;
-    }
-};
+    _audioContext->init();
+}
 
-} // namespace scene
+void AudioModule::deinit() {
+    _services.reset();
+
+    _audioPlayer.reset();
+    _audioContext.reset();
+    _audioFiles.reset();
+}
+
+} // namespace audio
 
 } // namespace reone
