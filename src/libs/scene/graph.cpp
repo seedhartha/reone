@@ -436,7 +436,7 @@ void SceneGraph::drawShadows() {
     if (!_activeCamera) {
         return;
     }
-    _graphicsSvc.defaultContext().withFaceCulling(CullFaceMode::Front, [this]() {
+    _graphicsSvc.context.withFaceCulling(CullFaceMode::Front, [this]() {
         for (auto &mesh : _shadowMeshes) {
             mesh->drawShadow();
         }
@@ -448,7 +448,7 @@ void SceneGraph::drawOpaque() {
         return;
     }
     if (_drawWalkmeshes || _drawTriggers) {
-        _graphicsSvc.defaultUniforms().setWalkmesh([this](auto &walkmesh) {
+        _graphicsSvc.uniforms.setWalkmesh([this](auto &walkmesh) {
             for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
                 walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
             }
@@ -499,7 +499,7 @@ void SceneGraph::drawLensFlares() {
     if (_flareLights.empty() || _drawWalkmeshes) {
         return;
     }
-    _graphicsSvc.defaultContext().withDepthTest(DepthTestMode::None, [this]() {
+    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
         for (auto &light : _flareLights) {
             Collision collision;
             if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
@@ -687,7 +687,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
 }
 
 void SceneGraph::fillLightingUniforms() {
-    _graphicsSvc.defaultUniforms().setLighting([this](auto &lighting) {
+    _graphicsSvc.uniforms.setLighting([this](auto &lighting) {
         lighting.numLights = static_cast<int>(_activeLights.size());
         for (size_t i = 0; i < _activeLights.size(); ++i) {
             LightUniforms &shaderLight = lighting.lights[i];

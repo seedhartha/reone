@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include "reone/system/exception/notimplemented.h"
+
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/lipanimations.h"
 #include "reone/graphics/meshes.h"
@@ -29,22 +32,51 @@
 #include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
 
-#include "reone/graphics/di/services.h"
-
 namespace reone {
 
 namespace graphics {
 
 class MockFonts : public IFonts, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Font> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockGraphicsContext : public IGraphicsContext, boost::noncopyable {
+public:
+    void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override {}
+    void clearDepth() override {}
+    void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override {}
+
+    void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override {}
+    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override {}
+    void withBlending(BlendMode mode, const std::function<void()> &block) override {}
+    void withPolygonMode(PolygonMode mode, const std::function<void()> &block) override {}
+    void withViewport(glm::ivec4 viewport, const std::function<void()> &block) override {}
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) override {}
 };
 
 class MockLipAnimations : public ILipAnimations, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<LipAnimation> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockMeshes : public IMeshes, boost::noncopyable {
+public:
+    Mesh &quad() const { throw NotImplementedException("quad"); }
+    Mesh &quadNDC() const { throw NotImplementedException("quadNDC"); }
+    Mesh &billboard() const { throw NotImplementedException("billboard"); }
+    Mesh &grass() const { throw NotImplementedException("grass"); }
+
+    Mesh &box() const { throw NotImplementedException("box"); }
+    Mesh &cubemap() const { throw NotImplementedException("cubemap"); }
 };
 
 class MockModels : public IModels, boost::noncopyable {
@@ -55,25 +87,107 @@ public:
 };
 
 class MockPipeline : public IPipeline, boost::noncopyable {
-};
-
-class MockShaders : public IShaders, boost::noncopyable {
-};
-
-class MockTextures : public ITextures, boost::noncopyable {
 public:
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage) override {
+    std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) override {
         return nullptr;
     }
 };
 
+class MockShaders : public IShaders, boost::noncopyable {
+public:
+    void use(ShaderProgram &program) override {}
+
+    ShaderProgram &simpleColor() const override { throw NotImplementedException("simpleColor"); }
+    ShaderProgram &simpleTexture() const override { throw NotImplementedException("simpleTexture"); }
+    ShaderProgram &gui() const override { throw NotImplementedException("gui"); }
+    ShaderProgram &text() const override { throw NotImplementedException("text"); }
+    ShaderProgram &points() const override { throw NotImplementedException("points"); }
+
+    ShaderProgram &pointLightShadows() const override { throw NotImplementedException("pointLightShadows"); }
+    ShaderProgram &directionalLightShadows() const override { throw NotImplementedException("directionalLightShadows"); }
+    ShaderProgram &modelOpaque() const override { throw NotImplementedException("modelOpaque"); }
+    ShaderProgram &modelTransparent() const override { throw NotImplementedException("modelTransparent"); }
+    ShaderProgram &aabb() const override { throw NotImplementedException("aabb"); }
+    ShaderProgram &walkmesh() const override { throw NotImplementedException("walkmesh"); }
+    ShaderProgram &particle() const override { throw NotImplementedException("particle"); }
+    ShaderProgram &grass() const override { throw NotImplementedException("grass"); }
+    ShaderProgram &billboard() const override { throw NotImplementedException("billboard"); }
+    ShaderProgram &ssao() const override { throw NotImplementedException("ssao"); }
+    ShaderProgram &ssr() const override { throw NotImplementedException("ssr"); }
+    ShaderProgram &combineOpaque() const override { throw NotImplementedException("combineOpaque"); }
+    ShaderProgram &combineGeometry() const override { throw NotImplementedException("combineGeometry"); }
+
+    ShaderProgram &boxBlur4() const override { throw NotImplementedException("boxBlur4"); }
+    ShaderProgram &gaussianBlur9() const override { throw NotImplementedException("gaussianBlur9"); }
+    ShaderProgram &gaussianBlur13() const override { throw NotImplementedException("gaussianBlur13"); }
+    ShaderProgram &medianFilter3() const override { throw NotImplementedException("medianFilter3"); }
+    ShaderProgram &medianFilter5() const override { throw NotImplementedException("medianFilter5"); }
+    ShaderProgram &fxaa() const override { throw NotImplementedException("fxaa"); }
+    ShaderProgram &sharpen() const override { throw NotImplementedException("sharpen"); }
+};
+
+class MockTextures : public ITextures, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    void bind(Texture &texture, int unit = TextureUnits::mainTex) override {}
+    void bindBuiltIn() override {}
+
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage) override {
+        return nullptr;
+    }
+
+    // Built-in
+
+    std::shared_ptr<Texture> default2DRGB() const override { return nullptr; }
+    std::shared_ptr<Texture> defaultArrayDepth() const override { return nullptr; }
+    std::shared_ptr<Texture> defaultCubemapRGB() const override { return nullptr; }
+    std::shared_ptr<Texture> defaultCubemapDepth() const override { return nullptr; }
+
+    std::shared_ptr<Texture> noiseRG() const override { return nullptr; }
+    std::shared_ptr<Texture> ssaoRGB() const override { return nullptr; }
+    std::shared_ptr<Texture> ssrRGBA() const override { return nullptr; }
+
+    // END Built-in
+};
+
 class MockUniforms : public IUniforms, boost::noncopyable {
+public:
+    void setGeneral(const std::function<void(GeneralUniforms &)> &block) override {}
+    void setText(const std::function<void(TextUniforms &)> &block) override {}
+    void setLighting(const std::function<void(LightingUniforms &)> &block) override {}
+    void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override {}
+    void setParticles(const std::function<void(ParticlesUniforms &)> &block) override {}
+    void setGrass(const std::function<void(GrassUniforms &)> &block) override {}
+    void setSSAO(const std::function<void(SSAOUniforms &)> &block) override {}
+    void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override {}
+    void setPoints(const std::function<void(PointsUniforms &)> &block) override {}
 };
 
 class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) override {
+        return nullptr;
+    }
 };
 
 class MockWindow : public IWindow, boost::noncopyable {
+public:
+    void processEvents(bool &quit) override {}
+
+    void swapBuffers() const override {}
+
+    bool isInFocus() const override { return false; }
+
+    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const override { return glm::mat4(1.0f); }
+
+    void setEventHandler(IEventHandler *eventHandler) override {}
+    void setRelativeMouseMode(bool enabled) override {}
+
+    uint32_t mouseState(int *x, int *y) override { return 0; }
+    void showCursor(bool show) override {}
 };
 
 class TestGraphicsModule : boost::noncopyable {

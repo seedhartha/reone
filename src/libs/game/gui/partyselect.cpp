@@ -308,7 +308,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(_strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(_resourceSvc.strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     _binding.btnAccept->setTextMessage(text);
 }
 

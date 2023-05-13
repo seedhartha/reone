@@ -122,7 +122,7 @@ void Equipment::load() {
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
-                slotDesc = _strings.get(maybeStrRef->second);
+                slotDesc = _resourceSvc.strings.get(maybeStrRef->second);
             }
 
             _binding.lblSlotName->setTextMessage(slotDesc);
@@ -393,7 +393,7 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
         return nullptr;
     }
 
-    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_graphicsSvc.textures.get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -405,8 +405,8 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _strings.get(kStrRefNone);
-        lbItem.iconTexture = _textures.get("inone", TextureUsage::GUI);
+        lbItem.text = _resourceSvc.strings.get(kStrRefNone);
+        lbItem.iconTexture = _graphicsSvc.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         _binding.lbItems->addItem(move(lbItem));
@@ -442,7 +442,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _textures.get(resRef, TextureUsage::GUI);
+    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

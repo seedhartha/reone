@@ -29,6 +29,36 @@ struct GraphicsOptions;
 class IShaders {
 public:
     virtual ~IShaders() = default;
+
+    virtual void use(ShaderProgram &program) = 0;
+
+    virtual ShaderProgram &simpleColor() const = 0;
+    virtual ShaderProgram &simpleTexture() const = 0;
+    virtual ShaderProgram &gui() const = 0;
+    virtual ShaderProgram &text() const = 0;
+    virtual ShaderProgram &points() const = 0;
+
+    virtual ShaderProgram &pointLightShadows() const = 0;
+    virtual ShaderProgram &directionalLightShadows() const = 0;
+    virtual ShaderProgram &modelOpaque() const = 0;
+    virtual ShaderProgram &modelTransparent() const = 0;
+    virtual ShaderProgram &aabb() const = 0;
+    virtual ShaderProgram &walkmesh() const = 0;
+    virtual ShaderProgram &particle() const = 0;
+    virtual ShaderProgram &grass() const = 0;
+    virtual ShaderProgram &billboard() const = 0;
+    virtual ShaderProgram &ssao() const = 0;
+    virtual ShaderProgram &ssr() const = 0;
+    virtual ShaderProgram &combineOpaque() const = 0;
+    virtual ShaderProgram &combineGeometry() const = 0;
+
+    virtual ShaderProgram &boxBlur4() const = 0;
+    virtual ShaderProgram &gaussianBlur9() const = 0;
+    virtual ShaderProgram &gaussianBlur13() const = 0;
+    virtual ShaderProgram &medianFilter3() const = 0;
+    virtual ShaderProgram &medianFilter5() const = 0;
+    virtual ShaderProgram &fxaa() const = 0;
+    virtual ShaderProgram &sharpen() const = 0;
 };
 
 class Shaders : public IShaders, boost::noncopyable {
@@ -42,35 +72,35 @@ public:
     void init();
     void deinit();
 
-    void use(ShaderProgram &program);
+    void use(ShaderProgram &program) override;
 
-    ShaderProgram &simpleColor() const { return *_spSimpleColor; }
-    ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
-    ShaderProgram &gui() const { return *_spGUI; }
-    ShaderProgram &text() const { return *_spText; }
-    ShaderProgram &points() const { return *_spPoints; }
+    ShaderProgram &simpleColor() const override { return *_spSimpleColor; }
+    ShaderProgram &simpleTexture() const override { return *_spSimpleTexture; }
+    ShaderProgram &gui() const override { return *_spGUI; }
+    ShaderProgram &text() const override { return *_spText; }
+    ShaderProgram &points() const override { return *_spPoints; }
 
-    ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
-    ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
-    ShaderProgram &modelOpaque() const { return *_spModelOpaque; }
-    ShaderProgram &modelTransparent() const { return *_spModelTransparent; }
-    ShaderProgram &aabb() const { return *_spAABB; }
-    ShaderProgram &walkmesh() const { return *_spWalkmesh; }
-    ShaderProgram &particle() const { return *_spParticle; }
-    ShaderProgram &grass() const { return *_spGrass; }
-    ShaderProgram &billboard() const { return *_spBillboard; }
-    ShaderProgram &ssao() const { return *_spSSAO; }
-    ShaderProgram &ssr() const { return *_spSSR; }
-    ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
-    ShaderProgram &combineGeometry() const { return *_spCombineGeometry; }
+    ShaderProgram &pointLightShadows() const override { return *_spPointLightShadows; }
+    ShaderProgram &directionalLightShadows() const override { return *_spDirectionalLightShadows; }
+    ShaderProgram &modelOpaque() const override { return *_spModelOpaque; }
+    ShaderProgram &modelTransparent() const override { return *_spModelTransparent; }
+    ShaderProgram &aabb() const override { return *_spAABB; }
+    ShaderProgram &walkmesh() const override { return *_spWalkmesh; }
+    ShaderProgram &particle() const override { return *_spParticle; }
+    ShaderProgram &grass() const override { return *_spGrass; }
+    ShaderProgram &billboard() const override { return *_spBillboard; }
+    ShaderProgram &ssao() const override { return *_spSSAO; }
+    ShaderProgram &ssr() const override { return *_spSSR; }
+    ShaderProgram &combineOpaque() const override { return *_spCombineOpaque; }
+    ShaderProgram &combineGeometry() const override { return *_spCombineGeometry; }
 
-    ShaderProgram &boxBlur4() const { return *_spBoxBlur4; }
-    ShaderProgram &gaussianBlur9() const { return *_spGaussianBlur9; }
-    ShaderProgram &gaussianBlur13() const { return *_spGaussianBlur13; }
-    ShaderProgram &medianFilter3() const { return *_spMedianFilter3; }
-    ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
-    ShaderProgram &fxaa() const { return *_spFXAA; }
-    ShaderProgram &sharpen() const { return *_spSharpen; }
+    ShaderProgram &boxBlur4() const override { return *_spBoxBlur4; }
+    ShaderProgram &gaussianBlur9() const override { return *_spGaussianBlur9; }
+    ShaderProgram &gaussianBlur13() const override { return *_spGaussianBlur13; }
+    ShaderProgram &medianFilter3() const override { return *_spMedianFilter3; }
+    ShaderProgram &medianFilter5() const override { return *_spMedianFilter5; }
+    ShaderProgram &fxaa() const override { return *_spFXAA; }
+    ShaderProgram &sharpen() const override { return *_spSharpen; }
 
 private:
     GraphicsOptions &_options;

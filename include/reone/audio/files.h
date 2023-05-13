@@ -32,6 +32,10 @@ class AudioStream;
 class IAudioFiles {
 public:
     virtual ~IAudioFiles() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<AudioStream> get(const std::string &key) = 0;
 };
 
 class AudioFiles : public IAudioFiles {
@@ -40,11 +44,11 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<AudioStream> get(const std::string &key) {
+    std::shared_ptr<AudioStream> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

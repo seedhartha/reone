@@ -17,33 +17,13 @@
 
 #pragma once
 
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/options.h"
+#include "reone/resource/di/services.h"
 
 #include "control.h"
 
 namespace reone {
-
-namespace resource {
-
-class Gff;
-class IGffs;
-class IResources;
-class IStrings;
-
-} // namespace resource
-
-namespace graphics {
-
-class Fonts;
-class GraphicsContext;
-class Meshes;
-class Pipeline;
-class Shaders;
-class Texture;
-class Uniforms;
-class Window;
-
-} // namespace graphics
 
 namespace scene {
 
@@ -97,36 +77,25 @@ protected:
     // Services
 
     scene::SceneGraphs &_sceneGraphs;
-
-    graphics::Fonts &_fonts;
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Pipeline &_pipeline;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-    graphics::Window &_window;
-
-    resource::IGffs &_gffs;
-    resource::IResources &_resources;
-    resource::IStrings &_strings;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
     // END Services
 
     GUI(
         graphics::GraphicsOptions &options,
         scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
-        resource::IGffs &gffs,
-        resource::IResources &resources,
-        resource::IStrings &strings);
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _options(options),
+        _sceneGraphs(sceneGraphs),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
+
+        _aspect = options.width / static_cast<float>(options.height);
+        _screenCenter.x = options.width / 2;
+        _screenCenter.y = options.height / 2;
+    }
 
     void loadControl(const resource::Gff &gffs);
     virtual void preloadControl(Control &control);

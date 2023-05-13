@@ -38,30 +38,6 @@ struct AudioServices {
         files(files),
         player(player) {
     }
-
-    AudioContext &defaultContext() {
-        auto casted = dynamic_cast<AudioContext *>(&context);
-        if (!casted) {
-            throw std::logic_error("Illegal AudioContext implementation");
-        }
-        return *casted;
-    }
-
-    AudioFiles &defaultFiles() {
-        auto casted = dynamic_cast<AudioFiles *>(&files);
-        if (!casted) {
-            throw std::logic_error("Illegal AudioFiles implementation");
-        }
-        return *casted;
-    }
-
-    AudioPlayer &defaultPlayer() {
-        auto casted = dynamic_cast<AudioPlayer *>(&player);
-        if (!casted) {
-            throw std::logic_error("Illegal AudioPlayer implementation");
-        }
-        return *casted;
-    }
 };
 
 } // namespace audio

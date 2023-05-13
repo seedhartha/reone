@@ -45,7 +45,7 @@ void ProgressBar::load(const Gff &gffs) {
     shared_ptr<Gff> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
         string fill(dir->getString("FILL"));
-        _progress.fill = _textures.get(fill, TextureUsage::GUI);
+        _progress.fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
     }
 }
 
@@ -53,7 +53,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
     if (_value == 0 || !_progress.fill) {
         return;
     }
-    _textures.bind(*_progress.fill);
+    _graphicsSvc.textures.bind(*_progress.fill);
 
     float w = _extent.width * _value / 100.0f;
 
@@ -61,13 +61,13 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _shaders.use(_shaders.gui());
-    _meshes.quad().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void ProgressBar::setValue(int value) {

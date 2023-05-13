@@ -62,6 +62,7 @@ namespace reone {
 namespace game {
 
 class Game;
+
 struct ServicesView;
 
 class ActionFactory {

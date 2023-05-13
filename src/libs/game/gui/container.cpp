@@ -55,10 +55,10 @@ void ContainerGUI::load() {
     GUI::load();
     bindControls();
 
-    string btnMessage(_strings.get(kSwitchToResRef) + " " + _strings.get(kGiveItemResRef));
+    string btnMessage(_resourceSvc.strings.get(kSwitchToResRef) + " " + _resourceSvc.strings.get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    string lblMessage(_strings.get(kInventoryResRef));
+    string lblMessage(_resourceSvc.strings.get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {
@@ -118,7 +118,7 @@ shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _textures.get(resRef, TextureUsage::GUI);
+    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
 }
 
 void ContainerGUI::transferItemsToPlayer() {

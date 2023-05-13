@@ -482,7 +482,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
         return;
     }
     glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.audio.defaultPlayer().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    _audioSourceVoice = _services.audio.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
@@ -697,7 +697,7 @@ void Creature::onEventSignalled(const string &name) {
     }
     shared_ptr<AudioStream> sound(materialSounds[index]);
     if (sound) {
-        _audioSourceFootstep = _services.audio.defaultPlayer().play(sound, AudioType::Sound, false, 1.0f, true, _position);
+        _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 
@@ -1068,14 +1068,14 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(_services.graphics.defaultTextures().defaultCubemapRGB().get());
+            body.setEnvironmentMap(_services.graphics.textures.defaultCubemapRGB().get());
         } else {
-            body.setEnvironmentMap(_services.graphics.defaultTextures().get(_envmap, TextureUsage::EnvironmentMap).get());
+            body.setEnvironmentMap(_services.graphics.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
         }
     }
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(_services.graphics.defaultTextures().get(bodyTextureName, TextureUsage::Diffuse));
+        shared_ptr<Texture> texture(_services.graphics.textures.get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             body.setDiffuseMap(texture.get());
         }
@@ -1186,7 +1186,7 @@ string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            shared_ptr<Texture> texture(_services.graphics.defaultTextures().get(tmp, TextureUsage::Diffuse));
+            shared_ptr<Texture> texture(_services.graphics.textures.get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = move(tmp);
                 texFound = true;

@@ -46,13 +46,13 @@ void ScrollBar::load(const Gff &gffs) {
     shared_ptr<Gff> dir(gffs.getStruct("DIR"));
     if (dir) {
         string image(dir->getString("IMAGE"));
-        _dir.image = _textures.get(image, TextureUsage::GUI);
+        _dir.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
     }
 
     shared_ptr<Gff> thumb(gffs.getStruct("THUMB"));
     if (thumb) {
         string image(thumb->getString("IMAGE"));
-        _thumb.image = _textures.get(image, TextureUsage::GUI);
+        _thumb.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
     }
 }
 
@@ -66,48 +66,48 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         return;
     }
 
-    _shaders.use(_shaders.gui());
-    _textures.bind(*_thumb.image);
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.textures.bind(*_thumb.image);
 
     // Top edge
-    _uniforms.setGeneral([this, &offset](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width, 1.0f, 1.0f));
     });
-    _meshes.quad().draw();
+    _graphicsSvc.meshes.quad().draw();
 
     // Left edge
-    _uniforms.setGeneral([this, &offset](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
-    _meshes.quad().draw();
+    _graphicsSvc.meshes.quad().draw();
 
     // Right edge
-    _uniforms.setGeneral([this, &offset](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
-    _meshes.quad().draw();
+    _graphicsSvc.meshes.quad().draw();
 
     // Bottom edge
-    _uniforms.setGeneral([this, &offset](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width, 1.0f, 1.0f));
     });
-    _meshes.quad().draw();
+    _graphicsSvc.meshes.quad().draw();
 
     // Thumb
     float frameHeight = _extent.height - 2.0f * _extent.width - 4.0f;
     float thumbHeight = frameHeight * _state.numVisible / static_cast<float>(_state.count);
     float y = glm::mix(0.0f, frameHeight - thumbHeight, _state.offset / static_cast<float>(_state.count - _state.numVisible));
-    _uniforms.setGeneral([this, &offset, &thumbHeight, &y](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &offset, &thumbHeight, &y](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
     });
-    _meshes.quad().draw();
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void ScrollBar::drawArrows(const glm::ivec2 &offset) {
@@ -119,7 +119,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _textures.bind(*_dir.image);
+    _graphicsSvc.textures.bind(*_dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);
@@ -134,13 +134,13 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _shaders.use(_shaders.gui());
-    _meshes.quad().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
@@ -149,13 +149,13 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _shaders.use(_shaders.gui());
-    _meshes.quad().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void ScrollBar::setScrollState(ScrollState state) {

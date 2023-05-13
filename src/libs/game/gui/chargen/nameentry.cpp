@@ -79,7 +79,7 @@ void NameEntry::bindControls() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
-    auto data = _resources.get(resRef, ResourceType::Ltr);
+    auto data = _resourceSvc.resources.get(resRef, ResourceType::Ltr);
     auto stream = ByteArrayInputStream(*data);
     ltr.load(stream);
 }

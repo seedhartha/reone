@@ -37,7 +37,25 @@ public:
     virtual ~ITextures() {
     }
 
+    virtual void invalidate() = 0;
+
+    virtual void bind(Texture &texture, int unit = TextureUnits::mainTex) = 0;
+    virtual void bindBuiltIn() = 0;
+
     virtual std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default) = 0;
+
+    // Built-in
+
+    virtual std::shared_ptr<Texture> default2DRGB() const = 0;
+    virtual std::shared_ptr<Texture> defaultArrayDepth() const = 0;
+    virtual std::shared_ptr<Texture> defaultCubemapRGB() const = 0;
+    virtual std::shared_ptr<Texture> defaultCubemapDepth() const = 0;
+
+    virtual std::shared_ptr<Texture> noiseRG() const = 0;
+    virtual std::shared_ptr<Texture> ssaoRGB() const = 0;
+    virtual std::shared_ptr<Texture> ssrRGBA() const = 0;
+
+    // END Built-in
 };
 
 class Textures : public ITextures, boost::noncopyable {
@@ -48,23 +66,24 @@ public:
     }
 
     void init();
-    void invalidate();
 
-    void bind(Texture &texture, int unit = TextureUnits::mainTex);
-    void bindBuiltIn();
+    void invalidate() override;
+
+    void bind(Texture &texture, int unit = TextureUnits::mainTex) override;
+    void bindBuiltIn() override;
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default) override;
 
     // Built-in
 
-    std::shared_ptr<Texture> default2DRGB() const { return _default2DRGB; }
-    std::shared_ptr<Texture> defaultArrayDepth() const { return _defaultArrayDepth; }
-    std::shared_ptr<Texture> defaultCubemapRGB() const { return _defaultCubemapRGB; }
-    std::shared_ptr<Texture> defaultCubemapDepth() const { return _defaultCubemapDepth; }
+    std::shared_ptr<Texture> default2DRGB() const override { return _default2DRGB; }
+    std::shared_ptr<Texture> defaultArrayDepth() const override { return _defaultArrayDepth; }
+    std::shared_ptr<Texture> defaultCubemapRGB() const override { return _defaultCubemapRGB; }
+    std::shared_ptr<Texture> defaultCubemapDepth() const override { return _defaultCubemapDepth; }
 
-    std::shared_ptr<Texture> noiseRG() const { return _noiseRG; }
-    std::shared_ptr<Texture> ssaoRGB() const { return _ssaoRGB; }
-    std::shared_ptr<Texture> ssrRGBA() const { return _ssrRGBA; }
+    std::shared_ptr<Texture> noiseRG() const override { return _noiseRG; }
+    std::shared_ptr<Texture> ssaoRGB() const override { return _ssaoRGB; }
+    std::shared_ptr<Texture> ssrRGBA() const override { return _ssrRGBA; }
 
     // END Built-in
 

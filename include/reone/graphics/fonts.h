@@ -33,6 +33,10 @@ class Window;
 class IFonts {
 public:
     virtual ~IFonts() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<Font> get(const std::string &key) = 0;
 };
 
 class Fonts : public IFonts {
@@ -52,11 +56,11 @@ public:
         _window(window) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Font> get(const std::string &key) {
+    std::shared_ptr<Font> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

@@ -191,7 +191,7 @@ void Area::loadStealthXP(const Gff &are) {
 void Area::loadGrass(const Gff &are) {
     string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
-        _grass.texture = _services.graphics.defaultTextures().get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
@@ -333,7 +333,7 @@ void Area::loadLYT() {
 
         // Walkmesh
         shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        auto walkmesh = _services.graphics.defaultWalkmeshes().get(lytRoom.name, ResourceType::Wok);
+        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(*walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);

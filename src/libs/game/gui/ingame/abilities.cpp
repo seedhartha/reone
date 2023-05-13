@@ -63,9 +63,9 @@ void AbilitiesMenu::load() {
     _binding.btnPowers->setDisabled(true);
     _binding.btnFeats->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_strings.get(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_strings.get(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_strings.get(kStrRefTotalRank));
+    _binding.lblSkillRank->setTextMessage(_resourceSvc.strings.get(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_resourceSvc.strings.get(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_resourceSvc.strings.get(kStrRefTotalRank));
     _binding.lblRankVal->setTextMessage("");
     _binding.lblBonusVal->setTextMessage("");
     _binding.lblTotalVal->setTextMessage("");
@@ -135,9 +135,9 @@ void AbilitiesMenu::loadSkills() {
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _strings.get(skills->getInt(row, "name"));
-        skillInfo.description = _strings.get(skills->getInt(row, "description"));
-        skillInfo.icon = _textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _resourceSvc.strings.get(skills->getInt(row, "name"));
+        skillInfo.description = _resourceSvc.strings.get(skills->getInt(row, "description"));
+        skillInfo.icon = _graphicsSvc.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -160,7 +160,7 @@ shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _textures.get(resRef, TextureUsage::GUI);
+    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {

@@ -24,6 +24,8 @@ namespace audio {
 class IAudioContext {
 public:
     virtual ~IAudioContext() = default;
+
+    virtual void setListenerPosition(glm::vec3 position) = 0;
 };
 
 class AudioContext : public IAudioContext, boost::noncopyable {
@@ -33,7 +35,7 @@ public:
     void init();
     void deinit();
 
-    void setListenerPosition(glm::vec3 position);
+    void setListenerPosition(glm::vec3 position) override;
 
 private:
     ALCdevice *_device {nullptr};

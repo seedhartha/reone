@@ -147,7 +147,7 @@ void Game::init() {
     _console = move(console);
     _profileOverlay = move(profileOverlay);
 
-    _services.graphics.defaultWindow().setEventHandler(this);
+    _services.graphics.window.setEventHandler(this);
 }
 
 int Game::run() {
@@ -159,8 +159,8 @@ int Game::run() {
 void Game::runMainLoop() {
     _ticks = _services.system.clock.ticks();
     while (!_quit) {
-        _services.graphics.defaultWindow().processEvents(_quit);
-        if (!_services.graphics.defaultWindow().isInFocus()) {
+        _services.graphics.window.processEvents(_quit);
+        if (!_services.graphics.window.isInFocus()) {
             continue;
         }
         update();
@@ -196,7 +196,7 @@ void Game::update() {
     _profileOverlay->update(dt);
 
     int x, y;
-    auto state = _services.graphics.defaultWindow().mouseState(&x, &y);
+    auto state = _services.graphics.window.mouseState(&x, &y);
     auto pressed = state & SDL_BUTTON(1);
     if (_cursor) {
         _cursor->setPosition(glm::ivec2(x, y));
@@ -205,7 +205,7 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    _services.graphics.defaultContext().clearColorDepth();
+    _services.graphics.context.clearColorDepth();
 
     if (_movie) {
         _movie->render();
@@ -216,7 +216,7 @@ void Game::drawAll() {
     }
 
     _profileOverlay->draw();
-    _services.graphics.defaultWindow().swapBuffers();
+    _services.graphics.window.swapBuffers();
 }
 
 void Game::loadModule(const string &name, string entry) {
@@ -227,11 +227,11 @@ void Game::loadModule(const string &name, string entry) {
 
         /*
         _services.game.defaultSoundSets().invalidate();
-        _services.graphics.defaultTextures().invalidate();
+        _services.graphics.textures.invalidate();
         _services.graphics.models.invalidate();
-        _services.graphics.defaultWalkmeshes().invalidate();
-        _services.graphics.defaultLipAnimations().invalidate();
-        _services.audio.defaultFiles().invalidate();
+        _services.graphics.walkmeshes.invalidate();
+        _services.graphics.lipAnimations.invalidate();
+        _services.audio.files.invalidate();
         _services.script.scripts.invalidate();
         */
 
@@ -320,10 +320,10 @@ void Game::setCursorType(CursorType type) {
     }
     if (type == CursorType::None) {
         _cursor.reset();
-        _services.graphics.defaultWindow().showCursor(true);
+        _services.graphics.window.showCursor(true);
     } else {
         _cursor = _services.game.defaultCursors().get(type);
-        _services.graphics.defaultWindow().showCursor(false);
+        _services.graphics.window.showCursor(false);
     }
     _cursorType = type;
 }
@@ -361,17 +361,17 @@ void Game::playMusic(const string &resRef) {
 
 void Game::drawWorld() {
     auto &scene = _services.scene.defaultGraphs().get(kSceneMain);
-    auto output = _services.graphics.defaultPipeline().draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
+    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
     }
-    _services.graphics.defaultUniforms().setGeneral([](auto &general) {
+    _services.graphics.uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.graphics.defaultShaders().use(_services.graphics.defaultShaders().simpleTexture());
-    _services.graphics.defaultTextures().bind(*output);
-    _services.graphics.defaultMeshes().quadNDC().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
+    _services.graphics.textures.bind(*output);
+    _services.graphics.meshes.quadNDC().draw();
 }
 
 void Game::toggleInGameCameraType() {
@@ -458,7 +458,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.audio.defaultPlayer().play(_musicResRef, AudioType::Music);
+        _music = _services.audio.player.play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -523,7 +523,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->getOrigin();
         }
-        _services.audio.defaultContext().setListenerPosition(move(listenerPosition));
+        _services.audio.context.setListenerPosition(move(listenerPosition));
     }
 }
 
@@ -669,7 +669,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _services.graphics.defaultWindow().setRelativeMouseMode(relative);
+    _services.graphics.window.setRelativeMouseMode(relative);
 }
 
 void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {

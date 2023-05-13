@@ -73,7 +73,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(sceneNode);
 
-    auto walkmesh = _services.graphics.defaultWalkmeshes().get(modelName, ResourceType::Pwk);
+    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {
         _walkmesh = sceneGraph.newWalkmesh(*walkmesh);
     }

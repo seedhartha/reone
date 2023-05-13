@@ -47,7 +47,7 @@ static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
     _frequency = _services.system.clock.performanceFrequency();
-    _font = _services.graphics.defaultFonts().get(kFontResRef);
+    _font = _services.graphics.fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
@@ -84,7 +84,7 @@ void ProfileOverlay::draw() {
         return;
     }
 
-    _services.graphics.defaultContext().withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         _font->draw(
             to_string(_fps),
             glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),

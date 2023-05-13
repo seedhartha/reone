@@ -17,7 +17,6 @@
 
 #include "reone/gui/gui.h"
 
-#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
@@ -26,9 +25,10 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/gffs.h"
 #include "reone/resource/gff.h"
+#include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
 
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/imagebutton.h"
@@ -51,43 +51,10 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(
-    GraphicsOptions &options,
-    SceneGraphs &sceneGraphs,
-    Fonts &fonts,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Pipeline &pipeline,
-    Shaders &shaders,
-    Textures &textures,
-    Uniforms &uniforms,
-    Window &window,
-    IGffs &gffs,
-    IResources &resources,
-    IStrings &strings) :
-    _options(options),
-    _sceneGraphs(sceneGraphs),
-    _fonts(fonts),
-    _graphicsContext(graphicsContext),
-    _meshes(meshes),
-    _pipeline(pipeline),
-    _shaders(shaders),
-    _textures(textures),
-    _uniforms(uniforms),
-    _window(window),
-    _gffs(gffs),
-    _resources(resources),
-    _strings(strings) {
-
-    _aspect = options.width / static_cast<float>(options.height);
-    _screenCenter.x = options.width / 2;
-    _screenCenter.y = options.height / 2;
-}
-
 void GUI::load() {
     debug("Load " + _resRef, LogChannels::gui);
 
-    shared_ptr<Gff> gui(_gffs.get(_resRef, ResourceType::Gui));
+    shared_ptr<Gff> gui(_resourceSvc.gffs.get(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -261,7 +228,7 @@ void GUI::update(float dt) {
 }
 
 void GUI::draw() {
-    _graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
         if (_background) {
             drawBackground();
         }
@@ -278,19 +245,19 @@ void GUI::draw() {
 }
 
 void GUI::drawBackground() {
-    _textures.bind(*_background);
+    _graphicsSvc.textures.bind(*_background);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _shaders.use(_shaders.gui());
-    _meshes.quad().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void GUI::resetFocus() {
@@ -318,31 +285,31 @@ unique_ptr<Control> GUI::newControl(
     unique_ptr<Control> control;
     switch (type) {
     case ControlType::Panel:
-        control = make_unique<Panel>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<Panel>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Label:
-        control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::LabelHilight:
-        control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Button:
-        control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ButtonToggle:
-        control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Slider:
-        control = make_unique<Slider>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<Slider>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ScrollBar:
-        control = make_unique<ScrollBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<ScrollBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ProgressBar:
-        control = make_unique<ProgressBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<ProgressBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ListBox:
-        control = make_unique<ListBox>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
+        control = make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     default:
         debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);

@@ -322,7 +322,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     if (maybeDescription == g_descStrRefBySkill.end())
         return;
 
-    string description(_strings.get(maybeDescription->second));
+    string description(_resourceSvc.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

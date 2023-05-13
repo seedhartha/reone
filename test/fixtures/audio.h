@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/audio/format/mp3reader.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/format/mp3reader.h"
 
 namespace reone {
 
@@ -57,12 +57,28 @@ private:
 };
 
 class MockAudioContext : public IAudioContext, boost::noncopyable {
+public:
+    void setListenerPosition(glm::vec3 position) override {}
 };
 
 class MockAudioFiles : public IAudioFiles, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<AudioStream> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
+public:
+    std::shared_ptr<AudioSource> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override {
+        return nullptr;
+    }
+
+    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioStream> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override {
+        return nullptr;
+    }
 };
 
 class TestAudioModule : boost::noncopyable {

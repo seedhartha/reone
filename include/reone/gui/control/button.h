@@ -28,27 +28,13 @@ public:
     Button(
         GUI &gui,
         scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
+        graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Button(
             gui,
             ControlType::Button,
             sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
+            graphicsSvc,
             strings) {
     }
 
@@ -57,27 +43,13 @@ protected:
         GUI &gui,
         ControlType type,
         scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
+        graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Control(
             gui,
             type,
             sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
+            graphicsSvc,
             strings) {
 
         _clickable = true;

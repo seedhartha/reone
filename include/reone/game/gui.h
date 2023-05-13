@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/audio/source.h"
+#include "reone/game/di/services.h"
 #include "reone/gui/gui.h"
 
 #include "types.h"
@@ -26,13 +27,8 @@ namespace reone {
 
 namespace game {
 
-struct ServicesView;
-
 class Game;
 
-/**
- * Encapsulates game-specific GUI configuration.
- */
 class GameGUI : public gui::GUI {
 protected:
     GameGUI(Game &game, ServicesView &services);

@@ -270,11 +270,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(_strings.get(g_genderStrRefs[button.character.gender]));
+    string classText(_resourceSvc.strings.get(g_genderStrRefs[button.character.gender]));
     classText += " " + _services.game.defaultClasses().get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    string descText(_strings.get(g_classDescStrRefs[clazz]));
+    string descText(_resourceSvc.strings.get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

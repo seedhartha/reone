@@ -282,7 +282,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     if (maybeDescription == g_descStrRefByAbility.end())
         return;
 
-    string description(_strings.get(maybeDescription->second));
+    string description(_resourceSvc.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

@@ -34,15 +34,9 @@ class IStrings;
 namespace graphics {
 
 class Font;
-class Fonts;
-class GraphicsContext;
-class Meshes;
-class Pipeline;
-class Shaders;
 class Texture;
-class Textures;
-class Uniforms;
-class Window;
+
+struct GraphicsServices;
 
 } // namespace graphics
 
@@ -209,14 +203,7 @@ protected:
 
     // Services
 
-    graphics::Fonts &_fonts;
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
-    graphics::Pipeline &_pipeline;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Uniforms &_uniforms;
-    graphics::Window &_window;
+    graphics::GraphicsServices &_graphicsSvc;
     resource::IStrings &_strings;
     scene::SceneGraphs &_sceneGraphs;
 
@@ -233,26 +220,12 @@ protected:
         GUI &gui,
         ControlType type,
         scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
+        graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         _gui(gui),
         _type(type),
         _sceneGraphs(sceneGraphs),
-        _fonts(fonts),
-        _graphicsContext(graphicsContext),
-        _meshes(meshes),
-        _pipeline(pipeline),
-        _shaders(shaders),
-        _textures(textures),
-        _uniforms(uniforms),
-        _window(window),
+        _graphicsSvc(graphicsSvc),
         _strings(strings) {
     }
 

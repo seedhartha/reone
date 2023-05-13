@@ -42,7 +42,7 @@ static const char kIconFontResRef[] = "dialogfont10x10a";
 
 void ImageButton::load(const Gff &gffs) {
     Control::load(gffs);
-    _iconFont = _fonts.get(kIconFontResRef);
+    _iconFont = _graphicsSvc.fonts.get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -90,20 +90,20 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _textures.bind(*iconFrame);
+        _graphicsSvc.textures.bind(*iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _uniforms.setGeneral([this, transform, &color](auto &general) {
+        _graphicsSvc.uniforms.setGeneral([this, transform, &color](auto &general) {
             general.resetLocals();
-            general.projection = _window.getOrthoProjection();
+            general.projection = _graphicsSvc.window.getOrthoProjection();
             general.model = move(transform);
             general.color = glm::vec4(color, 1.0f);
         });
-        _shaders.use(_shaders.gui());
-        _meshes.quad().draw();
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+        _graphicsSvc.meshes.quad().draw();
     }
 
     if (iconTexture) {
@@ -111,15 +111,15 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _textures.bind(*iconTexture);
+        _graphicsSvc.textures.bind(*iconTexture);
 
-        _uniforms.setGeneral([this, transform](auto &general) {
+        _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
-            general.projection = _window.getOrthoProjection();
+            general.projection = _graphicsSvc.window.getOrthoProjection();
             general.model = move(transform);
         });
-        _shaders.use(_shaders.gui());
-        _meshes.quad().draw();
+        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+        _graphicsSvc.meshes.quad().draw();
     }
 
     if (!iconText.empty()) {

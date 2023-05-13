@@ -26,6 +26,14 @@ namespace graphics {
 class IMeshes {
 public:
     virtual ~IMeshes() = default;
+
+    virtual Mesh &quad() const = 0;
+    virtual Mesh &quadNDC() const = 0;
+    virtual Mesh &billboard() const = 0;
+    virtual Mesh &grass() const = 0;
+
+    virtual Mesh &box() const = 0;
+    virtual Mesh &cubemap() const = 0;
 };
 
 class Meshes : public IMeshes, boost::noncopyable {
@@ -35,13 +43,13 @@ public:
     void init();
     void deinit();
 
-    Mesh &quad() const { return *_quad; }
-    Mesh &quadNDC() const { return *_quadNDC; }
-    Mesh &billboard() const { return *_billboard; }
-    Mesh &grass() const { return *_grass; }
+    Mesh &quad() const override { return *_quad; }
+    Mesh &quadNDC() const override { return *_quadNDC; }
+    Mesh &billboard() const override { return *_billboard; }
+    Mesh &grass() const override { return *_grass; }
 
-    Mesh &box() const { return *_box; }
-    Mesh &cubemap() const { return *_cubemap; }
+    Mesh &box() const override { return *_box; }
+    Mesh &cubemap() const override { return *_cubemap; }
 
 private:
     bool _inited {false};

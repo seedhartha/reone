@@ -36,6 +36,8 @@ class Uniforms;
 class IPipeline {
 public:
     virtual ~IPipeline() = default;
+
+    virtual std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) = 0;
 };
 
 class Pipeline : public IPipeline, boost::noncopyable {
@@ -57,7 +59,7 @@ public:
 
     void init();
 
-    std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim);
+    std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) override;
 
 private:
     struct BlitFlags {

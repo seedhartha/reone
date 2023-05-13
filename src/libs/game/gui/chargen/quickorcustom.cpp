@@ -70,7 +70,7 @@ void QuickOrCustom::load() {
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_strings.get(kStrRefQuickHelpText));
+        string text(_resourceSvc.strings.get(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });
@@ -81,7 +81,7 @@ void QuickOrCustom::load() {
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_strings.get(kStrRefCustomHelpText));
+        string text(_resourceSvc.strings.get(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });

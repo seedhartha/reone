@@ -257,7 +257,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    _graphicsSvc.defaultUniforms().setGeneral([&emitter](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([&emitter](auto &general) {
         general.resetLocals();
         general.gridSize = emitter->gridSize;
         switch (emitter->blendMode) {
@@ -270,7 +270,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             break;
         }
     });
-    _graphicsSvc.defaultUniforms().setParticles([&](auto &particles) {
+    _graphicsSvc.uniforms.setParticles([&](auto &particles) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
             particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
@@ -309,12 +309,12 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             }
         }
     });
-    _graphicsSvc.defaultShaders().use(_graphicsSvc.defaultShaders().particle());
-    _graphicsSvc.defaultTextures().bind(*texture);
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.particle());
+    _graphicsSvc.textures.bind(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
-    _graphicsSvc.defaultContext().withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
-        _graphicsSvc.defaultMeshes().billboard().drawInstanced(leafs.size());
+    _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
+        _graphicsSvc.meshes.billboard().drawInstanced(leafs.size());
     });
 }
 

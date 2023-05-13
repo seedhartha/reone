@@ -202,7 +202,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     string resRef(_filteredPortraits[_currentPortrait].resRef);
-    shared_ptr<Texture> portrait(_textures.get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> portrait(_graphicsSvc.textures.get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
 }
 

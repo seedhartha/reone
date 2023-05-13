@@ -17,16 +17,16 @@
 
 #include "reone/game/gui.h"
 
-#include "reone/audio/player.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/di/services.h"
 #include "reone/scene/di/services.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/guisounds.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -43,17 +43,8 @@ GameGUI::GameGUI(Game &game, ServicesView &services) :
     GUI(
         game.options().graphics,
         services.scene.defaultGraphs(),
-        services.graphics.defaultFonts(),
-        services.graphics.defaultContext(),
-        services.graphics.defaultMeshes(),
-        services.graphics.defaultPipeline(),
-        services.graphics.defaultShaders(),
-        services.graphics.defaultTextures(),
-        services.graphics.defaultUniforms(),
-        services.graphics.defaultWindow(),
-        services.resource.gffs,
-        services.resource.resources,
-        services.resource.strings),
+        services.graphics,
+        services.resource),
     _game(game),
     _services(services) {
 }
@@ -116,7 +107,7 @@ void GameGUI::loadBackground(BackgroundType type) {
         }
     }
 
-    _background = _textures.get(resRef, TextureUsage::Diffuse);
+    _background = _graphicsSvc.textures.get(resRef, TextureUsage::Diffuse);
 }
 
 string GameGUI::getResRef(const string &base) const {
@@ -124,12 +115,12 @@ string GameGUI::getResRef(const string &base) const {
 }
 
 void GameGUI::onClick(const string &control) {
-    _audioSource = _services.audio.defaultPlayer().play(_services.game.defaultGUISounds().getOnClick(), AudioType::Sound);
+    _audioSource = _services.audio.player.play(_services.game.defaultGUISounds().getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.audio.defaultPlayer().play(_services.game.defaultGUISounds().getOnEnter(), AudioType::Sound);
+        _audioSource = _services.audio.player.play(_services.game.defaultGUISounds().getOnEnter(), AudioType::Sound);
     }
 }
 

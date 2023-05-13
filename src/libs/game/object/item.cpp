@@ -62,7 +62,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     }
     shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
     if (sound) {
-        _audioSource = _services.audio.defaultPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        _audioSource = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
 
@@ -72,7 +72,7 @@ void Item::playImpactSound(int variant, glm::vec3 position) {
     }
     shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
     if (sound) {
-        _services.audio.defaultPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
 
@@ -139,7 +139,7 @@ void Item::loadUTI(const Gff &uti) {
     } else {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
-    _icon = _services.graphics.defaultTextures().get(iconResRef, TextureUsage::GUI);
+    _icon = _services.graphics.textures.get(iconResRef, TextureUsage::GUI);
 
     loadAmmunitionType();
 
@@ -159,10 +159,10 @@ void Item::loadAmmunitionType() {
         shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
         _ammunitionType->model = _services.graphics.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
-        _ammunitionType->shotSound1 = _services.audio.defaultFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
-        _ammunitionType->shotSound2 = _services.audio.defaultFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
-        _ammunitionType->impactSound1 = _services.audio.defaultFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
-        _ammunitionType->impactSound2 = _services.audio.defaultFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
+        _ammunitionType->shotSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
+        _ammunitionType->shotSound2 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
+        _ammunitionType->impactSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
+        _ammunitionType->impactSound2 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
     }
 }
 

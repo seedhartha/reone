@@ -195,6 +195,16 @@ struct PointsUniforms {
 class IUniforms {
 public:
     virtual ~IUniforms() = default;
+
+    virtual void setGeneral(const std::function<void(GeneralUniforms &)> &block) = 0;
+    virtual void setText(const std::function<void(TextUniforms &)> &block) = 0;
+    virtual void setLighting(const std::function<void(LightingUniforms &)> &block) = 0;
+    virtual void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) = 0;
+    virtual void setParticles(const std::function<void(ParticlesUniforms &)> &block) = 0;
+    virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
+    virtual void setSSAO(const std::function<void(SSAOUniforms &)> &block) = 0;
+    virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
+    virtual void setPoints(const std::function<void(PointsUniforms &)> &block) = 0;
 };
 
 class Uniforms : public IUniforms, boost::noncopyable {
@@ -204,15 +214,15 @@ public:
     void init();
     void deinit();
 
-    void setGeneral(const std::function<void(GeneralUniforms &)> &block);
-    void setText(const std::function<void(TextUniforms &)> &block);
-    void setLighting(const std::function<void(LightingUniforms &)> &block);
-    void setSkeletal(const std::function<void(SkeletalUniforms &)> &block);
-    void setParticles(const std::function<void(ParticlesUniforms &)> &block);
-    void setGrass(const std::function<void(GrassUniforms &)> &block);
-    void setSSAO(const std::function<void(SSAOUniforms &)> &block);
-    void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block);
-    void setPoints(const std::function<void(PointsUniforms &)> &block);
+    void setGeneral(const std::function<void(GeneralUniforms &)> &block) override;
+    void setText(const std::function<void(TextUniforms &)> &block) override;
+    void setLighting(const std::function<void(LightingUniforms &)> &block) override;
+    void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override;
+    void setParticles(const std::function<void(ParticlesUniforms &)> &block) override;
+    void setGrass(const std::function<void(GrassUniforms &)> &block) override;
+    void setSSAO(const std::function<void(SSAOUniforms &)> &block) override;
+    void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
+    void setPoints(const std::function<void(PointsUniforms &)> &block) override;
 
 private:
     bool _inited {false};

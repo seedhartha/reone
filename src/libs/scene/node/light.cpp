@@ -73,7 +73,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    _graphicsSvc.defaultUniforms().setGeneral([this, &flare](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, &flare](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::fixedsize;
         general.model = glm::translate(getOrigin());
@@ -81,10 +81,10 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         general.alpha = 0.5f;
         general.color = glm::vec4(_color, 1.0f);
     });
-    _graphicsSvc.defaultShaders().use(_graphicsSvc.defaultShaders().billboard());
-    _graphicsSvc.defaultTextures().bind(*flare.texture);
-    _graphicsSvc.defaultContext().withBlending(BlendMode::Additive, [this]() {
-        _graphicsSvc.defaultMeshes().billboard().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.billboard());
+    _graphicsSvc.textures.bind(*flare.texture);
+    _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
+        _graphicsSvc.meshes.billboard().draw();
     });
 }
 

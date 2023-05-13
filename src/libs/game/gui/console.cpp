@@ -60,7 +60,7 @@ static constexpr int kVisibleLineCount = 15;
 static constexpr float kTextOffset = 3.0f;
 
 void Console::init() {
-    _font = _services.graphics.defaultFonts().get("fnt_console");
+    _font = _services.graphics.fonts.get("fnt_console");
 
     addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
     addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
@@ -187,7 +187,7 @@ void Console::executeInputText() {
 }
 
 void Console::draw() {
-    _services.graphics.defaultContext().withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         drawBackground();
         drawLines();
     });
@@ -199,15 +199,15 @@ void Console::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
-    _services.graphics.defaultUniforms().setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.graphics.defaultWindow().getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
         general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         general.alpha = 0.5f;
     });
-    _services.graphics.defaultShaders().use(_services.graphics.defaultShaders().simpleColor());
-    _services.graphics.defaultMeshes().quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.meshes.quad().draw();
 }
 
 void Console::drawLines() {

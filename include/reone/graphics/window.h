@@ -30,6 +30,20 @@ class IEventHandler;
 class IWindow {
 public:
     virtual ~IWindow() = default;
+
+    virtual void processEvents(bool &quit) = 0;
+
+    virtual void swapBuffers() const = 0;
+
+    virtual bool isInFocus() const = 0;
+
+    virtual glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const = 0;
+
+    virtual void setEventHandler(IEventHandler *eventHandler) = 0;
+    virtual void setRelativeMouseMode(bool enabled) = 0;
+
+    virtual uint32_t mouseState(int *x, int *y) = 0;
+    virtual void showCursor(bool show) = 0;
 };
 
 class Window : public IWindow, boost::noncopyable {
@@ -43,19 +57,19 @@ public:
     void init();
     void deinit();
 
-    void processEvents(bool &quit);
+    void processEvents(bool &quit) override;
 
-    void swapBuffers() const;
+    void swapBuffers() const override;
 
-    bool isInFocus() const { return _focus; }
+    bool isInFocus() const override { return _focus; }
 
-    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const;
+    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const override;
 
-    void setEventHandler(IEventHandler *eventHandler) { _eventHandler = eventHandler; }
-    void setRelativeMouseMode(bool enabled);
+    void setEventHandler(IEventHandler *eventHandler) override { _eventHandler = eventHandler; }
+    void setRelativeMouseMode(bool enabled) override;
 
-    uint32_t mouseState(int *x, int *y);
-    void showCursor(bool show);
+    uint32_t mouseState(int *x, int *y) override;
+    void showCursor(bool show) override;
 
 private:
     GraphicsOptions &_options;

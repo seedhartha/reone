@@ -445,14 +445,14 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
+    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _window.getOrthoProjection();
+        general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = move(transform);
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
-    _shaders.use(_shaders.simpleColor());
-    _meshes.quad().draw();
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.simpleColor());
+    _graphicsSvc.meshes.quad().draw();
 }
 
 void HUD::toggleCombat(bool enabled) {

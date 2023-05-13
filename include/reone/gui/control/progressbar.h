@@ -28,27 +28,13 @@ public:
     ProgressBar(
         GUI &gui,
         scene::SceneGraphs &sceneGraphs,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Window &window,
+        graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Control(
             gui,
             ControlType::ProgressBar,
             sceneGraphs,
-            fonts,
-            graphicsContext,
-            meshes,
-            pipeline,
-            shaders,
-            textures,
-            uniforms,
-            window,
+            graphicsSvc,
             strings) {
     }
 

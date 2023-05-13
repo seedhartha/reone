@@ -27,6 +27,17 @@ namespace graphics {
 class IGraphicsContext {
 public:
     virtual ~IGraphicsContext() = default;
+
+    virtual void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) = 0;
+    virtual void clearDepth() = 0;
+    virtual void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) = 0;
+
+    virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
+    virtual void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) = 0;
+    virtual void withBlending(BlendMode mode, const std::function<void()> &block) = 0;
+    virtual void withPolygonMode(PolygonMode mode, const std::function<void()> &block) = 0;
+    virtual void withViewport(glm::ivec4 viewport, const std::function<void()> &block) = 0;
+    virtual void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) = 0;
 };
 
 class GraphicsContext : public IGraphicsContext, boost::noncopyable {
@@ -37,16 +48,16 @@ public:
 
     void init();
 
-    void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    void clearDepth();
-    void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override;
+    void clearDepth() override;
+    void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override;
 
-    void withDepthTest(DepthTestMode mode, const std::function<void()> &block);
-    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);
-    void withBlending(BlendMode mode, const std::function<void()> &block);
-    void withPolygonMode(PolygonMode mode, const std::function<void()> &block);
-    void withViewport(glm::ivec4 viewport, const std::function<void()> &block);
-    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+    void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
+    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override;
+    void withBlending(BlendMode mode, const std::function<void()> &block) override;
+    void withPolygonMode(PolygonMode mode, const std::function<void()> &block) override;
+    void withViewport(glm::ivec4 viewport, const std::function<void()> &block) override;
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) override;
 
 private:
     GraphicsOptions &_options;
