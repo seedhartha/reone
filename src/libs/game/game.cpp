@@ -115,7 +115,7 @@ void Game::init() {
     console->init();
     profileOverlay->init();
 
-    if (_tsl) {
+    if (isTSL()) {
         _mainMenuMusicResRef = "mus_sion";
         _charGenMusicResRef = "mus_main";
         _charGenLoadScreenResRef = "load_default";
@@ -949,7 +949,7 @@ CameraType Game::getConversationCamera(int &cameraId) const {
 }
 
 void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    if (_tsl) {
+    if (isTSL()) {
         member1 = kBlueprintResRefAtton;
         member2 = kBlueprintResRefKreia;
     } else {

@@ -61,11 +61,11 @@ namespace game {
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
-        bool tsl,
+        GameID gameId,
         boost::filesystem::path path,
         OptionsView &options,
         ServicesView &services) :
-        _tsl(tsl),
+        _gameId(gameId),
         _path(std::move(path)),
         _options(options),
         _services(services),
@@ -87,7 +87,7 @@ public:
     void playVideo(const std::string &name);
 
     bool isPaused() const { return _paused; }
-    bool isTSL() const { return _tsl; }
+    bool isTSL() const { return _gameId == GameID::TSL; }
 
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
@@ -171,7 +171,7 @@ public:
 
     // END IEventHandler
 
-protected:
+private:
     enum class GameScreen {
         None,
         MainMenu,
@@ -185,6 +185,7 @@ protected:
         SaveLoad
     };
 
+    GameID _gameId;
     boost::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
@@ -217,13 +218,29 @@ protected:
 
     // END Services
 
-    // GUI colors
+    // GUI
+
+    std::unique_ptr<MainMenu> _mainMenu;
+    std::unique_ptr<CharacterGeneration> _charGen;
+    std::unique_ptr<HUD> _hud;
+    std::unique_ptr<InGameMenu> _inGame;
+    std::unique_ptr<DialogGUI> _dialog;
+    std::unique_ptr<ComputerGUI> _computer;
+    std::unique_ptr<ContainerGUI> _container;
+    std::unique_ptr<PartySelection> _partySelect;
+    std::unique_ptr<SaveLoad> _saveLoad;
+
+    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
+
+    // END GUI
+
+    // GUI Colors
 
     glm::vec3 _guiColorBase {0.0f};
     glm::vec3 _guiColorHilight {0.0f};
     glm::vec3 _guiColorDisabled {0.0f};
 
-    // END GUI colors
+    // END GUI Colors
 
     // Modules
 
@@ -250,14 +267,14 @@ protected:
 
     // END Audio
 
-    // Globals/locals
+    // Global variables
 
     std::map<std::string, std::string> _globalStrings;
     std::map<std::string, bool> _globalBooleans;
     std::map<std::string, int> _globalNumbers;
     std::map<std::string, std::shared_ptr<Location>> _globalLocations;
 
-    // END Globals/locals
+    // END Global variables
 
     void start();
 
@@ -284,8 +301,8 @@ protected:
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
-    virtual void onModuleSelected(const std::string &name);
-    virtual void drawHUD();
+    void onModuleSelected(const std::string &name);
+    void drawHUD();
 
     void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const;
     gui::GUI *getScreenGUI() const;
@@ -301,33 +318,8 @@ protected:
 
     // GUI
 
-    virtual void loadInGameMenus();
-    virtual void loadLoadingScreen();
-
-    void changeScreen(GameScreen screen);
-
-    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
-
-    // END GUI
-
-private:
-    bool _tsl;
-
-    // GUI
-
-    std::unique_ptr<MainMenu> _mainMenu;
-    std::unique_ptr<CharacterGeneration> _charGen;
-    std::unique_ptr<HUD> _hud;
-    std::unique_ptr<InGameMenu> _inGame;
-    std::unique_ptr<DialogGUI> _dialog;
-    std::unique_ptr<ComputerGUI> _computer;
-    std::unique_ptr<ContainerGUI> _container;
-    std::unique_ptr<PartySelection> _partySelect;
-    std::unique_ptr<SaveLoad> _saveLoad;
-
-    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
-
-    // END GUI
+    void loadInGameMenus();
+    void loadLoadingScreen();
 
     void loadMainMenu();
     void loadCharacterGeneration();
@@ -338,6 +330,12 @@ private:
     void loadContainer();
     void loadPartySelection();
     void loadSaveLoad();
+
+    void changeScreen(GameScreen screen);
+
+    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
+
+    // END GUI
 };
 
 } // namespace game

@@ -30,15 +30,26 @@ using namespace reone::game;
 namespace reone {
 
 void Engine::init() {
+    loadOptions();
+
+    auto gameId = GameProbe(_options->game.path).probe();
+
+    initServices(gameId);
+
+    _game = make_unique<Game>(gameId, _options->game.path, *_optionsView, *_services);
+    _game->init();
+}
+
+void Engine::loadOptions() {
     _options = OptionsParser(_argc, _argv).parse();
     _optionsView = _options->toView();
 
     setLogLevel(_options->logging.level);
     setLogChannels(_options->logging.channels);
     setLogToFile(_options->logging.logToFile);
+}
 
-    auto gameId = GameProbe(_options->game.path).probe();
-
+void Engine::initServices(GameID gameId) {
     _systemModule = make_unique<SystemModule>();
     _resourceModule = make_unique<ResourceModule>(_options->game.path);
     _graphicsModule = make_unique<GraphicsModule>(_options->graphics, *_resourceModule);
@@ -71,9 +82,6 @@ void Engine::init() {
         _scriptModule->services(),
         _resourceModule->services(),
         _systemModule->services());
-
-    _game = make_unique<Game>(gameId == GameID::TSL, _options->game.path, *_optionsView, *_services);
-    _game->init();
 }
 
 void Engine::deinit() {

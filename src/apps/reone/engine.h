@@ -65,6 +65,9 @@ private:
 
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
+
+    void loadOptions();
+    void initServices(game::GameID gameId);
 };
 
 } // namespace reone
