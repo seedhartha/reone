@@ -15,24 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/module.h"
 
-#include "reone/system/services.h"
+using namespace std;
 
 namespace reone {
 
-class SystemModule : boost::noncopyable {
-public:
-    void init();
+namespace resource {
 
-    SystemServices &services() {
-        return *_services;
-    }
+void ResourceModule::init() {
+    _resources = make_unique<Resources>();
+    _strings = make_unique<Strings>();
+    _twoDas = make_unique<TwoDas>(*_resources);
+    _gffs = make_unique<Gffs>(*_resources);
 
-private:
-    std::unique_ptr<Clock> _clock;
+    _services = make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
 
-    std::unique_ptr<SystemServices> _services;
-};
+    _strings->init(_gamePath);
+}
+
+void ResourceModule::deinit() {
+    _services.reset();
+
+    _gffs.reset();
+    _twoDas.reset();
+    _strings.reset();
+    _resources.reset();
+}
+
+} // namespace resource
 
 } // namespace reone

@@ -76,7 +76,7 @@ class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
 class MockWindow : public IWindow, boost::noncopyable {
 };
 
-class GraphicsModule : boost::noncopyable {
+class TestGraphicsModule : boost::noncopyable {
 public:
     void init() {
         _fonts = std::make_unique<MockFonts>();

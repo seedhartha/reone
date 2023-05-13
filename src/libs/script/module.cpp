@@ -15,38 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "scene.h"
-
-#include "reone/game/types.h"
-
-#include "audio.h"
-#include "graphics.h"
+#include "reone/script/module.h"
 
 using namespace std;
 
-using namespace reone::game;
-using namespace reone::scene;
-
 namespace reone {
 
-void SceneModule::init() {
-    _sceneGraphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
-    _services = make_unique<SceneServices>(*_sceneGraphs);
+namespace script {
 
-    // Init scenes
-    _sceneGraphs->reserve(kSceneMain);
-    _sceneGraphs->reserve(kSceneMainMenu);
-    _sceneGraphs->reserve(kSceneCharGen);
-    for (int i = 0; i < kNumClasses; ++i) {
-        _sceneGraphs->reserve(str(boost::format("%s.%d") % kSceneClassSelect % i));
-    }
-    _sceneGraphs->reserve(kScenePortraitSelect);
-    _sceneGraphs->reserve(kSceneCharacter);
+void ScriptModule::init() {
+    _scripts = make_unique<Scripts>(_resource.resources());
+    _services = make_unique<ScriptServices>(*_scripts);
 }
 
-void SceneModule::deinit() {
+void ScriptModule::deinit() {
     _services.reset();
-    _sceneGraphs.reset();
+    _scripts.reset();
 }
+
+} // namespace script
 
 } // namespace reone

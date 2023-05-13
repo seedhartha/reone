@@ -15,19 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
-
-#include "audio.h"
-#include "graphics.h"
-#include "resource.h"
-#include "scene.h"
-#include "script.h"
+#include "reone/game/module.h"
 
 using namespace std;
 
-using namespace reone::game;
-
 namespace reone {
+
+namespace game {
 
 void GameModule::init() {
     _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
@@ -89,5 +83,7 @@ void GameModule::deinit() {
     _cursors.reset();
     _cameraStyles.reset();
 }
+
+} // namespace game
 
 } // namespace reone

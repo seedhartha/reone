@@ -65,7 +65,7 @@ class MockAudioFiles : public IAudioFiles, boost::noncopyable {
 class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
 };
 
-class AudioModule : boost::noncopyable {
+class TestAudioModule : boost::noncopyable {
 public:
     void init() {
         _context = std::make_unique<MockAudioContext>();

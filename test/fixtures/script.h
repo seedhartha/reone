@@ -89,7 +89,7 @@ private:
 class MockScripts : public IScripts, boost::noncopyable {
 };
 
-class SceneModule : boost::noncopyable {
+class TestSceneModule : boost::noncopyable {
 public:
     void init() {
         _scripts = std::make_unique<MockScripts>();

@@ -24,7 +24,7 @@ namespace reone {
 class MockClock : public IClock, boost::noncopyable {
 };
 
-class SystemModule : boost::noncopyable {
+class TestSystemModule : boost::noncopyable {
 public:
     void init() {
         _clock = std::make_unique<MockClock>();

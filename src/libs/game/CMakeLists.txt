@@ -199,6 +199,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/layout.h
     ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
+    ${GAME_INCLUDE_DIR}/module.h
     ${GAME_INCLUDE_DIR}/object/area.h
     ${GAME_INCLUDE_DIR}/object/creature.h
     ${GAME_INCLUDE_DIR}/object/door.h
@@ -406,6 +407,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui.cpp
     ${GAME_SOURCE_DIR}/guisounds.cpp
     ${GAME_SOURCE_DIR}/layouts.cpp
+    ${GAME_SOURCE_DIR}/module.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp

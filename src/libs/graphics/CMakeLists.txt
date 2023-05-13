@@ -53,6 +53,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/model.h
     ${GRAPHICS_INCLUDE_DIR}/modelnode.h
     ${GRAPHICS_INCLUDE_DIR}/models.h
+    ${GRAPHICS_INCLUDE_DIR}/module.h
     ${GRAPHICS_INCLUDE_DIR}/options.h
     ${GRAPHICS_INCLUDE_DIR}/pipeline.h
     ${GRAPHICS_INCLUDE_DIR}/pixelutil.h
@@ -99,6 +100,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/model.cpp
     ${GRAPHICS_SOURCE_DIR}/modelnode.cpp
     ${GRAPHICS_SOURCE_DIR}/models.cpp
+    ${GRAPHICS_SOURCE_DIR}/module.cpp
     ${GRAPHICS_SOURCE_DIR}/pipeline.cpp
     ${GRAPHICS_SOURCE_DIR}/pixelutil.cpp
     ${GRAPHICS_SOURCE_DIR}/renderbuffer.cpp

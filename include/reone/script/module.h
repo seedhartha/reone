@@ -17,33 +17,38 @@
 
 #pragma once
 
-#include "reone/scene/services.h"
+#include "reone/resource/module.h"
+
+#include "scripts.h"
+#include "services.h"
 
 namespace reone {
 
-namespace scene {
+namespace script {
 
-class MockSceneGraphs : public ISceneGraphs, boost::noncopyable {
-};
-
-class TestSceneModule : boost::noncopyable {
+class ScriptModule : boost::noncopyable {
 public:
-    void init() {
-        _graphs = std::make_unique<MockSceneGraphs>();
-
-        _services = std::make_unique<SceneServices>(*_graphs);
+    ScriptModule(resource::ResourceModule &resource) :
+        _resource(resource) {
     }
 
-    SceneServices &services() {
-        return *_services;
-    }
+    ~ScriptModule() { deinit(); }
+
+    void init();
+    void deinit();
+
+    Scripts &scripts() { return *_scripts; }
+
+    ScriptServices &services() { return *_services; }
 
 private:
-    std::unique_ptr<MockSceneGraphs> _graphs;
+    resource::ResourceModule &_resource;
 
-    std::unique_ptr<SceneServices> _services;
+    std::unique_ptr<Scripts> _scripts;
+
+    std::unique_ptr<ScriptServices> _services;
 };
 
-} // namespace scene
+} // namespace script
 
 } // namespace reone

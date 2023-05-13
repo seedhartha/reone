@@ -17,34 +17,47 @@
 
 #pragma once
 
-#include "reone/script/scripts.h"
-#include "reone/script/services.h"
+#include "reone/resource/module.h"
+
+#include "context.h"
+#include "files.h"
+#include "options.h"
+#include "player.h"
+#include "services.h"
 
 namespace reone {
 
-class ResourceModule;
+namespace audio {
 
-class ScriptModule : boost::noncopyable {
+class AudioModule : boost::noncopyable {
 public:
-    ScriptModule(ResourceModule &resource) :
+    AudioModule(AudioOptions &options, resource::ResourceModule &resource) :
+        _options(options),
         _resource(resource) {
     }
 
-    ~ScriptModule() { deinit(); }
+    ~AudioModule() { deinit(); }
 
     void init();
     void deinit();
 
-    script::Scripts &scripts() { return *_scripts; }
+    AudioContext &audioContext() { return *_audioContext; }
+    AudioFiles &audioFiles() { return *_audioFiles; }
+    AudioPlayer &audioPlayer() { return *_audioPlayer; }
 
-    script::ScriptServices &services() { return *_services; }
+    AudioServices &services() { return *_services; }
 
 private:
-    ResourceModule &_resource;
+    AudioOptions &_options;
+    resource::ResourceModule &_resource;
 
-    std::unique_ptr<script::Scripts> _scripts;
+    std::unique_ptr<AudioContext> _audioContext;
+    std::unique_ptr<AudioFiles> _audioFiles;
+    std::unique_ptr<AudioPlayer> _audioPlayer;
 
-    std::unique_ptr<script::ScriptServices> _services;
+    std::unique_ptr<AudioServices> _services;
 };
+
+} // namespace audio
 
 } // namespace reone

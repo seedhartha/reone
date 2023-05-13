@@ -15,15 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "graphics.h"
-
-#include "resource.h"
+#include "reone/graphics/module.h"
 
 using namespace std;
 
-using namespace reone::graphics;
-
 namespace reone {
+
+namespace graphics {
 
 void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
@@ -71,5 +69,7 @@ void GraphicsModule::deinit() {
     _graphicsContext.reset();
     _window.reset();
 }
+
+} // namespace graphics
 
 } // namespace reone

@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
-    auto graphicsModule = GraphicsModule();
+    auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = AudioModule();
+    auto audioModule = TestAudioModule();
     audioModule.init();
 
     auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
@@ -103,10 +103,10 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
-    auto graphicsModule = GraphicsModule();
+    auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = AudioModule();
+    auto audioModule = TestAudioModule();
     audioModule.init();
 
     auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
@@ -151,10 +151,10 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
-    auto graphicsModule = GraphicsModule();
+    auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = AudioModule();
+    auto audioModule = TestAudioModule();
     audioModule.init();
 
     auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
@@ -198,10 +198,10 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
-    auto graphicsModule = GraphicsModule();
+    auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = AudioModule();
+    auto audioModule = TestAudioModule();
     audioModule.init();
 
     auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
@@ -263,10 +263,10 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
-    auto graphicsModule = GraphicsModule();
+    auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = AudioModule();
+    auto audioModule = TestAudioModule();
     audioModule.init();
 
     auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());

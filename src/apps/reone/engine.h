@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "module/audio.h"
-#include "module/game.h"
-#include "module/graphics.h"
-#include "module/resource.h"
-#include "module/scene.h"
-#include "module/script.h"
-#include "module/system.h"
+#include "reone/audio/module.h"
+#include "reone/game/module.h"
+#include "reone/graphics/module.h"
+#include "reone/resource/module.h"
+#include "reone/scene/module.h"
+#include "reone/script/module.h"
+#include "reone/system/module.h"
 
 #include "options.h"
 
@@ -53,12 +53,12 @@ private:
     char **_argv;
 
     std::unique_ptr<SystemModule> _systemModule;
-    std::unique_ptr<ResourceModule> _resourceModule;
-    std::unique_ptr<GraphicsModule> _graphicsModule;
-    std::unique_ptr<AudioModule> _audioModule;
-    std::unique_ptr<SceneModule> _sceneModule;
-    std::unique_ptr<ScriptModule> _scriptModule;
-    std::unique_ptr<GameModule> _gameModule;
+    std::unique_ptr<resource::ResourceModule> _resourceModule;
+    std::unique_ptr<graphics::GraphicsModule> _graphicsModule;
+    std::unique_ptr<audio::AudioModule> _audioModule;
+    std::unique_ptr<scene::SceneModule> _sceneModule;
+    std::unique_ptr<script::ScriptModule> _scriptModule;
+    std::unique_ptr<game::GameModule> _gameModule;
 
     std::unique_ptr<Options> _options;
     std::unique_ptr<game::OptionsView> _optionsView;

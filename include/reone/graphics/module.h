@@ -17,27 +17,29 @@
 
 #pragma once
 
-#include "reone/graphics/context.h"
-#include "reone/graphics/fonts.h"
-#include "reone/graphics/lipanimations.h"
-#include "reone/graphics/meshes.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/options.h"
-#include "reone/graphics/pipeline.h"
-#include "reone/graphics/services.h"
-#include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
-#include "reone/graphics/uniforms.h"
-#include "reone/graphics/walkmeshes.h"
-#include "reone/graphics/window.h"
+#include "reone/resource/module.h"
+
+#include "context.h"
+#include "fonts.h"
+#include "lipanimations.h"
+#include "meshes.h"
+#include "models.h"
+#include "options.h"
+#include "pipeline.h"
+#include "services.h"
+#include "shaders.h"
+#include "textures.h"
+#include "uniforms.h"
+#include "walkmeshes.h"
+#include "window.h"
 
 namespace reone {
 
-class ResourceModule;
+namespace graphics {
 
 class GraphicsModule : boost::noncopyable {
 public:
-    GraphicsModule(graphics::GraphicsOptions &options, ResourceModule &resource) :
+    GraphicsModule(graphics::GraphicsOptions &options, resource::ResourceModule &resource) :
         _options(options),
         _resource(resource) {
     }
@@ -63,7 +65,7 @@ public:
 
 private:
     graphics::GraphicsOptions &_options;
-    ResourceModule &_resource;
+    resource::ResourceModule &_resource;
 
     std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::GraphicsContext> _graphicsContext;
@@ -79,5 +81,7 @@ private:
 
     std::unique_ptr<graphics::GraphicsServices> _services;
 };
+
+} // namespace graphics
 
 } // namespace reone

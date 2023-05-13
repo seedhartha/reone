@@ -25,7 +25,12 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::game;
+using namespace reone::graphics;
+using namespace reone::resource;
+using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 

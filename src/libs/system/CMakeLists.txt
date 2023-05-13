@@ -28,6 +28,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
     ${SYSTEM_INCLUDE_DIR}/logutil.h
     ${SYSTEM_INCLUDE_DIR}/memorycache.h
+    ${SYSTEM_INCLUDE_DIR}/module.h
     ${SYSTEM_INCLUDE_DIR}/pathutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
     ${SYSTEM_INCLUDE_DIR}/services.h
@@ -48,6 +49,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/clock.cpp
     ${SYSTEM_SOURCE_DIR}/hexutil.cpp
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
+    ${SYSTEM_SOURCE_DIR}/module.cpp
     ${SYSTEM_SOURCE_DIR}/pathutil.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp)

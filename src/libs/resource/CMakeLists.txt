@@ -36,6 +36,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
     ${RESOURCE_INCLUDE_DIR}/id.h
+    ${RESOURCE_INCLUDE_DIR}/module.h
     ${RESOURCE_INCLUDE_DIR}/provider.h
     ${RESOURCE_INCLUDE_DIR}/provider/erf.h
     ${RESOURCE_INCLUDE_DIR}/provider/folder.h
@@ -67,6 +68,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/module.cpp
     ${RESOURCE_SOURCE_DIR}/provider/erf.cpp
     ${RESOURCE_SOURCE_DIR}/provider/folder.cpp
     ${RESOURCE_SOURCE_DIR}/provider/keybif.cpp

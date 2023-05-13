@@ -21,6 +21,7 @@ set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/files.h
     ${AUDIO_INCLUDE_DIR}/format/mp3reader.h
     ${AUDIO_INCLUDE_DIR}/format/wavreader.h
+    ${AUDIO_INCLUDE_DIR}/module.h
     ${AUDIO_INCLUDE_DIR}/options.h
     ${AUDIO_INCLUDE_DIR}/player.h
     ${AUDIO_INCLUDE_DIR}/services.h
@@ -33,6 +34,7 @@ set(AUDIO_SOURCES
     ${AUDIO_SOURCE_DIR}/files.cpp
     ${AUDIO_SOURCE_DIR}/format/mp3reader.cpp
     ${AUDIO_SOURCE_DIR}/format/wavreader.cpp
+    ${AUDIO_SOURCE_DIR}/module.cpp
     ${AUDIO_SOURCE_DIR}/player.cpp
     ${AUDIO_SOURCE_DIR}/source.cpp
     ${AUDIO_SOURCE_DIR}/stream.cpp)

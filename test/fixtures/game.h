@@ -74,7 +74,7 @@ class MockSurfaces : public ISurfaces, boost::noncopyable {
 class MockVisiblities : public IVisibilities, boost::noncopyable {
 };
 
-class GameModule : boost::noncopyable {
+class TestGameModule : boost::noncopyable {
 public:
     void init() {
         _cameraStyles = std::make_unique<MockCameraStyles>();

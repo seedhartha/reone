@@ -15,32 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "resource.h"
+#include "reone/scene/module.h"
+
+#include "reone/game/types.h"
 
 using namespace std;
 
-using namespace reone::resource;
+using namespace reone::game;
 
 namespace reone {
 
-void ResourceModule::init() {
-    _resources = make_unique<Resources>();
-    _strings = make_unique<Strings>();
-    _twoDas = make_unique<TwoDas>(*_resources);
-    _gffs = make_unique<Gffs>(*_resources);
+namespace scene {
 
-    _services = make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
+void SceneModule::init() {
+    _sceneGraphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
+    _services = make_unique<SceneServices>(*_sceneGraphs);
 
-    _strings->init(_gamePath);
+    // Init scenes
+    _sceneGraphs->reserve(kSceneMain);
+    _sceneGraphs->reserve(kSceneMainMenu);
+    _sceneGraphs->reserve(kSceneCharGen);
+    for (int i = 0; i < kNumClasses; ++i) {
+        _sceneGraphs->reserve(str(boost::format("%s.%d") % kSceneClassSelect % i));
+    }
+    _sceneGraphs->reserve(kScenePortraitSelect);
+    _sceneGraphs->reserve(kSceneCharacter);
 }
 
-void ResourceModule::deinit() {
+void SceneModule::deinit() {
     _services.reset();
-
-    _gffs.reset();
-    _twoDas.reset();
-    _strings.reset();
-    _resources.reset();
+    _sceneGraphs.reset();
 }
+
+} // namespace scene
 
 } // namespace reone

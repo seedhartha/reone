@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "script.h"
+#pragma once
 
-#include "resource.h"
-
-using namespace std;
-
-using namespace reone::script;
+#include "services.h"
 
 namespace reone {
 
-void ScriptModule::init() {
-    _scripts = make_unique<Scripts>(_resource.resources());
-    _services = make_unique<ScriptServices>(*_scripts);
-}
+class SystemModule : boost::noncopyable {
+public:
+    void init();
 
-void ScriptModule::deinit() {
-    _services.reset();
-    _scripts.reset();
-}
+    SystemServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<Clock> _clock;
+
+    std::unique_ptr<SystemServices> _services;
+};
 
 } // namespace reone

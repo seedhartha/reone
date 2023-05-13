@@ -35,7 +35,7 @@ class MockStrings : public IStrings, boost::noncopyable {
 class MockTwoDas : public ITwoDas, boost::noncopyable {
 };
 
-class ResourceModule : boost::noncopyable {
+class TestResourceModule : boost::noncopyable {
 public:
     void init() {
         _gffs = std::make_unique<MockGffs>();

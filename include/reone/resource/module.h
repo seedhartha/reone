@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include "reone/resource/2das.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/resources.h"
-#include "reone/resource/services.h"
-#include "reone/resource/strings.h"
+#include "2das.h"
+#include "gffs.h"
+#include "resources.h"
+#include "services.h"
+#include "strings.h"
 
 namespace reone {
+
+namespace resource {
 
 class ResourceModule : boost::noncopyable {
 public:
@@ -36,22 +38,24 @@ public:
     void init();
     void deinit();
 
-    resource::Gffs &gffs() { return *_gffs; }
-    resource::Resources &resources() { return *_resources; }
-    resource::Strings &strings() { return *_strings; }
-    resource::TwoDas &twoDas() { return *_twoDas; }
+    Gffs &gffs() { return *_gffs; }
+    Resources &resources() { return *_resources; }
+    Strings &strings() { return *_strings; }
+    TwoDas &twoDas() { return *_twoDas; }
 
-    resource::ResourceServices &services() { return *_services; }
+    ResourceServices &services() { return *_services; }
 
 private:
     boost::filesystem::path _gamePath;
 
-    std::unique_ptr<resource::Gffs> _gffs;
-    std::unique_ptr<resource::Resources> _resources;
-    std::unique_ptr<resource::Strings> _strings;
-    std::unique_ptr<resource::TwoDas> _twoDas;
+    std::unique_ptr<Gffs> _gffs;
+    std::unique_ptr<Resources> _resources;
+    std::unique_ptr<Strings> _strings;
+    std::unique_ptr<TwoDas> _twoDas;
 
-    std::unique_ptr<resource::ResourceServices> _services;
+    std::unique_ptr<ResourceServices> _services;
 };
+
+} // namespace resource
 
 } // namespace reone

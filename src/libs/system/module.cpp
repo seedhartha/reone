@@ -15,32 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "audio.h"
-
-#include "resource.h"
+#include "reone/system/module.h"
 
 using namespace std;
 
-using namespace reone::audio;
-
 namespace reone {
 
-void AudioModule::init() {
-    _audioFiles = make_unique<AudioFiles>(_resource.resources());
-    _audioContext = make_unique<AudioContext>();
-    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
-
-    _services = make_unique<AudioServices>(*_audioContext, *_audioFiles, *_audioPlayer);
-
-    _audioContext->init();
-}
-
-void AudioModule::deinit() {
-    _services.reset();
-
-    _audioPlayer.reset();
-    _audioContext.reset();
-    _audioFiles.reset();
+void SystemModule::init() {
+    _clock = make_unique<Clock>();
+    _services = make_unique<SystemServices>(*_clock);
 }
 
 } // namespace reone
