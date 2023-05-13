@@ -22,8 +22,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class ResourceModule;
 
 class ScriptModule : boost::noncopyable {
@@ -48,7 +46,5 @@ private:
 
     std::unique_ptr<script::ScriptServices> _services;
 };
-
-} // namespace engine
 
 } // namespace reone

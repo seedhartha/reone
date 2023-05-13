@@ -21,13 +21,9 @@ using namespace std;
 
 namespace reone {
 
-namespace engine {
-
 void SystemModule::init() {
     _clock = make_unique<Clock>();
     _services = make_unique<SystemServices>(*_clock);
 }
-
-} // namespace engine
 
 } // namespace reone

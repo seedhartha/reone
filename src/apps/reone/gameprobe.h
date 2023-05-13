@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class GameProbe {
 public:
     GameProbe(boost::filesystem::path gamePath) :
@@ -34,7 +32,5 @@ public:
 private:
     boost::filesystem::path _gamePath;
 };
-
-} // namespace engine
 
 } // namespace reone

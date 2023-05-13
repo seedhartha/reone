@@ -25,8 +25,6 @@ using namespace reone::graphics;
 
 namespace reone {
 
-namespace engine {
-
 void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
     _graphicsContext = make_unique<GraphicsContext>(_options);
@@ -73,7 +71,5 @@ void GraphicsModule::deinit() {
     _graphicsContext.reset();
     _window.reset();
 }
-
-} // namespace engine
 
 } // namespace reone

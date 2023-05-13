@@ -23,8 +23,6 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace engine {
-
 void ResourceModule::init() {
     _resources = make_unique<Resources>();
     _strings = make_unique<Strings>();
@@ -44,7 +42,5 @@ void ResourceModule::deinit() {
     _strings.reset();
     _resources.reset();
 }
-
-} // namespace engine
 
 } // namespace reone

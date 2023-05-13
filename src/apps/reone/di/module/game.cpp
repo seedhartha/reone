@@ -29,8 +29,6 @@ using namespace reone::game;
 
 namespace reone {
 
-namespace engine {
-
 void GameModule::init() {
     _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
@@ -91,7 +89,5 @@ void GameModule::deinit() {
     _cursors.reset();
     _cameraStyles.reset();
 }
-
-} // namespace engine
 
 } // namespace reone

@@ -40,8 +40,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class AudioModule;
 class GraphicsModule;
 class ResourceModule;
@@ -104,7 +102,5 @@ private:
 
     std::unique_ptr<game::GameServices> _services;
 };
-
-} // namespace engine
 
 } // namespace reone

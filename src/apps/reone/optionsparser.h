@@ -23,8 +23,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class OptionsParser {
 public:
     OptionsParser(int argc, char **argv) :
@@ -38,7 +36,5 @@ private:
     int _argc;
     char **_argv;
 };
-
-} // namespace engine
 
 } // namespace reone

@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class SystemModule : boost::noncopyable {
 public:
     void init();
@@ -36,7 +34,5 @@ private:
 
     std::unique_ptr<SystemServices> _services;
 };
-
-} // namespace engine
 
 } // namespace reone

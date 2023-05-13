@@ -17,8 +17,8 @@
 
 #include "engine.h"
 
-#include "reone/system/logutil.h"
 #include "reone/game/game.h"
+#include "reone/system/logutil.h"
 
 #include "di/services.h"
 #include "gameprobe.h"
@@ -26,12 +26,9 @@
 
 using namespace std;
 
-using namespace reone::engine;
 using namespace reone::game;
 
 namespace reone {
-
-namespace engine {
 
 int Engine::run() {
     auto optionsParser = OptionsParser(_argc, _argv);
@@ -55,7 +52,5 @@ int Engine::run() {
 
     return 0;
 }
-
-} // namespace engine
 
 } // namespace reone

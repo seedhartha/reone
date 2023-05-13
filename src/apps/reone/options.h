@@ -18,13 +18,12 @@
 #pragma once
 
 #include "reone/audio/options.h"
-#include "reone/system/types.h"
 #include "reone/game/options.h"
 #include "reone/graphics/options.h"
+#include "reone/system/types.h"
+
 
 namespace reone {
-
-namespace engine {
 
 struct Options {
     struct Logging {
@@ -43,7 +42,5 @@ struct Options {
         return game::OptionsView(game, graphics, audio);
     }
 };
-
-} // namespace engine
 
 } // namespace reone

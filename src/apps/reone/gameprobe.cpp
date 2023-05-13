@@ -25,8 +25,6 @@ using namespace reone::game;
 
 namespace reone {
 
-namespace engine {
-
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
     boost::filesystem::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
@@ -42,7 +40,5 @@ GameID GameProbe::probe() {
 
     throw logic_error("Unable to determine game ID: " + _gamePath.string());
 }
-
-} // namespace engine
 
 } // namespace reone

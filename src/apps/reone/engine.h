@@ -19,8 +19,6 @@
 
 namespace reone {
 
-namespace engine {
-
 class Engine : boost::noncopyable {
 public:
     Engine(int argc, char **argv) :
@@ -37,7 +35,5 @@ private:
     int _argc;
     char **_argv;
 };
-
-} // namespace engine
 
 } // namespace reone
