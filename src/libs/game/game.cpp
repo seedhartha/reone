@@ -157,7 +157,7 @@ int Game::run() {
 }
 
 void Game::runMainLoop() {
-    _ticks = _services.system.defaultClock().ticks();
+    _ticks = _services.system.clock.ticks();
     while (!_quit) {
         _services.graphics.defaultWindow().processEvents(_quit);
         if (!_services.graphics.defaultWindow().isInFocus()) {
@@ -280,7 +280,7 @@ void Game::loadModule(const string &name, string entry) {
             string musicName(_module->area()->music());
             playMusic(musicName);
 
-            _ticks = _services.system.defaultClock().ticks();
+            _ticks = _services.system.clock.ticks();
             openInGame();
         } catch (const ValidationException &e) {
             error("Failed loading module '" + name + "': " + string(e.what()));
@@ -470,7 +470,7 @@ void Game::loadNextModule() {
 }
 
 float Game::measureFrameTime() {
-    uint32_t ticks = _services.system.defaultClock().ticks();
+    uint32_t ticks = _services.system.clock.ticks();
     float dt = (ticks - _ticks) / 1000.0f;
     _ticks = ticks;
 

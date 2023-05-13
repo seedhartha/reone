@@ -46,7 +46,7 @@ static constexpr int kFrameWidth = 125;
 static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
-    _frequency = _services.system.defaultClock().performanceFrequency();
+    _frequency = _services.system.clock.performanceFrequency();
     _font = _services.graphics.defaultFonts().get(kFontResRef);
 }
 
@@ -54,7 +54,7 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
         _enabled = !_enabled;
         if (_enabled) {
-            _counter = _services.system.defaultClock().performanceCounter();
+            _counter = _services.system.clock.performanceCounter();
             _refreshTimer.setTimeout(kRefreshDelay);
         }
         return true;
@@ -71,7 +71,7 @@ void ProfileOverlay::update(float dt) {
     ++_numFrames;
 
     if (_refreshTimer.advance(dt)) {
-        uint64_t counter = _services.system.defaultClock().performanceCounter();
+        uint64_t counter = _services.system.clock.performanceCounter();
         _fps = static_cast<int>(_numFrames * _frequency / (counter - _counter));
         _numFrames = 0;
         _counter = counter;

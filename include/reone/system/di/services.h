@@ -27,14 +27,6 @@ struct SystemServices {
     SystemServices(IClock &clock) :
         clock(clock) {
     }
-
-    Clock &defaultClock() {
-        auto casted = dynamic_cast<Clock *>(&clock);
-        if (!casted) {
-            throw std::logic_error("Illegal Clock implementation");
-        }
-        return *casted;
-    }
 };
 
 } // namespace reone

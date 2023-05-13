@@ -22,6 +22,18 @@
 namespace reone {
 
 class MockClock : public IClock, boost::noncopyable {
+public:
+    uint32_t ticks() const override {
+        return 0;
+    }
+
+    uint64_t performanceFrequency() const override {
+        return 0;
+    }
+
+    uint64_t performanceCounter() const override {
+        return 0;
+    };
 };
 
 class TestSystemModule : boost::noncopyable {
