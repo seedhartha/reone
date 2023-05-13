@@ -22,6 +22,7 @@ set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/fixtures/audio.h
     ${TESTS_SOURCE_DIR}/fixtures/game.h
     ${TESTS_SOURCE_DIR}/fixtures/graphics.h
+    ${TESTS_SOURCE_DIR}/fixtures/movie.h
     ${TESTS_SOURCE_DIR}/fixtures/resource.h
     ${TESTS_SOURCE_DIR}/fixtures/scene.h
     ${TESTS_SOURCE_DIR}/fixtures/script.h

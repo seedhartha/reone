@@ -21,6 +21,7 @@
 #include "reone/game/di/module.h"
 #include "reone/game/game.h"
 #include "reone/graphics/di/module.h"
+#include "reone/movie/di/module.h"
 #include "reone/resource/di/module.h"
 #include "reone/scene/di/module.h"
 #include "reone/script/di/module.h"
@@ -57,6 +58,7 @@ private:
     std::unique_ptr<resource::ResourceModule> _resourceModule;
     std::unique_ptr<graphics::GraphicsModule> _graphicsModule;
     std::unique_ptr<audio::AudioModule> _audioModule;
+    std::unique_ptr<movie::MovieModule> _movieModule;
     std::unique_ptr<scene::SceneModule> _sceneModule;
     std::unique_ptr<script::ScriptModule> _scriptModule;
     std::unique_ptr<game::GameModule> _gameModule;

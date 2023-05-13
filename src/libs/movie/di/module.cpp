@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "reone/game/game.h"
-
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/movie.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+#include "reone/movie/di/module.h"
 
 using namespace std;
 
-using namespace reone;
-using namespace reone::game;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(game)
+namespace movie {
 
-BOOST_AUTO_TEST_SUITE_END()
+void MovieModule::init() {
+    _movies = make_unique<Movies>(_gamePath, _graphics.services(), _audio.services());
+    _services = make_unique<MovieServices>(*_movies);
+}
+
+void MovieModule::deinit() {
+    _services.reset();
+    _movies.reset();
+}
+
+} // namespace movie
+
+} // namespace reone

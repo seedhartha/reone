@@ -71,12 +71,12 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::gui;
 using namespace reone::graphics;
+using namespace reone::gui;
+using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
-using namespace reone::movie;
 
 namespace reone {
 
@@ -329,15 +329,7 @@ void Game::setCursorType(CursorType type) {
 }
 
 void Game::playVideo(const string &name) {
-    boost::filesystem::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
-    if (path.empty()) {
-        return;
-    }
-
-    BikReader bik(path, _services.graphics, _services.audio);
-    bik.load();
-
-    _movie = bik.movie();
+    _movie = _services.movie.movies.get(name);
     if (!_movie) {
         return;
     }

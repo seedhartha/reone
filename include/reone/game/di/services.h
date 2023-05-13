@@ -17,6 +17,14 @@
 
 #pragma once
 
+#include "reone/audio/di/services.h"
+#include "reone/graphics/di/services.h"
+#include "reone/movie/di/services.h"
+#include "reone/resource/di/services.h"
+#include "reone/scene/di/services.h"
+#include "reone/script/di/services.h"
+#include "reone/system/di/services.h"
+
 #include "../camerastyles.h"
 #include "../cursors.h"
 #include "../d20/classes.h"
@@ -36,38 +44,6 @@
 #include "../visibilities.h"
 
 namespace reone {
-
-struct SystemServices;
-
-namespace resource {
-
-struct ResourceServices;
-
-}
-
-namespace audio {
-
-struct AudioServices;
-
-}
-
-namespace graphics {
-
-struct GraphicsServices;
-
-}
-
-namespace scene {
-
-struct SceneServices;
-
-}
-
-namespace script {
-
-struct ScriptServices;
-
-}
 
 namespace game {
 
@@ -130,6 +106,7 @@ struct GameServices {
 
 struct ServicesView {
     GameServices &game;
+    movie::MovieServices &movie;
     audio::AudioServices &audio;
     graphics::GraphicsServices &graphics;
     scene::SceneServices &scene;
@@ -139,6 +116,7 @@ struct ServicesView {
 
     ServicesView(
         GameServices &game,
+        movie::MovieServices &movie,
         audio::AudioServices &audio,
         graphics::GraphicsServices &graphics,
         scene::SceneServices &scene,
@@ -146,6 +124,7 @@ struct ServicesView {
         resource::ResourceServices &resource,
         SystemServices &system) :
         game(game),
+        movie(movie),
         audio(audio),
         graphics(graphics),
         scene(scene),

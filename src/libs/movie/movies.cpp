@@ -15,24 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include "reone/movie/movies.h"
 
-#include "reone/game/game.h"
-
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/movie.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+#include "reone/movie/format/bikreader.h"
+#include "reone/system/pathutil.h"
 
 using namespace std;
 
-using namespace reone;
-using namespace reone::game;
+namespace reone {
 
-BOOST_AUTO_TEST_SUITE(game)
+namespace movie {
 
-BOOST_AUTO_TEST_SUITE_END()
+shared_ptr<Movie> Movies::doGet(std::string name) {
+    auto path = getPathIgnoreCase(_gamePath, "movies/" + name + ".bik");
+    if (path.empty()) {
+        return nullptr;
+    }
+
+    BikReader bik(path, _graphicsSvc, _audioSvc);
+    bik.load();
+
+    return bik.movie();
+}
+
+} // namespace movie
+
+} // namespace reone

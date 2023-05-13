@@ -15,24 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#pragma once
 
-#include "reone/game/game.h"
+#include "reone/movie/di/services.h"
 
-#include "../fixtures/audio.h"
-#include "../fixtures/game.h"
-#include "../fixtures/graphics.h"
-#include "../fixtures/movie.h"
-#include "../fixtures/resource.h"
-#include "../fixtures/scene.h"
-#include "../fixtures/script.h"
-#include "../fixtures/system.h"
+namespace reone {
 
-using namespace std;
+namespace movie {
 
-using namespace reone;
-using namespace reone::game;
+class MockMovies : public IMovies, boost::noncopyable {
+public:
+    void invalidate() override {}
 
-BOOST_AUTO_TEST_SUITE(game)
+    std::shared_ptr<Movie> get(const std::string &name) override {
+        return nullptr;
+    }
+};
 
-BOOST_AUTO_TEST_SUITE_END()
+class TestMovieModule : boost::noncopyable {
+public:
+    void init() {
+        _movies = std::make_unique<MockMovies>();
+        _services = std::make_unique<MovieServices>(*_movies);
+    }
+
+    MovieServices &services() {
+        return *_services;
+    }
+
+private:
+    std::unique_ptr<MockMovies> _movies;
+
+    std::unique_ptr<MovieServices> _services;
+};
+
+} // namespace movie
+
+} // namespace reone
