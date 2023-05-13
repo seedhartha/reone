@@ -39,6 +39,10 @@ namespace game {
 class ISoundSets {
 public:
     virtual ~ISoundSets() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<SoundSet> get(const std::string &key) = 0;
 };
 
 class SoundSets : public ISoundSets {
@@ -52,11 +56,11 @@ public:
         _strings(strings) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<SoundSet> get(const std::string &key) {
+    std::shared_ptr<SoundSet> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

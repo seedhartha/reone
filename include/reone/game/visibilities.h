@@ -32,6 +32,10 @@ namespace game {
 class IVisibilities {
 public:
     virtual ~IVisibilities() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<Visibility> get(const std::string &key) = 0;
 };
 
 class Visibilities : public IVisibilities {
@@ -40,11 +44,11 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Visibility> get(const std::string &key) {
+    std::shared_ptr<Visibility> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

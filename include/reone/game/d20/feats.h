@@ -41,6 +41,10 @@ namespace game {
 class IFeats {
 public:
     virtual ~IFeats() = default;
+
+    virtual void init() = 0;
+
+    virtual std::shared_ptr<Feat> get(FeatType type) const = 0;
 };
 
 class Feats : public IFeats, boost::noncopyable {
@@ -54,9 +58,9 @@ public:
         _twoDas(twoDas) {
     }
 
-    void init();
+    void init() override;
 
-    std::shared_ptr<Feat> get(FeatType type) const;
+    std::shared_ptr<Feat> get(FeatType type) const override;
 
 private:
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;

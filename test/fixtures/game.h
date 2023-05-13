@@ -18,60 +18,190 @@
 #pragma once
 
 #include "reone/game/di/services.h"
+#include "reone/system/exception/notimplemented.h"
 
 namespace reone {
 
 namespace game {
 
 class MockCameraStyles : public ICameraStyles, boost::noncopyable {
+public:
+    std::shared_ptr<CameraStyle> get(int index) const override {
+        return nullptr;
+    }
+
+    std::shared_ptr<CameraStyle> get(const std::string &name) const override {
+        return nullptr;
+    }
 };
 
 class MockClasses : public IClasses, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<CreatureClass> get(ClassType key) override {
+        return nullptr;
+    }
 };
 
 class MockCursors : public ICursors, boost::noncopyable {
+public:
+    std::shared_ptr<graphics::Cursor> get(game::CursorType type) override {
+        return nullptr;
+    }
 };
 
 class MockDialogs : public IDialogs, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Dialog> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockFeats : public IFeats, boost::noncopyable {
+public:
+    void init() override {}
+
+    std::shared_ptr<Feat> get(FeatType type) const override {
+        return nullptr;
+    }
 };
 
 class MockFootstepSounds : public IFootstepSounds, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<FootstepTypeSounds> get(uint32_t key) override {
+        return nullptr;
+    }
 };
 
 class MockGUISounds : public IGUISounds, boost::noncopyable {
+public:
+    std::shared_ptr<audio::AudioStream> getOnClick() const override {
+        return nullptr;
+    }
+
+    std::shared_ptr<audio::AudioStream> getOnEnter() const override {
+        return nullptr;
+    }
 };
 
 class MockLayouts : public ILayouts, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Layout> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockPaths : public IPaths, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Path> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockPortraits : public IPortraits, boost::noncopyable {
+public:
+    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const override {
+        return nullptr;
+    }
+
+    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const override {
+        return nullptr;
+    }
+
+    const std::vector<Portrait> &portraits() const override {
+        return _portraits;
+    }
+
+private:
+    std::vector<Portrait> _portraits;
 };
 
 class MockReputes : public IReputes, boost::noncopyable {
+public:
+    bool getIsEnemy(const Creature &left, const Creature &right) const override {
+        return false;
+    }
+
+    bool getIsFriend(const Creature &left, const Creature &right) const override {
+        return false;
+    }
+
+    bool getIsNeutral(const Creature &left, const Creature &right) const override {
+        return false;
+    }
 };
 
 class MockResourceLayout : public IResourceLayout, boost::noncopyable {
+public:
+    void loadModuleResources(const std::string &moduleName) override {}
 };
 
 class MockSkills : public ISkills, boost::noncopyable {
+public:
+    std::shared_ptr<Skill> get(SkillType type) const override {
+        return nullptr;
+    }
 };
 
 class MockSoundSets : public ISoundSets, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<SoundSet> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class MockSpells : public ISpells, boost::noncopyable {
+public:
+    std::shared_ptr<Spell> get(SpellType type) const override {
+        return nullptr;
+    }
 };
 
 class MockSurfaces : public ISurfaces, boost::noncopyable {
+public:
+    bool isWalkable(int index) const override {
+        return false;
+    }
+
+    const Surface &getSurface(int index) const override {
+        throw NotImplementedException("getSurface");
+    }
+
+    std::set<uint32_t> getGrassSurfaces() const override {
+        return std::set<uint32_t>();
+    }
+
+    std::set<uint32_t> getWalkableSurfaces() const override {
+        return std::set<uint32_t>();
+    }
+
+    std::set<uint32_t> getWalkcheckSurfaces() const override {
+        return std::set<uint32_t>();
+    }
+
+    std::set<uint32_t> getLineOfSightSurfaces() const override {
+        return std::set<uint32_t>();
+    }
 };
 
 class MockVisiblities : public IVisibilities, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<Visibility> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class TestGameModule : boost::noncopyable {

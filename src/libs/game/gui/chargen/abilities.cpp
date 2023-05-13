@@ -108,7 +108,7 @@ void CharGenAbilities::load() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen.character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_services.game.defaultClasses().get(classType));
+        shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();

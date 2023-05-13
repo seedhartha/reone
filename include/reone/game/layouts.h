@@ -32,6 +32,10 @@ namespace game {
 class ILayouts {
 public:
     virtual ~ILayouts() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<Layout> get(const std::string &key) = 0;
 };
 
 class Layouts : public ILayouts {
@@ -40,11 +44,11 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Layout> get(const std::string &key) {
+    std::shared_ptr<Layout> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

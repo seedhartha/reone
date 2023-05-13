@@ -32,6 +32,10 @@ class Creature;
 class IReputes {
 public:
     virtual ~IReputes() = default;
+
+    virtual bool getIsEnemy(const Creature &left, const Creature &right) const = 0;
+    virtual bool getIsFriend(const Creature &left, const Creature &right) const = 0;
+    virtual bool getIsNeutral(const Creature &left, const Creature &right) const = 0;
 };
 
 class Reputes : public IReputes, boost::noncopyable {
@@ -42,9 +46,9 @@ public:
 
     void init();
 
-    bool getIsEnemy(const Creature &left, const Creature &right) const;
-    bool getIsFriend(const Creature &left, const Creature &right) const;
-    bool getIsNeutral(const Creature &left, const Creature &right) const;
+    bool getIsEnemy(const Creature &left, const Creature &right) const override;
+    bool getIsFriend(const Creature &left, const Creature &right) const override;
+    bool getIsNeutral(const Creature &left, const Creature &right) const override;
 
 private:
     resource::TwoDas &_twoDas;

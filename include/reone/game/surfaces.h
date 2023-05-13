@@ -32,6 +32,15 @@ namespace game {
 class ISurfaces {
 public:
     virtual ~ISurfaces() = default;
+
+    virtual bool isWalkable(int index) const = 0;
+
+    virtual const Surface &getSurface(int index) const = 0;
+
+    virtual std::set<uint32_t> getGrassSurfaces() const = 0;
+    virtual std::set<uint32_t> getWalkableSurfaces() const = 0;
+    virtual std::set<uint32_t> getWalkcheckSurfaces() const = 0;
+    virtual std::set<uint32_t> getLineOfSightSurfaces() const = 0;
 };
 
 class Surfaces : public ISurfaces, boost::noncopyable {
@@ -42,14 +51,14 @@ public:
 
     void init();
 
-    bool isWalkable(int index) const;
+    bool isWalkable(int index) const override;
 
-    const Surface &getSurface(int index) const;
+    const Surface &getSurface(int index) const override;
 
-    std::set<uint32_t> getGrassSurfaces() const;
-    std::set<uint32_t> getWalkableSurfaces() const;
-    std::set<uint32_t> getWalkcheckSurfaces() const;
-    std::set<uint32_t> getLineOfSightSurfaces() const;
+    std::set<uint32_t> getGrassSurfaces() const override;
+    std::set<uint32_t> getWalkableSurfaces() const override;
+    std::set<uint32_t> getWalkcheckSurfaces() const override;
+    std::set<uint32_t> getLineOfSightSurfaces() const override;
 
 private:
     resource::TwoDas &_twoDas;

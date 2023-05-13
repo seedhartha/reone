@@ -38,6 +38,9 @@ namespace game {
 class IGUISounds {
 public:
     virtual ~IGUISounds() = default;
+
+    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
+    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
 };
 
 class GUISounds : public IGUISounds, boost::noncopyable {
@@ -52,8 +55,8 @@ public:
     void init();
     void deinit();
 
-    std::shared_ptr<audio::AudioStream> getOnClick() const { return _onClick; }
-    std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
+    std::shared_ptr<audio::AudioStream> getOnClick() const override { return _onClick; }
+    std::shared_ptr<audio::AudioStream> getOnEnter() const override { return _onEnter; }
 
 private:
     audio::AudioFiles &_audioFiles;

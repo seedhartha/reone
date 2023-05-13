@@ -32,6 +32,9 @@ namespace game {
 class ICameraStyles {
 public:
     virtual ~ICameraStyles() = default;
+
+    virtual std::shared_ptr<CameraStyle> get(int index) const = 0;
+    virtual std::shared_ptr<CameraStyle> get(const std::string &name) const = 0;
 };
 
 class CameraStyles : public ICameraStyles, boost::noncopyable {
@@ -42,8 +45,8 @@ public:
 
     void init();
 
-    std::shared_ptr<CameraStyle> get(int index) const;
-    std::shared_ptr<CameraStyle> get(const std::string &name) const;
+    std::shared_ptr<CameraStyle> get(int index) const override;
+    std::shared_ptr<CameraStyle> get(const std::string &name) const override;
 
 private:
     resource::TwoDas &_twoDas;

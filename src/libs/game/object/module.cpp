@@ -166,7 +166,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                 cursor = CursorType::Pickup;
             } else {
                 auto creature = static_cast<Creature *>(object);
-                bool isEnemy = _services.game.defaultReputes().getIsEnemy(*creature, *_game.party().getLeader());
+                bool isEnemy = _services.game.reputes.getIsEnemy(*creature, *_game.party().getLeader());
                 cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
             }
             break;
@@ -235,7 +235,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
             partyLeader->addAction(_game.actionFactory().newOpenContainer(creature));
         }
     } else {
-        bool isEnemy = _services.game.defaultReputes().getIsEnemy(*partyLeader, *creature);
+        bool isEnemy = _services.game.reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
             partyLeader->addAction(_game.actionFactory().newAttack(creature));
@@ -286,7 +286,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
     case ObjectType::Creature: {
         auto leader = _game.party().getLeader();
         auto creature = static_pointer_cast<Creature>(object);
-        if (!creature->isDead() && _services.game.defaultReputes().getIsEnemy(*leader, *creature)) {
+        if (!creature->isDead() && _services.game.reputes.getIsEnemy(*leader, *creature)) {
             actions.push_back(ContextAction(ActionType::AttackObject));
             auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
             if (weapon && weapon->isRanged()) {

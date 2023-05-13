@@ -45,6 +45,8 @@ namespace game {
 class ICursors {
 public:
     virtual ~ICursors() = default;
+
+    virtual std::shared_ptr<graphics::Cursor> get(game::CursorType type) = 0;
 };
 
 class Cursors : public ICursors, boost::noncopyable {
@@ -70,7 +72,7 @@ public:
 
     void deinit();
 
-    std::shared_ptr<graphics::Cursor> get(game::CursorType type);
+    std::shared_ptr<graphics::Cursor> get(game::CursorType type) override;
 
 private:
     std::unordered_map<game::CursorType, std::shared_ptr<graphics::Cursor>> _cache;

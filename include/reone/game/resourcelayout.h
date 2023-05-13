@@ -34,6 +34,8 @@ struct OptionsView;
 class IResourceLayout {
 public:
     virtual ~IResourceLayout() = default;
+
+    virtual void loadModuleResources(const std::string &moduleName) = 0;
 };
 
 class ResourceLayout : public IResourceLayout, boost::noncopyable {
@@ -46,7 +48,7 @@ public:
 
     void init();
 
-    void loadModuleResources(const std::string &moduleName);
+    void loadModuleResources(const std::string &moduleName) override;
 
 private:
     GameID _gameId;

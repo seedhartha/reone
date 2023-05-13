@@ -39,6 +39,11 @@ namespace game {
 class IPortraits {
 public:
     virtual ~IPortraits() = default;
+
+    virtual std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const = 0;;
+    virtual std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const = 0;
+
+    virtual const std::vector<Portrait> &portraits() const = 0;
 };
 
 class Portraits : public IPortraits, boost::noncopyable {
@@ -49,10 +54,10 @@ public:
 
     void init();
 
-    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const;
-    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const;
+    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const override;
+    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const override;
 
-    const std::vector<Portrait> &portraits() const { return _portraits; }
+    const std::vector<Portrait> &portraits() const override { return _portraits; }
 
 private:
     graphics::Textures &_textures;

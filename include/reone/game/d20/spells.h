@@ -41,6 +41,8 @@ namespace game {
 class ISpells {
 public:
     virtual ~ISpells() = default;
+
+    virtual std::shared_ptr<Spell> get(SpellType type) const = 0;
 };
 
 class Spells : public ISpells, boost::noncopyable {
@@ -56,7 +58,7 @@ public:
 
     void init();
 
-    std::shared_ptr<Spell> get(SpellType type) const;
+    std::shared_ptr<Spell> get(SpellType type) const override;
 
 private:
     std::unordered_map<SpellType, std::shared_ptr<Spell>> _spells;

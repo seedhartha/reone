@@ -33,6 +33,10 @@ namespace game {
 class IPaths {
 public:
     virtual ~IPaths() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<Path> get(const std::string &key) = 0;
 };
 
 class Paths : public IPaths {
@@ -41,11 +45,11 @@ public:
         _gffs(gffs) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Path> get(const std::string &key) {
+    std::shared_ptr<Path> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

@@ -49,6 +49,10 @@ struct FootstepTypeSounds {
 class IFootstepSounds {
 public:
     virtual ~IFootstepSounds() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<FootstepTypeSounds> get(uint32_t key) = 0;
 };
 
 class FootstepSounds : public IFootstepSounds {
@@ -60,11 +64,11 @@ public:
         _twoDas(twoDas) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<FootstepTypeSounds> get(uint32_t key) {
+    std::shared_ptr<FootstepTypeSounds> get(uint32_t key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

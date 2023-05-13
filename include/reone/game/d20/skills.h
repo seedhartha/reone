@@ -41,6 +41,8 @@ namespace game {
 class ISkills {
 public:
     virtual ~ISkills() = default;
+
+    virtual std::shared_ptr<Skill> get(SkillType type) const = 0;
 };
 
 class Skills : public ISkills, boost::noncopyable {
@@ -56,7 +58,7 @@ public:
 
     void init();
 
-    std::shared_ptr<Skill> get(SkillType type) const;
+    std::shared_ptr<Skill> get(SkillType type) const override;
 
 private:
     std::unordered_map<SkillType, std::shared_ptr<Skill>> _skills;
