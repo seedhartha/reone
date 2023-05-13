@@ -35,7 +35,7 @@ if(wxWidgets_FOUND)
 
     set_target_properties(reone-launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
     target_precompile_headers(reone-launcher PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-    target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_link_libraries(reone-launcher PRIVATE ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
     list(APPEND InstallTargets reone-launcher)
 else()

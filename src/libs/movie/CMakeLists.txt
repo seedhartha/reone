@@ -32,5 +32,5 @@ target_precompile_headers(movie PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 
 if(ENABLE_MOVIE)
     target_compile_definitions(movie PRIVATE R_ENABLE_MOVIE)
-    target_link_libraries(movie PUBLIC ${FFMPEG_LIBRARIES})
+    target_link_libraries(movie PRIVATE ${FFMPEG_LIBRARIES})
 endif()

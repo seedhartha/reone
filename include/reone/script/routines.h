@@ -23,7 +23,7 @@ namespace script {
 
 class Routine;
 
-class IRoutines : boost::noncopyable {
+class IRoutines {
 public:
     virtual ~IRoutines() {
     }

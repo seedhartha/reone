@@ -56,7 +56,7 @@ add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PAT
 set_target_properties(system PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(system PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(system PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(system PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(system PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 if(NOT MSVC)
     target_link_libraries(system PRIVATE Threads::Threads)

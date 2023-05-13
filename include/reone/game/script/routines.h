@@ -29,7 +29,7 @@ struct RoutineContext;
 
 class Game;
 
-class Routines : public script::IRoutines {
+class Routines : public script::IRoutines, boost::noncopyable {
 public:
     Routines() = default;
 
