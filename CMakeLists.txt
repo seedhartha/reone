@@ -21,9 +21,9 @@ set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 
 # Options
 
-option(BUILD_TOOLS "build tools executable" OFF)
-option(BUILD_LAUNCHER "build launcher executable" OFF)
-option(BUILD_TESTS "build tests" OFF)
+option(BUILD_TOOLS "build tools executable" ON)
+option(BUILD_LAUNCHER "build launcher executable" ON)
+option(BUILD_TESTS "build tests" ON)
 
 option(ENABLE_MOVIE "enable movie playback" ON)
 option(ENABLE_ASAN "enable address sanitizer" OFF)
