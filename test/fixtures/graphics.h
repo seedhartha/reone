@@ -175,7 +175,13 @@ public:
 
 class MockWindow : public IWindow, boost::noncopyable {
 public:
-    void processEvents(bool &quit) override {}
+    // Overrides
+
+    void processEvents(bool &quit) override {
+        if (_processEventsStub) {
+            _processEventsStub(quit);
+        }
+    }
 
     void swapBuffers() const override {}
 
@@ -188,6 +194,19 @@ public:
 
     uint32_t mouseState(int *x, int *y) override { return 0; }
     void showCursor(bool show) override {}
+
+    // END Overrides
+
+    // Stubs
+
+    void whenProcessEventsThenAnswer(std::function<void(bool &)> fn) {
+        _processEventsStub = fn;
+    }
+
+    // END Stubs
+
+private:
+    std::function<void(bool &)> _processEventsStub;
 };
 
 class TestGraphicsModule : boost::noncopyable {
@@ -217,6 +236,10 @@ public:
             *_uniforms,
             *_walkmeshes,
             *_window);
+    }
+
+    MockWindow &window() {
+        return *_window;
     }
 
     GraphicsServices &services() {

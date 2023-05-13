@@ -140,7 +140,7 @@ void Game::init() {
         map->setArrowResRef("mm_barrow");
     }
 
-    _screen = GameScreen::MainMenu;
+    _screen = Screen::MainMenu;
 
     _routines = move(routines);
     _map = move(map);
@@ -165,6 +165,9 @@ int Game::run() {
 
 void Game::mainLoopIteration() {
     _services.graphics.window.processEvents(_quit);
+    if (_quit) {
+        return;
+    }
     if (!_services.graphics.window.isInFocus()) {
         return;
     }
@@ -185,7 +188,7 @@ void Game::update() {
     }
     updateCamera(dt);
 
-    bool updModule = !_movie && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
+    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
         _combat.update(dt);
@@ -420,7 +423,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
 
 void Game::drawGUI() {
     switch (_screen) {
-    case GameScreen::InGame:
+    case Screen::InGame:
         if (_cameraType == CameraType::ThirdPerson) {
             drawHUD();
         }
@@ -489,7 +492,7 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::updateCamera(float dt) {
     switch (_screen) {
-    case GameScreen::Conversation: {
+    case Screen::Conversation: {
         int cameraId;
         CameraType cameraType = getConversationCamera(cameraId);
         if (cameraType == CameraType::Static) {
@@ -498,7 +501,7 @@ void Game::updateCamera(float dt) {
         _cameraType = cameraType;
         break;
     }
-    case GameScreen::InGame:
+    case Screen::InGame:
         if (_cameraType != CameraType::FirstPerson && _cameraType != CameraType::ThirdPerson) {
             _cameraType = CameraType::ThirdPerson;
         }
@@ -546,7 +549,7 @@ bool Game::handle(const SDL_Event &event) {
             return true;
         }
         switch (_screen) {
-        case GameScreen::InGame: {
+        case Screen::InGame: {
             if (_console->handle(event)) {
                 return true;
             }
@@ -614,7 +617,7 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
         break;
 
     case SDLK_v:
-        if (_options.game.developer && _screen == GameScreen::InGame) {
+        if (_options.game.developer && _screen == Screen::InGame) {
             toggleInGameCameraType();
             return true;
         }
@@ -676,7 +679,7 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
         _loadScreen->setImage(imageResRef);
         _loadScreen->setProgress(0);
     }
-    changeScreen(GameScreen::Loading);
+    changeScreen(Screen::Loading);
     drawAll();
     block();
 }
@@ -689,11 +692,11 @@ void Game::openMainMenu() {
         loadSaveLoad();
     }
     playMusic(_mainMenuMusicResRef);
-    changeScreen(GameScreen::MainMenu);
+    changeScreen(Screen::MainMenu);
 }
 
 void Game::openInGame() {
-    changeScreen(GameScreen::InGame);
+    changeScreen(Screen::InGame);
 }
 
 void Game::openInGameMenu(InGameMenuTab tab) {
@@ -726,7 +729,7 @@ void Game::openInGameMenu(InGameMenuTab tab) {
     default:
         break;
     }
-    changeScreen(GameScreen::InGameMenu);
+    changeScreen(Screen::InGameMenu);
 }
 
 void Game::openContainer(const shared_ptr<Object> &container) {
@@ -734,7 +737,7 @@ void Game::openContainer(const shared_ptr<Object> &container) {
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _container->open(container);
-    changeScreen(GameScreen::Container);
+    changeScreen(Screen::Container);
 }
 
 void Game::openPartySelection(const PartySelectionContext &ctx) {
@@ -742,7 +745,7 @@ void Game::openPartySelection(const PartySelectionContext &ctx) {
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _partySelect->prepare(ctx);
-    changeScreen(GameScreen::PartySelection);
+    changeScreen(Screen::PartySelection);
 }
 
 void Game::openSaveLoad(SaveLoadMode mode) {
@@ -750,14 +753,14 @@ void Game::openSaveLoad(SaveLoadMode mode) {
     setCursorType(CursorType::Default);
     _saveLoad->setMode(mode);
     _saveLoad->refresh();
-    changeScreen(GameScreen::SaveLoad);
+    changeScreen(Screen::SaveLoad);
 }
 
 void Game::openLevelUp() {
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _charGen->startLevelUp();
-    changeScreen(GameScreen::CharacterGeneration);
+    changeScreen(Screen::CharacterGeneration);
 }
 
 void Game::startCharacterGeneration() {
@@ -768,7 +771,7 @@ void Game::startCharacterGeneration() {
         _loadScreen->setProgress(100);
         drawAll();
         playMusic(_charGenMusicResRef);
-        changeScreen(GameScreen::CharacterGeneration);
+        changeScreen(Screen::CharacterGeneration);
     });
 }
 
@@ -785,7 +788,7 @@ void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     stopMovement();
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
-    changeScreen(GameScreen::Conversation);
+    changeScreen(Screen::Conversation);
 
     auto dialog = _services.game.dialogs.get(resRef);
     bool computerConversation = dialog->conversationType == ConversationType::Computer;
@@ -824,7 +827,12 @@ void Game::loadInGameMenus() {
 
 void Game::loadMainMenu() {
     _mainMenu = make_unique<MainMenu>(*this, _services);
-    _mainMenu->load();
+    try {
+        _mainMenu->load();
+    } catch (const exception &e) {
+        error(boost::format("Error loading main menu GUI: %s") % string(e.what()));
+        _mainMenu.reset();
+    }
 }
 
 void Game::loadHUD() {
@@ -854,7 +862,12 @@ void Game::loadPartySelection() {
 
 void Game::loadSaveLoad() {
     _saveLoad = make_unique<SaveLoad>(*this, _services);
-    _saveLoad->load();
+    try {
+        _saveLoad->load();
+    } catch (const exception &e) {
+        error(boost::format("Error loading save/load GUI: %s") % string(e.what()));
+        _saveLoad.reset();
+    }
 }
 
 void Game::loadLoadingScreen() {
@@ -872,7 +885,7 @@ void Game::loadInGame() {
     _inGame->load();
 }
 
-void Game::changeScreen(GameScreen screen) {
+void Game::changeScreen(Screen screen) {
     GUI *gui = getScreenGUI();
     if (gui) {
         gui->resetFocus();
@@ -882,23 +895,23 @@ void Game::changeScreen(GameScreen screen) {
 
 GUI *Game::getScreenGUI() const {
     switch (_screen) {
-    case GameScreen::MainMenu:
+    case Screen::MainMenu:
         return _mainMenu.get();
-    case GameScreen::Loading:
+    case Screen::Loading:
         return static_cast<LoadingScreen *>(_loadScreen.get());
-    case GameScreen::CharacterGeneration:
+    case Screen::CharacterGeneration:
         return _charGen.get();
-    case GameScreen::InGame:
+    case Screen::InGame:
         return _cameraType == game::CameraType::ThirdPerson ? _hud.get() : nullptr;
-    case GameScreen::InGameMenu:
+    case Screen::InGameMenu:
         return _inGame.get();
-    case GameScreen::Conversation:
+    case Screen::Conversation:
         return _conversation;
-    case GameScreen::Container:
+    case Screen::Container:
         return _container.get();
-    case GameScreen::PartySelection:
+    case Screen::PartySelection:
         return _partySelect.get();
-    case GameScreen::SaveLoad:
+    case Screen::SaveLoad:
         return _saveLoad.get();
     default:
         return nullptr;

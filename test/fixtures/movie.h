@@ -25,11 +25,26 @@ namespace movie {
 
 class MockMovies : public IMovies, boost::noncopyable {
 public:
+    // Overrides
+
     void invalidate() override {}
 
     std::shared_ptr<Movie> get(const std::string &name) override {
-        return nullptr;
+        return _getStubs.at(name);
     }
+
+    // END Overrides
+
+    // Stubs
+
+    void whenGetThenReturn(std::string name, std::shared_ptr<Movie> movie) {
+        _getStubs.insert(std::make_pair(name, movie));
+    }
+
+    // END Stubs
+
+private:
+    std::map<std::string, std::shared_ptr<Movie>> _getStubs;
 };
 
 class TestMovieModule : boost::noncopyable {
@@ -37,6 +52,10 @@ public:
     void init() {
         _movies = std::make_unique<MockMovies>();
         _services = std::make_unique<MovieServices>(*_movies);
+    }
+
+    MockMovies &movies() {
+        return *_movies;
     }
 
     MovieServices &services() {

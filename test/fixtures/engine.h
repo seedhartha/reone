@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/logutil.h"
+
 #include "audio.h"
 #include "game.h"
 #include "graphics.h"
@@ -31,6 +33,8 @@ namespace reone {
 class TestEngine : boost::noncopyable {
 public:
     void init() {
+        initLog();
+
         _gameModule = std::make_unique<game::TestGameModule>();
         _movieModule = std::make_unique<movie::TestMovieModule>();
         _audioModule = std::make_unique<audio::TestAudioModule>();
@@ -62,6 +66,38 @@ public:
 
     game::OptionsView &options() {
         return _options;
+    }
+
+    game::TestGameModule &gameModule() {
+        return *_gameModule;
+    }
+
+    movie::TestMovieModule &movieModule() {
+        return *_movieModule;
+    }
+
+    audio::TestAudioModule &audioModule() {
+        return *_audioModule;
+    }
+
+    graphics::TestGraphicsModule &graphicsModule() {
+        return *_graphicsModule;
+    }
+
+    scene::TestSceneModule &sceneModule() {
+        return *_sceneModule;
+    }
+
+    script::TestScriptModule &scriptModule() {
+        return *_scriptModule;
+    }
+
+    resource::TestResourceModule &resourceModule() {
+        return *_resourceModule;
+    }
+
+    TestSystemModule &systemModule() {
+        return *_systemModule;
     }
 
     game::ServicesView &services() {

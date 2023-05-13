@@ -28,6 +28,7 @@
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/system/exception/notfound.h"
 #include "reone/system/logutil.h"
 
 #include "reone/gui/control/button.h"
@@ -54,7 +55,11 @@ namespace gui {
 void GUI::load() {
     debug("Load " + _resRef, LogChannels::gui);
 
-    shared_ptr<Gff> gui(_resourceSvc.gffs.get(_resRef, ResourceType::Gui));
+    auto gui = _resourceSvc.gffs.get(_resRef, ResourceType::Gui);
+    if (!gui) {
+        throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
+    }
+
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 

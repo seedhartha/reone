@@ -57,11 +57,21 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     engine->init();
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
-
-    // when
     game.init();
 
+    auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
+    engine->movieModule().movies().whenGetThenReturn("legal", legalMovie);
+
+    engine->graphicsModule().window().whenProcessEventsThenAnswer([](bool &quit) { quit = true; });
+
+    // when
+    game.run();
+
     // then
+    BOOST_TEST((game.currentScreen() == Game::Screen::MainMenu));
+    auto movie = game.movie();
+    BOOST_TEST(static_cast<bool>(movie));
+    BOOST_TEST((movie == legalMovie));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

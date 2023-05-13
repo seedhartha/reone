@@ -60,6 +60,19 @@ namespace game {
 
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
+    enum class Screen {
+        None,
+        MainMenu,
+        Loading,
+        CharacterGeneration,
+        InGame,
+        InGameMenu,
+        Conversation,
+        Container,
+        PartySelection,
+        SaveLoad
+    };
+
     Game(
         GameID gameId,
         boost::filesystem::path path,
@@ -127,6 +140,14 @@ public:
 
     void setBarkBubbleText(std::string text, float durartion);
 
+    Screen currentScreen() const {
+        return _screen;
+    }
+
+    std::shared_ptr<movie::Movie> movie() const {
+        return _movie;
+    }
+
     // Module loading
 
     /**
@@ -172,25 +193,12 @@ public:
     // END IEventHandler
 
 private:
-    enum class GameScreen {
-        None,
-        MainMenu,
-        Loading,
-        CharacterGeneration,
-        InGame,
-        InGameMenu,
-        Conversation,
-        Container,
-        PartySelection,
-        SaveLoad
-    };
-
     GameID _gameId;
     boost::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
 
-    GameScreen _screen {GameScreen::None};
+    Screen _screen {Screen::None};
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
@@ -329,7 +337,7 @@ private:
     void loadPartySelection();
     void loadSaveLoad();
 
-    void changeScreen(GameScreen screen);
+    void changeScreen(Screen screen);
 
     void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
 
