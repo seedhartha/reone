@@ -27,7 +27,7 @@ class Button : public Control {
 public:
     Button(
         GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Button(
@@ -42,7 +42,7 @@ protected:
     Button(
         GUI &gui,
         ControlType type,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Control(

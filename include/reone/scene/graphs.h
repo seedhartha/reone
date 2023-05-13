@@ -39,6 +39,12 @@ namespace scene {
 class ISceneGraphs {
 public:
     virtual ~ISceneGraphs() = default;
+
+    virtual void reserve(std::string name) = 0;
+
+    virtual SceneGraph &get(const std::string &name) = 0;
+
+    virtual const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const = 0;
 };
 
 class SceneGraphs : public ISceneGraphs, boost::noncopyable {
@@ -52,11 +58,11 @@ public:
         _audioSvc(audioSvc) {
     }
 
-    void reserve(std::string name);
+    void reserve(std::string name) override;
 
-    SceneGraph &get(const std::string &name);
+    SceneGraph &get(const std::string &name) override;
 
-    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const { return _scenes; }
+    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const override { return _scenes; }
 
 protected:
     graphics::GraphicsOptions &_graphicsOpt;

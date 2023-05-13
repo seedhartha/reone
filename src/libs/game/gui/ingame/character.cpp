@@ -238,7 +238,7 @@ void CharacterMenu::refreshPortraits() {
 }
 
 void CharacterMenu::refresh3D() {
-    auto &sceneGraph = _services.scene.defaultGraphs().get(kSceneCharacter);
+    auto &sceneGraph = _services.scene.graphs.get(kSceneCharacter);
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
     SceneInitializer(sceneGraph)

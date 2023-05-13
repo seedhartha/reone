@@ -27,7 +27,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraphs;
+class ISceneGraphs;
 
 } // namespace scene
 
@@ -76,7 +76,7 @@ protected:
 
     // Services
 
-    scene::SceneGraphs &_sceneGraphs;
+    scene::ISceneGraphs &_sceneGraphs;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
 
@@ -84,7 +84,7 @@ protected:
 
     GUI(
         graphics::GraphicsOptions &options,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::ResourceServices &resourceSvc) :
         _options(options),

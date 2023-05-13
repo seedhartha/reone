@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include "reone/script/di/services.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
-#include "reone/script/di/services.h"
 
 namespace reone {
 
@@ -87,6 +87,12 @@ private:
 };
 
 class MockScripts : public IScripts, boost::noncopyable {
+public:
+    void invalidate() override {}
+
+    std::shared_ptr<ScriptProgram> get(const std::string &key) override {
+        return nullptr;
+    }
 };
 
 class TestSceneModule : boost::noncopyable {

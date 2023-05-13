@@ -29,14 +29,6 @@ struct SceneServices {
     SceneServices(ISceneGraphs &graphs) :
         graphs(graphs) {
     }
-
-    SceneGraphs &defaultGraphs() {
-        auto casted = dynamic_cast<SceneGraphs *>(&graphs);
-        if (!casted) {
-            throw std::logic_error("Illegal SceneGraphs implementation");
-        }
-        return *casted;
-    }
 };
 
 } // namespace scene

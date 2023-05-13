@@ -165,7 +165,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     string sceneName(kSceneClassSelect);
     sceneName += "." + to_string(index);
 
-    auto &sceneGraph = _services.scene.defaultGraphs().get(sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(sceneName);
     float aspect = extent.width / static_cast<float>(extent.height);
 
     SceneInitializer(sceneGraph)

@@ -24,6 +24,19 @@ namespace reone {
 namespace scene {
 
 class MockSceneGraphs : public ISceneGraphs, boost::noncopyable {
+public:
+    void reserve(std::string name) override {}
+
+    SceneGraph &get(const std::string &name) override {
+        return *_scenes.at(name);
+    }
+
+    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const override {
+        return _scenes;
+    }
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
 };
 
 class TestSceneModule : boost::noncopyable {

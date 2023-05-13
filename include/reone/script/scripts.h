@@ -28,6 +28,10 @@ namespace script {
 class IScripts {
 public:
     virtual ~IScripts() = default;
+
+    virtual void invalidate() = 0;
+
+    virtual std::shared_ptr<ScriptProgram> get(const std::string &key) = 0;
 };
 
 class Scripts : public IScripts {
@@ -36,11 +40,11 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() {
+    void invalidate() override {
         _objects.clear();
     }
 
-    std::shared_ptr<ScriptProgram> get(const std::string &key) {
+    std::shared_ptr<ScriptProgram> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;

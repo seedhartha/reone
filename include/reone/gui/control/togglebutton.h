@@ -27,7 +27,7 @@ class ToggleButton : public Button {
 public:
     ToggleButton(
         GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Button(

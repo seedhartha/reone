@@ -27,7 +27,7 @@ class Label : public Control {
 public:
     Label(
         GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Control(

@@ -29,14 +29,6 @@ struct ScriptServices {
     ScriptServices(IScripts &scripts) :
         scripts(scripts) {
     }
-
-    Scripts &defaultScripts() {
-        auto casted = dynamic_cast<Scripts *>(&scripts);
-        if (!casted) {
-            throw std::logic_error("Illegal Scripts implementation");
-        }
-        return *casted;
-    }
 };
 
 } // namespace script

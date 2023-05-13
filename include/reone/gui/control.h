@@ -42,7 +42,7 @@ struct GraphicsServices;
 
 namespace scene {
 
-class SceneGraphs;
+class ISceneGraphs;
 
 }
 
@@ -205,7 +205,7 @@ protected:
 
     graphics::GraphicsServices &_graphicsSvc;
     resource::IStrings &_strings;
-    scene::SceneGraphs &_sceneGraphs;
+    scene::ISceneGraphs &_sceneGraphs;
 
     // END Services
 
@@ -219,7 +219,7 @@ protected:
     Control(
         GUI &gui,
         ControlType type,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         _gui(gui),

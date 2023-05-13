@@ -1053,7 +1053,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!model) {
         return nullptr;
     }
-    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     auto sceneNode = sceneGraph.newModel(*model, ModelUsage::Creature);
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
@@ -1062,7 +1062,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 }
 
 void Creature::finalizeModel(ModelSceneNode &body) {
-    auto &sceneGraph = _services.scene.defaultGraphs().get(_sceneName);
+    auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
     // Body texture
 

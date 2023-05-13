@@ -42,7 +42,7 @@ namespace game {
 GameGUI::GameGUI(Game &game, ServicesView &services) :
     GUI(
         game.options().graphics,
-        services.scene.defaultGraphs(),
+        services.scene.graphs,
         services.graphics,
         services.resource),
     _game(game),

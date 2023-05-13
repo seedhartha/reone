@@ -27,7 +27,7 @@ class Panel : public Control {
 public:
     Panel(
         GUI &gui,
-        scene::SceneGraphs &sceneGraphs,
+        scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
         Control(

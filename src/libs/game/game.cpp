@@ -96,7 +96,7 @@ void Game::init() {
     auto walkableSurfaces = _services.game.defaultSurfaces().getWalkableSurfaces();
     auto walkcheckSurfaces = _services.game.defaultSurfaces().getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.game.defaultSurfaces().getLineOfSightSurfaces();
-    for (auto &scene : _services.scene.defaultGraphs().scenes()) {
+    for (auto &scene : _services.scene.graphs.scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
         scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
@@ -106,7 +106,7 @@ void Game::init() {
     setCursorType(CursorType::Default);
 
     auto routines = make_unique<Routines>(*this, _services);
-    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.defaultScripts());
+    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.scripts);
 
     auto map = make_unique<Map>(*this, _services);
     auto console = make_unique<Console>(*this, _services);
@@ -247,7 +247,7 @@ void Game::loadModule(const string &name, string entry) {
             }
             drawAll();
 
-            _services.scene.defaultGraphs().get(kSceneMain).clear();
+            _services.scene.graphs.get(kSceneMain).clear();
 
             auto maybeModule = _loadedModules.find(name);
             if (maybeModule != _loadedModules.end()) {
@@ -360,7 +360,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    auto &scene = _services.scene.defaultGraphs().get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
@@ -532,7 +532,7 @@ void Game::updateSceneGraph(float dt) {
     if (!camera) {
         return;
     }
-    auto &sceneGraph = _services.scene.defaultGraphs().get(kSceneMain);
+    auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode().get());
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
