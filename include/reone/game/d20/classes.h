@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "../types.h"
 
 #include "class.h"
@@ -39,15 +37,29 @@ public:
     virtual ~IClasses() = default;
 };
 
-class Classes : public IClasses, public MemoryCache<ClassType, CreatureClass> {
+class Classes : public IClasses {
 public:
     Classes(resource::Strings &strings, resource::TwoDas &twoDas) :
-        MemoryCache(std::bind(&Classes::doGet, this, std::placeholders::_1)),
         _strings(strings),
         _twoDas(twoDas) {
     }
 
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<CreatureClass> get(ClassType key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
+    }
+
 private:
+    std::unordered_map<ClassType, std::shared_ptr<CreatureClass>> _objects;
+
     // Services
 
     resource::Strings &_strings;

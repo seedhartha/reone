@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "lipanimation.h"
 
 namespace reone {
@@ -36,15 +34,29 @@ public:
     virtual ~ILipAnimations() = default;
 };
 
-class LipAnimations : public ILipAnimations, public MemoryCache<std::string, LipAnimation> {
+class LipAnimations : public ILipAnimations {
 public:
     LipAnimations(resource::Resources &resources) :
-        MemoryCache(std::bind(&LipAnimations::doGet, this, std::placeholders::_1)),
         _resources(resources) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<LipAnimation> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     resource::Resources &_resources;
+
+    std::unordered_map<std::string, std::shared_ptr<LipAnimation>> _objects;
 
     std::shared_ptr<LipAnimation> doGet(std::string resRef);
 };

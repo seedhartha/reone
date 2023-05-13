@@ -18,7 +18,6 @@
 #pragma once
 
 #include "reone/audio/stream.h"
-#include "reone/system/memorycache.h"
 
 namespace reone {
 
@@ -52,21 +51,35 @@ public:
     virtual ~IFootstepSounds() = default;
 };
 
-class FootstepSounds : public IFootstepSounds, public MemoryCache<uint32_t, FootstepTypeSounds> {
+class FootstepSounds : public IFootstepSounds {
 public:
     FootstepSounds(
         audio::AudioFiles &audioFiles,
         resource::TwoDas &twoDas) :
-        MemoryCache(std::bind(&FootstepSounds::doGet, this, std::placeholders::_1)),
         _audioFiles(audioFiles),
         _twoDas(twoDas) {
     }
 
-    std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<FootstepTypeSounds> get(uint32_t key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
+    }
 
 private:
     audio::AudioFiles &_audioFiles;
     resource::TwoDas &_twoDas;
+
+    std::unordered_map<uint32_t, std::shared_ptr<FootstepTypeSounds>> _objects;
+
+    std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
 };
 
 } // namespace game

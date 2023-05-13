@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "font.h"
 
 namespace reone {
@@ -37,7 +35,7 @@ public:
     virtual ~IFonts() = default;
 };
 
-class Fonts : public IFonts, public MemoryCache<std::string, Font> {
+class Fonts : public IFonts {
 public:
     Fonts(
         GraphicsContext &graphicsContext,
@@ -46,7 +44,6 @@ public:
         Textures &textures,
         Uniforms &uniforms,
         Window &window) :
-        MemoryCache(std::bind(&Fonts::doGet, this, std::placeholders::_1)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
@@ -55,7 +52,22 @@ public:
         _window(window) {
     }
 
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<Font> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
+    }
+
 private:
+    std::unordered_map<std::string, std::shared_ptr<Font>> _objects;
+
     // Services
 
     GraphicsContext &_graphicsContext;

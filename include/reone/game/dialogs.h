@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "dialog.h"
 
 namespace reone {
@@ -38,17 +36,31 @@ public:
     virtual ~IDialogs() = default;
 };
 
-class Dialogs : public IDialogs, public MemoryCache<std::string, Dialog> {
+class Dialogs : public IDialogs {
 public:
     Dialogs(resource::Gffs &gffs, resource::Strings &strings) :
-        MemoryCache(std::bind(&Dialogs::doGet, this, std::placeholders::_1)),
         _gffs(gffs),
         _strings(strings) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<Dialog> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     resource::Gffs &_gffs;
     resource::Strings &_strings;
+
+    std::unordered_map<std::string, std::shared_ptr<Dialog>> _objects;
 
     std::shared_ptr<Dialog> doGet(std::string resRef);
 

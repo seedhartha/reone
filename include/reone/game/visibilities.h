@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "types.h"
 
 namespace reone {
@@ -36,15 +34,29 @@ public:
     virtual ~IVisibilities() = default;
 };
 
-class Visibilities : public IVisibilities, public MemoryCache<std::string, Visibility> {
+class Visibilities : public IVisibilities {
 public:
     Visibilities(resource::Resources &resources) :
-        MemoryCache(std::bind(&Visibilities::doGet, this, std::placeholders::_1)),
         _resources(resources) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<Visibility> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     resource::Resources &_resources;
+
+    std::unordered_map<std::string, std::shared_ptr<Visibility>> _objects;
 
     std::shared_ptr<Visibility> doGet(std::string resRef);
 };

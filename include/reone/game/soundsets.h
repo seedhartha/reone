@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "types.h"
 
 namespace reone {
@@ -43,22 +41,36 @@ public:
     virtual ~ISoundSets() = default;
 };
 
-class SoundSets : public ISoundSets, public MemoryCache<std::string, SoundSet> {
+class SoundSets : public ISoundSets {
 public:
     SoundSets(
         audio::AudioFiles &audioFiles,
         resource::Resources &resources,
         resource::Strings &strings) :
-        MemoryCache(std::bind(&SoundSets::doGet, this, std::placeholders::_1)),
         _audioFiles(audioFiles),
         _resources(resources),
         _strings(strings) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<SoundSet> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     audio::AudioFiles &_audioFiles;
     resource::Resources &_resources;
     resource::Strings &_strings;
+
+    std::unordered_map<std::string, std::shared_ptr<SoundSet>> _objects;
 
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };

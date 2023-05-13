@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
 #include "reone/resource/resources.h"
 
 #include "program.h"
@@ -31,12 +30,29 @@ public:
     virtual ~IScripts() = default;
 };
 
-class Scripts : public IScripts, public MemoryCache<std::string, ScriptProgram> {
+class Scripts : public IScripts {
 public:
-    Scripts(resource::Resources &resources);
+    Scripts(resource::Resources &resources) :
+        _resources(resources) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<ScriptProgram> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
+    }
 
 private:
     resource::Resources &_resources;
+
+    std::unordered_map<std::string, std::shared_ptr<ScriptProgram>> _objects;
 
     std::shared_ptr<ScriptProgram> doGet(std::string resRef);
 };

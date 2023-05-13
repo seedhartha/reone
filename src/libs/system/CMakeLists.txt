@@ -29,7 +29,6 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/exception/validation.h
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
     ${SYSTEM_INCLUDE_DIR}/logutil.h
-    ${SYSTEM_INCLUDE_DIR}/memorycache.h
     ${SYSTEM_INCLUDE_DIR}/pathutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
     ${SYSTEM_INCLUDE_DIR}/stream/bytearrayinput.h

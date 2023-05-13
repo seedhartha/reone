@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "layout.h"
 
 namespace reone {
@@ -36,15 +34,29 @@ public:
     virtual ~ILayouts() = default;
 };
 
-class Layouts : public ILayouts, public MemoryCache<std::string, Layout> {
+class Layouts : public ILayouts {
 public:
     Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
         _resources(resources) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<Layout> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     resource::Resources &_resources;
+
+    std::unordered_map<std::string, std::shared_ptr<Layout>> _objects;
 
     std::shared_ptr<Layout> doGet(std::string resRef);
 };

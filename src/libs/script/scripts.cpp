@@ -30,11 +30,6 @@ namespace reone {
 
 namespace script {
 
-Scripts::Scripts(Resources &resources) :
-    MemoryCache(bind(&Scripts::doGet, this, _1)),
-    _resources(resources) {
-}
-
 shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
     shared_ptr<ByteArray> data(_resources.get(resRef, ResourceType::Ncs));
     if (!data)

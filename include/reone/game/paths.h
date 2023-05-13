@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/memorycache.h"
-
 #include "path.h"
 
 namespace reone {
@@ -37,15 +35,29 @@ public:
     virtual ~IPaths() = default;
 };
 
-class Paths : public IPaths, public MemoryCache<std::string, Path> {
+class Paths : public IPaths {
 public:
     Paths(resource::Gffs &gffs) :
-        MemoryCache(std::bind(&Paths::doGet, this, std::placeholders::_1)),
         _gffs(gffs) {
+    }
+
+    void invalidate() {
+        _objects.clear();
+    }
+
+    std::shared_ptr<Path> get(const std::string &key) {
+        auto maybeObject = _objects.find(key);
+        if (maybeObject != _objects.end()) {
+            return maybeObject->second;
+        }
+        auto object = doGet(key);
+        return _objects.insert(make_pair(key, move(object))).first->second;
     }
 
 private:
     resource::Gffs &_gffs;
+
+    std::unordered_map<std::string, std::shared_ptr<Path>> _objects;
 
     std::shared_ptr<Path> doGet(std::string resRef);
 
