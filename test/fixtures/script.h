@@ -95,7 +95,7 @@ public:
     }
 };
 
-class TestSceneModule : boost::noncopyable {
+class TestScriptModule : boost::noncopyable {
 public:
     void init() {
         _scripts = std::make_unique<MockScripts>();

@@ -20,6 +20,7 @@ set(TESTS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/test)
 set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/checkutil.h
     ${TESTS_SOURCE_DIR}/fixtures/audio.h
+    ${TESTS_SOURCE_DIR}/fixtures/engine.h
     ${TESTS_SOURCE_DIR}/fixtures/game.h
     ${TESTS_SOURCE_DIR}/fixtures/graphics.h
     ${TESTS_SOURCE_DIR}/fixtures/movie.h

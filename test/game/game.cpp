@@ -18,8 +18,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "reone/game/game.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "../fixtures/audio.h"
+#include "../fixtures/engine.h"
 #include "../fixtures/game.h"
 #include "../fixtures/graphics.h"
 #include "../fixtures/movie.h"
@@ -31,8 +33,35 @@
 using namespace std;
 
 using namespace reone;
+using namespace reone::audio;
 using namespace reone::game;
+using namespace reone::graphics;
+using namespace reone::movie;
+using namespace reone::resource;
+using namespace reone::scene;
+using namespace reone::script;
 
 BOOST_AUTO_TEST_SUITE(game)
+
+BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
+    // given
+    auto gamePath = boost::filesystem::temp_directory_path();
+    gamePath.append("reone_test_game");
+    boost::filesystem::create_directory(gamePath);
+
+    auto modulesPath = gamePath;
+    modulesPath.append("modules");
+    boost::filesystem::create_directory(modulesPath);
+
+    auto engine = make_unique<TestEngine>();
+    engine->init();
+
+    auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
+
+    // when
+    game.init();
+
+    // then
+}
 
 BOOST_AUTO_TEST_SUITE_END()

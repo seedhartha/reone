@@ -18,17 +18,17 @@
 #include "reone/game/game.h"
 
 #include "reone/audio/context.h"
+#include "reone/audio/di/services.h"
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
-#include "reone/audio/di/services.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/lipanimations.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
@@ -38,33 +38,33 @@
 #include "reone/movie/format/bikreader.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
-#include "reone/scene/graphs.h"
 #include "reone/scene/di/services.h"
-#include "reone/script/scripts.h"
+#include "reone/scene/graphs.h"
 #include "reone/script/di/services.h"
+#include "reone/script/scripts.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/collectionutil.h"
+#include "reone/system/di/services.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/pathutil.h"
-#include "reone/system/di/services.h"
 
 #include "reone/game/combat.h"
 #include "reone/game/cursors.h"
 #include "reone/game/debug.h"
+#include "reone/game/di/services.h"
 #include "reone/game/dialogs.h"
 #include "reone/game/location.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/resourcelayout.h"
 #include "reone/game/script/routines.h"
-#include "reone/game/di/services.h"
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 
@@ -151,21 +151,25 @@ void Game::init() {
 }
 
 int Game::run() {
-    start();
-    runMainLoop();
+    playVideo("legal");
+    openMainMenu();
+
+    _ticks = _services.system.clock.ticks();
+
+    while (!_quit) {
+        mainLoopIteration();
+    }
+
     return 0;
 }
 
-void Game::runMainLoop() {
-    _ticks = _services.system.clock.ticks();
-    while (!_quit) {
-        _services.graphics.window.processEvents(_quit);
-        if (!_services.graphics.window.isInFocus()) {
-            continue;
-        }
-        update();
-        drawAll();
+void Game::mainLoopIteration() {
+    _services.graphics.window.processEvents(_quit);
+    if (!_services.graphics.window.isInFocus()) {
+        return;
     }
+    update();
+    drawAll();
 }
 
 void Game::update() {
@@ -917,11 +921,6 @@ void Game::loadModuleNames() {
             _moduleNames.insert(move(moduleName));
         }
     }
-}
-
-void Game::start() {
-    playVideo("legal");
-    openMainMenu();
 }
 
 void Game::loadModuleResources(const string &moduleName) {

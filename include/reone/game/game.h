@@ -276,14 +276,12 @@ private:
 
     // END Global variables
 
-    void start();
-
     void stopMovement();
 
     void loadModuleNames();
     void loadModuleResources(const std::string &moduleName);
 
-    void runMainLoop();
+    void mainLoopIteration();
     void update();
 
     float measureFrameTime();
