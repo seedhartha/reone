@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/scene/di/services.h"
 
 namespace reone {
@@ -25,18 +27,9 @@ namespace scene {
 
 class MockSceneGraphs : public ISceneGraphs, boost::noncopyable {
 public:
-    void reserve(std::string name) override {}
-
-    SceneGraph &get(const std::string &name) override {
-        return *_scenes.at(name);
-    }
-
-    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const override {
-        return _scenes;
-    }
-
-private:
-    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
+    MOCK_METHOD(void, reserve, (std::string name), (override));
+    MOCK_METHOD(SceneGraph &, get, (const std::string &name), (override));
+    MOCK_METHOD(std::set<std::string>, sceneNames, (), (const override));
 };
 
 class TestSceneModule : boost::noncopyable {
@@ -45,6 +38,10 @@ public:
         _graphs = std::make_unique<MockSceneGraphs>();
 
         _services = std::make_unique<SceneServices>(*_graphs);
+    }
+
+    MockSceneGraphs &graphs() {
+        return *_graphs;
     }
 
     SceneServices &services() {

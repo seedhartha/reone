@@ -39,139 +39,125 @@ namespace graphics {
 
 class MockFonts : public IFonts, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<Font> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Font>, get, (const std::string &key), (override));
 };
 
 class MockGraphicsContext : public IGraphicsContext, boost::noncopyable {
 public:
-    void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override {}
-    void clearDepth() override {}
-    void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override {}
+    MOCK_METHOD(void, clearColor, (glm::vec4 color), (override));
+    MOCK_METHOD(void, clearDepth, (), (override));
+    MOCK_METHOD(void, clearColorDepth, (glm::vec4 color), (override));
 
-    void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override {}
-    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override {}
-    void withBlending(BlendMode mode, const std::function<void()> &block) override {}
-    void withPolygonMode(PolygonMode mode, const std::function<void()> &block) override {}
-    void withViewport(glm::ivec4 viewport, const std::function<void()> &block) override {}
-    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) override {}
+    MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withFaceCulling, (CullFaceMode mode, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &block), (override));
 };
 
 class MockLipAnimations : public ILipAnimations, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<LipAnimation> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<LipAnimation>, get, (const std::string &key), (override));
 };
 
 class MockMeshes : public IMeshes, boost::noncopyable {
 public:
-    Mesh &quad() const { throw NotImplementedException("quad"); }
-    Mesh &quadNDC() const { throw NotImplementedException("quadNDC"); }
-    Mesh &billboard() const { throw NotImplementedException("billboard"); }
-    Mesh &grass() const { throw NotImplementedException("grass"); }
+    MOCK_METHOD(Mesh &, quad, (), (const override));
+    MOCK_METHOD(Mesh &, quadNDC, (), (const override));
+    MOCK_METHOD(Mesh &, billboard, (), (const override));
+    MOCK_METHOD(Mesh &, grass, (), (const override));
 
-    Mesh &box() const { throw NotImplementedException("box"); }
-    Mesh &cubemap() const { throw NotImplementedException("cubemap"); }
+    MOCK_METHOD(Mesh &, box, (), (const override));
+    MOCK_METHOD(Mesh &, cubemap, (), (const override));
 };
 
 class MockModels : public IModels, boost::noncopyable {
 public:
-    std::shared_ptr<Model> get(const std::string &resRef) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Model>, get, (const std::string &resRef), (override));
 };
 
 class MockPipeline : public IPipeline, boost::noncopyable {
 public:
-    std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Texture>, draw, (IScene & scene, const glm::ivec2 &dim), (override));
 };
 
 class MockShaders : public IShaders, boost::noncopyable {
 public:
-    void use(ShaderProgram &program) override {}
+    MOCK_METHOD(void, use, (ShaderProgram & program), (override));
 
-    ShaderProgram &simpleColor() const override { throw NotImplementedException("simpleColor"); }
-    ShaderProgram &simpleTexture() const override { throw NotImplementedException("simpleTexture"); }
-    ShaderProgram &gui() const override { throw NotImplementedException("gui"); }
-    ShaderProgram &text() const override { throw NotImplementedException("text"); }
-    ShaderProgram &points() const override { throw NotImplementedException("points"); }
+    MOCK_METHOD(ShaderProgram &, simpleColor, (), (const override));
+    MOCK_METHOD(ShaderProgram &, simpleTexture, (), (const override));
+    MOCK_METHOD(ShaderProgram &, gui, (), (const override));
+    MOCK_METHOD(ShaderProgram &, text, (), (const override));
+    MOCK_METHOD(ShaderProgram &, points, (), (const override));
 
-    ShaderProgram &pointLightShadows() const override { throw NotImplementedException("pointLightShadows"); }
-    ShaderProgram &directionalLightShadows() const override { throw NotImplementedException("directionalLightShadows"); }
-    ShaderProgram &modelOpaque() const override { throw NotImplementedException("modelOpaque"); }
-    ShaderProgram &modelTransparent() const override { throw NotImplementedException("modelTransparent"); }
-    ShaderProgram &aabb() const override { throw NotImplementedException("aabb"); }
-    ShaderProgram &walkmesh() const override { throw NotImplementedException("walkmesh"); }
-    ShaderProgram &particle() const override { throw NotImplementedException("particle"); }
-    ShaderProgram &grass() const override { throw NotImplementedException("grass"); }
-    ShaderProgram &billboard() const override { throw NotImplementedException("billboard"); }
-    ShaderProgram &ssao() const override { throw NotImplementedException("ssao"); }
-    ShaderProgram &ssr() const override { throw NotImplementedException("ssr"); }
-    ShaderProgram &combineOpaque() const override { throw NotImplementedException("combineOpaque"); }
-    ShaderProgram &combineGeometry() const override { throw NotImplementedException("combineGeometry"); }
+    MOCK_METHOD(ShaderProgram &, pointLightShadows, (), (const override));
+    MOCK_METHOD(ShaderProgram &, directionalLightShadows, (), (const override));
+    MOCK_METHOD(ShaderProgram &, modelOpaque, (), (const override));
+    MOCK_METHOD(ShaderProgram &, modelTransparent, (), (const override));
+    MOCK_METHOD(ShaderProgram &, aabb, (), (const override));
+    MOCK_METHOD(ShaderProgram &, walkmesh, (), (const override));
+    MOCK_METHOD(ShaderProgram &, particle, (), (const override));
+    MOCK_METHOD(ShaderProgram &, grass, (), (const override));
+    MOCK_METHOD(ShaderProgram &, billboard, (), (const override));
+    MOCK_METHOD(ShaderProgram &, ssao, (), (const override));
+    MOCK_METHOD(ShaderProgram &, ssr, (), (const override));
+    MOCK_METHOD(ShaderProgram &, combineOpaque, (), (const override));
+    MOCK_METHOD(ShaderProgram &, combineGeometry, (), (const override));
 
-    ShaderProgram &boxBlur4() const override { throw NotImplementedException("boxBlur4"); }
-    ShaderProgram &gaussianBlur9() const override { throw NotImplementedException("gaussianBlur9"); }
-    ShaderProgram &gaussianBlur13() const override { throw NotImplementedException("gaussianBlur13"); }
-    ShaderProgram &medianFilter3() const override { throw NotImplementedException("medianFilter3"); }
-    ShaderProgram &medianFilter5() const override { throw NotImplementedException("medianFilter5"); }
-    ShaderProgram &fxaa() const override { throw NotImplementedException("fxaa"); }
-    ShaderProgram &sharpen() const override { throw NotImplementedException("sharpen"); }
+    MOCK_METHOD(ShaderProgram &, boxBlur4, (), (const override));
+    MOCK_METHOD(ShaderProgram &, gaussianBlur9, (), (const override));
+    MOCK_METHOD(ShaderProgram &, gaussianBlur13, (), (const override));
+    MOCK_METHOD(ShaderProgram &, medianFilter3, (), (const override));
+    MOCK_METHOD(ShaderProgram &, medianFilter5, (), (const override));
+    MOCK_METHOD(ShaderProgram &, fxaa, (), (const override));
+    MOCK_METHOD(ShaderProgram &, sharpen, (), (const override));
 };
 
 class MockTextures : public ITextures, boost::noncopyable {
 public:
-    void invalidate() override {}
+    MOCK_METHOD(void, invalidate, (), (override));
 
-    void bind(Texture &texture, int unit = TextureUnits::mainTex) override {}
-    void bindBuiltIn() override {}
+    MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
+    MOCK_METHOD(void, bindBuiltIn, (), (override));
 
-    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Texture>, get, (const std::string &resRef, TextureUsage usage), (override));
 
     // Built-in
 
-    std::shared_ptr<Texture> default2DRGB() const override { return nullptr; }
-    std::shared_ptr<Texture> defaultArrayDepth() const override { return nullptr; }
-    std::shared_ptr<Texture> defaultCubemapRGB() const override { return nullptr; }
-    std::shared_ptr<Texture> defaultCubemapDepth() const override { return nullptr; }
+    MOCK_METHOD(std::shared_ptr<Texture>, default2DRGB, (), (const override));
+    MOCK_METHOD(std::shared_ptr<Texture>, defaultArrayDepth, (), (const override));
+    MOCK_METHOD(std::shared_ptr<Texture>, defaultCubemapRGB, (), (const override));
+    MOCK_METHOD(std::shared_ptr<Texture>, defaultCubemapDepth, (), (const override));
 
-    std::shared_ptr<Texture> noiseRG() const override { return nullptr; }
-    std::shared_ptr<Texture> ssaoRGB() const override { return nullptr; }
-    std::shared_ptr<Texture> ssrRGBA() const override { return nullptr; }
+    MOCK_METHOD(std::shared_ptr<Texture>, noiseRG, (), (const override));
+    MOCK_METHOD(std::shared_ptr<Texture>, ssaoRGB, (), (const override));
+    MOCK_METHOD(std::shared_ptr<Texture>, ssrRGBA, (), (const override));
 
     // END Built-in
 };
 
 class MockUniforms : public IUniforms, boost::noncopyable {
 public:
-    void setGeneral(const std::function<void(GeneralUniforms &)> &block) override {}
-    void setText(const std::function<void(TextUniforms &)> &block) override {}
-    void setLighting(const std::function<void(LightingUniforms &)> &block) override {}
-    void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override {}
-    void setParticles(const std::function<void(ParticlesUniforms &)> &block) override {}
-    void setGrass(const std::function<void(GrassUniforms &)> &block) override {}
-    void setSSAO(const std::function<void(SSAOUniforms &)> &block) override {}
-    void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override {}
-    void setPoints(const std::function<void(PointsUniforms &)> &block) override {}
+    MOCK_METHOD(void, setGeneral, (const std::function<void(GeneralUniforms &)> &block), (override));
+    MOCK_METHOD(void, setText, (const std::function<void(TextUniforms &)> &block), (override));
+    MOCK_METHOD(void, setLighting, (const std::function<void(LightingUniforms &)> &block), (override));
+    MOCK_METHOD(void, setSkeletal, (const std::function<void(SkeletalUniforms &)> &block), (override));
+    MOCK_METHOD(void, setParticles, (const std::function<void(ParticlesUniforms &)> &block), (override));
+    MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &block), (override));
+    MOCK_METHOD(void, setSSAO, (const std::function<void(SSAOUniforms &)> &block), (override));
+    MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &block), (override));
+    MOCK_METHOD(void, setPoints, (const std::function<void(PointsUniforms &)> &block), (override));
 };
 
 class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
-    void invalidate() override {}
+    MOCK_METHOD(void, invalidate, (), (override));
 
-    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Walkmesh>, get, (const std::string &resRef, resource::ResourceType type), (override));
 };
 
 class MockWindow : public IWindow, boost::noncopyable {

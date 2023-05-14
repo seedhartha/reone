@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/game/di/services.h"
 #include "reone/system/exception/notimplemented.h"
 

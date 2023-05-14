@@ -96,10 +96,11 @@ void Game::init() {
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
-    for (auto &scene : _services.scene.graphs.scenes()) {
-        scene.second->setWalkableSurfaces(walkableSurfaces);
-        scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
-        scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
+    for (auto &sceneName : _services.scene.graphs.sceneNames()) {
+        auto &scene = _services.scene.graphs.get(sceneName);
+        scene.setWalkableSurfaces(walkableSurfaces);
+        scene.setWalkcheckSurfaces(walkcheckSurfaces);
+        scene.setLineOfSightSurfaces(lineOfSightSurfaces);
     }
 
     loadModuleNames();
@@ -217,7 +218,6 @@ void Game::update(float dt) {
 }
 
 void Game::drawAll() {
-    return;
     _services.graphics.context.clearColorDepth();
 
     if (_movie) {
@@ -225,10 +225,10 @@ void Game::drawAll() {
     } else {
         drawWorld();
         drawGUI();
+        _profileOverlay->draw();
         _cursor->draw();
     }
 
-    _profileOverlay->draw();
     _services.graphics.window.swapBuffers();
 }
 

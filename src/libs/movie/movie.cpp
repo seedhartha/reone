@@ -81,6 +81,9 @@ void Movie::update(float dt) {
 }
 
 void Movie::render() {
+    if (!_videoStream) {
+        return;
+    }
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
         _graphicsSvc.textures.bind(*_texture);

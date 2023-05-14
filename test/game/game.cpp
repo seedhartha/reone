@@ -63,6 +63,10 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();
 
+    auto sceneNames = set<string>();
+    EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
+        .WillRepeatedly(Return(sceneNames));
+
     auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
     EXPECT_CALL(engine->movieModule().movies(), get(_))
         .WillRepeatedly(Return(legalMovie));

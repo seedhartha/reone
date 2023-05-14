@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/system/di/services.h"
 
 namespace reone {

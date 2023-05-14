@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/resource/di/services.h"
 
 namespace reone {
@@ -25,47 +27,33 @@ namespace resource {
 
 class MockGffs : public IGffs, boost::noncopyable {
 public:
-    void invalidate() {
-    }
-
-    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Gff>, get, (const std::string &resRef, ResourceType type), (override));
 };
 
 class MockResources : public IResources, boost::noncopyable {
 public:
-    void clearTransientProviders() override {}
+    MOCK_METHOD(void, clearTransientProviders, (), (override));
 
-    void indexKeyFile(const boost::filesystem::path &path) override {}
-    void indexErfFile(const boost::filesystem::path &path, bool transient = false) override {}
-    void indexRimFile(const boost::filesystem::path &path, bool transient = false) override {}
-    void indexDirectory(const boost::filesystem::path &path) override {}
-    void indexExeFile(const boost::filesystem::path &path) override {}
+    MOCK_METHOD(void, indexKeyFile, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexErfFile, (const boost::filesystem::path &path, bool transient), (override));
+    MOCK_METHOD(void, indexRimFile, (const boost::filesystem::path &path, bool transient), (override));
+    MOCK_METHOD(void, indexDirectory, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexExeFile, (const boost::filesystem::path &path), (override));
 
-    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<ByteArray>, get, (const std::string &resRef, ResourceType type, bool logNotFound), (override));
 };
 
 class MockStrings : public IStrings, boost::noncopyable {
 public:
-    std::string get(int strRef) override {
-        return "";
-    }
-
-    std::string getSound(int strRef) override {
-        return "";
-    }
+    MOCK_METHOD(std::string, get, (int strRef), (override));
+    MOCK_METHOD(std::string, getSound, (int strRef), (override));
 };
 
 class MockTwoDas : public ITwoDas, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<TwoDa> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<TwoDa>, get, (const std::string &key), (override));
 };
 
 class TestResourceModule : boost::noncopyable {

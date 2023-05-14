@@ -44,7 +44,7 @@ public:
 
     virtual SceneGraph &get(const std::string &name) = 0;
 
-    virtual const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const = 0;
+    virtual std::set<std::string> sceneNames() const = 0;
 };
 
 class SceneGraphs : public ISceneGraphs, boost::noncopyable {
@@ -62,14 +62,20 @@ public:
 
     SceneGraph &get(const std::string &name) override;
 
-    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const override { return _scenes; }
+    std::set<std::string> sceneNames() const override {
+        auto names = std::set<std::string>();
+        for (auto &scene : _scenes) {
+            names.insert(scene.first);
+        }
+        return names;
+    }
 
 protected:
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 
-    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
+    std::unordered_map<std::string, std::shared_ptr<SceneGraph>> _scenes;
 };
 
 } // namespace scene

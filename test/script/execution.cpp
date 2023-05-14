@@ -29,6 +29,10 @@ using namespace std;
 using namespace reone;
 using namespace reone::script;
 
+using testing::_;
+using testing::Return;
+using testing::ReturnRef;
+
 BOOST_AUTO_TEST_SUITE(script_execution)
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
@@ -215,9 +219,9 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
         VariableType::Object,
         Variable::ofObject(kObjectInvalid),
         vector<VariableType> {VariableType::String, VariableType::Int});
-
     auto routines = MockRoutines();
-    routines.add(0, routine);
+    EXPECT_CALL(routines, get(0))
+        .WillRepeatedly(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
@@ -249,9 +253,9 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
         VariableType::Vector,
         Variable::ofVector(glm::vec3(5.0f, 6.0f, 7.0f)),
         vector<VariableType> {VariableType::Vector, VariableType::Int});
-
     auto routines = MockRoutines();
-    routines.add(0, routine);
+    EXPECT_CALL(routines, get(0))
+        .WillRepeatedly(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
@@ -297,9 +301,9 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
         VariableType::Void,
         Variable(),
         vector<VariableType> {VariableType::Action});
-
     auto routines = MockRoutines();
-    routines.add(0, routine);
+    EXPECT_CALL(routines, get(0))
+        .WillRepeatedly(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;

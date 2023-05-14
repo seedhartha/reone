@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/script/di/services.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine.h"
@@ -58,41 +60,15 @@ private:
 
 class MockRoutines : public IRoutines, boost::noncopyable {
 public:
-    Routine &get(int index) override {
-        if (_routines.count(index) == 0) {
-            throw std::out_of_range("index is out of range: " + std::to_string(index));
-        }
-        return *_routines.at(index);
-    }
-
-    int getNumRoutines() const override {
-        return _routines.size();
-    }
-
-    int getIndexByName(const std::string &name) const override {
-        for (auto &pair : _routines) {
-            if (pair.second->name() == name) {
-                return pair.first;
-            }
-        }
-        return -1;
-    }
-
-    void add(int index, std::shared_ptr<Routine> routine) {
-        _routines[index] = std::move(routine);
-    }
-
-private:
-    std::map<int, std::shared_ptr<Routine>> _routines;
+    MOCK_METHOD(Routine &, get, (int index), (override));
+    MOCK_METHOD(int, getNumRoutines, (), (const override));
+    MOCK_METHOD(int, getIndexByName, (const std::string &name), (const override));
 };
 
 class MockScripts : public IScripts, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<ScriptProgram> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<ScriptProgram>, get, (const std::string &key), (override));
 };
 
 class TestScriptModule : boost::noncopyable {
