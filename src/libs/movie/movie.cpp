@@ -66,7 +66,7 @@ void Movie::deinit() {
 }
 
 void Movie::update(float dt) {
-    if (_finished) {
+    if (!_videoStream || _finished) {
         return;
     }
     _time += dt;

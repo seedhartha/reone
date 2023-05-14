@@ -30,21 +30,21 @@ public:
     void invalidate() override {}
 
     std::shared_ptr<Movie> get(const std::string &name) override {
-        return _getStubs.at(name);
+        return _getAnswers.at(name);
     }
 
     // END Overrides
 
-    // Stubs
+    // Answers
 
     void whenGetThenReturn(std::string name, std::shared_ptr<Movie> movie) {
-        _getStubs.insert(std::make_pair(name, movie));
+        _getAnswers.insert(std::make_pair(name, movie));
     }
 
-    // END Stubs
+    // END Answers
 
 private:
-    std::map<std::string, std::shared_ptr<Movie>> _getStubs;
+    std::map<std::string, std::shared_ptr<Movie>> _getAnswers;
 };
 
 class TestMovieModule : boost::noncopyable {

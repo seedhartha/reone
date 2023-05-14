@@ -157,13 +157,17 @@ int Game::run() {
     _ticks = _services.system.clock.ticks();
 
     while (!_quit) {
-        mainLoopIteration();
+        uint32_t ticks = _services.system.clock.ticks();
+        float dt = (ticks - _ticks) / 1000.0f;
+        _ticks = ticks;
+
+        mainLoopIteration(dt * _gameSpeed);
     }
 
     return 0;
 }
 
-void Game::mainLoopIteration() {
+void Game::mainLoopIteration(float dt) {
     _services.graphics.window.processEvents(_quit);
     if (_quit) {
         return;
@@ -171,21 +175,22 @@ void Game::mainLoopIteration() {
     if (!_services.graphics.window.isInFocus()) {
         return;
     }
-    update();
+    update(dt);
     drawAll();
 }
 
-void Game::update() {
-    float dt = measureFrameTime();
-
+void Game::update(float dt) {
     if (_movie) {
         updateMovie(dt);
-    } else {
-        updateMusic();
+        return;
     }
+
+    updateMusic();
+
     if (!_nextModule.empty()) {
         loadNextModule();
     }
+
     updateCamera(dt);
 
     bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
@@ -212,6 +217,7 @@ void Game::update() {
 }
 
 void Game::drawAll() {
+    return;
     _services.graphics.context.clearColorDepth();
 
     if (_movie) {
@@ -466,14 +472,6 @@ void Game::loadNextModule() {
 
     _nextModule.clear();
     _nextEntry.clear();
-}
-
-float Game::measureFrameTime() {
-    uint32_t ticks = _services.system.clock.ticks();
-    float dt = (ticks - _ticks) / 1000.0f;
-    _ticks = ticks;
-
-    return dt * _gameSpeed;
 }
 
 void Game::quit() {

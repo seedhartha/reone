@@ -62,7 +62,9 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
     engine->movieModule().movies().whenGetThenReturn("legal", legalMovie);
 
-    engine->graphicsModule().window().whenProcessEventsThenAnswer([](bool &quit) { quit = true; });
+    engine->graphicsModule().window().whenInFocusThenReturn(true);
+    engine->graphicsModule().window().whenProcessEventsThenAnswer({[](bool &quit) { quit = false; },
+                                                                   [](bool &quit) { quit = true; }});
 
     // when
     game.run();

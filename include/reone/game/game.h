@@ -289,15 +289,7 @@ private:
     void loadModuleNames();
     void loadModuleResources(const std::string &moduleName);
 
-    void mainLoopIteration();
-    void update();
-
-    float measureFrameTime();
-
-    void updateMusic();
-    void updateMovie(float dt);
-    void updateCamera(float dt);
-    void updateSceneGraph(float dt);
+    void mainLoopIteration(float dt);
 
     void loadDefaultParty();
     void loadNextModule();
@@ -314,9 +306,21 @@ private:
     gui::GUI *getScreenGUI() const;
     CameraType getConversationCamera(int &cameraId) const;
 
+    // Updates
+
+    void update(float dt);
+
+    void updateMovie(float dt);
+    void updateMusic();
+    void updateCamera(float dt);
+    void updateSceneGraph(float dt);
+
+    // END Updates
+
     // Rendering
 
     void drawAll();
+
     void drawWorld();
     void drawGUI();
 

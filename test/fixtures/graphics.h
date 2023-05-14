@@ -178,14 +178,20 @@ public:
     // Overrides
 
     void processEvents(bool &quit) override {
-        if (_processEventsStub) {
-            _processEventsStub(quit);
+        if (_processEventsAnswers.empty()) {
+            return;
+        }
+        _processEventsAnswers.front()(quit);
+        if (_processEventsAnswers.size() > 1) {
+            _processEventsAnswers.pop_front();
         }
     }
 
     void swapBuffers() const override {}
 
-    bool isInFocus() const override { return false; }
+    bool isInFocus() const override {
+        return _inFocusAnswer;
+    }
 
     glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const override { return glm::mat4(1.0f); }
 
@@ -197,16 +203,25 @@ public:
 
     // END Overrides
 
-    // Stubs
+    // Answers
 
-    void whenProcessEventsThenAnswer(std::function<void(bool &)> fn) {
-        _processEventsStub = fn;
+    void whenInFocusThenReturn(bool value) {
+        _inFocusAnswer = value;
     }
 
-    // END Stubs
+    void whenProcessEventsThenAnswer(std::function<void(bool &)> fn) {
+        _processEventsAnswers = {fn};
+    }
+
+    void whenProcessEventsThenAnswer(std::list<std::function<void(bool &)>> fn) {
+        _processEventsAnswers = fn;
+    }
+
+    // END Answers
 
 private:
-    std::function<void(bool &)> _processEventsStub;
+    bool _inFocusAnswer {false};
+    std::list<std::function<void(bool &)>> _processEventsAnswers;
 };
 
 class TestGraphicsModule : boost::noncopyable {
