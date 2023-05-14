@@ -19,6 +19,7 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/graphics/di/services.h"
+#include "reone/gui/di/services.h"
 #include "reone/movie/di/services.h"
 #include "reone/resource/di/services.h"
 #include "reone/scene/di/services.h"
@@ -110,6 +111,7 @@ struct ServicesView {
     audio::AudioServices &audio;
     graphics::GraphicsServices &graphics;
     scene::SceneServices &scene;
+    gui::GUIServices &gui;
     script::ScriptServices &script;
     resource::ResourceServices &resource;
     SystemServices &system;
@@ -120,6 +122,7 @@ struct ServicesView {
         audio::AudioServices &audio,
         graphics::GraphicsServices &graphics,
         scene::SceneServices &scene,
+        gui::GUIServices &gui,
         script::ScriptServices &script,
         resource::ResourceServices &resource,
         SystemServices &system) :
@@ -128,6 +131,7 @@ struct ServicesView {
         audio(audio),
         graphics(graphics),
         scene(scene),
+        gui(gui),
         script(script),
         resource(resource),
         system(system) {

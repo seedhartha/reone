@@ -36,7 +36,12 @@ namespace gui {
 constexpr int kDefaultResolutionX = 640;
 constexpr int kDefaultResolutionY = 480;
 
-class GUI : boost::noncopyable {
+class IGUI {
+public:
+    virtual ~IGUI() = default;
+};
+
+class GUI : public IGUI, boost::noncopyable {
 public:
     virtual void load();
 

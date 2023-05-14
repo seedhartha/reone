@@ -17,54 +17,54 @@
 
 #pragma once
 
-#include "types.h"
+#include "gui.h"
 
 namespace reone {
 
 namespace resource {
 
-class Resources;
+class Gffs;
 
 }
 
-namespace game {
+namespace gui {
 
-class IVisibilities {
+class IGUIs {
 public:
-    virtual ~IVisibilities() = default;
+    virtual ~IGUIs() = default;
 
     virtual void invalidate() = 0;
 
-    virtual std::shared_ptr<Visibility> get(const std::string &key) = 0;
+    virtual std::shared_ptr<IGUI> get(const std::string &resRef) = 0;
 };
 
-class Visibilities : public IVisibilities, boost::noncopyable {
+class GUIs : public IGUIs, boost::noncopyable {
 public:
-    Visibilities(resource::Resources &resources) :
-        _resources(resources) {
+    GUIs(resource::Gffs &gffs) :
+        _gffs(gffs) {
     }
 
     void invalidate() override {
-        _objects.clear();
+        _guis.clear();
     }
 
-    std::shared_ptr<Visibility> get(const std::string &key) override {
-        auto maybeObject = _objects.find(key);
-        if (maybeObject != _objects.end()) {
-            return maybeObject->second;
+    std::shared_ptr<IGUI> get(const std::string &resRef) override {
+        auto maybeGUI = _guis.find(resRef);
+        if (maybeGUI != _guis.end()) {
+            return maybeGUI->second;
         }
-        auto object = doGet(key);
-        return _objects.insert(make_pair(key, move(object))).first->second;
+        auto gui = doGet(resRef);
+        return _guis.insert(make_pair(resRef, move(gui))).first->second;
     }
 
 private:
-    resource::Resources &_resources;
+    resource::Gffs &_gffs;
 
-    std::unordered_map<std::string, std::shared_ptr<Visibility>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<IGUI>> _guis;
 
-    std::shared_ptr<Visibility> doGet(std::string resRef);
+    std::shared_ptr<IGUI> doGet(std::string resRef);
 };
 
-} // namespace game
+} // namespace gui
 
 } // namespace reone

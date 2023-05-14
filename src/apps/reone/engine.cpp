@@ -28,6 +28,7 @@ using namespace std;
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::movie;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -62,6 +63,7 @@ void Engine::initServices(GameID gameId) {
     _audioModule = make_unique<AudioModule>(_options->audio, *_resourceModule);
     _movieModule = make_unique<MovieModule>(_options->game.path, *_graphicsModule, *_audioModule);
     _sceneModule = make_unique<SceneModule>(_options->graphics, *_audioModule, *_graphicsModule);
+    _guiModule = make_unique<GUIModule>(*_resourceModule);
     _scriptModule = make_unique<ScriptModule>(*_resourceModule);
 
     _gameModule = make_unique<GameModule>(
@@ -79,6 +81,7 @@ void Engine::initServices(GameID gameId) {
     _audioModule->init();
     _movieModule->init();
     _sceneModule->init();
+    _guiModule->init();
     _scriptModule->init();
     _gameModule->init();
 
@@ -88,6 +91,7 @@ void Engine::initServices(GameID gameId) {
         _audioModule->services(),
         _graphicsModule->services(),
         _sceneModule->services(),
+        _guiModule->services(),
         _scriptModule->services(),
         _resourceModule->services(),
         _systemModule->services());
@@ -99,6 +103,7 @@ void Engine::deinit() {
 
     _gameModule.reset();
     _scriptModule.reset();
+    _guiModule.reset();
     _sceneModule.reset();
     _audioModule.reset();
     _graphicsModule.reset();

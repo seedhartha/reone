@@ -22,6 +22,7 @@
 #include "audio.h"
 #include "game.h"
 #include "graphics.h"
+#include "gui.h"
 #include "movie.h"
 #include "resource.h"
 #include "scene.h"
@@ -40,6 +41,7 @@ public:
         _audioModule = std::make_unique<audio::TestAudioModule>();
         _graphicsModule = std::make_unique<graphics::TestGraphicsModule>();
         _sceneModule = std::make_unique<scene::TestSceneModule>();
+        _guiModule = std::make_unique<gui::TestGUIModule>();
         _scriptModule = std::make_unique<script::TestScriptModule>();
         _resourceModule = std::make_unique<resource::TestResourceModule>();
         _systemModule = std::make_unique<TestSystemModule>();
@@ -49,6 +51,7 @@ public:
         _audioModule->init();
         _graphicsModule->init();
         _sceneModule->init();
+        _guiModule->init();
         _scriptModule->init();
         _resourceModule->init();
         _systemModule->init();
@@ -59,6 +62,7 @@ public:
             _audioModule->services(),
             _graphicsModule->services(),
             _sceneModule->services(),
+            _guiModule->services(),
             _scriptModule->services(),
             _resourceModule->services(),
             _systemModule->services());
@@ -88,6 +92,10 @@ public:
         return *_sceneModule;
     }
 
+    gui::TestGUIModule &guiModule() {
+        return *_guiModule;
+    }
+
     script::TestScriptModule &scriptModule() {
         return *_scriptModule;
     }
@@ -115,6 +123,7 @@ private:
     std::unique_ptr<audio::TestAudioModule> _audioModule;
     std::unique_ptr<graphics::TestGraphicsModule> _graphicsModule;
     std::unique_ptr<scene::TestSceneModule> _sceneModule;
+    std::unique_ptr<gui::TestGUIModule> _guiModule;
     std::unique_ptr<script::TestScriptModule> _scriptModule;
     std::unique_ptr<resource::TestResourceModule> _resourceModule;
     std::unique_ptr<TestSystemModule> _systemModule;

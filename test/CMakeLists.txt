@@ -30,6 +30,7 @@ set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/fixtures/engine.h
     ${TESTS_SOURCE_DIR}/fixtures/game.h
     ${TESTS_SOURCE_DIR}/fixtures/graphics.h
+    ${TESTS_SOURCE_DIR}/fixtures/gui.h
     ${TESTS_SOURCE_DIR}/fixtures/movie.h
     ${TESTS_SOURCE_DIR}/fixtures/resource.h
     ${TESTS_SOURCE_DIR}/fixtures/scene.h

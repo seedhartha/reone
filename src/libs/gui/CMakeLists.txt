@@ -27,7 +27,10 @@ set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/control/scrollbar.h
     ${GUI_INCLUDE_DIR}/control/slider.h
     ${GUI_INCLUDE_DIR}/control/togglebutton.h
+    ${GUI_INCLUDE_DIR}/di/module.h
+    ${GUI_INCLUDE_DIR}/di/services.h
     ${GUI_INCLUDE_DIR}/gui.h
+    ${GUI_INCLUDE_DIR}/guis.h
     ${GUI_INCLUDE_DIR}/sceneinitializer.h
     ${GUI_INCLUDE_DIR}/textinput.h
     ${GUI_INCLUDE_DIR}/types.h)
@@ -39,7 +42,9 @@ set(GUI_SOURCES
     ${GUI_SOURCE_DIR}/control/progressbar.cpp
     ${GUI_SOURCE_DIR}/control/scrollbar.cpp
     ${GUI_SOURCE_DIR}/control/togglebutton.cpp
+    ${GUI_SOURCE_DIR}/di/module.cpp
     ${GUI_SOURCE_DIR}/gui.cpp
+    ${GUI_SOURCE_DIR}/guis.cpp
     ${GUI_SOURCE_DIR}/sceneinitializer.cpp
     ${GUI_SOURCE_DIR}/textinput.cpp)
 
