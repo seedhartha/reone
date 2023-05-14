@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/system/exception/notimplemented.h"
+#include <gmock/gmock.h>
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
@@ -31,6 +31,7 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
+#include "reone/system/exception/notimplemented.h"
 
 namespace reone {
 
@@ -175,53 +176,14 @@ public:
 
 class MockWindow : public IWindow, boost::noncopyable {
 public:
-    // Overrides
-
-    void processEvents(bool &quit) override {
-        if (_processEventsAnswers.empty()) {
-            return;
-        }
-        _processEventsAnswers.front()(quit);
-        if (_processEventsAnswers.size() > 1) {
-            _processEventsAnswers.pop_front();
-        }
-    }
-
-    void swapBuffers() const override {}
-
-    bool isInFocus() const override {
-        return _inFocusAnswer;
-    }
-
-    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const override { return glm::mat4(1.0f); }
-
-    void setEventHandler(IEventHandler *eventHandler) override {}
-    void setRelativeMouseMode(bool enabled) override {}
-
-    uint32_t mouseState(int *x, int *y) override { return 0; }
-    void showCursor(bool show) override {}
-
-    // END Overrides
-
-    // Answers
-
-    void whenInFocusThenReturn(bool value) {
-        _inFocusAnswer = value;
-    }
-
-    void whenProcessEventsThenAnswer(std::function<void(bool &)> fn) {
-        _processEventsAnswers = {fn};
-    }
-
-    void whenProcessEventsThenAnswer(std::list<std::function<void(bool &)>> fn) {
-        _processEventsAnswers = fn;
-    }
-
-    // END Answers
-
-private:
-    bool _inFocusAnswer {false};
-    std::list<std::function<void(bool &)>> _processEventsAnswers;
+    MOCK_METHOD(void, processEvents, (bool &quit), (override));
+    MOCK_METHOD(void, swapBuffers, (), (const override));
+    MOCK_METHOD(bool, isInFocus, (), (const override));
+    MOCK_METHOD(glm::mat4, getOrthoProjection, (float near, float far), (const override));
+    MOCK_METHOD(void, setEventHandler, (IEventHandler *eventHandler), (override));
+    MOCK_METHOD(void, setRelativeMouseMode, (bool enabled), (override));
+    MOCK_METHOD(uint32_t, mouseState, (int *x, int *y), (override));
+    MOCK_METHOD(void, showCursor, (bool show), (override));
 };
 
 class TestGraphicsModule : boost::noncopyable {

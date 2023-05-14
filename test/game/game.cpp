@@ -41,6 +41,8 @@ using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
 
+using namespace testing;
+
 BOOST_AUTO_TEST_SUITE(game)
 
 BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
@@ -62,9 +64,12 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
     engine->movieModule().movies().whenGetThenReturn("legal", legalMovie);
 
-    engine->graphicsModule().window().whenInFocusThenReturn(true);
-    engine->graphicsModule().window().whenProcessEventsThenAnswer({[](bool &quit) { quit = false; },
-                                                                   [](bool &quit) { quit = true; }});
+    EXPECT_CALL(engine->graphicsModule().window(), isInFocus())
+        .WillRepeatedly(Return(true));
+
+    EXPECT_CALL(engine->graphicsModule().window(), processEvents(_))
+        .WillOnce(Invoke([](bool &quit) { quit = false; }))
+        .WillRepeatedly(Invoke([](bool &quit) { quit = true; }));
 
     // when
     game.run();

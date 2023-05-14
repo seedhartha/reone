@@ -37,7 +37,6 @@ find_package(Boost REQUIRED COMPONENTS filesystem program_options regex system O
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
-find_package(wxWidgets COMPONENTS core base)
 
 if(MSVC)
     find_package(OpenAL CONFIG REQUIRED)
@@ -49,9 +48,6 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/extern/glm ${CMAKE_SOURCE_DIR}/extern/tinyxml2 ${REONE_INCLUDE_DIR})
-
 if(ENABLE_MOVIE)
     if(MSVC)
         find_package(FFMPEG REQUIRED)
@@ -60,6 +56,17 @@ if(ENABLE_MOVIE)
     endif()
     include_directories(${FFMPEG_INCLUDE_DIRS})
 endif()
+
+if(BUILD_LAUNCHER)
+    find_package(wxWidgets COMPONENTS core base)
+endif()
+
+if(BUILD_TESTS)
+    find_package(GTest CONFIG REQUIRED)
+endif()
+
+set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/extern/glm ${CMAKE_SOURCE_DIR}/extern/tinyxml2 ${REONE_INCLUDE_DIR})
 
 add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
 
