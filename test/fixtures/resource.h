@@ -71,6 +71,10 @@ public:
             *_twoDas);
     }
 
+    MockGffs &gffs() {
+        return *_gffs;
+    }
+
     ResourceServices &services() {
         return *_services;
     }

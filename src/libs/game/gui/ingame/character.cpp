@@ -252,7 +252,7 @@ void CharacterMenu::refresh3D() {
     _binding.lbl3dChar->setSceneName(kSceneCharacter);
 }
 
-shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
+shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph) const {
     auto partyLeader = _game.party().getLeader();
 
     auto character = _game.objectFactory().newCreature(sceneGraph.name());

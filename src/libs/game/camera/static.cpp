@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-StaticCamera::StaticCamera(float aspect, SceneGraph &sceneGraph) :
+StaticCamera::StaticCamera(float aspect, ISceneGraph &sceneGraph) :
     _aspect(aspect) {
 
     _sceneNode = sceneGraph.newCamera();

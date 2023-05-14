@@ -24,7 +24,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraph;
+class ISceneGraph;
 
 }
 
@@ -34,7 +34,7 @@ class Game;
 
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, scene::SceneGraph &sceneGraph);
+    ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, scene::ISceneGraph &sceneGraph);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -46,7 +46,7 @@ public:
 
 private:
     Game &_game;
-    scene::SceneGraph &_sceneGraph;
+    scene::ISceneGraph &_sceneGraph;
 
     CameraStyle _style;
     glm::vec3 _targetPosition {0.0f};

@@ -73,7 +73,7 @@ private:
     void startModuleSelection();
     void loadModuleNames();
 
-    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::ISceneGraph &sceneGraph);
 };
 
 } // namespace game

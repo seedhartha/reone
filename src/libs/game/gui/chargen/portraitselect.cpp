@@ -138,7 +138,7 @@ void PortraitSelection::loadHeadModel() {
     _binding.lblHead->setSceneName(kScenePortraitSelect);
 }
 
-shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
     shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));

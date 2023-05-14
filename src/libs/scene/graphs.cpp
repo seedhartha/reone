@@ -36,7 +36,7 @@ void SceneGraphs::reserve(string name) {
     _scenes.insert(make_pair(name, move(scene)));
 }
 
-SceneGraph &SceneGraphs::get(const string &name) {
+ISceneGraph &SceneGraphs::get(const string &name) {
     auto maybeScene = _scenes.find(name);
     if (maybeScene == _scenes.end()) {
         throw logic_error(str(boost::format("Scene not found by name '%s'") % name));

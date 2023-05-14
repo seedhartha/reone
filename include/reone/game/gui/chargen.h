@@ -176,7 +176,7 @@ private:
     void changeScreen(CharGenScreen screen);
 
     gui::GUI *getSubGUI() const;
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::ISceneGraph &sceneGraph);
 
     void setAttributesVisible(bool visible);
 

@@ -127,7 +127,7 @@ private:
     void refreshPortraits();
     void refresh3D();
 
-    std::shared_ptr<scene::ModelSceneNode> getSceneModel(scene::SceneGraph &sceneGraph) const;
+    std::shared_ptr<scene::ModelSceneNode> getSceneModel(scene::ISceneGraph &sceneGraph) const;
     std::string describeClass(ClassType clazz) const;
 };
 

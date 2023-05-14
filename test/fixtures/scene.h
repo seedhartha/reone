@@ -25,10 +25,87 @@ namespace reone {
 
 namespace scene {
 
+class MockSceneGraph : public ISceneGraph, boost::noncopyable {
+public:
+    MOCK_METHOD(void, update, (float dt), (override));
+
+    MOCK_METHOD(void, clear, (), (override));
+
+    MOCK_METHOD(void, addRoot, (std::shared_ptr<ModelSceneNode>), (override));
+    MOCK_METHOD(void, addRoot, (std::shared_ptr<WalkmeshSceneNode>), (override));
+    MOCK_METHOD(void, addRoot, (std::shared_ptr<TriggerSceneNode>), (override));
+    MOCK_METHOD(void, addRoot, (std::shared_ptr<GrassSceneNode>), (override));
+    MOCK_METHOD(void, addRoot, (std::shared_ptr<SoundSceneNode>), (override));
+
+    MOCK_METHOD(void, removeRoot, (ModelSceneNode &), (override));
+    MOCK_METHOD(void, removeRoot, (WalkmeshSceneNode &), (override));
+    MOCK_METHOD(void, removeRoot, (TriggerSceneNode &), (override));
+    MOCK_METHOD(void, removeRoot, (GrassSceneNode &), (override));
+    MOCK_METHOD(void, removeRoot, (SoundSceneNode &), (override));
+
+    MOCK_METHOD(bool, testElevation, (const glm::vec2 &, Collision &), (const override));
+    MOCK_METHOD(bool, testLineOfSight, (const glm::vec3 &, const glm::vec3 &, Collision &), (const override));
+    MOCK_METHOD(bool, testWalk, (const glm::vec3 &, const glm::vec3 &, const IUser *, Collision &), (const override));
+
+    MOCK_METHOD(ModelSceneNode *, pickModelAt, (int, int, IUser *), (const override));
+
+    MOCK_METHOD(const std::string &, name, (), (const override));
+
+    MOCK_METHOD(void, setAmbientLightColor, (glm::vec3), (override));
+    MOCK_METHOD(void, setFog, (FogProperties fog), (override));
+
+    MOCK_METHOD(void, setWalkableSurfaces, (std::set<uint32_t>), (override));
+    MOCK_METHOD(void, setWalkcheckSurfaces, (std::set<uint32_t>), (override));
+    MOCK_METHOD(void, setLineOfSightSurfaces, (std::set<uint32_t>), (override));
+
+    MOCK_METHOD(void, setActiveCamera, (CameraSceneNode *), (override));
+    MOCK_METHOD(void, setUpdateRoots, (bool), (override));
+
+    MOCK_METHOD(void, setDrawAABB, (bool), (override));
+    MOCK_METHOD(void, setDrawWalkmeshes, (bool), (override));
+    MOCK_METHOD(void, setDrawTriggers, (bool), (override));
+
+    MOCK_METHOD(std::shared_ptr<CameraSceneNode>, newCamera, (), (override));
+    MOCK_METHOD(std::shared_ptr<ModelSceneNode>, newModel, (graphics::Model &, ModelUsage), (override));
+    MOCK_METHOD(std::shared_ptr<WalkmeshSceneNode>, newWalkmesh, (graphics::Walkmesh & walkmesh), (override));
+    MOCK_METHOD(std::shared_ptr<TriggerSceneNode>, newTrigger, (std::vector<glm::vec3> geometry), (override));
+    MOCK_METHOD(std::shared_ptr<SoundSceneNode>, newSound, (), (override));
+    MOCK_METHOD(std::shared_ptr<DummySceneNode>, newDummy, (graphics::ModelNode & modelNode), (override));
+    MOCK_METHOD(std::shared_ptr<MeshSceneNode>, newMesh, (ModelSceneNode & model, graphics::ModelNode &modelNode), (override));
+    MOCK_METHOD(std::shared_ptr<LightSceneNode>, newLight, (ModelSceneNode & model, graphics::ModelNode &modelNode), (override));
+    MOCK_METHOD(std::shared_ptr<EmitterSceneNode>, newEmitter, (graphics::ModelNode & modelNode), (override));
+    MOCK_METHOD(std::shared_ptr<ParticleSceneNode>, newParticle, (EmitterSceneNode & emitter), (override));
+    MOCK_METHOD(std::shared_ptr<GrassSceneNode>, newGrass, (GrassProperties properties, graphics::ModelNode &aabbNode), (override));
+    MOCK_METHOD(std::shared_ptr<GrassClusterSceneNode>, newGrassCluster, (GrassSceneNode & grass), (override));
+
+    MOCK_METHOD(void, drawShadows, (), (override));
+    MOCK_METHOD(void, drawOpaque, (), (override));
+    MOCK_METHOD(void, drawTransparent, (), (override));
+    MOCK_METHOD(void, drawLensFlares, (), (override));
+
+    MOCK_METHOD(void, fillLightingUniforms, (), (override));
+
+    MOCK_METHOD(std::shared_ptr<graphics::Camera>, camera, (), (const override));
+    MOCK_METHOD(const glm::vec3 &, ambientLightColor, (), (const override));
+
+    MOCK_METHOD(bool, isFogEnabled, (), (const override));
+
+    MOCK_METHOD(float, fogNear, (), (const override));
+    MOCK_METHOD(float, fogFar, (), (const override));
+    MOCK_METHOD(const glm::vec3 &, fogColor, (), (const override));
+
+    MOCK_METHOD(bool, hasShadowLight, (), (const override));
+    MOCK_METHOD(bool, isShadowLightDirectional, (), (const override));
+
+    MOCK_METHOD(glm::vec3, shadowLightPosition, (), (const override));
+    MOCK_METHOD(float, shadowStrength, (), (const override));
+    MOCK_METHOD(float, shadowRadius, (), (const override));
+};
+
 class MockSceneGraphs : public ISceneGraphs, boost::noncopyable {
 public:
     MOCK_METHOD(void, reserve, (std::string name), (override));
-    MOCK_METHOD(SceneGraph &, get, (const std::string &name), (override));
+    MOCK_METHOD(ISceneGraph &, get, (const std::string &name), (override));
     MOCK_METHOD(std::set<std::string>, sceneNames, (), (const override));
 };
 

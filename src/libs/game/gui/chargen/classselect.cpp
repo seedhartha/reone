@@ -171,7 +171,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     SceneInitializer(sceneGraph)
         .aspect(aspect)
         .depth(kDefaultClipPlaneNear, 10.0f)
-        .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
+        .modelSupplier([&](ISceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
         .invoke();
@@ -227,7 +227,7 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
     return result;
 }
 
-shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISceneGraph &sceneGraph) {
     shared_ptr<Creature> character(_game.objectFactory().newCreature(sceneGraph.name()));
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);

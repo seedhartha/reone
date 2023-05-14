@@ -88,4 +88,8 @@ target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
 target_precompile_headers(tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(tests PRIVATE tools ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} GTest::gmock GTest::gmock_main)
 
+if(MSVC)
+    target_compile_options(tests PRIVATE /bigobj)
+endif()
+
 add_test(NAME UnitTests COMMAND tests)

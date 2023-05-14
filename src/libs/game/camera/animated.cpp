@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-AnimatedCamera::AnimatedCamera(float aspect, SceneGraph &sceneGraph) :
+AnimatedCamera::AnimatedCamera(float aspect, ISceneGraph &sceneGraph) :
     _aspect(aspect),
     _sceneGraph(sceneGraph) {
 

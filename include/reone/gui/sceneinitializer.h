@@ -33,18 +33,15 @@ class Textures;
 namespace scene {
 
 class ModelSceneNode;
-class SceneGraph;
+class ISceneGraph;
 
 } // namespace scene
 
 namespace gui {
 
-/**
- * Utility class for initialization of 3D controls.
- */
 class SceneInitializer {
 public:
-    SceneInitializer(scene::SceneGraph &sceneGraph) :
+    SceneInitializer(scene::ISceneGraph &sceneGraph) :
         _sceneGraph(sceneGraph) {
     }
 
@@ -52,7 +49,7 @@ public:
 
     SceneInitializer &aspect(float aspect);
     SceneInitializer &depth(float zNear, float zFar);
-    SceneInitializer &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> &supplier);
+    SceneInitializer &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::ISceneGraph &)> &supplier);
     SceneInitializer &modelScale(float scale);
     SceneInitializer &modelOffset(glm::vec2 offset);
     SceneInitializer &cameraTransform(glm::mat4 transform);
@@ -60,12 +57,12 @@ public:
     SceneInitializer &ambientLightColor(glm::vec3 color);
 
 private:
-    scene::SceneGraph &_sceneGraph;
+    scene::ISceneGraph &_sceneGraph;
 
     float _aspect {1.0f};
     float _zNear {graphics::kDefaultClipPlaneNear};
     float _zFar {graphics::kDefaultClipPlaneFar};
-    std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> _modelSupplier;
+    std::function<std::shared_ptr<scene::ModelSceneNode>(scene::ISceneGraph &)> _modelSupplier;
     float _modelScale {1.0f};
     glm::vec2 _modelOffset {0.0f};
     glm::mat4 _cameraTransform {1.0f};

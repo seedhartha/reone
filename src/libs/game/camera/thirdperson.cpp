@@ -38,7 +38,7 @@ static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 static constexpr float kTargetPadding = 0.05f;
 
-ThirdPersonCamera::ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, SceneGraph &sceneGraph) :
+ThirdPersonCamera::ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, ISceneGraph &sceneGraph) :
     _game(game),
     _sceneGraph(sceneGraph) {
 

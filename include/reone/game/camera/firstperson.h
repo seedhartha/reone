@@ -23,7 +23,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraph;
+class ISceneGraph;
 
 }
 
@@ -31,7 +31,7 @@ namespace game {
 
 class FirstPersonCamera : public Camera {
 public:
-    FirstPersonCamera(float fovy, float aspect, scene::SceneGraph &sceneGraph);
+    FirstPersonCamera(float fovy, float aspect, scene::ISceneGraph &sceneGraph);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;

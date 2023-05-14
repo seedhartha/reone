@@ -67,7 +67,7 @@ private:
     void loadHeadModel();
 
     int getAppearanceFromCurrentPortrait() const;
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::ISceneGraph &sceneGraph);
 
     void setButtonColors(gui::Control &control);
 };

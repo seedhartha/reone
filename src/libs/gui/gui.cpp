@@ -40,6 +40,7 @@
 #include "reone/gui/control/scrollbar.h"
 #include "reone/gui/control/slider.h"
 #include "reone/gui/control/togglebutton.h"
+#include "reone/system/exception/validation.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -277,11 +278,11 @@ void GUI::resetFocus() {
 
 shared_ptr<Control> GUI::getControl(const string &tag) const {
     for (auto &control : _controls) {
-        if (control->tag() == tag)
+        if (control->tag() == tag) {
             return control;
+        }
     }
-    warn(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef);
-    return shared_ptr<Control>();
+    throw ValidationException(str(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef));
 }
 
 unique_ptr<Control> GUI::newControl(

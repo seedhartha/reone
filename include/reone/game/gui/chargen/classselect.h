@@ -88,7 +88,7 @@ private:
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 
-    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::ISceneGraph &sceneGraph);
     int getRandomCharacterAppearance(Gender gender, ClassType clazz);
     std::vector<Portrait> getPCPortraitsByGender(Gender gender);
 
@@ -96,7 +96,6 @@ private:
     void setClassButtonEnlarged(int index, bool enlarged);
 
     void onClassButtonFocusChanged(int index, bool focus);
-    void onClassButtonClick(int index);
 };
 
 } // namespace game

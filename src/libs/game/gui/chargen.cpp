@@ -424,7 +424,7 @@ void CharacterGeneration::reloadCharacterModel() {
     _binding.portraitLbl->setBorderFill(_services.game.portraits.getTextureByAppearance(_character.appearance));
 }
 
-shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &sceneGraph) {
     shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);

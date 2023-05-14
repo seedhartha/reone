@@ -55,7 +55,61 @@ struct Collision;
 
 class IAnimationEventListener;
 
-class SceneGraph : public graphics::IScene, boost::noncopyable {
+class ISceneGraph : public graphics::IScene {
+public:
+    virtual void update(float dt) = 0;
+
+    virtual void clear() = 0;
+
+    virtual void addRoot(std::shared_ptr<ModelSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<WalkmeshSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<TriggerSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<GrassSceneNode> node) = 0;
+    virtual void addRoot(std::shared_ptr<SoundSceneNode> node) = 0;
+
+    virtual void removeRoot(ModelSceneNode &node) = 0;
+    virtual void removeRoot(WalkmeshSceneNode &node) = 0;
+    virtual void removeRoot(TriggerSceneNode &node) = 0;
+    virtual void removeRoot(GrassSceneNode &node) = 0;
+    virtual void removeRoot(SoundSceneNode &node) = 0;
+
+    virtual bool testElevation(const glm::vec2 &position, Collision &outCollision) const = 0;
+    virtual bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const = 0;
+    virtual bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const = 0;
+
+    virtual ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const = 0;
+
+    virtual const std::string &name() const = 0;
+
+    virtual void setAmbientLightColor(glm::vec3 color) = 0;
+    virtual void setFog(FogProperties fog) = 0;
+
+    virtual void setWalkableSurfaces(std::set<uint32_t> surfaces) = 0;
+    virtual void setWalkcheckSurfaces(std::set<uint32_t> surfaces) = 0;
+    virtual void setLineOfSightSurfaces(std::set<uint32_t> surfaces) = 0;
+
+    virtual void setActiveCamera(CameraSceneNode *camera) = 0;
+    virtual void setUpdateRoots(bool update) = 0;
+
+    virtual void setDrawAABB(bool draw) = 0;
+    virtual void setDrawWalkmeshes(bool draw) = 0;
+    virtual void setDrawTriggers(bool draw) = 0;
+
+    virtual std::shared_ptr<CameraSceneNode> newCamera() = 0;
+    virtual std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage) = 0;
+    virtual std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh) = 0;
+    virtual std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry) = 0;
+    virtual std::shared_ptr<SoundSceneNode> newSound() = 0;
+    virtual std::shared_ptr<DummySceneNode> newDummy(graphics::ModelNode &modelNode) = 0;
+    virtual std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, graphics::ModelNode &modelNode) = 0;
+    virtual std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, graphics::ModelNode &modelNode) = 0;
+    virtual std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode) = 0;
+    virtual std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter) = 0;
+    virtual std::shared_ptr<GrassSceneNode> newGrass(GrassProperties properties, graphics::ModelNode &aabbNode) = 0;
+    virtual std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass) = 0;
+};
+
+class SceneGraph : public ISceneGraph, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
@@ -68,14 +122,14 @@ public:
         _audioSvc(audioSvc) {
     }
 
-    void update(float dt);
+    void update(float dt) override;
 
     void drawShadows() override;
     void drawOpaque() override;
     void drawTransparent() override;
     void drawLensFlares() override;
 
-    const std::string &name() const {
+    const std::string &name() const override {
         return _name;
     }
 
@@ -87,28 +141,28 @@ public:
         return _activeCamera ? _activeCamera->camera() : nullptr;
     }
 
-    void setActiveCamera(CameraSceneNode *camera) { _activeCamera = camera; }
-    void setUpdateRoots(bool update) { _updateRoots = update; }
+    void setActiveCamera(CameraSceneNode *camera) override { _activeCamera = camera; }
+    void setUpdateRoots(bool update) override { _updateRoots = update; }
 
-    void setDrawAABB(bool draw) { _drawAABB = draw; }
-    void setDrawWalkmeshes(bool draw) { _drawWalkmeshes = draw; }
-    void setDrawTriggers(bool draw) { _drawTriggers = draw; }
+    void setDrawAABB(bool draw) override { _drawAABB = draw; }
+    void setDrawWalkmeshes(bool draw) override { _drawWalkmeshes = draw; }
+    void setDrawTriggers(bool draw) override { _drawTriggers = draw; }
 
     // Roots
 
-    void clear();
+    void clear() override;
 
-    void addRoot(std::shared_ptr<ModelSceneNode> node);
-    void addRoot(std::shared_ptr<WalkmeshSceneNode> node);
-    void addRoot(std::shared_ptr<TriggerSceneNode> node);
-    void addRoot(std::shared_ptr<GrassSceneNode> node);
-    void addRoot(std::shared_ptr<SoundSceneNode> node);
+    void addRoot(std::shared_ptr<ModelSceneNode> node) override;
+    void addRoot(std::shared_ptr<WalkmeshSceneNode> node) override;
+    void addRoot(std::shared_ptr<TriggerSceneNode> node) override;
+    void addRoot(std::shared_ptr<GrassSceneNode> node) override;
+    void addRoot(std::shared_ptr<SoundSceneNode> node) override;
 
-    void removeRoot(ModelSceneNode &node);
-    void removeRoot(WalkmeshSceneNode &node);
-    void removeRoot(TriggerSceneNode &node);
-    void removeRoot(GrassSceneNode &node);
-    void removeRoot(SoundSceneNode &node);
+    void removeRoot(ModelSceneNode &node) override;
+    void removeRoot(WalkmeshSceneNode &node) override;
+    void removeRoot(TriggerSceneNode &node) override;
+    void removeRoot(GrassSceneNode &node) override;
+    void removeRoot(SoundSceneNode &node) override;
 
     // END Roots
 
@@ -118,7 +172,7 @@ public:
 
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
 
-    void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
+    void setAmbientLightColor(glm::vec3 color) override { _ambientLightColor = std::move(color); }
 
     // END Lighting
 
@@ -173,21 +227,21 @@ public:
 
     // Factory methods
 
-    std::shared_ptr<CameraSceneNode> newCamera();
-    std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage);
-    std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh);
-    std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
-    std::shared_ptr<SoundSceneNode> newSound();
+    std::shared_ptr<CameraSceneNode> newCamera() override;
+    std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage) override;
+    std::shared_ptr<WalkmeshSceneNode> newWalkmesh(graphics::Walkmesh &walkmesh) override;
+    std::shared_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry) override;
+    std::shared_ptr<SoundSceneNode> newSound() override;
 
-    std::shared_ptr<DummySceneNode> newDummy(graphics::ModelNode &modelNode);
-    std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, graphics::ModelNode &modelNode);
-    std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, graphics::ModelNode &modelNode);
+    std::shared_ptr<DummySceneNode> newDummy(graphics::ModelNode &modelNode) override;
+    std::shared_ptr<MeshSceneNode> newMesh(ModelSceneNode &model, graphics::ModelNode &modelNode) override;
+    std::shared_ptr<LightSceneNode> newLight(ModelSceneNode &model, graphics::ModelNode &modelNode) override;
 
-    std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode);
-    std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter);
+    std::shared_ptr<EmitterSceneNode> newEmitter(graphics::ModelNode &modelNode) override;
+    std::shared_ptr<ParticleSceneNode> newParticle(EmitterSceneNode &emitter) override;
 
-    std::shared_ptr<GrassSceneNode> newGrass(GrassProperties properties, graphics::ModelNode &aabbNode);
-    std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass);
+    std::shared_ptr<GrassSceneNode> newGrass(GrassProperties properties, graphics::ModelNode &aabbNode) override;
+    std::shared_ptr<GrassClusterSceneNode> newGrassCluster(GrassSceneNode &grass) override;
 
     // END Factory methods
 

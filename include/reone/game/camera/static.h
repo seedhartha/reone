@@ -23,7 +23,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraph;
+class ISceneGraph;
 
 }
 
@@ -33,7 +33,7 @@ class PlaceableCamera;
 
 class StaticCamera : public Camera {
 public:
-    StaticCamera(float aspect, scene::SceneGraph &sceneGraph);
+    StaticCamera(float aspect, scene::ISceneGraph &sceneGraph);
 
     void setObject(const PlaceableCamera &object);
 

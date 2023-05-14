@@ -70,7 +70,7 @@ SceneInitializer &SceneInitializer::depth(float zNear, float zFar) {
     return *this;
 }
 
-SceneInitializer &SceneInitializer::modelSupplier(const function<shared_ptr<ModelSceneNode>(SceneGraph &)> &supplier) {
+SceneInitializer &SceneInitializer::modelSupplier(const function<shared_ptr<ModelSceneNode>(ISceneGraph &)> &supplier) {
     _modelSupplier = supplier;
     return *this;
 }

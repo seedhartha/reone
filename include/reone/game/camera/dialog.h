@@ -26,7 +26,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraph;
+class ISceneGraph;
 
 }
 
@@ -42,14 +42,14 @@ public:
         ListenerFar
     };
 
-    DialogCamera(const CameraStyle &style, float aspect, scene::SceneGraph &sceneGraph);
+    DialogCamera(const CameraStyle &style, float aspect, scene::ISceneGraph &sceneGraph);
 
     void setSpeakerPosition(glm::vec3 position);
     void setListenerPosition(glm::vec3 position);
     void setVariant(Variant variant);
 
 private:
-    scene::SceneGraph &_sceneGraph;
+    scene::ISceneGraph &_sceneGraph;
 
     glm::vec3 _speakerPosition {0.0f};
     glm::vec3 _listenerPosition {0.0f};

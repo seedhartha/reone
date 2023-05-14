@@ -17,7 +17,6 @@
 
 #include "reone/game/gui/hud.h"
 
-#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
@@ -25,14 +24,17 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/control/label.h"
+#include "reone/system/logutil.h"
+
 
 #include "reone/game/action/usefeat.h"
 #include "reone/game/d20/feat.h"
 #include "reone/game/d20/feats.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
+
 
 using namespace std;
 

@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-DialogCamera::DialogCamera(const CameraStyle &style, float aspect, SceneGraph &sceneGraph) :
+DialogCamera::DialogCamera(const CameraStyle &style, float aspect, ISceneGraph &sceneGraph) :
     _sceneGraph(sceneGraph) {
 
     _sceneNode = sceneGraph.newCamera();

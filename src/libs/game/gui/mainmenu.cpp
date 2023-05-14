@@ -169,7 +169,7 @@ void MainMenu::setup3DView() {
     _binding.lbl3dView->setSceneName(kSceneMainMenu);
 }
 
-shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
+shared_ptr<ModelSceneNode> MainMenu::getKotorModel(ISceneGraph &sceneGraph) {
     return sceneGraph.newModel(*_services.graphics.models.get("mainmenu"), ModelUsage::GUI);
 }
 

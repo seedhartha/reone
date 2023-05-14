@@ -30,7 +30,7 @@ class Model;
 namespace scene {
 
 class ModelSceneNode;
-class SceneGraph;
+class ISceneGraph;
 
 } // namespace scene
 
@@ -40,7 +40,7 @@ const float kDefaultAnimCamFOV = 55.0f;
 
 class AnimatedCamera : public Camera {
 public:
-    AnimatedCamera(float aspect, scene::SceneGraph &sceneGraph);
+    AnimatedCamera(float aspect, scene::ISceneGraph &sceneGraph);
 
     void update(float dt) override;
 
@@ -53,7 +53,7 @@ public:
 
 private:
     float _aspect {1.0f};
-    scene::SceneGraph &_sceneGraph;
+    scene::ISceneGraph &_sceneGraph;
 
     std::shared_ptr<scene::ModelSceneNode> _model;
     float _fovy {kDefaultAnimCamFOV};
