@@ -16,7 +16,7 @@ jobs:
       run: >
         sudo sed -i 's/azure\.//' /etc/apt/sources.list &&
         sudo apt-get update &&
-        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.0-gtk3-dev
+        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.0-gtk3-dev libgmock-dev
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
