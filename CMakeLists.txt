@@ -58,11 +58,6 @@ if(ENABLE_MOVIE)
 endif()
 
 if(BUILD_LAUNCHER)
-    find_package(wxWidgets COMPONENTS core base)
-endif()
-
-if(BUILD_TESTS)
-    find_package(GTest CONFIG REQUIRED)
 endif()
 
 set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)

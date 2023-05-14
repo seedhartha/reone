@@ -15,6 +15,12 @@
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
+if(MSVC)
+    find_package(GTest CONFIG REQUIRED)
+else()
+    find_package(GTest REQUIRED)
+endif()
+
 set(TESTS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/test)
 
 set(TESTS_HEADERS
