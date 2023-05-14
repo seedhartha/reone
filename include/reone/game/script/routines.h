@@ -33,8 +33,10 @@ class Game;
 
 class Routines : public script::IRoutines, boost::noncopyable {
 public:
-    Routines(GameID gameId) :
-        _gameId(gameId) {
+    Routines(GameID gameId, Game *game, ServicesView *services) :
+        _gameId(gameId),
+        _game(game),
+        _services(services) {
     }
 
     void init();
@@ -44,19 +46,10 @@ public:
     int getNumRoutines() const override { return static_cast<int>(_routines.size()); }
     int getIndexByName(const std::string &name) const override;
 
-    void setGame(Game &game) {
-        _game = &game;
-    }
-
-    void setServices(ServicesView &services) {
-        _services = &services;
-    }
-
 private:
     GameID _gameId;
-
-    Game *_game {nullptr};
-    ServicesView *_services {nullptr};
+    Game *_game;
+    ServicesView *_services;
 
     std::vector<script::Routine> _routines;
 

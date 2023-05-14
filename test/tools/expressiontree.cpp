@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     auto program = ScriptProgram("");
     program.add(Instruction(InstructionType::RETN));
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     // when
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
     // given
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     auto program = ScriptProgram("");
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
 BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
     // given
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     auto program = ScriptProgram("");
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     // given
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     auto program = ScriptProgram("");
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
     // given
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     auto program = ScriptProgram("");
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
     // given
 
-    auto routines = Routines(GameID::KotOR);
+    auto routines = Routines(GameID::KotOR, nullptr, nullptr);
     routines.init();
 
     auto program = ScriptProgram("");

@@ -100,9 +100,7 @@ void Game::initLocalServices() {
     profileOverlay->init();
     _profileOverlay = move(profileOverlay);
 
-    auto routines = make_unique<Routines>(_gameId);
-    routines->setGame(*this);
-    routines->setServices(_services);
+    auto routines = make_unique<Routines>(_gameId, this, &_services);
     routines->init();
     _routines = move(routines);
 

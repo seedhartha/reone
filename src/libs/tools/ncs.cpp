@@ -55,7 +55,7 @@ void NcsTool::invokeBatch(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    auto routines = Routines(_gameId);
+    auto routines = Routines(_gameId, nullptr, nullptr);
     routines.init();
 
     return doInvokeBatch(input, outputDir, [this, &operation, &routines](auto &path, auto &outDir) {
