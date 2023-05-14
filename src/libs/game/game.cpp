@@ -671,7 +671,7 @@ void Game::setRelativeMouseMode(bool relative) {
 
 void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
     if (!_loadScreen) {
-        loadLoadingScreen();
+        _loadScreen = tryLoadGUI<LoadingScreen>();
     }
     if (_loadScreen) {
         _loadScreen->setImage(imageResRef);
@@ -684,10 +684,10 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
 
 void Game::openMainMenu() {
     if (!_mainMenu) {
-        loadMainMenu();
+        _mainMenu = tryLoadGUI<MainMenu>();
     }
     if (!_saveLoad) {
-        loadSaveLoad();
+        _saveLoad = tryLoadGUI<SaveLoad>();
     }
     playMusic(_mainMenuMusicResRef);
     changeScreen(Screen::MainMenu);
@@ -764,7 +764,7 @@ void Game::openLevelUp() {
 void Game::startCharacterGeneration() {
     withLoadingScreen(_charGenLoadScreenResRef, [this]() {
         if (!_charGen) {
-            loadCharacterGeneration();
+            _charGen = tryLoadGUI<CharacterGeneration>();
         }
         _loadScreen->setProgress(100);
         drawAll();
@@ -804,83 +804,23 @@ void Game::pauseConversation() {
 
 void Game::loadInGameMenus() {
     if (!_hud) {
-        loadHUD();
+        _hud = tryLoadGUI<HUD>();
     }
     if (!_inGame) {
-        loadInGame();
+        _inGame = tryLoadGUI<InGameMenu>();
     }
     if (!_dialog) {
-        loadDialog();
+        _dialog = tryLoadGUI<DialogGUI>();
     }
     if (!_computer) {
-        loadComputer();
+        _computer = tryLoadGUI<ComputerGUI>();
     }
     if (!_container) {
-        loadContainer();
+        _container = tryLoadGUI<ContainerGUI>();
     }
     if (!_partySelect) {
-        loadPartySelection();
+        _partySelect = tryLoadGUI<PartySelection>();
     }
-}
-
-void Game::loadMainMenu() {
-    _mainMenu = make_unique<MainMenu>(*this, _services);
-    try {
-        _mainMenu->load();
-    } catch (const exception &e) {
-        error(boost::format("Error loading main menu GUI: %s") % string(e.what()));
-        _mainMenu.reset();
-    }
-}
-
-void Game::loadHUD() {
-    _hud = make_unique<HUD>(*this, _services);
-    _hud->load();
-}
-
-void Game::loadDialog() {
-    _dialog = make_unique<DialogGUI>(*this, _services);
-    _dialog->load();
-}
-
-void Game::loadComputer() {
-    _computer = make_unique<ComputerGUI>(*this, _services);
-    _computer->load();
-}
-
-void Game::loadContainer() {
-    _container = make_unique<ContainerGUI>(*this, _services);
-    _container->load();
-}
-
-void Game::loadPartySelection() {
-    _partySelect = make_unique<PartySelection>(*this, _services);
-    _partySelect->load();
-}
-
-void Game::loadSaveLoad() {
-    _saveLoad = make_unique<SaveLoad>(*this, _services);
-    try {
-        _saveLoad->load();
-    } catch (const exception &e) {
-        error(boost::format("Error loading save/load GUI: %s") % string(e.what()));
-        _saveLoad.reset();
-    }
-}
-
-void Game::loadLoadingScreen() {
-    _loadScreen = make_unique<LoadingScreen>(*this, _services);
-    static_cast<LoadingScreen *>(_loadScreen.get())->load();
-}
-
-void Game::loadCharacterGeneration() {
-    _charGen = make_unique<CharacterGeneration>(*this, _services);
-    _charGen->load();
-}
-
-void Game::loadInGame() {
-    _inGame = make_unique<InGameMenu>(*this, _services);
-    _inGame->load();
 }
 
 void Game::changeScreen(Screen screen) {
@@ -896,7 +836,7 @@ GUI *Game::getScreenGUI() const {
     case Screen::MainMenu:
         return _mainMenu.get();
     case Screen::Loading:
-        return static_cast<LoadingScreen *>(_loadScreen.get());
+        return _loadScreen.get();
     case Screen::CharacterGeneration:
         return _charGen.get();
     case Screen::InGame:

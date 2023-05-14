@@ -329,21 +329,22 @@ private:
     // GUI
 
     void loadInGameMenus();
-    void loadLoadingScreen();
-
-    void loadMainMenu();
-    void loadCharacterGeneration();
-    void loadHUD();
-    void loadInGame();
-    void loadDialog();
-    void loadComputer();
-    void loadContainer();
-    void loadPartySelection();
-    void loadSaveLoad();
 
     void changeScreen(Screen screen);
 
     void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
+
+    template <class T>
+    std::unique_ptr<T> tryLoadGUI() {
+        auto gui = std::make_unique<T>(*this, _services);
+        try {
+            gui->load();
+            return gui;
+        } catch (const std::exception &e) {
+            error(boost::format("Error loading GUI: %s") % std::string(e.what()));
+            return nullptr;
+        }
+    }
 
     // END GUI
 };

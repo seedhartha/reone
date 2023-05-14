@@ -73,6 +73,7 @@ protected:
     bool _hasDefaultHilightColor {false};
     glm::vec3 _defaultHilightColor {0.0f};
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
+    bool _leftMouseDown {false};
 
     // Services
 
@@ -100,6 +101,17 @@ protected:
     void loadControl(const resource::Gff &gffs);
     virtual void preloadControl(Control &control);
 
+    virtual void onClick(const std::string &control) {}
+    virtual void onFocusChanged(const std::string &control, bool focus) {}
+
+    void positionRelativeToCenter(Control &control);
+    void stretchControl(Control &control);
+    void updateFocus(int x, int y);
+
+    void drawBackground();
+
+    Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
+
     std::shared_ptr<Control> getControl(const std::string &tag) const;
 
     template <class T>
@@ -114,20 +126,6 @@ protected:
     virtual bool handleKeyUp(SDL_Scancode key);
 
     // END User input
-
-    virtual void onClick(const std::string &control) {}
-    virtual void onFocusChanged(const std::string &control, bool focus) {}
-
-private:
-    bool _leftMouseDown {false};
-
-    void positionRelativeToCenter(Control &control);
-    void stretchControl(Control &control);
-    void updateFocus(int x, int y);
-
-    void drawBackground();
-
-    Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
 };
 
 } // namespace gui
