@@ -21,7 +21,6 @@
 #include "reone/system/stream/fileoutput.h"
 
 #include "../fixtures/audio.h"
-#include "../fixtures/data.h"
 #include "../fixtures/engine.h"
 #include "../fixtures/game.h"
 #include "../fixtures/graphics.h"
@@ -50,18 +49,21 @@ BOOST_AUTO_TEST_SUITE(game)
 
 BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     // given
-    auto gameData = TestGameData();
-    gameData.init();
+    auto gamePath = boost::filesystem::path();
 
     auto engine = make_unique<TestEngine>();
     engine->init();
 
-    auto game = Game(GameID::KotOR, gameData.gamePath(), engine->options(), engine->services());
+    auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();
 
     auto sceneNames = set<string>();
     EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
         .WillRepeatedly(Return(sceneNames));
+
+    auto moduleNames = set<string>();
+    EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
+        .WillRepeatedly(Return(moduleNames));
 
     auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
     EXPECT_CALL(engine->movieModule().movies(), get(_))

@@ -103,7 +103,8 @@ void Game::init() {
         scene.setLineOfSightSurfaces(lineOfSightSurfaces);
     }
 
-    loadModuleNames();
+    _moduleNames = _services.game.resourceLayout.moduleNames();
+
     setCursorType(CursorType::Default);
 
     auto routines = make_unique<Routines>(*this, _services);
@@ -254,10 +255,12 @@ void Game::loadModule(const string &name, string entry) {
                 _module->area()->unloadParty();
             }
 
-            loadModuleResources(name);
+            _services.game.resourceLayout.loadModuleResources(name);
+
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
             }
+
             drawAll();
 
             _services.scene.graphs.get(kSceneMain).clear();
@@ -858,24 +861,6 @@ GUI *Game::getScreenGUI() const {
 
 void Game::setBarkBubbleText(string text, float duration) {
     _hud->barkBubble().setBarkText(text, duration);
-}
-
-void Game::loadModuleNames() {
-    boost::filesystem::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
-    if (modules.empty()) {
-        throw ValidationException("Modules directory not found");
-    }
-    for (auto &entry : boost::filesystem::directory_iterator(modules)) {
-        string filename(boost::to_lower_copy(entry.path().filename().string()));
-        if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
-            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
-            _moduleNames.insert(move(moduleName));
-        }
-    }
-}
-
-void Game::loadModuleResources(const string &moduleName) {
-    _services.game.resourceLayout.loadModuleResources(moduleName);
 }
 
 void Game::onModuleSelected(const string &module) {

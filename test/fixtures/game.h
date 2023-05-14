@@ -95,6 +95,7 @@ public:
 
 class MockResourceLayout : public IResourceLayout, boost::noncopyable {
 public:
+    MOCK_METHOD(std::set<std::string>, moduleNames, (), (override));
     MOCK_METHOD(void, loadModuleResources, (const std::string &moduleName), (override));
 };
 
@@ -170,6 +171,10 @@ public:
             *_spells,
             *_surfaces,
             *_visibilities);
+    }
+
+    MockResourceLayout &resourceLayout() {
+        return *_resourceLayout;
     }
 
     GameServices &services() {

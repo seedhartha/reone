@@ -35,6 +35,8 @@ class IResourceLayout {
 public:
     virtual ~IResourceLayout() = default;
 
+    virtual std::set<std::string> moduleNames() = 0;
+
     virtual void loadModuleResources(const std::string &moduleName) = 0;
 };
 
@@ -47,6 +49,8 @@ public:
     }
 
     void init();
+
+    std::set<std::string> moduleNames() override;
 
     void loadModuleResources(const std::string &moduleName) override;
 

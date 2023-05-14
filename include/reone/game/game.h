@@ -286,9 +286,6 @@ private:
 
     void stopMovement();
 
-    void loadModuleNames();
-    void loadModuleResources(const std::string &moduleName);
-
     void mainLoopIteration(float dt);
 
     void loadDefaultParty();
