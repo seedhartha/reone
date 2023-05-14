@@ -32,6 +32,11 @@ namespace game {
 
 static constexpr int kMaxMemberCount = 3;
 
+static constexpr char kBlueprintResRefCarth[] = "p_carth";
+static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
+static constexpr char kBlueprintResRefAtton[] = "p_atton";
+static constexpr char kBlueprintResRefKreia[] = "p_kreia";
+
 bool Party::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN) {
         return handleKeyDown(event.key);
@@ -209,6 +214,18 @@ bool Party::removeMember(int npc) {
         return true;
     }
     return false;
+}
+
+void Party::defaultMembers(string &member1, string &member2, string &member3) const {
+    if (_game.isTSL()) {
+        member1 = kBlueprintResRefAtton;
+        member2 = kBlueprintResRefKreia;
+        member3.clear();
+    } else {
+        member1 = kBlueprintResRefCarth;
+        member2 = kBlueprintResRefBastila;
+        member3.clear();
+    }
 }
 
 } // namespace game

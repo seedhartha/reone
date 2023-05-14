@@ -84,13 +84,6 @@ namespace game {
 
 static constexpr char kModulesDirectoryName[] = "modules";
 
-static constexpr char kBlueprintResRefCarth[] = "p_carth";
-static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
-static constexpr char kBlueprintResRefAtton[] = "p_atton";
-static constexpr char kBlueprintResRefKreia[] = "p_kreia";
-
-static bool g_conversationsEnabled = true;
-
 void Game::init() {
     // Surfaces
     auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
@@ -306,7 +299,7 @@ void Game::loadModule(const string &name, string entry) {
 
 void Game::loadDefaultParty() {
     string member1, member2, member3;
-    getDefaultPartyMembers(member1, member2, member3);
+    _party.defaultMembers(member1, member2, member3);
 
     if (!member1.empty()) {
         shared_ptr<Creature> player(_objectFactory.newCreature());
@@ -777,9 +770,6 @@ void Game::startCharacterGeneration() {
 }
 
 void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
-    if (!g_conversationsEnabled)
-        return;
-
     shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
@@ -873,17 +863,6 @@ void Game::drawHUD() {
 
 CameraType Game::getConversationCamera(int &cameraId) const {
     return _conversation->getCamera(cameraId);
-}
-
-void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    if (isTSL()) {
-        member1 = kBlueprintResRefAtton;
-        member2 = kBlueprintResRefKreia;
-    } else {
-        member1 = kBlueprintResRefCarth;
-        member2 = kBlueprintResRefBastila;
-    }
-    member3.clear();
 }
 
 } // namespace game

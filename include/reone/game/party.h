@@ -25,9 +25,6 @@ class Creature;
 class Game;
 class Object;
 
-/**
- * Encapsulates party management.
- */
 class Party {
 public:
     struct Member {
@@ -85,6 +82,12 @@ public:
     const std::string &getAvailableMember(int npc) const;
 
     // END Available members
+
+    // Default party
+
+    void defaultMembers(std::string &member1, std::string &member2, std::string &member3) const;
+
+    // END Default party
 
 private:
     Game &_game;

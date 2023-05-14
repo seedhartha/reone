@@ -299,7 +299,6 @@ private:
     void onModuleSelected(const std::string &name);
     void drawHUD();
 
-    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const;
     gui::GUI *getScreenGUI() const;
     CameraType getConversationCamera(int &cameraId) const;
 
