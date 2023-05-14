@@ -28,182 +28,107 @@ namespace game {
 
 class MockCameraStyles : public ICameraStyles, boost::noncopyable {
 public:
-    std::shared_ptr<CameraStyle> get(int index) const override {
-        return nullptr;
-    }
-
-    std::shared_ptr<CameraStyle> get(const std::string &name) const override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<CameraStyle>, get, (int index), (const override));
+    MOCK_METHOD(std::shared_ptr<CameraStyle>, get, (const std::string &name), (const override));
 };
 
 class MockClasses : public IClasses, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<CreatureClass> get(ClassType key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<CreatureClass>, get, (ClassType key), (override));
 };
 
 class MockCursors : public ICursors, boost::noncopyable {
 public:
-    std::shared_ptr<graphics::Cursor> get(game::CursorType type) override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<graphics::Cursor>, get, (game::CursorType type), (override));
 };
 
 class MockDialogs : public IDialogs, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<Dialog> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Dialog>, get, (const std::string &key), (override));
 };
 
 class MockFeats : public IFeats, boost::noncopyable {
 public:
-    void init() override {}
-
-    std::shared_ptr<Feat> get(FeatType type) const override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, init, (), (override));
+    MOCK_METHOD(std::shared_ptr<Feat>, get, (FeatType type), (const override));
 };
 
 class MockFootstepSounds : public IFootstepSounds, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<FootstepTypeSounds> get(uint32_t key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<FootstepTypeSounds>, get, (uint32_t key), (override));
 };
 
 class MockGUISounds : public IGUISounds, boost::noncopyable {
 public:
-    std::shared_ptr<audio::AudioStream> getOnClick() const override {
-        return nullptr;
-    }
-
-    std::shared_ptr<audio::AudioStream> getOnEnter() const override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<audio::AudioStream>, getOnClick, (), (const override));
+    MOCK_METHOD(std::shared_ptr<audio::AudioStream>, getOnEnter, (), (const override));
 };
 
 class MockLayouts : public ILayouts, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<Layout> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Layout>, get, (const std::string &key), (override));
 };
 
 class MockPaths : public IPaths, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<Path> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Path>, get, (const std::string &key), (override));
 };
 
 class MockPortraits : public IPortraits, boost::noncopyable {
 public:
-    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const override {
-        return nullptr;
-    }
-
-    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const override {
-        return nullptr;
-    }
-
-    const std::vector<Portrait> &portraits() const override {
-        return _portraits;
-    }
-
-private:
-    std::vector<Portrait> _portraits;
+    MOCK_METHOD(std::shared_ptr<graphics::Texture>, getTextureByIndex, (int index), (const override));
+    MOCK_METHOD(std::shared_ptr<graphics::Texture>, getTextureByAppearance, (int appearance), (const override));
+    MOCK_METHOD(const std::vector<Portrait> &, portraits, (), (const override));
 };
 
 class MockReputes : public IReputes, boost::noncopyable {
 public:
-    bool getIsEnemy(const Creature &left, const Creature &right) const override {
-        return false;
-    }
-
-    bool getIsFriend(const Creature &left, const Creature &right) const override {
-        return false;
-    }
-
-    bool getIsNeutral(const Creature &left, const Creature &right) const override {
-        return false;
-    }
+    MOCK_METHOD(bool, getIsEnemy, (const Creature &left, const Creature &right), (const override));
+    MOCK_METHOD(bool, getIsFriend, (const Creature &left, const Creature &right), (const override));
+    MOCK_METHOD(bool, getIsNeutral, (const Creature &left, const Creature &right), (const override));
 };
 
 class MockResourceLayout : public IResourceLayout, boost::noncopyable {
 public:
-    void loadModuleResources(const std::string &moduleName) override {}
+    MOCK_METHOD(void, loadModuleResources, (const std::string &moduleName), (override));
 };
 
 class MockSkills : public ISkills, boost::noncopyable {
 public:
-    std::shared_ptr<Skill> get(SkillType type) const override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Skill>, get, (SkillType type), (const override));
 };
 
 class MockSoundSets : public ISoundSets, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<SoundSet> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<SoundSet>, get, (const std::string &key), (override));
 };
 
 class MockSpells : public ISpells, boost::noncopyable {
 public:
-    std::shared_ptr<Spell> get(SpellType type) const override {
-        return nullptr;
-    }
+    MOCK_METHOD(std::shared_ptr<Spell>, get, (SpellType type), (const override));
 };
 
 class MockSurfaces : public ISurfaces, boost::noncopyable {
 public:
-    bool isWalkable(int index) const override {
-        return false;
-    }
+    MOCK_METHOD(bool, isWalkable, (int index), (const override));
+    MOCK_METHOD(const Surface &, getSurface, (int index), (const override));
 
-    const Surface &getSurface(int index) const override {
-        throw NotImplementedException("getSurface");
-    }
-
-    std::set<uint32_t> getGrassSurfaces() const override {
-        return std::set<uint32_t>();
-    }
-
-    std::set<uint32_t> getWalkableSurfaces() const override {
-        return std::set<uint32_t>();
-    }
-
-    std::set<uint32_t> getWalkcheckSurfaces() const override {
-        return std::set<uint32_t>();
-    }
-
-    std::set<uint32_t> getLineOfSightSurfaces() const override {
-        return std::set<uint32_t>();
-    }
+    MOCK_METHOD(std::set<uint32_t>, getGrassSurfaces, (), (const override));
+    MOCK_METHOD(std::set<uint32_t>, getWalkableSurfaces, (), (const override));
+    MOCK_METHOD(std::set<uint32_t>, getWalkcheckSurfaces, (), (const override));
+    MOCK_METHOD(std::set<uint32_t>, getLineOfSightSurfaces, (), (const override));
 };
 
 class MockVisiblities : public IVisibilities, boost::noncopyable {
 public:
-    void invalidate() override {}
-
-    std::shared_ptr<Visibility> get(const std::string &key) override {
-        return nullptr;
-    }
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
 };
 
 class TestGameModule : boost::noncopyable {
