@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/audio/di/services.h"
 #include "reone/audio/format/mp3reader.h"
 
@@ -26,34 +28,12 @@ namespace audio {
 
 class MockMp3Reader : public Mp3Reader {
 public:
-    void load(IInputStream &stream) override {
-        _loadInvocations.push_back(std::make_tuple(&stream));
-    }
-
-    const std::vector<std::tuple<IInputStream *>> &loadInvocations() const {
-        return _loadInvocations;
-    }
-
-private:
-    std::vector<std::tuple<IInputStream *>> _loadInvocations;
+    MOCK_METHOD(void, load, (IInputStream & stream), (override));
 };
 
 class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
 public:
-    MockMp3ReaderFactory() :
-        _instance(std::make_shared<MockMp3Reader>()) {
-    }
-
-    MockMp3ReaderFactory(std::shared_ptr<Mp3Reader> instance) :
-        _instance(std::move(instance)) {
-    }
-
-    std::shared_ptr<Mp3Reader> create() override {
-        return _instance;
-    }
-
-private:
-    std::shared_ptr<Mp3Reader> _instance;
+    MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
 };
 
 class MockAudioContext : public IAudioContext, boost::noncopyable {

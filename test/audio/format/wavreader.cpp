@@ -30,6 +30,9 @@ using namespace std;
 using namespace reone;
 using namespace reone::audio;
 
+using testing::_;
+using testing::Return;
+
 BOOST_AUTO_TEST_SUITE(wav_reader)
 
 BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
@@ -145,15 +148,18 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
                         .append("\x00", 1)
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
+
     auto mp3Reader = make_shared<MockMp3Reader>();
-    auto mp3ReaderFactory = MockMp3ReaderFactory(mp3Reader);
+    EXPECT_CALL(*mp3Reader, load(_));
+
+    auto mp3ReaderFactory = MockMp3ReaderFactory();
+    EXPECT_CALL(mp3ReaderFactory, create())
+        .WillRepeatedly(Return(mp3Reader));
+
     auto reader = WavReader(mp3ReaderFactory);
 
-    // when
+    // expect
     reader.load(wav);
-
-    // then
-    BOOST_TEST(1ll == mp3Reader->loadInvocations().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+
 #include "reone/movie/di/services.h"
 
 namespace reone {
@@ -25,26 +27,8 @@ namespace movie {
 
 class MockMovies : public IMovies, boost::noncopyable {
 public:
-    // Overrides
-
-    void invalidate() override {}
-
-    std::shared_ptr<Movie> get(const std::string &name) override {
-        return _getAnswers.at(name);
-    }
-
-    // END Overrides
-
-    // Answers
-
-    void whenGetThenReturn(std::string name, std::shared_ptr<Movie> movie) {
-        _getAnswers.insert(std::make_pair(name, movie));
-    }
-
-    // END Answers
-
-private:
-    std::map<std::string, std::shared_ptr<Movie>> _getAnswers;
+    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(std::shared_ptr<Movie>, get, (const std::string &name), (override));
 };
 
 class TestMovieModule : boost::noncopyable {
