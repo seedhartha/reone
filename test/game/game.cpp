@@ -21,6 +21,7 @@
 #include "reone/system/stream/fileoutput.h"
 
 #include "../fixtures/audio.h"
+#include "../fixtures/data.h"
 #include "../fixtures/engine.h"
 #include "../fixtures/game.h"
 #include "../fixtures/graphics.h"
@@ -49,18 +50,13 @@ BOOST_AUTO_TEST_SUITE(game)
 
 BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     // given
-    auto gamePath = boost::filesystem::temp_directory_path();
-    gamePath.append("reone_test_game");
-    boost::filesystem::create_directory(gamePath);
-
-    auto modulesPath = gamePath;
-    modulesPath.append("modules");
-    boost::filesystem::create_directory(modulesPath);
+    auto gameData = TestGameData();
+    gameData.init();
 
     auto engine = make_unique<TestEngine>();
     engine->init();
 
-    auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
+    auto game = Game(GameID::KotOR, gameData.gamePath(), engine->options(), engine->services());
     game.init();
 
     auto sceneNames = set<string>();
