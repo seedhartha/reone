@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include "reone/system/stream/bytearrayinput.h"
 
 namespace reone {

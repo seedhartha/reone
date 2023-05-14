@@ -82,23 +82,23 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kModulesDirectoryName[] = "modules";
-
 void Game::init() {
-    // Surfaces
-    auto walkableSurfaces = _services.game.surfaces.getWalkableSurfaces();
-    auto walkcheckSurfaces = _services.game.surfaces.getWalkcheckSurfaces();
-    auto lineOfSightSurfaces = _services.game.surfaces.getLineOfSightSurfaces();
-    for (auto &sceneName : _services.scene.graphs.sceneNames()) {
-        auto &scene = _services.scene.graphs.get(sceneName);
-        scene.setWalkableSurfaces(walkableSurfaces);
-        scene.setWalkcheckSurfaces(walkcheckSurfaces);
-        scene.setLineOfSightSurfaces(lineOfSightSurfaces);
-    }
-
-    _moduleNames = _services.game.resourceLayout.moduleNames();
-
+    initLocalServices();
+    setSceneSurfaces();
     setCursorType(CursorType::Default);
+
+    _services.graphics.window.setEventHandler(this);
+    _moduleNames = _services.game.resourceLayout.moduleNames();
+}
+
+void Game::initLocalServices() {
+    auto console = make_unique<Console>(*this, _services);
+    console->init();
+    _console = move(console);
+
+    auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
+    profileOverlay->init();
+    _profileOverlay = move(profileOverlay);
 
     auto routines = make_unique<Routines>(_gameId);
     routines->setGame(*this);
@@ -108,20 +108,19 @@ void Game::init() {
 
     _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
 
-    auto map = make_unique<Map>(*this, _services);
-    auto console = make_unique<Console>(*this, _services);
-    auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
+    _map = make_unique<Map>(*this, _services);
+}
 
-    console->init();
-    profileOverlay->init();
-
-    _screen = Screen::MainMenu;
-
-    _map = move(map);
-    _console = move(console);
-    _profileOverlay = move(profileOverlay);
-
-    _services.graphics.window.setEventHandler(this);
+void Game::setSceneSurfaces() {
+    auto walkable = _services.game.surfaces.getWalkableSurfaces();
+    auto walkcheck = _services.game.surfaces.getWalkcheckSurfaces();
+    auto lineOfSight = _services.game.surfaces.getLineOfSightSurfaces();
+    for (auto &name : _services.scene.graphs.sceneNames()) {
+        auto &scene = _services.scene.graphs.get(name);
+        scene.setWalkableSurfaces(walkable);
+        scene.setWalkcheckSurfaces(walkcheck);
+        scene.setLineOfSightSurfaces(lineOfSight);
+    }
 }
 
 int Game::run() {
@@ -181,13 +180,7 @@ void Game::update(float dt) {
 
     _profileOverlay->update(dt);
 
-    int x, y;
-    auto state = _services.graphics.window.mouseState(&x, &y);
-    auto pressed = state & SDL_BUTTON(1);
-    if (_cursor) {
-        _cursor->setPosition(glm::ivec2(x, y));
-        _cursor->setPressed(pressed);
-    }
+    updateCursor();
 }
 
 void Game::drawAll() {
@@ -270,7 +263,7 @@ void Game::loadModule(const string &name, string entry) {
 
             _ticks = _services.system.clock.ticks();
             openInGame();
-        } catch (const ValidationException &e) {
+        } catch (const exception &e) {
             error("Failed loading module '" + name + "': " + string(e.what()));
         }
     });
@@ -510,6 +503,16 @@ void Game::updateSceneGraph(float dt) {
     sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
     sceneGraph.setDrawTriggers(isShowTriggersEnabled());
     sceneGraph.update(dt);
+}
+
+void Game::updateCursor() {
+    int x, y;
+    auto state = _services.graphics.window.mouseState(&x, &y);
+    auto pressed = state & SDL_BUTTON(1);
+    if (_cursor) {
+        _cursor->setPosition(glm::ivec2(x, y));
+        _cursor->setPressed(pressed);
+    }
 }
 
 bool Game::handle(const SDL_Event &event) {

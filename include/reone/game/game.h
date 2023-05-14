@@ -22,6 +22,7 @@
 #include "reone/graphics/eventhandler.h"
 #include "reone/movie/movie.h"
 #include "reone/script/routines.h"
+#include "reone/system/logutil.h"
 
 #include "action/factory.h"
 #include "camera.h"
@@ -119,6 +120,9 @@ public:
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
+
+    void initLocalServices();
+    void setSceneSurfaces();
 
     void setCursorType(CursorType type);
     void setPaused(bool paused);
@@ -291,6 +295,7 @@ private:
     void updateMusic();
     void updateCamera(float dt);
     void updateSceneGraph(float dt);
+    void updateCursor();
 
     // END Updates
 

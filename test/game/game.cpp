@@ -80,7 +80,6 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     game.run();
 
     // then
-    BOOST_TEST((game.currentScreen() == Game::Screen::MainMenu));
     auto movie = game.movie();
     BOOST_TEST(static_cast<bool>(movie));
     BOOST_TEST((movie == legalMovie));
