@@ -100,8 +100,13 @@ void Game::init() {
 
     setCursorType(CursorType::Default);
 
-    auto routines = make_unique<Routines>(*this, _services);
-    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.scripts);
+    auto routines = make_unique<Routines>(_gameId);
+    routines->setGame(*this);
+    routines->setServices(_services);
+    routines->init();
+    _routines = move(routines);
+
+    _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
 
     auto map = make_unique<Map>(*this, _services);
     auto console = make_unique<Console>(*this, _services);
@@ -110,15 +115,8 @@ void Game::init() {
     console->init();
     profileOverlay->init();
 
-    if (isTSL()) {
-        routines->initForTSL();
-    } else {
-        routines->initForKotOR();
-    }
-
     _screen = Screen::MainMenu;
 
-    _routines = move(routines);
     _map = move(map);
     _console = move(console);
     _profileOverlay = move(profileOverlay);
@@ -663,6 +661,9 @@ void Game::openMainMenu() {
     if (!_mainMenu) {
         _mainMenu = tryLoadGUI<MainMenu>();
     }
+    if (!_mainMenu) {
+        return;
+    }
     if (!_saveLoad) {
         _saveLoad = tryLoadGUI<SaveLoad>();
     }
@@ -739,10 +740,13 @@ void Game::openLevelUp() {
 }
 
 void Game::startCharacterGeneration() {
+    if (!_charGen) {
+        _charGen = tryLoadGUI<CharacterGeneration>();
+    }
+    if (!_charGen) {
+        return;
+    }
     withLoadingScreen(_charGen->loadScreenResRef(), [this]() {
-        if (!_charGen) {
-            _charGen = tryLoadGUI<CharacterGeneration>();
-        }
         _loadScreen->setProgress(100);
         drawAll();
         playMusic(_charGen->musicResRef());

@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     auto program = ScriptProgram("");
     program.add(Instruction(InstructionType::RETN));
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     // when
 
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
     // given
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     auto program = ScriptProgram("");
     program.add(Instruction(InstructionType::RSADDI));
@@ -98,8 +98,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
 BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
     // given
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     auto program = ScriptProgram("");
     program.add(Instruction::newJSR(8));
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     // given
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     auto program = ScriptProgram("");
     program.add(Instruction::newJSR(8));
@@ -246,8 +246,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
     // given
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     auto program = ScriptProgram("");
     program.add(Instruction::newJSR(8));
@@ -294,8 +294,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
 BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
     // given
 
-    auto routines = Routines(*static_cast<Game *>(nullptr), *static_cast<ServicesView *>(nullptr));
-    routines.initForKotOR();
+    auto routines = Routines(GameID::KotOR);
+    routines.init();
 
     auto program = ScriptProgram("");
     program.add(Instruction::newJSR(8));

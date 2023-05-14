@@ -20,6 +20,8 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
@@ -31,26 +33,35 @@ class Game;
 
 class Routines : public script::IRoutines, boost::noncopyable {
 public:
-    Routines() = default;
-
-    Routines(Game &game, ServicesView &services) :
-        _game(&game),
-        _services(&services) {
+    Routines(GameID gameId) :
+        _gameId(gameId) {
     }
 
-    void initForKotOR();
-    void initForTSL();
+    void init();
 
     script::Routine &get(int index) override;
 
     int getNumRoutines() const override { return static_cast<int>(_routines.size()); }
     int getIndexByName(const std::string &name) const override;
 
+    void setGame(Game &game) {
+        _game = &game;
+    }
+
+    void setServices(ServicesView &services) {
+        _services = &services;
+    }
+
 private:
+    GameID _gameId;
+
     Game *_game {nullptr};
     ServicesView *_services {nullptr};
 
     std::vector<script::Routine> _routines;
+
+    void initForKotOR();
+    void initForTSL();
 
     void add(
         std::string name,

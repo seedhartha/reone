@@ -17,8 +17,8 @@
 
 #include "reone/game/script/routines.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/script/variable.h"
+#include "reone/system/collectionutil.h"
 
 #include "reone/game/di/services.h"
 #include "reone/game/types.h"
@@ -47,6 +47,14 @@ namespace reone {
 namespace game {
 
 static constexpr int kBaseItemInvalid = 256;
+
+void Routines::init() {
+    if (_gameId == GameID::TSL) {
+        initForTSL();
+    } else {
+        initForKotOR();
+    }
+}
 
 void Routines::initForKotOR() {
     add("Random", R_INT, {R_INT}, &routine::random);
