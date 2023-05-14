@@ -148,7 +148,7 @@ public:
         return _screen;
     }
 
-    std::shared_ptr<movie::Movie> movie() const {
+    std::shared_ptr<movie::IMovie> movie() const {
         return _movie;
     }
 
@@ -198,7 +198,7 @@ private:
 
     uint32_t _ticks {0};
     bool _quit {false};
-    std::shared_ptr<movie::Movie> _movie;
+    std::shared_ptr<movie::IMovie> _movie;
     CursorType _cursorType {CursorType::None};
     std::shared_ptr<graphics::Cursor> _cursor;
     float _gameSpeed {1.0f};

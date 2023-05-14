@@ -18,8 +18,8 @@
 #pragma once
 
 #include "reone/audio/source.h"
-#include "reone/system/types.h"
 #include "reone/graphics/texture.h"
+#include "reone/system/types.h"
 
 #include "videostream.h"
 
@@ -41,7 +41,19 @@ namespace movie {
 
 class BikReader;
 
-class Movie {
+class IMovie {
+public:
+    virtual ~IMovie() = default;
+
+    virtual void update(float dt) = 0;
+    virtual void render() = 0;
+
+    virtual void finish() = 0;
+
+    virtual bool isFinished() const = 0;
+};
+
+class Movie : public IMovie, boost::noncopyable {
 public:
     Movie(
         graphics::GraphicsServices &graphicsSvc,
@@ -53,12 +65,12 @@ public:
     void init();
     void deinit();
 
-    void update(float dt);
-    void render();
+    void update(float dt) override;
+    void render() override;
 
-    void finish() { _finished = true; }
+    void finish() override { _finished = true; }
 
-    bool isFinished() const { return _finished; }
+    bool isFinished() const override { return _finished; }
 
     void setVideoStream(std::shared_ptr<VideoStream> stream) { _videoStream = std::move(stream); }
     void setAudioStream(std::shared_ptr<audio::AudioStream> stream) { _audioStream = std::move(stream); }

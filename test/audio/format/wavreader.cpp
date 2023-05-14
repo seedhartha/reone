@@ -150,12 +150,11 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
     auto wav = ByteArrayInputStream(wavBytes);
 
     auto mp3Reader = make_shared<MockMp3Reader>();
-    EXPECT_CALL(*mp3Reader, load(_))
-        .Times(1);
+    EXPECT_CALL(*mp3Reader, load(_)).Times(1);
 
     auto mp3ReaderFactory = MockMp3ReaderFactory();
     EXPECT_CALL(mp3ReaderFactory, create())
-        .WillRepeatedly(Return(mp3Reader));
+        .WillOnce(Return(mp3Reader));
 
     auto reader = WavReader(mp3ReaderFactory);
 

@@ -25,10 +25,18 @@ namespace reone {
 
 namespace movie {
 
+class MockMovie : public IMovie, boost::noncopyable {
+public:
+    MOCK_METHOD(void, update, (float dt), (override));
+    MOCK_METHOD(void, render, (), (override));
+    MOCK_METHOD(void, finish, (), (override));
+    MOCK_METHOD(bool, isFinished, (), (const override));
+};
+
 class MockMovies : public IMovies, boost::noncopyable {
 public:
     MOCK_METHOD(void, invalidate, (), (override));
-    MOCK_METHOD(std::shared_ptr<Movie>, get, (const std::string &name), (override));
+    MOCK_METHOD(std::shared_ptr<IMovie>, get, (const std::string &name), (override));
 };
 
 class TestMovieModule : boost::noncopyable {

@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
         vector<VariableType> {VariableType::String, VariableType::Int});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
-        .WillRepeatedly(ReturnRef(*routine));
+        .WillOnce(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
         vector<VariableType> {VariableType::Vector, VariableType::Int});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
-        .WillRepeatedly(ReturnRef(*routine));
+        .WillOnce(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
         vector<VariableType> {VariableType::Action});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
-        .WillRepeatedly(ReturnRef(*routine));
+        .WillOnce(ReturnRef(*routine));
 
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;

@@ -32,7 +32,7 @@ public:
 
     virtual void invalidate() = 0;
 
-    virtual std::shared_ptr<Movie> get(const std::string &name) = 0;
+    virtual std::shared_ptr<IMovie> get(const std::string &name) = 0;
 };
 
 class Movies : public IMovies, boost::noncopyable {
@@ -49,7 +49,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<Movie> get(const std::string &name) override {
+    std::shared_ptr<IMovie> get(const std::string &name) override {
         auto maybeObject = _objects.find(name);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -63,9 +63,9 @@ private:
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 
-    std::unordered_map<std::string, std::shared_ptr<Movie>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<IMovie>> _objects;
 
-    std::shared_ptr<Movie> doGet(std::string name);
+    std::shared_ptr<IMovie> doGet(std::string name);
 };
 
 } // namespace movie

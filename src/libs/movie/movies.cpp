@@ -26,7 +26,7 @@ namespace reone {
 
 namespace movie {
 
-shared_ptr<Movie> Movies::doGet(std::string name) {
+shared_ptr<IMovie> Movies::doGet(std::string name) {
     auto path = getPathIgnoreCase(_gamePath, "movies/" + name + ".bik");
     if (path.empty()) {
         return nullptr;

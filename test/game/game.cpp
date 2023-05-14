@@ -59,18 +59,22 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
 
     auto sceneNames = set<string>();
     EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
-        .WillRepeatedly(Return(sceneNames));
+        .WillOnce(Return(sceneNames));
 
     auto moduleNames = set<string>();
     EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
-        .WillRepeatedly(Return(moduleNames));
+        .WillOnce(Return(moduleNames));
 
-    auto legalMovie = make_shared<Movie>(engine->services().graphics, engine->services().audio);
+    auto legalMovie = make_shared<MockMovie>();
+    EXPECT_CALL(*legalMovie, update(_)).Times(1);
+    EXPECT_CALL(*legalMovie, isFinished()).WillOnce(Return(false));
+    EXPECT_CALL(*legalMovie, render()).Times(1);
+
     EXPECT_CALL(engine->movieModule().movies(), get(_))
-        .WillRepeatedly(Return(legalMovie));
+        .WillOnce(Return(legalMovie));
 
     EXPECT_CALL(engine->graphicsModule().window(), isInFocus())
-        .WillRepeatedly(Return(true));
+        .WillOnce(Return(true));
 
     EXPECT_CALL(engine->graphicsModule().window(), processEvents(_))
         .WillOnce(Invoke([](bool &quit) { quit = false; }))
