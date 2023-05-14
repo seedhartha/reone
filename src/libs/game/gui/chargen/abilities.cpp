@@ -86,7 +86,7 @@ void CharGenAbilities::load() {
         _binding.chaLbl.get()};
     for (auto &label : labels) {
         label->setFocusable(true);
-        label->setHilightColor(_game.getGUIColorBase());
+        label->setHilightColor(_guiColorBase);
     }
 
     _binding.strPointsBtn->setDisabled(true);

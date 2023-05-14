@@ -43,10 +43,9 @@ protected:
     Game &_game;
     ServicesView &_services;
 
-    void loadBackground(BackgroundType type);
-
-private:
     std::shared_ptr<audio::AudioSource> _audioSource;
+
+    void loadBackground(BackgroundType type);
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;

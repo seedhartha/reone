@@ -111,28 +111,9 @@ void Game::init() {
     profileOverlay->init();
 
     if (isTSL()) {
-        _mainMenuMusicResRef = "mus_sion";
-        _charGenMusicResRef = "mus_main";
-        _charGenLoadScreenResRef = "load_default";
-
-        _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
-        _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
-        _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
-
         routines->initForTSL();
-        map->setArrowResRef("mm_barrow_p");
-
     } else {
-        _mainMenuMusicResRef = "mus_theme_cult";
-        _charGenMusicResRef = "mus_theme_rep";
-        _charGenLoadScreenResRef = "load_chargen";
-
-        _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
-        _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
-        _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
-
         routines->initForKotOR();
-        map->setArrowResRef("mm_barrow");
     }
 
     _screen = Screen::MainMenu;
@@ -685,7 +666,7 @@ void Game::openMainMenu() {
     if (!_saveLoad) {
         _saveLoad = tryLoadGUI<SaveLoad>();
     }
-    playMusic(_mainMenuMusicResRef);
+    playMusic(_mainMenu->musicResRef());
     changeScreen(Screen::MainMenu);
 }
 
@@ -758,13 +739,13 @@ void Game::openLevelUp() {
 }
 
 void Game::startCharacterGeneration() {
-    withLoadingScreen(_charGenLoadScreenResRef, [this]() {
+    withLoadingScreen(_charGen->loadScreenResRef(), [this]() {
         if (!_charGen) {
             _charGen = tryLoadGUI<CharacterGeneration>();
         }
         _loadScreen->setProgress(100);
         drawAll();
-        playMusic(_charGenMusicResRef);
+        playMusic(_charGen->musicResRef());
         changeScreen(Screen::CharacterGeneration);
     });
 }

@@ -67,8 +67,8 @@ void SaveLoad::load() {
     _binding.lbGames->setSelectionMode(ListBox::SelectionMode::OnClick);
     _binding.lbGames->setPadding(3);
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
-    _binding.lbGames->protoItem().setBorderColorOverride(_game.getGUIColorBase());
-    _binding.lbGames->protoItem().setHilightColor(_defaultHilightColor);
+    _binding.lbGames->protoItem().setBorderColorOverride(_guiColorBase);
+    _binding.lbGames->protoItem().setHilightColor(_guiColorHilight);
     _binding.lbGames->setOnItemClick([this](const string &item) {
         // Get save number by item tag
         int selectedSaveNumber = -1;

@@ -98,6 +98,14 @@ public:
 
     void setCharacter(Character character);
 
+    const std::string &musicResRef() const {
+        return _musicResRef;
+    }
+
+    const std::string &loadScreenResRef() const {
+        return _loadScreenResRef;
+    }
+
 private:
     struct Binding {
         std::shared_ptr<gui::Label> defArrowLbl;
@@ -139,6 +147,9 @@ private:
 
         // END TSL only
     } _binding;
+
+    std::string _musicResRef;
+    std::string _loadScreenResRef;
 
     CharGenScreen _screen {CharGenScreen::ClassSelection};
     Type _type {Type::Quick};

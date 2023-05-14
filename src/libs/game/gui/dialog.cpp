@@ -136,13 +136,13 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 
 void DialogGUI::configureMessage() {
     _binding.lblMessage->setExtentTop(-_rootControl->extent().top);
-    _binding.lblMessage->setTextColor(_game.getGUIColorBase());
+    _binding.lblMessage->setTextColor(_guiColorBase);
 }
 
 void DialogGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_game.getGUIColorHilight());
-    _binding.lbReplies->protoItem().setTextColor(_game.getGUIColorBase());
+    _binding.lbReplies->protoItem().setHilightColor(_guiColorHilight);
+    _binding.lbReplies->protoItem().setTextColor(_guiColorBase);
 }
 
 void DialogGUI::onStart() {

@@ -53,9 +53,17 @@ void GameGUI::initForGame() {
     if (_game.isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
+
+        _guiColorBase = kTSLGUIColorBase;
+        _guiColorHilight = kTSLGUIColorHilight;
+        _guiColorDisabled = kTSLGUIColorDisabled;
+
     } else {
+        _guiColorBase = kGUIColorBase;
+        _guiColorHilight = kGUIColorHilight;
+        _guiColorDisabled = kGUIColorDisabled;
+
         _hasDefaultHilightColor = true;
-        _defaultHilightColor = _game.getGUIColorHilight();
     }
 }
 

@@ -189,8 +189,8 @@ void Equipment::configureItemsListBox() {
     });
 
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
-    protoItem.setBorderColor(_game.getGUIColorBase());
-    protoItem.setHilightColor(_game.getGUIColorHilight());
+    protoItem.setBorderColor(_guiColorBase);
+    protoItem.setHilightColor(_guiColorHilight);
 }
 
 static int getInventorySlot(Equipment::Slot slot) {

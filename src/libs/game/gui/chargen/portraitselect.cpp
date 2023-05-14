@@ -115,11 +115,11 @@ void PortraitSelection::bindControls() {
 
 void PortraitSelection::setButtonColors(Control &control) {
     Control::Text text(control.text());
-    text.color = _game.getGUIColorBase();
+    text.color = _guiColorBase;
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = _game.getGUIColorHilight();
+    hilight.color = _guiColorHilight;
     control.setHilight(move(hilight));
 }
 

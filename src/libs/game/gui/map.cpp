@@ -17,18 +17,18 @@
 
 #include "reone/game/gui/map.h"
 
-#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
-#include "reone/graphics/meshes.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
+#include "reone/system/logutil.h"
 
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
+#include "reone/game/game.h"
 
 using namespace std;
 
@@ -42,6 +42,16 @@ namespace game {
 static constexpr int kArrowSize = 32;
 static constexpr int kMapNoteSize = 16;
 static constexpr float kSelectedMapNoteScale = 1.5f;
+
+Map::Map(Game &game, ServicesView &services) :
+    _game(game),
+    _services(services) {
+    if (game.isTSL()) {
+        _arrowResRef = "mm_barrow_p";
+    } else {
+        _arrowResRef = "mm_barrow";
+    }
+}
 
 void Map::load(const string &area, const Gff &gffs) {
     loadProperties(gffs);
@@ -154,11 +164,14 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        _services.graphics.uniforms.setGeneral([this, transform, &selected](auto &general) {
+        auto guiColorHilight = _game.isTSL() ? kTSLGUIColorHilight : kGUIColorHilight;
+        auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
+
+        _services.graphics.uniforms.setGeneral([&](auto &general) {
             general.resetLocals();
             general.projection = _services.graphics.window.getOrthoProjection();
             general.model = move(transform);
-            general.color = glm::vec4(selected ? _game.getGUIColorHilight() : _game.getGUIColorBase(), 1.0f);
+            general.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
         _services.graphics.shaders.use(_services.graphics.shaders.gui());
         _services.graphics.meshes.quad().draw();

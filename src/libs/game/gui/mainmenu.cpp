@@ -50,10 +50,15 @@ static constexpr float kKotorModelSize = 1.4f;
 
 MainMenu::MainMenu(Game &game, ServicesView &services) :
     GameGUI(game, services) {
+
+    initForGame();
+
     if (game.isTSL()) {
         _resRef = "mainmenu8x6_p";
+        _musicResRef = "mus_sion";
     } else {
         _resRef = "mainmenu16x12";
+        _musicResRef = "mus_theme_cult";
         loadBackground(BackgroundType::Menu);
     }
 
@@ -140,8 +145,8 @@ void MainMenu::configureButtons() {
 }
 
 void MainMenu::setButtonColors(Control &control) {
-    control.setTextColor(_game.getGUIColorBase());
-    control.setHilightColor(_game.getGUIColorHilight());
+    control.setTextColor(_guiColorBase);
+    control.setHilightColor(_guiColorHilight);
 }
 
 void MainMenu::setup3DView() {

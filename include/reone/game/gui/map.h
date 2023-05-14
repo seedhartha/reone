@@ -41,18 +41,13 @@ public:
         Minimap
     };
 
-    Map(Game &game,
-        ServicesView &services) :
-        _game(game),
-        _services(services) {
-    }
+    Map(Game &game, ServicesView &services);
 
     void load(const std::string &area, const resource::Gff &gffs);
     void draw(Mode mode, const glm::vec4 &bounds);
 
     bool isLoaded() const { return static_cast<bool>(_areaTexture); }
 
-    void setArrowResRef(std::string resRef) { _arrowResRef = std::move(resRef); }
     void setSelectedNote(std::shared_ptr<Waypoint> waypoint) { _selectedNote = std::move(waypoint); }
 
 private:

@@ -243,8 +243,8 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    control.setBorderColor(_game.getGUIColorBase());
-    control.setHilightColor(_game.getGUIColorHilight());
+    control.setBorderColor(_guiColorBase);
+    control.setHilightColor(_guiColorHilight);
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {

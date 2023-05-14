@@ -441,7 +441,9 @@ void SelectionOverlay::drawActionIcon(int index) {
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    return (_selectedObject && _selectedHostile) ? red : _game.getGUIColorBase();
+    auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
+
+    return (_selectedObject && _selectedHostile) ? red : guiColorBase;
 }
 
 } // namespace game

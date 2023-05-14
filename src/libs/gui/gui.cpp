@@ -105,7 +105,7 @@ void GUI::loadControl(const Gff &gffs) {
     preloadControl(*control);
     control->load(gffs);
     if (_hasDefaultHilightColor) {
-        control->setHilightColor(_defaultHilightColor);
+        control->setHilightColor(_guiColorHilight);
     }
 
     ScalingMode scaling = _scaling;

@@ -70,8 +70,6 @@ protected:
     std::vector<std::shared_ptr<Control>> _controls;
     std::unordered_map<std::string, Control *> _controlByTag;
     Control *_focus {nullptr};
-    bool _hasDefaultHilightColor {false};
-    glm::vec3 _defaultHilightColor {0.0f};
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
     bool _leftMouseDown {false};
 
@@ -82,6 +80,16 @@ protected:
     resource::ResourceServices &_resourceSvc;
 
     // END Services
+
+    // GUI Colors
+
+    glm::vec3 _guiColorBase {0.0f};
+    glm::vec3 _guiColorHilight {0.0f};
+    glm::vec3 _guiColorDisabled {0.0f};
+
+    bool _hasDefaultHilightColor {false};
+
+    // END GUI Colors
 
     GUI(
         graphics::GraphicsOptions &options,

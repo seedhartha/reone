@@ -43,6 +43,14 @@ constexpr char kSceneClassSelect[] = "classselect";
 constexpr char kScenePortraitSelect[] = "portraitselect";
 constexpr char kSceneCharacter[] = "character";
 
+constexpr glm::vec3 kGUIColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+constexpr glm::vec3 kGUIColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+constexpr glm::vec3 kGUIColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+
+constexpr glm::vec3 kTSLGUIColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
+constexpr glm::vec3 kTSLGUIColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
+constexpr glm::vec3 kTSLGUIColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
+
 enum class GameID {
     KotOR,
     TSL

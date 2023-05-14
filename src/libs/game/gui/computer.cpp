@@ -83,14 +83,14 @@ void ComputerGUI::bindControls() {
 
 void ComputerGUI::configureMessage() {
     _binding.lbMessage->setProtoMatchContent(true);
-    _binding.lbMessage->protoItem().setHilightColor(_game.getGUIColorHilight());
-    _binding.lbMessage->protoItem().setTextColor(_game.getGUIColorBase());
+    _binding.lbMessage->protoItem().setHilightColor(_guiColorHilight);
+    _binding.lbMessage->protoItem().setTextColor(_guiColorBase);
 }
 
 void ComputerGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_game.getGUIColorHilight());
-    _binding.lbReplies->protoItem().setTextColor(_game.getGUIColorBase());
+    _binding.lbReplies->protoItem().setHilightColor(_guiColorHilight);
+    _binding.lbReplies->protoItem().setTextColor(_guiColorBase);
     _binding.lbReplies->setOnItemClick([this](auto &item) {
         int replyIdx = stoi(item);
         pickReply(replyIdx);

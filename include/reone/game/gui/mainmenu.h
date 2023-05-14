@@ -39,6 +39,8 @@ public:
 
     void onModuleSelected(const std::string &name);
 
+    const std::string &musicResRef() const { return _musicResRef; }
+
 private:
     struct Binding {
         std::shared_ptr<gui::ListBox> lbModules;
@@ -61,6 +63,8 @@ private:
         std::shared_ptr<gui::Button> btnTslrcm;
         // END TSL only
     } _binding;
+
+    std::string _musicResRef;
 
     void bindControls();
     void configureButtons();

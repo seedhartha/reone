@@ -178,14 +178,6 @@ public:
 
     // END Global variables
 
-    // GUI colors
-
-    const glm::vec3 &getGUIColorBase() const { return _guiColorBase; }
-    const glm::vec3 &getGUIColorHilight() const { return _guiColorHilight; }
-    const glm::vec3 &getGUIColorDisabled() const { return _guiColorDisabled; }
-
-    // END GUI colors
-
     // IEventHandler
 
     bool handle(const SDL_Event &event) override;
@@ -199,9 +191,6 @@ private:
     ServicesView &_services;
 
     Screen _screen {Screen::None};
-    std::string _mainMenuMusicResRef;
-    std::string _charGenMusicResRef;
-    std::string _charGenLoadScreenResRef;
 
     uint32_t _ticks {0};
     bool _quit {false};
@@ -241,14 +230,6 @@ private:
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
 
     // END GUI
-
-    // GUI Colors
-
-    glm::vec3 _guiColorBase {0.0f};
-    glm::vec3 _guiColorHilight {0.0f};
-    glm::vec3 _guiColorDisabled {0.0f};
-
-    // END GUI Colors
 
     // Modules
 

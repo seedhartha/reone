@@ -77,7 +77,7 @@ void CharGenSkills::load() {
         _binding.treatInjuryLbl.get()};
     for (auto &label : skillLabels) {
         label->setFocusable(true);
-        label->setHilightColor(_game.getGUIColorBase());
+        label->setHilightColor(_guiColorBase);
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
