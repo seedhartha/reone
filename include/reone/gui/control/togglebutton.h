@@ -26,7 +26,7 @@ namespace gui {
 class ToggleButton : public Button {
 public:
     ToggleButton(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

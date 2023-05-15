@@ -32,7 +32,7 @@ public:
     };
 
     ScrollBar(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

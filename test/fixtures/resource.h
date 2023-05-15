@@ -75,6 +75,10 @@ public:
         return *_gffs;
     }
 
+    MockStrings &strings() {
+        return *_strings;
+    }
+
     ResourceServices &services() {
         return *_services;
     }

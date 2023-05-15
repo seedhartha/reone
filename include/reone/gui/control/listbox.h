@@ -43,7 +43,7 @@ public:
     };
 
     ListBox(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

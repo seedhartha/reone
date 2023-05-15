@@ -190,7 +190,9 @@ void Game::drawAll() {
         drawWorld();
         drawGUI();
         _profileOverlay->draw();
-        _cursor->draw();
+        if (_cursor) {
+            _cursor->draw();
+        }
     }
 
     _services.graphics.window.swapBuffers();

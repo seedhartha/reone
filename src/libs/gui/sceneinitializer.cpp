@@ -34,13 +34,17 @@ namespace gui {
 void SceneInitializer::invoke() {
     shared_ptr<ModelSceneNode> model(_modelSupplier(_sceneGraph));
     if (!model) {
-        throw logic_error("model is null");
+        return;
     }
+
     _sceneGraph.clear();
     _sceneGraph.addRoot(model);
     _sceneGraph.setAmbientLightColor(_ambientLightColor);
 
     shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera());
+    if (!cameraNode) {
+        return;
+    }
     cameraNode->setOrthographicProjection(
         -_aspect * _modelScale + _modelOffset.x,
         _aspect * _modelScale + _modelOffset.x,

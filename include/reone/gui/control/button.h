@@ -26,7 +26,7 @@ namespace gui {
 class Button : public Control {
 public:
     Button(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :
@@ -40,7 +40,7 @@ public:
 
 protected:
     Button(
-        GUI &gui,
+        IGUI &gui,
         ControlType type,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,

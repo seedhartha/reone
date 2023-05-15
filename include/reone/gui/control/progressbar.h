@@ -26,7 +26,7 @@ namespace gui {
 class ProgressBar : public Control {
 public:
     ProgressBar(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

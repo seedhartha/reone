@@ -26,7 +26,7 @@ namespace gui {
 class Label : public Control {
 public:
     Label(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

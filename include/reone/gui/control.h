@@ -48,7 +48,7 @@ class ISceneGraphs;
 
 namespace gui {
 
-class GUI;
+class IGUI;
 
 /**
  * GUI control. Can render itself and handle events.
@@ -184,7 +184,7 @@ public:
     // END Event listeners
 
 protected:
-    GUI &_gui;
+    IGUI &_gui;
     ControlType _type;
 
     int _id {-1};
@@ -223,7 +223,7 @@ protected:
     // END Event listeners
 
     Control(
-        GUI &gui,
+        IGUI &gui,
         ControlType type,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,

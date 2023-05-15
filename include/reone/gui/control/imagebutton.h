@@ -26,7 +26,7 @@ namespace gui {
 class ImageButton : public Control {
 public:
     ImageButton(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

@@ -26,7 +26,7 @@ namespace gui {
 class Slider : public Control {
 public:
     Slider(
-        GUI &gui,
+        IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
         resource::IStrings &strings) :

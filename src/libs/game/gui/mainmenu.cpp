@@ -168,7 +168,11 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(ISceneGraph &sceneGraph) {
-    return sceneGraph.newModel(*_services.graphics.models.get("mainmenu"), ModelUsage::GUI);
+    auto model = _services.graphics.models.get("mainmenu");
+    if (!model) {
+        return nullptr;
+    }
+    return sceneGraph.newModel(*model, ModelUsage::GUI);
 }
 
 void MainMenu::startModuleSelection() {
