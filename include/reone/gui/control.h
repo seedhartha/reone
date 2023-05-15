@@ -109,6 +109,9 @@ public:
     virtual void load(const resource::Gff &gffs);
     virtual void update(float dt);
 
+    void updateTransform();
+    void updateTextLines();
+
     /**
      * Stretches this control in both directions.
      *
@@ -121,6 +124,8 @@ public:
     bool isFocusable() const { return _focusable; }
     bool isVisible() const { return _visible; }
 
+    int id() const { return _id; }
+    int padding() const { return _padding; }
     Border &border() const { return *_border; }
     const Extent &extent() const { return _extent; }
     const Border &hilight() const { return *_hilight; }
@@ -129,6 +134,7 @@ public:
     const std::vector<std::string> &textLines() const { return _textLines; }
     const std::string &sceneName() const { return _sceneName; }
 
+    void setId(int id) { _id = id; }
     void setTag(std::string tag) { _tag = std::move(tag); }
     void setBorder(Border border);
     void setBorderFill(std::string resRef);
@@ -239,9 +245,6 @@ private:
     void loadBorder(const resource::Gff &gffs);
     void loadText(const resource::Gff &gffs);
     void loadHilight(const resource::Gff &gffs);
-
-    void updateTransform();
-    void updateTextLines();
 
     void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, graphics::TextGravity &gravity) const;
 };

@@ -70,10 +70,11 @@ public:
     void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
     void stretch(float x, float y, int mask) override;
 
+    void changeProtoItemType(ControlType type);
+
     void setFocus(bool focus) override;
     void setExtent(Extent extent) override;
     void setExtentHeight(int height) override;
-    void setProtoItemType(ControlType type);
     void setSelectionMode(SelectionMode mode);
     void setProtoMatchContent(bool match);
 
@@ -92,7 +93,6 @@ public:
 
 private:
     SelectionMode _selectionMode {SelectionMode::OnHover};
-    ControlType _protoItemType {ControlType::Invalid};
     std::shared_ptr<Control> _protoItem;
     std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;

@@ -17,7 +17,6 @@
 
 #include "reone/gui/control/listbox.h"
 
-#include "reone/system/logutil.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
@@ -25,6 +24,7 @@
 #include "reone/graphics/textutil.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
 
 #include "reone/gui/gui.h"
 
@@ -83,8 +83,7 @@ void ListBox::load(const Gff &gffs) {
 
     shared_ptr<Gff> protoItem(gffs.getStruct("PROTOITEM"));
     if (protoItem) {
-        ControlType type = _protoItemType == ControlType::Invalid ? getType(*protoItem) : _protoItemType;
-        _protoItem = _gui.newControl(type, getTag(*protoItem));
+        _protoItem = _gui.newControl(getType(*protoItem), getTag(*protoItem));
         _protoItem->load(*protoItem);
     }
     shared_ptr<Gff> scrollBar(gffs.getStruct("SCROLLBAR"));
@@ -262,8 +261,22 @@ void ListBox::setExtentHeight(int height) {
     updateItemSlots();
 }
 
-void ListBox::setProtoItemType(ControlType type) {
-    _protoItemType = type;
+void ListBox::changeProtoItemType(ControlType type) {
+    if (!_protoItem) {
+        return;
+    }
+    auto &oldProtoItem = *_protoItem;
+
+    _protoItem = _gui.newControl(type, oldProtoItem.tag());
+    _protoItem->setId(oldProtoItem.id());
+    _protoItem->setPadding(oldProtoItem.padding());
+    _protoItem->setExtent(oldProtoItem.extent());
+    _protoItem->setBorder(oldProtoItem.border());
+    _protoItem->setText(oldProtoItem.text());
+    _protoItem->setHilight(oldProtoItem.hilight());
+
+    _protoItem->updateTextLines();
+    _protoItem->updateTransform();
 }
 
 void ListBox::setSelectionMode(SelectionMode mode) {

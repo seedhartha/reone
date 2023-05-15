@@ -172,12 +172,13 @@ void Equipment::bindControls() {
 }
 
 void Equipment::configureItemsListBox() {
+    _binding.lbItems->changeProtoItemType(ControlType::LabelHilight);
     _binding.lbItems->setPadding(5);
     _binding.lbItems->setOnItemClick([this](const string &item) {
         onItemsListBoxItemClick(item);
     });
 
-    ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
+    auto &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
     protoItem.setBorderColor(_baseColor);
     protoItem.setHilightColor(_hilightColor);
 }
@@ -278,15 +279,6 @@ void Equipment::updatePortraits() {
     _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
     _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
-
-// TODO: restore functionality
-/*
-void Equipment::preloadControl(Control &control) {
-    if (control.tag() == "LB_ITEMS") {
-        static_cast<ListBox &>(control).setProtoItemType(ControlType::LabelHilight);
-    }
-}
-*/
 
 void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
