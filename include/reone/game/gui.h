@@ -29,7 +29,7 @@ namespace game {
 
 class Game;
 
-class GameGUI : boost::noncopyable {
+class GameGUI : public gui::IGUIEventListener, boost::noncopyable {
 public:
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
@@ -63,8 +63,8 @@ protected:
 
     void loadBackground(BackgroundType type);
 
-    virtual void onClick(const std::string &control);
-    virtual void onFocusChanged(const std::string &control, bool focus);
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 
     std::string getResRef(const std::string &base) const;
 

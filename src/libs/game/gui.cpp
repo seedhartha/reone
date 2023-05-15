@@ -45,6 +45,7 @@ void GameGUI::load(const string &resRef) {
     if (!_gui) {
         throw NotFoundException(str(boost::format("GUI not found: %s") % resRef));
     }
+    _gui->setEventListener(*this);
 
     bindControls();
 

@@ -40,6 +40,7 @@ public:
     MOCK_METHOD(const glm::ivec2 &, rootOffset, (), (const override));
     MOCK_METHOD(const glm::ivec2 &, controlOffset, (), (const override));
 
+    MOCK_METHOD(void, setEventListener, (IGUIEventListener & listener), (override));
     MOCK_METHOD(void, setResolution, (int, int), (override));
     MOCK_METHOD(void, setScaling, (ScalingMode), (override));
     MOCK_METHOD(void, setControlScaling, (const std::string &, ScalingMode), (override));

@@ -36,6 +36,14 @@ namespace gui {
 constexpr int kDefaultResolutionX = 640;
 constexpr int kDefaultResolutionY = 480;
 
+class IGUIEventListener {
+public:
+    virtual ~IGUIEventListener() = default;
+
+    virtual void onClick(const std::string &control) = 0;
+    virtual void onFocusChanged(const std::string &control, bool focus) = 0;
+};
+
 class IGUI {
 public:
     enum class ScalingMode {
@@ -59,6 +67,7 @@ public:
     virtual const glm::ivec2 &rootOffset() const = 0;
     virtual const glm::ivec2 &controlOffset() const = 0;
 
+    virtual void setEventListener(IGUIEventListener &listener) = 0;
     virtual void setResolution(int x, int y) = 0;
     virtual void setScaling(ScalingMode scaling) = 0;
     virtual void setControlScaling(const std::string &tag, ScalingMode scaling) = 0;
@@ -108,6 +117,10 @@ public:
         return _controlOffset;
     }
 
+    void setEventListener(IGUIEventListener &listener) override {
+        _eventListener = &listener;
+    }
+
     void setResolution(int x, int y) override {
         _resolutionX = x;
         _resolutionY = y;
@@ -138,6 +151,8 @@ public:
 
 private:
     graphics::GraphicsOptions &_options;
+
+    IGUIEventListener *_eventListener {nullptr};
 
     std::string _resRef;
     int _resolutionX {kDefaultResolutionX};
@@ -172,8 +187,17 @@ private:
 
     void loadControl(const resource::Gff &gffs);
 
-    void onClick(const std::string &control) {}
-    void onFocusChanged(const std::string &control, bool focus) {}
+    void onClick(const std::string &control) {
+        if (_eventListener) {
+            _eventListener->onClick(control);
+        }
+    }
+
+    void onFocusChanged(const std::string &control, bool focus) {
+        if (_eventListener) {
+            _eventListener->onFocusChanged(control, focus);
+        }
+    }
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
