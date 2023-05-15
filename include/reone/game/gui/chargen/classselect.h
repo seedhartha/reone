@@ -49,9 +49,12 @@ public:
     ClassSelection(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
 private:
     struct ClassButton {
@@ -84,7 +87,8 @@ private:
     glm::ivec2 _enlargedButtonSize {0};
     std::vector<ClassButton> _classButtons;
 
-    void bindControls();
+    void bindControls() override;
+
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 

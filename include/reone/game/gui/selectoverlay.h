@@ -36,7 +36,7 @@ public:
         Game &game,
         ServicesView &services);
 
-    void load();
+    void init();
 
     bool handle(const SDL_Event &event);
     void update();

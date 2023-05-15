@@ -17,11 +17,10 @@
 
 #pragma once
 
-#include "../character.h"
-
 #include "reone/scene/graph.h"
 #include "reone/scene/node/model.h"
 
+#include "../character.h"
 #include "../gui.h"
 
 #include "chargen/abilities.h"
@@ -66,9 +65,12 @@ public:
         LevelUp
     };
 
-    CharacterGeneration(Game &game, ServicesView &services);
+    CharacterGeneration(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
+
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
     void draw() override;
@@ -170,12 +172,13 @@ private:
 
     // END Sub GUI
 
-    void bindControls();
+    void bindControls() override;
+
     void reloadCharacterModel();
     void updateAttributes();
     void changeScreen(CharGenScreen screen);
 
-    gui::GUI *getSubGUI() const;
+    GameGUI *getSubGUI() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::ISceneGraph &sceneGraph);
 
     void setAttributesVisible(bool visible);

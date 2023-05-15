@@ -31,9 +31,11 @@ namespace game {
 
 class MessagesMenu : public GameGUI {
 public:
-    MessagesMenu(Game &game, ServicesView &services);
+    MessagesMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
 private:
     struct Binding {
@@ -44,7 +46,7 @@ private:
         // END KotOR only
     } _binding;
 
-    void bindControls();
+    void bindControls() override;
 };
 
 } // namespace game

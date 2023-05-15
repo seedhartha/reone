@@ -21,12 +21,12 @@
 #include "reone/gui/control/imagebutton.h"
 #include "reone/resource/strings.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/object/item.h"
 #include "reone/game/object/placeable.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -44,21 +44,14 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-ContainerGUI::ContainerGUI(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("container");
+void ContainerGUI::init() {
+    auto resRef = getResRef("container");
+    load(resRef);
 
-    initForGame();
-}
-
-void ContainerGUI::load() {
-    GUI::load();
-    bindControls();
-
-    string btnMessage(_resourceSvc.strings.get(kSwitchToResRef) + " " + _resourceSvc.strings.get(kGiveItemResRef));
+    string btnMessage(_services.resource.strings.get(kSwitchToResRef) + " " + _services.resource.strings.get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    string lblMessage(_resourceSvc.strings.get(kInventoryResRef));
+    string lblMessage(_services.resource.strings.get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {
@@ -118,7 +111,7 @@ shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
+    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
 }
 
 void ContainerGUI::transferItemsToPlayer() {

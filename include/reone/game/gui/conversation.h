@@ -18,25 +18,19 @@
 #pragma once
 
 #include "reone/audio/source.h"
-#include "reone/system/timer.h"
-#include "../dialog.h"
-#include "../object.h"
-#include "../types.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/graphics/model.h"
+#include "reone/system/timer.h"
 
+#include "../dialog.h"
 #include "../gui.h"
+#include "../object.h"
+#include "../types.h"
 
 namespace reone {
 
 namespace game {
 
-/**
- * Base GUI for conversations.
- *
- * @see DialogGUI
- * @see Computer
- */
 class Conversation : public GameGUI {
 public:
     Conversation(Game &game, ServicesView &services) :
@@ -46,23 +40,10 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
 
-    /**
-     * Starts the specified conversation.
-     *
-     * @param owner owner of the conversation
-     */
     void start(const std::shared_ptr<Dialog> &dialog, const std::shared_ptr<Object> &owner);
 
-    /**
-     * Get camera used in this conversation.
-     *
-     * @param cameraId will be set to camera ID, if animated camera is used
-     */
     CameraType getCamera(int &cameraId) const;
 
-    /**
-     * Pause this conversation. When paused, entries cannot be skipped by clicking the mouse.
-     */
     void pause();
 
     void resume();
@@ -76,10 +57,6 @@ protected:
     bool _entryEnded {false};
     bool _paused {false};
 
-    /**
-     * @param index index of the entry in the DLG file
-     * @param start true if this is a starting entry, false otherwise
-     */
     virtual void loadEntry(int index, bool start = false);
 
     void pickReply(int index);
@@ -107,29 +84,15 @@ private:
 
     bool isSkippableEntry() const;
 
-    /**
-     * Recreates items in the replies list box.
-     */
     void refreshReplies();
 
     void finish();
     void endCurrentEntry();
 
-    /**
-     * @return index of the first active entry/reply from the specified list, -1 otherwise
-     */
     int indexOfFirstActive(const std::vector<Dialog::EntryReplyLink> &links);
 
-    /**
-     * Executes the specified script and checks its return value.
-     *
-     * @return true if the script returns -1 or 1, false otherwise
-     */
     bool evaluateCondition(const std::string &scriptResRef);
 
-    /**
-     * Replaces text in the message control.
-     */
     virtual void setMessage(std::string message) = 0;
 
     // Event handlers

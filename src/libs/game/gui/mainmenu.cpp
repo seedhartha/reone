@@ -18,18 +18,18 @@
 #include "reone/game/gui/mainmenu.h"
 
 #include "reone/audio/player.h"
-#include "reone/system/logutil.h"
-#include "reone/graphics/models.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
 #include "reone/gui/sceneinitializer.h"
-#include "reone/scene/graphs.h"
 #include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/types.h"
+#include "reone/system/logutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 #include "reone/game/types.h"
 
 using namespace std;
@@ -48,27 +48,20 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-MainMenu::MainMenu(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-
-    initForGame();
-
-    if (game.isTSL()) {
-        _resRef = "mainmenu8x6_p";
+void MainMenu::init() {
+    string resRef;
+    if (_game.isTSL()) {
+        resRef = "mainmenu8x6_p";
         _musicResRef = "mus_sion";
     } else {
-        _resRef = "mainmenu16x12";
+        resRef = "mainmenu16x12";
         _musicResRef = "mus_theme_cult";
+    }
+    load(resRef);
+
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
-
-    _resolutionX = 800;
-    _resolutionY = 600;
-}
-
-void MainMenu::load() {
-    GUI::load();
-    bindControls();
 
     _binding.lbModules->setVisible(false);
     _binding.lblNewContent->setVisible(false);
@@ -109,6 +102,11 @@ void MainMenu::load() {
     configureButtons();
 }
 
+void MainMenu::preload(IGUI &gui) {
+    GameGUI::preload(gui);
+    gui.setResolution(800, 600);
+}
+
 void MainMenu::bindControls() {
     _binding.lbModules = getControl<ListBox>("LB_MODULES");
     _binding.lbl3dView = getControl<Label>("LBL_3DVIEW");
@@ -145,8 +143,8 @@ void MainMenu::configureButtons() {
 }
 
 void MainMenu::setButtonColors(Control &control) {
-    control.setTextColor(_guiColorBase);
-    control.setHilightColor(_guiColorHilight);
+    control.setTextColor(_baseColor);
+    control.setHilightColor(_hilightColor);
 }
 
 void MainMenu::setup3DView() {

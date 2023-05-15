@@ -31,9 +31,12 @@ namespace game {
 
 class ContainerGUI : public GameGUI {
 public:
-    ContainerGUI(Game &game, ServicesView &services);
+    ContainerGUI(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
+
     void open(std::shared_ptr<Object> contanier);
 
     Object &container() const { return *_container; }
@@ -49,7 +52,8 @@ private:
 
     std::shared_ptr<Object> _container;
 
-    void bindControls();
+    void bindControls() override;
+
     void configureItemsListBox();
     void transferItemsToPlayer();
 

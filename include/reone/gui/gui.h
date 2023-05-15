@@ -38,28 +38,105 @@ constexpr int kDefaultResolutionY = 480;
 
 class IGUI {
 public:
-    virtual ~IGUI() = default;
-};
-
-class GUI : public IGUI, boost::noncopyable {
-public:
-    virtual void load();
-
-    virtual bool handle(const SDL_Event &event);
-    virtual void update(float dt);
-    virtual void draw();
-
-    void resetFocus();
-
-    std::unique_ptr<Control> newControl(ControlType type, std::string tag);
-
-protected:
     enum class ScalingMode {
         Center,
         PositionRelativeToCenter,
         Stretch
     };
 
+    virtual ~IGUI() = default;
+
+    virtual void load(const resource::Gff &gui) = 0;
+
+    virtual bool handle(const SDL_Event &event) = 0;
+    virtual void update(float dt) = 0;
+    virtual void draw() = 0;
+
+    virtual void resetFocus() = 0;
+
+    virtual Control &rootControl() = 0;
+
+    virtual const glm::ivec2 &rootOffset() const = 0;
+    virtual const glm::ivec2 &controlOffset() const = 0;
+
+    virtual void setResolution(int x, int y) = 0;
+    virtual void setScaling(ScalingMode scaling) = 0;
+    virtual void setControlScaling(const std::string &tag, ScalingMode scaling) = 0;
+    virtual void setDefaultHilightColor(glm::vec3 color) = 0;
+    virtual void setBackground(std::shared_ptr<graphics::Texture> texture) = 0;
+
+    virtual std::unique_ptr<Control> newControl(ControlType type, std::string tag) = 0;
+    virtual void addControl(std::shared_ptr<Control> control) = 0;
+
+    virtual std::shared_ptr<Control> getControl(const std::string &tag) const = 0;
+};
+
+class GUI : public IGUI, boost::noncopyable {
+public:
+    GUI(
+        graphics::GraphicsOptions &options,
+        scene::ISceneGraphs &sceneGraphs,
+        graphics::GraphicsServices &graphicsSvc,
+        resource::ResourceServices &resourceSvc) :
+        _options(options),
+        _sceneGraphs(sceneGraphs),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
+
+        _aspect = options.width / static_cast<float>(options.height);
+        _screenCenter.x = options.width / 2;
+        _screenCenter.y = options.height / 2;
+    }
+
+    void load(const resource::Gff &gui) override;
+
+    bool handle(const SDL_Event &event) override;
+    void update(float dt) override;
+    void draw() override;
+
+    void resetFocus() override;
+
+    Control &rootControl() override {
+        return *_rootControl;
+    }
+
+    const glm::ivec2 &rootOffset() const override {
+        return _rootOffset;
+    }
+
+    const glm::ivec2 &controlOffset() const override {
+        return _controlOffset;
+    }
+
+    void setResolution(int x, int y) override {
+        _resolutionX = x;
+        _resolutionY = y;
+    }
+
+    void setScaling(ScalingMode scaling) override {
+        _scaling = scaling;
+    }
+
+    void setControlScaling(const std::string &tag, ScalingMode scaling) override {
+        _scalingByControlTag[tag] = scaling;
+    }
+
+    void setDefaultHilightColor(glm::vec3 color) override {
+        _hasDefaultHilightColor = true;
+        _defaultHilightColor = color;
+    }
+
+    void setBackground(std::shared_ptr<graphics::Texture> texture) override {
+        _background = texture;
+    }
+
+    std::unique_ptr<Control> newControl(ControlType type, std::string tag) override;
+
+    void addControl(std::shared_ptr<Control> control) override;
+
+    std::shared_ptr<Control> getControl(const std::string &tag) const override;
+
+private:
     graphics::GraphicsOptions &_options;
 
     std::string _resRef;
@@ -88,34 +165,15 @@ protected:
 
     // GUI Colors
 
-    glm::vec3 _guiColorBase {0.0f};
-    glm::vec3 _guiColorHilight {0.0f};
-    glm::vec3 _guiColorDisabled {0.0f};
-
     bool _hasDefaultHilightColor {false};
+    glm::vec3 _defaultHilightColor {0.0f};
 
     // END GUI Colors
 
-    GUI(
-        graphics::GraphicsOptions &options,
-        scene::ISceneGraphs &sceneGraphs,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &resourceSvc) :
-        _options(options),
-        _sceneGraphs(sceneGraphs),
-        _graphicsSvc(graphicsSvc),
-        _resourceSvc(resourceSvc) {
-
-        _aspect = options.width / static_cast<float>(options.height);
-        _screenCenter.x = options.width / 2;
-        _screenCenter.y = options.height / 2;
-    }
-
     void loadControl(const resource::Gff &gffs);
-    virtual void preloadControl(Control &control);
 
-    virtual void onClick(const std::string &control) {}
-    virtual void onFocusChanged(const std::string &control, bool focus) {}
+    void onClick(const std::string &control) {}
+    void onFocusChanged(const std::string &control, bool focus) {}
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
@@ -124,14 +182,6 @@ protected:
     void drawBackground();
 
     Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
-
-    std::shared_ptr<Control> getControl(const std::string &tag) const;
-
-    template <class T>
-    std::shared_ptr<T> getControl(const std::string &tag) const {
-        auto ctrl = getControl(tag);
-        return std::static_pointer_cast<T>(ctrl);
-    }
 
     // User input
 

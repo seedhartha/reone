@@ -36,9 +36,13 @@ public:
     CharacterMenu(
         Game &game,
         InGameMenu &inGameMenu,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _inGameMenu(inGameMenu) {
+    }
 
-    void load() override;
+    void init();
+
     void update(float dt) override;
 
     void refreshControls();
@@ -123,7 +127,8 @@ private:
 
     InGameMenu &_inGameMenu;
 
-    void bindControls();
+    void bindControls() override;
+
     void refreshPortraits();
     void refresh3D();
 

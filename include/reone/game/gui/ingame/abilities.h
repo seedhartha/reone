@@ -34,9 +34,11 @@ namespace game {
 
 class AbilitiesMenu : public GameGUI {
 public:
-    AbilitiesMenu(Game &game, ServicesView &services);
+    AbilitiesMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     void refreshControls();
 
@@ -89,7 +91,8 @@ private:
 
     std::unordered_map<SkillType, SkillInfo> _skills;
 
-    void bindControls();
+    void bindControls() override;
+
     void loadSkills();
     void refreshPortraits();
 

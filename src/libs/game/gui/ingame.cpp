@@ -31,21 +31,9 @@ namespace reone {
 
 namespace game {
 
-InGameMenu::InGameMenu(
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("top");
-
-    if (game.isTSL()) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    }
-}
-
-void InGameMenu::load() {
-    GUI::load();
-    bindControls();
+void InGameMenu::init() {
+    auto resRef = getResRef("top");
+    load(resRef);
 
     _binding.btnEqu->setVisible(false);
     _binding.btnInv->setVisible(false);
@@ -93,6 +81,12 @@ void InGameMenu::load() {
     loadOptions();
 }
 
+void InGameMenu::preload(IGUI &gui) {
+    if (_game.isTSL()) {
+        gui.setResolution(800, 600);
+    }
+}
+
 void InGameMenu::bindControls() {
     _binding.lblhEqu = getControl<Label>("LBLH_EQU");
     _binding.lblhInv = getControl<Label>("LBLH_INV");
@@ -126,56 +120,56 @@ void InGameMenu::setTabLabelsFocusable(bool focusable) {
 
 void InGameMenu::loadEquipment() {
     _equip = make_unique<Equipment>(_game, *this, _services);
-    _equip->load();
+    _equip->init();
 }
 
 void InGameMenu::loadInventory() {
     _inventory = make_unique<InventoryMenu>(_game, _services);
-    _inventory->load();
+    _inventory->init();
 }
 
 void InGameMenu::loadCharacter() {
     _character = make_unique<CharacterMenu>(_game, *this, _services);
-    _character->load();
+    _character->init();
 }
 
 void InGameMenu::loadAbilities() {
     _abilities = make_unique<AbilitiesMenu>(_game, _services);
-    _abilities->load();
+    _abilities->init();
 }
 
 void InGameMenu::loadMessages() {
     _messages = make_unique<MessagesMenu>(_game, _services);
-    _messages->load();
+    _messages->init();
 }
 
 void InGameMenu::loadJournal() {
     _journal = make_unique<JournalMenu>(_game, _services);
-    _journal->load();
+    _journal->init();
 }
 
 void InGameMenu::loadMap() {
     _map = make_unique<MapMenu>(_game, _services);
-    _map->load();
+    _map->init();
 }
 
 void InGameMenu::loadOptions() {
     _options = make_unique<OptionsMenu>(_game, _services);
-    _options->load();
+    _options->init();
 }
 
 bool InGameMenu::handle(const SDL_Event &event) {
-    GUI *tabGui = getActiveTabGUI();
+    auto tabGui = getActiveTabGUI();
     if (tabGui && tabGui->handle(event))
         return true;
 
-    if (GUI::handle(event))
+    if (_gui->handle(event))
         return true;
 
     return false;
 }
 
-GUI *InGameMenu::getActiveTabGUI() const {
+GameGUI *InGameMenu::getActiveTabGUI() const {
     switch (_tab) {
     case InGameMenuTab::Equipment:
         return _equip.get();
@@ -199,20 +193,20 @@ GUI *InGameMenu::getActiveTabGUI() const {
 }
 
 void InGameMenu::update(float dt) {
-    GUI::update(dt);
+    GameGUI::update(dt);
 
-    GUI *tabGui = getActiveTabGUI();
+    auto tabGui = getActiveTabGUI();
     if (tabGui) {
         tabGui->update(dt);
     }
 }
 
 void InGameMenu::draw() {
-    GUI *tabGui = getActiveTabGUI();
+    auto tabGui = getActiveTabGUI();
     if (tabGui) {
         tabGui->draw();
     }
-    GUI::draw();
+    GameGUI::draw();
 }
 
 void InGameMenu::openEquipment() {
@@ -221,7 +215,7 @@ void InGameMenu::openEquipment() {
 }
 
 void InGameMenu::changeTab(InGameMenuTab tab) {
-    GUI *gui = getActiveTabGUI();
+    auto gui = getActiveTabGUI();
     if (gui) {
         gui->resetFocus();
     }

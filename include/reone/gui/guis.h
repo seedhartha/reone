@@ -35,34 +35,43 @@ public:
 
     virtual void invalidate() = 0;
 
-    virtual std::shared_ptr<IGUI> get(const std::string &resRef) = 0;
+    virtual std::shared_ptr<IGUI> get(const std::string &resRef, std::function<void(IGUI &)> preload = nullptr) = 0;
 };
 
 class GUIs : public IGUIs, boost::noncopyable {
 public:
-    GUIs(resource::Gffs &gffs) :
-        _gffs(gffs) {
+    GUIs(graphics::GraphicsOptions &graphicsOpt,
+         scene::ISceneGraphs &sceneGraphs,
+         graphics::GraphicsServices &graphicsSvc,
+         resource::ResourceServices &resourceSvc) :
+        _graphicsOpt(graphicsOpt),
+        _sceneGraphs(sceneGraphs),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc) {
     }
 
     void invalidate() override {
         _guis.clear();
     }
 
-    std::shared_ptr<IGUI> get(const std::string &resRef) override {
+    std::shared_ptr<IGUI> get(const std::string &resRef, std::function<void(IGUI &)> preload) override {
         auto maybeGUI = _guis.find(resRef);
         if (maybeGUI != _guis.end()) {
             return maybeGUI->second;
         }
-        auto gui = doGet(resRef);
+        auto gui = doGet(resRef, preload);
         return _guis.insert(make_pair(resRef, move(gui))).first->second;
     }
 
 private:
-    resource::Gffs &_gffs;
+    graphics::GraphicsOptions &_graphicsOpt;
+    scene::ISceneGraphs &_sceneGraphs;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
 
     std::unordered_map<std::string, std::shared_ptr<IGUI>> _guis;
 
-    std::shared_ptr<IGUI> doGet(std::string resRef);
+    std::shared_ptr<IGUI> doGet(std::string resRef, std::function<void(IGUI &)> preload);
 };
 
 } // namespace gui

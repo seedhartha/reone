@@ -43,7 +43,7 @@ public:
     void init();
     void deinit();
 
-    SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
+    SceneGraphs &graphs() { return *_graphs; }
 
     SceneServices &services() { return *_services; }
 
@@ -52,7 +52,7 @@ private:
     graphics::GraphicsModule &_graphics;
     audio::AudioModule &_audio;
 
-    std::unique_ptr<SceneGraphs> _sceneGraphs;
+    std::unique_ptr<SceneGraphs> _graphs;
 
     std::unique_ptr<SceneServices> _services;
 };

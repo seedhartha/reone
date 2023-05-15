@@ -20,20 +20,20 @@
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
 #include "reone/audio/source.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-#include "reone/graphics/models.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
 #include "reone/gui/control/panel.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/scene/types.h"
 #include "reone/script/execution.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -86,15 +86,10 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(Game &game, ServicesView &services) :
-    Conversation(game, services) {
-    _resRef = getResRef("dialog");
-    _scaling = ScalingMode::Stretch;
-}
+void DialogGUI::init() {
+    auto resRef = getResRef("dialog");
+    load(resRef);
 
-void DialogGUI::load() {
-    Conversation::load();
-    bindControls();
     configureMessage();
     configureReplies();
     loadFrames();
@@ -105,44 +100,47 @@ void DialogGUI::load() {
     });
 }
 
+void DialogGUI::preload(IGUI &gui) {
+    gui.setScaling(GUI::ScalingMode::Stretch);
+}
+
 void DialogGUI::bindControls() {
     _binding.lblMessage = getControl<Label>("LBL_MESSAGE");
     _binding.lbReplies = getControl<ListBox>("LB_REPLIES");
 }
 
 void DialogGUI::loadFrames() {
-    int rootTop = _rootControl->extent().top;
+    int rootTop = _gui->rootControl().extent().top;
     int messageHeight = _binding.lblMessage->extent().height;
 
     addFrame(kControlTagTopFrame, -rootTop, messageHeight);
-    addFrame(kControlTagBottomFrame, 0, _options.height - rootTop);
+    addFrame(kControlTagBottomFrame, 0, _game.options().graphics.height - rootTop);
 }
 
 void DialogGUI::addFrame(string tag, int top, int height) {
-    auto frame = newControl(ControlType::Panel, tag);
+    auto frame = _gui->newControl(ControlType::Panel, tag);
 
     Control::Extent extent;
-    extent.left = -_rootControl->extent().left;
+    extent.left = -_gui->rootControl().extent().left;
     extent.top = top;
-    extent.width = _options.width;
+    extent.width = _game.options().graphics.width;
     extent.height = height;
 
     frame->setExtent(move(extent));
     frame->setBorderFill("blackfill");
 
-    _controlByTag.insert(make_pair(tag, frame.get()));
-    _controls.insert(_controls.begin(), move(frame));
+    _gui->addControl(move(frame));
 }
 
 void DialogGUI::configureMessage() {
-    _binding.lblMessage->setExtentTop(-_rootControl->extent().top);
-    _binding.lblMessage->setTextColor(_guiColorBase);
+    _binding.lblMessage->setExtentTop(-_gui->rootControl().extent().top);
+    _binding.lblMessage->setTextColor(_baseColor);
 }
 
 void DialogGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_guiColorHilight);
-    _binding.lbReplies->protoItem().setTextColor(_guiColorBase);
+    _binding.lbReplies->protoItem().setHilightColor(_hilightColor);
+    _binding.lbReplies->protoItem().setTextColor(_baseColor);
 }
 
 void DialogGUI::onStart() {
@@ -331,7 +329,7 @@ void DialogGUI::repositionMessage() {
 
     if (_entryEnded) {
         text.align = Control::TextAlign::CenterBottom;
-        top = -_rootControl->extent().top;
+        top = -_gui->rootControl().extent().top;
     } else {
         text.align = Control::TextAlign::CenterTop;
         top = _binding.lbReplies->extent().top;

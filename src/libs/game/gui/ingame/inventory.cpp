@@ -21,10 +21,10 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -38,17 +38,11 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("inventory");
+void InventoryMenu::init() {
+    auto resRef = getResRef("inventory");
+    load(resRef);
 
-    initForGame();
     loadBackground(BackgroundType::Menu);
-}
-
-void InventoryMenu::load() {
-    GUI::load();
-    bindControls();
 
     _binding.lblCreditsValue->setVisible(false);
     _binding.btnUseItem->setDisabled(true);

@@ -30,18 +30,16 @@ namespace reone {
 
 namespace game {
 
-BarkBubble::BarkBubble(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("barkbubble");
-    _scaling = ScalingMode::PositionRelativeToCenter;
+void BarkBubble::init() {
+    auto resRef = getResRef("barkbubble");
+    load(resRef);
+
+    _gui->rootControl().setVisible(false);
+    _binding.lblBarkText->setVisible(false);
 }
 
-void BarkBubble::load() {
-    GUI::load();
-    bindControls();
-
-    _rootControl->setVisible(false);
-    _binding.lblBarkText->setVisible(false);
+void BarkBubble::preload(IGUI &gui) {
+    gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
 }
 
 void BarkBubble::bindControls() {
@@ -56,7 +54,7 @@ void BarkBubble::update(float dt) {
 
 void BarkBubble::setBarkText(const string &text, float duration) {
     if (text.empty()) {
-        _rootControl->setVisible(false);
+        _gui->rootControl().setVisible(false);
         _binding.lblBarkText->setVisible(false);
     } else {
         float textWidth = _binding.lblBarkText->text().font->measure(text);
@@ -65,8 +63,8 @@ void BarkBubble::setBarkText(const string &text, float duration) {
         float rootHeight = lineCount * _binding.lblBarkText->text().font->height() + 2 * padding;
         float labelHeight = lineCount * _binding.lblBarkText->text().font->height();
 
-        _rootControl->setVisible(true);
-        _rootControl->setExtentHeight(static_cast<int>(rootHeight));
+        _gui->rootControl().setVisible(true);
+        _gui->rootControl().setExtentHeight(static_cast<int>(rootHeight));
 
         _binding.lblBarkText->setExtentHeight(static_cast<int>(labelHeight));
         _binding.lblBarkText->setTextMessage(text);

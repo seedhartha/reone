@@ -39,9 +39,14 @@ public:
     NameEntry(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen),
+        _input(gui::TextInputFlags::lettersWhitespace) {
+    }
 
-    void load() override;
+    void init();
+
     bool handle(const SDL_Event &event) override;
 
     void loadRandomName();
@@ -60,7 +65,8 @@ private:
     LtrReader _femaleLtr;
     LtrReader _lastNameLtr;
 
-    void bindControls();
+    void bindControls() override;
+
     void loadLtrFile(const std::string &resRef, LtrReader &ltr);
 
     std::string getRandomName() const;

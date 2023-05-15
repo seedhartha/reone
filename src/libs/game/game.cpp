@@ -170,7 +170,7 @@ void Game::update(float dt) {
         _combat.update(dt);
     }
 
-    GUI *gui = getScreenGUI();
+    auto gui = getScreenGUI();
     if (gui) {
         gui->update(dt);
     }
@@ -405,7 +405,7 @@ void Game::drawGUI() {
         break;
 
     default: {
-        GUI *gui = getScreenGUI();
+        auto gui = getScreenGUI();
         if (gui) {
             gui->draw();
         }
@@ -518,7 +518,7 @@ bool Game::handle(const SDL_Event &event) {
         return true;
 
     if (!_movie) {
-        GUI *gui = getScreenGUI();
+        auto gui = getScreenGUI();
         if (gui && gui->handle(event)) {
             return true;
         }
@@ -803,14 +803,14 @@ void Game::loadInGameMenus() {
 }
 
 void Game::changeScreen(Screen screen) {
-    GUI *gui = getScreenGUI();
+    auto gui = getScreenGUI();
     if (gui) {
         gui->resetFocus();
     }
     _screen = screen;
 }
 
-GUI *Game::getScreenGUI() const {
+GameGUI *Game::getScreenGUI() const {
     switch (_screen) {
     case Screen::MainMenu:
         return _mainMenu.get();

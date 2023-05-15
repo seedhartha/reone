@@ -26,10 +26,10 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -47,25 +47,19 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("abilities");
+void AbilitiesMenu::init() {
+    auto resRef = getResRef("abilities");
+    load(resRef);
 
-    initForGame();
     loadBackground(BackgroundType::Menu);
-}
-
-void AbilitiesMenu::load() {
-    GUI::load();
-    bindControls();
 
     _binding.btnSkills->setDisabled(true);
     _binding.btnPowers->setDisabled(true);
     _binding.btnFeats->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_resourceSvc.strings.get(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_resourceSvc.strings.get(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_resourceSvc.strings.get(kStrRefTotalRank));
+    _binding.lblSkillRank->setTextMessage(_services.resource.strings.get(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_services.resource.strings.get(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_services.resource.strings.get(kStrRefTotalRank));
     _binding.lblRankVal->setTextMessage("");
     _binding.lblBonusVal->setTextMessage("");
     _binding.lblTotalVal->setTextMessage("");
@@ -135,9 +129,9 @@ void AbilitiesMenu::loadSkills() {
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _resourceSvc.strings.get(skills->getInt(row, "name"));
-        skillInfo.description = _resourceSvc.strings.get(skills->getInt(row, "description"));
-        skillInfo.icon = _graphicsSvc.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _services.resource.strings.get(skills->getInt(row, "name"));
+        skillInfo.description = _services.resource.strings.get(skills->getInt(row, "description"));
+        skillInfo.icon = _services.graphics.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -160,7 +154,7 @@ shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
+    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {

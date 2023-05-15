@@ -33,23 +33,21 @@ namespace reone {
 
 namespace game {
 
-LoadingScreen::LoadingScreen(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("loadscreen");
+void LoadingScreen::init() {
+    auto resRef = getResRef("loadscreen");
+    load(resRef);
 
-    if (_game.isTSL()) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-    } else {
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Load);
     }
-}
-
-void LoadingScreen::load() {
-    GUI::load();
-    bindControls();
 
     _binding.lblHint->setTextMessage("");
+}
+
+void LoadingScreen::preload(IGUI &gui) {
+    if (_game.isTSL()) {
+        gui.setResolution(800, 600);
+    }
 }
 
 void LoadingScreen::bindControls() {
@@ -60,7 +58,7 @@ void LoadingScreen::bindControls() {
 }
 
 void LoadingScreen::setImage(const string &resRef) {
-    _rootControl->setBorderFill(resRef);
+    _gui->rootControl().setBorderFill(resRef);
 }
 
 void LoadingScreen::setProgress(int progress) {

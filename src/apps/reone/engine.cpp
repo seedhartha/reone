@@ -63,7 +63,7 @@ void Engine::initServices(GameID gameId) {
     _audioModule = make_unique<AudioModule>(_options->audio, *_resourceModule);
     _movieModule = make_unique<MovieModule>(_options->game.path, *_graphicsModule, *_audioModule);
     _sceneModule = make_unique<SceneModule>(_options->graphics, *_audioModule, *_graphicsModule);
-    _guiModule = make_unique<GUIModule>(*_resourceModule);
+    _guiModule = make_unique<GUIModule>(_options->graphics, *_sceneModule, *_graphicsModule, *_resourceModule);
     _scriptModule = make_unique<ScriptModule>(*_resourceModule);
 
     _gameModule = make_unique<GameModule>(

@@ -28,9 +28,11 @@ namespace game {
 
 class LoadingScreen : public GameGUI {
 public:
-    LoadingScreen(Game &game, ServicesView &services);
+    LoadingScreen(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     void setImage(const std::string &resRef);
     void setProgress(int progress);
@@ -43,7 +45,8 @@ private:
         std::shared_ptr<gui::Label> lblLoading;
     } _binding;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
 };
 
 } // namespace game

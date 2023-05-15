@@ -20,14 +20,13 @@
 #include "reone/graphics/textures.h"
 #include "reone/resource/strings.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
+#include "reone/game/gui/ingame.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
-
-#include "reone/game/gui/ingame.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -70,21 +69,11 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::WeapL2, 31378},
     {Equipment::Slot::WeapR2, 31379}};
 
-Equipment::Equipment(
-    Game &game,
-    InGameMenu &inGameMenu,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _inGameMenu(inGameMenu) {
-    _resRef = getResRef("equip");
+void Equipment::init() {
+    auto resRef = getResRef("equip");
+    load(resRef);
 
-    initForGame();
     loadBackground(BackgroundType::Menu);
-}
-
-void Equipment::load() {
-    GUI::load();
-    bindControls();
 
     _binding.btnChange1->setFocusable(false);
     _binding.btnChange2->setFocusable(false);
@@ -122,7 +111,7 @@ void Equipment::load() {
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
-                slotDesc = _resourceSvc.strings.get(maybeStrRef->second);
+                slotDesc = _services.resource.strings.get(maybeStrRef->second);
             }
 
             _binding.lblSlotName->setTextMessage(slotDesc);
@@ -189,8 +178,8 @@ void Equipment::configureItemsListBox() {
     });
 
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
-    protoItem.setBorderColor(_guiColorBase);
-    protoItem.setHilightColor(_guiColorHilight);
+    protoItem.setBorderColor(_baseColor);
+    protoItem.setHilightColor(_hilightColor);
 }
 
 static int getInventorySlot(Equipment::Slot slot) {
@@ -290,11 +279,14 @@ void Equipment::updatePortraits() {
     _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
+// TODO: restore functionality
+/*
 void Equipment::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
         static_cast<ListBox &>(control).setProtoItemType(ControlType::LabelHilight);
     }
 }
+*/
 
 void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
@@ -393,7 +385,7 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
         return nullptr;
     }
 
-    shared_ptr<Texture> texture(_graphicsSvc.textures.get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_services.graphics.textures.get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -405,8 +397,8 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _resourceSvc.strings.get(kStrRefNone);
-        lbItem.iconTexture = _graphicsSvc.textures.get("inone", TextureUsage::GUI);
+        lbItem.text = _services.resource.strings.get(kStrRefNone);
+        lbItem.iconTexture = _services.graphics.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         _binding.lbItems->addItem(move(lbItem));
@@ -442,7 +434,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
+    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

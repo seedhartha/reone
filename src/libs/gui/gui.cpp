@@ -53,19 +53,14 @@ namespace reone {
 
 namespace gui {
 
-void GUI::load() {
+void GUI::load(const Gff &gui) {
     debug("Load " + _resRef, LogChannels::gui);
 
-    auto gui = _resourceSvc.gffs.get(_resRef, ResourceType::Gui);
-    if (!gui) {
-        throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
-    }
-
-    ControlType type = Control::getType(*gui);
-    string tag(Control::getTag(*gui));
+    ControlType type = Control::getType(gui);
+    string tag(Control::getTag(gui));
 
     _rootControl = newControl(type, tag);
-    _rootControl->load(*gui);
+    _rootControl->load(gui);
     _controlByTag[tag] = _rootControl.get();
 
     switch (_scaling) {
@@ -83,7 +78,7 @@ void GUI::load() {
     const Control::Extent &rootExtent = _rootControl->extent();
     _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
-    for (auto &ctrlGffs : gui->getList("CONTROLS")) {
+    for (auto &ctrlGffs : gui.getList("CONTROLS")) {
         loadControl(*ctrlGffs);
     }
 }
@@ -103,10 +98,9 @@ void GUI::loadControl(const Gff &gffs) {
     if (!control)
         return;
 
-    preloadControl(*control);
     control->load(gffs);
     if (_hasDefaultHilightColor) {
-        control->setHilightColor(_guiColorHilight);
+        control->setHilightColor(_defaultHilightColor);
     }
 
     ScalingMode scaling = _scaling;
@@ -127,9 +121,6 @@ void GUI::loadControl(const Gff &gffs) {
 
     _controlByTag[tag] = control.get();
     _controls.push_back(move(control));
-}
-
-void GUI::preloadControl(Control &control) {
 }
 
 void GUI::positionRelativeToCenter(Control &control) {
@@ -325,6 +316,11 @@ unique_ptr<Control> GUI::newControl(
     control->setTag(tag);
 
     return move(control);
+}
+
+void GUI::addControl(std::shared_ptr<Control> control) {
+    _controls.insert(_controls.begin(), control);
+    _controlByTag.insert(make_pair(control->tag(), control.get()));
 }
 
 } // namespace gui

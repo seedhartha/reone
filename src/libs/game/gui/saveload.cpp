@@ -17,13 +17,13 @@
 
 #include "reone/game/gui/saveload.h"
 
-#include "reone/system/logutil.h"
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/graphics/format/tgareader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/provider/erf.h"
 #include "reone/resource/strings.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/game/game.h"
 
@@ -46,20 +46,13 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-SaveLoad::SaveLoad(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("saveload");
+void SaveLoad::init() {
+    auto resRef = getResRef("saveload");
+    load(resRef);
 
-    initForGame();
-
-    if (!game.isTSL()) {
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
-}
-
-void SaveLoad::load() {
-    GUI::load();
-    bindControls();
 
     _binding.lblPlanetName->setVisible(false);
     _binding.lblAreaName->setVisible(false);
@@ -67,8 +60,8 @@ void SaveLoad::load() {
     _binding.lbGames->setSelectionMode(ListBox::SelectionMode::OnClick);
     _binding.lbGames->setPadding(3);
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
-    _binding.lbGames->protoItem().setBorderColorOverride(_guiColorBase);
-    _binding.lbGames->protoItem().setHilightColor(_guiColorHilight);
+    _binding.lbGames->protoItem().setBorderColorOverride(_baseColor);
+    _binding.lbGames->protoItem().setHilightColor(_hilightColor);
     _binding.lbGames->setOnItemClick([this](const string &item) {
         // Get save number by item tag
         int selectedSaveNumber = -1;
@@ -160,10 +153,10 @@ void SaveLoad::bindControls() {
 void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != SaveLoadMode::Save);
 
-    string panelName(_resourceSvc.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    string panelName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     _binding.lblPanelName->setTextMessage(move(panelName));
 
-    string actionName(_resourceSvc.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
+    string actionName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
     _binding.btnSaveLoad->setTextMessage(move(actionName));
 
     refreshSavedGames();

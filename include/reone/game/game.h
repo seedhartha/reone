@@ -284,7 +284,7 @@ private:
     void onModuleSelected(const std::string &name);
     void drawHUD();
 
-    gui::GUI *getScreenGUI() const;
+    GameGUI *getScreenGUI() const;
     CameraType getConversationCamera(int &cameraId) const;
 
     // Updates
@@ -320,7 +320,7 @@ private:
     std::unique_ptr<T> tryLoadGUI() {
         auto gui = std::make_unique<T>(*this, _services);
         try {
-            gui->load();
+            gui->init();
             return gui;
         } catch (const std::exception &e) {
             error(boost::format("Error loading GUI: %s") % std::string(e.what()));

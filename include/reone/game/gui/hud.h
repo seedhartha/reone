@@ -35,9 +35,12 @@ class ActionFactory;
 
 class HUD : public GameGUI {
 public:
-    HUD(Game &game, ServicesView &services);
+    HUD(Game &game, ServicesView &services) :
+        GameGUI(game, services),
+        _select(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -175,7 +178,9 @@ private:
     SelectionOverlay _select;
     std::unique_ptr<BarkBubble> _barkBubble;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
+
     void toggleCombat(bool enabled);
     void refreshActionQueueItems() const;
 

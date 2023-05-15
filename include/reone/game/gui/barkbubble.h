@@ -19,8 +19,8 @@
 
 #include "../gui.h"
 
-#include "reone/system/timer.h"
 #include "reone/gui/control/label.h"
+#include "reone/system/timer.h"
 
 namespace reone {
 
@@ -28,9 +28,12 @@ namespace game {
 
 class BarkBubble : public GameGUI {
 public:
-    BarkBubble(Game &game, ServicesView &services);
+    BarkBubble(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
+
     void update(float dt) override;
 
     void setBarkText(const std::string &text, float duration);
@@ -43,7 +46,8 @@ private:
     std::string _barkText;
     Timer _timer;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
 };
 
 } // namespace game

@@ -26,7 +26,6 @@
 #include "reone/gui/control/label.h"
 #include "reone/system/logutil.h"
 
-
 #include "reone/game/action/usefeat.h"
 #include "reone/game/d20/feat.h"
 #include "reone/game/d20/feats.h"
@@ -34,7 +33,6 @@
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-
 
 using namespace std;
 
@@ -50,26 +48,9 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(Game &game, ServicesView &services) :
-    GameGUI(game, services),
-    _select(game, services) {
-    _resRef = getResRef("mipc28x6");
-    _resolutionX = 800;
-    _resolutionY = 600;
-    _scaling = ScalingMode::PositionRelativeToCenter;
-
-    static string combatControlTags[] = {
-        "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
-        "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
-        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
-    for (auto &tag : combatControlTags) {
-        _scalingByControlTag.insert(make_pair(tag, ScalingMode::Stretch));
-    }
-}
-
-void HUD::load() {
-    GUI::load();
-    bindControls();
+void HUD::init() {
+    auto resRef = getResRef("mipc28x6");
+    load(resRef);
 
     _binding.btnClearAll->setVisible(false);
     _binding.btnTarget0->setVisible(false);
@@ -198,10 +179,23 @@ void HUD::load() {
         _game.party().setPartyLeaderByIndex(2);
     });
 
-    _select.load();
+    _select.init();
 
     _barkBubble = make_unique<BarkBubble>(_game, _services);
-    _barkBubble->load();
+    _barkBubble->init();
+}
+
+void HUD::preload(IGUI &gui) {
+    gui.setResolution(800, 600);
+    gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
+
+    static string combatControlTags[] = {
+        "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
+        "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
+        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
+    for (auto &tag : combatControlTags) {
+        gui.setControlScaling(tag, GUI::ScalingMode::Stretch);
+    }
 }
 
 void HUD::bindControls() {
@@ -329,14 +323,14 @@ void HUD::bindControls() {
 }
 
 bool HUD::handle(const SDL_Event &event) {
-    if (_select.handle(event))
+    if (_select.handle(event)) {
         return true;
-
-    return GUI::handle(event);
+    }
+    return _gui->handle(event);
 }
 
 void HUD::update(float dt) {
-    GUI::update(dt);
+    _gui->update(dt);
 
     Party &party = _game.party();
     vector<Label *> charLabels {
@@ -400,7 +394,7 @@ void HUD::update(float dt) {
 }
 
 void HUD::draw() {
-    GUI::draw();
+    _gui->draw();
 
     drawMinimap();
 
@@ -417,8 +411,8 @@ void HUD::drawMinimap() {
     const Control::Extent &extent = _binding.lblMapView->extent();
 
     glm::vec4 bounds;
-    bounds[0] = static_cast<float>(_controlOffset.x + extent.left);
-    bounds[1] = static_cast<float>(_controlOffset.y + extent.top);
+    bounds[0] = static_cast<float>(_gui->controlOffset().x + extent.left);
+    bounds[1] = static_cast<float>(_gui->controlOffset().y + extent.top);
     bounds[2] = static_cast<float>(extent.width);
     bounds[3] = static_cast<float>(extent.height);
 
@@ -444,17 +438,17 @@ void HUD::drawHealth(int memberIndex) {
     float h = glm::clamp(member->currentHitPoints() / static_cast<float>(member->hitPoints()), 0.0f, 1.0f) * extent.height;
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
+    transform = glm::translate(transform, glm::vec3(_gui->controlOffset().x + extent.left + extent.width - 14.0f, _gui->controlOffset().y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _graphicsSvc.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.simpleColor());
-    _graphicsSvc.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.meshes.quad().draw();
 }
 
 void HUD::toggleCombat(bool enabled) {

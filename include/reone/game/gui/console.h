@@ -43,6 +43,7 @@ public:
     }
 
     void init();
+
     bool handle(const SDL_Event &event);
     void draw();
 

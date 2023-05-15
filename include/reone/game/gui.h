@@ -29,26 +29,50 @@ namespace game {
 
 class Game;
 
-class GameGUI : public gui::GUI {
-protected:
-    GameGUI(Game &game, ServicesView &services);
+class GameGUI : boost::noncopyable {
+public:
+    virtual bool handle(const SDL_Event &event);
+    virtual void update(float dt);
+    virtual void draw();
 
-    void initForGame();
-
-    void update(float dt) override;
-
-    std::string getResRef(const std::string &base) const;
+    void resetFocus() {
+        _gui->resetFocus();
+    }
 
 protected:
     Game &_game;
     ServicesView &_services;
 
+    std::shared_ptr<gui::IGUI> _gui;
     std::shared_ptr<audio::AudioSource> _audioSource;
+
+    glm::vec3 _baseColor {0.0f};
+    glm::vec3 _disabledColor {0.0f};
+    glm::vec3 _hilightColor {0.0f};
+
+    GameGUI(Game &game,
+            ServicesView &services) :
+        _game(game),
+        _services(services) {
+    }
+
+    void load(const std::string &resRef);
+
+    virtual void preload(gui::IGUI &gui);
+    virtual void bindControls() {}
 
     void loadBackground(BackgroundType type);
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
+    virtual void onClick(const std::string &control);
+    virtual void onFocusChanged(const std::string &control, bool focus);
+
+    std::string getResRef(const std::string &base) const;
+
+    template <class T>
+    std::shared_ptr<T> getControl(const std::string &tag) const {
+        auto ctrl = _gui->getControl(tag);
+        return std::static_pointer_cast<T>(ctrl);
+    }
 };
 
 } // namespace game

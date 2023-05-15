@@ -37,9 +37,12 @@ public:
     LevelUpMenu(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
     void reset();
 
@@ -71,7 +74,8 @@ private:
     int _step {0};
     bool _hasAttributes {false};
 
-    void bindControls();
+    void bindControls() override;
+
     void doSetStep(int step);
 };
 

@@ -28,9 +28,11 @@ namespace game {
 
 class ComputerGUI : public Conversation {
 public:
-    ComputerGUI(Game &game, ServicesView &services);
+    ComputerGUI(Game &game, ServicesView &services) :
+        Conversation(game, services) {
+    }
 
-    void load() override;
+    void init();
 
 private:
     struct Binding {
@@ -67,7 +69,9 @@ private:
         // END TSL only
     } _binding;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
+
     void configureMessage();
     void configureReplies();
 

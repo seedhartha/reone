@@ -18,19 +18,19 @@
 #include "reone/game/gui/partyselect.h"
 
 #include "reone/graphics/textures.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/script/types.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -53,21 +53,18 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    if (game.isTSL()) {
-        _resRef = "partyselect_p";
+void PartySelection::init() {
+    string resRef;
+    if (_game.isTSL()) {
+        resRef = "partyselect_p";
     } else {
-        _resRef = "partyselection";
+        resRef = "partyselection";
+    }
+    load(resRef);
+
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
-
-    initForGame();
-}
-
-void PartySelection::load() {
-    GUI::load();
-    bindControls();
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &button = getNpcButton(i);
@@ -308,7 +305,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(_resourceSvc.strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(_services.resource.strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     _binding.btnAccept->setTextMessage(text);
 }
 

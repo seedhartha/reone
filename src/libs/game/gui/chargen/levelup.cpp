@@ -34,21 +34,10 @@ namespace reone {
 
 namespace game {
 
-LevelUpMenu::LevelUpMenu(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
+void LevelUpMenu::init() {
+    auto resRef = getResRef("leveluppnl");
+    load(resRef);
 
-    _resRef = getResRef("leveluppnl");
-
-    initForGame();
-}
-
-void LevelUpMenu::load() {
-    GUI::load();
-    bindControls();
     doSetStep(0);
 
     _binding.btnBack->setOnClick([this]() {

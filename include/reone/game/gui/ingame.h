@@ -34,9 +34,12 @@ namespace game {
 
 class InGameMenu : public GameGUI {
 public:
-    InGameMenu(Game &game, ServicesView &services);
+    InGameMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
+
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
     void draw() override;
@@ -85,7 +88,9 @@ private:
     std::unique_ptr<MapMenu> _map;
     std::unique_ptr<OptionsMenu> _options;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
+
     void updateTabButtons();
     void changeTab(InGameMenuTab tab);
 
@@ -98,7 +103,7 @@ private:
     void loadMap();
     void loadOptions();
 
-    GUI *getActiveTabGUI() const;
+    GameGUI *getActiveTabGUI() const;
 
     void setTabLabelsFocusable(bool focusable);
 };

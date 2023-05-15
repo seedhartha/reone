@@ -23,9 +23,8 @@
 #include "reone/resource/strings.h"
 
 #include "reone/game/d20/classes.h"
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
-
+#include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 
 using namespace std;
@@ -50,21 +49,9 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::Security, 256},
     {SkillType::TreatInjury, 258}};
 
-CharGenSkills::CharGenSkills(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
-
-    _resRef = getResRef("skchrgen");
-
-    initForGame();
-}
-
-void CharGenSkills::load() {
-    GUI::load();
-    bindControls();
+void CharGenSkills::init() {
+    auto resRef = getResRef("skchrgen");
+    load(resRef);
 
     vector<Label *> skillLabels {
         _binding.computerUseLbl.get(),
@@ -77,7 +64,7 @@ void CharGenSkills::load() {
         _binding.treatInjuryLbl.get()};
     for (auto &label : skillLabels) {
         label->setFocusable(true);
-        label->setHilightColor(_guiColorBase);
+        label->setHilightColor(_baseColor);
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
@@ -322,7 +309,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     if (maybeDescription == g_descStrRefBySkill.end())
         return;
 
-    string description(_resourceSvc.strings.get(maybeDescription->second));
+    string description(_services.resource.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

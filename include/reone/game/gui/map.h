@@ -44,6 +44,7 @@ public:
     Map(Game &game, ServicesView &services);
 
     void load(const std::string &area, const resource::Gff &gffs);
+
     void draw(Mode mode, const glm::vec4 &bounds);
 
     bool isLoaded() const { return static_cast<bool>(_areaTexture); }

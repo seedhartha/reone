@@ -37,9 +37,12 @@ public:
     QuickCharacterGeneration(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
     void goToNextStep();
 
@@ -66,7 +69,8 @@ private:
     CharacterGeneration &_charGen;
     int _step {0};
 
-    void bindControls();
+    void bindControls() override;
+
     void doSetStep(int step);
 };
 

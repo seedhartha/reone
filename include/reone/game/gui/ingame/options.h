@@ -31,9 +31,11 @@ namespace game {
 
 class OptionsMenu : public GameGUI {
 public:
-    OptionsMenu(Game &game, ServicesView &services);
+    OptionsMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
 private:
     struct Binding {
@@ -42,7 +44,7 @@ private:
         std::shared_ptr<gui::Button> btnExit;
     } _binding;
 
-    void bindControls();
+    void bindControls() override;
 };
 
 } // namespace game

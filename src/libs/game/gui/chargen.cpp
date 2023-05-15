@@ -49,12 +49,7 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("maincg");
-
-    initForGame();
-
+void CharacterGeneration::init() {
     if (_game.isTSL()) {
         _musicResRef = "mus_main";
         _loadScreenResRef = "load_default";
@@ -63,12 +58,10 @@ CharacterGeneration::CharacterGeneration(Game &game, ServicesView &services) :
         _loadScreenResRef = "load_chargen";
     }
 
-    loadBackground(BackgroundType::Menu);
-};
+    auto resRef = getResRef("maincg");
+    load(resRef);
 
-void CharacterGeneration::load() {
-    GUI::load();
-    bindControls();
+    loadBackground(BackgroundType::Menu);
 
     _binding.lblLevelVal->setVisible(false);
     _binding.lblName->setTextMessage("");
@@ -133,62 +126,62 @@ void CharacterGeneration::bindControls() {
 
 void CharacterGeneration::loadClassSelection() {
     _classSelection = make_unique<ClassSelection>(*this, _game, _services);
-    _classSelection->load();
+    _classSelection->init();
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
     _quickOrCustom = make_unique<QuickOrCustom>(*this, _game, _services);
-    _quickOrCustom->load();
+    _quickOrCustom->init();
 }
 
 void CharacterGeneration::loadQuick() {
     _quick = make_unique<QuickCharacterGeneration>(*this, _game, _services);
-    _quick->load();
+    _quick->init();
 }
 
 void CharacterGeneration::loadCustom() {
     _custom = make_unique<CustomCharacterGeneration>(*this, _game, _services);
-    _custom->load();
+    _custom->init();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
     _portraitSelection = make_unique<PortraitSelection>(*this, _game, _services);
-    _portraitSelection->load();
+    _portraitSelection->init();
 }
 
 void CharacterGeneration::loadAbilities() {
     _abilities = make_unique<CharGenAbilities>(*this, _game, _services);
-    _abilities->load();
+    _abilities->init();
 }
 
 void CharacterGeneration::loadSkills() {
     _charGenSkills = make_unique<CharGenSkills>(*this, _game, _services);
-    _charGenSkills->load();
+    _charGenSkills->init();
 }
 
 void CharacterGeneration::loadFeats() {
     _charGenFeats = make_unique<CharGenFeats>(*this, _game, _services);
-    _charGenFeats->load();
+    _charGenFeats->init();
 }
 
 void CharacterGeneration::loadNameEntry() {
     _nameEntry = make_unique<NameEntry>(*this, _game, _services);
-    _nameEntry->load();
+    _nameEntry->init();
 }
 
 void CharacterGeneration::loadLevelUp() {
     _levelUp = make_unique<LevelUpMenu>(*this, _game, _services);
-    _levelUp->load();
+    _levelUp->init();
 }
 
 bool CharacterGeneration::handle(const SDL_Event &event) {
     if (getSubGUI()->handle(event)) {
         return true;
     }
-    return GUI::handle(event);
+    return _gui->handle(event);
 }
 
-GUI *CharacterGeneration::getSubGUI() const {
+GameGUI *CharacterGeneration::getSubGUI() const {
     switch (_screen) {
     case CharGenScreen::ClassSelection:
         return _classSelection.get();
@@ -216,12 +209,12 @@ GUI *CharacterGeneration::getSubGUI() const {
 }
 
 void CharacterGeneration::update(float dt) {
-    GUI::update(dt);
+    GameGUI::update(dt);
     getSubGUI()->update(dt);
 }
 
 void CharacterGeneration::draw() {
-    GUI::draw();
+    GameGUI::draw();
     getSubGUI()->draw();
 }
 
@@ -231,7 +224,7 @@ void CharacterGeneration::openClassSelection() {
 }
 
 void CharacterGeneration::changeScreen(CharGenScreen screen) {
-    GUI *gui = getSubGUI();
+    auto gui = getSubGUI();
     if (gui) {
         gui->resetFocus();
     }

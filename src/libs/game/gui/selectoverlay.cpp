@@ -18,11 +18,11 @@
 #include "reone/game/gui/selectoverlay.h"
 
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
@@ -38,10 +38,10 @@
 #include "reone/game/d20/feats.h"
 #include "reone/game/d20/skill.h"
 #include "reone/game/d20/skills.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -72,7 +72,7 @@ SelectionOverlay::SelectionOverlay(
     _actionSlots.resize(kNumActionSlots);
 }
 
-void SelectionOverlay::load() {
+void SelectionOverlay::init() {
     _font = _services.graphics.fonts.get("dialogfont16x16");
     _friendlyReticle = _services.graphics.textures.get("friendlyreticle", TextureUsage::GUI);
     _friendlyReticle2 = _services.graphics.textures.get("friendlyreticle2", TextureUsage::GUI);

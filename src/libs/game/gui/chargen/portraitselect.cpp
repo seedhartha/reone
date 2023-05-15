@@ -17,27 +17,26 @@
 
 #include "reone/game/gui/chargen/portraitselect.h"
 
-#include "reone/system/collectionutil.h"
-#include "reone/system/randomutil.h"
-#include "reone/graphics/models.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
 #include "reone/graphics/textures.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/resource/resources.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-#include "reone/scene/di/services.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/randomutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
-#include "reone/game/di/services.h"
 #include "reone/game/types.h"
-
-#include "reone/game/gui/chargen.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -55,25 +54,13 @@ namespace game {
 
 static constexpr float kModelScale = 0.2f;
 
-PortraitSelection::PortraitSelection(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
+void PortraitSelection::init() {
+    auto resRef = getResRef("portcust");
+    load(resRef);
 
-    _resRef = getResRef("portcust");
-
-    initForGame();
-
-    if (!game.isTSL()) {
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
-}
-
-void PortraitSelection::load() {
-    GUI::load();
-    bindControls();
 
     setButtonColors(*_binding.btnAccept);
     setButtonColors(*_binding.btnBack);
@@ -115,11 +102,11 @@ void PortraitSelection::bindControls() {
 
 void PortraitSelection::setButtonColors(Control &control) {
     Control::Text text(control.text());
-    text.color = _guiColorBase;
+    text.color = _baseColor;
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = _guiColorHilight;
+    hilight.color = _hilightColor;
     control.setHilight(move(hilight));
 }
 
@@ -202,7 +189,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     string resRef(_filteredPortraits[_currentPortrait].resRef);
-    shared_ptr<Texture> portrait(_graphicsSvc.textures.get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> portrait(_services.graphics.textures.get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
 }
 

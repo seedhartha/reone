@@ -33,9 +33,11 @@ namespace game {
 
 class MainMenu : public GameGUI {
 public:
-    MainMenu(Game &game, ServicesView &services);
+    MainMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     void onModuleSelected(const std::string &name);
 
@@ -66,7 +68,9 @@ private:
 
     std::string _musicResRef;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
+
     void configureButtons();
     void setup3DView();
     void setButtonColors(gui::Control &control);

@@ -28,23 +28,23 @@ namespace reone {
 namespace scene {
 
 void SceneModule::init() {
-    _sceneGraphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
-    _services = make_unique<SceneServices>(*_sceneGraphs);
+    _graphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
+    _services = make_unique<SceneServices>(*_graphs);
 
     // Init scenes
-    _sceneGraphs->reserve(kSceneMain);
-    _sceneGraphs->reserve(kSceneMainMenu);
-    _sceneGraphs->reserve(kSceneCharGen);
+    _graphs->reserve(kSceneMain);
+    _graphs->reserve(kSceneMainMenu);
+    _graphs->reserve(kSceneCharGen);
     for (int i = 0; i < kNumClasses; ++i) {
-        _sceneGraphs->reserve(str(boost::format("%s.%d") % kSceneClassSelect % i));
+        _graphs->reserve(str(boost::format("%s.%d") % kSceneClassSelect % i));
     }
-    _sceneGraphs->reserve(kScenePortraitSelect);
-    _sceneGraphs->reserve(kSceneCharacter);
+    _graphs->reserve(kScenePortraitSelect);
+    _graphs->reserve(kSceneCharacter);
 }
 
 void SceneModule::deinit() {
     _services.reset();
-    _sceneGraphs.reset();
+    _graphs.reset();
 }
 
 } // namespace scene

@@ -40,9 +40,12 @@ public:
     CharGenAbilities(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
     void reset(bool newGame);
 
@@ -92,7 +95,8 @@ private:
     CreatureAttributes _attributes;
     int _points {0};
 
-    void bindControls();
+    void bindControls() override;
+
     void refreshControls();
     void updateCharacter();
 

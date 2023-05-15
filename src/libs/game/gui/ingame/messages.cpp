@@ -33,17 +33,11 @@ namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("messages");
+void MessagesMenu::init() {
+    auto resRef = getResRef("messages");
+    load(resRef);
 
-    initForGame();
     loadBackground(BackgroundType::Menu);
-}
-
-void MessagesMenu::load() {
-    GUI::load();
-    bindControls();
 
     _binding.btnExit->setOnClick([this]() {
         _game.openInGame();

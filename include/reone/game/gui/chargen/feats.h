@@ -36,9 +36,12 @@ public:
     CharGenFeats(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
 private:
     struct Binding {
@@ -50,7 +53,7 @@ private:
 
     CharacterGeneration &_charGen;
 
-    void bindControls();
+    void bindControls() override;
 };
 
 } // namespace game

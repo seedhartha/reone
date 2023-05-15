@@ -35,21 +35,10 @@ namespace reone {
 
 namespace game {
 
-CustomCharacterGeneration::CustomCharacterGeneration(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
+void CustomCharacterGeneration::init() {
+    auto resRef = getResRef("custpnl");
+    load(resRef);
 
-    _resRef = getResRef("custpnl");
-
-    initForGame();
-}
-
-void CustomCharacterGeneration::load() {
-    GUI::load();
-    bindControls();
     doSetStep(0);
 
     _binding.btnCancel->setOnClick([this]() {

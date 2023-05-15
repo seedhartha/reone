@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include "reone/graphics/di/module.h"
 #include "reone/resource/di/module.h"
+#include "reone/scene/di/module.h"
 
 #include "services.h"
 
@@ -27,7 +29,13 @@ namespace gui {
 
 class GUIModule : boost::noncopyable {
 public:
-    GUIModule(resource::ResourceModule &resource) :
+    GUIModule(graphics::GraphicsOptions &graphicsOpt,
+              scene::SceneModule &scene,
+              graphics::GraphicsModule &graphics,
+              resource::ResourceModule &resource) :
+        _graphicsOpt(graphicsOpt),
+        _scene(scene),
+        _graphics(graphics),
         _resource(resource) {
     }
 
@@ -41,6 +49,9 @@ public:
     GUIServices &services() { return *_services; }
 
 private:
+    graphics::GraphicsOptions &_graphicsOpt;
+    scene::SceneModule &_scene;
+    graphics::GraphicsModule &_graphics;
     resource::ResourceModule &_resource;
 
     std::unique_ptr<GUIs> _guis;
@@ -48,6 +59,6 @@ private:
     std::unique_ptr<GUIServices> _services;
 };
 
-} // namespace movie
+} // namespace gui
 
 } // namespace reone

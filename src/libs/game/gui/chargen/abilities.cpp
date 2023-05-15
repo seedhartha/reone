@@ -23,9 +23,8 @@
 #include "reone/resource/strings.h"
 
 #include "reone/game/d20/classes.h"
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
-
+#include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 
 using namespace std;
@@ -60,20 +59,9 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     {Ability::Wisdom, 225},
     {Ability::Charisma, 227}};
 
-CharGenAbilities::CharGenAbilities(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
-    _resRef = getResRef("abchrgen");
-
-    initForGame();
-}
-
-void CharGenAbilities::load() {
-    GUI::load();
-    bindControls();
+void CharGenAbilities::init() {
+    auto resRef = getResRef("abchrgen");
+    load(resRef);
 
     _binding.lbDesc->setProtoMatchContent(true);
 
@@ -86,7 +74,7 @@ void CharGenAbilities::load() {
         _binding.chaLbl.get()};
     for (auto &label : labels) {
         label->setFocusable(true);
-        label->setHilightColor(_guiColorBase);
+        label->setHilightColor(_baseColor);
     }
 
     _binding.strPointsBtn->setDisabled(true);
@@ -282,7 +270,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     if (maybeDescription == g_descStrRefByAbility.end())
         return;
 
-    string description(_resourceSvc.strings.get(maybeDescription->second));
+    string description(_services.resource.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

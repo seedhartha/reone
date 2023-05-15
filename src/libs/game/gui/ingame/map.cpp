@@ -39,17 +39,11 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(Game &game, ServicesView &services) :
-    GameGUI(game, services) {
-    _resRef = getResRef("map");
+void MapMenu::init() {
+    auto resRef = getResRef("map");
+    load(resRef);
 
-    initForGame();
     loadBackground(BackgroundType::Menu);
-}
-
-void MapMenu::load() {
-    GUI::load();
-    bindControls();
 
     _binding.btnReturn->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {
@@ -90,13 +84,13 @@ void MapMenu::bindControls() {
 }
 
 void MapMenu::draw() {
-    GUI::draw();
+    GameGUI::draw();
 
     const Control::Extent &extent = _binding.lblMap->extent();
 
     glm::vec4 bounds(
-        _controlOffset.x + extent.left,
-        _controlOffset.y + extent.top,
+        _gui->controlOffset().x + extent.left,
+        _gui->controlOffset().y + extent.top,
         extent.width,
         extent.height);
 
@@ -124,7 +118,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(_resourceSvc.strings.get(kStrRefMapNote));
+        string text(_services.resource.strings.get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

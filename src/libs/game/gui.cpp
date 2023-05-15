@@ -19,16 +19,17 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/audio/player.h"
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/guisounds.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/di/services.h"
 #include "reone/scene/di/services.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/guisounds.h"
+#include "reone/system/exception/notfound.h"
 
 using namespace std;
+using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -39,39 +40,52 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(Game &game, ServicesView &services) :
-    GUI(
-        game.options().graphics,
-        services.scene.graphs,
-        services.graphics,
-        services.resource),
-    _game(game),
-    _services(services) {
-}
+void GameGUI::load(const string &resRef) {
+    _gui = _services.gui.guis.get(resRef, bind(&GameGUI::preload, this, _1));
+    if (!_gui) {
+        throw NotFoundException(str(boost::format("GUI not found: %s") % resRef));
+    }
 
-void GameGUI::initForGame() {
+    bindControls();
+
     if (_game.isTSL()) {
-        _resolutionX = 800;
-        _resolutionY = 600;
-
-        _guiColorBase = kTSLGUIColorBase;
-        _guiColorHilight = kTSLGUIColorHilight;
-        _guiColorDisabled = kTSLGUIColorDisabled;
-
+        _baseColor = kTSLGUIColorBase;
+        _hilightColor = kTSLGUIColorHilight;
+        _disabledColor = kTSLGUIColorDisabled;
     } else {
-        _guiColorBase = kGUIColorBase;
-        _guiColorHilight = kGUIColorHilight;
-        _guiColorDisabled = kGUIColorDisabled;
-
-        _hasDefaultHilightColor = true;
+        _baseColor = kGUIColorBase;
+        _hilightColor = kGUIColorHilight;
+        _disabledColor = kGUIColorDisabled;
     }
 }
 
-void GameGUI::update(float dt) {
-    GUI::update(dt);
+void GameGUI::preload(IGUI &gui) {
+    if (_game.isTSL()) {
+        gui.setResolution(800, 600);
+    } else {
+        gui.setDefaultHilightColor(kGUIColorHilight);
+    }
+}
 
+bool GameGUI::handle(const SDL_Event &event) {
+    if (!_gui) {
+        return false;
+    }
+    return _gui->handle(event);
+}
+
+void GameGUI::update(float dt) {
+    if (_gui) {
+        _gui->update(dt);
+    }
     if (_audioSource) {
         _audioSource->update();
+    }
+}
+
+void GameGUI::draw() {
+    if (_gui) {
+        _gui->draw();
     }
 }
 
@@ -88,12 +102,13 @@ void GameGUI::loadBackground(BackgroundType type) {
             break;
         }
     } else {
-        if ((_options.width == 1600 && _options.height == 1200) ||
-            (_options.width == 1280 && _options.height == 960) ||
-            (_options.width == 1024 && _options.height == 768) ||
-            (_options.width == 800 && _options.height == 600)) {
+        auto &options = _game.options().graphics;
+        if ((options.width == 1600 && options.height == 1200) ||
+            (options.width == 1280 && options.height == 960) ||
+            (options.width == 1024 && options.height == 768) ||
+            (options.width == 800 && options.height == 600)) {
 
-            resRef = str(boost::format("%dx%d") % _options.width % _options.height);
+            resRef = str(boost::format("%dx%d") % options.width % options.height);
         } else {
             resRef = "1600x1200";
         }
@@ -115,7 +130,9 @@ void GameGUI::loadBackground(BackgroundType type) {
         }
     }
 
-    _background = _graphicsSvc.textures.get(resRef, TextureUsage::Diffuse);
+    if (_gui) {
+        _gui->setBackground(_services.graphics.textures.get(resRef, TextureUsage::Diffuse));
+    }
 }
 
 string GameGUI::getResRef(const string &base) const {

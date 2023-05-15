@@ -31,9 +31,12 @@ namespace game {
 
 class DialogGUI : public Conversation {
 public:
-    DialogGUI(Game &game, ServicesView &services);
+    DialogGUI(Game &game, ServicesView &services) :
+        Conversation(game, services) {
+    }
 
-    void load() override;
+    void init();
+
     void update(float dt) override;
 
 private:
@@ -50,7 +53,9 @@ private:
     std::shared_ptr<Object> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
 
-    void bindControls();
+    void preload(gui::IGUI &gui) override;
+    void bindControls() override;
+
     void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();

@@ -40,9 +40,12 @@ public:
     PortraitSelection(
         CharacterGeneration &charGen,
         Game &game,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _charGen(charGen) {
+    }
 
-    void load() override;
+    void init();
 
     void updatePortraits();
     void resetCurrentPortrait();
@@ -62,7 +65,8 @@ private:
     std::vector<Portrait> _filteredPortraits;
     int _currentPortrait {0};
 
-    void bindControls();
+    void bindControls() override;
+
     void loadCurrentPortrait();
     void loadHeadModel();
 

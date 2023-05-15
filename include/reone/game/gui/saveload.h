@@ -21,8 +21,8 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 
-#include "../savedgame.h"
 #include "../gui.h"
+#include "../savedgame.h"
 
 namespace reone {
 
@@ -30,9 +30,11 @@ namespace game {
 
 class SaveLoad : public GameGUI {
 public:
-    SaveLoad(Game &game, ServicesView &services);
+    SaveLoad(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     void refresh();
 

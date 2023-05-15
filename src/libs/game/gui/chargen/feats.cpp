@@ -35,21 +35,9 @@ namespace reone {
 
 namespace game {
 
-CharGenFeats::CharGenFeats(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
-
-    _resRef = getResRef("ftchrgen");
-
-    initForGame();
-}
-
-void CharGenFeats::load() {
-    GUI::load();
-    bindControls();
+void CharGenFeats::init() {
+    auto resRef = getResRef("ftchrgen");
+    load(resRef);
 
     _binding.btnAccept->setOnClick([this]() {
         _charGen.goToNextStep();

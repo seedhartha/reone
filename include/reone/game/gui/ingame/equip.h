@@ -56,9 +56,12 @@ public:
     Equipment(
         Game &game,
         InGameMenu &inGameMenu,
-        ServicesView &services);
+        ServicesView &services) :
+        GameGUI(game, services),
+        _inGameMenu(inGameMenu) {
+    }
 
-    void load() override;
+    void init();
 
     void update();
 
@@ -115,9 +118,8 @@ private:
     Slot _selectedSlot {Slot::None};
     int _selectedItemIdx {-1};
 
-    void preloadControl(gui::Control &control) override;
+    void bindControls() override;
 
-    void bindControls();
     void configureItemsListBox();
     void updateEquipment();
     void updateItems();

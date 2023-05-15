@@ -41,21 +41,9 @@ namespace game {
 static constexpr int kStrRefQuickHelpText = 241;
 static constexpr int kStrRefCustomHelpText = 242;
 
-QuickOrCustom::QuickOrCustom(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
-
-    _resRef = getResRef("qorcpnl");
-
-    initForGame();
-}
-
-void QuickOrCustom::load() {
-    GUI::load();
-    bindControls();
+void QuickOrCustom::init() {
+    auto resRef = getResRef("qorcpnl");
+    load(resRef);
 
     if (!_game.isTSL()) {
         _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
@@ -70,7 +58,7 @@ void QuickOrCustom::load() {
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_resourceSvc.strings.get(kStrRefQuickHelpText));
+        string text(_services.resource.strings.get(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });
@@ -81,7 +69,7 @@ void QuickOrCustom::load() {
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_resourceSvc.strings.get(kStrRefCustomHelpText));
+        string text(_services.resource.strings.get(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });

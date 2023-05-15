@@ -17,9 +17,9 @@
 
 #include "reone/game/gui/chargen/nameentry.h"
 
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/gui/control/button.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
@@ -36,22 +36,9 @@ namespace reone {
 
 namespace game {
 
-NameEntry::NameEntry(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen),
-    _input(TextInputFlags::lettersWhitespace) {
-
-    _resRef = getResRef("name");
-
-    initForGame();
-}
-
-void NameEntry::load() {
-    GUI::load();
-    bindControls();
+void NameEntry::init() {
+    auto resRef = getResRef("name");
+    load(resRef);
 
     loadLtrFile("humanm", _maleLtr);
     loadLtrFile("humanf", _femaleLtr);
@@ -79,7 +66,7 @@ void NameEntry::bindControls() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
-    auto data = _resourceSvc.resources.get(resRef, ResourceType::Ltr);
+    auto data = _services.resource.resources.get(resRef, ResourceType::Ltr);
     auto stream = ByteArrayInputStream(*data);
     ltr.load(stream);
 }
@@ -89,7 +76,7 @@ bool NameEntry::handle(const SDL_Event &event) {
         _binding.nameBoxEdit->setTextMessage(_input.text());
         return true;
     }
-    return GUI::handle(event);
+    return _gui->handle(event);
 }
 
 void NameEntry::loadRandomName() {

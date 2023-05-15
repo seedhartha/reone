@@ -36,21 +36,10 @@ namespace reone {
 
 namespace game {
 
-QuickCharacterGeneration::QuickCharacterGeneration(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
+void QuickCharacterGeneration::init() {
+    auto resRef = getResRef("quickpnl");
+    load(resRef);
 
-    _resRef = getResRef("quickpnl");
-
-    initForGame();
-}
-
-void QuickCharacterGeneration::load() {
-    GUI::load();
-    bindControls();
     doSetStep(0);
 
     if (!_game.isTSL()) {

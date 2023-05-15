@@ -33,9 +33,11 @@ namespace game {
 
 class InventoryMenu : public GameGUI {
 public:
-    InventoryMenu(Game &game, ServicesView &services);
+    InventoryMenu(Game &game, ServicesView &services) :
+        GameGUI(game, services) {
+    }
 
-    void load() override;
+    void init();
 
     void refreshPortraits();
 
@@ -78,7 +80,7 @@ private:
         // END TSL only
     } _binding;
 
-    void bindControls();
+    void bindControls() override;
 };
 
 } // namespace game

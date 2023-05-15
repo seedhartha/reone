@@ -17,26 +17,25 @@
 
 #include "reone/game/gui/chargen/classselect.h"
 
-#include "reone/system/randomutil.h"
-#include "reone/graphics/models.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/resource/strings.h"
-#include "reone/scene/graphs.h"
 #include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/game/d20/classes.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/portraits.h"
-#include "reone/game/di/services.h"
 #include "reone/game/types.h"
-
-#include "reone/game/gui/chargen.h"
 
 using namespace std;
 
@@ -64,24 +63,14 @@ static map<ClassType, int> g_classDescStrRefs {
     {ClassType::JediSentinel, 48032},
     {ClassType::JediGuardian, 48033}};
 
-ClassSelection::ClassSelection(
-    CharacterGeneration &charGen,
-    Game &game,
-    ServicesView &services) :
-    GameGUI(game, services),
-    _charGen(charGen) {
-    _resRef = getResRef("classsel");
+void ClassSelection::init() {
+    auto resRef = getResRef("classsel");
+    load(resRef);
 
-    if (!game.isTSL()) {
+    if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 
-    initForGame();
-}
-
-void ClassSelection::load() {
-    GUI::load();
-    bindControls();
     setupClassButtons();
     setButtonColors(*_binding.btnBack);
 
@@ -243,8 +232,8 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISc
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    control.setBorderColor(_guiColorBase);
-    control.setHilightColor(_guiColorHilight);
+    control.setBorderColor(_baseColor);
+    control.setHilightColor(_hilightColor);
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
@@ -270,11 +259,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(_resourceSvc.strings.get(g_genderStrRefs[button.character.gender]));
+    string classText(_services.resource.strings.get(g_genderStrRefs[button.character.gender]));
     classText += " " + _services.game.classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    string descText(_resourceSvc.strings.get(g_classDescStrRefs[clazz]));
+    string descText(_services.resource.strings.get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

@@ -24,7 +24,7 @@ namespace reone {
 namespace gui {
 
 void GUIModule::init() {
-    _guis = make_unique<GUIs>(_resource.gffs());
+    _guis = make_unique<GUIs>(_graphicsOpt, _scene.graphs(), _graphics.services(), _resource.services());
     _services = make_unique<GUIServices>(*_guis);
 }
 
