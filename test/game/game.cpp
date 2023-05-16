@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "reone/game/game.h"
+#include "reone/scene/collision.h"
 #include "reone/system/stream/fileoutput.h"
 
 #include "../fixtures/audio.h"

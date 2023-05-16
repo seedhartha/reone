@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 extern "C" {
 #ifdef _WIN32
 #define R_DECLSPEC __declspec(dllexport)
