@@ -46,13 +46,12 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-void SaveLoad::init() {
-    auto resRef = getResRef("saveload");
-    load(resRef);
-
+void SaveLoad::onGUILoaded() {
     if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
+
+    bindControls();
 
     _binding.lblPlanetName->setVisible(false);
     _binding.lblAreaName->setVisible(false);

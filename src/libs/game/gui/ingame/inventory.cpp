@@ -38,11 +38,9 @@ namespace reone {
 
 namespace game {
 
-void InventoryMenu::init() {
-    auto resRef = getResRef("inventory");
-    load(resRef);
-
+void InventoryMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.lblCreditsValue->setVisible(false);
     _binding.btnUseItem->setDisabled(true);

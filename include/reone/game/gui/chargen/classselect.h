@@ -52,9 +52,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("classsel");
     }
-
-    void init();
 
 private:
     struct ClassButton {
@@ -87,8 +86,9 @@ private:
     glm::ivec2 _enlargedButtonSize {0};
     std::vector<ClassButton> _classButtons;
 
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 

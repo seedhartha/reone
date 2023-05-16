@@ -63,13 +63,12 @@ static map<ClassType, int> g_classDescStrRefs {
     {ClassType::JediSentinel, 48032},
     {ClassType::JediGuardian, 48033}};
 
-void ClassSelection::init() {
-    auto resRef = getResRef("classsel");
-    load(resRef);
-
+void ClassSelection::onGUILoaded() {
     if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
+
+    bindControls();
 
     setupClassButtons();
     setButtonColors(*_binding.btnBack);

@@ -33,21 +33,20 @@ namespace reone {
 
 namespace game {
 
-void LoadingScreen::init() {
-    auto resRef = getResRef("loadscreen");
-    load(resRef);
-
-    if (!_game.isTSL()) {
-        loadBackground(BackgroundType::Load);
-    }
-
-    _binding.lblHint->setTextMessage("");
-}
-
 void LoadingScreen::preload(IGUI &gui) {
     if (_game.isTSL()) {
         gui.setResolution(800, 600);
     }
+}
+
+void LoadingScreen::onGUILoaded() {
+    if (!_game.isTSL()) {
+        loadBackground(BackgroundType::Load);
+    }
+
+    bindControls();
+
+    _binding.lblHint->setTextMessage("");
 }
 
 void LoadingScreen::bindControls() {

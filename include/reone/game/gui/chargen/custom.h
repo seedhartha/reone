@@ -40,9 +40,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("custpnl");
     }
-
-    void init();
 
     void goToNextStep();
 
@@ -78,7 +77,9 @@ private:
     CharacterGeneration &_charGen;
     int _step {0};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void doSetStep(int step);
 };

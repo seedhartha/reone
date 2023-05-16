@@ -49,19 +49,22 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-void CharacterGeneration::init() {
-    if (_game.isTSL()) {
+CharacterGeneration::CharacterGeneration(Game &game, ServicesView &services) :
+    GameGUI(game, services) {
+    _resRef = guiResRef("maincg");
+
+    if (game.isTSL()) {
         _musicResRef = "mus_main";
         _loadScreenResRef = "load_default";
     } else {
         _musicResRef = "mus_theme_rep";
         _loadScreenResRef = "load_chargen";
     }
+}
 
-    auto resRef = getResRef("maincg");
-    load(resRef);
-
+void CharacterGeneration::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.lblLevelVal->setVisible(false);
     _binding.lblName->setTextMessage("");

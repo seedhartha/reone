@@ -30,9 +30,8 @@ class BarkBubble : public GameGUI {
 public:
     BarkBubble(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("barkbubble");
     }
-
-    void init();
 
     void update(float dt) override;
 
@@ -47,7 +46,9 @@ private:
     Timer _timer;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 };
 
 } // namespace game

@@ -27,6 +27,7 @@
 #include "reone/resource/di/services.h"
 #include "reone/scene/di/services.h"
 #include "reone/system/exception/notfound.h"
+#include "reone/system/exception/validation.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -40,16 +41,12 @@ namespace reone {
 
 namespace game {
 
-void GameGUI::load(const string &resRef) {
-    _gui = _services.gui.guis.get(resRef, bind(&GameGUI::preload, this, _1));
-    if (!_gui) {
-        throw NotFoundException(str(boost::format("GUI not found: %s") % resRef));
-    }
-    _gui->setEventListener(*this);
+GameGUI::GameGUI(Game &game,
+                 ServicesView &services) :
+    _game(game),
+    _services(services) {
 
-    bindControls();
-
-    if (_game.isTSL()) {
+    if (game.isTSL()) {
         _baseColor = kTSLGUIColorBase;
         _hilightColor = kTSLGUIColorHilight;
         _disabledColor = kTSLGUIColorDisabled;
@@ -58,6 +55,19 @@ void GameGUI::load(const string &resRef) {
         _hilightColor = kGUIColorHilight;
         _disabledColor = kGUIColorDisabled;
     }
+}
+
+void GameGUI::init() {
+    if (_resRef.empty()) {
+        throw ValidationException("GUI resRef must not be empty");
+    }
+    _gui = _services.gui.guis.get(_resRef, bind(&GameGUI::preload, this, _1));
+    if (!_gui) {
+        throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
+    }
+    _gui->setEventListener(*this);
+
+    onGUILoaded();
 }
 
 void GameGUI::preload(IGUI &gui) {
@@ -136,7 +146,7 @@ void GameGUI::loadBackground(BackgroundType type) {
     }
 }
 
-string GameGUI::getResRef(const string &base) const {
+string GameGUI::guiResRef(const string &base) const {
     return _game.isTSL() ? base + "_p" : base;
 }
 

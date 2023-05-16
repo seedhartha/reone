@@ -41,9 +41,8 @@ namespace game {
 static constexpr int kStrRefQuickHelpText = 241;
 static constexpr int kStrRefCustomHelpText = 242;
 
-void QuickOrCustom::init() {
-    auto resRef = getResRef("qorcpnl");
-    load(resRef);
+void QuickOrCustom::onGUILoaded() {
+    bindControls();
 
     if (!_game.isTSL()) {
         _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));

@@ -86,10 +86,12 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-void DialogGUI::init() {
-    auto resRef = getResRef("dialog");
-    load(resRef);
+void DialogGUI::preload(IGUI &gui) {
+    gui.setScaling(GUI::ScalingMode::Stretch);
+}
 
+void DialogGUI::onGUILoaded() {
+    bindControls();
     configureMessage();
     configureReplies();
     loadFrames();
@@ -98,10 +100,6 @@ void DialogGUI::init() {
         int replyIdx = stoi(item);
         pickReply(replyIdx);
     });
-}
-
-void DialogGUI::preload(IGUI &gui) {
-    gui.setScaling(GUI::ScalingMode::Stretch);
 }
 
 void DialogGUI::bindControls() {

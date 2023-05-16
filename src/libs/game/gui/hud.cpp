@@ -48,9 +48,21 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-void HUD::init() {
-    auto resRef = getResRef("mipc28x6");
-    load(resRef);
+void HUD::preload(IGUI &gui) {
+    gui.setResolution(800, 600);
+    gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
+
+    static string combatControlTags[] = {
+        "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
+        "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
+        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
+    for (auto &tag : combatControlTags) {
+        gui.setControlScaling(tag, GUI::ScalingMode::Stretch);
+    }
+}
+
+void HUD::onGUILoaded() {
+    bindControls();
 
     _binding.btnClearAll->setVisible(false);
     _binding.btnTarget0->setVisible(false);
@@ -183,19 +195,6 @@ void HUD::init() {
 
     _barkBubble = make_unique<BarkBubble>(_game, _services);
     _barkBubble->init();
-}
-
-void HUD::preload(IGUI &gui) {
-    gui.setResolution(800, 600);
-    gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
-
-    static string combatControlTags[] = {
-        "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
-        "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
-        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
-    for (auto &tag : combatControlTags) {
-        gui.setControlScaling(tag, GUI::ScalingMode::Stretch);
-    }
 }
 
 void HUD::bindControls() {

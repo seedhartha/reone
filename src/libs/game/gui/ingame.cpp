@@ -31,9 +31,14 @@ namespace reone {
 
 namespace game {
 
-void InGameMenu::init() {
-    auto resRef = getResRef("top");
-    load(resRef);
+void InGameMenu::preload(IGUI &gui) {
+    if (_game.isTSL()) {
+        gui.setResolution(800, 600);
+    }
+}
+
+void InGameMenu::onGUILoaded() {
+    bindControls();
 
     _binding.btnEqu->setVisible(false);
     _binding.btnInv->setVisible(false);
@@ -79,12 +84,6 @@ void InGameMenu::init() {
     loadJournal();
     loadMap();
     loadOptions();
-}
-
-void InGameMenu::preload(IGUI &gui) {
-    if (_game.isTSL()) {
-        gui.setResolution(800, 600);
-    }
 }
 
 void InGameMenu::bindControls() {

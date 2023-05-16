@@ -32,9 +32,8 @@ class SaveLoad : public GameGUI {
 public:
     SaveLoad(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("saveload");
     }
-
-    void init();
 
     void refresh();
 
@@ -73,6 +72,8 @@ private:
 
     SaveLoadMode _mode {SaveLoadMode::Save};
     std::vector<SavedGameDescriptor> _saves;
+
+    void onGUILoaded() override;
 
     void bindControls();
     void refreshSavedGames();

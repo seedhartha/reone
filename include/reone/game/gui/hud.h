@@ -38,9 +38,8 @@ public:
     HUD(Game &game, ServicesView &services) :
         GameGUI(game, services),
         _select(game, services) {
+        _resRef = guiResRef("mipc28x6");
     }
-
-    void init();
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -179,8 +178,9 @@ private:
     std::unique_ptr<BarkBubble> _barkBubble;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void toggleCombat(bool enabled);
     void refreshActionQueueItems() const;
 

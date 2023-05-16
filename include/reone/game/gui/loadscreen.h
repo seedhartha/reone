@@ -30,9 +30,8 @@ class LoadingScreen : public GameGUI {
 public:
     LoadingScreen(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("loadscreen");
     }
-
-    void init();
 
     void setImage(const std::string &resRef);
     void setProgress(int progress);
@@ -46,7 +45,9 @@ private:
     } _binding;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 };
 
 } // namespace game

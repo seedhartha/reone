@@ -59,9 +59,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _inGameMenu(inGameMenu) {
+        _resRef = guiResRef("equip");
     }
-
-    void init();
 
     void update();
 
@@ -118,7 +117,9 @@ private:
     Slot _selectedSlot {Slot::None};
     int _selectedItemIdx {-1};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void configureItemsListBox();
     void updateEquipment();

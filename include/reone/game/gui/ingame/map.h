@@ -36,9 +36,8 @@ class MapMenu : public GameGUI {
 public:
     MapMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("map");
     }
-
-    void init();
 
     void draw() override;
 
@@ -62,7 +61,9 @@ private:
     std::vector<std::shared_ptr<Waypoint>> _notes;
     int _selectedNoteIdx {0};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void refreshSelectedNote();
 };

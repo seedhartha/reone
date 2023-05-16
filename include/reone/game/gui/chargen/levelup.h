@@ -40,9 +40,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("leveluppnl");
     }
-
-    void init();
 
     void reset();
 
@@ -74,7 +73,9 @@ private:
     int _step {0};
     bool _hasAttributes {false};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void doSetStep(int step);
 };

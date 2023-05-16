@@ -33,11 +33,9 @@ namespace reone {
 
 namespace game {
 
-void OptionsMenu::init() {
-    auto resRef = getResRef("optionsingame");
-    load(resRef);
-
+void OptionsMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnLoadGame->setOnClick([this]() {
         _game.openSaveLoad(SaveLoadMode::LoadFromInGame);

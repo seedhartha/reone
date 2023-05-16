@@ -65,11 +65,7 @@ public:
         LevelUp
     };
 
-    CharacterGeneration(Game &game, ServicesView &services) :
-        GameGUI(game, services) {
-    }
-
-    void init();
+    CharacterGeneration(Game &game, ServicesView &services);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -172,8 +168,9 @@ private:
 
     // END Sub GUI
 
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void reloadCharacterModel();
     void updateAttributes();
     void changeScreen(CharGenScreen screen);

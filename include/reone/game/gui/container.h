@@ -33,9 +33,8 @@ class ContainerGUI : public GameGUI {
 public:
     ContainerGUI(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("container");
     }
-
-    void init();
 
     void open(std::shared_ptr<Object> contanier);
 
@@ -52,8 +51,9 @@ private:
 
     std::shared_ptr<Object> _container;
 
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void configureItemsListBox();
     void transferItemsToPlayer();
 

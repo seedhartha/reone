@@ -34,9 +34,8 @@ namespace reone {
 
 namespace game {
 
-void LevelUpMenu::init() {
-    auto resRef = getResRef("leveluppnl");
-    load(resRef);
+void LevelUpMenu::onGUILoaded() {
+    bindControls();
 
     doSetStep(0);
 

@@ -69,11 +69,9 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::WeapL2, 31378},
     {Equipment::Slot::WeapR2, 31379}};
 
-void Equipment::init() {
-    auto resRef = getResRef("equip");
-    load(resRef);
-
+void Equipment::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnChange1->setFocusable(false);
     _binding.btnChange2->setFocusable(false);

@@ -39,11 +39,9 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-void MapMenu::init() {
-    auto resRef = getResRef("map");
-    load(resRef);
-
+void MapMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnReturn->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {

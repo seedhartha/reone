@@ -36,9 +36,8 @@ class AbilitiesMenu : public GameGUI {
 public:
     AbilitiesMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("abilities");
     }
-
-    void init();
 
     void refreshControls();
 
@@ -91,7 +90,9 @@ private:
 
     std::unordered_map<SkillType, SkillInfo> _skills;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void loadSkills();
     void refreshPortraits();

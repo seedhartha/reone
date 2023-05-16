@@ -44,9 +44,8 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-void ContainerGUI::init() {
-    auto resRef = getResRef("container");
-    load(resRef);
+void ContainerGUI::onGUILoaded() {
+    bindControls();
 
     string btnMessage(_services.resource.strings.get(kSwitchToResRef) + " " + _services.resource.strings.get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);

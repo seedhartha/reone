@@ -31,11 +31,7 @@ constexpr int kNpcCount = 9;
 
 class PartySelection : public GameGUI {
 public:
-    PartySelection(Game &game, ServicesView &services) :
-        GameGUI(game, services) {
-    }
-
-    void init();
+    PartySelection(Game &game, ServicesView &services);
 
     void prepare(const PartySelectionContext &ctx);
 
@@ -103,7 +99,9 @@ private:
     bool _added[kNpcCount] {false};
     int _availableCount {0};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void addNpc(int npc);
     void changeParty();

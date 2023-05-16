@@ -33,11 +33,9 @@ namespace reone {
 
 namespace game {
 
-void JournalMenu::init() {
-    auto resRef = getResRef("journal");
-    load(resRef);
-
+void JournalMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnExit->setOnClick([this]() {
         _game.openInGame();

@@ -59,9 +59,8 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     {Ability::Wisdom, 225},
     {Ability::Charisma, 227}};
 
-void CharGenAbilities::init() {
-    auto resRef = getResRef("abchrgen");
-    load(resRef);
+void CharGenAbilities::onGUILoaded() {
+    bindControls();
 
     _binding.lbDesc->setProtoMatchContent(true);
 

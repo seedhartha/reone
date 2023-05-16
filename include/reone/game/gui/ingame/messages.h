@@ -33,9 +33,10 @@ class MessagesMenu : public GameGUI {
 public:
     MessagesMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("messages");
     }
 
-    void init();
+    void onGUILoaded() override;
 
 private:
     struct Binding {
@@ -46,7 +47,7 @@ private:
         // END KotOR only
     } _binding;
 
-    void bindControls() override;
+    void bindControls();
 };
 
 } // namespace game

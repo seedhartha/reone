@@ -47,11 +47,9 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-void AbilitiesMenu::init() {
-    auto resRef = getResRef("abilities");
-    load(resRef);
-
+void AbilitiesMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnSkills->setDisabled(true);
     _binding.btnPowers->setDisabled(true);

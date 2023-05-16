@@ -35,9 +35,8 @@ class InventoryMenu : public GameGUI {
 public:
     InventoryMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("inventory");
     }
-
-    void init();
 
     void refreshPortraits();
 
@@ -80,7 +79,9 @@ private:
         // END TSL only
     } _binding;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 };
 
 } // namespace game

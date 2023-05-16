@@ -49,9 +49,8 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::Security, 256},
     {SkillType::TreatInjury, 258}};
 
-void CharGenSkills::init() {
-    auto resRef = getResRef("skchrgen");
-    load(resRef);
+void CharGenSkills::onGUILoaded() {
+    bindControls();
 
     vector<Label *> skillLabels {
         _binding.computerUseLbl.get(),

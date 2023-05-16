@@ -31,6 +31,8 @@ class Game;
 
 class GameGUI : public gui::IGUIEventListener, boost::noncopyable {
 public:
+    virtual void init();
+
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
     virtual void draw();
@@ -42,6 +44,7 @@ public:
 protected:
     Game &_game;
     ServicesView &_services;
+    std::string _resRef;
 
     std::shared_ptr<gui::IGUI> _gui;
     std::shared_ptr<audio::AudioSource> _audioSource;
@@ -50,23 +53,18 @@ protected:
     glm::vec3 _disabledColor {0.0f};
     glm::vec3 _hilightColor {0.0f};
 
-    GameGUI(Game &game,
-            ServicesView &services) :
-        _game(game),
-        _services(services) {
-    }
-
-    void load(const std::string &resRef);
+    GameGUI(Game &game, ServicesView &services);
 
     virtual void preload(gui::IGUI &gui);
-    virtual void bindControls() {}
+    virtual void onGUILoaded() {}
 
     void loadBackground(BackgroundType type);
 
+    virtual void configureControls() {}
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
 
-    std::string getResRef(const std::string &base) const;
+    std::string guiResRef(const std::string &base) const;
 
     template <class T>
     std::shared_ptr<T> getControl(const std::string &tag) const {

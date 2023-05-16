@@ -30,16 +30,14 @@ namespace reone {
 
 namespace game {
 
-void BarkBubble::init() {
-    auto resRef = getResRef("barkbubble");
-    load(resRef);
-
-    _gui->rootControl().setVisible(false);
-    _binding.lblBarkText->setVisible(false);
-}
-
 void BarkBubble::preload(IGUI &gui) {
     gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
+}
+
+void BarkBubble::onGUILoaded() {
+    bindControls();
+    _gui->rootControl().setVisible(false);
+    _binding.lblBarkText->setVisible(false);
 }
 
 void BarkBubble::bindControls() {

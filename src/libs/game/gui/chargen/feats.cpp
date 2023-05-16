@@ -35,9 +35,8 @@ namespace reone {
 
 namespace game {
 
-void CharGenFeats::init() {
-    auto resRef = getResRef("ftchrgen");
-    load(resRef);
+void CharGenFeats::onGUILoaded() {
+    bindControls();
 
     _binding.btnAccept->setOnClick([this]() {
         _charGen.goToNextStep();

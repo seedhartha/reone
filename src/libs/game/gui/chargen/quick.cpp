@@ -36,9 +36,8 @@ namespace reone {
 
 namespace game {
 
-void QuickCharacterGeneration::init() {
-    auto resRef = getResRef("quickpnl");
-    load(resRef);
+void QuickCharacterGeneration::onGUILoaded() {
+    bindControls();
 
     doSetStep(0);
 

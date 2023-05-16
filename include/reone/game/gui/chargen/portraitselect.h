@@ -43,9 +43,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("portcust");
     }
-
-    void init();
 
     void updatePortraits();
     void resetCurrentPortrait();
@@ -65,7 +64,9 @@ private:
     std::vector<Portrait> _filteredPortraits;
     int _currentPortrait {0};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void loadCurrentPortrait();
     void loadHeadModel();

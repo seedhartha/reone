@@ -41,9 +41,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("qorcpnl");
     }
-
-    void init();
 
 private:
     struct Binding {
@@ -56,7 +55,9 @@ private:
 
     CharacterGeneration &_charGen;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 };
 
 } // namespace game

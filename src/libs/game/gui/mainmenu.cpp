@@ -48,20 +48,29 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-void MainMenu::init() {
-    string resRef;
+MainMenu::MainMenu(Game &game, ServicesView &services) :
+    GameGUI(game, services) {
+
     if (_game.isTSL()) {
-        resRef = "mainmenu8x6_p";
+        _resRef = "mainmenu8x6_p";
         _musicResRef = "mus_sion";
     } else {
-        resRef = "mainmenu16x12";
+        _resRef = "mainmenu16x12";
         _musicResRef = "mus_theme_cult";
     }
-    load(resRef);
+}
 
+void MainMenu::preload(IGUI &gui) {
+    GameGUI::preload(gui);
+    gui.setResolution(800, 600);
+}
+
+void MainMenu::onGUILoaded() {
     if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
+
+    bindControls();
 
     _binding.lbModules->setVisible(false);
     _binding.lblNewContent->setVisible(false);
@@ -100,11 +109,6 @@ void MainMenu::init() {
 
     setup3DView();
     configureButtons();
-}
-
-void MainMenu::preload(IGUI &gui) {
-    GameGUI::preload(gui);
-    gui.setResolution(800, 600);
 }
 
 void MainMenu::bindControls() {

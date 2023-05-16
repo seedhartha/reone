@@ -31,20 +31,18 @@ namespace reone {
 
 namespace game {
 
-void ComputerGUI::init() {
-    auto resRef = getResRef("computer");
-    load(resRef);
-
-    configureMessage();
-    configureReplies();
-}
-
 void ComputerGUI::preload(IGUI &gui) {
     gui.setScaling(GUI::ScalingMode::Stretch);
 
     if (_game.isTSL()) {
         gui.setResolution(800, 600);
     }
+}
+
+void ComputerGUI::onGUILoaded() {
+    bindControls();
+    configureMessage();
+    configureReplies();
 }
 
 void ComputerGUI::bindControls() {

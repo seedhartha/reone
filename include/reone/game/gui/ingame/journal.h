@@ -33,9 +33,8 @@ class JournalMenu : public GameGUI {
 public:
     JournalMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("journal");
     }
-
-    void init();
 
 private:
     struct Binding {
@@ -48,7 +47,9 @@ private:
         // END KotOR only
     } _binding;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 };
 
 } // namespace game

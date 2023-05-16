@@ -53,18 +53,22 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-void PartySelection::init() {
-    string resRef;
-    if (_game.isTSL()) {
-        resRef = "partyselect_p";
-    } else {
-        resRef = "partyselection";
-    }
-    load(resRef);
+PartySelection::PartySelection(Game &game, ServicesView &services) :
+    GameGUI(game, services) {
 
+    if (game.isTSL()) {
+        _resRef = "partyselect_p";
+    } else {
+        _resRef = "partyselection";
+    }
+}
+
+void PartySelection::onGUILoaded() {
     if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
+
+    bindControls();
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &button = getNpcButton(i);

@@ -36,9 +36,8 @@ namespace reone {
 
 namespace game {
 
-void NameEntry::init() {
-    auto resRef = getResRef("name");
-    load(resRef);
+void NameEntry::onGUILoaded() {
+    bindControls();
 
     loadLtrFile("humanm", _maleLtr);
     loadLtrFile("humanf", _femaleLtr);

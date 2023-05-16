@@ -42,9 +42,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _charGen(charGen) {
+        _resRef = guiResRef("skchrgen");
     }
-
-    void init();
 
     void reset(bool newGame);
 
@@ -95,7 +94,9 @@ private:
     CreatureAttributes _attributes;
     int _points {0};
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void refreshControls();
     void updateCharacter();

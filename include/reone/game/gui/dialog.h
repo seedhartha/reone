@@ -33,9 +33,8 @@ class DialogGUI : public Conversation {
 public:
     DialogGUI(Game &game, ServicesView &services) :
         Conversation(game, services) {
+        _resRef = guiResRef("dialog");
     }
-
-    void init();
 
     void update(float dt) override;
 
@@ -54,8 +53,9 @@ private:
     std::map<std::string, Participant> _participantByTag;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();

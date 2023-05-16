@@ -43,9 +43,8 @@ public:
         GameGUI(game, services),
         _charGen(charGen),
         _input(gui::TextInputFlags::lettersWhitespace) {
+        _resRef = guiResRef("name");
     }
-
-    void init();
 
     bool handle(const SDL_Event &event) override;
 
@@ -65,7 +64,9 @@ private:
     LtrReader _femaleLtr;
     LtrReader _lastNameLtr;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void loadLtrFile(const std::string &resRef, LtrReader &ltr);
 

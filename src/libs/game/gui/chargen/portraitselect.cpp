@@ -54,13 +54,12 @@ namespace game {
 
 static constexpr float kModelScale = 0.2f;
 
-void PortraitSelection::init() {
-    auto resRef = getResRef("portcust");
-    load(resRef);
-
+void PortraitSelection::onGUILoaded() {
     if (!_game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
+
+    bindControls();
 
     setButtonColors(*_binding.btnAccept);
     setButtonColors(*_binding.btnBack);

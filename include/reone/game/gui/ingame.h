@@ -36,9 +36,8 @@ class InGameMenu : public GameGUI {
 public:
     InGameMenu(Game &game, ServicesView &services) :
         GameGUI(game, services) {
+        _resRef = guiResRef("top");
     }
-
-    void init();
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -89,8 +88,9 @@ private:
     std::unique_ptr<OptionsMenu> _options;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void updateTabButtons();
     void changeTab(InGameMenuTab tab);
 

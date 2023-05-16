@@ -30,9 +30,8 @@ class ComputerGUI : public Conversation {
 public:
     ComputerGUI(Game &game, ServicesView &services) :
         Conversation(game, services) {
+        _resRef = guiResRef("computer");
     }
-
-    void init();
 
 private:
     struct Binding {
@@ -70,8 +69,9 @@ private:
     } _binding;
 
     void preload(gui::IGUI &gui) override;
-    void bindControls() override;
+    void onGUILoaded() override;
 
+    void bindControls();
     void configureMessage();
     void configureReplies();
 

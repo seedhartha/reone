@@ -35,9 +35,8 @@ namespace reone {
 
 namespace game {
 
-void CustomCharacterGeneration::init() {
-    auto resRef = getResRef("custpnl");
-    load(resRef);
+void CustomCharacterGeneration::onGUILoaded() {
+    bindControls();
 
     doSetStep(0);
 

@@ -45,11 +45,9 @@ namespace reone {
 
 namespace game {
 
-void CharacterMenu::init() {
-    auto resRef = getResRef("character");
-    load(resRef);
-
+void CharacterMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
+    bindControls();
 
     _binding.btnAuto->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {

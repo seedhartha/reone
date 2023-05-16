@@ -39,9 +39,8 @@ public:
         ServicesView &services) :
         GameGUI(game, services),
         _inGameMenu(inGameMenu) {
+        _resRef = guiResRef("character");
     }
-
-    void init();
 
     void update(float dt) override;
 
@@ -127,7 +126,9 @@ private:
 
     InGameMenu &_inGameMenu;
 
-    void bindControls() override;
+    void onGUILoaded() override;
+
+    void bindControls();
 
     void refreshPortraits();
     void refresh3D();
