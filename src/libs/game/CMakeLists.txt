@@ -197,7 +197,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/profileoverlay.h
     ${GAME_INCLUDE_DIR}/gui/saveload.h
     ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
-    ${GAME_INCLUDE_DIR}/guisounds.h
+    ${GAME_INCLUDE_DIR}/gui/sounds.h
     ${GAME_INCLUDE_DIR}/layout.h
     ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
@@ -399,14 +399,14 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui/ingame/options.cpp
     ${GAME_SOURCE_DIR}/gui/ingame.cpp
     ${GAME_SOURCE_DIR}/gui/loadscreen.cpp
+    ${GAME_SOURCE_DIR}/gui.cpp
     ${GAME_SOURCE_DIR}/gui/mainmenu.cpp
     ${GAME_SOURCE_DIR}/gui/map.cpp
     ${GAME_SOURCE_DIR}/gui/partyselect.cpp
     ${GAME_SOURCE_DIR}/gui/profileoverlay.cpp
     ${GAME_SOURCE_DIR}/gui/saveload.cpp
     ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
-    ${GAME_SOURCE_DIR}/gui.cpp
-    ${GAME_SOURCE_DIR}/guisounds.cpp
+    ${GAME_SOURCE_DIR}/gui/sounds.cpp
     ${GAME_SOURCE_DIR}/layouts.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp

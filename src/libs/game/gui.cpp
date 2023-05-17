@@ -21,7 +21,7 @@
 #include "reone/audio/player.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/guisounds.h"
+#include "reone/game/gui/sounds.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/di/services.h"

@@ -34,7 +34,7 @@
 #include "../d20/spells.h"
 #include "../dialogs.h"
 #include "../footstepsounds.h"
-#include "../guisounds.h"
+#include "../gui/sounds.h"
 #include "../layouts.h"
 #include "../paths.h"
 #include "../portraits.h"
