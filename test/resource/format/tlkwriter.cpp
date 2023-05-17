@@ -17,10 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayoutput.h"
-#include "reone/system/stringbuilder.h"
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stringbuilder.h"
+
 
 #include "../../checkutil.h"
 
@@ -68,7 +69,7 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
         TalkTable::String {"John", ""},
         TalkTable::String {"Jane", "jane"}};
 
-    auto table = TalkTable(move(strings));
+    auto table = TalkTable(std::move(strings));
     auto writer = TlkWriter(table);
 
     // when

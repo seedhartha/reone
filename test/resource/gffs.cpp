@@ -21,7 +21,6 @@
 #include "reone/resource/resources.h"
 #include "reone/system/stream/bytearrayoutput.h"
 
-
 using namespace std;
 
 using namespace reone;
@@ -66,7 +65,7 @@ BOOST_AUTO_TEST_CASE(should_get_gff_with_caching) {
     provider->add(ResourceId("sample", ResourceType::Gff), resBytes);
 
     auto resources = Resources();
-    resources.indexProvider(move(provider), "[stub]", false);
+    resources.indexProvider(std::move(provider), "[stub]", false);
 
     auto gffs = Gffs(resources);
 
