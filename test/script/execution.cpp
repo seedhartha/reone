@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
     // given
     auto program = make_shared<ScriptProgram>("some_program");
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1, 1
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     program->add(Instruction(InstructionType::NEGF));      // -14.4
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
     program->add(Instruction(InstructionType::ADDII)); // 8
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     program->add(Instruction::newMOVSP(-4));
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
     auto context = make_unique<ExecutionContext>();
     context->routines = &routines;
 
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
 
     auto context = make_unique<ExecutionContext>();
 
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
 
     auto context = make_unique<ExecutionContext>();
 
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     program->add(Instruction(InstructionType::ADDFF)); // 15015.0
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     program->add(Instruction(InstructionType::LOGORII));
 
     auto context = make_unique<ExecutionContext>();
-    auto execution = ScriptExecution(program, move(context));
+    auto execution = ScriptExecution(program, std::move(context));
 
     // when
     auto result = execution.run();

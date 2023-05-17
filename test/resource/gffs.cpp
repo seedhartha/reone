@@ -17,9 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayoutput.h"
+
 
 using namespace std;
 
@@ -29,7 +30,7 @@ using namespace reone::resource;
 class StubProvider : public IResourceProvider {
 public:
     void add(ResourceId id, shared_ptr<ByteArray> res) {
-        _resources.insert(make_pair(id, move(res)));
+        _resources.insert(make_pair(id, std::move(res)));
     }
 
     shared_ptr<ByteArray> find(const ResourceId &id) override { return _resources.at(id); }

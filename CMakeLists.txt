@@ -58,6 +58,7 @@ if(ENABLE_MOVIE)
 endif()
 
 if(BUILD_LAUNCHER)
+    find_package(wxWidgets REQUIRED core base)
 endif()
 
 set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
