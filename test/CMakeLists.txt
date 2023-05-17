@@ -85,7 +85,11 @@ set(TESTS_SOURCES
 add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_include_directories(tests PRIVATE ${GTEST_INCLUDE_DIRS})
-target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
+
+if(NOT MINGW)
+    target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
+endif()
+
 target_precompile_headers(tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(tests PRIVATE tools ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} GTest::gmock GTest::gmock_main)
 
