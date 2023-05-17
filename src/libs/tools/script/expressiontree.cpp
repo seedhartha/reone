@@ -77,9 +77,9 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     }
 
     return ExpressionTree(
-        move(functionsVec),
+        std::move(functionsVec),
         ctx->expressions,
-        move(globals));
+        std::move(globals));
 }
 
 ExpressionTree::BlockExpression *ExpressionTree::decompileSafely(uint32_t start, shared_ptr<DecompilationContext> ctx) {

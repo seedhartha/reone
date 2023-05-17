@@ -216,8 +216,8 @@ Variable actionStartConversation(const vector<Variable> &args, const RoutineCont
         dialogResRef = caller->conversation();
     }
     auto action = ctx.game.actionFactory().newStartConversation(
-        move(objectToConverse),
-        move(dialogResRef),
+        std::move(objectToConverse),
+        std::move(dialogResRef),
         privateConversation,
         conversationType,
         ignoreStartRange,

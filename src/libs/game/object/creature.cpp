@@ -907,7 +907,7 @@ string Creature::getDieAnimation() const {
 }
 
 string Creature::getFirstIfCreatureModel(string creatureAnim, string elseAnim) const {
-    return _modelType == Creature::ModelType::Creature ? move(creatureAnim) : move(elseAnim);
+    return _modelType == Creature::ModelType::Creature ? std::move(creatureAnim) : std::move(elseAnim);
 }
 
 string Creature::getDeadAnimation() const {

@@ -130,9 +130,9 @@ void MdlReader::onLoad() {
     _model = make_unique<Model>(
         name,
         classification,
-        move(rootNode),
-        move(animations),
-        move(superModel),
+        std::move(rootNode),
+        std::move(animations),
+        std::move(superModel),
         animationScale);
 
     _model->setAffectedByFog(affectedByFog != 0);
@@ -181,8 +181,8 @@ shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *parent, b
     auto node = make_shared<ModelNode>(
         nodeNumber,
         name,
-        move(restPosition),
-        move(restOrientation),
+        std::move(restPosition),
+        std::move(restOrientation),
         animated,
         parent);
 
@@ -768,12 +768,12 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     }
 
     return make_unique<Animation>(
-        move(name),
+        std::move(name),
         length,
         transitionTime,
         root != _modelName ? root : "",
-        move(rootNode),
-        move(events));
+        std::move(rootNode),
+        std::move(events));
 }
 
 void MdlReader::initControllerFn() {

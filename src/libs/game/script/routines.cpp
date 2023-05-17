@@ -1777,10 +1777,10 @@ void Routines::add(
     }
 
     _routines.emplace_back(
-        move(name),
+        std::move(name),
         retType,
-        move(defRetValue),
-        move(argTypes),
+        std::move(defRetValue),
+        std::move(argTypes),
         [this, fn](auto &args, auto &execution) {
             RoutineContext ctx(*_game, *_services, execution);
             return fn(args, std::move(ctx));
@@ -1795,10 +1795,10 @@ void Routines::add(
     Variable defRetValue) {
 
     _routines.emplace_back(
-        move(name),
+        std::move(name),
         retType,
-        move(defRetValue),
-        move(argTypes),
+        std::move(defRetValue),
+        std::move(argTypes),
         [this, fn](auto &args, auto &execution) {
             RoutineContext ctx(*_game, *_services, execution);
             return fn(args, std::move(ctx));
