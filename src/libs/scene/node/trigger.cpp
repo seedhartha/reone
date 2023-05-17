@@ -18,8 +18,8 @@
 #include "reone/scene/node/trigger.h"
 
 #include "reone/graphics/context.h"
-#include "reone/graphics/mesh.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/mesh.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 
@@ -56,9 +56,9 @@ void TriggerSceneNode::init() {
         face.indices[0] = 0;
         face.indices[1] = i1;
         face.indices[2] = i2;
-        face.normal = move(normal);
+        face.normal = std::move(normal);
         face.material = kMaxWalkmeshMaterials - 1;
-        faces.push_back(move(face));
+        faces.push_back(std::move(face));
     }
 
     for (size_t i = 0; i < normals.size(); ++i) {
@@ -89,7 +89,7 @@ void TriggerSceneNode::init() {
     spec.offNormals = 3 * sizeof(float);
     spec.offMaterial = 6 * sizeof(float);
 
-    _mesh = make_unique<Mesh>(move(vertices), move(faces), move(spec));
+    _mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     _mesh->init();
 
     for (auto &point : _geometry) {

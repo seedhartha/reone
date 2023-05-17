@@ -51,7 +51,7 @@ void TlkWriter::save(IOutputStream &out) {
         strDataElem.soundResRef = str.soundResRef;
         strDataElem.offString = offString;
         strDataElem.stringSize = strSize;
-        strData.push_back(move(strDataElem));
+        strData.push_back(std::move(strDataElem));
 
         offString += strSize;
     }

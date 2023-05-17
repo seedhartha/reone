@@ -106,7 +106,7 @@ mad_flow Mp3Reader::outputFunc(void *playbuf, mad_header const *header, mad_pcm 
         }
     }
 
-    mp3->_stream->add(move(frame));
+    mp3->_stream->add(std::move(frame));
 
     return MAD_FLOW_CONTINUE;
 }

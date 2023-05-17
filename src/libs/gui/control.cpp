@@ -215,8 +215,8 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     _graphicsSvc.uniforms.setGeneral([this, projection, transform](auto &general) {
         general.resetGlobals();
         general.resetLocals();
-        general.projection = move(projection);
-        general.model = move(transform);
+        general.projection = std::move(projection);
+        general.model = std::move(transform);
     });
     _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
     _graphicsSvc.textures.bind(*output);
@@ -538,7 +538,7 @@ void Control::setFocus(bool focus) {
 }
 
 void Control::setExtent(Extent extent) {
-    _extent = move(extent);
+    _extent = std::move(extent);
     updateTransform();
     updateTextLines();
 }
@@ -554,7 +554,7 @@ void Control::setExtentTop(int top) {
 }
 
 void Control::setBorder(Border border) {
-    _border = make_shared<Border>(move(border));
+    _border = make_shared<Border>(std::move(border));
 }
 
 void Control::setBorderFill(string resRef) {
@@ -562,7 +562,7 @@ void Control::setBorderFill(string resRef) {
     if (!resRef.empty()) {
         texture = _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
     }
-    setBorderFill(move(texture));
+    setBorderFill(std::move(texture));
 }
 
 void Control::setBorderFill(shared_ptr<Texture> texture) {
@@ -574,16 +574,16 @@ void Control::setBorderFill(shared_ptr<Texture> texture) {
         if (!_border) {
             _border = make_shared<Border>();
         }
-        _border->fill = move(texture);
+        _border->fill = std::move(texture);
     }
 }
 
 void Control::setBorderColor(glm::vec3 color) {
-    _border->color = move(color);
+    _border->color = std::move(color);
 }
 
 void Control::setBorderColorOverride(glm::vec3 color) {
-    _borderColorOverride = move(color);
+    _borderColorOverride = std::move(color);
 }
 
 void Control::setUseBorderColorOverride(bool use) {
@@ -598,7 +598,7 @@ void Control::setHilightColor(glm::vec3 color) {
     if (!_hilight) {
         _hilight = make_shared<Border>();
     }
-    _hilight->color = move(color);
+    _hilight->color = std::move(color);
 }
 
 void Control::setHilightFill(string resRef) {
@@ -618,31 +618,31 @@ void Control::setHilightFill(shared_ptr<Texture> texture) {
         if (!_hilight) {
             _hilight = make_shared<Border>();
         }
-        _hilight->fill = move(texture);
+        _hilight->fill = std::move(texture);
     }
 }
 
 void Control::setText(Text text) {
-    _text = move(text);
+    _text = std::move(text);
     updateTextLines();
 }
 
 void Control::setTextMessage(string text) {
-    _text.text = move(text);
+    _text.text = std::move(text);
     updateTextLines();
 }
 
 void Control::setTextFont(shared_ptr<Font> font) {
-    _text.font = move(font);
+    _text.font = std::move(font);
     updateTextLines();
 }
 
 void Control::setTextColor(glm::vec3 color) {
-    _text.color = move(color);
+    _text.color = std::move(color);
 }
 
 void Control::setSceneName(string name) {
-    _sceneName = move(name);
+    _sceneName = std::move(name);
 }
 
 void Control::setPadding(int padding) {

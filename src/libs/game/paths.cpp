@@ -58,10 +58,10 @@ unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
             int pointIdx = connections[connectionIdx];
             point.adjPoints.push_back(pointIdx);
         }
-        path->points.push_back(move(point));
+        path->points.push_back(std::move(point));
     }
 
-    return move(path);
+    return std::move(path);
 }
 
 } // namespace game

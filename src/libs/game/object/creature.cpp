@@ -114,7 +114,7 @@ void Creature::loadAppearance() {
     auto modelSceneNode = buildModel();
     if (modelSceneNode) {
         finalizeModel(*modelSceneNode);
-        _sceneNode = move(modelSceneNode);
+        _sceneNode = std::move(modelSceneNode);
         _sceneNode->setUser(*this);
         _sceneNode->setLocalTransform(_transform);
     }
@@ -270,7 +270,7 @@ void Creature::playAnimation(AnimationType type, AnimationProperties properties)
     if (animName.empty())
         return;
 
-    playAnimation(animName, move(properties));
+    playAnimation(animName, std::move(properties));
 }
 
 void Creature::playAnimation(const string &name, AnimationProperties properties) {
@@ -412,7 +412,7 @@ void Creature::setPath(const glm::vec3 &dest, vector<glm::vec3> &&points, uint32
     path->timeFound = timeFound;
     path->pointIdx = pointIdx;
 
-    _path = move(path);
+    _path = std::move(path);
 }
 
 void Creature::clearPath() {
@@ -605,7 +605,7 @@ shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
         result = attackAction->object();
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 int Creature::getAttackBonus(bool offHand) const {
@@ -776,7 +776,7 @@ void Creature::advanceOnPath(bool run, float dt) {
 void Creature::updatePath(const glm::vec3 &dest) {
     vector<glm::vec3> points(_game.module()->area()->pathfinder().findPath(_position, dest));
     uint32_t now = _services.system.clock.ticks();
-    setPath(dest, move(points), now);
+    setPath(dest, std::move(points), now);
 }
 
 string Creature::getAnimationName(AnimationType anim) const {
@@ -1058,7 +1058,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
 
-    return move(sceneNode);
+    return std::move(sceneNode);
 }
 
 void Creature::finalizeModel(ModelSceneNode &body) {
@@ -1153,7 +1153,7 @@ string Creature::getBodyModelName() const {
     string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
 
-    return move(modelName);
+    return std::move(modelName);
 }
 
 string Creature::getBodyTextureName() const {
@@ -1188,7 +1188,7 @@ string Creature::getBodyTextureName() const {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
             shared_ptr<Texture> texture(_services.graphics.textures.get(tmp, TextureUsage::Diffuse));
             if (texture) {
-                texName = move(tmp);
+                texName = std::move(tmp);
                 texFound = true;
             }
         }
@@ -1197,7 +1197,7 @@ string Creature::getBodyTextureName() const {
         }
     }
 
-    return move(texName);
+    return std::move(texName);
 }
 
 string Creature::getHeadModelName() const {
@@ -1220,7 +1220,7 @@ string Creature::getHeadModelName() const {
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
 
-    return move(modelName);
+    return std::move(modelName);
 }
 
 string Creature::getMaskModelName() const {
@@ -1231,7 +1231,7 @@ string Creature::getMaskModelName() const {
     string modelName(boost::to_lower_copy(headItem->itemClass()));
     modelName += str(boost::format("_%03d") % headItem->modelVariation());
 
-    return move(modelName);
+    return std::move(modelName);
 }
 
 string Creature::getWeaponModelName(int slot) const {
@@ -1244,7 +1244,7 @@ string Creature::getWeaponModelName(int slot) const {
 
     modelName += str(boost::format("_%03d") % bodyItem->modelVariation());
 
-    return move(modelName);
+    return std::move(modelName);
 }
 
 void Creature::loadUTC(const Gff &utc) {

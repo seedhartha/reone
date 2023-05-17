@@ -17,10 +17,10 @@
 
 #include "reone/graphics/textures.h"
 
+#include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/stream/bytearrayinput.h"
-#include "reone/resource/resources.h"
 
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/format/tgareader.h"
@@ -64,9 +64,9 @@ void Textures::init() {
         float *pixel = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
         *pixel = random(-1.0f, 1.0f);
     }
-    auto noiseLayer = Texture::Layer {move(noisePixels)};
+    auto noiseLayer = Texture::Layer {std::move(noisePixels)};
     _noiseRG = make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
-    _noiseRG->setPixels(4, 4, PixelFormat::RG16F, move(noiseLayer));
+    _noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
     _noiseRG->init();
 
     auto ssaoPixels = make_shared<ByteArray>();
@@ -74,9 +74,9 @@ void Textures::init() {
     (*ssaoPixels)[0] = 0xff;
     (*ssaoPixels)[1] = 0xff;
     (*ssaoPixels)[2] = 0xff;
-    auto ssaoLayer = Texture::Layer {move(ssaoPixels)};
+    auto ssaoLayer = Texture::Layer {std::move(ssaoPixels)};
     _ssaoRGB = make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
-    _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, move(ssaoLayer));
+    _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
     _ssaoRGB->init();
 
     auto ssrPixels = make_shared<ByteArray>();
@@ -85,9 +85,9 @@ void Textures::init() {
     (*ssrPixels)[1] = 0;
     (*ssrPixels)[2] = 0;
     (*ssrPixels)[3] = 0;
-    auto ssrLayer = Texture::Layer {move(ssrPixels)};
+    auto ssrLayer = Texture::Layer {std::move(ssrPixels)};
     _ssrRGBA = make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
-    _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, move(ssrLayer));
+    _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, std::move(ssrLayer));
     _ssrRGBA->init();
 
     bindBuiltIn();
@@ -183,7 +183,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         warn("Texture not found: " + resRef, LogChannels::graphics);
     }
 
-    return move(texture);
+    return std::move(texture);
 }
 
 } // namespace graphics

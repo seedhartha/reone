@@ -204,7 +204,7 @@ void MainMenu::loadModuleNames() {
         ListBox::Item item;
         item.tag = module;
         item.text = module;
-        _binding.lbModules->addItem(move(item));
+        _binding.lbModules->addItem(std::move(item));
     }
 }
 

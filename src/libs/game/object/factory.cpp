@@ -36,39 +36,39 @@ shared_ptr<Item> ObjectFactory::newItem() {
 }
 
 shared_ptr<Area> ObjectFactory::newArea(string sceneName) {
-    return newObject<Area>(move(sceneName), _game, _services);
+    return newObject<Area>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature(string sceneName) {
-    return newObject<Creature>(move(sceneName), _game, _services);
+    return newObject<Creature>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Placeable> ObjectFactory::newPlaceable(string sceneName) {
-    return newObject<Placeable>(move(sceneName), _game, _services);
+    return newObject<Placeable>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Door> ObjectFactory::newDoor(string sceneName) {
-    return newObject<Door>(move(sceneName), _game, _services);
+    return newObject<Door>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Waypoint> ObjectFactory::newWaypoint(string sceneName) {
-    return newObject<Waypoint>(move(sceneName), _game, _services);
+    return newObject<Waypoint>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger(string sceneName) {
-    return newObject<Trigger>(move(sceneName), _game, _services);
+    return newObject<Trigger>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Sound> ObjectFactory::newSound(string sceneName) {
-    return newObject<Sound>(move(sceneName), _game, _services);
+    return newObject<Sound>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera(string sceneName) {
-    return newObject<PlaceableCamera>(move(sceneName), _game, _services);
+    return newObject<PlaceableCamera>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Encounter> ObjectFactory::newEncounter(string sceneName) {
-    return newObject<Encounter>(move(sceneName), _game, _services);
+    return newObject<Encounter>(std::move(sceneName), _game, _services);
 }
 
 shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {

@@ -17,14 +17,14 @@
 
 #include "reone/game/combat.h"
 
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-#include "reone/scene/graphs.h"
-#include "reone/scene/di/services.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -44,12 +44,12 @@ static constexpr float kProjectileSpeed = 16.0f;
 
 static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     auto attack = make_unique<Combat::Attack>();
-    attack->attacker = move(attacker);
-    attack->target = move(target);
-    attack->action = move(action);
+    attack->attacker = std::move(attacker);
+    attack->target = std::move(target);
+    attack->action = std::move(action);
     attack->resultType = resultType;
     attack->damage = damage;
-    return move(attack);
+    return std::move(attack);
 }
 
 static bool isRoundPastFirstAttack(float time) {
@@ -81,7 +81,7 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target,
     // Otherwise, start a new combat round
     auto round = make_unique<Round>();
     round->attack1 = makeAttack(attacker, target, action, resultType, damage);
-    _roundByAttacker.insert(make_pair(attacker->id(), move(round)));
+    _roundByAttacker.insert(make_pair(attacker->id(), std::move(round)));
     debug(boost::format("Start round: %s -> %s") % attacker->tag() % target->tag(), LogChannels::combat);
 }
 
@@ -323,7 +323,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 void Combat::applyAttackResult(const Attack &attack, bool offHand) {
@@ -352,7 +352,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
             }
         } else {
             shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
-            attack.target->applyEffect(move(effect), DurationType::Instant);
+            attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
     }
@@ -365,7 +365,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
             }
         } else {
             shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
-            attack.target->applyEffect(move(effect), DurationType::Instant);
+            attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
     }
@@ -386,9 +386,9 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, DamagePower::Normal, move(damager)));
+    shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, DamagePower::Normal, std::move(damager)));
 
-    return vector<shared_ptr<DamageEffect>> {move(effect)};
+    return vector<shared_ptr<DamageEffect>> {std::move(effect)};
 }
 
 void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<Object> &target, Round &round) {

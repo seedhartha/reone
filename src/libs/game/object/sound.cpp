@@ -21,16 +21,16 @@
 #include "reone/audio/player.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/sound.h"
-#include "reone/scene/di/services.h"
 
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
+#include "reone/game/game.h"
 
 using namespace std;
 
@@ -109,7 +109,7 @@ void Sound::loadTransformFromGIT(const Gff &gffs) {
     sceneNode->setEnabled(_active);
     sceneNode->setPriority(_priority);
     sceneNode->setMaxDistance(_maxDistance);
-    _sceneNode = move(sceneNode);
+    _sceneNode = std::move(sceneNode);
 }
 
 void Sound::update(float dt) {

@@ -286,7 +286,7 @@ void CharacterGeneration::startLevelUp() {
     character.appearance = partyLeader->appearance();
     character.gender = partyLeader->gender();
     character.attributes = partyLeader->attributes();
-    setCharacter(move(character));
+    setCharacter(std::move(character));
 
     int nextLevel = partyLeader->attributes().getAggregateLevel() + 1;
     bool hasAttributes = nextLevel % 4 == 0;
@@ -392,7 +392,7 @@ void CharacterGeneration::finish() {
 void CharacterGeneration::setCharacter(Character character) {
     bool appearanceChanged = character.appearance != _character.appearance;
 
-    _character = move(character);
+    _character = std::move(character);
 
     if (appearanceChanged) {
         reloadCharacterModel();
@@ -432,7 +432,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &s
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *creature->sceneNode());
 
-    return move(model);
+    return std::move(model);
 }
 
 void CharacterGeneration::updateAttributes() {

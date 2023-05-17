@@ -60,7 +60,7 @@ public:
             return maybeGUI->second;
         }
         auto gui = doGet(resRef, preload);
-        return _guis.insert(make_pair(resRef, move(gui))).first->second;
+        return _guis.insert(make_pair(resRef, std::move(gui))).first->second;
     }
 
 private:

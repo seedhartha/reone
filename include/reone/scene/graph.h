@@ -194,7 +194,7 @@ public:
         return _fog.color;
     }
 
-    void setFog(FogProperties fog) {
+    void setFog(FogProperties fog) override {
         _fog = std::move(fog);
     }
 
@@ -213,15 +213,15 @@ public:
 
     // Collision detection and object picking
 
-    bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
-    bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const;
-    bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
+    bool testElevation(const glm::vec2 &position, Collision &outCollision) const override;
+    bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const override;
+    bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const override;
 
-    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const;
+    ModelSceneNode *pickModelAt(int x, int y, IUser *except = nullptr) const override;
 
-    void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
-    void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
-    void setLineOfSightSurfaces(std::set<uint32_t> surfaces) { _lineOfSightSurfaces = std::move(surfaces); }
+    void setWalkableSurfaces(std::set<uint32_t> surfaces) override { _walkableSurfaces = std::move(surfaces); }
+    void setWalkcheckSurfaces(std::set<uint32_t> surfaces) override { _walkcheckSurfaces = std::move(surfaces); }
+    void setLineOfSightSurfaces(std::set<uint32_t> surfaces) override { _lineOfSightSurfaces = std::move(surfaces); }
 
     // END Collision detection and object picking
 

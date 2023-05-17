@@ -17,11 +17,11 @@
 
 #include "reone/tools/lip.h"
 
+#include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/format/lipwriter.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/format/lipwriter.h"
 
 #include "tinyxml2.h"
 
@@ -104,7 +104,7 @@ void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem
             element->FloatAttribute("time"),
             static_cast<uint8_t>(element->UnsignedAttribute("shape"))});
     }
-    auto animation = LipAnimation("", length, move(keyframes));
+    auto animation = LipAnimation("", length, std::move(keyframes));
 
     vector<string> tokens;
     boost::split(
@@ -116,7 +116,7 @@ void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem
     auto lipPath = boost::filesystem::path(destPath);
     lipPath.append(tokens[0] + ".lip");
 
-    auto writer = LipWriter(move(animation));
+    auto writer = LipWriter(std::move(animation));
     writer.save(lipPath);
 }
 

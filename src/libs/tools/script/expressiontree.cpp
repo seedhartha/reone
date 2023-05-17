@@ -17,14 +17,14 @@
 
 #include "reone/tools/script/expressiontree.h"
 
-#include "reone/system/exception/argument.h"
-#include "reone/system/exception/notimplemented.h"
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variableutil.h"
+#include "reone/system/exception/argument.h"
+#include "reone/system/exception/notimplemented.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
             auto label = make_shared<LabelExpression>();
             label->offset = offset;
             labels[offset] = label.get();
-            expressions.push_back(move(label));
+            expressions.push_back(std::move(label));
         }
     }
 
@@ -69,7 +69,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
     }
 
-    ctx->functions[startFunc->offset] = move(startFunc);
+    ctx->functions[startFunc->offset] = std::move(startFunc);
 
     auto functionsVec = vector<shared_ptr<Function>>();
     for (auto it = ctx->functions.rbegin(); it != ctx->functions.rend(); ++it) {
@@ -129,7 +129,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             }
 
             block->append(retExpr.get());
-            ctx->expressions.push_back(move(retExpr));
+            ctx->expressions.push_back(std::move(retExpr));
             break;
 
         } else if (ins.type == InstructionType::JMP) {
@@ -144,7 +144,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             }
 
             block->append(gotoExpr.get());
-            ctx->expressions.push_back(move(gotoExpr));
+            ctx->expressions.push_back(std::move(gotoExpr));
             break;
 
         } else if (ins.type == InstructionType::JSR) {
@@ -214,7 +214,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 callExpr->arguments.push_back(param);
             }
 
-            ctx->expressions.push_back(move(callExpr));
+            ctx->expressions.push_back(std::move(callExpr));
 
         } else if (ins.type == InstructionType::JZ ||
                    ins.type == InstructionType::JNZ) {
@@ -249,11 +249,11 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 ctx->branches->insert(make_pair(absJumpOffset, make_shared<DecompilationContext>(*ctx)));
             }
 
-            ctx->expressions.push_back(move(rightExpr));
-            ctx->expressions.push_back(move(testExpr));
-            ctx->expressions.push_back(move(ifTrueGotoExpr));
-            ctx->expressions.push_back(move(ifTrueBlockExpr));
-            ctx->expressions.push_back(move(condExpr));
+            ctx->expressions.push_back(std::move(rightExpr));
+            ctx->expressions.push_back(std::move(testExpr));
+            ctx->expressions.push_back(std::move(ifTrueGotoExpr));
+            ctx->expressions.push_back(std::move(ifTrueBlockExpr));
+            ctx->expressions.push_back(std::move(condExpr));
 
         } else if (ins.type == InstructionType::RSADDI ||
                    ins.type == InstructionType::RSADDF ||
@@ -266,7 +266,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto expression = parameterExpression(ins);
             block->append(expression.get());
             ctx->pushStack(expression.get());
-            ctx->expressions.push_back(move(expression));
+            ctx->expressions.push_back(std::move(expression));
 
         } else if (ins.type == InstructionType::CONSTI ||
                    ins.type == InstructionType::CONSTF ||
@@ -286,9 +286,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             block->append(assignExpr.get());
 
             ctx->pushStack(paramExpr.get());
-            ctx->expressions.push_back(move(constExpr));
-            ctx->expressions.push_back(move(paramExpr));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(constExpr));
+            ctx->expressions.push_back(std::move(paramExpr));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::ACTION) {
             auto &routine = ctx->routines.get(ins.routine);
@@ -320,7 +320,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto actionExpr = make_shared<ActionExpression>();
             actionExpr->offset = ins.offset;
             actionExpr->action = ins.routine;
-            actionExpr->arguments = move(arguments);
+            actionExpr->arguments = std::move(arguments);
 
             if (routine.returnType() != VariableType::Void) {
                 auto returnValue = make_shared<ParameterExpression>();
@@ -345,14 +345,14 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 } else {
                     ctx->pushStack(returnValue.get());
                 }
-                ctx->expressions.push_back(move(returnValue));
-                ctx->expressions.push_back(move(assignExpr));
+                ctx->expressions.push_back(std::move(returnValue));
+                ctx->expressions.push_back(std::move(assignExpr));
 
             } else {
                 block->append(actionExpr.get());
             }
 
-            ctx->expressions.push_back(move(actionExpr));
+            ctx->expressions.push_back(std::move(actionExpr));
 
         } else if (ins.type == InstructionType::CPDOWNSP ||
                    ins.type == InstructionType::CPDOWNBP) {
@@ -381,7 +381,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                     destExpr->locality = ParameterLocality::Output;
                     destExpr->stackOffset = stackOffset;
                     destination = destExpr.get();
-                    ctx->expressions.push_back(move(destExpr));
+                    ctx->expressions.push_back(std::move(destExpr));
                 } else {
                     destination = left.param;
                 }
@@ -393,7 +393,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 block->append(assignExpr.get());
 
                 left = right.withAllocatedBy(*left.allocatedBy);
-                ctx->expressions.push_back(move(assignExpr));
+                ctx->expressions.push_back(std::move(assignExpr));
             }
 
         } else if (ins.type == InstructionType::CPTOPSP ||
@@ -422,7 +422,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                     sourceExpr->locality = ParameterLocality::Input;
                     sourceExpr->stackOffset = stackOffset;
                     source = sourceExpr.get();
-                    ctx->expressions.push_back(move(sourceExpr));
+                    ctx->expressions.push_back(std::move(sourceExpr));
                 } else {
                     source = frame.param;
                 }
@@ -442,10 +442,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 auto frameCopy = StackFrame(frame);
                 frameCopy.allocatedBy = ctx->topCall().function;
                 frameCopy.param = paramExpr.get();
-                ctx->stack.push_back(move(frameCopy));
+                ctx->stack.push_back(std::move(frameCopy));
 
-                ctx->expressions.push_back(move(paramExpr));
-                ctx->expressions.push_back(move(assignExpr));
+                ctx->expressions.push_back(std::move(paramExpr));
+                ctx->expressions.push_back(std::move(assignExpr));
             }
 
         } else if (ins.type == InstructionType::MOVSP) {
@@ -487,9 +487,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             block->append(assignExpr.get());
 
             ctx->pushStack(resultExpr.get());
-            ctx->expressions.push_back(move(resultExpr));
-            ctx->expressions.push_back(move(unaryExpr));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(resultExpr));
+            ctx->expressions.push_back(std::move(unaryExpr));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::ADDII ||
                    ins.type == InstructionType::ADDIF ||
@@ -651,9 +651,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             block->append(assignExpr.get());
 
             ctx->pushStack(result.get());
-            ctx->expressions.push_back(move(result));
-            ctx->expressions.push_back(move(binaryExpr));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(result));
+            ctx->expressions.push_back(std::move(binaryExpr));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::ADDVV ||
                    ins.type == InstructionType::SUBVV) {
@@ -698,9 +698,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ctx->pushStack(resultY);
             ctx->pushStack(resultZ);
 
-            ctx->expressions.push_back(move(result));
-            ctx->expressions.push_back(move(binaryExpr));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(result));
+            ctx->expressions.push_back(std::move(binaryExpr));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::DIVFV ||
                    ins.type == InstructionType::MULFV) {
@@ -740,9 +740,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ctx->pushStack(resultY);
             ctx->pushStack(resultZ);
 
-            ctx->expressions.push_back(move(result));
-            ctx->expressions.push_back(move(binaryExpr));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(result));
+            ctx->expressions.push_back(std::move(binaryExpr));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::DIVVF ||
                    ins.type == InstructionType::MULVF) {
@@ -782,9 +782,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ctx->pushStack(resultY);
             ctx->pushStack(resultZ);
 
-            ctx->expressions.push_back(move(binaryExpr));
-            ctx->expressions.push_back(move(result));
-            ctx->expressions.push_back(move(assignExpr));
+            ctx->expressions.push_back(std::move(binaryExpr));
+            ctx->expressions.push_back(std::move(result));
+            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::EQUALTT ||
                    ins.type == InstructionType::NEQUALTT) {
@@ -824,13 +824,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->right = andOrExpression.get();
                 block->append(assignExpr.get());
 
-                ctx->expressions.push_back(move(compExpr));
-                ctx->expressions.push_back(move(andOrExpression));
-                ctx->expressions.push_back(move(assignExpr));
+                ctx->expressions.push_back(std::move(compExpr));
+                ctx->expressions.push_back(std::move(andOrExpression));
+                ctx->expressions.push_back(std::move(assignExpr));
             }
 
             ctx->pushStack(resultExpr.get());
-            ctx->expressions.push_back(move(resultExpr));
+            ctx->expressions.push_back(std::move(resultExpr));
 
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto absJumpOffset = ins.offset + 0x10;
@@ -849,8 +849,8 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
 
             ctx->savedAction = innerBlock.get();
 
-            ctx->expressions.push_back(move(gotoExpr));
-            ctx->expressions.push_back(move(innerBlock));
+            ctx->expressions.push_back(std::move(gotoExpr));
+            ctx->expressions.push_back(std::move(innerBlock));
 
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx->prevNumGlobals = ctx->numGlobals;
@@ -885,7 +885,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 destExpr->locality = ParameterLocality::Output;
                 destExpr->stackOffset = stackOffset;
                 destination = destExpr.get();
-                ctx->expressions.push_back(move(destExpr));
+                ctx->expressions.push_back(std::move(destExpr));
             } else {
                 destination = frame.param;
             }
@@ -904,7 +904,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             unaryExpr->operand = destination;
             block->append(unaryExpr.get());
 
-            ctx->expressions.push_back(move(unaryExpr));
+            ctx->expressions.push_back(std::move(unaryExpr));
 
         } else if (ins.type == InstructionType::DESTRUCT) {
             auto numFrames = ins.size / 4;
@@ -972,7 +972,7 @@ unique_ptr<ExpressionTree::ConstantExpression> ExpressionTree::constantExpressio
         } else if (ins.type == InstructionType::CONSTO) {
             constExpr->value = Variable::ofObject(ins.objectId);
         }
-        return move(constExpr);
+        return std::move(constExpr);
     }
     default:
         throw ArgumentException("Instruction is not of CONSTx type: " + to_string(static_cast<int>(ins.type)));
@@ -1008,7 +1008,7 @@ unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpress
         } else if (ins.type == InstructionType::RSADDTAL) {
             paramExpr->variableType = VariableType::Talent;
         }
-        return move(paramExpr);
+        return std::move(paramExpr);
     }
     default:
         throw ArgumentException("Instruction is not of RSADDx type: " + to_string(static_cast<int>(ins.type)));
@@ -1068,9 +1068,9 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     outX = xParamExpr.get();
 
-    expressions.push_back(move(xParamExpr));
-    expressions.push_back(move(xIndexExpr));
-    expressions.push_back(move(xAssignExpr));
+    expressions.push_back(std::move(xParamExpr));
+    expressions.push_back(std::move(xIndexExpr));
+    expressions.push_back(std::move(xAssignExpr));
 
     // Y
 
@@ -1093,9 +1093,9 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     outY = yParamExpr.get();
 
-    expressions.push_back(move(yParamExpr));
-    expressions.push_back(move(yIndexExpr));
-    expressions.push_back(move(yAssignExpr));
+    expressions.push_back(std::move(yParamExpr));
+    expressions.push_back(std::move(yIndexExpr));
+    expressions.push_back(std::move(yAssignExpr));
 
     // Z
 
@@ -1118,9 +1118,9 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     outZ = zParamExpr.get();
 
-    expressions.push_back(move(zParamExpr));
-    expressions.push_back(move(zIndexExpr));
-    expressions.push_back(move(zAssignExpr));
+    expressions.push_back(std::move(zParamExpr));
+    expressions.push_back(std::move(zIndexExpr));
+    expressions.push_back(std::move(zAssignExpr));
 }
 
 } // namespace script

@@ -97,10 +97,10 @@ void ContainerGUI::open(shared_ptr<Object> container) {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        _binding.lbItems->addItem(move(lbItem));
+        _binding.lbItems->addItem(std::move(lbItem));
     }
 
-    _container = move(container);
+    _container = std::move(container);
 }
 
 shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {

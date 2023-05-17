@@ -90,7 +90,7 @@ float BinaryResourceReader::readFloat() {
 string BinaryResourceReader::readCString(int len) {
     string result(_reader->getString(len));
     result.erase(find(result.begin(), result.end(), '\0'), result.end());
-    return move(result);
+    return std::move(result);
 }
 
 string BinaryResourceReader::readCString(size_t off, int len) {
@@ -100,7 +100,7 @@ string BinaryResourceReader::readCString(size_t off, int len) {
     string result(readCString(len));
     _reader->seek(pos);
 
-    return move(result);
+    return std::move(result);
 }
 
 string BinaryResourceReader::readCStringAt(size_t off) {
@@ -110,7 +110,7 @@ string BinaryResourceReader::readCStringAt(size_t off) {
     string result(_reader->getNullTerminatedString());
     _reader->seek(pos);
 
-    return move(result);
+    return std::move(result);
 }
 
 string BinaryResourceReader::readString(int len) {
@@ -124,7 +124,7 @@ string BinaryResourceReader::readString(size_t off, int len) {
     string result(_reader->getString(len));
     _reader->seek(pos);
 
-    return move(result);
+    return std::move(result);
 }
 
 ByteArray BinaryResourceReader::readBytes(int count) {
@@ -138,7 +138,7 @@ ByteArray BinaryResourceReader::readBytes(size_t off, int count) {
     ByteArray result(_reader->getBytes(count));
     _reader->seek(pos);
 
-    return move(result);
+    return std::move(result);
 }
 
 } // namespace resource

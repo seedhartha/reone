@@ -99,7 +99,7 @@ void ImageButton::drawIcon(
         _graphicsSvc.uniforms.setGeneral([this, transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _graphicsSvc.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
             general.color = glm::vec4(color, 1.0f);
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
@@ -116,7 +116,7 @@ void ImageButton::drawIcon(
         _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _graphicsSvc.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
         });
         _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
         _graphicsSvc.meshes.quad().draw();

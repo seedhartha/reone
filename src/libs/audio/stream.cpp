@@ -25,7 +25,7 @@ namespace audio {
 
 void AudioStream::add(Frame &&frame) {
     _duration += frame.samples.size() / static_cast<float>(frame.sampleRate);
-    _frames.push_back(move(frame));
+    _frames.push_back(std::move(frame));
 }
 
 int AudioStream::getFrameCount() const {

@@ -59,7 +59,7 @@ void Reputes::init() {
 
             values.push_back(value);
         }
-        g_factionValues.push_back(move(values));
+        g_factionValues.push_back(std::move(values));
     }
 }
 

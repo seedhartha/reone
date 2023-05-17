@@ -158,7 +158,7 @@ void PeReader::loadResourceDataEntry(const Section &section) {
     res.offset = section.offset + offData - section.virtualAddress;
     res.size = sizeData;
 
-    _resources.push_back(move(res));
+    _resources.push_back(std::move(res));
 }
 
 } // namespace resource

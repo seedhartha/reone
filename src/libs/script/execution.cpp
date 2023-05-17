@@ -37,8 +37,8 @@ static constexpr int kStartInstructionOffset = 13;
 static constexpr float kFloatTolerance = 1e-5;
 
 ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) :
-    _context(move(context)),
-    _program(move(program)) {
+    _context(std::move(context)),
+    _program(std::move(program)) {
 
     static unordered_map<InstructionType, function<void(ScriptExecution *, const Instruction &)>> g_handlers {
         {InstructionType::CPDOWNSP, &ScriptExecution::executeCPDOWNSP},
@@ -276,7 +276,7 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
         case VariableType::Action: {
             auto ctx = make_shared<ExecutionContext>(*_context);
             ctx->savedState = make_shared<ExecutionState>(_savedState);
-            args.push_back(Variable::ofAction(move(ctx)));
+            args.push_back(Variable::ofAction(std::move(ctx)));
             break;
         }
         default:
@@ -284,7 +284,7 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
             if (var.type != type) {
                 throw runtime_error("Invalid argument variable type");
             }
-            args.push_back(move(var));
+            args.push_back(std::move(var));
             _stack.pop_back();
             break;
         }
@@ -371,12 +371,12 @@ void ScriptExecution::executeEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
     vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
-        vars1.push_back(move(_stack.back()));
+        vars1.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
     vector<Variable> vars2;
     for (int i = 0; i < numVariables; ++i) {
-        vars2.push_back(move(_stack.back()));
+        vars2.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
     bool equal = std::equal(vars1.begin(), vars1.end(), vars2.begin());
@@ -435,12 +435,12 @@ void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
     vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
-        vars1.push_back(move(_stack.back()));
+        vars1.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
     vector<Variable> vars2;
     for (int i = 0; i < numVariables; ++i) {
-        vars2.push_back(move(_stack.back()));
+        vars2.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
     bool notEqual = !std::equal(vars1.begin(), vars1.end(), vars2.begin());
@@ -838,7 +838,7 @@ void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
 }
 
 int ScriptExecution::getIntFromStack() {
-    Variable var(move(_stack.back()));
+    Variable var(std::move(_stack.back()));
     _stack.pop_back();
 
     throwIfInvalidType(VariableType::Int, var.type);
@@ -847,7 +847,7 @@ int ScriptExecution::getIntFromStack() {
 }
 
 float ScriptExecution::getFloatFromStack() {
-    Variable var(move(_stack.back()));
+    Variable var(std::move(_stack.back()));
     _stack.pop_back();
 
     throwIfInvalidType(VariableType::Float, var.type);
@@ -864,10 +864,10 @@ glm::vec3 ScriptExecution::getVectorFromStack() {
 }
 
 void ScriptExecution::withStackVariables(const function<void(const Variable &, const Variable &)> &fn) {
-    Variable second(move(_stack.back()));
+    Variable second(std::move(_stack.back()));
     _stack.pop_back();
 
-    Variable first(move(_stack.back()));
+    Variable first(std::move(_stack.back()));
     _stack.pop_back();
 
     fn(first, second);

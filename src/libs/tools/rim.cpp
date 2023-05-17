@@ -17,9 +17,9 @@
 
 #include "reone/tools/rim.h"
 
-#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/rimwriter.h"
 #include "reone/resource/typeutil.h"
+#include "reone/system/stream/fileinput.h"
 
 using namespace std;
 
@@ -110,9 +110,9 @@ void RimTool::toRIM(const boost::filesystem::path &target) {
         RimWriter::Resource res;
         res.resRef = resRef.string();
         res.resType = resType;
-        res.data = move(data);
+        res.data = std::move(data);
 
-        rim.add(move(res));
+        rim.add(std::move(res));
     }
 
     boost::filesystem::path rimPath(target.parent_path());

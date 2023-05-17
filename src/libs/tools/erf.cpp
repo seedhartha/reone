@@ -17,9 +17,9 @@
 
 #include "reone/tools/erf.h"
 
-#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/typeutil.h"
+#include "reone/system/stream/fileinput.h"
 
 using namespace std;
 
@@ -110,9 +110,9 @@ void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) 
         ErfWriter::Resource res;
         res.resRef = resRef.string();
         res.resType = resType;
-        res.data = move(data);
+        res.data = std::move(data);
 
-        erf.add(move(res));
+        erf.add(std::move(res));
     }
 
     ErfWriter::FileType type;

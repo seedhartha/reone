@@ -49,7 +49,7 @@ void ParticleSceneNode::update(float dt) {
 
     auto transform = _localTransform;
     transform *= glm::translate(_velocity * dt);
-    setLocalTransform(move(transform));
+    setLocalTransform(std::move(transform));
 
     // Gravity-type P2P emitter
     if (modelNode.emitter()->p2p && !modelNode.emitter()->p2pBezier) {

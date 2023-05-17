@@ -17,15 +17,15 @@
 
 #include "reone/scene/node/model.h"
 
-#include "reone/system/collectionutil.h"
-#include "reone/system/logutil.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/system/collectionutil.h"
+#include "reone/system/logutil.h"
 
 #include "reone/scene/graph.h"
 #include "reone/scene/types.h"
@@ -87,7 +87,7 @@ void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
     if (node.isSkinMesh()) {
         // Reparent skin meshes to prevent animation being applied twice
         glm::mat4 transform(node.parent()->absoluteTransform() * node.localTransform());
-        sceneNode->setLocalTransform(move(transform));
+        sceneNode->setLocalTransform(std::move(transform));
         addChild(*sceneNode);
     } else {
         sceneNode->setLocalTransform(node.localTransform());
@@ -218,7 +218,7 @@ void ModelSceneNode::setEnvironmentMap(Texture *texture) {
 void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
     auto anim = _model->getAnimation(name);
     if (anim) {
-        playAnimation(*anim, nullptr, move(properties));
+        playAnimation(*anim, nullptr, std::move(properties));
     }
 }
 
@@ -402,7 +402,7 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
                 }
                 glm::quat animOrientation;
                 if (animNode->getOrientation(leftShape, rightShape, factor, animOrientation)) {
-                    orientation = move(animOrientation);
+                    orientation = std::move(animOrientation);
                     state.flags |= AnimationStateFlags::transform;
                 }
                 float animScale;
@@ -419,7 +419,7 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
             }
             glm::quat animOrientation;
             if (animNode->orientation().getByTime(time, animOrientation)) {
-                orientation = move(animOrientation);
+                orientation = std::move(animOrientation);
                 state.flags |= AnimationStateFlags::transform;
             }
             float animScale;
@@ -441,14 +441,14 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
         glm::vec3 animSelfIllum;
         if (animNode->selfIllumColor().getByTime(time, animSelfIllum)) {
             state.flags |= AnimationStateFlags::selfIllumColor;
-            state.selfIllumColor = move(animSelfIllum);
+            state.selfIllumColor = std::move(animSelfIllum);
         }
         glm::vec3 animColor;
         if (animNode->color().getByTime(time, animColor)) {
             state.flags |= AnimationStateFlags::color;
-            state.color = move(animColor);
+            state.color = std::move(animColor);
         }
-        channel.stateByNodeNumber[modelNode.number()] = move(state);
+        channel.stateByNodeNumber[modelNode.number()] = std::move(state);
     }
 
     for (auto &child : modelNode.children()) {

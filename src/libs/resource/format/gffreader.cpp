@@ -42,7 +42,7 @@ void GffReader::onLoad() {
     _listIndicesOffset = readUint32();
     _listIndicesCount = readUint32();
 
-    _root = move(readStruct(0));
+    _root = std::move(readStruct(0));
 }
 
 unique_ptr<Gff> GffReader::readStruct(int idx) {
@@ -63,7 +63,7 @@ unique_ptr<Gff> GffReader::readStruct(int idx) {
         }
     }
 
-    return make_unique<Gff>(type, move(fields));
+    return make_unique<Gff>(type, std::move(fields));
 }
 
 Gff::Field GffReader::readField(int idx) {
@@ -147,7 +147,7 @@ Gff::Field GffReader::readField(int idx) {
         throw ValidationException("Unsupported field type: " + to_string(type));
     }
 
-    return move(field);
+    return std::move(field);
 }
 
 string GffReader::readLabel(int idx) {
@@ -176,7 +176,7 @@ string GffReader::readStringFieldData(uint32_t off) {
     string s(readCString(size));
     seek(pos);
 
-    return move(s);
+    return std::move(s);
 }
 
 string GffReader::readResRefFieldData(uint32_t off) {
@@ -187,7 +187,7 @@ string GffReader::readResRefFieldData(uint32_t off) {
     string s(readCString(size));
     seek(pos);
 
-    return move(s);
+    return std::move(s);
 }
 
 GffReader::LocString GffReader::readCExoLocStringFieldData(uint32_t off) {
@@ -213,7 +213,7 @@ GffReader::LocString GffReader::readCExoLocStringFieldData(uint32_t off) {
 
     seek(pos);
 
-    return move(loc);
+    return std::move(loc);
 }
 
 int32_t GffReader::readStrRefFieldData(uint32_t off) {
@@ -236,7 +236,7 @@ ByteArray GffReader::readByteArrayFieldData(uint32_t off) {
     ByteArray arr(readBytes(size));
     seek(pos);
 
-    return move(arr);
+    return std::move(arr);
 }
 
 ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
@@ -251,7 +251,7 @@ vector<uint32_t> GffReader::readList(uint32_t off) {
     vector<uint32_t> arr(readUint32Array(count));
     seek(pos);
 
-    return move(arr);
+    return std::move(arr);
 }
 
 } // namespace resource

@@ -51,12 +51,12 @@ shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
                 string key(str(boost::format("%s%d") % pair.first % i));
                 string resRef(twoDa->getString(static_cast<int>(type), key));
                 shared_ptr<AudioStream> audio(_audioFiles.get(resRef));
-                pair.second.push_back(move(audio));
+                pair.second.push_back(std::move(audio));
             }
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 } // namespace game

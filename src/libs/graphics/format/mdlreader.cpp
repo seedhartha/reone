@@ -143,13 +143,13 @@ MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {
     result.offset = readUint32();
     result.count = readUint32();
     result.count2 = readUint32();
-    return move(result);
+    return std::move(result);
 }
 
 void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
     for (uint32_t offset : offsets) {
         string name(boost::to_lower_copy(readCStringAt(kMdlDataOffset + offset)));
-        _nodeNames.push_back(move(name));
+        _nodeNames.push_back(std::move(name));
     }
 }
 
@@ -213,7 +213,7 @@ shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *parent, b
         node->addChild(readNodes(offset, node.get(), animated, animNode));
     }
 
-    return move(node);
+    return std::move(node);
 }
 
 shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
@@ -306,12 +306,12 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             glm::mat4 boneMatrix(1.0f);
             boneMatrix *= glm::translate(glm::make_vec3(&tBoneValues[3 * i]));
             boneMatrix *= glm::mat4_cast(glm::quat(qBone[0], qBone[1], qBone[2], qBone[3]));
-            boneMatrices[i] = move(boneMatrix);
+            boneMatrices[i] = std::move(boneMatrix);
         }
 
         skin = make_shared<ModelNode::Skin>();
-        skin->boneMap = move(boneMap);
-        skin->boneMatrices = move(boneMatrices);
+        skin->boneMap = std::move(boneMap);
+        skin->boneMatrices = std::move(boneMatrices);
 
         spec.offBoneIndices = static_cast<int>(offMdxBoneIndices);
         spec.offBoneWeights = static_cast<int>(offMdxBoneWeights);
@@ -431,7 +431,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             face.adjacentFaces[2] = adjacentFaces[2];
             face.normal = glm::make_vec3(&normalValues[0]);
             face.material = material;
-            faces[i] = move(face);
+            faces[i] = std::move(face);
         }
 
         // Indices
@@ -455,7 +455,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         faces.emplace_back(10, 7, 11);
     }
 
-    auto mesh = make_unique<Mesh>(move(vertices), move(faces), spec);
+    auto mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), spec);
 
     ModelNode::UVAnimation uvAnimation;
     if (animateUV) {
@@ -471,22 +471,22 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     }
 
     auto nodeMesh = make_unique<ModelNode::TriangleMesh>();
-    nodeMesh->mesh = move(mesh);
-    nodeMesh->uvAnimation = move(uvAnimation);
+    nodeMesh->mesh = std::move(mesh);
+    nodeMesh->uvAnimation = std::move(uvAnimation);
     nodeMesh->diffuse = glm::make_vec3(&diffuse[0]);
     nodeMesh->ambient = glm::make_vec3(&ambient[0]);
     nodeMesh->transparency = static_cast<int>(transprencyHint);
     nodeMesh->render = static_cast<bool>(render);
     nodeMesh->shadow = static_cast<bool>(shadow);
     nodeMesh->backgroundGeometry = static_cast<bool>(backgroundGeometry);
-    nodeMesh->diffuseMap = move(diffuseMap);
-    nodeMesh->lightmap = move(lightmap);
-    nodeMesh->skin = move(skin);
-    nodeMesh->danglymesh = move(danglymesh);
-    nodeMesh->aabbTree = move(aabbTree);
+    nodeMesh->diffuseMap = std::move(diffuseMap);
+    nodeMesh->lightmap = std::move(lightmap);
+    nodeMesh->skin = std::move(skin);
+    nodeMesh->danglymesh = std::move(danglymesh);
+    nodeMesh->aabbTree = std::move(aabbTree);
     nodeMesh->saber = flags & MdlNodeFlags::saber;
 
-    return move(nodeMesh);
+    return std::move(nodeMesh);
 }
 
 shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
@@ -509,7 +509,7 @@ shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
         node->right = readAABBTree(offChildRight);
     }
 
-    return move(node);
+    return std::move(node);
 }
 
 shared_ptr<ModelNode::Light> MdlReader::readLight() {
@@ -546,7 +546,7 @@ shared_ptr<ModelNode::Light> MdlReader::readLight() {
         for (int i = 0; i < numFlares; ++i) {
             seek(kMdlDataOffset + flareColorShiftsArrayDef.offset + 12 * i);
             glm::vec3 colorShift(readFloat(), readFloat(), readFloat());
-            colorShifts.push_back(move(colorShift));
+            colorShifts.push_back(std::move(colorShift));
         }
 
         vector<shared_ptr<Texture>> flareTextures;
@@ -554,7 +554,7 @@ shared_ptr<ModelNode::Light> MdlReader::readLight() {
             seek(kMdlDataOffset + texNameOffsets[i]);
             string textureName(boost::to_lower_copy(readCString(12)));
             shared_ptr<Texture> texture(_textures.get(textureName));
-            flareTextures.push_back(move(texture));
+            flareTextures.push_back(std::move(texture));
         }
 
         for (int i = 0; i < numFlares; ++i) {
@@ -563,11 +563,11 @@ shared_ptr<ModelNode::Light> MdlReader::readLight() {
             lensFlare.colorShift = colorShifts[i];
             lensFlare.position = flarePositions[i];
             lensFlare.size = flareSizes[i];
-            light->flares.push_back(move(lensFlare));
+            light->flares.push_back(std::move(lensFlare));
         }
     }
 
-    return move(light);
+    return std::move(light);
 }
 
 static ModelNode::Emitter::UpdateMode parseEmitterUpdate(const string &str) {
@@ -650,7 +650,7 @@ shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     emitter->p2p = flags & EmitterFlags::p2p;
     emitter->p2pBezier = flags & EmitterFlags::p2pBezier;
 
-    return move(emitter);
+    return std::move(emitter);
 }
 
 shared_ptr<ModelNode::Reference> MdlReader::readReference() {
@@ -661,7 +661,7 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
     reference->model = _models.get(modelResRef);
     reference->reattachable = static_cast<bool>(reattachable);
 
-    return move(reference);
+    return std::move(reference);
 }
 
 void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool animNode, ModelNode &node) {
@@ -728,7 +728,7 @@ vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &
         anims.push_back(readAnimation(offset));
     }
 
-    return move(anims);
+    return std::move(anims);
 }
 
 unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
@@ -762,7 +762,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
             Animation::Event event;
             event.time = readFloat();
             event.name = boost::to_lower_copy(readCString(32));
-            events.push_back(move(event));
+            events.push_back(std::move(event));
         }
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });
     }
@@ -853,7 +853,7 @@ MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags)
     if (!fn) {
         fn = getFromLookupOrNull(_genericControllers, type);
     }
-    return move(fn);
+    return std::move(fn);
 }
 
 static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
@@ -924,7 +924,7 @@ void MdlReader::readOrientationController(const ControllerKey &key, const vector
 
             float time = data[rowTimeIdx];
             glm::quat orientation(w, x, y, z);
-            node.orientation().addFrame(time, move(orientation));
+            node.orientation().addFrame(time, std::move(orientation));
         }
         break;
     case 4:
@@ -940,7 +940,7 @@ void MdlReader::readOrientationController(const ControllerKey &key, const vector
             float w = data[rowDataIdx + 3];
             glm::quat orientation(w, x, y, z);
 
-            node.orientation().addFrame(time, move(orientation));
+            node.orientation().addFrame(time, std::move(orientation));
         }
         break;
     default:

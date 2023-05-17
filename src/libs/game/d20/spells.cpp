@@ -17,11 +17,11 @@
 
 #include "reone/game/d20/spells.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
+#include "reone/system/collectionutil.h"
 
 using namespace std;
 
@@ -44,11 +44,11 @@ void Spells::init() {
         uint32_t pips = spells->getUint(row, "pips");
 
         auto spell = make_shared<Spell>();
-        spell->name = move(name);
-        spell->description = move(description);
-        spell->icon = move(icon);
+        spell->name = std::move(name);
+        spell->description = std::move(description);
+        spell->icon = std::move(icon);
         spell->pips = pips;
-        _spells.insert(make_pair(static_cast<SpellType>(row), move(spell)));
+        _spells.insert(make_pair(static_cast<SpellType>(row), std::move(spell)));
     }
 }
 

@@ -52,7 +52,7 @@ void AudioContext::setListenerPosition(glm::vec3 position) {
         return;
     }
     alListener3f(AL_POSITION, position.x, position.y, position.z);
-    _listenerPosition = move(position);
+    _listenerPosition = std::move(position);
 }
 
 } // namespace audio

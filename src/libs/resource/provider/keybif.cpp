@@ -63,7 +63,7 @@ void KeyBifResourceProvider::init() {
             resource.bifOffset = bifResource.offset;
             resource.fileSize = bifResource.fileSize;
 
-            _resources[key->resId] = move(resource);
+            _resources[key->resId] = std::move(resource);
         }
     }
 }
@@ -82,7 +82,7 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
     bif.seek(resource.bifOffset, SeekOrigin::Begin);
     bif.read(buffer->data(), resource.fileSize);
 
-    return move(buffer);
+    return std::move(buffer);
 }
 
 } // namespace resource

@@ -17,15 +17,15 @@
 
 #include "reone/scene/node/emitter.h"
 
-#include "reone/system/randomutil.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/scene/graph.h"
 
@@ -163,7 +163,7 @@ void EmitterSceneNode::doSpawnParticle() {
     float angle2 = random(-halfSpread, halfSpread);
     glm::vec3 dir(glm::sin(angle1), glm::sin(angle2), glm::cos(angle1) * glm::cos(angle2));
     glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
-    particle->setVelocity(move(velocity));
+    particle->setVelocity(std::move(velocity));
 
     particle->setFrame(_frameStart);
     if (_fps > 0.0f) {

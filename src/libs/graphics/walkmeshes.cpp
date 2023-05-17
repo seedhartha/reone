@@ -17,8 +17,8 @@
 
 #include "reone/graphics/walkmeshes.h"
 
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/graphics/format/bwmreader.h"
 
@@ -61,7 +61,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
         walkmesh = reader.walkmesh();
     }
 
-    return move(walkmesh);
+    return std::move(walkmesh);
 }
 
 } // namespace graphics

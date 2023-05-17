@@ -53,7 +53,7 @@ void WalkmeshSceneNode::init() {
         face.indices[1] = vertIdxStart + 1;
         face.indices[2] = vertIdxStart + 2;
         face.material = wface.material;
-        faces.push_back(move(face));
+        faces.push_back(std::move(face));
     }
 
     Mesh::VertexSpec spec;
@@ -62,7 +62,7 @@ void WalkmeshSceneNode::init() {
     spec.offNormals = 3 * sizeof(float);
     spec.offMaterial = 6 * sizeof(float);
 
-    _mesh = make_unique<Mesh>(move(vertices), move(faces), move(spec));
+    _mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     _mesh->init();
 }
 

@@ -17,23 +17,23 @@
 
 #include "reone/game/object/placeable.h"
 
-#include "reone/graphics/models.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
 #include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-#include "reone/scene/di/services.h"
 #include "reone/script/types.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -71,7 +71,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     sceneNode->setUser(*this);
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
-    _sceneNode = move(sceneNode);
+    _sceneNode = std::move(sceneNode);
 
     auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {

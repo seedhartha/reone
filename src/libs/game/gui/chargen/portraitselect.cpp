@@ -80,7 +80,7 @@ void PortraitSelection::onGUILoaded() {
     _binding.btnAccept->setOnClick([this]() {
         Character character(_charGen.character());
         character.appearance = getAppearanceFromCurrentPortrait();
-        _charGen.setCharacter(move(character));
+        _charGen.setCharacter(std::move(character));
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
@@ -102,11 +102,11 @@ void PortraitSelection::bindControls() {
 void PortraitSelection::setButtonColors(Control &control) {
     Control::Text text(control.text());
     text.color = _baseColor;
-    control.setText(move(text));
+    control.setText(std::move(text));
 
     Control::Border hilight(control.hilight());
     hilight.color = _hilightColor;
-    control.setHilight(move(hilight));
+    control.setHilight(std::move(hilight));
 }
 
 void PortraitSelection::loadHeadModel() {
@@ -145,7 +145,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sce
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", *creatureModel);
 
-    return move(model);
+    return std::move(model);
 }
 
 int PortraitSelection::getAppearanceFromCurrentPortrait() const {
@@ -164,7 +164,7 @@ void PortraitSelection::updatePortraits() {
     int sex = _charGen.character().gender == Gender::Female ? 1 : 0;
     for (auto &portrait : _services.game.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
-            _filteredPortraits.push_back(move(portrait));
+            _filteredPortraits.push_back(std::move(portrait));
         }
     }
     resetCurrentPortrait();

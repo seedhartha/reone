@@ -44,7 +44,7 @@ void GraphicsContext::init() {
 
     glm::ivec4 viewport(0.0f);
     glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-    _viewports.push(move(viewport));
+    _viewports.push(std::move(viewport));
 
     _inited = true;
 }

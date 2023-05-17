@@ -17,10 +17,10 @@
 
 #include "reone/graphics/models.h"
 
+#include "reone/resource/resources.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/bytearrayinput.h"
-#include "reone/resource/resources.h"
 
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/model.h"
@@ -79,7 +79,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
         }
     }
 
-    return move(model);
+    return std::move(model);
 }
 
 } // namespace graphics

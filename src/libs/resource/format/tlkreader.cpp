@@ -61,10 +61,10 @@ void TlkReader::loadStrings() {
             text = readString(_stringsOffset + stringOffset, stringSize);
         }
 
-        strings.push_back(TalkTable::String {move(text), move(soundResRef)});
+        strings.push_back(TalkTable::String {std::move(text), std::move(soundResRef)});
     }
 
-    _table = make_unique<TalkTable>(move(strings));
+    _table = make_unique<TalkTable>(std::move(strings));
 }
 
 } // namespace resource

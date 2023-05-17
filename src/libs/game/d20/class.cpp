@@ -76,7 +76,7 @@ void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
         throws.reflex = twoDa->getInt(row, "refsave");
         throws.will = twoDa->getInt(row, "willsave");
 
-        _savingThrowsByLevel.insert(make_pair(level, move(throws)));
+        _savingThrowsByLevel.insert(make_pair(level, std::move(throws)));
     }
 }
 

@@ -137,7 +137,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _graphicsSvc.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
     _graphicsSvc.meshes.quad().draw();
@@ -152,14 +152,14 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _graphicsSvc.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
     _graphicsSvc.meshes.quad().draw();
 }
 
 void ScrollBar::setScrollState(ScrollState state) {
-    _state = move(state);
+    _state = std::move(state);
 }
 
 } // namespace gui

@@ -81,12 +81,12 @@ void TgaReader::loadTexture() {
     layers.reserve(_numLayers);
     for (int i = 0; i < _numLayers; ++i) {
         auto pixels = make_shared<ByteArray>(readPixels(_width, _height));
-        layers.push_back(Texture::Layer {move(pixels)});
+        layers.push_back(Texture::Layer {std::move(pixels)});
     }
 
     PixelFormat format = isGrayscale() ? PixelFormat::R8 : (_alpha ? PixelFormat::BGRA8 : PixelFormat::BGR8);
     _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
-    _texture->setPixels(_width, _height, format, move(layers));
+    _texture->setPixels(_width, _height, format, std::move(layers));
 }
 
 ByteArray TgaReader::readPixels(int w, int h) {
@@ -136,7 +136,7 @@ ByteArray TgaReader::readPixelsRLE(int w, int h) {
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 bool TgaReader::isGrayscale() const {

@@ -17,23 +17,21 @@
 
 #include "reone/game/object/area.h"
 
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/walkmesh.h"
 #include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/collision.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/grass.h"
 #include "reone/scene/node/grasscluster.h"
@@ -41,10 +39,13 @@
 #include "reone/scene/node/sound.h"
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
-#include "reone/scene/di/services.h"
 #include "reone/scene/types.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/game/camerastyles.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/layouts.h"
 #include "reone/game/location.h"
@@ -53,7 +54,6 @@
 #include "reone/game/reputes.h"
 #include "reone/game/room.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
 #include "reone/game/surfaces.h"
 #include "reone/game/types.h"
 #include "reone/game/visibilities.h"
@@ -96,7 +96,7 @@ Area::Area(
         "",
         game,
         services),
-    _sceneName(move(sceneName)) {
+    _sceneName(std::move(sceneName)) {
 
     init();
     _heartbeatTimer.setTimeout(kHeartbeatInterval);
@@ -119,7 +119,7 @@ void Area::init() {
 }
 
 void Area::load(string name, const Gff &are, const Gff &git, bool fromSave) {
-    _name = move(name);
+    _name = std::move(name);
 
     loadARE(are);
     loadGIT(git);
@@ -354,11 +354,11 @@ void Area::loadLYT() {
             sceneGraph.addRoot(grassSceneNode);
         }
 
-        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), walkmeshSceneNode, move(grassSceneNode));
+        auto room = make_unique<Room>(lytRoom.name, position, std::move(modelSceneNode), walkmeshSceneNode, std::move(grassSceneNode));
         if (walkmeshSceneNode) {
             walkmeshSceneNode->setUser(*room);
         }
-        _rooms.insert(make_pair(room->name(), move(room)));
+        _rooms.insert(make_pair(room->name(), std::move(room)));
     }
 }
 
@@ -376,7 +376,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
         result.insert(pair);
         result.insert(make_pair(pair.second, pair.first));
     }
-    return move(result);
+    return std::move(result);
 }
 
 void Area::loadPTH() {
@@ -947,7 +947,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     case ObjectType::Item: {
         auto item = _game.objectFactory().newItem();
         item->loadFromBlueprint(blueprintResRef);
-        object = move(item);
+        object = std::move(item);
         break;
     }
     case ObjectType::Creature: {
@@ -955,13 +955,13 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         creature->loadFromBlueprint(blueprintResRef);
         creature->setPosition(location->position());
         creature->setFacing(location->facing());
-        object = move(creature);
+        object = std::move(creature);
         break;
     }
     case ObjectType::Placeable: {
         auto placeable = _game.objectFactory().newPlaceable();
         placeable->loadFromBlueprint(blueprintResRef);
-        object = move(placeable);
+        object = std::move(placeable);
         break;
     }
     default:
@@ -979,7 +979,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         creature->runSpawnScript();
     }
 
-    return move(object);
+    return std::move(object);
 }
 
 void Area::updateObjectSelection() {
@@ -1011,11 +1011,11 @@ void Area::updateObjectSelection() {
 }
 
 void Area::hilightObject(shared_ptr<Object> object) {
-    _hilightedObject = move(object);
+    _hilightedObject = std::move(object);
 }
 
 void Area::selectObject(shared_ptr<Object> object) {
-    _selectedObject = move(object);
+    _selectedObject = std::move(object);
 }
 
 shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<Object> &)> &predicate) {
@@ -1044,7 +1044,7 @@ shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<Object> &tar
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias, target)) {
             float distance2 = creature->getSquareDistanceTo(*target);
-            candidates.push_back(make_pair(move(creature), distance2));
+            candidates.push_back(make_pair(std::move(creature), distance2));
         }
     }
 
@@ -1134,7 +1134,7 @@ shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
             float distance2 = creature->getSquareDistanceTo(location.position());
-            candidates.push_back(make_pair(move(creature), distance2));
+            candidates.push_back(make_pair(std::move(creature), distance2));
         }
     }
 

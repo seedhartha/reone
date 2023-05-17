@@ -19,9 +19,9 @@
 
 #include "reone/graphics/barycentricutil.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
@@ -134,7 +134,7 @@ void GrassSceneNode::update(float dt) {
             _clusterPool.pop();
             cluster->setLocalTransform(glm::translate(position));
             cluster->setVariant(getRandomGrassVariant());
-            cluster->setLightmapUV(move(lightmapUV));
+            cluster->setLightmapUV(std::move(lightmapUV));
             addChild(*cluster);
             _materializedClusters[faceIdx].push_back(cluster);
         }

@@ -71,7 +71,7 @@ shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     ByteArray data(size, '\0');
     in.read(&data[0], size);
 
-    return make_shared<ByteArray>(move(data));
+    return make_shared<ByteArray>(std::move(data));
 }
 
 } // namespace resource

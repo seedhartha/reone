@@ -17,13 +17,12 @@
 
 #include "reone/game/gui/console.h"
 
-#include "reone/system/logutil.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -33,14 +32,15 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variable.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/debug.h"
+#include "reone/game/di/services.h"
 #include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
 #include "reone/game/location.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -81,10 +81,10 @@ void Console::init() {
 
 void Console::addCommand(string name, string alias, string description, CommandHandler handler) {
     Command cmd;
-    cmd.name = move(name);
-    cmd.alias = move(alias);
-    cmd.description = move(description);
-    cmd.handler = move(handler);
+    cmd.name = std::move(name);
+    cmd.alias = std::move(alias);
+    cmd.description = std::move(description);
+    cmd.handler = std::move(handler);
 
     _commands.push_back(cmd);
     _commandByName.insert(make_pair(cmd.name, cmd));
@@ -177,7 +177,7 @@ void Console::executeInputText() {
     }
     if (handler) {
         try {
-            handler(_input.text(), move(tokens));
+            handler(_input.text(), std::move(tokens));
         } catch (const invalid_argument &) {
             print("Invalid argument");
         }
@@ -202,7 +202,7 @@ void Console::drawBackground() {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
         general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         general.alpha = 0.5f;
     });
@@ -369,7 +369,7 @@ void Console::cmdKill(string input, vector<string> tokens) {
         return;
     }
     auto effect = _game.effectFactory().newDamage(100000, DamageType::Universal, DamagePower::Normal, nullptr);
-    object->applyEffect(move(effect), DurationType::Instant);
+    object->applyEffect(std::move(effect), DurationType::Instant);
 }
 
 void Console::cmdAddItem(string input, vector<string> tokens) {

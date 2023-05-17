@@ -99,7 +99,7 @@ string BinaryReader::getString(int len) {
     string val;
     val.resize(len);
     _stream.read(&val[0], len);
-    return move(val);
+    return std::move(val);
 }
 
 string BinaryReader::getNullTerminatedString() {
@@ -121,7 +121,7 @@ ByteArray BinaryReader::getBytes(int count) {
     buffer.resize(count);
     int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
     buffer.resize(numRead);
-    return move(buffer);
+    return std::move(buffer);
 }
 
 bool BinaryReader::eof() const {

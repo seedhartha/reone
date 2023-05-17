@@ -120,7 +120,7 @@ void GUI::loadControl(const Gff &gffs) {
     }
 
     _controlByTag[tag] = control.get();
-    _controls.push_back(move(control));
+    _controls.push_back(std::move(control));
 }
 
 void GUI::positionRelativeToCenter(Control &control) {
@@ -131,7 +131,7 @@ void GUI::positionRelativeToCenter(Control &control) {
     if (extent.top >= 0.5f * _resolutionY) {
         extent.top = extent.top - _resolutionY + _options.height;
     }
-    control.setExtent(move(extent));
+    control.setExtent(std::move(extent));
 }
 
 bool GUI::handle(const SDL_Event &event) {
@@ -251,7 +251,7 @@ void GUI::drawBackground() {
     _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _graphicsSvc.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
     _graphicsSvc.meshes.quad().draw();
@@ -315,7 +315,7 @@ unique_ptr<Control> GUI::newControl(
 
     control->setTag(tag);
 
-    return move(control);
+    return std::move(control);
 }
 
 void GUI::addControl(std::shared_ptr<Control> control) {

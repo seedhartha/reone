@@ -148,9 +148,9 @@ static const Mesh::VertexSpec g_cubemapSpec {8 * sizeof(float), 0, 3 * sizeof(fl
 // END Boxes
 
 static unique_ptr<Mesh> getMesh(vector<float> vertices, vector<Mesh::Face> faces, Mesh::VertexSpec spec) {
-    auto mesh = make_unique<Mesh>(move(vertices), move(faces), move(spec));
+    auto mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     mesh->init();
-    return move(mesh);
+    return std::move(mesh);
 }
 
 void Meshes::init() {

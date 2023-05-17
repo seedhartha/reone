@@ -62,7 +62,7 @@ bool WavReader::readChunkHeader(ChunkHeader &chunk) {
     string id(readString(4));
     uint32_t size = readUint32();
 
-    chunk.id = move(id);
+    chunk.id = std::move(id);
     chunk.size = size;
 
     return true;
@@ -119,10 +119,10 @@ void WavReader::loadPCM(uint32_t chunkSize) {
     frame.format = getAudioFormat();
     frame.sampleRate = _sampleRate;
     frame.samples.resize(chunkSize);
-    frame.samples = move(data);
+    frame.samples = std::move(data);
 
     _stream = make_shared<AudioStream>();
-    _stream->add(move(frame));
+    _stream->add(std::move(frame));
 }
 
 static constexpr int kIMAIndexTable[] = {-1, -1, -1, -1, 2, 4, 6, 8};
@@ -178,7 +178,7 @@ void WavReader::loadIMAADPCM(uint32_t chunkSize) {
     }
 
     _stream = make_shared<AudioStream>();
-    _stream->add(move(frame));
+    _stream->add(std::move(frame));
 }
 
 AudioFormat WavReader::getAudioFormat() const {

@@ -85,22 +85,22 @@ SceneInitializer &SceneInitializer::modelScale(float scale) {
 }
 
 SceneInitializer &SceneInitializer::modelOffset(glm::vec2 offset) {
-    _modelOffset = move(offset);
+    _modelOffset = std::move(offset);
     return *this;
 }
 
 SceneInitializer &SceneInitializer::cameraTransform(glm::mat4 transform) {
-    _cameraTransform = move(transform);
+    _cameraTransform = std::move(transform);
     return *this;
 }
 
 SceneInitializer &SceneInitializer::cameraFromModelNode(string nodeName) {
-    _cameraNodeName = move(nodeName);
+    _cameraNodeName = std::move(nodeName);
     return *this;
 }
 
 SceneInitializer &SceneInitializer::ambientLightColor(glm::vec3 color) {
-    _ambientLightColor = move(color);
+    _ambientLightColor = std::move(color);
     return *this;
 }
 

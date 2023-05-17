@@ -68,7 +68,7 @@ void ListBox::addTextLinesAsItems(const string &text) {
         Item item;
         item.text = line;
         item._textLines = vector<string> {line};
-        _items.push_back(move(item));
+        _items.push_back(std::move(item));
     }
 
     updateItemSlots();
@@ -226,7 +226,7 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         state.numVisible = this->_slotCount;
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
-        scrollBar.setScrollState(move(state));
+        scrollBar.setScrollState(std::move(state));
         scrollBar.draw(screenSize, offset, vector<string>());
     }
 }

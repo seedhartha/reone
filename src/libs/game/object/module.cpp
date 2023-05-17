@@ -17,21 +17,21 @@
 
 #include "reone/game/object/module.h"
 
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 
 #include "reone/game/action/attack.h"
 #include "reone/game/action/factory.h"
 #include "reone/game/action/opencontainer.h"
 #include "reone/game/action/opendoor.h"
 #include "reone/game/action/startconversation.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
-#include "reone/game/di/services.h"
 
 #include "reone/game/object/factory.h"
 
@@ -46,7 +46,7 @@ namespace reone {
 namespace game {
 
 void Module::load(string name, const Gff &ifo, bool fromSave) {
-    _name = move(name);
+    _name = std::move(name);
 
     loadInfo(ifo);
     loadArea(ifo);
@@ -268,7 +268,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
         partyLeader->clearAllActions();
         partyLeader->addAction(_game.actionFactory().newStartConversation(placeable, placeable->conversation()));
     } else {
-        placeable->runOnUsed(move(partyLeader));
+        placeable->runOnUsed(std::move(partyLeader));
     }
 }
 
@@ -348,7 +348,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
         break;
     }
 
-    return move(actions);
+    return std::move(actions);
 }
 
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {

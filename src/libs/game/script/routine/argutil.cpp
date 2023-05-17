@@ -107,13 +107,13 @@ static inline void throwIfInvalidTalent(const shared_ptr<Talent> &talent) {
 shared_ptr<Object> getCaller(const RoutineContext &ctx) {
     auto object = ctx.game.getObjectById(ctx.execution.callerId);
     throwIfInvalidObject(ctx.execution.callerId, object);
-    return move(object);
+    return std::move(object);
 }
 
 shared_ptr<Object> getTriggerrer(const RoutineContext &ctx) {
     auto object = ctx.game.getObjectById(ctx.execution.triggererId);
     throwIfInvalidObject(ctx.execution.triggererId, object);
-    return move(object);
+    return std::move(object);
 }
 
 int getInt(const vector<Variable> &args, int index) {
@@ -151,7 +151,7 @@ shared_ptr<Object> getObject(const vector<Variable> &args, int index, const Rout
     auto object = ctx.game.getObjectById(objectId);
     throwIfInvalidObject(objectId, object);
 
-    return move(object);
+    return std::move(object);
 }
 
 shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
@@ -159,7 +159,7 @@ shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
     throwIfUnexpectedType(VariableType::Effect, args[index].type);
     auto effect = static_pointer_cast<Effect>(args[index].engineType);
     throwIfInvalidEffect(effect);
-    return move(effect);
+    return std::move(effect);
 }
 
 shared_ptr<Event> getEvent(const vector<Variable> &args, int index) {
@@ -167,7 +167,7 @@ shared_ptr<Event> getEvent(const vector<Variable> &args, int index) {
     throwIfUnexpectedType(VariableType::Event, args[index].type);
     auto event = static_pointer_cast<Event>(args[index].engineType);
     throwIfInvalidEvent(event);
-    return move(event);
+    return std::move(event);
 }
 
 shared_ptr<Location> getLocationArgument(const vector<Variable> &args, int index) {
@@ -175,7 +175,7 @@ shared_ptr<Location> getLocationArgument(const vector<Variable> &args, int index
     throwIfUnexpectedType(VariableType::Location, args[index].type);
     auto location = static_pointer_cast<Location>(args[index].engineType);
     throwIfInvalidLocation(location);
-    return move(location);
+    return std::move(location);
 }
 
 shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
@@ -183,7 +183,7 @@ shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
     throwIfUnexpectedType(VariableType::Talent, args[index].type);
     auto talent = static_pointer_cast<Talent>(args[index].engineType);
     throwIfInvalidTalent(talent);
-    return move(talent);
+    return std::move(talent);
 }
 
 shared_ptr<ExecutionContext> getAction(const vector<Variable> &args, int index) {
@@ -257,13 +257,13 @@ shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, co
 shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx) {
     auto caller = getCaller(ctx);
     throwIfObjectNotCreature(caller);
-    return static_pointer_cast<Creature>(move(caller));
+    return static_pointer_cast<Creature>(std::move(caller));
 }
 
 shared_ptr<Creature> getObjectAsCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotCreature(object);
-    return static_pointer_cast<Creature>(move(object));
+    return static_pointer_cast<Creature>(std::move(object));
 }
 
 shared_ptr<Creature> getObjectOrCallerAsCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
@@ -277,19 +277,19 @@ shared_ptr<Creature> getObjectOrCallerAsCreature(const vector<Variable> &args, i
 shared_ptr<Door> getObjectAsDoor(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotDoor(object);
-    return static_pointer_cast<Door>(move(object));
+    return static_pointer_cast<Door>(std::move(object));
 }
 
 shared_ptr<Placeable> getObjectAsPlaceable(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotPlaceable(object);
-    return static_pointer_cast<Placeable>(move(object));
+    return static_pointer_cast<Placeable>(std::move(object));
 }
 
 shared_ptr<Item> getObjectAsItem(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotItem(object);
-    return static_pointer_cast<Item>(move(object));
+    return static_pointer_cast<Item>(std::move(object));
 }
 
 shared_ptr<Item> getObjectAsItemOrNull(const vector<Variable> &args, int index, const RoutineContext &ctx) {
@@ -303,7 +303,7 @@ shared_ptr<Item> getObjectAsItemOrNull(const vector<Variable> &args, int index, 
 shared_ptr<Sound> getObjectAsSound(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotSound(object);
-    return static_pointer_cast<Sound>(move(object));
+    return static_pointer_cast<Sound>(std::move(object));
 }
 
 shared_ptr<Area> getObjectAsArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {

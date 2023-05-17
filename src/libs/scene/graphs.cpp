@@ -33,7 +33,7 @@ void SceneGraphs::reserve(string name) {
         _graphicsSvc,
         _audioSvc);
 
-    _scenes.insert(make_pair(name, move(scene)));
+    _scenes.insert(make_pair(name, std::move(scene)));
 }
 
 ISceneGraph &SceneGraphs::get(const string &name) {

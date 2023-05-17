@@ -159,13 +159,13 @@ shared_ptr<Shader> Shaders::initShader(ShaderType type, list<string> sources) {
 
     sources.push_front(g_glslHeader);
 
-    auto shader = make_unique<Shader>(type, move(sources));
+    auto shader = make_unique<Shader>(type, std::move(sources));
     shader->init();
-    return move(shader);
+    return std::move(shader);
 }
 
 shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> shaders) {
-    auto program = make_unique<ShaderProgram>(move(shaders));
+    auto program = make_unique<ShaderProgram>(std::move(shaders));
     program->init();
     program->use();
 
@@ -200,7 +200,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
     program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
 
-    return move(program);
+    return std::move(program);
 }
 
 } // namespace graphics

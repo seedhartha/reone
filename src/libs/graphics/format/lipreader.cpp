@@ -38,10 +38,10 @@ void LipReader::onLoad() {
         LipAnimation::Keyframe keyframe;
         keyframe.time = readFloat();
         keyframe.shape = readByte();
-        keyframes.push_back(move(keyframe));
+        keyframes.push_back(std::move(keyframe));
     }
 
-    _animation = make_shared<LipAnimation>(_name, length, move(keyframes));
+    _animation = make_shared<LipAnimation>(_name, length, std::move(keyframes));
 }
 
 } // namespace graphics

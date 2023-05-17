@@ -86,7 +86,7 @@ bool Party::addMember(int npc, shared_ptr<Creature> creature) {
     Member member;
     member.npc = npc;
     member.creature = creature;
-    _members.push_back(move(member));
+    _members.push_back(std::move(member));
 
     return true;
 }

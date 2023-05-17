@@ -40,14 +40,14 @@ DialogCamera::DialogCamera(const CameraStyle &style, float aspect, ISceneGraph &
 
 void DialogCamera::setSpeakerPosition(glm::vec3 position) {
     if (_speakerPosition != position) {
-        _speakerPosition = move(position);
+        _speakerPosition = std::move(position);
         updateSceneNode();
     }
 }
 
 void DialogCamera::setListenerPosition(glm::vec3 position) {
     if (_listenerPosition != position) {
-        _listenerPosition = move(position);
+        _listenerPosition = std::move(position);
         updateSceneNode();
     }
 }

@@ -72,7 +72,7 @@ void LytReader::appendRoom(const vector<string> &tokens) {
         stof(tokens[1]),
         stof(tokens[2]),
         stof(tokens[3]));
-    _layout.rooms.push_back(move(room));
+    _layout.rooms.push_back(std::move(room));
 }
 
 } // namespace game

@@ -41,7 +41,7 @@ void ErfResourceProvider::init() {
         resource.id = keys[i].resId;
         resource.offset = erfResources[i].offset;
         resource.fileSize = erfResources[i].size;
-        _resources[keys[i].resId] = move(resource);
+        _resources[keys[i].resId] = std::move(resource);
     }
 }
 
@@ -56,7 +56,7 @@ shared_ptr<ByteArray> ErfResourceProvider::find(const ResourceId &id) {
     auto erf = FileInputStream(_path, OpenMode::Binary);
     erf.seek(resource.offset, SeekOrigin::Begin);
     erf.read(buffer->data(), buffer->size());
-    return move(buffer);
+    return std::move(buffer);
 }
 
 } // namespace resource

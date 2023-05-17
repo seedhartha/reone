@@ -180,7 +180,7 @@ void ThirdPersonCamera::updateSceneNode() {
     glm::mat4 transform(1.0f);
     transform *= glm::translate(cameraPos);
     transform *= glm::mat4_cast(orientation);
-    _sceneNode->setLocalTransform(move(transform));
+    _sceneNode->setLocalTransform(std::move(transform));
 }
 
 void ThirdPersonCamera::stopMovement() {
@@ -190,7 +190,7 @@ void ThirdPersonCamera::stopMovement() {
 }
 
 void ThirdPersonCamera::setTargetPosition(glm::vec3 position) {
-    _targetPosition = move(position);
+    _targetPosition = std::move(position);
     updateSceneNode();
 }
 
@@ -200,7 +200,7 @@ void ThirdPersonCamera::setFacing(float facing) {
 }
 
 void ThirdPersonCamera::setStyle(CameraStyle style) {
-    _style = move(style);
+    _style = std::move(style);
     updateSceneNode();
 }
 

@@ -17,17 +17,17 @@
 
 #include "reone/scene/node/mesh.h"
 
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/lumautil.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/scene/graph.h"
 
@@ -322,7 +322,7 @@ void MeshSceneNode::setDiffuseMap(Texture *texture) {
 
 void MeshSceneNode::setEnvironmentMap(Texture *texture) {
     ModelNodeSceneNode::setEnvironmentMap(texture);
-    _nodeTextures.envmap = move(texture);
+    _nodeTextures.envmap = std::move(texture);
 }
 
 } // namespace scene

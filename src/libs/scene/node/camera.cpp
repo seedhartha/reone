@@ -46,14 +46,14 @@ void CameraSceneNode::setOrthographicProjection(float left, float right, float b
     auto camera = make_unique<OrthographicCamera>();
     camera->setProjection(left, right, bottom, top, zNear, zFar);
     camera->setView(_absTransformInv);
-    _camera = move(camera);
+    _camera = std::move(camera);
 }
 
 void CameraSceneNode::setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar) {
     auto camera = make_shared<PerspectiveCamera>();
     camera->setProjection(fovy, aspect, zNear, zFar);
     camera->setView(_absTransformInv);
-    _camera = move(camera);
+    _camera = std::move(camera);
 }
 
 } // namespace scene

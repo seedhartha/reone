@@ -95,10 +95,10 @@ void ComputerGUI::configureReplies() {
 
 void ComputerGUI::setMessage(string message) {
     ListBox::Item item;
-    item.text = move(message);
+    item.text = std::move(message);
 
     _binding.lbMessage->clearItems();
-    _binding.lbMessage->addItem(move(item));
+    _binding.lbMessage->addItem(std::move(item));
 }
 
 void ComputerGUI::setReplyLines(vector<string> lines) {
@@ -108,7 +108,7 @@ void ComputerGUI::setReplyLines(vector<string> lines) {
         ListBox::Item item;
         item.tag = to_string(i);
         item.text = lines[i];
-        _binding.lbReplies->addItem(move(item));
+        _binding.lbReplies->addItem(std::move(item));
     }
 }
 

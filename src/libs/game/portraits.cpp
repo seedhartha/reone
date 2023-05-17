@@ -49,7 +49,7 @@ void Portraits::init() {
         portrait.forPC = portraits->getBool(row, "forpc");
         portrait.sex = portraits->getInt(row, "sex");
 
-        _portraits.push_back(move(portrait));
+        _portraits.push_back(std::move(portrait));
     }
 }
 
@@ -58,7 +58,7 @@ shared_ptr<Texture> Portraits::getTextureByIndex(int index) const {
     if (index >= 0 && index < static_cast<int>(_portraits.size())) {
         result = getPortraitTexture(_portraits[index]);
     }
-    return move(result);
+    return std::move(result);
 }
 
 shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {

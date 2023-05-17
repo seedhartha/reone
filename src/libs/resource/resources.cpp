@@ -41,7 +41,7 @@ void Resources::indexKeyFile(const boost::filesystem::path &path) {
     }
     auto keyBif = make_unique<KeyBifResourceProvider>(path, static_cast<int>(_providers.size()));
     keyBif->init();
-    indexProvider(move(keyBif), path);
+    indexProvider(std::move(keyBif), path);
 }
 
 void Resources::indexErfFile(const boost::filesystem::path &path, bool transient) {
@@ -50,7 +50,7 @@ void Resources::indexErfFile(const boost::filesystem::path &path, bool transient
     }
     auto erf = make_unique<ErfResourceProvider>(path, static_cast<int>(_providers.size()));
     erf->init();
-    indexProvider(move(erf), path, transient);
+    indexProvider(std::move(erf), path, transient);
 }
 
 void Resources::indexRimFile(const boost::filesystem::path &path, bool transient) {
@@ -59,7 +59,7 @@ void Resources::indexRimFile(const boost::filesystem::path &path, bool transient
     }
     auto rim = make_unique<RimResourceProvider>(path, static_cast<int>(_providers.size()));
     rim->init();
-    indexProvider(move(rim), path, transient);
+    indexProvider(std::move(rim), path, transient);
 }
 
 void Resources::indexDirectory(const boost::filesystem::path &path) {
@@ -68,7 +68,7 @@ void Resources::indexDirectory(const boost::filesystem::path &path) {
     }
     auto folder = make_unique<Folder>(path, static_cast<int>(_providers.size()));
     folder->init();
-    indexProvider(move(folder), path);
+    indexProvider(std::move(folder), path);
 }
 
 void Resources::indexExeFile(const boost::filesystem::path &path) {
@@ -82,9 +82,9 @@ void Resources::indexExeFile(const boost::filesystem::path &path) {
 void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient) {
     debug(boost::format("Index provider %d at '%s'") % provider->id() % path.string(), LogChannels::resources);
     if (transient) {
-        _transientProviders.push_back(move(provider));
+        _transientProviders.push_back(std::move(provider));
     } else {
-        _providers.push_back(move(provider));
+        _providers.push_back(std::move(provider));
     }
 }
 
@@ -112,7 +112,7 @@ shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bo
     if (!data && logNotFound) {
         warn("Resource '" + id.string() + "' not found", LogChannels::resources);
     }
-    return move(data);
+    return std::move(data);
 }
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
@@ -127,7 +127,7 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
         return nullptr;
     }
 
-    return move(data);
+    return std::move(data);
 }
 
 shared_ptr<ByteArray> Resources::getFromProviders(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {

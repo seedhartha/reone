@@ -38,10 +38,10 @@ Model::Model(
     vector<shared_ptr<Animation>> animations,
     shared_ptr<Model> superModel,
     float animationScale) :
-    _name(move(name)),
+    _name(std::move(name)),
     _classification(classification),
     _rootNode(rootNode),
-    _superModel(move(superModel)),
+    _superModel(std::move(superModel)),
     _animationScale(animationScale) {
 
     if (_rootNode) {
@@ -91,7 +91,7 @@ shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
     if (!result && _superModel) {
         result = _superModel->getNodeByNameRecursive(name);
     }
-    return move(result);
+    return std::move(result);
 }
 
 shared_ptr<ModelNode> Model::getAABBNode() const {
@@ -115,7 +115,7 @@ vector<string> Model::getAnimationNames() const {
         result.push_back(anim.first);
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 shared_ptr<Animation> Model::getAnimation(const string &name) const {
@@ -128,7 +128,7 @@ shared_ptr<Animation> Model::getAnimation(const string &name) const {
         anim = _superModel->getAnimation(name);
     }
 
-    return move(anim);
+    return std::move(anim);
 }
 
 } // namespace graphics

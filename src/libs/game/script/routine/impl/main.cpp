@@ -17,16 +17,17 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 #include "reone/script/exception/notimpl.h"
 #include "reone/script/exception/unsupportedroutine.h"
 #include "reone/script/executioncontext.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/game/action/factory.h"
 #include "reone/game/combat.h"
+#include "reone/game/di/services.h"
 #include "reone/game/event.h"
 #include "reone/game/game.h"
 #include "reone/game/location.h"
@@ -35,7 +36,6 @@
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
 #include "reone/game/talent.h"
 
 #include "reone/game/script/routine/argutil.h"
@@ -89,8 +89,8 @@ Variable assignCommand(const vector<Variable> &args, const RoutineContext &ctx) 
     auto actionSubject = getObject(args, 0, ctx);
     auto actionToAssign = getAction(args, 1);
 
-    auto commandAction = ctx.game.actionFactory().newDoCommand(move(actionToAssign));
-    actionSubject->addAction(move(commandAction));
+    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(actionToAssign));
+    actionSubject->addAction(std::move(commandAction));
 
     return Variable::ofNull();
 }
@@ -99,8 +99,8 @@ Variable delayCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
     auto actionToDelay = getAction(args, 1);
 
-    auto commandAction = ctx.game.actionFactory().newDoCommand(move(actionToDelay));
-    getCaller(ctx)->delayAction(move(commandAction), seconds);
+    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(actionToDelay));
+    getCaller(ctx)->delayAction(std::move(commandAction), seconds);
 
     return Variable::ofNull();
 }
@@ -347,7 +347,7 @@ Variable getStringRight(const vector<Variable> &args, const RoutineContext &ctx)
         result = str.substr(str.length() - count, count);
     }
 
-    return Variable::ofString(move(result));
+    return Variable::ofString(std::move(result));
 }
 
 Variable getStringLeft(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -359,7 +359,7 @@ Variable getStringLeft(const vector<Variable> &args, const RoutineContext &ctx) 
         result = str.substr(0, count);
     }
 
-    return Variable::ofString(move(result));
+    return Variable::ofString(std::move(result));
 }
 
 Variable getSubString(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -671,7 +671,7 @@ Variable eventUserDefined(const vector<Variable> &args, const RoutineContext &ct
     int userDefinedEventNumber = getInt(args, 0);
     auto event = make_shared<Event>(userDefinedEventNumber);
 
-    return Variable::ofEvent(move(event));
+    return Variable::ofEvent(std::move(event));
 }
 
 Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -720,7 +720,7 @@ Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) 
     float angle = glm::radians(getFloat(args, 0));
     auto vector = glm::vec3(glm::cos(angle), glm::sin(angle), 0.0f);
 
-    return Variable::ofVector(move(vector));
+    return Variable::ofVector(std::move(vector));
 }
 
 Variable setItemStackSize(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -844,7 +844,7 @@ Variable getGlobalString(const vector<Variable> &args, const RoutineContext &ctx
     string identifier = getString(args, 0);
     string result = ctx.game.getGlobalString(identifier);
 
-    return Variable::ofString(move(result));
+    return Variable::ofString(std::move(result));
 }
 
 Variable getListenPatternNumber(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -917,13 +917,13 @@ Variable getLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObject(args, 0, ctx);
     auto location = make_shared<Location>(object->position(), object->getFacing());
 
-    return Variable::ofLocation(move(location));
+    return Variable::ofLocation(std::move(location));
 }
 
 Variable location(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
-    auto location = make_shared<Location>(move(position), orientation);
+    auto location = make_shared<Location>(std::move(position), orientation);
 
     return Variable::ofLocation(location);
 }
@@ -1063,7 +1063,7 @@ Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &c
     int strRef = getInt(args, 0);
     string result = ctx.services.resource.strings.get(strRef);
 
-    return Variable::ofString(move(result));
+    return Variable::ofString(std::move(result));
 }
 
 Variable destroyObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1228,7 +1228,7 @@ Variable objectToString(const vector<Variable> &args, const RoutineContext &ctx)
     auto object = getObject(args, 0, ctx);
     string result = str(boost::format("%x") % object->id());
 
-    return Variable::ofString(move(result));
+    return Variable::ofString(std::move(result));
 }
 
 Variable getIsImmune(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1323,7 +1323,7 @@ Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) 
     // TODO: use seconds
     AnimationProperties properties;
     properties.speed = speed;
-    caller->playAnimation(animType, move(properties));
+    caller->playAnimation(animType, std::move(properties));
 
     return Variable::ofNull();
 }
@@ -1332,14 +1332,14 @@ Variable talentSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     int spell = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Spell, spell);
 
-    return Variable::ofTalent(move(talent));
+    return Variable::ofTalent(std::move(talent));
 }
 
 Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     int feat = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Feat, feat);
 
-    return Variable::ofTalent(move(talent));
+    return Variable::ofTalent(std::move(talent));
 }
 
 Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1394,8 +1394,8 @@ Variable getCreatureTalentBest(const vector<Variable> &args, const RoutineContex
 Variable jumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto destination = getLocationArgument(args, 0);
 
-    auto action = ctx.game.actionFactory().newJumpToLocation(move(destination));
-    getCaller(ctx)->addActionOnTop(move(action));
+    auto action = ctx.game.actionFactory().newJumpToLocation(std::move(destination));
+    getCaller(ctx)->addActionOnTop(std::move(action));
 
     return Variable::ofNull();
 }
@@ -1734,8 +1734,8 @@ Variable jumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto toJumpTo = getObject(args, 0, ctx);
     bool walkStraightLineToPoint = getIntAsBoolOrElse(args, 1, true);
 
-    auto action = ctx.game.actionFactory().newJumpToObject(move(toJumpTo), walkStraightLineToPoint);
-    getCaller(ctx)->addActionOnTop(move(action));
+    auto action = ctx.game.actionFactory().newJumpToObject(std::move(toJumpTo), walkStraightLineToPoint);
+    getCaller(ctx)->addActionOnTop(std::move(action));
 
     return Variable::ofNull();
 }
@@ -2279,7 +2279,7 @@ Variable setEffectIcon(const vector<Variable> &args, const RoutineContext &ctx) 
 
     // TODO: implement
 
-    return Variable::ofEffect(move(effect));
+    return Variable::ofEffect(std::move(effect));
 }
 
 Variable faceObjectAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2505,7 +2505,7 @@ Variable getGlobalLocation(const vector<Variable> &args, const RoutineContext &c
     string identifier = getString(args, 0);
     auto value = ctx.game.getGlobalLocation(identifier);
 
-    return Variable::ofLocation(move(value));
+    return Variable::ofLocation(std::move(value));
 }
 
 Variable setGlobalLocation(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2621,7 +2621,7 @@ Variable showPartySelectionGUI(const vector<Variable> &args, const RoutineContex
     bool allowCancel = getIntAsBoolOrElse(args, 3, false);
 
     PartySelectionContext partyCtx;
-    partyCtx.exitScript = move(exitScript);
+    partyCtx.exitScript = std::move(exitScript);
     partyCtx.forceNpc1 = forceNpc1;
     partyCtx.forceNpc2 = forceNpc2;
 

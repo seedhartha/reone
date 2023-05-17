@@ -84,7 +84,7 @@ void BwmReader::onLoad() {
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
         face.normal = glm::make_vec3(&_normals[3 * i]);
 
-        _walkmesh->_faces.push_back(move(face));
+        _walkmesh->_faces.push_back(std::move(face));
     }
 
     if (_type == WalkmeshType::WOK) {

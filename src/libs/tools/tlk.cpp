@@ -17,12 +17,12 @@
 
 #include "reone/tools/tlk.h"
 
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-#include "reone/system/stream/fileinput.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/fileinput.h"
 
 #include "tinyxml2.h"
 
@@ -104,7 +104,7 @@ void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem
             element->Attribute("text"),
             element->Attribute("soundResRef")});
     }
-    auto table = TalkTable(move(strings));
+    auto table = TalkTable(std::move(strings));
 
     vector<string> tokens;
     boost::split(

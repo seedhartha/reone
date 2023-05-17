@@ -279,7 +279,7 @@ void CharGenSkills::updateCharacter() {
     for (auto &skillRank : _attributes.skillRanks()) {
         character.attributes.setSkillRank(skillRank.first, skillRank.second);
     }
-    _charGen.setCharacter(move(character));
+    _charGen.setCharacter(std::move(character));
 }
 
 int CharGenSkills::getPointCost(SkillType skill) const {

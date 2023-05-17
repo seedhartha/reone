@@ -19,9 +19,9 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmesh.h"
@@ -545,7 +545,7 @@ vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const funct
     for (auto &light : distances) {
         lights.push_back(light.first);
     }
-    return move(lights);
+    return std::move(lights);
 }
 
 bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollision) const {
@@ -730,7 +730,7 @@ shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode
 }
 
 shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    return newSceneNode<TriggerSceneNode, vector<glm::vec3>>(move(geometry));
+    return newSceneNode<TriggerSceneNode, vector<glm::vec3>>(std::move(geometry));
 }
 
 shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {

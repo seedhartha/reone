@@ -29,7 +29,7 @@ namespace graphics {
 static constexpr int kHeaderSize = 18;
 
 TgaWriter::TgaWriter(shared_ptr<Texture> texture) :
-    _texture(move(texture)) {
+    _texture(std::move(texture)) {
 }
 
 void TgaWriter::save(ostream &out, bool compress) {
@@ -165,7 +165,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {

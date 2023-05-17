@@ -18,9 +18,9 @@
 #include "reone/game/soundsets.h"
 
 #include "reone/audio/files.h"
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/game/format/ssfreader.h"
 
@@ -53,7 +53,7 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 } // namespace game

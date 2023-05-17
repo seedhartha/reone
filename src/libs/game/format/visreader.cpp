@@ -48,7 +48,7 @@ void VisReader::processLine(const string &line) {
         _roomFrom = boost::to_lower_copy(tokens[0]);
     } else {
         string room(boost::to_lower_copy(tokens[0]));
-        _visibility.insert(make_pair(_roomFrom, move(room)));
+        _visibility.insert(make_pair(_roomFrom, std::move(room)));
     }
 }
 

@@ -187,7 +187,7 @@ string describeInstruction(const Instruction &ins, IRoutines &routines) {
         break;
     }
 
-    return move(desc);
+    return std::move(desc);
 }
 
 const string &describeInstructionType(InstructionType type) {

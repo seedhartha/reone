@@ -41,7 +41,7 @@ void Surfaces::init() {
         surface.lineOfSight = surfacemat->getBool(row, "lineofsight");
         surface.grass = surfacemat->getBool(row, "grass");
         surface.sound = surfacemat->getString(row, "sound");
-        _surfaces.push_back(move(surface));
+        _surfaces.push_back(std::move(surface));
     }
 }
 
@@ -66,7 +66,7 @@ set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> 
             result.insert(static_cast<uint32_t>(i));
         }
     }
-    return move(result);
+    return std::move(result);
 }
 
 set<uint32_t> Surfaces::getGrassSurfaces() const {

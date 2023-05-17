@@ -160,7 +160,7 @@ bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
 }
 
 void TextInput::setText(string text) {
-    _text = move(text);
+    _text = std::move(text);
 }
 
 } // namespace gui

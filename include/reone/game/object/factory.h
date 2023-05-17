@@ -78,7 +78,7 @@ private:
         uint32_t id = _counter++;
         std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));
         _objectById.insert(std::make_pair(id, object));
-        return move(object);
+        return std::move(object);
     }
 };
 

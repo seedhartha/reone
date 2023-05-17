@@ -42,7 +42,7 @@ void PlayAnimationAction::execute(shared_ptr<Action> self, Object &actor, float 
     properties.speed = _speed;
     properties.duration = _durationSeconds;
 
-    actor.playAnimation(_anim, move(properties));
+    actor.playAnimation(_anim, std::move(properties));
 
     _playing = true;
 }

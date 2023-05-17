@@ -17,16 +17,16 @@
 
 #include "reone/tools/gff.h"
 
+#include "reone/resource/format/gffreader.h"
+#include "reone/resource/format/gffwriter.h"
+#include "reone/resource/strings.h"
+#include "reone/resource/typeutil.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/hexutil.h"
 #include "reone/system/logutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/resource/format/gffreader.h"
-#include "reone/resource/format/gffwriter.h"
-#include "reone/resource/strings.h"
-#include "reone/resource/typeutil.h"
 
 #include "tinyxml2.h"
 
@@ -76,7 +76,7 @@ void GffTool::invokeBatch(
 static string sanitizeXmlElementName(const std::string &s) {
     auto sanitized = s;
     boost::replace_all(sanitized, " ", "_");
-    return move(sanitized);
+    return std::move(sanitized);
 }
 
 static void printStructToXml(const Gff &gff, XMLPrinter &printer, Strings &strings, int index = -1) {
@@ -230,10 +230,10 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
             throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
         }
 
-        fields.push_back(move(field));
+        fields.push_back(std::move(field));
     }
 
-    return make_unique<Gff>(structType, move(fields));
+    return make_unique<Gff>(structType, std::move(fields));
 }
 
 static void convertXmlToGff(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {

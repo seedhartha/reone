@@ -233,7 +233,7 @@ public:
     }
 
     std::unique_ptr<TakeItemAction> newTakeItem(std::shared_ptr<Item> item, std::shared_ptr<Object> takeFrom) {
-        return std::make_unique<TakeItemAction>(_game, _services, move(item), move(takeFrom));
+        return std::make_unique<TakeItemAction>(_game, _services, std::move(item), std::move(takeFrom));
     }
 
     std::unique_ptr<UnequipItemAction> newUnequipItem(std::shared_ptr<Item> item, bool instant) {

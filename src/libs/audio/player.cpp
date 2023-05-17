@@ -30,14 +30,14 @@ shared_ptr<AudioSource> AudioPlayer::play(const string &resRef, AudioType type, 
     if (!stream) {
         return nullptr;
     }
-    return play(move(stream), type, loop, gain, positional, move(position));
+    return play(std::move(stream), type, loop, gain, positional, std::move(position));
 }
 
 shared_ptr<AudioSource> AudioPlayer::play(shared_ptr<AudioStream> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    auto source = make_shared<AudioSource>(move(stream), loop, getGain(type, gain), positional, move(position));
+    auto source = make_shared<AudioSource>(std::move(stream), loop, getGain(type, gain), positional, std::move(position));
     source->init();
     source->play();
-    return move(source);
+    return std::move(source);
 }
 
 float AudioPlayer::getGain(AudioType type, float gain) const {

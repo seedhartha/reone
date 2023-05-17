@@ -43,7 +43,7 @@ void Cursor::draw() {
     _uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _shaders.use(_shaders.gui());
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {

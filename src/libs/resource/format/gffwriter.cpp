@@ -233,7 +233,7 @@ void GffWriter::processTree() {
             writeField.type = static_cast<uint32_t>(field.type);
             writeField.labelIndex = labelIdx;
             writeField.dataOrDataOffset = dataOrDataOffset;
-            _context.fields.push_back(move(writeField));
+            _context.fields.push_back(std::move(writeField));
         }
 
         uint32_t dataOrDataOffset;
@@ -248,7 +248,7 @@ void GffWriter::processTree() {
         writeStruct.type = aStruct.type();
         writeStruct.dataOrDataOffset = dataOrDataOffset;
         writeStruct.fieldCount = static_cast<uint32_t>(aStruct.fields().size());
-        _context.structs.push_back(move(writeStruct));
+        _context.structs.push_back(std::move(writeStruct));
     }
 }
 

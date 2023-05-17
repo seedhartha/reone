@@ -271,7 +271,7 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.gui());
     _services.graphics.meshes.quad().draw();
@@ -297,7 +297,7 @@ void SelectionOverlay::drawTitleBar() {
         _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
             general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             general.alpha = 0.5f;
         });
@@ -331,7 +331,7 @@ void SelectionOverlay::drawHealthBar() {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
         general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
@@ -369,7 +369,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.gui());
     _services.graphics.meshes.quad().draw();
@@ -432,7 +432,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.gui());
     _services.graphics.meshes.quad().draw();

@@ -443,7 +443,7 @@ void HUD::drawHealth(int memberIndex) {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());

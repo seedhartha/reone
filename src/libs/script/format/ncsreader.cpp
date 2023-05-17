@@ -186,7 +186,7 @@ void NcsReader::readInstruction(size_t &offset) {
     size_t pos = tell();
     ins.nextOffset = static_cast<uint32_t>(pos);
 
-    _program->add(move(ins));
+    _program->add(std::move(ins));
 
     offset = pos;
 }

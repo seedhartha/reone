@@ -26,77 +26,77 @@ namespace script {
 Variable Variable::ofNull() {
     Variable result;
     result.type = VariableType::Void;
-    return move(result);
+    return std::move(result);
 }
 
 Variable Variable::ofInt(int value) {
     Variable result;
     result.type = VariableType::Int;
     result.intValue = value;
-    return move(result);
+    return std::move(result);
 }
 
 Variable Variable::ofFloat(float value) {
     Variable result;
     result.type = VariableType::Float;
     result.floatValue = value;
-    return move(result);
+    return std::move(result);
 }
 
 Variable Variable::ofString(string value) {
     Variable result;
     result.type = VariableType::String;
-    result.strValue = move(value);
-    return move(result);
+    result.strValue = std::move(value);
+    return std::move(result);
 }
 
 Variable Variable::ofVector(glm::vec3 value) {
     Variable result;
     result.type = VariableType::Vector;
-    result.vecValue = move(value);
-    return move(result);
+    result.vecValue = std::move(value);
+    return std::move(result);
 }
 
 Variable Variable::ofObject(uint32_t objectId) {
     Variable result;
     result.type = VariableType::Object;
     result.objectId = objectId;
-    return move(result);
+    return std::move(result);
 }
 
 Variable Variable::ofEffect(shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Effect;
-    result.engineType = move(engineType);
-    return move(result);
+    result.engineType = std::move(engineType);
+    return std::move(result);
 }
 
 Variable Variable::ofEvent(shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Event;
-    result.engineType = move(engineType);
-    return move(result);
+    result.engineType = std::move(engineType);
+    return std::move(result);
 }
 
 Variable Variable::ofLocation(shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Location;
-    result.engineType = move(engineType);
-    return move(result);
+    result.engineType = std::move(engineType);
+    return std::move(result);
 }
 
 Variable Variable::ofTalent(shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Talent;
-    result.engineType = move(engineType);
-    return move(result);
+    result.engineType = std::move(engineType);
+    return std::move(result);
 }
 
 Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
     Variable result;
     result.type = VariableType::Action;
-    result.context = move(context);
-    return move(result);
+    result.context = std::move(context);
+    return std::move(result);
 }
 
 const string Variable::toString() const {

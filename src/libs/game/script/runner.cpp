@@ -51,7 +51,7 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
     ctx->userDefinedEventNumber = userDefinedEventNumber;
     ctx->scriptVar = scriptVar;
 
-    return ScriptExecution(program, move(ctx)).run();
+    return ScriptExecution(program, std::move(ctx)).run();
 }
 
 } // namespace game

@@ -36,9 +36,9 @@ ModelNode::ModelNode(
     bool animated,
     ModelNode *parent) :
     _number(number),
-    _name(move(name)),
-    _restPosition(move(restPosition)),
-    _restOrientation(move(restOrientation)),
+    _name(std::move(name)),
+    _restPosition(std::move(restPosition)),
+    _restOrientation(std::move(restOrientation)),
     _animated(animated),
     _parent(parent) {
 
@@ -71,7 +71,7 @@ void ModelNode::init() {
 }
 
 void ModelNode::addChild(std::shared_ptr<ModelNode> child) {
-    _children.push_back(move(child));
+    _children.push_back(std::move(child));
 }
 
 bool ModelNode::getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const {

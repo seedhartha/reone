@@ -111,7 +111,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
         });
         _services.graphics.shaders.use(_services.graphics.shaders.gui());
 
@@ -131,7 +131,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
         });
         _services.graphics.shaders.use(_services.graphics.shaders.gui());
         _services.graphics.meshes.quad().draw();
@@ -170,7 +170,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         _services.graphics.uniforms.setGeneral([&](auto &general) {
             general.resetLocals();
             general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = move(transform);
+            general.model = std::move(transform);
             general.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
         _services.graphics.shaders.use(_services.graphics.shaders.gui());
@@ -202,7 +202,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
         break;
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
@@ -253,7 +253,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = move(transform);
+        general.model = std::move(transform);
     });
     _services.graphics.shaders.use(_services.graphics.shaders.gui());
     _services.graphics.meshes.quad().draw();

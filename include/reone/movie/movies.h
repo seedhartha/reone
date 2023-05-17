@@ -55,7 +55,7 @@ public:
             return maybeObject->second;
         }
         auto object = doGet(name);
-        return _objects.insert(make_pair(name, move(object))).first->second;
+        return _objects.insert(make_pair(name, std::move(object))).first->second;
     }
 
 private:

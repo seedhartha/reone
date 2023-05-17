@@ -19,9 +19,9 @@
 
 #include <boost/regex.hpp>
 
-#include "reone/system/exception/validation.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/routines.h"
+#include "reone/system/exception/validation.h"
 
 using namespace std;
 
@@ -218,7 +218,7 @@ Instruction PcodeReader::parseInstruction(const string &line, uint32_t addr) con
         break;
     };
 
-    return move(ins);
+    return std::move(ins);
 }
 
 void PcodeReader::applyArguments(const string &line, const string &restr, int numArgs, const function<void(const vector<string> &)> &fn) const {
@@ -231,7 +231,7 @@ void PcodeReader::applyArguments(const string &line, const string &restr, int nu
     for (int i = 0; i < numArgs; ++i) {
         args.push_back(what[1 + i].str());
     }
-    fn(move(args));
+    fn(std::move(args));
 }
 
 } // namespace script

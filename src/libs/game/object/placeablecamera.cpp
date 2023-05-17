@@ -42,7 +42,7 @@ void PlaceableCamera::loadTransformFromGIT(const Gff &gffs) {
     glm::quat orientation(gffs.getOrientation("Orientation"));
     float pitch = gffs.getFloat("Pitch");
 
-    _orientation = move(orientation);
+    _orientation = std::move(orientation);
     _orientation *= glm::quat_cast(glm::eulerAngleX(glm::radians(pitch)));
 
     updateTransform();

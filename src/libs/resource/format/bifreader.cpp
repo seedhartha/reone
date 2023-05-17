@@ -59,7 +59,7 @@ BifReader::ResourceEntry BifReader::readResourceEntry() {
     entry.fileSize = fileSize;
     entry.resType = resType;
 
-    return move(entry);
+    return std::move(entry);
 }
 
 } // namespace resource

@@ -59,10 +59,10 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
                 test += token;
 
                 if (font.measure(test) <= maxWidth) {
-                    line = move(test);
+                    line = std::move(test);
                 } else {
                     result.push_back(line);
-                    line = move(token);
+                    line = std::move(token);
                 }
             }
             break;
@@ -92,7 +92,7 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 } // namespace graphics

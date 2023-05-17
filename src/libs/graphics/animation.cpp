@@ -34,12 +34,12 @@ Animation::Animation(
     string root,
     shared_ptr<ModelNode> rootNode,
     vector<Event> events) :
-    _name(move(name)),
+    _name(std::move(name)),
     _length(length),
     _transitionTime(transitionTime),
-    _root(move(root)),
-    _rootNode(move(rootNode)),
-    _events(move(events)) {
+    _root(std::move(root)),
+    _rootNode(std::move(rootNode)),
+    _events(std::move(events)) {
 
     fillLookups();
 }

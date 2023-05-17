@@ -36,7 +36,7 @@ void CommandAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     executionCtx->callerId = actor.id();
 
     shared_ptr<ScriptProgram> program(_context->savedState->program);
-    ScriptExecution(program, move(executionCtx)).run();
+    ScriptExecution(program, std::move(executionCtx)).run();
     complete();
 }
 

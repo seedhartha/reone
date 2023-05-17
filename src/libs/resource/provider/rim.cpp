@@ -38,7 +38,7 @@ void RimResourceProvider::init() {
         resource.id = rimResource.resId;
         resource.offset = rimResource.offset;
         resource.fileSize = rimResource.size;
-        _resources[rimResource.resId] = move(resource);
+        _resources[rimResource.resId] = std::move(resource);
     }
 }
 
@@ -53,7 +53,7 @@ shared_ptr<ByteArray> RimResourceProvider::find(const ResourceId &id) {
     auto rim = FileInputStream(_path, OpenMode::Binary);
     rim.seek(resource.offset, SeekOrigin::Begin);
     rim.read(buffer->data(), buffer->size());
-    return move(buffer);
+    return std::move(buffer);
 }
 
 } // namespace resource

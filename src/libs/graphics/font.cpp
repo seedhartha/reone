@@ -47,11 +47,11 @@ void Font::load(shared_ptr<Texture> texture) {
         float aspect = w / h;
 
         Glyph glyph;
-        glyph.ul = move(ul);
-        glyph.lr = move(lr);
+        glyph.ul = std::move(ul);
+        glyph.lr = std::move(lr);
         glyph.size = glm::vec2(aspect * _height, _height);
 
-        _glyphs.push_back(move(glyph));
+        _glyphs.push_back(std::move(glyph));
     }
 }
 
@@ -85,7 +85,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
                 posScale[2] = glyph.size.x;
                 posScale[3] = glyph.size.y;
 
-                uniforms.chars[j].posScale = move(posScale);
+                uniforms.chars[j].posScale = std::move(posScale);
                 uniforms.chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
 
                 textOffset.x += glyph.size.x;

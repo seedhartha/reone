@@ -35,7 +35,7 @@ shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
     auto clazz = make_shared<CreatureClass>(type, *this, _strings, _twoDas);
     clazz->load(*classes, static_cast<int>(type));
 
-    return move(clazz);
+    return std::move(clazz);
 }
 
 } // namespace game

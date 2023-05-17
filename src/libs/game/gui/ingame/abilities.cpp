@@ -131,7 +131,7 @@ void AbilitiesMenu::loadSkills() {
         skillInfo.description = _services.resource.strings.get(skills->getInt(row, "description"));
         skillInfo.icon = _services.graphics.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
-        _skills.insert(make_pair(skill, move(skillInfo)));
+        _skills.insert(make_pair(skill, std::move(skillInfo)));
     }
 
     _binding.lbAbility->clearItems();
@@ -141,7 +141,7 @@ void AbilitiesMenu::loadSkills() {
         item.text = skill.second.name;
         item.iconFrame = getFrameTexture();
         item.iconTexture = skill.second.icon;
-        _binding.lbAbility->addItem(move(item));
+        _binding.lbAbility->addItem(std::move(item));
     }
 }
 

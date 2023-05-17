@@ -20,11 +20,11 @@
 #include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/room.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -75,18 +75,18 @@ void Object::clearAllActions() {
 }
 
 void Object::addAction(unique_ptr<Action> action) {
-    _actions.push_back(move(action));
+    _actions.push_back(std::move(action));
 }
 
 void Object::addActionOnTop(unique_ptr<Action> action) {
-    _actions.push_front(move(action));
+    _actions.push_front(std::move(action));
 }
 
 void Object::delayAction(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
-    delayed.action = move(action);
+    delayed.action = std::move(action);
     delayed.timer.setTimeout(seconds);
-    _delayed.push_back(move(delayed));
+    _delayed.push_back(std::move(delayed));
 }
 
 void Object::updateActions(float dt) {
@@ -108,7 +108,7 @@ void Object::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
         delayed.timer.advance(dt);
         if (delayed.timer.isTimedOut()) {
-            _actions.push_back(move(delayed.action));
+            _actions.push_back(std::move(delayed.action));
         }
     }
     auto delayedToRemove = remove_if(
@@ -160,7 +160,7 @@ shared_ptr<Item> Object::addItem(const string &resRef, int stackSize, bool dropa
         _items.push_back(result);
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 void Object::addItem(const shared_ptr<Item> &item) {
@@ -266,7 +266,7 @@ void Object::applyEffect(const shared_ptr<Effect> &effect, DurationType duration
         appliedEffect.effect = effect;
         appliedEffect.durationType = durationType;
         appliedEffect.duration = duration;
-        _effects.push_back(move(appliedEffect));
+        _effects.push_back(std::move(appliedEffect));
     }
 }
 

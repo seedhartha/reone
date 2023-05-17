@@ -149,7 +149,7 @@ void AudioSource::setPosition(glm::vec3 position) {
     if (_source && _positional) {
         alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
     }
-    _position = move(position);
+    _position = std::move(position);
 }
 
 } // namespace audio

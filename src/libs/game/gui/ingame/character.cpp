@@ -262,7 +262,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph)
     auto sceneModel = sceneGraph.newModel(*_services.graphics.models.get("charmain_light"), ModelUsage::GUI);
     sceneModel->attach("charmain_light", *character->sceneNode());
 
-    return move(sceneModel);
+    return std::move(sceneModel);
 }
 
 } // namespace game

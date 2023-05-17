@@ -245,7 +245,7 @@ void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refres
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, Layer layer, bool refresh) {
-    setPixels(w, h, format, vector<Layer> {move(layer)}, refresh);
+    setPixels(w, h, format, vector<Layer> {std::move(layer)}, refresh);
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, bool refresh) {
@@ -255,7 +255,7 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, 
     _width = w;
     _height = h;
     _pixelFormat = format;
-    _layers = move(layers);
+    _layers = std::move(layers);
 
     if (refresh) {
         this->refresh();

@@ -17,13 +17,13 @@
 
 #include "reone/tools/2da.h"
 
+#include "reone/resource/2da.h"
+#include "reone/resource/format/2dareader.h"
+#include "reone/resource/format/2dawriter.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/resource/2da.h"
-#include "reone/resource/format/2dareader.h"
-#include "reone/resource/format/2dawriter.h"
 
 #include "tinyxml2.h"
 
@@ -123,10 +123,10 @@ void TwoDaTool::to2DA(const boost::filesystem::path &path, const boost::filesyst
             }
             row.values.push_back(attribute->Value());
         }
-        rows.push_back(move(row));
+        rows.push_back(std::move(row));
     }
 
-    auto twoDa = TwoDa(move(columns), move(rows));
+    auto twoDa = TwoDa(std::move(columns), std::move(rows));
 
     vector<string> tokens;
     boost::split(

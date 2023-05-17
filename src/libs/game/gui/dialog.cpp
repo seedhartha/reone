@@ -124,10 +124,10 @@ void DialogGUI::addFrame(string tag, int top, int height) {
     extent.width = _game.options().graphics.width;
     extent.height = height;
 
-    frame->setExtent(move(extent));
+    frame->setExtent(std::move(extent));
     frame->setBorderFill("blackfill");
 
-    _gui->addControl(move(frame));
+    _gui->addControl(std::move(frame));
 }
 
 void DialogGUI::configureMessage() {
@@ -179,7 +179,7 @@ void DialogGUI::loadStuntParticipants() {
             creature->startStuntMode();
         }
 
-        _participantByTag.insert(make_pair(stunt.participant, move(participant)));
+        _participantByTag.insert(make_pair(stunt.participant, std::move(participant)));
     }
 }
 
@@ -281,7 +281,7 @@ void DialogGUI::updateParticipantAnimations() {
             if (animation) {
                 AnimationProperties properties;
                 properties.scale = 1.0f;
-                participant.creature->playAnimation(animation, move(properties));
+                participant.creature->playAnimation(animation, std::move(properties));
             }
         } else {
             shared_ptr<Creature> participant;
@@ -333,7 +333,7 @@ void DialogGUI::repositionMessage() {
         top = _binding.lbReplies->extent().top;
     }
 
-    _binding.lblMessage->setText(move(text));
+    _binding.lblMessage->setText(std::move(text));
     _binding.lblMessage->setExtentTop(top);
 }
 
@@ -373,7 +373,7 @@ void DialogGUI::setReplyLines(vector<string> lines) {
         ListBox::Item item;
         item.tag = to_string(i);
         item.text = lines[i];
-        _binding.lbReplies->addItem(move(item));
+        _binding.lbReplies->addItem(std::move(item));
     }
 }
 

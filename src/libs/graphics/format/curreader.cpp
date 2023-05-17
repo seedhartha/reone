@@ -72,7 +72,7 @@ void CurReader::loadData() {
     }
 
     _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
-    _texture->setPixels(_width, _width, PixelFormat::BGRA8, Texture::Layer {move(pixels)});
+    _texture->setPixels(_width, _width, PixelFormat::BGRA8, Texture::Layer {std::move(pixels)});
 }
 
 } // namespace graphics

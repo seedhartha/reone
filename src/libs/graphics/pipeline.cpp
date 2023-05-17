@@ -17,8 +17,8 @@
 
 #include "reone/graphics/pipeline.h"
 
-#include "reone/system/randomutil.h"
 #include "reone/scene/node/light.h"
+#include "reone/system/randomutil.h"
 
 #include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
@@ -84,7 +84,7 @@ static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projec
         }
     }
 
-    return move(corners);
+    return std::move(corners);
 }
 
 static glm::mat4 computeDirectionalLightSpaceMatrix(
@@ -164,7 +164,7 @@ void Pipeline::init() {
             auto sample = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(0.0f, 1.0f));
             sample = glm::normalize(sample);
             sample *= scale;
-            ssao.samples[i] = glm::vec4(move(sample), 0.0f);
+            ssao.samples[i] = glm::vec4(std::move(sample), 0.0f);
         }
     });
 }
@@ -344,7 +344,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
 
     // Register attachments
 
-    _attachments[dim] = move(attachments);
+    _attachments[dim] = std::move(attachments);
 }
 
 shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
@@ -524,7 +524,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _uniforms.setGeneral([&dim, &bias, &pixelStride, &maxSteps, &camera, screenProjection](auto &general) {
         general.resetGlobals();
         general.resetLocals();
-        general.screenProjection = move(screenProjection);
+        general.screenProjection = std::move(screenProjection);
         general.screenResolution = glm::vec2(dim.x, dim.y);
         general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
         general.clipNear = camera->zNear();

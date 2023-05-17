@@ -17,11 +17,11 @@
 
 #include "reone/game/d20/skills.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
+#include "reone/system/collectionutil.h"
 
 using namespace std;
 
@@ -44,10 +44,10 @@ void Skills::init() {
         shared_ptr<Texture> icon(_textures.get(skills->getString(row, "icon"), TextureUsage::GUI));
 
         auto skill = make_shared<Skill>();
-        skill->name = move(name);
-        skill->description = move(description);
-        skill->icon = move(icon);
-        _skills.insert(make_pair(static_cast<SkillType>(row), move(skill)));
+        skill->name = std::move(name);
+        skill->description = std::move(description);
+        skill->icon = std::move(icon);
+        _skills.insert(make_pair(static_cast<SkillType>(row), std::move(skill)));
     }
 }
 

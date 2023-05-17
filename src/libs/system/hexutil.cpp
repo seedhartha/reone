@@ -36,7 +36,7 @@ ByteArray unhexify(const string &s) {
         sscanf(&s[i], "%02hhx", &byte);
         bytes.push_back(static_cast<char>(byte));
     }
-    return move(bytes);
+    return std::move(bytes);
 }
 
 } // namespace reone

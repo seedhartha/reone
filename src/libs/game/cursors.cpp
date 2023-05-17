@@ -17,11 +17,11 @@
 
 #include "reone/game/cursors.h"
 
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/graphics/cursor.h"
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/texture.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 using namespace std;
 
@@ -68,7 +68,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     auto cursor = make_shared<Cursor>(textureUp, textureDown, _graphicsContext, _meshes, _shaders, _textures, _uniforms, _window);
     _cache.insert(make_pair(type, cursor));
 
-    return move(cursor);
+    return std::move(cursor);
 }
 
 const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
@@ -97,7 +97,7 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
         cursorNames.push_back(static_cast<uint32_t>(cursorId));
     }
 
-    return move(cursorNames);
+    return std::move(cursorNames);
 }
 
 shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {

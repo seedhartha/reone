@@ -94,15 +94,15 @@ void Game::init() {
 void Game::initLocalServices() {
     auto console = make_unique<Console>(*this, _services);
     console->init();
-    _console = move(console);
+    _console = std::move(console);
 
     auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
     profileOverlay->init();
-    _profileOverlay = move(profileOverlay);
+    _profileOverlay = std::move(profileOverlay);
 
     auto routines = make_unique<Routines>(_gameId, this, &_services);
     routines->init();
-    _routines = move(routines);
+    _routines = std::move(routines);
 
     _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
 
@@ -488,7 +488,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->getOrigin();
         }
-        _services.audio.context.setListenerPosition(move(listenerPosition));
+        _services.audio.context.setListenerPosition(std::move(listenerPosition));
     }
 }
 

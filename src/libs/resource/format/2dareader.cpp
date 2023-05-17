@@ -94,7 +94,7 @@ bool TwoDaReader::readToken(string &token) {
         if (*pch == '\t') {
             string s(start, pch - start);
             seek(pos + pch - start + 1);
-            token = move(s);
+            token = std::move(s);
             return true;
         }
     }

@@ -49,7 +49,7 @@ namespace movie {
 class BinkVideoDecoder : public VideoStream {
 public:
     BinkVideoDecoder(boost::filesystem::path path) :
-        _path(move(path)) {
+        _path(std::move(path)) {
     }
 
     ~BinkVideoDecoder() { deinit(); }
@@ -246,7 +246,7 @@ private:
                 uint8_t *src = _avFrameScaled->data[0] + static_cast<long long>(y) * _avFrameScaled->linesize[0];
                 memcpy(pixels->data() + dstIdx, src, 3ll * _videoCodecCtx->width);
             }
-            _frame.pixels = move(pixels);
+            _frame.pixels = std::move(pixels);
 
             break;
         }
@@ -281,8 +281,8 @@ private:
                 AudioStream::Frame frame;
                 frame.format = AudioFormat::Mono16;
                 frame.sampleRate = _audioCodecCtx->sample_rate;
-                frame.samples = move(samples);
-                _audioStream->add(move(frame));
+                frame.samples = std::move(samples);
+                _audioStream->add(std::move(frame));
             }
             if (ret < 0) {
                 if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN)) {

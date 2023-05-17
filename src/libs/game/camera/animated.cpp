@@ -58,7 +58,7 @@ static const string &getAnimationName(int animNumber) {
     }
     string name(str(boost::format("cut%03dw") % (animNumber - 1200 + 1)));
 
-    return nameByNumber.insert(make_pair(animNumber, move(name))).first->second;
+    return nameByNumber.insert(make_pair(animNumber, std::move(name))).first->second;
 }
 
 void AnimatedCamera::playAnimation(int animNumber) {

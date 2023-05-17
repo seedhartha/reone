@@ -79,7 +79,7 @@ void TpcReader::loadLayers() {
             _reader->ignore(getMipMapDataSize(w, h));
         }
 
-        _layers.push_back(Texture::Layer {move(pixels)});
+        _layers.push_back(Texture::Layer {std::move(pixels)});
     }
 }
 

@@ -17,8 +17,8 @@
 
 #include "reone/audio/files.h"
 
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
@@ -53,7 +53,7 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
         }
     }
 
-    return move(result);
+    return std::move(result);
 }
 
 } // namespace audio

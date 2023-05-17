@@ -258,7 +258,7 @@ void CharGenAbilities::updateCharacter() {
     for (auto &abilityScore : _attributes.abilityScores()) {
         character.attributes.setAbilityScore(abilityScore.first, abilityScore.second);
     }
-    _charGen.setCharacter(move(character));
+    _charGen.setCharacter(std::move(character));
 }
 
 void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {

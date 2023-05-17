@@ -17,11 +17,11 @@
 
 #include "reone/game/d20/feats.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
+#include "reone/system/collectionutil.h"
 
 using namespace std;
 
@@ -49,15 +49,15 @@ void Feats::init() {
         uint32_t pips = feats->getUint(row, "pips");
 
         auto feat = make_shared<Feat>();
-        feat->name = move(name);
-        feat->description = move(description);
-        feat->icon = move(icon);
+        feat->name = std::move(name);
+        feat->description = std::move(description);
+        feat->icon = std::move(icon);
         feat->minCharLevel = minCharLevel;
         feat->preReqFeat1 = preReqFeat1;
         feat->preReqFeat2 = preReqFeat2;
         feat->successor = successor;
         feat->pips = pips;
-        _feats.insert(make_pair(static_cast<FeatType>(row), move(feat)));
+        _feats.insert(make_pair(static_cast<FeatType>(row), std::move(feat)));
     }
 }
 

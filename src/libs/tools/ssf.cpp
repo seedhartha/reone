@@ -17,11 +17,11 @@
 
 #include "reone/tools/ssf.h"
 
+#include "reone/game/format/ssfreader.h"
+#include "reone/game/format/ssfwriter.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/game/format/ssfreader.h"
-#include "reone/game/format/ssfwriter.h"
 
 #include "tinyxml2.h"
 
@@ -112,7 +112,7 @@ void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem
     auto ssfPath = boost::filesystem::path(destPath);
     ssfPath.append(tokens[0] + ".ssf");
 
-    auto writer = SsfWriter(move(soundSet));
+    auto writer = SsfWriter(std::move(soundSet));
     writer.save(ssfPath);
 }
 

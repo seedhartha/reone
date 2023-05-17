@@ -97,7 +97,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
                 idx = vert.parentIndex;
             } while (idx != 0xffff);
             reverse(path.begin(), path.end());
-            return move(path);
+            return std::move(path);
         }
 
         // Skip current vertex if it has no adjacent vertices

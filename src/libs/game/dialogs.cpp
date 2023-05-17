@@ -59,7 +59,7 @@ unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
         dialog->stunts.push_back(getStunt(*stunt));
     }
 
-    return move(dialog);
+    return std::move(dialog);
 }
 
 Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const Gff &gffs) const {
@@ -67,7 +67,7 @@ Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const Gff &gffs) const {
     link.index = gffs.getInt("Index");
     link.active = gffs.getString("Active");
 
-    return move(link);
+    return std::move(link);
 }
 
 Dialog::EntryReply Dialogs::getEntryReply(const Gff &gffs) const {
@@ -100,21 +100,21 @@ Dialog::EntryReply Dialogs::getEntryReply(const Gff &gffs) const {
         entry.animations.push_back(getParticipantAnimation(*anim));
     }
 
-    return move(entry);
+    return std::move(entry);
 }
 
 Dialog::Stunt Dialogs::getStunt(const Gff &gffs) const {
     Dialog::Stunt stunt;
     stunt.participant = boost::to_lower_copy(gffs.getString("Participant"));
     stunt.stuntModel = boost::to_lower_copy(gffs.getString("StuntModel"));
-    return move(stunt);
+    return std::move(stunt);
 }
 
 Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const Gff &gffs) const {
     Dialog::ParticipantAnimation anim;
     anim.participant = boost::to_lower_copy(gffs.getString("Participant"));
     anim.animation = gffs.getInt("Animation");
-    return move(anim);
+    return std::move(anim);
 }
 
 } // namespace game

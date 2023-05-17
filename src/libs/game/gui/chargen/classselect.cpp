@@ -139,7 +139,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     extent.top = center.y - _defaultButtonSize.y / 2;
     extent.width = _defaultButtonSize.x;
     extent.height = _defaultButtonSize.y;
-    selButton.setExtent(move(extent));
+    selButton.setExtent(std::move(extent));
     selButton.setOnClick([this, character]() {
         _charGen.setCharacter(character);
         _charGen.openQuickOrCustom();
@@ -178,7 +178,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     classButton.control = &selButton;
     classButton.center = center;
     classButton.character = character;
-    _classButtons.push_back(move(classButton));
+    _classButtons.push_back(std::move(classButton));
 }
 
 vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
@@ -189,7 +189,7 @@ vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
             result.push_back(portrait);
         }
     }
-    return move(result);
+    return std::move(result);
 }
 
 int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz) {
@@ -227,7 +227,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISc
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *character->sceneNode());
 
-    return move(model);
+    return std::move(model);
 }
 
 void ClassSelection::setButtonColors(Control &control) {
@@ -245,7 +245,7 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
     extent.top = static_cast<int>(button.center.y - 0.5f * extent.height);
 
     Control &control = *button.control;
-    control.setExtent(move(extent));
+    control.setExtent(std::move(extent));
 }
 
 void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {

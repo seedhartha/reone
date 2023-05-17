@@ -40,7 +40,7 @@ void CameraStyles::init() {
         style->pitch = twoDa->getFloat(row, "pitch");
         style->viewAngle = twoDa->getFloat(row, "viewangle");
         style->height = twoDa->getFloat(row, "height");
-        _styles.push_back(move(style));
+        _styles.push_back(std::move(style));
     }
 }
 

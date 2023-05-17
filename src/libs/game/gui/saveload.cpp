@@ -84,7 +84,7 @@ void SaveLoad::onGUILoaded() {
         }
 
         // Set screenshot
-        _binding.lblScreenshot->setBorderFill(move(screenshot));
+        _binding.lblScreenshot->setBorderFill(std::move(screenshot));
     });
 
     _binding.btnSaveLoad->setOnClick([this]() {
@@ -153,10 +153,10 @@ void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != SaveLoadMode::Save);
 
     string panelName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
-    _binding.lblPanelName->setTextMessage(move(panelName));
+    _binding.lblPanelName->setTextMessage(std::move(panelName));
 
     string actionName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
-    _binding.btnSaveLoad->setTextMessage(move(actionName));
+    _binding.btnSaveLoad->setTextMessage(std::move(actionName));
 
     refreshSavedGames();
 }
@@ -164,7 +164,7 @@ void SaveLoad::refresh() {
 static boost::filesystem::path getSavesPath() {
     boost::filesystem::path savesPath(boost::filesystem::current_path());
     savesPath.append(kSavesDirectoryName);
-    return move(savesPath);
+    return std::move(savesPath);
 }
 
 void SaveLoad::refreshSavedGames() {
@@ -186,7 +186,7 @@ void SaveLoad::refreshSavedGames() {
         ListBox::Item item;
         item.tag = name;
         item.text = name;
-        _binding.lbGames->addItem(move(item));
+        _binding.lbGames->addItem(std::move(item));
     }
 }
 
@@ -208,10 +208,10 @@ static SavedGame peekSavedGame(const boost::filesystem::path &path) {
     }
 
     SavedGame result;
-    result.screen = move(screen);
+    result.screen = std::move(screen);
     result.lastModule = nfo.root()->getString("LastModule");
 
-    return move(result);
+    return std::move(result);
 }
 
 void SaveLoad::indexSavedGame(boost::filesystem::path path) {
@@ -223,8 +223,8 @@ void SaveLoad::indexSavedGame(boost::filesystem::path path) {
         SavedGameDescriptor descriptor;
         descriptor.number = number;
         descriptor.save = peekSavedGame(path);
-        descriptor.path = move(path);
-        _saves.push_back(move(descriptor));
+        descriptor.path = std::move(path);
+        _saves.push_back(std::move(descriptor));
     } catch (const exception &e) {
         warn("Error indexing a saved game: " + string(e.what()));
     }
@@ -255,7 +255,7 @@ int SaveLoad::getNewSaveNumber() const {
 static boost::filesystem::path getSaveGamePath(int number) {
     boost::filesystem::path result(getSavesPath());
     result.append(str(boost::format("%06d") % number) + ".sav");
-    return move(result);
+    return std::move(result);
 }
 
 void SaveLoad::deleteGame(int number) {

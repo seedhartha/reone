@@ -17,13 +17,13 @@
 
 #include "reone/game/object/encounter.h"
 
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
+#include "reone/game/game.h"
 
 using namespace std;
 
@@ -76,7 +76,7 @@ void Encounter::loadSpawnPointsFromGIT(const Gff &gffs) {
         SpawnPoint point;
         point.position = glm::vec3(x, y, z);
         point.orientation = glm::angleAxis(orientation, glm::vec3(0.0f, 0.0f, 1.0f)); // TODO: validate
-        _spawnPoints.push_back(move(point));
+        _spawnPoints.push_back(std::move(point));
     }
 }
 
@@ -116,7 +116,7 @@ void Encounter::loadCreaturesFromUTE(const Gff &ute) {
         creature._cr = creatureGffs->getFloat("CR");
         creature._resRef = creatureGffs->getString("ResRef");
         creature._singleSpawn = creatureGffs->getBool("SingleSpawn");
-        _creatures.push_back(move(creature));
+        _creatures.push_back(std::move(creature));
     }
 }
 

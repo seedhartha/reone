@@ -17,10 +17,10 @@
 
 #include "reone/resource/strings.h"
 
+#include "reone/resource/talktable.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/resource/talktable.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ string Strings::get(int strRef) {
     string text(_table->getString(strRef).text);
     process(text);
 
-    return move(text);
+    return std::move(text);
 }
 
 string Strings::getSound(int strRef) {

@@ -102,7 +102,7 @@ glm::vec3 SceneNode::getWorldCenterOfAABB() const {
 }
 
 void SceneNode::setLocalTransform(glm::mat4 transform) {
-    _localTransform = move(transform);
+    _localTransform = std::move(transform);
     computeAbsoluteTransforms();
 }
 

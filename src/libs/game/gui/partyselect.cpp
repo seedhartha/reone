@@ -252,7 +252,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
                 portrait = _services.game.portraits.getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
-            lblChar.setBorderFill(move(portrait));
+            lblChar.setBorderFill(std::move(portrait));
             lblNa.setVisible(false);
         } else {
             btnNpc.setDisabled(true);

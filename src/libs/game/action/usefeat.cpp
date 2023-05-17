@@ -18,10 +18,10 @@
 #include "reone/game/action/usefeat.h"
 
 #include "reone/game/combat.h"
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object.h"
 #include "reone/game/object/factory.h"
-#include "reone/game/di/services.h"
 
 using namespace std;
 
@@ -39,7 +39,7 @@ void UseFeatAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {
-        _game.combat().addAttack(move(creatureActor), _object, static_pointer_cast<ObjectAction>(self));
+        _game.combat().addAttack(std::move(creatureActor), _object, static_pointer_cast<ObjectAction>(self));
     }
 }
 

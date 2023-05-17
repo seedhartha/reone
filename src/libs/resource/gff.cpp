@@ -83,13 +83,13 @@ static glm::vec3 colorFromUint32(uint32_t value) {
 
     result /= 255.0f;
 
-    return move(result);
+    return std::move(result);
 }
 
 glm::vec3 Gff::getColor(const string &name, glm::vec3 defValue) const {
     const Field *field = get(name);
     if (!field)
-        return move(defValue);
+        return std::move(defValue);
 
     return colorFromUint32(field->uintValue);
 }
@@ -121,7 +121,7 @@ string Gff::getString(const string &name, string defValue) const {
 glm::vec3 Gff::getVector(const string &name, glm::vec3 defValue) const {
     const Field *field = get(name);
     if (!field)
-        return move(defValue);
+        return std::move(defValue);
 
     return field->vecValue;
 }
@@ -186,118 +186,118 @@ string Gff::Field::toString() const {
 }
 
 Gff::Field Gff::Field::newByte(string label, uint32_t val) {
-    Field tmp(FieldType::Byte, move(label));
+    Field tmp(FieldType::Byte, std::move(label));
     tmp.uintValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newChar(string label, int32_t val) {
-    Field tmp(FieldType::Char, move(label));
+    Field tmp(FieldType::Char, std::move(label));
     tmp.intValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newWord(string label, uint32_t val) {
-    Field tmp(FieldType::Word, move(label));
+    Field tmp(FieldType::Word, std::move(label));
     tmp.uintValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newShort(string label, int32_t val) {
-    Field tmp(FieldType::Short, move(label));
+    Field tmp(FieldType::Short, std::move(label));
     tmp.intValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newDword(string label, uint32_t val) {
-    Field tmp(FieldType::Dword, move(label));
+    Field tmp(FieldType::Dword, std::move(label));
     tmp.uintValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newInt(string label, int32_t val) {
-    Field tmp(FieldType::Int, move(label));
+    Field tmp(FieldType::Int, std::move(label));
     tmp.intValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newDword64(string label, uint64_t val) {
-    Field tmp(FieldType::Dword64, move(label));
+    Field tmp(FieldType::Dword64, std::move(label));
     tmp.uint64Value = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newInt64(string label, int64_t val) {
-    Field tmp(FieldType::Int64, move(label));
+    Field tmp(FieldType::Int64, std::move(label));
     tmp.int64Value = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newFloat(string label, float val) {
-    Field tmp(FieldType::Float, move(label));
+    Field tmp(FieldType::Float, std::move(label));
     tmp.floatValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newDouble(string label, double val) {
-    Field tmp(FieldType::Double, move(label));
+    Field tmp(FieldType::Double, std::move(label));
     tmp.doubleValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newCExoString(string label, string val) {
-    Field tmp(FieldType::CExoString, move(label));
-    tmp.strValue = move(val);
-    return move(tmp);
+    Field tmp(FieldType::CExoString, std::move(label));
+    tmp.strValue = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newResRef(string label, string val) {
-    Field tmp(FieldType::ResRef, move(label));
-    tmp.strValue = move(val);
-    return move(tmp);
+    Field tmp(FieldType::ResRef, std::move(label));
+    tmp.strValue = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newCExoLocString(string label, int32_t strRef, string val) {
-    Field tmp(FieldType::CExoLocString, move(label));
+    Field tmp(FieldType::CExoLocString, std::move(label));
     tmp.intValue = strRef;
-    tmp.strValue = move(val);
-    return move(tmp);
+    tmp.strValue = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newVoid(string label, ByteArray val) {
-    Field tmp(FieldType::Void, move(label));
-    tmp.data = move(val);
-    return move(tmp);
+    Field tmp(FieldType::Void, std::move(label));
+    tmp.data = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newStruct(string label, shared_ptr<Gff> val) {
-    Field tmp(FieldType::Struct, move(label));
-    tmp.children.push_back(move(val));
-    return move(tmp);
+    Field tmp(FieldType::Struct, std::move(label));
+    tmp.children.push_back(std::move(val));
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newList(string label, vector<shared_ptr<Gff>> val) {
-    Field tmp(FieldType::List, move(label));
-    tmp.children = move(val);
-    return move(tmp);
+    Field tmp(FieldType::List, std::move(label));
+    tmp.children = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newOrientation(string label, glm::quat val) {
-    Field tmp(FieldType::Orientation, move(label));
-    tmp.quatValue = move(val);
-    return move(tmp);
+    Field tmp(FieldType::Orientation, std::move(label));
+    tmp.quatValue = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newVector(string label, glm::vec3 val) {
-    Field tmp(FieldType::Vector, move(label));
-    tmp.vecValue = move(val);
-    return move(tmp);
+    Field tmp(FieldType::Vector, std::move(label));
+    tmp.vecValue = std::move(val);
+    return std::move(tmp);
 }
 
 Gff::Field Gff::Field::newStrRef(string label, int32_t val) {
-    Field tmp(FieldType::StrRef, move(label));
+    Field tmp(FieldType::StrRef, std::move(label));
     tmp.intValue = val;
-    return move(tmp);
+    return std::move(tmp);
 }
 
 } // namespace resource

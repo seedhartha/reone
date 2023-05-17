@@ -58,7 +58,7 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
         }
     }
 
-    layer.pixels = move(destPixels);
+    layer.pixels = std::move(destPixels);
     dstFormat = alpha ? PixelFormat::RGBA8 : PixelFormat::RGB8;
 }
 
@@ -161,7 +161,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
     }
 
-    return move(properties);
+    return std::move(properties);
 }
 
 } // namespace graphics

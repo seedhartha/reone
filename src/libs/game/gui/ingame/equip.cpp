@@ -391,7 +391,7 @@ void Equipment::updateItems() {
         lbItem.iconTexture = _services.graphics.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
-        _binding.lbItems->addItem(move(lbItem));
+        _binding.lbItems->addItem(std::move(lbItem));
     }
     shared_ptr<Creature> player(_game.party().player());
 
@@ -413,7 +413,7 @@ void Equipment::updateItems() {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        _binding.lbItems->addItem(move(lbItem));
+        _binding.lbItems->addItem(std::move(lbItem));
     }
 }
 
