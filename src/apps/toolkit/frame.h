@@ -15,32 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
+#pragma once
 
-#include "reone/system/logutil.h"
+#include <wx/wxprec.h>
 
-#include "cli/program.h"
-#include "frame.h"
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 
-using namespace std;
+#include <wx/glcanvas.h>
+#include <wx/splitter.h>
 
 namespace reone {
 
-bool ToolkitApp::OnInit() {
-    initLog();
-    setLogLevel(LogLevel::Debug);
+class ToolkitFrame : public wxFrame {
+public:
+    ToolkitFrame();
 
-    if (argc > 1) {
-        Program(argc, argv).run();
-        return false;
-    }
+private:
+    wxSplitterWindow *_splitter {nullptr};
+    wxGLCanvas *_glCanvas {nullptr};
 
-    auto frame = new ToolkitFrame();
-    frame->Show();
+    void OnSplitterSize(wxSizeEvent &event);
+    void OnSplitterSashPosChanging(wxSplitterEvent &event);
 
-    return true;
+    void OnGLCanvasPaint(wxPaintEvent &event);
+
+    wxDECLARE_EVENT_TABLE();
 };
 
 } // namespace reone
-
-wxIMPLEMENT_APP_CONSOLE(reone::ToolkitApp);

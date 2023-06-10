@@ -58,7 +58,7 @@ if(ENABLE_MOVIE)
 endif()
 
 if(BUILD_LAUNCHER OR BUILD_TOOLKIT)
-    find_package(wxWidgets REQUIRED core base)
+    find_package(wxWidgets REQUIRED core base OPTIONAL_COMPONENTS gl)
     include(${wxWidgets_USE_FILE})
 endif()
 

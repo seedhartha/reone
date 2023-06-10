@@ -32,8 +32,6 @@ namespace reone {
 static const char kIconName[] = "reone";
 static const char kConfigFilename[] = "reone.cfg";
 
-static const wxSize g_windowSize {640, 400};
-
 LauncherFrame::LauncherFrame() :
     wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
 
