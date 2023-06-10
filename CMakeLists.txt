@@ -21,7 +21,7 @@ set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 
 # Options
 
-option(BUILD_TOOLS "build toolkit application" ON)
+option(BUILD_TOOLKIT "build toolkit application" ON)
 option(BUILD_LAUNCHER "build launcher application" ON)
 option(BUILD_TESTS "build tests" ON)
 
@@ -96,7 +96,7 @@ add_subdirectory(src/libs/game) # game static library
 
 add_subdirectory(src/apps/reone) # reone application
 
-if(BUILD_TOOLS)
+if(BUILD_TOOLKIT)
     add_subdirectory(extern/tinyxml2) # tinyxml2 static library
     add_subdirectory(src/libs/tools) # tools static library
     add_subdirectory(src/apps/toolkit) # toolkit application
@@ -120,7 +120,7 @@ endif()
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS system resource graphics audio scene movie script gui game DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-if(BUILD_TOOLS)
+if(BUILD_TOOLKIT)
     install(TARGETS tools DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
