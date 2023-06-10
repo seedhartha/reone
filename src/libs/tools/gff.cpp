@@ -27,6 +27,7 @@
 #include "reone/system/logutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "tinyxml2.h"
 
@@ -139,22 +140,26 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, Strings &strin
 }
 
 void GffTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Strings &strings) {
-    auto stream = FileInputStream(input, OpenMode::Binary);
-
-    auto reader = GffReader();
-    reader.load(stream);
-
-    auto gff = reader.root();
+    auto gff = FileInputStream(input, OpenMode::Binary);
 
     auto xmlPath = outputDir;
     xmlPath.append(input.filename().string() + ".xml");
-    auto fp = fopen(xmlPath.string().c_str(), "wb");
+    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
 
-    auto printer = XMLPrinter(fp);
+    toXML(gff, xml, strings);
+}
+
+void GffTool::toXML(IInputStream &gff, IOutputStream &xml, Strings &strings) {
+    auto reader = GffReader();
+    reader.load(gff);
+
+    auto gffStruct = reader.root();
+
+    auto printer = XMLPrinter();
     printer.PushHeader(false, true);
-    printStructToXml(*gff, printer, strings);
+    printStructToXml(*gffStruct, printer, strings);
 
-    fclose(fp);
+    xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
 static unique_ptr<Gff> elementToGff(const XMLElement &element) {

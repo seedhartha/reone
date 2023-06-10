@@ -25,6 +25,7 @@ namespace resource {
 
 const std::string &getExtByResType(ResourceType type);
 ResourceType getResTypeByExt(const std::string &ext, bool logNotFound = true);
+bool isGFFCompatibleResType(ResourceType type);
 
 } // namespace resource
 

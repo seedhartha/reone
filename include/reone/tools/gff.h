@@ -19,6 +19,9 @@
 
 #include "tool.h"
 
+#include "reone/system/stream/input.h"
+#include "reone/system/stream/output.h"
+
 namespace reone {
 
 namespace resource {
@@ -42,6 +45,8 @@ public:
         const boost::filesystem::path &gamePath) override;
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
+
+    void toXML(IInputStream &gff, IOutputStream &xml, resource::Strings &strings);
 
 private:
     void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, resource::Strings &strings);

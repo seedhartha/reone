@@ -158,12 +158,15 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
         return;
     }
+    _gamePath = gamePath;
 
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
     keyReader.load(key);
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
+
+    _strings.init(gamePath);
 
     _filesTreeCtrl->DeleteAllItems();
     for (auto &file : boost::filesystem::directory_iterator(gamePath)) {
@@ -236,10 +239,12 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             }
             auto entry = FilesEntry();
             entry.path = file.path();
-            auto resType = getResTypeByExt(extension.substr(1), false);
-            if (resType != ResourceType::Invalid) {
-                auto resRef = filename.substr(0, filename.size() - 4);
-                entry.resId = make_unique<ResourceId>(resRef, resType);
+            if (!extension.empty()) {
+                auto resType = getResTypeByExt(extension.substr(1), false);
+                if (resType != ResourceType::Invalid) {
+                    auto resRef = filename.substr(0, filename.size() - 4);
+                    entry.resId = make_unique<ResourceId>(resRef, resType);
+                }
             }
             _files.insert(make_pair(itemId, std::move(entry)));
         }
@@ -335,7 +340,40 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
             auto res = ByteArrayInputStream(*resBytes);
             OpenResource(*entry.resId, res);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+            auto erf = FileInputStream(entry.path, OpenMode::Binary);
+            auto erfReader = ErfReader();
+            erfReader.load(erf);
+            auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&entry](auto &key) {
+                return key.resId == *entry.resId;
+            });
+            if (maybeKey == erfReader.keys().end()) {
+                return;
+            }
+            auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
+            auto erfEntry = erfReader.resources().at(resIdx);
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(erfEntry.size);
+            erf.seek(erfEntry.offset, SeekOrigin::Begin);
+            erf.read(&(*resBytes)[0], erfEntry.size);
+            auto res = ByteArrayInputStream(*resBytes);
+            OpenResource(*entry.resId, res);
         } else if (extension == ".rim") {
+            auto rim = FileInputStream(entry.path, OpenMode::Binary);
+            auto rimReader = RimReader();
+            rimReader.load(rim);
+            auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&entry](auto &res) {
+                return res.resId == *entry.resId;
+            });
+            if (maybeRes == rimReader.resources().end()) {
+                return;
+            }
+            auto rimRes = *maybeRes;
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(rimRes.size);
+            rim.seek(rimRes.offset, SeekOrigin::Begin);
+            rim.read(&(*resBytes)[0], rimRes.size);
+            auto res = ByteArrayInputStream(*resBytes);
+            OpenResource(*entry.resId, res);
         }
     } else {
         auto res = FileInputStream(entry.path, OpenMode::Binary);
@@ -348,6 +386,13 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
         TwoDaTool().toXML(data, xml);
+        _xmlTextCtrl->SetEditable(true);
+        _xmlTextCtrl->SetText(xmlBytes);
+        _xmlTextCtrl->SetEditable(false);
+    } else if (isGFFCompatibleResType(id.type)) {
+        auto xmlBytes = ByteArray();
+        auto xml = ByteArrayOutputStream(xmlBytes);
+        GffTool().toXML(data, xml, _strings);
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);

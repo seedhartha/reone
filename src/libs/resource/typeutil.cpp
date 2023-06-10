@@ -111,6 +111,46 @@ ResourceType getResTypeByExt(const string &ext, bool logNotFound) {
     return it->second;
 }
 
+bool isGFFCompatibleResType(ResourceType type) {
+    switch (type) {
+        case ResourceType::Res:
+        case ResourceType::Plt:
+        case ResourceType::Are:
+        case ResourceType::Set:
+        case ResourceType::Ifo:
+        case ResourceType::Bic:
+        case ResourceType::Git:
+        case ResourceType::Bti:
+        case ResourceType::Uti:
+        case ResourceType::Btc:
+        case ResourceType::Utc:
+        case ResourceType::Dlg:
+        case ResourceType::Itp:
+        case ResourceType::Utt:
+        case ResourceType::Uts:
+        case ResourceType::Gff:
+        case ResourceType::Fac:
+        case ResourceType::Ute:
+        case ResourceType::Utd:
+        case ResourceType::Utp:
+        case ResourceType::Dft:
+        case ResourceType::Gic:
+        case ResourceType::Gui:
+        case ResourceType::Utm:
+        case ResourceType::Dwk:
+        case ResourceType::Pwk:
+        case ResourceType::Jrl:
+        case ResourceType::Mod:
+        case ResourceType::Utw:
+        case ResourceType::Ptm:
+        case ResourceType::Ptt:
+        case ResourceType::Pth:
+        return true;
+    default:
+        return false;
+    }
+}
+
 } // namespace resource
 
 } // namespace reone

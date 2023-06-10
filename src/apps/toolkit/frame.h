@@ -30,6 +30,7 @@
 
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/id.h"
+#include "reone/resource/strings.h"
 #include "reone/system/stream/input.h"
 
 namespace reone {
@@ -52,10 +53,12 @@ private:
     wxGLCanvas *_glCanvas {nullptr};
     wxSplitterWindow *_splitter {nullptr};
 
-    std::map<void *, FilesEntry> _files;
-
+    boost::filesystem::path _gamePath;
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
+    resource::Strings _strings;
+
+    std::map<void *, FilesEntry> _files;
 
     void OpenFile(FilesEntry &entry);
     void OpenResource(resource::ResourceId &id, IInputStream &data);
