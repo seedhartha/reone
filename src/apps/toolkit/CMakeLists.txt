@@ -16,15 +16,20 @@
 set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 
 set(TOOLKIT_HEADERS
+    ${TOOLKIT_SOURCE_DIR}/app.h
     ${TOOLKIT_SOURCE_DIR}/program.h)
 
 set(TOOLKIT_SOURCES
-    ${TOOLKIT_SOURCE_DIR}/main.cpp
+    ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/program.cpp)
+
+if(WIN32)
+    list(APPEND TOOLKIT_SOURCES ${CMAKE_SOURCE_DIR}/assets/reone.rc)
+endif()
 
 add_executable(toolkit ${TOOLKIT_HEADERS} ${TOOLKIT_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(toolkit PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(toolkit PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(toolkit PRIVATE tools ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(toolkit PRIVATE tools ${wxWidgets_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets toolkit)

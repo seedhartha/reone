@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-include(${wxWidgets_USE_FILE})
-
 set(LAUNCHER_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/launcher)
 
 set(LAUNCHER_HEADERS

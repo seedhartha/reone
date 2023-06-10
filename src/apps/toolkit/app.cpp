@@ -15,25 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "app.h"
+
 #include "reone/system/logutil.h"
 
 #include "program.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-int main(int argc, char **argv) {
+bool ToolkitApp::OnInit() {
     initLog();
     setLogLevel(LogLevel::Debug);
 
-    try {
-        return Program(argc, argv).run();
-    } catch (const exception &ex) {
-        try {
-            cerr << "Program terminated exceptionally: " << string(ex.what()) << endl;
-        } catch (...) {
-        }
-        return 1;
+    if (argc > 1) {
+        Program(argc, argv).run();
+        return false;
     }
-}
+
+    return false;
+};
+
+} // namespace reone
+
+wxIMPLEMENT_APP_CONSOLE(reone::ToolkitApp);

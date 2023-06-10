@@ -57,8 +57,9 @@ if(ENABLE_MOVIE)
     include_directories(${FFMPEG_INCLUDE_DIRS})
 endif()
 
-if(BUILD_LAUNCHER)
+if(BUILD_LAUNCHER OR BUILD_TOOLKIT)
     find_package(wxWidgets REQUIRED core base)
+    include(${wxWidgets_USE_FILE})
 endif()
 
 set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)

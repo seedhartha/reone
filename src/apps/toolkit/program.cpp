@@ -17,8 +17,8 @@
 
 #include "program.h"
 
-#include "reone/system/pathutil.h"
 #include "reone/resource/types.h"
+#include "reone/system/pathutil.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/audio.h"
 #include "reone/tools/erf.h"
@@ -103,6 +103,7 @@ int Program::run() {
 
 void Program::initOptions() {
     _optsCmdLine.add_options()                                                                //
+        ("help", "print this list of program options")                                        //
         ("game", value<string>(), "path to game directory")                                   //
         ("dest", value<string>(), "path to destination directory")                            //
         ("tsl", value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?")        //
