@@ -27,6 +27,8 @@
 #include <wx/glcanvas.h>
 #include <wx/splitter.h>
 
+#include "reone/resource/format/keyreader.h"
+
 namespace reone {
 
 class ToolkitFrame : public wxFrame {
@@ -45,6 +47,9 @@ private:
     wxSplitterWindow *_splitter {nullptr};
 
     std::map<void *, FilesEntry> _files;
+
+    std::vector<resource::KeyReader::KeyEntry> _keyKeys;
+    std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
     void OnOpenGameDirectoryMenu(wxCommandEvent &event);
 

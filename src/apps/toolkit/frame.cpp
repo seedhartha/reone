@@ -19,7 +19,12 @@
 
 #include <wx/dirdlg.h>
 
+#include "reone/resource/format/erfreader.h"
+#include "reone/resource/format/keyreader.h"
+#include "reone/resource/format/rimreader.h"
+#include "reone/resource/typeutil.h"
 #include "reone/system/pathutil.h"
+#include "reone/system/stream/fileinput.h"
 
 using namespace std;
 
@@ -34,11 +39,15 @@ static const set<string> kFilesSubdirectoryWhitelist {
     "texturepacks"                                               //
 };
 
-static const set<string> kFilesExtensionWhitelist {
-    ".key", ".bif", ".erf", ".sav", ".rim", ".mod", //
-    ".tlk", ".res", ".gui", ".dlg",                 //
-    ".mdl", ".tga",                                 //
-    ".wav"                                          //
+static const set<string> kFilesArchiveWhitelist {
+    ".bif", ".erf", ".sav", ".rim", ".mod" //
+};
+
+static const set<string> kFilesRegularWhitelist {
+    ".tlk",                 //
+    ".res", ".gui", ".dlg", //
+    ".mdl", ".tga",         //
+    ".wav"                  //
 };
 
 struct EventHandlerID {
@@ -51,7 +60,7 @@ ToolkitFrame::ToolkitFrame() :
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
 #endif
-    SetMinClientSize(wxSize(800, 600));
+    SetMinClientSize(wxSize(1024, 768));
     Maximize();
 
     auto fileMenu = new wxMenu();
@@ -63,10 +72,10 @@ ToolkitFrame::ToolkitFrame() :
     _splitter = new wxSplitterWindow(this, wxID_ANY);
     _splitter->Bind(wxEVT_SIZE, &ToolkitFrame::OnSplitterSize, this);
     _splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, &ToolkitFrame::OnSplitterSashPosChanging, this);
-    _splitter->SetMinimumPaneSize(100);
+    _splitter->SetMinimumPaneSize(300);
 
     auto dataSplitter = new wxSplitterWindow(_splitter, wxID_ANY);
-    dataSplitter->SetMinimumPaneSize(100);
+    dataSplitter->SetMinimumPaneSize(300);
 
     auto filesPanel = new wxPanel(dataSplitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
@@ -114,15 +123,21 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         return;
     }
 
+    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto keyReader = resource::KeyReader();
+    keyReader.load(key);
+    _keyKeys = keyReader.keys();
+    _keyFiles = keyReader.files();
+
     _filesTreeCtrl->DeleteAllItems();
     for (auto &file : boost::filesystem::directory_iterator(gamePath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         void *itemId;
-        if (file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) {
+        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveWhitelist.count(filename) > 0) {
             auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
             itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
+        } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularWhitelist.count(extension) > 0) {
             auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
             itemId = item.GetID();
         } else {
@@ -169,22 +184,60 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     if (item.loaded) {
         return;
     }
-    for (auto &file : boost::filesystem::directory_iterator(item.path)) {
-        auto filename = boost::to_lower_copy(file.path().filename().string());
-        auto extension = boost::to_lower_copy(file.path().extension().string());
-        void *itemId;
-        if (file.status().type() == boost::filesystem::directory_file) {
-            auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
-            itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
-            auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
-            itemId = item.GetID();
-        } else {
-            continue;
+    if (boost::filesystem::is_directory(item.path)) {
+        for (auto &file : boost::filesystem::directory_iterator(item.path)) {
+            auto filename = boost::to_lower_copy(file.path().filename().string());
+            auto extension = boost::to_lower_copy(file.path().extension().string());
+            void *itemId;
+            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveWhitelist.count(extension) > 0) {
+                auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
+                itemId = item.GetID();
+            } else if (file.status().type() == boost::filesystem::regular_file && kFilesArchiveWhitelist.count(extension) > 0) {
+                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
+                itemId = item.GetID();
+            } else {
+                continue;
+            }
+            auto entry = FilesEntry();
+            entry.path = file.path();
+            _files.insert(make_pair(itemId, std::move(entry)));
         }
-        auto entry = FilesEntry();
-        entry.path = file.path();
-        _files.insert(make_pair(itemId, std::move(entry)));
+    } else {
+        auto extension = boost::to_lower_copy(item.path.extension().string());
+        if (boost::ends_with(extension, ".bif")) {
+            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(item.path.filename().string()));
+            auto maybeFile = std::find_if(_keyFiles.begin(), _keyFiles.end(), [&filename](auto &file) {
+                return boost::to_lower_copy(file.filename) == filename;
+            });
+            if (maybeFile != _keyFiles.end()) {
+                auto bifIdx = std::distance(_keyFiles.begin(), maybeFile);
+                for (auto &key : _keyKeys) {
+                    if (key.bifIdx != bifIdx) {
+                        continue;
+                    }
+                    auto itemText = str(boost::format("%s.%s") % key.resId.resRef % resource::getExtByResType(key.resId.type));
+                    _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                }
+            }
+        } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
+            auto erf = FileInputStream(item.path, OpenMode::Binary);
+            auto erfReader = resource::ErfReader();
+            erfReader.load(erf);
+            auto &keys = erfReader.keys();
+            for (auto &key : keys) {
+                auto itemText = str(boost::format("%s.%s") % key.resId.resRef % resource::getExtByResType(key.resId.type));
+                _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+            }
+        } else if (boost::ends_with(extension, ".rim")) {
+            auto rim = FileInputStream(item.path, OpenMode::Binary);
+            auto rimReader = resource::RimReader();
+            rimReader.load(rim);
+            auto &resources = rimReader.resources();
+            for (auto &resource : resources) {
+                auto itemText = str(boost::format("%s.%s") % resource.resId.resRef % resource::getExtByResType(resource.resId.type));
+                _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+            }
+        }
     }
     item.loaded = true;
 }
