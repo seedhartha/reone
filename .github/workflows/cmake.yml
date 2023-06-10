@@ -7,7 +7,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.10
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -16,7 +16,7 @@ jobs:
       run: >
         sudo sed -i 's/azure\.//' /etc/apt/sources.list &&
         sudo apt-get update &&
-        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.2-dev libgmock-dev
+        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.0-gtk3-dev libgmock-dev
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
@@ -24,7 +24,7 @@ jobs:
     - name: Configure CMake
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TOOLKIT=OFF
 
     - name: Build
       working-directory: ${{github.workspace}}/build
