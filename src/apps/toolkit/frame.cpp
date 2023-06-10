@@ -18,15 +18,24 @@
 #include "frame.h"
 
 #include <wx/dirdlg.h>
+#include <wx/notebook.h>
+#include <wx/stc/stc.h>
 
+#include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/pathutil.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/tools/2da.h"
+#include "reone/tools/gff.h"
 
 using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
@@ -78,6 +87,7 @@ ToolkitFrame::ToolkitFrame() :
     auto filesPanel = new wxPanel(dataSplitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ToolkitFrame::OnFilesTreeCtrlItemExpanding, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ToolkitFrame::OnFilesTreeCtrlItemActivated, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnFilesTreeCtrlItemEditingDone, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Files");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
@@ -92,8 +102,35 @@ ToolkitFrame::ToolkitFrame() :
     dataSplitter->SetSashGravity(0.5);
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
 
-    auto renderPanel = new wxPanel(_splitter);
-    auto renderSizer = new wxStaticBoxSizer(wxVERTICAL, renderPanel, "3D");
+    auto notebook = new wxNotebook(_splitter, wxID_ANY);
+
+    auto xmlPanel = new wxPanel(notebook);
+    auto xmlSizer = new wxBoxSizer(wxVERTICAL);
+    _xmlTextCtrl = new wxStyledTextCtrl(xmlPanel);
+    _xmlTextCtrl->SetLexer(wxSTC_LEX_XML);
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_XMLSTART, wxColour(255, 0, 0));
+    _xmlTextCtrl->StyleSetBackground(wxSTC_H_XMLSTART, wxColour(255, 255, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_XMLEND, wxColour(255, 0, 0));
+    _xmlTextCtrl->StyleSetBackground(wxSTC_H_XMLEND, wxColour(255, 255, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_DEFAULT, wxColour(0, 0, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_COMMENT, wxColour(0, 128, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_NUMBER, wxColour(255, 0, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_DOUBLESTRING, wxColour(128, 0, 255));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_SINGLESTRING, wxColour(128, 0, 255));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_TAG, wxColour(0, 0, 255));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_TAGEND, wxColour(0, 0, 255));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_TAGUNKNOWN, wxColour(0, 0, 255));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_ATTRIBUTE, wxColour(255, 0, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN, wxColour(255, 0, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_ENTITY, wxColour(0, 0, 0));
+    _xmlTextCtrl->StyleSetForeground(wxSTC_H_CDATA, wxColour(255, 128, 0));
+    _xmlTextCtrl->SetEditable(false);
+    xmlSizer->Add(_xmlTextCtrl, 1, wxEXPAND);
+    xmlPanel->SetSizer(xmlSizer);
+    notebook->InsertPage(0, xmlPanel, "XML");
+
+    auto renderPanel = new wxPanel(notebook);
+    auto renderSizer = new wxBoxSizer(wxVERTICAL);
     auto glAttributes = wxGLAttributes().Defaults();
     glAttributes.EndList();
     //_glCanvas = new wxGLCanvas(renderPanel, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
@@ -102,8 +139,9 @@ ToolkitFrame::ToolkitFrame() :
     // glContext->SetCurrent(*_glCanvas);
     // renderSizer->Add(_glCanvas, 1, wxEXPAND);
     renderPanel->SetSizer(renderSizer);
+    notebook->InsertPage(1, renderPanel, "3D");
 
-    _splitter->SplitVertically(dataSplitter, renderPanel);
+    _splitter->SplitVertically(dataSplitter, notebook);
 
     CreateStatusBar();
 }
@@ -122,7 +160,7 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
     }
 
     auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = resource::KeyReader();
+    auto keyReader = KeyReader();
     keyReader.load(key);
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
@@ -177,13 +215,13 @@ void ToolkitFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
 }
 
 void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
-    auto itemId = event.GetItem().GetID();
-    auto &item = _files.at(itemId);
-    if (item.loaded) {
+    auto expandingItemId = event.GetItem().GetID();
+    auto &expandingItem = _files.at(expandingItemId);
+    if (expandingItem.loaded) {
         return;
     }
-    if (boost::filesystem::is_directory(item.path)) {
-        for (auto &file : boost::filesystem::directory_iterator(item.path)) {
+    if (boost::filesystem::is_directory(expandingItem.path)) {
+        for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
             auto extension = boost::to_lower_copy(file.path().extension().string());
             void *itemId;
@@ -198,12 +236,17 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             }
             auto entry = FilesEntry();
             entry.path = file.path();
+            auto resType = getResTypeByExt(extension.substr(1), false);
+            if (resType != ResourceType::Invalid) {
+                auto resRef = filename.substr(0, filename.size() - 4);
+                entry.resId = make_unique<ResourceId>(resRef, resType);
+            }
             _files.insert(make_pair(itemId, std::move(entry)));
         }
     } else {
-        auto extension = boost::to_lower_copy(item.path.extension().string());
+        auto extension = boost::to_lower_copy(expandingItem.path.extension().string());
         if (boost::ends_with(extension, ".bif")) {
-            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(item.path.filename().string()));
+            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(expandingItem.path.filename().string()));
             auto maybeFile = std::find_if(_keyFiles.begin(), _keyFiles.end(), [&filename](auto &file) {
                 return boost::to_lower_copy(file.filename) == filename;
             });
@@ -213,31 +256,102 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
                     if (key.bifIdx != bifIdx) {
                         continue;
                     }
-                    auto itemText = str(boost::format("%s.%s") % key.resId.resRef % resource::getExtByResType(key.resId.type));
-                    _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                    auto itemText = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                    auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                    auto entry = FilesEntry();
+                    entry.path = expandingItem.path;
+                    entry.resId = make_unique<ResourceId>(key.resId);
+                    entry.archived = true;
+                    _files.insert(make_pair(item.GetID(), std::move(entry)));
                 }
             }
         } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
-            auto erf = FileInputStream(item.path, OpenMode::Binary);
-            auto erfReader = resource::ErfReader();
+            auto erf = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto erfReader = ErfReader();
             erfReader.load(erf);
             auto &keys = erfReader.keys();
             for (auto &key : keys) {
-                auto itemText = str(boost::format("%s.%s") % key.resId.resRef % resource::getExtByResType(key.resId.type));
-                _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                auto itemText = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                auto entry = FilesEntry();
+                entry.path = expandingItem.path;
+                entry.resId = make_unique<ResourceId>(key.resId);
+                entry.archived = true;
+                _files.insert(make_pair(item.GetID(), std::move(entry)));
             }
         } else if (boost::ends_with(extension, ".rim")) {
-            auto rim = FileInputStream(item.path, OpenMode::Binary);
-            auto rimReader = resource::RimReader();
+            auto rim = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto rimReader = RimReader();
             rimReader.load(rim);
             auto &resources = rimReader.resources();
             for (auto &resource : resources) {
-                auto itemText = str(boost::format("%s.%s") % resource.resId.resRef % resource::getExtByResType(resource.resId.type));
-                _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                auto itemText = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
+                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
+                auto entry = FilesEntry();
+                entry.path = expandingItem.path;
+                entry.resId = make_unique<ResourceId>(resource.resId);
+                entry.archived = true;
+                _files.insert(make_pair(item.GetID(), std::move(entry)));
             }
         }
     }
-    item.loaded = true;
+    expandingItem.loaded = true;
+}
+
+void ToolkitFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
+    auto itemId = event.GetItem().GetID();
+    if (_files.count(itemId) == 0) {
+        return;
+    }
+    auto &item = _files.at(itemId);
+    OpenFile(item);
+}
+
+void ToolkitFrame::OpenFile(FilesEntry &entry) {
+    if (!entry.resId) {
+        return;
+    }
+    if (entry.archived) {
+        auto extension = boost::to_lower_copy(entry.path.extension().string());
+        if (extension == ".bif") {
+            auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&entry](auto &key) {
+                return key.resId == *entry.resId;
+            });
+            if (maybeKey == _keyKeys.end()) {
+                return;
+            }
+            auto resIdx = maybeKey->resIdx;
+            auto bif = FileInputStream(entry.path, OpenMode::Binary);
+            auto bifReader = BifReader();
+            bifReader.load(bif);
+            if (bifReader.resources().size() <= resIdx) {
+                return;
+            }
+            auto &bifEntry = bifReader.resources().at(resIdx);
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(bifEntry.fileSize);
+            bif.seek(bifEntry.offset, SeekOrigin::Begin);
+            bif.read(&(*resBytes)[0], bifEntry.fileSize);
+            auto res = ByteArrayInputStream(*resBytes);
+            OpenResource(*entry.resId, res);
+        } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+        } else if (extension == ".rim") {
+        }
+    } else {
+        auto res = FileInputStream(entry.path, OpenMode::Binary);
+        OpenResource(*entry.resId, res);
+    }
+}
+
+void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
+    if (id.type == ResourceType::TwoDa) {
+        auto xmlBytes = ByteArray();
+        auto xml = ByteArrayOutputStream(xmlBytes);
+        TwoDaTool().toXML(data, xml);
+        _xmlTextCtrl->SetEditable(true);
+        _xmlTextCtrl->SetText(xmlBytes);
+        _xmlTextCtrl->SetEditable(false);
+    }
 }
 
 void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {

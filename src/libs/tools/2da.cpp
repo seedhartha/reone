@@ -24,6 +24,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "tinyxml2.h"
 
@@ -60,18 +61,21 @@ void TwoDaTool::invokeBatch(
 }
 
 void TwoDaTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
-    auto stream = FileInputStream(input, OpenMode::Binary);
-
-    auto reader = TwoDaReader();
-    reader.load(stream);
-
-    auto table = reader.twoDa();
+    auto twoDa = FileInputStream(input, OpenMode::Binary);
 
     auto xmlPath = outputDir;
     xmlPath.append(input.filename().string() + ".xml");
-    auto fp = fopen(xmlPath.string().c_str(), "wb");
+    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
 
-    auto printer = XMLPrinter(fp);
+    toXML(twoDa, xml);
+}
+
+void TwoDaTool::toXML(IInputStream &twoDa, IOutputStream &xml) {
+    auto reader = TwoDaReader();
+    reader.load(twoDa);
+
+    auto table = reader.twoDa();
+    auto printer = XMLPrinter();
     printer.PushHeader(false, true);
     printer.OpenElement("rows");
     for (int row = 0; row < table->getRowCount(); ++row) {
@@ -86,7 +90,7 @@ void TwoDaTool::toXML(const boost::filesystem::path &input, const boost::filesys
     }
     printer.CloseElement();
 
-    fclose(fp);
+    xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
 void TwoDaTool::to2DA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {

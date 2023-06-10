@@ -26,8 +26,11 @@
 #include <wx/dataview.h>
 #include <wx/glcanvas.h>
 #include <wx/splitter.h>
+#include <wx/stc/stc.h>
 
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/id.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -38,11 +41,14 @@ public:
 private:
     struct FilesEntry {
         boost::filesystem::path path;
+        std::unique_ptr<resource::ResourceId> resId;
         bool loaded {false};
+        bool archived {false};
     };
 
     wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};
+    wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
     wxSplitterWindow *_splitter {nullptr};
 
@@ -51,15 +57,23 @@ private:
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
+    void OpenFile(FilesEntry &entry);
+    void OpenResource(resource::ResourceId &id, IInputStream &data);
+
+    // Events
+
     void OnOpenGameDirectoryMenu(wxCommandEvent &event);
 
     void OnSplitterSize(wxSizeEvent &event);
     void OnSplitterSashPosChanging(wxSplitterEvent &event);
 
     void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
+    void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnGLCanvasPaint(wxPaintEvent &event);
+
+    // END Events
 
     wxDECLARE_EVENT_TABLE();
 };

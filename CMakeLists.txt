@@ -58,7 +58,7 @@ if(ENABLE_MOVIE)
 endif()
 
 if(BUILD_LAUNCHER OR BUILD_TOOLKIT)
-    find_package(wxWidgets REQUIRED core base OPTIONAL_COMPONENTS gl)
+    find_package(wxWidgets REQUIRED core base OPTIONAL_COMPONENTS gl stc)
     include(${wxWidgets_USE_FILE})
 endif()
 
@@ -81,7 +81,7 @@ endif()
 
 # END Compile Options
 
-# Engine libraries
+# Libraries
 
 add_subdirectory(src/libs/system) # system static library
 add_subdirectory(src/libs/resource) # resource static library
@@ -93,13 +93,15 @@ add_subdirectory(src/libs/movie) # movie static library
 add_subdirectory(src/libs/script) # script static library
 add_subdirectory(src/libs/game) # game static library
 add_subdirectory(src/libs/tools) # tools static library
+add_subdirectory(extern/tinyxml2) # tinyxml2 static library
 
-# END Engine libraries
+# END Libraries
+
+# Applications
 
 add_subdirectory(src/apps/reone) # reone application
 
 if(BUILD_TOOLKIT)
-    add_subdirectory(extern/tinyxml2) # tinyxml2 static library
     add_subdirectory(src/apps/toolkit) # toolkit application
 endif()
 
@@ -112,7 +114,9 @@ if(BUILD_TESTS)
     add_subdirectory(test) # tests executable
 endif()
 
-## Installation
+# END Applications
+
+# Installation
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
@@ -121,4 +125,4 @@ endif()
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS system resource graphics audio scene movie script gui game tools DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-## END Installation
+# END Installation
