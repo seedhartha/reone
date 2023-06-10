@@ -34,9 +34,8 @@ static constexpr char kIconName[] = "reone";
 static constexpr int kMinPanelWidth = 640;
 
 static const set<string> kFilesSubdirectoryWhitelist {
-    "data", "lips", "modules", "override", "rims", "saves",      //
-    "streammusic", "streamsounds", "streamwaves", "streamvoice", //
-    "texturepacks"                                               //
+    "data", "lips", "modules", "movies", "override", "rims", "saves", "texturepacks", //
+    "streammusic", "streamsounds", "streamwaves", "streamvoice",                      //
 };
 
 static const set<string> kFilesArchiveWhitelist {
@@ -45,7 +44,7 @@ static const set<string> kFilesArchiveWhitelist {
 
 static const set<string> kFilesRegularBlacklist {
     ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico",                    //
-    ".zip", ".pdf", ".txt",                                            //
+    ".zip", ".pdf",                                                    //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store" //
 };
 
@@ -136,7 +135,7 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveWhitelist.count(filename) > 0) {
             auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
             itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularBlacklist.count(extension) == 0) {
+        } else if (file.status().type() == boost::filesystem::regular_file && (kFilesRegularBlacklist.count(extension) == 0 && extension != ".txt")) {
             auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
             itemId = item.GetID();
         } else {
