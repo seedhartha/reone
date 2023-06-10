@@ -52,6 +52,7 @@ ToolkitFrame::ToolkitFrame() :
     SetIcon(wxIcon(kIconName));
 #endif
     SetMinClientSize(wxSize(800, 600));
+    Maximize();
 
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
