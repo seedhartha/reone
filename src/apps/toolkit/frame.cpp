@@ -192,7 +192,7 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveWhitelist.count(extension) > 0) {
                 auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
                 itemId = item.GetID();
-            } else if (file.status().type() == boost::filesystem::regular_file && kFilesArchiveWhitelist.count(extension) > 0) {
+            } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularWhitelist.count(extension) > 0) {
                 auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
                 itemId = item.GetID();
             } else {
