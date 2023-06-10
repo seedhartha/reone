@@ -17,15 +17,32 @@
 
 #include "frame.h"
 
-#include <wx/dataview.h>
+#include <wx/dirdlg.h>
+
+#include "reone/system/pathutil.h"
+
+using namespace std;
 
 namespace reone {
 
 static constexpr char kIconName[] = "reone";
 static constexpr int kMinPanelWidth = 640;
 
+static const set<string> kFilesSubdirectoryWhitelist {
+    "data", "lips", "modules", "override", "rims", "saves",      //
+    "streammusic", "streamsounds", "streamwaves", "streamvoice", //
+    "texturepacks"                                               //
+};
+
+static const set<string> kFilesExtensionWhitelist {
+    ".key", ".bif", ".erf", ".sav", ".rim", ".mod", //
+    ".tlk", ".res", ".gui", ".dlg",                 //
+    ".mdl", ".tga",                                 //
+    ".wav"                                          //
+};
+
 struct EventHandlerID {
-    static constexpr int openFolderMenuItem = wxID_HIGHEST + 1;
+    static constexpr int openGameDir = wxID_HIGHEST + 1;
 };
 
 ToolkitFrame::ToolkitFrame() :
@@ -37,7 +54,7 @@ ToolkitFrame::ToolkitFrame() :
     SetMinClientSize(wxSize(800, 600));
 
     auto fileMenu = new wxMenu();
-    fileMenu->Append(EventHandlerID::openFolderMenuItem, "&Open Folder");
+    fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
     SetMenuBar(menuBar);
@@ -51,32 +68,75 @@ ToolkitFrame::ToolkitFrame() :
     dataSplitter->SetMinimumPaneSize(100);
 
     auto filesPanel = new wxPanel(dataSplitter);
-    auto filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
-    // auto filesRootItem = filesTreeCtrl->AppendContainer(wxDataViewItem(0), "...");
+    _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ToolkitFrame::OnFilesTreeCtrlItemExpanding, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnFilesTreeCtrlItemEditingDone, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Files");
-    filesSizer->Add(filesTreeCtrl, 1, wxEXPAND);
+    filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
 
     auto modulesPanel = new wxPanel(dataSplitter);
-    auto modulesListBox = new wxListBox(modulesPanel, wxID_ANY);
-    // modulesListBox->AppendString("...");
+    _modulesListBox = new wxListBox(modulesPanel, wxID_ANY);
     auto modulesSizer = new wxStaticBoxSizer(wxVERTICAL, modulesPanel, "Modules");
-    modulesSizer->Add(modulesListBox, 1, wxEXPAND);
+    modulesSizer->Add(_modulesListBox, 1, wxEXPAND);
     modulesPanel->SetSizer(modulesSizer);
 
     dataSplitter->SetSashGravity(0.5);
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
 
+    auto renderPanel = new wxPanel(_splitter);
+    auto renderSizer = new wxStaticBoxSizer(wxVERTICAL, renderPanel, "3D");
     auto glAttributes = wxGLAttributes().Defaults();
     glAttributes.EndList();
-    _glCanvas = new wxGLCanvas(_splitter, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
-    auto glContext = new wxGLContext(_glCanvas);
-    glContext->SetCurrent(*_glCanvas);
+    //_glCanvas = new wxGLCanvas(renderPanel, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    //_glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
+    // auto glContext = new wxGLContext(_glCanvas);
+    // glContext->SetCurrent(*_glCanvas);
+    // renderSizer->Add(_glCanvas, 1, wxEXPAND);
+    renderPanel->SetSizer(renderSizer);
 
-    _splitter->SplitVertically(dataSplitter, _glCanvas);
+    _splitter->SplitVertically(dataSplitter, renderPanel);
 
     CreateStatusBar();
+}
+
+void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
+    auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (dialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto gamePath = boost::filesystem::path((string)dialog->GetPath());
+    auto keyPath = getPathIgnoreCase(gamePath, "chitin.key", false);
+    auto modulesPath = getPathIgnoreCase(gamePath, "modules", false);
+    if (keyPath.empty() || modulesPath.empty()) {
+        wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
+        return;
+    }
+
+    _filesTreeCtrl->DeleteAllItems();
+    for (auto &entry : boost::filesystem::directory_iterator(gamePath)) {
+        auto filename = boost::to_lower_copy(entry.path().filename().string());
+        auto extension = boost::to_lower_copy(entry.path().extension().string());
+        if (entry.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) {
+            _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
+        } else if (entry.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
+            _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
+        }
+    }
+
+    _modulesListBox->Clear();
+    for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
+        auto filename = boost::to_lower_copy(entry.path().filename().string());
+        auto extension = boost::to_lower_copy(entry.path().extension().string());
+        if (extension != ".rim" && extension != ".mod") {
+            continue;
+        }
+        if (extension == ".rim" && boost::ends_with(filename, "_s.rim")) {
+            continue;
+        }
+        auto moduleName = boost::to_lower_copy(entry.path().filename().replace_extension().string());
+        _modulesListBox->AppendString(moduleName);
+    }
 }
 
 void ToolkitFrame::OnSplitterSize(wxSizeEvent &event) {
@@ -94,6 +154,13 @@ void ToolkitFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
     }
 }
 
+void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
+}
+
+void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+    event.Veto();
+}
+
 void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_glCanvas);
 
@@ -103,7 +170,8 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
-wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame) //
+wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                       //
+    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryMenu) //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

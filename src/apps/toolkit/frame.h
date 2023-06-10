@@ -23,6 +23,7 @@
 #include <wx/wx.h>
 #endif
 
+#include <wx/dataview.h>
 #include <wx/glcanvas.h>
 #include <wx/splitter.h>
 
@@ -33,11 +34,19 @@ public:
     ToolkitFrame();
 
 private:
-    wxSplitterWindow *_splitter {nullptr};
+    wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
+    wxListBox *_modulesListBox {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
+
+    wxSplitterWindow *_splitter {nullptr};
+
+    void OnOpenGameDirectoryMenu(wxCommandEvent &event);
 
     void OnSplitterSize(wxSizeEvent &event);
     void OnSplitterSashPosChanging(wxSplitterEvent &event);
+
+    void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
+    void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnGLCanvasPaint(wxPaintEvent &event);
 
