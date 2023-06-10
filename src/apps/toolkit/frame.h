@@ -34,11 +34,17 @@ public:
     ToolkitFrame();
 
 private:
+    struct FilesEntry {
+        boost::filesystem::path path;
+        bool loaded {false};
+    };
+
     wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
-
     wxSplitterWindow *_splitter {nullptr};
+
+    std::map<void *, FilesEntry> _files;
 
     void OnOpenGameDirectoryMenu(wxCommandEvent &event);
 

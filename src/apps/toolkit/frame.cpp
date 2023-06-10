@@ -115,14 +115,22 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
     }
 
     _filesTreeCtrl->DeleteAllItems();
-    for (auto &entry : boost::filesystem::directory_iterator(gamePath)) {
-        auto filename = boost::to_lower_copy(entry.path().filename().string());
-        auto extension = boost::to_lower_copy(entry.path().extension().string());
-        if (entry.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) {
-            _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
-        } else if (entry.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
-            _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
+    for (auto &file : boost::filesystem::directory_iterator(gamePath)) {
+        auto filename = boost::to_lower_copy(file.path().filename().string());
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        void *itemId;
+        if (file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) {
+            auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
+            itemId = item.GetID();
+        } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
+            auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
+            itemId = item.GetID();
+        } else {
+            continue;
         }
+        auto entry = FilesEntry();
+        entry.path = file.path();
+        _files.insert(make_pair(itemId, std::move(entry)));
     }
 
     _modulesListBox->Clear();
@@ -156,6 +164,29 @@ void ToolkitFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
 }
 
 void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
+    auto itemId = event.GetItem().GetID();
+    auto &item = _files.at(itemId);
+    if (item.loaded) {
+        return;
+    }
+    for (auto &file : boost::filesystem::directory_iterator(item.path)) {
+        auto filename = boost::to_lower_copy(file.path().filename().string());
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        void *itemId;
+        if (file.status().type() == boost::filesystem::directory_file) {
+            auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
+            itemId = item.GetID();
+        } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionWhitelist.count(extension) > 0) {
+            auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
+            itemId = item.GetID();
+        } else {
+            continue;
+        }
+        auto entry = FilesEntry();
+        entry.path = file.path();
+        _files.insert(make_pair(itemId, std::move(entry)));
+    }
+    item.loaded = true;
 }
 
 void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
