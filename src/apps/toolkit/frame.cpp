@@ -43,11 +43,10 @@ static const set<string> kFilesArchiveWhitelist {
     ".bif", ".erf", ".sav", ".rim", ".mod" //
 };
 
-static const set<string> kFilesRegularWhitelist {
-    ".tlk",                 //
-    ".res", ".gui", ".dlg", //
-    ".mdl", ".tga",         //
-    ".wav"                  //
+static const set<string> kFilesRegularBlacklist {
+    ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico",                    //
+    ".zip", ".pdf", ".txt",                                            //
+    ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store" //
 };
 
 struct EventHandlerID {
@@ -137,7 +136,7 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveWhitelist.count(filename) > 0) {
             auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
             itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularWhitelist.count(extension) > 0) {
+        } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularBlacklist.count(extension) == 0) {
             auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
             itemId = item.GetID();
         } else {
@@ -192,7 +191,7 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveWhitelist.count(extension) > 0) {
                 auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
                 itemId = item.GetID();
-            } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularWhitelist.count(extension) > 0) {
+            } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularBlacklist.count(extension) == 0) {
                 auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
                 itemId = item.GetID();
             } else {
