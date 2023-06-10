@@ -23,6 +23,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "tinyxml2.h"
 
@@ -59,18 +60,21 @@ void TlkTool::invokeBatch(
 }
 
 void TlkTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto stream = FileInputStream(path, OpenMode::Binary);
-
-    auto reader = TlkReader();
-    reader.load(stream);
-
-    auto table = reader.table();
+    auto tlk = FileInputStream(path, OpenMode::Binary);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
-    auto fp = fopen(xmlPath.string().c_str(), "wb");
+    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
 
-    auto printer = XMLPrinter(fp);
+    toXML(tlk, xml);
+}
+
+void TlkTool::toXML(IInputStream &tlk, IOutputStream &xml) {
+    auto reader = TlkReader();
+    reader.load(tlk);
+
+    auto table = reader.table();
+    auto printer = XMLPrinter();
     printer.PushHeader(false, true);
     printer.OpenElement("strings");
     for (int i = 0; i < table->getStringCount(); ++i) {
@@ -82,7 +86,7 @@ void TlkTool::toXML(const boost::filesystem::path &path, const boost::filesystem
     }
     printer.CloseElement();
 
-    fclose(fp);
+    xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
 void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {

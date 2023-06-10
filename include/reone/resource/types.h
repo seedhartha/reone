@@ -40,6 +40,7 @@ enum class ResourceType : uint16_t {
     Bic = 2015,
     Wok = 2016,
     TwoDa = 2017,
+    Tlk = 2018,
     Txi = 2022,
     Git = 2023,
     Bti = 2024,

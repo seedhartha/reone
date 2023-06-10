@@ -19,6 +19,9 @@
 
 #include "tool.h"
 
+#include "reone/system/stream/input.h"
+#include "reone/system/stream/output.h"
+
 namespace reone {
 
 class TlkTool : public Tool {
@@ -36,6 +39,8 @@ public:
         const boost::filesystem::path &gamePath) override;
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
+
+    void toXML(IInputStream &tlk, IOutputStream &xml);
 
 private:
     void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);

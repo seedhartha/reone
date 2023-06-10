@@ -32,6 +32,7 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/gff.h"
+#include "reone/tools/tlk.h"
 
 using namespace std;
 
@@ -184,6 +185,10 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         }
         auto entry = FilesEntry();
         entry.path = file.path();
+        if (extension == ".tlk") {
+            auto resRef = filename.substr(0, filename.size() - 4);
+            entry.resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
+        }
         _files.insert(make_pair(itemId, std::move(entry)));
     }
 
@@ -393,6 +398,13 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
         GffTool().toXML(data, xml, _strings);
+        _xmlTextCtrl->SetEditable(true);
+        _xmlTextCtrl->SetText(xmlBytes);
+        _xmlTextCtrl->SetEditable(false);
+    } else if (id.type == ResourceType::Tlk) {
+        auto xmlBytes = ByteArray();
+        auto xml = ByteArrayOutputStream(xmlBytes);
+        TlkTool().toXML(data, xml);
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);

@@ -42,6 +42,7 @@ static unordered_map<ResourceType, string> g_extByType {
     {ResourceType::Bic, "bic"},
     {ResourceType::Wok, "wok"},
     {ResourceType::TwoDa, "2da"},
+    {ResourceType::Tlk, "tlk"},
     {ResourceType::Txi, "txi"},
     {ResourceType::Git, "git"},
     {ResourceType::Bti, "bti"},
