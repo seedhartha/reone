@@ -92,6 +92,7 @@ add_subdirectory(src/libs/scene) # scene static library
 add_subdirectory(src/libs/movie) # movie static library
 add_subdirectory(src/libs/script) # script static library
 add_subdirectory(src/libs/game) # game static library
+add_subdirectory(src/libs/tools) # tools static library
 
 # END Engine libraries
 
@@ -99,7 +100,6 @@ add_subdirectory(src/apps/reone) # reone application
 
 if(BUILD_TOOLKIT)
     add_subdirectory(extern/tinyxml2) # tinyxml2 static library
-    add_subdirectory(src/libs/tools) # tools static library
     add_subdirectory(src/apps/toolkit) # toolkit application
 endif()
 
