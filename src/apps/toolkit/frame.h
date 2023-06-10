@@ -72,7 +72,10 @@ private:
 
     void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
+    void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
+
+    void OnPopupCommandSelected(wxCommandEvent &event);
 
     void OnGLCanvasPaint(wxPaintEvent &event);
 

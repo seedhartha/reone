@@ -33,9 +33,10 @@ public:
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
+    void extract(resource::RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath);
+
 private:
     void list(const resource::RimReader &rim);
-    void extract(resource::RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath);
     void toRIM(const boost::filesystem::path &target);
 };
 

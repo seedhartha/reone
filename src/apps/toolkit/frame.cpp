@@ -31,7 +31,10 @@
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/tools/2da.h"
+#include "reone/tools/erf.h"
 #include "reone/tools/gff.h"
+#include "reone/tools/keybif.h"
+#include "reone/tools/rim.h"
 #include "reone/tools/tlk.h"
 
 using namespace std;
@@ -62,6 +65,10 @@ struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
 };
 
+struct CommandID {
+    static constexpr int extract = 1;
+};
+
 ToolkitFrame::ToolkitFrame() :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
 
@@ -88,6 +95,7 @@ ToolkitFrame::ToolkitFrame() :
     auto filesPanel = new wxPanel(dataSplitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ToolkitFrame::OnFilesTreeCtrlItemExpanding, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ToolkitFrame::OnFilesTreeCtrlItemContextMenu, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ToolkitFrame::OnFilesTreeCtrlItemActivated, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnFilesTreeCtrlItemEditingDone, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Files");
@@ -317,6 +325,23 @@ void ToolkitFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     OpenFile(item);
 }
 
+void ToolkitFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+    auto itemId = event.GetItem().GetID();
+    if (_files.count(itemId) == 0) {
+        return;
+    }
+    auto &item = _files.at(itemId);
+    auto extension = boost::to_lower_copy(item.path.extension().string());
+    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveWhitelist.count(extension) == 0) {
+        return;
+    }
+    auto menu = wxMenu();
+    menu.Append(CommandID::extract, "Extract...");
+    menu.SetClientData(&item);
+    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ToolkitFrame::OnPopupCommandSelected), nullptr, this);
+    PopupMenu(&menu, event.GetPosition());
+}
+
 void ToolkitFrame::OpenFile(FilesEntry &entry) {
     if (!entry.resId) {
         return;
@@ -355,7 +380,7 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
                 return;
             }
             auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
-            auto erfEntry = erfReader.resources().at(resIdx);
+            auto &erfEntry = erfReader.resources().at(resIdx);
             auto resBytes = make_unique<ByteArray>();
             resBytes->resize(erfEntry.size);
             erf.seek(erfEntry.offset, SeekOrigin::Begin);
@@ -372,7 +397,7 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
             if (maybeRes == rimReader.resources().end()) {
                 return;
             }
-            auto rimRes = *maybeRes;
+            auto &rimRes = *maybeRes;
             auto resBytes = make_unique<ByteArray>();
             resBytes->resize(rimRes.size);
             rim.seek(rimRes.offset, SeekOrigin::Begin);
@@ -413,6 +438,59 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
 
 void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
+}
+
+void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
+    if (event.GetId() == CommandID::extract) {
+        auto menu = static_cast<wxMenu *>(event.GetEventObject());
+        auto data = menu->GetClientData();
+        auto entry = reinterpret_cast<FilesEntry *>(data);
+        if (entry->archived) {
+            // TODO: extract individual files
+        } else {
+            auto extension = boost::to_lower_copy(entry->path.extension().string());
+            if (extension == ".bif") {
+                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+                if (dialog->ShowModal() != wxID_OK) {
+                    return;
+                }
+                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+                auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+                auto keyReader = KeyReader();
+                auto key = FileInputStream(keyPath, OpenMode::Binary);
+                keyReader.load(key);
+                auto filename = boost::to_lower_copy(entry->path.filename().string());
+                auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
+                    return boost::contains(boost::to_lower_copy(file.filename), filename);
+                });
+                if (maybeBif == keyReader.files().end()) {
+                    return;
+                }
+                auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
+                KeyBifTool().extractBIF(keyReader, bifIdx, entry->path, destPath);
+            } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+                if (dialog->ShowModal() != wxID_OK) {
+                    return;
+                }
+                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+                auto erf = FileInputStream(entry->path, OpenMode::Binary);
+                auto erfReader = ErfReader();
+                erfReader.load(erf);
+                ErfTool().extract(erfReader, entry->path, destPath);
+            } else if (extension == ".rim") {
+                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+                if (dialog->ShowModal() != wxID_OK) {
+                    return;
+                }
+                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+                auto rim = FileInputStream(entry->path, OpenMode::Binary);
+                auto rimReader = RimReader();
+                rimReader.load(rim);
+                RimTool().extract(rimReader, entry->path, destPath);
+            }
+        }
+    }
 }
 
 void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {

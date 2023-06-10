@@ -34,10 +34,11 @@ public:
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
+    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
+
 private:
     void listKEY(const resource::KeyReader &key);
     void listBIF(const resource::KeyReader &key, int bifIdx);
-    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

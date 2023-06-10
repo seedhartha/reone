@@ -141,7 +141,6 @@ bool isGFFCompatibleResType(ResourceType type) {
         case ResourceType::Dwk:
         case ResourceType::Pwk:
         case ResourceType::Jrl:
-        case ResourceType::Mod:
         case ResourceType::Utw:
         case ResourceType::Ptm:
         case ResourceType::Ptt:
