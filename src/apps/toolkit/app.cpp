@@ -19,7 +19,7 @@
 
 #include "reone/system/logutil.h"
 
-#include "program.h"
+#include "cli/program.h"
 
 using namespace std;
 
