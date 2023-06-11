@@ -20,11 +20,15 @@
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
+#include "reone/game/format/ssfreader.h"
 #include "reone/game/script/routines.h"
+#include "reone/graphics/format/lipreader.h"
+#include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
+#include "reone/resource/format/tlkreader.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -44,6 +48,7 @@
 using namespace std;
 
 using namespace reone::game;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
@@ -126,6 +131,12 @@ ToolkitFrame::ToolkitFrame() :
     textSizer->Add(_plainTextCtrl, 1, wxEXPAND);
     _textPanel->SetSizer(textSizer);
 
+    _tablePanel = new wxPanel(_notebook);
+    auto tableSizer = new wxBoxSizer(wxVERTICAL);
+    _tableCtrl = new wxDataViewListCtrl(_tablePanel, wxID_ANY);
+    tableSizer->Add(_tableCtrl, 1, wxEXPAND);
+    _tablePanel->SetSizer(tableSizer);
+
     _xmlPanel = new wxPanel(_notebook);
     auto xmlSizer = new wxBoxSizer(wxVERTICAL);
     _xmlTextCtrl = new wxStyledTextCtrl(_xmlPanel);
@@ -202,6 +213,7 @@ ToolkitFrame::ToolkitFrame() :
     _splitter->SplitVertically(dataSplitter, _notebook, 1);
 
     _textPanel->Hide();
+    _tablePanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
@@ -478,6 +490,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         ;
 
     _textPanel->Hide();
+    _tablePanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
@@ -485,14 +498,26 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     _renderPanel->Hide();
 
     if (id.type == ResourceType::TwoDa) {
-        auto xmlBytes = ByteArray();
-        auto xml = ByteArrayOutputStream(xmlBytes);
-        TwoDaTool().toXML(data, xml);
-        _xmlTextCtrl->SetEditable(true);
-        _xmlTextCtrl->SetText(xmlBytes);
-        _xmlTextCtrl->SetEditable(false);
-        _notebook->AddPage(_xmlPanel, "XML");
-        _xmlPanel->Show();
+        _tableCtrl->ClearColumns();
+        _tableCtrl->DeleteAllItems();
+        auto reader = TwoDaReader();
+        reader.load(data);
+        auto twoDa = reader.twoDa();
+        _tableCtrl->AppendTextColumn("Index");
+        for (auto &column : twoDa->columns()) {
+            _tableCtrl->AppendTextColumn(column);
+        }
+        for (int i = 0; i < twoDa->getRowCount(); ++i) {
+            auto &row = twoDa->rows()[i];
+            auto values = wxVector<wxVariant>();
+            values.push_back(wxVariant(to_string(i)));
+            for (auto &value : row.values) {
+                values.push_back(wxVariant(value));
+            }
+            _tableCtrl->AppendItem(values);
+        }
+        _notebook->AddPage(_tablePanel, "Table");
+        _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto xmlBytes = ByteArray();

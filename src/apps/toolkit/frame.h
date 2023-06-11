@@ -66,6 +66,7 @@ private:
     wxNotebook *_notebook {nullptr};
 
     wxPanel *_textPanel {nullptr};
+    wxPanel *_tablePanel {nullptr};
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
@@ -73,6 +74,7 @@ private:
     wxPanel *_renderPanel {nullptr};
 
     wxTextCtrl *_plainTextCtrl {nullptr};
+    wxDataViewListCtrl *_tableCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxTextCtrl *_pcodeTextCtrl {nullptr};
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
