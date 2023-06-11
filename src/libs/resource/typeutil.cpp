@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 static unordered_map<ResourceType, string> g_extByType {
-    {ResourceType::Res, "inv"},
+    {ResourceType::Res, "res"},
     {ResourceType::Bmp, "bmp"},
     {ResourceType::Tga, "tga"},
     {ResourceType::Wav, "wav"},
@@ -114,37 +114,37 @@ ResourceType getResTypeByExt(const string &ext, bool logNotFound) {
 
 bool isGFFCompatibleResType(ResourceType type) {
     switch (type) {
-        case ResourceType::Res:
-        case ResourceType::Plt:
-        case ResourceType::Are:
-        case ResourceType::Set:
-        case ResourceType::Ifo:
-        case ResourceType::Bic:
-        case ResourceType::Git:
-        case ResourceType::Bti:
-        case ResourceType::Uti:
-        case ResourceType::Btc:
-        case ResourceType::Utc:
-        case ResourceType::Dlg:
-        case ResourceType::Itp:
-        case ResourceType::Utt:
-        case ResourceType::Uts:
-        case ResourceType::Gff:
-        case ResourceType::Fac:
-        case ResourceType::Ute:
-        case ResourceType::Utd:
-        case ResourceType::Utp:
-        case ResourceType::Dft:
-        case ResourceType::Gic:
-        case ResourceType::Gui:
-        case ResourceType::Utm:
-        case ResourceType::Dwk:
-        case ResourceType::Pwk:
-        case ResourceType::Jrl:
-        case ResourceType::Utw:
-        case ResourceType::Ptm:
-        case ResourceType::Ptt:
-        case ResourceType::Pth:
+    case ResourceType::Res:
+    case ResourceType::Plt:
+    case ResourceType::Are:
+    case ResourceType::Set:
+    case ResourceType::Ifo:
+    case ResourceType::Bic:
+    case ResourceType::Git:
+    case ResourceType::Bti:
+    case ResourceType::Uti:
+    case ResourceType::Btc:
+    case ResourceType::Utc:
+    case ResourceType::Dlg:
+    case ResourceType::Itp:
+    case ResourceType::Utt:
+    case ResourceType::Uts:
+    case ResourceType::Gff:
+    case ResourceType::Fac:
+    case ResourceType::Ute:
+    case ResourceType::Utd:
+    case ResourceType::Utp:
+    case ResourceType::Dft:
+    case ResourceType::Gic:
+    case ResourceType::Gui:
+    case ResourceType::Utm:
+    case ResourceType::Dwk:
+    case ResourceType::Pwk:
+    case ResourceType::Jrl:
+    case ResourceType::Utw:
+    case ResourceType::Ptm:
+    case ResourceType::Ptt:
+    case ResourceType::Pth:
         return true;
     default:
         return false;
