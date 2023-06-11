@@ -35,6 +35,8 @@ bool ToolkitApp::OnInit() {
         return false;
     }
 
+    wxImage::AddHandler(new wxTGAHandler());
+
     auto frame = new ToolkitFrame();
     frame->Show();
 

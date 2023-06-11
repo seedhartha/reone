@@ -69,6 +69,7 @@ private:
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
+    wxPanel *_imagePanel {nullptr};
     wxPanel *_renderPanel {nullptr};
 
     wxTextCtrl *_plainTextCtrl {nullptr};
@@ -76,6 +77,8 @@ private:
     wxTextCtrl *_pcodeTextCtrl {nullptr};
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
+
+    std::unique_ptr<wxBitmap> _image;
 
     // END Widgets
 
@@ -96,6 +99,7 @@ private:
 
     void OnPopupCommandSelected(wxCommandEvent &event);
 
+    void OnImagePanelPaint(wxPaintEvent &event);
     void OnGLCanvasPaint(wxPaintEvent &event);
 
     // END Events

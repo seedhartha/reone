@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/stream/output.h"
+
 #include "../types.h"
 
 namespace reone {
@@ -29,13 +31,12 @@ class TgaWriter {
 public:
     TgaWriter(std::shared_ptr<Texture> texture);
 
-    void save(std::ostream &out, bool compress = false);
-    void save(const boost::filesystem::path &path, bool compress = false);
+    void save(IOutputStream &out, bool compress = false);
 
 private:
     std::shared_ptr<Texture> _texture;
 
-    void writeRLE(uint8_t *pixels, int depth, std::ostream &out);
+    void writeRLE(uint8_t *pixels, int depth, IOutputStream &out);
 
     std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
 };

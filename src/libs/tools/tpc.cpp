@@ -17,11 +17,13 @@
 
 #include "reone/tools/tpc.h"
 
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-#include "reone/system/stream/fileinput.h"
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/format/tpcreader.h"
+#include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 using namespace std;
 
@@ -52,30 +54,35 @@ void TpcTool::invokeBatch(
 }
 
 void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    // Read TPC
+    auto tpc = FileInputStream(path, OpenMode::Binary);
 
-    auto stream = FileInputStream(path, OpenMode::Binary);
-
-    TpcReader tpc("", TextureUsage::GUI);
-    tpc.load(stream);
-
-    // Write TGA
-
-    boost::filesystem::path tgaPath(destPath);
+    auto tgaPath = destPath;
     tgaPath.append(path.filename().string());
     tgaPath.replace_extension("tga");
 
-    TgaWriter writer(tpc.texture());
-    writer.save(tgaPath, true);
+    auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
+    auto txiBytes = make_unique<ByteArray>();
+    auto txiMemory = ByteArrayOutputStream(*txiBytes);
+    toTGA(tpc, tga, txiMemory);
 
-    // Write TXI
-
-    if (!tpc.txiData().empty()) {
-        boost::filesystem::path txiPath(tgaPath);
+    if (!txiBytes->empty()) {
+        auto txiPath = tgaPath;
         txiPath.replace_extension("txi");
 
-        boost::filesystem::ofstream txi(txiPath, ios::binary);
-        txi.write(tpc.txiData().data(), tpc.txiData().size());
+        auto txi = FileOutputStream(txiPath, OpenMode::Binary);
+        txi.write(&(*txiBytes)[0], txiBytes->size());
+    }
+}
+
+void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi) {
+    auto reader = TpcReader("", TextureUsage::GUI);
+    reader.load(tpc);
+
+    auto tgaWriter = TgaWriter(reader.texture());
+    tgaWriter.save(tga, true);
+
+    if (!reader.txiData().empty()) {
+        txi.write(reader.txiData().data(), reader.txiData().size());
     }
 }
 

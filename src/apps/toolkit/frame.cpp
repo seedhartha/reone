@@ -18,6 +18,7 @@
 #include "frame.h"
 
 #include <wx/dirdlg.h>
+#include <wx/mstream.h>
 
 #include "reone/game/script/routines.h"
 #include "reone/resource/format/bifreader.h"
@@ -38,6 +39,7 @@
 #include "reone/tools/rim.h"
 #include "reone/tools/ssf.h"
 #include "reone/tools/tlk.h"
+#include "reone/tools/tpc.h"
 
 using namespace std;
 
@@ -183,6 +185,9 @@ ToolkitFrame::ToolkitFrame() :
     pcodeSizer->Add(_pcodeTextCtrl, 1, wxEXPAND);
     _pcodePanel->SetSizer(pcodeSizer);
 
+    _imagePanel = new wxPanel(_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    _imagePanel->Bind(wxEVT_PAINT, &ToolkitFrame::OnImagePanelPaint, this);
+
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
     auto glAttributes = wxGLAttributes().Defaults();
@@ -200,6 +205,7 @@ ToolkitFrame::ToolkitFrame() :
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
+    _imagePanel->Hide();
     _renderPanel->Hide();
 
     CreateStatusBar();
@@ -475,6 +481,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
+    _imagePanel->Hide();
     _renderPanel->Hide();
 
     if (id.type == ResourceType::TwoDa) {
@@ -577,6 +584,27 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(false);
         _notebook->AddPage(_xmlPanel, "XML");
         _xmlPanel->Show();
+
+    } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
+        auto tgaBytes = make_unique<ByteArray>();
+        if (id.type == ResourceType::Tpc) {
+            auto tga = ByteArrayOutputStream(*tgaBytes);
+            auto txiBytes = make_unique<ByteArray>();
+            auto txi = ByteArrayOutputStream(*txiBytes);
+            TpcTool().toTGA(data, tga, txi);
+        } else {
+            data.seek(0, SeekOrigin::End);
+            auto length = data.position();
+            data.seek(0, SeekOrigin::Begin);
+            tgaBytes->resize(length, '\0');
+            data.read(&(*tgaBytes)[0], length);
+        }
+        auto wxStream = wxMemoryInputStream(&(*tgaBytes)[0], tgaBytes->size());
+        auto image = wxImage();
+        image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
+        _image = make_unique<wxBitmap>(image);
+        _notebook->AddPage(_imagePanel, "Image");
+        _imagePanel->Show();
     }
 
     /*
@@ -636,6 +664,19 @@ void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
             RimTool().extract(rimReader, entry->path, destPath);
         }
     }
+}
+
+void ToolkitFrame::OnImagePanelPaint(wxPaintEvent &event) {
+    wxPaintDC dc(_imagePanel);
+
+    if (!_image) {
+        return;
+    }
+    int w, h;
+    dc.GetSize(&w, &h);
+    int x = (w - _image->GetWidth()) / 2;
+    int y = (h - _image->GetHeight()) / 2;
+    dc.DrawBitmap(*_image, x, y);
 }
 
 void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {

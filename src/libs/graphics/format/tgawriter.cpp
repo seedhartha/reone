@@ -32,7 +32,7 @@ TgaWriter::TgaWriter(shared_ptr<Texture> texture) :
     _texture(std::move(texture)) {
 }
 
-void TgaWriter::save(ostream &out, bool compress) {
+void TgaWriter::save(IOutputStream &out, bool compress) {
     // Image ID, color-mapped images, RLE and image orientation are not supported
 
     int width = _texture->width();
@@ -168,7 +168,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
     return std::move(result);
 }
 
-void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
+void TgaWriter::writeRLE(uint8_t *pixels, int depth, IOutputStream &out) {
     uint8_t *from = pixels;
     uint8_t repeat = 0, direct = 0;
     int bytes = depth / 8;
@@ -176,7 +176,7 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
     for (int x = 1; x < _texture->width(); ++x) {
         if (memcpy(pixels, pixels + bytes, bytes)) {
             if (repeat) {
-                out.put(128 + repeat);
+                out.writeByte(128 + repeat);
                 out.write(reinterpret_cast<char *>(from), bytes);
                 from = pixels + bytes;
                 repeat = 0;
@@ -186,7 +186,7 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
             }
         } else {
             if (direct) {
-                out.put(direct - 1);
+                out.writeByte(direct - 1);
                 out.write(reinterpret_cast<char *>(from), bytes * static_cast<size_t>(direct));
                 from = pixels;
                 direct = 0;
@@ -196,13 +196,13 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
             }
         }
         if (repeat == 128) {
-            out.put(static_cast<char>(255));
+            out.writeByte(static_cast<char>(255));
             out.write(reinterpret_cast<char *>(from), bytes);
             from = pixels + bytes;
             direct = 0;
             repeat = 0;
         } else if (direct == 128) {
-            out.put(127);
+            out.writeByte(127);
             out.write(reinterpret_cast<char *>(from), bytes * static_cast<size_t>(direct));
             from = pixels + bytes;
             direct = 0;
@@ -212,17 +212,12 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
     }
 
     if (repeat > 0) {
-        out.put(128 + repeat);
+        out.writeByte(128 + repeat);
         out.write(reinterpret_cast<char *>(from), bytes);
     } else {
-        out.put(direct);
+        out.writeByte(direct);
         out.write(reinterpret_cast<char *>(from), bytes * static_cast<size_t>(direct + 1));
     }
-}
-
-void TgaWriter::save(const boost::filesystem::path &path, bool compress) {
-    boost::filesystem::ofstream tga(path, ios::binary);
-    save(tga, compress);
 }
 
 } // namespace graphics
