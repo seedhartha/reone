@@ -536,7 +536,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             }
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, "Table");
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.2da") % id.resRef));
         _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
@@ -545,7 +545,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto root = reader.root();
         AppendGffStructToTree(wxDataViewItem(), "/", *root);
-        _notebook->AddPage(_gffPanel, "GFF");
+        _notebook->AddPage(_gffPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
         _gffPanel->Show();
 
         /*
@@ -577,20 +577,20 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(str.soundResRef));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, "Table");
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.tlk") % id.resRef));
         _tablePanel->Show();
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
-        auto str = string(length, '\0');
-        data.read(&str[0], length);
+        auto text = string(length, '\0');
+        data.read(&text[0], length);
         _plainTextCtrl->SetEditable(true);
         _plainTextCtrl->Clear();
-        _plainTextCtrl->AppendText(str);
+        _plainTextCtrl->AppendText(text);
         _plainTextCtrl->SetEditable(false);
-        _notebook->AddPage(_textPanel, "Text");
+        _notebook->AddPage(_textPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
         _textPanel->Show();
 
     } else if (id.type == ResourceType::Ncs) {
@@ -606,7 +606,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _pcodeTextCtrl->Clear();
         _pcodeTextCtrl->AppendText(*pcodeBytes);
         _pcodeTextCtrl->SetEditable(false);
-        _notebook->AddPage(_pcodePanel, "Compiled NWScript");
+        _notebook->AddPage(_pcodePanel, str(boost::format("%s.pcode") % id.resRef));
         _pcodePanel->Show();
 
         data.seek(0, SeekOrigin::Begin);
@@ -616,19 +616,19 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(*nssBytes);
         _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, "NWScript Source");
+        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef));
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Nss) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
-        auto str = string(length, '\0');
-        data.read(&str[0], length);
+        auto text = string(length, '\0');
+        data.read(&text[0], length);
         _nssTextCtrl->SetEditable(true);
-        _nssTextCtrl->SetText(str);
+        _nssTextCtrl->SetText(text);
         _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, "NWScript Source");
+        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef));
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Lip) {
@@ -645,7 +645,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(kf.shape)));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, "Table");
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.lip") % id.resRef));
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
@@ -662,7 +662,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(soundSet.at(i))));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, "Table");
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.ssf") % id.resRef));
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
@@ -683,7 +683,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         auto image = wxImage();
         image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
         _image = make_unique<wxBitmap>(image);
-        _notebook->AddPage(_imagePanel, "Image");
+        _notebook->AddPage(_imagePanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
         _imagePanel->Show();
     }
 
