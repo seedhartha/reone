@@ -23,6 +23,7 @@
 #include "reone/game/format/ssfreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
@@ -603,14 +604,21 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Lip) {
-        auto xmlBytes = ByteArray();
-        auto xml = ByteArrayOutputStream(xmlBytes);
-        LipTool().toXML(data, xml);
-        _xmlTextCtrl->SetEditable(true);
-        _xmlTextCtrl->SetText(xmlBytes);
-        _xmlTextCtrl->SetEditable(false);
-        _notebook->AddPage(_xmlPanel, "XML");
-        _xmlPanel->Show();
+        _tableCtrl->ClearColumns();
+        _tableCtrl->DeleteAllItems();
+        auto reader = LipReader("");
+        reader.load(data);
+        auto animation = reader.animation();
+        _tableCtrl->AppendTextColumn("Time");
+        _tableCtrl->AppendTextColumn("Shape");
+        for (auto &kf : animation->keyframes()) {
+            auto values = wxVector<wxVariant>();
+            values.push_back(wxVariant(to_string(kf.time)));
+            values.push_back(wxVariant(to_string(kf.shape)));
+            _tableCtrl->AppendItem(values);
+        }
+        _notebook->AddPage(_tablePanel, "Table");
+        _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
         auto xmlBytes = ByteArray();
