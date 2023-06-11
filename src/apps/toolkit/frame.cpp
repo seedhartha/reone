@@ -247,7 +247,7 @@ ToolkitFrame::ToolkitFrame() :
     _imageSplitter->Hide();
     _renderPanel->Hide();
 
-    CreateStatusBar();
+    // CreateStatusBar();
 }
 
 void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
