@@ -39,6 +39,7 @@
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/tools/2da.h"
+#include "reone/tools/audio.h"
 #include "reone/tools/erf.h"
 #include "reone/tools/gff.h"
 #include "reone/tools/keybif.h"
@@ -80,6 +81,20 @@ static const set<ResourceType> kFilesPlaintextExtensions {
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 2;
+    static constexpr int unwrapTool = wxID_HIGHEST + 3;
+    static constexpr int toRimTool = wxID_HIGHEST + 4;
+    static constexpr int toErfTool = wxID_HIGHEST + 5;
+    static constexpr int toModTool = wxID_HIGHEST + 6;
+    static constexpr int toXmlTool = wxID_HIGHEST + 7;
+    static constexpr int toTwoDaTool = wxID_HIGHEST + 8;
+    static constexpr int toGffTool = wxID_HIGHEST + 9;
+    static constexpr int toTlkTool = wxID_HIGHEST + 10;
+    static constexpr int toLipTool = wxID_HIGHEST + 11;
+    static constexpr int toSsfTool = wxID_HIGHEST + 12;
+    static constexpr int toTgaTool = wxID_HIGHEST + 13;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 14;
+    static constexpr int toNcsTool = wxID_HIGHEST + 15;
+    static constexpr int toNssTool = wxID_HIGHEST + 16;
 };
 
 struct CommandID {
@@ -98,7 +113,22 @@ ToolkitFrame::ToolkitFrame() :
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
     auto toolsMenu = new wxMenu();
-    toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch &convert TPC to TGA...");
+    toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
+    toolsMenu->AppendSeparator();
+    toolsMenu->Append(EventHandlerID::unwrapTool, "Unwrap WAV to WAV/MP3...");
+    toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
+    toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
+    toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
+    toolsMenu->Append(EventHandlerID::toXmlTool, "Convert 2DA/GFF/TLK/LIP/SSF to XML...");
+    toolsMenu->Append(EventHandlerID::toTwoDaTool, "Convert XML to 2DA...");
+    toolsMenu->Append(EventHandlerID::toGffTool, "Convert XML to GFF...");
+    toolsMenu->Append(EventHandlerID::toTlkTool, "Convert XML to TLK...");
+    toolsMenu->Append(EventHandlerID::toLipTool, "Convert XML to LIP...");
+    toolsMenu->Append(EventHandlerID::toSsfTool, "Convert XML to SSF...");
+    toolsMenu->Append(EventHandlerID::toTgaTool, "Convert TPC to TGA/TXI...");
+    toolsMenu->Append(EventHandlerID::toPcodeTool, "Convert NCS to PCODE...");
+    toolsMenu->Append(EventHandlerID::toNcsTool, "Convert PCODE to NCS...");
+    toolsMenu->Append(EventHandlerID::toNssTool, "Convert PCODE to NSS...");
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
     menuBar->Append(toolsMenu, "&Tools");
@@ -254,7 +284,7 @@ ToolkitFrame::ToolkitFrame() :
     // CreateStatusBar();
 }
 
-void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
+void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog->ShowModal() != wxID_OK) {
         return;
@@ -318,9 +348,22 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         _modulesListBox->AppendString(moduleName);
     }
     */
+
+    _tools.clear();
+    _tools.push_back(make_shared<KeyBifTool>());
+    _tools.push_back(make_shared<ErfTool>());
+    _tools.push_back(make_shared<RimTool>());
+    _tools.push_back(make_shared<TwoDaTool>());
+    _tools.push_back(make_shared<TlkTool>());
+    _tools.push_back(make_shared<LipTool>());
+    _tools.push_back(make_shared<SsfTool>());
+    _tools.push_back(make_shared<GffTool>());
+    _tools.push_back(make_shared<TpcTool>());
+    _tools.push_back(make_shared<AudioTool>());
+    _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
-void ToolkitFrame::OnBatchConvertTpcToTga(wxCommandEvent &event) {
+void ToolkitFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
@@ -339,6 +382,91 @@ void ToolkitFrame::OnBatchConvertTpcToTga(wxCommandEvent &event) {
         }
         tool.toTGA(file.path(), destPath);
     }
+    wxMessageBox("Operation completed successfully", "Success");
+}
+
+void ToolkitFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::Unwrap);
+}
+
+void ToolkitFrame::OnToRimToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToRIM);
+}
+
+void ToolkitFrame::OnToErfToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToERF);
+}
+
+void ToolkitFrame::OnToModToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToMOD);
+}
+
+void ToolkitFrame::OnToXmlToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToXML);
+}
+
+void ToolkitFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::To2DA);
+}
+
+void ToolkitFrame::OnToGffToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToGFF);
+}
+
+void ToolkitFrame::OnToTlkToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToTLK);
+}
+
+void ToolkitFrame::OnToLipToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToLIP);
+}
+
+void ToolkitFrame::OnToSsfToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToSSF);
+}
+
+void ToolkitFrame::OnToTgaToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToTGA);
+}
+
+void ToolkitFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToPCODE);
+}
+
+void ToolkitFrame::OnToNcsToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToNCS);
+}
+
+void ToolkitFrame::OnToNssToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToNSS);
+}
+
+void ToolkitFrame::InvokeTool(Operation operation) {
+    auto srcFileDialog = new wxFileDialog(
+        nullptr,
+        "Choose source file",
+        "",
+        "",
+        wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
+        wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
+    if (srcFileDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto sourcePath = boost::filesystem::path((string)srcFileDialog->GetPath());
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    for (auto &tool : _tools) {
+        if (!tool->supports(operation, sourcePath)) {
+            continue;
+        }
+        tool->invoke(operation, sourcePath, destPath, _gamePath);
+        wxMessageBox("Operation completed successfully", "Success");
+        return;
+    }
+    wxMessageBox("Tool not found", "Error", wxICON_ERROR);
 }
 
 void ToolkitFrame::OnSplitterSize(wxSizeEvent &event) {
@@ -858,9 +986,23 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
-wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                        //
-    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryMenu)  //
-    EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTga) //
+wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
+    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTgaCommand) //
+    EVT_MENU(EventHandlerID::unwrapTool, ToolkitFrame::OnUnwrapToolCommand)              //
+    EVT_MENU(EventHandlerID::toRimTool, ToolkitFrame::OnToRimToolCommand)                //
+    EVT_MENU(EventHandlerID::toErfTool, ToolkitFrame::OnToErfToolCommand)                //
+    EVT_MENU(EventHandlerID::toModTool, ToolkitFrame::OnToModToolCommand)                //
+    EVT_MENU(EventHandlerID::toXmlTool, ToolkitFrame::OnToXmlToolCommand)                //
+    EVT_MENU(EventHandlerID::toTwoDaTool, ToolkitFrame::OnToTwoDaToolCommand)            //
+    EVT_MENU(EventHandlerID::toGffTool, ToolkitFrame::OnToGffToolCommand)                //
+    EVT_MENU(EventHandlerID::toTlkTool, ToolkitFrame::OnToTlkToolCommand)                //
+    EVT_MENU(EventHandlerID::toLipTool, ToolkitFrame::OnToLipToolCommand)                //
+    EVT_MENU(EventHandlerID::toSsfTool, ToolkitFrame::OnToSsfToolCommand)                //
+    EVT_MENU(EventHandlerID::toTgaTool, ToolkitFrame::OnToTgaToolCommand)                //
+    EVT_MENU(EventHandlerID::toPcodeTool, ToolkitFrame::OnToPcodeToolCommand)            //
+    EVT_MENU(EventHandlerID::toNcsTool, ToolkitFrame::OnToNcsToolCommand)                //
+    EVT_MENU(EventHandlerID::toNssTool, ToolkitFrame::OnToNssToolCommand)                //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

@@ -35,6 +35,7 @@
 #include "reone/resource/id.h"
 #include "reone/resource/strings.h"
 #include "reone/system/stream/input.h"
+#include "reone/tools/tool.h"
 
 namespace reone {
 
@@ -57,6 +58,7 @@ private:
     resource::Strings _strings;
 
     std::map<void *, FilesEntry> _files;
+    std::vector<std::shared_ptr<Tool>> _tools;
 
     // Widgets
 
@@ -96,10 +98,27 @@ private:
 
     void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
 
+    void InvokeTool(Operation operation);
+
     // Events
 
-    void OnOpenGameDirectoryMenu(wxCommandEvent &event);
-    void OnBatchConvertTpcToTga(wxCommandEvent &event);
+    void OnOpenGameDirectoryCommand(wxCommandEvent &event);
+    void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
+
+    void OnUnwrapToolCommand(wxCommandEvent &event);
+    void OnToRimToolCommand(wxCommandEvent &event);
+    void OnToErfToolCommand(wxCommandEvent &event);
+    void OnToModToolCommand(wxCommandEvent &event);
+    void OnToXmlToolCommand(wxCommandEvent &event);
+    void OnToTwoDaToolCommand(wxCommandEvent &event);
+    void OnToGffToolCommand(wxCommandEvent &event);
+    void OnToTlkToolCommand(wxCommandEvent &event);
+    void OnToLipToolCommand(wxCommandEvent &event);
+    void OnToSsfToolCommand(wxCommandEvent &event);
+    void OnToTgaToolCommand(wxCommandEvent &event);
+    void OnToPcodeToolCommand(wxCommandEvent &event);
+    void OnToNcsToolCommand(wxCommandEvent &event);
+    void OnToNssToolCommand(wxCommandEvent &event);
 
     void OnSplitterSize(wxSizeEvent &event);
     void OnSplitterSashPosChanging(wxSplitterEvent &event);
