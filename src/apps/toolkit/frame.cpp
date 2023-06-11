@@ -382,6 +382,9 @@ void ToolkitFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         return;
     }
     auto &item = _files.at(itemId);
+    if (item.archived) {
+        return;
+    }
     auto extension = boost::to_lower_copy(item.path.extension().string());
     if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveExtensions.count(extension) == 0) {
         return;
@@ -569,50 +572,46 @@ void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto menu = static_cast<wxMenu *>(event.GetEventObject());
         auto data = menu->GetClientData();
         auto entry = reinterpret_cast<FilesEntry *>(data);
-        if (entry->archived) {
-            // TODO: extract individual files
-        } else {
-            auto extension = boost::to_lower_copy(entry->path.extension().string());
-            if (extension == ".bif") {
-                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-                if (dialog->ShowModal() != wxID_OK) {
-                    return;
-                }
-                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-                auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
-                auto keyReader = KeyReader();
-                auto key = FileInputStream(keyPath, OpenMode::Binary);
-                keyReader.load(key);
-                auto filename = boost::to_lower_copy(entry->path.filename().string());
-                auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
-                    return boost::contains(boost::to_lower_copy(file.filename), filename);
-                });
-                if (maybeBif == keyReader.files().end()) {
-                    return;
-                }
-                auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
-                KeyBifTool().extractBIF(keyReader, bifIdx, entry->path, destPath);
-            } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-                if (dialog->ShowModal() != wxID_OK) {
-                    return;
-                }
-                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-                auto erf = FileInputStream(entry->path, OpenMode::Binary);
-                auto erfReader = ErfReader();
-                erfReader.load(erf);
-                ErfTool().extract(erfReader, entry->path, destPath);
-            } else if (extension == ".rim") {
-                auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-                if (dialog->ShowModal() != wxID_OK) {
-                    return;
-                }
-                auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-                auto rim = FileInputStream(entry->path, OpenMode::Binary);
-                auto rimReader = RimReader();
-                rimReader.load(rim);
-                RimTool().extract(rimReader, entry->path, destPath);
+        auto extension = boost::to_lower_copy(entry->path.extension().string());
+        if (extension == ".bif") {
+            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+            if (dialog->ShowModal() != wxID_OK) {
+                return;
             }
+            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+            auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+            auto keyReader = KeyReader();
+            auto key = FileInputStream(keyPath, OpenMode::Binary);
+            keyReader.load(key);
+            auto filename = boost::to_lower_copy(entry->path.filename().string());
+            auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
+                return boost::contains(boost::to_lower_copy(file.filename), filename);
+            });
+            if (maybeBif == keyReader.files().end()) {
+                return;
+            }
+            auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
+            KeyBifTool().extractBIF(keyReader, bifIdx, entry->path, destPath);
+        } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+            if (dialog->ShowModal() != wxID_OK) {
+                return;
+            }
+            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+            auto erf = FileInputStream(entry->path, OpenMode::Binary);
+            auto erfReader = ErfReader();
+            erfReader.load(erf);
+            ErfTool().extract(erfReader, entry->path, destPath);
+        } else if (extension == ".rim") {
+            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+            if (dialog->ShowModal() != wxID_OK) {
+                return;
+            }
+            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+            auto rim = FileInputStream(entry->path, OpenMode::Binary);
+            auto rimReader = RimReader();
+            rimReader.load(rim);
+            RimTool().extract(rimReader, entry->path, destPath);
         }
     }
 }
