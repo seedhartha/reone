@@ -29,6 +29,7 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/format/tlkreader.h"
+#include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -530,14 +531,25 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlPanel->Show();
 
     } else if (id.type == ResourceType::Tlk) {
-        auto xmlBytes = ByteArray();
-        auto xml = ByteArrayOutputStream(xmlBytes);
-        TlkTool().toXML(data, xml);
-        _xmlTextCtrl->SetEditable(true);
-        _xmlTextCtrl->SetText(xmlBytes);
-        _xmlTextCtrl->SetEditable(false);
-        _notebook->AddPage(_xmlPanel, "XML");
-        _xmlPanel->Show();
+        _tableCtrl->ClearColumns();
+        _tableCtrl->DeleteAllItems();
+        auto reader = TlkReader();
+        reader.load(data);
+        auto tlk = reader.table();
+        _tableCtrl->AppendTextColumn("Index");
+        _tableCtrl->AppendTextColumn("Text");
+        _tableCtrl->AppendTextColumn("Sound");
+        for (int i = 0; i < tlk->getStringCount(); ++i) {
+            auto &str = tlk->getString(i);
+            auto values = wxVector<wxVariant>();
+            auto cleaned = boost::replace_all_copy(str.text, "\n", "\\n");
+            values.push_back(wxVariant(to_string(i)));
+            values.push_back(wxVariant(cleaned));
+            values.push_back(wxVariant(str.soundResRef));
+            _tableCtrl->AppendItem(values);
+        }
+        _notebook->AddPage(_tablePanel, "Table");
+        _tablePanel->Show();
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
