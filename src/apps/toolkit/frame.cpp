@@ -921,6 +921,10 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             _notebook->AddPage(_audioPanel, id.string(), true);
         }
         _audioPanel->Show();
+
+    } else {
+        wxMessageBox("Resource type not supported", "Warning", wxICON_WARNING);
+        return;
     }
 
     /*
