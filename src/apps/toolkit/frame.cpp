@@ -713,7 +713,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         if (_notebook->GetPage(i) == _talkTablePanel) {
             talkTableOpen = true;
         }
-        if (_notebook->GetPage(i) == _audioPanel) {
+        if (_notebook->GetPage(i) == _audioPanel && _audioSource && _audioSource->isPlaying()) {
             audioOpen = true;
         }
     }
