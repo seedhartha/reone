@@ -212,13 +212,17 @@ ToolkitFrame::ToolkitFrame() :
 
     _pcodePanel = new wxPanel(_notebook);
     auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
-    _pcodeTextCtrl = new wxTextCtrl(_pcodePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _pcodeTextCtrl = new wxTextCtrl(_pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _pcodeTextCtrl->SetEditable(false);
     pcodeSizer->Add(_pcodeTextCtrl, 1, wxEXPAND);
     _pcodePanel->SetSizer(pcodeSizer);
 
-    _imagePanel = new wxPanel(_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _imagePanel->Bind(wxEVT_PAINT, &ToolkitFrame::OnImagePanelPaint, this);
+    _imageSplitter = new wxSplitterWindow(_notebook, wxID_ANY);
+    _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    _imageCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnImageCanvasPaint, this);
+    _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _imageInfoCtrl->SetEditable(false);
+    _imageSplitter->SetMinimumPaneSize(100);
 
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
@@ -240,7 +244,7 @@ ToolkitFrame::ToolkitFrame() :
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
-    _imagePanel->Hide();
+    _imageSplitter->Hide();
     _renderPanel->Hide();
 
     CreateStatusBar();
@@ -522,7 +526,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
-    _imagePanel->Hide();
+    _imageSplitter->Hide();
     _renderPanel->Hide();
 
     if (id.type == ResourceType::TwoDa) {
@@ -555,17 +559,6 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         AppendGffStructToTree(wxDataViewItem(), "/", *root);
         _notebook->AddPage(_gffPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
         _gffPanel->Show();
-
-        /*
-        auto xmlBytes = ByteArray();
-        auto xml = ByteArrayOutputStream(xmlBytes);
-        GffTool().toXML(data, xml, _strings);
-        _xmlTextCtrl->SetEditable(true);
-        _xmlTextCtrl->SetText(xmlBytes);
-        _xmlTextCtrl->SetEditable(false);
-        _notebook->AddPage(_xmlPanel, "XML");
-        _xmlPanel->Show();
-        */
 
     } else if (id.type == ResourceType::Tlk) {
         if (_talkTableCtrl->GetItemCount() == 0) {
@@ -682,19 +675,27 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             auto txiBytes = make_unique<ByteArray>();
             auto txi = ByteArrayOutputStream(*txiBytes);
             TpcTool().toTGA(data, tga, txi);
+            if (txiBytes->empty()) {
+                _imageSplitter->Unsplit(_imageInfoCtrl);
+            } else {
+                _imageInfoCtrl->Clear();
+                _imageInfoCtrl->AppendText(*txiBytes);
+                _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+            }
         } else {
             data.seek(0, SeekOrigin::End);
             auto length = data.position();
             data.seek(0, SeekOrigin::Begin);
             tgaBytes->resize(length, '\0');
             data.read(&(*tgaBytes)[0], length);
+            _imageSplitter->Unsplit(_imageInfoCtrl);
         }
         auto wxStream = wxMemoryInputStream(&(*tgaBytes)[0], tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
         _image = make_unique<wxBitmap>(image);
-        _notebook->AddPage(_imagePanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
-        _imagePanel->Show();
+        _notebook->AddPage(_imageSplitter, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
+        _imageSplitter->Show();
     }
 
     /*
@@ -810,8 +811,8 @@ void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     }
 }
 
-void ToolkitFrame::OnImagePanelPaint(wxPaintEvent &event) {
-    wxPaintDC dc(_imagePanel);
+void ToolkitFrame::OnImageCanvasPaint(wxPaintEvent &event) {
+    wxPaintDC dc(_imageCanvas);
 
     if (!_image) {
         return;

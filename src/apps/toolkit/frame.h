@@ -73,7 +73,7 @@ private:
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
-    wxPanel *_imagePanel {nullptr};
+    wxSplitterWindow *_imageSplitter {nullptr};
     wxPanel *_renderPanel {nullptr};
 
     wxTextCtrl *_plainTextCtrl {nullptr};
@@ -83,6 +83,8 @@ private:
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxTextCtrl *_pcodeTextCtrl {nullptr};
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
+    wxPanel *_imageCanvas {nullptr};
+    wxTextCtrl *_imageInfoCtrl {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
 
     std::unique_ptr<wxBitmap> _image;
@@ -110,7 +112,7 @@ private:
 
     void OnPopupCommandSelected(wxCommandEvent &event);
 
-    void OnImagePanelPaint(wxPaintEvent &event);
+    void OnImageCanvasPaint(wxPaintEvent &event);
     void OnGLCanvasPaint(wxPaintEvent &event);
 
     // END Events
