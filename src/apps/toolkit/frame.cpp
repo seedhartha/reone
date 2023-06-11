@@ -18,8 +18,6 @@
 #include "frame.h"
 
 #include <wx/dirdlg.h>
-#include <wx/notebook.h>
-#include <wx/stc/stc.h>
 
 #include "reone/game/script/routines.h"
 #include "reone/resource/format/bifreader.h"
@@ -115,19 +113,18 @@ ToolkitFrame::ToolkitFrame() :
 
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
 
-    auto notebook = new wxNotebook(_splitter, wxID_ANY);
+    _notebook = new wxNotebook(_splitter, wxID_ANY);
 
-    auto textPanel = new wxPanel(notebook);
+    _textPanel = new wxPanel(_notebook);
     auto textSizer = new wxBoxSizer(wxVERTICAL);
-    _plainTextCtrl = new wxTextCtrl(textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _plainTextCtrl = new wxTextCtrl(_textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _plainTextCtrl->SetEditable(false);
     textSizer->Add(_plainTextCtrl, 1, wxEXPAND);
-    textPanel->SetSizer(textSizer);
-    notebook->InsertPage(0, textPanel, "Text");
+    _textPanel->SetSizer(textSizer);
 
-    auto xmlPanel = new wxPanel(notebook);
+    _xmlPanel = new wxPanel(_notebook);
     auto xmlSizer = new wxBoxSizer(wxVERTICAL);
-    _xmlTextCtrl = new wxStyledTextCtrl(xmlPanel);
+    _xmlTextCtrl = new wxStyledTextCtrl(_xmlPanel);
     _xmlTextCtrl->SetLexer(wxSTC_LEX_XML);
     _xmlTextCtrl->StyleSetForeground(wxSTC_H_XMLSTART, wxColour(255, 0, 0));
     _xmlTextCtrl->StyleSetBackground(wxSTC_H_XMLSTART, wxColour(255, 255, 0));
@@ -147,12 +144,11 @@ ToolkitFrame::ToolkitFrame() :
     _xmlTextCtrl->StyleSetForeground(wxSTC_H_CDATA, wxColour(255, 128, 0));
     _xmlTextCtrl->SetEditable(false);
     xmlSizer->Add(_xmlTextCtrl, 1, wxEXPAND);
-    xmlPanel->SetSizer(xmlSizer);
-    notebook->InsertPage(1, xmlPanel, "XML");
+    _xmlPanel->SetSizer(xmlSizer);
 
-    auto nssPanel = new wxPanel(notebook);
+    _nssPanel = new wxPanel(_notebook);
     auto nssSizer = new wxBoxSizer(wxVERTICAL);
-    _nssTextCtrl = new wxStyledTextCtrl(nssPanel);
+    _nssTextCtrl = new wxStyledTextCtrl(_nssPanel);
     _nssTextCtrl->SetEditable(false);
     _nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
     _nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
@@ -176,30 +172,33 @@ ToolkitFrame::ToolkitFrame() :
     _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
     _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENTDOC, wxColour(0, 128, 128));
     nssSizer->Add(_nssTextCtrl, 1, wxEXPAND);
-    nssPanel->SetSizer(nssSizer);
-    notebook->InsertPage(2, nssPanel, "NWScript Source");
+    _nssPanel->SetSizer(nssSizer);
 
-    auto pcodePanel = new wxPanel(notebook);
+    _pcodePanel = new wxPanel(_notebook);
     auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
-    _pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _pcodeTextCtrl = new wxTextCtrl(_pcodePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _pcodeTextCtrl->SetEditable(false);
     pcodeSizer->Add(_pcodeTextCtrl, 1, wxEXPAND);
-    pcodePanel->SetSizer(pcodeSizer);
-    notebook->InsertPage(3, pcodePanel, "Compiled NWScript");
+    _pcodePanel->SetSizer(pcodeSizer);
 
-    auto renderPanel = new wxPanel(notebook);
+    _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
     auto glAttributes = wxGLAttributes().Defaults();
     glAttributes.EndList();
-    //_glCanvas = new wxGLCanvas(renderPanel, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    //_glCanvas = new wxGLCanvas(_renderPanel, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     //_glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
     // auto glContext = new wxGLContext(_glCanvas);
     // glContext->SetCurrent(*_glCanvas);
     // renderSizer->Add(_glCanvas, 1, wxEXPAND);
-    renderPanel->SetSizer(renderSizer);
-    notebook->InsertPage(4, renderPanel, "3D");
+    _renderPanel->SetSizer(renderSizer);
 
-    _splitter->SplitVertically(dataSplitter, notebook, 1);
+    _splitter->SplitVertically(dataSplitter, _notebook, 1);
+
+    _textPanel->Hide();
+    _xmlPanel->Hide();
+    _nssPanel->Hide();
+    _pcodePanel->Hide();
+    _renderPanel->Hide();
 
     CreateStatusBar();
 }
@@ -464,6 +463,15 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
 }
 
 void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
+    while (_notebook->RemovePage(0))
+        ;
+
+    _textPanel->Hide();
+    _xmlPanel->Hide();
+    _nssPanel->Hide();
+    _pcodePanel->Hide();
+    _renderPanel->Hide();
+
     if (id.type == ResourceType::TwoDa) {
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
@@ -471,6 +479,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);
+        _notebook->AddPage(_xmlPanel, "XML");
+        _xmlPanel->Show();
+
     } else if (isGFFCompatibleResType(id.type)) {
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
@@ -478,6 +489,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);
+        _notebook->AddPage(_xmlPanel, "XML");
+        _xmlPanel->Show();
+
     } else if (id.type == ResourceType::Tlk) {
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
@@ -485,6 +499,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);
+        _notebook->AddPage(_xmlPanel, "XML");
+        _xmlPanel->Show();
+
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
@@ -495,6 +512,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _plainTextCtrl->Clear();
         _plainTextCtrl->AppendText(str);
         _plainTextCtrl->SetEditable(false);
+        _notebook->AddPage(_textPanel, "Text");
+        _textPanel->Show();
+
     } else if (id.type == ResourceType::Ncs) {
         auto gameId = GameID::KotOR;
         auto routines = make_unique<Routines>(gameId, nullptr, nullptr);
@@ -508,6 +528,8 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _pcodeTextCtrl->Clear();
         _pcodeTextCtrl->AppendText(*pcodeBytes);
         _pcodeTextCtrl->SetEditable(false);
+        _notebook->AddPage(_pcodePanel, "Compiled NWScript");
+        _pcodePanel->Show();
 
         data.seek(0, SeekOrigin::Begin);
         auto nssBytes = make_unique<ByteArray>();
@@ -516,6 +538,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(*nssBytes);
         _nssTextCtrl->SetEditable(false);
+        _notebook->AddPage(_nssPanel, "NWScript Source");
+        _nssPanel->Show();
+
     } else if (id.type == ResourceType::Nss) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
@@ -525,7 +550,14 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(str);
         _nssTextCtrl->SetEditable(false);
+        _notebook->AddPage(_nssPanel, "NWScript Source");
+        _nssPanel->Show();
     }
+
+    /*
+    _notebook->AddPage(_renderPanel, "3D");
+    _renderPanel->Show();
+    */
 }
 
 void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {

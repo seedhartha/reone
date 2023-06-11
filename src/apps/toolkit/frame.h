@@ -25,6 +25,7 @@
 
 #include <wx/dataview.h>
 #include <wx/glcanvas.h>
+#include <wx/notebook.h>
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
@@ -48,15 +49,6 @@ private:
         bool archived {false};
     };
 
-    wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
-    wxListBox *_modulesListBox {nullptr};
-    wxTextCtrl *_plainTextCtrl {nullptr};
-    wxStyledTextCtrl *_xmlTextCtrl {nullptr};
-    wxTextCtrl *_pcodeTextCtrl {nullptr};
-    wxStyledTextCtrl *_nssTextCtrl {nullptr};
-    wxGLCanvas *_glCanvas {nullptr};
-    wxSplitterWindow *_splitter {nullptr};
-
     boost::filesystem::path _gamePath;
     reone::game::GameID _gameId {reone::game::GameID::KotOR};
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
@@ -64,6 +56,28 @@ private:
     resource::Strings _strings;
 
     std::map<void *, FilesEntry> _files;
+
+    // Widgets
+
+    wxSplitterWindow *_splitter {nullptr};
+
+    wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
+    wxListBox *_modulesListBox {nullptr};
+    wxNotebook *_notebook {nullptr};
+
+    wxPanel *_textPanel {nullptr};
+    wxPanel *_xmlPanel {nullptr};
+    wxPanel *_nssPanel {nullptr};
+    wxPanel *_pcodePanel {nullptr};
+    wxPanel *_renderPanel {nullptr};
+
+    wxTextCtrl *_plainTextCtrl {nullptr};
+    wxStyledTextCtrl *_xmlTextCtrl {nullptr};
+    wxTextCtrl *_pcodeTextCtrl {nullptr};
+    wxStyledTextCtrl *_nssTextCtrl {nullptr};
+    wxGLCanvas *_glCanvas {nullptr};
+
+    // END Widgets
 
     void OpenFile(FilesEntry &entry);
     void OpenResource(resource::ResourceId &id, IInputStream &data);
