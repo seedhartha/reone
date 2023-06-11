@@ -27,11 +27,13 @@
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
+#include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
+#include "reone/system/hexutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
@@ -139,6 +141,13 @@ ToolkitFrame::ToolkitFrame() :
     tableSizer->Add(_tableCtrl, 1, wxEXPAND);
     _tablePanel->SetSizer(tableSizer);
 
+    _gffPanel = new wxPanel(_notebook);
+    auto gffSizer = new wxBoxSizer(wxVERTICAL);
+    _gffTreeCtrl = new wxDataViewTreeCtrl(_gffPanel, wxID_ANY);
+    _gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnGffTreeCtrlItemEditingDone, this);
+    gffSizer->Add(_gffTreeCtrl, 1, wxEXPAND);
+    _gffPanel->SetSizer(gffSizer);
+
     _xmlPanel = new wxPanel(_notebook);
     auto xmlSizer = new wxBoxSizer(wxVERTICAL);
     _xmlTextCtrl = new wxStyledTextCtrl(_xmlPanel);
@@ -216,6 +225,7 @@ ToolkitFrame::ToolkitFrame() :
 
     _textPanel->Hide();
     _tablePanel->Hide();
+    _gffPanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
@@ -494,6 +504,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
 
     _textPanel->Hide();
     _tablePanel->Hide();
+    _gffPanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
     _pcodePanel->Hide();
@@ -523,6 +534,15 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
+        _gffTreeCtrl->DeleteAllItems();
+        auto reader = GffReader();
+        reader.load(data);
+        auto root = reader.root();
+        AppendGffStructToTree(wxDataViewItem(), "/", *root);
+        _notebook->AddPage(_gffPanel, "GFF");
+        _gffPanel->Show();
+
+        /*
         auto xmlBytes = ByteArray();
         auto xml = ByteArrayOutputStream(xmlBytes);
         GffTool().toXML(data, xml, _strings);
@@ -531,6 +551,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(false);
         _notebook->AddPage(_xmlPanel, "XML");
         _xmlPanel->Show();
+        */
 
     } else if (id.type == ResourceType::Tlk) {
         _tableCtrl->ClearColumns();
@@ -666,7 +687,60 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     */
 }
 
+void ToolkitFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text, const Gff &gff) {
+    auto structItem = _gffTreeCtrl->AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
+    for (auto &field : gff.fields()) {
+        switch (field.type) {
+        case Gff::FieldType::CExoString:
+        case Gff::FieldType::ResRef:
+            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % field.strValue % static_cast<int>(field.type)));
+            break;
+        case Gff::FieldType::CExoLocString: {
+            auto locStringItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            _gffTreeCtrl->AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
+            _gffTreeCtrl->AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
+        } break;
+        case Gff::FieldType::Void:
+            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)));
+            break;
+        case Gff::FieldType::Struct:
+            AppendGffStructToTree(structItem, field.label, *field.children[0]);
+            break;
+        case Gff::FieldType::List: {
+            auto listItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            for (auto it = field.children.begin(); it != field.children.end(); ++it) {
+                auto childIdx = std::distance(field.children.begin(), it);
+                AppendGffStructToTree(listItem, to_string(childIdx), **it);
+            }
+        } break;
+        case Gff::FieldType::Orientation: {
+            auto orientationItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
+            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
+            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
+            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
+        } break;
+        case Gff::FieldType::Vector: {
+            auto vectorItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
+            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
+            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
+        } break;
+        case Gff::FieldType::StrRef:
+            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)));
+            break;
+        default:
+            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)));
+            break;
+        }
+    }
+}
+
 void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+    event.Veto();
+}
+
+void ToolkitFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
 }
 

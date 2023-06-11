@@ -177,7 +177,6 @@ string Gff::Field::toString() const {
     case FieldType::Double:
         return to_string(doubleValue);
     case FieldType::CExoString:
-        return strValue;
     case FieldType::ResRef:
         return strValue;
     default:

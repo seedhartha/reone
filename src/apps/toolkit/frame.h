@@ -31,6 +31,7 @@
 
 #include "reone/game/types.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/gff.h"
 #include "reone/resource/id.h"
 #include "reone/resource/strings.h"
 #include "reone/system/stream/input.h"
@@ -67,6 +68,7 @@ private:
 
     wxPanel *_textPanel {nullptr};
     wxPanel *_tablePanel {nullptr};
+    wxPanel *_gffPanel {nullptr};
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
@@ -75,6 +77,7 @@ private:
 
     wxTextCtrl *_plainTextCtrl {nullptr};
     wxDataViewListCtrl *_tableCtrl {nullptr};
+    wxDataViewTreeCtrl *_gffTreeCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxTextCtrl *_pcodeTextCtrl {nullptr};
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
@@ -87,6 +90,8 @@ private:
     void OpenFile(FilesEntry &entry);
     void OpenResource(resource::ResourceId &id, IInputStream &data);
 
+    void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
+
     // Events
 
     void OnOpenGameDirectoryMenu(wxCommandEvent &event);
@@ -98,6 +103,8 @@ private:
     void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
+
+    void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);
 
