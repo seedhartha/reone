@@ -40,10 +40,8 @@ public:
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
-    void toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi);
-
-private:
     void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi);
 };
 
 } // namespace reone

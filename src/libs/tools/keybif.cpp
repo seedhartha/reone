@@ -97,7 +97,7 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::files
         if (keyEntry.bifIdx != bifIdx) {
             continue;
         }
-        cout << "Extracting " + keyEntry.resId.string() << endl;
+        debug("Extracting " + keyEntry.resId.string());
 
         auto &bifResource = bifResources.at(keyEntry.resIdx);
         auto buffer = ByteArray(bifResource.fileSize, '\0');

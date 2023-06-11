@@ -79,6 +79,7 @@ static const set<ResourceType> kFilesPlaintextExtensions {
 
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
+    static constexpr int batchTpcToTga = wxID_HIGHEST + 2;
 };
 
 struct CommandID {
@@ -96,8 +97,11 @@ ToolkitFrame::ToolkitFrame() :
 
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
+    auto toolsMenu = new wxMenu();
+    toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch &convert TPC to TGA...");
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
+    menuBar->Append(toolsMenu, "&Tools");
     SetMenuBar(menuBar);
 
     _splitter = new wxSplitterWindow(this, wxID_ANY);
@@ -314,6 +318,27 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         _modulesListBox->AppendString(moduleName);
     }
     */
+}
+
+void ToolkitFrame::OnBatchConvertTpcToTga(wxCommandEvent &event) {
+    auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (srcDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto sourcePath = boost::filesystem::path((string)srcDirDialog->GetPath());
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto tool = TpcTool();
+    for (auto &file : boost::filesystem::directory_iterator(sourcePath)) {
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
+            continue;
+        }
+        tool.toTGA(file.path(), destPath);
+    }
 }
 
 void ToolkitFrame::OnSplitterSize(wxSizeEvent &event) {
@@ -833,8 +858,9 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
-wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                       //
-    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryMenu) //
+wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                        //
+    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryMenu)  //
+    EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTga) //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

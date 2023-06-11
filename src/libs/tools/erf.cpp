@@ -66,7 +66,7 @@ void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, co
     for (size_t i = 0; i < erf.keys().size(); ++i) {
         auto &key = erf.keys()[i];
         auto &erfResource = erf.resources()[i];
-        cout << "Extracting " << key.resId.string() << endl;
+        debug("Extracting " + key.resId.string());
 
         auto buffer = ByteArray(erfResource.size, '\0');
         auto erf = FileInputStream(erfPath, OpenMode::Binary);

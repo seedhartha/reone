@@ -66,7 +66,7 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
 
     for (size_t i = 0; i < rim.resources().size(); ++i) {
         auto &rimResource = rim.resources()[i];
-        cout << "Extracting " << rimResource.resId.string() << endl;
+        debug("Extracting " + rimResource.resId.string());
 
         auto buffer = ByteArray(rimResource.size, '\0');
         auto rim = FileInputStream(rimPath, OpenMode::Binary);

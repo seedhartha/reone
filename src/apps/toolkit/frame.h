@@ -99,6 +99,7 @@ private:
     // Events
 
     void OnOpenGameDirectoryMenu(wxCommandEvent &event);
+    void OnBatchConvertTpcToTga(wxCommandEvent &event);
 
     void OnSplitterSize(wxSizeEvent &event);
     void OnSplitterSashPosChanging(wxSplitterEvent &event);
