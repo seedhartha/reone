@@ -20,6 +20,9 @@
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
+#include "reone/audio/stream.h"
 #include "reone/game/format/ssfreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
@@ -52,6 +55,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -102,8 +106,14 @@ struct CommandID {
     static constexpr int extract = 1;
 };
 
-ToolkitFrame::ToolkitFrame() :
-    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
+struct TimerID {
+    static constexpr int audio = 1;
+};
+
+ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
+    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
+    _audioCtx(audioCtx),
+    _audioTimer(this, TimerID::audio) {
 
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
@@ -298,6 +308,8 @@ ToolkitFrame::ToolkitFrame() :
     _tools.push_back(make_shared<NcsTool>(GameID::KotOR));
 
     // CreateStatusBar();
+
+    _audioTimer.Start(1000 / 60);
 }
 
 void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
@@ -880,6 +892,14 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _image = make_unique<wxBitmap>(image);
         _notebook->AddPage(_imageSplitter, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
         _imageSplitter->Show();
+
+    } else if (id.type == ResourceType::Wav /* || id.type == ResourceType::Mp3 */) {
+        auto mp3ReaderFactory = Mp3ReaderFactory();
+        auto reader = WavReader(mp3ReaderFactory);
+        reader.load(data);
+        _audioSource = make_unique<AudioSource>(reader.stream(), false, 1.0f, false, glm::vec3());
+        _audioSource->init();
+        _audioSource->play();
     }
 
     /*
@@ -1017,6 +1037,12 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
+void ToolkitFrame::OnAudioTimer(wxTimerEvent &event) {
+    if (_audioSource) {
+        _audioSource->update();
+    }
+}
+
 wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
     EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTgaCommand) //
@@ -1035,6 +1061,7 @@ wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                      
     EVT_MENU(EventHandlerID::toPcodeTool, ToolkitFrame::OnToPcodeToolCommand)            //
     EVT_MENU(EventHandlerID::toNcsTool, ToolkitFrame::OnToNcsToolCommand)                //
     EVT_MENU(EventHandlerID::toNssTool, ToolkitFrame::OnToNssToolCommand)                //
+    EVT_TIMER(TimerID::audio, ToolkitFrame::OnAudioTimer)                                //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

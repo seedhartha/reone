@@ -29,6 +29,8 @@
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
+#include "reone/audio/context.h"
+#include "reone/audio/source.h"
 #include "reone/game/types.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
@@ -41,7 +43,7 @@ namespace reone {
 
 class ToolkitFrame : public wxFrame {
 public:
-    ToolkitFrame();
+    ToolkitFrame(audio::AudioContext &audioCtx);
 
 private:
     struct FilesEntry {
@@ -59,6 +61,9 @@ private:
 
     std::map<void *, FilesEntry> _files;
     std::vector<std::shared_ptr<Tool>> _tools;
+
+    audio::AudioContext &_audioCtx;
+    std::unique_ptr<audio::AudioSource> _audioSource;
 
     // Widgets
 
@@ -90,6 +95,8 @@ private:
     wxGLCanvas *_glCanvas {nullptr};
 
     std::unique_ptr<wxBitmap> _image;
+
+    wxTimer _audioTimer;
 
     // END Widgets
 
@@ -135,6 +142,8 @@ private:
 
     void OnImageCanvasPaint(wxPaintEvent &event);
     void OnGLCanvasPaint(wxPaintEvent &event);
+
+    void OnAudioTimer(wxTimerEvent &event);
 
     // END Events
 

@@ -23,11 +23,16 @@
 #include <wx/wx.h>
 #endif
 
+#include "reone/audio/context.h"
+
 namespace reone {
 
 class ToolkitApp : public wxApp {
 public:
     bool OnInit() override;
+
+private:
+    std::unique_ptr<audio::AudioContext> _audioCtx;
 };
 
 } // namespace reone

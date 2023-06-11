@@ -24,6 +24,8 @@
 
 using namespace std;
 
+using namespace reone::audio;
+
 namespace reone {
 
 bool ToolkitApp::OnInit() {
@@ -37,7 +39,10 @@ bool ToolkitApp::OnInit() {
 
     wxImage::AddHandler(new wxTGAHandler());
 
-    auto frame = new ToolkitFrame();
+    _audioCtx = make_unique<AudioContext>();
+    _audioCtx->init();
+
+    auto frame = new ToolkitFrame(*_audioCtx);
     frame->Show();
 
     return true;
