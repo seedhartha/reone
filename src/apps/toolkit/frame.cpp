@@ -708,13 +708,13 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
 
 void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     bool talkTableOpen = false;
-    bool audioOpen = false;
+    size_t audioPageIdx = -1;
     for (size_t i = 0; i < _notebook->GetPageCount(); ++i) {
         if (_notebook->GetPage(i) == _talkTablePanel) {
             talkTableOpen = true;
         }
         if (_notebook->GetPage(i) == _audioPanel && _audioSource && _audioSource->isPlaying()) {
-            audioOpen = true;
+            audioPageIdx = i;
         }
     }
     while (_notebook->GetPageCount() > 0) {
@@ -723,7 +723,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     if (talkTableOpen) {
         _notebook->AddPage(_talkTablePanel, "dialog.tlk");
     }
-    if (audioOpen) {
+    if (audioPageIdx != -1) {
         _notebook->AddPage(_audioPanel, _audioResId.string());
     }
 
@@ -917,7 +917,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             _audioTimer.Start(1000 / 60);
         }
         _audioResId = id;
-        if (!audioOpen) {
+        if (audioPageIdx != -1) {
+            _notebook->SetPageText(audioPageIdx, id.string());
+        } else {
             _notebook->AddPage(_audioPanel, id.string(), true);
         }
         _audioPanel->Show();
