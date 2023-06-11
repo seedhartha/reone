@@ -255,7 +255,8 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         void *itemId;
-        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveExtensions.count(filename) > 0) {
+        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
+            (file.status().type() == boost::filesystem::regular_file && kFilesArchiveExtensions.count(extension) > 0)) {
             auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
             itemId = item.GetID();
         } else if (file.status().type() == boost::filesystem::regular_file && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
