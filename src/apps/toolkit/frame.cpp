@@ -61,7 +61,7 @@ static constexpr char kIconName[] = "reone";
 static constexpr int kMinPanelWidth = 640;
 
 static const set<string> kFilesSubdirectoryWhitelist {
-    "data", "lips", "modules", "movies", "override", "rims", "saves", "texturepacks", //
+    "data", "lips", "localvault", "modules", "movies", "override", "rims", "saves", "texturepacks", //
     "streammusic", "streamsounds", "streamwaves", "streamvoice"};
 
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
@@ -821,7 +821,7 @@ void ToolkitFrame::OnImageCanvasPaint(wxPaintEvent &event) {
     dc.GetSize(&w, &h);
     int x = (w - _image->GetWidth()) / 2;
     int y = (h - _image->GetHeight()) / 2;
-    dc.DrawBitmap(*_image, x, y);
+    dc.DrawBitmap(*_image, x, y, true);
 }
 
 void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
