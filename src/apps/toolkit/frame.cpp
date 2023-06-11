@@ -621,14 +621,21 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
-        auto xmlBytes = ByteArray();
-        auto xml = ByteArrayOutputStream(xmlBytes);
-        SsfTool().toXML(data, xml);
-        _xmlTextCtrl->SetEditable(true);
-        _xmlTextCtrl->SetText(xmlBytes);
-        _xmlTextCtrl->SetEditable(false);
-        _notebook->AddPage(_xmlPanel, "XML");
-        _xmlPanel->Show();
+        _tableCtrl->ClearColumns();
+        _tableCtrl->DeleteAllItems();
+        auto reader = SsfReader();
+        reader.load(data);
+        auto &soundSet = reader.soundSet();
+        _tableCtrl->AppendTextColumn("Index");
+        _tableCtrl->AppendTextColumn("Sound");
+        for (size_t i = 0; i < soundSet.size(); ++i) {
+            auto values = wxVector<wxVariant>();
+            values.push_back(wxVariant(to_string(i)));
+            values.push_back(wxVariant(to_string(soundSet.at(i))));
+            _tableCtrl->AppendItem(values);
+        }
+        _notebook->AddPage(_tablePanel, "Table");
+        _tablePanel->Show();
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
         auto tgaBytes = make_unique<ByteArray>();
