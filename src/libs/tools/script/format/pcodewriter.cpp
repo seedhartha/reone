@@ -27,8 +27,7 @@ namespace reone {
 
 namespace script {
 
-void PcodeWriter::save(const boost::filesystem::path &path) {
-    boost::filesystem::ofstream pcode(path);
+void PcodeWriter::save(IOutputStream &pcode) {
     try {
         set<uint32_t> jumpOffsets;
         for (auto &instr : _program.instructions()) {
@@ -47,15 +46,15 @@ void PcodeWriter::save(const boost::filesystem::path &path) {
             writeInstruction(instr, pcode, jumpOffsets);
         }
     } catch (const exception &e) {
-        boost::filesystem::remove(path);
         throw runtime_error(e.what());
     }
 }
 
-void PcodeWriter::writeInstruction(const Instruction &ins, boost::filesystem::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
+void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode, const set<uint32_t> &jumpOffsets) {
     if (jumpOffsets.count(ins.offset) > 0) {
         string label(str(boost::format("loc_%08x:") % ins.offset));
-        pcode << label << endl;
+        pcode.write(label);
+        pcode.write("\n");
     }
 
     string desc(describeInstructionType(ins.type));
@@ -113,7 +112,8 @@ void PcodeWriter::writeInstruction(const Instruction &ins, boost::filesystem::of
         break;
     }
 
-    pcode << desc << endl;
+    pcode.write(desc);
+    pcode.write("\n");
 }
 
 } // namespace script

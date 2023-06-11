@@ -19,13 +19,13 @@
 
 #include <boost/regex.hpp>
 
+#include "reone/game/script/routines.h"
+#include "reone/script/format/ncsreader.h"
+#include "reone/script/format/ncswriter.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
-#include "reone/game/script/routines.h"
-#include "reone/script/format/ncsreader.h"
-#include "reone/script/format/ncswriter.h"
 
 #include "reone/tools/script/expressiontree.h"
 #include "reone/tools/script/format/nsswriter.h"
@@ -70,16 +70,21 @@ void NcsTool::invokeBatch(
 }
 
 void NcsTool::toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
-    auto stream = FileInputStream(input, OpenMode::Binary);
+    auto ncs = FileInputStream(input, OpenMode::Binary);
 
-    NcsReader ncs("");
-    ncs.load(stream);
-
-    boost::filesystem::path pcodePath(outputDir);
+    auto pcodePath = outputDir;
     pcodePath.append(input.filename().string() + ".pcode");
+    auto pcode = FileOutputStream(pcodePath, OpenMode::Text);
 
-    PcodeWriter pcode(*ncs.program(), routines);
-    pcode.save(pcodePath);
+    toPCODE(ncs, pcode, routines);
+}
+
+void NcsTool::toPCODE(IInputStream &ncs, IOutputStream &pcode, Routines &routines) {
+    auto reader = NcsReader("");
+    reader.load(ncs);
+
+    auto writer = PcodeWriter(*reader.program(), routines);
+    writer.save(pcode);
 }
 
 void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
@@ -98,18 +103,20 @@ void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesyste
 void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
     auto ncs = FileInputStream(input, OpenMode::Binary);
 
+    auto nssPath = outputDir;
+    nssPath.append(input.filename().string() + ".nss");
+    auto nss = FileOutputStream(nssPath, OpenMode::Text);
+
+    toNSS(ncs, nss, routines);
+}
+
+void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines) {
     auto reader = NcsReader("");
     reader.load(ncs);
 
-    auto compiledProgram = reader.program();
-    auto program = ExpressionTree::fromProgram(*compiledProgram, routines);
+    auto expressionTree = ExpressionTree::fromProgram(*reader.program(), routines);
 
-    auto nssPath = outputDir;
-    nssPath.append(input.filename().string() + ".nss");
-
-    auto nss = FileOutputStream(nssPath);
-
-    auto writer = NssWriter(program, routines);
+    auto writer = NssWriter(expressionTree, routines);
     writer.save(nss);
 }
 

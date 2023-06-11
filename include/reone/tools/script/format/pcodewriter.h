@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/script/program.h"
+#include "reone/system/stream/output.h"
 
 namespace reone {
 
@@ -32,13 +33,13 @@ public:
         _routines(routines) {
     }
 
-    void save(const boost::filesystem::path &path);
+    void save(IOutputStream &pcode);
 
 private:
     ScriptProgram &_program;
     IRoutines &_routines;
 
-    void writeInstruction(const Instruction &ins, boost::filesystem::ofstream &pcode, const std::set<uint32_t> &jumpOffsets);
+    void writeInstruction(const Instruction &ins, IOutputStream &pcode, const std::set<uint32_t> &jumpOffsets);
 };
 
 } // namespace script

@@ -21,6 +21,7 @@
 #include <wx/notebook.h>
 #include <wx/stc/stc.h>
 
+#include "reone/game/script/routines.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/keyreader.h"
@@ -34,11 +35,13 @@
 #include "reone/tools/erf.h"
 #include "reone/tools/gff.h"
 #include "reone/tools/keybif.h"
+#include "reone/tools/ncs.h"
 #include "reone/tools/rim.h"
 #include "reone/tools/tlk.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
@@ -61,8 +64,7 @@ static const set<ResourceType> kFilesPlaintextExtensions {
     ResourceType::Txt,
     ResourceType::Txi,
     ResourceType::Lyt,
-    ResourceType::Vis,
-    ResourceType::Nss};
+    ResourceType::Vis};
 
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
@@ -111,7 +113,6 @@ ToolkitFrame::ToolkitFrame() :
     modulesSizer->Add(_modulesListBox, 1, wxEXPAND);
     modulesPanel->SetSizer(modulesSizer);
 
-    dataSplitter->SetSashGravity(0.5);
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
 
     auto notebook = new wxNotebook(_splitter, wxID_ANY);
@@ -149,6 +150,43 @@ ToolkitFrame::ToolkitFrame() :
     xmlPanel->SetSizer(xmlSizer);
     notebook->InsertPage(1, xmlPanel, "XML");
 
+    auto nssPanel = new wxPanel(notebook);
+    auto nssSizer = new wxBoxSizer(wxVERTICAL);
+    _nssTextCtrl = new wxStyledTextCtrl(nssPanel);
+    _nssTextCtrl->SetEditable(false);
+    _nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
+    _nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
+    _nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object string struct talent vector void");
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSOR, wxColour(128, 64, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_DEFAULT, wxColour(0, 0, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_WORD, wxColour(0, 0, 255));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_WORD2, wxColour(128, 0, 255));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_NUMBER, wxColour(255, 128, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_STRING, wxColour(128, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_CHARACTER, wxColour(128, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_OPERATOR, wxColour(0, 0, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_VERBATIM, wxColour(0, 0, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_REGEX, wxColour(0, 0, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENT, wxColour(0, 128, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINE, wxColour(0, 128, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOC, wxColour(0, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINEDOC, wxColour(0, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
+    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENTDOC, wxColour(0, 128, 128));
+    nssSizer->Add(_nssTextCtrl, 1, wxEXPAND);
+    nssPanel->SetSizer(nssSizer);
+    notebook->InsertPage(2, nssPanel, "NWScript Source");
+
+    auto pcodePanel = new wxPanel(notebook);
+    auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
+    _pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _pcodeTextCtrl->SetEditable(false);
+    pcodeSizer->Add(_pcodeTextCtrl, 1, wxEXPAND);
+    pcodePanel->SetSizer(pcodeSizer);
+    notebook->InsertPage(3, pcodePanel, "Compiled NWScript");
+
     auto renderPanel = new wxPanel(notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
     auto glAttributes = wxGLAttributes().Defaults();
@@ -159,9 +197,9 @@ ToolkitFrame::ToolkitFrame() :
     // glContext->SetCurrent(*_glCanvas);
     // renderSizer->Add(_glCanvas, 1, wxEXPAND);
     renderPanel->SetSizer(renderSizer);
-    notebook->InsertPage(2, renderPanel, "3D");
+    notebook->InsertPage(4, renderPanel, "3D");
 
-    _splitter->SplitVertically(dataSplitter, notebook);
+    _splitter->SplitVertically(dataSplitter, notebook, 1);
 
     CreateStatusBar();
 }
@@ -179,6 +217,9 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         return;
     }
     _gamePath = gamePath;
+
+    auto tslExePath = getPathIgnoreCase(gamePath, "swkotor2.exe", false);
+    _gameId = !tslExePath.empty() ? GameID::TSL : GameID::KotOR;
 
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
@@ -454,6 +495,36 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _plainTextCtrl->Clear();
         _plainTextCtrl->AppendText(str);
         _plainTextCtrl->SetEditable(false);
+    } else if (id.type == ResourceType::Ncs) {
+        auto gameId = GameID::KotOR;
+        auto routines = make_unique<Routines>(gameId, nullptr, nullptr);
+        routines->init();
+
+        auto pcodeBytes = make_unique<ByteArray>();
+        auto pcode = ByteArrayOutputStream(*pcodeBytes);
+        auto tool = NcsTool(gameId);
+        tool.toPCODE(data, pcode, *routines);
+        _pcodeTextCtrl->SetEditable(true);
+        _pcodeTextCtrl->Clear();
+        _pcodeTextCtrl->AppendText(*pcodeBytes);
+        _pcodeTextCtrl->SetEditable(false);
+
+        data.seek(0, SeekOrigin::Begin);
+        auto nssBytes = make_unique<ByteArray>();
+        auto nss = ByteArrayOutputStream(*nssBytes);
+        tool.toNSS(data, nss, *routines);
+        _nssTextCtrl->SetEditable(true);
+        _nssTextCtrl->SetText(*nssBytes);
+        _nssTextCtrl->SetEditable(false);
+    } else if (id.type == ResourceType::Nss) {
+        data.seek(0, SeekOrigin::End);
+        auto length = data.position();
+        data.seek(0, SeekOrigin::Begin);
+        auto str = string(length, '\0');
+        data.read(&str[0], length);
+        _nssTextCtrl->SetEditable(true);
+        _nssTextCtrl->SetText(str);
+        _nssTextCtrl->SetEditable(false);
     }
 }
 

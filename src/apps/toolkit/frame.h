@@ -28,6 +28,7 @@
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
+#include "reone/game/types.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/id.h"
 #include "reone/resource/strings.h"
@@ -51,10 +52,13 @@ private:
     wxListBox *_modulesListBox {nullptr};
     wxTextCtrl *_plainTextCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
+    wxTextCtrl *_pcodeTextCtrl {nullptr};
+    wxStyledTextCtrl *_nssTextCtrl {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
     wxSplitterWindow *_splitter {nullptr};
 
     boost::filesystem::path _gamePath;
+    reone::game::GameID _gameId {reone::game::GameID::KotOR};
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
     resource::Strings _strings;

@@ -28,7 +28,7 @@ namespace reone {
 
 bool ToolkitApp::OnInit() {
     initLog();
-    setLogLevel(LogLevel::Debug);
+    setLogLevel(LogLevel::Info);
 
     if (argc > 1) {
         Program(argc, argv).run();

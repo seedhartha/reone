@@ -18,6 +18,8 @@
 #pragma once
 
 #include "reone/game/types.h"
+#include "reone/system/stream/input.h"
+#include "reone/system/stream/output.h"
 
 #include "tool.h"
 
@@ -48,6 +50,9 @@ public:
         const boost::filesystem::path &gamePath) override;
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
+
+    void toPCODE(IInputStream &ncs, IOutputStream &pcode, game::Routines &routines);
+    void toNSS(IInputStream &ncs, IOutputStream &nss, game::Routines &routines);
 
 private:
     game::GameID _gameId;
