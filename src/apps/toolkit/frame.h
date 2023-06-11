@@ -64,6 +64,7 @@ private:
 
     audio::AudioContext &_audioCtx;
     std::unique_ptr<audio::AudioSource> _audioSource;
+    resource::ResourceId _audioResId;
 
     // Widgets
 
@@ -82,6 +83,7 @@ private:
     wxPanel *_pcodePanel {nullptr};
     wxSplitterWindow *_imageSplitter {nullptr};
     wxPanel *_renderPanel {nullptr};
+    wxPanel *_audioPanel {nullptr};
 
     wxTextCtrl *_plainTextCtrl {nullptr};
     wxDataViewListCtrl *_tableCtrl {nullptr};
@@ -144,6 +146,7 @@ private:
     void OnGLCanvasPaint(wxPaintEvent &event);
 
     void OnAudioTimer(wxTimerEvent &event);
+    void OnStopAudioCommand(wxCommandEvent &event);
 
     // END Events
 

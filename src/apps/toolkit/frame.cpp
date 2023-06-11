@@ -282,6 +282,13 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     // renderSizer->Add(_glCanvas, 1, wxEXPAND);
     _renderPanel->SetSizer(renderSizer);
 
+    _audioPanel = new wxPanel(_notebook);
+    auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
+    stopAudioButton->Bind(wxEVT_BUTTON, &ToolkitFrame::OnStopAudioCommand, this);
+    auto audioSizer = new wxBoxSizer(wxVERTICAL);
+    audioSizer->Add(stopAudioButton);
+    _audioPanel->SetSizer(audioSizer);
+
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
     _textPanel->Hide();
@@ -293,6 +300,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _pcodePanel->Hide();
     _imageSplitter->Hide();
     _renderPanel->Hide();
+    _audioPanel->Hide();
 
     _tools.clear();
     _tools.push_back(make_shared<KeyBifTool>());
@@ -308,8 +316,6 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _tools.push_back(make_shared<NcsTool>(GameID::KotOR));
 
     // CreateStatusBar();
-
-    _audioTimer.Start(1000 / 60);
 }
 
 void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
@@ -702,10 +708,13 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
 
 void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     bool talkTableOpen = false;
+    bool audioOpen = false;
     for (size_t i = 0; i < _notebook->GetPageCount(); ++i) {
         if (_notebook->GetPage(i) == _talkTablePanel) {
             talkTableOpen = true;
-            break;
+        }
+        if (_notebook->GetPage(i) == _audioPanel) {
+            audioOpen = true;
         }
     }
     while (_notebook->GetPageCount() > 0) {
@@ -714,10 +723,12 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     if (talkTableOpen) {
         _notebook->AddPage(_talkTablePanel, "dialog.tlk");
     }
+    if (audioOpen) {
+        _notebook->AddPage(_audioPanel, _audioResId.string());
+    }
 
     _textPanel->Hide();
     _tablePanel->Hide();
-    _talkTablePanel->Hide();
     _gffPanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
@@ -744,7 +755,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             }
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.2da") % id.resRef), true);
+        _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
@@ -753,7 +764,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto root = reader.root();
         AppendGffStructToTree(wxDataViewItem(), "/", *root);
-        _notebook->AddPage(_gffPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
+        _notebook->AddPage(_gffPanel, id.string(), true);
         _gffPanel->Show();
 
     } else if (id.type == ResourceType::Tlk) {
@@ -776,7 +787,9 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
                 _talkTableCtrl->AppendItem(values);
             }
         }
-        _notebook->AddPage(_talkTablePanel, str(boost::format("%s.tlk") % id.resRef), true);
+        if (!talkTableOpen) {
+            _notebook->AddPage(_talkTablePanel, id.string(), true);
+        }
         _talkTablePanel->Show();
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
@@ -789,7 +802,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _plainTextCtrl->Clear();
         _plainTextCtrl->AppendText(text);
         _plainTextCtrl->SetEditable(false);
-        _notebook->AddPage(_textPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
+        _notebook->AddPage(_textPanel, id.string(), true);
         _textPanel->Show();
 
     } else if (id.type == ResourceType::Ncs) {
@@ -827,7 +840,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(text);
         _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef), true);
+        _notebook->AddPage(_nssPanel, id.string(), true);
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Lip) {
@@ -844,7 +857,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(kf.shape)));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.lip") % id.resRef), true);
+        _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
@@ -861,7 +874,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(soundSet.at(i))));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.ssf") % id.resRef), true);
+        _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
@@ -890,7 +903,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         auto image = wxImage();
         image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
         _image = make_unique<wxBitmap>(image);
-        _notebook->AddPage(_imageSplitter, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
+        _notebook->AddPage(_imageSplitter, id.string(), true);
         _imageSplitter->Show();
 
     } else if (id.type == ResourceType::Wav /* || id.type == ResourceType::Mp3 */) {
@@ -900,6 +913,14 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _audioSource = make_unique<AudioSource>(reader.stream(), false, 1.0f, false, glm::vec3());
         _audioSource->init();
         _audioSource->play();
+        if (!_audioTimer.IsRunning()) {
+            _audioTimer.Start(1000 / 60);
+        }
+        _audioResId = id;
+        if (!audioOpen) {
+            _notebook->AddPage(_audioPanel, id.string(), true);
+        }
+        _audioPanel->Show();
     }
 
     /*
@@ -1041,6 +1062,14 @@ void ToolkitFrame::OnAudioTimer(wxTimerEvent &event) {
     if (_audioSource) {
         _audioSource->update();
     }
+}
+
+void ToolkitFrame::OnStopAudioCommand(wxCommandEvent &event) {
+    if (_audioSource) {
+        _audioSource->stop();
+        _audioSource.reset();
+    }
+    _audioTimer.Stop();
 }
 
 wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
