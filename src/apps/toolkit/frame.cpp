@@ -48,18 +48,21 @@ static constexpr int kMinPanelWidth = 640;
 
 static const set<string> kFilesSubdirectoryWhitelist {
     "data", "lips", "modules", "movies", "override", "rims", "saves", "texturepacks", //
-    "streammusic", "streamsounds", "streamwaves", "streamvoice",                      //
-};
+    "streammusic", "streamsounds", "streamwaves", "streamvoice"};
 
-static const set<string> kFilesArchiveWhitelist {
-    ".bif", ".erf", ".sav", ".rim", ".mod" //
-};
+static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const set<string> kFilesRegularBlacklist {
-    ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico",                    //
-    ".zip", ".pdf",                                                    //
-    ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store" //
-};
+static const set<string> kFilesExtensionBlacklist {
+    ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
+    ".zip", ".pdf",                                 //
+    ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
+
+static const set<ResourceType> kFilesPlaintextExtensions {
+    ResourceType::Txt,
+    ResourceType::Txi,
+    ResourceType::Lyt,
+    ResourceType::Vis,
+    ResourceType::Nss};
 
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
@@ -113,6 +116,14 @@ ToolkitFrame::ToolkitFrame() :
 
     auto notebook = new wxNotebook(_splitter, wxID_ANY);
 
+    auto textPanel = new wxPanel(notebook);
+    auto textSizer = new wxBoxSizer(wxVERTICAL);
+    _plainTextCtrl = new wxTextCtrl(textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    _plainTextCtrl->SetEditable(false);
+    textSizer->Add(_plainTextCtrl, 1, wxEXPAND);
+    textPanel->SetSizer(textSizer);
+    notebook->InsertPage(0, textPanel, "Text");
+
     auto xmlPanel = new wxPanel(notebook);
     auto xmlSizer = new wxBoxSizer(wxVERTICAL);
     _xmlTextCtrl = new wxStyledTextCtrl(xmlPanel);
@@ -136,7 +147,7 @@ ToolkitFrame::ToolkitFrame() :
     _xmlTextCtrl->SetEditable(false);
     xmlSizer->Add(_xmlTextCtrl, 1, wxEXPAND);
     xmlPanel->SetSizer(xmlSizer);
-    notebook->InsertPage(0, xmlPanel, "XML");
+    notebook->InsertPage(1, xmlPanel, "XML");
 
     auto renderPanel = new wxPanel(notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
@@ -148,7 +159,7 @@ ToolkitFrame::ToolkitFrame() :
     // glContext->SetCurrent(*_glCanvas);
     // renderSizer->Add(_glCanvas, 1, wxEXPAND);
     renderPanel->SetSizer(renderSizer);
-    notebook->InsertPage(1, renderPanel, "3D");
+    notebook->InsertPage(2, renderPanel, "3D");
 
     _splitter->SplitVertically(dataSplitter, notebook);
 
@@ -182,10 +193,10 @@ void ToolkitFrame::OnOpenGameDirectoryMenu(wxCommandEvent &event) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         void *itemId;
-        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveWhitelist.count(filename) > 0) {
+        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) || kFilesArchiveExtensions.count(filename) > 0) {
             auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
             itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && (kFilesRegularBlacklist.count(extension) == 0 && extension != ".txt")) {
+        } else if (file.status().type() == boost::filesystem::regular_file && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
             auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
             itemId = item.GetID();
         } else {
@@ -241,10 +252,10 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
             auto extension = boost::to_lower_copy(file.path().extension().string());
             void *itemId;
-            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveWhitelist.count(extension) > 0) {
+            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveExtensions.count(extension) > 0) {
                 auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
                 itemId = item.GetID();
-            } else if (file.status().type() == boost::filesystem::regular_file && kFilesRegularBlacklist.count(extension) == 0) {
+            } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionBlacklist.count(extension) == 0) {
                 auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
                 itemId = item.GetID();
             } else {
@@ -332,7 +343,7 @@ void ToolkitFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     }
     auto &item = _files.at(itemId);
     auto extension = boost::to_lower_copy(item.path.extension().string());
-    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveWhitelist.count(extension) == 0) {
+    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveExtensions.count(extension) == 0) {
         return;
     }
     auto menu = wxMenu();
@@ -433,6 +444,16 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _xmlTextCtrl->SetEditable(true);
         _xmlTextCtrl->SetText(xmlBytes);
         _xmlTextCtrl->SetEditable(false);
+    } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
+        data.seek(0, SeekOrigin::End);
+        auto length = data.position();
+        data.seek(0, SeekOrigin::Begin);
+        auto str = string(length, '\0');
+        data.read(&str[0], length);
+        _plainTextCtrl->SetEditable(true);
+        _plainTextCtrl->Clear();
+        _plainTextCtrl->AppendText(str);
+        _plainTextCtrl->SetEditable(false);
     }
 }
 

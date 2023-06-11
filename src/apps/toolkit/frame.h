@@ -49,6 +49,7 @@ private:
 
     wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};
+    wxTextCtrl *_plainTextCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
     wxSplitterWindow *_splitter {nullptr};
