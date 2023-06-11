@@ -22,6 +22,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "tinyxml2.h"
 
@@ -58,18 +59,22 @@ void SsfTool::invokeBatch(
 }
 
 void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto stream = FileInputStream(path, OpenMode::Binary);
-
-    auto reader = SsfReader();
-    reader.load(stream);
-
-    auto soundSet = reader.soundSet();
+    auto ssf = FileInputStream(path, OpenMode::Binary);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
-    auto fp = fopen(xmlPath.string().c_str(), "wb");
+    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
 
-    auto printer = XMLPrinter(fp);
+    toXML(ssf, xml);
+}
+
+void SsfTool::toXML(IInputStream &ssf, IOutputStream &xml) {
+    auto reader = SsfReader();
+    reader.load(ssf);
+
+    auto soundSet = reader.soundSet();
+
+    auto printer = XMLPrinter();
     printer.PushHeader(false, true);
     printer.OpenElement("soundset");
     for (size_t i = 0; i < soundSet.size(); ++i) {
@@ -80,7 +85,7 @@ void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem
     }
     printer.CloseElement();
 
-    fclose(fp);
+    xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
 void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {

@@ -22,6 +22,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 
 #include "tinyxml2.h"
 
@@ -58,18 +59,22 @@ void LipTool::invokeBatch(
 }
 
 void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto stream = FileInputStream(path, OpenMode::Binary);
-
-    auto reader = LipReader("");
-    reader.load(stream);
-
-    auto animation = reader.animation();
+    auto lip = FileInputStream(path, OpenMode::Binary);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
-    auto fp = fopen(xmlPath.string().c_str(), "wb");
+    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
 
-    auto printer = XMLPrinter(fp);
+    toXML(lip, xml);
+}
+
+void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
+    auto reader = LipReader("");
+    reader.load(lip);
+
+    auto animation = reader.animation();
+
+    auto printer = XMLPrinter();
     printer.PushHeader(false, true);
     printer.OpenElement("animation");
     printer.PushAttribute("length", animation->length());
@@ -81,7 +86,7 @@ void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem
     }
     printer.CloseElement();
 
-    fclose(fp);
+    xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
 void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {

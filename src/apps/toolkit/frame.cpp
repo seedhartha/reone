@@ -33,8 +33,10 @@
 #include "reone/tools/erf.h"
 #include "reone/tools/gff.h"
 #include "reone/tools/keybif.h"
+#include "reone/tools/lip.h"
 #include "reone/tools/ncs.h"
 #include "reone/tools/rim.h"
+#include "reone/tools/ssf.h"
 #include "reone/tools/tlk.h"
 
 using namespace std;
@@ -555,6 +557,26 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(false);
         _notebook->AddPage(_nssPanel, "NWScript Source");
         _nssPanel->Show();
+
+    } else if (id.type == ResourceType::Lip) {
+        auto xmlBytes = ByteArray();
+        auto xml = ByteArrayOutputStream(xmlBytes);
+        LipTool().toXML(data, xml);
+        _xmlTextCtrl->SetEditable(true);
+        _xmlTextCtrl->SetText(xmlBytes);
+        _xmlTextCtrl->SetEditable(false);
+        _notebook->AddPage(_xmlPanel, "XML");
+        _xmlPanel->Show();
+
+    } else if (id.type == ResourceType::Ssf) {
+        auto xmlBytes = ByteArray();
+        auto xml = ByteArrayOutputStream(xmlBytes);
+        SsfTool().toXML(data, xml);
+        _xmlTextCtrl->SetEditable(true);
+        _xmlTextCtrl->SetText(xmlBytes);
+        _xmlTextCtrl->SetEditable(false);
+        _notebook->AddPage(_xmlPanel, "XML");
+        _xmlPanel->Show();
     }
 
     /*
