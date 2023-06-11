@@ -257,6 +257,7 @@ ToolkitFrame::ToolkitFrame() :
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
+    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
 
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
@@ -669,8 +670,19 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
 }
 
 void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
-    while (_notebook->RemovePage(0))
-        ;
+    bool talkTableOpen = false;
+    for (size_t i = 0; i < _notebook->GetPageCount(); ++i) {
+        if (_notebook->GetPage(i) == _talkTablePanel) {
+            talkTableOpen = true;
+            break;
+        }
+    }
+    while (_notebook->GetPageCount() > 0) {
+        _notebook->RemovePage(0);
+    }
+    if (talkTableOpen) {
+        _notebook->AddPage(_talkTablePanel, "dialog.tlk");
+    }
 
     _textPanel->Hide();
     _tablePanel->Hide();
@@ -701,7 +713,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             }
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.2da") % id.resRef));
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.2da") % id.resRef), true);
         _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
@@ -710,7 +722,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto root = reader.root();
         AppendGffStructToTree(wxDataViewItem(), "/", *root);
-        _notebook->AddPage(_gffPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
+        _notebook->AddPage(_gffPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
         _gffPanel->Show();
 
     } else if (id.type == ResourceType::Tlk) {
@@ -733,7 +745,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
                 _talkTableCtrl->AppendItem(values);
             }
         }
-        _notebook->AddPage(_talkTablePanel, str(boost::format("%s.tlk") % id.resRef));
+        _notebook->AddPage(_talkTablePanel, str(boost::format("%s.tlk") % id.resRef), true);
         _talkTablePanel->Show();
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
@@ -746,7 +758,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _plainTextCtrl->Clear();
         _plainTextCtrl->AppendText(text);
         _plainTextCtrl->SetEditable(false);
-        _notebook->AddPage(_textPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
+        _notebook->AddPage(_textPanel, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
         _textPanel->Show();
 
     } else if (id.type == ResourceType::Ncs) {
@@ -762,7 +774,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _pcodeTextCtrl->Clear();
         _pcodeTextCtrl->AppendText(*pcodeBytes);
         _pcodeTextCtrl->SetEditable(false);
-        _notebook->AddPage(_pcodePanel, str(boost::format("%s.pcode") % id.resRef));
+        _notebook->AddPage(_pcodePanel, str(boost::format("%s.pcode") % id.resRef), true);
         _pcodePanel->Show();
 
         data.seek(0, SeekOrigin::Begin);
@@ -772,7 +784,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(*nssBytes);
         _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef));
+        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef), true);
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Nss) {
@@ -784,7 +796,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(text);
         _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef));
+        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef), true);
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Lip) {
@@ -801,7 +813,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(kf.shape)));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.lip") % id.resRef));
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.lip") % id.resRef), true);
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
@@ -818,7 +830,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(soundSet.at(i))));
             _tableCtrl->AppendItem(values);
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.ssf") % id.resRef));
+        _notebook->AddPage(_tablePanel, str(boost::format("%s.ssf") % id.resRef), true);
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
@@ -847,7 +859,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         auto image = wxImage();
         image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
         _image = make_unique<wxBitmap>(image);
-        _notebook->AddPage(_imageSplitter, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)));
+        _notebook->AddPage(_imageSplitter, str(boost::format("%s.%s") % id.resRef % getExtByResType(id.type)), true);
         _imageSplitter->Show();
     }
 
