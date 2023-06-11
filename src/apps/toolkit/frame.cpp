@@ -81,20 +81,21 @@ static const set<ResourceType> kFilesPlaintextExtensions {
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 2;
-    static constexpr int unwrapTool = wxID_HIGHEST + 3;
-    static constexpr int toRimTool = wxID_HIGHEST + 4;
-    static constexpr int toErfTool = wxID_HIGHEST + 5;
-    static constexpr int toModTool = wxID_HIGHEST + 6;
-    static constexpr int toXmlTool = wxID_HIGHEST + 7;
-    static constexpr int toTwoDaTool = wxID_HIGHEST + 8;
-    static constexpr int toGffTool = wxID_HIGHEST + 9;
-    static constexpr int toTlkTool = wxID_HIGHEST + 10;
-    static constexpr int toLipTool = wxID_HIGHEST + 11;
-    static constexpr int toSsfTool = wxID_HIGHEST + 12;
-    static constexpr int toTgaTool = wxID_HIGHEST + 13;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 14;
-    static constexpr int toNcsTool = wxID_HIGHEST + 15;
-    static constexpr int toNssTool = wxID_HIGHEST + 16;
+    static constexpr int extractTool = wxID_HIGHEST + 3;
+    static constexpr int unwrapTool = wxID_HIGHEST + 4;
+    static constexpr int toRimTool = wxID_HIGHEST + 5;
+    static constexpr int toErfTool = wxID_HIGHEST + 6;
+    static constexpr int toModTool = wxID_HIGHEST + 7;
+    static constexpr int toXmlTool = wxID_HIGHEST + 8;
+    static constexpr int toTwoDaTool = wxID_HIGHEST + 9;
+    static constexpr int toGffTool = wxID_HIGHEST + 10;
+    static constexpr int toTlkTool = wxID_HIGHEST + 11;
+    static constexpr int toLipTool = wxID_HIGHEST + 12;
+    static constexpr int toSsfTool = wxID_HIGHEST + 13;
+    static constexpr int toTgaTool = wxID_HIGHEST + 14;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 15;
+    static constexpr int toNcsTool = wxID_HIGHEST + 16;
+    static constexpr int toNssTool = wxID_HIGHEST + 17;
 };
 
 struct CommandID {
@@ -115,6 +116,7 @@ ToolkitFrame::ToolkitFrame() :
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
     toolsMenu->AppendSeparator();
+    toolsMenu->Append(EventHandlerID::extractTool, "Extract BIF/RIM/ERF archive...");
     toolsMenu->Append(EventHandlerID::unwrapTool, "Unwrap WAV to WAV/MP3...");
     toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
     toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
@@ -282,6 +284,19 @@ ToolkitFrame::ToolkitFrame() :
     _imageSplitter->Hide();
     _renderPanel->Hide();
 
+    _tools.clear();
+    _tools.push_back(make_shared<KeyBifTool>());
+    _tools.push_back(make_shared<ErfTool>());
+    _tools.push_back(make_shared<RimTool>());
+    _tools.push_back(make_shared<TwoDaTool>());
+    _tools.push_back(make_shared<TlkTool>());
+    _tools.push_back(make_shared<LipTool>());
+    _tools.push_back(make_shared<SsfTool>());
+    _tools.push_back(make_shared<GffTool>());
+    _tools.push_back(make_shared<TpcTool>());
+    _tools.push_back(make_shared<AudioTool>());
+    _tools.push_back(make_shared<NcsTool>(GameID::KotOR));
+
     // CreateStatusBar();
 }
 
@@ -384,6 +399,10 @@ void ToolkitFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
         tool.toTGA(file.path(), destPath);
     }
     wxMessageBox("Operation completed successfully", "Success");
+}
+
+void ToolkitFrame::OnExtractToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::Extract);
 }
 
 void ToolkitFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
@@ -1001,6 +1020,7 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
 wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
     EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTgaCommand) //
+    EVT_MENU(EventHandlerID::extractTool, ToolkitFrame::OnExtractToolCommand)            //
     EVT_MENU(EventHandlerID::unwrapTool, ToolkitFrame::OnUnwrapToolCommand)              //
     EVT_MENU(EventHandlerID::toRimTool, ToolkitFrame::OnToRimToolCommand)                //
     EVT_MENU(EventHandlerID::toErfTool, ToolkitFrame::OnToErfToolCommand)                //

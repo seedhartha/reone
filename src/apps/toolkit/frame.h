@@ -105,6 +105,7 @@ private:
     void OnOpenGameDirectoryCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
 
+    void OnExtractToolCommand(wxCommandEvent &event);
     void OnUnwrapToolCommand(wxCommandEvent &event);
     void OnToRimToolCommand(wxCommandEvent &event);
     void OnToErfToolCommand(wxCommandEvent &event);
