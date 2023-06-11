@@ -68,6 +68,7 @@ private:
 
     wxPanel *_textPanel {nullptr};
     wxPanel *_tablePanel {nullptr};
+    wxPanel *_talkTablePanel {nullptr};
     wxPanel *_gffPanel {nullptr};
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
@@ -77,6 +78,7 @@ private:
 
     wxTextCtrl *_plainTextCtrl {nullptr};
     wxDataViewListCtrl *_tableCtrl {nullptr};
+    wxDataViewListCtrl *_talkTableCtrl {nullptr};
     wxDataViewTreeCtrl *_gffTreeCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxTextCtrl *_pcodeTextCtrl {nullptr};

@@ -145,6 +145,12 @@ ToolkitFrame::ToolkitFrame() :
     tableSizer->Add(_tableCtrl, 1, wxEXPAND);
     _tablePanel->SetSizer(tableSizer);
 
+    _talkTablePanel = new wxPanel(_notebook);
+    auto talkTableSizer = new wxBoxSizer(wxVERTICAL);
+    _talkTableCtrl = new wxDataViewListCtrl(_talkTablePanel, wxID_ANY);
+    talkTableSizer->Add(_talkTableCtrl, 1, wxEXPAND);
+    _talkTablePanel->SetSizer(talkTableSizer);
+
     _gffPanel = new wxPanel(_notebook);
     auto gffSizer = new wxBoxSizer(wxVERTICAL);
     _gffTreeCtrl = new wxDataViewTreeCtrl(_gffPanel, wxID_ANY);
@@ -229,6 +235,7 @@ ToolkitFrame::ToolkitFrame() :
 
     _textPanel->Hide();
     _tablePanel->Hide();
+    _talkTablePanel->Hide();
     _gffPanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
@@ -510,6 +517,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
 
     _textPanel->Hide();
     _tablePanel->Hide();
+    _talkTablePanel->Hide();
     _gffPanel->Hide();
     _xmlPanel->Hide();
     _nssPanel->Hide();
@@ -560,25 +568,27 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
         */
 
     } else if (id.type == ResourceType::Tlk) {
-        _tableCtrl->ClearColumns();
-        _tableCtrl->DeleteAllItems();
-        auto reader = TlkReader();
-        reader.load(data);
-        auto tlk = reader.table();
-        _tableCtrl->AppendTextColumn("Index");
-        _tableCtrl->AppendTextColumn("Text");
-        _tableCtrl->AppendTextColumn("Sound");
-        for (int i = 0; i < tlk->getStringCount(); ++i) {
-            auto &str = tlk->getString(i);
-            auto values = wxVector<wxVariant>();
-            auto cleaned = boost::replace_all_copy(str.text, "\n", "\\n");
-            values.push_back(wxVariant(to_string(i)));
-            values.push_back(wxVariant(cleaned));
-            values.push_back(wxVariant(str.soundResRef));
-            _tableCtrl->AppendItem(values);
+        if (_talkTableCtrl->GetItemCount() == 0) {
+            _talkTableCtrl->ClearColumns();
+            _talkTableCtrl->DeleteAllItems();
+            auto reader = TlkReader();
+            reader.load(data);
+            auto tlk = reader.table();
+            _talkTableCtrl->AppendTextColumn("Index");
+            _talkTableCtrl->AppendTextColumn("Text");
+            _talkTableCtrl->AppendTextColumn("Sound");
+            for (int i = 0; i < tlk->getStringCount(); ++i) {
+                auto &str = tlk->getString(i);
+                auto values = wxVector<wxVariant>();
+                auto cleaned = boost::replace_all_copy(str.text, "\n", "\\n");
+                values.push_back(wxVariant(to_string(i)));
+                values.push_back(wxVariant(cleaned));
+                values.push_back(wxVariant(str.soundResRef));
+                _talkTableCtrl->AppendItem(values);
+            }
         }
-        _notebook->AddPage(_tablePanel, str(boost::format("%s.tlk") % id.resRef));
-        _tablePanel->Show();
+        _notebook->AddPage(_talkTablePanel, str(boost::format("%s.tlk") % id.resRef));
+        _talkTablePanel->Show();
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
@@ -698,9 +708,10 @@ void ToolkitFrame::AppendGffStructToTree(wxDataViewItem parent, const string &te
     for (auto &field : gff.fields()) {
         switch (field.type) {
         case Gff::FieldType::CExoString:
-        case Gff::FieldType::ResRef:
-            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % field.strValue % static_cast<int>(field.type)));
-            break;
+        case Gff::FieldType::ResRef: {
+            auto cleaned = boost::replace_all_copy(field.strValue, "\n", "\\n");
+            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)));
+        } break;
         case Gff::FieldType::CExoLocString: {
             auto locStringItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
             _gffTreeCtrl->AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
