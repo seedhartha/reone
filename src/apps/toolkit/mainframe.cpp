@@ -419,14 +419,14 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto sourcePath = boost::filesystem::path((string)srcDirDialog->GetPath());
+    auto srcPath = boost::filesystem::path((string)srcDirDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
     auto tool = TpcTool();
-    for (auto &file : boost::filesystem::directory_iterator(sourcePath)) {
+    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
         auto extension = boost::to_lower_copy(file.path().extension().string());
         if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
             continue;
@@ -507,13 +507,13 @@ void MainFrame::InvokeTool(Operation operation) {
     if (srcFileDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto sourcePath = boost::filesystem::path((string)srcFileDialog->GetPath());
+    auto srcPath = boost::filesystem::path((string)srcFileDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    if (_viewModel->invokeTool(operation, sourcePath, destPath)) {
+    if (_viewModel->invokeTool(operation, srcPath, destPath)) {
         wxMessageBox("Operation completed successfully", "Success");
     } else {
         wxMessageBox("Tool not found", "Error", wxICON_ERROR);
