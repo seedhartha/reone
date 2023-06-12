@@ -301,19 +301,6 @@ MainFrame::MainFrame() :
     _renderPanel->Hide();
     _audioPanel->Hide();
 
-    _tools.clear();
-    _tools.push_back(make_shared<KeyBifTool>());
-    _tools.push_back(make_shared<ErfTool>());
-    _tools.push_back(make_shared<RimTool>());
-    _tools.push_back(make_shared<TwoDaTool>());
-    _tools.push_back(make_shared<TlkTool>());
-    _tools.push_back(make_shared<LipTool>());
-    _tools.push_back(make_shared<SsfTool>());
-    _tools.push_back(make_shared<GffTool>());
-    _tools.push_back(make_shared<TpcTool>());
-    _tools.push_back(make_shared<AudioTool>());
-    _tools.push_back(make_shared<NcsTool>(GameID::KotOR));
-
     _viewModel = make_unique<MainViewModel>();
     _viewModel->onViewCreated();
 
@@ -393,18 +380,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     }
     */
 
-    _tools.clear();
-    _tools.push_back(make_shared<KeyBifTool>());
-    _tools.push_back(make_shared<ErfTool>());
-    _tools.push_back(make_shared<RimTool>());
-    _tools.push_back(make_shared<TwoDaTool>());
-    _tools.push_back(make_shared<TlkTool>());
-    _tools.push_back(make_shared<LipTool>());
-    _tools.push_back(make_shared<SsfTool>());
-    _tools.push_back(make_shared<GffTool>());
-    _tools.push_back(make_shared<TpcTool>());
-    _tools.push_back(make_shared<AudioTool>());
-    _tools.push_back(make_shared<NcsTool>(_gameId));
+    _viewModel->onGameDirectoryChanged(_gamePath);
 }
 
 void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
@@ -537,15 +513,11 @@ void MainFrame::InvokeTool(Operation operation) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    for (auto &tool : _tools) {
-        if (!tool->supports(operation, sourcePath)) {
-            continue;
-        }
-        tool->invoke(operation, sourcePath, destPath, _gamePath);
+    if (_viewModel->invokeTool(operation, sourcePath, destPath)) {
         wxMessageBox("Operation completed successfully", "Success");
-        return;
+    } else {
+        wxMessageBox("Tool not found", "Error", wxICON_ERROR);
     }
-    wxMessageBox("Tool not found", "Error", wxICON_ERROR);
 }
 
 void MainFrame::OnSplitterSize(wxSizeEvent &event) {

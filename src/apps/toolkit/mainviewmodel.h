@@ -17,12 +17,29 @@
 
 #pragma once
 
+#include "reone/game/types.h"
+#include "reone/tools/tool.h"
+#include "reone/tools/types.h"
+
 namespace reone {
 
 class MainViewModel : boost::noncopyable {
 public:
+    bool invokeTool(Operation operation,
+                    const boost::filesystem::path &srcPath,
+                    const boost::filesystem::path &destPath);
+
     void onViewCreated();
     void onViewDestroyed();
+
+    void onGameDirectoryChanged(boost::filesystem::path path);
+
+private:
+    boost::filesystem::path _gamePath;
+    game::GameID _gameId {game::GameID::KotOR};
+    std::vector<std::shared_ptr<Tool>> _tools;
+
+    void reloadTools();
 };
 
 } // namespace reone

@@ -42,7 +42,6 @@
 #include "reone/resource/id.h"
 #include "reone/resource/strings.h"
 #include "reone/system/stream/input.h"
-#include "reone/tools/tool.h"
 
 #include "mainviewmodel.h"
 
@@ -70,7 +69,6 @@ private:
     resource::Strings _strings;
 
     std::map<void *, FilesEntry> _files;
-    std::vector<std::shared_ptr<Tool>> _tools;
 
     std::unique_ptr<audio::AudioSource> _audioSource;
     resource::ResourceId _audioResId;
