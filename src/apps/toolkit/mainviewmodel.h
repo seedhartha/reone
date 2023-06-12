@@ -40,6 +40,9 @@ public:
         bool archived {false};
     };
 
+    bool extractAllBifs(const boost::filesystem::path &destPath);
+    bool batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
+
     bool invokeTool(Operation operation,
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);

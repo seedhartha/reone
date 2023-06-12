@@ -895,25 +895,9 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    auto tool = KeyBifTool();
-
-    auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key");
-    auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
-
-    int bifIdx = 0;
-    for (auto &file : _keyFiles) {
-        auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
-        auto bifPath = getPathIgnoreCase(_viewModel->gamePath(), cleanedFilename);
-        if (bifPath.empty()) {
-            warn("BIF not found: " + bifPath.string());
-            continue;
-        }
-        tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
+    if (_viewModel->extractAllBifs(destPath)) {
+        wxMessageBox("Operation completed successfully", "Success");
     }
-
-    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
@@ -927,15 +911,9 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    auto tool = TpcTool();
-    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
-        auto extension = boost::to_lower_copy(file.path().extension().string());
-        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
-            continue;
-        }
-        tool.toTGA(file.path(), destPath);
+    if (_viewModel->batchConvertTpcToTga(srcPath, destPath)) {
+        wxMessageBox("Operation completed successfully", "Success");
     }
-    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {

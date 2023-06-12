@@ -101,6 +101,40 @@ void MainViewModel::loadTools() {
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
+bool MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
+    auto tool = KeyBifTool();
+
+    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto keyReader = KeyReader();
+    keyReader.load(key);
+
+    int bifIdx = 0;
+    for (auto &file : _keyFiles) {
+        auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
+        auto bifPath = getPathIgnoreCase(_gamePath, cleanedFilename);
+        if (bifPath.empty()) {
+            warn("BIF not found: " + bifPath.string());
+            continue;
+        }
+        tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
+    }
+
+    return true;
+}
+
+bool MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
+    auto tool = TpcTool();
+    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
+            continue;
+        }
+        tool.toTGA(file.path(), destPath);
+    }
+    return true;
+}
+
 bool MainViewModel::invokeTool(Operation operation,
                                const boost::filesystem::path &srcPath,
                                const boost::filesystem::path &destPath) {
