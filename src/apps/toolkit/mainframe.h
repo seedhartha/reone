@@ -44,11 +44,13 @@
 #include "reone/system/stream/input.h"
 #include "reone/tools/tool.h"
 
+#include "mainviewmodel.h"
+
 namespace reone {
 
-class ToolkitFrame : public wxFrame {
+class MainFrame : public wxFrame {
 public:
-    ToolkitFrame(audio::AudioContext &audioCtx);
+    MainFrame();
 
 private:
     struct FilesEntry {
@@ -57,6 +59,9 @@ private:
         bool loaded {false};
         bool archived {false};
     };
+
+    std::unique_ptr<MainViewModel> _viewModel;
+    std::unique_ptr<audio::AudioContext> _audioCtx;
 
     boost::filesystem::path _gamePath;
     reone::game::GameID _gameId {reone::game::GameID::KotOR};
@@ -67,7 +72,6 @@ private:
     std::map<void *, FilesEntry> _files;
     std::vector<std::shared_ptr<Tool>> _tools;
 
-    audio::AudioContext &_audioCtx;
     std::unique_ptr<audio::AudioSource> _audioSource;
     resource::ResourceId _audioResId;
 
@@ -115,6 +119,8 @@ private:
     void InvokeTool(Operation operation);
 
     // Events
+
+    void OnClose(wxCloseEvent &event);
 
     void OnOpenGameDirectoryCommand(wxCommandEvent &event);
     void OnExtractAllBifsCommand(wxCommandEvent &event);

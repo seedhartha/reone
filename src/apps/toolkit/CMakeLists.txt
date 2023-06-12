@@ -17,11 +17,13 @@ set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 
 set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/app.h
-    ${TOOLKIT_SOURCE_DIR}/frame.h)
+    ${TOOLKIT_SOURCE_DIR}/mainframe.h
+    ${TOOLKIT_SOURCE_DIR}/mainviewmodel.h)
 
 set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/app.cpp
-    ${TOOLKIT_SOURCE_DIR}/frame.cpp)
+    ${TOOLKIT_SOURCE_DIR}/mainframe.cpp
+    ${TOOLKIT_SOURCE_DIR}/mainviewmodel.cpp)
 
 if(WIN32)
     list(APPEND TOOLKIT_SOURCES ${CMAKE_SOURCE_DIR}/assets/reone.rc)

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "frame.h"
+#include "mainframe.h"
 
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
@@ -112,9 +112,8 @@ struct TimerID {
     static constexpr int audio = 1;
 };
 
-ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
+MainFrame::MainFrame() :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
-    _audioCtx(audioCtx),
     _audioTimer(this, TimerID::audio) {
 
 #ifdef _WIN32
@@ -150,8 +149,8 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     SetMenuBar(menuBar);
 
     _splitter = new wxSplitterWindow(this, wxID_ANY);
-    _splitter->Bind(wxEVT_SIZE, &ToolkitFrame::OnSplitterSize, this);
-    _splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, &ToolkitFrame::OnSplitterSashPosChanging, this);
+    _splitter->Bind(wxEVT_SIZE, &MainFrame::OnSplitterSize, this);
+    _splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, &MainFrame::OnSplitterSashPosChanging, this);
     _splitter->SetMinimumPaneSize(300);
 
     /*
@@ -161,10 +160,10 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
 
     auto filesPanel = new wxPanel(_splitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ToolkitFrame::OnFilesTreeCtrlItemExpanding, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ToolkitFrame::OnFilesTreeCtrlItemContextMenu, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ToolkitFrame::OnFilesTreeCtrlItemActivated, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnFilesTreeCtrlItemEditingDone, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &MainFrame::OnFilesTreeCtrlItemExpanding, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnFilesTreeCtrlItemContextMenu, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &MainFrame::OnFilesTreeCtrlItemActivated, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnFilesTreeCtrlItemEditingDone, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Files");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
@@ -203,7 +202,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _gffPanel = new wxPanel(_notebook);
     auto gffSizer = new wxBoxSizer(wxVERTICAL);
     _gffTreeCtrl = new wxDataViewTreeCtrl(_gffPanel, wxID_ANY);
-    _gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &ToolkitFrame::OnGffTreeCtrlItemEditingDone, this);
+    _gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnGffTreeCtrlItemEditingDone, this);
     gffSizer->Add(_gffTreeCtrl, 1, wxEXPAND);
     _gffPanel->SetSizer(gffSizer);
 
@@ -267,7 +266,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
 
     _imageSplitter = new wxSplitterWindow(_notebook, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _imageCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnImageCanvasPaint, this);
+    _imageCanvas->Bind(wxEVT_PAINT, &MainFrame::OnImageCanvasPaint, this);
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
@@ -276,7 +275,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
     _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
+    _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
     auto glContext = new wxGLContext(_glCanvas);
     glContext->SetCurrent(*_glCanvas);
     renderSizer->Add(_glCanvas, 1, wxEXPAND);
@@ -284,7 +283,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
 
     _audioPanel = new wxPanel(_notebook);
     auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
-    stopAudioButton->Bind(wxEVT_BUTTON, &ToolkitFrame::OnStopAudioCommand, this);
+    stopAudioButton->Bind(wxEVT_BUTTON, &MainFrame::OnStopAudioCommand, this);
     auto audioSizer = new wxBoxSizer(wxVERTICAL);
     audioSizer->Add(stopAudioButton);
     _audioPanel->SetSizer(audioSizer);
@@ -315,10 +314,21 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _tools.push_back(make_shared<AudioTool>());
     _tools.push_back(make_shared<NcsTool>(GameID::KotOR));
 
+    _viewModel = make_unique<MainViewModel>();
+    _viewModel->onViewCreated();
+
+    _audioCtx = make_unique<AudioContext>();
+    _audioCtx->init();
+
     // CreateStatusBar();
 }
 
-void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
+void MainFrame::OnClose(wxCloseEvent &event) {
+    Destroy();
+    _viewModel->onViewDestroyed();
+}
+
+void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog->ShowModal() != wxID_OK) {
         return;
@@ -397,7 +407,7 @@ void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
-void ToolkitFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
+void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     if (_gamePath.empty()) {
         wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
         return;
@@ -428,7 +438,7 @@ void ToolkitFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     wxMessageBox("Operation completed successfully", "Success");
 }
 
-void ToolkitFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
+void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
@@ -450,67 +460,67 @@ void ToolkitFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     wxMessageBox("Operation completed successfully", "Success");
 }
 
-void ToolkitFrame::OnExtractToolCommand(wxCommandEvent &event) {
+void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::Extract);
 }
 
-void ToolkitFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
+void MainFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::Unwrap);
 }
 
-void ToolkitFrame::OnToRimToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToRimToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToRIM);
 }
 
-void ToolkitFrame::OnToErfToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToErfToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToERF);
 }
 
-void ToolkitFrame::OnToModToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToModToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToMOD);
 }
 
-void ToolkitFrame::OnToXmlToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToXmlToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToXML);
 }
 
-void ToolkitFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::To2DA);
 }
 
-void ToolkitFrame::OnToGffToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToGffToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToGFF);
 }
 
-void ToolkitFrame::OnToTlkToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToTlkToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToTLK);
 }
 
-void ToolkitFrame::OnToLipToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToLipToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToLIP);
 }
 
-void ToolkitFrame::OnToSsfToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToSsfToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToSSF);
 }
 
-void ToolkitFrame::OnToTgaToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToTgaToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToTGA);
 }
 
-void ToolkitFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToPCODE);
 }
 
-void ToolkitFrame::OnToNcsToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToNcsToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToNCS);
 }
 
-void ToolkitFrame::OnToNssToolCommand(wxCommandEvent &event) {
+void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToNSS);
 }
 
-void ToolkitFrame::InvokeTool(Operation operation) {
+void MainFrame::InvokeTool(Operation operation) {
     auto srcFileDialog = new wxFileDialog(
         nullptr,
         "Choose source file",
@@ -538,7 +548,7 @@ void ToolkitFrame::InvokeTool(Operation operation) {
     wxMessageBox("Tool not found", "Error", wxICON_ERROR);
 }
 
-void ToolkitFrame::OnSplitterSize(wxSizeEvent &event) {
+void MainFrame::OnSplitterSize(wxSizeEvent &event) {
     int requestedPanelSize = event.GetSize().x - _splitter->GetSashSize() - _splitter->GetSashPosition();
     if (requestedPanelSize < kMinPanelWidth) {
         _splitter->SetSashPosition(event.GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
@@ -546,14 +556,14 @@ void ToolkitFrame::OnSplitterSize(wxSizeEvent &event) {
     event.Skip();
 }
 
-void ToolkitFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
+void MainFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
     int requestedPanelSize = _splitter->GetSize().x - _splitter->GetSashSize() - event.GetSashPosition();
     if (requestedPanelSize < kMinPanelWidth) {
         event.SetSashPosition(_splitter->GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
     }
 }
 
-void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
+void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
     auto &expandingItem = _files.at(expandingItemId);
     if (expandingItem.loaded) {
@@ -639,7 +649,7 @@ void ToolkitFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     expandingItem.loaded = true;
 }
 
-void ToolkitFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
+void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     if (_files.count(itemId) == 0) {
         return;
@@ -648,7 +658,7 @@ void ToolkitFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     OpenFile(item);
 }
 
-void ToolkitFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     if (_files.count(itemId) == 0) {
         return;
@@ -664,11 +674,11 @@ void ToolkitFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto menu = wxMenu();
     menu.Append(CommandID::extract, "Extract...");
     menu.SetClientData(&item);
-    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ToolkitFrame::OnPopupCommandSelected), nullptr, this);
+    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
     PopupMenu(&menu, event.GetPosition());
 }
 
-void ToolkitFrame::OpenFile(FilesEntry &entry) {
+void MainFrame::OpenFile(FilesEntry &entry) {
     if (!entry.resId) {
         return;
     }
@@ -737,7 +747,7 @@ void ToolkitFrame::OpenFile(FilesEntry &entry) {
     }
 }
 
-void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
+void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
     bool talkTableOpen = false;
     size_t audioPageIdx = -1;
     for (size_t i = 0; i < _notebook->GetPageCount(); ++i) {
@@ -966,7 +976,7 @@ void ToolkitFrame::OpenResource(ResourceId &id, IInputStream &data) {
     */
 }
 
-void ToolkitFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text, const Gff &gff) {
+void MainFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text, const Gff &gff) {
     auto structItem = _gffTreeCtrl->AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
     for (auto &field : gff.fields()) {
         switch (field.type) {
@@ -1016,15 +1026,15 @@ void ToolkitFrame::AppendGffStructToTree(wxDataViewItem parent, const string &te
     }
 }
 
-void ToolkitFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
 }
 
-void ToolkitFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
 }
 
-void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
+void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     if (event.GetId() == CommandID::extract) {
         auto menu = static_cast<wxMenu *>(event.GetEventObject());
         auto data = menu->GetClientData();
@@ -1073,7 +1083,7 @@ void ToolkitFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     }
 }
 
-void ToolkitFrame::OnImageCanvasPaint(wxPaintEvent &event) {
+void MainFrame::OnImageCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_imageCanvas);
 
     if (!_image) {
@@ -1086,7 +1096,7 @@ void ToolkitFrame::OnImageCanvasPaint(wxPaintEvent &event) {
     dc.DrawBitmap(*_image, x, y, true);
 }
 
-void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
+void MainFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_glCanvas);
 
     glViewport(0, 0, _glCanvas->GetClientSize().x, _glCanvas->GetClientSize().y);
@@ -1095,13 +1105,13 @@ void ToolkitFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
-void ToolkitFrame::OnAudioTimer(wxTimerEvent &event) {
+void MainFrame::OnAudioTimer(wxTimerEvent &event) {
     if (_audioSource) {
         _audioSource->update();
     }
 }
 
-void ToolkitFrame::OnStopAudioCommand(wxCommandEvent &event) {
+void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
     if (_audioSource) {
         _audioSource->stop();
         _audioSource.reset();
@@ -1109,26 +1119,27 @@ void ToolkitFrame::OnStopAudioCommand(wxCommandEvent &event) {
     _audioTimer.Stop();
 }
 
-wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
-    EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryCommand)      //
-    EVT_MENU(EventHandlerID::extractAllBifs, ToolkitFrame::OnExtractAllBifsCommand)      //
-    EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTgaCommand) //
-    EVT_MENU(EventHandlerID::extractTool, ToolkitFrame::OnExtractToolCommand)            //
-    EVT_MENU(EventHandlerID::unwrapTool, ToolkitFrame::OnUnwrapToolCommand)              //
-    EVT_MENU(EventHandlerID::toRimTool, ToolkitFrame::OnToRimToolCommand)                //
-    EVT_MENU(EventHandlerID::toErfTool, ToolkitFrame::OnToErfToolCommand)                //
-    EVT_MENU(EventHandlerID::toModTool, ToolkitFrame::OnToModToolCommand)                //
-    EVT_MENU(EventHandlerID::toXmlTool, ToolkitFrame::OnToXmlToolCommand)                //
-    EVT_MENU(EventHandlerID::toTwoDaTool, ToolkitFrame::OnToTwoDaToolCommand)            //
-    EVT_MENU(EventHandlerID::toGffTool, ToolkitFrame::OnToGffToolCommand)                //
-    EVT_MENU(EventHandlerID::toTlkTool, ToolkitFrame::OnToTlkToolCommand)                //
-    EVT_MENU(EventHandlerID::toLipTool, ToolkitFrame::OnToLipToolCommand)                //
-    EVT_MENU(EventHandlerID::toSsfTool, ToolkitFrame::OnToSsfToolCommand)                //
-    EVT_MENU(EventHandlerID::toTgaTool, ToolkitFrame::OnToTgaToolCommand)                //
-    EVT_MENU(EventHandlerID::toPcodeTool, ToolkitFrame::OnToPcodeToolCommand)            //
-    EVT_MENU(EventHandlerID::toNcsTool, ToolkitFrame::OnToNcsToolCommand)                //
-    EVT_MENU(EventHandlerID::toNssTool, ToolkitFrame::OnToNssToolCommand)                //
-    EVT_TIMER(TimerID::audio, ToolkitFrame::OnAudioTimer)                                //
+wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
+    EVT_CLOSE(MainFrame::OnClose)                                                     //
+    EVT_MENU(EventHandlerID::openGameDir, MainFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::extractAllBifs, MainFrame::OnExtractAllBifsCommand)      //
+    EVT_MENU(EventHandlerID::batchTpcToTga, MainFrame::OnBatchConvertTpcToTgaCommand) //
+    EVT_MENU(EventHandlerID::extractTool, MainFrame::OnExtractToolCommand)            //
+    EVT_MENU(EventHandlerID::unwrapTool, MainFrame::OnUnwrapToolCommand)              //
+    EVT_MENU(EventHandlerID::toRimTool, MainFrame::OnToRimToolCommand)                //
+    EVT_MENU(EventHandlerID::toErfTool, MainFrame::OnToErfToolCommand)                //
+    EVT_MENU(EventHandlerID::toModTool, MainFrame::OnToModToolCommand)                //
+    EVT_MENU(EventHandlerID::toXmlTool, MainFrame::OnToXmlToolCommand)                //
+    EVT_MENU(EventHandlerID::toTwoDaTool, MainFrame::OnToTwoDaToolCommand)            //
+    EVT_MENU(EventHandlerID::toGffTool, MainFrame::OnToGffToolCommand)                //
+    EVT_MENU(EventHandlerID::toTlkTool, MainFrame::OnToTlkToolCommand)                //
+    EVT_MENU(EventHandlerID::toLipTool, MainFrame::OnToLipToolCommand)                //
+    EVT_MENU(EventHandlerID::toSsfTool, MainFrame::OnToSsfToolCommand)                //
+    EVT_MENU(EventHandlerID::toTgaTool, MainFrame::OnToTgaToolCommand)                //
+    EVT_MENU(EventHandlerID::toPcodeTool, MainFrame::OnToPcodeToolCommand)            //
+    EVT_MENU(EventHandlerID::toNcsTool, MainFrame::OnToNcsToolCommand)                //
+    EVT_MENU(EventHandlerID::toNssTool, MainFrame::OnToNssToolCommand)                //
+    EVT_TIMER(TimerID::audio, MainFrame::OnAudioTimer)                                //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

@@ -15,28 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
-
-#include "reone/system/logutil.h"
-
-#include "mainframe.h"
-
-using namespace std;
+#pragma once
 
 namespace reone {
 
-bool ToolkitApp::OnInit() {
-    initLog();
-    setLogLevel(LogLevel::Info);
-
-    wxImage::AddHandler(new wxTGAHandler());
-
-    auto frame = new MainFrame();
-    frame->Show();
-
-    return true;
+class MainViewModel : boost::noncopyable {
+public:
+    void onViewCreated();
+    void onViewDestroyed();
 };
 
 } // namespace reone
-
-wxIMPLEMENT_APP(reone::ToolkitApp);
