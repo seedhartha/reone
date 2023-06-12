@@ -255,7 +255,6 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
     _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
     _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENTDOC, wxColour(0, 128, 128));
     nssSizer->Add(_nssTextCtrl, 1, wxEXPAND);
     _nssPanel->SetSizer(nssSizer);
 
@@ -276,13 +275,11 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
 
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
-    auto glAttributes = wxGLAttributes().Defaults();
-    glAttributes.EndList();
-    //_glCanvas = new wxGLCanvas(_renderPanel, glAttributes, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    //_glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
-    // auto glContext = new wxGLContext(_glCanvas);
-    // glContext->SetCurrent(*_glCanvas);
-    // renderSizer->Add(_glCanvas, 1, wxEXPAND);
+    _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    _glCanvas->Bind(wxEVT_PAINT, &ToolkitFrame::OnGLCanvasPaint, this);
+    auto glContext = new wxGLContext(_glCanvas);
+    glContext->SetCurrent(*_glCanvas);
+    renderSizer->Add(_glCanvas, 1, wxEXPAND);
     _renderPanel->SetSizer(renderSizer);
 
     _audioPanel = new wxPanel(_notebook);
