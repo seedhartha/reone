@@ -19,7 +19,6 @@
 
 #include "reone/system/logutil.h"
 
-#include "cli/program.h"
 #include "frame.h"
 
 using namespace std;
@@ -31,11 +30,6 @@ namespace reone {
 bool ToolkitApp::OnInit() {
     initLog();
     setLogLevel(LogLevel::Info);
-
-    if (argc > 1) {
-        Program(argc, argv).run();
-        return false;
-    }
 
     wxImage::AddHandler(new wxTGAHandler());
 
@@ -50,4 +44,4 @@ bool ToolkitApp::OnInit() {
 
 } // namespace reone
 
-wxIMPLEMENT_APP_CONSOLE(reone::ToolkitApp);
+wxIMPLEMENT_APP(reone::ToolkitApp);
