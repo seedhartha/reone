@@ -72,6 +72,7 @@ static const set<string> kFilesSubdirectoryWhitelist {
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
 static const set<string> kFilesExtensionBlacklist {
+    ".key",                                         //
     ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
