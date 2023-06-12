@@ -327,10 +327,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
         wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
         return;
     }
-    _gamePath = gamePath;
-
-    auto tslExePath = getPathIgnoreCase(gamePath, "swkotor2.exe", false);
-    _gameId = !tslExePath.empty() ? GameID::TSL : GameID::KotOR;
+    _viewModel->onGameDirectoryChanged(gamePath);
 
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
@@ -338,31 +335,24 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 
-    _strings.init(gamePath);
-
     _filesTreeCtrl->Freeze();
     _filesTreeCtrl->DeleteAllItems();
-    for (auto &file : boost::filesystem::directory_iterator(gamePath)) {
-        auto filename = boost::to_lower_copy(file.path().filename().string());
-        auto extension = boost::to_lower_copy(file.path().extension().string());
+    auto gameDirItems = _viewModel->gameDirItems();
+    for (size_t i = 0; i < gameDirItems.size(); ++i) {
+        auto &item = gameDirItems[i];
         void *itemId;
-        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
-            (file.status().type() == boost::filesystem::regular_file && kFilesArchiveExtensions.count(extension) > 0)) {
-            auto item = _filesTreeCtrl->AppendContainer(wxDataViewItem(), filename);
-            itemId = item.GetID();
-        } else if (file.status().type() == boost::filesystem::regular_file && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
-            auto item = _filesTreeCtrl->AppendItem(wxDataViewItem(), filename);
-            itemId = item.GetID();
+        if (item.container) {
+            auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
+            itemId = treeItem.GetID();
         } else {
-            continue;
+            auto treeItem = _filesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
+            itemId = treeItem.GetID();
         }
         auto entry = FilesEntry();
-        entry.path = file.path();
-        if (extension == ".tlk") {
-            auto resRef = filename.substr(0, filename.size() - 4);
-            entry.resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
-        }
+        entry.path = item.path;
+        entry.resId = item.resId;
         _files.insert(make_pair(itemId, std::move(entry)));
+        _viewModel->onGameDirectoryItemIdentified(i, itemId);
     }
     _filesTreeCtrl->Thaw();
 
@@ -381,12 +371,10 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
         _modulesListBox->AppendString(moduleName);
     }
     */
-
-    _viewModel->onGameDirectoryChanged(_gamePath);
 }
 
 void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
-    if (_gamePath.empty()) {
+    if (_viewModel->gamePath().empty()) {
         wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
         return;
     }
@@ -397,7 +385,7 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
     auto tool = KeyBifTool();
 
-    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+    auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key");
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
     keyReader.load(key);
@@ -405,7 +393,7 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
         auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
-        auto bifPath = getPathIgnoreCase(_gamePath, cleanedFilename);
+        auto bifPath = getPathIgnoreCase(_viewModel->gamePath(), cleanedFilename);
         if (bifPath.empty()) {
             warn("BIF not found: " + bifPath.string());
             continue;
@@ -1032,7 +1020,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
                 return;
             }
             auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+            auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key", false);
             auto keyReader = KeyReader();
             auto key = FileInputStream(keyPath, OpenMode::Binary);
             keyReader.load(key);

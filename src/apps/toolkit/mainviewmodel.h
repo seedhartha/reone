@@ -18,6 +18,8 @@
 #pragma once
 
 #include "reone/game/types.h"
+#include "reone/resource/format/keyreader.h"
+#include "reone/resource/id.h"
 #include "reone/tools/tool.h"
 #include "reone/tools/types.h"
 
@@ -25,21 +27,47 @@ namespace reone {
 
 class MainViewModel : boost::noncopyable {
 public:
+    typedef void *GameDirectoryItemId;
+
+    struct GameDirectoryItem {
+        GameDirectoryItemId id {nullptr};
+        GameDirectoryItemId parentId {nullptr};
+        std::string displayName;
+        boost::filesystem::path path;
+        std::shared_ptr<resource::ResourceId> resId;
+        bool container {false};
+        bool loaded {false};
+        bool archived {false};
+    };
+
     bool invokeTool(Operation operation,
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);
+
+    game::GameID gameId() const { return _gameId; }
+    const boost::filesystem::path &gamePath() const { return _gamePath; }
+    const std::vector<GameDirectoryItem> &gameDirItems() const { return _gameDirItems; }
 
     void onViewCreated();
     void onViewDestroyed();
 
     void onGameDirectoryChanged(boost::filesystem::path path);
+    void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
 
 private:
     boost::filesystem::path _gamePath;
     game::GameID _gameId {game::GameID::KotOR};
+
+    std::vector<resource::KeyReader::KeyEntry> _keyKeys;
+    std::vector<resource::KeyReader::FileEntry> _keyFiles;
+
+    std::vector<GameDirectoryItem> _gameDirItems;
+    std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
+
     std::vector<std::shared_ptr<Tool>> _tools;
 
-    void reloadTools();
+    void loadGameDirectory();
+    void loadTools();
 };
 
 } // namespace reone

@@ -40,7 +40,6 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/id.h"
-#include "reone/resource/strings.h"
 #include "reone/system/stream/input.h"
 
 #include "mainviewmodel.h"
@@ -54,7 +53,7 @@ public:
 private:
     struct FilesEntry {
         boost::filesystem::path path;
-        std::unique_ptr<resource::ResourceId> resId;
+        std::shared_ptr<resource::ResourceId> resId;
         bool loaded {false};
         bool archived {false};
     };
@@ -62,12 +61,8 @@ private:
     std::unique_ptr<MainViewModel> _viewModel;
     std::unique_ptr<audio::AudioContext> _audioCtx;
 
-    boost::filesystem::path _gamePath;
-    reone::game::GameID _gameId {reone::game::GameID::KotOR};
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
-    resource::Strings _strings;
-
     std::map<void *, FilesEntry> _files;
 
     std::unique_ptr<audio::AudioSource> _audioSource;
