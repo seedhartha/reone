@@ -806,47 +806,14 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto menu = static_cast<wxMenu *>(event.GetEventObject());
         auto itemId = menu->GetClientData();
         auto &item = _viewModel->gameDirItemById(itemId);
-        auto extension = boost::to_lower_copy(item.path.extension().string());
-        if (extension == ".bif") {
-            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-            if (dialog->ShowModal() != wxID_OK) {
-                return;
-            }
-            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key", false);
-            auto keyReader = KeyReader();
-            auto key = FileInputStream(keyPath, OpenMode::Binary);
-            keyReader.load(key);
-            auto filename = boost::to_lower_copy(item.path.filename().string());
-            auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
-                return boost::contains(boost::to_lower_copy(file.filename), filename);
-            });
-            if (maybeBif == keyReader.files().end()) {
-                return;
-            }
-            auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
-            KeyBifTool().extractBIF(keyReader, bifIdx, item.path, destPath);
-        } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-            if (dialog->ShowModal() != wxID_OK) {
-                return;
-            }
-            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto erf = FileInputStream(item.path, OpenMode::Binary);
-            auto erfReader = ErfReader();
-            erfReader.load(erf);
-            ErfTool().extract(erfReader, item.path, destPath);
-        } else if (extension == ".rim") {
-            auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-            if (dialog->ShowModal() != wxID_OK) {
-                return;
-            }
-            auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto rim = FileInputStream(item.path, OpenMode::Binary);
-            auto rimReader = RimReader();
-            rimReader.load(rim);
-            RimTool().extract(rimReader, item.path, destPath);
+
+        auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+        if (dialog->ShowModal() != wxID_OK) {
+            return;
         }
+        auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+
+        _viewModel->extractArchive(item.path, destPath);
     }
 }
 

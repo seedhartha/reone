@@ -101,6 +101,38 @@ void MainViewModel::loadTools() {
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
+bool MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
+    auto extension = boost::to_lower_copy(srcPath.extension().string());
+    if (extension == ".bif") {
+        auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+        auto keyReader = KeyReader();
+        auto key = FileInputStream(keyPath, OpenMode::Binary);
+        keyReader.load(key);
+        auto filename = boost::to_lower_copy(srcPath.filename().string());
+        auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
+            return boost::contains(boost::to_lower_copy(file.filename), filename);
+        });
+        if (maybeBif == keyReader.files().end()) {
+            return false;
+        }
+        auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
+        KeyBifTool().extractBIF(keyReader, bifIdx, srcPath, destPath);
+    } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+        auto erf = FileInputStream(srcPath, OpenMode::Binary);
+        auto erfReader = ErfReader();
+        erfReader.load(erf);
+        ErfTool().extract(erfReader, srcPath, destPath);
+    } else if (extension == ".rim") {
+        auto rim = FileInputStream(srcPath, OpenMode::Binary);
+        auto rimReader = RimReader();
+        rimReader.load(rim);
+        RimTool().extract(rimReader, srcPath, destPath);
+    } else {
+        return false;
+    }
+    return true;
+}
+
 bool MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
