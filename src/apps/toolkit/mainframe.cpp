@@ -340,6 +340,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
     _strings.init(gamePath);
 
+    _filesTreeCtrl->Freeze();
     _filesTreeCtrl->DeleteAllItems();
     for (auto &file : boost::filesystem::directory_iterator(gamePath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
@@ -363,6 +364,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
         }
         _files.insert(make_pair(itemId, std::move(entry)));
     }
+    _filesTreeCtrl->Thaw();
 
     /*
     _modulesListBox->Clear();
@@ -541,6 +543,7 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     if (expandingItem.loaded) {
         return;
     }
+    _filesTreeCtrl->Freeze();
     if (boost::filesystem::is_directory(expandingItem.path)) {
         for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
@@ -618,6 +621,7 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
             }
         }
     }
+    _filesTreeCtrl->Thaw();
     expandingItem.loaded = true;
 }
 
@@ -896,7 +900,7 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
             auto tga = ByteArrayOutputStream(*tgaBytes);
             auto txiBytes = make_unique<ByteArray>();
             auto txi = ByteArrayOutputStream(*txiBytes);
-            TpcTool().toTGA(data, tga, txi);
+            TpcTool().toTGA(data, tga, txi, false);
             if (txiBytes->empty()) {
                 _imageSplitter->Unsplit(_imageInfoCtrl);
             } else {

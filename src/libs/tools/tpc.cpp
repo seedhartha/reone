@@ -63,7 +63,7 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
     auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
     auto txiBytes = make_unique<ByteArray>();
     auto txiMemory = ByteArrayOutputStream(*txiBytes);
-    toTGA(tpc, tga, txiMemory);
+    toTGA(tpc, tga, txiMemory, true);
 
     if (!txiBytes->empty()) {
         auto txiPath = tgaPath;
@@ -74,12 +74,12 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
     }
 }
 
-void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi) {
+void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi, bool compress) {
     auto reader = TpcReader("", TextureUsage::GUI);
     reader.load(tpc);
 
     auto tgaWriter = TgaWriter(reader.texture());
-    tgaWriter.save(tga, true);
+    tgaWriter.save(tga, compress);
 
     if (!reader.txiData().empty()) {
         txi.write(reader.txiData().data(), reader.txiData().size());
