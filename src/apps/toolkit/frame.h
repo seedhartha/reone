@@ -29,9 +29,13 @@
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
+// Xlib conflict workaround
+#ifdef None
+#undef None
+#endif
+
 #include "reone/audio/context.h"
 #include "reone/audio/source.h"
-#include "reone/audio/stream.h"
 #include "reone/game/types.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"

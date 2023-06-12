@@ -17,13 +17,9 @@
 
 #pragma once
 
+#include "reone/audio/stream.h"
+
 namespace reone {
-
-namespace audio {
-
-class AudioStream;
-
-}
 
 namespace game {
 
@@ -1350,7 +1346,7 @@ struct PartySelectionContext {
 };
 
 typedef std::multimap<std::string, std::string> Visibility;
-typedef std::unordered_map<SoundSetEntry, std::shared_ptr<audio::AudioStream>> SoundSet;
+typedef std::unordered_map<SoundSetEntry, std::shared_ptr<reone::audio::AudioStream>> SoundSet;
 
 } // namespace game
 
