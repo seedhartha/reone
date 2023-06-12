@@ -85,22 +85,23 @@ static const set<ResourceType> kFilesPlaintextExtensions {
 
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
-    static constexpr int batchTpcToTga = wxID_HIGHEST + 2;
-    static constexpr int extractTool = wxID_HIGHEST + 3;
-    static constexpr int unwrapTool = wxID_HIGHEST + 4;
-    static constexpr int toRimTool = wxID_HIGHEST + 5;
-    static constexpr int toErfTool = wxID_HIGHEST + 6;
-    static constexpr int toModTool = wxID_HIGHEST + 7;
-    static constexpr int toXmlTool = wxID_HIGHEST + 8;
-    static constexpr int toTwoDaTool = wxID_HIGHEST + 9;
-    static constexpr int toGffTool = wxID_HIGHEST + 10;
-    static constexpr int toTlkTool = wxID_HIGHEST + 11;
-    static constexpr int toLipTool = wxID_HIGHEST + 12;
-    static constexpr int toSsfTool = wxID_HIGHEST + 13;
-    static constexpr int toTgaTool = wxID_HIGHEST + 14;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 15;
-    static constexpr int toNcsTool = wxID_HIGHEST + 16;
-    static constexpr int toNssTool = wxID_HIGHEST + 17;
+    static constexpr int extractAllBifs = wxID_HIGHEST + 2;
+    static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
+    static constexpr int extractTool = wxID_HIGHEST + 4;
+    static constexpr int unwrapTool = wxID_HIGHEST + 5;
+    static constexpr int toRimTool = wxID_HIGHEST + 6;
+    static constexpr int toErfTool = wxID_HIGHEST + 7;
+    static constexpr int toModTool = wxID_HIGHEST + 8;
+    static constexpr int toXmlTool = wxID_HIGHEST + 9;
+    static constexpr int toTwoDaTool = wxID_HIGHEST + 10;
+    static constexpr int toGffTool = wxID_HIGHEST + 11;
+    static constexpr int toTlkTool = wxID_HIGHEST + 12;
+    static constexpr int toLipTool = wxID_HIGHEST + 13;
+    static constexpr int toSsfTool = wxID_HIGHEST + 14;
+    static constexpr int toTgaTool = wxID_HIGHEST + 15;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 16;
+    static constexpr int toNcsTool = wxID_HIGHEST + 17;
+    static constexpr int toNssTool = wxID_HIGHEST + 18;
 };
 
 struct CommandID {
@@ -125,6 +126,7 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
     auto toolsMenu = new wxMenu();
+    toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
     toolsMenu->AppendSeparator();
     toolsMenu->Append(EventHandlerID::extractTool, "Extract BIF/RIM/ERF archive...");
@@ -396,6 +398,37 @@ void ToolkitFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<AudioTool>());
     _tools.push_back(make_shared<NcsTool>(_gameId));
+}
+
+void ToolkitFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
+    if (_gamePath.empty()) {
+        wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
+        return;
+    }
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto tool = KeyBifTool();
+
+    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto keyReader = KeyReader();
+    keyReader.load(key);
+
+    int bifIdx = 0;
+    for (auto &file : _keyFiles) {
+        auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
+        auto bifPath = getPathIgnoreCase(_gamePath, cleanedFilename);
+        if (bifPath.empty()) {
+            warn("BIF not found: " + bifPath.string());
+            continue;
+        }
+        tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
+    }
+
+    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void ToolkitFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
@@ -1081,6 +1114,7 @@ void ToolkitFrame::OnStopAudioCommand(wxCommandEvent &event) {
 
 wxBEGIN_EVENT_TABLE(ToolkitFrame, wxFrame)                                               //
     EVT_MENU(EventHandlerID::openGameDir, ToolkitFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::extractAllBifs, ToolkitFrame::OnExtractAllBifsCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, ToolkitFrame::OnBatchConvertTpcToTgaCommand) //
     EVT_MENU(EventHandlerID::extractTool, ToolkitFrame::OnExtractToolCommand)            //
     EVT_MENU(EventHandlerID::unwrapTool, ToolkitFrame::OnUnwrapToolCommand)              //

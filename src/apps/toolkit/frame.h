@@ -112,6 +112,7 @@ private:
     // Events
 
     void OnOpenGameDirectoryCommand(wxCommandEvent &event);
+    void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
 
     void OnExtractToolCommand(wxCommandEvent &event);
