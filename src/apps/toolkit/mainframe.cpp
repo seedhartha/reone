@@ -164,7 +164,7 @@ MainFrame::MainFrame() :
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnFilesTreeCtrlItemContextMenu, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &MainFrame::OnFilesTreeCtrlItemActivated, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnFilesTreeCtrlItemEditingDone, this);
-    auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Files");
+    auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Game Directory");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
 
