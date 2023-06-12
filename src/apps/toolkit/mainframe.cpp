@@ -754,6 +754,7 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
     _renderPanel->Hide();
 
     if (id.type == ResourceType::TwoDa) {
+        _tableCtrl->Freeze();
         _tableCtrl->ClearColumns();
         _tableCtrl->DeleteAllItems();
         auto reader = TwoDaReader();
@@ -772,20 +773,24 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
             }
             _tableCtrl->AppendItem(values);
         }
+        _tableCtrl->Thaw();
         _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
     } else if (isGFFCompatibleResType(id.type)) {
+        _gffTreeCtrl->Freeze();
         _gffTreeCtrl->DeleteAllItems();
         auto reader = GffReader();
         reader.load(data);
         auto root = reader.root();
         AppendGffStructToTree(wxDataViewItem(), "/", *root);
+        _gffTreeCtrl->Thaw();
         _notebook->AddPage(_gffPanel, id.string(), true);
         _gffPanel->Show();
 
     } else if (id.type == ResourceType::Tlk) {
         if (_talkTableCtrl->GetItemCount() == 0) {
+            _talkTableCtrl->Freeze();
             _talkTableCtrl->ClearColumns();
             _talkTableCtrl->DeleteAllItems();
             auto reader = TlkReader();
@@ -803,6 +808,7 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
                 values.push_back(wxVariant(str.soundResRef));
                 _talkTableCtrl->AppendItem(values);
             }
+            _talkTableCtrl->Thaw();
         }
         if (!talkTableOpen) {
             _notebook->AddPage(_talkTablePanel, id.string(), true);
@@ -861,6 +867,7 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
         _nssPanel->Show();
 
     } else if (id.type == ResourceType::Lip) {
+        _tableCtrl->Freeze();
         _tableCtrl->ClearColumns();
         _tableCtrl->DeleteAllItems();
         auto reader = LipReader("");
@@ -874,10 +881,12 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(kf.shape)));
             _tableCtrl->AppendItem(values);
         }
+        _tableCtrl->Thaw();
         _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
     } else if (id.type == ResourceType::Ssf) {
+        _tableCtrl->Freeze();
         _tableCtrl->ClearColumns();
         _tableCtrl->DeleteAllItems();
         auto reader = SsfReader();
@@ -891,6 +900,7 @@ void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
             values.push_back(wxVariant(to_string(soundSet.at(i))));
             _tableCtrl->AppendItem(values);
         }
+        _tableCtrl->Thaw();
         _notebook->AddPage(_tablePanel, id.string(), true);
         _tablePanel->Show();
 
