@@ -51,19 +51,11 @@ public:
     MainFrame();
 
 private:
-    struct FilesEntry {
-        boost::filesystem::path path;
-        std::shared_ptr<resource::ResourceId> resId;
-        bool loaded {false};
-        bool archived {false};
-    };
-
     std::unique_ptr<MainViewModel> _viewModel;
     std::unique_ptr<audio::AudioContext> _audioCtx;
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
-    std::map<void *, FilesEntry> _files;
 
     std::unique_ptr<audio::AudioSource> _audioSource;
     resource::ResourceId _audioResId;
@@ -104,7 +96,7 @@ private:
 
     // END Widgets
 
-    void OpenFile(FilesEntry &entry);
+    void OpenFile(MainViewModel::GameDirectoryItem &item);
     void OpenResource(resource::ResourceId &id, IInputStream &data);
 
     void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);

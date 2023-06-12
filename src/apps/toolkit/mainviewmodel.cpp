@@ -82,7 +82,7 @@ void MainViewModel::loadGameDirectory() {
             auto resRef = filename.substr(0, filename.size() - 4);
             item.resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
         }
-        _gameDirItems.push_back(item);
+        _gameDirItems.push_back(std::move(item));
     }
 }
 
@@ -114,6 +114,11 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
+MainViewModel::GameDirectoryItem &MainViewModel::getGameDirItemById(GameDirectoryItemId id) {
+    auto index = _idToGameDirItemIdx.at(id);
+    return _gameDirItems[index];
+}
+
 void MainViewModel::onViewCreated() {
     loadTools();
 }
@@ -130,7 +135,94 @@ void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
 
 void MainViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
     _gameDirItems[index].id = id;
-    _idToGameDirItem[id] = &_gameDirItems[index];
+    _idToGameDirItemIdx.insert(make_pair(id, index));
+}
+
+void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
+    if (_idToGameDirItemIdx.count(id) == 0) {
+        return;
+    }
+    auto expandingItemIdx = _idToGameDirItemIdx.at(id);
+    auto expandingItem = _gameDirItems[expandingItemIdx];
+    if (boost::filesystem::is_directory(expandingItem.path)) {
+        for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
+            auto filename = boost::to_lower_copy(file.path().filename().string());
+            auto extension = boost::to_lower_copy(file.path().extension().string());
+            bool container;
+            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveExtensions.count(extension) > 0) {
+                container = true;
+            } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionBlacklist.count(extension) == 0) {
+                container = false;
+            } else {
+                continue;
+            }
+            auto item = GameDirectoryItem();
+            item.parentId = expandingItem.id;
+            item.displayName = filename;
+            item.path = file.path();
+            if (!extension.empty()) {
+                auto resType = getResTypeByExt(extension.substr(1), false);
+                if (resType != ResourceType::Invalid) {
+                    auto resRef = filename.substr(0, filename.size() - 4);
+                    item.resId = make_shared<ResourceId>(resRef, resType);
+                }
+            }
+            item.container = container;
+            _gameDirItems.push_back(std::move(item));
+        }
+    } else {
+        auto extension = boost::to_lower_copy(expandingItem.path.extension().string());
+        if (boost::ends_with(extension, ".bif")) {
+            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(expandingItem.path.filename().string()));
+            auto maybeFile = std::find_if(_keyFiles.begin(), _keyFiles.end(), [&filename](auto &file) {
+                return boost::to_lower_copy(file.filename) == filename;
+            });
+            if (maybeFile != _keyFiles.end()) {
+                auto bifIdx = std::distance(_keyFiles.begin(), maybeFile);
+                for (auto &key : _keyKeys) {
+                    if (key.bifIdx != bifIdx) {
+                        continue;
+                    }
+                    auto item = GameDirectoryItem();
+                    item.parentId = expandingItem.id;
+                    item.displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                    item.path = expandingItem.path;
+                    item.resId = make_shared<ResourceId>(key.resId);
+                    item.archived = true;
+                    _gameDirItems.push_back(std::move(item));
+                }
+            }
+        } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
+            auto erf = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto erfReader = ErfReader();
+            erfReader.load(erf);
+            auto &keys = erfReader.keys();
+            for (auto &key : keys) {
+                auto item = GameDirectoryItem();
+                item.parentId = expandingItem.id;
+                item.displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                item.path = expandingItem.path;
+                item.resId = make_shared<ResourceId>(key.resId);
+                item.archived = true;
+                _gameDirItems.push_back(std::move(item));
+            }
+        } else if (boost::ends_with(extension, ".rim")) {
+            auto rim = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto rimReader = RimReader();
+            rimReader.load(rim);
+            auto &resources = rimReader.resources();
+            for (auto &resource : resources) {
+                auto item = GameDirectoryItem();
+                item.parentId = expandingItem.id;
+                item.displayName = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
+                item.path = expandingItem.path;
+                item.resId = make_shared<ResourceId>(resource.resId);
+                item.archived = true;
+                _gameDirItems.push_back(std::move(item));
+            }
+        }
+    }
+    expandingItem.loaded = true;
 }
 
 } // namespace reone

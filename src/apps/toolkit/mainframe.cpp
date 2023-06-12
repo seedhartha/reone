@@ -315,6 +315,21 @@ void MainFrame::OnClose(wxCloseEvent &event) {
     _viewModel->onViewDestroyed();
 }
 
+void MainFrame::OnSplitterSize(wxSizeEvent &event) {
+    int requestedPanelSize = event.GetSize().x - _splitter->GetSashSize() - _splitter->GetSashPosition();
+    if (requestedPanelSize < kMinPanelWidth) {
+        _splitter->SetSashPosition(event.GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
+    }
+    event.Skip();
+}
+
+void MainFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
+    int requestedPanelSize = _splitter->GetSize().x - _splitter->GetSashSize() - event.GetSashPosition();
+    if (requestedPanelSize < kMinPanelWidth) {
+        event.SetSashPosition(_splitter->GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
+    }
+}
+
 void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog->ShowModal() != wxID_OK) {
@@ -337,7 +352,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
     _filesTreeCtrl->Freeze();
     _filesTreeCtrl->DeleteAllItems();
-    auto gameDirItems = _viewModel->gameDirItems();
+    auto &gameDirItems = _viewModel->gameDirItems();
     for (size_t i = 0; i < gameDirItems.size(); ++i) {
         auto &item = gameDirItems[i];
         void *itemId;
@@ -348,10 +363,6 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
             auto treeItem = _filesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
             itemId = treeItem.GetID();
         }
-        auto entry = FilesEntry();
-        entry.path = item.path;
-        entry.resId = item.resId;
-        _files.insert(make_pair(itemId, std::move(entry)));
         _viewModel->onGameDirectoryItemIdentified(i, itemId);
     }
     _filesTreeCtrl->Thaw();
@@ -373,241 +384,29 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     */
 }
 
-void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
-    if (_viewModel->gamePath().empty()) {
-        wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
-        return;
-    }
-    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-    if (destDirDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    auto tool = KeyBifTool();
-
-    auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key");
-    auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
-
-    int bifIdx = 0;
-    for (auto &file : _keyFiles) {
-        auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
-        auto bifPath = getPathIgnoreCase(_viewModel->gamePath(), cleanedFilename);
-        if (bifPath.empty()) {
-            warn("BIF not found: " + bifPath.string());
-            continue;
-        }
-        tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
-    }
-
-    wxMessageBox("Operation completed successfully", "Success");
-}
-
-void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
-    auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-    if (srcDirDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto srcPath = boost::filesystem::path((string)srcDirDialog->GetPath());
-    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-    if (destDirDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    auto tool = TpcTool();
-    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
-        auto extension = boost::to_lower_copy(file.path().extension().string());
-        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
-            continue;
-        }
-        tool.toTGA(file.path(), destPath);
-    }
-    wxMessageBox("Operation completed successfully", "Success");
-}
-
-void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::Extract);
-}
-
-void MainFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::Unwrap);
-}
-
-void MainFrame::OnToRimToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToRIM);
-}
-
-void MainFrame::OnToErfToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToERF);
-}
-
-void MainFrame::OnToModToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToMOD);
-}
-
-void MainFrame::OnToXmlToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToXML);
-}
-
-void MainFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::To2DA);
-}
-
-void MainFrame::OnToGffToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToGFF);
-}
-
-void MainFrame::OnToTlkToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToTLK);
-}
-
-void MainFrame::OnToLipToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToLIP);
-}
-
-void MainFrame::OnToSsfToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToSSF);
-}
-
-void MainFrame::OnToTgaToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToTGA);
-}
-
-void MainFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToPCODE);
-}
-
-void MainFrame::OnToNcsToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToNCS);
-}
-
-void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToNSS);
-}
-
-void MainFrame::InvokeTool(Operation operation) {
-    auto srcFileDialog = new wxFileDialog(
-        nullptr,
-        "Choose source file",
-        "",
-        "",
-        wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
-        wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
-    if (srcFileDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto srcPath = boost::filesystem::path((string)srcFileDialog->GetPath());
-    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-    if (destDirDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    if (_viewModel->invokeTool(operation, srcPath, destPath)) {
-        wxMessageBox("Operation completed successfully", "Success");
-    } else {
-        wxMessageBox("Tool not found", "Error", wxICON_ERROR);
-    }
-}
-
-void MainFrame::OnSplitterSize(wxSizeEvent &event) {
-    int requestedPanelSize = event.GetSize().x - _splitter->GetSashSize() - _splitter->GetSashPosition();
-    if (requestedPanelSize < kMinPanelWidth) {
-        _splitter->SetSashPosition(event.GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
-    }
-    event.Skip();
-}
-
-void MainFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
-    int requestedPanelSize = _splitter->GetSize().x - _splitter->GetSashSize() - event.GetSashPosition();
-    if (requestedPanelSize < kMinPanelWidth) {
-        event.SetSashPosition(_splitter->GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
-    }
-}
-
 void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
-    auto &expandingItem = _files.at(expandingItemId);
+    auto expandingItem = _viewModel->getGameDirItemById(expandingItemId);
     if (expandingItem.loaded) {
         return;
     }
+    _viewModel->onGameDirectoryItemExpanding(expandingItemId);
     _filesTreeCtrl->Freeze();
-    if (boost::filesystem::is_directory(expandingItem.path)) {
-        for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
-            auto filename = boost::to_lower_copy(file.path().filename().string());
-            auto extension = boost::to_lower_copy(file.path().extension().string());
-            void *itemId;
-            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveExtensions.count(extension) > 0) {
-                auto item = _filesTreeCtrl->AppendContainer(event.GetItem(), filename);
-                itemId = item.GetID();
-            } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionBlacklist.count(extension) == 0) {
-                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), filename);
-                itemId = item.GetID();
-            } else {
-                continue;
-            }
-            auto entry = FilesEntry();
-            entry.path = file.path();
-            if (!extension.empty()) {
-                auto resType = getResTypeByExt(extension.substr(1), false);
-                if (resType != ResourceType::Invalid) {
-                    auto resRef = filename.substr(0, filename.size() - 4);
-                    entry.resId = make_unique<ResourceId>(resRef, resType);
-                }
-            }
-            _files.insert(make_pair(itemId, std::move(entry)));
+    auto &gameDirItems = _viewModel->gameDirItems();
+    for (size_t i = 0; i < gameDirItems.size(); ++i) {
+        auto &item = gameDirItems[i];
+        if (item.id || item.parentId != expandingItemId) {
+            continue;
         }
-    } else {
-        auto extension = boost::to_lower_copy(expandingItem.path.extension().string());
-        if (boost::ends_with(extension, ".bif")) {
-            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(expandingItem.path.filename().string()));
-            auto maybeFile = std::find_if(_keyFiles.begin(), _keyFiles.end(), [&filename](auto &file) {
-                return boost::to_lower_copy(file.filename) == filename;
-            });
-            if (maybeFile != _keyFiles.end()) {
-                auto bifIdx = std::distance(_keyFiles.begin(), maybeFile);
-                for (auto &key : _keyKeys) {
-                    if (key.bifIdx != bifIdx) {
-                        continue;
-                    }
-                    auto itemText = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
-                    auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
-                    auto entry = FilesEntry();
-                    entry.path = expandingItem.path;
-                    entry.resId = make_unique<ResourceId>(key.resId);
-                    entry.archived = true;
-                    _files.insert(make_pair(item.GetID(), std::move(entry)));
-                }
-            }
-        } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
-            auto erf = FileInputStream(expandingItem.path, OpenMode::Binary);
-            auto erfReader = ErfReader();
-            erfReader.load(erf);
-            auto &keys = erfReader.keys();
-            for (auto &key : keys) {
-                auto itemText = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
-                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
-                auto entry = FilesEntry();
-                entry.path = expandingItem.path;
-                entry.resId = make_unique<ResourceId>(key.resId);
-                entry.archived = true;
-                _files.insert(make_pair(item.GetID(), std::move(entry)));
-            }
-        } else if (boost::ends_with(extension, ".rim")) {
-            auto rim = FileInputStream(expandingItem.path, OpenMode::Binary);
-            auto rimReader = RimReader();
-            rimReader.load(rim);
-            auto &resources = rimReader.resources();
-            for (auto &resource : resources) {
-                auto itemText = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
-                auto item = _filesTreeCtrl->AppendItem(event.GetItem(), itemText);
-                auto entry = FilesEntry();
-                entry.path = expandingItem.path;
-                entry.resId = make_unique<ResourceId>(resource.resId);
-                entry.archived = true;
-                _files.insert(make_pair(item.GetID(), std::move(entry)));
-            }
+        void *itemId;
+        if (item.container) {
+            auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(expandingItemId), item.displayName);
+            itemId = treeItem.GetID();
+        } else {
+            auto treeItem = _filesTreeCtrl->AppendItem(wxDataViewItem(expandingItemId), item.displayName);
+            itemId = treeItem.GetID();
         }
+        _viewModel->onGameDirectoryItemIdentified(i, itemId);
     }
     _filesTreeCtrl->Thaw();
     expandingItem.loaded = true;
@@ -615,48 +414,25 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    if (_files.count(itemId) == 0) {
-        return;
-    }
-    auto &item = _files.at(itemId);
+    auto item = _viewModel->getGameDirItemById(itemId);
     OpenFile(item);
 }
 
-void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
-    auto itemId = event.GetItem().GetID();
-    if (_files.count(itemId) == 0) {
+void MainFrame::OpenFile(MainViewModel::GameDirectoryItem &item) {
+    if (!item.resId) {
         return;
     }
-    auto &item = _files.at(itemId);
     if (item.archived) {
-        return;
-    }
-    auto extension = boost::to_lower_copy(item.path.extension().string());
-    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveExtensions.count(extension) == 0) {
-        return;
-    }
-    auto menu = wxMenu();
-    menu.Append(CommandID::extract, "Extract...");
-    menu.SetClientData(&item);
-    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
-    PopupMenu(&menu, event.GetPosition());
-}
-
-void MainFrame::OpenFile(FilesEntry &entry) {
-    if (!entry.resId) {
-        return;
-    }
-    if (entry.archived) {
-        auto extension = boost::to_lower_copy(entry.path.extension().string());
+        auto extension = boost::to_lower_copy(item.path.extension().string());
         if (extension == ".bif") {
-            auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&entry](auto &key) {
-                return key.resId == *entry.resId;
+            auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&item](auto &key) {
+                return key.resId == *item.resId;
             });
             if (maybeKey == _keyKeys.end()) {
                 return;
             }
             auto resIdx = maybeKey->resIdx;
-            auto bif = FileInputStream(entry.path, OpenMode::Binary);
+            auto bif = FileInputStream(item.path, OpenMode::Binary);
             auto bifReader = BifReader();
             bifReader.load(bif);
             if (bifReader.resources().size() <= resIdx) {
@@ -668,13 +444,13 @@ void MainFrame::OpenFile(FilesEntry &entry) {
             bif.seek(bifEntry.offset, SeekOrigin::Begin);
             bif.read(&(*resBytes)[0], bifEntry.fileSize);
             auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*entry.resId, res);
+            OpenResource(*item.resId, res);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-            auto erf = FileInputStream(entry.path, OpenMode::Binary);
+            auto erf = FileInputStream(item.path, OpenMode::Binary);
             auto erfReader = ErfReader();
             erfReader.load(erf);
-            auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&entry](auto &key) {
-                return key.resId == *entry.resId;
+            auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&item](auto &key) {
+                return key.resId == *item.resId;
             });
             if (maybeKey == erfReader.keys().end()) {
                 return;
@@ -686,13 +462,13 @@ void MainFrame::OpenFile(FilesEntry &entry) {
             erf.seek(erfEntry.offset, SeekOrigin::Begin);
             erf.read(&(*resBytes)[0], erfEntry.size);
             auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*entry.resId, res);
+            OpenResource(*item.resId, res);
         } else if (extension == ".rim") {
-            auto rim = FileInputStream(entry.path, OpenMode::Binary);
+            auto rim = FileInputStream(item.path, OpenMode::Binary);
             auto rimReader = RimReader();
             rimReader.load(rim);
-            auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&entry](auto &res) {
-                return res.resId == *entry.resId;
+            auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&item](auto &res) {
+                return res.resId == *item.resId;
             });
             if (maybeRes == rimReader.resources().end()) {
                 return;
@@ -703,11 +479,11 @@ void MainFrame::OpenFile(FilesEntry &entry) {
             rim.seek(rimRes.offset, SeekOrigin::Begin);
             rim.read(&(*resBytes)[0], rimRes.size);
             auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*entry.resId, res);
+            OpenResource(*item.resId, res);
         }
     } else {
-        auto res = FileInputStream(entry.path, OpenMode::Binary);
-        OpenResource(*entry.resId, res);
+        auto res = FileInputStream(item.path, OpenMode::Binary);
+        OpenResource(*item.resId, res);
     }
 }
 
@@ -1000,6 +776,23 @@ void MainFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text,
     }
 }
 
+void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+    auto itemId = event.GetItem().GetID();
+    auto item = _viewModel->getGameDirItemById(itemId);
+    if (item.archived) {
+        return;
+    }
+    auto extension = boost::to_lower_copy(item.path.extension().string());
+    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveExtensions.count(extension) == 0) {
+        return;
+    }
+    auto menu = wxMenu();
+    menu.Append(CommandID::extract, "Extract...");
+    menu.SetClientData(itemId);
+    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
+    PopupMenu(&menu, event.GetPosition());
+}
+
 void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
 }
@@ -1011,9 +804,9 @@ void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
 void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     if (event.GetId() == CommandID::extract) {
         auto menu = static_cast<wxMenu *>(event.GetEventObject());
-        auto data = menu->GetClientData();
-        auto entry = reinterpret_cast<FilesEntry *>(data);
-        auto extension = boost::to_lower_copy(entry->path.extension().string());
+        auto itemId = menu->GetClientData();
+        auto item = _viewModel->getGameDirItemById(itemId);
+        auto extension = boost::to_lower_copy(item.path.extension().string());
         if (extension == ".bif") {
             auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
             if (dialog->ShowModal() != wxID_OK) {
@@ -1024,7 +817,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
             auto keyReader = KeyReader();
             auto key = FileInputStream(keyPath, OpenMode::Binary);
             keyReader.load(key);
-            auto filename = boost::to_lower_copy(entry->path.filename().string());
+            auto filename = boost::to_lower_copy(item.path.filename().string());
             auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
                 return boost::contains(boost::to_lower_copy(file.filename), filename);
             });
@@ -1032,27 +825,27 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
                 return;
             }
             auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
-            KeyBifTool().extractBIF(keyReader, bifIdx, entry->path, destPath);
+            KeyBifTool().extractBIF(keyReader, bifIdx, item.path, destPath);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
             auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
             if (dialog->ShowModal() != wxID_OK) {
                 return;
             }
             auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto erf = FileInputStream(entry->path, OpenMode::Binary);
+            auto erf = FileInputStream(item.path, OpenMode::Binary);
             auto erfReader = ErfReader();
             erfReader.load(erf);
-            ErfTool().extract(erfReader, entry->path, destPath);
+            ErfTool().extract(erfReader, item.path, destPath);
         } else if (extension == ".rim") {
             auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
             if (dialog->ShowModal() != wxID_OK) {
                 return;
             }
             auto destPath = boost::filesystem::path(string(dialog->GetPath()));
-            auto rim = FileInputStream(entry->path, OpenMode::Binary);
+            auto rim = FileInputStream(item.path, OpenMode::Binary);
             auto rimReader = RimReader();
             rimReader.load(rim);
-            RimTool().extract(rimReader, entry->path, destPath);
+            RimTool().extract(rimReader, item.path, destPath);
         }
     }
 }
@@ -1091,6 +884,142 @@ void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
         _audioSource.reset();
     }
     _audioTimer.Stop();
+}
+void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
+    if (_viewModel->gamePath().empty()) {
+        wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
+        return;
+    }
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto tool = KeyBifTool();
+
+    auto keyPath = getPathIgnoreCase(_viewModel->gamePath(), "chitin.key");
+    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto keyReader = KeyReader();
+    keyReader.load(key);
+
+    int bifIdx = 0;
+    for (auto &file : _keyFiles) {
+        auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
+        auto bifPath = getPathIgnoreCase(_viewModel->gamePath(), cleanedFilename);
+        if (bifPath.empty()) {
+            warn("BIF not found: " + bifPath.string());
+            continue;
+        }
+        tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
+    }
+
+    wxMessageBox("Operation completed successfully", "Success");
+}
+
+void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
+    auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (srcDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto srcPath = boost::filesystem::path((string)srcDirDialog->GetPath());
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto tool = TpcTool();
+    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
+            continue;
+        }
+        tool.toTGA(file.path(), destPath);
+    }
+    wxMessageBox("Operation completed successfully", "Success");
+}
+
+void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::Extract);
+}
+
+void MainFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::Unwrap);
+}
+
+void MainFrame::OnToRimToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToRIM);
+}
+
+void MainFrame::OnToErfToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToERF);
+}
+
+void MainFrame::OnToModToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToMOD);
+}
+
+void MainFrame::OnToXmlToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToXML);
+}
+
+void MainFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::To2DA);
+}
+
+void MainFrame::OnToGffToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToGFF);
+}
+
+void MainFrame::OnToTlkToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToTLK);
+}
+
+void MainFrame::OnToLipToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToLIP);
+}
+
+void MainFrame::OnToSsfToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToSSF);
+}
+
+void MainFrame::OnToTgaToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToTGA);
+}
+
+void MainFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToPCODE);
+}
+
+void MainFrame::OnToNcsToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToNCS);
+}
+
+void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
+    InvokeTool(Operation::ToNSS);
+}
+
+void MainFrame::InvokeTool(Operation operation) {
+    auto srcFileDialog = new wxFileDialog(
+        nullptr,
+        "Choose source file",
+        "",
+        "",
+        wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
+        wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
+    if (srcFileDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto srcPath = boost::filesystem::path((string)srcFileDialog->GetPath());
+    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+    if (destDirDialog->ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    if (_viewModel->invokeTool(operation, srcPath, destPath)) {
+        wxMessageBox("Operation completed successfully", "Success");
+    } else {
+        wxMessageBox("Tool not found", "Error", wxICON_ERROR);
+    }
 }
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)

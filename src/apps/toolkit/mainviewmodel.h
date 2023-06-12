@@ -44,6 +44,8 @@ public:
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);
 
+    GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id);
+
     game::GameID gameId() const { return _gameId; }
     const boost::filesystem::path &gamePath() const { return _gamePath; }
     const std::vector<GameDirectoryItem> &gameDirItems() const { return _gameDirItems; }
@@ -53,6 +55,7 @@ public:
 
     void onGameDirectoryChanged(boost::filesystem::path path);
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
+    void onGameDirectoryItemExpanding(GameDirectoryItemId id);
 
 private:
     boost::filesystem::path _gamePath;
@@ -62,7 +65,7 @@ private:
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
     std::vector<GameDirectoryItem> _gameDirItems;
-    std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
+    std::map<GameDirectoryItemId, int> _idToGameDirItemIdx;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
