@@ -74,13 +74,13 @@ void MainViewModel::loadGameDirectory() {
         } else {
             continue;
         }
-        auto item = GameDirectoryItem();
-        item.displayName = filename;
-        item.path = file.path();
-        item.container = container;
+        auto item = make_shared<GameDirectoryItem>();
+        item->displayName = filename;
+        item->path = file.path();
+        item->container = container;
         if (extension == ".tlk") {
             auto resRef = filename.substr(0, filename.size() - 4);
-            item.resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
+            item->resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
         }
         _gameDirItems.push_back(std::move(item));
     }
@@ -114,11 +114,6 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
-MainViewModel::GameDirectoryItem &MainViewModel::getGameDirItemById(GameDirectoryItemId id) {
-    auto index = _idToGameDirItemIdx.at(id);
-    return _gameDirItems[index];
-}
-
 void MainViewModel::onViewCreated() {
     loadTools();
 }
@@ -134,16 +129,16 @@ void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
 }
 
 void MainViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
-    _gameDirItems[index].id = id;
-    _idToGameDirItemIdx.insert(make_pair(id, index));
+    auto &item = _gameDirItems[index];
+    item->id = id;
+    _idToGameDirItem.insert(make_pair(id, item.get()));
 }
 
 void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
-    if (_idToGameDirItemIdx.count(id) == 0) {
+    if (_idToGameDirItem.count(id) == 0) {
         return;
     }
-    auto expandingItemIdx = _idToGameDirItemIdx.at(id);
-    auto expandingItem = _gameDirItems[expandingItemIdx];
+    auto &expandingItem = *_idToGameDirItem.at(id);
     if (boost::filesystem::is_directory(expandingItem.path)) {
         for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
@@ -156,18 +151,18 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             } else {
                 continue;
             }
-            auto item = GameDirectoryItem();
-            item.parentId = expandingItem.id;
-            item.displayName = filename;
-            item.path = file.path();
+            auto item = make_shared<GameDirectoryItem>();
+            item->parentId = expandingItem.id;
+            item->displayName = filename;
+            item->path = file.path();
             if (!extension.empty()) {
                 auto resType = getResTypeByExt(extension.substr(1), false);
                 if (resType != ResourceType::Invalid) {
                     auto resRef = filename.substr(0, filename.size() - 4);
-                    item.resId = make_shared<ResourceId>(resRef, resType);
+                    item->resId = make_shared<ResourceId>(resRef, resType);
                 }
             }
-            item.container = container;
+            item->container = container;
             _gameDirItems.push_back(std::move(item));
         }
     } else {
@@ -183,12 +178,12 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                     if (key.bifIdx != bifIdx) {
                         continue;
                     }
-                    auto item = GameDirectoryItem();
-                    item.parentId = expandingItem.id;
-                    item.displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
-                    item.path = expandingItem.path;
-                    item.resId = make_shared<ResourceId>(key.resId);
-                    item.archived = true;
+                    auto item = make_shared<GameDirectoryItem>();
+                    item->parentId = expandingItem.id;
+                    item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                    item->path = expandingItem.path;
+                    item->resId = make_shared<ResourceId>(key.resId);
+                    item->archived = true;
                     _gameDirItems.push_back(std::move(item));
                 }
             }
@@ -198,12 +193,12 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             erfReader.load(erf);
             auto &keys = erfReader.keys();
             for (auto &key : keys) {
-                auto item = GameDirectoryItem();
-                item.parentId = expandingItem.id;
-                item.displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
-                item.path = expandingItem.path;
-                item.resId = make_shared<ResourceId>(key.resId);
-                item.archived = true;
+                auto item = make_shared<GameDirectoryItem>();
+                item->parentId = expandingItem.id;
+                item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                item->path = expandingItem.path;
+                item->resId = make_shared<ResourceId>(key.resId);
+                item->archived = true;
                 _gameDirItems.push_back(std::move(item));
             }
         } else if (boost::ends_with(extension, ".rim")) {
@@ -212,12 +207,12 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             rimReader.load(rim);
             auto &resources = rimReader.resources();
             for (auto &resource : resources) {
-                auto item = GameDirectoryItem();
-                item.parentId = expandingItem.id;
-                item.displayName = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
-                item.path = expandingItem.path;
-                item.resId = make_shared<ResourceId>(resource.resId);
-                item.archived = true;
+                auto item = make_shared<GameDirectoryItem>();
+                item->parentId = expandingItem.id;
+                item->displayName = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
+                item->path = expandingItem.path;
+                item->resId = make_shared<ResourceId>(resource.resId);
+                item->archived = true;
                 _gameDirItems.push_back(std::move(item));
             }
         }

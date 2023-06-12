@@ -352,9 +352,9 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
     _filesTreeCtrl->Freeze();
     _filesTreeCtrl->DeleteAllItems();
-    auto &gameDirItems = _viewModel->gameDirItems();
-    for (size_t i = 0; i < gameDirItems.size(); ++i) {
-        auto &item = gameDirItems[i];
+    int numGameDirItems = _viewModel->numGameDirItems();
+    for (int i = 0; i < numGameDirItems; ++i) {
+        auto &item = _viewModel->gameDirItem(i);
         void *itemId;
         if (item.container) {
             auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
@@ -386,15 +386,15 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
-    auto expandingItem = _viewModel->getGameDirItemById(expandingItemId);
+    auto &expandingItem = _viewModel->gameDirItemById(expandingItemId);
     if (expandingItem.loaded) {
         return;
     }
     _viewModel->onGameDirectoryItemExpanding(expandingItemId);
     _filesTreeCtrl->Freeze();
-    auto &gameDirItems = _viewModel->gameDirItems();
-    for (size_t i = 0; i < gameDirItems.size(); ++i) {
-        auto &item = gameDirItems[i];
+    int numGameDirItems = _viewModel->numGameDirItems();
+    for (int i = 0; i < numGameDirItems; ++i) {
+        auto &item = _viewModel->gameDirItem(i);
         if (item.id || item.parentId != expandingItemId) {
             continue;
         }
@@ -414,7 +414,7 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto item = _viewModel->getGameDirItemById(itemId);
+    auto &item = _viewModel->gameDirItemById(itemId);
     OpenFile(item);
 }
 
@@ -778,7 +778,7 @@ void MainFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text,
 
 void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto item = _viewModel->getGameDirItemById(itemId);
+    auto &item = _viewModel->gameDirItemById(itemId);
     if (item.archived) {
         return;
     }
@@ -805,7 +805,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     if (event.GetId() == CommandID::extract) {
         auto menu = static_cast<wxMenu *>(event.GetEventObject());
         auto itemId = menu->GetClientData();
-        auto item = _viewModel->getGameDirItemById(itemId);
+        auto &item = _viewModel->gameDirItemById(itemId);
         auto extension = boost::to_lower_copy(item.path.extension().string());
         if (extension == ".bif") {
             auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);

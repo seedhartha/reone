@@ -44,11 +44,12 @@ public:
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);
 
-    GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id);
-
     game::GameID gameId() const { return _gameId; }
     const boost::filesystem::path &gamePath() const { return _gamePath; }
-    const std::vector<GameDirectoryItem> &gameDirItems() const { return _gameDirItems; }
+
+    int numGameDirItems() const { return static_cast<int>(_gameDirItems.size()); }
+    GameDirectoryItem &gameDirItem(int index) { return *_gameDirItems[index]; }
+    GameDirectoryItem &gameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -64,8 +65,8 @@ private:
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
-    std::vector<GameDirectoryItem> _gameDirItems;
-    std::map<GameDirectoryItemId, int> _idToGameDirItemIdx;
+    std::vector<std::shared_ptr<GameDirectoryItem>> _gameDirItems;
+    std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
