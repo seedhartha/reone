@@ -141,9 +141,9 @@ ToolkitFrame::ToolkitFrame(AudioContext &audioCtx) :
     toolsMenu->Append(EventHandlerID::toLipTool, "Convert XML to LIP...");
     toolsMenu->Append(EventHandlerID::toSsfTool, "Convert XML to SSF...");
     toolsMenu->Append(EventHandlerID::toTgaTool, "Convert TPC to TGA/TXI...");
-    toolsMenu->Append(EventHandlerID::toPcodeTool, "Convert NCS to PCODE...");
-    toolsMenu->Append(EventHandlerID::toNcsTool, "Convert PCODE to NCS...");
-    toolsMenu->Append(EventHandlerID::toNssTool, "Convert PCODE to NSS...");
+    toolsMenu->Append(EventHandlerID::toPcodeTool, "Disassemble NCS to PCODE...");
+    toolsMenu->Append(EventHandlerID::toNcsTool, "Assemble NCS from PCODE...");
+    toolsMenu->Append(EventHandlerID::toNssTool, "Decompile NCS (experimental)...");
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
     menuBar->Append(toolsMenu, "&Tools");
