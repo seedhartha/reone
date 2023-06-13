@@ -17,11 +17,16 @@
 
 #pragma once
 
+#include "reone/audio/di/module.h"
 #include "reone/audio/stream.h"
 #include "reone/game/types.h"
+#include "reone/graphics/di/module.h"
+#include "reone/resource/di/module.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/id.h"
+#include "reone/scene/di/module.h"
+#include "reone/system/di/module.h"
 #include "reone/system/stream/input.h"
 #include "reone/tools/tool.h"
 #include "reone/tools/types.h"
@@ -96,6 +101,8 @@ public:
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);
 
+    void render3D(int w, int h);
+
     game::GameID gameId() const { return _gameId; }
     const boost::filesystem::path &gamePath() const { return _gamePath; }
 
@@ -114,7 +121,7 @@ public:
     LiveData<std::string> &imageInfo() { return _imageInfo; }
     LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
     LiveData<Progress> &progress() { return _progress; }
-    LiveData<bool> &loadEngine() { return _loadEngine; }
+    LiveData<bool> &engineLoadRequested() { return _engineLoadRequested; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -136,6 +143,8 @@ private:
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
+    // Live data
+
     LiveData<std::list<Page>> _pages;
     LiveData<std::shared_ptr<TableContent>> _tableContent;
     LiveData<std::shared_ptr<TableContent>> _talkTableContent;
@@ -147,10 +156,28 @@ private:
     LiveData<std::string> _imageInfo;
     LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
     LiveData<Progress> _progress;
-    LiveData<bool> _loadEngine;
+    LiveData<bool> _engineLoadRequested;
+
+    // END Live data
+
+    // Embedded engine
+
+    graphics::GraphicsOptions _graphicsOpt;
+    audio::AudioOptions _audioOpt;
+
+    std::unique_ptr<SystemModule> _systemModule;
+    std::unique_ptr<resource::ResourceModule> _resourceModule;
+    std::unique_ptr<graphics::GraphicsModule> _graphicsModule;
+    std::unique_ptr<audio::AudioModule> _audioModule;
+    std::unique_ptr<scene::SceneModule> _sceneModule;
+
+    bool _engineLoaded {false};
+
+    // END Embedded engine
 
     void loadGameDirectory();
     void loadTools();
+    void loadEngine();
 };
 
 } // namespace reone

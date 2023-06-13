@@ -412,53 +412,28 @@ MainFrame::MainFrame() :
         _progressDialog->Raise();
         _progressDialog->Show();
     });
-    _viewModel->loadEngine().subscribe([this](auto &load) {
-        if (load) {
-            LoadEngine();
+    _viewModel->engineLoadRequested().subscribe([this](auto &requested) {
+        if (!requested) {
+            return;
         }
+        auto glAttribs = vector<int> {
+            WX_GL_CORE_PROFILE,     //
+            WX_GL_MAJOR_VERSION, 3, //
+            WX_GL_MINOR_VERSION, 3, //
+            0};
+        _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+        _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
+
+        auto glContext = new wxGLContext(_glCanvas);
+        glContext->SetCurrent(*_glCanvas);
+
+        auto renderSizer = new wxBoxSizer(wxVERTICAL);
+        renderSizer->Add(_glCanvas, 1, wxEXPAND);
+        _renderPanel->SetSizer(renderSizer);
     });
     _viewModel->onViewCreated();
 
     // CreateStatusBar();
-}
-
-void MainFrame::LoadEngine() {
-    if (_engineLoaded) {
-        return;
-    }
-    if (_viewModel->gamePath().empty()) {
-        wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
-        return;
-    }
-
-    auto glAttribs = vector<int> {
-        WX_GL_CORE_PROFILE,     //
-        WX_GL_MAJOR_VERSION, 3, //
-        WX_GL_MINOR_VERSION, 3, //
-        0};
-    _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
-
-    auto glContext = new wxGLContext(_glCanvas);
-    glContext->SetCurrent(*_glCanvas);
-
-    auto renderSizer = new wxBoxSizer(wxVERTICAL);
-    renderSizer->Add(_glCanvas, 1, wxEXPAND);
-    _renderPanel->SetSizer(renderSizer);
-
-    _systemModule = make_unique<SystemModule>();
-    _resourceModule = make_unique<ResourceModule>(_viewModel->gamePath());
-    _graphicsModule = make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
-    _audioModule = make_unique<AudioModule>(_audioOpt, *_resourceModule);
-    _sceneModule = make_unique<SceneModule>(_graphicsOpt, *_audioModule, *_graphicsModule);
-
-    _systemModule->init();
-    _resourceModule->init();
-    _graphicsModule->init();
-    _audioModule->init();
-    _sceneModule->init();
-
-    _engineLoaded = true;
 }
 
 wxWindow *MainFrame::GetPageWindow(PageType type) const {
@@ -704,9 +679,7 @@ void MainFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_glCanvas);
 
     auto clientSize = _glCanvas->GetClientSize();
-    glViewport(0, 0, clientSize.x, clientSize.y);
-
-    _graphicsModule->graphicsContext().clearColorDepth(glm::vec4(0.0f, 0.25f, 0.5f, 0.0f));
+    _viewModel->render3D(clientSize.x, clientSize.y);
 
     _glCanvas->SwapBuffers();
 }

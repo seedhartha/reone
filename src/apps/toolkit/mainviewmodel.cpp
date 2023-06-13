@@ -44,12 +44,15 @@
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
 
+#include "di/graphicsmodule.h"
+
 using namespace std;
 
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -299,7 +302,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         pages.push_back(Page(PageType::Image, id.string()));
 
     } else if (id.type == ResourceType::Mdl) {
-        _loadEngine.reset(true);
+        loadEngine();
         pages.push_back(Page(PageType::Model, id.string()));
 
     } else if (id.type == ResourceType::Wav) {
@@ -307,7 +310,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
         _audioStream.reset(reader.stream());
-        _loadEngine.reset(true);
+        loadEngine();
         pages.push_back(Page(PageType::Audio, id.string()));
 
     } else {
@@ -369,6 +372,27 @@ void MainViewModel::loadTools() {
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<AudioTool>());
     _tools.push_back(make_shared<NcsTool>(_gameId));
+}
+
+void MainViewModel::loadEngine() {
+    if (_engineLoaded || _gamePath.empty()) {
+        return;
+    }
+    _engineLoadRequested.reset(true);
+
+    _systemModule = make_unique<SystemModule>();
+    _resourceModule = make_unique<ResourceModule>(_gamePath);
+    _graphicsModule = make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
+    _audioModule = make_unique<AudioModule>(_audioOpt, *_resourceModule);
+    _sceneModule = make_unique<SceneModule>(_graphicsOpt, *_audioModule, *_graphicsModule);
+
+    _systemModule->init();
+    _resourceModule->init();
+    _graphicsModule->init();
+    _audioModule->init();
+    _sceneModule->init();
+
+    _engineLoaded = true;
 }
 
 void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
@@ -470,6 +494,11 @@ bool MainViewModel::invokeTool(Operation operation,
         return true;
     }
     return false;
+}
+
+void MainViewModel::render3D(int w, int h) {
+    auto &ctx = _graphicsModule->graphicsContext();
+    ctx.clearColorDepth(glm::vec4(0.0f, 0.25f, 0.5f, 0.0f));
 }
 
 void MainViewModel::onViewCreated() {
