@@ -26,6 +26,7 @@
 #include <wx/dataview.h>
 #include <wx/glcanvas.h>
 #include <wx/notebook.h>
+#include <wx/progdlg.h>
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
@@ -62,6 +63,7 @@ private:
     // Widgets
 
     wxSplitterWindow *_splitter {nullptr};
+    wxProgressDialog *_progressDialog {nullptr};
 
     wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};

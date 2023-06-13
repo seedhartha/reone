@@ -366,7 +366,7 @@ void MainViewModel::loadTools() {
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
 
-bool MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
+void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
         auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
@@ -378,7 +378,7 @@ bool MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
             return boost::contains(boost::to_lower_copy(file.filename), filename);
         });
         if (maybeBif == keyReader.files().end()) {
-            return false;
+            return;
         }
         auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
         KeyBifTool().extractBIF(keyReader, bifIdx, srcPath, destPath);
@@ -392,13 +392,10 @@ bool MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
         auto rimReader = RimReader();
         rimReader.load(rim);
         RimTool().extract(rimReader, srcPath, destPath);
-    } else {
-        return false;
     }
-    return true;
 }
 
-bool MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
+void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
     auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
@@ -406,30 +403,55 @@ bool MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto keyReader = KeyReader();
     keyReader.load(key);
 
+    auto progress = Progress();
+    progress.visible = true;
+    progress.title = "Extract all BIF archives";
+    _progress.reset(progress);
+
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
         auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
         auto bifPath = getPathIgnoreCase(_gamePath, cleanedFilename);
         if (bifPath.empty()) {
-            warn("BIF not found: " + bifPath.string());
             continue;
         }
+        progress.value = 100 * bifIdx / static_cast<int>(_keyFiles.size());
         tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
+        _progress.reset(progress);
     }
 
-    return true;
+    progress.visible = false;
+    _progress.reset(progress);
 }
 
-bool MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
-    auto tool = TpcTool();
+void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
+    vector<boost::filesystem::path> tpcFiles;
     for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
-        auto extension = boost::to_lower_copy(file.path().extension().string());
-        if (file.status().type() != boost::filesystem::regular_file || extension != ".tpc") {
+        if (file.status().type() != boost::filesystem::regular_file) {
             continue;
         }
-        tool.toTGA(file.path(), destPath);
+        auto extension = boost::to_lower_copy(file.path().extension().string());
+        if (extension == ".tpc") {
+            tpcFiles.push_back(file.path());
+        }
     }
-    return true;
+
+    auto progress = Progress();
+    progress.visible = true;
+    progress.title = "Batch convert TPC to TGA/TXI";
+    _progress.reset(progress);
+
+    auto tool = TpcTool();
+    for (size_t i = 0; i < tpcFiles.size(); ++i) {
+        progress.value = 100 * static_cast<int>(i / tpcFiles.size());
+        _progress.reset(progress);
+
+        auto &tpcPath = tpcFiles[i];
+        tool.toTGA(tpcPath, destPath);
+    }
+
+    progress.visible = false;
+    _progress.reset(progress);
 }
 
 bool MainViewModel::invokeTool(Operation operation,

@@ -286,6 +286,9 @@ MainFrame::MainFrame() :
 
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
+    _progressDialog = new wxProgressDialog("", "", 100, this);
+    _progressDialog->Hide();
+
     for (auto &page : kAllPageTypes) {
         auto window = GetPageWindow(page);
         window->Hide();
@@ -402,6 +405,16 @@ MainFrame::MainFrame() :
             _audioTimer.Stop();
             _audioSource.reset();
         }
+    });
+    _viewModel->progress().subscribe([this](auto &progress) {
+        if (!progress.visible) {
+            _progressDialog->Hide();
+            return;
+        }
+        _progressDialog->SetTitle(progress.title);
+        _progressDialog->Update(progress.value, progress.message);
+        _progressDialog->Raise();
+        _progressDialog->Show();
     });
     _viewModel->onViewCreated();
 
@@ -633,6 +646,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto destPath = boost::filesystem::path(string(dialog->GetPath()));
 
         _viewModel->extractArchive(item.path, destPath);
+        wxMessageBox("Operation completed successfully", "Success");
     }
 }
 
@@ -681,9 +695,8 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    if (_viewModel->extractAllBifs(destPath)) {
-        wxMessageBox("Operation completed successfully", "Success");
-    }
+    _viewModel->extractAllBifs(destPath);
+    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
@@ -697,9 +710,8 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
         return;
     }
     auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
-    if (_viewModel->batchConvertTpcToTga(srcPath, destPath)) {
-        wxMessageBox("Operation completed successfully", "Success");
-    }
+    _viewModel->batchConvertTpcToTga(srcPath, destPath);
+    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {

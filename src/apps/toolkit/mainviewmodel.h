@@ -66,6 +66,13 @@ struct Page {
     }
 };
 
+struct Progress {
+    bool visible {false};
+    std::string title;
+    std::string message;
+    int value {0};
+};
+
 struct TableContent {
     std::vector<std::string> columns;
     std::vector<std::vector<std::string>> rows;
@@ -81,9 +88,9 @@ public:
     void openFile(const GameDirectoryItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
 
-    bool extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
-    bool extractAllBifs(const boost::filesystem::path &destPath);
-    bool batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
+    void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
+    void extractAllBifs(const boost::filesystem::path &destPath);
+    void batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
 
     bool invokeTool(Operation operation,
                     const boost::filesystem::path &srcPath,
@@ -106,6 +113,7 @@ public:
     LiveData<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
     LiveData<std::string> &imageInfo() { return _imageInfo; }
     LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
+    LiveData<Progress> &progress() { return _progress; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -137,6 +145,7 @@ private:
     LiveData<std::shared_ptr<ByteArray>> _imageData;
     LiveData<std::string> _imageInfo;
     LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
+    LiveData<Progress> _progress;
 
     void loadGameDirectory();
     void loadTools();
