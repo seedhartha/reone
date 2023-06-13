@@ -58,7 +58,6 @@ private:
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
     std::unique_ptr<audio::AudioSource> _audioSource;
-    resource::ResourceId _audioResId;
 
     // Widgets
 
@@ -96,12 +95,11 @@ private:
 
     // END Widgets
 
-    void OpenFile(MainViewModel::GameDirectoryItem &item);
-    void OpenResource(resource::ResourceId &id, IInputStream &data);
-
     void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
 
     void InvokeTool(Operation operation);
+
+    wxWindow *GetPageWindow(PageType type) const;
 
     // Events
 

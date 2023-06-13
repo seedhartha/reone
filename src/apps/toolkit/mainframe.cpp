@@ -65,23 +65,19 @@ namespace reone {
 static constexpr char kIconName[] = "reone";
 static constexpr int kMinPanelWidth = 640;
 
-static const set<string> kFilesSubdirectoryWhitelist {
-    "data", "lips", "localvault", "modules", "movies", "override", "rims", "saves", "texturepacks", //
-    "streammusic", "streamsounds", "streamwaves", "streamvoice"};
-
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const set<string> kFilesExtensionBlacklist {
-    ".key",                                         //
-    ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
-    ".zip", ".pdf",                                 //
-    ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
-
-static const set<ResourceType> kFilesPlaintextExtensions {
-    ResourceType::Txt,
-    ResourceType::Txi,
-    ResourceType::Lyt,
-    ResourceType::Vis};
+static const set<PageType> kAllPageTypes {
+    PageType::Text,
+    PageType::XML,
+    PageType::Table,
+    PageType::TalkTable,
+    PageType::GFF,
+    PageType::NSS,
+    PageType::PCODE,
+    PageType::Image,
+    PageType::Model,
+    PageType::Audio};
 
 struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
@@ -290,24 +286,156 @@ MainFrame::MainFrame() :
 
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
-    _textPanel->Hide();
-    _tablePanel->Hide();
-    _talkTablePanel->Hide();
-    _gffPanel->Hide();
-    _xmlPanel->Hide();
-    _nssPanel->Hide();
-    _pcodePanel->Hide();
-    _imageSplitter->Hide();
-    _renderPanel->Hide();
-    _audioPanel->Hide();
+    for (auto &page : kAllPageTypes) {
+        auto window = GetPageWindow(page);
+        window->Hide();
+    }
 
     _viewModel = make_unique<MainViewModel>();
+    _viewModel->pages().subscribe([this](auto &pages) {
+        auto activeTypes = set<PageType>();
+        for (auto &page : pages) {
+            activeTypes.insert(page.type);
+        }
+        for (auto &page : kAllPageTypes) {
+            auto window = GetPageWindow(page);
+            if (!window) {
+                continue;
+            }
+            if (activeTypes.count(page) > 0) {
+                window->Show();
+            } else {
+                window->Hide();
+            }
+        }
+        while (_notebook->GetPageCount() > 0) {
+            _notebook->RemovePage(0);
+        }
+        for (auto &page : pages) {
+            auto window = GetPageWindow(page.type);
+            _notebook->AddPage(window, page.displayName);
+        }
+    });
+    _viewModel->textContent().subscribe([this](auto &content) {
+        _plainTextCtrl->SetEditable(true);
+        _plainTextCtrl->Clear();
+        _plainTextCtrl->AppendText(content);
+        _plainTextCtrl->SetEditable(false);
+    });
+    _viewModel->tableContent().subscribe([this](auto &content) {
+        _tableCtrl->Freeze();
+        _tableCtrl->ClearColumns();
+        _tableCtrl->DeleteAllItems();
+        if (content) {
+            for (auto &column : content->columns) {
+                _tableCtrl->AppendTextColumn(column);
+            }
+            for (auto &row : content->rows) {
+                auto values = wxVector<wxVariant>();
+                for (auto &value : row) {
+                    values.push_back(wxVariant(value));
+                }
+                _tableCtrl->AppendItem(values);
+            }
+        }
+        _tableCtrl->Thaw();
+    });
+    _viewModel->talkTableContent().subscribe([this](auto &content) {
+        _talkTableCtrl->Freeze();
+        _talkTableCtrl->ClearColumns();
+        _talkTableCtrl->DeleteAllItems();
+        if (content) {
+            for (auto &column : content->columns) {
+                _talkTableCtrl->AppendTextColumn(column);
+            }
+            for (auto &row : content->rows) {
+                auto values = wxVector<wxVariant>();
+                for (auto &value : row) {
+                    values.push_back(wxVariant(value));
+                }
+                _talkTableCtrl->AppendItem(values);
+            }
+        }
+        _talkTableCtrl->Thaw();
+    });
+    _viewModel->gffContent().subscribe([this](auto &content) {
+        _gffTreeCtrl->Freeze();
+        _gffTreeCtrl->DeleteAllItems();
+        AppendGffStructToTree(wxDataViewItem(), "/", *content);
+        _gffTreeCtrl->Thaw();
+    });
+    _viewModel->nssContent().subscribe([this](auto &content) {
+        _nssTextCtrl->SetEditable(true);
+        _nssTextCtrl->SetText(content);
+        _nssTextCtrl->SetEditable(false);
+    });
+    _viewModel->pcodeContent().subscribe([this](auto &content) {
+        _pcodeTextCtrl->SetEditable(true);
+        _pcodeTextCtrl->Clear();
+        _pcodeTextCtrl->AppendText(content);
+        _pcodeTextCtrl->SetEditable(false);
+    });
+    _viewModel->imageData().subscribe([this](auto &data) {
+        auto stream = wxMemoryInputStream(&(*data)[0], data->size());
+        auto image = wxImage();
+        image.LoadFile(stream, wxBITMAP_TYPE_TGA);
+        _image = make_unique<wxBitmap>(image);
+    });
+    _viewModel->imageInfo().subscribe([this](auto &info) {
+        _imageInfoCtrl->Clear();
+        _imageInfoCtrl->AppendText(info);
+        if (!info.empty()) {
+            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+        } else {
+            _imageSplitter->Unsplit(_imageInfoCtrl);
+        }
+    });
+    _viewModel->audioStream().subscribe([this](auto &stream) {
+        if (stream) {
+            _audioSource = make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
+            _audioSource->init();
+            _audioSource->play();
+            if (!_audioTimer.IsRunning()) {
+                _audioTimer.Start(1000 / 60);
+            }
+        } else {
+            _audioTimer.Stop();
+            _audioSource.reset();
+        }
+    });
     _viewModel->onViewCreated();
 
     _audioCtx = make_unique<AudioContext>();
     _audioCtx->init();
 
     // CreateStatusBar();
+}
+
+wxWindow *MainFrame::GetPageWindow(PageType type) const {
+    switch (type) {
+    case PageType::Text:
+        return _textPanel;
+    case PageType::XML:
+        return _xmlPanel;
+    case PageType::Table:
+        return _tablePanel;
+    case PageType::TalkTable:
+        return _talkTablePanel;
+    case PageType::GFF:
+        return _gffPanel;
+    case PageType::NSS:
+        return _nssPanel;
+    case PageType::PCODE:
+        return _pcodePanel;
+    case PageType::Image:
+        return _imageSplitter;
+    case PageType::Model:
+        return _renderPanel;
+    case PageType::Audio:
+        return _audioPanel;
+    default:
+        return nullptr;
+    }
 }
 
 void MainFrame::OnClose(wxCloseEvent &event) {
@@ -414,316 +542,7 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto &item = _viewModel->gameDirItemById(itemId);
-    OpenFile(item);
-}
-
-void MainFrame::OpenFile(MainViewModel::GameDirectoryItem &item) {
-    if (!item.resId) {
-        return;
-    }
-    if (item.archived) {
-        auto extension = boost::to_lower_copy(item.path.extension().string());
-        if (extension == ".bif") {
-            auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&item](auto &key) {
-                return key.resId == *item.resId;
-            });
-            if (maybeKey == _keyKeys.end()) {
-                return;
-            }
-            auto resIdx = maybeKey->resIdx;
-            auto bif = FileInputStream(item.path, OpenMode::Binary);
-            auto bifReader = BifReader();
-            bifReader.load(bif);
-            if (bifReader.resources().size() <= resIdx) {
-                return;
-            }
-            auto &bifEntry = bifReader.resources().at(resIdx);
-            auto resBytes = make_unique<ByteArray>();
-            resBytes->resize(bifEntry.fileSize);
-            bif.seek(bifEntry.offset, SeekOrigin::Begin);
-            bif.read(&(*resBytes)[0], bifEntry.fileSize);
-            auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*item.resId, res);
-        } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-            auto erf = FileInputStream(item.path, OpenMode::Binary);
-            auto erfReader = ErfReader();
-            erfReader.load(erf);
-            auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&item](auto &key) {
-                return key.resId == *item.resId;
-            });
-            if (maybeKey == erfReader.keys().end()) {
-                return;
-            }
-            auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
-            auto &erfEntry = erfReader.resources().at(resIdx);
-            auto resBytes = make_unique<ByteArray>();
-            resBytes->resize(erfEntry.size);
-            erf.seek(erfEntry.offset, SeekOrigin::Begin);
-            erf.read(&(*resBytes)[0], erfEntry.size);
-            auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*item.resId, res);
-        } else if (extension == ".rim") {
-            auto rim = FileInputStream(item.path, OpenMode::Binary);
-            auto rimReader = RimReader();
-            rimReader.load(rim);
-            auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&item](auto &res) {
-                return res.resId == *item.resId;
-            });
-            if (maybeRes == rimReader.resources().end()) {
-                return;
-            }
-            auto &rimRes = *maybeRes;
-            auto resBytes = make_unique<ByteArray>();
-            resBytes->resize(rimRes.size);
-            rim.seek(rimRes.offset, SeekOrigin::Begin);
-            rim.read(&(*resBytes)[0], rimRes.size);
-            auto res = ByteArrayInputStream(*resBytes);
-            OpenResource(*item.resId, res);
-        }
-    } else {
-        auto res = FileInputStream(item.path, OpenMode::Binary);
-        OpenResource(*item.resId, res);
-    }
-}
-
-void MainFrame::OpenResource(ResourceId &id, IInputStream &data) {
-    bool talkTableOpen = false;
-    size_t audioPageIdx = -1;
-    for (size_t i = 0; i < _notebook->GetPageCount(); ++i) {
-        if (_notebook->GetPage(i) == _talkTablePanel) {
-            talkTableOpen = true;
-        }
-        if (_notebook->GetPage(i) == _audioPanel && _audioSource && _audioSource->isPlaying()) {
-            audioPageIdx = i;
-        }
-    }
-    while (_notebook->GetPageCount() > 0) {
-        _notebook->RemovePage(0);
-    }
-    if (talkTableOpen) {
-        _notebook->AddPage(_talkTablePanel, "dialog.tlk");
-    }
-    if (audioPageIdx != -1) {
-        _notebook->AddPage(_audioPanel, _audioResId.string());
-    }
-
-    _textPanel->Hide();
-    _tablePanel->Hide();
-    _gffPanel->Hide();
-    _xmlPanel->Hide();
-    _nssPanel->Hide();
-    _pcodePanel->Hide();
-    _imageSplitter->Hide();
-    _renderPanel->Hide();
-
-    if (id.type == ResourceType::TwoDa) {
-        _tableCtrl->Freeze();
-        _tableCtrl->ClearColumns();
-        _tableCtrl->DeleteAllItems();
-        auto reader = TwoDaReader();
-        reader.load(data);
-        auto twoDa = reader.twoDa();
-        _tableCtrl->AppendTextColumn("Index");
-        for (auto &column : twoDa->columns()) {
-            _tableCtrl->AppendTextColumn(column);
-        }
-        for (int i = 0; i < twoDa->getRowCount(); ++i) {
-            auto &row = twoDa->rows()[i];
-            auto values = wxVector<wxVariant>();
-            values.push_back(wxVariant(to_string(i)));
-            for (auto &value : row.values) {
-                values.push_back(wxVariant(value));
-            }
-            _tableCtrl->AppendItem(values);
-        }
-        _tableCtrl->Thaw();
-        _notebook->AddPage(_tablePanel, id.string(), true);
-        _tablePanel->Show();
-
-    } else if (isGFFCompatibleResType(id.type)) {
-        _gffTreeCtrl->Freeze();
-        _gffTreeCtrl->DeleteAllItems();
-        auto reader = GffReader();
-        reader.load(data);
-        auto root = reader.root();
-        AppendGffStructToTree(wxDataViewItem(), "/", *root);
-        _gffTreeCtrl->Thaw();
-        _notebook->AddPage(_gffPanel, id.string(), true);
-        _gffPanel->Show();
-
-    } else if (id.type == ResourceType::Tlk) {
-        if (_talkTableCtrl->GetItemCount() == 0) {
-            _talkTableCtrl->Freeze();
-            _talkTableCtrl->ClearColumns();
-            _talkTableCtrl->DeleteAllItems();
-            auto reader = TlkReader();
-            reader.load(data);
-            auto tlk = reader.table();
-            _talkTableCtrl->AppendTextColumn("Index");
-            _talkTableCtrl->AppendTextColumn("Text");
-            _talkTableCtrl->AppendTextColumn("Sound");
-            for (int i = 0; i < tlk->getStringCount(); ++i) {
-                auto &str = tlk->getString(i);
-                auto values = wxVector<wxVariant>();
-                auto cleaned = boost::replace_all_copy(str.text, "\n", "\\n");
-                values.push_back(wxVariant(to_string(i)));
-                values.push_back(wxVariant(cleaned));
-                values.push_back(wxVariant(str.soundResRef));
-                _talkTableCtrl->AppendItem(values);
-            }
-            _talkTableCtrl->Thaw();
-        }
-        if (!talkTableOpen) {
-            _notebook->AddPage(_talkTablePanel, id.string(), true);
-        }
-        _talkTablePanel->Show();
-
-    } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
-        data.seek(0, SeekOrigin::End);
-        auto length = data.position();
-        data.seek(0, SeekOrigin::Begin);
-        auto text = string(length, '\0');
-        data.read(&text[0], length);
-        _plainTextCtrl->SetEditable(true);
-        _plainTextCtrl->Clear();
-        _plainTextCtrl->AppendText(text);
-        _plainTextCtrl->SetEditable(false);
-        _notebook->AddPage(_textPanel, id.string(), true);
-        _textPanel->Show();
-
-    } else if (id.type == ResourceType::Ncs) {
-        auto gameId = GameID::KotOR;
-        auto routines = make_unique<Routines>(gameId, nullptr, nullptr);
-        routines->init();
-
-        auto pcodeBytes = make_unique<ByteArray>();
-        auto pcode = ByteArrayOutputStream(*pcodeBytes);
-        auto tool = NcsTool(gameId);
-        tool.toPCODE(data, pcode, *routines);
-        _pcodeTextCtrl->SetEditable(true);
-        _pcodeTextCtrl->Clear();
-        _pcodeTextCtrl->AppendText(*pcodeBytes);
-        _pcodeTextCtrl->SetEditable(false);
-        _notebook->AddPage(_pcodePanel, str(boost::format("%s.pcode") % id.resRef), true);
-        _pcodePanel->Show();
-
-        data.seek(0, SeekOrigin::Begin);
-        auto nssBytes = make_unique<ByteArray>();
-        auto nss = ByteArrayOutputStream(*nssBytes);
-        tool.toNSS(data, nss, *routines);
-        _nssTextCtrl->SetEditable(true);
-        _nssTextCtrl->SetText(*nssBytes);
-        _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, str(boost::format("%s.nss") % id.resRef), true);
-        _nssPanel->Show();
-
-    } else if (id.type == ResourceType::Nss) {
-        data.seek(0, SeekOrigin::End);
-        auto length = data.position();
-        data.seek(0, SeekOrigin::Begin);
-        auto text = string(length, '\0');
-        data.read(&text[0], length);
-        _nssTextCtrl->SetEditable(true);
-        _nssTextCtrl->SetText(text);
-        _nssTextCtrl->SetEditable(false);
-        _notebook->AddPage(_nssPanel, id.string(), true);
-        _nssPanel->Show();
-
-    } else if (id.type == ResourceType::Lip) {
-        _tableCtrl->Freeze();
-        _tableCtrl->ClearColumns();
-        _tableCtrl->DeleteAllItems();
-        auto reader = LipReader("");
-        reader.load(data);
-        auto animation = reader.animation();
-        _tableCtrl->AppendTextColumn("Time");
-        _tableCtrl->AppendTextColumn("Shape");
-        for (auto &kf : animation->keyframes()) {
-            auto values = wxVector<wxVariant>();
-            values.push_back(wxVariant(to_string(kf.time)));
-            values.push_back(wxVariant(to_string(kf.shape)));
-            _tableCtrl->AppendItem(values);
-        }
-        _tableCtrl->Thaw();
-        _notebook->AddPage(_tablePanel, id.string(), true);
-        _tablePanel->Show();
-
-    } else if (id.type == ResourceType::Ssf) {
-        _tableCtrl->Freeze();
-        _tableCtrl->ClearColumns();
-        _tableCtrl->DeleteAllItems();
-        auto reader = SsfReader();
-        reader.load(data);
-        auto &soundSet = reader.soundSet();
-        _tableCtrl->AppendTextColumn("Index");
-        _tableCtrl->AppendTextColumn("Sound");
-        for (size_t i = 0; i < soundSet.size(); ++i) {
-            auto values = wxVector<wxVariant>();
-            values.push_back(wxVariant(to_string(i)));
-            values.push_back(wxVariant(to_string(soundSet.at(i))));
-            _tableCtrl->AppendItem(values);
-        }
-        _tableCtrl->Thaw();
-        _notebook->AddPage(_tablePanel, id.string(), true);
-        _tablePanel->Show();
-
-    } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
-        auto tgaBytes = make_unique<ByteArray>();
-        if (id.type == ResourceType::Tpc) {
-            auto tga = ByteArrayOutputStream(*tgaBytes);
-            auto txiBytes = make_unique<ByteArray>();
-            auto txi = ByteArrayOutputStream(*txiBytes);
-            TpcTool().toTGA(data, tga, txi, false);
-            if (txiBytes->empty()) {
-                _imageSplitter->Unsplit(_imageInfoCtrl);
-            } else {
-                _imageInfoCtrl->Clear();
-                _imageInfoCtrl->AppendText(*txiBytes);
-                _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
-            }
-        } else {
-            data.seek(0, SeekOrigin::End);
-            auto length = data.position();
-            data.seek(0, SeekOrigin::Begin);
-            tgaBytes->resize(length, '\0');
-            data.read(&(*tgaBytes)[0], length);
-            _imageSplitter->Unsplit(_imageInfoCtrl);
-        }
-        auto wxStream = wxMemoryInputStream(&(*tgaBytes)[0], tgaBytes->size());
-        auto image = wxImage();
-        image.LoadFile(wxStream, wxBITMAP_TYPE_TGA);
-        _image = make_unique<wxBitmap>(image);
-        _notebook->AddPage(_imageSplitter, id.string(), true);
-        _imageSplitter->Show();
-
-    } else if (id.type == ResourceType::Wav /* || id.type == ResourceType::Mp3 */) {
-        auto mp3ReaderFactory = Mp3ReaderFactory();
-        auto reader = WavReader(mp3ReaderFactory);
-        reader.load(data);
-        _audioSource = make_unique<AudioSource>(reader.stream(), false, 1.0f, false, glm::vec3());
-        _audioSource->init();
-        _audioSource->play();
-        if (!_audioTimer.IsRunning()) {
-            _audioTimer.Start(1000 / 60);
-        }
-        _audioResId = id;
-        if (audioPageIdx != -1) {
-            _notebook->SetPageText(audioPageIdx, id.string());
-        } else {
-            _notebook->AddPage(_audioPanel, id.string(), true);
-        }
-        _audioPanel->Show();
-
-    } else {
-        wxMessageBox("Resource type not supported", "Warning", wxICON_WARNING);
-        return;
-    }
-
-    /*
-    _notebook->AddPage(_renderPanel, "3D");
-    _renderPanel->Show();
-    */
+    _viewModel->onGameDirectoryItemActivated(itemId);
 }
 
 void MainFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text, const Gff &gff) {

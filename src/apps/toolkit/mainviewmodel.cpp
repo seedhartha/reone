@@ -17,8 +17,20 @@
 
 #include "mainviewmodel.h"
 
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
+#include "reone/game/format/ssfreader.h"
+#include "reone/game/script/routines.h"
+#include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/lipanimation.h"
+#include "reone/resource/format/2dareader.h"
+#include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/format/tlkreader.h"
+#include "reone/resource/talktable.h"
 #include "reone/system/pathutil.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/audio.h"
@@ -34,7 +46,9 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::game;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
@@ -50,6 +64,257 @@ static const set<string> kFilesExtensionBlacklist {
     ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
+
+static const set<ResourceType> kFilesPlaintextExtensions {
+    ResourceType::Txt,
+    ResourceType::Txi,
+    ResourceType::Lyt,
+    ResourceType::Vis};
+
+void MainViewModel::openFile(const GameDirectoryItem &item) {
+    if (!item.resId) {
+        return;
+    }
+    if (item.archived) {
+        auto extension = boost::to_lower_copy(item.path.extension().string());
+        if (extension == ".bif") {
+            auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&item](auto &key) {
+                return key.resId == *item.resId;
+            });
+            if (maybeKey == _keyKeys.end()) {
+                return;
+            }
+            auto resIdx = maybeKey->resIdx;
+            auto bif = FileInputStream(item.path, OpenMode::Binary);
+            auto bifReader = BifReader();
+            bifReader.load(bif);
+            if (bifReader.resources().size() <= resIdx) {
+                return;
+            }
+            auto &bifEntry = bifReader.resources().at(resIdx);
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(bifEntry.fileSize);
+            bif.seek(bifEntry.offset, SeekOrigin::Begin);
+            bif.read(&(*resBytes)[0], bifEntry.fileSize);
+            auto res = ByteArrayInputStream(*resBytes);
+            openResource(*item.resId, res);
+        } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
+            auto erf = FileInputStream(item.path, OpenMode::Binary);
+            auto erfReader = ErfReader();
+            erfReader.load(erf);
+            auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&item](auto &key) {
+                return key.resId == *item.resId;
+            });
+            if (maybeKey == erfReader.keys().end()) {
+                return;
+            }
+            auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
+            auto &erfEntry = erfReader.resources().at(resIdx);
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(erfEntry.size);
+            erf.seek(erfEntry.offset, SeekOrigin::Begin);
+            erf.read(&(*resBytes)[0], erfEntry.size);
+            auto res = ByteArrayInputStream(*resBytes);
+            openResource(*item.resId, res);
+        } else if (extension == ".rim") {
+            auto rim = FileInputStream(item.path, OpenMode::Binary);
+            auto rimReader = RimReader();
+            rimReader.load(rim);
+            auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&item](auto &res) {
+                return res.resId == *item.resId;
+            });
+            if (maybeRes == rimReader.resources().end()) {
+                return;
+            }
+            auto &rimRes = *maybeRes;
+            auto resBytes = make_unique<ByteArray>();
+            resBytes->resize(rimRes.size);
+            rim.seek(rimRes.offset, SeekOrigin::Begin);
+            rim.read(&(*resBytes)[0], rimRes.size);
+            auto res = ByteArrayInputStream(*resBytes);
+            openResource(*item.resId, res);
+        }
+    } else {
+        auto res = FileInputStream(item.path, OpenMode::Binary);
+        openResource(*item.resId, res);
+    }
+}
+
+void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
+    auto pages = _pages.data();
+    pages.clear();
+
+    if (id.type == ResourceType::TwoDa) {
+        auto reader = TwoDaReader();
+        reader.load(data);
+        auto twoDa = reader.twoDa();
+
+        auto columns = vector<string>();
+        columns.push_back("Index");
+        for (auto &column : twoDa->columns()) {
+            columns.push_back(column);
+        }
+        auto rows = vector<vector<string>>();
+        for (int i = 0; i < twoDa->getRowCount(); ++i) {
+            auto &row = twoDa->rows()[i];
+            auto values = vector<string>();
+            values.push_back(to_string(i));
+            for (auto &value : row.values) {
+                values.push_back(value);
+            }
+            rows.push_back(std::move(values));
+        }
+
+        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _tableContent.reset(std::move(content));
+
+        pages.push_back(Page(PageType::Table, id.string()));
+
+    } else if (isGFFCompatibleResType(id.type)) {
+        auto reader = GffReader();
+        reader.load(data);
+        _gffContent.reset(reader.root());
+        pages.push_back(Page(PageType::GFF, id.string()));
+
+    } else if (id.type == ResourceType::Tlk) {
+        if (!_talkTableContent.data()) {
+            auto reader = TlkReader();
+            reader.load(data);
+            auto tlk = reader.table();
+
+            auto columns = vector<string>();
+            columns.push_back("Index");
+            columns.push_back("Text");
+            columns.push_back("Sound");
+
+            auto rows = vector<vector<string>>();
+            for (int i = 0; i < tlk->getStringCount(); ++i) {
+                auto &str = tlk->getString(i);
+                auto cleanedText = boost::replace_all_copy(str.text, "\n", "\\n");
+                auto values = vector<string>();
+                values.push_back(to_string(i));
+                values.push_back(cleanedText);
+                values.push_back(str.soundResRef);
+                rows.push_back(std::move(values));
+            }
+
+            auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
+            _talkTableContent.reset(std::move(content));
+        }
+        pages.push_back(Page(PageType::TalkTable, id.string()));
+
+    } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
+        data.seek(0, SeekOrigin::End);
+        auto length = data.position();
+        data.seek(0, SeekOrigin::Begin);
+        auto text = string(length, '\0');
+        data.read(&text[0], length);
+        _textContent.reset(text);
+        pages.push_back(Page(PageType::Text, id.string()));
+
+    } else if (id.type == ResourceType::Ncs) {
+        auto routines = make_unique<Routines>(_gameId, nullptr, nullptr);
+        routines->init();
+
+        auto pcodeBytes = make_unique<ByteArray>();
+        auto pcode = ByteArrayOutputStream(*pcodeBytes);
+        auto tool = NcsTool(_gameId);
+        tool.toPCODE(data, pcode, *routines);
+        _pcodeContent.reset(*pcodeBytes);
+        pages.push_back(Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef)));
+
+        data.seek(0, SeekOrigin::Begin);
+        auto nssBytes = make_unique<ByteArray>();
+        auto nss = ByteArrayOutputStream(*nssBytes);
+        tool.toNSS(data, nss, *routines);
+        _nssContent.reset(*nssBytes);
+        pages.push_back(Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef)));
+
+    } else if (id.type == ResourceType::Nss) {
+        data.seek(0, SeekOrigin::End);
+        auto length = data.position();
+        data.seek(0, SeekOrigin::Begin);
+        auto text = string(length, '\0');
+        data.read(&text[0], length);
+        _nssContent.reset(text);
+        pages.push_back(Page(PageType::NSS, id.string()));
+
+    } else if (id.type == ResourceType::Lip) {
+        auto reader = LipReader("");
+        reader.load(data);
+        auto animation = reader.animation();
+
+        auto columns = vector<string>();
+        columns.push_back("Time");
+        columns.push_back("Shape");
+        auto rows = vector<vector<string>>();
+        for (auto &kf : animation->keyframes()) {
+            auto values = vector<string>();
+            values.push_back(to_string(kf.time));
+            values.push_back(to_string(kf.shape));
+            rows.push_back(std::move(values));
+        }
+        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _tableContent.reset(std::move(content));
+
+        pages.push_back(Page(PageType::Table, id.string()));
+
+    } else if (id.type == ResourceType::Ssf) {
+        auto reader = SsfReader();
+        reader.load(data);
+        auto &soundSet = reader.soundSet();
+
+        auto columns = vector<string>();
+        columns.push_back("Index");
+        columns.push_back("Sound");
+        auto rows = vector<vector<string>>();
+        for (size_t i = 0; i < soundSet.size(); ++i) {
+            auto values = vector<string>();
+            values.push_back(to_string(i));
+            values.push_back(to_string(soundSet.at(i)));
+            rows.push_back(std::move(values));
+        }
+        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _tableContent.reset(std::move(content));
+
+        pages.push_back(Page(PageType::Table, id.string()));
+
+    } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
+        auto tgaBytes = make_shared<ByteArray>();
+        if (id.type == ResourceType::Tpc) {
+            auto tga = ByteArrayOutputStream(*tgaBytes);
+            auto txiBytes = make_unique<ByteArray>();
+            auto txi = ByteArrayOutputStream(*txiBytes);
+            TpcTool().toTGA(data, tga, txi, false);
+            _imageInfo.reset(*txiBytes);
+        } else {
+            data.seek(0, SeekOrigin::End);
+            auto length = data.position();
+            data.seek(0, SeekOrigin::Begin);
+            tgaBytes->resize(length, '\0');
+            data.read(&(*tgaBytes)[0], length);
+            _imageInfo.reset("");
+        }
+        _imageData.reset(tgaBytes);
+        pages.push_back(Page(PageType::Image, id.string()));
+
+    } else if (id.type == ResourceType::Wav) {
+        auto mp3ReaderFactory = Mp3ReaderFactory();
+        auto reader = WavReader(mp3ReaderFactory);
+        reader.load(data);
+        _audioStream.reset(reader.stream());
+        pages.push_back(Page(PageType::Audio, id.string()));
+
+    } else {
+        return;
+    }
+
+    _pages.reset(pages);
+
+    if (id.type != ResourceType::Wav) {
+        _audioStream.reset(nullptr);
+    }
+}
 
 void MainViewModel::loadGameDirectory() {
     auto tslExePath = getPathIgnoreCase(_gamePath, "swkotor2.exe", false);
@@ -185,6 +450,7 @@ void MainViewModel::onViewCreated() {
 }
 
 void MainViewModel::onViewDestroyed() {
+    _audioStream.reset(nullptr);
 }
 
 void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
@@ -284,6 +550,11 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
         }
     }
     expandingItem.loaded = true;
+}
+
+void MainViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
+    auto &item = *_idToGameDirItem.at(id);
+    openFile(item);
 }
 
 } // namespace reone

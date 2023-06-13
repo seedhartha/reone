@@ -17,28 +17,69 @@
 
 #pragma once
 
+#include "reone/audio/stream.h"
 #include "reone/game/types.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/gff.h"
 #include "reone/resource/id.h"
+#include "reone/system/stream/input.h"
 #include "reone/tools/tool.h"
 #include "reone/tools/types.h"
 
+#include "livedata.h"
+
 namespace reone {
+
+typedef void *GameDirectoryItemId;
+
+struct GameDirectoryItem {
+    GameDirectoryItemId id {nullptr};
+    GameDirectoryItemId parentId {nullptr};
+    std::string displayName;
+    boost::filesystem::path path;
+    std::shared_ptr<resource::ResourceId> resId;
+    bool container {false};
+    bool loaded {false};
+    bool archived {false};
+};
+
+enum class PageType {
+    Text,
+    XML,
+    Table,
+    TalkTable,
+    GFF,
+    NSS,
+    PCODE,
+    Image,
+    Model,
+    Audio
+};
+
+struct Page {
+    PageType type;
+    std::string displayName;
+
+    Page(PageType type, std::string displayName) :
+        type(type),
+        displayName(displayName) {
+    }
+};
+
+struct TableContent {
+    std::vector<std::string> columns;
+    std::vector<std::vector<std::string>> rows;
+
+    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
+        columns(columns),
+        rows(rows) {
+    }
+};
 
 class MainViewModel : boost::noncopyable {
 public:
-    typedef void *GameDirectoryItemId;
-
-    struct GameDirectoryItem {
-        GameDirectoryItemId id {nullptr};
-        GameDirectoryItemId parentId {nullptr};
-        std::string displayName;
-        boost::filesystem::path path;
-        std::shared_ptr<resource::ResourceId> resId;
-        bool container {false};
-        bool loaded {false};
-        bool archived {false};
-    };
+    void openFile(const GameDirectoryItem &item);
+    void openResource(const resource::ResourceId &id, IInputStream &data);
 
     bool extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
     bool extractAllBifs(const boost::filesystem::path &destPath);
@@ -55,12 +96,24 @@ public:
     GameDirectoryItem &gameDirItem(int index) { return *_gameDirItems[index]; }
     GameDirectoryItem &gameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
+    LiveData<std::list<Page>> &pages() { return _pages; }
+    LiveData<std::string> &textContent() { return _textContent; }
+    LiveData<std::shared_ptr<TableContent>> &tableContent() { return _tableContent; }
+    LiveData<std::shared_ptr<TableContent>> &talkTableContent() { return _talkTableContent; }
+    LiveData<std::shared_ptr<resource::Gff>> &gffContent() { return _gffContent; }
+    LiveData<std::string> &nssContent() { return _nssContent; }
+    LiveData<std::string> &pcodeContent() { return _pcodeContent; }
+    LiveData<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
+    LiveData<std::string> &imageInfo() { return _imageInfo; }
+    LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
+
     void onViewCreated();
     void onViewDestroyed();
 
     void onGameDirectoryChanged(boost::filesystem::path path);
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
     void onGameDirectoryItemExpanding(GameDirectoryItemId id);
+    void onGameDirectoryItemActivated(GameDirectoryItemId id);
 
 private:
     boost::filesystem::path _gamePath;
@@ -73,6 +126,17 @@ private:
     std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
+
+    LiveData<std::list<Page>> _pages;
+    LiveData<std::shared_ptr<TableContent>> _tableContent;
+    LiveData<std::shared_ptr<TableContent>> _talkTableContent;
+    LiveData<std::shared_ptr<resource::Gff>> _gffContent;
+    LiveData<std::string> _textContent;
+    LiveData<std::string> _nssContent;
+    LiveData<std::string> _pcodeContent;
+    LiveData<std::shared_ptr<ByteArray>> _imageData;
+    LiveData<std::string> _imageInfo;
+    LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
 
     void loadGameDirectory();
     void loadTools();
