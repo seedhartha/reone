@@ -53,8 +53,6 @@
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
 
-#include "di/graphicsmodule.h"
-
 using namespace std;
 
 using namespace reone::audio;

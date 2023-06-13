@@ -22,6 +22,7 @@
 #include "reone/game/format/ssfreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
@@ -301,8 +302,22 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _imageData.reset(tgaBytes);
         pages.push_back(Page(PageType::Image, id.string()));
 
-    } else if (id.type == ResourceType::Mdl) {
+    } else if (id.type == ResourceType::Mdl || id.type == ResourceType::Mdx) {
         loadEngine();
+        /*
+        auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
+        if (!mdxBytes) {
+            throw runtime_error("Companion MDX file not found");
+        }
+        auto mdx = ByteArrayInputStream(*mdxBytes);
+        auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
+        reader.load(data, mdx);
+        */
+        auto model = _graphicsModule->models().get(id.resRef);
+        auto &scene = _sceneModule->graphs().get(kSceneMain);
+        auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
+        scene.clear();
+        scene.addRoot(sceneNode);
         pages.push_back(Page(PageType::Model, id.string()));
 
     } else if (id.type == ResourceType::Wav) {
@@ -380,6 +395,12 @@ void MainViewModel::loadEngine() {
     }
     _engineLoadRequested.reset(true);
 
+    _graphicsOpt.grass = false;
+    _graphicsOpt.ssao = false;
+    _graphicsOpt.ssr = false;
+    _graphicsOpt.fxaa = false;
+    _graphicsOpt.sharpen = false;
+
     _systemModule = make_unique<SystemModule>();
     _resourceModule = make_unique<ResourceModule>(_gamePath);
     _graphicsModule = make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
@@ -391,6 +412,23 @@ void MainViewModel::loadEngine() {
     _graphicsModule->init();
     _audioModule->init();
     _sceneModule->init();
+
+    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+    auto guiTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf", false);
+    auto tpaTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf", false);
+
+    auto &resources = _resourceModule->resources();
+    resources.indexKeyFile(keyPath);
+    resources.indexErfFile(guiTexPackPath);
+    resources.indexErfFile(tpaTexPackPath);
+
+    auto &sceneGraphs = _sceneModule->graphs();
+    sceneGraphs.reserve(kSceneMain);
+    auto &scene = sceneGraphs.get(kSceneMain);
+    _cameraNode = scene.newCamera();
+    _cameraNode->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    scene.setActiveCamera(_cameraNode.get());
+    scene.setAmbientLightColor(glm::vec3(1.0f));
 
     _engineLoaded = true;
 }
@@ -497,8 +535,26 @@ bool MainViewModel::invokeTool(Operation operation,
 }
 
 void MainViewModel::render3D(int w, int h) {
-    auto &ctx = _graphicsModule->graphicsContext();
-    ctx.clearColorDepth(glm::vec4(0.0f, 0.25f, 0.5f, 0.0f));
+    auto &scene = _sceneModule->graphs().get(kSceneMain);
+    scene.update(0.0f);
+
+    float aspect = w / static_cast<float>(h);
+    _cameraNode->setPerspectiveProjection(glm::radians(90.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+
+    auto output = _graphicsModule->pipeline().draw(scene, glm::ivec2(w, h));
+    if (!output) {
+        return;
+    }
+    _graphicsModule->uniforms().setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
+    _graphicsModule->graphicsContext().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
+        _graphicsModule->graphicsContext().clearColorDepth();
+        _graphicsModule->shaders().use(_graphicsModule->shaders().simpleTexture());
+        _graphicsModule->textures().bind(*output);
+        _graphicsModule->meshes().quadNDC().draw();
+    });
 }
 
 void MainViewModel::onViewCreated() {

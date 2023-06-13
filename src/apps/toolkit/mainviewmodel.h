@@ -143,6 +143,8 @@ private:
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
+    std::shared_ptr<scene::CameraSceneNode> _cameraNode;
+
     // Live data
 
     LiveData<std::list<Page>> _pages;
