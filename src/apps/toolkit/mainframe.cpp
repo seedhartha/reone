@@ -422,6 +422,8 @@ MainFrame::MainFrame() :
             0};
         _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
         _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
+        _glCanvas->Bind(wxEVT_MOTION, &MainFrame::OnGLCanvasMouseMotion, this);
+        _glCanvas->Bind(wxEVT_MOUSEWHEEL, &MainFrame::OnGLCanvasMouseWheel, this);
 
         auto glContext = new wxGLContext(_glCanvas);
         glContext->SetCurrent(*_glCanvas);
@@ -429,6 +431,11 @@ MainFrame::MainFrame() :
         auto renderSizer = new wxBoxSizer(wxVERTICAL);
         renderSizer->Add(_glCanvas, 1, wxEXPAND);
         _renderPanel->SetSizer(renderSizer);
+    });
+    _viewModel->renderRequested().subscribe([this](auto &requested) {
+        if (requested) {
+            _glCanvas->Refresh();
+        }
     });
     _viewModel->onViewCreated();
 
@@ -681,6 +688,15 @@ void MainFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _viewModel->render3D(clientSize.x, clientSize.y);
 
     _glCanvas->SwapBuffers();
+}
+
+void MainFrame::OnGLCanvasMouseWheel(wxMouseEvent &event) {
+    auto delta = event.GetWheelDelta() * event.GetWheelRotation();
+    _viewModel->onGLCanvasMouseWheel(delta);
+}
+
+void MainFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
+    _viewModel->onGLCanvasMouseMotion();
 }
 
 void MainFrame::OnAudioTimer(wxTimerEvent &event) {

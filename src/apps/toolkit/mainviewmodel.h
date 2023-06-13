@@ -122,6 +122,7 @@ public:
     LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
     LiveData<Progress> &progress() { return _progress; }
     LiveData<bool> &engineLoadRequested() { return _engineLoadRequested; }
+    LiveData<bool> &renderRequested() { return _renderRequested; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -130,6 +131,9 @@ public:
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
     void onGameDirectoryItemExpanding(GameDirectoryItemId id);
     void onGameDirectoryItemActivated(GameDirectoryItemId id);
+
+    void onGLCanvasMouseMotion();
+    void onGLCanvasMouseWheel(int delta);
 
 private:
     boost::filesystem::path _gamePath;
@@ -144,6 +148,7 @@ private:
     std::vector<std::shared_ptr<Tool>> _tools;
 
     std::shared_ptr<scene::CameraSceneNode> _cameraNode;
+    float _cameraDistance {8.0f};
 
     // Live data
 
@@ -159,6 +164,7 @@ private:
     LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
     LiveData<Progress> _progress;
     LiveData<bool> _engineLoadRequested;
+    LiveData<bool> _renderRequested;
 
     // END Live data
 
@@ -180,6 +186,8 @@ private:
     void loadGameDirectory();
     void loadTools();
     void loadEngine();
+
+    void updateCameraTransform();
 };
 
 } // namespace reone

@@ -304,6 +304,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
     } else if (id.type == ResourceType::Mdl || id.type == ResourceType::Mdx) {
         loadEngine();
+
         /*
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
@@ -318,14 +319,17 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
         scene.clear();
         scene.addRoot(sceneNode);
+
+        updateCameraTransform();
+
         pages.push_back(Page(PageType::Model, id.string()));
 
     } else if (id.type == ResourceType::Wav) {
+        loadEngine();
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
         _audioStream.reset(reader.stream());
-        loadEngine();
         pages.push_back(Page(PageType::Audio, id.string()));
 
     } else {
@@ -426,12 +430,7 @@ void MainViewModel::loadEngine() {
     sceneGraphs.reserve(kSceneMain);
     auto &scene = sceneGraphs.get(kSceneMain);
 
-    auto cameraTransform = glm::mat4(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 8.0f, 0.0f));
-    cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform *= glm::rotate(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     _cameraNode = scene.newCamera();
-    _cameraNode->setLocalTransform(cameraTransform);
 
     scene.setActiveCamera(_cameraNode.get());
     scene.setAmbientLightColor(glm::vec3(1.0f));
@@ -563,6 +562,15 @@ void MainViewModel::render3D(int w, int h) {
     });
 }
 
+void MainViewModel::updateCameraTransform() {
+    auto cameraTransform = glm::mat4(1.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, _cameraDistance, 0.0f));
+    cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraTransform *= glm::rotate(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    _cameraNode->setLocalTransform(cameraTransform);
+}
+
 void MainViewModel::onViewCreated() {
     loadTools();
 }
@@ -673,6 +681,15 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
 void MainViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
     auto &item = *_idToGameDirItem.at(id);
     openFile(item);
+}
+
+void MainViewModel::onGLCanvasMouseMotion() {
+}
+
+void MainViewModel::onGLCanvasMouseWheel(int delta) {
+    _cameraDistance = glm::clamp(_cameraDistance - glm::clamp(delta, -1, 1), 0.0f, 64.0f);
+    updateCameraTransform();
+    _renderRequested.reset(true);
 }
 
 } // namespace reone

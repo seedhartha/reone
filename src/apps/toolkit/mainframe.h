@@ -142,7 +142,10 @@ private:
     void OnPopupCommandSelected(wxCommandEvent &event);
 
     void OnImageCanvasPaint(wxPaintEvent &event);
+
     void OnGLCanvasPaint(wxPaintEvent &event);
+    void OnGLCanvasMouseWheel(wxMouseEvent &event);
+    void OnGLCanvasMouseMotion(wxMouseEvent &event);
 
     void OnAudioTimer(wxTimerEvent &event);
     void OnStopAudioCommand(wxCommandEvent &event);
