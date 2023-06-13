@@ -132,7 +132,7 @@ public:
     void onGameDirectoryItemExpanding(GameDirectoryItemId id);
     void onGameDirectoryItemActivated(GameDirectoryItemId id);
 
-    void onGLCanvasMouseMotion();
+    void onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown);
     void onGLCanvasMouseWheel(int delta);
 
 private:
@@ -148,7 +148,12 @@ private:
     std::vector<std::shared_ptr<Tool>> _tools;
 
     std::shared_ptr<scene::CameraSceneNode> _cameraNode;
+    std::shared_ptr<scene::ModelSceneNode> _modelNode;
     float _cameraDistance {8.0f};
+    float _modelHeading {0.0f};
+    float _modelPitch {0.0f};
+    int _lastMouseX {0};
+    int _lastMouseY {0};
 
     // Live data
 
@@ -187,6 +192,7 @@ private:
     void loadTools();
     void loadEngine();
 
+    void updateModelTransform();
     void updateCameraTransform();
 };
 

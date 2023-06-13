@@ -314,12 +314,18 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
         reader.load(data, mdx);
         */
-        auto model = _graphicsModule->models().get(id.resRef);
-        auto &scene = _sceneModule->graphs().get(kSceneMain);
-        auto sceneNode = scene.newModel(*model, ModelUsage::Creature);
-        scene.clear();
-        scene.addRoot(sceneNode);
 
+        auto &scene = _sceneModule->graphs().get(kSceneMain);
+        scene.clear();
+
+        auto model = _graphicsModule->models().get(id.resRef);
+        _modelNode = scene.newModel(*model, ModelUsage::Creature);
+        _modelHeading = 0.0f;
+        _modelPitch = 0.0f;
+        updateModelTransform();
+        scene.addRoot(_modelNode);
+
+        _cameraDistance = 8.0f;
         updateCameraTransform();
 
         pages.push_back(Page(PageType::Model, id.string()));
@@ -562,6 +568,13 @@ void MainViewModel::render3D(int w, int h) {
     });
 }
 
+void MainViewModel::updateModelTransform() {
+    auto transform = glm::mat4(1.0f);
+    transform *= glm::rotate(_modelHeading, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_modelPitch, glm::vec3(-1.0f, 0.0f, 0.0f));
+    _modelNode->setLocalTransform(transform);
+}
+
 void MainViewModel::updateCameraTransform() {
     auto cameraTransform = glm::mat4(1.0f);
     cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, _cameraDistance, 0.0f));
@@ -683,7 +696,19 @@ void MainViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
     openFile(item);
 }
 
-void MainViewModel::onGLCanvasMouseMotion() {
+void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown) {
+    int dx = x - _lastMouseX;
+    int dy = y - _lastMouseY;
+
+    if (leftDown) {
+        _modelHeading += dx / glm::pi<float>() / 32.0f;
+        _modelPitch += dy / glm::pi<float>() / 32.0f;
+        updateModelTransform();
+        _renderRequested.reset(true);
+    }
+
+    _lastMouseX = x;
+    _lastMouseY = y;
 }
 
 void MainViewModel::onGLCanvasMouseWheel(int delta) {

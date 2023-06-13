@@ -696,7 +696,9 @@ void MainFrame::OnGLCanvasMouseWheel(wxMouseEvent &event) {
 }
 
 void MainFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
-    _viewModel->onGLCanvasMouseMotion();
+    wxClientDC dc(_glCanvas);
+    auto position = event.GetLogicalPosition(dc);
+    _viewModel->onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
 void MainFrame::OnAudioTimer(wxTimerEvent &event) {
