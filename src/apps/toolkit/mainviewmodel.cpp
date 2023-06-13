@@ -425,8 +425,14 @@ void MainViewModel::loadEngine() {
     auto &sceneGraphs = _sceneModule->graphs();
     sceneGraphs.reserve(kSceneMain);
     auto &scene = sceneGraphs.get(kSceneMain);
+
+    auto cameraTransform = glm::mat4(1.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, 8.0f, 0.0f));
+    cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraTransform *= glm::rotate(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     _cameraNode = scene.newCamera();
-    _cameraNode->setLocalTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    _cameraNode->setLocalTransform(cameraTransform);
+
     scene.setActiveCamera(_cameraNode.get());
     scene.setAmbientLightColor(glm::vec3(1.0f));
 
@@ -539,7 +545,7 @@ void MainViewModel::render3D(int w, int h) {
     scene.update(0.0f);
 
     float aspect = w / static_cast<float>(h);
-    _cameraNode->setPerspectiveProjection(glm::radians(90.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
     auto output = _graphicsModule->pipeline().draw(scene, glm::ivec2(w, h));
     if (!output) {
