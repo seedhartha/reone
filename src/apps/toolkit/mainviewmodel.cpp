@@ -441,6 +441,7 @@ void MainViewModel::loadEngine() {
 
     scene.setActiveCamera(_cameraNode.get());
     scene.setAmbientLightColor(glm::vec3(1.0f));
+    scene.setUpdateRoots(false);
 
     _engineLoaded = true;
 }
