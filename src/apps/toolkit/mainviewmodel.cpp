@@ -325,7 +325,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         updateModelTransform();
         scene.addRoot(_modelNode);
 
-        _cameraDistance = 8.0f;
+        _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
         updateCameraTransform();
 
         pages.push_back(Page(PageType::Model, id.string()));
@@ -577,7 +577,7 @@ void MainViewModel::updateModelTransform() {
 
 void MainViewModel::updateCameraTransform() {
     auto cameraTransform = glm::mat4(1.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(0.0f, _cameraDistance, 0.0f));
+    cameraTransform = glm::translate(cameraTransform, _cameraPosition);
     cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     cameraTransform *= glm::rotate(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -701,9 +701,14 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
     int dy = y - _lastMouseY;
 
     if (leftDown) {
-        _modelHeading += dx / glm::pi<float>() / 32.0f;
-        _modelPitch += dy / glm::pi<float>() / 32.0f;
+        _modelHeading += dx / glm::pi<float>() / 64.0f;
+        //_modelPitch += dy / glm::pi<float>() / 64.0f;
         updateModelTransform();
+        _renderRequested.reset(true);
+    } else if (rightDown) {
+        _cameraPosition.x += dx / static_cast<float>(256.0f);
+        _cameraPosition.z += dy / static_cast<float>(256.0f);
+        updateCameraTransform();
         _renderRequested.reset(true);
     }
 
@@ -712,7 +717,7 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
 }
 
 void MainViewModel::onGLCanvasMouseWheel(int delta) {
-    _cameraDistance = glm::clamp(_cameraDistance - glm::clamp(delta, -1, 1), 0.0f, 64.0f);
+    _cameraPosition.y = glm::max(0.0f, _cameraPosition.y - glm::clamp(delta, -1, 1));
     updateCameraTransform();
     _renderRequested.reset(true);
 }

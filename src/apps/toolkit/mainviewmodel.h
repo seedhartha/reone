@@ -149,7 +149,7 @@ private:
 
     std::shared_ptr<scene::CameraSceneNode> _cameraNode;
     std::shared_ptr<scene::ModelSceneNode> _modelNode;
-    float _cameraDistance {8.0f};
+    glm::vec3 _cameraPosition {0.0f};
     float _modelHeading {0.0f};
     float _modelPitch {0.0f};
     int _lastMouseX {0};
