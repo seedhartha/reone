@@ -280,9 +280,6 @@ MainFrame::MainFrame() :
 
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
-    _progressDialog = new wxProgressDialog("", "", 100, this);
-    _progressDialog->Hide();
-
     for (auto &page : kAllPageTypes) {
         auto window = GetPageWindow(page);
         window->Hide();
@@ -401,14 +398,18 @@ MainFrame::MainFrame() :
         }
     });
     _viewModel->progress().subscribe([this](auto &progress) {
-        if (!progress.visible) {
-            _progressDialog->Hide();
-            return;
+        if (progress.visible) {
+            if (!_progressDialog) {
+                _progressDialog = new wxProgressDialog("", "", 100, this);
+            }
+            _progressDialog->SetTitle(progress.title);
+            _progressDialog->Update(progress.value, progress.message);
+        } else {
+            if (_progressDialog) {
+                _progressDialog->Destroy();
+                _progressDialog = nullptr;
+            }
         }
-        _progressDialog->SetTitle(progress.title);
-        _progressDialog->Update(progress.value, progress.message);
-        _progressDialog->Raise();
-        _progressDialog->Show();
     });
     _viewModel->engineLoadRequested().subscribe([this](auto &requested) {
         if (!requested) {
