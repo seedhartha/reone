@@ -302,10 +302,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _imageData.reset(tgaBytes);
         pages.push_back(Page(PageType::Image, id.string()));
 
-    } else if (id.type == ResourceType::Mdl || id.type == ResourceType::Mdx) {
+    } else if (id.type == ResourceType::Mdl) {
         loadEngine();
 
-        /*
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
             throw runtime_error("Companion MDX file not found");
@@ -313,13 +312,13 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto mdx = ByteArrayInputStream(*mdxBytes);
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
         reader.load(data, mdx);
-        */
+        _model = reader.model();
+        _model->init();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);
         scene.clear();
 
-        auto model = _graphicsModule->models().get(id.resRef);
-        _modelNode = scene.newModel(*model, ModelUsage::Creature);
+        _modelNode = scene.newModel(*_model, ModelUsage::Creature);
         _modelHeading = 0.0f;
         _modelPitch = 0.0f;
         updateModelTransform();
@@ -426,11 +425,13 @@ void MainViewModel::loadEngine() {
     auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
     auto guiTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf", false);
     auto tpaTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf", false);
+    auto overridePath = getPathIgnoreCase(_gamePath, "override", false);
 
     auto &resources = _resourceModule->resources();
     resources.indexKeyFile(keyPath);
     resources.indexErfFile(guiTexPackPath);
     resources.indexErfFile(tpaTexPackPath);
+    resources.indexDirectory(overridePath);
 
     auto &sceneGraphs = _sceneModule->graphs();
     sceneGraphs.reserve(kSceneMain);

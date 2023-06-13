@@ -21,6 +21,7 @@
 #include "reone/audio/stream.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/module.h"
+#include "reone/graphics/model.h"
 #include "reone/resource/di/module.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
@@ -148,6 +149,7 @@ private:
     std::vector<std::shared_ptr<Tool>> _tools;
 
     std::shared_ptr<scene::CameraSceneNode> _cameraNode;
+    std::shared_ptr<graphics::Model> _model;
     std::shared_ptr<scene::ModelSceneNode> _modelNode;
     glm::vec3 _cameraPosition {0.0f};
     float _modelHeading {0.0f};
