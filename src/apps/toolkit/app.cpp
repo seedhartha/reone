@@ -39,4 +39,4 @@ bool ToolkitApp::OnInit() {
 
 } // namespace reone
 
-wxIMPLEMENT_APP_CONSOLE(reone::ToolkitApp);
+wxIMPLEMENT_APP(reone::ToolkitApp);

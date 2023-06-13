@@ -30,9 +30,12 @@
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
 
-// Xlib conflict workaround
+// Xlib conflicts workaround
 #ifdef None
 #undef None
+#endif
+#ifdef Always
+#undef Always
 #endif
 
 #include "reone/audio/context.h"
