@@ -79,7 +79,7 @@ private:
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
     wxSplitterWindow *_imageSplitter {nullptr};
-    wxPanel *_renderPanel {nullptr};
+    wxSplitterWindow *_renderSplitter {nullptr};
     wxPanel *_audioPanel {nullptr};
 
     wxTextCtrl *_plainTextCtrl {nullptr};
@@ -91,10 +91,12 @@ private:
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
     wxPanel *_imageCanvas {nullptr};
     wxTextCtrl *_imageInfoCtrl {nullptr};
+    wxListBox *_animationsListBox {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
 
     std::unique_ptr<wxBitmap> _image;
 
+    wxTimer _renderTimer;
     wxTimer _audioTimer;
 
     // END Widgets
@@ -129,9 +131,6 @@ private:
     void OnToNcsToolCommand(wxCommandEvent &event);
     void OnToNssToolCommand(wxCommandEvent &event);
 
-    void OnSplitterSize(wxSizeEvent &event);
-    void OnSplitterSashPosChanging(wxSplitterEvent &event);
-
     void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
@@ -147,7 +146,11 @@ private:
     void OnGLCanvasMouseWheel(wxMouseEvent &event);
     void OnGLCanvasMouseMotion(wxMouseEvent &event);
 
+    void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
+
+    void OnRenderTimer(wxTimerEvent &event);
     void OnAudioTimer(wxTimerEvent &event);
+
     void OnStopAudioCommand(wxCommandEvent &event);
 
     // END Events

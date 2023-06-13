@@ -102,6 +102,9 @@ public:
                     const boost::filesystem::path &srcPath,
                     const boost::filesystem::path &destPath);
 
+    void playAnimation(const std::string &anim);
+
+    void update3D();
     void render3D(int w, int h);
 
     game::GameID gameId() const { return _gameId; }
@@ -120,10 +123,12 @@ public:
     LiveData<std::string> &pcodeContent() { return _pcodeContent; }
     LiveData<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
     LiveData<std::string> &imageInfo() { return _imageInfo; }
+    LiveData<std::vector<std::string>> &animations() { return _animations; }
     LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
     LiveData<Progress> &progress() { return _progress; }
     LiveData<bool> &engineLoadRequested() { return _engineLoadRequested; }
     LiveData<bool> &renderRequested() { return _renderRequested; }
+    LiveData<bool> &renderTimerEnabled() { return _renderTimerEnabled; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -156,6 +161,7 @@ private:
     float _modelPitch {0.0f};
     int _lastMouseX {0};
     int _lastMouseY {0};
+    uint32_t _lastTicks {0};
 
     // Live data
 
@@ -168,10 +174,12 @@ private:
     LiveData<std::string> _pcodeContent;
     LiveData<std::shared_ptr<ByteArray>> _imageData;
     LiveData<std::string> _imageInfo;
+    LiveData<std::vector<std::string>> _animations;
     LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
     LiveData<Progress> _progress;
     LiveData<bool> _engineLoadRequested;
     LiveData<bool> _renderRequested;
+    LiveData<bool> _renderTimerEnabled;
 
     // END Live data
 

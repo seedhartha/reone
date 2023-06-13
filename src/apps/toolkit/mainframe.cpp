@@ -64,7 +64,6 @@ using namespace reone::scene;
 namespace reone {
 
 static constexpr char kIconName[] = "toolkit";
-static constexpr int kMinPanelWidth = 640;
 
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
@@ -106,11 +105,13 @@ struct CommandID {
 };
 
 struct TimerID {
-    static constexpr int audio = 1;
+    static constexpr int render = 1;
+    static constexpr int audio = 2;
 };
 
 MainFrame::MainFrame() :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
+    _renderTimer(this, TimerID::render),
     _audioTimer(this, TimerID::audio) {
 
 #ifdef _WIN32
@@ -146,8 +147,6 @@ MainFrame::MainFrame() :
     SetMenuBar(menuBar);
 
     _splitter = new wxSplitterWindow(this, wxID_ANY);
-    _splitter->Bind(wxEVT_SIZE, &MainFrame::OnSplitterSize, this);
-    _splitter->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, &MainFrame::OnSplitterSashPosChanging, this);
     _splitter->SetMinimumPaneSize(300);
 
     /*
@@ -267,9 +266,10 @@ MainFrame::MainFrame() :
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
-    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, numeric_limits<int>::max());
 
-    _renderPanel = new wxPanel(_notebook);
+    _renderSplitter = new wxSplitterWindow(_notebook);
+    _renderSplitter->SetMinimumPaneSize(100);
 
     _audioPanel = new wxPanel(_notebook);
     auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
@@ -379,9 +379,22 @@ MainFrame::MainFrame() :
         _imageInfoCtrl->Clear();
         _imageInfoCtrl->AppendText(info);
         if (!info.empty()) {
-            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, numeric_limits<int>::max());
         } else {
             _imageSplitter->Unsplit(_imageInfoCtrl);
+        }
+    });
+    _viewModel->animations().subscribe([this](auto &animations) {
+        if (!animations.empty()) {
+            _animationsListBox->Freeze();
+            _animationsListBox->Clear();
+            for (auto &animation : animations) {
+                _animationsListBox->Append(animation);
+            }
+            _animationsListBox->Thaw();
+            _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, numeric_limits<int>::max());
+        } else {
+            _renderSplitter->Unsplit();
         }
     });
     _viewModel->audioStream().subscribe([this](auto &stream) {
@@ -420,7 +433,7 @@ MainFrame::MainFrame() :
             WX_GL_MAJOR_VERSION, 3, //
             WX_GL_MINOR_VERSION, 3, //
             0};
-        _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+        _glCanvas = new wxGLCanvas(_renderSplitter, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
         _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
         _glCanvas->Bind(wxEVT_MOTION, &MainFrame::OnGLCanvasMouseMotion, this);
         _glCanvas->Bind(wxEVT_MOUSEWHEEL, &MainFrame::OnGLCanvasMouseWheel, this);
@@ -428,13 +441,22 @@ MainFrame::MainFrame() :
         auto glContext = new wxGLContext(_glCanvas);
         glContext->SetCurrent(*_glCanvas);
 
-        auto renderSizer = new wxBoxSizer(wxVERTICAL);
-        renderSizer->Add(_glCanvas, 1, wxEXPAND);
-        _renderPanel->SetSizer(renderSizer);
+        _animationsListBox = new wxListBox(_renderSplitter, wxID_ANY);
+        _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::OnAnimationsListBoxDoubleClick, this);
+        _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, numeric_limits<int>::max());
     });
     _viewModel->renderRequested().subscribe([this](auto &requested) {
         if (requested) {
             _glCanvas->Refresh();
+        }
+    });
+    _viewModel->renderTimerEnabled().subscribe([this](auto &enabled) {
+        if (enabled) {
+            if (!_renderTimer.IsRunning()) {
+                _renderTimer.Start(1000 / 60);
+            }
+        } else {
+            _renderTimer.Stop();
         }
     });
     _viewModel->onViewCreated();
@@ -461,7 +483,7 @@ wxWindow *MainFrame::GetPageWindow(PageType type) const {
     case PageType::Image:
         return _imageSplitter;
     case PageType::Model:
-        return _renderPanel;
+        return _renderSplitter;
     case PageType::Audio:
         return _audioPanel;
     default:
@@ -472,21 +494,6 @@ wxWindow *MainFrame::GetPageWindow(PageType type) const {
 void MainFrame::OnClose(wxCloseEvent &event) {
     Destroy();
     _viewModel->onViewDestroyed();
-}
-
-void MainFrame::OnSplitterSize(wxSizeEvent &event) {
-    int requestedPanelSize = event.GetSize().x - _splitter->GetSashSize() - _splitter->GetSashPosition();
-    if (requestedPanelSize < kMinPanelWidth) {
-        _splitter->SetSashPosition(event.GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
-    }
-    event.Skip();
-}
-
-void MainFrame::OnSplitterSashPosChanging(wxSplitterEvent &event) {
-    int requestedPanelSize = _splitter->GetSize().x - _splitter->GetSashSize() - event.GetSashPosition();
-    if (requestedPanelSize < kMinPanelWidth) {
-        event.SetSashPosition(_splitter->GetSize().x - _splitter->GetSashSize() - kMinPanelWidth);
-    }
 }
 
 void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
@@ -701,6 +708,20 @@ void MainFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
     _viewModel->onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
+void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
+    int selection = event.GetSelection();
+    if (selection == -1) {
+        return;
+    }
+    auto animation = _animationsListBox->GetString(selection);
+    _viewModel->playAnimation((string)animation);
+}
+
+void MainFrame::OnRenderTimer(wxTimerEvent &event) {
+    _viewModel->update3D();
+    _glCanvas->Refresh();
+}
+
 void MainFrame::OnAudioTimer(wxTimerEvent &event) {
     if (_audioSource) {
         _audioSource->update();
@@ -847,6 +868,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(EventHandlerID::toPcodeTool, MainFrame::OnToPcodeToolCommand)            //
     EVT_MENU(EventHandlerID::toNcsTool, MainFrame::OnToNcsToolCommand)                //
     EVT_MENU(EventHandlerID::toNssTool, MainFrame::OnToNssToolCommand)                //
+    EVT_TIMER(TimerID::render, MainFrame::OnRenderTimer)                              //
     EVT_TIMER(TimerID::audio, MainFrame::OnAudioTimer)                                //
     wxEND_EVENT_TABLE()
 

@@ -305,6 +305,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     } else if (id.type == ResourceType::Mdl) {
         loadEngine();
 
+        _renderTimerEnabled.reset(false);
+
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
             throw runtime_error("Companion MDX file not found");
@@ -312,11 +314,15 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto mdx = ByteArrayInputStream(*mdxBytes);
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
         reader.load(data, mdx);
-        _model = reader.model();
-        _model->init();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);
         scene.clear();
+        scene.update(0.0f);
+        _modelNode.reset();
+
+        _model = reader.model();
+        _model->init();
+        _animations.reset(_model->getAnimationNames());
 
         _modelNode = scene.newModel(*_model, ModelUsage::Creature);
         _modelHeading = 0.0f;
@@ -342,6 +348,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     }
 
     _pages.reset(pages);
+
+    _renderTimerEnabled.reset(id.type == ResourceType::Mdl);
 
     if (id.type != ResourceType::Wav) {
         _audioStream.reset(nullptr);
@@ -441,7 +449,6 @@ void MainViewModel::loadEngine() {
 
     scene.setActiveCamera(_cameraNode.get());
     scene.setAmbientLightColor(glm::vec3(1.0f));
-    scene.setUpdateRoots(false);
 
     _engineLoaded = true;
 }
@@ -547,9 +554,27 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
+void MainViewModel::playAnimation(const string &anim) {
+    if (!_modelNode) {
+        return;
+    }
+    _modelNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+}
+
+void MainViewModel::update3D() {
+    auto ticks = _systemModule->services().clock.ticks();
+    if (_lastTicks == 0) {
+        _lastTicks = ticks;
+    }
+    float delta = (ticks - _lastTicks) / 1000.0f;
+    _lastTicks = ticks;
+
+    auto &scene = _sceneModule->graphs().get(kSceneMain);
+    scene.update(delta);
+}
+
 void MainViewModel::render3D(int w, int h) {
     auto &scene = _sceneModule->graphs().get(kSceneMain);
-    scene.update(0.0f);
 
     float aspect = w / static_cast<float>(h);
     _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
@@ -706,12 +731,12 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
         _modelHeading += dx / glm::pi<float>() / 64.0f;
         //_modelPitch += dy / glm::pi<float>() / 64.0f;
         updateModelTransform();
-        _renderRequested.reset(true);
+        //_renderRequested.reset(true);
     } else if (rightDown) {
         _cameraPosition.x += dx / static_cast<float>(256.0f);
         _cameraPosition.z += dy / static_cast<float>(256.0f);
         updateCameraTransform();
-        _renderRequested.reset(true);
+        //_renderRequested.reset(true);
     }
 
     _lastMouseX = x;
@@ -721,7 +746,7 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
 void MainViewModel::onGLCanvasMouseWheel(int delta) {
     _cameraPosition.y = glm::max(0.0f, _cameraPosition.y - glm::clamp(delta, -1, 1));
     updateCameraTransform();
-    _renderRequested.reset(true);
+    //_renderRequested.reset(true);
 }
 
 } // namespace reone
