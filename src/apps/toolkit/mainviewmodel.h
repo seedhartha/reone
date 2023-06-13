@@ -114,6 +114,7 @@ public:
     LiveData<std::string> &imageInfo() { return _imageInfo; }
     LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
     LiveData<Progress> &progress() { return _progress; }
+    LiveData<bool> &loadEngine() { return _loadEngine; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -146,6 +147,7 @@ private:
     LiveData<std::string> _imageInfo;
     LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
     LiveData<Progress> _progress;
+    LiveData<bool> _loadEngine;
 
     void loadGameDirectory();
     void loadTools();

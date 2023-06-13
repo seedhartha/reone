@@ -32,7 +32,7 @@ public:
         _resource(resource) {
     }
 
-    ~GraphicsModule() { deinit(); }
+    virtual ~GraphicsModule() { deinit(); }
 
     void init();
     void deinit();
@@ -47,11 +47,11 @@ public:
     graphics::Textures &textures() { return *_textures; }
     graphics::Uniforms &uniforms() { return *_uniforms; }
     graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
-    graphics::Window &window() { return *_window; }
+    graphics::IWindow &window() { return *_window; }
 
     graphics::GraphicsServices &services() { return *_services; }
 
-private:
+protected:
     graphics::GraphicsOptions &_options;
     resource::ResourceModule &_resource;
 
@@ -65,9 +65,11 @@ private:
     std::unique_ptr<graphics::Textures> _textures;
     std::unique_ptr<graphics::Uniforms> _uniforms;
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
-    std::unique_ptr<graphics::Window> _window;
+    std::unique_ptr<graphics::IWindow> _window;
 
     std::unique_ptr<graphics::GraphicsServices> _services;
+
+    virtual std::unique_ptr<graphics::IWindow> newWindow();
 };
 
 } // namespace graphics

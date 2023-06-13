@@ -298,11 +298,16 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _imageData.reset(tgaBytes);
         pages.push_back(Page(PageType::Image, id.string()));
 
+    } else if (id.type == ResourceType::Mdl) {
+        _loadEngine.reset(true);
+        pages.push_back(Page(PageType::Model, id.string()));
+
     } else if (id.type == ResourceType::Wav) {
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
         _audioStream.reset(reader.stream());
+        _loadEngine.reset(true);
         pages.push_back(Page(PageType::Audio, id.string()));
 
     } else {

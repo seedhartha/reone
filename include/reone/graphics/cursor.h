@@ -21,13 +21,14 @@ namespace reone {
 
 namespace graphics {
 
+class IWindow;
+
 class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
 class Textures;
 class Uniforms;
-class Window;
 
 class Cursor : boost::noncopyable {
 public:
@@ -39,7 +40,7 @@ public:
         Shaders &shaders,
         Textures &textures,
         Uniforms &uniforms,
-        Window &window) :
+        IWindow &window) :
         _up(std::move(up)),
         _down(std::move(down)),
         _graphicsContext(graphicsContext),
@@ -69,7 +70,7 @@ private:
     Shaders &_shaders;
     Textures &_textures;
     Uniforms &_uniforms;
-    Window &_window;
+    IWindow &_window;
 
     // END Services
 };

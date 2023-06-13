@@ -36,11 +36,16 @@
 #endif
 
 #include "reone/audio/context.h"
+#include "reone/audio/di/module.h"
 #include "reone/audio/source.h"
 #include "reone/game/types.h"
+#include "reone/graphics/di/module.h"
+#include "reone/resource/di/module.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/id.h"
+#include "reone/scene/di/module.h"
+#include "reone/system/di/module.h"
 #include "reone/system/stream/input.h"
 
 #include "mainviewmodel.h"
@@ -53,7 +58,6 @@ public:
 
 private:
     std::unique_ptr<MainViewModel> _viewModel;
-    std::unique_ptr<audio::AudioContext> _audioCtx;
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
@@ -97,9 +101,26 @@ private:
 
     // END Widgets
 
+    // Embedded engine
+
+    graphics::GraphicsOptions _graphicsOpt;
+    audio::AudioOptions _audioOpt;
+
+    std::unique_ptr<SystemModule> _systemModule;
+    std::unique_ptr<resource::ResourceModule> _resourceModule;
+    std::unique_ptr<graphics::GraphicsModule> _graphicsModule;
+    std::unique_ptr<audio::AudioModule> _audioModule;
+    std::unique_ptr<scene::SceneModule> _sceneModule;
+
+    bool _engineLoaded {false};
+
+    // END Embedded engine
+
     void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
 
     void InvokeTool(Operation operation);
+
+    void LoadEngine();
 
     wxWindow *GetPageWindow(PageType type) const;
 

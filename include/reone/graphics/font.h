@@ -29,7 +29,6 @@ class Shaders;
 class Texture;
 class Textures;
 class Uniforms;
-class Window;
 
 class Font {
 public:
@@ -38,14 +37,12 @@ public:
         Meshes &meshes,
         Shaders &shaders,
         Textures &textures,
-        Uniforms &uniforms,
-        Window &window) :
+        Uniforms &uniforms) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
-        _uniforms(uniforms),
-        _window(window) {
+        _uniforms(uniforms) {
     }
 
     void load(std::shared_ptr<Texture> texture);
@@ -78,7 +75,6 @@ private:
     Shaders &_shaders;
     Textures &_textures;
     Uniforms &_uniforms;
-    Window &_window;
 
     // END Services
 

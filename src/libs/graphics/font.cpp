@@ -24,7 +24,6 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 
 using namespace std;
 

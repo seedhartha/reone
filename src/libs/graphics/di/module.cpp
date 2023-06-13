@@ -24,7 +24,7 @@ namespace reone {
 namespace graphics {
 
 void GraphicsModule::init() {
-    _window = make_unique<Window>(_options);
+    _window = newWindow();
     _graphicsContext = make_unique<GraphicsContext>(_options);
     _meshes = make_unique<Meshes>();
     _textures = make_unique<Textures>(_options, _resource.resources());
@@ -33,7 +33,7 @@ void GraphicsModule::init() {
     _lipAnimations = make_unique<LipAnimations>(_resource.resources());
     _uniforms = make_unique<Uniforms>();
     _shaders = make_unique<Shaders>(_options);
-    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms, *_window);
+    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
     _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
 
     _services = make_unique<GraphicsServices>(
@@ -49,7 +49,6 @@ void GraphicsModule::init() {
         *_walkmeshes,
         *_window);
 
-    _window->init();
     _graphicsContext->init();
     _meshes->init();
     _textures->init();
@@ -68,6 +67,12 @@ void GraphicsModule::deinit() {
     _meshes.reset();
     _graphicsContext.reset();
     _window.reset();
+}
+
+unique_ptr<IWindow> GraphicsModule::newWindow() {
+    auto window = make_unique<Window>(_options);
+    window->init();
+    return window;
 }
 
 } // namespace graphics

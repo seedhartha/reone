@@ -29,6 +29,8 @@ class Resources;
 
 namespace graphics {
 
+class IWindow;
+
 class Cursor;
 class GraphicsContext;
 class Meshes;
@@ -36,7 +38,6 @@ class Shaders;
 class Texture;
 class Textures;
 class Uniforms;
-class Window;
 
 } // namespace graphics
 
@@ -57,7 +58,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Uniforms &uniforms,
-        graphics::Window &window,
+        graphics::IWindow &window,
         resource::Resources &resources) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
@@ -84,7 +85,7 @@ private:
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
     graphics::Uniforms &_uniforms;
-    graphics::Window &_window;
+    graphics::IWindow &_window;
     resource::Resources &_resources;
 
     // END Services

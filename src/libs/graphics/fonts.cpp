@@ -44,7 +44,7 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (!texture)
         return nullptr;
 
-    auto font = make_shared<Font>(_graphicsContext, _meshes, _shaders, _textures, _uniforms, _window);
+    auto font = make_shared<Font>(_graphicsContext, _meshes, _shaders, _textures, _uniforms);
     font->load(texture);
 
     return std::move(font);
