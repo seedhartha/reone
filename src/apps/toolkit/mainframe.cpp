@@ -63,7 +63,7 @@ using namespace reone::scene;
 
 namespace reone {
 
-static constexpr char kIconName[] = "reone";
+static constexpr char kIconName[] = "toolkit";
 static constexpr int kMinPanelWidth = 640;
 
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
