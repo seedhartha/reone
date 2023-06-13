@@ -270,11 +270,19 @@ MainFrame::MainFrame() :
 
     _renderPanel = new wxPanel(_notebook);
     auto renderSizer = new wxBoxSizer(wxVERTICAL);
-    _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+
+    auto glAttribs = vector<int> {
+        WX_GL_CORE_PROFILE,     //
+        WX_GL_MAJOR_VERSION, 3, //
+        WX_GL_MINOR_VERSION, 3, //
+        0};
+    _glCanvas = new wxGLCanvas(_renderPanel, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
+
     auto glContext = new wxGLContext(_glCanvas);
     glContext->SetCurrent(*_glCanvas);
     renderSizer->Add(_glCanvas, 1, wxEXPAND);
+
     _renderPanel->SetSizer(renderSizer);
 
     _audioPanel = new wxPanel(_notebook);
