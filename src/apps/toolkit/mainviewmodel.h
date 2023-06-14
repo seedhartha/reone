@@ -140,6 +140,7 @@ public:
 
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
+    EventHandler<int> &pageSelected() { return _pageSelected; }
     EventHandler<std::shared_ptr<TableContent>> &tableContent() { return _tableContent; }
     EventHandler<std::shared_ptr<TableContent>> &talkTableContent() { return _talkTableContent; }
     EventHandler<std::shared_ptr<resource::Gff>> &gffContent() { return _gffContent; }
@@ -195,6 +196,7 @@ private:
 
     EventHandler<Page *> _pageAdded;
     EventHandler<PageRemovingEventData> _pageRemoving;
+    EventHandler<int> _pageSelected;
     EventHandler<std::shared_ptr<TableContent>> _tableContent;
     EventHandler<std::shared_ptr<TableContent>> _talkTableContent;
     EventHandler<std::shared_ptr<resource::Gff>> _gffContent;

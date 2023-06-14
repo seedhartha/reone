@@ -298,6 +298,9 @@ MainFrame::MainFrame() :
             _notebook->DeletePage(data.index);
         }
     });
+    _viewModel->pageSelected().subscribe([this](int page) {
+        _notebook->SetSelection(page);
+    });
     _viewModel->tableContent().subscribe([this](auto &content) {
         _tableCtrl->Freeze();
         _tableCtrl->ClearColumns();

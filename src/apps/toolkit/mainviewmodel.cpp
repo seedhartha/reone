@@ -145,6 +145,14 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 }
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
+    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id](auto &page) {
+        return page.resourceId == id;
+    });
+    if (samePage != _pages.end()) {
+        _pageSelected.invoke(std::distance(_pages.begin(), samePage));
+        return;
+    }
+
     if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
