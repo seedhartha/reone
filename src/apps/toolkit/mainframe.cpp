@@ -470,9 +470,9 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
     _filesTreeCtrl->Freeze();
     _filesTreeCtrl->DeleteAllItems();
-    int numGameDirItems = _viewModel->numGameDirItems();
+    int numGameDirItems = _viewModel->getGameDirItemCount();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = _viewModel->gameDirItem(i);
+        auto &item = _viewModel->getGameDirItem(i);
         void *itemId;
         if (item.container) {
             auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
@@ -504,15 +504,15 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
-    auto &expandingItem = _viewModel->gameDirItemById(expandingItemId);
+    auto &expandingItem = _viewModel->getGameDirItemById(expandingItemId);
     if (expandingItem.loaded) {
         return;
     }
     _viewModel->onGameDirectoryItemExpanding(expandingItemId);
     _filesTreeCtrl->Freeze();
-    int numGameDirItems = _viewModel->numGameDirItems();
+    int numGameDirItems = _viewModel->getGameDirItemCount();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = _viewModel->gameDirItem(i);
+        auto &item = _viewModel->getGameDirItem(i);
         if (item.id || item.parentId != expandingItemId) {
             continue;
         }
@@ -548,6 +548,11 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
             auto locStringItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
             ctrl.AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
             ctrl.AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
+            if (field.intValue != -1) {
+                auto tlkText = _viewModel->getTalkTableText(field.intValue);
+                auto cleanedTlkText = boost::replace_all_copy(tlkText, "\n", "\\n");
+                ctrl.AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
+            }
         } break;
         case Gff::FieldType::Void:
             ctrl.AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)));
@@ -587,7 +592,7 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
 
 void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto &item = _viewModel->gameDirItemById(itemId);
+    auto &item = _viewModel->getGameDirItemById(itemId);
     if (item.resId && item.resId->type == ResourceType::Ncs) {
         auto menu = wxMenu();
         menu.Append(CommandID::decompile, "Decompile");
@@ -616,7 +621,7 @@ void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
 
 void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
-    auto &page = _viewModel->page(pageIdx);
+    auto &page = _viewModel->getPage(pageIdx);
     if (page.type == PageType::Text) {
         _notebook->DeletePage(pageIdx);
     } else {
@@ -636,7 +641,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
 
     if (event.GetId() == CommandID::extract) {
         auto itemId = menu->GetClientData();
-        auto &item = _viewModel->gameDirItemById(itemId);
+        auto &item = _viewModel->getGameDirItemById(itemId);
 
         auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {

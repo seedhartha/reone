@@ -212,12 +212,22 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         auto columns = vector<string>();
         columns.push_back("Index");
-        columns.push_back("Sound");
+        columns.push_back("StrRef");
+        columns.push_back("TalkTableText");
+        columns.push_back("TalkTableSound");
         auto rows = vector<vector<string>>();
         for (size_t i = 0; i < soundSet.size(); ++i) {
             auto values = vector<string>();
             values.push_back(to_string(i));
-            values.push_back(to_string(soundSet.at(i)));
+            auto strRef = *reinterpret_cast<const int *>(&soundSet.at(i));
+            values.push_back(to_string(strRef));
+            if (strRef != -1) {
+                values.push_back(getTalkTableText(strRef));
+                values.push_back(getTalkTableSound(strRef));
+            } else {
+                values.push_back("");
+                values.push_back("");
+            }
             rows.push_back(std::move(values));
         }
 
@@ -337,6 +347,12 @@ void MainViewModel::loadGameDirectory() {
     keyReader.load(key);
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
+
+    auto tlkPath = getPathIgnoreCase(_gamePath, "dialog.tlk", false);
+    auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
+    auto tlkReader = TlkReader();
+    tlkReader.load(tlk);
+    _talkTable = tlkReader.table();
 
     _routines = make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();

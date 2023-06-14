@@ -27,6 +27,7 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/id.h"
+#include "reone/resource/talktable.h"
 #include "reone/scene/di/module.h"
 #include "reone/system/di/module.h"
 #include "reone/system/stream/input.h"
@@ -133,15 +134,18 @@ public:
     game::GameID gameId() const { return _gameId; }
     const boost::filesystem::path &gamePath() const { return _gamePath; }
 
-    int numGameDirItems() const { return static_cast<int>(_gameDirItems.size()); }
-    GameDirectoryItem &gameDirItem(int index) { return *_gameDirItems[index]; }
-    GameDirectoryItem &gameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
+    int getGameDirItemCount() const { return static_cast<int>(_gameDirItems.size()); }
+    GameDirectoryItem &getGameDirItem(int index) { return *_gameDirItems[index]; }
+    GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
-    const Page &page(int index) {
+    const Page &getPage(int index) {
         auto pageIterator = _pages.begin();
         std::advance(pageIterator, index);
         return *pageIterator;
     }
+
+    std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
+    std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
@@ -175,6 +179,7 @@ private:
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
+    std::shared_ptr<resource::TalkTable> _talkTable;
     std::unique_ptr<game::Routines> _routines;
 
     std::vector<std::shared_ptr<GameDirectoryItem>> _gameDirItems;
