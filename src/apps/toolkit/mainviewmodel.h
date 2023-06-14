@@ -62,12 +62,24 @@ enum class PageType {
     Audio
 };
 
+struct TableContent {
+    std::vector<std::string> columns;
+    std::vector<std::vector<std::string>> rows;
+
+    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
+        columns(columns),
+        rows(rows) {
+    }
+};
+
 struct Page {
     PageType type;
     std::string displayName;
     resource::ResourceId resourceId;
 
     std::string textContent;
+    std::shared_ptr<TableContent> tableContent;
+    std::shared_ptr<resource::Gff> gffContent;
 
     Page(PageType type,
          std::string displayName,
@@ -95,16 +107,6 @@ struct Progress {
     std::string title;
     std::string message;
     int value {0};
-};
-
-struct TableContent {
-    std::vector<std::string> columns;
-    std::vector<std::vector<std::string>> rows;
-
-    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
-        columns(columns),
-        rows(rows) {
-    }
 };
 
 class MainViewModel : boost::noncopyable {
@@ -141,9 +143,6 @@ public:
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
     EventHandler<int> &pageSelected() { return _pageSelected; }
-    EventHandler<std::shared_ptr<TableContent>> &tableContent() { return _tableContent; }
-    EventHandler<std::shared_ptr<TableContent>> &talkTableContent() { return _talkTableContent; }
-    EventHandler<std::shared_ptr<resource::Gff>> &gffContent() { return _gffContent; }
     EventHandler<std::string> &nssContent() { return _nssContent; }
     EventHandler<std::string> &pcodeContent() { return _pcodeContent; }
     EventHandler<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
@@ -197,9 +196,7 @@ private:
     EventHandler<Page *> _pageAdded;
     EventHandler<PageRemovingEventData> _pageRemoving;
     EventHandler<int> _pageSelected;
-    EventHandler<std::shared_ptr<TableContent>> _tableContent;
-    EventHandler<std::shared_ptr<TableContent>> _talkTableContent;
-    EventHandler<std::shared_ptr<resource::Gff>> _gffContent;
+
     EventHandler<std::string> _nssContent;
     EventHandler<std::string> _pcodeContent;
     EventHandler<std::shared_ptr<ByteArray>> _imageData;

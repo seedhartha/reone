@@ -186,73 +186,43 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.invoke(std::move(content));
-
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Table;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
         auto page = Page(PageType::Table, id.string(), id);
+        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader();
         reader.load(data);
-        _gffContent.invoke(reader.root());
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::GFF;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
         auto page = Page(PageType::GFF, id.string(), id);
+        page.gffContent = reader.root();
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Tlk) {
-        if (!_talkTableContent.data()) {
-            auto reader = TlkReader();
-            reader.load(data);
-            auto tlk = reader.table();
+        auto reader = TlkReader();
+        reader.load(data);
+        auto tlk = reader.table();
 
-            auto columns = vector<string>();
-            columns.push_back("Index");
-            columns.push_back("Text");
-            columns.push_back("Sound");
+        auto columns = vector<string>();
+        columns.push_back("Index");
+        columns.push_back("Text");
+        columns.push_back("Sound");
 
-            auto rows = vector<vector<string>>();
-            for (int i = 0; i < tlk->getStringCount(); ++i) {
-                auto &str = tlk->getString(i);
-                auto cleanedText = boost::replace_all_copy(str.text, "\n", "\\n");
-                auto values = vector<string>();
-                values.push_back(to_string(i));
-                values.push_back(cleanedText);
-                values.push_back(str.soundResRef);
-                rows.push_back(std::move(values));
-            }
-
-            auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-            _talkTableContent.invoke(std::move(content));
+        auto rows = vector<vector<string>>();
+        for (int i = 0; i < tlk->getStringCount(); ++i) {
+            auto &str = tlk->getString(i);
+            auto cleanedText = boost::replace_all_copy(str.text, "\n", "\\n");
+            auto values = vector<string>();
+            values.push_back(to_string(i));
+            values.push_back(cleanedText);
+            values.push_back(str.soundResRef);
+            rows.push_back(std::move(values));
         }
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::TalkTable;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
-        auto page = Page(PageType::TalkTable, id.string(), id);
+        auto page = Page(PageType::Table, id.string(), id);
+        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 
@@ -331,18 +301,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             values.push_back(to_string(kf.shape));
             rows.push_back(std::move(values));
         }
-        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.invoke(std::move(content));
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Table;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
         auto page = Page(PageType::Table, id.string(), id);
+        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 
@@ -362,17 +323,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.invoke(std::move(content));
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Table;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
         auto page = Page(PageType::Table, id.string(), id);
+        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 

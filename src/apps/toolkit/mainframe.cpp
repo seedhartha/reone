@@ -69,9 +69,6 @@ static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim"
 
 static const set<PageType> kStaticPageTypes {
     PageType::XML,
-    PageType::Table,
-    PageType::TalkTable,
-    PageType::GFF,
     PageType::NSS,
     PageType::PCODE,
     PageType::Image,
@@ -173,27 +170,8 @@ MainFrame::MainFrame() :
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
     */
 
-    _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT));
+    _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
-
-    _tablePanel = new wxPanel(_notebook);
-    auto tableSizer = new wxBoxSizer(wxVERTICAL);
-    _tableCtrl = new wxDataViewListCtrl(_tablePanel, wxID_ANY);
-    tableSizer->Add(_tableCtrl, 1, wxEXPAND);
-    _tablePanel->SetSizer(tableSizer);
-
-    _talkTablePanel = new wxPanel(_notebook);
-    auto talkTableSizer = new wxBoxSizer(wxVERTICAL);
-    _talkTableCtrl = new wxDataViewListCtrl(_talkTablePanel, wxID_ANY);
-    talkTableSizer->Add(_talkTableCtrl, 1, wxEXPAND);
-    _talkTablePanel->SetSizer(talkTableSizer);
-
-    _gffPanel = new wxPanel(_notebook);
-    auto gffSizer = new wxBoxSizer(wxVERTICAL);
-    _gffTreeCtrl = new wxDataViewTreeCtrl(_gffPanel, wxID_ANY);
-    _gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnGffTreeCtrlItemEditingDone, this);
-    gffSizer->Add(_gffTreeCtrl, 1, wxEXPAND);
-    _gffPanel->SetSizer(gffSizer);
 
     _xmlPanel = new wxPanel(_notebook);
     auto xmlSizer = new wxBoxSizer(wxVERTICAL);
@@ -301,48 +279,6 @@ MainFrame::MainFrame() :
     _viewModel->pageSelected().subscribe([this](int page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->tableContent().subscribe([this](auto &content) {
-        _tableCtrl->Freeze();
-        _tableCtrl->ClearColumns();
-        _tableCtrl->DeleteAllItems();
-        if (content) {
-            for (auto &column : content->columns) {
-                _tableCtrl->AppendTextColumn(column);
-            }
-            for (auto &row : content->rows) {
-                auto values = wxVector<wxVariant>();
-                for (auto &value : row) {
-                    values.push_back(wxVariant(value));
-                }
-                _tableCtrl->AppendItem(values);
-            }
-        }
-        _tableCtrl->Thaw();
-    });
-    _viewModel->talkTableContent().subscribe([this](auto &content) {
-        _talkTableCtrl->Freeze();
-        _talkTableCtrl->ClearColumns();
-        _talkTableCtrl->DeleteAllItems();
-        if (content) {
-            for (auto &column : content->columns) {
-                _talkTableCtrl->AppendTextColumn(column);
-            }
-            for (auto &row : content->rows) {
-                auto values = wxVector<wxVariant>();
-                for (auto &value : row) {
-                    values.push_back(wxVariant(value));
-                }
-                _talkTableCtrl->AppendItem(values);
-            }
-        }
-        _talkTableCtrl->Thaw();
-    });
-    _viewModel->gffContent().subscribe([this](auto &content) {
-        _gffTreeCtrl->Freeze();
-        _gffTreeCtrl->DeleteAllItems();
-        AppendGffStructToTree(wxDataViewItem(), "/", *content);
-        _gffTreeCtrl->Thaw();
-    });
     _viewModel->nssContent().subscribe([this](auto &content) {
         _nssTextCtrl->SetEditable(true);
         _nssTextCtrl->SetText(content);
@@ -449,7 +385,7 @@ MainFrame::MainFrame() :
     // CreateStatusBar();
 }
 
-wxWindow *MainFrame::NewPageWindow(const Page &page) const {
+wxWindow *MainFrame::NewPageWindow(const Page &page) {
     switch (page.type) {
     case PageType::Text: {
         auto textPanel = new wxPanel(_notebook);
@@ -461,6 +397,38 @@ wxWindow *MainFrame::NewPageWindow(const Page &page) const {
         textPanel->SetSizer(textSizer);
         return textPanel;
     }
+    case PageType::Table: {
+        auto tablePanel = new wxPanel(_notebook);
+        auto tableSizer = new wxBoxSizer(wxVERTICAL);
+        auto tableCtrl = new wxDataViewListCtrl(tablePanel, wxID_ANY);
+        tableCtrl->Freeze();
+        for (auto &column : page.tableContent->columns) {
+            tableCtrl->AppendTextColumn(column);
+        }
+        for (auto &row : page.tableContent->rows) {
+            auto values = wxVector<wxVariant>();
+            for (auto &value : row) {
+                values.push_back(wxVariant(value));
+            }
+            tableCtrl->AppendItem(values);
+        }
+        tableCtrl->Thaw();
+        tableSizer->Add(tableCtrl, 1, wxEXPAND);
+        tablePanel->SetSizer(tableSizer);
+        return tablePanel;
+    }
+    case PageType::GFF: {
+        auto gffPanel = new wxPanel(_notebook);
+        auto gffSizer = new wxBoxSizer(wxVERTICAL);
+        auto gffTreeCtrl = new wxDataViewTreeCtrl(gffPanel, wxID_ANY);
+        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnGffTreeCtrlItemEditingDone, this);
+        gffTreeCtrl->Freeze();
+        AppendGffStructToTree(*gffTreeCtrl, wxDataViewItem(), "/", *page.gffContent);
+        gffTreeCtrl->Thaw();
+        gffSizer->Add(gffTreeCtrl, 1, wxEXPAND);
+        gffPanel->SetSizer(gffSizer);
+        return gffPanel;
+    }
     default:
         throw logic_error("Unsupported page type");
     }
@@ -470,12 +438,6 @@ wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
     switch (type) {
     case PageType::XML:
         return _xmlPanel;
-    case PageType::Table:
-        return _tablePanel;
-    case PageType::TalkTable:
-        return _talkTablePanel;
-    case PageType::GFF:
-        return _gffPanel;
     case PageType::NSS:
         return _nssPanel;
     case PageType::PCODE:
@@ -583,51 +545,51 @@ void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     _viewModel->onGameDirectoryItemActivated(itemId);
 }
 
-void MainFrame::AppendGffStructToTree(wxDataViewItem parent, const string &text, const Gff &gff) {
-    auto structItem = _gffTreeCtrl->AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
+void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const string &text, const Gff &gff) {
+    auto structItem = ctrl.AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
     for (auto &field : gff.fields()) {
         switch (field.type) {
         case Gff::FieldType::CExoString:
         case Gff::FieldType::ResRef: {
             auto cleaned = boost::replace_all_copy(field.strValue, "\n", "\\n");
-            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)));
+            ctrl.AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)));
         } break;
         case Gff::FieldType::CExoLocString: {
-            auto locStringItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            _gffTreeCtrl->AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
-            _gffTreeCtrl->AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
+            auto locStringItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            ctrl.AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
+            ctrl.AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
         } break;
         case Gff::FieldType::Void:
-            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)));
+            ctrl.AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)));
             break;
         case Gff::FieldType::Struct:
-            AppendGffStructToTree(structItem, field.label, *field.children[0]);
+            AppendGffStructToTree(ctrl, structItem, field.label, *field.children[0]);
             break;
         case Gff::FieldType::List: {
-            auto listItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            auto listItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
             for (auto it = field.children.begin(); it != field.children.end(); ++it) {
                 auto childIdx = std::distance(field.children.begin(), it);
-                AppendGffStructToTree(listItem, to_string(childIdx), **it);
+                AppendGffStructToTree(ctrl, listItem, to_string(childIdx), **it);
             }
         } break;
         case Gff::FieldType::Orientation: {
-            auto orientationItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
-            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
-            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
-            _gffTreeCtrl->AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
+            auto orientationItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            ctrl.AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
+            ctrl.AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
+            ctrl.AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
+            ctrl.AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
         } break;
         case Gff::FieldType::Vector: {
-            auto vectorItem = _gffTreeCtrl->AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
-            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
-            _gffTreeCtrl->AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
+            auto vectorItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
+            ctrl.AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
+            ctrl.AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
+            ctrl.AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
         } break;
         case Gff::FieldType::StrRef:
-            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)));
+            ctrl.AppendItem(structItem, str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)));
             break;
         default:
-            _gffTreeCtrl->AppendItem(structItem, str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)));
+            ctrl.AppendItem(structItem, str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)));
             break;
         }
     }

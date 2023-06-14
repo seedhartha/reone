@@ -71,9 +71,7 @@ private:
     wxListBox *_modulesListBox {nullptr};
     wxAuiNotebook *_notebook {nullptr};
 
-    wxPanel *_tablePanel {nullptr};
     wxPanel *_talkTablePanel {nullptr};
-    wxPanel *_gffPanel {nullptr};
     wxPanel *_xmlPanel {nullptr};
     wxPanel *_nssPanel {nullptr};
     wxPanel *_pcodePanel {nullptr};
@@ -81,9 +79,7 @@ private:
     wxSplitterWindow *_renderSplitter {nullptr};
     wxPanel *_audioPanel {nullptr};
 
-    wxDataViewListCtrl *_tableCtrl {nullptr};
     wxDataViewListCtrl *_talkTableCtrl {nullptr};
-    wxDataViewTreeCtrl *_gffTreeCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
     wxTextCtrl *_pcodeTextCtrl {nullptr};
     wxStyledTextCtrl *_nssTextCtrl {nullptr};
@@ -99,11 +95,11 @@ private:
 
     // END Widgets
 
-    void AppendGffStructToTree(wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
+    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
 
     void InvokeTool(Operation operation);
 
-    wxWindow *NewPageWindow(const Page &page) const;
+    wxWindow *NewPageWindow(const Page &page);
     wxWindow *GetStaticPageWindow(PageType type) const;
 
     // Events
