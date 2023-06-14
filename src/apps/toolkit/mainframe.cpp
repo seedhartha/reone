@@ -69,8 +69,6 @@ static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim"
 
 static const set<PageType> kStaticPageTypes {
     PageType::XML,
-    PageType::NSS,
-    PageType::PCODE,
     PageType::Image,
     PageType::Model,
     PageType::Audio};
@@ -197,40 +195,6 @@ MainFrame::MainFrame() :
     xmlSizer->Add(_xmlTextCtrl, 1, wxEXPAND);
     _xmlPanel->SetSizer(xmlSizer);
 
-    _nssPanel = new wxPanel(_notebook);
-    auto nssSizer = new wxBoxSizer(wxVERTICAL);
-    _nssTextCtrl = new wxStyledTextCtrl(_nssPanel);
-    _nssTextCtrl->SetEditable(false);
-    _nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
-    _nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
-    _nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object string struct talent vector void");
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSOR, wxColour(128, 64, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_DEFAULT, wxColour(0, 0, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_WORD, wxColour(0, 0, 255));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_WORD2, wxColour(128, 0, 255));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_NUMBER, wxColour(255, 128, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_STRING, wxColour(128, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_CHARACTER, wxColour(128, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_OPERATOR, wxColour(0, 0, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_VERBATIM, wxColour(0, 0, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_REGEX, wxColour(0, 0, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENT, wxColour(0, 128, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINE, wxColour(0, 128, 0));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOC, wxColour(0, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINEDOC, wxColour(0, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
-    _nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
-    nssSizer->Add(_nssTextCtrl, 1, wxEXPAND);
-    _nssPanel->SetSizer(nssSizer);
-
-    _pcodePanel = new wxPanel(_notebook);
-    auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
-    _pcodeTextCtrl = new wxTextCtrl(_pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _pcodeTextCtrl->SetEditable(false);
-    pcodeSizer->Add(_pcodeTextCtrl, 1, wxEXPAND);
-    _pcodePanel->SetSizer(pcodeSizer);
-
     _imageSplitter = new wxSplitterWindow(_notebook, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     _imageCanvas->Bind(wxEVT_PAINT, &MainFrame::OnImageCanvasPaint, this);
@@ -278,17 +242,6 @@ MainFrame::MainFrame() :
     });
     _viewModel->pageSelected().subscribe([this](int page) {
         _notebook->SetSelection(page);
-    });
-    _viewModel->nssContent().subscribe([this](auto &content) {
-        _nssTextCtrl->SetEditable(true);
-        _nssTextCtrl->SetText(content);
-        _nssTextCtrl->SetEditable(false);
-    });
-    _viewModel->pcodeContent().subscribe([this](auto &content) {
-        _pcodeTextCtrl->SetEditable(true);
-        _pcodeTextCtrl->Clear();
-        _pcodeTextCtrl->AppendText(content);
-        _pcodeTextCtrl->SetEditable(false);
     });
     _viewModel->imageData().subscribe([this](auto &data) {
         auto stream = wxMemoryInputStream(&(*data)[0], data->size());
@@ -429,6 +382,46 @@ wxWindow *MainFrame::NewPageWindow(const Page &page) {
         gffPanel->SetSizer(gffSizer);
         return gffPanel;
     }
+    case PageType::PCODE: {
+        auto pcodePanel = new wxPanel(_notebook);
+        auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
+        auto pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+        pcodeTextCtrl->AppendText(page.pcodeContent);
+        pcodeTextCtrl->SetEditable(false);
+        pcodeSizer->Add(pcodeTextCtrl, 1, wxEXPAND);
+        pcodePanel->SetSizer(pcodeSizer);
+        return pcodePanel;
+    }
+    case PageType::NSS: {
+        auto nssPanel = new wxPanel(_notebook);
+        auto nssSizer = new wxBoxSizer(wxVERTICAL);
+        auto nssTextCtrl = new wxStyledTextCtrl(nssPanel);
+        nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
+        nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
+        nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object string struct talent vector void");
+        nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSOR, wxColour(128, 64, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_DEFAULT, wxColour(0, 0, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_WORD, wxColour(0, 0, 255));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_WORD2, wxColour(128, 0, 255));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_NUMBER, wxColour(255, 128, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_STRING, wxColour(128, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_CHARACTER, wxColour(128, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_OPERATOR, wxColour(0, 0, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_VERBATIM, wxColour(0, 0, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_REGEX, wxColour(0, 0, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENT, wxColour(0, 128, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINE, wxColour(0, 128, 0));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOC, wxColour(0, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINEDOC, wxColour(0, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
+        nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
+        nssTextCtrl->SetText(page.nssContent);
+        nssTextCtrl->SetEditable(false);
+        nssSizer->Add(nssTextCtrl, 1, wxEXPAND);
+        nssPanel->SetSizer(nssSizer);
+        return nssPanel;
+    }
     default:
         throw logic_error("Unsupported page type");
     }
@@ -438,10 +431,6 @@ wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
     switch (type) {
     case PageType::XML:
         return _xmlPanel;
-    case PageType::NSS:
-        return _nssPanel;
-    case PageType::PCODE:
-        return _pcodePanel;
     case PageType::Image:
         return _imageSplitter;
     case PageType::Model:

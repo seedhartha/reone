@@ -53,7 +53,6 @@ enum class PageType {
     Text,
     XML,
     Table,
-    TalkTable,
     GFF,
     NSS,
     PCODE,
@@ -80,6 +79,8 @@ struct Page {
     std::string textContent;
     std::shared_ptr<TableContent> tableContent;
     std::shared_ptr<resource::Gff> gffContent;
+    std::string pcodeContent;
+    std::string nssContent;
 
     Page(PageType type,
          std::string displayName,
@@ -143,8 +144,6 @@ public:
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
     EventHandler<int> &pageSelected() { return _pageSelected; }
-    EventHandler<std::string> &nssContent() { return _nssContent; }
-    EventHandler<std::string> &pcodeContent() { return _pcodeContent; }
     EventHandler<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
     EventHandler<std::string> &imageInfo() { return _imageInfo; }
     EventHandler<std::vector<std::string>> &animations() { return _animations; }
@@ -196,9 +195,6 @@ private:
     EventHandler<Page *> _pageAdded;
     EventHandler<PageRemovingEventData> _pageRemoving;
     EventHandler<int> _pageSelected;
-
-    EventHandler<std::string> _nssContent;
-    EventHandler<std::string> _pcodeContent;
     EventHandler<std::shared_ptr<ByteArray>> _imageData;
     EventHandler<std::string> _imageInfo;
     EventHandler<std::vector<std::string>> _animations;

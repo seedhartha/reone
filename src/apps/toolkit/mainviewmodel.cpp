@@ -234,17 +234,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto pcode = ByteArrayOutputStream(*pcodeBytes);
         auto tool = NcsTool(_gameId);
         tool.toPCODE(data, pcode, *routines);
-        _pcodeContent.invoke(*pcodeBytes);
 
-        auto pcodePageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::PCODE;
-        });
-        if (pcodePageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pcodePageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pcodePageToErase));
-            _pages.erase(pcodePageToErase);
-        }
         auto pcodePage = Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef), id);
+        pcodePage.pcodeContent = *pcodeBytes;
         _pages.push_back(pcodePage);
         _pageAdded.invoke(&pcodePage);
 
@@ -252,17 +244,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto nssBytes = make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
         tool.toNSS(data, nss, *routines);
-        _nssContent.invoke(*nssBytes);
 
-        auto nssPageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::PCODE;
-        });
-        if (nssPageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), nssPageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*nssPageToErase));
-            _pages.erase(nssPageToErase);
-        }
-        auto nssPage = Page(PageType::PCODE, str(boost::format("%s.nss") % id.resRef), id);
+        auto nssPage = Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef), id);
+        nssPage.nssContent = *nssBytes;
         _pages.push_back(nssPage);
         _pageAdded.invoke(&nssPage);
 
@@ -272,17 +256,9 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         data.seek(0, SeekOrigin::Begin);
         auto text = string(length, '\0');
         data.read(&text[0], length);
-        _nssContent.invoke(text);
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::NSS;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
-            _pages.erase(pageToErase);
-        }
         auto page = Page(PageType::NSS, id.string(), id);
+        page.nssContent = text;
         _pages.push_back(page);
         _pageAdded.invoke(&page);
 
@@ -322,7 +298,6 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             values.push_back(to_string(soundSet.at(i)));
             rows.push_back(std::move(values));
         }
-        auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
 
         auto page = Page(PageType::Table, id.string(), id);
         page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));

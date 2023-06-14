@@ -71,18 +71,12 @@ private:
     wxListBox *_modulesListBox {nullptr};
     wxAuiNotebook *_notebook {nullptr};
 
-    wxPanel *_talkTablePanel {nullptr};
     wxPanel *_xmlPanel {nullptr};
-    wxPanel *_nssPanel {nullptr};
-    wxPanel *_pcodePanel {nullptr};
     wxSplitterWindow *_imageSplitter {nullptr};
     wxSplitterWindow *_renderSplitter {nullptr};
     wxPanel *_audioPanel {nullptr};
 
-    wxDataViewListCtrl *_talkTableCtrl {nullptr};
     wxStyledTextCtrl *_xmlTextCtrl {nullptr};
-    wxTextCtrl *_pcodeTextCtrl {nullptr};
-    wxStyledTextCtrl *_nssTextCtrl {nullptr};
     wxPanel *_imageCanvas {nullptr};
     wxTextCtrl *_imageInfoCtrl {nullptr};
     wxListBox *_animationsListBox {nullptr};
