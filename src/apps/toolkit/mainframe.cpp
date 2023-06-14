@@ -96,6 +96,7 @@ struct EventHandlerID {
 
 struct CommandID {
     static constexpr int extract = 1;
+    static constexpr int decompile = 2;
 };
 
 struct TimerID {
@@ -382,7 +383,7 @@ wxWindow *MainFrame::NewPageWindow(const Page &page) {
         gffPanel->SetSizer(gffSizer);
         return gffPanel;
     }
-    case PageType::PCODE: {
+    case PageType::NCS: {
         auto pcodePanel = new wxPanel(_notebook);
         auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
         auto pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
@@ -587,18 +588,26 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
 void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     auto &item = _viewModel->gameDirItemById(itemId);
-    if (item.archived) {
-        return;
+    if (item.resId && item.resId->type == ResourceType::Ncs) {
+        auto menu = wxMenu();
+        menu.Append(CommandID::decompile, "Decompile");
+        menu.SetClientData(itemId);
+        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
+        PopupMenu(&menu, event.GetPosition());
+    } else {
+        if (item.archived || !boost::filesystem::is_regular_file(item.path)) {
+            return;
+        }
+        auto extension = item.path.extension().string();
+        if (kFilesArchiveExtensions.count(extension) == 0) {
+            return;
+        }
+        auto menu = wxMenu();
+        menu.Append(CommandID::extract, "Extract...");
+        menu.SetClientData(itemId);
+        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
+        PopupMenu(&menu, event.GetPosition());
     }
-    auto extension = boost::to_lower_copy(item.path.extension().string());
-    if (!boost::filesystem::is_regular_file(item.path) || kFilesArchiveExtensions.count(extension) == 0) {
-        return;
-    }
-    auto menu = wxMenu();
-    menu.Append(CommandID::extract, "Extract...");
-    menu.SetClientData(itemId);
-    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
-    PopupMenu(&menu, event.GetPosition());
 }
 
 void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
@@ -623,8 +632,9 @@ void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
 }
 
 void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
+    auto menu = static_cast<wxMenu *>(event.GetEventObject());
+
     if (event.GetId() == CommandID::extract) {
-        auto menu = static_cast<wxMenu *>(event.GetEventObject());
         auto itemId = menu->GetClientData();
         auto &item = _viewModel->gameDirItemById(itemId);
 
@@ -636,6 +646,10 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
 
         _viewModel->extractArchive(item.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
+
+    } else if (event.GetId() == CommandID::decompile) {
+        auto itemId = menu->GetClientData();
+        _viewModel->decompile(itemId);
     }
 }
 

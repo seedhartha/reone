@@ -19,6 +19,7 @@
 
 #include "reone/audio/di/module.h"
 #include "reone/audio/stream.h"
+#include "reone/game/script/routines.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/module.h"
 #include "reone/graphics/model.h"
@@ -55,7 +56,7 @@ enum class PageType {
     Table,
     GFF,
     NSS,
-    PCODE,
+    NCS,
     Image,
     Model,
     Audio
@@ -114,6 +115,7 @@ class MainViewModel : boost::noncopyable {
 public:
     void openFile(const GameDirectoryItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
+    void decompile(GameDirectoryItemId itemId);
 
     void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
     void extractAllBifs(const boost::filesystem::path &destPath);
@@ -173,6 +175,8 @@ private:
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
+    std::unique_ptr<game::Routines> _routines;
+
     std::vector<std::shared_ptr<GameDirectoryItem>> _gameDirItems;
     std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
 
@@ -227,6 +231,8 @@ private:
 
     void updateModelTransform();
     void updateCameraTransform();
+
+    void withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block);
 };
 
 } // namespace reone
