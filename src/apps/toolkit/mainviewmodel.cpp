@@ -172,13 +172,13 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
-        pages.push_back(Page(PageType::Table, id.string()));
+        pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader();
         reader.load(data);
         _gffContent.reset(reader.root());
-        pages.push_back(Page(PageType::GFF, id.string()));
+        pages.push_back(Page(PageType::GFF, id.string(), id));
 
     } else if (id.type == ResourceType::Tlk) {
         if (!_talkTableContent.data()) {
@@ -205,7 +205,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
             _talkTableContent.reset(std::move(content));
         }
-        pages.push_back(Page(PageType::TalkTable, id.string()));
+        pages.push_back(Page(PageType::TalkTable, id.string(), id));
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
@@ -214,7 +214,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
         _textContent.reset(text);
-        pages.push_back(Page(PageType::Text, id.string()));
+        pages.push_back(Page(PageType::Text, id.string(), id));
 
     } else if (id.type == ResourceType::Ncs) {
         auto routines = make_unique<Routines>(_gameId, nullptr, nullptr);
@@ -225,14 +225,14 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto tool = NcsTool(_gameId);
         tool.toPCODE(data, pcode, *routines);
         _pcodeContent.reset(*pcodeBytes);
-        pages.push_back(Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef)));
+        pages.push_back(Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef), id));
 
         data.seek(0, SeekOrigin::Begin);
         auto nssBytes = make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
         tool.toNSS(data, nss, *routines);
         _nssContent.reset(*nssBytes);
-        pages.push_back(Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef)));
+        pages.push_back(Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef), id));
 
     } else if (id.type == ResourceType::Nss) {
         data.seek(0, SeekOrigin::End);
@@ -241,7 +241,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
         _nssContent.reset(text);
-        pages.push_back(Page(PageType::NSS, id.string()));
+        pages.push_back(Page(PageType::NSS, id.string(), id));
 
     } else if (id.type == ResourceType::Lip) {
         auto reader = LipReader("");
@@ -261,7 +261,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
-        pages.push_back(Page(PageType::Table, id.string()));
+        pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (id.type == ResourceType::Ssf) {
         auto reader = SsfReader();
@@ -281,7 +281,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
-        pages.push_back(Page(PageType::Table, id.string()));
+        pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
         auto tgaBytes = make_shared<ByteArray>();
@@ -300,7 +300,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             _imageInfo.reset("");
         }
         _imageData.reset(tgaBytes);
-        pages.push_back(Page(PageType::Image, id.string()));
+        pages.push_back(Page(PageType::Image, id.string(), id));
 
     } else if (id.type == ResourceType::Mdl) {
         loadEngine();
@@ -333,7 +333,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
         updateCameraTransform();
 
-        pages.push_back(Page(PageType::Model, id.string()));
+        pages.push_back(Page(PageType::Model, id.string(), id));
 
     } else if (id.type == ResourceType::Wav) {
         loadEngine();
@@ -341,7 +341,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
         _audioStream.reset(reader.stream());
-        pages.push_back(Page(PageType::Audio, id.string()));
+        pages.push_back(Page(PageType::Audio, id.string(), id));
 
     } else {
         return;
@@ -617,6 +617,28 @@ void MainViewModel::onViewCreated() {
 
 void MainViewModel::onViewDestroyed() {
     _audioStream.reset(nullptr);
+}
+
+void MainViewModel::onNotebookPageClose(int page) {
+    ResourceId pageResId;
+
+    auto pages = _pages.data();
+    for (auto it = pages.begin(); it != pages.end(); ++it) {
+        auto index = std::distance(pages.begin(), it);
+        if (index == page) {
+            pageResId = it->resourceId;
+            pages.erase(it);
+            break;
+        }
+    }
+    _pages.reset(pages);
+
+    if (pageResId.type == ResourceType::Mdl) {
+        _renderTimerEnabled.reset(false);
+    }
+    if (pageResId.type == ResourceType::Wav) {
+        _audioStream.reset(nullptr);
+    }
 }
 
 void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {

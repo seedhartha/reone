@@ -65,10 +65,14 @@ enum class PageType {
 struct Page {
     PageType type;
     std::string displayName;
+    resource::ResourceId resourceId;
 
-    Page(PageType type, std::string displayName) :
+    Page(PageType type,
+         std::string displayName,
+         resource::ResourceId resourceId) :
         type(type),
-        displayName(displayName) {
+        displayName(displayName),
+        resourceId(resourceId) {
     }
 };
 
@@ -132,6 +136,8 @@ public:
 
     void onViewCreated();
     void onViewDestroyed();
+
+    void onNotebookPageClose(int page);
 
     void onGameDirectoryChanged(boost::filesystem::path path);
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);

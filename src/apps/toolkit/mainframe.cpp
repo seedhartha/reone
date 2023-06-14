@@ -174,7 +174,8 @@ MainFrame::MainFrame() :
     dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
     */
 
-    _notebook = new wxNotebook(_splitter, wxID_ANY);
+    _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT));
+    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
 
     _textPanel = new wxPanel(_notebook);
     auto textSizer = new wxBoxSizer(wxVERTICAL);
@@ -652,6 +653,12 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
 
 void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
     event.Veto();
+}
+
+void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
+    event.Veto();
+    int page = event.GetSelection();
+    _viewModel->onNotebookPageClose(page);
 }
 
 void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {

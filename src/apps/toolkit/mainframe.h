@@ -23,9 +23,9 @@
 #include <wx/wx.h>
 #endif
 
+#include <wx/aui/auibook.h>
 #include <wx/dataview.h>
 #include <wx/glcanvas.h>
-#include <wx/notebook.h>
 #include <wx/progdlg.h>
 #include <wx/splitter.h>
 #include <wx/stc/stc.h>
@@ -69,7 +69,7 @@ private:
 
     wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};
-    wxNotebook *_notebook {nullptr};
+    wxAuiNotebook *_notebook {nullptr};
 
     wxPanel *_textPanel {nullptr};
     wxPanel *_tablePanel {nullptr};
@@ -135,6 +135,8 @@ private:
     void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
+
+    void OnNotebookPageClose(wxAuiNotebookEvent &event);
 
     void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
