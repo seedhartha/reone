@@ -303,13 +303,15 @@ MainFrame::MainFrame() :
                 window->Hide();
             }
         }
+        _notebook->Freeze();
         while (_notebook->GetPageCount() > 0) {
             _notebook->RemovePage(0);
         }
         for (auto &page : pages) {
             auto window = GetPageWindow(page.type);
-            _notebook->AddPage(window, page.displayName);
+            _notebook->AddPage(window, page.displayName, true);
         }
+        _notebook->Thaw();
     });
     _viewModel->textContent().subscribe([this](auto &content) {
         _plainTextCtrl->SetEditable(true);

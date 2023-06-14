@@ -146,7 +146,6 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     auto pages = _pages.data();
-    pages.clear();
 
     if (id.type == ResourceType::TwoDa) {
         auto reader = TwoDaReader();
@@ -172,12 +171,21 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Table;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader();
         reader.load(data);
         _gffContent.reset(reader.root());
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::GFF;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::GFF, id.string(), id));
 
     } else if (id.type == ResourceType::Tlk) {
@@ -205,6 +213,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
             _talkTableContent.reset(std::move(content));
         }
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::TalkTable;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::TalkTable, id.string(), id));
 
     } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
@@ -214,6 +227,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
         _textContent.reset(text);
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Text;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Text, id.string(), id));
 
     } else if (id.type == ResourceType::Ncs) {
@@ -225,6 +243,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto tool = NcsTool(_gameId);
         tool.toPCODE(data, pcode, *routines);
         _pcodeContent.reset(*pcodeBytes);
+
+        auto pcodePageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::PCODE;
+        });
+        pages.erase(pcodePageToErase, pages.end());
         pages.push_back(Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef), id));
 
         data.seek(0, SeekOrigin::Begin);
@@ -232,6 +255,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto nss = ByteArrayOutputStream(*nssBytes);
         tool.toNSS(data, nss, *routines);
         _nssContent.reset(*nssBytes);
+
+        auto nssPageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::NSS;
+        });
+        pages.erase(nssPageToErase, pages.end());
         pages.push_back(Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef), id));
 
     } else if (id.type == ResourceType::Nss) {
@@ -241,6 +269,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
         _nssContent.reset(text);
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::NSS;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::NSS, id.string(), id));
 
     } else if (id.type == ResourceType::Lip) {
@@ -261,6 +294,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Table;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (id.type == ResourceType::Ssf) {
@@ -281,6 +318,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
         _tableContent.reset(std::move(content));
 
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Table;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Table, id.string(), id));
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
@@ -300,6 +341,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             _imageInfo.reset("");
         }
         _imageData.reset(tgaBytes);
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Image;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Image, id.string(), id));
 
     } else if (id.type == ResourceType::Mdl) {
@@ -333,6 +379,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
         updateCameraTransform();
 
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Model;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Model, id.string(), id));
 
     } else if (id.type == ResourceType::Wav) {
@@ -341,6 +391,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
         _audioStream.reset(reader.stream());
+
+        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+            return page.type == PageType::Audio;
+        });
+        pages.erase(pageToErase, pages.end());
         pages.push_back(Page(PageType::Audio, id.string(), id));
 
     } else {
@@ -349,10 +404,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
     _pages.reset(pages);
 
-    _renderTimerEnabled.reset(id.type == ResourceType::Mdl);
-
-    if (id.type != ResourceType::Wav) {
-        _audioStream.reset(nullptr);
+    if (id.type == ResourceType::Mdl) {
+        _renderTimerEnabled.reset(true);
     }
 }
 
