@@ -32,7 +32,7 @@
 #include "reone/tools/tool.h"
 #include "reone/tools/types.h"
 
-#include "livedata.h"
+#include "eventhandler.h"
 
 namespace reone {
 
@@ -67,12 +67,26 @@ struct Page {
     std::string displayName;
     resource::ResourceId resourceId;
 
+    std::string textContent;
+
     Page(PageType type,
          std::string displayName,
          resource::ResourceId resourceId) :
         type(type),
         displayName(displayName),
         resourceId(resourceId) {
+    }
+};
+
+struct PageRemovingEventData {
+    int index {0};
+    Page *page {nullptr};
+
+    PageRemovingEventData() {}
+
+    PageRemovingEventData(int index, Page *page) :
+        index(index),
+        page(page) {
     }
 };
 
@@ -118,21 +132,27 @@ public:
     GameDirectoryItem &gameDirItem(int index) { return *_gameDirItems[index]; }
     GameDirectoryItem &gameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
-    LiveData<std::list<Page>> &pages() { return _pages; }
-    LiveData<std::string> &textContent() { return _textContent; }
-    LiveData<std::shared_ptr<TableContent>> &tableContent() { return _tableContent; }
-    LiveData<std::shared_ptr<TableContent>> &talkTableContent() { return _talkTableContent; }
-    LiveData<std::shared_ptr<resource::Gff>> &gffContent() { return _gffContent; }
-    LiveData<std::string> &nssContent() { return _nssContent; }
-    LiveData<std::string> &pcodeContent() { return _pcodeContent; }
-    LiveData<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
-    LiveData<std::string> &imageInfo() { return _imageInfo; }
-    LiveData<std::vector<std::string>> &animations() { return _animations; }
-    LiveData<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
-    LiveData<Progress> &progress() { return _progress; }
-    LiveData<bool> &engineLoadRequested() { return _engineLoadRequested; }
-    LiveData<bool> &renderRequested() { return _renderRequested; }
-    LiveData<bool> &renderTimerEnabled() { return _renderTimerEnabled; }
+    const Page &page(int index) {
+        auto pageIterator = _pages.begin();
+        std::advance(pageIterator, index);
+        return *pageIterator;
+    }
+
+    EventHandler<Page *> &pageAdded() { return _pageAdded; }
+    EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
+    EventHandler<std::shared_ptr<TableContent>> &tableContent() { return _tableContent; }
+    EventHandler<std::shared_ptr<TableContent>> &talkTableContent() { return _talkTableContent; }
+    EventHandler<std::shared_ptr<resource::Gff>> &gffContent() { return _gffContent; }
+    EventHandler<std::string> &nssContent() { return _nssContent; }
+    EventHandler<std::string> &pcodeContent() { return _pcodeContent; }
+    EventHandler<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
+    EventHandler<std::string> &imageInfo() { return _imageInfo; }
+    EventHandler<std::vector<std::string>> &animations() { return _animations; }
+    EventHandler<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
+    EventHandler<Progress> &progress() { return _progress; }
+    EventHandler<bool> &engineLoadRequested() { return _engineLoadRequested; }
+    EventHandler<bool> &renderRequested() { return _renderRequested; }
+    EventHandler<bool> &renderTimerEnabled() { return _renderTimerEnabled; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -169,25 +189,27 @@ private:
     int _lastMouseY {0};
     uint32_t _lastTicks {0};
 
-    // Live data
+    std::list<Page> _pages;
 
-    LiveData<std::list<Page>> _pages;
-    LiveData<std::shared_ptr<TableContent>> _tableContent;
-    LiveData<std::shared_ptr<TableContent>> _talkTableContent;
-    LiveData<std::shared_ptr<resource::Gff>> _gffContent;
-    LiveData<std::string> _textContent;
-    LiveData<std::string> _nssContent;
-    LiveData<std::string> _pcodeContent;
-    LiveData<std::shared_ptr<ByteArray>> _imageData;
-    LiveData<std::string> _imageInfo;
-    LiveData<std::vector<std::string>> _animations;
-    LiveData<std::shared_ptr<audio::AudioStream>> _audioStream;
-    LiveData<Progress> _progress;
-    LiveData<bool> _engineLoadRequested;
-    LiveData<bool> _renderRequested;
-    LiveData<bool> _renderTimerEnabled;
+    // Event handlers
 
-    // END Live data
+    EventHandler<Page *> _pageAdded;
+    EventHandler<PageRemovingEventData> _pageRemoving;
+    EventHandler<std::shared_ptr<TableContent>> _tableContent;
+    EventHandler<std::shared_ptr<TableContent>> _talkTableContent;
+    EventHandler<std::shared_ptr<resource::Gff>> _gffContent;
+    EventHandler<std::string> _nssContent;
+    EventHandler<std::string> _pcodeContent;
+    EventHandler<std::shared_ptr<ByteArray>> _imageData;
+    EventHandler<std::string> _imageInfo;
+    EventHandler<std::vector<std::string>> _animations;
+    EventHandler<std::shared_ptr<audio::AudioStream>> _audioStream;
+    EventHandler<Progress> _progress;
+    EventHandler<bool> _engineLoadRequested;
+    EventHandler<bool> _renderRequested;
+    EventHandler<bool> _renderTimerEnabled;
+
+    // END Event handlers
 
     // Embedded engine
 

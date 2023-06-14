@@ -20,11 +20,11 @@
 namespace reone {
 
 template <class T>
-class LiveData : boost::noncopyable {
+class EventHandler : boost::noncopyable {
 public:
     typedef std::function<void(const T &)> Subscriber;
 
-    void reset(T data) {
+    void invoke(T data) {
         _data = std::move(data);
         for (auto &subscriber : _subscribers) {
             subscriber(_data);

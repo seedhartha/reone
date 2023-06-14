@@ -145,9 +145,19 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 }
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
-    auto pages = _pages.data();
+    if (kFilesPlaintextExtensions.count(id.type) > 0) {
+        data.seek(0, SeekOrigin::End);
+        auto length = data.position();
+        data.seek(0, SeekOrigin::Begin);
+        auto text = string(length, '\0');
+        data.read(&text[0], length);
 
-    if (id.type == ResourceType::TwoDa) {
+        auto page = Page(PageType::Text, id.string(), id);
+        page.textContent = text;
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
+
+    } else if (id.type == ResourceType::TwoDa) {
         auto reader = TwoDaReader();
         reader.load(data);
         auto twoDa = reader.twoDa();
@@ -169,24 +179,36 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         }
 
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.reset(std::move(content));
+        _tableContent.invoke(std::move(content));
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Table;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Table, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Table, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader();
         reader.load(data);
-        _gffContent.reset(reader.root());
+        _gffContent.invoke(reader.root());
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::GFF;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::GFF, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::GFF, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Tlk) {
         if (!_talkTableContent.data()) {
@@ -211,28 +233,20 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             }
 
             auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-            _talkTableContent.reset(std::move(content));
+            _talkTableContent.invoke(std::move(content));
         }
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::TalkTable;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::TalkTable, id.string(), id));
-
-    } else if (kFilesPlaintextExtensions.count(id.type) > 0) {
-        data.seek(0, SeekOrigin::End);
-        auto length = data.position();
-        data.seek(0, SeekOrigin::Begin);
-        auto text = string(length, '\0');
-        data.read(&text[0], length);
-        _textContent.reset(text);
-
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
-            return page.type == PageType::Text;
-        });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Text, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::TalkTable, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Ncs) {
         auto routines = make_unique<Routines>(_gameId, nullptr, nullptr);
@@ -242,25 +256,37 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto pcode = ByteArrayOutputStream(*pcodeBytes);
         auto tool = NcsTool(_gameId);
         tool.toPCODE(data, pcode, *routines);
-        _pcodeContent.reset(*pcodeBytes);
+        _pcodeContent.invoke(*pcodeBytes);
 
-        auto pcodePageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pcodePageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::PCODE;
         });
-        pages.erase(pcodePageToErase, pages.end());
-        pages.push_back(Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef), id));
+        if (pcodePageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pcodePageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pcodePageToErase));
+            _pages.erase(pcodePageToErase);
+        }
+        auto pcodePage = Page(PageType::PCODE, str(boost::format("%s.pcode") % id.resRef), id);
+        _pages.push_back(pcodePage);
+        _pageAdded.invoke(&pcodePage);
 
         data.seek(0, SeekOrigin::Begin);
         auto nssBytes = make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
         tool.toNSS(data, nss, *routines);
-        _nssContent.reset(*nssBytes);
+        _nssContent.invoke(*nssBytes);
 
-        auto nssPageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
-            return page.type == PageType::NSS;
+        auto nssPageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
+            return page.type == PageType::PCODE;
         });
-        pages.erase(nssPageToErase, pages.end());
-        pages.push_back(Page(PageType::NSS, str(boost::format("%s.nss") % id.resRef), id));
+        if (nssPageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), nssPageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*nssPageToErase));
+            _pages.erase(nssPageToErase);
+        }
+        auto nssPage = Page(PageType::PCODE, str(boost::format("%s.nss") % id.resRef), id);
+        _pages.push_back(nssPage);
+        _pageAdded.invoke(&nssPage);
 
     } else if (id.type == ResourceType::Nss) {
         data.seek(0, SeekOrigin::End);
@@ -268,13 +294,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         data.seek(0, SeekOrigin::Begin);
         auto text = string(length, '\0');
         data.read(&text[0], length);
-        _nssContent.reset(text);
+        _nssContent.invoke(text);
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::NSS;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::NSS, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::NSS, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Lip) {
         auto reader = LipReader("");
@@ -292,13 +324,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.reset(std::move(content));
+        _tableContent.invoke(std::move(content));
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Table;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Table, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Table, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Ssf) {
         auto reader = SsfReader();
@@ -316,13 +354,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
         auto content = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _tableContent.reset(std::move(content));
+        _tableContent.invoke(std::move(content));
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Table;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Table, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Table, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
         auto tgaBytes = make_shared<ByteArray>();
@@ -331,27 +375,33 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             auto txiBytes = make_unique<ByteArray>();
             auto txi = ByteArrayOutputStream(*txiBytes);
             TpcTool().toTGA(data, tga, txi, false);
-            _imageInfo.reset(*txiBytes);
+            _imageInfo.invoke(*txiBytes);
         } else {
             data.seek(0, SeekOrigin::End);
             auto length = data.position();
             data.seek(0, SeekOrigin::Begin);
             tgaBytes->resize(length, '\0');
             data.read(&(*tgaBytes)[0], length);
-            _imageInfo.reset("");
+            _imageInfo.invoke("");
         }
-        _imageData.reset(tgaBytes);
+        _imageData.invoke(tgaBytes);
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Image;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Image, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Image, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Mdl) {
         loadEngine();
 
-        _renderTimerEnabled.reset(false);
+        _renderTimerEnabled.invoke(false);
 
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
@@ -368,7 +418,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         _model = reader.model();
         _model->init();
-        _animations.reset(_model->getAnimationNames());
+        _animations.invoke(_model->getAnimationNames());
 
         _modelNode = scene.newModel(*_model, ModelUsage::Creature);
         _modelHeading = 0.0f;
@@ -379,33 +429,43 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
         updateCameraTransform();
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Model;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Model, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Model, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else if (id.type == ResourceType::Wav) {
         loadEngine();
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(mp3ReaderFactory);
         reader.load(data);
-        _audioStream.reset(reader.stream());
+        _audioStream.invoke(reader.stream());
 
-        auto pageToErase = remove_if(pages.begin(), pages.end(), [](auto &page) {
+        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page.type == PageType::Audio;
         });
-        pages.erase(pageToErase, pages.end());
-        pages.push_back(Page(PageType::Audio, id.string(), id));
+        if (pageToErase != _pages.end()) {
+            auto index = std::distance(_pages.begin(), pageToErase);
+            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pages.erase(pageToErase);
+        }
+        auto page = Page(PageType::Audio, id.string(), id);
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
 
     } else {
         return;
     }
 
-    _pages.reset(pages);
-
     if (id.type == ResourceType::Mdl) {
-        _renderTimerEnabled.reset(true);
+        _renderTimerEnabled.invoke(true);
     }
 }
 
@@ -463,7 +523,7 @@ void MainViewModel::loadEngine() {
     if (_engineLoaded || _gamePath.empty()) {
         return;
     }
-    _engineLoadRequested.reset(true);
+    _engineLoadRequested.invoke(true);
 
     _graphicsOpt.grass = false;
     _graphicsOpt.ssao = false;
@@ -546,7 +606,7 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto progress = Progress();
     progress.visible = true;
     progress.title = "Extract all BIF archives";
-    _progress.reset(progress);
+    _progress.invoke(progress);
 
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
@@ -557,11 +617,11 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
         }
         progress.value = 100 * bifIdx / static_cast<int>(_keyFiles.size());
         tool.extractBIF(keyReader, bifIdx++, bifPath, destPath);
-        _progress.reset(progress);
+        _progress.invoke(progress);
     }
 
     progress.visible = false;
-    _progress.reset(progress);
+    _progress.invoke(progress);
 }
 
 void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
@@ -579,19 +639,19 @@ void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath,
     auto progress = Progress();
     progress.visible = true;
     progress.title = "Batch convert TPC to TGA/TXI";
-    _progress.reset(progress);
+    _progress.invoke(progress);
 
     auto tool = TpcTool();
     for (size_t i = 0; i < tpcFiles.size(); ++i) {
         progress.value = 100 * static_cast<int>(i / tpcFiles.size());
-        _progress.reset(progress);
+        _progress.invoke(progress);
 
         auto &tpcPath = tpcFiles[i];
         tool.toTGA(tpcPath, destPath);
     }
 
     progress.visible = false;
-    _progress.reset(progress);
+    _progress.invoke(progress);
 }
 
 bool MainViewModel::invokeTool(Operation operation,
@@ -669,28 +729,20 @@ void MainViewModel::onViewCreated() {
 }
 
 void MainViewModel::onViewDestroyed() {
-    _audioStream.reset(nullptr);
+    _audioStream.invoke(nullptr);
 }
 
 void MainViewModel::onNotebookPageClose(int page) {
-    ResourceId pageResId;
-
-    auto pages = _pages.data();
-    for (auto it = pages.begin(); it != pages.end(); ++it) {
-        auto index = std::distance(pages.begin(), it);
-        if (index == page) {
-            pageResId = it->resourceId;
-            pages.erase(it);
-            break;
-        }
-    }
-    _pages.reset(pages);
+    auto pageIterator = _pages.begin();
+    std::advance(pageIterator, page);
+    auto pageResId = pageIterator->resourceId;
+    _pages.erase(pageIterator);
 
     if (pageResId.type == ResourceType::Mdl) {
-        _renderTimerEnabled.reset(false);
+        _renderTimerEnabled.invoke(false);
     }
     if (pageResId.type == ResourceType::Wav) {
-        _audioStream.reset(nullptr);
+        _audioStream.invoke(nullptr);
     }
 }
 

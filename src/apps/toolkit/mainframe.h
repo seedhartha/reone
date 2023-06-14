@@ -71,7 +71,6 @@ private:
     wxListBox *_modulesListBox {nullptr};
     wxAuiNotebook *_notebook {nullptr};
 
-    wxPanel *_textPanel {nullptr};
     wxPanel *_tablePanel {nullptr};
     wxPanel *_talkTablePanel {nullptr};
     wxPanel *_gffPanel {nullptr};
@@ -82,7 +81,6 @@ private:
     wxSplitterWindow *_renderSplitter {nullptr};
     wxPanel *_audioPanel {nullptr};
 
-    wxTextCtrl *_plainTextCtrl {nullptr};
     wxDataViewListCtrl *_tableCtrl {nullptr};
     wxDataViewListCtrl *_talkTableCtrl {nullptr};
     wxDataViewTreeCtrl *_gffTreeCtrl {nullptr};
@@ -105,7 +103,8 @@ private:
 
     void InvokeTool(Operation operation);
 
-    wxWindow *GetPageWindow(PageType type) const;
+    wxWindow *NewPageWindow(const Page &page) const;
+    wxWindow *GetStaticPageWindow(PageType type) const;
 
     // Events
 

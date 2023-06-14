@@ -17,7 +17,7 @@ set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 
 set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/app.h
-    ${TOOLKIT_SOURCE_DIR}/livedata.h
+    ${TOOLKIT_SOURCE_DIR}/eventhandler.h
     ${TOOLKIT_SOURCE_DIR}/mainframe.h
     ${TOOLKIT_SOURCE_DIR}/mainviewmodel.h)
 

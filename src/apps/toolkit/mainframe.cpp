@@ -67,8 +67,7 @@ static constexpr char kIconName[] = "toolkit";
 
 static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const set<PageType> kAllPageTypes {
-    PageType::Text,
+static const set<PageType> kStaticPageTypes {
     PageType::XML,
     PageType::Table,
     PageType::TalkTable,
@@ -177,13 +176,6 @@ MainFrame::MainFrame() :
     _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT));
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
 
-    _textPanel = new wxPanel(_notebook);
-    auto textSizer = new wxBoxSizer(wxVERTICAL);
-    _plainTextCtrl = new wxTextCtrl(_textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _plainTextCtrl->SetEditable(false);
-    textSizer->Add(_plainTextCtrl, 1, wxEXPAND);
-    _textPanel->SetSizer(textSizer);
-
     _tablePanel = new wxPanel(_notebook);
     auto tableSizer = new wxBoxSizer(wxVERTICAL);
     _tableCtrl = new wxDataViewListCtrl(_tablePanel, wxID_ANY);
@@ -281,43 +273,30 @@ MainFrame::MainFrame() :
 
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
-    for (auto &page : kAllPageTypes) {
-        auto window = GetPageWindow(page);
+    for (auto &page : kStaticPageTypes) {
+        auto window = GetStaticPageWindow(page);
         window->Hide();
     }
 
     _viewModel = make_unique<MainViewModel>();
-    _viewModel->pages().subscribe([this](auto &pages) {
-        auto activeTypes = set<PageType>();
-        for (auto &page : pages) {
-            activeTypes.insert(page.type);
+    _viewModel->pageAdded().subscribe([this](auto &page) {
+        wxWindow *window;
+        if (kStaticPageTypes.count(page->type) > 0) {
+            window = GetStaticPageWindow(page->type);
+        } else {
+            window = NewPageWindow(*page);
         }
-        for (auto &page : kAllPageTypes) {
-            auto window = GetPageWindow(page);
-            if (!window) {
-                continue;
-            }
-            if (activeTypes.count(page) > 0) {
-                window->Show();
-            } else {
-                window->Hide();
-            }
-        }
-        _notebook->Freeze();
-        while (_notebook->GetPageCount() > 0) {
-            _notebook->RemovePage(0);
-        }
-        for (auto &page : pages) {
-            auto window = GetPageWindow(page.type);
-            _notebook->AddPage(window, page.displayName, true);
-        }
-        _notebook->Thaw();
+        window->Show();
+        _notebook->AddPage(window, page->displayName, true);
     });
-    _viewModel->textContent().subscribe([this](auto &content) {
-        _plainTextCtrl->SetEditable(true);
-        _plainTextCtrl->Clear();
-        _plainTextCtrl->AppendText(content);
-        _plainTextCtrl->SetEditable(false);
+    _viewModel->pageRemoving().subscribe([this](auto &data) {
+        if (kStaticPageTypes.count(data.page->type) > 0) {
+            auto window = GetStaticPageWindow(data.page->type);
+            window->Hide();
+            _notebook->RemovePage(data.index);
+        } else {
+            _notebook->DeletePage(data.index);
+        }
     });
     _viewModel->tableContent().subscribe([this](auto &content) {
         _tableCtrl->Freeze();
@@ -467,10 +446,25 @@ MainFrame::MainFrame() :
     // CreateStatusBar();
 }
 
-wxWindow *MainFrame::GetPageWindow(PageType type) const {
+wxWindow *MainFrame::NewPageWindow(const Page &page) const {
+    switch (page.type) {
+    case PageType::Text: {
+        auto textPanel = new wxPanel(_notebook);
+        auto textSizer = new wxBoxSizer(wxVERTICAL);
+        auto plainTextCtrl = new wxTextCtrl(textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+        plainTextCtrl->AppendText(page.textContent);
+        plainTextCtrl->SetEditable(false);
+        textSizer->Add(plainTextCtrl, 1, wxEXPAND);
+        textPanel->SetSizer(textSizer);
+        return textPanel;
+    }
+    default:
+        throw logic_error("Unsupported page type");
+    }
+}
+
+wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
     switch (type) {
-    case PageType::Text:
-        return _textPanel;
     case PageType::XML:
         return _xmlPanel;
     case PageType::Table:
@@ -658,9 +652,16 @@ void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
 }
 
 void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
+    int pageIdx = event.GetSelection();
+    auto &page = _viewModel->page(pageIdx);
+    if (page.type == PageType::Text) {
+        _notebook->DeletePage(pageIdx);
+    } else {
+        _notebook->RemovePage(pageIdx);
+    }
+    _viewModel->onNotebookPageClose(pageIdx);
+
     event.Veto();
-    int page = event.GetSelection();
-    _viewModel->onNotebookPageClose(page);
 }
 
 void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
