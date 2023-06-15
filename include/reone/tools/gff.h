@@ -24,12 +24,6 @@
 
 namespace reone {
 
-namespace resource {
-
-class Strings;
-
-}
-
 class GffTool : public Tool {
 public:
     void invoke(
@@ -46,10 +40,10 @@ public:
 
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
-    void toXML(IInputStream &gff, IOutputStream &xml, resource::Strings &strings);
+    void toXML(IInputStream &gff, IOutputStream &xml);
 
 private:
-    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, resource::Strings &strings);
+    void toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
     void toGFF(const boost::filesystem::path &input, const boost::filesystem::path &outputDir);
 };
 

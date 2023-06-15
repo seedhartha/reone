@@ -79,6 +79,7 @@ struct Page {
     resource::ResourceId resourceId;
 
     std::string textContent;
+    std::string xmlContent;
     std::shared_ptr<TableContent> tableContent;
     std::shared_ptr<resource::Gff> gffContent;
     std::string pcodeContent;
@@ -116,6 +117,8 @@ class MainViewModel : boost::noncopyable {
 public:
     void openFile(const GameDirectoryItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
+
+    void openAsXml(GameDirectoryItemId itemId);
     void decompile(GameDirectoryItemId itemId);
 
     void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);

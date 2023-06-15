@@ -443,18 +443,43 @@ void MainViewModel::loadEngine() {
     _engineLoaded = true;
 }
 
-void MainViewModel::decompile(GameDirectoryItemId itemId) {
-    auto item = _idToGameDirItem.at(itemId);
+void MainViewModel::openAsXml(GameDirectoryItemId itemId) {
+    auto &item = *_idToGameDirItem.at(itemId);
 
-    withResourceStream(*item, [this, &item](auto &res) {
+    withResourceStream(item, [this, &item](auto &res) {
+        auto xmlBytes = make_unique<ByteArray>();
+        auto xml = ByteArrayOutputStream(*xmlBytes);
+        if (item.resId->type == ResourceType::TwoDa) {
+            TwoDaTool().toXML(res, xml);
+        } else if (isGFFCompatibleResType(item.resId->type)) {
+            GffTool().toXML(res, xml);
+        } else if (item.resId->type == ResourceType::Tlk) {
+            TlkTool().toXML(res, xml);
+        } else if (item.resId->type == ResourceType::Lip) {
+            LipTool().toXML(res, xml);
+        } else if (item.resId->type == ResourceType::Ssf) {
+            SsfTool().toXML(res, xml);
+        }
+
+        auto page = Page(PageType::XML, str(boost::format("%s.xml") % item.resId->string()), *item.resId);
+        page.xmlContent = *xmlBytes;
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
+    });
+}
+
+void MainViewModel::decompile(GameDirectoryItemId itemId) {
+    auto &item = *_idToGameDirItem.at(itemId);
+
+    withResourceStream(item, [this, &item](auto &res) {
         auto nssBytes = make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines);
 
-        auto nssPage = Page(PageType::NSS, str(boost::format("%s.nss") % item->resId->resRef), *item->resId);
-        nssPage.nssContent = *nssBytes;
-        _pages.push_back(nssPage);
-        _pageAdded.invoke(&nssPage);
+        auto page = Page(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
+        page.nssContent = *nssBytes;
+        _pages.push_back(page);
+        _pageAdded.invoke(&page);
     });
 }
 
