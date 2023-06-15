@@ -76,6 +76,10 @@ protected:
         return _reader->getUint32Array(offset, count);
     }
 
+    inline std::vector<int32_t> readInt32Array(int count) {
+        return _reader->getInt32Array(count);
+    }
+
     inline std::vector<float> readFloatArray(int count) {
         return _reader->getFloatArray(count);
     }

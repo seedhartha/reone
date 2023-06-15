@@ -30,7 +30,7 @@ void SsfReader::onLoad() {
     uint32_t tableOffset = readUint32();
     int entryCount = static_cast<int>((_size - tableOffset) / 4);
     seek(tableOffset);
-    _soundSet = readUint32Array(entryCount);
+    _soundSet = readInt32Array(entryCount);
 }
 
 } // namespace game

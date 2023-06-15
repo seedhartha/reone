@@ -78,6 +78,15 @@ public:
         return std::move(result);
     }
 
+    inline std::vector<int32_t> getInt32Array(int count) {
+        std::vector<int32_t> result;
+        result.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            result.push_back(getInt32());
+        }
+        return std::move(result);
+    }
+
     inline std::vector<float> getFloatArray(int count) {
         std::vector<float> result;
         result.reserve(count);

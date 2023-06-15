@@ -219,7 +219,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         for (size_t i = 0; i < soundSet.size(); ++i) {
             auto values = vector<string>();
             values.push_back(to_string(i));
-            auto strRef = *reinterpret_cast<const int *>(&soundSet.at(i));
+            auto strRef = soundSet.at(i);
             values.push_back(to_string(strRef));
             if (strRef != -1) {
                 values.push_back(getTalkTableText(strRef));
