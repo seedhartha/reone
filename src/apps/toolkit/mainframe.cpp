@@ -96,8 +96,7 @@ struct EventHandlerID {
 
 struct CommandID {
     static constexpr int extract = 1;
-    static constexpr int openasxml = 2;
-    static constexpr int decompile = 3;
+    static constexpr int decompile = 2;
 };
 
 struct TimerID {
@@ -304,24 +303,6 @@ MainFrame::MainFrame() :
 }
 
 void MainFrame::SaveFile() {
-    auto pageIdx = _notebook->GetSelection();
-    if (pageIdx == -1) {
-        return;
-    }
-    auto &page = _viewModel->getPage(pageIdx);
-    if (page.type != PageType::XML) {
-        return;
-    }
-    auto window = _notebook->GetPage(pageIdx);
-    for (auto &child : window->GetChildren()) {
-        auto xmlTextCtrl = dynamic_cast<wxStyledTextCtrl *>(child);
-        if (!xmlTextCtrl) {
-            continue;
-        }
-        page.xmlContent = xmlTextCtrl->GetText();
-        xmlTextCtrl->SetSavePoint();
-        break;
-    }
 }
 
 wxWindow *MainFrame::NewPageWindow(Page &page) {
@@ -335,38 +316,6 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         textSizer->Add(plainTextCtrl, 1, wxEXPAND);
         textPanel->SetSizer(textSizer);
         return textPanel;
-    }
-    case PageType::XML: {
-        auto xmlPanel = new wxPanel(_notebook);
-        auto xmlSizer = new wxBoxSizer(wxVERTICAL);
-        auto xmlTextCtrl = new wxStyledTextCtrl(xmlPanel);
-        xmlTextCtrl->SetLexer(wxSTC_LEX_XML);
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_XMLSTART, wxColour(255, 0, 0));
-        xmlTextCtrl->StyleSetBackground(wxSTC_H_XMLSTART, wxColour(255, 255, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_XMLEND, wxColour(255, 0, 0));
-        xmlTextCtrl->StyleSetBackground(wxSTC_H_XMLEND, wxColour(255, 255, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_DEFAULT, wxColour(0, 0, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_COMMENT, wxColour(0, 128, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_NUMBER, wxColour(255, 0, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_DOUBLESTRING, wxColour(128, 0, 255));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_SINGLESTRING, wxColour(128, 0, 255));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_TAG, wxColour(0, 0, 255));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_TAGEND, wxColour(0, 0, 255));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_TAGUNKNOWN, wxColour(0, 0, 255));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_ATTRIBUTE, wxColour(255, 0, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN, wxColour(255, 0, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_ENTITY, wxColour(0, 0, 0));
-        xmlTextCtrl->StyleSetForeground(wxSTC_H_CDATA, wxColour(255, 128, 0));
-        xmlTextCtrl->SetUndoCollection(false);
-        xmlTextCtrl->SetText(page.xmlContent);
-        xmlTextCtrl->SetUndoCollection(true);
-        xmlTextCtrl->SetSavePoint();
-        xmlTextCtrl->Bind(wxEVT_KEY_DOWN, &MainFrame::OnXmlKeyDown, this);
-        xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTLEFT, &MainFrame::OnXmlSavePointLeft, this);
-        xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTREACHED, &MainFrame::OnXmlSavePointReached, this);
-        xmlSizer->Add(xmlTextCtrl, 1, wxEXPAND);
-        xmlPanel->SetSizer(xmlSizer);
-        return xmlPanel;
     }
     case PageType::Table: {
         auto tablePanel = new wxPanel(_notebook);
@@ -596,17 +545,7 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
 void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     auto &item = _viewModel->getGameDirItemById(itemId);
-    if (item.resId && (item.resId->type == ResourceType::TwoDa ||
-                       item.resId->type == ResourceType::Tlk ||
-                       item.resId->type == ResourceType::Lip ||
-                       item.resId->type == ResourceType::Ssf ||
-                       isGFFCompatibleResType(item.resId->type))) {
-        auto menu = wxMenu();
-        menu.Append(CommandID::openasxml, "Open as XML");
-        menu.SetClientData(itemId);
-        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
-        PopupMenu(&menu, event.GetPosition());
-    } else if (item.resId && item.resId->type == ResourceType::Ncs) {
+    if (item.resId && item.resId->type == ResourceType::Ncs) {
         auto menu = wxMenu();
         menu.Append(CommandID::decompile, "Decompile");
         menu.SetClientData(itemId);
@@ -651,43 +590,10 @@ void MainFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
         return;
     }
     auto &page = _viewModel->getPage(pageIdx);
-    if (page.type == PageType::XML && page.dirty) {
+    if (page.dirty) {
         _saveFileMenuItem->Enable(true);
     } else {
         _saveFileMenuItem->Enable(false);
-    }
-    event.Skip();
-}
-
-void MainFrame::OnXmlSavePointLeft(wxStyledTextEvent &event) {
-    auto &textCtrl = *static_cast<wxStyledTextCtrl *>(event.GetEventObject());
-    auto panel = textCtrl.GetParent();
-    auto pageIdx = _notebook->GetPageIndex(panel);
-    auto pageText = _notebook->GetPageText(pageIdx);
-    if (!boost::starts_with(pageText, "*")) {
-        _notebook->SetPageText(pageIdx, str(boost::format("*%s") % pageText));
-    }
-    auto &page = _viewModel->getPage(pageIdx);
-    page.dirty = true;
-    _saveFileMenuItem->Enable(true);
-}
-
-void MainFrame::OnXmlSavePointReached(wxStyledTextEvent &event) {
-    auto &textCtrl = *static_cast<wxStyledTextCtrl *>(event.GetEventObject());
-    auto panel = textCtrl.GetParent();
-    auto pageIdx = _notebook->GetPageIndex(panel);
-    auto pageText = _notebook->GetPageText(pageIdx);
-    if (boost::starts_with(pageText, "*")) {
-        _notebook->SetPageText(pageIdx, pageText.Mid(1));
-    }
-    auto &page = _viewModel->getPage(pageIdx);
-    page.dirty = true;
-    _saveFileMenuItem->Enable(false);
-}
-
-void MainFrame::OnXmlKeyDown(wxKeyEvent &event) {
-    if (event.GetKeyCode() == 'S' && (event.GetModifiers() & wxMOD_CONTROL) != 0) {
-        SaveFile();
     }
     event.Skip();
 }
@@ -711,10 +617,6 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
 
         _viewModel->extractArchive(item.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
-
-    } else if (event.GetId() == CommandID::openasxml) {
-        auto itemId = menu->GetClientData();
-        _viewModel->openAsXml(itemId);
 
     } else if (event.GetId() == CommandID::decompile) {
         auto itemId = menu->GetClientData();
@@ -782,6 +684,7 @@ void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
     }
     _audioTimer.Stop();
 }
+
 void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     if (_viewModel->gamePath().empty()) {
         wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);

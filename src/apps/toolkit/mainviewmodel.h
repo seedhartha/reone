@@ -53,11 +53,10 @@ struct GameDirectoryItem {
 
 enum class PageType {
     Text,
-    XML,
     Table,
     GFF,
-    NSS,
     NCS,
+    NSS,
     Image,
     Model,
     Audio
@@ -129,13 +128,9 @@ struct Progress {
 
 class MainViewModel : boost::noncopyable {
 public:
-    void openFile(const GameDirectoryItem &item);
-    void openResource(const resource::ResourceId &id, IInputStream &data);
-
-    void openAsXml(GameDirectoryItemId itemId);
+    void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId);
 
-    void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
     void extractAllBifs(const boost::filesystem::path &destPath);
     void batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
 
@@ -248,6 +243,9 @@ private:
     void loadGameDirectory();
     void loadTools();
     void loadEngine();
+
+    void openFile(const GameDirectoryItem &item);
+    void openResource(const resource::ResourceId &id, IInputStream &data);
 
     void updateModelTransform();
     void updateCameraTransform();

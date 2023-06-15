@@ -135,10 +135,6 @@ private:
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);
 
-    void OnXmlSavePointLeft(wxStyledTextEvent &event);
-    void OnXmlSavePointReached(wxStyledTextEvent &event);
-    void OnXmlKeyDown(wxKeyEvent &event);
-
     void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);

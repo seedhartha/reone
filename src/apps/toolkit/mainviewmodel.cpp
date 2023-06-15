@@ -441,38 +441,6 @@ void MainViewModel::loadEngine() {
     _engineLoaded = true;
 }
 
-void MainViewModel::openAsXml(GameDirectoryItemId itemId) {
-    auto &item = *_idToGameDirItem.at(itemId);
-    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&item](auto &page) {
-        return page->resourceId == *item.resId && page->type == PageType::XML;
-    });
-    if (samePage != _pages.end()) {
-        _pageSelected.invoke(std::distance(_pages.begin(), samePage));
-        return;
-    }
-
-    withResourceStream(item, [this, &item](auto &res) {
-        auto xmlBytes = make_unique<ByteArray>();
-        auto xml = ByteArrayOutputStream(*xmlBytes);
-        if (item.resId->type == ResourceType::TwoDa) {
-            TwoDaTool().toXML(res, xml);
-        } else if (isGFFCompatibleResType(item.resId->type)) {
-            GffTool().toXML(res, xml);
-        } else if (item.resId->type == ResourceType::Tlk) {
-            TlkTool().toXML(res, xml);
-        } else if (item.resId->type == ResourceType::Lip) {
-            LipTool().toXML(res, xml);
-        } else if (item.resId->type == ResourceType::Ssf) {
-            SsfTool().toXML(res, xml);
-        }
-
-        auto page = make_shared<Page>(PageType::XML, str(boost::format("%s.xml") % item.resId->string()), *item.resId);
-        page->xmlContent = *xmlBytes;
-        _pages.push_back(std::move(page));
-        _pageAdded.invoke(_pages.back().get());
-    });
-}
-
 void MainViewModel::decompile(GameDirectoryItemId itemId) {
     auto &item = *_idToGameDirItem.at(itemId);
 
