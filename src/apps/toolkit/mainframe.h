@@ -133,6 +133,7 @@ private:
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
+    void OnNotebookPageChanged(wxAuiNotebookEvent &event);
 
     void OnXmlSavePointLeft(wxStyledTextEvent &event);
     void OnXmlSavePointReached(wxStyledTextEvent &event);

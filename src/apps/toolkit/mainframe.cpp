@@ -120,6 +120,7 @@ MainFrame::MainFrame() :
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
     fileMenu->AppendSeparator();
     _saveFileMenuItem = fileMenu->Append(EventHandlerID::saveFile, "&Save");
+    _saveFileMenuItem->Enable(false);
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
@@ -159,6 +160,7 @@ MainFrame::MainFrame() :
 
     _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
+    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MainFrame::OnNotebookPageChanged, this);
 
     _imageSplitter = new wxSplitterWindow(_notebook, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
@@ -633,14 +635,28 @@ void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
 void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
     auto &page = _viewModel->getPage(pageIdx);
-    if (page.type == PageType::Text) {
-        _notebook->DeletePage(pageIdx);
-    } else {
+    if (kStaticPageTypes.count(page.type) > 0) {
         _notebook->RemovePage(pageIdx);
+    } else {
+        _notebook->DeletePage(pageIdx);
     }
     _viewModel->onNotebookPageClose(pageIdx);
 
     event.Veto();
+}
+
+void MainFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
+    int pageIdx = event.GetSelection();
+    if (pageIdx == -1) {
+        return;
+    }
+    auto &page = _viewModel->getPage(pageIdx);
+    if (page.type == PageType::XML && page.dirty) {
+        _saveFileMenuItem->Enable(true);
+    } else {
+        _saveFileMenuItem->Enable(false);
+    }
+    event.Skip();
 }
 
 void MainFrame::OnXmlSavePointLeft(wxStyledTextEvent &event) {
@@ -651,6 +667,9 @@ void MainFrame::OnXmlSavePointLeft(wxStyledTextEvent &event) {
     if (!boost::starts_with(pageText, "*")) {
         _notebook->SetPageText(pageIdx, str(boost::format("*%s") % pageText));
     }
+    auto &page = _viewModel->getPage(pageIdx);
+    page.dirty = true;
+    _saveFileMenuItem->Enable(true);
 }
 
 void MainFrame::OnXmlSavePointReached(wxStyledTextEvent &event) {
@@ -661,6 +680,9 @@ void MainFrame::OnXmlSavePointReached(wxStyledTextEvent &event) {
     if (boost::starts_with(pageText, "*")) {
         _notebook->SetPageText(pageIdx, pageText.Mid(1));
     }
+    auto &page = _viewModel->getPage(pageIdx);
+    page.dirty = true;
+    _saveFileMenuItem->Enable(false);
 }
 
 void MainFrame::OnXmlKeyDown(wxKeyEvent &event) {

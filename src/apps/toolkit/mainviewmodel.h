@@ -84,6 +84,7 @@ struct Page : boost::noncopyable {
     std::shared_ptr<resource::Gff> gffContent;
     std::string pcodeContent;
     std::string nssContent;
+    bool dirty {false};
 
     Page(PageType type,
          std::string displayName,
