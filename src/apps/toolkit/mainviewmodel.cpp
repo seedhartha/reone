@@ -238,21 +238,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
         auto tgaBytes = make_shared<ByteArray>();
+        auto txiBytes = make_shared<ByteArray>();
         if (id.type == ResourceType::Tpc) {
             auto tga = ByteArrayOutputStream(*tgaBytes);
-            auto txiBytes = make_unique<ByteArray>();
             auto txi = ByteArrayOutputStream(*txiBytes);
             TpcTool().toTGA(data, tga, txi, false);
-            _imageInfo.invoke(*txiBytes);
         } else {
             data.seek(0, SeekOrigin::End);
             auto length = data.position();
             data.seek(0, SeekOrigin::Begin);
             tgaBytes->resize(length, '\0');
             data.read(&(*tgaBytes)[0], length);
-            _imageInfo.invoke("");
         }
-        _imageData.invoke(tgaBytes);
+        _imageChanged.invoke(ImageContent(tgaBytes, txiBytes));
 
         auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
             return page->type == PageType::Image;

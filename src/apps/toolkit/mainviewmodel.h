@@ -106,6 +106,19 @@ struct PageRemovingEventData {
     }
 };
 
+struct ImageContent {
+    std::shared_ptr<ByteArray> tgaBytes;
+    std::shared_ptr<ByteArray> txiBytes;
+
+    ImageContent() {
+    }
+
+    ImageContent(std::shared_ptr<ByteArray> tgaBytes, std::shared_ptr<ByteArray> txiBytes) :
+        tgaBytes(tgaBytes),
+        txiBytes(txiBytes) {
+    }
+};
+
 struct Progress {
     bool visible {false};
     std::string title;
@@ -153,8 +166,7 @@ public:
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
     EventHandler<int> &pageSelected() { return _pageSelected; }
-    EventHandler<std::shared_ptr<ByteArray>> &imageData() { return _imageData; }
-    EventHandler<std::string> &imageInfo() { return _imageInfo; }
+    EventHandler<ImageContent> &imageChanged() { return _imageChanged; }
     EventHandler<std::vector<std::string>> &animations() { return _animations; }
     EventHandler<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
     EventHandler<Progress> &progress() { return _progress; }
@@ -207,8 +219,7 @@ private:
     EventHandler<Page *> _pageAdded;
     EventHandler<PageRemovingEventData> _pageRemoving;
     EventHandler<int> _pageSelected;
-    EventHandler<std::shared_ptr<ByteArray>> _imageData;
-    EventHandler<std::string> _imageInfo;
+    EventHandler<ImageContent> _imageChanged;
     EventHandler<std::vector<std::string>> _animations;
     EventHandler<std::shared_ptr<audio::AudioStream>> _audioStream;
     EventHandler<Progress> _progress;

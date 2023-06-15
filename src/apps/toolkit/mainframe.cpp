@@ -119,7 +119,7 @@ MainFrame::MainFrame() :
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
     fileMenu->AppendSeparator();
-    fileMenu->Append(EventHandlerID::saveFile, "&Save");
+    _saveFileMenuItem = fileMenu->Append(EventHandlerID::saveFile, "&Save");
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
@@ -208,16 +208,14 @@ MainFrame::MainFrame() :
     _viewModel->pageSelected().subscribe([this](int page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->imageData().subscribe([this](auto &data) {
-        auto stream = wxMemoryInputStream(&(*data)[0], data->size());
+    _viewModel->imageChanged().subscribe([this](auto &data) {
+        auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
         _image = make_unique<wxBitmap>(image);
-    });
-    _viewModel->imageInfo().subscribe([this](auto &info) {
         _imageInfoCtrl->Clear();
-        _imageInfoCtrl->AppendText(info);
-        if (!info.empty()) {
+        _imageInfoCtrl->AppendText(*data.txiBytes);
+        if (!data.txiBytes->empty()) {
             _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, numeric_limits<int>::max());
         } else {
             _imageSplitter->Unsplit(_imageInfoCtrl);

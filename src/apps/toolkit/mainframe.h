@@ -62,6 +62,12 @@ private:
 
     std::unique_ptr<audio::AudioSource> _audioSource;
 
+    // Menus
+
+    wxMenuItem *_saveFileMenuItem {nullptr};
+
+    // END Menus
+
     // Widgets
 
     wxSplitterWindow *_splitter {nullptr};
