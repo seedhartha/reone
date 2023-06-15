@@ -92,6 +92,14 @@ struct Page {
         displayName(displayName),
         resourceId(resourceId) {
     }
+
+    bool operator==(const Page &that) const {
+        return this == &that;
+    }
+
+    bool operator!=(const Page &that) const {
+        return this != &that;
+    }
 };
 
 struct PageRemovingEventData {
@@ -103,6 +111,18 @@ struct PageRemovingEventData {
     PageRemovingEventData(int index, Page *page) :
         index(index),
         page(page) {
+    }
+};
+
+struct PageDisplayNameChangedEventData {
+    int index {0};
+    std::string displayName;
+
+    PageDisplayNameChangedEventData() {}
+
+    PageDisplayNameChangedEventData(int index, std::string displayName) :
+        index(index),
+        displayName(displayName) {
     }
 };
 

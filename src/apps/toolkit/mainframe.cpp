@@ -315,7 +315,7 @@ MainFrame::MainFrame() :
     // CreateStatusBar();
 }
 
-wxWindow *MainFrame::NewPageWindow(const Page &page) {
+wxWindow *MainFrame::NewPageWindow(Page &page) {
     switch (page.type) {
     case PageType::Text: {
         auto textPanel = new wxPanel(_notebook);
@@ -348,8 +348,12 @@ wxWindow *MainFrame::NewPageWindow(const Page &page) {
         xmlTextCtrl->StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN, wxColour(255, 0, 0));
         xmlTextCtrl->StyleSetForeground(wxSTC_H_ENTITY, wxColour(0, 0, 0));
         xmlTextCtrl->StyleSetForeground(wxSTC_H_CDATA, wxColour(255, 128, 0));
+        xmlTextCtrl->SetUndoCollection(false);
         xmlTextCtrl->SetText(page.xmlContent);
-        xmlTextCtrl->SetEditable(false);
+        xmlTextCtrl->SetUndoCollection(true);
+        xmlTextCtrl->SetSavePoint();
+        xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTLEFT, &MainFrame::OnXmlSavePointLeft, this);
+        xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTREACHED, &MainFrame::OnXmlSavePointReached, this);
         xmlSizer->Add(xmlTextCtrl, 1, wxEXPAND);
         xmlPanel->SetSizer(xmlSizer);
         return xmlPanel;
@@ -641,6 +645,26 @@ void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     _viewModel->onNotebookPageClose(pageIdx);
 
     event.Veto();
+}
+
+void MainFrame::OnXmlSavePointLeft(wxStyledTextEvent &event) {
+    auto &textCtrl = *static_cast<wxStyledTextCtrl *>(event.GetEventObject());
+    auto panel = textCtrl.GetParent();
+    auto pageIdx = _notebook->GetPageIndex(panel);
+    auto pageText = _notebook->GetPageText(pageIdx);
+    if (!boost::starts_with(pageText, "*")) {
+        _notebook->SetPageText(pageIdx, str(boost::format("*%s") % pageText));
+    }
+}
+
+void MainFrame::OnXmlSavePointReached(wxStyledTextEvent &event) {
+    auto &textCtrl = *static_cast<wxStyledTextCtrl *>(event.GetEventObject());
+    auto panel = textCtrl.GetParent();
+    auto pageIdx = _notebook->GetPageIndex(panel);
+    auto pageText = _notebook->GetPageText(pageIdx);
+    if (boost::starts_with(pageText, "*")) {
+        _notebook->SetPageText(pageIdx, pageText.Mid(1));
+    }
 }
 
 void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {

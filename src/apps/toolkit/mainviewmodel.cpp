@@ -445,6 +445,13 @@ void MainViewModel::loadEngine() {
 
 void MainViewModel::openAsXml(GameDirectoryItemId itemId) {
     auto &item = *_idToGameDirItem.at(itemId);
+    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&item](auto &page) {
+        return page.resourceId == *item.resId && page.type == PageType::XML;
+    });
+    if (samePage != _pages.end()) {
+        _pageSelected.invoke(std::distance(_pages.begin(), samePage));
+        return;
+    }
 
     withResourceStream(item, [this, &item](auto &res) {
         auto xmlBytes = make_unique<ByteArray>();

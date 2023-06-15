@@ -91,7 +91,7 @@ private:
 
     void InvokeTool(Operation operation);
 
-    wxWindow *NewPageWindow(const Page &page);
+    wxWindow *NewPageWindow(Page &page);
     wxWindow *GetStaticPageWindow(PageType type) const;
 
     // Events
@@ -124,6 +124,9 @@ private:
     void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
+
+    void OnXmlSavePointLeft(wxStyledTextEvent &event);
+    void OnXmlSavePointReached(wxStyledTextEvent &event);
 
     void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
 
