@@ -99,6 +99,7 @@ private:
     void OnClose(wxCloseEvent &event);
 
     void OnOpenGameDirectoryCommand(wxCommandEvent &event);
+    void OnSaveFileCommand(wxCommandEvent &event);
     void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
 

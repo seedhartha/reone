@@ -82,7 +82,7 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id](auto &page) {
-        return page.resourceId == id;
+        return page->resourceId == id;
     });
     if (samePage != _pages.end()) {
         _pageSelected.invoke(std::distance(_pages.begin(), samePage));
@@ -96,10 +96,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
 
-        auto page = Page(PageType::Text, id.string(), id);
-        page.textContent = text;
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Text, id.string(), id);
+        page->textContent = text;
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::TwoDa) {
         auto reader = TwoDaReader();
@@ -122,19 +122,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto page = Page(PageType::Table, id.string(), id);
-        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader();
         reader.load(data);
 
-        auto page = Page(PageType::GFF, id.string(), id);
-        page.gffContent = reader.root();
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::GFF, id.string(), id);
+        page->gffContent = reader.root();
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Tlk) {
         auto reader = TlkReader();
@@ -157,20 +157,20 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto page = Page(PageType::Table, id.string(), id);
-        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Ncs) {
         auto pcodeBytes = make_unique<ByteArray>();
         auto pcode = ByteArrayOutputStream(*pcodeBytes);
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
-        auto ncsPage = Page(PageType::NCS, id.string(), id);
-        ncsPage.pcodeContent = *pcodeBytes;
-        _pages.push_back(ncsPage);
-        _pageAdded.invoke(&ncsPage);
+        auto page = make_shared<Page>(PageType::NCS, id.string(), id);
+        page->pcodeContent = *pcodeBytes;
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Nss) {
         data.seek(0, SeekOrigin::End);
@@ -179,10 +179,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto text = string(length, '\0');
         data.read(&text[0], length);
 
-        auto page = Page(PageType::NSS, id.string(), id);
-        page.nssContent = text;
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::NSS, id.string(), id);
+        page->nssContent = text;
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Lip) {
         auto reader = LipReader("");
@@ -200,10 +200,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto page = Page(PageType::Table, id.string(), id);
-        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Ssf) {
         auto reader = SsfReader();
@@ -231,10 +231,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto page = Page(PageType::Table, id.string(), id);
-        page.tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
         auto tgaBytes = make_shared<ByteArray>();
@@ -255,16 +255,16 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _imageData.invoke(tgaBytes);
 
         auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Image;
+            return page->type == PageType::Image;
         });
         if (pageToErase != _pages.end()) {
             auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = Page(PageType::Image, id.string(), id);
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Image, id.string(), id);
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Mdl) {
         loadEngine();
@@ -298,16 +298,16 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         updateCameraTransform();
 
         auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Model;
+            return page->type == PageType::Model;
         });
         if (pageToErase != _pages.end()) {
             auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = Page(PageType::Model, id.string(), id);
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Model, id.string(), id);
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Wav) {
         loadEngine();
@@ -317,16 +317,16 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _audioStream.invoke(reader.stream());
 
         auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page.type == PageType::Audio;
+            return page->type == PageType::Audio;
         });
         if (pageToErase != _pages.end()) {
             auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.invoke(PageRemovingEventData(index, &*pageToErase));
+            _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = Page(PageType::Audio, id.string(), id);
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::Audio, id.string(), id);
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
 
     } else {
         return;
@@ -446,7 +446,7 @@ void MainViewModel::loadEngine() {
 void MainViewModel::openAsXml(GameDirectoryItemId itemId) {
     auto &item = *_idToGameDirItem.at(itemId);
     auto samePage = std::find_if(_pages.begin(), _pages.end(), [&item](auto &page) {
-        return page.resourceId == *item.resId && page.type == PageType::XML;
+        return page->resourceId == *item.resId && page->type == PageType::XML;
     });
     if (samePage != _pages.end()) {
         _pageSelected.invoke(std::distance(_pages.begin(), samePage));
@@ -468,10 +468,10 @@ void MainViewModel::openAsXml(GameDirectoryItemId itemId) {
             SsfTool().toXML(res, xml);
         }
 
-        auto page = Page(PageType::XML, str(boost::format("%s.xml") % item.resId->string()), *item.resId);
-        page.xmlContent = *xmlBytes;
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::XML, str(boost::format("%s.xml") % item.resId->string()), *item.resId);
+        page->xmlContent = *xmlBytes;
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
     });
 }
 
@@ -483,10 +483,10 @@ void MainViewModel::decompile(GameDirectoryItemId itemId) {
         auto nss = ByteArrayOutputStream(*nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines);
 
-        auto page = Page(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
-        page.nssContent = *nssBytes;
-        _pages.push_back(page);
-        _pageAdded.invoke(&page);
+        auto page = make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
+        page->nssContent = *nssBytes;
+        _pages.push_back(std::move(page));
+        _pageAdded.invoke(_pages.back().get());
     });
 }
 
@@ -728,7 +728,7 @@ void MainViewModel::onViewDestroyed() {
 void MainViewModel::onNotebookPageClose(int page) {
     auto pageIterator = _pages.begin();
     std::advance(pageIterator, page);
-    auto pageResId = pageIterator->resourceId;
+    auto pageResId = (*pageIterator)->resourceId;
     _pages.erase(pageIterator);
 
     if (pageResId.type == ResourceType::Mdl) {

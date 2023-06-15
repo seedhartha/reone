@@ -73,7 +73,7 @@ struct TableContent {
     }
 };
 
-struct Page {
+struct Page : boost::noncopyable {
     PageType type;
     std::string displayName;
     resource::ResourceId resourceId;
@@ -92,14 +92,6 @@ struct Page {
         displayName(displayName),
         resourceId(resourceId) {
     }
-
-    bool operator==(const Page &that) const {
-        return this == &that;
-    }
-
-    bool operator!=(const Page &that) const {
-        return this != &that;
-    }
 };
 
 struct PageRemovingEventData {
@@ -111,18 +103,6 @@ struct PageRemovingEventData {
     PageRemovingEventData(int index, Page *page) :
         index(index),
         page(page) {
-    }
-};
-
-struct PageDisplayNameChangedEventData {
-    int index {0};
-    std::string displayName;
-
-    PageDisplayNameChangedEventData() {}
-
-    PageDisplayNameChangedEventData(int index, std::string displayName) :
-        index(index),
-        displayName(displayName) {
     }
 };
 
@@ -161,10 +141,10 @@ public:
     GameDirectoryItem &getGameDirItem(int index) { return *_gameDirItems[index]; }
     GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
-    const Page &getPage(int index) {
+    Page &getPage(int index) {
         auto pageIterator = _pages.begin();
         std::advance(pageIterator, index);
-        return *pageIterator;
+        return **pageIterator;
     }
 
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
@@ -220,7 +200,7 @@ private:
     int _lastMouseY {0};
     uint32_t _lastTicks {0};
 
-    std::list<Page> _pages;
+    std::list<std::shared_ptr<Page>> _pages;
 
     // Event handlers
 

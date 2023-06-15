@@ -91,6 +91,7 @@ struct EventHandlerID {
     static constexpr int toPcodeTool = wxID_HIGHEST + 16;
     static constexpr int toNcsTool = wxID_HIGHEST + 17;
     static constexpr int toNssTool = wxID_HIGHEST + 18;
+    static constexpr int saveFile = wxID_HIGHEST + 19;
 };
 
 struct CommandID {
@@ -117,6 +118,8 @@ MainFrame::MainFrame() :
 
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
+    fileMenu->AppendSeparator();
+    fileMenu->Append(EventHandlerID::saveFile, "&Save");
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
@@ -144,11 +147,6 @@ MainFrame::MainFrame() :
     _splitter = new wxSplitterWindow(this, wxID_ANY);
     _splitter->SetMinimumPaneSize(300);
 
-    /*
-    auto dataSplitter = new wxSplitterWindow(_splitter, wxID_ANY);
-    dataSplitter->SetMinimumPaneSize(300);
-    */
-
     auto filesPanel = new wxPanel(_splitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &MainFrame::OnFilesTreeCtrlItemExpanding, this);
@@ -158,16 +156,6 @@ MainFrame::MainFrame() :
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Game Directory");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
-
-    /*
-    auto modulesPanel = new wxPanel(dataSplitter);
-    _modulesListBox = new wxListBox(modulesPanel, wxID_ANY);
-    auto modulesSizer = new wxStaticBoxSizer(wxVERTICAL, modulesPanel, "Modules");
-    modulesSizer->Add(_modulesListBox, 1, wxEXPAND);
-    modulesPanel->SetSizer(modulesSizer);
-
-    dataSplitter->SplitHorizontally(filesPanel, modulesPanel);
-    */
 
     _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
@@ -489,22 +477,27 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
         _viewModel->onGameDirectoryItemIdentified(i, itemId);
     }
     _filesTreeCtrl->Thaw();
+}
 
-    /*
-    _modulesListBox->Clear();
-    for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
-        auto filename = boost::to_lower_copy(entry.path().filename().string());
-        auto extension = boost::to_lower_copy(entry.path().extension().string());
-        if (extension != ".rim" && extension != ".mod") {
-            continue;
-        }
-        if (extension == ".rim" && boost::ends_with(filename, "_s.rim")) {
-            continue;
-        }
-        auto moduleName = boost::to_lower_copy(entry.path().filename().replace_extension().string());
-        _modulesListBox->AppendString(moduleName);
+void MainFrame::OnSaveFileCommand(wxCommandEvent &event) {
+    auto pageIdx = _notebook->GetSelection();
+    if (pageIdx == -1) {
+        return;
     }
-    */
+    auto &page = _viewModel->getPage(pageIdx);
+    if (page.type != PageType::XML) {
+        return;
+    }
+    auto window = _notebook->GetPage(pageIdx);
+    for (auto &child : window->GetChildren()) {
+        auto xmlTextCtrl = dynamic_cast<wxStyledTextCtrl *>(child);
+        if (!xmlTextCtrl) {
+            continue;
+        }
+        page.xmlContent = xmlTextCtrl->GetText();
+        xmlTextCtrl->SetSavePoint();
+        break;
+    }
 }
 
 void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
@@ -873,6 +866,7 @@ void MainFrame::InvokeTool(Operation operation) {
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_CLOSE(MainFrame::OnClose)                                                     //
     EVT_MENU(EventHandlerID::openGameDir, MainFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::saveFile, MainFrame::OnSaveFileCommand)                  //
     EVT_MENU(EventHandlerID::extractAllBifs, MainFrame::OnExtractAllBifsCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, MainFrame::OnBatchConvertTpcToTgaCommand) //
     EVT_MENU(EventHandlerID::extractTool, MainFrame::OnExtractToolCommand)            //
