@@ -91,6 +91,8 @@ private:
 
     void InvokeTool(Operation operation);
 
+    void SaveFile();
+
     wxWindow *NewPageWindow(Page &page);
     wxWindow *GetStaticPageWindow(PageType type) const;
 
@@ -128,6 +130,7 @@ private:
 
     void OnXmlSavePointLeft(wxStyledTextEvent &event);
     void OnXmlSavePointReached(wxStyledTextEvent &event);
+    void OnXmlKeyDown(wxKeyEvent &event);
 
     void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
 

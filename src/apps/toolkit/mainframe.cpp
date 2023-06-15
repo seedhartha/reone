@@ -303,6 +303,27 @@ MainFrame::MainFrame() :
     // CreateStatusBar();
 }
 
+void MainFrame::SaveFile() {
+    auto pageIdx = _notebook->GetSelection();
+    if (pageIdx == -1) {
+        return;
+    }
+    auto &page = _viewModel->getPage(pageIdx);
+    if (page.type != PageType::XML) {
+        return;
+    }
+    auto window = _notebook->GetPage(pageIdx);
+    for (auto &child : window->GetChildren()) {
+        auto xmlTextCtrl = dynamic_cast<wxStyledTextCtrl *>(child);
+        if (!xmlTextCtrl) {
+            continue;
+        }
+        page.xmlContent = xmlTextCtrl->GetText();
+        xmlTextCtrl->SetSavePoint();
+        break;
+    }
+}
+
 wxWindow *MainFrame::NewPageWindow(Page &page) {
     switch (page.type) {
     case PageType::Text: {
@@ -340,6 +361,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         xmlTextCtrl->SetText(page.xmlContent);
         xmlTextCtrl->SetUndoCollection(true);
         xmlTextCtrl->SetSavePoint();
+        xmlTextCtrl->Bind(wxEVT_KEY_DOWN, &MainFrame::OnXmlKeyDown, this);
         xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTLEFT, &MainFrame::OnXmlSavePointLeft, this);
         xmlTextCtrl->Bind(wxEVT_STC_SAVEPOINTREACHED, &MainFrame::OnXmlSavePointReached, this);
         xmlSizer->Add(xmlTextCtrl, 1, wxEXPAND);
@@ -480,24 +502,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
 }
 
 void MainFrame::OnSaveFileCommand(wxCommandEvent &event) {
-    auto pageIdx = _notebook->GetSelection();
-    if (pageIdx == -1) {
-        return;
-    }
-    auto &page = _viewModel->getPage(pageIdx);
-    if (page.type != PageType::XML) {
-        return;
-    }
-    auto window = _notebook->GetPage(pageIdx);
-    for (auto &child : window->GetChildren()) {
-        auto xmlTextCtrl = dynamic_cast<wxStyledTextCtrl *>(child);
-        if (!xmlTextCtrl) {
-            continue;
-        }
-        page.xmlContent = xmlTextCtrl->GetText();
-        xmlTextCtrl->SetSavePoint();
-        break;
-    }
+    SaveFile();
 }
 
 void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
@@ -658,6 +663,13 @@ void MainFrame::OnXmlSavePointReached(wxStyledTextEvent &event) {
     if (boost::starts_with(pageText, "*")) {
         _notebook->SetPageText(pageIdx, pageText.Mid(1));
     }
+}
+
+void MainFrame::OnXmlKeyDown(wxKeyEvent &event) {
+    if (event.GetKeyCode() == 'S' && (event.GetModifiers() & wxMOD_CONTROL) != 0) {
+        SaveFile();
+    }
+    event.Skip();
 }
 
 void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
