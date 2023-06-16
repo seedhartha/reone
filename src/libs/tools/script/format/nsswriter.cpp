@@ -320,6 +320,9 @@ string NssWriter::describeConstant(const ExpressionTree::ConstantExpression &con
 }
 
 string NssWriter::describeParameter(const ExpressionTree::ParameterExpression &paramExpr) {
+    if (paramExpr.assignments.size() == 1l && paramExpr.reads.size() == 1ll && paramExpr.assignedConst) {
+        return describeConstant(*paramExpr.assignedConst);
+    }
     if (paramExpr.locality == ExpressionTree::ParameterLocality::Local) {
         if (!paramExpr.suffix.empty()) {
             return str(boost::format("var_%08x_%s") % paramExpr.offset % paramExpr.suffix);
