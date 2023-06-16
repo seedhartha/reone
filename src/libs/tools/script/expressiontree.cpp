@@ -37,7 +37,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     startFunc->name = "_start";
     startFunc->offset = 13;
 
-    auto functions = map<uint32_t, shared_ptr<Function>>();
+    auto offsetToFunction = map<uint32_t, shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
@@ -54,7 +54,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
     }
 
-    auto ctx = make_shared<DecompilationContext>(program, routines, labels, functions, expressions);
+    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunction, expressions);
     ctx->pushCallStack(startFunc.get());
     startFunc->block = decompileSafely(13, ctx);
 
@@ -69,15 +69,18 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
     }
 
-    ctx->functions[startFunc->offset] = std::move(startFunc);
+    // Add _start function, but only if it's not degenerate
+    if (startFunc->block->expressions.size() > 1ll) {
+        ctx->functions[startFunc->offset] = std::move(startFunc);
+    }
 
-    auto functionsVec = vector<shared_ptr<Function>>();
+    auto functions = vector<shared_ptr<Function>>();
     for (auto it = ctx->functions.rbegin(); it != ctx->functions.rend(); ++it) {
-        functionsVec.push_back(it->second);
+        functions.push_back(it->second);
     }
 
     return ExpressionTree(
-        std::move(functionsVec),
+        std::move(functions),
         ctx->expressions,
         std::move(globals));
 }
