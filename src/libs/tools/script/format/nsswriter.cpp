@@ -309,7 +309,7 @@ string NssWriter::describeConstant(const ExpressionTree::ConstantExpression &con
     if (constExpr.value.type == VariableType::Int) {
         return to_string(constExpr.value.intValue);
     } else if (constExpr.value.type == VariableType::Float) {
-        return str(boost::format("%ff") % constExpr.value.floatValue);
+        return str(boost::format("%f") % constExpr.value.floatValue);
     } else if (constExpr.value.type == VariableType::String) {
         return str(boost::format("\"%s\"") % constExpr.value.strValue);
     } else if (constExpr.value.type == VariableType::Object) {
