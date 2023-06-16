@@ -969,30 +969,35 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         offset = ins.nextOffset;
     }
 
-    // Cleanup expression
+    // Cleanup block expressions
     for (auto it = block->expressions.begin(); it != block->expressions.end();) {
         auto expr = *it;
         if (expr->type == ExpressionType::Parameter) {
-            // Remove declarations
+            // Remove redundant declaration
             it = block->expressions.erase(it);
+            continue;
         } else if (expr->type == ExpressionType::Assign) {
-            // Remove assignments when only one assignment and less than two reads
             auto assignExpr = static_cast<BinaryExpression *>(expr);
-            if (assignExpr->left->type != ExpressionType::Parameter || assignExpr->right->type != ExpressionType::Constant) {
-                ++it;
-                continue;
+            if (assignExpr->left->type == ExpressionType::Parameter && assignExpr->right->type == ExpressionType::Constant) {
+                // Remove param to constant assignment if it's the only one and param is read less than twice
+                auto leftParam = static_cast<ParameterExpression *>(assignExpr->left);
+                if (leftParam->assignments.size() == 1l &&
+                    leftParam->assignments.front() == expr->offset &&
+                    leftParam->reads.size() < 2ll) {
+                    it = block->expressions.erase(it);
+                    continue;
+                }
+            } else if (assignExpr->left->type == ExpressionType::Parameter && assignExpr->right->type == ExpressionType::Action) {
+                // Remove param to function return value assignment if param is never read
+                auto leftParam = static_cast<ParameterExpression *>(assignExpr->left);
+                if (leftParam->reads.empty()) {
+                    it = block->expressions.erase(it);
+                    it = block->expressions.insert(it, assignExpr->right);
+                    continue;
+                }
             }
-            auto leftParam = static_cast<ParameterExpression *>(assignExpr->left);
-            if (leftParam->assignments.size() == 1l &&
-                leftParam->assignments.front() == expr->offset &&
-                leftParam->reads.size() < 2ll) {
-                it = block->expressions.erase(it);
-            } else {
-                ++it;
-            }
-        } else {
-            ++it;
         }
+        ++it;
     }
     if (!block->expressions.empty() && block->expressions.back()->type == ExpressionType::Return) {
         block->expressions.pop_back();
