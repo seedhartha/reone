@@ -130,6 +130,10 @@ public:
         std::string suffix;
         int stackOffset {0}; // input/output
 
+        std::list<uint32_t> assignments;
+        std::list<uint32_t> reads;
+        ConstantExpression *assignedConst {nullptr};
+
         ParameterExpression() :
             Expression(ExpressionType::Parameter) {
         }
@@ -146,7 +150,6 @@ public:
     struct BinaryExpression : Expression {
         Expression *left {nullptr};
         Expression *right {nullptr};
-        bool declareLeft {false};
 
         BinaryExpression(ExpressionType type) :
             Expression(type) {

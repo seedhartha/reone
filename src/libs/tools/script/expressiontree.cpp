@@ -284,6 +284,8 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = paramExpr.get();
             assignExpr->right = constExpr.get();
             block->append(assignExpr.get());
+            paramExpr->assignments.push_back(ins.offset);
+            paramExpr->assignedConst = constExpr.get();
 
             ctx->pushStack(paramExpr.get());
             ctx->expressions.push_back(std::move(constExpr));
@@ -333,6 +335,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->left = returnValue.get();
                 assignExpr->right = actionExpr.get();
                 block->append(assignExpr.get());
+                returnValue->assignments.push_back(ins.offset);
 
                 if (routine.returnType() == VariableType::Vector) {
                     ParameterExpression *retValX = nullptr;
@@ -391,6 +394,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->left = destination;
                 assignExpr->right = right.param;
                 block->append(assignExpr.get());
+                destination->assignments.push_back(ins.offset);
 
                 left = right.withAllocatedBy(*left.allocatedBy);
                 ctx->expressions.push_back(std::move(assignExpr));
@@ -438,6 +442,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->left = paramExpr.get();
                 assignExpr->right = source;
                 block->append(assignExpr.get());
+                paramExpr->assignments.push_back(ins.offset);
 
                 auto frameCopy = StackFrame(frame);
                 frameCopy.allocatedBy = ctx->topCall().function;
@@ -485,6 +490,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = resultExpr.get();
             assignExpr->right = unaryExpr.get();
             block->append(assignExpr.get());
+            resultExpr->assignments.push_back(ins.offset);
 
             ctx->pushStack(resultExpr.get());
             ctx->expressions.push_back(std::move(resultExpr));
@@ -649,6 +655,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
             block->append(assignExpr.get());
+            result->assignments.push_back(ins.offset);
 
             ctx->pushStack(result.get());
             ctx->expressions.push_back(std::move(result));
@@ -689,6 +696,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
             block->append(assignExpr.get());
+            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -731,6 +739,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
             block->append(assignExpr.get());
+            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -773,6 +782,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
             block->append(assignExpr.get());
+            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -823,6 +833,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->left = resultExpr.get();
                 assignExpr->right = andOrExpression.get();
                 block->append(assignExpr.get());
+                resultExpr->assignments.push_back(ins.offset);
 
                 ctx->expressions.push_back(std::move(compExpr));
                 ctx->expressions.push_back(std::move(andOrExpression));
@@ -930,23 +941,14 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         offset = ins.nextOffset;
     }
 
-    for (size_t i = 0; i < block->expressions.size() - 1;) {
-        if (block->expressions[i]->type != ExpressionType::Parameter ||
-            block->expressions[i + 1]->type != ExpressionType::Assign) {
-            i++;
-            continue;
+    // Remove parameter declarations
+    for (auto it = block->expressions.begin(); it != block->expressions.end();) {
+        auto expr = *it;
+        if (expr->type == ExpressionType::Parameter) {
+            it = block->expressions.erase(it);
+        } else {
+            ++it;
         }
-        auto paramExpr = static_cast<ParameterExpression *>(block->expressions[i]);
-        auto assignExpr = static_cast<BinaryExpression *>(block->expressions[i + 1]);
-        if (assignExpr->left != paramExpr) {
-            i++;
-            continue;
-        }
-        assignExpr->declareLeft = true;
-        for (size_t j = i; j < block->expressions.size() - 1; ++j) {
-            block->expressions[j] = block->expressions[j + 1];
-        }
-        block->expressions.pop_back();
     }
 
     debug(boost::format("End decompiling block at %08x") % start);
@@ -1065,6 +1067,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     xAssignExpr->left = xParamExpr.get();
     xAssignExpr->right = xIndexExpr.get();
     block.append(xAssignExpr.get());
+    xParamExpr->assignments.push_back(offset);
 
     outX = xParamExpr.get();
 
@@ -1090,6 +1093,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     yAssignExpr->left = yParamExpr.get();
     yAssignExpr->right = yIndexExpr.get();
     block.append(yAssignExpr.get());
+    yParamExpr->assignments.push_back(offset);
 
     outY = yParamExpr.get();
 
@@ -1115,6 +1119,7 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     zAssignExpr->left = zParamExpr.get();
     zAssignExpr->right = zIndexExpr.get();
     block.append(zAssignExpr.get());
+    zParamExpr->assignments.push_back(offset);
 
     outZ = zParamExpr.get();
 

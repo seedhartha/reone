@@ -17,13 +17,13 @@
 
 #include "reone/tools/script/format/nsswriter.h"
 
+#include "reone/script/routine.h"
+#include "reone/script/routines.h"
+#include "reone/script/variableutil.h"
 #include "reone/system/exception/argument.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/textwriter.h"
-#include "reone/script/routine.h"
-#include "reone/script/routines.h"
-#include "reone/script/variableutil.h"
 
 using namespace std;
 
@@ -214,7 +214,10 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         bool declareLeft = false;
         if (binaryExpr.type == ExpressionType::Assign) {
             operation = "=";
-            declareLeft = binaryExpr.declareLeft;
+            auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(binaryExpr.left);
+            if (paramExpr->assignments.size() == 1l && paramExpr->assignments.front() == binaryExpr.offset) {
+                declareLeft = true;
+            }
         } else if (binaryExpr.type == ExpressionType::Add) {
             operation = "+";
         } else if (binaryExpr.type == ExpressionType::Subtract) {
