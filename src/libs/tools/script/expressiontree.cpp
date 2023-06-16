@@ -994,6 +994,9 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             ++it;
         }
     }
+    if (!block->expressions.empty() && block->expressions.back()->type == ExpressionType::Return) {
+        block->expressions.pop_back();
+    }
 
     debug(boost::format("End decompiling block at %08x") % start);
     ctx->expressions.push_back(block);
