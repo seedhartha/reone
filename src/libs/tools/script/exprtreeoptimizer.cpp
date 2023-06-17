@@ -46,22 +46,14 @@ void ExpressionTreeOptimizer::analyzeBlock(BlockExpression &block, OptimizationC
 }
 
 void ExpressionTreeOptimizer::analyze(Expression &expr, OptimizationContext &ctx, Expression &container, int binaryDir) {
-    if (expr.type == ExpressionType::Goto) {
-        auto gotoExpr = static_cast<GotoExpression *>(&expr);
-        ctx.labels[gotoExpr->label].jumps.push_back(LabelJumpEvent(gotoExpr));
-    } else if (expr.type == ExpressionType::Conditional) {
-        auto conditionalExpr = static_cast<ConditionalExpression *>(&expr);
-        if (conditionalExpr->ifTrue) {
-            analyzeBlock(*conditionalExpr->ifTrue, ctx);
-        }
-        if (conditionalExpr->ifFalse) {
-            analyzeBlock(*conditionalExpr->ifFalse, ctx);
-        }
-    } else if (expr.type == ExpressionType::Parameter) {
+    if (expr.type == ExpressionType::Parameter) {
         auto paramExpr = static_cast<ParameterExpression *>(&expr);
         auto read = ParameterReadEvent(&container);
         read.binaryDir = binaryDir;
         ctx.parameters[paramExpr].reads.push_back(std::move(read));
+    } else if (expr.type == ExpressionType::Goto) {
+        auto gotoExpr = static_cast<GotoExpression *>(&expr);
+        ctx.labels[gotoExpr->label].jumps.push_back(LabelJumpEvent(gotoExpr));
     } else if (expr.type == ExpressionType::Return) {
         auto returnExpr = static_cast<ReturnExpression *>(&expr);
         if (returnExpr->value && returnExpr->value->type == ExpressionType::Parameter) {
@@ -140,27 +132,37 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
             compactBlock(*func, *branch.block, ctx);
         }
         compactBlock(*func, *func->block, ctx);
+
+        branches = func->branches;
+        for (auto &[offset, branch] : branches) {
+            if (branch.block->expressions.size() == 2ll &&
+                branch.block->expressions.front()->type == ExpressionType::Label &&
+                branch.block->expressions.back()->type == ExpressionType::Return) {
+                func->branches.erase(offset);
+            }
+        }
     }
 }
 
 void ExpressionTreeOptimizer::compactBlock(Function &func, BlockExpression &block, OptimizationContext &ctx) {
-    for (auto it = block.expressions.begin(); it != block.expressions.end(); ++it) {
+    for (auto it = block.expressions.begin(); it != block.expressions.end();) {
         auto expr = *it;
         if (expr->type == ExpressionType::Parameter) {
             auto paramExpr = static_cast<ParameterExpression *>(expr);
             if (ctx.parameters[paramExpr].reads.empty()) {
-                it = --block.expressions.erase(it);
+                it = block.expressions.erase(it);
+                continue;
             }
         } else if (expr->type == ExpressionType::Goto) {
             auto gotoExpr = static_cast<GotoExpression *>(expr);
             auto &labelEvents = ctx.labels[gotoExpr->label];
             auto &branch = func.branches.at(gotoExpr->label->offset);
-            if (labelEvents.jumps.size() == 1ll) {
-                auto branchOffset = gotoExpr->label->offset;
-                auto maybeBranch = func.branches.find(branchOffset);
-                if (maybeBranch != func.branches.end()) {
+            auto branchOffset = gotoExpr->label->offset;
+            auto maybeBranch = func.branches.find(branchOffset);
+            if (maybeBranch != func.branches.end()) {
+                auto &branch = maybeBranch->second;
+                if (labelEvents.jumps.size() == 1ll) {
                     it = block.expressions.erase(it);
-                    auto &branch = maybeBranch->second;
                     for (auto &branchExpr : branch.block->expressions) {
                         if (branchExpr == gotoExpr->label) {
                             continue;
@@ -168,15 +170,37 @@ void ExpressionTreeOptimizer::compactBlock(Function &func, BlockExpression &bloc
                         it = ++block.expressions.insert(it, branchExpr);
                     }
                     func.branches.erase(branchOffset);
-                    --it;
+                    continue;
+                } else if (branch.block->expressions.size() == 2ll &&
+                           branch.block->expressions.front()->type == ExpressionType::Label &&
+                           branch.block->expressions.back()->type == ExpressionType::Return) {
+                    it = block.expressions.erase(it);
+                    it = block.expressions.insert(it, branch.block->expressions.back());
+                    ++it;
+                    continue;
                 }
+            }
+        } else if (expr->type == ExpressionType::Conditional) {
+            auto conditionalExpr = static_cast<ConditionalExpression *>(expr);
+            if (conditionalExpr->ifTrue) {
+                compactBlock(func, *conditionalExpr->ifTrue, ctx);
+            }
+            if (conditionalExpr->ifFalse) {
+                compactBlock(func, *conditionalExpr->ifFalse, ctx);
             }
         } else if (expr->type == ExpressionType::Action) {
             auto actionExpr = static_cast<ActionExpression *>(expr);
-            for (auto &arg : actionExpr->arguments) {
+            for (auto argIter = actionExpr->arguments.begin(); argIter != actionExpr->arguments.end(); ++argIter) {
+                auto &arg = *argIter;
                 if (arg->type == ExpressionType::Block) {
                     auto blockArg = static_cast<BlockExpression *>(arg);
                     compactBlock(func, *blockArg, ctx);
+                    if (blockArg->expressions.size() == 2ll &&
+                        blockArg->expressions.front()->type == ExpressionType::Action &&
+                        blockArg->expressions.back()->type == ExpressionType::Return) {
+                        argIter = actionExpr->arguments.erase(argIter);
+                        argIter = actionExpr->arguments.insert(argIter, blockArg->expressions.front());
+                    }
                 }
             }
         } else if (ExpressionTree::isBinaryExpression(expr->type)) {
@@ -188,24 +212,29 @@ void ExpressionTreeOptimizer::compactBlock(Function &func, BlockExpression &bloc
                     auto &read = paramEvents.reads.front();
                     auto &write = paramEvents.writes.front();
                     if (read.expression->type == ExpressionType::Action) {
-                        it = --block.expressions.erase(it);
+                        it = block.expressions.erase(it);
                         auto readAction = static_cast<ActionExpression *>(read.expression);
                         readAction->arguments[read.actionArgIdx] = write.value;
+                        continue;
                     } else if (ExpressionTree::isBinaryExpression(read.expression->type)) {
-                        it = --block.expressions.erase(it);
+                        it = block.expressions.erase(it);
                         auto readBinary = static_cast<BinaryExpression *>(read.expression);
                         if (read.binaryDir == -1) {
                             readBinary->left = write.value;
                         } else {
                             readBinary->right = write.value;
                         }
+                        continue;
                     }
                 } else if (paramEvents.reads.empty() && binaryExpr->right->type == ExpressionType::Action) {
                     it = block.expressions.erase(it);
                     it = block.expressions.insert(it, binaryExpr->right);
+                    ++it;
+                    continue;
                 }
             }
         }
+        ++it;
     }
 }
 

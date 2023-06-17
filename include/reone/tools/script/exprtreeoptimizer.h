@@ -69,7 +69,6 @@ struct LabelEvents {
 struct OptimizationContext {
     std::map<ParameterExpression *, ParameterEvents> parameters;
     std::map<LabelExpression *, LabelEvents> labels;
-    //std::set<uint32_t> inlinedBranches;
 };
 
 class IExpressionTreeOptimizer {

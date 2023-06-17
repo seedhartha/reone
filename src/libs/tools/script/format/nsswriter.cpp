@@ -59,11 +59,11 @@ void NssWriter::writeFunction(const Function &function, TextWriter &writer) {
     auto params = vector<string>();
     for (auto &argument : function.inputs) {
         auto type = describeVariableType(argument.type);
-        params.push_back(str(boost::format("%s in_%d") % type % (-argument.stackOffset)));
+        params.push_back(str(boost::format("%s in_%d") % type % (-argument.stackOffset - 1)));
     }
     for (auto &argument : function.outputs) {
         auto type = describeVariableType(argument.type);
-        params.push_back(str(boost::format("%s &out_%d") % type % (-argument.stackOffset)));
+        params.push_back(str(boost::format("%s &out_%d") % type % (-argument.stackOffset - 1)));
     }
     writer.putLine(str(boost::format("%s %s(%s)") % returnType % name % boost::join(params, ", ")));
 
@@ -350,9 +350,9 @@ string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
             return str(boost::format("var_%08x") % paramExpr.offset);
         }
     } else if (paramExpr.locality == ParameterLocality::Input) {
-        return str(boost::format("in_%d") % (-paramExpr.stackOffset));
+        return str(boost::format("in_%d") % (-paramExpr.stackOffset - 1));
     } else if (paramExpr.locality == ParameterLocality::Output) {
-        return str(boost::format("out_%d") % (-paramExpr.stackOffset));
+        return str(boost::format("out_%d") % (-paramExpr.stackOffset - 1));
     } else if (paramExpr.locality == ParameterLocality::Global) {
         return str(boost::format("glob_%08x") % paramExpr.offset);
     } else {
