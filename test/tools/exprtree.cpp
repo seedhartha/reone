@@ -195,17 +195,23 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     BOOST_TEST(0ll == mainFunc->inputs.size());
     BOOST_TEST(0ll == mainFunc->outputs.size());
     BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(mainFunc->returnType));
-    BOOST_TEST(11 == mainFunc->block->expressions.size());
+    BOOST_TEST(7 == mainFunc->block->expressions.size());
+    auto branchBlocks = vector<BlockExpression *>();
+    for (auto &[offset, branch] : mainFunc->branches) {
+        branchBlocks.push_back(branch.block);
+    }
+    auto jnzBlock = branchBlocks.front();
+    BOOST_TEST(2ll == jnzBlock->expressions.size());
+    auto jzBlock = branchBlocks.back();
+    BOOST_TEST(2ll == jzBlock->expressions.size());
     // loc_jnz:
     // return;
-    BOOST_TEST(static_cast<int>(ExpressionType::Label) == static_cast<int>(mainFunc->block->expressions[7]->type));
-    auto jnzLabelExpr = static_cast<LabelExpression *>(mainFunc->block->expressions[7]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(mainFunc->block->expressions[8]->type));
+    auto jnzLabelExpr = static_cast<LabelExpression *>(jnzBlock->expressions[0]);
+    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(jnzBlock->expressions[1]->type));
     // loc_jz:
     // return;
-    BOOST_TEST(static_cast<int>(ExpressionType::Label) == static_cast<int>(mainFunc->block->expressions[9]->type));
-    auto jzLabelExpr = static_cast<LabelExpression *>(mainFunc->block->expressions[9]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(mainFunc->block->expressions[10]->type));
+    auto jzLabelExpr = static_cast<LabelExpression *>(jzBlock->expressions[0]);
+    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(jzBlock->expressions[1]->type));
     // int a = 2;
     BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[0]->type));
     BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[0])->left->type));
