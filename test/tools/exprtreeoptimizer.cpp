@@ -15,28 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
+#include <boost/test/unit_test.hpp>
 
-#include "reone/system/logutil.h"
-
-#include "mainframe.h"
+#include "reone/tools/script/exprtreeoptimizer.h"
 
 using namespace std;
 
-namespace reone {
+using namespace reone::script;
 
-bool ToolkitApp::OnInit() {
-    initLog();
-    setLogLevel(LogLevel::Info);
+BOOST_AUTO_TEST_SUITE(expression_tree_optimizer)
 
-    wxImage::AddHandler(new wxTGAHandler());
+BOOST_AUTO_TEST_CASE(should_optimize_expression_tree) {
+    // given
 
-    auto frame = new MainFrame();
-    frame->Show();
+    // when
 
-    return true;
-};
+    // then
+}
 
-} // namespace reone
-
-wxIMPLEMENT_APP_CONSOLE(reone::ToolkitApp);
+BOOST_AUTO_TEST_SUITE_END()

@@ -27,7 +27,8 @@ set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/lip.h
     ${TOOLS_INCLUDE_DIR}/ncs.h
     ${TOOLS_INCLUDE_DIR}/rim.h
-    ${TOOLS_INCLUDE_DIR}/script/expressiontree.h
+    ${TOOLS_INCLUDE_DIR}/script/exprtree.h
+    ${TOOLS_INCLUDE_DIR}/script/exprtreeoptimizer.h
     ${TOOLS_INCLUDE_DIR}/script/format/nsswriter.h
     ${TOOLS_INCLUDE_DIR}/script/format/pcodereader.h
     ${TOOLS_INCLUDE_DIR}/script/format/pcodewriter.h
@@ -38,7 +39,8 @@ set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/types.h)
 
 set(TOOLS_SOURCES
-    ${TOOLS_SOURCE_DIR}/script/expressiontree.cpp
+    ${TOOLS_SOURCE_DIR}/script/exprtree.cpp
+    ${TOOLS_SOURCE_DIR}/script/exprtreeoptimizer.cpp
     ${TOOLS_SOURCE_DIR}/script/format/nsswriter.cpp
     ${TOOLS_SOURCE_DIR}/script/format/pcodereader.cpp
     ${TOOLS_SOURCE_DIR}/script/format/pcodewriter.cpp

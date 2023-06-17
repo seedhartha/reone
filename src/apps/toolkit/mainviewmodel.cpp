@@ -68,7 +68,7 @@ static const set<string> kFilesExtensionBlacklist {
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
 
-static const set<ResourceType> kFilesPlaintextExtensions {
+static const set<ResourceType> kFilesPlaintextResourceTypes {
     ResourceType::Txt,
     ResourceType::Txi,
     ResourceType::Lyt,
@@ -81,15 +81,16 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 }
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
-    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id](auto &page) {
-        return page->resourceId == id;
+    auto pageType = getPageType(id.type);
+    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id, &pageType](auto &page) {
+        return page->resourceId == id && page->type == pageType;
     });
     if (samePage != _pages.end()) {
         _pageSelected.invoke(std::distance(_pages.begin(), samePage));
         return;
     }
 
-    if (kFilesPlaintextExtensions.count(id.type) > 0) {
+    if (kFilesPlaintextResourceTypes.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
@@ -332,6 +333,35 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
     if (id.type == ResourceType::Mdl) {
         _renderTimerEnabled.invoke(true);
+    }
+}
+
+PageType MainViewModel::getPageType(ResourceType type) const {
+    if (kFilesPlaintextResourceTypes.count(type) > 0) {
+        return PageType::Text;
+    }
+    if (isGFFCompatibleResType(type)) {
+        return PageType::GFF;
+    }
+    switch (type) {
+    case ResourceType::TwoDa:
+    case ResourceType::Tlk:
+    case ResourceType::Lip:
+    case ResourceType::Ssf:
+        return PageType::Table;
+    case ResourceType::Ncs:
+        return PageType::NCS;
+    case ResourceType::Nss:
+        return PageType::NSS;
+    case ResourceType::Tga:
+    case ResourceType::Tpc:
+        return PageType::Image;
+    case ResourceType::Mdl:
+        return PageType::Model;
+    case ResourceType::Wav:
+        return PageType::Audio;
+    default:
+        throw logic_error(str(boost::format("Unsupported resource type: %d") % static_cast<int>(type)));
     }
 }
 

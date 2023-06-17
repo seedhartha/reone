@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../expressiontree.h"
+#include "../exprtree.h"
 
 namespace reone {
 
@@ -43,17 +43,17 @@ private:
     ExpressionTree &_program;
     IRoutines &_routines;
 
-    void writeFunction(const ExpressionTree::Function &function, TextWriter &writer);
-    void writeBlock(int level, const ExpressionTree::BlockExpression &block, TextWriter &writer);
-    void writeExpression(int blockLevel, bool declare, const ExpressionTree::Expression &expression, TextWriter &writer);
+    void writeFunction(const Function &function, TextWriter &writer);
+    void writeBlock(int level, const BlockExpression &block, bool brackets, TextWriter &writer);
+    void writeExpression(int blockLevel, bool declare, const Expression &expression, TextWriter &writer);
 
     std::string indentAtLevel(int level);
 
-    std::string describeFunction(const ExpressionTree::Function &function);
-    std::string describeLabel(const ExpressionTree::LabelExpression &labelExpr);
-    std::string describeConstant(const ExpressionTree::ConstantExpression &constExpr);
-    std::string describeParameter(const ExpressionTree::ParameterExpression &paramExpr);
-    std::string describeAction(const ExpressionTree::ActionExpression &actionExpr);
+    std::string describeFunction(const Function &function);
+    std::string describeLabel(const LabelExpression &labelExpr);
+    std::string describeConstant(const ConstantExpression &constExpr);
+    std::string describeParameter(const ParameterExpression &paramExpr);
+    std::string describeAction(const ActionExpression &actionExpr);
 };
 
 } // namespace script

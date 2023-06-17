@@ -43,16 +43,17 @@ void NssWriter::save(IOutputStream &stream) {
     }
 
     auto writtenOffsets = set<uint32_t>();
-    for (auto &function : _program.functions()) {
-        if (writtenOffsets.count(function->offset) > 0) {
+    for (auto it = _program.functions().rbegin(); it != _program.functions().rend(); ++it) {
+        auto &func = **it;
+        if (writtenOffsets.count(func.offset) > 0) {
             continue;
         }
-        writeFunction(*function, writer);
-        writtenOffsets.insert(function->offset);
+        writeFunction(func, writer);
+        writtenOffsets.insert(func.offset);
     }
 }
 
-void NssWriter::writeFunction(const ExpressionTree::Function &function, TextWriter &writer) {
+void NssWriter::writeFunction(const Function &function, TextWriter &writer) {
     auto returnType = describeVariableType(function.returnType);
     auto name = describeFunction(function);
     auto params = vector<string>();
@@ -66,20 +67,26 @@ void NssWriter::writeFunction(const ExpressionTree::Function &function, TextWrit
     }
     writer.putLine(str(boost::format("%s %s(%s)") % returnType % name % boost::join(params, ", ")));
 
-    writeBlock(0, *function.block, writer);
-
-    writer.put("\n\n");
+    writer.putLine("{");
+    writeBlock(0, *function.block, false, writer);
+    for (auto &[offset, branch] : function.branches) {
+        writeBlock(0, *branch.block, false, writer);
+    }
+    writer.putLine("}");
+    writer.putLine("");
 }
 
-void NssWriter::writeBlock(int level, const ExpressionTree::BlockExpression &block, TextWriter &writer) {
+void NssWriter::writeBlock(int level, const BlockExpression &block, bool brackets, TextWriter &writer) {
     auto innerLevel = 1 + level;
     auto indent = indentAtLevel(level);
     auto innerIndent = indentAtLevel(innerLevel);
 
-    writer.putLine(indent + string("{"));
+    if (brackets) {
+        writer.putLine(indent + string("{"));
+    }
     for (auto &innerExpr : block.expressions) {
         if (innerExpr->type == ExpressionType::Parameter &&
-            static_cast<const ExpressionTree::ParameterExpression *>(innerExpr)->locality == ExpressionTree::ParameterLocality::Global) {
+            static_cast<const ParameterExpression *>(innerExpr)->locality == ParameterLocality::Global) {
             continue;
         }
         if (innerExpr->type == ExpressionType::Label) {
@@ -96,24 +103,26 @@ void NssWriter::writeBlock(int level, const ExpressionTree::BlockExpression &blo
             writer.put("\n");
         }
     }
-    writer.put(indent + string("}"));
+    if (brackets) {
+        writer.put(indent + string("}"));
+    }
 }
 
-void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTree::Expression &expression, TextWriter &writer) {
+void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &expression, TextWriter &writer) {
     auto indent = indentAtLevel(blockLevel);
 
     if (expression.type == ExpressionType::Label) {
-        auto &labelExpr = static_cast<const ExpressionTree::LabelExpression &>(expression);
+        auto &labelExpr = static_cast<const LabelExpression &>(expression);
         auto name = describeLabel(labelExpr);
         writer.put(name + ":");
 
     } else if (expression.type == ExpressionType::Goto) {
-        auto &gotoExpr = static_cast<const ExpressionTree::GotoExpression &>(expression);
+        auto &gotoExpr = static_cast<const GotoExpression &>(expression);
         auto name = describeLabel(*gotoExpr.label);
         writer.put("goto " + name);
 
     } else if (expression.type == ExpressionType::Return) {
-        auto &returnExpr = static_cast<const ExpressionTree::ReturnExpression &>(expression);
+        auto &returnExpr = static_cast<const ReturnExpression &>(expression);
         writer.put("return");
         if (returnExpr.value) {
             writer.put(" ");
@@ -121,12 +130,12 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         }
 
     } else if (expression.type == ExpressionType::Constant) {
-        auto &constExpr = static_cast<const ExpressionTree::ConstantExpression &>(expression);
+        auto &constExpr = static_cast<const ConstantExpression &>(expression);
         auto value = describeConstant(constExpr);
         writer.put(value);
 
     } else if (expression.type == ExpressionType::Parameter) {
-        auto &paramExpr = static_cast<const ExpressionTree::ParameterExpression &>(expression);
+        auto &paramExpr = static_cast<const ParameterExpression &>(expression);
         auto name = describeParameter(paramExpr);
         if (declare) {
             auto type = describeVariableType(paramExpr.variableType);
@@ -136,7 +145,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         }
 
     } else if (expression.type == ExpressionType::Call) {
-        auto &callExpr = static_cast<const ExpressionTree::CallExpression &>(expression);
+        auto &callExpr = static_cast<const CallExpression &>(expression);
         auto name = describeFunction(*callExpr.function);
         auto params = vector<string>();
         for (auto &param : callExpr.arguments) {
@@ -146,7 +155,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         writer.put(str(boost::format("%s(%s)") % name % boost::join(params, ", ")));
 
     } else if (expression.type == ExpressionType::Action) {
-        auto &actionExpr = static_cast<const ExpressionTree::ActionExpression &>(expression);
+        auto &actionExpr = static_cast<const ActionExpression &>(expression);
         auto name = describeAction(actionExpr);
         writer.put(name + "(");
         for (size_t i = 0; i < actionExpr.arguments.size(); ++i) {
@@ -154,19 +163,24 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
                 writer.put(", ");
             }
             auto argExpr = actionExpr.arguments[i];
-            if (argExpr->type == ExpressionType::Parameter) {
-                auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(argExpr);
-                auto name = describeParameter(*paramExpr);
-                writer.put(name);
+            if (argExpr->type == ExpressionType::Constant) {
+                auto constArg = static_cast<ConstantExpression *>(argExpr);
+                writer.put(describeConstant(*constArg));
+            } else if (argExpr->type == ExpressionType::Parameter) {
+                auto paramArg = static_cast<ParameterExpression *>(argExpr);
+                writer.put(describeParameter(*paramArg));
             } else if (argExpr->type == ExpressionType::Vector) {
-                auto vecExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
-                writeExpression(blockLevel, false, *vecExpr, writer);
+                auto vecArg = static_cast<VectorExpression *>(argExpr);
+                writeExpression(blockLevel, false, *vecArg, writer);
+            } else if (argExpr->type == ExpressionType::Action) {
+                auto actionArg = static_cast<ActionExpression *>(argExpr);
+                writeExpression(blockLevel, false, *actionArg, writer);
             } else if (argExpr->type == ExpressionType::Block) {
-                auto blockExpr = static_cast<ExpressionTree::BlockExpression *>(argExpr);
-                writer.putLine("[&]()");
-                writeBlock(blockLevel, *blockExpr, writer);
+                auto blockArg = static_cast<BlockExpression *>(argExpr);
+                writer.putLine("");
+                writeBlock(blockLevel, *blockArg, true, writer);
             } else {
-                throw ValidationException("Action argument is not a parameter, vector or block expression");
+                throw ValidationException("Unsupported action argument");
             }
         }
         writer.put(")");
@@ -176,8 +190,8 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
                expression.type == ExpressionType::Not ||
                expression.type == ExpressionType::Increment ||
                expression.type == ExpressionType::Decrement) {
-        auto &unaryExpr = static_cast<const ExpressionTree::UnaryExpression &>(expression);
-        auto name = describeParameter(*unaryExpr.operand);
+        auto &unaryExpr = static_cast<const UnaryExpression &>(expression);
+        auto name = describeParameter(*static_cast<ParameterExpression *>(unaryExpr.operand));
         if (expression.type == ExpressionType::Negate) {
             writer.put("-" + name);
         } else if (expression.type == ExpressionType::OnesComplement) {
@@ -209,15 +223,12 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
                expression.type == ExpressionType::GreaterThan ||
                expression.type == ExpressionType::LessThan ||
                expression.type == ExpressionType::LessThanOrEqual) {
-        auto &binaryExpr = static_cast<const ExpressionTree::BinaryExpression &>(expression);
+        auto &binaryExpr = static_cast<const BinaryExpression &>(expression);
         string operation;
         bool declareLeft = false;
         if (binaryExpr.type == ExpressionType::Assign) {
             operation = "=";
-            auto paramExpr = static_cast<ExpressionTree::ParameterExpression *>(binaryExpr.left);
-            if (paramExpr->assignments.size() == 1l && paramExpr->assignments.front() == binaryExpr.offset) {
-                declareLeft = true;
-            }
+            declareLeft = binaryExpr.declareLeft;
         } else if (binaryExpr.type == ExpressionType::Add) {
             operation = "+";
         } else if (binaryExpr.type == ExpressionType::Subtract) {
@@ -259,32 +270,44 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const ExpressionTr
         if (binaryExpr.type == ExpressionType::RightShiftUnsigned) {
             writer.put("(unsigned int)");
         }
+        if (ExpressionTree::isBinaryExpression(binaryExpr.left->type)) {
+            writer.put("(");
+        }
         writeExpression(blockLevel, declareLeft, *binaryExpr.left, writer);
+        if (ExpressionTree::isBinaryExpression(binaryExpr.left->type)) {
+            writer.put(")");
+        }
         writer.put(str(boost::format(" %s ") % operation));
+        if (ExpressionTree::isBinaryExpression(binaryExpr.right->type)) {
+            writer.put("(");
+        }
         writeExpression(blockLevel, false, *binaryExpr.right, writer);
+        if (ExpressionTree::isBinaryExpression(binaryExpr.right->type)) {
+            writer.put(")");
+        }
 
     } else if (expression.type == ExpressionType::Conditional) {
-        auto &condExpr = static_cast<const ExpressionTree::ConditionalExpression &>(expression);
+        auto &condExpr = static_cast<const ConditionalExpression &>(expression);
         writer.put("if(");
         writeExpression(blockLevel, false, *condExpr.test, writer);
         writer.putLine(")");
-        writeBlock(blockLevel, *condExpr.ifTrue, writer);
+        writeBlock(blockLevel, *condExpr.ifTrue, true, writer);
         writer.putLine("");
         if (condExpr.ifFalse) {
             writer.putLine(indent + "else");
-            writeBlock(blockLevel, *condExpr.ifFalse, writer);
+            writeBlock(blockLevel, *condExpr.ifFalse, true, writer);
             writer.putLine("");
         }
 
     } else if (expression.type == ExpressionType::Vector) {
-        auto &vecExpr = static_cast<const ExpressionTree::VectorExpression &>(expression);
+        auto &vecExpr = static_cast<const VectorExpression &>(expression);
         auto xComp = describeParameter(*vecExpr.components[0]);
         auto yComp = describeParameter(*vecExpr.components[1]);
         auto zComp = describeParameter(*vecExpr.components[2]);
         writer.put(str(boost::format("vector(%s, %s, %s)") % xComp % yComp % zComp));
 
     } else if (expression.type == ExpressionType::VectorIndex) {
-        auto &indexExpr = static_cast<const ExpressionTree::VectorIndexExpression &>(expression);
+        auto &indexExpr = static_cast<const VectorIndexExpression &>(expression);
         auto name = describeParameter(*indexExpr.vector);
         writer.put(str(boost::format("%s[%d]") % name % indexExpr.index));
 
@@ -297,15 +320,15 @@ string NssWriter::indentAtLevel(int level) {
     return string(4 * level, ' ');
 }
 
-string NssWriter::describeFunction(const ExpressionTree::Function &function) {
+string NssWriter::describeFunction(const Function &function) {
     return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.offset);
 }
 
-string NssWriter::describeLabel(const ExpressionTree::LabelExpression &labelExpr) {
+string NssWriter::describeLabel(const LabelExpression &labelExpr) {
     return str(boost::format("loc_%08x") % labelExpr.offset);
 }
 
-string NssWriter::describeConstant(const ExpressionTree::ConstantExpression &constExpr) {
+string NssWriter::describeConstant(const ConstantExpression &constExpr) {
     if (constExpr.value.type == VariableType::Int) {
         return to_string(constExpr.value.intValue);
     } else if (constExpr.value.type == VariableType::Float) {
@@ -319,28 +342,25 @@ string NssWriter::describeConstant(const ExpressionTree::ConstantExpression &con
     }
 }
 
-string NssWriter::describeParameter(const ExpressionTree::ParameterExpression &paramExpr) {
-    if (paramExpr.assignments.size() == 1l && paramExpr.reads.size() == 1ll && paramExpr.assignedConst) {
-        return describeConstant(*paramExpr.assignedConst);
-    }
-    if (paramExpr.locality == ExpressionTree::ParameterLocality::Local) {
+string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
+    if (paramExpr.locality == ParameterLocality::Local) {
         if (!paramExpr.suffix.empty()) {
             return str(boost::format("var_%08x_%s") % paramExpr.offset % paramExpr.suffix);
         } else {
             return str(boost::format("var_%08x") % paramExpr.offset);
         }
-    } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Input) {
+    } else if (paramExpr.locality == ParameterLocality::Input) {
         return str(boost::format("in_%d") % (-paramExpr.stackOffset));
-    } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Output) {
+    } else if (paramExpr.locality == ParameterLocality::Output) {
         return str(boost::format("out_%d") % (-paramExpr.stackOffset));
-    } else if (paramExpr.locality == ExpressionTree::ParameterLocality::Global) {
+    } else if (paramExpr.locality == ParameterLocality::Global) {
         return str(boost::format("glob_%08x") % paramExpr.offset);
     } else {
         throw ArgumentException("Unsupported parameter locality: " + to_string(static_cast<int>(paramExpr.locality)));
     }
 }
 
-string NssWriter::describeAction(const ExpressionTree::ActionExpression &actionExpr) {
+string NssWriter::describeAction(const ActionExpression &actionExpr) {
     auto numRoutines = _routines.getNumRoutines();
     if (actionExpr.action >= numRoutines) {
         throw ArgumentException(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));

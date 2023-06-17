@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/script/expressiontree.h"
+#include "reone/tools/script/exprtree.h"
 
 #include "reone/script/instrutil.h"
 #include "reone/script/routine.h"
@@ -25,6 +25,7 @@
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
+#include "reone/tools/script/exprtreeoptimizer.h"
 
 using namespace std;
 
@@ -32,12 +33,12 @@ namespace reone {
 
 namespace script {
 
-ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutines &routines) {
+ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutines &routines, IExpressionTreeOptimizer &optimizer) {
     auto startFunc = make_shared<Function>();
     startFunc->name = "_start";
     startFunc->offset = 13;
 
-    auto offsetToFunction = map<uint32_t, shared_ptr<Function>>();
+    auto offsetToFunc = map<uint32_t, shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
 
     auto labels = unordered_map<uint32_t, LabelExpression *>();
@@ -54,38 +55,39 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
     }
 
-    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunction, expressions);
+    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
     ctx->pushCallStack(startFunc.get());
     startFunc->block = decompileSafely(13, ctx);
 
-    auto globals = set<const ParameterExpression *>();
+    auto globals = set<ParameterExpression *>();
     for (auto &expression : expressions) {
         if (expression->type != ExpressionType::Parameter) {
             continue;
         }
-        auto paramExpr = static_cast<const ParameterExpression *>(expression.get());
+        auto paramExpr = static_cast<ParameterExpression *>(expression.get());
         if (paramExpr->locality == ParameterLocality::Global) {
             globals.insert(paramExpr);
         }
     }
 
-    // Add _start function, but only if it's not degenerate
-    if (startFunc->block->expressions.size() > 1ll) {
-        ctx->functions[startFunc->offset] = std::move(startFunc);
-    }
+    ctx->functions[startFunc->offset] = std::move(startFunc);
 
     auto functions = vector<shared_ptr<Function>>();
-    for (auto it = ctx->functions.rbegin(); it != ctx->functions.rend(); ++it) {
-        functions.push_back(it->second);
+    for (auto &[offset, func] : offsetToFunc) {
+        functions.push_back(func);
     }
 
-    return ExpressionTree(
+    auto tree = ExpressionTree(
+        std::move(globals),
         std::move(functions),
-        ctx->expressions,
-        std::move(globals));
+        ctx->expressions);
+
+    optimizer.optimize(tree);
+
+    return tree;
 }
 
-ExpressionTree::BlockExpression *ExpressionTree::decompileSafely(uint32_t start, shared_ptr<DecompilationContext> ctx) {
+BlockExpression *ExpressionTree::decompileSafely(uint32_t start, shared_ptr<DecompilationContext> ctx) {
     try {
         return decompile(start, ctx);
     } catch (const logic_error &e) {
@@ -96,7 +98,7 @@ ExpressionTree::BlockExpression *ExpressionTree::decompileSafely(uint32_t start,
     }
 }
 
-ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<DecompilationContext> ctx) {
+BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<DecompilationContext> ctx) {
     debug(boost::format("Begin decompiling block at %08x") % start);
 
     auto block = make_shared<BlockExpression>();
@@ -173,9 +175,10 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
 
                 for (auto &[branchOffset, branchCtx] : branches) {
                     auto branchBlock = decompileSafely(branchOffset, branchCtx);
-                    for (auto &expression : branchBlock->expressions) {
-                        sub->block->append(expression);
-                    }
+                    sub->branches.insert(make_pair(branchOffset, Branch(branchBlock)));
+                    // for (auto &expression : branchBlock->expressions) {
+                    //     sub->block->append(expression);
+                    // }
                 }
 
                 bool isMain = false;
@@ -224,7 +227,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto absJumpOffset = ins.offset + ins.jumpOffset;
 
             auto leftExpr = ctx->stack.back().param;
-            leftExpr->reads.push_back(ins.offset);
             ctx->stack.pop_back();
 
             auto rightExpr = make_shared<ConstantExpression>();
@@ -281,20 +283,18 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto paramExpr = make_shared<ParameterExpression>();
             paramExpr->offset = ins.offset;
             paramExpr->variableType = constExpr->value.type;
-            block->append(paramExpr.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = paramExpr.get();
             assignExpr->right = constExpr.get();
+            assignExpr->declareLeft = true;
             block->append(assignExpr.get());
-            paramExpr->assignments.push_back(ins.offset);
-            paramExpr->assignedConst = constExpr.get();
 
             ctx->pushStack(paramExpr.get());
+            ctx->expressions.push_back(std::move(assignExpr));
             ctx->expressions.push_back(std::move(constExpr));
             ctx->expressions.push_back(std::move(paramExpr));
-            ctx->expressions.push_back(std::move(assignExpr));
 
         } else if (ins.type == InstructionType::ACTION) {
             auto &routine = ctx->routines.get(ins.routine);
@@ -305,20 +305,16 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 auto argType = routine.getArgumentType(i);
                 if (argType == VariableType::Vector) {
                     auto argZ = ctx->stack.back().param;
-                    argZ->reads.push_back(ins.offset);
                     ctx->stack.pop_back();
                     auto argY = ctx->stack.back().param;
-                    argY->reads.push_back(ins.offset);
                     ctx->stack.pop_back();
                     auto argX = ctx->stack.back().param;
-                    argX->reads.push_back(ins.offset);
                     ctx->stack.pop_back();
                     argument = ctx->appendVectorCompose(ins.offset, *block, *argX, *argY, *argZ);
                 } else if (argType == VariableType::Action) {
                     argument = ctx->savedAction;
                 } else {
                     argument = ctx->stack.back().param;
-                    static_cast<ParameterExpression *>(argument)->reads.push_back(ins.offset);
                     ctx->stack.pop_back();
                 }
                 if (!argument) {
@@ -336,14 +332,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 auto returnValue = make_shared<ParameterExpression>();
                 returnValue->offset = ins.offset;
                 returnValue->variableType = routine.returnType();
-                block->append(returnValue.get());
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
                 assignExpr->left = returnValue.get();
                 assignExpr->right = actionExpr.get();
+                assignExpr->declareLeft = true;
                 block->append(assignExpr.get());
-                returnValue->assignments.push_back(ins.offset);
 
                 if (routine.returnType() == VariableType::Vector) {
                     ParameterExpression *retValX = nullptr;
@@ -379,7 +374,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             for (int i = 0; i < numFrames; ++i) {
                 auto &left = ctx->stack[startIdx + numFrames - i - 1];
                 auto &right = ctx->stack[stackSize - i - 1];
-                right.param->reads.push_back(ins.offset);
 
                 ParameterExpression *destination;
                 if (left.allocatedBy != ctx->topCall().function && left.param->locality != ParameterLocality::Global) {
@@ -403,7 +397,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->left = destination;
                 assignExpr->right = right.param;
                 block->append(assignExpr.get());
-                destination->assignments.push_back(ins.offset);
 
                 left = right.withAllocatedBy(*left.allocatedBy);
                 ctx->expressions.push_back(std::move(assignExpr));
@@ -439,20 +432,18 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 } else {
                     source = frame.param;
                 }
-                source->reads.push_back(ins.offset);
 
                 auto paramExpr = make_shared<ParameterExpression>();
                 paramExpr->offset = ins.offset;
                 paramExpr->variableType = source->variableType;
                 paramExpr->suffix = to_string(i);
-                block->append(paramExpr.get());
 
                 auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                 assignExpr->offset = ins.offset;
                 assignExpr->left = paramExpr.get();
                 assignExpr->right = source;
+                assignExpr->declareLeft = true;
                 block->append(assignExpr.get());
-                paramExpr->assignments.push_back(ins.offset);
 
                 auto frameCopy = StackFrame(frame);
                 frameCopy.allocatedBy = ctx->topCall().function;
@@ -475,7 +466,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                    ins.type == InstructionType::COMPI ||
                    ins.type == InstructionType::NOTI) {
             auto value = ctx->stack.back().param;
-            value->reads.push_back(ins.offset);
             ctx->stack.pop_back();
 
             auto resultExpr = make_shared<ParameterExpression>();
@@ -501,7 +491,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             assignExpr->left = resultExpr.get();
             assignExpr->right = unaryExpr.get();
             block->append(assignExpr.get());
-            resultExpr->assignments.push_back(ins.offset);
 
             ctx->pushStack(resultExpr.get());
             ctx->expressions.push_back(std::move(resultExpr));
@@ -559,10 +548,8 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                    ins.type == InstructionType::SHRIGHTII ||
                    ins.type == InstructionType::USHRIGHTII) {
             auto right = ctx->stack.back().param;
-            right->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto left = ctx->stack.back().param;
-            left->reads.push_back(ins.offset);
             ctx->stack.pop_back();
 
             ExpressionType type;
@@ -661,14 +648,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto result = make_shared<ParameterExpression>();
             result->offset = ins.offset;
             result->variableType = varType;
-            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
+            assignExpr->declareLeft = true;
             block->append(assignExpr.get());
-            result->assignments.push_back(ins.offset);
 
             ctx->pushStack(result.get());
             ctx->expressions.push_back(std::move(result));
@@ -678,24 +664,18 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         } else if (ins.type == InstructionType::ADDVV ||
                    ins.type == InstructionType::SUBVV) {
             auto rightZ = ctx->stack.back().param;
-            rightZ->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto rightY = ctx->stack.back().param;
-            rightY->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto rightX = ctx->stack.back().param;
-            rightX->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
             auto leftZ = ctx->stack.back().param;
-            leftZ->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto leftY = ctx->stack.back().param;
-            leftY->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto leftX = ctx->stack.back().param;
-            leftX->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
@@ -708,14 +688,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto result = make_shared<ParameterExpression>();
             result->offset = ins.offset;
             result->variableType = VariableType::Vector;
-            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
+            assignExpr->declareLeft = true;
             block->append(assignExpr.get());
-            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -732,18 +711,14 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         } else if (ins.type == InstructionType::DIVFV ||
                    ins.type == InstructionType::MULFV) {
             auto rightZ = ctx->stack.back().param;
-            rightZ->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto rightY = ctx->stack.back().param;
-            rightY->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto rightX = ctx->stack.back().param;
-            rightX->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
 
             auto left = ctx->stack.back().param;
-            left->reads.push_back(ins.offset);
             ctx->stack.pop_back();
 
             auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
@@ -755,14 +730,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto result = make_shared<ParameterExpression>();
             result->offset = ins.offset;
             result->variableType = VariableType::Vector;
-            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
+            assignExpr->declareLeft = true;
             block->append(assignExpr.get());
-            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -779,17 +753,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         } else if (ins.type == InstructionType::DIVVF ||
                    ins.type == InstructionType::MULVF) {
             auto right = ctx->stack.back().param;
-            right->reads.push_back(ins.offset);
             ctx->stack.pop_back();
 
             auto leftZ = ctx->stack.back().param;
-            leftZ->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto leftY = ctx->stack.back().param;
-            leftY->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto leftX = ctx->stack.back().param;
-            leftX->reads.push_back(ins.offset);
             ctx->stack.pop_back();
             auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
@@ -802,14 +772,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             auto result = make_shared<ParameterExpression>();
             result->offset = ins.offset;
             result->variableType = VariableType::Vector;
-            block->append(result.get());
 
             auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
             assignExpr->offset = ins.offset;
             assignExpr->left = result.get();
             assignExpr->right = binaryExpr.get();
+            assignExpr->declareLeft = true;
             block->append(assignExpr.get());
-            result->assignments.push_back(ins.offset);
 
             ParameterExpression *resultX = nullptr;
             ParameterExpression *resultY = nullptr;
@@ -829,20 +798,17 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             vector<StackFrame> rightFrames;
             for (int i = 0; i < numFrames; ++i) {
                 rightFrames.push_back(ctx->stack.back());
-                rightFrames.back().param->reads.push_back(ins.offset);
                 ctx->stack.pop_back();
             }
             vector<StackFrame> leftFrames;
             for (int i = 0; i < numFrames; ++i) {
                 leftFrames.push_back(ctx->stack.back());
-                leftFrames.back().param->reads.push_back(ins.offset);
                 ctx->stack.pop_back();
             }
 
             auto resultExpr = make_shared<ParameterExpression>();
             resultExpr->offset = ins.offset;
             resultExpr->variableType = VariableType::Int;
-            block->append(resultExpr.get());
 
             for (int i = 0; i < numFrames; ++i) {
                 auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
@@ -861,8 +827,8 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
                 assignExpr->offset = ins.offset;
                 assignExpr->left = resultExpr.get();
                 assignExpr->right = andOrExpression.get();
+                assignExpr->declareLeft = true;
                 block->append(assignExpr.get());
-                resultExpr->assignments.push_back(ins.offset);
 
                 ctx->expressions.push_back(std::move(compExpr));
                 ctx->expressions.push_back(std::move(andOrExpression));
@@ -929,7 +895,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             } else {
                 destination = frame.param;
             }
-            destination->reads.push_back(ins.offset);
 
             ExpressionType type;
             if (ins.type == InstructionType::DECISP ||
@@ -944,7 +909,6 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
             unaryExpr->offset = ins.offset;
             unaryExpr->operand = destination;
             block->append(unaryExpr.get());
-            destination->assignments.push_back(ins.offset);
 
             ctx->expressions.push_back(std::move(unaryExpr));
 
@@ -972,47 +936,13 @@ ExpressionTree::BlockExpression *ExpressionTree::decompile(uint32_t start, share
         offset = ins.nextOffset;
     }
 
-    // Cleanup block expressions
-    for (auto it = block->expressions.begin(); it != block->expressions.end();) {
-        auto expr = *it;
-        if (expr->type == ExpressionType::Parameter) {
-            // Remove redundant declaration
-            it = block->expressions.erase(it);
-            continue;
-        } else if (expr->type == ExpressionType::Assign) {
-            auto assignExpr = static_cast<BinaryExpression *>(expr);
-            if (assignExpr->left->type == ExpressionType::Parameter && assignExpr->right->type == ExpressionType::Constant) {
-                // Remove param to constant assignment if it's the only one and param is read less than twice
-                auto leftParam = static_cast<ParameterExpression *>(assignExpr->left);
-                if (leftParam->assignments.size() == 1l &&
-                    leftParam->assignments.front() == expr->offset &&
-                    leftParam->reads.size() < 2ll) {
-                    it = block->expressions.erase(it);
-                    continue;
-                }
-            } else if (assignExpr->left->type == ExpressionType::Parameter && assignExpr->right->type == ExpressionType::Action) {
-                // Remove param to function return value assignment if param is never read
-                auto leftParam = static_cast<ParameterExpression *>(assignExpr->left);
-                if (leftParam->reads.empty()) {
-                    it = block->expressions.erase(it);
-                    it = block->expressions.insert(it, assignExpr->right);
-                    continue;
-                }
-            }
-        }
-        ++it;
-    }
-    if (!block->expressions.empty() && block->expressions.back()->type == ExpressionType::Return) {
-        block->expressions.pop_back();
-    }
-
     debug(boost::format("End decompiling block at %08x") % start);
     ctx->expressions.push_back(block);
 
     return block.get();
 }
 
-unique_ptr<ExpressionTree::ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
+unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::CONSTI:
     case InstructionType::CONSTF:
@@ -1036,7 +966,7 @@ unique_ptr<ExpressionTree::ConstantExpression> ExpressionTree::constantExpressio
     }
 }
 
-unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpression(const Instruction &ins) {
+unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::RSADDI:
     case InstructionType::RSADDF:
@@ -1072,7 +1002,7 @@ unique_ptr<ExpressionTree::ParameterExpression> ExpressionTree::parameterExpress
     }
 }
 
-ExpressionTree::VectorExpression *ExpressionTree::DecompilationContext::appendVectorCompose(
+VectorExpression *ExpressionTree::DecompilationContext::appendVectorCompose(
     uint32_t offset,
     BlockExpression &block,
     ParameterExpression &x,
@@ -1104,8 +1034,6 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     ParameterExpression *&outY,
     ParameterExpression *&outZ) {
 
-    vec.reads.push_back(offset);
-
     // X
 
     auto xIndexExpr = make_shared<VectorIndexExpression>();
@@ -1117,14 +1045,13 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     xParamExpr->offset = offset;
     xParamExpr->variableType = VariableType::Float;
     xParamExpr->suffix = "x";
-    block.append(xParamExpr.get());
 
     auto xAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
     xAssignExpr->offset = offset;
     xAssignExpr->left = xParamExpr.get();
     xAssignExpr->right = xIndexExpr.get();
+    xAssignExpr->declareLeft = true;
     block.append(xAssignExpr.get());
-    xParamExpr->assignments.push_back(offset);
 
     outX = xParamExpr.get();
 
@@ -1143,14 +1070,13 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     yParamExpr->offset = offset;
     yParamExpr->variableType = VariableType::Float;
     yParamExpr->suffix = "y";
-    block.append(yParamExpr.get());
 
     auto yAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
     yAssignExpr->offset = offset;
     yAssignExpr->left = yParamExpr.get();
     yAssignExpr->right = yIndexExpr.get();
+    yAssignExpr->declareLeft = true;
     block.append(yAssignExpr.get());
-    yParamExpr->assignments.push_back(offset);
 
     outY = yParamExpr.get();
 
@@ -1169,20 +1095,81 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     zParamExpr->offset = offset;
     zParamExpr->variableType = VariableType::Float;
     zParamExpr->suffix = "z";
-    block.append(zParamExpr.get());
 
     auto zAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
     zAssignExpr->offset = offset;
     zAssignExpr->left = zParamExpr.get();
     zAssignExpr->right = zIndexExpr.get();
+    zAssignExpr->declareLeft = true;
     block.append(zAssignExpr.get());
-    zParamExpr->assignments.push_back(offset);
 
     outZ = zParamExpr.get();
 
     expressions.push_back(std::move(zParamExpr));
     expressions.push_back(std::move(zIndexExpr));
     expressions.push_back(std::move(zAssignExpr));
+}
+
+unique_ptr<ExpressionTree> ExpressionTree::deepCopy() const {
+    auto functions = vector<shared_ptr<Function>>();
+    auto expressions = vector<shared_ptr<Expression>>();
+
+    auto globals = set<ParameterExpression *>();
+    for (auto &expr : expressions) {
+        if (expr->type != ExpressionType::Parameter) {
+            continue;
+        }
+        auto paramExpr = static_pointer_cast<ParameterExpression>(expr);
+        if (paramExpr->locality == ParameterLocality::Global) {
+            globals.insert(paramExpr.get());
+        }
+    }
+
+    return make_unique<ExpressionTree>(
+        std::move(globals),
+        std::move(functions),
+        std::move(expressions));
+}
+
+bool ExpressionTree::isUnaryExpression(ExpressionType type) {
+    switch (type) {
+    case Negate:
+    case Not:
+    case OnesComplement:
+    case Increment:
+    case Decrement:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool ExpressionTree::isBinaryExpression(ExpressionType type) {
+    switch (type) {
+    case Assign:
+    case Add:
+    case Subtract:
+    case Multiply:
+    case Divide:
+    case Modulo:
+    case LogicalAnd:
+    case LogicalOr:
+    case BitwiseOr:
+    case BitwiseExlusiveOr:
+    case BitwiseAnd:
+    case LeftShift:
+    case RightShift:
+    case RightShiftUnsigned:
+    case Equal:
+    case NotEqual:
+    case GreaterThanOrEqual:
+    case GreaterThan:
+    case LessThan:
+    case LessThanOrEqual:
+        return true;
+    default:
+        return false;
+    }
 }
 
 } // namespace script

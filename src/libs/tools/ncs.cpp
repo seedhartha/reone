@@ -27,7 +27,8 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 
-#include "reone/tools/script/expressiontree.h"
+#include "reone/tools/script/exprtree.h"
+#include "reone/tools/script/exprtreeoptimizer.h"
 #include "reone/tools/script/format/nsswriter.h"
 #include "reone/tools/script/format/pcodereader.h"
 #include "reone/tools/script/format/pcodewriter.h"
@@ -114,9 +115,10 @@ void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines) {
     auto reader = NcsReader("");
     reader.load(ncs);
 
-    auto expressionTree = ExpressionTree::fromProgram(*reader.program(), routines);
+    auto optimizer = ExpressionTreeOptimizer();
+    auto exprTree = ExpressionTree::fromProgram(*reader.program(), routines, optimizer);
 
-    auto writer = NssWriter(expressionTree, routines);
+    auto writer = NssWriter(exprTree, routines);
     writer.save(nss);
 }
 

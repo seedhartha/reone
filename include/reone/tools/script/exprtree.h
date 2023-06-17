@@ -24,6 +24,7 @@ namespace reone {
 
 namespace script {
 
+class IExpressionTreeOptimizer;
 class IRoutines;
 
 enum ExpressionType {
@@ -80,178 +81,192 @@ enum ExpressionType {
     // END Binary
 };
 
-class ExpressionTree {
-public:
-    enum class ParameterLocality {
-        Local,
-        Input,
-        Output,
-        Global
-    };
+enum class ParameterLocality {
+    Local,
+    Input,
+    Output,
+    Global
+};
 
-    struct Expression {
-        ExpressionType type;
-        uint32_t offset {0};
+struct Expression {
+    ExpressionType type;
+    uint32_t offset {0};
 
-        Expression(ExpressionType type) :
-            type(type) {
-        }
-    };
+    Expression(ExpressionType type) :
+        type(type) {
+    }
+};
 
-    struct BlockExpression : Expression {
-        std::vector<Expression *> expressions;
+struct BlockExpression : Expression {
+    std::vector<Expression *> expressions;
 
-        BlockExpression() :
-            Expression(ExpressionType::Block) {
-        }
-
-        bool contains(uint32_t offset) {
-            return !expressions.empty() &&
-                   offset >= expressions.front()->offset &&
-                   offset <= expressions.back()->offset;
-        }
-
-        void append(Expression *e) {
-            expressions.push_back(e);
-        }
-    };
-
-    struct ConstantExpression : Expression {
-        Variable value;
-
-        ConstantExpression() :
-            Expression(ExpressionType::Constant) {
-        }
-    };
-
-    struct ParameterExpression : Expression {
-        VariableType variableType {VariableType::Int};
-        ParameterLocality locality {ParameterLocality::Local};
-        std::string suffix;
-        int stackOffset {0}; // input/output
-
-        std::list<uint32_t> assignments;
-        std::list<uint32_t> reads;
-        ConstantExpression *assignedConst {nullptr};
-
-        ParameterExpression() :
-            Expression(ExpressionType::Parameter) {
-        }
-    };
-
-    struct UnaryExpression : Expression {
-        ParameterExpression *operand {nullptr};
-
-        UnaryExpression(ExpressionType type) :
-            Expression(type) {
-        }
-    };
-
-    struct BinaryExpression : Expression {
-        Expression *left {nullptr};
-        Expression *right {nullptr};
-
-        BinaryExpression(ExpressionType type) :
-            Expression(type) {
-        }
-    };
-
-    struct LabelExpression : Expression {
-        LabelExpression() :
-            Expression(ExpressionType::Label) {
-        }
-    };
-
-    struct GotoExpression : Expression {
-        LabelExpression *label {nullptr};
-
-        GotoExpression() :
-            Expression(ExpressionType::Goto) {
-        }
-    };
-
-    struct ReturnExpression : Expression {
-        Expression *value {nullptr};
-
-        ReturnExpression() :
-            Expression(ExpressionType::Return) {
-        }
-    };
-
-    struct ConditionalExpression : Expression {
-        Expression *test {nullptr};
-        BlockExpression *ifTrue {nullptr};
-        BlockExpression *ifFalse {nullptr};
-
-        ConditionalExpression() :
-            Expression(ExpressionType::Conditional) {
-        }
-    };
-
-    struct ActionExpression : Expression {
-        int action {0};
-        std::vector<Expression *> arguments;
-
-        ActionExpression() :
-            Expression(ExpressionType::Action) {
-        }
-    };
-
-    struct FunctionArgument {
-        VariableType type;
-        int stackOffset;
-
-        FunctionArgument(VariableType type, int stackOffset) :
-            type(type),
-            stackOffset(stackOffset) {
-        }
-    };
-
-    struct Function {
-        std::string name;
-        uint32_t offset {0};
-        std::vector<FunctionArgument> inputs;
-        std::vector<FunctionArgument> outputs;
-        VariableType returnType {VariableType::Void};
-        BlockExpression *block {nullptr};
-    };
-
-    struct CallExpression : Expression {
-        Function *function {nullptr};
-        std::vector<ParameterExpression *> arguments;
-
-        CallExpression() :
-            Expression(ExpressionType::Call) {
-        }
-    };
-
-    struct VectorExpression : Expression {
-        std::vector<ParameterExpression *> components;
-
-        VectorExpression() :
-            Expression(ExpressionType::Vector) {
-        }
-    };
-
-    struct VectorIndexExpression : Expression {
-        ParameterExpression *vector {nullptr};
-        int index {0};
-
-        VectorIndexExpression() :
-            Expression(ExpressionType::VectorIndex) {
-        }
-    };
-
-    ExpressionTree(
-        std::vector<std::shared_ptr<Function>> functions,
-        std::vector<std::shared_ptr<Expression>> expressions,
-        std::set<const ParameterExpression *> globals) :
-        _functions(std::move(functions)),
-        _expressions(std::move(expressions)),
-        _globals(std::move(globals)) {
+    BlockExpression() :
+        Expression(ExpressionType::Block) {
     }
 
-    const std::vector<std::shared_ptr<Function>> &functions() const {
+    bool contains(uint32_t offset) {
+        return !expressions.empty() &&
+               offset >= expressions.front()->offset &&
+               offset <= expressions.back()->offset;
+    }
+
+    void append(Expression *e) {
+        expressions.push_back(e);
+    }
+};
+
+struct ConstantExpression : Expression {
+    Variable value;
+
+    ConstantExpression() :
+        Expression(ExpressionType::Constant) {
+    }
+};
+
+struct ParameterExpression : Expression {
+    VariableType variableType {VariableType::Int};
+    ParameterLocality locality {ParameterLocality::Local};
+    std::string suffix;
+    int stackOffset {0}; // input/output
+
+    ParameterExpression() :
+        Expression(ExpressionType::Parameter) {
+    }
+};
+
+struct UnaryExpression : Expression {
+    Expression *operand {nullptr};
+
+    UnaryExpression(ExpressionType type) :
+        Expression(type) {
+    }
+};
+
+struct BinaryExpression : Expression {
+    Expression *left {nullptr};
+    Expression *right {nullptr};
+    bool declareLeft {false};
+
+    BinaryExpression(ExpressionType type) :
+        Expression(type) {
+    }
+};
+
+struct LabelExpression : Expression {
+    LabelExpression() :
+        Expression(ExpressionType::Label) {
+    }
+};
+
+struct GotoExpression : Expression {
+    LabelExpression *label {nullptr};
+
+    GotoExpression() :
+        Expression(ExpressionType::Goto) {
+    }
+};
+
+struct ReturnExpression : Expression {
+    Expression *value {nullptr};
+
+    ReturnExpression() :
+        Expression(ExpressionType::Return) {
+    }
+};
+
+struct ConditionalExpression : Expression {
+    Expression *test {nullptr};
+    BlockExpression *ifTrue {nullptr};
+    BlockExpression *ifFalse {nullptr};
+
+    ConditionalExpression() :
+        Expression(ExpressionType::Conditional) {
+    }
+};
+
+struct ActionExpression : Expression {
+    int action {0};
+    std::vector<Expression *> arguments;
+
+    ActionExpression() :
+        Expression(ExpressionType::Action) {
+    }
+};
+
+struct FunctionArgument {
+    VariableType type;
+    int stackOffset;
+
+    FunctionArgument(VariableType type, int stackOffset) :
+        type(type),
+        stackOffset(stackOffset) {
+    }
+};
+
+struct Branch {
+    BlockExpression *block {nullptr};
+
+    Branch() = default;
+
+    Branch(BlockExpression *block) :
+        block(block) {
+    }
+};
+
+struct Function {
+    std::string name;
+    uint32_t offset {0};
+    std::vector<FunctionArgument> inputs;
+    std::vector<FunctionArgument> outputs;
+    VariableType returnType {VariableType::Void};
+    BlockExpression *block {nullptr};
+    std::map<uint32_t, Branch> branches;
+};
+
+struct CallExpression : Expression {
+    Function *function {nullptr};
+    std::vector<ParameterExpression *> arguments;
+
+    CallExpression() :
+        Expression(ExpressionType::Call) {
+    }
+};
+
+struct VectorExpression : Expression {
+    std::vector<ParameterExpression *> components;
+
+    VectorExpression() :
+        Expression(ExpressionType::Vector) {
+    }
+};
+
+struct VectorIndexExpression : Expression {
+    ParameterExpression *vector {nullptr};
+    int index {0};
+
+    VectorIndexExpression() :
+        Expression(ExpressionType::VectorIndex) {
+    }
+};
+
+class ExpressionTree {
+public:
+    ExpressionTree(
+        std::set<ParameterExpression *> globals,
+        std::vector<std::shared_ptr<Function>> functions,
+        std::vector<std::shared_ptr<Expression>> expressions) :
+        _globals(std::move(globals)),
+        _functions(std::move(functions)),
+        _expressions(std::move(expressions)) {
+    }
+
+    std::unique_ptr<ExpressionTree> deepCopy() const;
+
+    const std::set<ParameterExpression *> &globals() const {
+        return _globals;
+    }
+
+    std::vector<std::shared_ptr<Function>> &functions() {
         return _functions;
     }
 
@@ -259,11 +274,10 @@ public:
         return _expressions;
     }
 
-    const std::set<const ParameterExpression *> &globals() const {
-        return _globals;
-    }
+    static ExpressionTree fromProgram(const ScriptProgram &program, IRoutines &routines, IExpressionTreeOptimizer &optimizer);
 
-    static ExpressionTree fromProgram(const ScriptProgram &program, IRoutines &routines);
+    static bool isUnaryExpression(ExpressionType type);
+    static bool isBinaryExpression(ExpressionType type);
 
 private:
     struct CallStackFrame {
@@ -373,9 +387,9 @@ private:
             ParameterExpression *&outZ);
     };
 
+    std::set<ParameterExpression *> _globals;
     std::vector<std::shared_ptr<Function>> _functions;
     std::vector<std::shared_ptr<Expression>> _expressions;
-    std::set<const ParameterExpression *> _globals;
 
     static BlockExpression *decompile(uint32_t start, std::shared_ptr<DecompilationContext> ctx);
     static BlockExpression *decompileSafely(uint32_t start, std::shared_ptr<DecompilationContext> ctx);

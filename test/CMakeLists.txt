@@ -80,7 +80,8 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/script/execution.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
-    ${TESTS_SOURCE_DIR}/tools/expressiontree.cpp)
+    ${TESTS_SOURCE_DIR}/tools/exprtree.cpp
+    ${TESTS_SOURCE_DIR}/tools/exprtreeoptimizer.cpp)
 
 add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
