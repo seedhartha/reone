@@ -131,6 +131,11 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 retExpr->value = retVal;
                 auto startFunc = ctx->topCall().function;
                 startFunc->returnType = retVal->variableType;
+            } else if (ctx->outputs->count(-1) > 0) {
+                auto retVal = ctx->outputs->at(-1);
+                retExpr->value = retVal;
+                auto function = ctx->topCall().function;
+                function->returnType = retVal->variableType;
             }
 
             block->append(retExpr.get());
@@ -221,7 +226,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             }
 
             ctx->expressions.push_back(std::move(callExpr));
-
         } else if (ins.type == InstructionType::JZ ||
                    ins.type == InstructionType::JNZ) {
             auto absJumpOffset = ins.offset + ins.jumpOffset;
@@ -260,7 +264,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(ifTrueGotoExpr));
             ctx->expressions.push_back(std::move(ifTrueBlockExpr));
             ctx->expressions.push_back(std::move(condExpr));
-
         } else if (ins.type == InstructionType::RSADDI ||
                    ins.type == InstructionType::RSADDF ||
                    ins.type == InstructionType::RSADDS ||
@@ -273,7 +276,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             block->append(expression.get());
             ctx->pushStack(expression.get());
             ctx->expressions.push_back(std::move(expression));
-
         } else if (ins.type == InstructionType::CONSTI ||
                    ins.type == InstructionType::CONSTF ||
                    ins.type == InstructionType::CONSTS ||
@@ -295,7 +297,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(assignExpr));
             ctx->expressions.push_back(std::move(constExpr));
             ctx->expressions.push_back(std::move(paramExpr));
-
         } else if (ins.type == InstructionType::ACTION) {
             auto &routine = ctx->routines.get(ins.routine);
 
@@ -359,7 +360,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             }
 
             ctx->expressions.push_back(std::move(actionExpr));
-
         } else if (ins.type == InstructionType::CPDOWNSP ||
                    ins.type == InstructionType::CPDOWNBP) {
             auto stackSize = static_cast<int>(ctx->stack.size());
@@ -401,7 +401,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 left = right.withAllocatedBy(*left.allocatedBy);
                 ctx->expressions.push_back(std::move(assignExpr));
             }
-
         } else if (ins.type == InstructionType::CPTOPSP ||
                    ins.type == InstructionType::CPTOPBP) {
             auto stackSize = static_cast<int>(ctx->stack.size());
@@ -453,7 +452,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 ctx->expressions.push_back(std::move(paramExpr));
                 ctx->expressions.push_back(std::move(assignExpr));
             }
-
         } else if (ins.type == InstructionType::MOVSP) {
             if (ins.stackOffset >= 0) {
                 throw ValidationException("Non-negative stack offsets are not supported");
@@ -496,7 +494,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(resultExpr));
             ctx->expressions.push_back(std::move(unaryExpr));
             ctx->expressions.push_back(std::move(assignExpr));
-
         } else if (ins.type == InstructionType::ADDII ||
                    ins.type == InstructionType::ADDIF ||
                    ins.type == InstructionType::ADDFI ||
@@ -660,7 +657,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(result));
             ctx->expressions.push_back(std::move(binaryExpr));
             ctx->expressions.push_back(std::move(assignExpr));
-
         } else if (ins.type == InstructionType::ADDVV ||
                    ins.type == InstructionType::SUBVV) {
             auto rightZ = ctx->stack.back().param;
@@ -707,7 +703,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(result));
             ctx->expressions.push_back(std::move(binaryExpr));
             ctx->expressions.push_back(std::move(assignExpr));
-
         } else if (ins.type == InstructionType::DIVFV ||
                    ins.type == InstructionType::MULFV) {
             auto rightZ = ctx->stack.back().param;
@@ -749,7 +744,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(result));
             ctx->expressions.push_back(std::move(binaryExpr));
             ctx->expressions.push_back(std::move(assignExpr));
-
         } else if (ins.type == InstructionType::DIVVF ||
                    ins.type == InstructionType::MULVF) {
             auto right = ctx->stack.back().param;
@@ -791,7 +785,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             ctx->expressions.push_back(std::move(binaryExpr));
             ctx->expressions.push_back(std::move(result));
             ctx->expressions.push_back(std::move(assignExpr));
-
         } else if (ins.type == InstructionType::EQUALTT ||
                    ins.type == InstructionType::NEQUALTT) {
             auto numFrames = ins.size / 4;
@@ -837,7 +830,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
 
             ctx->pushStack(resultExpr.get());
             ctx->expressions.push_back(std::move(resultExpr));
-
         } else if (ins.type == InstructionType::STORE_STATE) {
             auto absJumpOffset = ins.offset + 0x10;
 
@@ -857,17 +849,14 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
 
             ctx->expressions.push_back(std::move(gotoExpr));
             ctx->expressions.push_back(std::move(innerBlock));
-
         } else if (ins.type == InstructionType::SAVEBP) {
             ctx->prevNumGlobals = ctx->numGlobals;
             ctx->numGlobals = static_cast<int>(ctx->stack.size());
             for (int i = 0; i < ctx->numGlobals; ++i) {
                 ctx->stack[i].param->locality = ParameterLocality::Global;
             }
-
         } else if (ins.type == InstructionType::RESTOREBP) {
             // ctx.numGlobals = ctx.prevNumGlobals;
-
         } else if (ins.type == InstructionType::DECISP ||
                    ins.type == InstructionType::DECIBP ||
                    ins.type == InstructionType::INCISP ||
@@ -911,7 +900,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             block->append(unaryExpr.get());
 
             ctx->expressions.push_back(std::move(unaryExpr));
-
         } else if (ins.type == InstructionType::DESTRUCT) {
             auto numFrames = ins.size / 4;
             auto startNoDestroy = static_cast<int>(ctx->stack.size()) - numFrames + (ins.stackOffset / 4);
@@ -928,7 +916,6 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
             for (auto &frame : framesNoDestroy) {
                 ctx->stack.push_back(frame);
             }
-
         } else {
             throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
         }

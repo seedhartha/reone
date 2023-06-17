@@ -120,12 +120,8 @@ void ExpressionTreeOptimizer::analyze(Expression &expr, OptimizationContext &ctx
 
 void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext &ctx) {
     auto &functions = tree.functions();
-    auto &startFunc = functions.front();
-    if (startFunc->block->expressions.size() == 2ll &&
-        startFunc->block->expressions.front()->type == ExpressionType::Call &&
-        startFunc->block->expressions.back()->type == ExpressionType::Return) {
-        functions.erase(functions.begin());
-    }
+    functions.erase(functions.begin());
+
     for (auto &func : functions) {
         auto branches = func->branches;
         for (auto &[offset, branch] : branches) {
