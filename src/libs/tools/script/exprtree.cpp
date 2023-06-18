@@ -131,7 +131,7 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 retExpr->value = retVal;
                 auto startFunc = ctx->topCall().function;
                 startFunc->returnType = retVal->variableType;
-            } else if (ctx->outputs->count(-1) > 0) {
+            } else if (ctx->outputs && ctx->outputs->count(-1) > 0) {
                 auto retVal = ctx->outputs->at(-1);
                 retExpr->value = retVal;
                 auto function = ctx->topCall().function;
