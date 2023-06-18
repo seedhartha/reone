@@ -398,7 +398,7 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 assignExpr->right = right.param;
                 block->append(assignExpr.get());
 
-                left = right.withAllocatedBy(*left.allocatedBy);
+                left.param->variableType = right.param->variableType;
                 ctx->expressions.push_back(std::move(assignExpr));
             }
         } else if (ins.type == InstructionType::CPTOPSP ||
@@ -444,11 +444,7 @@ BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<Decompilat
                 assignExpr->declareLeft = true;
                 block->append(assignExpr.get());
 
-                auto frameCopy = StackFrame(frame);
-                frameCopy.allocatedBy = ctx->topCall().function;
-                frameCopy.param = paramExpr.get();
-                ctx->stack.push_back(std::move(frameCopy));
-
+                ctx->stack.push_back(StackFrame(paramExpr.get(), ctx->topCall().function));
                 ctx->expressions.push_back(std::move(paramExpr));
                 ctx->expressions.push_back(std::move(assignExpr));
             }

@@ -24,13 +24,13 @@ namespace reone {
 namespace script {
 
 struct ParameterWriteEvent {
-    BinaryExpression *assignExpr {nullptr};
+    Expression *writeExpr {nullptr};
     Expression *value {nullptr};
 
     ParameterWriteEvent() = default;
 
-    ParameterWriteEvent(BinaryExpression *assignExpr, Expression *value) :
-        assignExpr(assignExpr),
+    ParameterWriteEvent(Expression *writeExpr, Expression *value) :
+        writeExpr(writeExpr),
         value(value) {
     }
 };

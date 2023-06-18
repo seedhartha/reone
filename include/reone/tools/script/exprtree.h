@@ -300,17 +300,6 @@ private:
             param(param),
             allocatedBy(allocatedBy) {
         }
-
-        StackFrame(const StackFrame &other) {
-            param = other.param;
-            allocatedBy = other.allocatedBy;
-        }
-
-        StackFrame withAllocatedBy(Function &allocatedBy) {
-            auto copy = StackFrame(*this);
-            copy.allocatedBy = &allocatedBy;
-            return std::move(copy);
-        }
     };
 
     struct DecompilationContext {

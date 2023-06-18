@@ -103,6 +103,9 @@ void ExpressionTreeOptimizer::analyze(Expression &expr, OptimizationContext &ctx
         }
         auto paramOperand = static_cast<ParameterExpression *>(unaryExpr->operand);
         ctx.parameters[paramOperand].reads.push_back(ParameterReadEvent(unaryExpr));
+        if (unaryExpr->type == ExpressionType::Increment || unaryExpr->type == ExpressionType::Decrement) {
+            ctx.parameters[paramOperand].writes.push_back(ParameterWriteEvent(unaryExpr, paramOperand));
+        }
     } else if (ExpressionTree::isBinaryExpression(expr.type)) {
         auto binaryExpr = static_cast<BinaryExpression *>(&expr);
         if (binaryExpr->type == ExpressionType::Assign) {
