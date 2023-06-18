@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
     BOOST_TEST(0ll == startingConditionalFunc->inputs.size());
     BOOST_TEST(1ll == startingConditionalFunc->outputs.size());
     BOOST_TEST(static_cast<int>(VariableType::Int) == static_cast<int>(startingConditionalFunc->outputs[0].type));
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(startingConditionalFunc->returnType));
+    BOOST_TEST(static_cast<int>(VariableType::Int) == static_cast<int>(startingConditionalFunc->returnType));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
