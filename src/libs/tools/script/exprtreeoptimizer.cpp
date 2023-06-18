@@ -147,11 +147,15 @@ void ExpressionTreeOptimizer::compactBlock(Function &func, BlockExpression &bloc
     for (auto it = block.expressions.begin(); it != block.expressions.end();) {
         auto expr = *it;
         if (expr->type == ExpressionType::Parameter) {
+            it = block.expressions.erase(it);
             auto paramExpr = static_cast<ParameterExpression *>(expr);
-            if (ctx.parameters[paramExpr].reads.empty()) {
-                it = block.expressions.erase(it);
-                continue;
+            if (!ctx.parameters[paramExpr].writes.empty()) {
+                auto &write = ctx.parameters[paramExpr].writes.front();
+                if (write.writeExpr->type == ExpressionType::Assign) {
+                    static_cast<BinaryExpression *>(write.writeExpr)->declareLeft = true;
+                }
             }
+            continue;
         } else if (expr->type == ExpressionType::Goto) {
             auto gotoExpr = static_cast<GotoExpression *>(expr);
             auto &labelEvents = ctx.labels[gotoExpr->label];
@@ -207,7 +211,11 @@ void ExpressionTreeOptimizer::compactBlock(Function &func, BlockExpression &bloc
             if (binaryExpr->type == ExpressionType::Assign && binaryExpr->declareLeft) {
                 auto leftParam = static_cast<ParameterExpression *>(binaryExpr->left);
                 auto &paramEvents = ctx.parameters[leftParam];
-                if (paramEvents.reads.size() == 1ll && paramEvents.writes.size() == 1ll) {
+                if (paramEvents.writes.size() == 1ll && paramEvents.reads.empty()) {
+                    it = block.expressions.erase(it);
+                    continue;
+                }
+                if (paramEvents.writes.size() == 1ll && paramEvents.reads.size() == 1ll) {
                     auto &read = paramEvents.reads.front();
                     auto &write = paramEvents.writes.front();
                     if (read.expression->type == ExpressionType::Action) {
