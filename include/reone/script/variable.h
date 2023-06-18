@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/exception/notimplemented.h"
+
 #include "types.h"
 
 namespace reone {
@@ -29,7 +31,7 @@ class EngineType;
 class ScriptObject;
 
 struct Variable {
-    VariableType type;
+    VariableType type {VariableType::Void};
     std::string strValue;
     glm::vec3 vecValue {0.0f};
     std::shared_ptr<EngineType> engineType;
@@ -54,6 +56,17 @@ struct Variable {
 
     bool operator!=(const Variable &other) const {
         return !operator==(other);
+    }
+
+    Variable operator-() {
+        switch (type) {
+        case VariableType::Int:
+            return Variable::ofInt(-intValue);
+        case VariableType::Float:
+            return Variable::ofFloat(-floatValue);
+        default:
+            throw NotImplementedException();
+        }
     }
 
     static Variable ofNull();

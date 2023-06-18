@@ -69,6 +69,7 @@ struct LabelEvents {
 struct OptimizationContext {
     std::map<ParameterExpression *, ParameterEvents> parameters;
     std::map<LabelExpression *, LabelEvents> labels;
+    std::stack<BlockExpression *> blocksToCompact;
 };
 
 class IExpressionTreeOptimizer {
@@ -84,11 +85,9 @@ public:
 
 private:
     void analyze(ExpressionTree &tree, OptimizationContext &ctx);
-    void analyzeBlock(BlockExpression &block, OptimizationContext &ctx);
-    void analyze(Expression &expr, OptimizationContext &ctx, Expression &container, int binaryDir = -1);
+    void analyzeFunction(Function &func, OptimizationContext &ctx);
 
-    void compact(ExpressionTree &tree, OptimizationContext &ctx);
-    void compactBlock(Function &func, BlockExpression &block, OptimizationContext &ctx);
+    void compact(OptimizationContext &ctx);
 };
 
 } // namespace script

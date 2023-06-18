@@ -82,10 +82,10 @@ enum ExpressionType {
 };
 
 enum class ParameterLocality {
+    Global,
     Local,
-    Input,
-    Output,
-    Global
+    Argument,
+    ReturnValue,
 };
 
 struct Expression {
@@ -99,6 +99,7 @@ struct Expression {
 
 struct BlockExpression : Expression {
     std::vector<Expression *> expressions;
+    bool initialized {false};
 
     BlockExpression() :
         Expression(ExpressionType::Block) {
@@ -128,6 +129,7 @@ struct ParameterExpression : Expression {
     ParameterLocality locality {ParameterLocality::Local};
     std::string suffix;
     int stackOffset {0}; // input/output
+    Expression *assignedFrom {nullptr};
 
     ParameterExpression() :
         Expression(ExpressionType::Parameter) {
@@ -203,24 +205,12 @@ struct FunctionArgument {
     }
 };
 
-struct Branch {
-    BlockExpression *block {nullptr};
-
-    Branch() = default;
-
-    Branch(BlockExpression *block) :
-        block(block) {
-    }
-};
-
 struct Function {
     std::string name;
     uint32_t offset {0};
-    std::vector<FunctionArgument> inputs;
-    std::vector<FunctionArgument> outputs;
+    std::vector<FunctionArgument> arguments;
     VariableType returnType {VariableType::Void};
     BlockExpression *block {nullptr};
-    std::map<uint32_t, Branch> branches;
 };
 
 struct CallExpression : Expression {
@@ -249,10 +239,20 @@ struct VectorIndexExpression : Expression {
     }
 };
 
+struct GlobalVariable {
+    ParameterExpression &param;
+    Variable value;
+
+    GlobalVariable(ParameterExpression &param, Variable value) :
+        param(param),
+        value(value) {
+    }
+};
+
 class ExpressionTree {
 public:
     ExpressionTree(
-        std::set<ParameterExpression *> globals,
+        std::vector<GlobalVariable> globals,
         std::vector<std::shared_ptr<Function>> functions,
         std::vector<std::shared_ptr<Expression>> expressions) :
         _globals(std::move(globals)),
@@ -260,9 +260,7 @@ public:
         _expressions(std::move(expressions)) {
     }
 
-    std::unique_ptr<ExpressionTree> deepCopy() const;
-
-    const std::set<ParameterExpression *> &globals() const {
+    const std::vector<GlobalVariable> &globals() const {
         return _globals;
     }
 
@@ -317,7 +315,7 @@ private:
 
         std::map<int, ParameterExpression *> *inputs {nullptr};
         std::map<int, ParameterExpression *> *outputs {nullptr};
-        std::map<uint32_t, std::shared_ptr<DecompilationContext>> *branches {nullptr};
+        ParameterExpression *returnValue {nullptr};
 
         DecompilationContext(
             const ScriptProgram &compiled,
@@ -345,7 +343,7 @@ private:
             savedAction(other.savedAction),
             inputs(other.inputs),
             outputs(other.outputs),
-            branches(other.branches) {
+            returnValue(other.returnValue) {
         }
 
         void pushCallStack(Function *function) {
@@ -376,12 +374,13 @@ private:
             ParameterExpression *&outZ);
     };
 
-    std::set<ParameterExpression *> _globals;
+    std::vector<GlobalVariable> _globals;
     std::vector<std::shared_ptr<Function>> _functions;
     std::vector<std::shared_ptr<Expression>> _expressions;
 
-    static BlockExpression *decompile(uint32_t start, std::shared_ptr<DecompilationContext> ctx);
-    static BlockExpression *decompileSafely(uint32_t start, std::shared_ptr<DecompilationContext> ctx);
+    static void decompileFunction(Function &func, std::shared_ptr<DecompilationContext> ctx);
+
+    static Variable evaluate(Expression &expr);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const Instruction &ins);
     static std::unique_ptr<ParameterExpression> parameterExpression(const Instruction &ins);

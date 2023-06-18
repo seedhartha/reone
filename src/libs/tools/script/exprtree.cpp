@@ -34,20 +34,15 @@ namespace reone {
 namespace script {
 
 ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutines &routines, IExpressionTreeOptimizer &optimizer) {
-    auto startFunc = make_shared<Function>();
-    startFunc->name = "_start";
-    startFunc->offset = 13;
-
-    auto offsetToFunc = map<uint32_t, shared_ptr<Function>>();
     auto expressions = vector<shared_ptr<Expression>>();
-
+    auto offsetToFunc = map<uint32_t, shared_ptr<Function>>();
     auto labels = unordered_map<uint32_t, LabelExpression *>();
     for (auto &ins : program.instructions()) {
-        if (ins.type == InstructionType::JMP ||
-            ins.type == InstructionType::JZ ||
-            ins.type == InstructionType::JNZ ||
-            ins.type == InstructionType::STORE_STATE) {
-            auto offset = ins.offset + (ins.type == InstructionType::STORE_STATE ? 0x10 : ins.jumpOffset);
+        if ((ins.type == InstructionType::JMP ||
+             ins.type == InstructionType::JZ ||
+             ins.type == InstructionType::JNZ) &&
+            ins.jumpOffset < 0) {
+            auto offset = ins.offset + ins.jumpOffset;
             auto label = make_shared<LabelExpression>();
             label->offset = offset;
             labels[offset] = label.get();
@@ -56,25 +51,35 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     }
 
     auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
+    auto startFunc = make_shared<Function>();
+    startFunc->offset = 13;
     ctx->pushCallStack(startFunc.get());
-    startFunc->block = decompileSafely(13, ctx);
+    decompileFunction(*startFunc, ctx);
 
-    auto globals = set<ParameterExpression *>();
+    auto globals = vector<GlobalVariable>();
     for (auto &expression : expressions) {
         if (expression->type != ExpressionType::Parameter) {
             continue;
         }
         auto paramExpr = static_cast<ParameterExpression *>(expression.get());
         if (paramExpr->locality == ParameterLocality::Global) {
-            globals.insert(paramExpr);
+            globals.push_back(GlobalVariable(*paramExpr, evaluate(*paramExpr)));
         }
     }
-
-    ctx->functions[startFunc->offset] = std::move(startFunc);
-
     auto functions = vector<shared_ptr<Function>>();
     for (auto &[offset, func] : offsetToFunc) {
         functions.push_back(func);
+    }
+    if (!globals.empty()) {
+        functions.erase(functions.begin());
+    }
+    if (!functions.empty()) {
+        auto &mainFunc = functions.front();
+        if (mainFunc->returnType != VariableType::Void) {
+            mainFunc->name = "StartingConditional";
+        } else {
+            mainFunc->name = "main";
+        }
     }
 
     auto tree = ExpressionTree(
@@ -87,842 +92,872 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     return tree;
 }
 
-BlockExpression *ExpressionTree::decompileSafely(uint32_t start, shared_ptr<DecompilationContext> ctx) {
-    try {
-        return decompile(start, ctx);
-    } catch (const logic_error &e) {
-        error(boost::format("Block decompilation failed at %08x: %s") % start % string(e.what()));
-        auto emptyBlock = make_shared<BlockExpression>();
-        ctx->expressions.push_back(emptyBlock);
-        return emptyBlock.get();
-    }
-}
+void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationContext> ctx) {
+    debug(boost::format("Decompiling function at %08x") % func.offset);
 
-BlockExpression *ExpressionTree::decompile(uint32_t start, shared_ptr<DecompilationContext> ctx) {
-    debug(boost::format("Begin decompiling block at %08x") % start);
+    auto mainBlock = make_shared<BlockExpression>();
+    mainBlock->offset = func.offset;
 
-    auto block = make_shared<BlockExpression>();
-    block->offset = start;
+    auto blocksToDecompile = stack<pair<BlockExpression *, shared_ptr<DecompilationContext>>>();
+    blocksToDecompile.push(make_pair(mainBlock.get(), ctx));
+    auto decompiledBlocks = map<uint32_t, BlockExpression *>();
 
-    for (uint32_t offset = start; offset < ctx->program.length();) {
-        auto maybeLabel = ctx->labels.find(offset);
-        if (maybeLabel != ctx->labels.end()) {
-            block->append(maybeLabel->second);
-        }
+    func.block = mainBlock.get();
+    ctx->expressions.push_back(std::move(mainBlock));
 
-        // debug(boost::format("Stack: size=%d") % ctx->stack.size());
-        // for (auto it = ctx->stack.rbegin(); it != ctx->stack.rend(); ++it) {
-        //     auto type = describeVariableType(it->param->variableType);
-        //     debug("    " + type);
-        // }
+    while (!blocksToDecompile.empty()) {
+        auto [block, ctx] = blocksToDecompile.top();
+        blocksToDecompile.pop();
+        decompiledBlocks[block->offset] = block;
 
-        auto &ins = ctx->program.getInstruction(offset);
-        debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
+        try {
+            debug(boost::format("Begin decompiling block at %08x") % block->offset);
 
-        if (ins.type == InstructionType::NOP ||
-            ins.type == InstructionType::NOP2) {
-
-        } else if (ins.type == InstructionType::RETN) {
-            auto retExpr = make_shared<ReturnExpression>();
-            retExpr->offset = ins.offset;
-
-            if (ctx->callStack.size() == 1ll && !ctx->stack.empty()) {
-                auto retVal = ctx->stack.back().param;
-                retExpr->value = retVal;
-                auto startFunc = ctx->topCall().function;
-                startFunc->returnType = retVal->variableType;
-            } else if (ctx->outputs && ctx->outputs->count(-1) > 0) {
-                auto retVal = ctx->outputs->at(-1);
-                retExpr->value = retVal;
-                auto function = ctx->topCall().function;
-                function->returnType = retVal->variableType;
-            }
-
-            block->append(retExpr.get());
-            ctx->expressions.push_back(std::move(retExpr));
-            break;
-
-        } else if (ins.type == InstructionType::JMP) {
-            auto absJumpOffset = ins.offset + ins.jumpOffset;
-
-            auto gotoExpr = make_shared<GotoExpression>();
-            gotoExpr->offset = ins.offset;
-            gotoExpr->label = ctx->labels.at(absJumpOffset);
-
-            if (ctx->branches->count(absJumpOffset) == 0) {
-                ctx->branches->insert(make_pair(absJumpOffset, make_shared<DecompilationContext>(*ctx)));
-            }
-
-            block->append(gotoExpr.get());
-            ctx->expressions.push_back(std::move(gotoExpr));
-            break;
-
-        } else if (ins.type == InstructionType::JSR) {
-            auto absJumpOffset = ins.offset + ins.jumpOffset;
-            shared_ptr<Function> sub;
-
-            if (ctx->functions.count(absJumpOffset) == 0) {
-                sub = make_shared<Function>();
-                sub->offset = absJumpOffset;
-
-                ctx->functions[sub->offset] = sub;
-
-                auto inputs = map<int, ParameterExpression *>();
-                auto outputs = map<int, ParameterExpression *>();
-                auto branches = map<uint32_t, shared_ptr<DecompilationContext>>();
-
-                auto subCtx = make_shared<DecompilationContext>(*ctx);
-                subCtx->inputs = &inputs;
-                subCtx->outputs = &outputs;
-                subCtx->branches = &branches;
-                subCtx->pushCallStack(sub.get());
-                sub->block = decompileSafely(absJumpOffset, subCtx);
-
-                for (auto &[branchOffset, branchCtx] : branches) {
-                    auto branchBlock = decompileSafely(branchOffset, branchCtx);
-                    sub->branches.insert(make_pair(branchOffset, Branch(branchBlock)));
-                    // for (auto &expression : branchBlock->expressions) {
-                    //     sub->block->append(expression);
-                    // }
+            for (uint32_t offset = block->offset; offset < ctx->program.length();) {
+                auto maybeLabel = ctx->labels.find(offset);
+                if (maybeLabel != ctx->labels.end()) {
+                    block->append(maybeLabel->second);
                 }
 
-                bool isMain = false;
-                if (subCtx->callStack.size() == 2ll) {
-                    if (subCtx->numGlobals > 0) {
-                        sub->name = "_globals";
+                // debug(boost::format("Stack: size=%d") % ctx->stack.size());
+                // for (auto it = ctx->stack.rbegin(); it != ctx->stack.rend(); ++it) {
+                //     auto type = describeVariableType(it->param->variableType);
+                //     debug("    " + type);
+                // }
+
+                auto &ins = ctx->program.getInstruction(offset);
+                debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
+
+                if (ins.type == InstructionType::NOP ||
+                    ins.type == InstructionType::NOP2) {
+
+                } else if (ins.type == InstructionType::RETN) {
+                    auto retExpr = make_shared<ReturnExpression>();
+                    retExpr->offset = ins.offset;
+                    if (ctx->returnValue) {
+                        retExpr->value = ctx->returnValue;
+                    }
+
+                    block->append(retExpr.get());
+                    ctx->expressions.push_back(std::move(retExpr));
+                    break;
+
+                } else if (ins.type == InstructionType::JMP) {
+                    auto absJumpOffset = ins.offset + ins.jumpOffset;
+                    if (ins.jumpOffset < 0) {
+                        auto gotoExpr = make_shared<GotoExpression>();
+                        gotoExpr->offset = ins.offset;
+                        gotoExpr->label = ctx->labels.at(absJumpOffset);
+                        block->append(gotoExpr.get());
+                        ctx->expressions.push_back(std::move(gotoExpr));
+                        break;
+                    }
+                    offset = absJumpOffset;
+                    continue;
+
+                } else if (ins.type == InstructionType::JSR) {
+                    auto absJumpOffset = ins.offset + ins.jumpOffset;
+                    shared_ptr<Function> sub;
+
+                    if (ctx->functions.count(absJumpOffset) == 0) {
+                        sub = make_shared<Function>();
+                        sub->offset = absJumpOffset;
+
+                        ctx->functions[sub->offset] = sub;
+
+                        auto inputs = map<int, ParameterExpression *>();
+                        auto outputs = map<int, ParameterExpression *>();
+
+                        auto subCtx = make_shared<DecompilationContext>(*ctx);
+                        subCtx->inputs = &inputs;
+                        subCtx->outputs = &outputs;
+                        subCtx->pushCallStack(sub.get());
+
+                        decompileFunction(*sub, subCtx);
+
+                        for (auto &[stackOffset, param] : inputs) {
+                            sub->arguments.push_back(FunctionArgument(param->variableType, stackOffset));
+                        }
+                        if (!outputs.empty()) {
+                            if (outputs.size() > 1ll) {
+                                throw ValidationException("Function must not have more than 1 output variable");
+                            }
+                            sub->returnType = outputs.begin()->second->variableType;
+                        }
                     } else {
-                        isMain = true;
+                        sub = ctx->functions.at(absJumpOffset);
                     }
-                } else if (subCtx->callStack.size() == 3ll && ctx->numGlobals > 0) {
-                    isMain = true;
-                }
-                if (isMain) {
-                    sub->name = !subCtx->outputs->empty() ? "StartingConditional" : "main";
-                }
 
-                for (auto &[stackOffset, param] : inputs) {
-                    sub->inputs.push_back(FunctionArgument(param->variableType, stackOffset));
-                }
-                for (auto &[stackOffset, param] : outputs) {
-                    sub->outputs.push_back(FunctionArgument(param->variableType, stackOffset));
-                }
+                    auto callExpr = make_shared<CallExpression>();
+                    callExpr->offset = ins.offset;
+                    callExpr->function = sub.get();
 
-            } else {
-                sub = ctx->functions.at(absJumpOffset);
-            }
-
-            auto callExpr = make_shared<CallExpression>();
-            callExpr->offset = ins.offset;
-            callExpr->function = sub.get();
-            block->append(callExpr.get());
-
-            for (auto &argument : sub->inputs) {
-                auto param = ctx->stack[ctx->stack.size() + argument.stackOffset].param;
-                callExpr->arguments.push_back(param);
-            }
-            for (auto &argument : sub->outputs) {
-                auto param = ctx->stack[ctx->stack.size() + argument.stackOffset].param;
-                callExpr->arguments.push_back(param);
-            }
-
-            ctx->expressions.push_back(std::move(callExpr));
-        } else if (ins.type == InstructionType::JZ ||
-                   ins.type == InstructionType::JNZ) {
-            auto absJumpOffset = ins.offset + ins.jumpOffset;
-
-            auto leftExpr = ctx->stack.back().param;
-            ctx->stack.pop_back();
-
-            auto rightExpr = make_shared<ConstantExpression>();
-            rightExpr->offset = ins.offset;
-            rightExpr->value = Variable::ofInt(0);
-
-            auto testExpr = make_shared<BinaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Equal : ExpressionType::NotEqual);
-            testExpr->offset = ins.offset;
-            testExpr->left = leftExpr;
-            testExpr->right = rightExpr.get();
-
-            auto ifTrueGotoExpr = make_shared<GotoExpression>();
-            ifTrueGotoExpr->offset = ins.offset;
-            ifTrueGotoExpr->label = ctx->labels.at(absJumpOffset);
-
-            auto ifTrueBlockExpr = make_shared<BlockExpression>();
-            ifTrueBlockExpr->offset = ins.offset;
-            ifTrueBlockExpr->append(ifTrueGotoExpr.get());
-
-            auto condExpr = make_shared<ConditionalExpression>();
-            condExpr->test = testExpr.get();
-            condExpr->ifTrue = ifTrueBlockExpr.get();
-            block->append(condExpr.get());
-
-            if (ctx->branches->count(absJumpOffset) == 0) {
-                ctx->branches->insert(make_pair(absJumpOffset, make_shared<DecompilationContext>(*ctx)));
-            }
-
-            ctx->expressions.push_back(std::move(rightExpr));
-            ctx->expressions.push_back(std::move(testExpr));
-            ctx->expressions.push_back(std::move(ifTrueGotoExpr));
-            ctx->expressions.push_back(std::move(ifTrueBlockExpr));
-            ctx->expressions.push_back(std::move(condExpr));
-        } else if (ins.type == InstructionType::RSADDI ||
-                   ins.type == InstructionType::RSADDF ||
-                   ins.type == InstructionType::RSADDS ||
-                   ins.type == InstructionType::RSADDO ||
-                   ins.type == InstructionType::RSADDEFF ||
-                   ins.type == InstructionType::RSADDEVT ||
-                   ins.type == InstructionType::RSADDLOC ||
-                   ins.type == InstructionType::RSADDTAL) {
-            auto expression = parameterExpression(ins);
-            block->append(expression.get());
-            ctx->pushStack(expression.get());
-            ctx->expressions.push_back(std::move(expression));
-        } else if (ins.type == InstructionType::CONSTI ||
-                   ins.type == InstructionType::CONSTF ||
-                   ins.type == InstructionType::CONSTS ||
-                   ins.type == InstructionType::CONSTO) {
-            auto constExpr = constantExpression(ins);
-
-            auto paramExpr = make_shared<ParameterExpression>();
-            paramExpr->offset = ins.offset;
-            paramExpr->variableType = constExpr->value.type;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = paramExpr.get();
-            assignExpr->right = constExpr.get();
-            assignExpr->declareLeft = true;
-            block->append(assignExpr.get());
-
-            ctx->pushStack(paramExpr.get());
-            ctx->expressions.push_back(std::move(assignExpr));
-            ctx->expressions.push_back(std::move(constExpr));
-            ctx->expressions.push_back(std::move(paramExpr));
-        } else if (ins.type == InstructionType::ACTION) {
-            auto &routine = ctx->routines.get(ins.routine);
-
-            vector<Expression *> arguments;
-            for (int i = 0; i < ins.argCount; ++i) {
-                Expression *argument;
-                auto argType = routine.getArgumentType(i);
-                if (argType == VariableType::Vector) {
-                    auto argZ = ctx->stack.back().param;
-                    ctx->stack.pop_back();
-                    auto argY = ctx->stack.back().param;
-                    ctx->stack.pop_back();
-                    auto argX = ctx->stack.back().param;
-                    ctx->stack.pop_back();
-                    argument = ctx->appendVectorCompose(ins.offset, *block, *argX, *argY, *argZ);
-                } else if (argType == VariableType::Action) {
-                    argument = ctx->savedAction;
-                } else {
-                    argument = ctx->stack.back().param;
-                    ctx->stack.pop_back();
-                }
-                if (!argument) {
-                    throw ValidationException("Unable not extract action argument from stack");
-                }
-                arguments.push_back(argument);
-            }
-
-            auto actionExpr = make_shared<ActionExpression>();
-            actionExpr->offset = ins.offset;
-            actionExpr->action = ins.routine;
-            actionExpr->arguments = std::move(arguments);
-
-            if (routine.returnType() != VariableType::Void) {
-                auto returnValue = make_shared<ParameterExpression>();
-                returnValue->offset = ins.offset;
-                returnValue->variableType = routine.returnType();
-
-                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                assignExpr->offset = ins.offset;
-                assignExpr->left = returnValue.get();
-                assignExpr->right = actionExpr.get();
-                assignExpr->declareLeft = true;
-                block->append(assignExpr.get());
-
-                if (routine.returnType() == VariableType::Vector) {
-                    ParameterExpression *retValX = nullptr;
-                    ParameterExpression *retValY = nullptr;
-                    ParameterExpression *retValZ = nullptr;
-                    ctx->appendVectorDecompose(ins.offset, *block, *returnValue, retValX, retValY, retValZ);
-                    ctx->pushStack(retValX);
-                    ctx->pushStack(retValY);
-                    ctx->pushStack(retValZ);
-                } else {
-                    ctx->pushStack(returnValue.get());
-                }
-                ctx->expressions.push_back(std::move(returnValue));
-                ctx->expressions.push_back(std::move(assignExpr));
-
-            } else {
-                block->append(actionExpr.get());
-            }
-
-            ctx->expressions.push_back(std::move(actionExpr));
-        } else if (ins.type == InstructionType::CPDOWNSP ||
-                   ins.type == InstructionType::CPDOWNBP) {
-            auto stackSize = static_cast<int>(ctx->stack.size());
-            if (ins.stackOffset >= 0) {
-                throw ValidationException("Non-negative stack offsets are not supported");
-            }
-            auto startIdx = (ins.type == InstructionType::CPDOWNSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
-            if (startIdx < 0) {
-                throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
-            }
-            auto numFrames = ins.size / 4;
-            for (int i = 0; i < numFrames; ++i) {
-                auto &left = ctx->stack[startIdx + numFrames - i - 1];
-                auto &right = ctx->stack[stackSize - i - 1];
-
-                ParameterExpression *destination;
-                if (left.allocatedBy != ctx->topCall().function && left.param->locality != ParameterLocality::Global) {
-                    auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
-                    if (ctx->outputs->count(stackOffset) == 0) {
-                        (*ctx->outputs)[stackOffset] = left.param;
+                    for (auto &argument : sub->arguments) {
+                        auto param = ctx->stack[ctx->stack.size() + argument.stackOffset].param;
+                        callExpr->arguments.push_back(param);
                     }
-                    auto destExpr = make_shared<ParameterExpression>();
-                    destExpr->offset = ins.offset;
-                    destExpr->variableType = left.param->variableType;
-                    destExpr->locality = ParameterLocality::Output;
-                    destExpr->stackOffset = stackOffset;
-                    destination = destExpr.get();
-                    ctx->expressions.push_back(std::move(destExpr));
-                } else {
-                    destination = left.param;
-                }
 
-                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                assignExpr->offset = ins.offset;
-                assignExpr->left = destination;
-                assignExpr->right = right.param;
-                block->append(assignExpr.get());
+                    if (sub->returnType != VariableType::Void) {
+                        auto resultExpr = make_shared<ParameterExpression>();
+                        resultExpr->offset = ins.offset;
+                        resultExpr->variableType = sub->returnType;
 
-                left.param->variableType = right.param->variableType;
-                ctx->expressions.push_back(std::move(assignExpr));
-            }
-        } else if (ins.type == InstructionType::CPTOPSP ||
-                   ins.type == InstructionType::CPTOPBP) {
-            auto stackSize = static_cast<int>(ctx->stack.size());
-            if (ins.stackOffset >= 0) {
-                throw ValidationException("Non-negative stack offsets are not supported");
-            }
-            auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
-            if (startIdx < 0) {
-                throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
-            }
-            auto numFrames = ins.size / 4;
-            for (int i = 0; i < numFrames; ++i) {
-                auto &frame = ctx->stack[startIdx + numFrames - i - 1];
+                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        assignExpr->left = resultExpr.get();
+                        assignExpr->right = callExpr.get();
+                        assignExpr->declareLeft = true;
+                        block->append(assignExpr.get());
 
-                ParameterExpression *source;
-                if (frame.allocatedBy != ctx->topCall().function && frame.param->locality != ParameterLocality::Global) {
-                    auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
-                    if (ctx->inputs->count(stackOffset) == 0) {
-                        (*ctx->inputs)[stackOffset] = frame.param;
+                        ctx->expressions.push_back(std::move(resultExpr));
+                        ctx->expressions.push_back(std::move(assignExpr));
+
+                    } else {
+                        block->append(callExpr.get());
                     }
-                    auto sourceExpr = make_shared<ParameterExpression>();
-                    sourceExpr->offset = ins.offset;
-                    sourceExpr->variableType = frame.param->variableType;
-                    sourceExpr->locality = ParameterLocality::Input;
-                    sourceExpr->stackOffset = stackOffset;
-                    source = sourceExpr.get();
-                    ctx->expressions.push_back(std::move(sourceExpr));
+
+                    ctx->expressions.push_back(std::move(callExpr));
+
+                } else if (ins.type == InstructionType::JZ ||
+                           ins.type == InstructionType::JNZ) {
+                    auto ifTrueOffset = ins.offset + ins.jumpOffset;
+                    auto ifFalseOffset = ins.nextOffset;
+
+                    auto leftExpr = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+
+                    auto rightExpr = make_shared<ConstantExpression>();
+                    rightExpr->offset = ins.offset;
+                    rightExpr->value = Variable::ofInt(0);
+
+                    auto testExpr = make_shared<BinaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Equal : ExpressionType::NotEqual);
+                    testExpr->offset = ins.offset;
+                    testExpr->left = leftExpr;
+                    testExpr->right = rightExpr.get();
+
+                    BlockExpression *ifTrueBlockPtr;
+                    if (ins.jumpOffset > 0) {
+
+                        if (decompiledBlocks.count(ifTrueOffset) > 0) {
+                            ifTrueBlockPtr = decompiledBlocks.at(ifTrueOffset);
+                        } else {
+                            auto ifTrueCtx = make_shared<DecompilationContext>(*ctx);
+                            auto ifTrueBlock = make_shared<BlockExpression>();
+                            ifTrueBlock->offset = ifTrueOffset;
+
+                            blocksToDecompile.push(make_pair(ifTrueBlock.get(), ifTrueCtx));
+                            ifTrueBlockPtr = ifTrueBlock.get();
+
+                            ctx->expressions.push_back(std::move(ifTrueBlock));
+                        }
+
+                    } else {
+                        auto gotoExpr = make_shared<GotoExpression>();
+                        gotoExpr->offset = ins.offset;
+                        gotoExpr->label = ctx->labels.at(ifTrueOffset);
+
+                        auto gotoBlockExpr = make_shared<BlockExpression>();
+                        gotoBlockExpr->offset = ins.offset;
+                        gotoBlockExpr->append(gotoExpr.get());
+                        gotoBlockExpr->initialized = true;
+                        ifTrueBlockPtr = gotoBlockExpr.get();
+
+                        ctx->expressions.push_back(std::move(gotoExpr));
+                        ctx->expressions.push_back(std::move(gotoBlockExpr));
+                    }
+
+                    auto condExpr = make_shared<ConditionalExpression>();
+                    condExpr->test = testExpr.get();
+                    condExpr->ifTrue = ifTrueBlockPtr;
+                    block->append(condExpr.get());
+
+                    ctx->expressions.push_back(std::move(rightExpr));
+                    ctx->expressions.push_back(std::move(testExpr));
+                    ctx->expressions.push_back(std::move(condExpr));
+                    offset = ins.nextOffset;
+                    continue;
+
+                } else if (ins.type == InstructionType::RSADDI ||
+                           ins.type == InstructionType::RSADDF ||
+                           ins.type == InstructionType::RSADDS ||
+                           ins.type == InstructionType::RSADDO ||
+                           ins.type == InstructionType::RSADDEFF ||
+                           ins.type == InstructionType::RSADDEVT ||
+                           ins.type == InstructionType::RSADDLOC ||
+                           ins.type == InstructionType::RSADDTAL) {
+                    auto expression = parameterExpression(ins);
+                    block->append(expression.get());
+                    ctx->pushStack(expression.get());
+                    ctx->expressions.push_back(std::move(expression));
+
+                } else if (ins.type == InstructionType::CONSTI ||
+                           ins.type == InstructionType::CONSTF ||
+                           ins.type == InstructionType::CONSTS ||
+                           ins.type == InstructionType::CONSTO) {
+                    auto constExpr = constantExpression(ins);
+
+                    auto paramExpr = make_shared<ParameterExpression>();
+                    paramExpr->offset = ins.offset;
+                    paramExpr->variableType = constExpr->value.type;
+                    paramExpr->assignedFrom = constExpr.get();
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = paramExpr.get();
+                    assignExpr->right = constExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ctx->pushStack(paramExpr.get());
+                    ctx->expressions.push_back(std::move(assignExpr));
+                    ctx->expressions.push_back(std::move(constExpr));
+                    ctx->expressions.push_back(std::move(paramExpr));
+
+                } else if (ins.type == InstructionType::ACTION) {
+                    auto &routine = ctx->routines.get(ins.routine);
+
+                    vector<Expression *> arguments;
+                    for (int i = 0; i < ins.argCount; ++i) {
+                        Expression *argument;
+                        auto argType = routine.getArgumentType(i);
+                        if (argType == VariableType::Vector) {
+                            auto argZ = ctx->stack.back().param;
+                            ctx->stack.pop_back();
+                            auto argY = ctx->stack.back().param;
+                            ctx->stack.pop_back();
+                            auto argX = ctx->stack.back().param;
+                            ctx->stack.pop_back();
+                            argument = ctx->appendVectorCompose(ins.offset, *block, *argX, *argY, *argZ);
+                        } else if (argType == VariableType::Action) {
+                            argument = ctx->savedAction;
+                        } else {
+                            argument = ctx->stack.back().param;
+                            ctx->stack.pop_back();
+                        }
+                        if (!argument) {
+                            throw ValidationException("Unable to extract action argument from stack");
+                        }
+                        arguments.push_back(argument);
+                    }
+
+                    auto actionExpr = make_shared<ActionExpression>();
+                    actionExpr->offset = ins.offset;
+                    actionExpr->action = ins.routine;
+                    actionExpr->arguments = std::move(arguments);
+
+                    if (routine.returnType() != VariableType::Void) {
+                        auto returnValue = make_shared<ParameterExpression>();
+                        returnValue->offset = ins.offset;
+                        returnValue->variableType = routine.returnType();
+
+                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        assignExpr->offset = ins.offset;
+                        assignExpr->left = returnValue.get();
+                        assignExpr->right = actionExpr.get();
+                        assignExpr->declareLeft = true;
+                        block->append(assignExpr.get());
+
+                        if (routine.returnType() == VariableType::Vector) {
+                            ParameterExpression *retValX = nullptr;
+                            ParameterExpression *retValY = nullptr;
+                            ParameterExpression *retValZ = nullptr;
+                            ctx->appendVectorDecompose(ins.offset, *block, *returnValue, retValX, retValY, retValZ);
+                            ctx->pushStack(retValX);
+                            ctx->pushStack(retValY);
+                            ctx->pushStack(retValZ);
+                        } else {
+                            ctx->pushStack(returnValue.get());
+                        }
+                        ctx->expressions.push_back(std::move(returnValue));
+                        ctx->expressions.push_back(std::move(assignExpr));
+
+                    } else {
+                        block->append(actionExpr.get());
+                    }
+
+                    ctx->expressions.push_back(std::move(actionExpr));
+
+                } else if (ins.type == InstructionType::CPDOWNSP ||
+                           ins.type == InstructionType::CPDOWNBP) {
+                    auto stackSize = static_cast<int>(ctx->stack.size());
+                    if (ins.stackOffset >= 0) {
+                        throw ValidationException("Non-negative stack offsets are not supported");
+                    }
+                    auto startIdx = (ins.type == InstructionType::CPDOWNSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
+                    auto numFrames = ins.size / 4;
+                    for (int i = 0; i < numFrames; ++i) {
+                        auto leftIdx = startIdx + numFrames - i - 1;
+                        if (leftIdx < 0) {
+                            continue;
+                        }
+                        auto &left = ctx->stack[leftIdx];
+                        auto &right = ctx->stack[stackSize - i - 1];
+
+                        ParameterExpression *destination;
+                        if (left.allocatedBy != ctx->topCall().function && left.param->locality != ParameterLocality::Global) {
+                            auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
+                            if (ctx->outputs->count(stackOffset) == 0) {
+                                (*ctx->outputs)[stackOffset] = left.param;
+                            }
+                            auto destExpr = make_shared<ParameterExpression>();
+                            destExpr->offset = ins.offset;
+                            destExpr->variableType = left.param->variableType;
+                            destExpr->locality = ParameterLocality::ReturnValue;
+                            destExpr->stackOffset = stackOffset;
+                            ctx->returnValue = destExpr.get();
+                            destination = destExpr.get();
+                            ctx->expressions.push_back(std::move(destExpr));
+                        } else {
+                            destination = left.param;
+                        }
+
+                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        assignExpr->offset = ins.offset;
+                        assignExpr->left = destination;
+                        assignExpr->right = right.param;
+                        if (destination->locality == ParameterLocality::ReturnValue) {
+                            assignExpr->declareLeft = true;
+                        }
+                        block->append(assignExpr.get());
+
+                        destination->variableType = right.param->variableType;
+                        destination->assignedFrom = right.param;
+                        ctx->expressions.push_back(std::move(assignExpr));
+                    }
+                } else if (ins.type == InstructionType::CPTOPSP ||
+                           ins.type == InstructionType::CPTOPBP) {
+                    auto stackSize = static_cast<int>(ctx->stack.size());
+                    if (ins.stackOffset >= 0) {
+                        throw ValidationException("Non-negative stack offsets are not supported");
+                    }
+                    auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
+                    if (startIdx < 0) {
+                        throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
+                    }
+                    auto numFrames = ins.size / 4;
+                    for (int i = 0; i < numFrames; ++i) {
+                        auto &frame = ctx->stack[startIdx + numFrames - i - 1];
+
+                        ParameterExpression *source;
+                        if (frame.allocatedBy != ctx->topCall().function && frame.param->locality != ParameterLocality::Global) {
+                            auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
+                            if (ctx->inputs->count(stackOffset) == 0) {
+                                (*ctx->inputs)[stackOffset] = frame.param;
+                            }
+                            auto sourceExpr = make_shared<ParameterExpression>();
+                            sourceExpr->offset = ins.offset;
+                            sourceExpr->variableType = frame.param->variableType;
+                            sourceExpr->locality = ParameterLocality::Argument;
+                            sourceExpr->stackOffset = stackOffset;
+                            source = sourceExpr.get();
+                            ctx->expressions.push_back(std::move(sourceExpr));
+                        } else {
+                            source = frame.param;
+                        }
+
+                        auto paramExpr = make_shared<ParameterExpression>();
+                        paramExpr->offset = ins.offset;
+                        paramExpr->variableType = source->variableType;
+                        paramExpr->assignedFrom = source;
+                        if (numFrames > 1) {
+                            paramExpr->suffix = to_string(i);
+                        }
+
+                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        assignExpr->offset = ins.offset;
+                        assignExpr->left = paramExpr.get();
+                        assignExpr->right = source;
+                        assignExpr->declareLeft = true;
+                        block->append(assignExpr.get());
+
+                        ctx->stack.push_back(StackFrame(paramExpr.get(), ctx->topCall().function));
+                        ctx->expressions.push_back(std::move(paramExpr));
+                        ctx->expressions.push_back(std::move(assignExpr));
+                    }
+                } else if (ins.type == InstructionType::MOVSP) {
+                    if (ins.stackOffset >= 0) {
+                        throw ValidationException("Non-negative stack offsets are not supported");
+                    }
+                    for (int i = 0; i < -ins.stackOffset / 4; ++i) {
+                        ctx->stack.pop_back();
+                    }
+                } else if (ins.type == InstructionType::NEGI ||
+                           ins.type == InstructionType::NEGF ||
+                           ins.type == InstructionType::COMPI ||
+                           ins.type == InstructionType::NOTI) {
+                    auto value = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+
+                    ExpressionType type;
+                    if (ins.type == InstructionType::NEGI ||
+                        ins.type == InstructionType::NEGF) {
+                        type = ExpressionType::Negate;
+                    } else if (ins.type == InstructionType::COMPI) {
+                        type = ExpressionType::OnesComplement;
+                    } else if (ins.type == InstructionType::NOTI) {
+                        type = ExpressionType::Not;
+                    }
+                    auto unaryExpr = make_shared<UnaryExpression>(type);
+                    unaryExpr->offset = ins.offset;
+                    unaryExpr->operand = value;
+
+                    auto resultExpr = make_shared<ParameterExpression>();
+                    resultExpr->offset = ins.offset;
+                    resultExpr->variableType = value->variableType;
+                    resultExpr->assignedFrom = unaryExpr.get();
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = resultExpr.get();
+                    assignExpr->right = unaryExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ctx->pushStack(resultExpr.get());
+                    ctx->expressions.push_back(std::move(resultExpr));
+                    ctx->expressions.push_back(std::move(unaryExpr));
+                    ctx->expressions.push_back(std::move(assignExpr));
+
+                } else if (ins.type == InstructionType::ADDII ||
+                           ins.type == InstructionType::ADDIF ||
+                           ins.type == InstructionType::ADDFI ||
+                           ins.type == InstructionType::ADDFF ||
+                           ins.type == InstructionType::ADDSS ||
+                           ins.type == InstructionType::SUBII ||
+                           ins.type == InstructionType::SUBIF ||
+                           ins.type == InstructionType::SUBFI ||
+                           ins.type == InstructionType::SUBFF ||
+                           ins.type == InstructionType::MULII ||
+                           ins.type == InstructionType::MULIF ||
+                           ins.type == InstructionType::MULFI ||
+                           ins.type == InstructionType::MULFF ||
+                           ins.type == InstructionType::DIVII ||
+                           ins.type == InstructionType::DIVIF ||
+                           ins.type == InstructionType::DIVFI ||
+                           ins.type == InstructionType::DIVFF ||
+                           ins.type == InstructionType::MODII ||
+                           ins.type == InstructionType::LOGANDII ||
+                           ins.type == InstructionType::LOGORII ||
+                           ins.type == InstructionType::INCORII ||
+                           ins.type == InstructionType::EXCORII ||
+                           ins.type == InstructionType::BOOLANDII ||
+                           ins.type == InstructionType::EQUALII ||
+                           ins.type == InstructionType::EQUALFF ||
+                           ins.type == InstructionType::EQUALSS ||
+                           ins.type == InstructionType::EQUALOO ||
+                           ins.type == InstructionType::EQUALEFFEFF ||
+                           ins.type == InstructionType::EQUALEVTEVT ||
+                           ins.type == InstructionType::EQUALLOCLOC ||
+                           ins.type == InstructionType::EQUALTALTAL ||
+                           ins.type == InstructionType::NEQUALII ||
+                           ins.type == InstructionType::NEQUALFF ||
+                           ins.type == InstructionType::NEQUALSS ||
+                           ins.type == InstructionType::NEQUALOO ||
+                           ins.type == InstructionType::NEQUALEFFEFF ||
+                           ins.type == InstructionType::NEQUALEVTEVT ||
+                           ins.type == InstructionType::NEQUALLOCLOC ||
+                           ins.type == InstructionType::NEQUALTALTAL ||
+                           ins.type == InstructionType::GEQII ||
+                           ins.type == InstructionType::GEQFF ||
+                           ins.type == InstructionType::GTII ||
+                           ins.type == InstructionType::GTFF ||
+                           ins.type == InstructionType::LTII ||
+                           ins.type == InstructionType::LTFF ||
+                           ins.type == InstructionType::LEQII ||
+                           ins.type == InstructionType::LEQFF ||
+                           ins.type == InstructionType::SHLEFTII ||
+                           ins.type == InstructionType::SHRIGHTII ||
+                           ins.type == InstructionType::USHRIGHTII) {
+                    auto right = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto left = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+
+                    ExpressionType type;
+                    if (ins.type == InstructionType::ADDII ||
+                        ins.type == InstructionType::ADDIF ||
+                        ins.type == InstructionType::ADDFI ||
+                        ins.type == InstructionType::ADDFF ||
+                        ins.type == InstructionType::ADDSS) {
+                        type = ExpressionType::Add;
+                    } else if (ins.type == InstructionType::SUBII ||
+                               ins.type == InstructionType::SUBIF ||
+                               ins.type == InstructionType::SUBFI ||
+                               ins.type == InstructionType::SUBFF) {
+                        type = ExpressionType::Subtract;
+                    } else if (ins.type == InstructionType::MULII ||
+                               ins.type == InstructionType::MULIF ||
+                               ins.type == InstructionType::MULFI ||
+                               ins.type == InstructionType::MULFF) {
+                        type = ExpressionType::Multiply;
+                    } else if (ins.type == InstructionType::DIVII ||
+                               ins.type == InstructionType::DIVIF ||
+                               ins.type == InstructionType::DIVFI ||
+                               ins.type == InstructionType::DIVFF) {
+                        type = ExpressionType::Divide;
+                    } else if (ins.type == InstructionType::MODII) {
+                        type = ExpressionType::Modulo;
+                    } else if (ins.type == InstructionType::LOGANDII) {
+                        type = ExpressionType::LogicalAnd;
+                    } else if (ins.type == InstructionType::LOGORII) {
+                        type = ExpressionType::LogicalOr;
+                    } else if (ins.type == InstructionType::INCORII) {
+                        type = ExpressionType::BitwiseOr;
+                    } else if (ins.type == InstructionType::EXCORII) {
+                        type = ExpressionType::BitwiseExlusiveOr;
+                    } else if (ins.type == InstructionType::BOOLANDII) {
+                        type = ExpressionType::BitwiseAnd;
+                    } else if (ins.type == InstructionType::EQUALII ||
+                               ins.type == InstructionType::EQUALFF ||
+                               ins.type == InstructionType::EQUALSS ||
+                               ins.type == InstructionType::EQUALOO ||
+                               ins.type == InstructionType::EQUALEFFEFF ||
+                               ins.type == InstructionType::EQUALEVTEVT ||
+                               ins.type == InstructionType::EQUALLOCLOC ||
+                               ins.type == InstructionType::EQUALTALTAL) {
+                        type = ExpressionType::Equal;
+                    } else if (ins.type == InstructionType::NEQUALII ||
+                               ins.type == InstructionType::NEQUALFF ||
+                               ins.type == InstructionType::NEQUALSS ||
+                               ins.type == InstructionType::NEQUALOO ||
+                               ins.type == InstructionType::NEQUALEFFEFF ||
+                               ins.type == InstructionType::NEQUALEVTEVT ||
+                               ins.type == InstructionType::NEQUALLOCLOC ||
+                               ins.type == InstructionType::NEQUALTALTAL) {
+                        type = ExpressionType::NotEqual;
+                    } else if (ins.type == InstructionType::GEQII ||
+                               ins.type == InstructionType::GEQFF) {
+                        type = ExpressionType::GreaterThanOrEqual;
+                    } else if (ins.type == InstructionType::GTII ||
+                               ins.type == InstructionType::GTFF) {
+                        type = ExpressionType::GreaterThan;
+                    } else if (ins.type == InstructionType::LTII ||
+                               ins.type == InstructionType::LTFF) {
+                        type = ExpressionType::LessThan;
+                    } else if (ins.type == InstructionType::LEQII ||
+                               ins.type == InstructionType::LEQFF) {
+                        type = ExpressionType::LessThanOrEqual;
+                    } else if (ins.type == InstructionType::SHLEFTII) {
+                        type = ExpressionType::LeftShift;
+                    } else if (ins.type == InstructionType::SHRIGHTII) {
+                        type = ExpressionType::RightShift;
+                    } else if (ins.type == InstructionType::USHRIGHTII) {
+                        type = ExpressionType::RightShiftUnsigned;
+                    }
+                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    binaryExpr->offset = ins.offset;
+                    binaryExpr->left = left;
+                    binaryExpr->right = right;
+
+                    VariableType varType;
+                    if (ins.type == InstructionType::ADDIF ||
+                        ins.type == InstructionType::ADDFI ||
+                        ins.type == InstructionType::ADDFF ||
+                        ins.type == InstructionType::SUBIF ||
+                        ins.type == InstructionType::SUBFI ||
+                        ins.type == InstructionType::SUBFF ||
+                        ins.type == InstructionType::MULIF ||
+                        ins.type == InstructionType::MULFI ||
+                        ins.type == InstructionType::MULFF ||
+                        ins.type == InstructionType::DIVIF ||
+                        ins.type == InstructionType::DIVFI ||
+                        ins.type == InstructionType::DIVFF) {
+                        varType = VariableType::Float;
+                    } else {
+                        varType = VariableType::Int;
+                    }
+                    auto result = make_shared<ParameterExpression>();
+                    result->offset = ins.offset;
+                    result->variableType = varType;
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = result.get();
+                    assignExpr->right = binaryExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ctx->pushStack(result.get());
+                    ctx->expressions.push_back(std::move(result));
+                    ctx->expressions.push_back(std::move(binaryExpr));
+                    ctx->expressions.push_back(std::move(assignExpr));
+
+                } else if (ins.type == InstructionType::ADDVV ||
+                           ins.type == InstructionType::SUBVV) {
+                    auto rightZ = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto rightY = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto rightX = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
+
+                    auto leftZ = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto leftY = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto leftX = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
+
+                    auto type = (ins.type == InstructionType::ADDVV) ? ExpressionType::Add : ExpressionType::Subtract;
+                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    binaryExpr->offset = ins.offset;
+                    binaryExpr->left = left;
+                    binaryExpr->right = right;
+
+                    auto result = make_shared<ParameterExpression>();
+                    result->offset = ins.offset;
+                    result->variableType = VariableType::Vector;
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = result.get();
+                    assignExpr->right = binaryExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ParameterExpression *resultX = nullptr;
+                    ParameterExpression *resultY = nullptr;
+                    ParameterExpression *resultZ = nullptr;
+                    ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+                    ctx->pushStack(resultX);
+                    ctx->pushStack(resultY);
+                    ctx->pushStack(resultZ);
+
+                    ctx->expressions.push_back(std::move(result));
+                    ctx->expressions.push_back(std::move(binaryExpr));
+                    ctx->expressions.push_back(std::move(assignExpr));
+
+                } else if (ins.type == InstructionType::DIVFV ||
+                           ins.type == InstructionType::MULFV) {
+                    auto rightZ = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto rightY = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto rightX = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
+
+                    auto left = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+
+                    auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
+                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    binaryExpr->offset = ins.offset;
+                    binaryExpr->left = left;
+                    binaryExpr->right = right;
+
+                    auto result = make_shared<ParameterExpression>();
+                    result->offset = ins.offset;
+                    result->variableType = VariableType::Vector;
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = result.get();
+                    assignExpr->right = binaryExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ParameterExpression *resultX = nullptr;
+                    ParameterExpression *resultY = nullptr;
+                    ParameterExpression *resultZ = nullptr;
+                    ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+                    ctx->pushStack(resultX);
+                    ctx->pushStack(resultY);
+                    ctx->pushStack(resultZ);
+
+                    ctx->expressions.push_back(std::move(result));
+                    ctx->expressions.push_back(std::move(binaryExpr));
+                    ctx->expressions.push_back(std::move(assignExpr));
+
+                } else if (ins.type == InstructionType::DIVVF ||
+                           ins.type == InstructionType::MULVF) {
+                    auto right = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+
+                    auto leftZ = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto leftY = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto leftX = ctx->stack.back().param;
+                    ctx->stack.pop_back();
+                    auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
+
+                    auto type = (ins.type == InstructionType::DIVVF) ? ExpressionType::Divide : ExpressionType::Multiply;
+                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    binaryExpr->offset = ins.offset;
+                    binaryExpr->left = left;
+                    binaryExpr->right = right;
+
+                    auto result = make_shared<ParameterExpression>();
+                    result->offset = ins.offset;
+                    result->variableType = VariableType::Vector;
+
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = ins.offset;
+                    assignExpr->left = result.get();
+                    assignExpr->right = binaryExpr.get();
+                    assignExpr->declareLeft = true;
+                    block->append(assignExpr.get());
+
+                    ParameterExpression *resultX = nullptr;
+                    ParameterExpression *resultY = nullptr;
+                    ParameterExpression *resultZ = nullptr;
+                    ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
+                    ctx->pushStack(resultX);
+                    ctx->pushStack(resultY);
+                    ctx->pushStack(resultZ);
+
+                    ctx->expressions.push_back(std::move(binaryExpr));
+                    ctx->expressions.push_back(std::move(result));
+                    ctx->expressions.push_back(std::move(assignExpr));
+
+                } else if (ins.type == InstructionType::EQUALTT ||
+                           ins.type == InstructionType::NEQUALTT) {
+                    auto numFrames = ins.size / 4;
+                    vector<StackFrame> rightFrames;
+                    for (int i = 0; i < numFrames; ++i) {
+                        rightFrames.push_back(ctx->stack.back());
+                        ctx->stack.pop_back();
+                    }
+                    vector<StackFrame> leftFrames;
+                    for (int i = 0; i < numFrames; ++i) {
+                        leftFrames.push_back(ctx->stack.back());
+                        ctx->stack.pop_back();
+                    }
+
+                    auto resultExpr = make_shared<ParameterExpression>();
+                    resultExpr->offset = ins.offset;
+                    resultExpr->variableType = VariableType::Int;
+
+                    for (int i = 0; i < numFrames; ++i) {
+                        auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
+                        auto compExpr = make_shared<BinaryExpression>(firstType);
+                        compExpr->offset = ins.offset;
+                        compExpr->left = leftFrames[i].param;
+                        compExpr->right = rightFrames[i].param;
+
+                        auto secondType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::LogicalAnd : ExpressionType::LogicalOr;
+                        auto andOrExpression = make_shared<BinaryExpression>(secondType);
+                        andOrExpression->offset = ins.offset;
+                        andOrExpression->left = resultExpr.get();
+                        andOrExpression->right = compExpr.get();
+
+                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        assignExpr->offset = ins.offset;
+                        assignExpr->left = resultExpr.get();
+                        assignExpr->right = andOrExpression.get();
+                        assignExpr->declareLeft = true;
+                        block->append(assignExpr.get());
+
+                        ctx->expressions.push_back(std::move(compExpr));
+                        ctx->expressions.push_back(std::move(andOrExpression));
+                        ctx->expressions.push_back(std::move(assignExpr));
+                    }
+
+                    ctx->pushStack(resultExpr.get());
+                    ctx->expressions.push_back(std::move(resultExpr));
+
+                } else if (ins.type == InstructionType::STORE_STATE) {
+                    auto absJumpOffset = ins.offset + 0x10;
+                    if (decompiledBlocks.count(absJumpOffset) > 0) {
+                        ctx->savedAction = decompiledBlocks.at(absJumpOffset);
+                    } else {
+                        auto actionBlock = make_shared<BlockExpression>();
+                        actionBlock->offset = absJumpOffset;
+                        auto actionCtx = make_shared<DecompilationContext>(*ctx);
+
+                        blocksToDecompile.push(make_pair(actionBlock.get(), actionCtx));
+                        ctx->savedAction = actionBlock.get();
+
+                        ctx->expressions.push_back(std::move(actionBlock));
+                    }
+                } else if (ins.type == InstructionType::SAVEBP) {
+                    ctx->prevNumGlobals = ctx->numGlobals;
+                    ctx->numGlobals = static_cast<int>(ctx->stack.size());
+                    for (int i = 0; i < ctx->numGlobals; ++i) {
+                        ctx->stack[i].param->locality = ParameterLocality::Global;
+                    }
+
+                } else if (ins.type == InstructionType::RESTOREBP) {
+                    // ctx.numGlobals = ctx.prevNumGlobals;
+
+                } else if (ins.type == InstructionType::DECISP ||
+                           ins.type == InstructionType::DECIBP ||
+                           ins.type == InstructionType::INCISP ||
+                           ins.type == InstructionType::INCIBP) {
+                    if (ins.stackOffset >= 0) {
+                        throw ValidationException("Non-negative stack offsets are not supported");
+                    }
+                    auto stackSize = static_cast<int>(ctx->stack.size());
+                    auto frameIdx = ((ins.type == InstructionType::DECISP || ins.type == InstructionType::INCISP) ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
+                    auto &frame = ctx->stack[frameIdx];
+
+                    ParameterExpression *destination;
+                    if (frame.allocatedBy != ctx->topCall().function) {
+                        auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter);
+                        if (ctx->outputs->count(stackOffset) == 0) {
+                            (*ctx->outputs)[stackOffset] = frame.param;
+                        }
+                        auto destExpr = make_shared<ParameterExpression>();
+                        destExpr->offset = ins.offset;
+                        destExpr->variableType = frame.param->variableType;
+                        destExpr->locality = ParameterLocality::ReturnValue;
+                        destExpr->stackOffset = stackOffset;
+                        destination = destExpr.get();
+                        ctx->expressions.push_back(std::move(destExpr));
+                    } else {
+                        destination = frame.param;
+                    }
+
+                    ExpressionType type;
+                    if (ins.type == InstructionType::DECISP ||
+                        ins.type == InstructionType::DECIBP) {
+                        type = ExpressionType::Decrement;
+                    } else if (ins.type == InstructionType::INCISP ||
+                               ins.type == InstructionType::INCIBP) {
+                        type = ExpressionType::Increment;
+                    }
+
+                    auto unaryExpr = make_shared<UnaryExpression>(type);
+                    unaryExpr->offset = ins.offset;
+                    unaryExpr->operand = destination;
+                    block->append(unaryExpr.get());
+
+                    ctx->expressions.push_back(std::move(unaryExpr));
+
+                } else if (ins.type == InstructionType::DESTRUCT) {
+                    auto numFrames = ins.size / 4;
+                    auto startNoDestroy = static_cast<int>(ctx->stack.size()) - numFrames + (ins.stackOffset / 4);
+                    auto numFramesNoDestroy = ins.sizeNoDestroy / 4;
+
+                    vector<StackFrame> framesNoDestroy;
+                    for (int i = 0; i < numFramesNoDestroy; ++i) {
+                        auto &frame = ctx->stack[startNoDestroy + i];
+                        framesNoDestroy.push_back(frame);
+                    }
+                    for (int i = 0; i < numFrames - numFramesNoDestroy; ++i) {
+                        ctx->stack.pop_back();
+                    }
+                    for (auto &frame : framesNoDestroy) {
+                        ctx->stack.push_back(frame);
+                    }
                 } else {
-                    source = frame.param;
+                    throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
                 }
 
-                auto paramExpr = make_shared<ParameterExpression>();
-                paramExpr->offset = ins.offset;
-                paramExpr->variableType = source->variableType;
-                paramExpr->suffix = to_string(i);
-
-                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                assignExpr->offset = ins.offset;
-                assignExpr->left = paramExpr.get();
-                assignExpr->right = source;
-                assignExpr->declareLeft = true;
-                block->append(assignExpr.get());
-
-                ctx->stack.push_back(StackFrame(paramExpr.get(), ctx->topCall().function));
-                ctx->expressions.push_back(std::move(paramExpr));
-                ctx->expressions.push_back(std::move(assignExpr));
-            }
-        } else if (ins.type == InstructionType::MOVSP) {
-            if (ins.stackOffset >= 0) {
-                throw ValidationException("Non-negative stack offsets are not supported");
-            }
-            for (int i = 0; i < -ins.stackOffset / 4; ++i) {
-                ctx->stack.pop_back();
-            }
-        } else if (ins.type == InstructionType::NEGI ||
-                   ins.type == InstructionType::NEGF ||
-                   ins.type == InstructionType::COMPI ||
-                   ins.type == InstructionType::NOTI) {
-            auto value = ctx->stack.back().param;
-            ctx->stack.pop_back();
-
-            auto resultExpr = make_shared<ParameterExpression>();
-            resultExpr->offset = ins.offset;
-            resultExpr->variableType = value->variableType;
-            block->append(resultExpr.get());
-
-            ExpressionType type;
-            if (ins.type == InstructionType::NEGI ||
-                ins.type == InstructionType::NEGF) {
-                type = ExpressionType::Negate;
-            } else if (ins.type == InstructionType::COMPI) {
-                type = ExpressionType::OnesComplement;
-            } else if (ins.type == InstructionType::NOTI) {
-                type = ExpressionType::Not;
-            }
-            auto unaryExpr = make_shared<UnaryExpression>(type);
-            unaryExpr->offset = ins.offset;
-            unaryExpr->operand = value;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = resultExpr.get();
-            assignExpr->right = unaryExpr.get();
-            block->append(assignExpr.get());
-
-            ctx->pushStack(resultExpr.get());
-            ctx->expressions.push_back(std::move(resultExpr));
-            ctx->expressions.push_back(std::move(unaryExpr));
-            ctx->expressions.push_back(std::move(assignExpr));
-        } else if (ins.type == InstructionType::ADDII ||
-                   ins.type == InstructionType::ADDIF ||
-                   ins.type == InstructionType::ADDFI ||
-                   ins.type == InstructionType::ADDFF ||
-                   ins.type == InstructionType::ADDSS ||
-                   ins.type == InstructionType::SUBII ||
-                   ins.type == InstructionType::SUBIF ||
-                   ins.type == InstructionType::SUBFI ||
-                   ins.type == InstructionType::SUBFF ||
-                   ins.type == InstructionType::MULII ||
-                   ins.type == InstructionType::MULIF ||
-                   ins.type == InstructionType::MULFI ||
-                   ins.type == InstructionType::MULFF ||
-                   ins.type == InstructionType::DIVII ||
-                   ins.type == InstructionType::DIVIF ||
-                   ins.type == InstructionType::DIVFI ||
-                   ins.type == InstructionType::DIVFF ||
-                   ins.type == InstructionType::MODII ||
-                   ins.type == InstructionType::LOGANDII ||
-                   ins.type == InstructionType::LOGORII ||
-                   ins.type == InstructionType::INCORII ||
-                   ins.type == InstructionType::EXCORII ||
-                   ins.type == InstructionType::BOOLANDII ||
-                   ins.type == InstructionType::EQUALII ||
-                   ins.type == InstructionType::EQUALFF ||
-                   ins.type == InstructionType::EQUALSS ||
-                   ins.type == InstructionType::EQUALOO ||
-                   ins.type == InstructionType::EQUALEFFEFF ||
-                   ins.type == InstructionType::EQUALEVTEVT ||
-                   ins.type == InstructionType::EQUALLOCLOC ||
-                   ins.type == InstructionType::EQUALTALTAL ||
-                   ins.type == InstructionType::NEQUALII ||
-                   ins.type == InstructionType::NEQUALFF ||
-                   ins.type == InstructionType::NEQUALSS ||
-                   ins.type == InstructionType::NEQUALOO ||
-                   ins.type == InstructionType::NEQUALEFFEFF ||
-                   ins.type == InstructionType::NEQUALEVTEVT ||
-                   ins.type == InstructionType::NEQUALLOCLOC ||
-                   ins.type == InstructionType::NEQUALTALTAL ||
-                   ins.type == InstructionType::GEQII ||
-                   ins.type == InstructionType::GEQFF ||
-                   ins.type == InstructionType::GTII ||
-                   ins.type == InstructionType::GTFF ||
-                   ins.type == InstructionType::LTII ||
-                   ins.type == InstructionType::LTFF ||
-                   ins.type == InstructionType::LEQII ||
-                   ins.type == InstructionType::LEQFF ||
-                   ins.type == InstructionType::SHLEFTII ||
-                   ins.type == InstructionType::SHRIGHTII ||
-                   ins.type == InstructionType::USHRIGHTII) {
-            auto right = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto left = ctx->stack.back().param;
-            ctx->stack.pop_back();
-
-            ExpressionType type;
-            if (ins.type == InstructionType::ADDII ||
-                ins.type == InstructionType::ADDIF ||
-                ins.type == InstructionType::ADDFI ||
-                ins.type == InstructionType::ADDFF ||
-                ins.type == InstructionType::ADDSS) {
-                type = ExpressionType::Add;
-            } else if (ins.type == InstructionType::SUBII ||
-                       ins.type == InstructionType::SUBIF ||
-                       ins.type == InstructionType::SUBFI ||
-                       ins.type == InstructionType::SUBFF) {
-                type = ExpressionType::Subtract;
-            } else if (ins.type == InstructionType::MULII ||
-                       ins.type == InstructionType::MULIF ||
-                       ins.type == InstructionType::MULFI ||
-                       ins.type == InstructionType::MULFF) {
-                type = ExpressionType::Multiply;
-            } else if (ins.type == InstructionType::DIVII ||
-                       ins.type == InstructionType::DIVIF ||
-                       ins.type == InstructionType::DIVFI ||
-                       ins.type == InstructionType::DIVFF) {
-                type = ExpressionType::Divide;
-            } else if (ins.type == InstructionType::MODII) {
-                type = ExpressionType::Modulo;
-            } else if (ins.type == InstructionType::LOGANDII) {
-                type = ExpressionType::LogicalAnd;
-            } else if (ins.type == InstructionType::LOGORII) {
-                type = ExpressionType::LogicalOr;
-            } else if (ins.type == InstructionType::INCORII) {
-                type = ExpressionType::BitwiseOr;
-            } else if (ins.type == InstructionType::EXCORII) {
-                type = ExpressionType::BitwiseExlusiveOr;
-            } else if (ins.type == InstructionType::BOOLANDII) {
-                type = ExpressionType::BitwiseAnd;
-            } else if (ins.type == InstructionType::EQUALII ||
-                       ins.type == InstructionType::EQUALFF ||
-                       ins.type == InstructionType::EQUALSS ||
-                       ins.type == InstructionType::EQUALOO ||
-                       ins.type == InstructionType::EQUALEFFEFF ||
-                       ins.type == InstructionType::EQUALEVTEVT ||
-                       ins.type == InstructionType::EQUALLOCLOC ||
-                       ins.type == InstructionType::EQUALTALTAL) {
-                type = ExpressionType::Equal;
-            } else if (ins.type == InstructionType::NEQUALII ||
-                       ins.type == InstructionType::NEQUALFF ||
-                       ins.type == InstructionType::NEQUALSS ||
-                       ins.type == InstructionType::NEQUALOO ||
-                       ins.type == InstructionType::NEQUALEFFEFF ||
-                       ins.type == InstructionType::NEQUALEVTEVT ||
-                       ins.type == InstructionType::NEQUALLOCLOC ||
-                       ins.type == InstructionType::NEQUALTALTAL) {
-                type = ExpressionType::NotEqual;
-            } else if (ins.type == InstructionType::GEQII ||
-                       ins.type == InstructionType::GEQFF) {
-                type = ExpressionType::GreaterThanOrEqual;
-            } else if (ins.type == InstructionType::GTII ||
-                       ins.type == InstructionType::GTFF) {
-                type = ExpressionType::GreaterThan;
-            } else if (ins.type == InstructionType::LTII ||
-                       ins.type == InstructionType::LTFF) {
-                type = ExpressionType::LessThan;
-            } else if (ins.type == InstructionType::LEQII ||
-                       ins.type == InstructionType::LEQFF) {
-                type = ExpressionType::LessThanOrEqual;
-            } else if (ins.type == InstructionType::SHLEFTII) {
-                type = ExpressionType::LeftShift;
-            } else if (ins.type == InstructionType::SHRIGHTII) {
-                type = ExpressionType::RightShift;
-            } else if (ins.type == InstructionType::USHRIGHTII) {
-                type = ExpressionType::RightShiftUnsigned;
-            }
-            auto binaryExpr = make_shared<BinaryExpression>(type);
-            binaryExpr->offset = ins.offset;
-            binaryExpr->left = left;
-            binaryExpr->right = right;
-
-            VariableType varType;
-            if (ins.type == InstructionType::ADDIF ||
-                ins.type == InstructionType::ADDFI ||
-                ins.type == InstructionType::ADDFF ||
-                ins.type == InstructionType::SUBIF ||
-                ins.type == InstructionType::SUBFI ||
-                ins.type == InstructionType::SUBFF ||
-                ins.type == InstructionType::MULIF ||
-                ins.type == InstructionType::MULFI ||
-                ins.type == InstructionType::MULFF ||
-                ins.type == InstructionType::DIVIF ||
-                ins.type == InstructionType::DIVFI ||
-                ins.type == InstructionType::DIVFF) {
-                varType = VariableType::Float;
-            } else {
-                varType = VariableType::Int;
-            }
-            auto result = make_shared<ParameterExpression>();
-            result->offset = ins.offset;
-            result->variableType = varType;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = result.get();
-            assignExpr->right = binaryExpr.get();
-            assignExpr->declareLeft = true;
-            block->append(assignExpr.get());
-
-            ctx->pushStack(result.get());
-            ctx->expressions.push_back(std::move(result));
-            ctx->expressions.push_back(std::move(binaryExpr));
-            ctx->expressions.push_back(std::move(assignExpr));
-        } else if (ins.type == InstructionType::ADDVV ||
-                   ins.type == InstructionType::SUBVV) {
-            auto rightZ = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto rightY = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto rightX = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
-
-            auto leftZ = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto leftY = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto leftX = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
-
-            auto type = (ins.type == InstructionType::ADDVV) ? ExpressionType::Add : ExpressionType::Subtract;
-            auto binaryExpr = make_shared<BinaryExpression>(type);
-            binaryExpr->offset = ins.offset;
-            binaryExpr->left = left;
-            binaryExpr->right = right;
-
-            auto result = make_shared<ParameterExpression>();
-            result->offset = ins.offset;
-            result->variableType = VariableType::Vector;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = result.get();
-            assignExpr->right = binaryExpr.get();
-            assignExpr->declareLeft = true;
-            block->append(assignExpr.get());
-
-            ParameterExpression *resultX = nullptr;
-            ParameterExpression *resultY = nullptr;
-            ParameterExpression *resultZ = nullptr;
-            ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultX);
-            ctx->pushStack(resultY);
-            ctx->pushStack(resultZ);
-
-            ctx->expressions.push_back(std::move(result));
-            ctx->expressions.push_back(std::move(binaryExpr));
-            ctx->expressions.push_back(std::move(assignExpr));
-        } else if (ins.type == InstructionType::DIVFV ||
-                   ins.type == InstructionType::MULFV) {
-            auto rightZ = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto rightY = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto rightX = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto right = ctx->appendVectorCompose(ins.offset, *block, *rightX, *rightY, *rightZ);
-
-            auto left = ctx->stack.back().param;
-            ctx->stack.pop_back();
-
-            auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
-            auto binaryExpr = make_shared<BinaryExpression>(type);
-            binaryExpr->offset = ins.offset;
-            binaryExpr->left = left;
-            binaryExpr->right = right;
-
-            auto result = make_shared<ParameterExpression>();
-            result->offset = ins.offset;
-            result->variableType = VariableType::Vector;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = result.get();
-            assignExpr->right = binaryExpr.get();
-            assignExpr->declareLeft = true;
-            block->append(assignExpr.get());
-
-            ParameterExpression *resultX = nullptr;
-            ParameterExpression *resultY = nullptr;
-            ParameterExpression *resultZ = nullptr;
-            ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultX);
-            ctx->pushStack(resultY);
-            ctx->pushStack(resultZ);
-
-            ctx->expressions.push_back(std::move(result));
-            ctx->expressions.push_back(std::move(binaryExpr));
-            ctx->expressions.push_back(std::move(assignExpr));
-        } else if (ins.type == InstructionType::DIVVF ||
-                   ins.type == InstructionType::MULVF) {
-            auto right = ctx->stack.back().param;
-            ctx->stack.pop_back();
-
-            auto leftZ = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto leftY = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto leftX = ctx->stack.back().param;
-            ctx->stack.pop_back();
-            auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
-
-            auto type = (ins.type == InstructionType::DIVVF) ? ExpressionType::Divide : ExpressionType::Multiply;
-            auto binaryExpr = make_shared<BinaryExpression>(type);
-            binaryExpr->offset = ins.offset;
-            binaryExpr->left = left;
-            binaryExpr->right = right;
-
-            auto result = make_shared<ParameterExpression>();
-            result->offset = ins.offset;
-            result->variableType = VariableType::Vector;
-
-            auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-            assignExpr->offset = ins.offset;
-            assignExpr->left = result.get();
-            assignExpr->right = binaryExpr.get();
-            assignExpr->declareLeft = true;
-            block->append(assignExpr.get());
-
-            ParameterExpression *resultX = nullptr;
-            ParameterExpression *resultY = nullptr;
-            ParameterExpression *resultZ = nullptr;
-            ctx->appendVectorDecompose(ins.offset, *block, *result, resultX, resultY, resultZ);
-            ctx->pushStack(resultX);
-            ctx->pushStack(resultY);
-            ctx->pushStack(resultZ);
-
-            ctx->expressions.push_back(std::move(binaryExpr));
-            ctx->expressions.push_back(std::move(result));
-            ctx->expressions.push_back(std::move(assignExpr));
-        } else if (ins.type == InstructionType::EQUALTT ||
-                   ins.type == InstructionType::NEQUALTT) {
-            auto numFrames = ins.size / 4;
-            vector<StackFrame> rightFrames;
-            for (int i = 0; i < numFrames; ++i) {
-                rightFrames.push_back(ctx->stack.back());
-                ctx->stack.pop_back();
-            }
-            vector<StackFrame> leftFrames;
-            for (int i = 0; i < numFrames; ++i) {
-                leftFrames.push_back(ctx->stack.back());
-                ctx->stack.pop_back();
+                offset = ins.nextOffset;
             }
 
-            auto resultExpr = make_shared<ParameterExpression>();
-            resultExpr->offset = ins.offset;
-            resultExpr->variableType = VariableType::Int;
+            debug(boost::format("End decompiling block at %08x") % block->offset);
+            block->initialized = true;
 
-            for (int i = 0; i < numFrames; ++i) {
-                auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
-                auto compExpr = make_shared<BinaryExpression>(firstType);
-                compExpr->offset = ins.offset;
-                compExpr->left = leftFrames[i].param;
-                compExpr->right = rightFrames[i].param;
-
-                auto secondType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::LogicalAnd : ExpressionType::LogicalOr;
-                auto andOrExpression = make_shared<BinaryExpression>(secondType);
-                andOrExpression->offset = ins.offset;
-                andOrExpression->left = resultExpr.get();
-                andOrExpression->right = compExpr.get();
-
-                auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                assignExpr->offset = ins.offset;
-                assignExpr->left = resultExpr.get();
-                assignExpr->right = andOrExpression.get();
-                assignExpr->declareLeft = true;
-                block->append(assignExpr.get());
-
-                ctx->expressions.push_back(std::move(compExpr));
-                ctx->expressions.push_back(std::move(andOrExpression));
-                ctx->expressions.push_back(std::move(assignExpr));
-            }
-
-            ctx->pushStack(resultExpr.get());
-            ctx->expressions.push_back(std::move(resultExpr));
-        } else if (ins.type == InstructionType::STORE_STATE) {
-            auto absJumpOffset = ins.offset + 0x10;
-
-            if (ctx->branches->count(absJumpOffset) == 0) {
-                ctx->branches->insert(make_pair(absJumpOffset, make_shared<DecompilationContext>(*ctx)));
-            }
-
-            auto gotoExpr = make_shared<GotoExpression>();
-            gotoExpr->offset = ins.offset;
-            gotoExpr->label = ctx->labels.at(absJumpOffset);
-
-            auto innerBlock = make_shared<BlockExpression>();
-            innerBlock->offset = ins.offset;
-            innerBlock->append(gotoExpr.get());
-
-            ctx->savedAction = innerBlock.get();
-
-            ctx->expressions.push_back(std::move(gotoExpr));
-            ctx->expressions.push_back(std::move(innerBlock));
-        } else if (ins.type == InstructionType::SAVEBP) {
-            ctx->prevNumGlobals = ctx->numGlobals;
-            ctx->numGlobals = static_cast<int>(ctx->stack.size());
-            for (int i = 0; i < ctx->numGlobals; ++i) {
-                ctx->stack[i].param->locality = ParameterLocality::Global;
-            }
-        } else if (ins.type == InstructionType::RESTOREBP) {
-            // ctx.numGlobals = ctx.prevNumGlobals;
-        } else if (ins.type == InstructionType::DECISP ||
-                   ins.type == InstructionType::DECIBP ||
-                   ins.type == InstructionType::INCISP ||
-                   ins.type == InstructionType::INCIBP) {
-            if (ins.stackOffset >= 0) {
-                throw ValidationException("Non-negative stack offsets are not supported");
-            }
-            auto stackSize = static_cast<int>(ctx->stack.size());
-            auto frameIdx = ((ins.type == InstructionType::DECISP || ins.type == InstructionType::INCISP) ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
-            auto &frame = ctx->stack[frameIdx];
-
-            ParameterExpression *destination;
-            if (frame.allocatedBy != ctx->topCall().function) {
-                auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter);
-                if (ctx->outputs->count(stackOffset) == 0) {
-                    (*ctx->outputs)[stackOffset] = frame.param;
-                }
-                auto destExpr = make_shared<ParameterExpression>();
-                destExpr->offset = ins.offset;
-                destExpr->variableType = frame.param->variableType;
-                destExpr->locality = ParameterLocality::Output;
-                destExpr->stackOffset = stackOffset;
-                destination = destExpr.get();
-                ctx->expressions.push_back(std::move(destExpr));
-            } else {
-                destination = frame.param;
-            }
-
-            ExpressionType type;
-            if (ins.type == InstructionType::DECISP ||
-                ins.type == InstructionType::DECIBP) {
-                type = ExpressionType::Decrement;
-            } else if (ins.type == InstructionType::INCISP ||
-                       ins.type == InstructionType::INCIBP) {
-                type = ExpressionType::Increment;
-            }
-
-            auto unaryExpr = make_shared<UnaryExpression>(type);
-            unaryExpr->offset = ins.offset;
-            unaryExpr->operand = destination;
-            block->append(unaryExpr.get());
-
-            ctx->expressions.push_back(std::move(unaryExpr));
-        } else if (ins.type == InstructionType::DESTRUCT) {
-            auto numFrames = ins.size / 4;
-            auto startNoDestroy = static_cast<int>(ctx->stack.size()) - numFrames + (ins.stackOffset / 4);
-            auto numFramesNoDestroy = ins.sizeNoDestroy / 4;
-
-            vector<StackFrame> framesNoDestroy;
-            for (int i = 0; i < numFramesNoDestroy; ++i) {
-                auto &frame = ctx->stack[startNoDestroy + i];
-                framesNoDestroy.push_back(frame);
-            }
-            for (int i = 0; i < numFrames - numFramesNoDestroy; ++i) {
-                ctx->stack.pop_back();
-            }
-            for (auto &frame : framesNoDestroy) {
-                ctx->stack.push_back(frame);
-            }
-        } else {
-            throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
+        } catch (const logic_error &e) {
+            error(boost::format("Error decompiling block at %08x: %s") % block->offset % string(e.what()));
         }
-
-        offset = ins.nextOffset;
     }
 
-    debug(boost::format("End decompiling block at %08x") % start);
-    ctx->expressions.push_back(block);
-
-    return block.get();
+    debug(boost::format("End decompiling function at %08x") % func.offset);
 }
 
 unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
@@ -1093,25 +1128,30 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     expressions.push_back(std::move(zAssignExpr));
 }
 
-unique_ptr<ExpressionTree> ExpressionTree::deepCopy() const {
-    auto functions = vector<shared_ptr<Function>>();
-    auto expressions = vector<shared_ptr<Expression>>();
-
-    auto globals = set<ParameterExpression *>();
-    for (auto &expr : expressions) {
-        if (expr->type != ExpressionType::Parameter) {
-            continue;
+Variable ExpressionTree::evaluate(Expression &expr) {
+    switch (expr.type) {
+    case ExpressionType::Constant:
+        return static_cast<ConstantExpression *>(&expr)->value;
+    case ExpressionType::Parameter: {
+        auto paramExpr = static_cast<ParameterExpression *>(&expr);
+        if (!paramExpr->assignedFrom) {
+            return Variable::ofNull();
         }
-        auto paramExpr = static_pointer_cast<ParameterExpression>(expr);
-        if (paramExpr->locality == ParameterLocality::Global) {
-            globals.insert(paramExpr.get());
+        return evaluate(*paramExpr->assignedFrom);
+    }
+    case ExpressionType::Negate: {
+        auto unaryExpr = static_cast<UnaryExpression *>(&expr);
+        if (unaryExpr->operand->type == ExpressionType::Parameter) {
+            auto paramOperand = static_cast<ParameterExpression *>(unaryExpr->operand);
+            if (!paramOperand->assignedFrom) {
+                return Variable::ofNull();
+            }
+            return -evaluate(*paramOperand->assignedFrom);
         }
     }
-
-    return make_unique<ExpressionTree>(
-        std::move(globals),
-        std::move(functions),
-        std::move(expressions));
+    default:
+        throw NotImplementedException("Expression evaluation not implemented");
+    }
 }
 
 bool ExpressionTree::isUnaryExpression(ExpressionType type) {

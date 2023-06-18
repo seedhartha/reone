@@ -17,9 +17,9 @@
 
 #include "reone/script/routine.h"
 
-#include "reone/system/logutil.h"
 #include "reone/script/exception/argument.h"
-#include "reone/script/exception/notimpl.h"
+#include "reone/system/exception/notimplemented.h"
+#include "reone/system/logutil.h"
 
 #include "reone/script/variable.h"
 

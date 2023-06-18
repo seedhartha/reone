@@ -21,9 +21,8 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/script/exception/notimpl.h"
-
 #include "reone/game/script/routine/context.h"
+#include "reone/system/exception/notimplemented.h"
 
 using namespace std;
 

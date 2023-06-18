@@ -21,6 +21,10 @@ namespace reone {
 
 class NotImplementedException : public std::logic_error {
 public:
+    NotImplementedException() :
+        std::logic_error("") {
+    }
+
     NotImplementedException(const std::string &message) :
         std::logic_error(message) {
     }

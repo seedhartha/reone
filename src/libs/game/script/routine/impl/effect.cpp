@@ -21,16 +21,14 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/script/exception/notimpl.h"
-
 #include "reone/game/di/services.h"
 #include "reone/game/effect.h"
 #include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
-#include "reone/game/types.h"
-
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
+#include "reone/game/types.h"
+#include "reone/system/exception/notimplemented.h"
 
 using namespace std;
 

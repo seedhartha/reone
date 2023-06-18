@@ -21,7 +21,6 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/di/services.h
     ${SCRIPT_INCLUDE_DIR}/enginetype.h
     ${SCRIPT_INCLUDE_DIR}/exception/argument.h
-    ${SCRIPT_INCLUDE_DIR}/exception/notimpl.h
     ${SCRIPT_INCLUDE_DIR}/exception/unsupportedroutine.h
     ${SCRIPT_INCLUDE_DIR}/execution.h
     ${SCRIPT_INCLUDE_DIR}/executioncontext.h

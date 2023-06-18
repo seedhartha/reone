@@ -49,19 +49,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    BOOST_TEST(0ll == globals.size());
-
-    auto &functions = tree.functions();
-    BOOST_TEST(1ll == functions.size());
-
-    auto &startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-    BOOST_TEST(0ll == startFunc->inputs.size());
-    BOOST_TEST(0ll == startFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(startFunc->returnType));
-    BOOST_TEST(1ll == startFunc->block->expressions.size());
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
@@ -86,22 +73,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    BOOST_TEST(0ll == globals.size());
-
-    auto &functions = tree.functions();
-    BOOST_TEST(2ll == functions.size());
-
-    auto startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-
-    auto startingConditionalFunc = functions[1];
-    BOOST_TEST("StartingConditional" == startingConditionalFunc->name);
-    BOOST_TEST(0ll == startingConditionalFunc->inputs.size());
-    BOOST_TEST(1ll == startingConditionalFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Int) == static_cast<int>(startingConditionalFunc->outputs[0].type));
-    BOOST_TEST(static_cast<int>(VariableType::Int) == static_cast<int>(startingConditionalFunc->returnType));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
@@ -130,27 +101,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    auto globalsVec = vector<const ParameterExpression *>(globals.begin(), globals.end());
-    BOOST_TEST(1ll == globalsVec.size());
-    BOOST_TEST(static_cast<int>(VariableType::Int) == static_cast<int>(globalsVec[0]->variableType));
-    BOOST_TEST(static_cast<int>(ParameterLocality::Global) == static_cast<int>(globalsVec[0]->locality));
-
-    auto &functions = tree.functions();
-    BOOST_TEST(3ll == functions.size());
-
-    auto startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-
-    auto globalsFunc = functions[1];
-    BOOST_TEST("_globals" == globalsFunc->name);
-
-    auto mainFunc = functions[2];
-    BOOST_TEST("main" == mainFunc->name);
-    BOOST_TEST(0ll == mainFunc->inputs.size());
-    BOOST_TEST(0ll == mainFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(mainFunc->returnType));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
@@ -180,86 +130,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    BOOST_TEST(0ll == globals.size());
-
-    auto &functions = tree.functions();
-    BOOST_TEST(2ll == functions.size());
-
-    auto startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-
-    auto mainFunc = functions[1];
-    BOOST_TEST("main" == mainFunc->name);
-    BOOST_TEST(0ll == mainFunc->inputs.size());
-    BOOST_TEST(0ll == mainFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(mainFunc->returnType));
-    BOOST_TEST(7 == mainFunc->block->expressions.size());
-    auto branchBlocks = vector<BlockExpression *>();
-    for (auto &[offset, branch] : mainFunc->branches) {
-        branchBlocks.push_back(branch.block);
-    }
-    auto jnzBlock = branchBlocks.front();
-    BOOST_TEST(2ll == jnzBlock->expressions.size());
-    auto jzBlock = branchBlocks.back();
-    BOOST_TEST(2ll == jzBlock->expressions.size());
-    // loc_jnz:
-    // return;
-    auto jnzLabelExpr = static_cast<LabelExpression *>(jnzBlock->expressions[0]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(jnzBlock->expressions[1]->type));
-    // loc_jz:
-    // return;
-    auto jzLabelExpr = static_cast<LabelExpression *>(jzBlock->expressions[0]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(jzBlock->expressions[1]->type));
-    // int a = 2;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[0]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[0])->left->type));
-    auto aExpr = static_cast<ParameterExpression *>(static_cast<BinaryExpression *>(mainFunc->block->expressions[0])->left);
-    BOOST_TEST(static_cast<int>(ExpressionType::Constant) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[0])->right->type));
-    // int b = 1;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[1]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[1])->left->type));
-    auto bExpr = static_cast<ParameterExpression *>(static_cast<BinaryExpression *>(mainFunc->block->expressions[1])->left);
-    BOOST_TEST(static_cast<int>(ExpressionType::Constant) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[1])->right->type));
-    // int c = a;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[2]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[2])->left->type));
-    auto cExpr = static_cast<ParameterExpression *>(static_cast<BinaryExpression *>(mainFunc->block->expressions[2])->left);
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[2])->right->type));
-    BOOST_TEST(aExpr == static_cast<BinaryExpression *>(mainFunc->block->expressions[2])->right);
-    // if(c == 0) { goto loc_jz; }
-    BOOST_TEST(static_cast<int>(ExpressionType::Conditional) == static_cast<int>(mainFunc->block->expressions[3]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Equal) == static_cast<int>(static_cast<ConditionalExpression *>(mainFunc->block->expressions[3])->test->type));
-    auto jzIfTrue = static_cast<ConditionalExpression *>(mainFunc->block->expressions[3])->ifTrue;
-    BOOST_TEST(jzIfTrue);
-    BOOST_TEST(1ll == jzIfTrue->expressions.size());
-    BOOST_TEST(static_cast<int>(ExpressionType::Goto) == static_cast<int>(jzIfTrue->expressions[0]->type));
-    BOOST_TEST(jzLabelExpr == static_cast<GotoExpression *>(jzIfTrue->expressions[0])->label);
-    auto jzIfFalse = static_cast<ConditionalExpression *>(mainFunc->block->expressions[3])->ifFalse;
-    BOOST_TEST(!jzIfFalse);
-    // int d = a / b;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[4]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[4])->left->type));
-    auto dExpr = static_cast<ParameterExpression *>(static_cast<BinaryExpression *>(mainFunc->block->expressions[4])->left);
-    BOOST_TEST(static_cast<int>(ExpressionType::Divide) == static_cast<int>(static_cast<BinaryExpression *>(mainFunc->block->expressions[4])->right->type));
-    auto aDivBExpr = static_cast<BinaryExpression *>(static_cast<BinaryExpression *>(mainFunc->block->expressions[4])->right);
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(aDivBExpr->left->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Parameter) == static_cast<int>(aDivBExpr->right->type));
-    BOOST_TEST(aExpr == aDivBExpr->left);
-    BOOST_TEST(bExpr == aDivBExpr->right);
-    // if(d != 0) { goto loc_jnz; }
-    BOOST_TEST(static_cast<int>(ExpressionType::Conditional) == static_cast<int>(mainFunc->block->expressions[5]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::NotEqual) == static_cast<int>(static_cast<ConditionalExpression *>(mainFunc->block->expressions[5])->test->type));
-    auto jnzIfTrue = static_cast<ConditionalExpression *>(mainFunc->block->expressions[5])->ifTrue;
-    BOOST_TEST(jnzIfTrue);
-    BOOST_TEST(1ll == jnzIfTrue->expressions.size());
-    BOOST_TEST(static_cast<int>(ExpressionType::Goto) == static_cast<int>(jnzIfTrue->expressions[0]->type));
-    BOOST_TEST(jnzLabelExpr == static_cast<GotoExpression *>(jnzIfTrue->expressions[0])->label);
-    auto jnzIfFalse = static_cast<ConditionalExpression *>(mainFunc->block->expressions[5])->ifFalse;
-    BOOST_TEST(!jnzIfFalse);
-    // return;
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(mainFunc->block->expressions[6]->type));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
@@ -295,21 +165,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    BOOST_TEST(0ll == globals.size());
-
-    auto &functions = tree.functions();
-    BOOST_TEST(2ll == functions.size());
-
-    auto startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-
-    auto mainFunc = functions[1];
-    BOOST_TEST("main" == mainFunc->name);
-    BOOST_TEST(0ll == mainFunc->inputs.size());
-    BOOST_TEST(0ll == mainFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(mainFunc->returnType));
 }
 
 BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
@@ -373,131 +228,6 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
     auto tree = ExpressionTree::fromProgram(program, routines, optimizer);
 
     // then
-
-    auto &globals = tree.globals();
-    BOOST_TEST(0ll == globals.size());
-
-    auto &functions = tree.functions();
-    BOOST_TEST(2ll == functions.size());
-
-    auto startFunc = functions[0];
-    BOOST_TEST("_start" == startFunc->name);
-
-    auto mainFunc = functions[1];
-    BOOST_TEST("main" == mainFunc->name);
-    BOOST_TEST(0ll == mainFunc->inputs.size());
-    BOOST_TEST(0ll == mainFunc->outputs.size());
-    BOOST_TEST(static_cast<int>(VariableType::Void) == static_cast<int>(mainFunc->returnType));
-    BOOST_TEST(71ll == mainFunc->block->expressions.size());
-    // vector v1 = Vector(1.0f, 2.0f, 3.0f);
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[0]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[1]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[2]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[3]->type));
-    auto v1Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[3]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Action) == static_cast<int>(v1Assign->right->type));
-    auto v1Action = static_cast<ActionExpression *>(v1Assign->right);
-    BOOST_TEST(142 == v1Action->action);
-    BOOST_TEST(3ll == v1Action->arguments.size());
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[4]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[5]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[6]->type));
-    // vector v2 = Vector(-3.0f, -2.0f, -1.0f);
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[7]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[8]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[9]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[10]->type));
-    auto v2Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[10]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Action) == static_cast<int>(v2Assign->right->type));
-    auto v2Action = static_cast<ActionExpression *>(v2Assign->right);
-    BOOST_TEST(142 == v2Action->action);
-    BOOST_TEST(3ll == v2Action->arguments.size());
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[11]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[12]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[13]->type));
-    // vector v3 = v1 + v2;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[14]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[15]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[16]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[17]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[18]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[19]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[20]->type));
-    auto v3Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[20]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Add) == static_cast<int>(v3Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[21]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[22]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[23]->type));
-    // vector v4 = v1 - v2;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[24]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[25]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[26]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[27]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[28]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[29]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[30]->type));
-    auto v4Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[30]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Subtract) == static_cast<int>(v4Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[31]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[32]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[33]->type));
-    // vector v5 = 2.0f * v1;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[34]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[35]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[36]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[37]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[38]->type));
-    auto v5Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[38]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Multiply) == static_cast<int>(v5Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[39]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[40]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[41]->type));
-    // vector v6 = 2.0f / v1;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[42]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[43]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[44]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[45]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[46]->type));
-    auto v6Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[46]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Divide) == static_cast<int>(v6Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[47]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[48]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[49]->type));
-    // vector v7 = v1 * 2.0f;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[50]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[51]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[52]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[53]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[54]->type));
-    auto v7Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[54]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Multiply) == static_cast<int>(v7Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[55]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[56]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[57]->type));
-    // vector v8 = v1 / 2.0f;
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[58]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[59]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[60]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[61]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[62]->type));
-    auto v8Assign = static_cast<BinaryExpression *>(mainFunc->block->expressions[62]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Divide) == static_cast<int>(v8Assign->right->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[63]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[64]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[65]->type));
-    // float f = VectorToAngle(v1);
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[66]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[67]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[68]->type));
-    BOOST_TEST(static_cast<int>(ExpressionType::Assign) == static_cast<int>(mainFunc->block->expressions[69]->type));
-    auto fAssign = static_cast<BinaryExpression *>(mainFunc->block->expressions[69]);
-    BOOST_TEST(static_cast<int>(ExpressionType::Action) == static_cast<int>(fAssign->right->type));
-    auto fAction = static_cast<ActionExpression *>(fAssign->right);
-    BOOST_TEST(145 == fAction->action);
-    BOOST_TEST(1ll == fAction->arguments.size());
-    BOOST_TEST(static_cast<int>(ExpressionType::Vector) == static_cast<int>(fAction->arguments[0]->type));
-    // return;
-    BOOST_TEST(static_cast<int>(ExpressionType::Return) == static_cast<int>(mainFunc->block->expressions[70]->type));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

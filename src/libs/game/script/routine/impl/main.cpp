@@ -19,9 +19,9 @@
 
 #include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
-#include "reone/script/exception/notimpl.h"
 #include "reone/script/exception/unsupportedroutine.h"
 #include "reone/script/executioncontext.h"
+#include "reone/system/exception/notimplemented.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 
