@@ -40,16 +40,12 @@ public:
     void save(IOutputStream &stream);
 
 private:
-    struct WriteContext {
-        std::map<BlockExpression *, std::string> writtenBlocks;
-    };
-
     ExpressionTree &_program;
     IRoutines &_routines;
 
     void writeFunction(const Function &function, TextWriter &writer);
-    void writeBlock(int level, const BlockExpression &block, WriteContext &ctx, TextWriter &writer);
-    void writeExpression(int blockLevel, bool declare, const Expression &expression, WriteContext &ctx, TextWriter &writer);
+    void writeBlock(int level, const BlockExpression &block, TextWriter &writer);
+    void writeExpression(int blockLevel, bool declare, const Expression &expression, TextWriter &writer);
 
     std::string indentAtLevel(int level);
 

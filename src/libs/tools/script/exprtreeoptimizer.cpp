@@ -49,11 +49,11 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
             auto blockExpr = static_cast<BlockExpression *>(expr);
             if (analyzedBlocks.count(blockExpr) == 0) {
                 for (auto it = blockExpr->expressions.rbegin(); it != blockExpr->expressions.rend(); ++it) {
-                    exprToAnalyze.push(make_tuple(*it, blockExpr, -1));
+                    exprToAnalyze.push(make_tuple(*it, blockExpr, binaryDir));
                 }
                 analyzedBlocks.insert(blockExpr);
+                ctx.blocksToCompact.push(blockExpr);
             }
-            ctx.blocksToCompact.push(blockExpr);
         } else if (expr->type == ExpressionType::Parameter) {
             auto paramExpr = static_cast<ParameterExpression *>(expr);
             auto read = ParameterReadEvent(container);
@@ -70,9 +70,9 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
             }
         } else if (expr->type == ExpressionType::Conditional) {
             auto conditionalExpr = static_cast<ConditionalExpression *>(expr);
-            exprToAnalyze.push(make_tuple(conditionalExpr->test, conditionalExpr, -1));
+            exprToAnalyze.push(make_tuple(conditionalExpr->test, conditionalExpr, binaryDir));
             if (conditionalExpr->ifTrue) {
-                exprToAnalyze.push(make_tuple(conditionalExpr->ifTrue, conditionalExpr, -1));
+                exprToAnalyze.push(make_tuple(conditionalExpr->ifTrue, conditionalExpr, binaryDir));
             }
         } else if (expr->type == ExpressionType::Action) {
             auto actionExpr = static_cast<ActionExpression *>(expr);
@@ -85,13 +85,19 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                     ctx.parameters[paramArg].reads.push_back(std::move(read));
                 } else if (arg->type == ExpressionType::Block) {
                     auto blockArg = static_cast<BlockExpression *>(arg);
-                    exprToAnalyze.push(make_tuple(blockArg, actionExpr, -1));
+                    exprToAnalyze.push(make_tuple(blockArg, actionExpr, binaryDir));
                 }
             }
         } else if (expr->type == ExpressionType::Call) {
             auto callExpr = static_cast<CallExpression *>(expr);
-            for (auto &arg : callExpr->arguments) {
-                ctx.parameters[arg].reads.push_back(ParameterReadEvent(callExpr));
+            for (size_t i = 0; i < callExpr->arguments.size(); ++i) {
+                auto arg = callExpr->arguments[i];
+                if (arg->type == ExpressionType::Parameter) {
+                    auto paramArg = static_cast<ParameterExpression *>(arg);
+                    auto read = ParameterReadEvent(callExpr);
+                    read.callArgIdx = static_cast<int>(i);
+                    ctx.parameters[paramArg].reads.push_back(std::move(read));
+                }
             }
         } else if (expr->type == ExpressionType::Vector) {
             auto vectorExpr = static_cast<VectorExpression *>(expr);
@@ -136,7 +142,7 @@ void ExpressionTreeOptimizer::compact(OptimizationContext &ctx) {
             auto expr = *it;
             if (expr->type == ExpressionType::Parameter) {
                 auto paramExpr = static_cast<ParameterExpression *>(expr);
-                if (!ctx.parameters[paramExpr].writes.empty()) {
+                if (ctx.parameters[paramExpr].writes.size() == 1ll) {
                     auto &write = ctx.parameters[paramExpr].writes.front();
                     if (write.writeExpr->type == ExpressionType::Assign) {
                         it = block->expressions.erase(it);
@@ -175,6 +181,11 @@ void ExpressionTreeOptimizer::compact(OptimizationContext &ctx) {
                             it = block->expressions.erase(it);
                             auto readAction = static_cast<ActionExpression *>(read.expression);
                             readAction->arguments[read.actionArgIdx] = write.value;
+                            continue;
+                        } else if (read.expression->type == ExpressionType::Call) {
+                            it = block->expressions.erase(it);
+                            auto readCall = static_cast<CallExpression *>(read.expression);
+                            readCall->arguments[read.callArgIdx] = write.value;
                             continue;
                         } else if (ExpressionTree::isBinaryExpression(read.expression->type)) {
                             it = block->expressions.erase(it);

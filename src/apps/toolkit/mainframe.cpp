@@ -363,6 +363,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         auto nssPanel = new wxPanel(_notebook);
         auto nssSizer = new wxBoxSizer(wxVERTICAL);
         auto nssTextCtrl = new wxStyledTextCtrl(nssPanel);
+        nssTextCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
         nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
         nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
         nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object string struct talent vector void");

@@ -128,7 +128,11 @@ struct ParameterExpression : Expression {
     VariableType variableType {VariableType::Int};
     ParameterLocality locality {ParameterLocality::Local};
     std::string suffix;
-    int stackOffset {0}; // input/output
+
+    int outerStackOffset {0};
+    bool outerRead {false};
+    bool outerModified {false};
+
     Expression *assignedFrom {nullptr};
 
     ParameterExpression() :
@@ -198,10 +202,12 @@ struct ActionExpression : Expression {
 struct FunctionArgument {
     VariableType type;
     int stackOffset;
+    bool pointer {false};
 
-    FunctionArgument(VariableType type, int stackOffset) :
+    FunctionArgument(VariableType type, int stackOffset, bool pointer) :
         type(type),
-        stackOffset(stackOffset) {
+        stackOffset(stackOffset),
+        pointer(pointer) {
     }
 };
 
@@ -210,12 +216,13 @@ struct Function {
     uint32_t offset {0};
     std::vector<FunctionArgument> arguments;
     VariableType returnType {VariableType::Void};
+    int retValStackOffset {0};
     BlockExpression *block {nullptr};
 };
 
 struct CallExpression : Expression {
     Function *function {nullptr};
-    std::vector<ParameterExpression *> arguments;
+    std::vector<Expression *> arguments;
 
     CallExpression() :
         Expression(ExpressionType::Call) {
@@ -313,9 +320,7 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
-        std::map<int, ParameterExpression *> *inputs {nullptr};
-        std::map<int, ParameterExpression *> *outputs {nullptr};
-        ParameterExpression *returnValue {nullptr};
+        std::map<int, ParameterExpression *> *outerParams {nullptr};
 
         DecompilationContext(
             const ScriptProgram &compiled,
@@ -341,9 +346,7 @@ private:
             numGlobals(other.numGlobals),
             prevNumGlobals(other.prevNumGlobals),
             savedAction(other.savedAction),
-            inputs(other.inputs),
-            outputs(other.outputs),
-            returnValue(other.returnValue) {
+            outerParams(other.outerParams) {
         }
 
         void pushCallStack(Function *function) {

@@ -38,6 +38,7 @@ struct ParameterWriteEvent {
 struct ParameterReadEvent {
     Expression *expression {nullptr};
     int actionArgIdx {0};
+    int callArgIdx {0};
     int binaryDir {-1};
 
     ParameterReadEvent() = default;

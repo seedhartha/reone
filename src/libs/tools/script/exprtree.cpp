@@ -50,10 +50,12 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
     }
 
-    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
     auto startFunc = make_shared<Function>();
     startFunc->offset = 13;
+
+    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
     ctx->pushCallStack(startFunc.get());
+
     decompileFunction(*startFunc, ctx);
 
     auto globals = vector<GlobalVariable>();
@@ -134,10 +136,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                 } else if (ins.type == InstructionType::RETN) {
                     auto retExpr = make_shared<ReturnExpression>();
                     retExpr->offset = ins.offset;
-                    if (ctx->returnValue) {
-                        retExpr->value = ctx->returnValue;
-                    }
-
                     block->append(retExpr.get());
                     ctx->expressions.push_back(std::move(retExpr));
                     break;
@@ -165,24 +163,16 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                         ctx->functions[sub->offset] = sub;
 
-                        auto inputs = map<int, ParameterExpression *>();
-                        auto outputs = map<int, ParameterExpression *>();
+                        auto outerParams = map<int, ParameterExpression *>();
 
                         auto subCtx = make_shared<DecompilationContext>(*ctx);
-                        subCtx->inputs = &inputs;
-                        subCtx->outputs = &outputs;
+                        subCtx->outerParams = &outerParams;
                         subCtx->pushCallStack(sub.get());
 
                         decompileFunction(*sub, subCtx);
 
-                        for (auto &[stackOffset, param] : inputs) {
-                            sub->arguments.push_back(FunctionArgument(param->variableType, stackOffset));
-                        }
-                        if (!outputs.empty()) {
-                            if (outputs.size() > 1ll) {
-                                throw ValidationException("Function must not have more than 1 output variable");
-                            }
-                            sub->returnType = outputs.begin()->second->variableType;
+                        for (auto &[stackOffset, param] : outerParams) {
+                            sub->arguments.push_back(FunctionArgument(param->variableType, stackOffset, param->outerModified));
                         }
                     } else {
                         sub = ctx->functions.at(absJumpOffset);
@@ -193,28 +183,43 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     callExpr->function = sub.get();
 
                     for (auto &argument : sub->arguments) {
-                        auto param = ctx->stack[ctx->stack.size() + argument.stackOffset].param;
-                        callExpr->arguments.push_back(param);
+                        ParameterExpression *argParam;
+                        auto stackIdx = static_cast<int>(ctx->stack.size()) + argument.stackOffset / 4;
+                        if (stackIdx < ctx->topCall().stackSizeOnEnter) {
+                            auto stackOffset = 4 * (stackIdx - ctx->topCall().stackSizeOnEnter);
+                            if (ctx->outerParams->count(stackOffset) > 0) {
+                                argParam = ctx->outerParams->at(stackOffset);
+                                if (argument.pointer) {
+                                    argParam->outerModified = true;
+                                }
+                            } else {
+                                auto forwarded = make_shared<ParameterExpression>();
+                                forwarded->offset = ins.offset;
+                                forwarded->locality = ParameterLocality::Argument;
+                                forwarded->outerStackOffset = stackOffset;
+                                forwarded->outerModified = argument.pointer;
+                                argParam = forwarded.get();
+                                ctx->outerParams->insert(make_pair(stackOffset, forwarded.get()));
+                                ctx->expressions.push_back(std::move(forwarded));
+                            }
+                        } else {
+                            argParam = ctx->stack[stackIdx].param;
+                        }
+                        callExpr->arguments.push_back(argParam);
                     }
 
-                    if (sub->returnType != VariableType::Void) {
-                        auto resultExpr = make_shared<ParameterExpression>();
-                        resultExpr->offset = ins.offset;
-                        resultExpr->variableType = sub->returnType;
+                    // if (sub->returnType != VariableType::Void) {
+                    //    auto retValParam = ctx->stack[ctx->stack.size() + sub->retValStackOffset / 4].param;
+                    //    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    //    assignExpr->left = retValParam;
+                    //    assignExpr->right = callExpr.get();
+                    //    block->append(assignExpr.get());
+                    //    ctx->expressions.push_back(std::move(assignExpr));
+                    //} else {
+                    //    block->append(callExpr.get());
+                    //}
 
-                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
-                        assignExpr->left = resultExpr.get();
-                        assignExpr->right = callExpr.get();
-                        assignExpr->declareLeft = true;
-                        block->append(assignExpr.get());
-
-                        ctx->expressions.push_back(std::move(resultExpr));
-                        ctx->expressions.push_back(std::move(assignExpr));
-
-                    } else {
-                        block->append(callExpr.get());
-                    }
-
+                    block->append(callExpr.get());
                     ctx->expressions.push_back(std::move(callExpr));
 
                 } else if (ins.type == InstructionType::JZ ||
@@ -394,18 +399,21 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                         ParameterExpression *destination;
                         if (left.allocatedBy != ctx->topCall().function && left.param->locality != ParameterLocality::Global) {
-                            auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
-                            if (ctx->outputs->count(stackOffset) == 0) {
-                                (*ctx->outputs)[stackOffset] = left.param;
+                            auto stackOffset = ins.stackOffset + 4 * (stackSize - ctx->topCall().stackSizeOnEnter + i);
+                            if (ctx->outerParams->count(stackOffset) > 0) {
+                                destination = ctx->outerParams->at(stackOffset);
+                                destination->outerModified = true;
+                            } else {
+                                auto destExpr = make_shared<ParameterExpression>();
+                                destExpr->offset = ins.offset;
+                                destExpr->variableType = left.param->variableType;
+                                destExpr->locality = ParameterLocality::Argument;
+                                destExpr->outerStackOffset = stackOffset;
+                                destExpr->outerModified = true;
+                                destination = destExpr.get();
+                                ctx->outerParams->insert(make_pair(stackOffset, destination));
+                                ctx->expressions.push_back(std::move(destExpr));
                             }
-                            auto destExpr = make_shared<ParameterExpression>();
-                            destExpr->offset = ins.offset;
-                            destExpr->variableType = left.param->variableType;
-                            destExpr->locality = ParameterLocality::ReturnValue;
-                            destExpr->stackOffset = stackOffset;
-                            ctx->returnValue = destExpr.get();
-                            destination = destExpr.get();
-                            ctx->expressions.push_back(std::move(destExpr));
                         } else {
                             destination = left.param;
                         }
@@ -439,17 +447,21 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                         ParameterExpression *source;
                         if (frame.allocatedBy != ctx->topCall().function && frame.param->locality != ParameterLocality::Global) {
-                            auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter) + i;
-                            if (ctx->inputs->count(stackOffset) == 0) {
-                                (*ctx->inputs)[stackOffset] = frame.param;
+                            auto stackOffset = ins.stackOffset + 4 * (stackSize - ctx->topCall().stackSizeOnEnter + i);
+                            if (ctx->outerParams->count(stackOffset) > 0) {
+                                source = ctx->outerParams->at(stackOffset);
+                                source->outerRead = true;
+                            } else {
+                                auto sourceExpr = make_shared<ParameterExpression>();
+                                sourceExpr->offset = ins.offset;
+                                sourceExpr->variableType = frame.param->variableType;
+                                sourceExpr->locality = ParameterLocality::Argument;
+                                sourceExpr->outerStackOffset = stackOffset;
+                                sourceExpr->outerRead = true;
+                                source = sourceExpr.get();
+                                ctx->outerParams->insert(make_pair(stackOffset, source));
+                                ctx->expressions.push_back(std::move(sourceExpr));
                             }
-                            auto sourceExpr = make_shared<ParameterExpression>();
-                            sourceExpr->offset = ins.offset;
-                            sourceExpr->variableType = frame.param->variableType;
-                            sourceExpr->locality = ParameterLocality::Argument;
-                            sourceExpr->stackOffset = stackOffset;
-                            source = sourceExpr.get();
-                            ctx->expressions.push_back(std::move(sourceExpr));
                         } else {
                             source = frame.param;
                         }
@@ -894,18 +906,24 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto &frame = ctx->stack[frameIdx];
 
                     ParameterExpression *destination;
-                    if (frame.allocatedBy != ctx->topCall().function) {
-                        auto stackOffset = (ins.stackOffset / 4) + (stackSize - ctx->topCall().stackSizeOnEnter);
-                        if (ctx->outputs->count(stackOffset) == 0) {
-                            (*ctx->outputs)[stackOffset] = frame.param;
+                    if (frame.allocatedBy != ctx->topCall().function && frame.param->locality != ParameterLocality::Global) {
+                        auto stackOffset = ins.stackOffset + 4 * (stackSize - ctx->topCall().stackSizeOnEnter);
+                        if (ctx->outerParams->count(stackOffset) > 0) {
+                            destination = ctx->outerParams->at(stackOffset);
+                            destination->outerRead = true;
+                            destination->outerModified = true;
+                        } else {
+                            auto destExpr = make_shared<ParameterExpression>();
+                            destExpr->offset = ins.offset;
+                            destExpr->variableType = frame.param->variableType;
+                            destExpr->locality = ParameterLocality::Argument;
+                            destExpr->outerStackOffset = stackOffset;
+                            destExpr->outerRead = true;
+                            destExpr->outerModified = true;
+                            destination = destExpr.get();
+                            ctx->outerParams->insert(make_pair(stackOffset, destination));
+                            ctx->expressions.push_back(std::move(destExpr));
                         }
-                        auto destExpr = make_shared<ParameterExpression>();
-                        destExpr->offset = ins.offset;
-                        destExpr->variableType = frame.param->variableType;
-                        destExpr->locality = ParameterLocality::ReturnValue;
-                        destExpr->stackOffset = stackOffset;
-                        destination = destExpr.get();
-                        ctx->expressions.push_back(std::move(destExpr));
                     } else {
                         destination = frame.param;
                     }
