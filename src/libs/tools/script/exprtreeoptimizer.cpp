@@ -147,6 +147,13 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
         }
         tree.functions().erase(tree.functions().begin()); // __globals
     }
+    for (auto &func : tree.functions()) {
+        if (func->returnType == VariableType::Void &&
+            !func->block->expressions.empty() &&
+            func->block->expressions.back()->type == ExpressionType::Return) {
+            func->block->expressions.pop_back();
+        }
+    }
 
     while (!ctx.blocksToCompact.empty()) {
         auto block = ctx.blocksToCompact.top();
