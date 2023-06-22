@@ -118,7 +118,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
     auto blocksToDecompile = stack<pair<BlockExpression *, shared_ptr<DecompilationContext>>>();
     blocksToDecompile.push(make_pair(mainBlock.get(), ctx));
-    auto decompiledBlocks = map<uint32_t, BlockExpression *>();
+    auto decompiledBlocks = map<pair<uint32_t, size_t>, BlockExpression *>();
 
     func.block = mainBlock.get();
     ctx->expressions.push_back(std::move(mainBlock));
@@ -126,7 +126,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
     while (!blocksToDecompile.empty()) {
         auto [block, ctx] = blocksToDecompile.top();
         blocksToDecompile.pop();
-        decompiledBlocks[block->offset] = block;
+        decompiledBlocks[make_pair(block->offset, ctx->stack.size())] = block;
 
         try {
             debug(boost::format("Begin decompiling block at %08x") % block->offset);
@@ -257,9 +257,9 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                     BlockExpression *ifTrueBlockPtr;
                     if (ins.jumpOffset > 0) {
-
-                        if (decompiledBlocks.count(ifTrueOffset) > 0) {
-                            ifTrueBlockPtr = decompiledBlocks.at(ifTrueOffset);
+                        auto blockKey = make_pair(ifTrueOffset, ctx->stack.size());
+                        if (decompiledBlocks.count(blockKey) > 0) {
+                            ifTrueBlockPtr = decompiledBlocks.at(blockKey);
                         } else {
                             auto ifTrueCtx = make_shared<DecompilationContext>(*ctx);
                             auto ifTrueBlock = make_shared<BlockExpression>();
@@ -884,8 +884,9 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                 } else if (ins.type == InstructionType::STORE_STATE) {
                     auto absJumpOffset = ins.offset + 0x10;
-                    if (decompiledBlocks.count(absJumpOffset) > 0) {
-                        ctx->savedAction = decompiledBlocks.at(absJumpOffset);
+                    auto blockKey = make_pair(absJumpOffset, ctx->stack.size());
+                    if (decompiledBlocks.count(blockKey) > 0) {
+                        ctx->savedAction = decompiledBlocks.at(blockKey);
                     } else {
                         auto actionBlock = make_shared<BlockExpression>();
                         actionBlock->offset = absJumpOffset;
