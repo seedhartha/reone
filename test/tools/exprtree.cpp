@@ -38,6 +38,8 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     // given
 
     auto program = ScriptProgram("");
+    program.add(Instruction::newJSR(8));
+    program.add(Instruction(InstructionType::RETN));
     program.add(Instruction(InstructionType::RETN));
 
     auto routines = Routines(GameID::KotOR, nullptr, nullptr);
