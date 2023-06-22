@@ -471,13 +471,13 @@ void MainViewModel::loadEngine() {
     _engineLoaded = true;
 }
 
-void MainViewModel::decompile(GameDirectoryItemId itemId) {
+void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     auto &item = *_idToGameDirItem.at(itemId);
 
-    withResourceStream(item, [this, &item](auto &res) {
+    withResourceStream(item, [this, &item, &optimize](auto &res) {
         auto nssBytes = make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
-        NcsTool(_gameId).toNSS(res, nss, *_routines);
+        NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
         auto page = make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
         page->nssContent = *nssBytes;

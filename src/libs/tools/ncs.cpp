@@ -111,12 +111,17 @@ void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesyste
     toNSS(ncs, nss, routines);
 }
 
-void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines) {
+void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines, bool optimize) {
     auto reader = NcsReader("");
     reader.load(ncs);
 
-    auto optimizer = ExpressionTreeOptimizer();
-    auto exprTree = ExpressionTree::fromProgram(*reader.program(), routines, optimizer);
+    unique_ptr<IExpressionTreeOptimizer> optimizer;
+    if (optimize) {
+        optimizer = make_unique<ExpressionTreeOptimizer>();
+    } else {
+        optimizer = make_unique<NoOpExpressionTreeOptimizer>();
+    }
+    auto exprTree = ExpressionTree::fromProgram(*reader.program(), routines, *optimizer);
 
     auto writer = NssWriter(exprTree, routines);
     writer.save(nss);

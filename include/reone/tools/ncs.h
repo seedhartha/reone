@@ -52,7 +52,7 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &input) const override;
 
     void toPCODE(IInputStream &ncs, IOutputStream &pcode, game::Routines &routines);
-    void toNSS(IInputStream &ncs, IOutputStream &nss, game::Routines &routines);
+    void toNSS(IInputStream &ncs, IOutputStream &nss, game::Routines &routines, bool optimize = true);
 
 private:
     game::GameID _gameId;

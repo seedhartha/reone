@@ -80,6 +80,11 @@ public:
     virtual void optimize(ExpressionTree &tree) = 0;
 };
 
+class NoOpExpressionTreeOptimizer : public IExpressionTreeOptimizer, boost::noncopyable {
+public:
+    void optimize(ExpressionTree &tree) override {}
+};
+
 class ExpressionTreeOptimizer : public IExpressionTreeOptimizer, boost::noncopyable {
 public:
     void optimize(ExpressionTree &tree) override;
