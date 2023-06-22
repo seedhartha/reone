@@ -245,10 +245,12 @@ struct VectorIndexExpression : Expression {
 };
 
 struct GlobalVariable {
-    ParameterExpression &param;
+    ParameterExpression *param {nullptr};
     Variable value;
 
-    GlobalVariable(ParameterExpression &param, Variable value) :
+    GlobalVariable() = default;
+
+    GlobalVariable(ParameterExpression *param, Variable value) :
         param(param),
         value(value) {
     }

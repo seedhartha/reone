@@ -71,7 +71,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
         auto paramExpr = static_cast<ParameterExpression *>(expression.get());
         if (paramExpr->locality == ParameterLocality::Global) {
-            globals.push_back(GlobalVariable(*paramExpr, Variable::ofNull()));
+            globals.push_back(GlobalVariable(paramExpr, Variable::ofNull()));
         }
     }
     int mainFuncIdx;

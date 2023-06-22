@@ -38,11 +38,11 @@ void NssWriter::save(IOutputStream &stream) {
     if (!_program.globals().empty()) {
         for (auto &global : _program.globals()) {
             if (global.value.type != VariableType::Void) {
-                writeExpression(0, true, global.param, writer);
+                writeExpression(0, true, *global.param, writer);
                 writer.put(" = ");
                 writer.put(describeConstant(global.value));
             } else {
-                writeExpression(0, true, global.param, writer);
+                writeExpression(0, true, *global.param, writer);
             }
             writer.putLine(";");
         }

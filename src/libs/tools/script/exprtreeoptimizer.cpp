@@ -136,8 +136,14 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
 void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext &ctx) {
     tree.functions().erase(tree.functions().begin()); // __start
     if (!tree.globals().empty()) {
-        for (auto &global : tree.globals()) {
-            global.value = evaluate(global.param, ctx);
+        for (auto it = tree.globals().begin(); it != tree.globals().end();) {
+            it->value = evaluate(*it->param, ctx);
+            auto &globalEvents = ctx.parameters.at(it->param);
+            if (globalEvents.reads.empty()) {
+                it = tree.globals().erase(it);
+                continue;
+            }
+            ++it;
         }
         tree.functions().erase(tree.functions().begin()); // __globals
     }
