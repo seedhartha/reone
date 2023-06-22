@@ -27,7 +27,7 @@ namespace script {
 void ExpressionTreeOptimizer::optimize(ExpressionTree &tree) {
     auto ctx = make_unique<OptimizationContext>();
     analyze(tree, *ctx);
-    compact(*ctx);
+    compact(tree, *ctx);
 }
 
 void ExpressionTreeOptimizer::analyze(ExpressionTree &tree, OptimizationContext &ctx) {
@@ -133,7 +133,15 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
     }
 }
 
-void ExpressionTreeOptimizer::compact(OptimizationContext &ctx) {
+void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext &ctx) {
+    tree.functions().erase(tree.functions().begin()); // __start
+    if (!tree.globals().empty()) {
+        for (auto &global : tree.globals()) {
+            global.value = evaluate(global.param, ctx);
+        }
+        tree.functions().erase(tree.functions().begin()); // __globals
+    }
+
     while (!ctx.blocksToCompact.empty()) {
         auto block = ctx.blocksToCompact.top();
         ctx.blocksToCompact.pop();
@@ -212,6 +220,27 @@ void ExpressionTreeOptimizer::compact(OptimizationContext &ctx) {
             ++it;
         }
     }
+}
+
+Variable ExpressionTreeOptimizer::evaluate(Expression &expr, OptimizationContext &ctx) {
+    if (expr.type == ExpressionType::Constant) {
+        return static_cast<ConstantExpression *>(&expr)->value;
+    }
+    if (expr.type == ExpressionType::Parameter) {
+        auto paramExpr = static_cast<ParameterExpression *>(&expr);
+        auto &paramEvents = ctx.parameters.at(paramExpr);
+        if (!paramEvents.writes.empty()) {
+            auto &write = paramEvents.writes.front();
+            return evaluate(*write.value, ctx);
+        } else {
+            return Variable::ofNull();
+        }
+    }
+    if (expr.type == ExpressionType::Negate) {
+        auto negateExpr = static_cast<UnaryExpression *>(&expr);
+        return -evaluate(*negateExpr->operand, ctx);
+    }
+    throw NotImplementedException();
 }
 
 } // namespace script

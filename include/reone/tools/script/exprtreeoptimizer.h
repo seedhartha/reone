@@ -93,7 +93,9 @@ private:
     void analyze(ExpressionTree &tree, OptimizationContext &ctx);
     void analyzeFunction(Function &func, OptimizationContext &ctx);
 
-    void compact(OptimizationContext &ctx);
+    void compact(ExpressionTree &tree, OptimizationContext &ctx);
+
+    Variable evaluate(Expression &param, OptimizationContext &ctx);
 };
 
 } // namespace script

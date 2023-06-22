@@ -51,13 +51,19 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     }
 
     auto startFunc = make_shared<Function>();
+    startFunc->name = "__start";
     startFunc->offset = 13;
 
     auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
+    ctx->functions[startFunc->offset] = startFunc;
     ctx->pushCallStack(startFunc.get());
 
     decompileFunction(*startFunc, ctx);
 
+    auto functions = vector<shared_ptr<Function>>();
+    for (auto &[offset, func] : offsetToFunc) {
+        functions.push_back(func);
+    }
     auto globals = vector<GlobalVariable>();
     for (auto &expression : expressions) {
         if (expression->type != ExpressionType::Parameter) {
@@ -65,23 +71,33 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         }
         auto paramExpr = static_cast<ParameterExpression *>(expression.get());
         if (paramExpr->locality == ParameterLocality::Global) {
-            globals.push_back(GlobalVariable(*paramExpr, evaluate(*paramExpr)));
+            globals.push_back(GlobalVariable(*paramExpr, Variable::ofNull()));
         }
     }
-    auto functions = vector<shared_ptr<Function>>();
-    for (auto &[offset, func] : offsetToFunc) {
-        functions.push_back(func);
-    }
+    int mainFuncIdx;
     if (!globals.empty()) {
-        functions.erase(functions.begin());
-    }
-    if (!functions.empty()) {
-        auto &mainFunc = functions.front();
-        if (mainFunc->returnType != VariableType::Void) {
-            mainFunc->name = "StartingConditional";
-        } else {
-            mainFunc->name = "main";
+        auto &globalsFunc = functions[1];
+        globalsFunc->name = "__globals";
+        for (auto it = globalsFunc->block->expressions.begin(); it != globalsFunc->block->expressions.end(); ++it) {
+            auto expr = *it;
+            if (expr->type != ExpressionType::Parameter) {
+                continue;
+            }
+            auto paramExpr = static_cast<ParameterExpression *>(expr);
+            if (paramExpr->locality == ParameterLocality::Global) {
+                it = globalsFunc->block->expressions.erase(it);
+                continue;
+            }
         }
+        mainFuncIdx = 2;
+    } else {
+        mainFuncIdx = 1;
+    }
+    auto &mainFunc = functions[mainFuncIdx];
+    if (mainFunc->returnType != VariableType::Void) {
+        mainFunc->name = "StartingConditional";
+    } else {
+        mainFunc->name = "main";
     }
 
     auto tree = ExpressionTree(
@@ -303,7 +319,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto paramExpr = make_shared<ParameterExpression>();
                     paramExpr->offset = ins.offset;
                     paramExpr->variableType = constExpr->value.type;
-                    paramExpr->assignedFrom = constExpr.get();
 
                     auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
@@ -428,7 +443,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         block->append(assignExpr.get());
 
                         destination->variableType = right.param->variableType;
-                        destination->assignedFrom = right.param;
                         ctx->expressions.push_back(std::move(assignExpr));
                     }
                 } else if (ins.type == InstructionType::CPTOPSP ||
@@ -469,7 +483,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         auto paramExpr = make_shared<ParameterExpression>();
                         paramExpr->offset = ins.offset;
                         paramExpr->variableType = source->variableType;
-                        paramExpr->assignedFrom = source;
                         if (numFrames > 1) {
                             paramExpr->suffix = to_string(i);
                         }
@@ -515,7 +528,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto resultExpr = make_shared<ParameterExpression>();
                     resultExpr->offset = ins.offset;
                     resultExpr->variableType = value->variableType;
-                    resultExpr->assignedFrom = unaryExpr.get();
 
                     auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
@@ -1144,32 +1156,6 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
     expressions.push_back(std::move(zParamExpr));
     expressions.push_back(std::move(zIndexExpr));
     expressions.push_back(std::move(zAssignExpr));
-}
-
-Variable ExpressionTree::evaluate(Expression &expr) {
-    switch (expr.type) {
-    case ExpressionType::Constant:
-        return static_cast<ConstantExpression *>(&expr)->value;
-    case ExpressionType::Parameter: {
-        auto paramExpr = static_cast<ParameterExpression *>(&expr);
-        if (!paramExpr->assignedFrom) {
-            return Variable::ofNull();
-        }
-        return evaluate(*paramExpr->assignedFrom);
-    }
-    case ExpressionType::Negate: {
-        auto unaryExpr = static_cast<UnaryExpression *>(&expr);
-        if (unaryExpr->operand->type == ExpressionType::Parameter) {
-            auto paramOperand = static_cast<ParameterExpression *>(unaryExpr->operand);
-            if (!paramOperand->assignedFrom) {
-                return Variable::ofNull();
-            }
-            return -evaluate(*paramOperand->assignedFrom);
-        }
-    }
-    default:
-        throw NotImplementedException("Expression evaluation not implemented");
-    }
 }
 
 bool ExpressionTree::isUnaryExpression(ExpressionType type) {

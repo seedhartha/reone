@@ -36,7 +36,6 @@ void NssWriter::save(IOutputStream &stream) {
     auto writer = TextWriter(stream);
 
     if (!_program.globals().empty()) {
-        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
         for (auto &global : _program.globals()) {
             if (global.value.type != VariableType::Void) {
                 writeExpression(0, true, global.param, writer);
@@ -82,10 +81,6 @@ void NssWriter::writeBlock(int level, const BlockExpression &block, TextWriter &
 
     writer.putLine(indent + string("{"));
     for (auto &innerExpr : block.expressions) {
-        if (innerExpr->type == ExpressionType::Parameter &&
-            static_cast<const ParameterExpression *>(innerExpr)->locality == ParameterLocality::Global) {
-            continue;
-        }
         if (innerExpr->type == ExpressionType::Label) {
             writer.put(indent);
         } else {

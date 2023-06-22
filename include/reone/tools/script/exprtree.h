@@ -133,8 +133,6 @@ struct ParameterExpression : Expression {
     bool outerRead {false};
     bool outerModified {false};
 
-    Expression *assignedFrom {nullptr};
-
     ParameterExpression() :
         Expression(ExpressionType::Parameter) {
     }
@@ -267,7 +265,7 @@ public:
         _expressions(std::move(expressions)) {
     }
 
-    const std::vector<GlobalVariable> &globals() const {
+    std::vector<GlobalVariable> &globals() {
         return _globals;
     }
 
@@ -382,8 +380,6 @@ private:
     std::vector<std::shared_ptr<Expression>> _expressions;
 
     static void decompileFunction(Function &func, std::shared_ptr<DecompilationContext> ctx);
-
-    static Variable evaluate(Expression &expr);
 
     static std::unique_ptr<ConstantExpression> constantExpression(const Instruction &ins);
     static std::unique_ptr<ParameterExpression> parameterExpression(const Instruction &ins);
