@@ -175,17 +175,30 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
                expression.type == ExpressionType::Increment ||
                expression.type == ExpressionType::Decrement) {
         auto &unaryExpr = static_cast<const UnaryExpression &>(expression);
-        auto name = describeParameter(*static_cast<ParameterExpression *>(unaryExpr.operand));
+        string prefix, suffix;
         if (expression.type == ExpressionType::Negate) {
-            writer.put("-" + name);
+            prefix = "-";
         } else if (expression.type == ExpressionType::OnesComplement) {
-            writer.put("~" + name);
+            prefix = "~";
         } else if (expression.type == ExpressionType::Not) {
-            writer.put("!" + name);
+            prefix = "!";
         } else if (expression.type == ExpressionType::Increment) {
-            writer.put(name + "++");
+            suffix = "++";
         } else if (expression.type == ExpressionType::Decrement) {
-            writer.put(name + "--");
+            suffix = "--";
+        }
+        if (!prefix.empty()) {
+            writer.put(prefix);
+        }
+        if (ExpressionTree::isBinaryExpression(unaryExpr.operand->type)) {
+            writer.put("(");
+        }
+        writeExpression(blockLevel, false, *unaryExpr.operand, writer);
+        if (ExpressionTree::isBinaryExpression(unaryExpr.operand->type)) {
+            writer.put(")");
+        }
+        if (!suffix.empty()) {
+            writer.put(suffix);
         }
 
     } else if (expression.type == ExpressionType::Assign ||

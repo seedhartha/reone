@@ -273,6 +273,11 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                             auto readCall = static_cast<CallExpression *>(read.expression);
                             readCall->arguments[read.callArgIdx] = write.value;
                             continue;
+                        } else if (ExpressionTree::isUnaryExpression(read.expression->type)) {
+                            it = block->expressions.erase(it);
+                            auto readUnary = static_cast<UnaryExpression *>(read.expression);
+                            readUnary->operand = write.value;
+                            continue;
                         } else if (ExpressionTree::isBinaryExpression(read.expression->type)) {
                             it = block->expressions.erase(it);
                             auto readBinary = static_cast<BinaryExpression *>(read.expression);
