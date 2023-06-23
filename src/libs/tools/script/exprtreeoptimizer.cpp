@@ -54,7 +54,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                 analyzedBlocks.insert(blockExpr);
                 ctx.blocksToCompact.push(blockExpr);
             }
-        } else if (expr->type == ExpressionType::Parameter) {
+        } else if (expr->type == ExpressionType::Parameter && container && container->type != ExpressionType::Block) {
             auto paramExpr = static_cast<ParameterExpression *>(expr);
             auto read = ParameterReadEvent(container);
             read.binaryDir = binaryDir;
@@ -137,12 +137,12 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
     tree.functions().erase(tree.functions().begin()); // __start
     if (!tree.globals().empty()) {
         for (auto it = tree.globals().begin(); it != tree.globals().end();) {
-            it->value = evaluate(*it->param, ctx);
-            auto &globalEvents = ctx.parameters.at(it->param);
+            auto &globalEvents = ctx.parameters[it->param];
             if (globalEvents.reads.empty()) {
                 it = tree.globals().erase(it);
                 continue;
             }
+            it->value = evaluate(*it->param, ctx);
             ++it;
         }
         tree.functions().erase(tree.functions().begin()); // __globals
