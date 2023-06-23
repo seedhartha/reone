@@ -71,6 +71,7 @@ struct OptimizationContext {
     std::map<ParameterExpression *, ParameterEvents> parameters;
     std::map<LabelExpression *, LabelEvents> labels;
     std::stack<BlockExpression *> blocksToCompact;
+    std::map<CallExpression *, ParameterExpression *> callDestinations;
 };
 
 class IExpressionTreeOptimizer {

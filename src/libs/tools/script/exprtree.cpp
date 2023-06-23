@@ -52,10 +52,10 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
 
     auto startFunc = make_shared<Function>();
     startFunc->name = "__start";
-    startFunc->offset = 13;
+    startFunc->start = 13;
 
     auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
-    ctx->functions[startFunc->offset] = startFunc;
+    ctx->functions[startFunc->start] = startFunc;
     ctx->pushCallStack(startFunc.get());
 
     decompileFunction(*startFunc, ctx);
@@ -94,11 +94,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
         mainFuncIdx = 1;
     }
     auto &mainFunc = functions[mainFuncIdx];
-    if (mainFunc->returnType != VariableType::Void) {
-        mainFunc->name = "StartingConditional";
-    } else {
-        mainFunc->name = "main";
-    }
+    mainFunc->name = "main";
 
     auto tree = ExpressionTree(
         std::move(globals),
@@ -111,10 +107,10 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
 }
 
 void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationContext> ctx) {
-    debug(boost::format("Decompiling function at %08x") % func.offset);
+    debug(boost::format("Decompiling function at %08x") % func.start);
 
     auto mainBlock = make_shared<BlockExpression>();
-    mainBlock->offset = func.offset;
+    mainBlock->offset = func.start;
 
     auto blocksToDecompile = stack<pair<BlockExpression *, shared_ptr<DecompilationContext>>>();
     blocksToDecompile.push(make_pair(mainBlock.get(), ctx));
@@ -122,6 +118,8 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
     func.block = mainBlock.get();
     ctx->expressions.push_back(std::move(mainBlock));
+
+    uint32_t maxOffset = func.start;
 
     while (!blocksToDecompile.empty()) {
         auto [block, ctx] = blocksToDecompile.top();
@@ -132,6 +130,8 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
             debug(boost::format("Begin decompiling block at %08x") % block->offset);
 
             for (uint32_t offset = block->offset; offset < ctx->program.length();) {
+                maxOffset = std::max(maxOffset, offset);
+
                 auto maybeLabel = ctx->labels.find(offset);
                 if (maybeLabel != ctx->labels.end()) {
                     block->append(maybeLabel->second);
@@ -175,9 +175,9 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                     if (ctx->functions.count(absJumpOffset) == 0) {
                         sub = make_shared<Function>();
-                        sub->offset = absJumpOffset;
+                        sub->start = absJumpOffset;
 
-                        ctx->functions[sub->offset] = sub;
+                        ctx->functions[sub->start] = sub;
 
                         auto outerParams = map<int, ParameterExpression *>();
 
@@ -188,7 +188,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         decompileFunction(*sub, subCtx);
 
                         for (auto &[stackOffset, param] : outerParams) {
-                            sub->arguments.push_back(FunctionArgument(param->variableType, stackOffset, param->outerModified));
+                            sub->arguments.push_back(FunctionArgument(param, param->variableType, stackOffset, param->outerModified));
                         }
                     } else {
                         sub = ctx->functions.at(absJumpOffset);
@@ -953,7 +953,9 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
         }
     }
 
-    debug(boost::format("End decompiling function at %08x") % func.offset);
+    func.end = maxOffset;
+
+    debug(boost::format("End decompiling function at %08x") % func.start);
 }
 
 unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {

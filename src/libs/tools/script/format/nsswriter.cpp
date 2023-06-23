@@ -143,6 +143,9 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
                 writer.put(", ");
             }
             auto argExpr = callExpr.arguments[i];
+            if (callExpr.function->arguments[i].pointer) {
+                writer.put("&");
+            }
             writeExpression(blockLevel, false, *argExpr, writer);
         }
         writer.put(")");
@@ -299,7 +302,7 @@ string NssWriter::indentAtLevel(int level) {
 }
 
 string NssWriter::describeFunction(const Function &function) {
-    return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.offset);
+    return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.start);
 }
 
 string NssWriter::describeLabel(const LabelExpression &labelExpr) {

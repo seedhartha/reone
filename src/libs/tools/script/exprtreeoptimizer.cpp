@@ -97,6 +97,9 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                     auto read = ParameterReadEvent(callExpr);
                     read.callArgIdx = static_cast<int>(i);
                     ctx.parameters[paramArg].reads.push_back(std::move(read));
+                    if (callExpr->function->arguments[i].pointer) {
+                        ctx.parameters[paramArg].writes.push_back(ParameterWriteEvent(callExpr, callExpr));
+                    }
                 }
             }
         } else if (expr->type == ExpressionType::Vector) {
@@ -147,12 +150,61 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
         }
         tree.functions().erase(tree.functions().begin()); // __globals
     }
+
     for (auto &func : tree.functions()) {
-        if (func->returnType == VariableType::Void &&
-            !func->block->expressions.empty() &&
-            func->block->expressions.back()->type == ExpressionType::Return) {
-            func->block->expressions.pop_back();
+        auto retValArg = func->arguments.end();
+        for (auto argIter = func->arguments.begin(); argIter != func->arguments.end(); ++argIter) {
+            auto &argEvents = ctx.parameters[argIter->param];
+            if (argEvents.reads.empty() && !argEvents.writes.empty()) {
+                retValArg = argIter;
+            }
         }
+        ParameterExpression *retVal = nullptr;
+        int retValArgIdx = -1;
+        if (retValArg != func->arguments.end()) {
+            retVal = retValArg->param;
+            retVal->locality = ParameterLocality::ReturnValue;
+            retValArgIdx = std::distance(func->arguments.begin(), retValArg);
+            func->returnType = retVal->variableType;
+            func->retValStackOffset = retValArg->stackOffset;
+            func->arguments.erase(retValArg);
+        }
+        if (func->returnType == VariableType::Void) {
+            if (!func->block->expressions.empty() && func->block->expressions.back()->type == ExpressionType::Return) {
+                func->block->expressions.pop_back();
+            }
+        } else {
+            func->block->expressions.insert(func->block->expressions.begin(), retVal);
+            for (auto &expr : tree.expressions()) {
+                if (expr->type == ExpressionType::Return) {
+                    auto retExpr = static_cast<ReturnExpression *>(expr.get());
+                    if (!func->contains(retExpr->offset)) {
+                        continue;
+                    }
+                    retExpr->value = retVal;
+                } else if (expr->type == ExpressionType::Call) {
+                    auto callExpr = static_cast<CallExpression *>(expr.get());
+                    if (callExpr->function != func.get()) {
+                        continue;
+                    }
+                    Expression *destination = callExpr->arguments[retValArgIdx];
+                    auto argToErase = callExpr->arguments.begin();
+                    std::advance(argToErase, retValArgIdx);
+                    callExpr->arguments.erase(argToErase);
+                    if (destination && destination->type == ExpressionType::Parameter) {
+                        ctx.callDestinations[callExpr] = static_cast<ParameterExpression *>(destination);
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+
+    auto &mainFunc = tree.functions().front();
+    if (mainFunc->returnType != VariableType::Void) {
+        mainFunc->name = "StartingConditional";
+    } else {
+        mainFunc->name = "main";
     }
 
     while (!ctx.blocksToCompact.empty()) {
@@ -184,6 +236,19 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                             argIter = actionExpr->arguments.insert(argIter, blockArg->expressions.front());
                         }
                     }
+                }
+            } else if (expr->type == ExpressionType::Call) {
+                auto callExpr = static_cast<CallExpression *>(expr);
+                if (ctx.callDestinations.count(callExpr) > 0) {
+                    auto destination = ctx.callDestinations.at(callExpr);
+                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    assignExpr->offset = callExpr->offset;
+                    assignExpr->left = destination;
+                    assignExpr->right = callExpr;
+                    it = block->expressions.erase(it);
+                    it = ++block->expressions.insert(it, assignExpr.get());
+                    tree.expressions().push_back(std::move(assignExpr));
+                    continue;
                 }
             } else if (ExpressionTree::isBinaryExpression(expr->type)) {
                 auto binaryExpr = static_cast<BinaryExpression *>(expr);

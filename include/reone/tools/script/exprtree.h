@@ -198,12 +198,17 @@ struct ActionExpression : Expression {
 };
 
 struct FunctionArgument {
+    ParameterExpression *param {nullptr};
     VariableType type;
     int stackOffset;
     bool pointer {false};
 
-    FunctionArgument(VariableType type, int stackOffset, bool pointer) :
+    FunctionArgument(ParameterExpression *param,
+                     VariableType type,
+                     int stackOffset,
+                     bool pointer) :
         type(type),
+        param(param),
         stackOffset(stackOffset),
         pointer(pointer) {
     }
@@ -211,11 +216,16 @@ struct FunctionArgument {
 
 struct Function {
     std::string name;
-    uint32_t offset {0};
+    uint32_t start {0};
+    uint32_t end {0};
     std::vector<FunctionArgument> arguments;
     VariableType returnType {VariableType::Void};
     int retValStackOffset {0};
     BlockExpression *block {nullptr};
+
+    bool contains(uint32_t offset) const {
+        return start <= offset && offset >= end;
+    }
 };
 
 struct CallExpression : Expression {
@@ -275,7 +285,7 @@ public:
         return _functions;
     }
 
-    const std::vector<std::shared_ptr<Expression>> &expressions() const {
+    std::vector<std::shared_ptr<Expression>> &expressions() {
         return _expressions;
     }
 
