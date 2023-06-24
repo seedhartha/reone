@@ -99,7 +99,6 @@ struct Expression {
 
 struct BlockExpression : Expression {
     std::vector<Expression *> expressions;
-    bool initialized {false};
 
     BlockExpression() :
         Expression(ExpressionType::Block) {

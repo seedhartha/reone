@@ -238,8 +238,8 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                     if (arg->type == ExpressionType::Block) {
                         auto blockArg = static_cast<BlockExpression *>(arg);
                         if (blockArg->expressions.size() == 2ll &&
-                            blockArg->expressions.front()->type == ExpressionType::Action &&
-                            blockArg->expressions.back()->type == ExpressionType::Return) {
+                            blockArg->expressions.back()->type == ExpressionType::Return &&
+                            (blockArg->expressions.front()->type == ExpressionType::Action || blockArg->expressions.front()->type == ExpressionType::Call)) {
                             int argIdx = std::distance(actionExpr->arguments.begin(), argIter);
                             debug(boost::format("Degenerate block argument %d in action call at %08x collapsed") % argIdx % blockArg->offset);
                             argIter = actionExpr->arguments.erase(argIter);

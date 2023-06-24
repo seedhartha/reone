@@ -247,7 +247,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         auto gotoBlockExpr = make_shared<BlockExpression>();
                         gotoBlockExpr->offset = ins.offset;
                         gotoBlockExpr->append(gotoExpr.get());
-                        gotoBlockExpr->initialized = true;
                         ifTrueBlockPtr = gotoBlockExpr.get();
 
                         ctx->expressions.push_back(std::move(gotoExpr));
@@ -946,7 +945,6 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
             }
 
             debug(boost::format("End decompiling block at %08x") % block->offset);
-            block->initialized = true;
 
         } catch (const logic_error &e) {
             error(boost::format("Error decompiling block at %08x: %s") % block->offset % string(e.what()));
