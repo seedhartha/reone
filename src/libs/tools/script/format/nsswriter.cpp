@@ -23,6 +23,7 @@
 #include "reone/system/exception/argument.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/exception/validation.h"
+#include "reone/system/logutil.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/textwriter.h"
 
@@ -36,13 +37,14 @@ void NssWriter::save(IOutputStream &stream) {
     auto writer = TextWriter(stream);
 
     if (!_program.globals().empty()) {
+        auto ctx = WriteContext();
         for (auto &global : _program.globals()) {
             if (global.value.type != VariableType::Void) {
-                writeExpression(0, true, *global.param, writer);
+                writeExpression(0, true, *global.param, ctx, writer);
                 writer.put(" = ");
                 writer.put(describeConstant(global.value));
             } else {
-                writeExpression(0, true, *global.param, writer);
+                writeExpression(0, true, *global.param, ctx, writer);
             }
             writer.putLine(";");
         }
@@ -67,14 +69,96 @@ void NssWriter::writeFunction(const Function &function, TextWriter &writer) {
         }
     }
     writer.putLine(str(boost::format("%s %s(%s)") % returnType % name % boost::join(params, ", ")));
-
-    writeBlock(0, *function.block, writer);
-
-    writer.putLine("");
-    writer.putLine("");
+    writeBlocks(function, writer);
+    writer.put("\n\n");
 }
 
-void NssWriter::writeBlock(int level, const BlockExpression &block, TextWriter &writer) {
+struct BlockLevelCompare {
+    bool operator()(const pair<BlockExpression *, int> &a, const pair<BlockExpression *, int> &b) const {
+        if (a.second > b.second) {
+            return true;
+        }
+        if (a.second < b.second) {
+            return false;
+        }
+        if (a.first->offset > b.first->offset) {
+            return true;
+        }
+        if (a.first->offset < b.first->offset) {
+            return false;
+        }
+        return a.first < b.first;
+    }
+};
+
+void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
+    debug(boost::format("Writing blocks of function at %08x") % func.block->offset);
+    set<pair<BlockExpression *, int>, BlockLevelCompare> blocksToWrite;
+
+    queue<pair<Expression *, int>> exprToVisit;
+    exprToVisit.push(make_pair(func.block, 0));
+    while (!exprToVisit.empty()) {
+        auto [expr, level] = exprToVisit.front();
+        exprToVisit.pop();
+        if (expr->type == ExpressionType::Block) {
+            auto blockExpr = static_cast<BlockExpression *>(expr);
+            debug(boost::format("Visiting block (%p, %d) at %08x") % blockExpr % level % blockExpr->offset);
+            auto blockKey = make_pair(blockExpr, level);
+            if (blocksToWrite.count(blockKey) == 0) {
+                blocksToWrite.insert(blockKey);
+                for (auto nestedExpr : blockExpr->expressions) {
+                    exprToVisit.push(make_pair(nestedExpr, level + 1));
+                }
+            } else {
+                debug("Ignoring already written block");
+            }
+        } else if (expr->type == ExpressionType::Return) {
+            auto returnExpr = static_cast<ReturnExpression *>(expr);
+            if (returnExpr->value) {
+                exprToVisit.push(make_pair(returnExpr->value, level));
+            }
+        } else if (expr->type == ExpressionType::Conditional) {
+            auto conditionalExpr = static_cast<ConditionalExpression *>(expr);
+            exprToVisit.push(make_pair(conditionalExpr->test, level));
+            if (conditionalExpr->ifTrue) {
+                exprToVisit.push(make_pair(conditionalExpr->ifTrue, level));
+            }
+        } else if (expr->type == ExpressionType::Action) {
+            auto actionExpr = static_cast<ActionExpression *>(expr);
+            for (auto &arg : actionExpr->arguments) {
+                exprToVisit.push(make_pair(arg, level));
+            }
+        } else if (expr->type == ExpressionType::Call) {
+            auto callExpr = static_cast<CallExpression *>(expr);
+            for (auto &arg : callExpr->arguments) {
+                exprToVisit.push(make_pair(arg, level));
+            }
+        } else if (ExpressionTree::isUnaryExpression(expr->type)) {
+            auto unaryExpr = static_cast<UnaryExpression *>(expr);
+            exprToVisit.push(make_pair(unaryExpr->operand, level));
+        } else if (ExpressionTree::isBinaryExpression(expr->type)) {
+            auto binaryExpr = static_cast<BinaryExpression *>(expr);
+            exprToVisit.push(make_pair(binaryExpr->left, level));
+            exprToVisit.push(make_pair(binaryExpr->right, level));
+        }
+    }
+
+    auto blockString = string();
+    auto blockStream = ByteArrayOutputStream(blockString);
+    auto blockWriter = TextWriter(blockStream);
+    auto ctx = WriteContext();
+    for (auto [block, level] : blocksToWrite) {
+        debug(boost::format("Writing block (%p, %d)") % block % level);
+        blockString.clear();
+        writeBlock(level, *block, ctx, blockWriter);
+        auto blockKey = make_pair(block, level);
+        ctx.writtenBlocks[blockKey] = blockString;
+    }
+    auto &rootBlock = ctx.writtenBlocks.at(make_pair(func.block, 0));
+    writer.put(rootBlock);
+}
+
+void NssWriter::writeBlock(int level, const BlockExpression &block, WriteContext &ctx, TextWriter &writer) {
     auto innerLevel = 1 + level;
     auto indent = indentAtLevel(level);
     auto innerIndent = indentAtLevel(innerLevel);
@@ -86,7 +170,7 @@ void NssWriter::writeBlock(int level, const BlockExpression &block, TextWriter &
         } else {
             writer.put(innerIndent);
         }
-        writeExpression(innerLevel, true, *innerExpr, writer);
+        writeExpression(innerLevel, true, *innerExpr, ctx, writer);
         if (innerExpr->type != ExpressionType::Label &&
             innerExpr->type != ExpressionType::Conditional) {
             writer.put(";");
@@ -98,7 +182,7 @@ void NssWriter::writeBlock(int level, const BlockExpression &block, TextWriter &
     writer.put(indent + string("}"));
 }
 
-void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &expression, TextWriter &writer) {
+void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &expression, WriteContext &ctx, TextWriter &writer) {
     auto indent = indentAtLevel(blockLevel);
 
     if (expression.type == ExpressionType::Label) {
@@ -116,7 +200,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         writer.put("return");
         if (returnExpr.value) {
             writer.put(" ");
-            writeExpression(blockLevel, false, *returnExpr.value, writer);
+            writeExpression(blockLevel, false, *returnExpr.value, ctx, writer);
         }
 
     } else if (expression.type == ExpressionType::Constant) {
@@ -146,7 +230,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
             if (callExpr.function->arguments[i].pointer) {
                 writer.put("&");
             }
-            writeExpression(blockLevel, false, *argExpr, writer);
+            writeExpression(blockLevel, false, *argExpr, ctx, writer);
         }
         writer.put(")");
 
@@ -162,9 +246,14 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
             if (argExpr->type == ExpressionType::Block) {
                 auto blockArg = static_cast<BlockExpression *>(argExpr);
                 writer.putLine("");
-                writeBlock(blockLevel, *blockArg, writer);
+                auto blockKey = make_pair(blockArg, blockLevel);
+                if (ctx.writtenBlocks.count(blockKey) > 0) {
+                    writer.put(ctx.writtenBlocks.at(blockKey));
+                } else {
+                    warn(boost::format("Block (%p, %d) not written") % blockArg % blockLevel);
+                }
             } else {
-                writeExpression(blockLevel, false, *argExpr, writer);
+                writeExpression(blockLevel, false, *argExpr, ctx, writer);
             }
         }
         writer.put(")");
@@ -193,7 +282,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         if (ExpressionTree::isBinaryExpression(unaryExpr.operand->type)) {
             writer.put("(");
         }
-        writeExpression(blockLevel, false, *unaryExpr.operand, writer);
+        writeExpression(blockLevel, false, *unaryExpr.operand, ctx, writer);
         if (ExpressionTree::isBinaryExpression(unaryExpr.operand->type)) {
             writer.put(")");
         }
@@ -270,7 +359,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         if (ExpressionTree::isBinaryExpression(binaryExpr.left->type)) {
             writer.put("(");
         }
-        writeExpression(blockLevel, declareLeft, *binaryExpr.left, writer);
+        writeExpression(blockLevel, declareLeft, *binaryExpr.left, ctx, writer);
         if (ExpressionTree::isBinaryExpression(binaryExpr.left->type)) {
             writer.put(")");
         }
@@ -278,7 +367,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         if (ExpressionTree::isBinaryExpression(binaryExpr.right->type)) {
             writer.put("(");
         }
-        writeExpression(blockLevel, false, *binaryExpr.right, writer);
+        writeExpression(blockLevel, false, *binaryExpr.right, ctx, writer);
         if (ExpressionTree::isBinaryExpression(binaryExpr.right->type)) {
             writer.put(")");
         }
@@ -286,10 +375,15 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
     } else if (expression.type == ExpressionType::Conditional) {
         auto &condExpr = static_cast<const ConditionalExpression &>(expression);
         writer.put("if(");
-        writeExpression(blockLevel, false, *condExpr.test, writer);
+        writeExpression(blockLevel, false, *condExpr.test, ctx, writer);
         writer.putLine(")");
         if (condExpr.ifTrue) {
-            writeBlock(blockLevel, *condExpr.ifTrue, writer);
+            auto blockKey = make_pair(condExpr.ifTrue, blockLevel);
+            if (ctx.writtenBlocks.count(blockKey) > 0) {
+                writer.put(ctx.writtenBlocks.at(blockKey));
+            } else {
+                warn(boost::format("Block (%p, %d) not written") % condExpr.ifTrue % blockLevel);
+            }
         }
         writer.putLine("");
 

@@ -96,7 +96,7 @@ private:
 
     void compact(ExpressionTree &tree, OptimizationContext &ctx);
 
-    Variable evaluate(Expression &param, OptimizationContext &ctx);
+    Variable evaluate(Expression &param, Function &globalsFunc, OptimizationContext &ctx);
 };
 
 } // namespace script
