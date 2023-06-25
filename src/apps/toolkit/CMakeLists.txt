@@ -22,6 +22,7 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/mainviewmodel.h)
 
 set(TOOLKIT_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/mainframe.cpp
     ${TOOLKIT_SOURCE_DIR}/mainviewmodel.cpp)
