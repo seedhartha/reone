@@ -33,7 +33,6 @@
 #include "reone/game/types.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 
@@ -163,7 +162,7 @@ void MainMenu::setup3DView() {
     SceneInitializer(sceneGraph)
         .aspect(aspect)
         .depth(kDefaultClipPlaneNear, 10.0f)
-        .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+        .modelSupplier(bind(&MainMenu::getKotorModel, this, std::placeholders::_1))
         .modelScale(kKotorModelSize)
         .cameraFromModelNode("camerahook")
         .invoke();

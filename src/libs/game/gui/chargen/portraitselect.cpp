@@ -39,7 +39,6 @@
 #include "reone/game/types.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 
@@ -116,7 +115,7 @@ void PortraitSelection::loadHeadModel() {
     SceneInitializer(sceneGraph)
         .aspect(aspect)
         .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
+        .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, std::placeholders::_1))
         .modelScale(kModelScale)
         .cameraFromModelNode(_charGen.character().gender == Gender::Male ? "camerahookm" : "camerahookf")
         .invoke();

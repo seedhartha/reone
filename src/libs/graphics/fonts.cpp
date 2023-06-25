@@ -24,7 +24,6 @@
 #include "reone/graphics/window.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::resource;
 

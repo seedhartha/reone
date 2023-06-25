@@ -61,7 +61,6 @@
 #include "reone/game/object/factory.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;

@@ -34,7 +34,6 @@
 #include "reone/game/types.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 
@@ -411,7 +410,7 @@ void CharacterGeneration::reloadCharacterModel() {
     SceneInitializer(sceneGraph)
         .aspect(aspect)
         .depth(kDefaultClipPlaneNear, 10.0f)
-        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
+        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, std::placeholders::_1))
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
         .invoke();

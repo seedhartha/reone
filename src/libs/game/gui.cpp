@@ -30,7 +30,6 @@
 #include "reone/system/exception/validation.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -61,7 +60,7 @@ void GameGUI::init() {
     if (_resRef.empty()) {
         throw ValidationException("GUI resRef must not be empty");
     }
-    _gui = _services.gui.guis.get(_resRef, bind(&GameGUI::preload, this, _1));
+    _gui = _services.gui.guis.get(_resRef, bind(&GameGUI::preload, this, std::placeholders::_1));
     if (!_gui) {
         throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
     }

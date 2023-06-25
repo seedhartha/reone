@@ -43,7 +43,6 @@
 #include "reone/system/exception/validation.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::graphics;
 using namespace reone::resource;

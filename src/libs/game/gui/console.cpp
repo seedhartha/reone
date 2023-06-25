@@ -43,7 +43,6 @@
 #include "reone/game/party.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::gui;
 using namespace reone::graphics;
@@ -62,21 +61,21 @@ static constexpr float kTextOffset = 3.0f;
 void Console::init() {
     _font = _services.graphics.fonts.get("fnt_console");
 
-    addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
-    addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
-    addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, _1, _2));
-    addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, _1, _2));
-    addCommand("runscript", "rs", "run script", bind(&Console::cmdRunScript, this, _1, _2));
-    addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
-    addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
-    addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
-    addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
-    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
-    addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
-    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", bind(&Console::cmdShowWalkmesh, this, _1, _2));
-    addCommand("showtriggers", "st", "toggle rendering triggers", bind(&Console::cmdShowTriggers, this, _1, _2));
+    addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("runscript", "rs", "run script", bind(&Console::cmdRunScript, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", bind(&Console::cmdShowWalkmesh, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("showtriggers", "st", "toggle rendering triggers", bind(&Console::cmdShowTriggers, this, std::placeholders::_1, std::placeholders::_2));
 
-    addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, _1, _2));
+    addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void Console::addCommand(string name, string alias, string description, CommandHandler handler) {

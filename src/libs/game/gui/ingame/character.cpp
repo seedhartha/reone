@@ -32,7 +32,6 @@
 #include "reone/game/types.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 
@@ -231,7 +230,7 @@ void CharacterMenu::refresh3D() {
     SceneInitializer(sceneGraph)
         .aspect(aspect)
         .depth(kDefaultClipPlaneNear, 10.0f)
-        .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
+        .modelSupplier(bind(&CharacterMenu::getSceneModel, this, std::placeholders::_1))
         .modelOffset(glm::vec2(0.0f, 1.7f))
         .cameraFromModelNode("camerahook")
         .invoke();

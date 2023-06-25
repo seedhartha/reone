@@ -29,7 +29,6 @@
 #include "reone/game/party.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 

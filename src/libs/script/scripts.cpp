@@ -22,7 +22,6 @@
 #include "reone/script/format/ncsreader.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::resource;
 

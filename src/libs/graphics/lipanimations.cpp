@@ -18,14 +18,11 @@
 
 #include "reone/graphics/lipanimations.h"
 
+#include "reone/graphics/format/lipreader.h"
+#include "reone/resource/resources.h"
 #include "reone/system/stream/bytearrayinput.h"
 
-#include "reone/resource/resources.h"
-
-#include "reone/graphics/format/lipreader.h"
-
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::resource;
 

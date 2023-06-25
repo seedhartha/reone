@@ -27,7 +27,6 @@
 #include "reone/script/variable.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 namespace reone {
 

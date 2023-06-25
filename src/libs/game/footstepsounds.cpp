@@ -22,7 +22,6 @@
 #include "reone/resource/2das.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::resource;

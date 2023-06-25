@@ -23,7 +23,6 @@
 #include "reone/resource/resources.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 namespace reone {
 
