@@ -28,6 +28,7 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
+#include "reone/system/exception/argument.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
@@ -81,7 +82,12 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
 }
 
 void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
-    auto pageType = getPageType(id.type);
+    PageType pageType;
+    try {
+        pageType = getPageType(id.type);
+    } catch (const ArgumentException &e) {
+        return;
+    }
     auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id, &pageType](auto &page) {
         return page->resourceId == id && page->type == pageType;
     });
@@ -361,7 +367,7 @@ PageType MainViewModel::getPageType(ResourceType type) const {
     case ResourceType::Wav:
         return PageType::Audio;
     default:
-        throw logic_error(str(boost::format("Unsupported resource type: %d") % static_cast<int>(type)));
+        throw ArgumentException(str(boost::format("Unsupported resource type: %d") % static_cast<int>(type)));
     }
 }
 
@@ -847,12 +853,10 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
         _modelHeading += dx / glm::pi<float>() / 64.0f;
         //_modelPitch += dy / glm::pi<float>() / 64.0f;
         updateModelTransform();
-        //_renderRequested.reset(true);
     } else if (rightDown) {
         _cameraPosition.x += dx / static_cast<float>(256.0f);
         _cameraPosition.z += dy / static_cast<float>(256.0f);
         updateCameraTransform();
-        //_renderRequested.reset(true);
     }
 
     _lastMouseX = x;
@@ -862,7 +866,6 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
 void MainViewModel::onGLCanvasMouseWheel(int delta) {
     _cameraPosition.y = glm::max(0.0f, _cameraPosition.y - glm::clamp(delta, -1, 1));
     updateCameraTransform();
-    //_renderRequested.reset(true);
 }
 
 } // namespace reone
