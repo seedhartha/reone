@@ -23,8 +23,6 @@ using namespace std;
 
 namespace reone {
 
-static constexpr char kLogFilename[] = "reone.log";
-
 static thread::id g_mainThreadId;
 
 static int g_channels = LogChannels::general;
@@ -32,6 +30,7 @@ static LogLevel g_level = LogLevel::Info;
 
 static bool g_logToFile = false;
 static unique_ptr<boost::filesystem::ofstream> g_logFile;
+static boost::filesystem::path g_logFilename = boost::filesystem::path("reone.log");
 
 static const unordered_map<LogLevel, string> g_nameByLogLevel {
     {LogLevel::Error, "ERR"},
@@ -62,7 +61,7 @@ static void log(LogLevel level, const string &s, int channel) {
     }
     if (g_logToFile && !g_logFile) {
         boost::filesystem::path path(boost::filesystem::current_path());
-        path.append(kLogFilename);
+        path.append(g_logFilename);
         g_logFile = make_unique<boost::filesystem::ofstream>(path);
     }
     auto &out = g_logToFile ? *g_logFile : cout;
@@ -123,6 +122,10 @@ void setLogChannels(int mask) {
 
 void setLogToFile(bool log) {
     g_logToFile = log;
+}
+
+void setLogFilename(boost::filesystem::path filename) {
+    g_logFilename = filename;
 }
 
 } // namespace reone
