@@ -17,11 +17,18 @@
 
 #include "app.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "frame.h"
 
 namespace reone {
 
 bool LauncherApp::OnInit() {
+#ifdef _WIN32
+    SetProcessDPIAware();
+#endif
     auto frame = new LauncherFrame(); // managed by the library
     frame->Show();
     return true;

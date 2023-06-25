@@ -17,6 +17,10 @@
 
 #include "app.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "reone/system/logutil.h"
 
 #include "mainframe.h"
@@ -28,6 +32,10 @@ namespace reone {
 bool ToolkitApp::OnInit() {
     initLog();
     setLogToFile(true);
+
+#ifdef _WIN32
+    SetProcessDPIAware();
+#endif
 
     wxImage::AddHandler(new wxTGAHandler());
 

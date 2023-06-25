@@ -17,6 +17,10 @@
 
 #include "reone/system/logutil.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "engine.h"
 
 using namespace std;
@@ -25,6 +29,11 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     initLog();
+
+#ifdef _WIN32
+    SetProcessDPIAware();
+#endif
+
     auto engine = Engine(argc, argv);
     try {
         engine.init();
