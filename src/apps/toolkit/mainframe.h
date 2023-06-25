@@ -88,9 +88,6 @@ private:
 
     std::unique_ptr<wxBitmap> _image;
 
-    wxTimer _renderTimer;
-    wxTimer _audioTimer;
-
     // END Widgets
 
     void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
@@ -104,6 +101,7 @@ private:
 
     // Events
 
+    void OnIdle(wxIdleEvent &event);
     void OnClose(wxCloseEvent &event);
 
     void OnOpenGameDirectoryCommand(wxCommandEvent &event);
@@ -146,9 +144,6 @@ private:
     void OnGLCanvasMouseMotion(wxMouseEvent &event);
 
     void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
-
-    void OnRenderTimer(wxTimerEvent &event);
-    void OnAudioTimer(wxTimerEvent &event);
 
     void OnStopAudioCommand(wxCommandEvent &event);
 

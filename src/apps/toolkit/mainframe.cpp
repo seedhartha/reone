@@ -106,9 +106,7 @@ struct TimerID {
 };
 
 MainFrame::MainFrame() :
-    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
-    _renderTimer(this, TimerID::render),
-    _audioTimer(this, TimerID::audio) {
+    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
 
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
@@ -241,11 +239,7 @@ MainFrame::MainFrame() :
             _audioSource = make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             _audioSource->init();
             _audioSource->play();
-            if (!_audioTimer.IsRunning()) {
-                _audioTimer.Start(1000 / 60);
-            }
         } else {
-            _audioTimer.Stop();
             _audioSource.reset();
         }
     });
@@ -284,20 +278,6 @@ MainFrame::MainFrame() :
         _animationsListBox = new wxListBox(_renderSplitter, wxID_ANY);
         _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::OnAnimationsListBoxDoubleClick, this);
         _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, numeric_limits<int>::max());
-    });
-    _viewModel->renderRequested().subscribe([this](auto &requested) {
-        if (requested) {
-            _glCanvas->Refresh();
-        }
-    });
-    _viewModel->renderTimerEnabled().subscribe([this](auto &enabled) {
-        if (enabled) {
-            if (!_renderTimer.IsRunning()) {
-                _renderTimer.Start(1000 / 60);
-            }
-        } else {
-            _renderTimer.Stop();
-        }
     });
     _viewModel->onViewCreated();
 
@@ -413,6 +393,17 @@ wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
 void MainFrame::OnClose(wxCloseEvent &event) {
     Destroy();
     _viewModel->onViewDestroyed();
+}
+
+void MainFrame::OnIdle(wxIdleEvent &event) {
+    if (_viewModel->isRenderEnabled()) {
+        _viewModel->update3D();
+        _glCanvas->Refresh();
+    }
+    if (_audioSource) {
+        _audioSource->update();
+    }
+    event.RequestMore();
 }
 
 void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
@@ -674,23 +665,11 @@ void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     _viewModel->playAnimation((string)animation);
 }
 
-void MainFrame::OnRenderTimer(wxTimerEvent &event) {
-    _viewModel->update3D();
-    _glCanvas->Refresh();
-}
-
-void MainFrame::OnAudioTimer(wxTimerEvent &event) {
-    if (_audioSource) {
-        _audioSource->update();
-    }
-}
-
 void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
     if (_audioSource) {
         _audioSource->stop();
         _audioSource.reset();
     }
-    _audioTimer.Stop();
 }
 
 void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
@@ -808,6 +787,7 @@ void MainFrame::InvokeTool(Operation operation) {
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_CLOSE(MainFrame::OnClose)                                                     //
+    EVT_IDLE(MainFrame::OnIdle)                                                       //
     EVT_MENU(EventHandlerID::openGameDir, MainFrame::OnOpenGameDirectoryCommand)      //
     EVT_MENU(EventHandlerID::saveFile, MainFrame::OnSaveFileCommand)                  //
     EVT_MENU(EventHandlerID::extractAllBifs, MainFrame::OnExtractAllBifsCommand)      //
@@ -827,8 +807,6 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(EventHandlerID::toPcodeTool, MainFrame::OnToPcodeToolCommand)            //
     EVT_MENU(EventHandlerID::toNcsTool, MainFrame::OnToNcsToolCommand)                //
     EVT_MENU(EventHandlerID::toNssTool, MainFrame::OnToNssToolCommand)                //
-    EVT_TIMER(TimerID::render, MainFrame::OnRenderTimer)                              //
-    EVT_TIMER(TimerID::audio, MainFrame::OnAudioTimer)                                //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

@@ -268,7 +268,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     } else if (id.type == ResourceType::Mdl) {
         loadEngine();
 
-        _renderTimerEnabled.invoke(false);
+        _renderEnabled = false;
 
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
@@ -332,7 +332,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     }
 
     if (id.type == ResourceType::Mdl) {
-        _renderTimerEnabled.invoke(true);
+        _renderEnabled = true;
     }
 }
 
@@ -728,7 +728,7 @@ void MainViewModel::onNotebookPageClose(int page) {
     _pages.erase(pageIterator);
 
     if (pageResId.type == ResourceType::Mdl) {
-        _renderTimerEnabled.invoke(false);
+        _renderEnabled = false;
     }
     if (pageResId.type == ResourceType::Wav) {
         _audioStream.invoke(nullptr);
