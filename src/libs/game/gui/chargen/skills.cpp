@@ -27,8 +27,6 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::gui;
@@ -39,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-static const unordered_map<SkillType, int> g_descStrRefBySkill {
+static const std::unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::ComputerUse, 244},
     {SkillType::Demolitions, 246},
     {SkillType::Stealth, 248},
@@ -52,7 +50,7 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
 void CharGenSkills::onGUILoaded() {
     bindControls();
 
-    vector<Label *> skillLabels {
+    std::vector<Label *> skillLabels {
         _binding.computerUseLbl.get(),
         _binding.demolitionsLbl.get(),
         _binding.stealthLbl.get(),
@@ -211,7 +209,7 @@ void CharGenSkills::bindControls() {
 
 void CharGenSkills::reset(bool newGame) {
     const CreatureAttributes &attributes = _charGen.character().attributes;
-    shared_ptr<CreatureClass> clazz(_services.game.classes.get(attributes.getEffectiveClass()));
+    std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
@@ -234,16 +232,16 @@ void CharGenSkills::reset(bool newGame) {
 }
 
 void CharGenSkills::refreshControls() {
-    _binding.remainingSelectionsLbl->setTextMessage(to_string(_points));
+    _binding.remainingSelectionsLbl->setTextMessage(std::to_string(_points));
 
-    _binding.computerUsePointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::ComputerUse)));
-    _binding.demolitionsPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Demolitions)));
-    _binding.stealthPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Stealth)));
-    _binding.awarenessPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Awareness)));
-    _binding.persuadePointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Persuade)));
-    _binding.repairPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Repair)));
-    _binding.securityPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::Security)));
-    _binding.treatInjuryPointsBtn->setTextMessage(to_string(_attributes.getSkillRank(SkillType::TreatInjury)));
+    _binding.computerUsePointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::ComputerUse)));
+    _binding.demolitionsPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Demolitions)));
+    _binding.stealthPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Stealth)));
+    _binding.awarenessPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Awareness)));
+    _binding.persuadePointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Persuade)));
+    _binding.repairPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Repair)));
+    _binding.securityPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Security)));
+    _binding.treatInjuryPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::TreatInjury)));
 
     _binding.comMinusBtn->setVisible(_attributes.getSkillRank(SkillType::ComputerUse) > 0);
     _binding.demMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Demolitions) > 0);
@@ -267,7 +265,7 @@ void CharGenSkills::refreshControls() {
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     ClassType clazz = _charGen.character().attributes.getEffectiveClass();
 
-    shared_ptr<CreatureClass> creatureClass(_services.game.classes.get(clazz));
+    std::shared_ptr<CreatureClass> creatureClass(_services.game.classes.get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
     int pointCost = creatureClass->isClassSkill(skill) ? 1 : 2;
 
@@ -284,7 +282,7 @@ void CharGenSkills::updateCharacter() {
 
 int CharGenSkills::getPointCost(SkillType skill) const {
     ClassType clazz = _charGen.character().attributes.getEffectiveClass();
-    shared_ptr<CreatureClass> creatureClass(_services.game.classes.get(clazz));
+    std::shared_ptr<CreatureClass> creatureClass(_services.game.classes.get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 
@@ -308,7 +306,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     if (maybeDescription == g_descStrRefBySkill.end())
         return;
 
-    string description(_services.resource.strings.get(maybeDescription->second));
+    std::string description(_services.resource.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

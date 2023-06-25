@@ -23,8 +23,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 

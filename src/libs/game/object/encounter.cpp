@@ -25,8 +25,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::resource;
 using namespace reone::scene;
 
@@ -35,15 +33,15 @@ namespace reone {
 namespace game {
 
 void Encounter::loadFromGIT(const Gff &gffs) {
-    string blueprintResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string blueprintResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(blueprintResRef);
 
     loadPositionFromGIT(gffs);
     loadGeometryFromGIT(gffs);
 }
 
-void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
+void Encounter::loadFromBlueprint(const std::string &blueprintResRef) {
+    std::shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }

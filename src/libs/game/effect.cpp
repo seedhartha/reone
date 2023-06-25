@@ -19,14 +19,12 @@
 
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
 void Effect::applyTo(Object &object) {
-    debug("Unsupported effect type: " + to_string(static_cast<int>(_type)));
+    debug("Unsupported effect type: " + std::to_string(static_cast<int>(_type)));
 }
 
 } // namespace game

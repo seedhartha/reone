@@ -19,8 +19,6 @@
 
 #include "reone/tools/script/exprtreeoptimizer.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 BOOST_AUTO_TEST_SUITE(expression_tree_optimizer)

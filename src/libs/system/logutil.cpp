@@ -19,60 +19,58 @@
 
 #include "reone/system/collectionutil.h"
 
-using namespace std;
-
 namespace reone {
 
-static thread::id g_mainThreadId;
+static std::thread::id g_mainThreadId;
 
 static int g_channels = LogChannels::general;
 static LogLevel g_level = LogLevel::Info;
 
 static bool g_logToFile = false;
-static unique_ptr<boost::filesystem::ofstream> g_logFile;
-static boost::filesystem::path g_logFilename = boost::filesystem::path("reone.log");
+static std::unique_ptr<boost::filesystem::ofstream> g_logFile;
+static std::string g_logFilename = "reone.log";
 
-static const unordered_map<LogLevel, string> g_nameByLogLevel {
+static const std::unordered_map<LogLevel, std::string> g_nameByLogLevel {
     {LogLevel::Error, "ERR"},
     {LogLevel::Warn, "WRN"},
     {LogLevel::Info, "INF"},
     {LogLevel::Debug, "DBG"}};
 
-static string describeLogLevel(LogLevel level) {
+static std::string describeLogLevel(LogLevel level) {
     return getFromLookupOrElse(g_nameByLogLevel, level, [&level]() {
-        return to_string(static_cast<int>(level));
+        return std::to_string(static_cast<int>(level));
     });
 }
 
-static void log(ostream &out, LogLevel level, const string &s, int channel) {
+static void log(std::ostream &out, LogLevel level, const std::string &s, int channel) {
     auto msg = boost::format("%s %s") % describeLogLevel(level) % s;
-    out << msg << endl;
+    out << msg << std::endl;
 }
 
-static void log(LogLevel level, const string &s, int channel) {
+static void log(LogLevel level, const std::string &s, int channel) {
     if (!isLogLevelEnabled(level)) {
         return;
     }
     if (!isLogChannelEnabled(channel)) {
         return;
     }
-    if (this_thread::get_id() != g_mainThreadId) {
-        throw logic_error("Must not log outside the main thread");
+    if (std::this_thread::get_id() != g_mainThreadId) {
+        throw std::logic_error("Must not log outside the main thread");
     }
     if (g_logToFile && !g_logFile) {
         boost::filesystem::path path(boost::filesystem::current_path());
         path.append(g_logFilename);
-        g_logFile = make_unique<boost::filesystem::ofstream>(path);
+        g_logFile = std::make_unique<boost::filesystem::ofstream>(path);
     }
-    auto &out = g_logToFile ? *g_logFile : cout;
+    auto &out = g_logToFile ? *g_logFile : std::cout;
     log(out, level, s, channel);
 }
 
 void initLog() {
-    g_mainThreadId = this_thread::get_id();
+    g_mainThreadId = std::this_thread::get_id();
 }
 
-void error(const string &s, int channel) {
+void error(const std::string &s, int channel) {
     log(LogLevel::Error, s, channel);
 }
 
@@ -80,7 +78,7 @@ void error(const boost::format &s, int channel) {
     log(LogLevel::Error, str(s), channel);
 }
 
-void warn(const string &s, int channel) {
+void warn(const std::string &s, int channel) {
     log(LogLevel::Warn, s, channel);
 }
 
@@ -88,7 +86,7 @@ void warn(const boost::format &s, int channel) {
     log(LogLevel::Warn, str(s), channel);
 }
 
-void info(const string &s, int channel) {
+void info(const std::string &s, int channel) {
     log(LogLevel::Info, s, channel);
 }
 
@@ -96,7 +94,7 @@ void info(const boost::format &s, int channel) {
     log(LogLevel::Info, str(s), channel);
 }
 
-void debug(const string &s, int channel) {
+void debug(const std::string &s, int channel) {
     log(LogLevel::Debug, s, channel);
 }
 
@@ -124,7 +122,7 @@ void setLogToFile(bool log) {
     g_logToFile = log;
 }
 
-void setLogFilename(boost::filesystem::path filename) {
+void setLogFilename(std::string filename) {
     g_logFilename = filename;
 }
 

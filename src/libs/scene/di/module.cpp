@@ -19,8 +19,6 @@
 
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::game;
 
 namespace reone {
@@ -28,8 +26,8 @@ namespace reone {
 namespace scene {
 
 void SceneModule::init() {
-    _graphs = make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
-    _services = make_unique<SceneServices>(*_graphs);
+    _graphs = std::make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services());
+    _services = std::make_unique<SceneServices>(*_graphs);
 
     // Init scenes
     _graphs->reserve(kSceneMain);

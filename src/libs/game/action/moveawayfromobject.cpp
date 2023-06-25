@@ -17,13 +17,11 @@
 
 #include "reone/game/action/moveawayfromobject.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void MoveAwayFromObject::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void MoveAwayFromObject::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

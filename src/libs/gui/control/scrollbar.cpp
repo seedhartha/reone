@@ -31,8 +31,6 @@
 
 #include "reone/gui/gui.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -43,20 +41,20 @@ namespace gui {
 void ScrollBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<Gff> dir(gffs.getStruct("DIR"));
+    std::shared_ptr<Gff> dir(gffs.getStruct("DIR"));
     if (dir) {
-        string image(dir->getString("IMAGE"));
+        std::string image(dir->getString("IMAGE"));
         _dir.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
     }
 
-    shared_ptr<Gff> thumb(gffs.getStruct("THUMB"));
+    std::shared_ptr<Gff> thumb(gffs.getStruct("THUMB"));
     if (thumb) {
-        string image(thumb->getString("IMAGE"));
+        std::string image(thumb->getString("IMAGE"));
         _thumb.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
     }
 }
 
-void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
+void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
     drawThumb(offset);
     drawArrows(offset);
 }

@@ -43,8 +43,6 @@
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -62,7 +60,7 @@ static constexpr int kActionBarPadding = 3;
 static constexpr int kActionWidth = 35;
 static constexpr int kActionHeight = 59;
 
-static string g_attackIcon("i_attack");
+static std::string g_attackIcon("i_attack");
 
 SelectionOverlay::SelectionOverlay(
     Game &game,
@@ -121,11 +119,11 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
         return false;
 
-    shared_ptr<Creature> leader(_game.party().getLeader());
+    std::shared_ptr<Creature> leader(_game.party().getLeader());
     if (!leader)
         return false;
 
-    shared_ptr<Area> area(_game.module()->area());
+    std::shared_ptr<Area> area(_game.module()->area());
     auto selectedObject = area->selectedObject();
     if (!selectedObject)
         return false;
@@ -181,8 +179,8 @@ void SelectionOverlay::update() {
     _selectedObject.reset();
     _selectedHostile = false;
 
-    shared_ptr<Module> module(_game.module());
-    shared_ptr<Area> area(module->area());
+    std::shared_ptr<Module> module(_game.module());
+    std::shared_ptr<Area> area(module->area());
 
     Camera *camera = _game.getActiveCamera();
     glm::mat4 projection(camera->sceneNode()->camera()->projection());
@@ -195,7 +193,7 @@ void SelectionOverlay::update() {
         if (_hilightedScreenCoords.z < 1.0f) {
             _hilightedObject = hilightedObject;
 
-            auto hilightedCreature = dynamic_pointer_cast<Creature>(hilightedObject);
+            auto hilightedCreature = std::dynamic_pointer_cast<Creature>(hilightedObject);
             if (hilightedCreature) {
                 _hilightedHostile = !hilightedCreature->isDead() && _services.game.reputes.getIsEnemy(*(_game.party().getLeader()), *hilightedCreature);
             }
@@ -212,7 +210,7 @@ void SelectionOverlay::update() {
             for (int i = 0; i < kNumActionSlots; ++i) {
                 _actionSlots[i].actions.clear();
             }
-            vector<ContextAction> actions(module->getContextActions(selectedObject));
+            std::vector<ContextAction> actions(module->getContextActions(selectedObject));
             _hasActions = !actions.empty();
             if (_hasActions) {
                 for (auto &action : actions) {
@@ -235,7 +233,7 @@ void SelectionOverlay::update() {
                 }
             }
 
-            auto selectedCreature = dynamic_pointer_cast<Creature>(selectedObject);
+            auto selectedCreature = std::dynamic_pointer_cast<Creature>(selectedObject);
             if (selectedCreature) {
                 _selectedHostile = !selectedCreature->isDead() && _services.game.reputes.getIsEnemy(*_game.party().getLeader(), *selectedCreature);
             }
@@ -257,7 +255,7 @@ void SelectionOverlay::draw() {
     });
 }
 
-void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
+void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
     _services.graphics.textures.bind(*texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
@@ -349,7 +347,7 @@ void SelectionOverlay::drawActionBar() {
 }
 
 void SelectionOverlay::drawActionFrame(int index) {
-    shared_ptr<Texture> frameTexture;
+    std::shared_ptr<Texture> frameTexture;
     if (index == _selectedActionSlot) {
         frameTexture = _hilightedScroll;
     } else if (_selectedHostile) {
@@ -391,21 +389,21 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (slot.indexSelected >= slot.actions.size())
         return;
 
-    shared_ptr<Texture> texture;
+    std::shared_ptr<Texture> texture;
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
     case ActionType::AttackObject:
         texture = _services.graphics.textures.get(g_attackIcon, TextureUsage::GUI);
         break;
     case ActionType::UseFeat: {
-        shared_ptr<Feat> feat(_services.game.feats.get(action.feat));
+        std::shared_ptr<Feat> feat(_services.game.feats.get(action.feat));
         if (feat) {
             texture = feat->icon;
         }
         break;
     }
     case ActionType::UseSkill: {
-        shared_ptr<Skill> skill(_services.game.skills.get(action.skill));
+        std::shared_ptr<Skill> skill(_services.game.skills.get(action.skill));
         if (skill) {
             texture = skill->icon;
         }

@@ -17,12 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayinput.h"
-#include "reone/system/stringbuilder.h"
 #include "reone/graphics/format/tgareader.h"
 #include "reone/graphics/texture.h"
-
-using namespace std;
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::graphics;
@@ -53,7 +51,7 @@ BOOST_AUTO_TEST_CASE(should_load_tga) {
     // then
     auto texture = reader.texture();
     BOOST_TEST(static_cast<bool>(texture));
-    BOOST_TEST(string("some_texture") == texture->name());
+    BOOST_TEST(std::string("some_texture") == texture->name());
     BOOST_TEST(1 == texture->width());
     BOOST_TEST(1 == texture->height());
     BOOST_TEST(1ll == texture->layers().size());

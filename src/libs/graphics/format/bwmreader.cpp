@@ -19,23 +19,21 @@
 
 #include "reone/graphics/walkmesh.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 void BwmReader::onLoad() {
-    checkSignature(string("BWM V1.0", 8));
+    checkSignature(std::string("BWM V1.0", 8));
 
     _type = static_cast<WalkmeshType>(readUint32());
 
-    vector<float> relUsePosition1(readFloatArray(3));
-    vector<float> relUsePosition2(readFloatArray(3));
-    vector<float> absUsePosition1(readFloatArray(3));
-    vector<float> absUsePosition2(readFloatArray(3));
+    std::vector<float> relUsePosition1(readFloatArray(3));
+    std::vector<float> relUsePosition2(readFloatArray(3));
+    std::vector<float> absUsePosition1(readFloatArray(3));
+    std::vector<float> absUsePosition2(readFloatArray(3));
 
-    vector<float> position(readFloatArray(3));
+    std::vector<float> position(readFloatArray(3));
     _position = glm::make_vec3(&position[0]);
 
     _numVertices = readUint32();
@@ -64,7 +62,7 @@ void BwmReader::onLoad() {
         _offPerimeters = readUint32();
     }
 
-    _walkmesh = make_shared<Walkmesh>();
+    _walkmesh = std::make_shared<Walkmesh>();
     _walkmesh->_area = _type == WalkmeshType::WOK;
 
     loadVertices();
@@ -137,25 +135,25 @@ void BwmReader::loadNormals() {
 void BwmReader::loadAABB() {
     seek(_offAabb);
 
-    vector<shared_ptr<Walkmesh::AABB>> aabbs;
+    std::vector<std::shared_ptr<Walkmesh::AABB>> aabbs;
     aabbs.resize(_numAabb);
 
-    vector<pair<uint32_t, uint32_t>> aabbChildren;
+    std::vector<std::pair<uint32_t, uint32_t>> aabbChildren;
     aabbChildren.resize(_numAabb);
 
     for (uint32_t i = 0; i < _numAabb; ++i) {
-        vector<float> bounds(readFloatArray(6));
+        std::vector<float> bounds(readFloatArray(6));
         int faceIdx = readInt32();
         ignore(4); // unknown
         uint32_t mostSignificantPlane = readUint32();
         uint32_t childIdx1 = readUint32();
         uint32_t childIdx2 = readUint32();
 
-        aabbs[i] = make_shared<Walkmesh::AABB>();
+        aabbs[i] = std::make_shared<Walkmesh::AABB>();
         aabbs[i]->value = AABB(glm::make_vec3(&bounds[0]), glm::make_vec3(&bounds[3]));
         aabbs[i]->faceIdx = faceIdx;
 
-        aabbChildren[i] = make_pair(childIdx1, childIdx2);
+        aabbChildren[i] = std::make_pair(childIdx1, childIdx2);
     }
 
     for (uint32_t i = 0; i < _numAabb; ++i) {

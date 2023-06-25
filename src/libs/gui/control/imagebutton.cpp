@@ -29,8 +29,6 @@
 
 #include "reone/gui/gui.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -47,10 +45,10 @@ void ImageButton::load(const Gff &gffs) {
 
 void ImageButton::draw(
     const glm::ivec2 &offset,
-    const vector<string> &text,
-    const string &iconText,
-    const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) {
+    const std::vector<std::string> &text,
+    const std::string &iconText,
+    const std::shared_ptr<Texture> &iconTexture,
+    const std::shared_ptr<Texture> &iconFrame) {
 
     if (!_visible)
         return;
@@ -75,9 +73,9 @@ void ImageButton::draw(
 
 void ImageButton::drawIcon(
     const glm::ivec2 &offset,
-    const string &iconText,
-    const shared_ptr<Texture> &iconTexture,
-    const shared_ptr<Texture> &iconFrame) {
+    const std::string &iconText,
+    const std::shared_ptr<Texture> &iconTexture,
+    const std::shared_ptr<Texture> &iconFrame) {
 
     if (!iconFrame && !iconTexture)
         return;

@@ -21,15 +21,13 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void PcodeWriter::save(IOutputStream &pcode) {
     try {
-        set<uint32_t> jumpOffsets;
+        std::set<uint32_t> jumpOffsets;
         for (auto &instr : _program.instructions()) {
             switch (instr.type) {
             case InstructionType::JMP:
@@ -45,19 +43,19 @@ void PcodeWriter::save(IOutputStream &pcode) {
         for (auto &instr : _program.instructions()) {
             writeInstruction(instr, pcode, jumpOffsets);
         }
-    } catch (const exception &e) {
-        throw runtime_error(e.what());
+    } catch (const std::exception &e) {
+        throw std::runtime_error(e.what());
     }
 }
 
-void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode, const set<uint32_t> &jumpOffsets) {
+void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode, const std::set<uint32_t> &jumpOffsets) {
     if (jumpOffsets.count(ins.offset) > 0) {
-        string label(str(boost::format("loc_%08x:") % ins.offset));
+        std::string label(str(boost::format("loc_%08x:") % ins.offset));
         pcode.write(label);
         pcode.write("\n");
     }
 
-    string desc(describeInstructionType(ins.type));
+    std::string desc(describeInstructionType(ins.type));
 
     switch (ins.type) {
     case InstructionType::CPDOWNSP:
@@ -67,26 +65,26 @@ void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode,
         desc += str(boost::format(" %d, %d") % ins.stackOffset % ins.size);
         break;
     case InstructionType::CONSTI:
-        desc += " " + to_string(ins.intValue);
+        desc += " " + std::to_string(ins.intValue);
         break;
     case InstructionType::CONSTF:
-        desc += " " + to_string(ins.floatValue);
+        desc += " " + std::to_string(ins.floatValue);
         break;
     case InstructionType::CONSTS:
         desc += " \"" + ins.strValue + "\"";
         break;
     case InstructionType::CONSTO:
-        desc += " " + to_string(ins.objectId);
+        desc += " " + std::to_string(ins.objectId);
         break;
     case InstructionType::ACTION:
         desc += str(boost::format(" %s, %d") % _routines.get(ins.routine).name() % ins.argCount);
         break;
     case InstructionType::EQUALTT:
     case InstructionType::NEQUALTT:
-        desc += " " + to_string(ins.size);
+        desc += " " + std::to_string(ins.size);
         break;
     case InstructionType::MOVSP:
-        desc += " " + to_string(ins.stackOffset);
+        desc += " " + std::to_string(ins.stackOffset);
         break;
     case InstructionType::JMP:
     case InstructionType::JSR:
@@ -103,7 +101,7 @@ void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode,
     case InstructionType::INCISP:
     case InstructionType::DECIBP:
     case InstructionType::INCIBP:
-        desc += " " + to_string(ins.stackOffset);
+        desc += " " + std::to_string(ins.stackOffset);
         break;
     case InstructionType::STORE_STATE:
         desc += str(boost::format(" %d, %d") % ins.size % ins.sizeLocals);

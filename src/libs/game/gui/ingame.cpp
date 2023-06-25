@@ -19,8 +19,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -118,42 +116,42 @@ void InGameMenu::setTabLabelsFocusable(bool focusable) {
 }
 
 void InGameMenu::loadEquipment() {
-    _equip = make_unique<Equipment>(_game, *this, _services);
+    _equip = std::make_unique<Equipment>(_game, *this, _services);
     _equip->init();
 }
 
 void InGameMenu::loadInventory() {
-    _inventory = make_unique<InventoryMenu>(_game, _services);
+    _inventory = std::make_unique<InventoryMenu>(_game, _services);
     _inventory->init();
 }
 
 void InGameMenu::loadCharacter() {
-    _character = make_unique<CharacterMenu>(_game, *this, _services);
+    _character = std::make_unique<CharacterMenu>(_game, *this, _services);
     _character->init();
 }
 
 void InGameMenu::loadAbilities() {
-    _abilities = make_unique<AbilitiesMenu>(_game, _services);
+    _abilities = std::make_unique<AbilitiesMenu>(_game, _services);
     _abilities->init();
 }
 
 void InGameMenu::loadMessages() {
-    _messages = make_unique<MessagesMenu>(_game, _services);
+    _messages = std::make_unique<MessagesMenu>(_game, _services);
     _messages->init();
 }
 
 void InGameMenu::loadJournal() {
-    _journal = make_unique<JournalMenu>(_game, _services);
+    _journal = std::make_unique<JournalMenu>(_game, _services);
     _journal->init();
 }
 
 void InGameMenu::loadMap() {
-    _map = make_unique<MapMenu>(_game, _services);
+    _map = std::make_unique<MapMenu>(_game, _services);
     _map->init();
 }
 
 void InGameMenu::loadOptions() {
-    _options = make_unique<OptionsMenu>(_game, _services);
+    _options = std::make_unique<OptionsMenu>(_game, _services);
     _options->init();
 }
 
@@ -265,11 +263,11 @@ void InGameMenu::openOptions() {
     changeTab(InGameMenuTab::Options);
 }
 
-shared_ptr<Button> InGameMenu::getBtnChange2() {
+std::shared_ptr<Button> InGameMenu::getBtnChange2() {
     return _game.isTSL() ? getControl<Button>("BTN_CHANGE2") : nullptr;
 }
 
-shared_ptr<Button> InGameMenu::getBtnChange3() {
+std::shared_ptr<Button> InGameMenu::getBtnChange3() {
     return _game.isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
 }
 

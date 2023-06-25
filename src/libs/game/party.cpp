@@ -24,8 +24,6 @@
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
@@ -58,13 +56,13 @@ bool Party::handleKeyDown(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-bool Party::addAvailableMember(int npc, const string &blueprint) {
+bool Party::addAvailableMember(int npc, const std::string &blueprint) {
     auto maybeMember = _availableMembers.find(npc);
     if (maybeMember != _availableMembers.end()) {
         warn("Party: NPC already exists");
         return false;
     }
-    _availableMembers.insert(make_pair(npc, blueprint));
+    _availableMembers.insert(std::make_pair(npc, blueprint));
 
     return true;
 }
@@ -78,7 +76,7 @@ bool Party::removeAvailableMember(int npc) {
     return false;
 }
 
-bool Party::addMember(int npc, shared_ptr<Creature> creature) {
+bool Party::addMember(int npc, std::shared_ptr<Creature> creature) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");
         return false;
@@ -130,11 +128,11 @@ void Party::onLeaderChanged() {
     _game.module()->area()->onPartyLeaderMoved(true);
 }
 
-const string &Party::getAvailableMember(int npc) const {
+const std::string &Party::getAvailableMember(int npc) const {
     return _availableMembers.find(npc)->second;
 }
 
-shared_ptr<Creature> Party::getMember(int index) const {
+std::shared_ptr<Creature> Party::getMember(int index) const {
     return _members.size() > index ? _members[index].creature : nullptr;
 }
 
@@ -170,7 +168,7 @@ bool Party::isMember(const Object &object) const {
     return false;
 }
 
-shared_ptr<Creature> Party::getLeader() const {
+std::shared_ptr<Creature> Party::getLeader() const {
     return !_members.empty() ? _members[0].creature : nullptr;
 }
 
@@ -183,7 +181,7 @@ void Party::setPartyLeader(int npc) {
         }
     }
     if (memberIdx == -1) {
-        warn("Party: NPC not found: " + to_string(npc));
+        warn("Party: NPC not found: " + std::to_string(npc));
         return;
     }
     if (memberIdx == 0)
@@ -203,7 +201,7 @@ void Party::setPartyLeaderByIndex(int index) {
     onLeaderChanged();
 }
 
-void Party::setPlayer(const shared_ptr<Creature> &player) {
+void Party::setPlayer(const std::shared_ptr<Creature> &player) {
     _player = player;
 }
 
@@ -216,7 +214,7 @@ bool Party::removeMember(int npc) {
     return false;
 }
 
-void Party::defaultMembers(string &member1, string &member2, string &member3) const {
+void Party::defaultMembers(std::string &member1, std::string &member2, std::string &member3) const {
     if (_game.isTSL()) {
         member1 = kBlueprintResRefAtton;
         member2 = kBlueprintResRefKreia;

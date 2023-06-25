@@ -27,8 +27,6 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -43,7 +41,7 @@ static constexpr int kStartingPoints = 30;
 static constexpr int kMinAbilityScore = 8;
 static constexpr int kMaxAbilityScore = 18;
 
-static const unordered_map<string, Ability> g_abilityByAlias {
+static const std::unordered_map<std::string, Ability> g_abilityByAlias {
     {"STR", Ability::Strength},
     {"DEX", Ability::Dexterity},
     {"CON", Ability::Constitution},
@@ -51,7 +49,7 @@ static const unordered_map<string, Ability> g_abilityByAlias {
     {"WIS", Ability::Wisdom},
     {"CHA", Ability::Charisma}};
 
-static const unordered_map<Ability, int> g_descStrRefByAbility {
+static const std::unordered_map<Ability, int> g_descStrRefByAbility {
     {Ability::Strength, 222},
     {Ability::Dexterity, 223},
     {Ability::Constitution, 224},
@@ -64,7 +62,7 @@ void CharGenAbilities::onGUILoaded() {
 
     _binding.lbDesc->setProtoMatchContent(true);
 
-    vector<Label *> labels {
+    std::vector<Label *> labels {
         _binding.strLbl.get(),
         _binding.dexLbl.get(),
         _binding.conLbl.get(),
@@ -95,7 +93,7 @@ void CharGenAbilities::onGUILoaded() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen.character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
+        std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();
@@ -217,18 +215,18 @@ void CharGenAbilities::reset(bool newGame) {
 }
 
 void CharGenAbilities::refreshControls() {
-    _binding.remainingSelectionsLbl->setTextMessage(to_string(_points));
+    _binding.remainingSelectionsLbl->setTextMessage(std::to_string(_points));
     _binding.costPointsLbl->setTextMessage("");
     if (!_game.isTSL()) {
         _binding.lblAbilityMod->setTextMessage("");
     }
 
-    _binding.strPointsBtn->setTextMessage(to_string(_attributes.strength()));
-    _binding.dexPointsBtn->setTextMessage(to_string(_attributes.dexterity()));
-    _binding.conPointsBtn->setTextMessage(to_string(_attributes.constitution()));
-    _binding.intPointsBtn->setTextMessage(to_string(_attributes.intelligence()));
-    _binding.wisPointsBtn->setTextMessage(to_string(_attributes.wisdom()));
-    _binding.chaPointsBtn->setTextMessage(to_string(_attributes.charisma()));
+    _binding.strPointsBtn->setTextMessage(std::to_string(_attributes.strength()));
+    _binding.dexPointsBtn->setTextMessage(std::to_string(_attributes.dexterity()));
+    _binding.conPointsBtn->setTextMessage(std::to_string(_attributes.constitution()));
+    _binding.intPointsBtn->setTextMessage(std::to_string(_attributes.intelligence()));
+    _binding.wisPointsBtn->setTextMessage(std::to_string(_attributes.wisdom()));
+    _binding.chaPointsBtn->setTextMessage(std::to_string(_attributes.charisma()));
 
     _binding.strMinusBtn->setVisible(_attributes.strength() > kMinAbilityScore);
     _binding.dexMinusBtn->setVisible(_attributes.dexterity() > kMinAbilityScore);
@@ -249,7 +247,7 @@ int CharGenAbilities::getPointCost(Ability ability) const {
     return glm::clamp(_attributes.getAbilityModifier(ability), 1, 3);
 }
 
-static Ability getAbilityByAlias(const string &alias) {
+static Ability getAbilityByAlias(const std::string &alias) {
     return g_abilityByAlias.find(alias)->second;
 }
 
@@ -269,7 +267,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     if (maybeDescription == g_descStrRefByAbility.end())
         return;
 
-    string description(_services.resource.strings.get(maybeDescription->second));
+    std::string description(_services.resource.strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

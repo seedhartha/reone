@@ -17,8 +17,6 @@
 
 #include "reone/gui/textinput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace gui {
@@ -159,7 +157,7 @@ bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
     return false;
 }
 
-void TextInput::setText(string text) {
+void TextInput::setText(std::string text) {
     _text = std::move(text);
 }
 

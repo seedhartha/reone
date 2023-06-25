@@ -31,8 +31,6 @@
 #include "reone/game/party.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -121,7 +119,7 @@ void CharacterMenu::bindControls() {
         _binding.lblClass1 = getControl<Label>("LBL_CLASS1");
         _binding.lblClass2 = getControl<Label>("LBL_CLASS2");
         for (int i = 0; i < kNumControlsGood; ++i) {
-            _binding.lblGood[i] = getControl<Label>("LBL_GOOD" + to_string(i + 1));
+            _binding.lblGood[i] = getControl<Label>("LBL_GOOD" + std::to_string(i + 1));
         }
         _binding.lblLevel = getControl<Label>("LBL_LEVEL");
         _binding.lblLevel1 = getControl<Label>("LBL_LEVEL1");
@@ -139,7 +137,7 @@ void CharacterMenu::bindControls() {
         _binding.lblTitle = getControl<Label>("LBL_TITLE");
         _binding.lblXpBack = getControl<Label>("LBL_XP_BACK");
         for (int i = 0; i < kNumControlsBar; ++i) {
-            _binding.lblBar[i] = getControl<Label>("LBL_BAR" + to_string(i + 1));
+            _binding.lblBar[i] = getControl<Label>("LBL_BAR" + std::to_string(i + 1));
         }
         _binding.btnChange1 = _inGameMenu.getBtnChange2();
         _binding.btnChange2 = _inGameMenu.getBtnChange3();
@@ -147,22 +145,22 @@ void CharacterMenu::bindControls() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_game.party().getLeader());
+    std::shared_ptr<Creature> leader(_game.party().getLeader());
     _binding.btnLevelup->setVisible(leader->isLevelUpPending());
     _binding.btnAuto->setVisible(leader->isLevelUpPending());
     GameGUI::update(dt);
 }
 
-static string toStringOrEmptyIfZero(int value) {
-    return value != 0 ? to_string(value) : "";
+static std::string toStringOrEmptyIfZero(int value) {
+    return value != 0 ? std::to_string(value) : "";
 }
 
-static string describeAbilityModifier(int value) {
-    return value > 0 ? "+" + to_string(value) : to_string(value);
+static std::string describeAbilityModifier(int value) {
+    return value > 0 ? "+" + std::to_string(value) : std::to_string(value);
 }
 
 void CharacterMenu::refreshControls() {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (!_game.isTSL()) {
@@ -173,35 +171,35 @@ void CharacterMenu::refreshControls() {
     }
 
     _binding.lblVitalityStat->setTextMessage(str(boost::format("%d/%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
-    _binding.lblDefenseStat->setTextMessage(to_string(attributes.getDefense()));
+    _binding.lblDefenseStat->setTextMessage(std::to_string(attributes.getDefense()));
     _binding.lblForceStat->setTextMessage("");
 
-    _binding.lblStr->setTextMessage(to_string(attributes.strength()));
+    _binding.lblStr->setTextMessage(std::to_string(attributes.strength()));
     _binding.lblStrMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Strength)));
-    _binding.lblDex->setTextMessage(to_string(attributes.dexterity()));
+    _binding.lblDex->setTextMessage(std::to_string(attributes.dexterity()));
     _binding.lblDexMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Dexterity)));
-    _binding.lblCon->setTextMessage(to_string(attributes.constitution()));
+    _binding.lblCon->setTextMessage(std::to_string(attributes.constitution()));
     _binding.lblConMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Constitution)));
-    _binding.lblInt->setTextMessage(to_string(attributes.intelligence()));
+    _binding.lblInt->setTextMessage(std::to_string(attributes.intelligence()));
     _binding.lblIntMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Intelligence)));
-    _binding.lblWis->setTextMessage(to_string(attributes.wisdom()));
+    _binding.lblWis->setTextMessage(std::to_string(attributes.wisdom()));
     _binding.lblWisMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Wisdom)));
-    _binding.lblCha->setTextMessage(to_string(attributes.charisma()));
+    _binding.lblCha->setTextMessage(std::to_string(attributes.charisma()));
     _binding.lblChaMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Charisma)));
 
     SavingThrows savingThrows(attributes.getAggregateSavingThrows());
-    _binding.lblFortitudeStat->setTextMessage(to_string(savingThrows.fortitude));
-    _binding.lblReflexStat->setTextMessage(to_string(savingThrows.reflex));
-    _binding.lblWillStat->setTextMessage(to_string(savingThrows.will));
+    _binding.lblFortitudeStat->setTextMessage(std::to_string(savingThrows.fortitude));
+    _binding.lblReflexStat->setTextMessage(std::to_string(savingThrows.reflex));
+    _binding.lblWillStat->setTextMessage(std::to_string(savingThrows.will));
 
-    _binding.lblExperienceStat->setTextMessage(to_string(partyLeader->xp()));
-    _binding.lblNeededXp->setTextMessage(to_string(partyLeader->getNeededXP()));
+    _binding.lblExperienceStat->setTextMessage(std::to_string(partyLeader->xp()));
+    _binding.lblNeededXp->setTextMessage(std::to_string(partyLeader->getNeededXP()));
 
     refreshPortraits();
     refresh3D();
 }
 
-string CharacterMenu::describeClass(ClassType clazz) const {
+std::string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid)
         return "";
 
@@ -213,8 +211,8 @@ void CharacterMenu::refreshPortraits() {
         return;
 
     Party &party = _game.party();
-    shared_ptr<Creature> partyMember1(party.getMember(1));
-    shared_ptr<Creature> partyMember2(party.getMember(2));
+    std::shared_ptr<Creature> partyMember1(party.getMember(1));
+    std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
     _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
     _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
@@ -238,7 +236,7 @@ void CharacterMenu::refresh3D() {
     _binding.lbl3dChar->setSceneName(kSceneCharacter);
 }
 
-shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph) const {
+std::shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph) const {
     auto partyLeader = _game.party().getLeader();
 
     auto character = _game.objectFactory().newCreature(sceneGraph.name());

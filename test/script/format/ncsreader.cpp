@@ -17,12 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayinput.h"
-#include "reone/system/stringbuilder.h"
 #include "reone/script/format/ncsreader.h"
 #include "reone/script/program.h"
-
-using namespace std;
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::script;

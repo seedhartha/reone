@@ -19,13 +19,11 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void ResumeConversationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void ResumeConversationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     _game.resumeConversation();
     complete();
 }

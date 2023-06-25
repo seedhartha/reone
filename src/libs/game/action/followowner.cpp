@@ -17,13 +17,11 @@
 
 #include "reone/game/action/followowner.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void FollowOwnerAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void FollowOwnerAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

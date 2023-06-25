@@ -20,8 +20,6 @@
 #include "reone/graphics/camera/orthographic.h"
 #include "reone/graphics/camera/perspective.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -43,14 +41,14 @@ bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
 }
 
 void CameraSceneNode::setOrthographicProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
-    auto camera = make_unique<OrthographicCamera>();
+    auto camera = std::make_unique<OrthographicCamera>();
     camera->setProjection(left, right, bottom, top, zNear, zFar);
     camera->setView(_absTransformInv);
     _camera = std::move(camera);
 }
 
 void CameraSceneNode::setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar) {
-    auto camera = make_shared<PerspectiveCamera>();
+    auto camera = std::make_shared<PerspectiveCamera>();
     camera->setProjection(fovy, aspect, zNear, zFar);
     camera->setView(_absTransformInv);
     _camera = std::move(camera);

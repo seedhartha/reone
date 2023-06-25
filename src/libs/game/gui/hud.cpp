@@ -34,8 +34,6 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -46,13 +44,13 @@ namespace reone {
 
 namespace game {
 
-static string g_attackIcon("i_attack");
+static std::string g_attackIcon("i_attack");
 
 void HUD::preload(IGUI &gui) {
     gui.setResolution(800, 600);
     gui.setScaling(GUI::ScalingMode::PositionRelativeToCenter);
 
-    static string combatControlTags[] = {
+    static std::string combatControlTags[] = {
         "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
         "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
         "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
@@ -193,7 +191,7 @@ void HUD::onGUILoaded() {
 
     _select.init();
 
-    _barkBubble = make_unique<BarkBubble>(_game, _services);
+    _barkBubble = std::make_unique<BarkBubble>(_game, _services);
     _barkBubble->init();
 }
 
@@ -332,19 +330,19 @@ void HUD::update(float dt) {
     _gui->update(dt);
 
     Party &party = _game.party();
-    vector<Label *> charLabels {
+    std::vector<Label *> charLabels {
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
         _binding.lblChar3.get()};
-    vector<Label *> backLabels {
+    std::vector<Label *> backLabels {
         _binding.lblBack1.get(),
         _binding.lblBack2.get(),
         _binding.lblBack3.get()};
-    vector<Label *> lvlUpBgLabels {
+    std::vector<Label *> lvlUpBgLabels {
         _binding.lblLvlUpBg1.get(),
         _binding.lblLvlUpBg2.get(),
         _binding.lblLvlUpBg3.get()};
-    vector<Label *> levevlUpLabels {
+    std::vector<Label *> levevlUpLabels {
         _binding.lblLevelUp1.get(),
         _binding.lblLevelUp2.get(),
         _binding.lblLevelUp3.get()};
@@ -359,7 +357,7 @@ void HUD::update(float dt) {
             lblLvlUpBg = lvlUpBgLabels[i];
         }
 
-        shared_ptr<Creature> member(party.getMember(i));
+        std::shared_ptr<Creature> member(party.getMember(i));
         if (member) {
             lblChar.setVisible(true);
             lblChar.setBorderFill(member->portrait());
@@ -415,7 +413,7 @@ void HUD::drawMinimap() {
     bounds[2] = static_cast<float>(extent.width);
     bounds[3] = static_cast<float>(extent.height);
 
-    shared_ptr<Area> area(_game.module()->area());
+    std::shared_ptr<Area> area(_game.module()->area());
     _game.map().draw(Map::Mode::Minimap, bounds);
 }
 
@@ -424,8 +422,8 @@ void HUD::drawHealth(int memberIndex) {
         return;
 
     Party &party = _game.party();
-    shared_ptr<Creature> member(party.getMember(memberIndex));
-    vector<Label *> backLabels {
+    std::shared_ptr<Creature> member(party.getMember(memberIndex));
+    std::vector<Label *> backLabels {
         _binding.lblBack1.get(),
         _binding.lblBack2.get(),
         _binding.lblBack3.get()};
@@ -470,7 +468,7 @@ void HUD::toggleCombat(bool enabled) {
 
 void HUD::refreshActionQueueItems() const {
     auto &actions = _game.party().getLeader()->actions();
-    vector<Label *> queueLabels {
+    std::vector<Label *> queueLabels {
         _binding.lblQueue0.get(),
         _binding.lblQueue1.get(),
         _binding.lblQueue2.get(),
@@ -484,8 +482,8 @@ void HUD::refreshActionQueueItems() const {
                 item.setBorderFill(g_attackIcon);
                 break;
             case ActionType::UseFeat: {
-                auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                shared_ptr<Feat> feat(_services.game.feats.get(featAction->feat()));
+                auto featAction = std::static_pointer_cast<UseFeatAction>(actions[i]);
+                std::shared_ptr<Feat> feat(_services.game.feats.get(featAction->feat()));
                 if (feat) {
                     item.setBorderFill(feat->icon);
                 }

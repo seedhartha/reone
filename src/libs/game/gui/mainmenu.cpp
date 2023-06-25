@@ -32,8 +32,6 @@
 #include "reone/game/party.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -102,7 +100,7 @@ void MainMenu::onGUILoaded() {
     _binding.btnWarp->setOnClick([this]() {
         startModuleSelection();
     });
-    _binding.lbModules->setOnItemClick([this](const string &item) {
+    _binding.lbModules->setOnItemClick([this](const std::string &item) {
         onModuleSelected(item);
     });
 
@@ -170,7 +168,7 @@ void MainMenu::setup3DView() {
     _binding.lbl3dView->setSceneName(kSceneMainMenu);
 }
 
-shared_ptr<ModelSceneNode> MainMenu::getKotorModel(ISceneGraph &sceneGraph) {
+std::shared_ptr<ModelSceneNode> MainMenu::getKotorModel(ISceneGraph &sceneGraph) {
     auto model = _services.graphics.models.get("mainmenu");
     if (!model) {
         return nullptr;
@@ -207,7 +205,7 @@ void MainMenu::loadModuleNames() {
     }
 }
 
-void MainMenu::onModuleSelected(const string &name) {
+void MainMenu::onModuleSelected(const std::string &name) {
     _game.loadModule(name);
 }
 

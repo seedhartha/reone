@@ -20,8 +20,6 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/fileoutput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -31,7 +29,7 @@ LipWriter::LipWriter(LipAnimation &&animation) :
 }
 
 void LipWriter::save(const boost::filesystem::path &path) {
-    auto lip = make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto lip = std::make_shared<FileOutputStream>(path, OpenMode::Binary);
 
     BinaryWriter writer(*lip);
     writer.putString("LIP V1.0");

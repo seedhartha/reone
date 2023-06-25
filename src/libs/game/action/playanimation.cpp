@@ -21,16 +21,14 @@
 
 #include "reone/game/object.h"
 
-using namespace std;
-
 using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-void PlayAnimationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    string animName = actor.getAnimationName(_anim);
+void PlayAnimationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
+    std::string animName = actor.getAnimationName(_anim);
     if (_playing) {
         if (actor.getActiveAnimationName() != animName) {
             complete();

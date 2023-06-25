@@ -17,13 +17,11 @@
 
 #include "reone/game/action/unequipitem.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void UnequipItemAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void UnequipItemAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

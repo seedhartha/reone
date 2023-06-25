@@ -34,8 +34,6 @@
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/mesh.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::graphics;
 
@@ -73,7 +71,7 @@ void ModelSceneNode::init() {
 
 void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
     // Convert model node to scene node
-    shared_ptr<ModelNodeSceneNode> sceneNode;
+    std::shared_ptr<ModelNodeSceneNode> sceneNode;
     if (node.isMesh()) {
         sceneNode = _sceneGraph.newMesh(*this, node);
     } else if (node.isLight()) {
@@ -118,7 +116,7 @@ void ModelSceneNode::update(float dt) {
     updateAnimations(dt);
 }
 
-void ModelSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
+void ModelSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
     for (auto &leaf : leafs) {
         static_cast<MeshSceneNode *>(leaf)->draw();
     }
@@ -161,7 +159,7 @@ void ModelSceneNode::computeAABB() {
     }
 }
 
-void ModelSceneNode::signalEvent(const string &name) {
+void ModelSceneNode::signalEvent(const std::string &name) {
     if (name == "detonate") {
         for (auto &node : _nodeByNumber) {
             if (node.second->type() == SceneNodeType::Emitter) {
@@ -173,7 +171,7 @@ void ModelSceneNode::signalEvent(const string &name) {
     }
 }
 
-void ModelSceneNode::attach(const string &parentName, SceneNode &node) {
+void ModelSceneNode::attach(const std::string &parentName, SceneNode &node) {
     auto maybeParent = _nodeByName.find(parentName);
     if (maybeParent == _nodeByName.end()) {
         return;
@@ -181,7 +179,7 @@ void ModelSceneNode::attach(const string &parentName, SceneNode &node) {
     auto parent = maybeParent->second;
     parent->addChild(node);
 
-    _attachments.insert(make_pair(parentName, &node));
+    _attachments.insert(std::make_pair(parentName, &node));
 
     computeAABB();
 }
@@ -190,11 +188,11 @@ ModelNodeSceneNode *ModelSceneNode::getNodeByNumber(uint16_t number) {
     return getFromLookupOrNull(_nodeByNumber, number);
 }
 
-ModelNodeSceneNode *ModelSceneNode::getNodeByName(const string &name) {
+ModelNodeSceneNode *ModelSceneNode::getNodeByName(const std::string &name) {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
-SceneNode *ModelSceneNode::getAttachment(const string &parentName) {
+SceneNode *ModelSceneNode::getAttachment(const std::string &parentName) {
     auto parent = _model->getNodeByName(parentName);
     return parent ? getFromLookupOrNull(_attachments, parent->name()) : nullptr;
 }
@@ -215,7 +213,7 @@ void ModelSceneNode::setEnvironmentMap(Texture *texture) {
     }
 }
 
-void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
+void ModelSceneNode::playAnimation(const std::string &name, AnimationProperties properties) {
     auto anim = _model->getAnimation(name);
     if (anim) {
         playAnimation(*anim, nullptr, std::move(properties));
@@ -382,7 +380,7 @@ static bool doesNodeHaveAncestor(const ModelNode &node, const std::string &name)
 }
 
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
-    shared_ptr<ModelNode> animNode(channel.anim->getNodeByName(modelNode.name()));
+    std::shared_ptr<ModelNode> animNode(channel.anim->getNodeByName(modelNode.name()));
     if (animNode && modelNode.isAnimated() && doesNodeHaveAncestor(modelNode, channel.anim->root())) {
         AnimationState state;
         state.flags = 0;
@@ -557,7 +555,7 @@ bool ModelSceneNode::isAnimationFinished() const {
     return _animChannels.empty() || _animChannels.front().finished;
 }
 
-string ModelSceneNode::activeAnimationName() const {
+std::string ModelSceneNode::activeAnimationName() const {
     if (_animChannels.empty()) {
         return "";
     }

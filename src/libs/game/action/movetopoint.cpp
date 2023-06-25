@@ -17,17 +17,15 @@
 
 #include "reone/game/action/movetopoint.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void MoveToPointAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void MoveToPointAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
     bool reached = creatureActor->navigateTo(_point, true, 1.0f, dt);
     if (reached) {

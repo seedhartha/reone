@@ -28,8 +28,6 @@
 
 #include "tinyxml2.h"
 
-using namespace std;
-
 using namespace tinyxml2;
 
 using namespace reone::resource;
@@ -42,7 +40,7 @@ void TwoDaTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TwoDaTool::invokeBatch(
@@ -101,13 +99,13 @@ void TwoDaTool::to2DA(const boost::filesystem::path &path, const boost::filesyst
 
     auto rootElement = document.RootElement();
     if (!rootElement) {
-        cerr << "XML is empty" << endl;
+        std::cerr << "XML is empty" << std::endl;
         fclose(fp);
         return;
     }
 
-    auto columns = vector<string>();
-    auto rows = vector<TwoDa::Row>();
+    auto columns = std::vector<std::string>();
+    auto rows = std::vector<TwoDa::Row>();
 
     // Columns
     auto firstElement = rootElement->FirstChildElement();
@@ -132,7 +130,7 @@ void TwoDaTool::to2DA(const boost::filesystem::path &path, const boost::filesyst
 
     auto twoDa = TwoDa(std::move(columns), std::move(rows));
 
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     boost::split(
         tokens,
         path.filename().string(),

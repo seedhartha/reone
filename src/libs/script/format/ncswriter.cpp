@@ -25,14 +25,12 @@
 
 #include "reone/script/program.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void NcsWriter::save(const boost::filesystem::path &path) {
-    auto ncs = make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto ncs = std::make_shared<FileOutputStream>(path, OpenMode::Binary);
     save(ncs);
 }
 
@@ -111,10 +109,10 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
 
     BinaryWriter ncsWriter(*out, boost::endian::order::big);
 
-    ncsWriter.putString(string("NCS V1.0", 8));
+    ncsWriter.putString(std::string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);
     ncsWriter.putUint32(13 + writer.tell());
-    ncsWriter.putString(string(&bytes[0], bytes.size()));
+    ncsWriter.putString(std::string(&bytes[0], bytes.size()));
 }
 
 } // namespace script

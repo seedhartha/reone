@@ -25,8 +25,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -100,7 +98,7 @@ void MapMenu::refreshControls() {
     _notes.clear();
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
-        auto waypoint = static_pointer_cast<Waypoint>(object);
+        auto waypoint = std::static_pointer_cast<Waypoint>(object);
         if (waypoint->isMapNoteEnabled() && !waypoint->mapNote().empty()) {
             _notes.push_back(waypoint);
         }
@@ -111,12 +109,12 @@ void MapMenu::refreshControls() {
 }
 
 void MapMenu::refreshSelectedNote() {
-    shared_ptr<Waypoint> note;
+    std::shared_ptr<Waypoint> note;
 
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(_services.resource.strings.get(kStrRefMapNote));
+        std::string text(_services.resource.strings.get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

@@ -20,13 +20,11 @@
 #include "reone/game/location.h"
 #include "reone/game/object.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void JumpToLocationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     actor.setPosition(_location->position());
     actor.setFacing(_location->facing());
 

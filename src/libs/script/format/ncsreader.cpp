@@ -21,19 +21,17 @@
 
 #include "reone/script/program.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void NcsReader::onLoad() {
-    checkSignature(string("NCS V1.0", 8));
+    checkSignature(std::string("NCS V1.0", 8));
 
     uint8_t byteCode = readByte();
     uint32_t length = readUint32();
 
-    _program = make_unique<ScriptProgram>(_resRef);
+    _program = std::make_unique<ScriptProgram>(_resRef);
 
     size_t off = tell();
     while (off < length) {
@@ -180,7 +178,7 @@ void NcsReader::readInstruction(size_t &offset) {
     case InstructionType::NOP2:
         break;
     default:
-        throw runtime_error(str(boost::format("Unsupported instruction type: %04x") % static_cast<int>(ins.type)));
+        throw std::runtime_error(str(boost::format("Unsupported instruction type: %04x") % static_cast<int>(ins.type)));
     }
 
     size_t pos = tell();

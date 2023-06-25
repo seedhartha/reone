@@ -19,8 +19,6 @@
 
 #include "reone/resource/typeutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -37,21 +35,21 @@ void Folder::loadDirectory(const boost::filesystem::path &path) {
             continue;
         }
 
-        string resRef(childPath.filename().replace_extension("").string());
+        std::string resRef(childPath.filename().replace_extension("").string());
         boost::to_lower(resRef);
 
-        string ext(childPath.extension().string().substr(1));
+        std::string ext(childPath.extension().string().substr(1));
         boost::to_lower(ext);
 
         Resource res;
         res.path = childPath;
         res.type = getResTypeByExt(ext);
 
-        _resources.insert(make_pair(resRef, res));
+        _resources.insert(std::make_pair(resRef, res));
     }
 }
 
-shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
+std::shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     boost::filesystem::path path;
     for (auto &res : _resources) {
         if (res.first == id.resRef && res.second.type == id.type) {
@@ -60,18 +58,18 @@ shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
         }
     }
     if (path.empty()) {
-        return shared_ptr<ByteArray>();
+        return std::shared_ptr<ByteArray>();
     }
-    boost::filesystem::ifstream in(path, ios::binary);
+    boost::filesystem::ifstream in(path, std::ios::binary);
 
-    in.seekg(0, ios::end);
+    in.seekg(0, std::ios::end);
     size_t size = in.tellg();
 
-    in.seekg(ios::beg);
+    in.seekg(std::ios::beg);
     ByteArray data(size, '\0');
     in.read(&data[0], size);
 
-    return make_shared<ByteArray>(std::move(data));
+    return std::make_shared<ByteArray>(std::move(data));
 }
 
 } // namespace resource

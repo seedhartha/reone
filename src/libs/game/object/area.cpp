@@ -60,8 +60,6 @@
 
 #include "reone/game/object/factory.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::graphics;
@@ -86,7 +84,7 @@ static CameraStyle g_defaultCameraStyle {"", 3.2f, 83.0f, 0.45f, 55.0f};
 
 Area::Area(
     uint32_t id,
-    string sceneName,
+    std::string sceneName,
     Game &game,
     ServicesView &services) :
     Object(
@@ -105,19 +103,19 @@ void Area::init() {
     const GraphicsOptions &opts = _game.options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 
-    _objectsByType.insert(make_pair(ObjectType::Creature, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Item, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Trigger, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Door, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::AreaOfEffect, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Waypoint, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Placeable, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Store, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Encounter, ObjectList()));
-    _objectsByType.insert(make_pair(ObjectType::Sound, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Creature, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Item, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Trigger, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Door, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::AreaOfEffect, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Waypoint, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Placeable, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Store, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Encounter, ObjectList()));
+    _objectsByType.insert(std::make_pair(ObjectType::Sound, ObjectList()));
 }
 
-void Area::load(string name, const Gff &are, const Gff &git, bool fromSave) {
+void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave) {
     _name = std::move(name);
 
     loadARE(are);
@@ -142,7 +140,7 @@ void Area::loadARE(const Gff &are) {
 void Area::loadCameraStyle(const Gff &are) {
     // Area
     int areaStyleIdx = are.getInt("CameraStyle");
-    shared_ptr<CameraStyle> areaStyle(_services.game.cameraStyles.get(areaStyleIdx));
+    std::shared_ptr<CameraStyle> areaStyle(_services.game.cameraStyles.get(areaStyleIdx));
     if (areaStyle) {
         _camStyleDefault = *areaStyle;
     } else {
@@ -150,7 +148,7 @@ void Area::loadCameraStyle(const Gff &are) {
     }
 
     // Combat
-    shared_ptr<CameraStyle> combatStyle(_services.game.cameraStyles.get("Combat"));
+    std::shared_ptr<CameraStyle> combatStyle(_services.game.cameraStyles.get("Combat"));
     if (combatStyle) {
         _camStyleDefault = *combatStyle;
     } else {
@@ -188,7 +186,7 @@ void Area::loadStealthXP(const Gff &are) {
 }
 
 void Area::loadGrass(const Gff &are) {
-    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
+    std::string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
         _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
     }
@@ -230,21 +228,21 @@ void Area::loadGIT(const Gff &git) {
 }
 
 void Area::loadProperties(const Gff &git) {
-    shared_ptr<Gff> props(git.getStruct("AreaProperties"));
+    std::shared_ptr<Gff> props(git.getStruct("AreaProperties"));
     if (!props) {
         warn("Area properties not found in GIT");
         return;
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
+        std::shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
 
 void Area::loadCreatures(const Gff &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_game.objectFactory().newCreature(_sceneName));
+        std::shared_ptr<Creature> creature(_game.objectFactory().newCreature(_sceneName));
         creature->loadFromGIT(*gffs);
         landObject(*creature);
         add(creature);
@@ -253,7 +251,7 @@ void Area::loadCreatures(const Gff &git) {
 
 void Area::loadDoors(const Gff &git) {
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_game.objectFactory().newDoor(_sceneName));
+        std::shared_ptr<Door> door(_game.objectFactory().newDoor(_sceneName));
         door->loadFromGIT(*gffs);
         add(door);
     }
@@ -261,7 +259,7 @@ void Area::loadDoors(const Gff &git) {
 
 void Area::loadPlaceables(const Gff &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable(_sceneName));
+        std::shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable(_sceneName));
         placeable->loadFromGIT(*gffs);
         add(placeable);
     }
@@ -269,7 +267,7 @@ void Area::loadPlaceables(const Gff &git) {
 
 void Area::loadWaypoints(const Gff &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint(_sceneName));
+        std::shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint(_sceneName));
         waypoint->loadFromGIT(*gffs);
         add(waypoint);
     }
@@ -277,7 +275,7 @@ void Area::loadWaypoints(const Gff &git) {
 
 void Area::loadTriggers(const Gff &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger(_sceneName));
+        std::shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger(_sceneName));
         trigger->loadFromGIT(*gffs);
         add(trigger);
     }
@@ -285,7 +283,7 @@ void Area::loadTriggers(const Gff &git) {
 
 void Area::loadSounds(const Gff &git) {
     for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_game.objectFactory().newSound(_sceneName));
+        std::shared_ptr<Sound> sound(_game.objectFactory().newSound(_sceneName));
         sound->loadFromGIT(*gffs);
         add(sound);
     }
@@ -293,7 +291,7 @@ void Area::loadSounds(const Gff &git) {
 
 void Area::loadCameras(const Gff &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera(_sceneName));
+        std::shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera(_sceneName));
         camera->loadFromGIT(*gffs);
         add(camera);
     }
@@ -301,7 +299,7 @@ void Area::loadCameras(const Gff &git) {
 
 void Area::loadEncounters(const Gff &git) {
     for (auto &gffs : git.getList("Encounter List")) {
-        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter(_sceneName));
+        std::shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter(_sceneName));
         encounter->loadFromGIT(*gffs);
         add(encounter);
     }
@@ -321,7 +319,7 @@ void Area::loadLYT() {
 
         // Model
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
-        shared_ptr<ModelSceneNode> modelSceneNode(sceneGraph.newModel(*model, ModelUsage::Room));
+        std::shared_ptr<ModelSceneNode> modelSceneNode(sceneGraph.newModel(*model, ModelUsage::Room));
         modelSceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -331,7 +329,7 @@ void Area::loadLYT() {
         sceneGraph.addRoot(modelSceneNode);
 
         // Walkmesh
-        shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
+        std::shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
         auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(*walkmesh);
@@ -339,7 +337,7 @@ void Area::loadLYT() {
         }
 
         // Grass
-        shared_ptr<GrassSceneNode> grassSceneNode;
+        std::shared_ptr<GrassSceneNode> grassSceneNode;
         auto aabbNode = modelSceneNode->model().getAABBNode();
         if (_grass.texture && aabbNode && _game.options().graphics.grass) {
             auto grassProperties = GrassProperties();
@@ -353,11 +351,11 @@ void Area::loadLYT() {
             sceneGraph.addRoot(grassSceneNode);
         }
 
-        auto room = make_unique<Room>(lytRoom.name, position, std::move(modelSceneNode), walkmeshSceneNode, std::move(grassSceneNode));
+        auto room = std::make_unique<Room>(lytRoom.name, position, std::move(modelSceneNode), walkmeshSceneNode, std::move(grassSceneNode));
         if (walkmeshSceneNode) {
             walkmeshSceneNode->setUser(*room);
         }
-        _rooms.insert(make_pair(room->name(), std::move(room)));
+        _rooms.insert(std::make_pair(room->name(), std::move(room)));
     }
 }
 
@@ -373,17 +371,17 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
     Visibility result;
     for (auto &pair : visibility) {
         result.insert(pair);
-        result.insert(make_pair(pair.second, pair.first));
+        result.insert(std::make_pair(pair.second, pair.first));
     }
     return std::move(result);
 }
 
 void Area::loadPTH() {
-    shared_ptr<Path> path(_services.game.paths.get(_name));
+    std::shared_ptr<Path> path(_services.game.paths.get(_name));
     if (!path) {
         return;
     }
-    unordered_map<int, float> pointZ;
+    std::unordered_map<int, float> pointZ;
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
@@ -394,7 +392,7 @@ void Area::loadPTH() {
             warn(boost::format("Point %d elevation not found") % i);
             continue;
         }
-        pointZ.insert(make_pair(static_cast<int>(i), collision.intersection.z));
+        pointZ.insert(std::make_pair(static_cast<int>(i), collision.intersection.z));
     }
 
     _pathfinder.load(path->points, pointZ);
@@ -406,20 +404,20 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
-    _firstPersonCamera = make_unique<FirstPersonCamera>(glm::radians(kDefaultFieldOfView), _cameraAspect, sceneGraph);
+    _firstPersonCamera = std::make_unique<FirstPersonCamera>(glm::radians(kDefaultFieldOfView), _cameraAspect, sceneGraph);
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_camStyleDefault, _cameraAspect, _game, sceneGraph);
+    _thirdPersonCamera = std::make_unique<ThirdPersonCamera>(_camStyleDefault, _cameraAspect, _game, sceneGraph);
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = make_unique<DialogCamera>(_camStyleDefault, _cameraAspect, sceneGraph);
-    _animatedCamera = make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
-    _staticCamera = make_unique<StaticCamera>(_cameraAspect, sceneGraph);
+    _dialogCamera = std::make_unique<DialogCamera>(_camStyleDefault, _cameraAspect, sceneGraph);
+    _animatedCamera = std::make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
+    _staticCamera = std::make_unique<StaticCamera>(_cameraAspect, sceneGraph);
 }
 
-void Area::add(const shared_ptr<Object> &object) {
+void Area::add(const std::shared_ptr<Object> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
     _objectsByTag[object->tag()].push_back(object);
@@ -430,21 +428,21 @@ void Area::add(const shared_ptr<Object> &object) {
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         if (sceneNode->type() == SceneNodeType::Model) {
-            sceneGraph.addRoot(static_pointer_cast<ModelSceneNode>(sceneNode));
+            sceneGraph.addRoot(std::static_pointer_cast<ModelSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Sound) {
-            sceneGraph.addRoot(static_pointer_cast<SoundSceneNode>(sceneNode));
+            sceneGraph.addRoot(std::static_pointer_cast<SoundSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Trigger) {
-            sceneGraph.addRoot(static_pointer_cast<TriggerSceneNode>(sceneNode));
+            sceneGraph.addRoot(std::static_pointer_cast<TriggerSceneNode>(sceneNode));
         }
     }
     if (object->type() == ObjectType::Placeable) {
-        auto placeable = static_pointer_cast<Placeable>(object);
+        auto placeable = std::static_pointer_cast<Placeable>(object);
         auto walkmesh = placeable->walkmesh();
         if (walkmesh) {
             sceneGraph.addRoot(walkmesh);
         }
     } else if (object->type() == ObjectType::Door) {
-        auto door = static_pointer_cast<Door>(object);
+        auto door = std::static_pointer_cast<Door>(object);
         auto walkmeshClosed = door->walkmeshClosed();
         if (walkmeshClosed) {
             sceneGraph.addRoot(walkmeshClosed);
@@ -493,21 +491,21 @@ void Area::doDestroyObject(uint32_t objectId) {
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         if (sceneNode->type() == SceneNodeType::Model) {
-            sceneGraph.removeRoot(*static_pointer_cast<ModelSceneNode>(sceneNode));
+            sceneGraph.removeRoot(*std::static_pointer_cast<ModelSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Sound) {
-            sceneGraph.removeRoot(*static_pointer_cast<SoundSceneNode>(sceneNode));
+            sceneGraph.removeRoot(*std::static_pointer_cast<SoundSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Trigger) {
-            sceneGraph.removeRoot(*static_pointer_cast<TriggerSceneNode>(sceneNode));
+            sceneGraph.removeRoot(*std::static_pointer_cast<TriggerSceneNode>(sceneNode));
         }
     }
     if (object->type() == ObjectType::Placeable) {
-        auto placeable = static_pointer_cast<Placeable>(object);
+        auto placeable = std::static_pointer_cast<Placeable>(object);
         auto walkmesh = placeable->walkmesh();
         if (walkmesh) {
             sceneGraph.removeRoot(*walkmesh);
         }
     } else if (object->type() == ObjectType::Door) {
-        auto door = static_pointer_cast<Door>(object);
+        auto door = std::static_pointer_cast<Door>(object);
         auto walkmeshOpen1 = door->walkmeshOpen1();
         if (walkmeshOpen1) {
             sceneGraph.removeRoot(*walkmeshOpen1);
@@ -548,7 +546,7 @@ ObjectList &Area::getObjectsByType(ObjectType type) {
     return _objectsByType.find(type)->second;
 }
 
-shared_ptr<Object> Area::getObjectByTag(const string &tag, int nth) const {
+std::shared_ptr<Object> Area::getObjectByTag(const std::string &tag, int nth) const {
     auto objects = _objectsByTag.find(tag);
     if (objects == _objectsByTag.end())
         return nullptr;
@@ -602,7 +600,7 @@ void Area::unloadParty() {
 }
 
 void Area::reloadParty() {
-    shared_ptr<Creature> player(_game.party().player());
+    std::shared_ptr<Creature> player(_game.party().player());
     loadParty(player->position(), player->getFacing());
 }
 
@@ -636,7 +634,7 @@ void Area::update(float dt) {
     }
 }
 
-bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
+bool Area::moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
     static glm::vec3 up {0.0f, 0.0f, 1.0f};
     static glm::vec3 zOffset {0.0f, 0.0f, 0.1f};
 
@@ -696,7 +694,7 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     return true;
 }
 
-bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
+bool Area::moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
     glm::vec2 delta(dest - glm::vec2(creature->position()));
     glm::vec2 dir(glm::normalize(delta));
     return moveCreature(creature, dir, run, dt);
@@ -755,7 +753,7 @@ void Area::destroyObject(const Object &object) {
     _objectsToDestroy.insert(object.id());
 }
 
-glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<Object> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
+glm::vec3 Area::getSelectableScreenCoords(const std::shared_ptr<Object> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
     static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
     glm::vec3 position(object->getSelectablePosition());
@@ -771,8 +769,8 @@ void Area::update3rdPersonCameraFacing() {
     _thirdPersonCamera->setFacing(partyLeader->getFacing());
 }
 
-void Area::startDialog(const shared_ptr<Object> &object, const string &resRef) {
-    string finalResRef(resRef);
+void Area::startDialog(const std::shared_ptr<Object> &object, const std::string &resRef) {
+    std::string finalResRef(resRef);
     if (resRef.empty()) {
         finalResRef = object->conversation();
     }
@@ -794,7 +792,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
 }
 
 void Area::updateRoomVisibility() {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game.cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -824,11 +822,11 @@ void Area::updateRoomVisibility() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<Object> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Object> partyLeader(_game.party().getLeader());
     if (!partyLeader) {
         return;
     }
-    auto model = static_pointer_cast<ModelSceneNode>(partyLeader->sceneNode());
+    auto model = std::static_pointer_cast<ModelSceneNode>(partyLeader->sceneNode());
     if (!model) {
         return;
     }
@@ -846,11 +844,11 @@ void Area::updateVisibility() {
     }
 }
 
-void Area::checkTriggersIntersection(const shared_ptr<Object> &triggerrer) {
+void Area::checkTriggersIntersection(const std::shared_ptr<Object> &triggerrer) {
     glm::vec2 position2d(triggerrer->position());
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
-        auto trigger = static_pointer_cast<Trigger>(object);
+        auto trigger = std::static_pointer_cast<Trigger>(object);
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) {
             continue;
         }
@@ -873,7 +871,7 @@ void Area::updateHeartbeat(float dt) {
             _game.scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
-            string heartbeat(object->getOnHeartbeat());
+            std::string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
                 _game.scriptRunner().run(heartbeat, object->id());
             }
@@ -895,7 +893,7 @@ Camera &Area::getCamera(CameraType type) {
     case CameraType::Dialog:
         return *_dialogCamera;
     default:
-        throw invalid_argument("Unsupported camera type: " + to_string(static_cast<int>(type)));
+        throw std::invalid_argument("Unsupported camera type: " + std::to_string(static_cast<int>(type)));
     }
 }
 
@@ -940,8 +938,8 @@ void Area::setUnescapable(bool value) {
     _unescapable = value;
 }
 
-shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
-    shared_ptr<Object> object;
+std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location) {
+    std::shared_ptr<Object> object;
     switch (type) {
     case ObjectType::Item: {
         auto item = _game.objectFactory().newItem();
@@ -964,7 +962,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         break;
     }
     default:
-        warn("Unsupported object type: " + to_string(static_cast<int>(type)));
+        warn("Unsupported object type: " + std::to_string(static_cast<int>(type)));
         break;
     }
     if (!object) {
@@ -973,7 +971,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 
     add(object);
 
-    auto creature = dynamic_pointer_cast<Creature>(object);
+    auto creature = std::dynamic_pointer_cast<Creature>(object);
     if (creature) {
         creature->runSpawnScript();
     }
@@ -1009,20 +1007,20 @@ void Area::updateObjectSelection() {
     }
 }
 
-void Area::hilightObject(shared_ptr<Object> object) {
+void Area::hilightObject(std::shared_ptr<Object> object) {
     _hilightedObject = std::move(object);
 }
 
-void Area::selectObject(shared_ptr<Object> object) {
+void Area::selectObject(std::shared_ptr<Object> object) {
     _selectedObject = std::move(object);
 }
 
-shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<Object> &)> &predicate) {
-    vector<pair<shared_ptr<Object>, float>> candidates;
+std::shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<Object> &)> &predicate) {
+    std::vector<std::pair<std::shared_ptr<Object>, float>> candidates;
 
     for (auto &object : _objects) {
         if (predicate(object)) {
-            candidates.push_back(make_pair(object, object->getSquareDistanceTo(origin)));
+            candidates.push_back(std::make_pair(object, object->getSquareDistanceTo(origin)));
         }
     }
     sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
@@ -1036,14 +1034,14 @@ shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth, cons
     return candidates[nth].first;
 }
 
-shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<Object> &target, const SearchCriteriaList &criterias, int nth) {
-    vector<pair<shared_ptr<Creature>, float>> candidates;
+std::shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<Object> &target, const SearchCriteriaList &criterias, int nth) {
+    std::vector<std::pair<std::shared_ptr<Creature>, float>> candidates;
 
     for (auto &object : getObjectsByType(ObjectType::Creature)) {
-        auto creature = static_pointer_cast<Creature>(object);
+        auto creature = std::static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias, target)) {
             float distance2 = creature->getSquareDistanceTo(*target);
-            candidates.push_back(make_pair(std::move(creature), distance2));
+            candidates.push_back(std::make_pair(std::move(creature), distance2));
         }
     }
 
@@ -1061,15 +1059,15 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
             auto reputation = static_cast<ReputationType>(criteria.second);
             switch (reputation) {
             case ReputationType::Friend:
-                if (!target || !_services.game.reputes.getIsFriend(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsFriend(creature, *std::static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Enemy:
-                if (!target || !_services.game.reputes.getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsEnemy(creature, *std::static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Neutral:
-                if (!target || !_services.game.reputes.getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsNeutral(creature, *std::static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             default:
@@ -1126,14 +1124,14 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
     return true;
 }
 
-shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location, const SearchCriteriaList &criterias, int nth) {
-    vector<pair<shared_ptr<Creature>, float>> candidates;
+std::shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location, const SearchCriteriaList &criterias, int nth) {
+    std::vector<std::pair<std::shared_ptr<Creature>, float>> candidates;
 
     for (auto &object : getObjectsByType(ObjectType::Creature)) {
-        auto creature = static_pointer_cast<Creature>(object);
+        auto creature = std::static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
             float distance2 = creature->getSquareDistanceTo(location.position());
-            candidates.push_back(make_pair(std::move(creature), distance2));
+            candidates.push_back(std::make_pair(std::move(creature), distance2));
         }
     }
 
@@ -1159,7 +1157,7 @@ void Area::doUpdatePerception() {
         if (object->isDead())
             continue;
 
-        auto creature = static_pointer_cast<Creature>(object);
+        auto creature = std::static_pointer_cast<Creature>(object);
         float hearingRange2 = creature->perception().hearingRange * creature->perception().hearingRange;
         float sightRange2 = creature->perception().sightRange * creature->perception().sightRange;
 

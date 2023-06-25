@@ -17,8 +17,6 @@
 
 #include "reone/audio/context.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {
@@ -26,11 +24,11 @@ namespace audio {
 void AudioContext::init() {
     _device = alcOpenDevice(nullptr);
     if (!_device) {
-        throw runtime_error("Failed to open an OpenAL device");
+        throw std::runtime_error("Failed to open an OpenAL device");
     }
     _context = alcCreateContext(_device, nullptr);
     if (!_context) {
-        throw runtime_error("Failed to create an OpenAL context");
+        throw std::runtime_error("Failed to create an OpenAL context");
     }
     alcMakeContextCurrent(_context);
 }

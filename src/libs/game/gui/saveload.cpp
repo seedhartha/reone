@@ -27,8 +27,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -61,7 +59,7 @@ void SaveLoad::onGUILoaded() {
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
     _binding.lbGames->protoItem().setBorderColorOverride(_baseColor);
     _binding.lbGames->protoItem().setHilightColor(_hilightColor);
-    _binding.lbGames->setOnItemClick([this](const string &item) {
+    _binding.lbGames->setOnItemClick([this](const std::string &item) {
         // Get save number by item tag
         int selectedSaveNumber = -1;
         for (int i = 0; i < _binding.lbGames->getItemCount(); ++i) {
@@ -73,7 +71,7 @@ void SaveLoad::onGUILoaded() {
         }
 
         // Get save screenshot by save number
-        shared_ptr<Texture> screenshot;
+        std::shared_ptr<Texture> screenshot;
         if (selectedSaveNumber != -1) {
             for (auto &save : _saves) {
                 if (save.number == selectedSaveNumber) {
@@ -152,10 +150,10 @@ void SaveLoad::bindControls() {
 void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != SaveLoadMode::Save);
 
-    string panelName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    std::string panelName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     _binding.lblPanelName->setTextMessage(std::move(panelName));
 
-    string actionName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
+    std::string actionName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
     _binding.btnSaveLoad->setTextMessage(std::move(actionName));
 
     refreshSavedGames();
@@ -182,7 +180,7 @@ void SaveLoad::refreshSavedGames() {
 
     _binding.lbGames->clearItems();
     for (size_t i = 0; i < _saves.size(); ++i) {
-        string name(str(boost::format("%06d") % _saves[i].number));
+        std::string name(str(boost::format("%06d") % _saves[i].number));
         ListBox::Item item;
         item.tag = name;
         item.text = name;
@@ -198,7 +196,7 @@ static SavedGame peekSavedGame(const boost::filesystem::path &path) {
     GffReader nfo;
     nfo.load(nfoStream);
 
-    shared_ptr<Texture> screen;
+    std::shared_ptr<Texture> screen;
     auto screenData = erfResourceProvider.find(ResourceId("screen", ResourceType::Tga));
     if (screenData) {
         auto tgaStream = ByteArrayInputStream(*screenData);
@@ -225,8 +223,8 @@ void SaveLoad::indexSavedGame(boost::filesystem::path path) {
         descriptor.save = peekSavedGame(path);
         descriptor.path = std::move(path);
         _saves.push_back(std::move(descriptor));
-    } catch (const exception &e) {
-        warn("Error indexing a saved game: " + string(e.what()));
+    } catch (const std::exception &e) {
+        warn("Error indexing a saved game: " + std::string(e.what()));
     }
 }
 
@@ -239,7 +237,7 @@ int SaveLoad::getSelectedSaveNumber() const {
     if (hilightedIdx == -1)
         return -1;
 
-    string tag(_binding.lbGames->getItemAt(hilightedIdx).tag);
+    std::string tag(_binding.lbGames->getItemAt(hilightedIdx).tag);
 
     return stoi(tag);
 }
@@ -247,7 +245,7 @@ int SaveLoad::getSelectedSaveNumber() const {
 int SaveLoad::getNewSaveNumber() const {
     int number = 0;
     for (auto &save : _saves) {
-        number = max(number, save.number);
+        number = std::max(number, save.number);
     }
     return number + 1;
 }

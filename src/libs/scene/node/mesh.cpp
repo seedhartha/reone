@@ -35,8 +35,6 @@
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/model.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -54,7 +52,7 @@ void MeshSceneNode::init() {
 }
 
 void MeshSceneNode::initTextures() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;
     }
@@ -84,7 +82,7 @@ void MeshSceneNode::refreshAdditionalTextures() {
 void MeshSceneNode::update(float dt) {
     SceneNode::update(dt);
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
@@ -123,7 +121,7 @@ bool MeshSceneNode::shouldRender() const {
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return false;
     }
@@ -289,7 +287,7 @@ void MeshSceneNode::draw() {
 }
 
 void MeshSceneNode::drawShadow() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;
     }

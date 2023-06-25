@@ -20,8 +20,6 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/fileoutput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {

@@ -17,26 +17,24 @@
 
 #include "reone/graphics/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 void GraphicsModule::init() {
     _window = newWindow();
-    _graphicsContext = make_unique<GraphicsContext>(_options);
-    _meshes = make_unique<Meshes>();
-    _textures = make_unique<Textures>(_options, _resource.resources());
-    _models = make_unique<Models>(*_textures, _resource.resources());
-    _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
-    _lipAnimations = make_unique<LipAnimations>(_resource.resources());
-    _uniforms = make_unique<Uniforms>();
-    _shaders = make_unique<Shaders>(_options);
-    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
-    _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
+    _graphicsContext = std::make_unique<GraphicsContext>(_options);
+    _meshes = std::make_unique<Meshes>();
+    _textures = std::make_unique<Textures>(_options, _resource.resources());
+    _models = std::make_unique<Models>(*_textures, _resource.resources());
+    _walkmeshes = std::make_unique<Walkmeshes>(_resource.resources());
+    _lipAnimations = std::make_unique<LipAnimations>(_resource.resources());
+    _uniforms = std::make_unique<Uniforms>();
+    _shaders = std::make_unique<Shaders>(_options);
+    _fonts = std::make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
+    _pipeline = std::make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
 
-    _services = make_unique<GraphicsServices>(
+    _services = std::make_unique<GraphicsServices>(
         *_fonts,
         *_graphicsContext,
         *_lipAnimations,
@@ -69,8 +67,8 @@ void GraphicsModule::deinit() {
     _window.reset();
 }
 
-unique_ptr<IWindow> GraphicsModule::newWindow() {
-    auto window = make_unique<Window>(_options);
+std::unique_ptr<IWindow> GraphicsModule::newWindow() {
+    auto window = std::make_unique<Window>(_options);
     window->init();
     return window;
 }

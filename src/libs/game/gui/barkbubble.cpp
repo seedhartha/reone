@@ -19,8 +19,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::gui;
@@ -50,7 +48,7 @@ void BarkBubble::update(float dt) {
     }
 }
 
-void BarkBubble::setBarkText(const string &text, float duration) {
+void BarkBubble::setBarkText(const std::string &text, float duration) {
     if (text.empty()) {
         _gui->rootControl().setVisible(false);
         _binding.lblBarkText->setVisible(false);

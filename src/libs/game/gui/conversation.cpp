@@ -32,8 +32,6 @@
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -48,7 +46,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 
 static bool g_allEntriesSkippable = false;
 
-void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<Object> &owner) {
+void Conversation::start(const std::shared_ptr<Dialog> &dialog, const std::shared_ptr<Object> &owner) {
     debug("Start " + dialog->resRef, LogChannels::conversation);
 
     _dialog = dialog;
@@ -78,7 +76,7 @@ void Conversation::loadConversationBackground() {
 }
 
 void Conversation::loadCameraModel() {
-    string modelResRef(_dialog->cameraModel);
+    std::string modelResRef(_dialog->cameraModel);
     _cameraModel = modelResRef.empty() ? nullptr : _services.graphics.models.get(modelResRef);
 }
 
@@ -95,7 +93,7 @@ void Conversation::loadStartEntry() {
     loadEntry(entryIdx, true);
 }
 
-int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links) {
+int Conversation::indexOfFirstActive(const std::vector<Dialog::EntryReplyLink> &links) {
     for (auto &link : links) {
         if (link.active.empty() || evaluateCondition(link.active)) {
             return link.index;
@@ -104,7 +102,7 @@ int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links
     return -1;
 }
 
-bool Conversation::evaluateCondition(const string &scriptResRef) {
+bool Conversation::evaluateCondition(const std::string &scriptResRef) {
     return _game.scriptRunner().run(scriptResRef, _owner->id()) != 0;
 }
 
@@ -123,7 +121,7 @@ void Conversation::onFinish() {
 }
 
 void Conversation::loadEntry(int index, bool start) {
-    debug("Load entry " + to_string(index), LogChannels::conversation);
+    debug("Load entry " + std::to_string(index), LogChannels::conversation);
     _currentEntry = &_dialog->getEntry(index);
 
     setMessage(_currentEntry->text);
@@ -163,7 +161,7 @@ void Conversation::loadVoiceOver() {
     }
 
     // Play current voice over either from Sound or from VO_ResRef
-    string voiceResRef;
+    std::string voiceResRef;
     if (!_currentEntry->sound.empty()) {
         voiceResRef = _currentEntry->sound;
         _lipAnimation = _services.graphics.lipAnimations.get(_currentEntry->sound);
@@ -181,7 +179,7 @@ void Conversation::loadVoiceOver() {
     }
 }
 
-static string getCameraAnimationName(int ordinal) {
+static std::string getCameraAnimationName(int ordinal) {
     return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
 }
 
@@ -189,8 +187,8 @@ void Conversation::scheduleEndOfEntry() {
     float duration = kDefaultEntryDuration;
 
     if (_cameraModel && (_currentEntry->waitFlags & Dialog::WaitFlags::waitAnimFinish)) {
-        string animName(getCameraAnimationName(_currentEntry->cameraAnimation));
-        shared_ptr<Animation> animation(_cameraModel->getAnimation(animName));
+        std::string animName(getCameraAnimationName(_currentEntry->cameraAnimation));
+        std::shared_ptr<Animation> animation(_cameraModel->getAnimation(animName));
         if (animation) {
             duration = animation->length();
         }
@@ -219,12 +217,12 @@ void Conversation::loadReplies() {
     refreshReplies();
 }
 
-static string getReplyText(const Dialog::EntryReply &reply, int index) {
+static std::string getReplyText(const Dialog::EntryReply &reply, int index) {
     return str(boost::format("%d. %s") % (index + 1) % (reply.text.empty() ? "[empty]" : reply.text));
 }
 
 void Conversation::refreshReplies() {
-    vector<string> lines;
+    std::vector<std::string> lines;
     if (!_autoPickFirstReply) {
         for (size_t i = 0; i < _replies.size(); ++i) {
             lines.push_back(getReplyText(*_replies[i], static_cast<int>(i)));
@@ -234,7 +232,7 @@ void Conversation::refreshReplies() {
 }
 
 void Conversation::pickReply(int index) {
-    debug("Pick reply " + to_string(index), LogChannels::conversation);
+    debug("Pick reply " + std::to_string(index), LogChannels::conversation);
     const Dialog::EntryReply &reply = *_replies[index];
 
     // Run reply script
@@ -329,7 +327,7 @@ void Conversation::update(float dt) {
 }
 
 CameraType Conversation::getCamera(int &cameraId) const {
-    string cameraModel(_dialog->cameraModel);
+    std::string cameraModel(_dialog->cameraModel);
     if (!cameraModel.empty()) {
         return CameraType::Animated;
     }

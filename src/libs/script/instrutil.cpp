@@ -23,13 +23,11 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
-static unordered_map<InstructionType, string> g_descByInstrType {
+static std::unordered_map<InstructionType, std::string> g_descByInstrType {
     {InstructionType::NOP, "NOP"},
     {InstructionType::CPDOWNSP, "CPDOWNSP"},
     {InstructionType::RSADDI, "RSADDI"},
@@ -126,13 +124,13 @@ static unordered_map<InstructionType, string> g_descByInstrType {
     {InstructionType::STORE_STATE, "STORE_STATE"},
     {InstructionType::NOP2, "NOP2"}};
 
-static map<string, InstructionType> g_instrTypeByDesc = associate<pair<InstructionType, string>, string, InstructionType>(
+static std::map<std::string, InstructionType> g_instrTypeByDesc = associate<std::pair<InstructionType, std::string>, std::string, InstructionType>(
     mapToEntries(g_descByInstrType),
     [](auto &pair) { return pair.second; },
     [](auto &pair) { return pair.first; });
 
-string describeInstruction(const Instruction &ins, IRoutines &routines) {
-    string desc(str(boost::format("%08x %s") % ins.offset % describeInstructionType(ins.type)));
+std::string describeInstruction(const Instruction &ins, IRoutines &routines) {
+    std::string desc(str(boost::format("%08x %s") % ins.offset % describeInstructionType(ins.type)));
 
     switch (ins.type) {
     case InstructionType::CPDOWNSP:
@@ -142,26 +140,26 @@ string describeInstruction(const Instruction &ins, IRoutines &routines) {
         desc += str(boost::format(" %d, %d") % ins.stackOffset % ins.size);
         break;
     case InstructionType::CONSTI:
-        desc += " " + to_string(ins.intValue);
+        desc += " " + std::to_string(ins.intValue);
         break;
     case InstructionType::CONSTF:
-        desc += " " + to_string(ins.floatValue);
+        desc += " " + std::to_string(ins.floatValue);
         break;
     case InstructionType::CONSTS:
         desc += " \"" + ins.strValue + "\"";
         break;
     case InstructionType::CONSTO:
-        desc += " " + to_string(ins.objectId);
+        desc += " " + std::to_string(ins.objectId);
         break;
     case InstructionType::ACTION:
         desc += str(boost::format(" %s(%d), %d") % routines.get(ins.routine).name() % ins.routine % ins.argCount);
         break;
     case InstructionType::EQUALTT:
     case InstructionType::NEQUALTT:
-        desc += " " + to_string(ins.size);
+        desc += " " + std::to_string(ins.size);
         break;
     case InstructionType::MOVSP:
-        desc += " " + to_string(ins.stackOffset);
+        desc += " " + std::to_string(ins.stackOffset);
         break;
     case InstructionType::JMP:
     case InstructionType::JSR:
@@ -178,7 +176,7 @@ string describeInstruction(const Instruction &ins, IRoutines &routines) {
     case InstructionType::INCISP:
     case InstructionType::DECIBP:
     case InstructionType::INCIBP:
-        desc += " " + to_string(ins.stackOffset);
+        desc += " " + std::to_string(ins.stackOffset);
         break;
     case InstructionType::STORE_STATE:
         desc += str(boost::format(" %d, %d") % ins.size % ins.sizeLocals);
@@ -190,18 +188,18 @@ string describeInstruction(const Instruction &ins, IRoutines &routines) {
     return std::move(desc);
 }
 
-const string &describeInstructionType(InstructionType type) {
+const std::string &describeInstructionType(InstructionType type) {
     auto maybeDesc = g_descByInstrType.find(type);
     if (maybeDesc == g_descByInstrType.end()) {
-        throw invalid_argument("Unsupported instruction type: " + to_string(static_cast<int>(type)));
+        throw std::invalid_argument("Unsupported instruction type: " + std::to_string(static_cast<int>(type)));
     }
     return maybeDesc->second;
 }
 
-InstructionType parseInstructionType(const string &desc) {
+InstructionType parseInstructionType(const std::string &desc) {
     auto maybeInstrType = g_instrTypeByDesc.find(desc);
     if (maybeInstrType == g_instrTypeByDesc.end()) {
-        throw invalid_argument("Unrecognized instruction type: " + desc);
+        throw std::invalid_argument("Unrecognized instruction type: " + desc);
     }
     return maybeInstrType->second;
 }

@@ -19,14 +19,12 @@
 
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void Action::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    warn("Action execution not implemented: " + to_string(static_cast<int>(_type)));
+void Action::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
+    warn("Action execution not implemented: " + std::to_string(static_cast<int>(_type)));
     complete();
 }
 

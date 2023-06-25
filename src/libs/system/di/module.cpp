@@ -17,13 +17,11 @@
 
 #include "reone/system/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 void SystemModule::init() {
-    _clock = make_unique<Clock>();
-    _services = make_unique<SystemServices>(*_clock);
+    _clock = std::make_unique<Clock>();
+    _services = std::make_unique<SystemServices>(*_clock);
 }
 
 } // namespace reone

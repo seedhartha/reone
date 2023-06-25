@@ -30,8 +30,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -53,7 +51,7 @@ Map::Map(Game &game, ServicesView &services) :
     }
 }
 
-void Map::load(const string &area, const Gff &gffs) {
+void Map::load(const std::string &area, const Gff &gffs) {
     loadProperties(gffs);
     loadTextures(area);
 }
@@ -66,8 +64,8 @@ void Map::loadProperties(const Gff &gffs) {
     _mapPoint2 = glm::vec2(gffs.getFloat("MapPt2X"), gffs.getFloat("MapPt2Y"));
 }
 
-void Map::loadTextures(const string &area) {
-    string resRef("lbl_map" + area);
+void Map::loadTextures(const std::string &area) {
+    std::string resRef("lbl_map" + area);
     _areaTexture = _services.graphics.textures.get(resRef, TextureUsage::GUI);
 
     if (!_arrowTexture) {
@@ -91,7 +89,7 @@ void Map::draw(Mode mode, const glm::vec4 &bounds) {
 
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
     if (mode == Mode::Minimap) {
-        shared_ptr<Creature> partyLeader(_game.party().getLeader());
+        std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         if (!partyLeader) {
             return;
         }
@@ -145,7 +143,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     _services.graphics.textures.bind(*_noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
-        auto waypoint = static_pointer_cast<Waypoint>(object);
+        auto waypoint = std::static_pointer_cast<Waypoint>(object);
         if (!waypoint->isMapNoteEnabled() || waypoint->mapNote().empty())
             continue;
 
@@ -198,7 +196,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
         result.y = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.y;
         break;
     default:
-        warn("Map: invalid north axis: " + to_string(_northAxis));
+        warn("Map: invalid north axis: " + std::to_string(_northAxis));
         break;
     }
 
@@ -206,7 +204,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (!partyLeader) {
         return;
     }

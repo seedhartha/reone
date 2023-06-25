@@ -23,19 +23,17 @@
 #include "reone/script/routines.h"
 #include "reone/system/exception/validation.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void PcodeReader::load() {
-    vector<string> insLines;
-    map<int, string> labelByLineIdx;
-    map<int, uint32_t> addrByLineIdx;
+    std::vector<std::string> insLines;
+    std::map<int, std::string> labelByLineIdx;
+    std::map<int, uint32_t> addrByLineIdx;
 
     boost::filesystem::ifstream pcode(_path);
-    string line;
+    std::string line;
     boost::smatch what;
     boost::regex re("^([_\\d\\w]+):$");
     uint32_t addr = 13;
@@ -63,19 +61,19 @@ void PcodeReader::load() {
         _addrByLabel[pair.second] = addrByLineIdx[pair.first];
     }
 
-    _program = make_shared<ScriptProgram>(filename.string());
+    _program = std::make_shared<ScriptProgram>(filename.string());
     for (size_t i = 0; i < insLines.size(); ++i) {
         uint32_t insAddr = addrByLineIdx.find(static_cast<int>(i))->second;
         _program->add(parseInstruction(insLines[i], insAddr));
     }
 }
 
-int PcodeReader::getInstructionSize(const string &line) {
+int PcodeReader::getInstructionSize(const std::string &line) {
     int result = 2;
 
     size_t spaceIdx = line.find(" ");
-    string typeDesc(spaceIdx != string::npos ? line.substr(0, spaceIdx) : line);
-    string argsLine(line.substr(typeDesc.length()));
+    std::string typeDesc(spaceIdx != std::string::npos ? line.substr(0, spaceIdx) : line);
+    std::string argsLine(line.substr(typeDesc.length()));
     InstructionType type = parseInstructionType(typeDesc);
 
     switch (type) {
@@ -123,10 +121,10 @@ int PcodeReader::getInstructionSize(const string &line) {
     return result;
 }
 
-Instruction PcodeReader::parseInstruction(const string &line, uint32_t addr) const {
+Instruction PcodeReader::parseInstruction(const std::string &line, uint32_t addr) const {
     size_t spaceIdx = line.find(" ");
-    string typeDesc(spaceIdx != string::npos ? line.substr(0, spaceIdx) : line);
-    string argsLine(line.substr(typeDesc.length()));
+    std::string typeDesc(spaceIdx != std::string::npos ? line.substr(0, spaceIdx) : line);
+    std::string argsLine(line.substr(typeDesc.length()));
     InstructionType type = parseInstructionType(typeDesc);
 
     Instruction ins;
@@ -179,7 +177,7 @@ Instruction PcodeReader::parseInstruction(const string &line, uint32_t addr) con
     case InstructionType::JZ:
     case InstructionType::JNZ:
         applyArguments(argsLine, "^ ([_\\d\\w]+)$", 1, [this, &ins](auto &args) {
-            const string &label = args[0];
+            const std::string &label = args[0];
             auto maybeAddr = _addrByLabel.find(label);
             if (maybeAddr == _addrByLabel.end()) {
                 throw ValidationException("Instruction address not found by label '" + label + "'");
@@ -221,13 +219,13 @@ Instruction PcodeReader::parseInstruction(const string &line, uint32_t addr) con
     return std::move(ins);
 }
 
-void PcodeReader::applyArguments(const string &line, const string &restr, int numArgs, const function<void(const vector<string> &)> &fn) const {
+void PcodeReader::applyArguments(const std::string &line, const std::string &restr, int numArgs, const std::function<void(const std::vector<std::string> &)> &fn) const {
     boost::smatch what;
     boost::regex re(restr);
     if (!boost::regex_match(line, what, re)) {
-        throw invalid_argument(str(boost::format("Arguments line '%s' must match regular expression '%s'") % line % restr));
+        throw std::invalid_argument(str(boost::format("Arguments line '%s' must match regular expression '%s'") % line % restr));
     }
-    vector<string> args;
+    std::vector<std::string> args;
     for (int i = 0; i < numArgs; ++i) {
         args.push_back(what[1 + i].str());
     }

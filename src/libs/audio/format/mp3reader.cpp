@@ -21,8 +21,6 @@
 
 #include "reone/audio/stream.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {
@@ -51,7 +49,7 @@ void Mp3Reader::load(IInputStream &stream) {
     stream.read(&data[0], size);
 
     _input = data;
-    _stream = make_shared<AudioStream>();
+    _stream = std::make_shared<AudioStream>();
 
     mad_decoder decoder;
     mad_decoder_init(

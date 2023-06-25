@@ -24,8 +24,6 @@
 
 #include "reone/game/gui/chargen.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;

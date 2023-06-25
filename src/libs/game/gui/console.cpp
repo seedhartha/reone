@@ -42,8 +42,6 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::scene;
@@ -61,24 +59,24 @@ static constexpr float kTextOffset = 3.0f;
 void Console::init() {
     _font = _services.graphics.fonts.get("fnt_console");
 
-    addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("runscript", "rs", "run script", bind(&Console::cmdRunScript, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", bind(&Console::cmdShowWalkmesh, this, std::placeholders::_1, std::placeholders::_2));
-    addCommand("showtriggers", "st", "toggle rendering triggers", bind(&Console::cmdShowTriggers, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("clear", "c", "clear console", std::bind(&Console::cmdClear, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("info", "i", "information on selected object", std::bind(&Console::cmdInfo, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listglobals", "lg", "list global variables", std::bind(&Console::cmdListGlobals, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listlocals", "ll", "list local variables", std::bind(&Console::cmdListLocals, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("runscript", "rs", "run script", std::bind(&Console::cmdRunScript, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("listanim", "la", "list animations of selected object", std::bind(&Console::cmdListAnim, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("playanim", "pa", "play animation on selected object", std::bind(&Console::cmdPlayAnim, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("warp", "w", "warp to a module", std::bind(&Console::cmdWarp, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("kill", "k", "kill selected object", std::bind(&Console::cmdKill, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("additem", "ai", "add item to selected object", std::bind(&Console::cmdAddItem, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("givexp", "xp", "give experience to selected creature", std::bind(&Console::cmdGiveXP, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", std::bind(&Console::cmdShowWalkmesh, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("showtriggers", "st", "toggle rendering triggers", std::bind(&Console::cmdShowTriggers, this, std::placeholders::_1, std::placeholders::_2));
 
-    addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("help", "h", "list console commands", std::bind(&Console::cmdHelp, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-void Console::addCommand(string name, string alias, string description, CommandHandler handler) {
+void Console::addCommand(std::string name, std::string alias, std::string description, CommandHandler handler) {
     Command cmd;
     cmd.name = std::move(name);
     cmd.alias = std::move(alias);
@@ -86,10 +84,10 @@ void Console::addCommand(string name, string alias, string description, CommandH
     cmd.handler = std::move(handler);
 
     _commands.push_back(cmd);
-    _commandByName.insert(make_pair(cmd.name, cmd));
+    _commandByName.insert(std::make_pair(cmd.name, cmd));
 
     if (!cmd.alias.empty()) {
-        _commandByAlias.insert(make_pair(cmd.alias, cmd));
+        _commandByAlias.insert(std::make_pair(cmd.alias, cmd));
     }
 }
 
@@ -129,7 +127,7 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
             return true;
 
         case SDLK_RETURN: {
-            string text(_input.text());
+            std::string text(_input.text());
             if (!text.empty()) {
                 executeInputText();
                 _history.push(_input.text());
@@ -159,7 +157,7 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 void Console::executeInputText() {
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
     if (tokens.empty()) {
         return;
@@ -177,7 +175,7 @@ void Console::executeInputText() {
     if (handler) {
         try {
             handler(_input.text(), std::move(tokens));
-        } catch (const invalid_argument &) {
+        } catch (const std::invalid_argument &) {
             print("Invalid argument");
         }
     } else {
@@ -216,24 +214,24 @@ void Console::drawLines() {
 
     // Input
 
-    string text("> " + _input.text());
+    std::string text("> " + _input.text());
     _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
 
     // Output
 
     for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
-        const string &line = _output[static_cast<size_t>(i) + _outputOffset];
+        const std::string &line = _output[static_cast<size_t>(i) + _outputOffset];
         position.y -= _font->height();
         _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
 
-void Console::cmdClear(string input, vector<string> tokens) {
+void Console::cmdClear(std::string input, std::vector<std::string> tokens) {
     _output.clear();
     _outputOffset = 0;
 }
 
-void Console::cmdInfo(string input, vector<string> tokens) {
+void Console::cmdInfo(std::string input, std::vector<std::string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("No object is selected");
@@ -241,8 +239,8 @@ void Console::cmdInfo(string input, vector<string> tokens) {
     }
     glm::vec3 position(object->position());
 
-    stringstream ss;
-    ss << setprecision(2) << fixed
+    std::stringstream ss;
+    ss << std::setprecision(2) << std::fixed
        << "id=" << object->id()
        << " "
        << "tag=\"" << object->tag() << "\""
@@ -253,7 +251,7 @@ void Console::cmdInfo(string input, vector<string> tokens) {
 
     switch (object->type()) {
     case ObjectType::Creature: {
-        auto creature = static_pointer_cast<Creature>(object);
+        auto creature = std::static_pointer_cast<Creature>(object);
         ss << " "
            << "app=" << creature->appearance()
            << " "
@@ -261,7 +259,7 @@ void Console::cmdInfo(string input, vector<string> tokens) {
         break;
     }
     case ObjectType::Placeable: {
-        auto placeable = static_pointer_cast<Placeable>(object);
+        auto placeable = std::static_pointer_cast<Placeable>(object);
         ss << " "
            << "app=" << placeable->appearance();
         break;
@@ -273,7 +271,7 @@ void Console::cmdInfo(string input, vector<string> tokens) {
     print(ss.str());
 }
 
-void Console::cmdListGlobals(string input, vector<string> tokens) {
+void Console::cmdListGlobals(std::string input, std::vector<std::string> tokens) {
     auto &strings = _game.globalStrings();
     for (auto &var : strings) {
         print(var.first + " = " + var.second);
@@ -286,7 +284,7 @@ void Console::cmdListGlobals(string input, vector<string> tokens) {
 
     auto &numbers = _game.globalNumbers();
     for (auto &var : numbers) {
-        print(var.first + " = " + to_string(var.second));
+        print(var.first + " = " + std::to_string(var.second));
     }
 
     auto &locations = _game.globalLocations();
@@ -300,7 +298,7 @@ void Console::cmdListGlobals(string input, vector<string> tokens) {
     }
 }
 
-void Console::cmdListLocals(string input, vector<string> tokens) {
+void Console::cmdListLocals(std::string input, std::vector<std::string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("No object is selected");
@@ -309,16 +307,16 @@ void Console::cmdListLocals(string input, vector<string> tokens) {
 
     auto &booleans = object->localBooleans();
     for (auto &var : booleans) {
-        print(to_string(var.first) + " -> " + (var.second ? "true" : "false"));
+        print(std::to_string(var.first) + " -> " + (var.second ? "true" : "false"));
     }
 
     auto &numbers = object->localNumbers();
     for (auto &var : numbers) {
-        print(to_string(var.first) + " -> " + to_string(var.second));
+        print(std::to_string(var.first) + " -> " + std::to_string(var.second));
     }
 }
 
-void Console::cmdListAnim(string input, vector<string> tokens) {
+void Console::cmdListAnim(std::string input, std::vector<std::string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         object = _game.party().getLeader();
@@ -328,13 +326,13 @@ void Console::cmdListAnim(string input, vector<string> tokens) {
         }
     }
 
-    string substr;
+    std::string substr;
     if (static_cast<int>(tokens.size()) > 1) {
         substr = tokens[1];
     }
 
-    auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
-    vector<string> anims(model->model().getAnimationNames());
+    auto model = std::static_pointer_cast<ModelSceneNode>(object->sceneNode());
+    std::vector<std::string> anims(model->model().getAnimationNames());
     sort(anims.begin(), anims.end());
 
     for (auto &anim : anims) {
@@ -344,7 +342,7 @@ void Console::cmdListAnim(string input, vector<string> tokens) {
     }
 }
 
-void Console::cmdPlayAnim(string input, vector<string> tokens) {
+void Console::cmdPlayAnim(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: playanim anim_name");
         return;
@@ -357,11 +355,11 @@ void Console::cmdPlayAnim(string input, vector<string> tokens) {
             return;
         }
     }
-    auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
+    auto model = std::static_pointer_cast<ModelSceneNode>(object->sceneNode());
     model->playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
-void Console::cmdKill(string input, vector<string> tokens) {
+void Console::cmdKill(std::string input, std::vector<std::string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("No object is selected");
@@ -371,7 +369,7 @@ void Console::cmdKill(string input, vector<string> tokens) {
     object->applyEffect(std::move(effect), DurationType::Instant);
 }
 
-void Console::cmdAddItem(string input, vector<string> tokens) {
+void Console::cmdAddItem(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: additem item_tpl [size]");
         return;
@@ -388,7 +386,7 @@ void Console::cmdAddItem(string input, vector<string> tokens) {
     object->addItem(tokens[1], stackSize);
 }
 
-void Console::cmdGiveXP(string input, vector<string> tokens) {
+void Console::cmdGiveXP(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: givexp amount");
         return;
@@ -404,10 +402,10 @@ void Console::cmdGiveXP(string input, vector<string> tokens) {
     }
 
     int amount = stoi(tokens[1]);
-    static_pointer_cast<Creature>(object)->giveXP(amount);
+    std::static_pointer_cast<Creature>(object)->giveXP(amount);
 }
 
-void Console::cmdWarp(string input, vector<string> tokens) {
+void Console::cmdWarp(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: warp module");
         return;
@@ -415,13 +413,13 @@ void Console::cmdWarp(string input, vector<string> tokens) {
     _game.loadModule(tokens[1]);
 }
 
-void Console::cmdRunScript(string input, vector<string> tokens) {
+void Console::cmdRunScript(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 3) {
         print("Usage: runscript resref caller_id [triggerrer_id [event_number [script_var]]], e.g. runscript k_ai_master 1 2 3 4");
         return;
     }
 
-    string resRef = tokens[1];
+    std::string resRef = tokens[1];
     auto callerId = static_cast<uint32_t>(stoi(tokens[2]));
     auto triggerrerId = tokens.size() > 3 ? static_cast<uint32_t>(stoi(tokens[3])) : kObjectInvalid;
     int eventNumber = tokens.size() > 4 ? stoi(tokens[4]) : -1;
@@ -431,7 +429,7 @@ void Console::cmdRunScript(string input, vector<string> tokens) {
     print(str(boost::format("%s -> %d") % resRef % result));
 }
 
-void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
+void Console::cmdShowWalkmesh(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: showwalkmesh 1|0");
         return;
@@ -440,7 +438,7 @@ void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
     setShowWalkmesh(show);
 }
 
-void Console::cmdShowTriggers(string input, vector<string> tokens) {
+void Console::cmdShowTriggers(std::string input, std::vector<std::string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: showtriggers 1|0");
         return;
@@ -449,7 +447,7 @@ void Console::cmdShowTriggers(string input, vector<string> tokens) {
     setShowTriggers(show);
 }
 
-void Console::cmdHelp(string input, vector<string> tokens) {
+void Console::cmdHelp(std::string input, std::vector<std::string> tokens) {
     for (auto &cmd : _commands) {
         auto text = cmd.name;
         if (!cmd.alias.empty()) {
@@ -460,13 +458,13 @@ void Console::cmdHelp(string input, vector<string> tokens) {
     }
 }
 
-void Console::print(const string &text) {
+void Console::print(const std::string &text) {
     float maxWidth = _game.options().graphics.width - 2.0f * kTextOffset;
 
-    ostringstream ss;
+    std::ostringstream ss;
     for (size_t i = 0; i < text.length(); ++i) {
         ss << text[i];
-        string s = ss.str();
+        std::string s = ss.str();
         float w = _font->measure(s);
         if (w >= maxWidth) {
             _output.push_front(s.substr(0, s.length() - 1));

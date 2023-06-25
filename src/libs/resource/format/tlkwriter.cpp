@@ -22,8 +22,6 @@
 
 #include "reone/resource/talktable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -40,7 +38,7 @@ void TlkWriter::save(const boost::filesystem::path &path) {
 }
 
 void TlkWriter::save(IOutputStream &out) {
-    vector<StringDataElement> strData;
+    std::vector<StringDataElement> strData;
 
     uint32_t offString = 0;
     for (int i = 0; i < _talkTable.getStringCount(); ++i) {
@@ -60,13 +58,13 @@ void TlkWriter::save(IOutputStream &out) {
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable.getStringCount());
-    writer.putUint32(20 + 40 * _talkTable.getStringCount()); // offset to string entries
+    writer.putUint32(20 + 40 * _talkTable.getStringCount()); // offset to std::string entries
 
     for (int i = 0; i < _talkTable.getStringCount(); ++i) {
         const StringDataElement &strDataElem = strData[i];
         writer.putUint32(7); // flags
 
-        string soundResRef(strDataElem.soundResRef);
+        std::string soundResRef(strDataElem.soundResRef);
         soundResRef.resize(16);
         writer.putString(soundResRef);
 

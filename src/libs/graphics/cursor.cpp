@@ -26,14 +26,12 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 void Cursor::draw() {
-    shared_ptr<Texture> texture(_pressed ? _down : _up);
+    std::shared_ptr<Texture> texture(_pressed ? _down : _up);
     _textures.bind(*texture);
 
     glm::mat4 transform(1.0f);

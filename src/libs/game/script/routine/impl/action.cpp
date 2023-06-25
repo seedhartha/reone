@@ -30,8 +30,6 @@
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 namespace reone {
@@ -40,14 +38,14 @@ namespace game {
 
 namespace routine {
 
-Variable actionRandomWalk(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newRandomWalk();
     getCaller(ctx)->addAction(std::move(action));
 
     return Variable::ofNull();
 }
 
-Variable actionMoveToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto destination = getLocationArgument(args, 0);
     bool run = getIntAsBoolOrElse(args, 1, false);
 
@@ -57,7 +55,7 @@ Variable actionMoveToLocation(const vector<Variable> &args, const RoutineContext
     return Variable::ofNull();
 }
 
-Variable actionMoveToObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto moveTo = getObject(args, 0, ctx);
     bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 1.0f);
@@ -68,7 +66,7 @@ Variable actionMoveToObject(const vector<Variable> &args, const RoutineContext &
     return Variable::ofNull();
 }
 
-Variable actionMoveAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionMoveAwayFromObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto fleeFrom = getObject(args, 0, ctx);
     bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 40.0f);
@@ -79,7 +77,7 @@ Variable actionMoveAwayFromObject(const vector<Variable> &args, const RoutineCon
     return Variable::ofNull();
 }
 
-Variable actionEquipItem(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionEquipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
     int inventorySlot = getInt(args, 1);
     bool instant = getIntAsBoolOrElse(args, 2, false);
@@ -90,7 +88,7 @@ Variable actionEquipItem(const vector<Variable> &args, const RoutineContext &ctx
     return Variable::ofNull();
 }
 
-Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionUnequipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
     bool instant = getIntAsBoolOrElse(args, 1, false);
 
@@ -100,7 +98,7 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
     return Variable::ofNull();
 }
 
-Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionAttack(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto attackee = getObject(args, 0, ctx);
     bool passive = getIntAsBoolOrElse(args, 1, false);
 
@@ -111,7 +109,7 @@ Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofNull();
 }
 
-Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionPlayAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto animation = getIntAsEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
     float durationSeconds = getFloatOrElse(args, 2, 0.0f);
@@ -122,7 +120,7 @@ Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext 
     return Variable::ofNull();
 }
 
-Variable actionOpenDoor(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionOpenDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto door = getObjectAsDoor(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newOpenDoor(std::move(door));
@@ -131,7 +129,7 @@ Variable actionOpenDoor(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofNull();
 }
 
-Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionCloseDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto door = getObjectAsDoor(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newCloseDoor(std::move(door));
@@ -140,7 +138,7 @@ Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx
     return Variable::ofNull();
 }
 
-Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionCastSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
     auto target = getObject(args, 1, ctx);
     int metaMagic = getIntOrElse(args, 2, 0);
@@ -155,7 +153,7 @@ Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineCont
     return Variable::ofNull();
 }
 
-Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionGiveItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
     auto giveTo = getObject(args, 1, ctx);
 
@@ -165,7 +163,7 @@ Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofNull();
 }
 
-Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionTakeItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
     auto takeFrom = getObject(args, 1, ctx);
 
@@ -175,7 +173,7 @@ Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofNull();
 }
 
-Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionJumpToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getIntAsBoolOrElse(args, 1, true);
 
@@ -185,7 +183,7 @@ Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &
     return Variable::ofNull();
 }
 
-Variable actionWait(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionWait(const std::vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
 
     auto action = ctx.game.actionFactory().newWait(seconds);
@@ -194,18 +192,18 @@ Variable actionWait(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofNull();
 }
 
-Variable actionStartConversation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionStartConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto objectToConverse = getObject(args, 0, ctx);
-    string dialogResRef = getStringOrElse(args, 1, "");
+    std::string dialogResRef = getStringOrElse(args, 1, "");
     bool privateConversation = getIntAsBoolOrElse(args, 2, false);
     auto conversationType = getIntAsEnumOrElse(args, 3, ConversationType::Cinematic);
     bool ignoreStartRange = getIntAsBoolOrElse(args, 4, false);
-    string nameObjectToIgnore1 = getStringOrElse(args, 5, "");
-    string nameObjectToIgnore2 = getStringOrElse(args, 6, "");
-    string nameObjectToIgnore3 = getStringOrElse(args, 7, "");
-    string nameObjectToIgnore4 = getStringOrElse(args, 8, "");
-    string nameObjectToIgnore5 = getStringOrElse(args, 9, "");
-    string nameObjectToIgnore6 = getStringOrElse(args, 10, "");
+    std::string nameObjectToIgnore1 = getStringOrElse(args, 5, "");
+    std::string nameObjectToIgnore2 = getStringOrElse(args, 6, "");
+    std::string nameObjectToIgnore3 = getStringOrElse(args, 7, "");
+    std::string nameObjectToIgnore4 = getStringOrElse(args, 8, "");
+    std::string nameObjectToIgnore5 = getStringOrElse(args, 9, "");
+    std::string nameObjectToIgnore6 = getStringOrElse(args, 10, "");
     bool useLeader = getIntAsBoolOrElse(args, 11, false);
     int barkX = getIntOrElse(args, 12, -1);
     int barkY = getIntOrElse(args, 13, -1);
@@ -236,21 +234,21 @@ Variable actionStartConversation(const vector<Variable> &args, const RoutineCont
     return Variable::ofNull();
 }
 
-Variable actionPauseConversation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionPauseConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newPauseConversation();
     getCaller(ctx)->addAction(std::move(action));
 
     return Variable::ofNull();
 }
 
-Variable actionResumeConversation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionResumeConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newResumeConversation();
     getCaller(ctx)->addAction(std::move(action));
 
     return Variable::ofNull();
 }
 
-Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionJumpToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationArgument(args, 0);
 
     auto action = ctx.game.actionFactory().newJumpToLocation(std::move(location));
@@ -259,7 +257,7 @@ Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext
     return Variable::ofNull();
 }
 
-Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionUseSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto skill = getIntAsEnum<SkillType>(args, 0);
     auto target = getObject(args, 1, ctx);
     int subSkill = getIntOrElse(args, 2, 0);
@@ -271,7 +269,7 @@ Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofNull();
 }
 
-Variable actionDoCommand(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionDoCommand(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = getAction(args, 0);
 
     auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(action));
@@ -280,7 +278,7 @@ Variable actionDoCommand(const vector<Variable> &args, const RoutineContext &ctx
     return Variable::ofNull();
 }
 
-Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionUseTalentOnObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto chosenTalent = getTalent(args, 0);
     auto target = getObject(args, 1, ctx);
 
@@ -290,7 +288,7 @@ Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineCont
     return Variable::ofNull();
 }
 
-Variable actionInteractObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionInteractObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto placeable = getObjectAsPlaceable(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newInteractObject(std::move(placeable));
@@ -299,14 +297,14 @@ Variable actionInteractObject(const vector<Variable> &args, const RoutineContext
     return Variable::ofNull();
 }
 
-Variable actionSurrenderToEnemies(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newSurrenderToEnemies();
     getCaller(ctx)->addAction(std::move(action));
 
     return Variable::ofNull();
 }
 
-Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionForceMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto destination = getLocationArgument(args, 0);
     bool run = getIntAsBoolOrElse(args, 1, false);
     float timeout = getFloatOrElse(args, 2, 30.0f);
@@ -317,7 +315,7 @@ Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineCo
     return Variable::ofNull();
 }
 
-Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionForceMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto moveTo = getObject(args, 0, ctx);
     bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 1.0f);
@@ -329,7 +327,7 @@ Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineCont
     return Variable::ofNull();
 }
 
-Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionEquipMostDamagingMelee(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto versus = getObjectOrNull(args, 0, ctx);
     bool offHand = getIntAsBoolOrElse(args, 1, false);
 
@@ -339,7 +337,7 @@ Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const Routin
     return Variable::ofNull();
 }
 
-Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionEquipMostDamagingRanged(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto versus = getObjectOrNull(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newEquipMostDamagingRanged(std::move(versus));
@@ -348,7 +346,7 @@ Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const Routi
     return Variable::ofNull();
 }
 
-Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionUnlockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObject(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newUnlockObject(std::move(target));
@@ -357,7 +355,7 @@ Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &
     return Variable::ofNull();
 }
 
-Variable actionLockObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionLockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObject(args, 0, ctx);
 
     auto action = ctx.game.actionFactory().newLockObject(std::move(target));
@@ -366,7 +364,7 @@ Variable actionLockObject(const vector<Variable> &args, const RoutineContext &ct
     return Variable::ofNull();
 }
 
-Variable actionCastFakeSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionCastFakeSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
     auto target = getObject(args, 1, ctx);
     auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
@@ -377,7 +375,7 @@ Variable actionCastFakeSpellAtObject(const vector<Variable> &args, const Routine
     return Variable::ofNull();
 }
 
-Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionCastFakeSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
     auto location = getLocationArgument(args, 1);
     auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
@@ -388,7 +386,7 @@ Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const Routi
     return Variable::ofNull();
 }
 
-Variable actionBarkString(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionBarkString(const std::vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
 
     auto action = ctx.game.actionFactory().newBarkString(strRef);
@@ -397,7 +395,7 @@ Variable actionBarkString(const vector<Variable> &args, const RoutineContext &ct
     return Variable::ofNull();
 }
 
-Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionFollowLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newFollowLeader();
     getCaller(ctx)->addAction(std::move(action));
 
@@ -406,7 +404,7 @@ Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &
 
 // TSL
 
-Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionFollowOwner(const std::vector<Variable> &args, const RoutineContext &ctx) {
     float range = getFloatOrElse(args, 0, 2.5f);
 
     auto action = ctx.game.actionFactory().newFollowOwner(range);
@@ -415,7 +413,7 @@ Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &c
     return Variable::ofNull();
 }
 
-Variable actionSwitchWeapons(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable actionSwitchWeapons(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.game.actionFactory().newSwitchWeapons();
     getCaller(ctx)->addAction(std::move(action));
 

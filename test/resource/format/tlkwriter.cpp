@@ -22,10 +22,7 @@
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stringbuilder.h"
 
-
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -40,24 +37,24 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
                               .append("TLK V3.0", 8)
                               .append("\x00\x00\x00\x00", 4) // language id
                               .append("\x02\x00\x00\x00", 4) // number of strings
-                              .append("\x64\x00\x00\x00", 4) // offset to string entries
-                              // string data 0
+                              .append("\x64\x00\x00\x00", 4) // offset to std::string entries
+                              // std::string data 0
                               .append("\x07\x00\x00\x00", 4)                                                  // flags
                               .append("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
                               .append("\x00\x00\x00\x00", 4)                                                  // volume variance
                               .append("\x00\x00\x00\x00", 4)                                                  // pitch variance
                               .append("\x00\x00\x00\x00", 4)                                                  // offset to string
-                              .append("\x04\x00\x00\x00", 4)                                                  // string size
+                              .append("\x04\x00\x00\x00", 4)                                                  // std::string size
                               .append("\x00\x00\x00\x00", 4)                                                  // sound length
-                              // string data 1
+                              // std::string data 1
                               .append("\x07\x00\x00\x00", 4)                                      // flags
                               .append("jane\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // sound res ref
                               .append("\x00\x00\x00\x00", 4)                                      // volume variance
                               .append("\x00\x00\x00\x00", 4)                                      // pitch variance
                               .append("\x04\x00\x00\x00", 4)                                      // offset to string
-                              .append("\x04\x00\x00\x00", 4)                                      // string size
+                              .append("\x04\x00\x00\x00", 4)                                      // std::string size
                               .append("\x00\x00\x00\x00", 4)                                      // sound length
-                              // string entries
+                              // std::string entries
                               .append("John")
                               .append("Jane")
                               .build();
@@ -65,7 +62,7 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
 
-    auto strings = vector<TalkTable::String> {
+    auto strings = std::vector<TalkTable::String> {
         TalkTable::String {"John", ""},
         TalkTable::String {"Jane", "jane"}};
 
@@ -78,7 +75,7 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
 
     // then
 
-    auto actualOutput = string(&bytes[0], bytes.size());
+    auto actualOutput = std::string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

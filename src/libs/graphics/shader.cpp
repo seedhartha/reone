@@ -17,8 +17,6 @@
 
 #include "reone/graphics/shader.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -32,7 +30,7 @@ static GLenum getShaderTypeGL(ShaderType type) {
     case ShaderType::Fragment:
         return GL_FRAGMENT_SHADER;
     default:
-        throw invalid_argument("Unexpected shader type: " + to_string(static_cast<int>(type)));
+        throw std::invalid_argument("Unexpected shader type: " + std::to_string(static_cast<int>(type)));
     }
 }
 
@@ -40,7 +38,7 @@ void Shader::init() {
     if (_inited) {
         return;
     }
-    vector<const char *> sourcePtrs;
+    std::vector<const char *> sourcePtrs;
     for (auto &src : _sources) {
         sourcePtrs.push_back(src.c_str());
     }
@@ -54,7 +52,7 @@ void Shader::init() {
         char log[512];
         GLsizei logSize;
         glGetShaderInfoLog(_nameGL, sizeof(log), &logSize, log);
-        throw runtime_error(str(boost::format("Failed compiling shader %d: %s") % static_cast<int>(_nameGL) % string(log, logSize)));
+        throw std::runtime_error(str(boost::format("Failed compiling shader %d: %s") % static_cast<int>(_nameGL) % std::string(log, logSize)));
     }
 
     _inited = true;

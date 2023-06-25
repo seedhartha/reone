@@ -17,11 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/format/erfreader.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/resource/format/erfreader.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;

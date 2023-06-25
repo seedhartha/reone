@@ -30,8 +30,6 @@
 
 #include "reone/gui/gui.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -42,14 +40,14 @@ namespace gui {
 void ProgressBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<Gff> dir(gffs.getStruct("PROGRESS"));
+    std::shared_ptr<Gff> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
-        string fill(dir->getString("FILL"));
+        std::string fill(dir->getString("FILL"));
         _progress.fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
     }
 }
 
-void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
+void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
     if (_value == 0 || !_progress.fill) {
         return;
     }
@@ -72,7 +70,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
 
 void ProgressBar::setValue(int value) {
     if (value < 0 || value > 100) {
-        throw out_of_range("value out of range: " + to_string(value));
+        throw std::out_of_range("value out of range: " + std::to_string(value));
     }
     _value = value;
 }

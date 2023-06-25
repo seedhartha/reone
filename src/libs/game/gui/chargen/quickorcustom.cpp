@@ -26,8 +26,6 @@
 
 #include "reone/game/gui/chargen.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -57,7 +55,7 @@ void QuickOrCustom::onGUILoaded() {
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_services.resource.strings.get(kStrRefQuickHelpText));
+        std::string text(_services.resource.strings.get(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });
@@ -68,7 +66,7 @@ void QuickOrCustom::onGUILoaded() {
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        string text(_services.resource.strings.get(kStrRefCustomHelpText));
+        std::string text(_services.resource.strings.get(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });

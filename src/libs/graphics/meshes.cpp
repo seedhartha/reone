@@ -20,39 +20,37 @@
 
 #include "reone/graphics/mesh.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 // Quads
 
-static const vector<float> g_quadVertices {
+static const std::vector<float> g_quadVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
-static const vector<float> g_quadNDCVertices {
+static const std::vector<float> g_quadNDCVertices {
     -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     -1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
-static const vector<float> g_billboardVertices {
+static const std::vector<float> g_billboardVertices {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
     0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
     -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
 
-static const vector<float> g_grassVertices {
+static const std::vector<float> g_grassVertices {
     -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
     0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
     0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
     -0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
 
-static const vector<Mesh::Face> g_quadFaces {
+static const std::vector<Mesh::Face> g_quadFaces {
     Mesh::Face(0, 1, 2),
     Mesh::Face(2, 3, 0)};
 
@@ -62,7 +60,7 @@ static const Mesh::VertexSpec g_quadSpec {5 * sizeof(float), 0, -1, 3 * sizeof(f
 
 // Boxes
 
-static const vector<float> g_boxVertices {
+static const std::vector<float> g_boxVertices {
     // back face
     -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, // bottom-left
     1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,   // top-right
@@ -95,7 +93,7 @@ static const vector<float> g_boxVertices {
     -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f   // bottom-left
 };
 
-static const vector<float> g_cubemapVertices {
+static const std::vector<float> g_cubemapVertices {
     // back face
     -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
     1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,   // top-right
@@ -128,7 +126,7 @@ static const vector<float> g_cubemapVertices {
     -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f   // bottom-left
 };
 
-static const vector<Mesh::Face> g_boxFaces {
+static const std::vector<Mesh::Face> g_boxFaces {
     Mesh::Face(0, 1, 2),
     Mesh::Face(1, 0, 3),
     Mesh::Face(4, 5, 6),
@@ -147,8 +145,8 @@ static const Mesh::VertexSpec g_cubemapSpec {8 * sizeof(float), 0, 3 * sizeof(fl
 
 // END Boxes
 
-static unique_ptr<Mesh> getMesh(vector<float> vertices, vector<Mesh::Face> faces, Mesh::VertexSpec spec) {
-    auto mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
+static std::unique_ptr<Mesh> getMesh(std::vector<float> vertices, std::vector<Mesh::Face> faces, Mesh::VertexSpec spec) {
+    auto mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     mesh->init();
     return std::move(mesh);
 }

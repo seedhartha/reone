@@ -17,19 +17,17 @@
 
 #include "reone/system/randomutil.h"
 
-using namespace std;
-
 namespace reone {
 
-static default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
+static std::default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
 
 int random(int min, int max) {
-    uniform_int_distribution<int> dist(min, max);
+    std::uniform_int_distribution<int> dist(min, max);
     return dist(g_generator);
 }
 
 float random(float min, float max) {
-    uniform_real_distribution<float> distr(min, max);
+    std::uniform_real_distribution<float> distr(min, max);
     return distr(g_generator);
 }
 

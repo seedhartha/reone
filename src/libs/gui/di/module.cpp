@@ -17,15 +17,13 @@
 
 #include "reone/gui/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace gui {
 
 void GUIModule::init() {
-    _guis = make_unique<GUIs>(_graphicsOpt, _scene.graphs(), _graphics.services(), _resource.services());
-    _services = make_unique<GUIServices>(*_guis);
+    _guis = std::make_unique<GUIs>(_graphicsOpt, _scene.graphs(), _graphics.services(), _resource.services());
+    _services = std::make_unique<GUIServices>(*_guis);
 }
 
 void GUIModule::deinit() {

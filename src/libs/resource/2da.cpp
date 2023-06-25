@@ -20,15 +20,13 @@
 #include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 static constexpr char kCellValueDeleted[] = "****";
 
-int TwoDa::indexByCellValue(const string &column, const string &value) const {
+int TwoDa::indexByCellValue(const std::string &column, const std::string &value) const {
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
         warn("2DA: column not found: " + column);
@@ -42,7 +40,7 @@ int TwoDa::indexByCellValue(const string &column, const string &value) const {
     return -1;
 }
 
-int TwoDa::getColumnIndex(const string &column) const {
+int TwoDa::getColumnIndex(const std::string &column) const {
     for (size_t i = 0; i < _columns.size(); ++i) {
         if (_columns[i] == column)
             return static_cast<int>(i);
@@ -50,13 +48,13 @@ int TwoDa::getColumnIndex(const string &column) const {
     return -1;
 }
 
-static vector<string> getColumnNames(const vector<pair<string, string>> &values) {
-    return transform<pair<string, string>, string>(values, [](auto &pair) { return pair.first; });
+static std::vector<std::string> getColumnNames(const std::vector<std::pair<std::string, std::string>> &values) {
+    return transform<std::pair<std::string, std::string>, std::string>(values, [](auto &pair) { return pair.first; });
 }
 
-int TwoDa::indexByCellValues(const vector<pair<string, string>> &values) const {
-    vector<string> columns(getColumnNames(values));
-    vector<int> columnIndices(getColumnIndices(columns));
+int TwoDa::indexByCellValues(const std::vector<std::pair<std::string, std::string>> &values) const {
+    std::vector<std::string> columns(getColumnNames(values));
+    std::vector<int> columnIndices(getColumnIndices(columns));
 
     for (size_t i = 0; i < _rows.size(); ++i) {
         bool match = true;
@@ -74,21 +72,21 @@ int TwoDa::indexByCellValues(const vector<pair<string, string>> &values) const {
     return -1;
 }
 
-vector<int> TwoDa::getColumnIndices(const vector<string> &columns) const {
-    vector<int> indices;
+std::vector<int> TwoDa::getColumnIndices(const std::vector<std::string> &columns) const {
+    std::vector<int> indices;
     for (auto &column : columns) {
         int index = getColumnIndex(column);
         if (index == -1) {
-            throw logic_error("Column not found: " + column);
+            throw std::logic_error("Column not found: " + column);
         }
         indices.push_back(index);
     }
     return std::move(indices);
 }
 
-string TwoDa::getString(int row, const string &column, string defValue) const {
+std::string TwoDa::getString(int row, const std::string &column, std::string defValue) const {
     if (row < 0 || row >= _rows.size()) {
-        warn("2DA: row index out of range: " + to_string(row));
+        warn("2DA: row index out of range: " + std::to_string(row));
         return std::move(defValue);
     }
 
@@ -98,7 +96,7 @@ string TwoDa::getString(int row, const string &column, string defValue) const {
         return std::move(defValue);
     }
 
-    const string &value = _rows[row].values[columnIdx];
+    const std::string &value = _rows[row].values[columnIdx];
 
     if (value == kCellValueDeleted) {
         warn(boost::format("2DA: cell value was deleted: %d %s") % row % column);
@@ -108,32 +106,32 @@ string TwoDa::getString(int row, const string &column, string defValue) const {
     return value;
 }
 
-int TwoDa::getInt(int row, const string &column, int defValue) const {
-    const string &value = getString(row, column);
+int TwoDa::getInt(int row, const std::string &column, int defValue) const {
+    const std::string &value = getString(row, column);
     if (value.empty())
         return defValue;
 
     return stoi(value);
 }
 
-uint32_t TwoDa::getUint(int row, const string &column, uint32_t defValue) const {
-    const string &value = getString(row, column);
+uint32_t TwoDa::getUint(int row, const std::string &column, uint32_t defValue) const {
+    const std::string &value = getString(row, column);
     if (value.empty())
         return defValue;
 
     return stoi(value, nullptr, 16);
 }
 
-float TwoDa::getFloat(int row, const string &column, float defValue) const {
-    const string &value = getString(row, column);
+float TwoDa::getFloat(int row, const std::string &column, float defValue) const {
+    const std::string &value = getString(row, column);
     if (value.empty())
         return defValue;
 
     return stof(value);
 }
 
-bool TwoDa::getBool(int row, const string &column, bool defValue) const {
-    const string &value = getString(row, column);
+bool TwoDa::getBool(int row, const std::string &column, bool defValue) const {
+    const std::string &value = getString(row, column);
     if (value.empty())
         return defValue;
 

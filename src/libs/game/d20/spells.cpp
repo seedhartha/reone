@@ -23,8 +23,6 @@
 #include "reone/resource/strings.h"
 #include "reone/system/collectionutil.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -33,26 +31,26 @@ namespace reone {
 namespace game {
 
 void Spells::init() {
-    shared_ptr<TwoDa> spells(_twoDas.get("spells"));
+    std::shared_ptr<TwoDa> spells(_twoDas.get("spells"));
     if (!spells)
         return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
-        string name(_strings.get(spells->getInt(row, "name", -1)));
-        string description(_strings.get(spells->getInt(row, "spelldesc", -1)));
-        shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
+        std::string name(_strings.get(spells->getInt(row, "name", -1)));
+        std::string description(_strings.get(spells->getInt(row, "spelldesc", -1)));
+        std::shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getUint(row, "pips");
 
-        auto spell = make_shared<Spell>();
+        auto spell = std::make_shared<Spell>();
         spell->name = std::move(name);
         spell->description = std::move(description);
         spell->icon = std::move(icon);
         spell->pips = pips;
-        _spells.insert(make_pair(static_cast<SpellType>(row), std::move(spell)));
+        _spells.insert(std::make_pair(static_cast<SpellType>(row), std::move(spell)));
     }
 }
 
-shared_ptr<Spell> Spells::get(SpellType type) const {
+std::shared_ptr<Spell> Spells::get(SpellType type) const {
     return getFromLookupOrNull(_spells, type);
 }
 

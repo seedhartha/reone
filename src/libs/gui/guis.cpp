@@ -19,20 +19,18 @@
 
 #include "reone/resource/gffs.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace gui {
 
-shared_ptr<IGUI> GUIs::doGet(string resRef, function<void(IGUI &)> preload) {
+std::shared_ptr<IGUI> GUIs::doGet(std::string resRef, std::function<void(IGUI &)> preload) {
     auto gff = _resourceSvc.gffs.get(resRef, ResourceType::Gui);
     if (!gff) {
         return nullptr;
     }
-    auto gui = make_shared<GUI>(_graphicsOpt, _sceneGraphs, _graphicsSvc, _resourceSvc);
+    auto gui = std::make_shared<GUI>(_graphicsOpt, _sceneGraphs, _graphicsSvc, _resourceSvc);
     if (preload) {
         preload(*gui);
     }

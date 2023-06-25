@@ -23,25 +23,23 @@
 
 #include "reone/script/variable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
-Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) {
+Variable Routine::invoke(const std::vector<Variable> &args, ExecutionContext &ctx) {
     try {
         return _func(args, ctx);
     } catch (const NotImplementedException &ex) {
-        string msg = "Routine not implemented: " + _name;
+        std::string msg = "Routine not implemented: " + _name;
         return onException(msg, ex);
     } catch (const ArgumentException &ex) {
-        string msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
+        std::string msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
         return onException(msg, ex);
     }
 }
 
-Variable Routine::onException(const string &msg, const exception &ex) const {
+Variable Routine::onException(const std::string &msg, const std::exception &ex) const {
     switch (_returnType) {
     case VariableType::Action:
         error(msg, LogChannels::script);

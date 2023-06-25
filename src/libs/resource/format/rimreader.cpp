@@ -17,14 +17,12 @@
 
 #include "reone/resource/format/rimreader.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 void RimReader::onLoad() {
-    checkSignature(string("RIM V1.0", 8));
+    checkSignature(std::string("RIM V1.0", 8));
     ignore(4);
 
     _numResources = readUint32();

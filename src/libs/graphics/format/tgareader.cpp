@@ -22,8 +22,6 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -40,7 +38,7 @@ void TgaReader::onLoad() {
     case TGADataType::RGBA_RLE:
         break;
     default:
-        warn("Unsupported TGA data type: " + to_string(static_cast<int>(_dataType)));
+        warn("Unsupported TGA data type: " + std::to_string(static_cast<int>(_dataType)));
         return;
     }
 
@@ -51,13 +49,13 @@ void TgaReader::onLoad() {
 
     uint8_t bpp = readByte();
     if ((isRGBA() && bpp != 24 && bpp != 32) || (isGrayscale() && bpp != 8)) {
-        throw runtime_error("Unsupported bits per pixel: " + to_string(bpp));
+        throw std::runtime_error("Unsupported bits per pixel: " + std::to_string(bpp));
     }
 
     uint8_t descriptor = readByte();
     bool flipY = (descriptor & 0x10) != 0;
     if (flipY) {
-        throw runtime_error("Vertically flipped images are not supported");
+        throw std::runtime_error("Vertically flipped images are not supported");
     }
 
     bool cubemap = height / width == kNumCubeFaces;
@@ -77,15 +75,15 @@ void TgaReader::onLoad() {
 }
 
 void TgaReader::loadTexture() {
-    vector<Texture::Layer> layers;
+    std::vector<Texture::Layer> layers;
     layers.reserve(_numLayers);
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = make_shared<ByteArray>(readPixels(_width, _height));
+        auto pixels = std::make_shared<ByteArray>(readPixels(_width, _height));
         layers.push_back(Texture::Layer {std::move(pixels)});
     }
 
     PixelFormat format = isGrayscale() ? PixelFormat::R8 : (_alpha ? PixelFormat::BGRA8 : PixelFormat::BGR8);
-    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture = std::make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->setPixels(_width, _height, format, std::move(layers));
 }
 

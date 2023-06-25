@@ -31,8 +31,6 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/types.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -40,53 +38,53 @@ namespace reone {
 namespace graphics {
 
 void Textures::init() {
-    _default2DRGB = make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
+    _default2DRGB = std::make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
     _default2DRGB->clear(1, 1, PixelFormat::RGB8);
     _default2DRGB->init();
 
-    _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
+    _defaultCubemapRGB = std::make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
     _defaultCubemapRGB->setCubemap(true);
     _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
     _defaultCubemapRGB->init();
 
-    _defaultCubemapDepth = make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
+    _defaultCubemapDepth = std::make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
     _defaultCubemapDepth->setCubemap(true);
     _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
     _defaultCubemapDepth->init();
 
-    _defaultArrayDepth = make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
+    _defaultArrayDepth = std::make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
-    auto noisePixels = make_shared<ByteArray>();
+    auto noisePixels = std::make_shared<ByteArray>();
     noisePixels->resize(4 * 4 * 2 * sizeof(float));
     for (int i = 0; i < 4 * 4 * 2; ++i) {
         float *pixel = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
         *pixel = random(-1.0f, 1.0f);
     }
     auto noiseLayer = Texture::Layer {std::move(noisePixels)};
-    _noiseRG = make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
+    _noiseRG = std::make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
     _noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
     _noiseRG->init();
 
-    auto ssaoPixels = make_shared<ByteArray>();
+    auto ssaoPixels = std::make_shared<ByteArray>();
     ssaoPixels->resize(3);
     (*ssaoPixels)[0] = 0xff;
     (*ssaoPixels)[1] = 0xff;
     (*ssaoPixels)[2] = 0xff;
     auto ssaoLayer = Texture::Layer {std::move(ssaoPixels)};
-    _ssaoRGB = make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
+    _ssaoRGB = std::make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
     _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
     _ssaoRGB->init();
 
-    auto ssrPixels = make_shared<ByteArray>();
+    auto ssrPixels = std::make_shared<ByteArray>();
     ssrPixels->resize(4);
     (*ssrPixels)[0] = 0;
     (*ssrPixels)[1] = 0;
     (*ssrPixels)[2] = 0;
     (*ssrPixels)[3] = 0;
     auto ssrLayer = Texture::Layer {std::move(ssrPixels)};
-    _ssrRGBA = make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
+    _ssrRGBA = std::make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
     _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, std::move(ssrLayer));
     _ssrRGBA->init();
 
@@ -127,7 +125,7 @@ void Textures::bindBuiltIn() {
     bind(*_ssrRGBA, TextureUnits::ssr);
 }
 
-shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
+std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage usage) {
     if (resRef.empty()) {
         return nullptr;
     }
@@ -135,14 +133,14 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
     if (maybeTexture != _cache.end()) {
         return maybeTexture->second;
     }
-    string lcResRef(boost::to_lower_copy(resRef));
-    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef, usage)));
+    std::string lcResRef(boost::to_lower_copy(resRef));
+    auto inserted = _cache.insert(std::make_pair(lcResRef, doGet(lcResRef, usage)));
 
     return inserted.first->second;
 }
 
-shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
-    shared_ptr<Texture> texture;
+std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage usage) {
+    std::shared_ptr<Texture> texture;
 
     auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
@@ -176,7 +174,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         if (texture->isCubemap()) {
             prepareCubemap(*texture);
         }
-        float anisotropy = max(1.0f, exp2f(_options.anisotropicFiltering));
+        float anisotropy = std::max(1.0f, exp2f(_options.anisotropicFiltering));
         texture->setAnisotropy(anisotropy);
         texture->init();
     } else {

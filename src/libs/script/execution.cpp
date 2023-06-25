@@ -26,8 +26,6 @@
 #include "reone/script/routines.h"
 #include "reone/script/variable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
@@ -35,11 +33,11 @@ namespace script {
 static constexpr int kStartInstructionOffset = 13;
 static constexpr float kFloatTolerance = 1e-5;
 
-ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) :
+ScriptExecution::ScriptExecution(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context) :
     _context(std::move(context)),
     _program(std::move(program)) {
 
-    static unordered_map<InstructionType, function<void(ScriptExecution *, const Instruction &)>> g_handlers {
+    static std::unordered_map<InstructionType, std::function<void(ScriptExecution *, const Instruction &)>> g_handlers {
         {InstructionType::CPDOWNSP, &ScriptExecution::executeCPDOWNSP},
         {InstructionType::RSADDI, &ScriptExecution::executeRSADDI},
         {InstructionType::RSADDF, &ScriptExecution::executeRSADDF},
@@ -135,19 +133,19 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
     for (auto &pair : g_handlers) {
         registerHandler(pair.first, pair.second);
     }
-    _handlers.insert(make_pair(InstructionType::NOP, [](auto &) {}));
-    _handlers.insert(make_pair(InstructionType::NOP2, [](auto &) {}));
+    _handlers.insert(std::make_pair(InstructionType::NOP, [](auto &) {}));
+    _handlers.insert(std::make_pair(InstructionType::NOP2, [](auto &) {}));
 }
 
 int ScriptExecution::run() {
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
-        vector<Variable> globals(_context->savedState->globals);
+        std::vector<Variable> globals(_context->savedState->globals);
         copy(globals.begin(), globals.end(), back_inserter(_stack));
         _globalCount = static_cast<int>(_stack.size());
 
-        vector<Variable> locals(_context->savedState->locals);
+        std::vector<Variable> locals(_context->savedState->locals);
         copy(locals.begin(), locals.end(), back_inserter(_stack));
 
         insOff = _context->savedState->insOffset;
@@ -175,7 +173,7 @@ int ScriptExecution::run() {
         }
         try {
             handler->second(ins);
-        } catch (const exception &ex) {
+        } catch (const std::exception &ex) {
             debug(boost::format("Halt '%s'") % _program->name(), LogChannels::script);
             return -1;
         }
@@ -261,10 +259,10 @@ void ScriptExecution::executeCONSTO(const Instruction &ins) {
 void ScriptExecution::executeACTION(const Instruction &ins) {
     auto &routine = _context->routines->get(ins.routine);
     if (ins.argCount > routine.getArgumentCount()) {
-        throw runtime_error("Too many routine arguments");
+        throw std::runtime_error("Too many routine arguments");
     }
 
-    vector<Variable> args;
+    std::vector<Variable> args;
     for (int i = 0; i < ins.argCount; ++i) {
         VariableType type = routine.getArgumentType(i);
         switch (type) {
@@ -273,15 +271,15 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
             break;
 
         case VariableType::Action: {
-            auto ctx = make_shared<ExecutionContext>(*_context);
-            ctx->savedState = make_shared<ExecutionState>(_savedState);
+            auto ctx = std::make_shared<ExecutionContext>(*_context);
+            ctx->savedState = std::make_shared<ExecutionState>(_savedState);
             args.push_back(Variable::ofAction(std::move(ctx)));
             break;
         }
         default:
             Variable var(_stack.back());
             if (var.type != type) {
-                throw runtime_error("Invalid argument variable type");
+                throw std::runtime_error("Invalid argument variable type");
             }
             args.push_back(std::move(var));
             _stack.pop_back();
@@ -291,11 +289,11 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
 
     Variable retValue = routine.invoke(args, *_context);
     if (isLogChannelEnabled(LogChannels::script2)) {
-        vector<string> argStrings;
+        std::vector<std::string> argStrings;
         for (auto &arg : args) {
             argStrings.push_back(arg.toString());
         }
-        string argsString(boost::join(argStrings, ", "));
+        std::string argsString(boost::join(argStrings, ", "));
         debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script2);
     }
     switch (routine.returnType()) {
@@ -368,12 +366,12 @@ void ScriptExecution::executeEQUALOO(const Instruction &ins) {
 
 void ScriptExecution::executeEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
-    vector<Variable> vars1;
+    std::vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
         vars1.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
-    vector<Variable> vars2;
+    std::vector<Variable> vars2;
     for (int i = 0; i < numVariables; ++i) {
         vars2.push_back(std::move(_stack.back()));
         _stack.pop_back();
@@ -432,12 +430,12 @@ void ScriptExecution::executeNEQUALOO(const Instruction &ins) {
 
 void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
     int numVariables = ins.size / 4;
-    vector<Variable> vars1;
+    std::vector<Variable> vars1;
     for (int i = 0; i < numVariables; ++i) {
         vars1.push_back(std::move(_stack.back()));
         _stack.pop_back();
     }
-    vector<Variable> vars2;
+    std::vector<Variable> vars2;
     for (int i = 0; i < numVariables; ++i) {
         vars2.push_back(std::move(_stack.back()));
         _stack.pop_back();
@@ -664,7 +662,7 @@ void ScriptExecution::executeDIVII(const Instruction &ins) {
 
 void ScriptExecution::executeDIVIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
-        _stack.push_back(Variable::ofFloat(left / max(kFloatTolerance, right)));
+        _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
@@ -676,7 +674,7 @@ void ScriptExecution::executeDIVFI(const Instruction &ins) {
 
 void ScriptExecution::executeDIVFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
-        _stack.push_back(Variable::ofFloat(left / max(kFloatTolerance, right)));
+        _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
@@ -862,7 +860,7 @@ glm::vec3 ScriptExecution::getVectorFromStack() {
     return glm::vec3(x, y, z);
 }
 
-void ScriptExecution::withStackVariables(const function<void(const Variable &, const Variable &)> &fn) {
+void ScriptExecution::withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn) {
     Variable second(std::move(_stack.back()));
     _stack.pop_back();
 
@@ -872,7 +870,7 @@ void ScriptExecution::withStackVariables(const function<void(const Variable &, c
     fn(first, second);
 }
 
-void ScriptExecution::withIntsFromStack(const function<void(int, int)> &fn) {
+void ScriptExecution::withIntsFromStack(const std::function<void(int, int)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
@@ -880,7 +878,7 @@ void ScriptExecution::withIntsFromStack(const function<void(int, int)> &fn) {
     });
 }
 
-void ScriptExecution::withIntFloatFromStack(const function<void(int, float)> &fn) {
+void ScriptExecution::withIntFloatFromStack(const std::function<void(int, float)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
@@ -888,7 +886,7 @@ void ScriptExecution::withIntFloatFromStack(const function<void(int, float)> &fn
     });
 }
 
-void ScriptExecution::withFloatIntFromStack(const function<void(float, int)> &fn) {
+void ScriptExecution::withFloatIntFromStack(const std::function<void(float, int)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
@@ -896,7 +894,7 @@ void ScriptExecution::withFloatIntFromStack(const function<void(float, int)> &fn
     });
 }
 
-void ScriptExecution::withFloatsFromStack(const function<void(float, float)> &fn) {
+void ScriptExecution::withFloatsFromStack(const std::function<void(float, float)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
@@ -904,7 +902,7 @@ void ScriptExecution::withFloatsFromStack(const function<void(float, float)> &fn
     });
 }
 
-void ScriptExecution::withStringsFromStack(const function<void(const string &, const string &)> &fn) {
+void ScriptExecution::withStringsFromStack(const std::function<void(const std::string &, const std::string &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::String, left.type);
         throwIfInvalidType(VariableType::String, right.type);
@@ -912,7 +910,7 @@ void ScriptExecution::withStringsFromStack(const function<void(const string &, c
     });
 }
 
-void ScriptExecution::withObjectsFromStack(const function<void(uint32_t, uint32_t)> &fn) {
+void ScriptExecution::withObjectsFromStack(const std::function<void(uint32_t, uint32_t)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Object, left.type);
         throwIfInvalidType(VariableType::Object, right.type);
@@ -920,7 +918,7 @@ void ScriptExecution::withObjectsFromStack(const function<void(uint32_t, uint32_
     });
 }
 
-void ScriptExecution::withEffectsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+void ScriptExecution::withEffectsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Effect, left.type);
         throwIfInvalidType(VariableType::Effect, right.type);
@@ -928,7 +926,7 @@ void ScriptExecution::withEffectsFromStack(const function<void(const shared_ptr<
     });
 }
 
-void ScriptExecution::withEventsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+void ScriptExecution::withEventsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Event, left.type);
         throwIfInvalidType(VariableType::Event, right.type);
@@ -936,7 +934,7 @@ void ScriptExecution::withEventsFromStack(const function<void(const shared_ptr<E
     });
 }
 
-void ScriptExecution::withLocationsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+void ScriptExecution::withLocationsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Location, left.type);
         throwIfInvalidType(VariableType::Location, right.type);
@@ -944,7 +942,7 @@ void ScriptExecution::withLocationsFromStack(const function<void(const shared_pt
     });
 }
 
-void ScriptExecution::withTalentsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+void ScriptExecution::withTalentsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
     withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Talent, left.type);
         throwIfInvalidType(VariableType::Talent, right.type);
@@ -952,21 +950,21 @@ void ScriptExecution::withTalentsFromStack(const function<void(const shared_ptr<
     });
 }
 
-void ScriptExecution::withFloatVectorFromStack(const function<void(float, const glm::vec3 &)> &fn) {
+void ScriptExecution::withFloatVectorFromStack(const std::function<void(float, const glm::vec3 &)> &fn) {
     auto right = getVectorFromStack();
     auto left = getFloatFromStack();
 
     fn(left, right);
 }
 
-void ScriptExecution::withVectorFloatFromStack(const function<void(const glm::vec3 &, float)> &fn) {
+void ScriptExecution::withVectorFloatFromStack(const std::function<void(const glm::vec3 &, float)> &fn) {
     auto right = getFloatFromStack();
     auto left = getVectorFromStack();
 
     fn(left, right);
 }
 
-void ScriptExecution::withVectorsFromStack(const function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
+void ScriptExecution::withVectorsFromStack(const std::function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
     auto right = getVectorFromStack();
     auto left = getVectorFromStack();
 
@@ -975,9 +973,9 @@ void ScriptExecution::withVectorsFromStack(const function<void(const glm::vec3 &
 
 void ScriptExecution::throwIfInvalidType(VariableType expected, VariableType actual) {
     if (actual != expected) {
-        throw runtime_error(str(boost::format("Invalid variable type: expected=%d, actual=%d") %
-                                static_cast<int>(expected) %
-                                static_cast<int>(actual)));
+        throw std::runtime_error(str(boost::format("Invalid variable type: expected=%d, actual=%d") %
+                                     static_cast<int>(expected) %
+                                     static_cast<int>(actual)));
     }
 }
 

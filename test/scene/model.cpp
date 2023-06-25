@@ -28,8 +28,6 @@
 #include "../fixtures/audio.h"
 #include "../fixtures/graphics.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -47,27 +45,27 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
     auto audioModule = TestAudioModule();
     audioModule.init();
 
-    auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
 
-    auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
+    auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
-    auto mesh = make_shared<ModelNode::TriangleMesh>();
-    auto meshNode = make_shared<ModelNode>(1, "mesh_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
+    auto mesh = std::make_shared<ModelNode::TriangleMesh>();
+    auto meshNode = std::make_shared<ModelNode>(1, "mesh_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
     meshNode->setMesh(mesh);
     rootNode->addChild(meshNode);
 
-    auto light = make_shared<ModelNode::Light>();
-    auto lightNode = make_shared<ModelNode>(2, "light_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
+    auto light = std::make_shared<ModelNode::Light>();
+    auto lightNode = std::make_shared<ModelNode>(2, "light_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
     lightNode->setLight(light);
     rootNode->addChild(lightNode);
 
-    auto emitter = make_shared<ModelNode::Emitter>();
-    auto emitterNode = make_shared<ModelNode>(3, "emitter_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
+    auto emitter = std::make_shared<ModelNode::Emitter>();
+    auto emitterNode = std::make_shared<ModelNode>(3, "emitter_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
     emitterNode->setEmitter(emitter);
     rootNode->addChild(emitterNode);
 
-    auto model = Model("some_model", 0, rootNode, vector<shared_ptr<Animation>>(), nullptr, 1.0f);
-    auto modelSceneNode = make_shared<ModelSceneNode>(
+    auto model = Model("some_model", 0, rootNode, std::vector<std::shared_ptr<Animation>>(), nullptr, 1.0f);
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
         *scene,
@@ -109,20 +107,20 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
     auto audioModule = TestAudioModule();
     audioModule.init();
 
-    auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
 
-    auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
+    auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
-    auto animRootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto animRootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     animRootNode->position().addFrame(0.0f, glm::vec3(0.0f));
     animRootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
-    auto animations = vector<shared_ptr<Animation>> {
-        make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, vector<Animation::Event>())};
+    auto animations = std::vector<std::shared_ptr<Animation>> {
+        std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
 
-    auto modelSceneNode = make_shared<ModelSceneNode>(
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
         *scene,
@@ -157,19 +155,19 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
     auto audioModule = TestAudioModule();
     audioModule.init();
 
-    auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
 
-    auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
+    auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
-    auto animRootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto animRootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     animRootNode->position().addFrame(0.0f, glm::vec3(0.0f));
     animRootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
-    auto animations = vector<shared_ptr<Animation>> {
-        make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, vector<Animation::Event>())};
+    auto animations = std::vector<std::shared_ptr<Animation>> {
+        std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-    auto modelSceneNode = make_shared<ModelSceneNode>(
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
         *scene,
@@ -204,28 +202,28 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
     auto audioModule = TestAudioModule();
     audioModule.init();
 
-    auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
 
-    auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
-    auto dummyNode = make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
+    auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
+    auto dummyNode = std::make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
     rootNode->addChild(dummyNode);
 
-    auto anim1RootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto anim1RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     anim1RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
     anim1RootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
-    auto anim2RootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
-    auto anim2DummyNode = make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, anim2RootNode.get());
+    auto anim2RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto anim2DummyNode = std::make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, anim2RootNode.get());
     anim2DummyNode->position().addFrame(0.0f, glm::vec3(0.0f));
     anim2DummyNode->position().addFrame(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
     anim2RootNode->addChild(anim2DummyNode);
 
-    auto animations = vector<shared_ptr<Animation>> {
-        make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, vector<Animation::Event>()),
-        make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, vector<Animation::Event>())};
+    auto animations = std::vector<std::shared_ptr<Animation>> {
+        std::make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, std::vector<Animation::Event>()),
+        std::make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, std::vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-    auto modelSceneNode = make_shared<ModelSceneNode>(
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
         *scene,
@@ -269,24 +267,24 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
     auto audioModule = TestAudioModule();
     audioModule.init();
 
-    auto scene = make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
 
-    auto rootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
+    auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
-    auto anim1RootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto anim1RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     anim1RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
     anim1RootNode->position().addFrame(1.0f, glm::vec3(1.0f, 2.0f, 3.0f));
 
-    auto anim2RootNode = make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
+    auto anim2RootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), false, nullptr);
     anim2RootNode->position().addFrame(0.0f, glm::vec3(0.0f));
     anim2RootNode->position().addFrame(2.0f, glm::vec3(4.0f, 5.0f, 6.0f));
 
-    auto animations = vector<shared_ptr<Animation>> {
-        make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, vector<Animation::Event>()),
-        make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, vector<Animation::Event>())};
+    auto animations = std::vector<std::shared_ptr<Animation>> {
+        std::make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, std::vector<Animation::Event>()),
+        std::make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, std::vector<Animation::Event>())};
 
     auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
-    auto modelSceneNode = make_shared<ModelSceneNode>(
+    auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
         *scene,

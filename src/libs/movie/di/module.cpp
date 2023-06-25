@@ -17,15 +17,13 @@
 
 #include "reone/movie/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace movie {
 
 void MovieModule::init() {
-    _movies = make_unique<Movies>(_gamePath, _graphics.services(), _audio.services());
-    _services = make_unique<MovieServices>(*_movies);
+    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), _audio.services());
+    _services = std::make_unique<MovieServices>(*_movies);
 }
 
 void MovieModule::deinit() {

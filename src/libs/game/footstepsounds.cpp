@@ -21,8 +21,6 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::resource;
 
@@ -30,13 +28,13 @@ namespace reone {
 
 namespace game {
 
-shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
-    shared_ptr<FootstepTypeSounds> result;
+std::shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
+    std::shared_ptr<FootstepTypeSounds> result;
 
-    shared_ptr<TwoDa> twoDa(_twoDas.get("footstepsounds"));
+    std::shared_ptr<TwoDa> twoDa(_twoDas.get("footstepsounds"));
     if (twoDa) {
-        result = make_shared<FootstepTypeSounds>();
-        map<string, vector<shared_ptr<AudioStream>> &> dict {
+        result = std::make_shared<FootstepTypeSounds>();
+        std::map<std::string, std::vector<std::shared_ptr<AudioStream>> &> dict {
             {"dirt", result->dirt},
             {"grass", result->grass},
             {"stone", result->stone},
@@ -47,9 +45,9 @@ shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
             {"leaves", result->leaves}};
         for (auto &pair : dict) {
             for (int i = 0; i < 3; ++i) {
-                string key(str(boost::format("%s%d") % pair.first % i));
-                string resRef(twoDa->getString(static_cast<int>(type), key));
-                shared_ptr<AudioStream> audio(_audioFiles.get(resRef));
+                std::string key(str(boost::format("%s%d") % pair.first % i));
+                std::string resRef(twoDa->getString(static_cast<int>(type), key));
+                std::shared_ptr<AudioStream> audio(_audioFiles.get(resRef));
                 pair.second.push_back(std::move(audio));
             }
         }

@@ -24,8 +24,6 @@
 
 #include "reone/scene/graph.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -33,8 +31,8 @@ namespace reone {
 namespace scene {
 
 void WalkmeshSceneNode::init() {
-    vector<float> vertices;
-    vector<Mesh::Face> faces;
+    std::vector<float> vertices;
+    std::vector<Mesh::Face> faces;
 
     for (auto &wface : _walkmesh.faces()) {
         size_t vertIdxStart = vertices.size() / 7;
@@ -62,7 +60,7 @@ void WalkmeshSceneNode::init() {
     spec.offNormals = 3 * sizeof(float);
     spec.offMaterial = 6 * sizeof(float);
 
-    _mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
+    _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     _mesh->init();
 }
 

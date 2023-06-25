@@ -28,8 +28,6 @@
 #include "reone/game/options.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -56,9 +54,9 @@ static constexpr char kTexturePackFilenameLow[] = "swpc_tex_tpc.erf";
 static constexpr char kExeFilenameKotor[] = "swkotor.exe";
 static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
 
-static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
+static const std::vector<std::string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
-static const unordered_map<TextureQuality, string> texPackByQuality {
+static const std::unordered_map<TextureQuality, std::string> texPackByQuality {
     {TextureQuality::High, kTexturePackFilenameHigh},
     {TextureQuality::Medium, kTexturePackFilenameMedium},
     {TextureQuality::Low, kTexturePackFilenameLow}};
@@ -69,7 +67,7 @@ void ResourceLayout::init() {
     } else if (_gameId == GameID::TSL) {
         initForTSL();
     } else {
-        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+        throw std::logic_error("Unsupported game ID: " + std::to_string(static_cast<int>(_gameId)));
     }
 }
 
@@ -120,8 +118,8 @@ void ResourceLayout::initForTSL() {
     resources.indexExeFile(getPathIgnoreCase(_options.game.path, kExeFilenameTsl));
 }
 
-set<string> ResourceLayout::moduleNames() {
-    auto moduleNames = set<string>();
+std::set<std::string> ResourceLayout::moduleNames() {
+    auto moduleNames = std::set<std::string>();
     auto modulesPath = getPathIgnoreCase(_options.game.path, kModulesDirectoryName);
     if (modulesPath.empty()) {
         throw ValidationException("Modules directory not found");
@@ -136,7 +134,7 @@ set<string> ResourceLayout::moduleNames() {
     return moduleNames;
 }
 
-void ResourceLayout::loadModuleResources(const string &moduleName) {
+void ResourceLayout::loadModuleResources(const std::string &moduleName) {
     _resourceSvc.twoDas.invalidate();
     _resourceSvc.gffs.invalidate();
     _resourceSvc.resources.clearTransientProviders();

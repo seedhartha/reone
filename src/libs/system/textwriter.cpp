@@ -17,15 +17,13 @@
 
 #include "reone/system/textwriter.h"
 
-using namespace std;
-
 namespace reone {
 
-void TextWriter::put(const string &s) {
+void TextWriter::put(const std::string &s) {
     _stream.write(&s[0], s.length());
 }
 
-void TextWriter::putLine(const string &s) {
+void TextWriter::putLine(const std::string &s) {
     _stream.write(&s[0], s.length());
     _stream.writeByte('\n');
 }

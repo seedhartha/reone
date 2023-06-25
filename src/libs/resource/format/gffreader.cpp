@@ -20,8 +20,6 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -45,25 +43,25 @@ void GffReader::onLoad() {
     _root = std::move(readStruct(0));
 }
 
-unique_ptr<Gff> GffReader::readStruct(int idx) {
+std::unique_ptr<Gff> GffReader::readStruct(int idx) {
     seek(_structOffset + 12ll * idx);
 
     uint32_t type = readUint32();
     uint32_t dataOffset = readUint32();
     uint32_t fieldCount = readUint32();
 
-    auto fields = vector<Gff::Field>();
+    auto fields = std::vector<Gff::Field>();
 
     if (fieldCount == 1) {
         fields.push_back(readField(dataOffset));
     } else {
-        vector<uint32_t> indices(readFieldIndices(dataOffset, fieldCount));
+        std::vector<uint32_t> indices(readFieldIndices(dataOffset, fieldCount));
         for (auto &idx : indices) {
             fields.push_back(readField(idx));
         }
     }
 
-    return make_unique<Gff>(type, std::move(fields));
+    return std::make_unique<Gff>(type, std::move(fields));
 }
 
 Gff::Field GffReader::readField(int idx) {
@@ -123,7 +121,7 @@ Gff::Field GffReader::readField(int idx) {
         field.children.push_back(readStruct(dataOrDataOffset));
         break;
     case Gff::FieldType::List: {
-        vector<uint32_t> list(readList(dataOrDataOffset));
+        std::vector<uint32_t> list(readList(dataOrDataOffset));
         for (auto &item : list) {
             field.children.push_back(readStruct(item));
         }
@@ -144,18 +142,18 @@ Gff::Field GffReader::readField(int idx) {
         field.intValue = readStrRefFieldData(dataOrDataOffset);
         break;
     default:
-        throw ValidationException("Unsupported field type: " + to_string(type));
+        throw ValidationException("Unsupported field type: " + std::to_string(type));
     }
 
     return std::move(field);
 }
 
-string GffReader::readLabel(int idx) {
+std::string GffReader::readLabel(int idx) {
     uint32_t off = _labelOffset + 16 * idx;
     return readCString(off, 16);
 }
 
-vector<uint32_t> GffReader::readFieldIndices(uint32_t off, int count) {
+std::vector<uint32_t> GffReader::readFieldIndices(uint32_t off, int count) {
     return readUint32Array(_fieldIndicesOffset + off, count);
 }
 
@@ -168,23 +166,23 @@ uint64_t GffReader::readQWordFieldData(uint32_t off) {
     return val;
 }
 
-string GffReader::readStringFieldData(uint32_t off) {
+std::string GffReader::readStringFieldData(uint32_t off) {
     size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint32_t size = readUint32();
-    string s(readCString(size));
+    std::string s(readCString(size));
     seek(pos);
 
     return std::move(s);
 }
 
-string GffReader::readResRefFieldData(uint32_t off) {
+std::string GffReader::readResRefFieldData(uint32_t off) {
     size_t pos = tell();
     seek(_fieldDataOffset + off);
 
     uint8_t size = readByte();
-    string s(readCString(size));
+    std::string s(readCString(size));
     seek(pos);
 
     return std::move(s);
@@ -243,12 +241,12 @@ ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
     return readBytes(_fieldDataOffset + off, size);
 }
 
-vector<uint32_t> GffReader::readList(uint32_t off) {
+std::vector<uint32_t> GffReader::readList(uint32_t off) {
     size_t pos = tell();
     seek(static_cast<size_t>(_listIndicesOffset) + off);
 
     uint32_t count = readUint32();
-    vector<uint32_t> arr(readUint32Array(count));
+    std::vector<uint32_t> arr(readUint32Array(count));
     seek(pos);
 
     return std::move(arr);

@@ -17,8 +17,6 @@
 
 #include "reone/graphics/uniforms.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -69,53 +67,53 @@ void Uniforms::deinit() {
     _inited = false;
 }
 
-void Uniforms::setGeneral(const function<void(GeneralUniforms &)> &block) {
+void Uniforms::setGeneral(const std::function<void(GeneralUniforms &)> &block) {
     block(_general);
     refreshBuffer(*_ubGeneral, UniformBlockBindingPoints::general, &_general, sizeof(GeneralUniforms));
 }
 
-void Uniforms::setText(const function<void(TextUniforms &)> &block) {
+void Uniforms::setText(const std::function<void(TextUniforms &)> &block) {
     block(_text);
     refreshBuffer(*_ubText, UniformBlockBindingPoints::text, &_text, sizeof(TextUniforms));
 }
 
-void Uniforms::setLighting(const function<void(LightingUniforms &)> &block) {
+void Uniforms::setLighting(const std::function<void(LightingUniforms &)> &block) {
     block(_lighting);
     refreshBuffer(*_ubLighting, UniformBlockBindingPoints::lighting, &_lighting, sizeof(LightingUniforms));
 }
 
-void Uniforms::setSkeletal(const function<void(SkeletalUniforms &)> &block) {
+void Uniforms::setSkeletal(const std::function<void(SkeletalUniforms &)> &block) {
     block(_skeletal);
     refreshBuffer(*_ubSkeletal, UniformBlockBindingPoints::skeletal, &_skeletal, sizeof(SkeletalUniforms));
 }
 
-void Uniforms::setParticles(const function<void(ParticlesUniforms &)> &block) {
+void Uniforms::setParticles(const std::function<void(ParticlesUniforms &)> &block) {
     block(_particles);
     refreshBuffer(*_ubParticles, UniformBlockBindingPoints::particles, &_particles, sizeof(ParticlesUniforms));
 }
 
-void Uniforms::setGrass(const function<void(GrassUniforms &)> &block) {
+void Uniforms::setGrass(const std::function<void(GrassUniforms &)> &block) {
     block(_grass);
     refreshBuffer(*_ubGrass, UniformBlockBindingPoints::grass, &_grass, sizeof(GrassUniforms));
 }
 
-void Uniforms::setSSAO(const function<void(SSAOUniforms &)> &block) {
+void Uniforms::setSSAO(const std::function<void(SSAOUniforms &)> &block) {
     block(_ssao);
     refreshBuffer(*_ubSSAO, UniformBlockBindingPoints::ssao, &_ssao, sizeof(SSAOUniforms));
 }
 
-void Uniforms::setWalkmesh(const function<void(WalkmeshUniforms &)> &block) {
+void Uniforms::setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) {
     block(_walkmesh);
     refreshBuffer(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh, &_walkmesh, sizeof(WalkmeshUniforms));
 }
 
-void Uniforms::setPoints(const function<void(PointsUniforms &)> &block) {
+void Uniforms::setPoints(const std::function<void(PointsUniforms &)> &block) {
     block(_points);
     refreshBuffer(*_ubPoints, UniformBlockBindingPoints::points, &_points, sizeof(PointsUniforms));
 }
 
-unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {
-    auto buf = make_unique<UniformBuffer>();
+std::unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {
+    auto buf = std::make_unique<UniformBuffer>();
     buf->setData(data, size);
     buf->init();
     return std::move(buf);

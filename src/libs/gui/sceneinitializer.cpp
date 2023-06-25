@@ -22,8 +22,6 @@
 #include "reone/scene/node/mesh.h"
 #include "reone/scene/node/model.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -32,7 +30,7 @@ namespace reone {
 namespace gui {
 
 void SceneInitializer::invoke() {
-    shared_ptr<ModelSceneNode> model(_modelSupplier(_sceneGraph));
+    std::shared_ptr<ModelSceneNode> model(_modelSupplier(_sceneGraph));
     if (!model) {
         return;
     }
@@ -41,7 +39,7 @@ void SceneInitializer::invoke() {
     _sceneGraph.addRoot(model);
     _sceneGraph.setAmbientLightColor(_ambientLightColor);
 
-    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera());
+    std::shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera());
     if (!cameraNode) {
         return;
     }
@@ -55,7 +53,7 @@ void SceneInitializer::invoke() {
     if (_cameraNodeName.empty()) {
         cameraNode->setLocalTransform(_cameraTransform);
     } else {
-        shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_cameraNodeName));
+        std::shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_cameraNodeName));
         if (modelNode) {
             cameraNode->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }
@@ -74,7 +72,7 @@ SceneInitializer &SceneInitializer::depth(float zNear, float zFar) {
     return *this;
 }
 
-SceneInitializer &SceneInitializer::modelSupplier(const function<shared_ptr<ModelSceneNode>(ISceneGraph &)> &supplier) {
+SceneInitializer &SceneInitializer::modelSupplier(const std::function<std::shared_ptr<ModelSceneNode>(ISceneGraph &)> &supplier) {
     _modelSupplier = supplier;
     return *this;
 }
@@ -94,7 +92,7 @@ SceneInitializer &SceneInitializer::cameraTransform(glm::mat4 transform) {
     return *this;
 }
 
-SceneInitializer &SceneInitializer::cameraFromModelNode(string nodeName) {
+SceneInitializer &SceneInitializer::cameraFromModelNode(std::string nodeName) {
     _cameraNodeName = std::move(nodeName);
     return *this;
 }

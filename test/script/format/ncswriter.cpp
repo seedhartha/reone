@@ -17,14 +17,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "reone/system/stream/bytearrayoutput.h"
-#include "reone/system/stringbuilder.h"
 #include "reone/script/format/ncswriter.h"
 #include "reone/script/program.h"
+#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::script;
@@ -233,7 +231,7 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
 
     auto writer = NcsWriter(program);
     auto bytes = ByteArray();
-    auto stream = make_shared<ByteArrayOutputStream>(bytes);
+    auto stream = std::make_shared<ByteArrayOutputStream>(bytes);
 
     // when
 
@@ -241,7 +239,7 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
 
     // then
 
-    auto actualOutput = string(&bytes[0], bytes.size());
+    auto actualOutput = std::string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

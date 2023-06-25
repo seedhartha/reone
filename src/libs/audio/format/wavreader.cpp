@@ -23,24 +23,22 @@
 
 #include "reone/audio/format/mp3reader.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {
 
 void WavReader::onLoad() {
-    string sign(readString(4));
+    std::string sign(readString(4));
     if (sign == "\xff\xf3\x60\xc4") {
         seek(0x1da);
     } else if (sign != "RIFF") {
-        throw runtime_error("WAV: invalid file signature: " + sign);
+        throw std::runtime_error("WAV: invalid file signature: " + sign);
     }
 
     uint32_t chunkSize = readUint32();
-    string format(readString(4));
+    std::string format(readString(4));
     if (format != "WAVE") {
-        throw runtime_error("WAV: invalid chunk format: " + format);
+        throw std::runtime_error("WAV: invalid chunk format: " + format);
     }
     ChunkHeader chunk;
     while (readChunkHeader(chunk)) {
@@ -59,7 +57,7 @@ bool WavReader::readChunkHeader(ChunkHeader &chunk) {
     if (_reader->eof())
         return false;
 
-    string id(readString(4));
+    std::string id(readString(4));
     uint32_t size = readUint32();
 
     chunk.id = std::move(id);
@@ -71,11 +69,11 @@ bool WavReader::readChunkHeader(ChunkHeader &chunk) {
 void WavReader::loadFormat(ChunkHeader chunk) {
     _audioFormat = static_cast<WavAudioFormat>(readUint16());
     if (_audioFormat != WavAudioFormat::PCM && _audioFormat != WavAudioFormat::IMAADPCM) {
-        throw runtime_error("WAV: unsupported audio format: " + to_string(static_cast<int>(_audioFormat)));
+        throw std::runtime_error("WAV: unsupported audio format: " + std::to_string(static_cast<int>(_audioFormat)));
     }
     _channelCount = readUint16();
     if (_channelCount != 1 && _channelCount != 2) {
-        throw runtime_error("WAV: invalid number of channels: " + to_string(_channelCount));
+        throw std::runtime_error("WAV: invalid number of channels: " + std::to_string(_channelCount));
     }
     _sampleRate = readUint32();
 
@@ -85,7 +83,7 @@ void WavReader::loadFormat(ChunkHeader chunk) {
     _bitsPerSample = readUint16();
 
     if (_bitsPerSample != 4 && _bitsPerSample != 8 && _bitsPerSample != 16) {
-        throw runtime_error("WAV: invalid bits per sample: " + to_string(_bitsPerSample));
+        throw std::runtime_error("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
     }
 
     ignore(chunk.size - 16);
@@ -121,7 +119,7 @@ void WavReader::loadPCM(uint32_t chunkSize) {
     frame.samples.resize(chunkSize);
     frame.samples = std::move(data);
 
-    _stream = make_shared<AudioStream>();
+    _stream = std::make_shared<AudioStream>();
     _stream->add(std::move(frame));
 }
 
@@ -177,7 +175,7 @@ void WavReader::loadIMAADPCM(uint32_t chunkSize) {
         }
     }
 
-    _stream = make_shared<AudioStream>();
+    _stream = std::make_shared<AudioStream>();
     _stream->add(std::move(frame));
 }
 
@@ -190,15 +188,15 @@ AudioFormat WavReader::getAudioFormat() const {
         case 8:
             return _channelCount == 2 ? AudioFormat::Stereo8 : AudioFormat::Mono8;
         default:
-            throw logic_error("WAV: PCM: invalid bits per sample: " + to_string(_bitsPerSample));
+            throw std::logic_error("WAV: PCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
         }
     case WavAudioFormat::IMAADPCM:
         if (_bitsPerSample != 4) {
-            throw logic_error("WAV: IMA ADPCM: invalid bits per sample: " + to_string(_bitsPerSample));
+            throw std::logic_error("WAV: IMA ADPCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
         }
         return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
     default:
-        throw logic_error("WAV: invalid audio format: " + to_string(static_cast<int>(_audioFormat)));
+        throw std::logic_error("WAV: invalid audio format: " + std::to_string(static_cast<int>(_audioFormat)));
     }
 }
 
@@ -213,10 +211,10 @@ void WavReader::getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, in
 int16_t WavReader::getIMASample(int channel, uint8_t nibble) {
     int step = (2 * (nibble & 0x7) + 1) * kIMAStepTable[_ima[channel].stepIndex] / 8;
     int diff = nibble & 0x8 ? -step : step;
-    int sample = min(max(_ima[channel].lastSample + diff, -32768), 32767);
+    int sample = std::min(std::max(_ima[channel].lastSample + diff, -32768), 32767);
 
     _ima[channel].lastSample = sample;
-    _ima[channel].stepIndex = min(max(_ima[channel].stepIndex + kIMAIndexTable[nibble & 0x7], 0), 88);
+    _ima[channel].stepIndex = std::min(std::max(_ima[channel].stepIndex + kIMAIndexTable[nibble & 0x7], 0), 88);
 
     return sample;
 }

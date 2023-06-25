@@ -17,13 +17,11 @@
 
 #include "reone/game/action/castfakespellatobject.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void CastFakeSpellAtObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void CastFakeSpellAtObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

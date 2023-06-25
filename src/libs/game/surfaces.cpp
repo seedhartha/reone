@@ -20,8 +20,6 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -29,7 +27,7 @@ namespace reone {
 namespace game {
 
 void Surfaces::init() {
-    shared_ptr<TwoDa> surfacemat(_twoDas.get("surfacemat"));
+    std::shared_ptr<TwoDa> surfacemat(_twoDas.get("surfacemat"));
     if (!surfacemat) {
         return;
     }
@@ -47,20 +45,20 @@ void Surfaces::init() {
 
 bool Surfaces::isWalkable(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
-        throw out_of_range("index is out of range");
+        throw std::out_of_range("index is out of range");
     }
     return _surfaces[index].walk;
 }
 
 const Surface &Surfaces::getSurface(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
-        throw out_of_range("index is out of range: " + to_string(index));
+        throw std::out_of_range("index is out of range: " + std::to_string(index));
     }
     return _surfaces[index];
 }
 
-set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> &pred) const {
-    set<uint32_t> result;
+std::set<uint32_t> Surfaces::getSurfaceIndices(const std::function<bool(const Surface &)> &pred) const {
+    std::set<uint32_t> result;
     for (size_t i = 0; i < _surfaces.size(); ++i) {
         if (pred(_surfaces[i])) {
             result.insert(static_cast<uint32_t>(i));
@@ -69,19 +67,19 @@ set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> 
     return std::move(result);
 }
 
-set<uint32_t> Surfaces::getGrassSurfaces() const {
+std::set<uint32_t> Surfaces::getGrassSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.grass; });
 }
 
-set<uint32_t> Surfaces::getWalkableSurfaces() const {
+std::set<uint32_t> Surfaces::getWalkableSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.walk; });
 }
 
-set<uint32_t> Surfaces::getWalkcheckSurfaces() const {
+std::set<uint32_t> Surfaces::getWalkcheckSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.walkcheck; });
 }
 
-set<uint32_t> Surfaces::getLineOfSightSurfaces() const {
+std::set<uint32_t> Surfaces::getLineOfSightSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.lineOfSight; });
 }
 

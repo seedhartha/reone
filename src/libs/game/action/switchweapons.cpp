@@ -17,13 +17,11 @@
 
 #include "reone/game/action/switchweapons.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void SwitchWeaponsAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void SwitchWeaponsAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

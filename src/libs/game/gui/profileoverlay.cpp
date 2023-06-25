@@ -18,18 +18,16 @@
 #include "reone/game/gui/profileoverlay.h"
 
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/window.h"
 #include "reone/system/di/services.h"
 
 #include "reone/game/di/services.h"
-
-using namespace std;
 
 using namespace reone::graphics;
 
@@ -86,7 +84,7 @@ void ProfileOverlay::draw() {
 
     _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         _font->draw(
-            to_string(_fps),
+            std::to_string(_fps),
             glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),
             glm::vec3(1.0f),
             TextGravity::LeftTop);

@@ -37,8 +37,6 @@
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::graphics;
@@ -51,11 +49,11 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-static map<Gender, int> g_genderStrRefs {
+static std::map<Gender, int> g_genderStrRefs {
     {Gender::Male, 646},
     {Gender::Female, 647}};
 
-static map<ClassType, int> g_classDescStrRefs {
+static std::map<ClassType, int> g_classDescStrRefs {
     {ClassType::Scoundrel, 32109},
     {ClassType::Scout, 32110},
     {ClassType::Soldier, 32111},
@@ -120,7 +118,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     // Button control
 
-    vector<Button *> selButtons {
+    std::vector<Button *> selButtons {
         _binding.btnSel1.get(),
         _binding.btnSel2.get(),
         _binding.btnSel3.get(),
@@ -150,8 +148,8 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     // 3D control
 
-    string sceneName(kSceneClassSelect);
-    sceneName += "." + to_string(index);
+    std::string sceneName(kSceneClassSelect);
+    sceneName += "." + std::to_string(index);
 
     auto &sceneGraph = _services.scene.graphs.get(sceneName);
     float aspect = extent.width / static_cast<float>(extent.height);
@@ -164,7 +162,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         .cameraFromModelNode("camerahook")
         .invoke();
 
-    vector<Label *> threeDModels {
+    std::vector<Label *> threeDModels {
         _binding.threeDModel1.get(),
         _binding.threeDModel2.get(),
         _binding.threeDModel3.get(),
@@ -181,8 +179,8 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     _classButtons.push_back(std::move(classButton));
 }
 
-vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
-    vector<Portrait> result;
+std::vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
+    std::vector<Portrait> result;
     int sex = gender == Gender::Female ? 1 : 0;
     for (auto &portrait : _services.game.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
@@ -194,7 +192,7 @@ vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
 
 int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz) {
     int result = 0;
-    vector<Portrait> portraits(getPCPortraitsByGender(gender));
+    std::vector<Portrait> portraits(getPCPortraitsByGender(gender));
     int portraitIdx = random(0, static_cast<int>(portraits.size()) - 1);
     const Portrait &portrait = portraits[portraitIdx];
 
@@ -215,8 +213,8 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
     return result;
 }
 
-shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISceneGraph &sceneGraph) {
-    shared_ptr<Creature> character(_game.objectFactory().newCreature(sceneGraph.name()));
+std::shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISceneGraph &sceneGraph) {
+    std::shared_ptr<Creature> character(_game.objectFactory().newCreature(sceneGraph.name()));
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");
@@ -258,11 +256,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(_services.resource.strings.get(g_genderStrRefs[button.character.gender]));
+    std::string classText(_services.resource.strings.get(g_genderStrRefs[button.character.gender]));
     classText += " " + _services.game.classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    string descText(_services.resource.strings.get(g_classDescStrRefs[clazz]));
+    std::string descText(_services.resource.strings.get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

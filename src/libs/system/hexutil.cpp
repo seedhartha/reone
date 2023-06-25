@@ -17,19 +17,17 @@
 
 #include "reone/system/hexutil.h"
 
-using namespace std;
-
 namespace reone {
 
-string hexify(const string &s, string separator) {
-    ostringstream ss;
+std::string hexify(const std::string &s, std::string separator) {
+    std::ostringstream ss;
     for (auto &ch : s) {
-        ss << hex << setw(2) << setfill('0') << static_cast<int>(ch & 0xff) << separator;
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(ch & 0xff) << separator;
     }
     return ss.str();
 }
 
-ByteArray unhexify(const string &s) {
+ByteArray unhexify(const std::string &s) {
     auto bytes = ByteArray();
     for (size_t i = 0; i < s.size(); i += 2) {
         uint8_t byte;

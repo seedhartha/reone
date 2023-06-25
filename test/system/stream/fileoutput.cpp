@@ -21,8 +21,6 @@
 
 #include "../../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(file_output_stream)
@@ -48,8 +46,8 @@ BOOST_AUTO_TEST_CASE(should_write_to_file) {
 
     // then
 
-    auto tmpFile = boost::filesystem::ifstream(tmpPath, ios::binary);
-    tmpFile.seekg(0, ios::end);
+    auto tmpFile = boost::filesystem::ifstream(tmpPath, std::ios::binary);
+    tmpFile.seekg(0, std::ios::end);
     auto tmpSize = tmpFile.tellg();
     auto bytes = ByteArray();
     bytes.resize(tmpSize);

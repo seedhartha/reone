@@ -19,24 +19,22 @@
 
 #include "reone/system/randomutil.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-static const vector<char> g_letters {
+static const std::vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
     'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '\'', '-'};
 
 void LtrReader::onLoad() {
-    checkSignature(string("LTR V1.0", 8));
+    checkSignature(std::string("LTR V1.0", 8));
 
     _letterCount = readByte();
     if (_letterCount != 28) {
-        throw runtime_error("Unsupported letter count");
+        throw std::runtime_error("Unsupported letter count");
     }
     readLetterSet(_singleLetters);
 
@@ -71,8 +69,8 @@ void LtrReader::readLetterSet(LetterSet &set) {
     }
 }
 
-string LtrReader::getRandomName(int maxLength) const {
-    string name;
+std::string LtrReader::getRandomName(int maxLength) const {
+    std::string name;
 
     float probability;
     int firstLetterIdx = 0;

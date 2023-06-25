@@ -21,8 +21,6 @@
 #include "reone/resource/typeutil.h"
 #include "reone/system/stream/fileinput.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -50,7 +48,7 @@ void ErfTool::invoke(Operation operation, const boost::filesystem::path &input, 
 
 void ErfTool::list(const ErfReader &erf) {
     for (auto &key : erf.keys()) {
-        cout << key.resId.string() << endl;
+        std::cout << key.resId.string() << std::endl;
     }
 }
 
@@ -77,7 +75,7 @@ void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, co
         auto &ext = getExtByResType(key.resId.type);
         resPath.append(key.resId.resRef + "." + ext);
 
-        auto res = boost::filesystem::ofstream(resPath, ios::binary);
+        auto res = boost::filesystem::ofstream(resPath, std::ios::binary);
         res.write(&buffer[0], buffer.size());
     }
 }
@@ -90,15 +88,15 @@ void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) 
         if (boost::filesystem::is_directory(path))
             continue;
 
-        string ext(path.extension().string());
+        std::string ext(path.extension().string());
         ext.erase(0, 1);
 
         ResourceType resType = getResTypeByExt(ext, false);
         if (resType == ResourceType::Invalid)
             continue;
 
-        boost::filesystem::ifstream in(path, ios::binary);
-        in.seekg(0, ios::end);
+        boost::filesystem::ifstream in(path, std::ios::binary);
+        in.seekg(0, std::ios::end);
         size_t size = in.tellg();
         ByteArray data(size, '\0');
         in.seekg(0);
@@ -116,7 +114,7 @@ void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) 
     }
 
     ErfWriter::FileType type;
-    string ext;
+    std::string ext;
 
     if (operation == Operation::ToMOD) {
         type = ErfWriter::FileType::MOD;
@@ -135,7 +133,7 @@ bool ErfTool::supports(Operation operation, const boost::filesystem::path &input
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        string ext(input.extension().string());
+        std::string ext(input.extension().string());
         return !boost::filesystem::is_directory(input) &&
                (ext == ".erf" || ext == ".mod" || ext == ".sav");
     }

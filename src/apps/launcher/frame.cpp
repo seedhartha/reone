@@ -21,8 +21,6 @@
 
 #include "reone/graphics/types.h"
 
-using namespace std;
-
 using namespace boost::program_options;
 
 using namespace reone::graphics;
@@ -75,12 +73,12 @@ LauncherFrame::LauncherFrame() :
 
     int displayW, displayH;
     wxDisplaySize(&displayW, &displayH);
-    string displayRes = to_string(displayW) + "x" + to_string(displayH);
+    std::string displayRes = std::to_string(displayW) + "x" + std::to_string(displayH);
     if (resChoices.Index(displayRes) == wxNOT_FOUND) {
         resChoices.Add(displayRes);
     }
 
-    string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
+    std::string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
     if (resSelection == wxNOT_FOUND) {
         resChoices.Add(configResolution);
@@ -300,7 +298,7 @@ LauncherFrame::LauncherFrame() :
 void LauncherFrame::LoadConfiguration() {
     options_description options;
     options.add_options()                                                 //
-        ("game", value<string>()->default_value(_config.gameDir))         //
+        ("game", value<std::string>()->default_value(_config.gameDir))    //
         ("dev", value<bool>()->default_value(_config.devMode))            //
         ("width", value<int>()->default_value(_config.width))             //
         ("height", value<int>()->default_value(_config.height))           //
@@ -331,7 +329,7 @@ void LauncherFrame::LoadConfiguration() {
     store(parse_config_file<char>(kConfigFilename, options, true), vars);
     notify(vars);
 
-    _config.gameDir = vars["game"].as<string>();
+    _config.gameDir = vars["game"].as<std::string>();
     _config.devMode = vars["dev"].as<bool>();
     _config.width = vars["width"].as<int>();
     _config.height = vars["height"].as<int>();
@@ -358,7 +356,7 @@ void LauncherFrame::LoadConfiguration() {
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
     SaveConfiguration();
 
-    string exe("reone");
+    std::string exe("reone");
 #ifndef _WIN32
     exe.insert(0, "./");
 #endif
@@ -369,7 +367,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized {
+    static std::set<std::string> recognized {
         "game=",
         "dev=",
         "width=",
@@ -393,8 +391,8 @@ void LauncherFrame::SaveConfiguration() {
         "logch=",
         "logfile="};
 
-    string resolution(_choiceResolution->GetStringSelection());
-    vector<string> tokens;
+    std::string resolution(_choiceResolution->GetStringSelection());
+    std::vector<std::string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
     int logch = LogChannels::general;
@@ -455,10 +453,10 @@ void LauncherFrame::SaveConfiguration() {
     _config.logch = logch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 
-    vector<string> lines;
+    std::vector<std::string> lines;
 
     boost::filesystem::ifstream in(kConfigFilename);
-    for (string line; getline(in, line);) {
+    for (std::string line; getline(in, line);) {
         bool add = true;
         for (auto &opt : recognized) {
             if (boost::starts_with(line, opt)) {
@@ -472,30 +470,30 @@ void LauncherFrame::SaveConfiguration() {
     }
 
     boost::filesystem::ofstream config(kConfigFilename);
-    config << "game=" << _config.gameDir << endl;
-    config << "dev=" << (_config.devMode ? 1 : 0) << endl;
-    config << "width=" << _config.width << endl;
-    config << "height=" << _config.height << endl;
-    config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
-    config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
-    config << "grass=" << (_config.grass ? 1 : 0) << endl;
-    config << "ssao=" << (_config.ssao ? 1 : 0) << endl;
-    config << "ssr=" << (_config.ssr ? 1 : 0) << endl;
-    config << "fxaa=" << (_config.fxaa ? 1 : 0) << endl;
-    config << "sharpen=" << (_config.sharpen ? 1 : 0) << endl;
-    config << "texquality=" << _config.texQuality << endl;
-    config << "shadowres=" << _config.shadowres << endl;
-    config << "anisofilter=" << _config.anisofilter << endl;
-    config << "drawdist=" << _config.drawdist << endl;
-    config << "musicvol=" << _config.musicvol << endl;
-    config << "voicevol=" << _config.voicevol << endl;
-    config << "soundvol=" << _config.soundvol << endl;
-    config << "movievol=" << _config.movievol << endl;
-    config << "loglevel=" << _config.loglevel << endl;
-    config << "logch=" << _config.logch << endl;
-    config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
+    config << "game=" << _config.gameDir << std::endl;
+    config << "dev=" << (_config.devMode ? 1 : 0) << std::endl;
+    config << "width=" << _config.width << std::endl;
+    config << "height=" << _config.height << std::endl;
+    config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << std::endl;
+    config << "vsync=" << (_config.vsync ? 1 : 0) << std::endl;
+    config << "grass=" << (_config.grass ? 1 : 0) << std::endl;
+    config << "ssao=" << (_config.ssao ? 1 : 0) << std::endl;
+    config << "ssr=" << (_config.ssr ? 1 : 0) << std::endl;
+    config << "fxaa=" << (_config.fxaa ? 1 : 0) << std::endl;
+    config << "sharpen=" << (_config.sharpen ? 1 : 0) << std::endl;
+    config << "texquality=" << _config.texQuality << std::endl;
+    config << "shadowres=" << _config.shadowres << std::endl;
+    config << "anisofilter=" << _config.anisofilter << std::endl;
+    config << "drawdist=" << _config.drawdist << std::endl;
+    config << "musicvol=" << _config.musicvol << std::endl;
+    config << "voicevol=" << _config.voicevol << std::endl;
+    config << "soundvol=" << _config.soundvol << std::endl;
+    config << "movievol=" << _config.movievol << std::endl;
+    config << "loglevel=" << _config.loglevel << std::endl;
+    config << "logch=" << _config.logch << std::endl;
+    config << "logfile=" << (_config.logfile ? 1 : 0) << std::endl;
     for (auto &line : lines) {
-        config << line << endl;
+        config << line << std::endl;
     }
 }
 

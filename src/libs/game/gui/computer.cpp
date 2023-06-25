@@ -19,8 +19,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -93,7 +91,7 @@ void ComputerGUI::configureReplies() {
     });
 }
 
-void ComputerGUI::setMessage(string message) {
+void ComputerGUI::setMessage(std::string message) {
     ListBox::Item item;
     item.text = std::move(message);
 
@@ -101,12 +99,12 @@ void ComputerGUI::setMessage(string message) {
     _binding.lbMessage->addItem(std::move(item));
 }
 
-void ComputerGUI::setReplyLines(vector<string> lines) {
+void ComputerGUI::setReplyLines(std::vector<std::string> lines) {
     _binding.lbReplies->clearItems();
 
     for (size_t i = 0; i < lines.size(); ++i) {
         ListBox::Item item;
-        item.tag = to_string(i);
+        item.tag = std::to_string(i);
         item.text = lines[i];
         _binding.lbReplies->addItem(std::move(item));
     }

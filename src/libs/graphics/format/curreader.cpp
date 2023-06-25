@@ -20,8 +20,6 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -56,7 +54,7 @@ void CurReader::loadData() {
     ByteArray xorData(_reader->getBytes(numPixels));
     ByteArray andData(_reader->getBytes(numPixels / 8));
 
-    auto pixels = make_shared<ByteArray>(4 * numPixels, '\0');
+    auto pixels = std::make_shared<ByteArray>(4 * numPixels, '\0');
 
     for (int y = 0; y < _width; ++y) {
         for (int x = 0; x < _width; ++x) {
@@ -71,7 +69,7 @@ void CurReader::loadData() {
         }
     }
 
-    _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
+    _texture = std::make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
     _texture->setPixels(_width, _width, PixelFormat::BGRA8, Texture::Layer {std::move(pixels)});
 }
 

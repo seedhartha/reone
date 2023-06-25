@@ -19,8 +19,6 @@
 
 #include "reone/resource/talktable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -32,7 +30,7 @@ struct StringFlags {
 };
 
 void TlkReader::onLoad() {
-    checkSignature(string("TLK V3.0", 8));
+    checkSignature(std::string("TLK V3.0", 8));
 
     uint32_t languageId = readUint32();
     _stringCount = readUint32();
@@ -42,12 +40,12 @@ void TlkReader::onLoad() {
 }
 
 void TlkReader::loadStrings() {
-    auto strings = vector<TalkTable::String>();
+    auto strings = std::vector<TalkTable::String>();
 
     for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = readUint32();
 
-        string soundResRef(readCString(16));
+        std::string soundResRef(readCString(16));
         boost::to_lower(soundResRef);
 
         ignore(8);
@@ -56,7 +54,7 @@ void TlkReader::loadStrings() {
         uint32_t stringSize = readUint32();
         float soundLength = readFloat();
 
-        string text;
+        std::string text;
         if (flags & StringFlags::textPresent) {
             text = readString(_stringsOffset + stringOffset, stringSize);
         }
@@ -64,7 +62,7 @@ void TlkReader::loadStrings() {
         strings.push_back(TalkTable::String {std::move(text), std::move(soundResRef)});
     }
 
-    _table = make_unique<TalkTable>(std::move(strings));
+    _table = std::make_unique<TalkTable>(std::move(strings));
 }
 
 } // namespace resource

@@ -31,8 +31,6 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -64,17 +62,17 @@ void AbilitiesMenu::onGUILoaded() {
     _binding.lblName->setTextMessage("");
 
     _binding.lbDesc->setProtoMatchContent(true);
-    _binding.lbAbility->setOnItemClick([this](const string &item) {
+    _binding.lbAbility->setOnItemClick([this](const std::string &item) {
         auto skill = static_cast<SkillType>(stoi(item));
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo == _skills.end())
             return;
 
-        shared_ptr<Creature> partyLeader(_game.party().getLeader());
+        std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
-        _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+        _binding.lblRankVal->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblBonusVal->setTextMessage("0");
-        _binding.lblTotalVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+        _binding.lblTotalVal->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblName->setTextMessage(maybeSkillInfo->second.name);
 
         _binding.lbDesc->clearItems();
@@ -121,7 +119,7 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDa> skills(_services.resource.twoDas.get("skills"));
+    std::shared_ptr<TwoDa> skills(_services.resource.twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 
@@ -131,13 +129,13 @@ void AbilitiesMenu::loadSkills() {
         skillInfo.description = _services.resource.strings.get(skills->getInt(row, "description"));
         skillInfo.icon = _services.graphics.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
-        _skills.insert(make_pair(skill, std::move(skillInfo)));
+        _skills.insert(std::make_pair(skill, std::move(skillInfo)));
     }
 
     _binding.lbAbility->clearItems();
     for (auto &skill : _skills) {
         ListBox::Item item;
-        item.tag = to_string(static_cast<int>(skill.second.skill));
+        item.tag = std::to_string(static_cast<int>(skill.second.skill));
         item.text = skill.second.name;
         item.iconFrame = getFrameTexture();
         item.iconTexture = skill.second.icon;
@@ -145,8 +143,8 @@ void AbilitiesMenu::loadSkills() {
     }
 }
 
-shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
-    string resRef;
+std::shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
+    std::string resRef;
     if (_game.isTSL()) {
         resRef = "uibit_eqp_itm1";
     } else {
@@ -164,9 +162,9 @@ void AbilitiesMenu::refreshPortraits() {
         return;
 
     Party &party = _game.party();
-    shared_ptr<Creature> partyLeader(party.getLeader());
-    shared_ptr<Creature> partyMember1(party.getMember(1));
-    shared_ptr<Creature> partyMember2(party.getMember(2));
+    std::shared_ptr<Creature> partyLeader(party.getLeader());
+    std::shared_ptr<Creature> partyMember1(party.getMember(1));
+    std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
     _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
     _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);

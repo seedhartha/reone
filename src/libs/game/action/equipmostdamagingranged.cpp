@@ -17,13 +17,11 @@
 
 #include "reone/game/action/equipmostdamagingranged.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void EquipMostDamagingRangedAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void EquipMostDamagingRangedAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

@@ -21,8 +21,6 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/camera.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 

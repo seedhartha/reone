@@ -23,19 +23,17 @@
 
 #include "reone/game/object.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-void CommandAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    auto executionCtx = make_unique<ExecutionContext>(*_context);
+void CommandAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
+    auto executionCtx = std::make_unique<ExecutionContext>(*_context);
     executionCtx->callerId = actor.id();
 
-    shared_ptr<ScriptProgram> program(_context->savedState->program);
+    std::shared_ptr<ScriptProgram> program(_context->savedState->program);
     ScriptExecution(program, std::move(executionCtx)).run();
     complete();
 }

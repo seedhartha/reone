@@ -24,8 +24,6 @@
 #include "reone/game/script/routine/context.h"
 #include "reone/system/exception/notimplemented.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 namespace reone {
@@ -36,153 +34,153 @@ namespace routine {
 
 namespace minigame {
 
-Variable setLateralAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setLateralAccelerationPerSecond(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSpeedBlurEffect(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setSpeedBlurEffect(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable playAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable adjustFollowerHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable adjustFollowerHitPoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastFollowerHit(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getLastFollowerHit(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastObstacleHit(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getLastObstacleHit(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectName(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getObjectName(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onDeath(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable onDeath(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFollowerHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setFollowerHitPoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onDamage(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable onDamage(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable removeAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayer(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlayer(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEnemyCount(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getEnemyCount(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getEnemy(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getHitPoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getMaxHitPoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSphereRadius(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getSphereRadius(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPosition(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerOffset(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlayerOffset(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlayerSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerMinSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlayerMinSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlayerAccelerationPerSecond(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerInvincibility(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerInvincibility(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerMinSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerMinSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerAccelerationPerSecond(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerTunnelPos(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerTunnelPos(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerTunnelNeg(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerTunnelNeg(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsInvulnerable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getIsInvulnerable(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable startInvulnerability(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable startInvulnerability(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerMaxSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlayerMaxSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
 // TSL
 
-Variable getSwoopUpgrade(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getSwoopUpgrade(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrackPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getTrackPosition(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFollowerPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setFollowerPosition(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable destroyMiniGameObject(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable destroyMiniGameObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setJumpSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setJumpSpeed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable playerApplyForce(const std::vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

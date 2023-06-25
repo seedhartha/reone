@@ -17,8 +17,6 @@
 
 #include "reone/system/binaryreader.h"
 
-using namespace std;
-
 namespace reone {
 
 size_t BinaryReader::tell() {
@@ -95,15 +93,15 @@ double BinaryReader::getDouble() {
     return *reinterpret_cast<double *>(&val);
 }
 
-string BinaryReader::getString(int len) {
-    string val;
+std::string BinaryReader::getString(int len) {
+    std::string val;
     val.resize(len);
     _stream.read(&val[0], len);
     return std::move(val);
 }
 
-string BinaryReader::getNullTerminatedString() {
-    ostringstream ss;
+std::string BinaryReader::getNullTerminatedString() {
+    std::ostringstream ss;
 
     char ch;
     do {

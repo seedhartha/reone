@@ -19,8 +19,6 @@
 
 #include "reone/audio/stream.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {
@@ -38,7 +36,7 @@ static int getALFormat(AudioFormat format) {
     case AudioFormat::Stereo16:
         return AL_FORMAT_STEREO16;
     default:
-        throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
+        throw std::logic_error("Unknown audio format: " + std::to_string(static_cast<int>(format)));
     }
 }
 
@@ -53,7 +51,7 @@ static void fillBuffer(const AudioStream::Frame &frame, uint32_t buffer) {
 
 void AudioSource::init() {
     int frameCount = _stream->getFrameCount();
-    int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
+    int bufferCount = std::min(std::max(frameCount, 1), kMaxBufferCount);
 
     _buffers.resize(bufferCount);
     _streaming = bufferCount > 1;

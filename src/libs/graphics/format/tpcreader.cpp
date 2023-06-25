@@ -23,8 +23,6 @@
 
 #include "reone/graphics/format/txireader.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -70,7 +68,7 @@ void TpcReader::loadLayers() {
     _layers.reserve(_numLayers);
 
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = make_shared<ByteArray>(_reader->getBytes(_dataSize));
+        auto pixels = std::make_shared<ByteArray>(_reader->getBytes(_dataSize));
 
         // Ignore mip maps
         for (int j = 1; j < _numMipMaps; ++j) {
@@ -98,7 +96,7 @@ void TpcReader::loadFeatures() {
 }
 
 void TpcReader::loadTexture() {
-    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture = std::make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->setPixels(_width, _height, getPixelFormat(), _layers);
     _texture->setFeatures(_features);
 }
@@ -129,7 +127,7 @@ int TpcReader::getMipMapDataSize(int width, int height) const {
         }
     }
 
-    throw logic_error("Unable to compute TPC mip map size");
+    throw std::logic_error("Unable to compute TPC mip map size");
 }
 
 PixelFormat TpcReader::getPixelFormat() const {
@@ -142,7 +140,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::RGBA8;
         default:
-            throw logic_error("Unsupported uncompressed TPC encoding: " + to_string(static_cast<int>(_encoding)));
+            throw std::logic_error("Unsupported uncompressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
         }
     } else
         switch (_encoding) {
@@ -151,7 +149,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::DXT5;
         default:
-            throw logic_error("Unsupported compressed TPC encoding: " + to_string(static_cast<int>(_encoding)));
+            throw std::logic_error("Unsupported compressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
         }
 }
 

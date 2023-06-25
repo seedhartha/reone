@@ -19,8 +19,6 @@
 
 #include "reone/graphics/aabb.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::graphics;
 
@@ -32,7 +30,7 @@ BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_within
 
     // when
     float distance = -1.0f;
-    bool intersected = aabb.raycast(glm::vec3(0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), numeric_limits<float>::max(), distance);
+    bool intersected = aabb.raycast(glm::vec3(0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), std::numeric_limits<float>::max(), distance);
 
     // then
     BOOST_REQUIRE(intersected);

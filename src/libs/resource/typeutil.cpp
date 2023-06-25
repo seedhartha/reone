@@ -19,13 +19,11 @@
 
 #include "reone/resource/types.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
-static unordered_map<ResourceType, string> g_extByType {
+static std::unordered_map<ResourceType, std::string> g_extByType {
     {ResourceType::Res, "res"},
     {ResourceType::Bmp, "bmp"},
     {ResourceType::Tga, "tga"},
@@ -81,23 +79,23 @@ static unordered_map<ResourceType, string> g_extByType {
     {ResourceType::Mdx, "mdx"},
     {ResourceType::Mp3, "mp3"}};
 
-static unordered_map<string, ResourceType> g_typeByExt;
+static std::unordered_map<std::string, ResourceType> g_typeByExt;
 static bool g_typeByExtInited = false;
 
-const string &getExtByResType(ResourceType type) {
+const std::string &getExtByResType(ResourceType type) {
     auto it = g_extByType.find(type);
     if (it != g_extByType.end())
         return it->second;
 
-    g_extByType.insert(make_pair(type, to_string(static_cast<int>(type))));
+    g_extByType.insert(std::make_pair(type, std::to_string(static_cast<int>(type))));
 
     return g_extByType[type];
 }
 
-ResourceType getResTypeByExt(const string &ext, bool logNotFound) {
+ResourceType getResTypeByExt(const std::string &ext, bool logNotFound) {
     if (!g_typeByExtInited) {
         for (auto &entry : g_extByType) {
-            g_typeByExt.insert(make_pair(entry.second, entry.first));
+            g_typeByExt.insert(std::make_pair(entry.second, entry.first));
         }
         g_typeByExtInited = true;
     }

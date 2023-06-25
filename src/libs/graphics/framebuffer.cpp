@@ -20,8 +20,6 @@
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/texture.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -79,7 +77,7 @@ static GLenum getAttachmentGL(Framebuffer::Attachment attachment, int index = 0)
     case Framebuffer::Attachment::DepthStencil:
         return GL_DEPTH_STENCIL_ATTACHMENT;
     }
-    throw invalid_argument("Unsupported framebuffer attachment: " + to_string(static_cast<int>(attachment)));
+    throw std::invalid_argument("Unsupported framebuffer attachment: " + std::to_string(static_cast<int>(attachment)));
 }
 
 void Framebuffer::attachTexture(const Texture &texture, Attachment attachment, int index) const {

@@ -19,13 +19,11 @@
 
 #include "reone/game/object.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void JumpToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void JumpToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     actor.setPosition(_object->position());
     actor.setFacing(_object->getFacing());
 

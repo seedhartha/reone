@@ -17,8 +17,6 @@
 
 #include "reone/game/format/ssfreader.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -26,7 +24,7 @@ namespace reone {
 namespace game {
 
 void SsfReader::onLoad() {
-    checkSignature(string("SSF V1.1", 8));
+    checkSignature(std::string("SSF V1.1", 8));
     uint32_t tableOffset = readUint32();
     int entryCount = static_cast<int>((_size - tableOffset) / 4);
     seek(tableOffset);

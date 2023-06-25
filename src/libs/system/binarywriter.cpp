@@ -17,8 +17,6 @@
 
 #include "reone/system/binarywriter.h"
 
-using namespace std;
-
 namespace reone {
 
 void BinaryWriter::putByte(uint8_t val) {
@@ -53,12 +51,12 @@ void BinaryWriter::putFloat(float val) {
     put(*reinterpret_cast<uint32_t *>(&val));
 }
 
-void BinaryWriter::putString(const string &str) {
+void BinaryWriter::putString(const std::string &str) {
     _stream.write(&str[0], str.length());
 }
 
-void BinaryWriter::putStringExact(const string &str, int len) {
-    int strLen = min(len, static_cast<int>(str.length()));
+void BinaryWriter::putStringExact(const std::string &str, int len) {
+    int strLen = std::min(len, static_cast<int>(str.length()));
     if (strLen > 0) {
         _stream.write(&str[0], strLen);
     }
@@ -67,7 +65,7 @@ void BinaryWriter::putStringExact(const string &str, int len) {
     }
 }
 
-void BinaryWriter::putCString(const string &str) {
+void BinaryWriter::putCString(const std::string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream.write(&str[0], len);
     _stream.writeByte('\0');

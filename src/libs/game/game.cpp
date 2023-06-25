@@ -68,8 +68,6 @@
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::gui;
@@ -92,21 +90,21 @@ void Game::init() {
 }
 
 void Game::initLocalServices() {
-    auto console = make_unique<Console>(*this, _services);
+    auto console = std::make_unique<Console>(*this, _services);
     console->init();
     _console = std::move(console);
 
-    auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
+    auto profileOverlay = std::make_unique<ProfileOverlay>(_services, _options);
     profileOverlay->init();
     _profileOverlay = std::move(profileOverlay);
 
-    auto routines = make_unique<Routines>(_gameId, this, &_services);
+    auto routines = std::make_unique<Routines>(_gameId, this, &_services);
     routines->init();
     _routines = std::move(routines);
 
-    _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.script.scripts);
+    _scriptRunner = std::make_unique<ScriptRunner>(*_routines, _services.script.scripts);
 
-    _map = make_unique<Map>(*this, _services);
+    _map = std::make_unique<Map>(*this, _services);
 }
 
 void Game::setSceneSurfaces() {
@@ -198,7 +196,7 @@ void Game::drawAll() {
     _services.graphics.window.swapBuffers();
 }
 
-void Game::loadModule(const string &name, string entry) {
+void Game::loadModule(const std::string &name, std::string entry) {
     info("Load module '" + name + "'");
 
     withLoadingScreen("load_" + name, [this, &name, &entry]() {
@@ -236,13 +234,13 @@ void Game::loadModule(const string &name, string entry) {
             } else {
                 _module = _objectFactory.newModule();
 
-                shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
+                std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }
 
                 _module->load(name, *ifo);
-                _loadedModules.insert(make_pair(name, _module));
+                _loadedModules.insert(std::make_pair(name, _module));
             }
 
             if (_party.isEmpty()) {
@@ -258,23 +256,23 @@ void Game::loadModule(const string &name, string entry) {
             }
             drawAll();
 
-            string musicName(_module->area()->music());
+            std::string musicName(_module->area()->music());
             playMusic(musicName);
 
             _ticks = _services.system.clock.ticks();
             openInGame();
-        } catch (const exception &e) {
-            error("Failed loading module '" + name + "': " + string(e.what()));
+        } catch (const std::exception &e) {
+            error("Failed loading module '" + name + "': " + std::string(e.what()));
         }
     });
 }
 
 void Game::loadDefaultParty() {
-    string member1, member2, member3;
+    std::string member1, member2, member3;
     _party.defaultMembers(member1, member2, member3);
 
     if (!member1.empty()) {
-        shared_ptr<Creature> player(_objectFactory.newCreature());
+        std::shared_ptr<Creature> player(_objectFactory.newCreature());
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -282,13 +280,13 @@ void Game::loadDefaultParty() {
         _party.setPlayer(player);
     }
     if (!member2.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        std::shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
         _party.addMember(0, companion);
     }
     if (!member3.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        std::shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);
         _party.addMember(1, companion);
@@ -309,7 +307,7 @@ void Game::setCursorType(CursorType type) {
     _cursorType = type;
 }
 
-void Game::playVideo(const string &name) {
+void Game::playVideo(const std::string &name) {
     _movie = _services.movie.movies.get(name);
     if (!_movie) {
         return;
@@ -321,7 +319,7 @@ void Game::playVideo(const string &name) {
     }
 }
 
-void Game::playMusic(const string &resRef) {
+void Game::playMusic(const std::string &resRef) {
     if (_musicResRef == resRef) {
         return;
     }
@@ -356,7 +354,7 @@ void Game::toggleInGameCameraType() {
         break;
     case CameraType::ThirdPerson: {
         _module->player().stopMovement();
-        shared_ptr<Area> area(_module->area());
+        std::shared_ptr<Area> area(_module->area());
         auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
         auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
         firstPerson.setPosition(thirdPerson.sceneNode()->getOrigin());
@@ -377,17 +375,17 @@ Camera *Game::getActiveCamera() const {
     if (!_module) {
         return nullptr;
     }
-    shared_ptr<Area> area(_module->area());
+    std::shared_ptr<Area> area(_module->area());
     if (!area) {
         return nullptr;
     }
     return &area->getCamera(_cameraType);
 }
 
-shared_ptr<Object> Game::getObjectById(uint32_t id) const {
+std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     switch (id) {
     case kObjectSelf:
-        throw invalid_argument("id is invalid");
+        throw std::invalid_argument("id is invalid");
     case kObjectInvalid:
         return nullptr;
     default:
@@ -451,7 +449,7 @@ void Game::stopMovement() {
     _module->player().stopMovement();
 }
 
-void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
+void Game::scheduleModuleTransition(const std::string &moduleName, const std::string &entry) {
     _nextModule = moduleName;
     _nextEntry = entry;
 }
@@ -481,7 +479,7 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            shared_ptr<Creature> partyLeader(_party.getLeader());
+            std::shared_ptr<Creature> partyLeader(_party.getLeader());
             if (partyLeader) {
                 listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
             }
@@ -606,36 +604,36 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-bool Game::getGlobalBoolean(const string &name) const {
+bool Game::getGlobalBoolean(const std::string &name) const {
     return getFromLookupOrElse(_globalBooleans, name, false);
 }
 
-int Game::getGlobalNumber(const string &name) const {
+int Game::getGlobalNumber(const std::string &name) const {
     return getFromLookupOrElse(_globalNumbers, name, 0);
 }
 
-string Game::getGlobalString(const string &name) const {
-    static string empty;
+std::string Game::getGlobalString(const std::string &name) const {
+    static std::string empty;
     return getFromLookupOrElse(_globalStrings, name, empty);
 }
 
-shared_ptr<Location> Game::getGlobalLocation(const string &name) const {
+std::shared_ptr<Location> Game::getGlobalLocation(const std::string &name) const {
     return getFromLookupOrNull(_globalLocations, name);
 }
 
-void Game::setGlobalBoolean(const string &name, bool value) {
+void Game::setGlobalBoolean(const std::string &name, bool value) {
     _globalBooleans[name] = value;
 }
 
-void Game::setGlobalNumber(const string &name, int value) {
+void Game::setGlobalNumber(const std::string &name, int value) {
     _globalNumbers[name] = value;
 }
 
-void Game::setGlobalString(const string &name, const string &value) {
+void Game::setGlobalString(const std::string &name, const std::string &value) {
     _globalStrings[name] = value;
 }
 
-void Game::setGlobalLocation(const string &name, const shared_ptr<Location> &location) {
+void Game::setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location) {
     _globalLocations[name] = location;
 }
 
@@ -647,7 +645,7 @@ void Game::setRelativeMouseMode(bool relative) {
     _services.graphics.window.setRelativeMouseMode(relative);
 }
 
-void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
+void Game::withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block) {
     if (!_loadScreen) {
         _loadScreen = tryLoadGUI<LoadingScreen>();
     }
@@ -711,7 +709,7 @@ void Game::openInGameMenu(InGameMenuTab tab) {
     changeScreen(Screen::InGameMenu);
 }
 
-void Game::openContainer(const shared_ptr<Object> &container) {
+void Game::openContainer(const std::shared_ptr<Object> &container) {
     stopMovement();
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
@@ -757,8 +755,8 @@ void Game::startCharacterGeneration() {
     });
 }
 
-void Game::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
-    shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
+void Game::startDialog(const std::shared_ptr<Object> &owner, const std::string &resRef) {
+    std::shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;
@@ -837,11 +835,11 @@ GameGUI *Game::getScreenGUI() const {
     }
 }
 
-void Game::setBarkBubbleText(string text, float duration) {
+void Game::setBarkBubbleText(std::string text, float duration) {
     _hud->barkBubble().setBarkText(text, duration);
 }
 
-void Game::onModuleSelected(const string &module) {
+void Game::onModuleSelected(const std::string &module) {
     _mainMenu->onModuleSelected(module);
 }
 

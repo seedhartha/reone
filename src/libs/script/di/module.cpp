@@ -17,15 +17,13 @@
 
 #include "reone/script/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void ScriptModule::init() {
-    _scripts = make_unique<Scripts>(_resource.resources());
-    _services = make_unique<ScriptServices>(*_scripts);
+    _scripts = std::make_unique<Scripts>(_resource.resources());
+    _services = std::make_unique<ScriptServices>(*_scripts);
 }
 
 void ScriptModule::deinit() {

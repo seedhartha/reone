@@ -17,13 +17,11 @@
 
 #include "reone/game/action/castspellatobject.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void CastSpellAtObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void CastSpellAtObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

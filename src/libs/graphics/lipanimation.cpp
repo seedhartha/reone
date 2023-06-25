@@ -17,8 +17,6 @@
 
 #include "reone/graphics/lipanimation.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {

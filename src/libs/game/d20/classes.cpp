@@ -19,8 +19,6 @@
 
 #include "reone/resource/2das.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -29,10 +27,10 @@ namespace game {
 
 static const char kClassesTableResRef[] = "classes";
 
-shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDa> classes(_twoDas.get(kClassesTableResRef));
+std::shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
+    std::shared_ptr<TwoDa> classes(_twoDas.get(kClassesTableResRef));
 
-    auto clazz = make_shared<CreatureClass>(type, *this, _strings, _twoDas);
+    auto clazz = std::make_shared<CreatureClass>(type, *this, _strings, _twoDas);
     clazz->load(*classes, static_cast<int>(type));
 
     return std::move(clazz);

@@ -20,8 +20,6 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/fileoutput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -49,7 +47,7 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
         writer.putString("ERF V1.0");
     }
     writer.putUint32(0); // language count
-    writer.putUint32(0); // localized string size
+    writer.putUint32(0); // localized std::string size
     writer.putUint32(numResources);
     writer.putUint32(0xa0);         // offset to localized string
     writer.putUint32(0xa0);         // offset to key list
@@ -63,7 +61,7 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
 
     // Write keys
     for (auto &res : _resources) {
-        string resRef(res.resRef);
+        std::string resRef(res.resRef);
         resRef.resize(16);
         writer.putString(resRef);
 

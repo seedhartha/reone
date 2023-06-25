@@ -35,8 +35,6 @@
 #include "reone/game/game.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::gui;
@@ -53,7 +51,7 @@ static const char kControlTagTopFrame[] = "TOP";
 static const char kControlTagBottomFrame[] = "BOTTOM";
 static const char kObjectTagOwner[] = "owner";
 
-static const unordered_map<string, AnimationType> g_animTypeByName {
+static const std::unordered_map<std::string, AnimationType> g_animTypeByName {
     {"dead", AnimationType::LoopingDead},
     {"taunt", AnimationType::FireForgetTaunt},
     {"greeting", AnimationType::FireForgetGreeting},
@@ -96,7 +94,7 @@ void DialogGUI::onGUILoaded() {
     configureReplies();
     loadFrames();
 
-    _binding.lbReplies->setOnItemClick([this](const string &item) {
+    _binding.lbReplies->setOnItemClick([this](const std::string &item) {
         int replyIdx = stoi(item);
         pickReply(replyIdx);
     });
@@ -115,7 +113,7 @@ void DialogGUI::loadFrames() {
     addFrame(kControlTagBottomFrame, 0, _game.options().graphics.height - rootTop);
 }
 
-void DialogGUI::addFrame(string tag, int top, int height) {
+void DialogGUI::addFrame(std::string tag, int top, int height) {
     auto frame = _gui->newControl(ControlType::Panel, tag);
 
     Control::Extent extent;
@@ -156,11 +154,11 @@ void DialogGUI::loadStuntParticipants() {
     _participantByTag.clear();
 
     for (auto &stunt : _dialog->stunts) {
-        shared_ptr<Creature> creature;
+        std::shared_ptr<Creature> creature;
         if (stunt.participant == kObjectTagOwner) {
-            creature = dynamic_pointer_cast<Creature>(_owner);
+            creature = std::dynamic_pointer_cast<Creature>(_owner);
         } else {
-            creature = dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(stunt.participant));
+            creature = std::dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(stunt.participant));
         }
         if (!creature) {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
@@ -170,7 +168,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(_services.graphics.models.get(stunt.stuntModel));
+            std::shared_ptr<Model> model(_services.graphics.models.get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;
@@ -179,7 +177,7 @@ void DialogGUI::loadStuntParticipants() {
             creature->startStuntMode();
         }
 
-        _participantByTag.insert(make_pair(stunt.participant, std::move(participant)));
+        _participantByTag.insert(std::make_pair(stunt.participant, std::move(participant)));
     }
 }
 
@@ -193,8 +191,8 @@ void DialogGUI::onLoadEntry() {
 }
 
 void DialogGUI::loadCurrentSpeaker() {
-    shared_ptr<Area> area(_game.module()->area());
-    shared_ptr<Object> speaker;
+    std::shared_ptr<Area> area(_game.module()->area());
+    std::shared_ptr<Object> speaker;
 
     if (!_currentEntry->speaker.empty()) {
         speaker = area->getObjectByTag(_currentEntry->speaker);
@@ -205,7 +203,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make previous speaker stop talking, if any
     if (_currentSpeaker && _currentSpeaker != speaker) {
-        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+        auto speakerCreature = std::dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->stopTalking();
         }
@@ -214,10 +212,10 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make current speaker face the player, and vice versa
     if (_currentSpeaker) {
-        shared_ptr<Creature> player(_game.party().player());
+        std::shared_ptr<Creature> player(_game.party().player());
         player->face(*_currentSpeaker);
 
-        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+        auto speakerCreature = std::dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->startTalking(_lipAnimation);
             speakerCreature->face(*player);
@@ -226,10 +224,10 @@ void DialogGUI::loadCurrentSpeaker() {
 }
 
 void DialogGUI::updateCamera() {
-    shared_ptr<Area> area(_game.module()->area());
+    std::shared_ptr<Area> area(_game.module()->area());
 
     if (_dialog->cameraModel.empty()) {
-        shared_ptr<Creature> player(_game.party().player());
+        std::shared_ptr<Creature> player(_game.party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
@@ -244,11 +242,11 @@ void DialogGUI::updateCamera() {
 }
 
 glm::vec3 DialogGUI::getTalkPosition(const Object &object) const {
-    auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
+    auto model = std::static_pointer_cast<ModelSceneNode>(object.sceneNode());
     if (!model)
         return object.position();
 
-    shared_ptr<ModelNode> talkDummy(model->model().getNodeByNameRecursive("talkdummy"));
+    std::shared_ptr<ModelNode> talkDummy(model->model().getNodeByNameRecursive("talkdummy"));
     if (!talkDummy)
         return model->getWorldCenterOfAABB();
 
@@ -276,19 +274,19 @@ void DialogGUI::updateParticipantAnimations() {
                 continue;
             }
             const Participant &participant = maybeParticipant->second;
-            string animName(getStuntAnimationName(anim.animation));
-            shared_ptr<Animation> animation(participant.model->getAnimation(animName));
+            std::string animName(getStuntAnimationName(anim.animation));
+            std::shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
                 AnimationProperties properties;
                 properties.scale = 1.0f;
                 participant.creature->playAnimation(animation, std::move(properties));
             }
         } else {
-            shared_ptr<Creature> participant;
+            std::shared_ptr<Creature> participant;
             if (anim.participant == "owner") {
-                participant = dynamic_pointer_cast<Creature>(_owner);
+                participant = std::dynamic_pointer_cast<Creature>(_owner);
             } else {
-                participant = dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(anim.participant));
+                participant = std::dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(anim.participant));
             }
             if (!participant) {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);
@@ -302,20 +300,20 @@ void DialogGUI::updateParticipantAnimations() {
     }
 }
 
-string DialogGUI::getStuntAnimationName(int ordinal) const {
+std::string DialogGUI::getStuntAnimationName(int ordinal) const {
     return str(boost::format("cut%03dw") % (ordinal - 1200 + 1));
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDa> animations(_services.resource.twoDas.get("dialoganimations"));
+    std::shared_ptr<TwoDa> animations(_services.resource.twoDas.get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {
-        warn("Dialog: animation index out of bounds: " + to_string(index));
+        warn("Dialog: animation index out of bounds: " + std::to_string(index));
         return AnimationType::Invalid;
     }
 
-    string name(boost::to_lower_copy(animations->getString(index, "name")));
+    std::string name(boost::to_lower_copy(animations->getString(index, "name")));
     auto maybeAnimType = g_animTypeByName.find(name);
 
     return maybeAnimType != g_animTypeByName.end() ? maybeAnimType->second : AnimationType::Invalid;
@@ -343,7 +341,7 @@ void DialogGUI::onFinish() {
     }
 
     // Make current speaker stop talking, if any
-    auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
+    auto speakerCreature = std::dynamic_pointer_cast<Creature>(_currentSpeaker);
     if (speakerCreature) {
         speakerCreature->stopTalking();
     }
@@ -362,16 +360,16 @@ void DialogGUI::onEntryEnded() {
     repositionMessage();
 }
 
-void DialogGUI::setMessage(string message) {
+void DialogGUI::setMessage(std::string message) {
     _binding.lblMessage->setTextMessage(message);
 }
 
-void DialogGUI::setReplyLines(vector<string> lines) {
+void DialogGUI::setReplyLines(std::vector<std::string> lines) {
     _binding.lbReplies->clearItems();
 
     for (size_t i = 0; i < lines.size(); ++i) {
         ListBox::Item item;
-        item.tag = to_string(i);
+        item.tag = std::to_string(i);
         item.text = lines[i];
         _binding.lbReplies->addItem(std::move(item));
     }

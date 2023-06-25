@@ -22,8 +22,6 @@
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/model.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -49,16 +47,16 @@ void AnimatedCamera::update(float dt) {
     }
 }
 
-static const string &getAnimationName(int animNumber) {
-    static map<int, string> nameByNumber;
+static const std::string &getAnimationName(int animNumber) {
+    static std::map<int, std::string> nameByNumber;
 
     auto maybeName = nameByNumber.find(animNumber);
     if (maybeName != nameByNumber.end()) {
         return maybeName->second;
     }
-    string name(str(boost::format("cut%03dw") % (animNumber - 1200 + 1)));
+    std::string name(str(boost::format("cut%03dw") % (animNumber - 1200 + 1)));
 
-    return nameByNumber.insert(make_pair(animNumber, std::move(name))).first->second;
+    return nameByNumber.insert(std::make_pair(animNumber, std::move(name))).first->second;
 }
 
 void AnimatedCamera::playAnimation(int animNumber) {
@@ -71,7 +69,7 @@ bool AnimatedCamera::isAnimationFinished() const {
     return _model ? _model->isAnimationFinished() : false;
 }
 
-void AnimatedCamera::setModel(shared_ptr<Model> model) {
+void AnimatedCamera::setModel(std::shared_ptr<Model> model) {
     if ((_model && &_model->model() == model.get()) ||
         (!_model && !model))
         return;

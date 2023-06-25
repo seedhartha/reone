@@ -17,8 +17,6 @@
 
 #include "reone/game/object/placeablecamera.h"
 
-using namespace std;
-
 using namespace reone::resource;
 using namespace reone::scene;
 

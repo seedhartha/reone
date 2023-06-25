@@ -27,8 +27,6 @@
 
 #include "tinyxml2.h"
 
-using namespace std;
-
 using namespace tinyxml2;
 
 using namespace reone::resource;
@@ -41,7 +39,7 @@ void TlkTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TlkTool::invokeBatch(
@@ -97,12 +95,12 @@ void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem
 
     auto rootElement = document.RootElement();
     if (!rootElement) {
-        cerr << "XML is empty" << endl;
+        std::cerr << "XML is empty" << std::endl;
         fclose(fp);
         return;
     }
 
-    auto strings = vector<TalkTable::String>();
+    auto strings = std::vector<TalkTable::String>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
         strings.push_back(TalkTable::String {
             element->Attribute("text"),
@@ -110,7 +108,7 @@ void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem
     }
     auto table = TalkTable(std::move(strings));
 
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     boost::split(
         tokens,
         path.filename().string(),

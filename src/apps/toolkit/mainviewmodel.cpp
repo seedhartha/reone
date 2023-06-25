@@ -47,8 +47,6 @@
 
 #include "di/graphicsmodule.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -57,19 +55,19 @@ using namespace reone::scene;
 
 namespace reone {
 
-static const set<string> kFilesSubdirectoryWhitelist {
+static const std::set<std::string> kFilesSubdirectoryWhitelist {
     "data", "lips", "localvault", "modules", "movies", "override", "rims", "saves", "texturepacks", //
     "streammusic", "streamsounds", "streamwaves", "streamvoice"};
 
-static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
+static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const set<string> kFilesExtensionBlacklist {
+static const std::set<std::string> kFilesExtensionBlacklist {
     ".key",                                         //
     ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
 
-static const set<ResourceType> kFilesPlaintextResourceTypes {
+static const std::set<ResourceType> kFilesPlaintextResourceTypes {
     ResourceType::Txt,
     ResourceType::Txi,
     ResourceType::Lyt,
@@ -100,10 +98,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
-        auto text = string(length, '\0');
+        auto text = std::string(length, '\0');
         data.read(&text[0], length);
 
-        auto page = make_shared<Page>(PageType::Text, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::Text, id.string(), id);
         page->textContent = text;
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -113,24 +111,24 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto twoDa = reader.twoDa();
 
-        auto columns = vector<string>();
+        auto columns = std::vector<std::string>();
         columns.push_back("Index");
         for (auto &column : twoDa->columns()) {
             columns.push_back(column);
         }
-        auto rows = vector<vector<string>>();
+        auto rows = std::vector<std::vector<std::string>>();
         for (int i = 0; i < twoDa->getRowCount(); ++i) {
             auto &row = twoDa->rows()[i];
-            auto values = vector<string>();
-            values.push_back(to_string(i));
+            auto values = std::vector<std::string>();
+            values.push_back(std::to_string(i));
             for (auto &value : row.values) {
                 values.push_back(value);
             }
             rows.push_back(std::move(values));
         }
 
-        auto page = make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -138,7 +136,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto reader = GffReader();
         reader.load(data);
 
-        auto page = make_shared<Page>(PageType::GFF, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::GFF, id.string(), id);
         page->gffContent = reader.root();
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -148,33 +146,33 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto tlk = reader.table();
 
-        auto columns = vector<string>();
+        auto columns = std::vector<std::string>();
         columns.push_back("Index");
         columns.push_back("Text");
         columns.push_back("Sound");
 
-        auto rows = vector<vector<string>>();
+        auto rows = std::vector<std::vector<std::string>>();
         for (int i = 0; i < tlk->getStringCount(); ++i) {
             auto &str = tlk->getString(i);
             auto cleanedText = boost::replace_all_copy(str.text, "\n", "\\n");
-            auto values = vector<string>();
-            values.push_back(to_string(i));
+            auto values = std::vector<std::string>();
+            values.push_back(std::to_string(i));
             values.push_back(cleanedText);
             values.push_back(str.soundResRef);
             rows.push_back(std::move(values));
         }
 
-        auto page = make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Ncs) {
-        auto pcodeBytes = make_unique<ByteArray>();
+        auto pcodeBytes = std::make_unique<ByteArray>();
         auto pcode = ByteArrayOutputStream(*pcodeBytes);
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
-        auto page = make_shared<Page>(PageType::NCS, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::NCS, id.string(), id);
         page->pcodeContent = *pcodeBytes;
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -183,10 +181,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
-        auto text = string(length, '\0');
+        auto text = std::string(length, '\0');
         data.read(&text[0], length);
 
-        auto page = make_shared<Page>(PageType::NSS, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::NSS, id.string(), id);
         page->nssContent = text;
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -196,19 +194,19 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto animation = reader.animation();
 
-        auto columns = vector<string>();
+        auto columns = std::vector<std::string>();
         columns.push_back("Time");
         columns.push_back("Shape");
-        auto rows = vector<vector<string>>();
+        auto rows = std::vector<std::vector<std::string>>();
         for (auto &kf : animation->keyframes()) {
-            auto values = vector<string>();
-            values.push_back(to_string(kf.time));
-            values.push_back(to_string(kf.shape));
+            auto values = std::vector<std::string>();
+            values.push_back(std::to_string(kf.time));
+            values.push_back(std::to_string(kf.shape));
             rows.push_back(std::move(values));
         }
 
-        auto page = make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -217,17 +215,17 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         reader.load(data);
         auto &soundSet = reader.soundSet();
 
-        auto columns = vector<string>();
+        auto columns = std::vector<std::string>();
         columns.push_back("Index");
         columns.push_back("StrRef");
         columns.push_back("TalkTableText");
         columns.push_back("TalkTableSound");
-        auto rows = vector<vector<string>>();
+        auto rows = std::vector<std::vector<std::string>>();
         for (size_t i = 0; i < soundSet.size(); ++i) {
-            auto values = vector<string>();
-            values.push_back(to_string(i));
+            auto values = std::vector<std::string>();
+            values.push_back(std::to_string(i));
             auto strRef = soundSet.at(i);
-            values.push_back(to_string(strRef));
+            values.push_back(std::to_string(strRef));
             if (strRef != -1) {
                 values.push_back(getTalkTableText(strRef));
                 values.push_back(getTalkTableSound(strRef));
@@ -238,14 +236,14 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             rows.push_back(std::move(values));
         }
 
-        auto page = make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = make_shared<TableContent>(std::move(columns), std::move(rows));
+        auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
+        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
-        auto tgaBytes = make_shared<ByteArray>();
-        auto txiBytes = make_shared<ByteArray>();
+        auto tgaBytes = std::make_shared<ByteArray>();
+        auto txiBytes = std::make_shared<ByteArray>();
         if (id.type == ResourceType::Tpc) {
             auto tga = ByteArrayOutputStream(*tgaBytes);
             auto txi = ByteArrayOutputStream(*txiBytes);
@@ -267,7 +265,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = make_shared<Page>(PageType::Image, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::Image, id.string(), id);
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -278,7 +276,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
-            throw runtime_error("Companion MDX file not found");
+            throw std::runtime_error("Companion MDX file not found");
         }
         auto mdx = ByteArrayInputStream(*mdxBytes);
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
@@ -310,7 +308,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = make_shared<Page>(PageType::Model, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::Model, id.string(), id);
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -329,7 +327,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             _pageRemoving.invoke(PageRemovingEventData(index, pageToErase->get()));
             _pages.erase(pageToErase);
         }
-        auto page = make_shared<Page>(PageType::Audio, id.string(), id);
+        auto page = std::make_shared<Page>(PageType::Audio, id.string(), id);
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -388,7 +386,7 @@ void MainViewModel::loadGameDirectory() {
     tlkReader.load(tlk);
     _talkTable = tlkReader.table();
 
-    _routines = make_unique<Routines>(_gameId, nullptr, nullptr);
+    _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
 
     for (auto &file : boost::filesystem::directory_iterator(_gamePath)) {
@@ -403,13 +401,13 @@ void MainViewModel::loadGameDirectory() {
         } else {
             continue;
         }
-        auto item = make_shared<GameDirectoryItem>();
+        auto item = std::make_shared<GameDirectoryItem>();
         item->displayName = filename;
         item->path = file.path();
         item->container = container;
         if (extension == ".tlk") {
             auto resRef = filename.substr(0, filename.size() - 4);
-            item->resId = make_unique<ResourceId>(resRef, ResourceType::Tlk);
+            item->resId = std::make_unique<ResourceId>(resRef, ResourceType::Tlk);
         }
         _gameDirItems.push_back(std::move(item));
     }
@@ -417,17 +415,17 @@ void MainViewModel::loadGameDirectory() {
 
 void MainViewModel::loadTools() {
     _tools.clear();
-    _tools.push_back(make_shared<KeyBifTool>());
-    _tools.push_back(make_shared<ErfTool>());
-    _tools.push_back(make_shared<RimTool>());
-    _tools.push_back(make_shared<TwoDaTool>());
-    _tools.push_back(make_shared<TlkTool>());
-    _tools.push_back(make_shared<LipTool>());
-    _tools.push_back(make_shared<SsfTool>());
-    _tools.push_back(make_shared<GffTool>());
-    _tools.push_back(make_shared<TpcTool>());
-    _tools.push_back(make_shared<AudioTool>());
-    _tools.push_back(make_shared<NcsTool>(_gameId));
+    _tools.push_back(std::make_shared<KeyBifTool>());
+    _tools.push_back(std::make_shared<ErfTool>());
+    _tools.push_back(std::make_shared<RimTool>());
+    _tools.push_back(std::make_shared<TwoDaTool>());
+    _tools.push_back(std::make_shared<TlkTool>());
+    _tools.push_back(std::make_shared<LipTool>());
+    _tools.push_back(std::make_shared<SsfTool>());
+    _tools.push_back(std::make_shared<GffTool>());
+    _tools.push_back(std::make_shared<TpcTool>());
+    _tools.push_back(std::make_shared<AudioTool>());
+    _tools.push_back(std::make_shared<NcsTool>(_gameId));
 }
 
 void MainViewModel::loadEngine() {
@@ -442,11 +440,11 @@ void MainViewModel::loadEngine() {
     _graphicsOpt.fxaa = false;
     _graphicsOpt.sharpen = false;
 
-    _systemModule = make_unique<SystemModule>();
-    _resourceModule = make_unique<ResourceModule>(_gamePath);
-    _graphicsModule = make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
-    _audioModule = make_unique<AudioModule>(_audioOpt, *_resourceModule);
-    _sceneModule = make_unique<SceneModule>(_graphicsOpt, *_audioModule, *_graphicsModule);
+    _systemModule = std::make_unique<SystemModule>();
+    _resourceModule = std::make_unique<ResourceModule>(_gamePath);
+    _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
+    _audioModule = std::make_unique<AudioModule>(_audioOpt, *_resourceModule);
+    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_audioModule, *_graphicsModule);
 
     _systemModule->init();
     _resourceModule->init();
@@ -481,11 +479,11 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     auto &item = *_idToGameDirItem.at(itemId);
 
     withResourceStream(item, [this, &item, &optimize](auto &res) {
-        auto nssBytes = make_unique<ByteArray>();
+        auto nssBytes = std::make_unique<ByteArray>();
         auto nss = ByteArrayOutputStream(*nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
-        auto page = make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
+        auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
         page->nssContent = *nssBytes;
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -551,7 +549,7 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
 }
 
 void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
-    vector<boost::filesystem::path> tpcFiles;
+    std::vector<boost::filesystem::path> tpcFiles;
     for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
         if (file.status().type() != boost::filesystem::regular_file) {
             continue;
@@ -593,7 +591,7 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
-void MainViewModel::playAnimation(const string &anim) {
+void MainViewModel::playAnimation(const std::string &anim) {
     if (!_modelNode) {
         return;
     }
@@ -650,7 +648,7 @@ void MainViewModel::updateCameraTransform() {
     _cameraNode->setLocalTransform(cameraTransform);
 }
 
-void MainViewModel::withResourceStream(const GameDirectoryItem &item, function<void(IInputStream &)> block) {
+void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block) {
     if (!item.resId) {
         return;
     }
@@ -671,7 +669,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, function<v
                 return;
             }
             auto &bifEntry = bifReader.resources().at(resIdx);
-            auto resBytes = make_unique<ByteArray>();
+            auto resBytes = std::make_unique<ByteArray>();
             resBytes->resize(bifEntry.fileSize);
             bif.seek(bifEntry.offset, SeekOrigin::Begin);
             bif.read(&(*resBytes)[0], bifEntry.fileSize);
@@ -689,7 +687,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, function<v
             }
             auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
             auto &erfEntry = erfReader.resources().at(resIdx);
-            auto resBytes = make_unique<ByteArray>();
+            auto resBytes = std::make_unique<ByteArray>();
             resBytes->resize(erfEntry.size);
             erf.seek(erfEntry.offset, SeekOrigin::Begin);
             erf.read(&(*resBytes)[0], erfEntry.size);
@@ -706,7 +704,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, function<v
                 return;
             }
             auto &rimRes = *maybeRes;
-            auto resBytes = make_unique<ByteArray>();
+            auto resBytes = std::make_unique<ByteArray>();
             resBytes->resize(rimRes.size);
             rim.seek(rimRes.offset, SeekOrigin::Begin);
             rim.read(&(*resBytes)[0], rimRes.size);
@@ -751,7 +749,7 @@ void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
 void MainViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
     auto &item = _gameDirItems[index];
     item->id = id;
-    _idToGameDirItem.insert(make_pair(id, item.get()));
+    _idToGameDirItem.insert(std::make_pair(id, item.get()));
 }
 
 void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
@@ -771,7 +769,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             } else {
                 continue;
             }
-            auto item = make_shared<GameDirectoryItem>();
+            auto item = std::make_shared<GameDirectoryItem>();
             item->parentId = expandingItem.id;
             item->displayName = filename;
             item->path = file.path();
@@ -779,7 +777,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                 auto resType = getResTypeByExt(extension.substr(1), false);
                 if (resType != ResourceType::Invalid) {
                     auto resRef = filename.substr(0, filename.size() - 4);
-                    item->resId = make_shared<ResourceId>(resRef, resType);
+                    item->resId = std::make_shared<ResourceId>(resRef, resType);
                 }
             }
             item->container = container;
@@ -798,11 +796,11 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                     if (key.bifIdx != bifIdx) {
                         continue;
                     }
-                    auto item = make_shared<GameDirectoryItem>();
+                    auto item = std::make_shared<GameDirectoryItem>();
                     item->parentId = expandingItem.id;
                     item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
                     item->path = expandingItem.path;
-                    item->resId = make_shared<ResourceId>(key.resId);
+                    item->resId = std::make_shared<ResourceId>(key.resId);
                     item->archived = true;
                     _gameDirItems.push_back(std::move(item));
                 }
@@ -813,11 +811,11 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             erfReader.load(erf);
             auto &keys = erfReader.keys();
             for (auto &key : keys) {
-                auto item = make_shared<GameDirectoryItem>();
+                auto item = std::make_shared<GameDirectoryItem>();
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
                 item->path = expandingItem.path;
-                item->resId = make_shared<ResourceId>(key.resId);
+                item->resId = std::make_shared<ResourceId>(key.resId);
                 item->archived = true;
                 _gameDirItems.push_back(std::move(item));
             }
@@ -827,11 +825,11 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             rimReader.load(rim);
             auto &resources = rimReader.resources();
             for (auto &resource : resources) {
-                auto item = make_shared<GameDirectoryItem>();
+                auto item = std::make_shared<GameDirectoryItem>();
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
                 item->path = expandingItem.path;
-                item->resId = make_shared<ResourceId>(resource.resId);
+                item->resId = std::make_shared<ResourceId>(resource.resId);
                 item->archived = true;
                 _gameDirItems.push_back(std::move(item));
             }

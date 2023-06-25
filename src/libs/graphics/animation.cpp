@@ -21,19 +21,17 @@
 
 #include "reone/graphics/modelnode.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 Animation::Animation(
-    string name,
+    std::string name,
     float length,
     float transitionTime,
-    string root,
-    shared_ptr<ModelNode> rootNode,
-    vector<Event> events) :
+    std::string root,
+    std::shared_ptr<ModelNode> rootNode,
+    std::vector<Event> events) :
     _name(std::move(name)),
     _length(length),
     _transitionTime(transitionTime),
@@ -45,15 +43,15 @@ Animation::Animation(
 }
 
 void Animation::fillLookups() {
-    stack<shared_ptr<ModelNode>> nodes;
+    std::stack<std::shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
     while (!nodes.empty()) {
-        shared_ptr<ModelNode> node(nodes.top());
+        std::shared_ptr<ModelNode> node(nodes.top());
         nodes.pop();
 
-        _nodeByNumber.insert(make_pair(node->number(), node));
-        _nodeByName.insert(make_pair(node->name(), node));
+        _nodeByNumber.insert(std::make_pair(node->number(), node));
+        _nodeByName.insert(std::make_pair(node->name(), node));
 
         for (auto &child : node->children()) {
             nodes.push(child);
@@ -61,11 +59,11 @@ void Animation::fillLookups() {
     }
 }
 
-shared_ptr<ModelNode> Animation::getNodeByNumber(uint16_t number) const {
+std::shared_ptr<ModelNode> Animation::getNodeByNumber(uint16_t number) const {
     return getFromLookupOrNull(_nodeByNumber, number);
 }
 
-shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {
+std::shared_ptr<ModelNode> Animation::getNodeByName(const std::string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
 

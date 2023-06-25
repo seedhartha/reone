@@ -17,20 +17,18 @@
 
 #include "reone/audio/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {
 
 void AudioModule::init() {
-    _files = make_unique<AudioFiles>(_resource.resources());
-    _context = make_unique<AudioContext>();
-    _player = make_unique<AudioPlayer>(_options, *_files);
+    _files = std::make_unique<AudioFiles>(_resource.resources());
+    _context = std::make_unique<AudioContext>();
+    _player = std::make_unique<AudioPlayer>(_options, *_files);
 
     _context->init();
 
-    _services = make_unique<AudioServices>(*_context, *_files, *_player);
+    _services = std::make_unique<AudioServices>(*_context, *_files, *_player);
 }
 
 void AudioModule::deinit() {

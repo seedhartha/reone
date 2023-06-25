@@ -21,8 +21,6 @@
 
 #include "reone/scene/node/emitter.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {

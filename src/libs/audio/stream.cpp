@@ -17,8 +17,6 @@
 
 #include "reone/audio/stream.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace audio {

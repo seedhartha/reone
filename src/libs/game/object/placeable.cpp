@@ -35,8 +35,6 @@
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -47,19 +45,19 @@ namespace reone {
 namespace game {
 
 void Placeable::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(gffs);
 }
 
-void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
+void Placeable::loadFromBlueprint(const std::string &resRef) {
+    std::shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
     if (!utp) {
         return;
     }
     loadUTP(*utp);
-    shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
-    string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
+    std::shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
+    std::string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);
     if (!model) {
@@ -89,13 +87,13 @@ void Placeable::loadTransformFromGIT(const Gff &gffs) {
     updateTransform();
 }
 
-void Placeable::runOnUsed(shared_ptr<Object> usedBy) {
+void Placeable::runOnUsed(std::shared_ptr<Object> usedBy) {
     if (!_onUsed.empty()) {
         _game.scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
-void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
+void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
     if (!_onInvDisturbed.empty()) {
         _game.scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
@@ -140,7 +138,7 @@ void Placeable::loadUTP(const Gff &utp) {
     _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
 
     for (auto &itemGffs : utp.getList("ItemList")) {
-        string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
+        std::string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
         addItem(resRef, 1, true);
     }
 

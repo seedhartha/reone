@@ -22,19 +22,17 @@
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/resources.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
-shared_ptr<Gff> Gffs::get(const string &resRef, ResourceType type) {
+std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
     ResourceId id(resRef, type);
     auto maybeGff = _cache.find(id);
     if (maybeGff != _cache.end()) {
         return maybeGff->second;
     }
-    shared_ptr<Gff> gff;
+    std::shared_ptr<Gff> gff;
     auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
         auto stream = ByteArrayInputStream(*maybeRaw);
@@ -42,7 +40,7 @@ shared_ptr<Gff> Gffs::get(const string &resRef, ResourceType type) {
         reader.load(stream);
         gff = reader.root();
     }
-    auto inserted = _cache.insert(make_pair(id, gff));
+    auto inserted = _cache.insert(std::make_pair(id, gff));
     return inserted.first->second;
 }
 

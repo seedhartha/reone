@@ -17,8 +17,6 @@
 
 #include "reone/script/variable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
@@ -43,7 +41,7 @@ Variable Variable::ofFloat(float value) {
     return std::move(result);
 }
 
-Variable Variable::ofString(string value) {
+Variable Variable::ofString(std::string value) {
     Variable result;
     result.type = VariableType::String;
     result.strValue = std::move(value);
@@ -64,53 +62,53 @@ Variable Variable::ofObject(uint32_t objectId) {
     return std::move(result);
 }
 
-Variable Variable::ofEffect(shared_ptr<EngineType> engineType) {
+Variable Variable::ofEffect(std::shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Effect;
     result.engineType = std::move(engineType);
     return std::move(result);
 }
 
-Variable Variable::ofEvent(shared_ptr<EngineType> engineType) {
+Variable Variable::ofEvent(std::shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Event;
     result.engineType = std::move(engineType);
     return std::move(result);
 }
 
-Variable Variable::ofLocation(shared_ptr<EngineType> engineType) {
+Variable Variable::ofLocation(std::shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Location;
     result.engineType = std::move(engineType);
     return std::move(result);
 }
 
-Variable Variable::ofTalent(shared_ptr<EngineType> engineType) {
+Variable Variable::ofTalent(std::shared_ptr<EngineType> engineType) {
     Variable result;
     result.type = VariableType::Talent;
     result.engineType = std::move(engineType);
     return std::move(result);
 }
 
-Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
+Variable Variable::ofAction(std::shared_ptr<ExecutionContext> context) {
     Variable result;
     result.type = VariableType::Action;
     result.context = std::move(context);
     return std::move(result);
 }
 
-const string Variable::toString() const {
+const std::string Variable::toString() const {
     switch (type) {
     case VariableType::Void:
         return "void";
     case VariableType::Int:
-        return to_string(intValue);
+        return std::to_string(intValue);
     case VariableType::Float:
-        return to_string(floatValue);
+        return std::to_string(floatValue);
     case VariableType::String:
         return str(boost::format("\"%s\"") % strValue);
     case VariableType::Object:
-        return to_string(objectId);
+        return std::to_string(objectId);
     case VariableType::Vector:
         return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
     case VariableType::Effect:
@@ -124,7 +122,7 @@ const string Variable::toString() const {
     case VariableType::Action:
         return "action";
     default:
-        throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
+        throw std::logic_error("Unsupported variable type: " + std::to_string(static_cast<int>(type)));
     }
 }
 

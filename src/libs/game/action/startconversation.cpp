@@ -17,12 +17,10 @@
 
 #include "reone/game/action/startconversation.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 namespace reone {
 
@@ -30,9 +28,9 @@ namespace game {
 
 static constexpr float kMaxConversationDistance = 4.0f;
 
-void StartConversationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void StartConversationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto actorPtr = _game.objectFactory().getObjectById(actor.id());
-    auto creatureActor = static_pointer_cast<Creature>(actorPtr);
+    auto creatureActor = std::static_pointer_cast<Creature>(actorPtr);
 
     bool reached =
         !creatureActor ||

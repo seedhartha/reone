@@ -23,14 +23,12 @@
 #include "reone/game/object/module.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
 bool Player::handle(const SDL_Event &event) {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    std::shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader)
         return false;
 
@@ -67,7 +65,7 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
         return true;
     }
     case SDL_SCANCODE_X: {
-        shared_ptr<Creature> partyLeader(_party.getLeader());
+        std::shared_ptr<Creature> partyLeader(_party.getLeader());
         partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
         return true;
     }
@@ -128,7 +126,7 @@ bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 }
 
 void Player::update(float dt) {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    std::shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader || partyLeader->isMovementRestricted()) {
         return;
     }
@@ -164,7 +162,7 @@ void Player::stopMovement() {
     _moveBackward = false;
     _moveRight = false;
 
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    std::shared_ptr<Creature> partyLeader(_party.getLeader());
     if (partyLeader) {
         partyLeader->setMovementType(Creature::MovementType::None);
     }

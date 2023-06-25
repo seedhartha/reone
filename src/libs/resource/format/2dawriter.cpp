@@ -21,8 +21,6 @@
 
 #include "reone/resource/2da.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -35,7 +33,7 @@ void TwoDaWriter::save(const boost::filesystem::path &path) {
 }
 
 void TwoDaWriter::save(IOutputStream &out) {
-    _writer = make_unique<BinaryWriter>(out);
+    _writer = std::make_unique<BinaryWriter>(out);
     _writer->putString(kSignature);
     _writer->putChar('\n');
 
@@ -57,13 +55,13 @@ void TwoDaWriter::writeHeaders() {
 
 void TwoDaWriter::writeLabels() {
     for (int i = 0; i < _twoDa.getRowCount(); ++i) {
-        _writer->putString(to_string(i));
+        _writer->putString(std::to_string(i));
         _writer->putChar('\t');
     }
 }
 
 void TwoDaWriter::writeData() {
-    vector<pair<string, int>> data;
+    std::vector<std::pair<std::string, int>> data;
     int dataSize = 0;
 
     size_t columnCount = _twoDa.columns().size();
@@ -71,12 +69,12 @@ void TwoDaWriter::writeData() {
 
     for (int i = 0; i < _twoDa.getRowCount(); ++i) {
         for (size_t j = 0; j < columnCount; ++j) {
-            const string &value = _twoDa.rows()[i].values[j];
+            const std::string &value = _twoDa.rows()[i].values[j];
             auto maybeData = find_if(data.begin(), data.end(), [&](auto &pair) { return pair.first == value; });
             if (maybeData != data.end()) {
                 _writer->putUint16(maybeData->second);
             } else {
-                data.push_back(make_pair(value, dataSize));
+                data.push_back(std::make_pair(value, dataSize));
                 _writer->putUint16(dataSize);
                 int len = static_cast<int>(strnlen(&value[0], value.length()));
                 dataSize += len + 1;

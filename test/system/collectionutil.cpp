@@ -19,8 +19,6 @@
 
 #include "reone/system/collectionutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 struct Item {
@@ -32,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(collection_util)
 
 BOOST_AUTO_TEST_CASE(should_transform) {
     // given
-    auto input = vector<Item> {{1, 2}, {1, 3}, {4, 5}};
+    auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
     // when
     auto output = transform<Item, int>(input, [](auto &item) { return item.value; });
@@ -46,7 +44,7 @@ BOOST_AUTO_TEST_CASE(should_transform) {
 
 BOOST_AUTO_TEST_CASE(should_group_by_key) {
     // given
-    auto input = vector<Item> {{1, 2}, {1, 3}, {4, 5}};
+    auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
     // when
     auto output = groupBy<int, Item>(input, [](auto &item) { return item.key; });
@@ -61,7 +59,7 @@ BOOST_AUTO_TEST_CASE(should_group_by_key) {
 
 BOOST_AUTO_TEST_CASE(should_group_by_key_and_map_value) {
     // given
-    auto input = vector<Item> {{1, 2}, {1, 3}, {4, 5}};
+    auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
     // when
     auto output = groupBy<Item, int, int>(

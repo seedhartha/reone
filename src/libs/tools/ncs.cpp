@@ -33,8 +33,6 @@
 #include "reone/tools/script/format/pcodereader.h"
 #include "reone/tools/script/format/pcodewriter.h"
 
-using namespace std;
-
 using namespace reone::game;
 using namespace reone::resource;
 using namespace reone::script;
@@ -47,7 +45,7 @@ void NcsTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void NcsTool::invokeBatch(
@@ -115,11 +113,11 @@ void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines, b
     auto reader = NcsReader("");
     reader.load(ncs);
 
-    unique_ptr<IExpressionTreeOptimizer> optimizer;
+    std::unique_ptr<IExpressionTreeOptimizer> optimizer;
     if (optimize) {
-        optimizer = make_unique<ExpressionTreeOptimizer>();
+        optimizer = std::make_unique<ExpressionTreeOptimizer>();
     } else {
-        optimizer = make_unique<NoOpExpressionTreeOptimizer>();
+        optimizer = std::make_unique<NoOpExpressionTreeOptimizer>();
     }
     auto exprTree = ExpressionTree::fromProgram(*reader.program(), routines, *optimizer);
 

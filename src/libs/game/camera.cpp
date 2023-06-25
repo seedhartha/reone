@@ -17,8 +17,6 @@
 
 #include "reone/game/camera.h"
 
-using namespace std;
-
 using namespace reone::scene;
 
 namespace reone {

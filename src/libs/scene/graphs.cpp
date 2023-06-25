@@ -17,29 +17,27 @@
 
 #include "reone/scene/graphs.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace scene {
 
-void SceneGraphs::reserve(string name) {
+void SceneGraphs::reserve(std::string name) {
     if (_scenes.count(name) > 0) {
         return;
     }
-    auto scene = make_unique<SceneGraph>(
+    auto scene = std::make_unique<SceneGraph>(
         name,
         _graphicsOpt,
         _graphicsSvc,
         _audioSvc);
 
-    _scenes.insert(make_pair(name, std::move(scene)));
+    _scenes.insert(std::make_pair(name, std::move(scene)));
 }
 
-ISceneGraph &SceneGraphs::get(const string &name) {
+ISceneGraph &SceneGraphs::get(const std::string &name) {
     auto maybeScene = _scenes.find(name);
     if (maybeScene == _scenes.end()) {
-        throw logic_error(str(boost::format("Scene not found by name '%s'") % name));
+        throw std::logic_error(str(boost::format("Scene not found by name '%s'") % name));
     }
     return *maybeScene->second;
 }

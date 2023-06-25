@@ -17,18 +17,16 @@
 
 #include "reone/game/action/movetoobject.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object.h"
 #include "reone/game/object/factory.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void MoveToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void MoveToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto dest = _object->position();
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 

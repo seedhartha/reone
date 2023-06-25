@@ -19,8 +19,6 @@
 
 #include "reone/graphics/lipanimation.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -28,12 +26,12 @@ namespace graphics {
 void LipReader::onLoad() {
     // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
 
-    checkSignature(string("LIP V1.0", 8));
+    checkSignature(std::string("LIP V1.0", 8));
 
     float length = readFloat();
     uint32_t entryCount = readUint32();
 
-    vector<LipAnimation::Keyframe> keyframes;
+    std::vector<LipAnimation::Keyframe> keyframes;
     for (uint32_t i = 0; i < entryCount; ++i) {
         LipAnimation::Keyframe keyframe;
         keyframe.time = readFloat();
@@ -41,7 +39,7 @@ void LipReader::onLoad() {
         keyframes.push_back(std::move(keyframe));
     }
 
-    _animation = make_shared<LipAnimation>(_name, length, std::move(keyframes));
+    _animation = std::make_shared<LipAnimation>(_name, length, std::move(keyframes));
 }
 
 } // namespace graphics

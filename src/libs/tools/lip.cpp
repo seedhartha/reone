@@ -26,8 +26,6 @@
 
 #include "tinyxml2.h"
 
-using namespace std;
-
 using namespace tinyxml2;
 
 using namespace reone::graphics;
@@ -40,7 +38,7 @@ void LipTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void LipTool::invokeBatch(
@@ -97,13 +95,13 @@ void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem
 
     auto rootElement = document.RootElement();
     if (!rootElement) {
-        cerr << "XML is empty" << endl;
+        std::cerr << "XML is empty" << std::endl;
         fclose(fp);
         return;
     }
 
     auto length = rootElement->FloatAttribute("length");
-    auto keyframes = vector<LipAnimation::Keyframe>();
+    auto keyframes = std::vector<LipAnimation::Keyframe>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
         keyframes.push_back(LipAnimation::Keyframe {
             element->FloatAttribute("time"),
@@ -111,7 +109,7 @@ void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem
     }
     auto animation = LipAnimation("", length, std::move(keyframes));
 
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     boost::split(
         tokens,
         path.filename().string(),

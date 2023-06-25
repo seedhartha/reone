@@ -30,8 +30,6 @@
 
 #include "tinyxml2.h"
 
-using namespace std;
-
 using namespace tinyxml2;
 
 using namespace reone::resource;
@@ -43,12 +41,12 @@ void GffTool::invoke(Operation operation,
                      const boost::filesystem::path &outputDir,
                      const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void GffTool::invokeBatch(
     Operation operation,
-    const vector<boost::filesystem::path> &input,
+    const std::vector<boost::filesystem::path> &input,
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
@@ -66,7 +64,7 @@ void GffTool::invokeBatch(
     });
 }
 
-static string sanitizeXmlElementName(const std::string &s) {
+static std::string sanitizeXmlElementName(const std::string &s) {
     auto sanitized = s;
     boost::replace_all(sanitized, " ", "_");
     return std::move(sanitized);
@@ -150,13 +148,13 @@ void GffTool::toXML(IInputStream &gff, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-static unique_ptr<Gff> elementToGff(const XMLElement &element) {
+static std::unique_ptr<Gff> elementToGff(const XMLElement &element) {
     if (strncmp(element.Name(), "struct", 6) != 0) {
-        throw invalid_argument("XML element must have name 'struct'");
+        throw std::invalid_argument("XML element must have name 'struct'");
     }
 
     auto structType = element.UnsignedAttribute("type");
-    auto fields = vector<Gff::Field>();
+    auto fields = std::vector<Gff::Field>();
 
     for (auto fieldElement = element.FirstChildElement(); fieldElement; fieldElement = fieldElement->NextSiblingElement()) {
         auto fieldType = static_cast<Gff::FieldType>(fieldElement->IntAttribute("type"));
@@ -220,13 +218,13 @@ static unique_ptr<Gff> elementToGff(const XMLElement &element) {
                 fieldElement->FloatAttribute("z"));
             break;
         default:
-            throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(fieldType)));
+            throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(fieldType)));
         }
 
         fields.push_back(std::move(field));
     }
 
-    return make_unique<Gff>(structType, std::move(fields));
+    return std::make_unique<Gff>(structType, std::move(fields));
 }
 
 static void convertXmlToGff(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
@@ -239,7 +237,7 @@ static void convertXmlToGff(const boost::filesystem::path &input, const boost::f
 
     auto rootElement = document.RootElement();
     if (!rootElement) {
-        cerr << "XML is empty" << endl;
+        std::cerr << "XML is empty" << std::endl;
         return;
     }
 
@@ -258,7 +256,7 @@ void GffTool::toGFF(const boost::filesystem::path &input, const boost::filesyste
     if (input.extension() == ".xml") {
         convertXmlToGff(input, outputDir);
     } else {
-        cerr << "Input file must have XML extension" << endl;
+        std::cerr << "Input file must have XML extension" << std::endl;
     }
 }
 

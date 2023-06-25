@@ -21,8 +21,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;

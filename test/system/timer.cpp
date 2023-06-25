@@ -19,8 +19,6 @@
 
 #include "reone/system/timer.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(timer)

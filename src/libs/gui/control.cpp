@@ -34,8 +34,6 @@
 
 #include "reone/gui/gui.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -48,11 +46,11 @@ ControlType Control::getType(const Gff &gffs) {
     return static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
 }
 
-string Control::getTag(const Gff &gffs) {
+std::string Control::getTag(const Gff &gffs) {
     return gffs.getString("TAG");
 }
 
-string Control::getParent(const Gff &gffs) {
+std::string Control::getParent(const Gff &gffs) {
     return gffs.getString("Obj_Parent");
 }
 
@@ -76,11 +74,11 @@ void Control::load(const Gff &gffs) {
     loadExtent(*gffs.getStruct("EXTENT"));
     loadBorder(*gffs.getStruct("BORDER"));
 
-    shared_ptr<Gff> text(gffs.getStruct("TEXT"));
+    std::shared_ptr<Gff> text(gffs.getStruct("TEXT"));
     if (text) {
         loadText(*text);
     }
-    shared_ptr<Gff> hilight(gffs.getStruct("HILIGHT"));
+    std::shared_ptr<Gff> hilight(gffs.getStruct("HILIGHT"));
     if (hilight) {
         loadHilight(*hilight);
     }
@@ -96,11 +94,11 @@ void Control::loadExtent(const Gff &gffs) {
 }
 
 void Control::loadBorder(const Gff &gffs) {
-    string corner(gffs.getString("CORNER"));
-    string edge(gffs.getString("EDGE"));
-    string fill(gffs.getString("FILL"));
+    std::string corner(gffs.getString("CORNER"));
+    std::string edge(gffs.getString("EDGE"));
+    std::string fill(gffs.getString("FILL"));
 
-    _border = make_shared<Border>();
+    _border = std::make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
         _border->corner = _graphicsSvc.textures.get(corner, TextureUsage::GUI);
@@ -136,11 +134,11 @@ void Control::updateTextLines() {
 }
 
 void Control::loadHilight(const Gff &gffs) {
-    string corner(gffs.getString("CORNER"));
-    string edge(gffs.getString("EDGE"));
-    string fill(gffs.getString("FILL"));
+    std::string corner(gffs.getString("CORNER"));
+    std::string edge(gffs.getString("EDGE"));
+    std::string fill(gffs.getString("FILL"));
 
-    _hilight = make_shared<Border>();
+    _hilight = std::make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
         _hilight->corner = _graphicsSvc.textures.get(corner, TextureUsage::GUI);
@@ -183,7 +181,7 @@ void Control::update(float dt) {
     _sceneGraphs.get(_sceneName).update(dt);
 }
 
-void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
+void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
     if (!_visible) {
         return;
     }
@@ -199,7 +197,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     if (_sceneName.empty()) {
         return;
     }
-    shared_ptr<Texture> output;
+    std::shared_ptr<Texture> output;
     _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
         output = _graphicsSvc.pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
     });
@@ -416,7 +414,7 @@ const glm::vec3 &Control::getBorderColor() const {
     return (_focus && _hilight) ? _hilight->color : _border->color;
 }
 
-void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
+void Control::drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
     glm::ivec2 position;
     TextGravity gravity;
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
@@ -554,25 +552,25 @@ void Control::setExtentTop(int top) {
 }
 
 void Control::setBorder(Border border) {
-    _border = make_shared<Border>(std::move(border));
+    _border = std::make_shared<Border>(std::move(border));
 }
 
-void Control::setBorderFill(string resRef) {
-    shared_ptr<Texture> texture;
+void Control::setBorderFill(std::string resRef) {
+    std::shared_ptr<Texture> texture;
     if (!resRef.empty()) {
         texture = _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
     }
     setBorderFill(std::move(texture));
 }
 
-void Control::setBorderFill(shared_ptr<Texture> texture) {
+void Control::setBorderFill(std::shared_ptr<Texture> texture) {
     if (!texture && _border) {
         _border->fill.reset();
         return;
     }
     if (texture) {
         if (!_border) {
-            _border = make_shared<Border>();
+            _border = std::make_shared<Border>();
         }
         _border->fill = std::move(texture);
     }
@@ -591,32 +589,32 @@ void Control::setUseBorderColorOverride(bool use) {
 }
 
 void Control::setHilight(Border hilight) {
-    _hilight = make_shared<Border>(hilight);
+    _hilight = std::make_shared<Border>(hilight);
 }
 
 void Control::setHilightColor(glm::vec3 color) {
     if (!_hilight) {
-        _hilight = make_shared<Border>();
+        _hilight = std::make_shared<Border>();
     }
     _hilight->color = std::move(color);
 }
 
-void Control::setHilightFill(string resRef) {
-    shared_ptr<Texture> texture;
+void Control::setHilightFill(std::string resRef) {
+    std::shared_ptr<Texture> texture;
     if (!resRef.empty()) {
         texture = _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
     }
     setHilightFill(texture);
 }
 
-void Control::setHilightFill(shared_ptr<Texture> texture) {
+void Control::setHilightFill(std::shared_ptr<Texture> texture) {
     if (!texture && _hilight) {
         _hilight->fill.reset();
         return;
     }
     if (texture) {
         if (!_hilight) {
-            _hilight = make_shared<Border>();
+            _hilight = std::make_shared<Border>();
         }
         _hilight->fill = std::move(texture);
     }
@@ -627,12 +625,12 @@ void Control::setText(Text text) {
     updateTextLines();
 }
 
-void Control::setTextMessage(string text) {
+void Control::setTextMessage(std::string text) {
     _text.text = std::move(text);
     updateTextLines();
 }
 
-void Control::setTextFont(shared_ptr<Font> font) {
+void Control::setTextFont(std::shared_ptr<Font> font) {
     _text.font = std::move(font);
     updateTextLines();
 }
@@ -641,7 +639,7 @@ void Control::setTextColor(glm::vec3 color) {
     _text.color = std::move(color);
 }
 
-void Control::setSceneName(string name) {
+void Control::setSceneName(std::string name) {
     _sceneName = std::move(name);
 }
 

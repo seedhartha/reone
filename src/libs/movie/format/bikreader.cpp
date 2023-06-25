@@ -36,8 +36,6 @@ extern "C" {
 
 #endif
 
-using namespace std;
-
 using namespace reone::audio;
 
 namespace reone {
@@ -85,7 +83,7 @@ public:
 
     void load() {
         if (avformat_open_input(&_formatCtx, _path.string().c_str(), nullptr, nullptr) != 0) {
-            throw runtime_error("Failed to open BIK file: " + _path.string());
+            throw std::runtime_error("Failed to open BIK file: " + _path.string());
         }
         findStreams();
 
@@ -135,7 +133,7 @@ private:
 
     void findStreams() {
         if (avformat_find_stream_info(_formatCtx, nullptr) != 0) {
-            throw runtime_error("Failed to find BIK stream info");
+            throw std::runtime_error("Failed to find BIK stream info");
         }
         for (uint32_t i = 0; i < _formatCtx->nb_streams; ++i) {
             AVCodecParameters *codecParams = _formatCtx->streams[i]->codecpar;
@@ -151,7 +149,7 @@ private:
             }
         }
         if (_videoStreamIdx == -1) {
-            throw runtime_error("Video stream not found in BIK");
+            throw std::runtime_error("Video stream not found in BIK");
         }
     }
 
@@ -159,14 +157,14 @@ private:
         AVCodecParameters *codecParams = _formatCtx->streams[streamIdx]->codecpar;
         const AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
         if (!codec) {
-            throw runtime_error("BIK codec not found");
+            throw std::runtime_error("BIK codec not found");
         }
         *codecCtx = avcodec_alloc_context3(codec);
         if (avcodec_parameters_to_context(*codecCtx, codecParams) != 0) {
-            throw runtime_error("Failed to copy BIK codec parameters");
+            throw std::runtime_error("Failed to copy BIK codec parameters");
         }
         if (avcodec_open2(*codecCtx, codec, nullptr) != 0) {
-            throw runtime_error("Failed to open BIK codec");
+            throw std::runtime_error("Failed to open BIK codec");
         }
     }
 
@@ -240,7 +238,7 @@ private:
                 _avFrameScaled->data, _avFrameScaled->linesize);
 
             // Save frame
-            auto pixels = make_shared<ByteArray>(3ll * _videoCodecCtx->width * _videoCodecCtx->height, '\0');
+            auto pixels = std::make_shared<ByteArray>(3ll * _videoCodecCtx->width * _videoCodecCtx->height, '\0');
             for (int y = 0; y < _videoCodecCtx->height; ++y) {
                 int dstIdx = 3 * _videoCodecCtx->width * y;
                 uint8_t *src = _avFrameScaled->data[0] + static_cast<long long>(y) * _avFrameScaled->linesize[0];
@@ -257,7 +255,7 @@ private:
     }
 
     void loadAudioStream() {
-        _audioStream = make_shared<AudioStream>();
+        _audioStream = std::make_shared<AudioStream>();
 
         AVPacket packet;
         int ret;
@@ -319,13 +317,13 @@ private:
 void BikReader::load() {
 #ifdef R_ENABLE_MOVIE
     if (!boost::filesystem::exists(_path)) {
-        throw runtime_error("BIK: file not found: " + _path.string());
+        throw std::runtime_error("BIK: file not found: " + _path.string());
     }
 
-    auto decoder = make_shared<BinkVideoDecoder>(_path);
+    auto decoder = std::make_shared<BinkVideoDecoder>(_path);
     decoder->load();
 
-    _movie = make_shared<Movie>(_graphicsSvc, _audioSvc);
+    _movie = std::make_shared<Movie>(_graphicsSvc, _audioSvc);
     _movie->setVideoStream(decoder);
     _movie->setAudioStream(decoder->audioStream());
     _movie->init();

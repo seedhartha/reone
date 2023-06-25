@@ -25,8 +25,6 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -37,7 +35,7 @@ void TpcTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TpcTool::invokeBatch(
@@ -61,7 +59,7 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
     tgaPath.replace_extension("tga");
 
     auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
-    auto txiBytes = make_unique<ByteArray>();
+    auto txiBytes = std::make_unique<ByteArray>();
     auto txiMemory = ByteArrayOutputStream(*txiBytes);
     toTGA(tpc, tga, txiMemory, true);
 

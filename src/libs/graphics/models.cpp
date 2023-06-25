@@ -26,8 +26,6 @@
 #include "reone/graphics/model.h"
 #include "reone/graphics/textures.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -42,7 +40,7 @@ void Models::invalidate() {
     _cache.clear();
 }
 
-shared_ptr<Model> Models::get(const string &resRef) {
+std::shared_ptr<Model> Models::get(const std::string &resRef) {
     if (resRef.empty()) {
         return nullptr;
     }
@@ -53,16 +51,16 @@ shared_ptr<Model> Models::get(const string &resRef) {
         return maybeModel->second;
     }
 
-    auto inserted = _cache.insert(make_pair(lcResRef, doGet(lcResRef)));
+    auto inserted = _cache.insert(std::make_pair(lcResRef, doGet(lcResRef)));
     return inserted.first->second;
 }
 
-shared_ptr<Model> Models::doGet(const string &resRef) {
+std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     debug("Load model " + resRef, LogChannels::graphics);
 
-    shared_ptr<ByteArray> mdlData(_resources.get(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(_resources.get(resRef, ResourceType::Mdx));
-    shared_ptr<Model> model;
+    std::shared_ptr<ByteArray> mdlData(_resources.get(resRef, ResourceType::Mdl));
+    std::shared_ptr<ByteArray> mdxData(_resources.get(resRef, ResourceType::Mdx));
+    std::shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
         auto mdl = ByteArrayInputStream(*mdlData);
@@ -75,7 +73,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
                 model->init();
             }
         } catch (const ValidationException &e) {
-            error(boost::format("Error loading model %s: %s") % resRef % string(e.what()), LogChannels::graphics);
+            error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannels::graphics);
         }
     }
 

@@ -17,13 +17,11 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/format/rimwriter.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/resource/format/rimwriter.h"
 
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -62,7 +60,7 @@ BOOST_AUTO_TEST_CASE(should_write_rim) {
 
     // then
 
-    auto actualOutput = string(&bytes[0], bytes.size());
+    auto actualOutput = std::string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

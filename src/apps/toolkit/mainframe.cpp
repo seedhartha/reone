@@ -53,8 +53,6 @@
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -65,9 +63,9 @@ namespace reone {
 
 static constexpr char kIconName[] = "toolkit";
 
-static const set<string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
+static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const set<PageType> kStaticPageTypes {
+static const std::set<PageType> kStaticPageTypes {
     PageType::Image,
     PageType::Model,
     PageType::Audio};
@@ -166,7 +164,7 @@ MainFrame::MainFrame() :
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
-    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, numeric_limits<int>::max());
+    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
 
     _renderSplitter = new wxSplitterWindow(_notebook);
     _renderSplitter->SetMinimumPaneSize(100);
@@ -185,7 +183,7 @@ MainFrame::MainFrame() :
         window->Hide();
     }
 
-    _viewModel = make_unique<MainViewModel>();
+    _viewModel = std::make_unique<MainViewModel>();
     _viewModel->pageAdded().subscribe([this](auto &page) {
         wxWindow *window;
         if (kStaticPageTypes.count(page->type) > 0) {
@@ -212,11 +210,11 @@ MainFrame::MainFrame() :
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
-        _image = make_unique<wxBitmap>(image);
+        _image = std::make_unique<wxBitmap>(image);
         _imageInfoCtrl->Clear();
         _imageInfoCtrl->AppendText(*data.txiBytes);
         if (!data.txiBytes->empty()) {
-            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, numeric_limits<int>::max());
+            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
         } else {
             _imageSplitter->Unsplit(_imageInfoCtrl);
         }
@@ -229,14 +227,14 @@ MainFrame::MainFrame() :
                 _animationsListBox->Append(animation);
             }
             _animationsListBox->Thaw();
-            _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, numeric_limits<int>::max());
+            _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, std::numeric_limits<int>::max());
         } else {
             _renderSplitter->Unsplit();
         }
     });
     _viewModel->audioStream().subscribe([this](auto &stream) {
         if (stream) {
-            _audioSource = make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
+            _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             _audioSource->init();
             _audioSource->play();
         } else {
@@ -277,7 +275,7 @@ MainFrame::MainFrame() :
 
         _animationsListBox = new wxListBox(_renderSplitter, wxID_ANY);
         _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::OnAnimationsListBoxDoubleClick, this);
-        _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, numeric_limits<int>::max());
+        _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, std::numeric_limits<int>::max());
     });
     _viewModel->onViewCreated();
 
@@ -348,7 +346,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         nssTextCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
         nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
         nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
-        nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object string struct talent vector void");
+        nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object std::string struct talent vector void");
         nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSOR, wxColour(128, 64, 0));
         nssTextCtrl->StyleSetForeground(wxSTC_C_DEFAULT, wxColour(0, 0, 0));
         nssTextCtrl->StyleSetForeground(wxSTC_C_WORD, wxColour(0, 0, 255));
@@ -373,7 +371,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         return nssPanel;
     }
     default:
-        throw logic_error("Unsupported page type");
+        throw std::logic_error("Unsupported page type");
     }
 }
 
@@ -411,7 +409,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     if (dialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto gamePath = boost::filesystem::path((string)dialog->GetPath());
+    auto gamePath = boost::filesystem::path((std::string)dialog->GetPath());
     auto keyPath = getPathIgnoreCase(gamePath, "chitin.key", false);
     auto modulesPath = getPathIgnoreCase(gamePath, "modules", false);
     if (keyPath.empty() || modulesPath.empty()) {
@@ -481,7 +479,7 @@ void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     _viewModel->onGameDirectoryItemActivated(itemId);
 }
 
-void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const string &text, const Gff &gff) {
+void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const Gff &gff) {
     auto structItem = ctrl.AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
     for (auto &field : gff.fields()) {
         switch (field.type) {
@@ -510,7 +508,7 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
             auto listItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
             for (auto it = field.children.begin(); it != field.children.end(); ++it) {
                 auto childIdx = std::distance(field.children.begin(), it);
-                AppendGffStructToTree(ctrl, listItem, to_string(childIdx), **it);
+                AppendGffStructToTree(ctrl, listItem, std::to_string(childIdx), **it);
             }
         } break;
         case Gff::FieldType::Orientation: {
@@ -608,7 +606,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         if (dialog->ShowModal() != wxID_OK) {
             return;
         }
-        auto destPath = boost::filesystem::path(string(dialog->GetPath()));
+        auto destPath = boost::filesystem::path(std::string(dialog->GetPath()));
 
         _viewModel->extractArchive(item.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
@@ -662,7 +660,7 @@ void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
         return;
     }
     auto animation = _animationsListBox->GetString(selection);
-    _viewModel->playAnimation((string)animation);
+    _viewModel->playAnimation((std::string)animation);
 }
 
 void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
@@ -681,7 +679,7 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
     _viewModel->extractAllBifs(destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
@@ -691,12 +689,12 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto srcPath = boost::filesystem::path((string)srcDirDialog->GetPath());
+    auto srcPath = boost::filesystem::path((std::string)srcDirDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
     _viewModel->batchConvertTpcToTga(srcPath, destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
@@ -772,12 +770,12 @@ void MainFrame::InvokeTool(Operation operation) {
     if (srcFileDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto srcPath = boost::filesystem::path((string)srcFileDialog->GetPath());
+    auto srcPath = boost::filesystem::path((std::string)srcFileDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((string)destDirDialog->GetPath());
+    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
     if (_viewModel->invokeTool(operation, srcPath, destPath)) {
         wxMessageBox("Operation completed successfully", "Success");
     } else {

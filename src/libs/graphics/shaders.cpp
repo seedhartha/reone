@@ -25,8 +25,6 @@
 #include "reone/graphics/glsl/vertex.h"
 #include "reone/graphics/options.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -145,7 +143,7 @@ void Shaders::use(ShaderProgram &program) {
     }
 }
 
-shared_ptr<Shader> Shaders::initShader(ShaderType type, list<string> sources) {
+std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::list<std::string> sources) {
     auto defines = StringBuilder();
     defines.append("\n");
     if (_options.ssr) {
@@ -159,13 +157,13 @@ shared_ptr<Shader> Shaders::initShader(ShaderType type, list<string> sources) {
 
     sources.push_front(g_glslHeader);
 
-    auto shader = make_unique<Shader>(type, std::move(sources));
+    auto shader = std::make_unique<Shader>(type, std::move(sources));
     shader->init();
     return std::move(shader);
 }
 
-shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> shaders) {
-    auto program = make_unique<ShaderProgram>(std::move(shaders));
+std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders) {
+    auto program = std::make_unique<ShaderProgram>(std::move(shaders));
     program->init();
     program->use();
 

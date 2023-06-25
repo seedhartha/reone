@@ -32,8 +32,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -43,13 +41,13 @@ namespace reone {
 namespace game {
 
 void Sound::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(gffs);
 }
 
-void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
+void Sound::loadFromBlueprint(const std::string &resRef) {
+    std::shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
     if (!uts) {
         return;
     }
@@ -92,7 +90,7 @@ void Sound::loadUTS(const Gff &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const Gff &uts) {
-    shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
+    std::shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }
@@ -125,7 +123,7 @@ void Sound::update(float dt) {
         _timeout = glm::max(0.0f, _timeout - dt);
         return;
     }
-    const vector<string> &sounds = _sounds;
+    const std::vector<std::string> &sounds = _sounds;
     int soundCount = static_cast<int>(sounds.size());
     if (sounds.empty()) {
         setActive(false);

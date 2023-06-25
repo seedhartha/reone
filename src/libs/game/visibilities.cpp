@@ -23,15 +23,13 @@
 
 #include "reone/system/stream/bytearrayinput.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-shared_ptr<Visibility> Visibilities::doGet(string resRef) {
+std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
     auto data = _resources.get(resRef, ResourceType::Vis);
     if (!data) {
         return nullptr;
@@ -41,7 +39,7 @@ shared_ptr<Visibility> Visibilities::doGet(string resRef) {
     VisReader vis;
     vis.load(stream);
 
-    return make_shared<Visibility>(vis.visibility());
+    return std::make_shared<Visibility>(vis.visibility());
 }
 
 } // namespace game

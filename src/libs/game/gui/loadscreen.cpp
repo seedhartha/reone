@@ -21,8 +21,6 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -56,7 +54,7 @@ void LoadingScreen::bindControls() {
     _binding.lblLoading = getControl<Label>("LBL_LOADING");
 }
 
-void LoadingScreen::setImage(const string &resRef) {
+void LoadingScreen::setImage(const std::string &resRef) {
     _gui->rootControl().setBorderFill(resRef);
 }
 

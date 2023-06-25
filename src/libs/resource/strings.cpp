@@ -22,8 +22,6 @@
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -39,28 +37,28 @@ void Strings::init(const boost::filesystem::path &gameDir) {
     _table = tlkReader.table();
 }
 
-string Strings::get(int strRef) {
+std::string Strings::get(int strRef) {
     if (!_table || strRef < 0 || strRef >= _table->getStringCount())
         return "";
 
-    string text(_table->getString(strRef).text);
+    std::string text(_table->getString(strRef).text);
     process(text);
 
     return std::move(text);
 }
 
-string Strings::getSound(int strRef) {
+std::string Strings::getSound(int strRef) {
     if (!_table || strRef < 0 || strRef >= _table->getStringCount())
         return "";
 
     return _table->getString(strRef).soundResRef;
 }
 
-void Strings::process(string &str) {
+void Strings::process(std::string &str) {
     stripDeveloperNotes(str);
 }
 
-void Strings::stripDeveloperNotes(string &str) {
+void Strings::stripDeveloperNotes(std::string &str) {
     do {
         size_t openBracketIdx = str.find_first_of('{', 0);
         if (openBracketIdx == -1)

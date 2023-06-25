@@ -31,8 +31,6 @@
 #include "../fixtures/script.h"
 #include "../fixtures/system.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::audio;
 using namespace reone::game;
@@ -54,21 +52,21 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
     // given
     auto gamePath = boost::filesystem::path();
 
-    auto engine = make_unique<TestEngine>();
+    auto engine = std::make_unique<TestEngine>();
     engine->init();
 
-    auto sceneNames = set<string>();
+    auto sceneNames = std::set<std::string>();
     EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
         .WillOnce(Return(sceneNames));
 
-    auto moduleNames = set<string>();
+    auto moduleNames = std::set<std::string>();
     EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
         .WillOnce(Return(moduleNames));
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();
 
-    auto legalMovie = make_shared<MockMovie>();
+    auto legalMovie = std::make_shared<MockMovie>();
     EXPECT_CALL(*legalMovie, update(_)).Times(1);
     EXPECT_CALL(*legalMovie, isFinished()).WillOnce(Return(false));
     EXPECT_CALL(*legalMovie, render()).Times(1);
@@ -96,39 +94,39 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     // given
     auto gamePath = boost::filesystem::path();
 
-    auto engine = make_unique<TestEngine>();
+    auto engine = std::make_unique<TestEngine>();
     engine->init();
 
-    auto sceneNames = set<string>();
+    auto sceneNames = std::set<std::string>();
     EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
         .WillOnce(Return(sceneNames));
 
-    auto moduleNames = set<string>();
+    auto moduleNames = std::set<std::string>();
     EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
         .WillOnce(Return(moduleNames));
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();
 
-    auto legalMovie = make_shared<MockMovie>();
+    auto legalMovie = std::make_shared<MockMovie>();
     EXPECT_CALL(*legalMovie, update(_)).Times(1);
     EXPECT_CALL(*legalMovie, isFinished()).WillOnce(Return(true));
 
     EXPECT_CALL(engine->movieModule().movies(), get(_))
         .WillOnce(Return(legalMovie));
 
-    auto gui = make_shared<MockGUI>();
-    auto label = make_shared<Label>(
+    auto gui = std::make_shared<MockGUI>();
+    auto label = std::make_shared<Label>(
         *gui,
         engine->sceneModule().graphs(),
         engine->graphicsModule().services(),
         engine->resourceModule().strings());
-    auto button = make_shared<Button>(
+    auto button = std::make_shared<Button>(
         *gui,
         engine->sceneModule().graphs(),
         engine->graphicsModule().services(),
         engine->resourceModule().strings());
-    auto listBox = make_shared<ListBox>(
+    auto listBox = std::make_shared<ListBox>(
         *gui,
         engine->sceneModule().graphs(),
         engine->graphicsModule().services(),
@@ -152,7 +150,7 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     EXPECT_CALL(engine->guiModule().guis(), get("mainmenu16x12", _))
         .WillOnce(Return(gui));
 
-    auto mainMenuScene = make_shared<MockSceneGraph>();
+    auto mainMenuScene = std::make_shared<MockSceneGraph>();
     EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMainMenu))
         .WillOnce(ReturnRef(*mainMenuScene));
 
@@ -163,7 +161,7 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     EXPECT_CALL(engine->graphicsModule().window(), isInFocus())
         .WillOnce(Return(true));
 
-    auto mainScene = make_shared<MockSceneGraph>();
+    auto mainScene = std::make_shared<MockSceneGraph>();
     EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMain))
         .WillOnce(ReturnRef(*mainScene));
 

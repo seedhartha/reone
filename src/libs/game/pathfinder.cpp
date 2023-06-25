@@ -17,15 +17,13 @@
 
 #include "reone/game/pathfinder.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
 const Pathfinder::ContextVertex &Pathfinder::Context::getVertexWithLeastTotalCostFromOpen() const {
     uint16_t bestIdx = 0xffff;
-    float bestTotalCost = numeric_limits<float>().max();
+    float bestTotalCost = std::numeric_limits<float>().max();
 
     for (uint16_t idx : open) {
         const ContextVertex &vert = vertices.find(idx)->second;
@@ -38,7 +36,7 @@ const Pathfinder::ContextVertex &Pathfinder::Context::getVertexWithLeastTotalCos
     return vertices.find(bestIdx)->second;
 }
 
-void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int, float> &pointZ) {
+void Pathfinder::load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ) {
     for (uint16_t i = 0; i < points.size(); ++i) {
         if (pointZ.count(i) == 0) {
             continue;
@@ -56,10 +54,10 @@ void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int
     }
 }
 
-const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
+const std::vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
     // When there are no vertices, return a path of start and end points
     if (_vertices.empty()) {
-        return vector<glm::vec3> {from, to};
+        return std::vector<glm::vec3> {from, to};
     }
 
     // Find vertices nearest to start and end points
@@ -68,7 +66,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
 
     // When start and end point have a common nearest vertex, return a path of start and end point
     if (fromIdx == toIdx) {
-        return vector<glm::vec3> {from, to};
+        return std::vector<glm::vec3> {from, to};
     }
 
     Context ctx;
@@ -76,7 +74,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
     // Add vertex, nearest to start point, to open list
     ContextVertex fromVert;
     fromVert.index = fromIdx;
-    ctx.vertices.insert(make_pair(fromIdx, fromVert));
+    ctx.vertices.insert(std::make_pair(fromIdx, fromVert));
     ctx.open.insert(fromIdx);
 
     while (!ctx.open.empty()) {
@@ -89,7 +87,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
 
         // Reconstruct path if current vertex is nearest to end point
         if (current.index == toIdx) {
-            vector<glm::vec3> path;
+            std::vector<glm::vec3> path;
             uint16_t idx = current.index;
             do {
                 const ContextVertex &vert = ctx.vertices.find(idx)->second;
@@ -126,13 +124,13 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
             }
 
             // Insert or update adjacent vertex in open list
-            ctx.vertices.insert(make_pair(adjVertIdx, child));
+            ctx.vertices.insert(std::make_pair(adjVertIdx, child));
             ctx.open.insert(adjVertIdx);
         }
     }
 
     // Return a path of start and end points by default
-    return vector<glm::vec3> {from, to};
+    return std::vector<glm::vec3> {from, to};
 }
 
 uint16_t Pathfinder::getNearestVertex(const glm::vec3 &point) const {

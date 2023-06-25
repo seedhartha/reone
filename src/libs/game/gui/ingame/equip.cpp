@@ -28,8 +28,6 @@
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -42,7 +40,7 @@ namespace game {
 
 static constexpr int kStrRefNone = 363;
 
-static unordered_map<Equipment::Slot, string> g_slotNames = {
+static std::unordered_map<Equipment::Slot, std::string> g_slotNames = {
     {Equipment::Slot::Implant, "IMPLANT"},
     {Equipment::Slot::Head, "HEAD"},
     {Equipment::Slot::Hands, "HANDS"},
@@ -55,7 +53,7 @@ static unordered_map<Equipment::Slot, string> g_slotNames = {
     {Equipment::Slot::WeapL2, "WEAP_L2"},
     {Equipment::Slot::WeapR2, "WEAP_R2"}};
 
-static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
+static std::unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::Implant, 31388},
     {Equipment::Slot::Head, 31375},
     {Equipment::Slot::Hands, 31383},
@@ -104,7 +102,7 @@ void Equipment::onGUILoaded() {
             if (!focus)
                 return;
 
-            string slotDesc;
+            std::string slotDesc;
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
@@ -134,7 +132,7 @@ void Equipment::bindControls() {
         _binding.lblBack1 = getControl<Label>("LBL_BACK1");
         _binding.lblDefBack = getControl<Label>("LBL_DEF_BACK");
         for (int i = 0; i < kNumControlsBar; ++i) {
-            _binding.lblBar[i] = getControl<Label>("LBL_BAR" + to_string(i + 1));
+            _binding.lblBar[i] = getControl<Label>("LBL_BAR" + std::to_string(i + 1));
         }
         _binding.lblAttackMod = getControl<Label>("LBL_ATTACKMOD");
         _binding.lblDamText = getControl<Label>("LBL_DAMTEXT");
@@ -171,7 +169,7 @@ void Equipment::bindControls() {
 void Equipment::configureItemsListBox() {
     _binding.lbItems->changeProtoItemType(ControlType::LabelHilight);
     _binding.lbItems->setPadding(5);
-    _binding.lbItems->setOnItemClick([this](const string &item) {
+    _binding.lbItems->setOnItemClick([this](const std::string &item) {
         onItemsListBoxItemClick(item);
     });
 
@@ -205,16 +203,16 @@ static int getInventorySlot(Equipment::Slot slot) {
     case Equipment::Slot::WeapR2:
         return InventorySlot::rightWeapon2;
     default:
-        throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
+        throw std::invalid_argument("Equipment: invalid slot: " + std::to_string(static_cast<int>(slot)));
     }
 }
 
-void Equipment::onItemsListBoxItemClick(const string &item) {
+void Equipment::onItemsListBoxItemClick(const std::string &item) {
     if (_selectedSlot == Slot::None)
         return;
 
-    shared_ptr<Creature> player(_game.party().player());
-    shared_ptr<Item> itemObj;
+    std::shared_ptr<Creature> player(_game.party().player());
+    std::shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
             if (playerItem->tag() == item) {
@@ -224,8 +222,8 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
-    shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
         if (equipped) {
@@ -238,7 +236,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    shared_ptr<Item> clonedItem(_game.objectFactory().newItem());
+                    std::shared_ptr<Item> clonedItem(_game.objectFactory().newItem());
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
@@ -257,10 +255,10 @@ void Equipment::update() {
     auto partyLeader(_game.party().getLeader());
 
     if (!_game.isTSL()) {
-        string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
+        std::string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
         _binding.lblVitality->setTextMessage(vitalityString);
     }
-    _binding.lblDef->setTextMessage(to_string(partyLeader->getDefense()));
+    _binding.lblDef->setTextMessage(std::to_string(partyLeader->getDefense()));
 }
 
 void Equipment::updatePortraits() {
@@ -268,9 +266,9 @@ void Equipment::updatePortraits() {
         return;
 
     Party &party = _game.party();
-    shared_ptr<Creature> partyLeader(party.getLeader());
-    shared_ptr<Creature> partyMember1(party.getMember(1));
-    shared_ptr<Creature> partyMember2(party.getMember(2));
+    std::shared_ptr<Creature> partyLeader(party.getLeader());
+    std::shared_ptr<Creature> partyMember1(party.getMember(1));
+    std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
     _binding.lblPortrait->setBorderFill(partyLeader->portrait());
     _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
@@ -299,12 +297,12 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &lbl : _binding.lblInv) {
         int slot = getInventorySlot(lbl.first);
-        shared_ptr<Texture> fill;
+        std::shared_ptr<Texture> fill;
 
         auto equipped = equipment.find(slot);
         if (equipped != equipment.end()) {
@@ -324,7 +322,7 @@ void Equipment::updateEquipment() {
     _binding.lblAtkL->setTextMessage(str(boost::format("%d-%d") % min % max));
 
     int attackBonus = partyLeader->getAttackBonus();
-    string attackBonusString(to_string(attackBonus));
+    std::string attackBonusString(std::to_string(attackBonus));
     if (attackBonus > 0) {
         attackBonusString.insert(0, "+");
     }
@@ -332,14 +330,14 @@ void Equipment::updateEquipment() {
     _binding.lblToHitR->setTextMessage(attackBonusString);
 }
 
-shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
-    static unordered_map<Slot, shared_ptr<Texture>> icons;
+std::shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
+    static std::unordered_map<Slot, std::shared_ptr<Texture>> icons;
 
     auto icon = icons.find(slot);
     if (icon != icons.end())
         return icon->second;
 
-    string resRef;
+    std::string resRef;
     switch (slot) {
     case Slot::Implant:
         resRef = "iimplant";
@@ -374,8 +372,8 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
         return nullptr;
     }
 
-    shared_ptr<Texture> texture(_services.graphics.textures.get(resRef, TextureUsage::GUI));
-    auto pair = icons.insert(make_pair(slot, texture));
+    std::shared_ptr<Texture> texture(_services.graphics.textures.get(resRef, TextureUsage::GUI));
+    auto pair = icons.insert(std::make_pair(slot, texture));
 
     return pair.first->second;
 }
@@ -392,7 +390,7 @@ void Equipment::updateItems() {
 
         _binding.lbItems->addItem(std::move(lbItem));
     }
-    shared_ptr<Creature> player(_game.party().player());
+    std::shared_ptr<Creature> player(_game.party().player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
@@ -410,14 +408,14 @@ void Equipment::updateItems() {
         lbItem.iconFrame = getItemFrameTexture(item->stackSize());
 
         if (item->stackSize() > 1) {
-            lbItem.iconText = to_string(item->stackSize());
+            lbItem.iconText = std::to_string(item->stackSize());
         }
         _binding.lbItems->addItem(std::move(lbItem));
     }
 }
 
-shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
-    string resRef;
+std::shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
+    std::string resRef;
     if (_game.isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {

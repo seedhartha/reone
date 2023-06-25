@@ -17,32 +17,30 @@
 
 #include "reone/game/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
 void GameModule::init() {
-    _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
-    _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
-    _cursors = make_unique<Cursors>(_graphics.graphicsContext(), _graphics.meshes(), _graphics.shaders(), _graphics.textures(), _graphics.uniforms(), _graphics.window(), _resource.resources());
-    _dialogs = make_unique<Dialogs>(_resource.gffs(), _resource.strings());
-    _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
-    _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.twoDas());
-    _guiSounds = make_unique<GUISounds>(_audio.files(), _resource.twoDas());
-    _layouts = make_unique<Layouts>(_resource.resources());
-    _paths = make_unique<Paths>(_resource.gffs());
-    _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
-    _reputes = make_unique<Reputes>(_resource.twoDas());
-    _resourceLayout = make_unique<ResourceLayout>(_gameId, _options, _resource.services());
-    _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
-    _soundSets = make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
-    _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
-    _surfaces = make_unique<Surfaces>(_resource.twoDas());
-    _visibilities = make_unique<Visibilities>(_resource.resources());
+    _cameraStyles = std::make_unique<CameraStyles>(_resource.twoDas());
+    _classes = std::make_unique<Classes>(_resource.strings(), _resource.twoDas());
+    _cursors = std::make_unique<Cursors>(_graphics.graphicsContext(), _graphics.meshes(), _graphics.shaders(), _graphics.textures(), _graphics.uniforms(), _graphics.window(), _resource.resources());
+    _dialogs = std::make_unique<Dialogs>(_resource.gffs(), _resource.strings());
+    _feats = std::make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _footstepSounds = std::make_unique<FootstepSounds>(_audio.files(), _resource.twoDas());
+    _guiSounds = std::make_unique<GUISounds>(_audio.files(), _resource.twoDas());
+    _layouts = std::make_unique<Layouts>(_resource.resources());
+    _paths = std::make_unique<Paths>(_resource.gffs());
+    _portraits = std::make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
+    _reputes = std::make_unique<Reputes>(_resource.twoDas());
+    _resourceLayout = std::make_unique<ResourceLayout>(_gameId, _options, _resource.services());
+    _skills = std::make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _soundSets = std::make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
+    _spells = std::make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _surfaces = std::make_unique<Surfaces>(_resource.twoDas());
+    _visibilities = std::make_unique<Visibilities>(_resource.resources());
 
-    _services = make_unique<GameServices>(
+    _services = std::make_unique<GameServices>(
         *_cameraStyles,
         *_classes,
         *_cursors,

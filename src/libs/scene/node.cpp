@@ -17,8 +17,6 @@
 
 #include "reone/scene/node.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace scene {

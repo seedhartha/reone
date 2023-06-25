@@ -17,19 +17,17 @@
 
 #include "reone/resource/di/module.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 void ResourceModule::init() {
-    _resources = make_unique<Resources>();
-    _strings = make_unique<Strings>();
-    _twoDas = make_unique<TwoDas>(*_resources);
-    _gffs = make_unique<Gffs>(*_resources);
+    _resources = std::make_unique<Resources>();
+    _strings = std::make_unique<Strings>();
+    _twoDas = std::make_unique<TwoDas>(*_resources);
+    _gffs = std::make_unique<Gffs>(*_resources);
 
-    _services = make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
+    _services = std::make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
 
     _strings->init(_gamePath);
 }

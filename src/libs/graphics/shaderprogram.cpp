@@ -19,8 +19,6 @@
 
 #include "reone/graphics/types.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -42,7 +40,7 @@ void ShaderProgram::init() {
     GLsizei logSize;
     if (!success) {
         glGetProgramInfoLog(_nameGL, sizeof(log), &logSize, log);
-        throw runtime_error("Failed linking shader program: " + string(log, logSize));
+        throw std::runtime_error("Failed linking shader program: " + std::string(log, logSize));
     }
 
     _inited = true;
@@ -61,7 +59,7 @@ void ShaderProgram::use() {
     glUseProgram(_nameGL);
 }
 
-void ShaderProgram::bindUniformBlock(const string &name, int bindingPoint) {
+void ShaderProgram::bindUniformBlock(const std::string &name, int bindingPoint) {
     GLuint blockIdx = glGetUniformBlockIndex(_nameGL, name.c_str());
     if (blockIdx == GL_INVALID_INDEX) {
         return;
@@ -69,43 +67,43 @@ void ShaderProgram::bindUniformBlock(const string &name, int bindingPoint) {
     glUniformBlockBinding(_nameGL, blockIdx, bindingPoint);
 }
 
-void ShaderProgram::setUniform(const string &name, int value) {
+void ShaderProgram::setUniform(const std::string &name, int value) {
     setUniform(name, [this, &value](int loc) {
         glUniform1i(loc, value);
     });
 }
 
-void ShaderProgram::setUniform(const string &name, float value) {
+void ShaderProgram::setUniform(const std::string &name, float value) {
     setUniform(name, [this, &value](int loc) {
         glUniform1f(loc, value);
     });
 }
 
-void ShaderProgram::setUniform(const string &name, const glm::vec2 &v) {
+void ShaderProgram::setUniform(const std::string &name, const glm::vec2 &v) {
     setUniform(name, [this, &v](int loc) {
         glUniform2f(loc, v.x, v.y);
     });
 }
 
-void ShaderProgram::setUniform(const string &name, const glm::vec3 &v) {
+void ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
     setUniform(name, [this, &v](int loc) {
         glUniform3f(loc, v.x, v.y, v.z);
     });
 }
 
-void ShaderProgram::setUniform(const string &name, const glm::mat4 &m) {
+void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     setUniform(name, [this, &m](int loc) {
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
     });
 }
 
-void ShaderProgram::setUniform(const string &name, const vector<glm::mat4> &arr) {
+void ShaderProgram::setUniform(const std::string &name, const std::vector<glm::mat4> &arr) {
     setUniform(name, [this, &arr](int loc) {
         glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
     });
 }
 
-void ShaderProgram::setUniform(const string &name, const function<void(int)> &setter) {
+void ShaderProgram::setUniform(const std::string &name, const std::function<void(int)> &setter) {
     GLint location;
 
     auto maybeLocation = _uniformLocations.find(name);
@@ -113,7 +111,7 @@ void ShaderProgram::setUniform(const string &name, const function<void(int)> &se
         location = maybeLocation->second;
     } else {
         location = glGetUniformLocation(_nameGL, name.c_str());
-        _uniformLocations.insert(make_pair(name, location));
+        _uniformLocations.insert(std::make_pair(name, location));
     }
 
     if (location != -1) {

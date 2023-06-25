@@ -21,8 +21,6 @@
 
 #include "../../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(byte_array_output_stream)

@@ -19,21 +19,19 @@
 
 #include "reone/graphics/font.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
-vector<string> breakText(const string &text, Font &font, int maxWidth) {
-    vector<string> result;
-    string line;
-    ostringstream tokenBuffer;
+std::vector<std::string> breakText(const std::string &text, Font &font, int maxWidth) {
+    std::vector<std::string> result;
+    std::string line;
+    std::ostringstream tokenBuffer;
 
     for (char ch : text) {
         switch (ch) {
         case '\n': {
-            string token(tokenBuffer.str());
+            std::string token(tokenBuffer.str());
             if (!token.empty()) {
                 tokenBuffer.str("");
                 if (!line.empty()) {
@@ -48,11 +46,11 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
             break;
         }
         case ' ': {
-            string token(tokenBuffer.str());
+            std::string token(tokenBuffer.str());
             if (!token.empty()) {
                 tokenBuffer.str("");
 
-                string test(line);
+                std::string test(line);
                 if (!test.empty()) {
                     test += " ";
                 }
@@ -73,8 +71,8 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
         }
     }
 
-    string token(tokenBuffer.str());
-    string test(line);
+    std::string token(tokenBuffer.str());
+    std::string test(line);
     if (!token.empty()) {
         if (!test.empty()) {
             test += " ";

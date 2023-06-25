@@ -17,8 +17,6 @@
 
 #include "reone/graphics/context.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -29,7 +27,7 @@ void GraphicsContext::init() {
     }
     GLenum error = glewInit();
     if (error != GLEW_OK) {
-        throw runtime_error(str(boost::format("glewInit failed: %s") % glewGetErrorString(error)));
+        throw std::runtime_error(str(boost::format("glewInit failed: %s") % glewGetErrorString(error)));
     }
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
@@ -66,7 +64,7 @@ void GraphicsContext::clearColorDepth(glm::vec4 color) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block) {
+void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {
     if (_blendModes.top() == mode) {
         block();
         return;
@@ -81,7 +79,7 @@ void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block
     setBlendMode(_blendModes.top());
 }
 
-void GraphicsContext::withDepthTest(DepthTestMode mode, const function<void()> &block) {
+void GraphicsContext::withDepthTest(DepthTestMode mode, const std::function<void()> &block) {
     if (_depthTestModes.top() == mode) {
         block();
         return;
@@ -95,7 +93,7 @@ void GraphicsContext::withDepthTest(DepthTestMode mode, const function<void()> &
     setDepthTestMode(_depthTestModes.top());
 }
 
-void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> &block) {
+void GraphicsContext::withFaceCulling(CullFaceMode mode, const std::function<void()> &block) {
     if (_cullFaceModes.top() == mode) {
         block();
         return;
@@ -109,7 +107,7 @@ void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> 
     setCullFaceMode(_cullFaceModes.top());
 }
 
-void GraphicsContext::withPolygonMode(PolygonMode mode, const function<void()> &block) {
+void GraphicsContext::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {
     if (_polygonModes.top() == mode) {
         block();
         return;
@@ -123,7 +121,7 @@ void GraphicsContext::withPolygonMode(PolygonMode mode, const function<void()> &
     setPolygonMode(_polygonModes.top());
 }
 
-void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &block) {
+void GraphicsContext::withViewport(glm::ivec4 viewport, const std::function<void()> &block) {
     if (_viewports.top() == viewport) {
         block();
         return;
@@ -137,7 +135,7 @@ void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &
     setViewport(_viewports.top());
 }
 
-void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
     glClear(GL_COLOR_BUFFER_BIT);

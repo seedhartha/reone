@@ -17,12 +17,10 @@
 
 #include "reone/game/layouts.h"
 
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/bytearrayinput.h"
 
 #include "reone/game/format/lytreader.h"
-
-using namespace std;
 
 using namespace reone::resource;
 
@@ -30,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-shared_ptr<Layout> Layouts::doGet(string resRef) {
+std::shared_ptr<Layout> Layouts::doGet(std::string resRef) {
     auto data = _resources.get(resRef, ResourceType::Lyt);
     if (!data) {
         return nullptr;
@@ -38,7 +36,7 @@ shared_ptr<Layout> Layouts::doGet(string resRef) {
     auto stream = ByteArrayInputStream(*data);
     LytReader lyt;
     lyt.load(stream);
-    return make_shared<Layout>(lyt.layout());
+    return std::make_shared<Layout>(lyt.layout());
 }
 
 } // namespace game

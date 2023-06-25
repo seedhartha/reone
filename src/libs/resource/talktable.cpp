@@ -17,8 +17,6 @@
 
 #include "reone/resource/talktable.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -29,7 +27,7 @@ int TalkTable::getStringCount() const {
 
 const TalkTable::String &TalkTable::getString(int index) const {
     if (index < 0 || index >= static_cast<int>(_strings.size())) {
-        throw out_of_range("index is out of range");
+        throw std::out_of_range("index is out of range");
     }
     return _strings[index];
 }

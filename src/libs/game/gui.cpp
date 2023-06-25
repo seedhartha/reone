@@ -29,8 +29,6 @@
 #include "reone/system/exception/notfound.h"
 #include "reone/system/exception/validation.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::gui;
@@ -60,7 +58,7 @@ void GameGUI::init() {
     if (_resRef.empty()) {
         throw ValidationException("GUI resRef must not be empty");
     }
-    _gui = _services.gui.guis.get(_resRef, bind(&GameGUI::preload, this, std::placeholders::_1));
+    _gui = _services.gui.guis.get(_resRef, std::bind(&GameGUI::preload, this, std::placeholders::_1));
     if (!_gui) {
         throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
     }
@@ -100,7 +98,7 @@ void GameGUI::draw() {
 }
 
 void GameGUI::loadBackground(BackgroundType type) {
-    string resRef;
+    std::string resRef;
 
     if (_game.isTSL()) {
         switch (type) {
@@ -145,15 +143,15 @@ void GameGUI::loadBackground(BackgroundType type) {
     }
 }
 
-string GameGUI::guiResRef(const string &base) const {
+std::string GameGUI::guiResRef(const std::string &base) const {
     return _game.isTSL() ? base + "_p" : base;
 }
 
-void GameGUI::onClick(const string &control) {
+void GameGUI::onClick(const std::string &control) {
     _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
-void GameGUI::onFocusChanged(const string &control, bool focus) {
+void GameGUI::onFocusChanged(const std::string &control, bool focus) {
     if (focus) {
         _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }

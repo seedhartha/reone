@@ -17,14 +17,12 @@
 
 #include "reone/resource/format/keyreader.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 void KeyReader::onLoad() {
-    checkSignature(string("KEY V1  ", 8));
+    checkSignature(std::string("KEY V1  ", 8));
 
     _numBifs = readUint32();
     _numKeys = readUint32();

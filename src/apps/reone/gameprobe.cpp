@@ -19,8 +19,6 @@
 
 #include "reone/system/pathutil.h"
 
-using namespace std;
-
 using namespace reone::game;
 
 namespace reone {
@@ -38,7 +36,7 @@ GameID GameProbe::probe() {
         return GameID::TSL;
     }
 
-    throw logic_error("Unable to determine game ID: " + _gamePath.string());
+    throw std::logic_error("Unable to determine game ID: " + _gamePath.string());
 }
 
 } // namespace reone

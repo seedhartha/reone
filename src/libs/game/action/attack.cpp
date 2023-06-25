@@ -23,13 +23,11 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/object/factory.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void AttackAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void AttackAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     if (_object->isDead()) {
         complete();
         return;
@@ -39,7 +37,7 @@ void AttackAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {
-        _game.combat().addAttack(std::move(creatureActor), _object, static_pointer_cast<ObjectAction>(self));
+        _game.combat().addAttack(std::move(creatureActor), _object, std::static_pointer_cast<ObjectAction>(self));
     }
 }
 

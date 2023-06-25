@@ -21,8 +21,6 @@
 #include "reone/resource/typeutil.h"
 #include "reone/system/stream/fileinput.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -51,7 +49,7 @@ void RimTool::invoke(Operation operation, const boost::filesystem::path &input, 
 
 void RimTool::list(const RimReader &rim) {
     for (auto &res : rim.resources()) {
-        cout << res.resId.string() << endl;
+        std::cout << res.resId.string() << std::endl;
     }
 }
 
@@ -77,7 +75,7 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
         auto &ext = getExtByResType(rimResource.resId.type);
         resPath.append(rimResource.resId.resRef + "." + ext);
 
-        auto res = boost::filesystem::ofstream(resPath, ios::binary);
+        auto res = boost::filesystem::ofstream(resPath, std::ios::binary);
         res.write(&buffer[0], buffer.size());
     }
 }
@@ -90,15 +88,15 @@ void RimTool::toRIM(const boost::filesystem::path &target) {
         if (boost::filesystem::is_directory(path))
             continue;
 
-        string ext(path.extension().string());
+        std::string ext(path.extension().string());
         ext.erase(0, 1);
 
         ResourceType resType = getResTypeByExt(ext, false);
         if (resType == ResourceType::Invalid)
             continue;
 
-        boost::filesystem::ifstream in(path, ios::binary);
-        in.seekg(0, ios::end);
+        boost::filesystem::ifstream in(path, std::ios::binary);
+        in.seekg(0, std::ios::end);
         size_t size = in.tellg();
         ByteArray data(size, '\0');
         in.seekg(0);

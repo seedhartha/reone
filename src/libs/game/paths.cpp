@@ -19,15 +19,13 @@
 
 #include "reone/resource/gffs.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-shared_ptr<Path> Paths::doGet(string resRef) {
+std::shared_ptr<Path> Paths::doGet(std::string resRef) {
     auto pth = _gffs.get(resRef, ResourceType::Pth);
     if (!pth) {
         return nullptr;
@@ -35,10 +33,10 @@ shared_ptr<Path> Paths::doGet(string resRef) {
     return loadPath(*pth);
 }
 
-unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
-    auto path = make_unique<Path>();
+std::unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
+    auto path = std::make_unique<Path>();
 
-    vector<int> connections;
+    std::vector<int> connections;
     for (auto &connection : pth.getList("Path_Conections")) {
         int destination = connection->getInt("Destination");
         connections.push_back(destination);

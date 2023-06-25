@@ -17,20 +17,18 @@
 
 #include "reone/game/action/opencontainer.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/object/placeable.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void OpenContainerAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void OpenContainerAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
-    auto placeable = static_pointer_cast<Placeable>(_object);
+    auto placeable = std::static_pointer_cast<Placeable>(_object);
     bool reached = creatureActor->navigateTo(placeable->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
         _game.openContainer(placeable);

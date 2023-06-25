@@ -35,8 +35,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -47,7 +45,7 @@ namespace reone {
 namespace game {
 
 void Door::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
@@ -58,14 +56,14 @@ void Door::loadFromGIT(const Gff &gffs) {
     loadTransformFromGIT(gffs);
 }
 
-void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
+void Door::loadFromBlueprint(const std::string &resRef) {
+    std::shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
     if (!utd) {
         return;
     }
     loadUTD(*utd);
-    shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
-    string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
+    std::shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
+    std::string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = _services.graphics.models.get(modelName);
     if (!model) {
@@ -114,8 +112,8 @@ bool Door::isSelectable() const {
     return !_static && !_open;
 }
 
-void Door::open(const shared_ptr<Object> &triggerrer) {
-    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+void Door::open(const std::shared_ptr<Object> &triggerrer) {
+    auto model = std::static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
         // model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("opening1");
@@ -132,8 +130,8 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
     _open = true;
 }
 
-void Door::close(const shared_ptr<Object> &triggerrer) {
-    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+void Door::close(const std::shared_ptr<Object> &triggerrer) {
+    auto model = std::static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
         // model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("closing1");

@@ -24,8 +24,6 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -64,7 +62,7 @@ void NameEntry::bindControls() {
     _binding.nameBoxEdit = getControl<Control>("NAME_BOX_EDIT");
 }
 
-void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
+void NameEntry::loadLtrFile(const std::string &resRef, LtrReader &ltr) {
     auto data = _services.resource.resources.get(resRef, ResourceType::Ltr);
     auto stream = ByteArrayInputStream(*data);
     ltr.load(stream);
@@ -82,7 +80,7 @@ void NameEntry::loadRandomName() {
     _binding.nameBoxEdit->setTextMessage(getRandomName());
 }
 
-string NameEntry::getRandomName() const {
+std::string NameEntry::getRandomName() const {
     Gender gender = _charGen.character().gender;
     const LtrReader &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
     return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);

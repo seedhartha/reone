@@ -17,11 +17,9 @@
 
 #include "reone/tools/keybif.h"
 
+#include "reone/resource/typeutil.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
-#include "reone/resource/typeutil.h"
-
-using namespace std;
 
 using namespace reone::resource;
 
@@ -65,14 +63,14 @@ void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &inpu
 
 void KeyBifTool::listKEY(const KeyReader &key) {
     for (auto &file : key.files()) {
-        cout << file.filename << " " << file.fileSize << endl;
+        std::cout << file.filename << " " << file.fileSize << std::endl;
     }
 }
 
 void KeyBifTool::listBIF(const KeyReader &key, int bifIdx) {
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx == bifIdx) {
-            cout << keyEntry.resId.string() << endl;
+            std::cout << keyEntry.resId.string() << std::endl;
         }
     }
 }
@@ -108,7 +106,7 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::files
         auto &ext = getExtByResType(keyEntry.resId.type);
         resPath.append(keyEntry.resId.resRef + "." + ext);
 
-        auto out = boost::filesystem::ofstream(resPath, ios::binary);
+        auto out = boost::filesystem::ofstream(resPath, std::ios::binary);
         out.write(&buffer[0], buffer.size());
     }
 }

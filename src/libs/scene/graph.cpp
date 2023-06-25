@@ -39,8 +39,6 @@
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -70,11 +68,11 @@ void SceneGraph::clear() {
     _activeLights.clear();
 }
 
-void SceneGraph::addRoot(shared_ptr<ModelSceneNode> node) {
+void SceneGraph::addRoot(std::shared_ptr<ModelSceneNode> node) {
     _modelRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
+void SceneGraph::addRoot(std::shared_ptr<WalkmeshSceneNode> node) {
     if (node->walkmesh().isAreaWalkmesh()) {
         _walkmeshRoots.push_back(node);
     } else {
@@ -82,15 +80,15 @@ void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
     }
 }
 
-void SceneGraph::addRoot(shared_ptr<TriggerSceneNode> node) {
+void SceneGraph::addRoot(std::shared_ptr<TriggerSceneNode> node) {
     _triggerRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(shared_ptr<GrassSceneNode> node) {
+void SceneGraph::addRoot(std::shared_ptr<GrassSceneNode> node) {
     _grassRoots.push_back(node);
 }
 
-void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
+void SceneGraph::addRoot(std::shared_ptr<SoundSceneNode> node) {
     _soundRoots.push_back(node);
 }
 
@@ -184,7 +182,7 @@ void SceneGraph::updateLighting() {
         float radius2 = light.radius() * light.radius();
         return distance2 < radius2 * radius2 + kLightRadiusBias2;
     });
-    set<LightSceneNode *> lookup;
+    std::set<LightSceneNode *> lookup;
     for (auto &light : closestLights) {
         lookup.insert(light);
     }
@@ -253,7 +251,7 @@ void SceneGraph::updateFlareLights() {
 }
 
 void SceneGraph::updateSounds() {
-    vector<pair<SoundSceneNode *, float>> distances;
+    std::vector<std::pair<SoundSceneNode *, float>> distances;
     glm::vec3 cameraPos(_activeCamera->localTransform()[3]);
 
     // For each sound, calculate its distance to the camera
@@ -267,7 +265,7 @@ void SceneGraph::updateSounds() {
         if (dist2 > maxDist2) {
             continue;
         }
-        distances.push_back(make_pair(root.get(), dist2));
+        distances.push_back(std::make_pair(root.get(), dist2));
     }
 
     // Take up to N most closest sounds to the camera
@@ -352,7 +350,7 @@ void SceneGraph::refreshFromNode(SceneNode &node) {
 void SceneGraph::prepareOpaqueLeafs() {
     _opaqueLeafs.clear();
 
-    vector<SceneNode *> bucket;
+    std::vector<SceneNode *> bucket;
     auto camera = _activeCamera->camera();
 
     // Group grass clusters into buckets without sorting
@@ -369,13 +367,13 @@ void SceneGraph::prepareOpaqueLeafs() {
                 continue;
             }
             if (bucket.size() >= kMaxGrassClusters) {
-                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+                _opaqueLeafs.push_back(std::make_pair(grass.get(), bucket));
                 bucket.clear();
             }
             bucket.push_back(cluster);
         }
         if (!bucket.empty()) {
-            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+            _opaqueLeafs.push_back(std::make_pair(grass.get(), bucket));
             bucket.clear();
         }
     }
@@ -387,7 +385,7 @@ void SceneGraph::prepareTransparentLeafs() {
     auto camera = _activeCamera->camera();
 
     // Add meshes and emitters to transparent leafs
-    vector<SceneNode *> leafs;
+    std::vector<SceneNode *> leafs;
     for (auto &mesh : _transparentMeshes) {
         leafs.push_back(mesh);
     }
@@ -406,7 +404,7 @@ void SceneGraph::prepareTransparentLeafs() {
 
     // Group transparent leafs into buckets
     SceneNode *bucketParent = nullptr;
-    vector<SceneNode *> bucket;
+    std::vector<SceneNode *> bucket;
     for (auto leaf : leafs) {
         SceneNode *parent = leaf->parent();
         if (leaf->type() == SceneNodeType::Mesh) {
@@ -420,7 +418,7 @@ void SceneGraph::prepareTransparentLeafs() {
                 maxCount = kMaxGrassClusters;
             }
             if (bucketParent != parent || bucket.size() >= maxCount) {
-                _transparentLeafs.push_back(make_pair(bucketParent, bucket));
+                _transparentLeafs.push_back(std::make_pair(bucketParent, bucket));
                 bucket.clear();
             }
         }
@@ -428,7 +426,7 @@ void SceneGraph::prepareTransparentLeafs() {
         bucket.push_back(leaf);
     }
     if (bucketParent && !bucket.empty()) {
-        _transparentLeafs.push_back(make_pair(bucketParent, bucket));
+        _transparentLeafs.push_back(std::make_pair(bucketParent, bucket));
     }
 }
 
@@ -510,15 +508,15 @@ void SceneGraph::drawLensFlares() {
     });
 }
 
-vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &, float)> &pred) const {
+std::vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const {
     // Compute distance from each light to the camera
-    vector<pair<LightSceneNode *, float>> distances;
+    std::vector<std::pair<LightSceneNode *, float>> distances;
     for (auto &light : _lights) {
         float distance2 = light->getSquareDistanceTo(*_activeCamera);
         if (!pred(*light, distance2)) {
             continue;
         }
-        distances.push_back(make_pair(light, distance2));
+        distances.push_back(std::make_pair(light, distance2));
     }
 
     // Sort lights by distance to the camera. Directional lights are prioritizied
@@ -541,7 +539,7 @@ vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const funct
         distances.erase(distances.begin() + count, distances.end());
     }
 
-    vector<LightSceneNode *> lights;
+    std::vector<LightSceneNode *> lights;
     for (auto &light : distances) {
         lights.push_back(light.first);
     }
@@ -586,7 +584,7 @@ bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest,
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
     float maxDistance = glm::length(originToDest);
-    float minDistance = numeric_limits<float>::max();
+    float minDistance = std::numeric_limits<float>::max();
 
     for (auto &root : _walkmeshRoots) {
         if (!root->isEnabled()) {
@@ -612,14 +610,14 @@ bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest,
         minDistance = distance;
     }
 
-    return minDistance != numeric_limits<float>::max();
+    return minDistance != std::numeric_limits<float>::max();
 }
 
 bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const {
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
     float maxDistance = glm::length(originToDest);
-    float minDistance = numeric_limits<float>::max();
+    float minDistance = std::numeric_limits<float>::max();
 
     for (auto &root : _walkmeshRoots) {
         if (!root->isEnabled() || root->user() == excludeUser) {
@@ -645,7 +643,7 @@ bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const 
         minDistance = distance;
     }
 
-    return minDistance != numeric_limits<float>::max();
+    return minDistance != std::numeric_limits<float>::max();
 }
 
 ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
@@ -659,7 +657,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
     glm::vec3 end(glm::unProject(glm::vec3(x, _graphicsOpt.height - y, 1.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 dir(glm::normalize(end - start));
 
-    vector<pair<ModelSceneNode *, float>> distances;
+    std::vector<std::pair<ModelSceneNode *, float>> distances;
     for (auto &model : _modelRoots) {
         if (!model->isPickable() || model->user() == except) {
             continue;
@@ -675,7 +673,7 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
             if (testLineOfSight(start, start + distance * dir, collision) && collision.user != model->user()) {
                 continue;
             }
-            distances.push_back(make_pair(model.get(), distance));
+            distances.push_back(std::make_pair(model.get(), distance));
         }
     }
     if (distances.empty()) {
@@ -701,51 +699,51 @@ void SceneGraph::fillLightingUniforms() {
     });
 }
 
-shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
+std::shared_ptr<CameraSceneNode> SceneGraph::newCamera() {
     return newSceneNode<CameraSceneNode>();
 }
 
-shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
+std::shared_ptr<DummySceneNode> SceneGraph::newDummy(ModelNode &modelNode) {
     return newSceneNode<DummySceneNode, ModelNode &>(modelNode);
 }
 
-shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
+std::shared_ptr<ModelSceneNode> SceneGraph::newModel(Model &model, ModelUsage usage) {
     return newSceneNode<ModelSceneNode, Model &, ModelUsage>(model, usage);
 }
 
-shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
+std::shared_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(Walkmesh &walkmesh) {
     return newSceneNode<WalkmeshSceneNode, Walkmesh &>(walkmesh);
 }
 
-shared_ptr<SoundSceneNode> SceneGraph::newSound() {
+std::shared_ptr<SoundSceneNode> SceneGraph::newSound() {
     return newSceneNode<SoundSceneNode>();
 }
 
-shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, ModelNode &modelNode) {
+std::shared_ptr<MeshSceneNode> SceneGraph::newMesh(ModelSceneNode &model, ModelNode &modelNode) {
     return newSceneNode<MeshSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
 }
 
-shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode &modelNode) {
+std::shared_ptr<LightSceneNode> SceneGraph::newLight(ModelSceneNode &model, ModelNode &modelNode) {
     return newSceneNode<LightSceneNode, ModelSceneNode &, ModelNode &>(model, modelNode);
 }
 
-shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    return newSceneNode<TriggerSceneNode, vector<glm::vec3>>(std::move(geometry));
+std::shared_ptr<TriggerSceneNode> SceneGraph::newTrigger(std::vector<glm::vec3> geometry) {
+    return newSceneNode<TriggerSceneNode, std::vector<glm::vec3>>(std::move(geometry));
 }
 
-shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
+std::shared_ptr<EmitterSceneNode> SceneGraph::newEmitter(ModelNode &modelNode) {
     return newSceneNode<EmitterSceneNode, ModelNode &>(modelNode);
 }
 
-shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
+std::shared_ptr<ParticleSceneNode> SceneGraph::newParticle(EmitterSceneNode &emitter) {
     return newSceneNode<ParticleSceneNode, EmitterSceneNode &>(emitter);
 }
 
-shared_ptr<GrassSceneNode> SceneGraph::newGrass(GrassProperties properties, ModelNode &aabbNode) {
+std::shared_ptr<GrassSceneNode> SceneGraph::newGrass(GrassProperties properties, ModelNode &aabbNode) {
     return newSceneNode<GrassSceneNode, GrassProperties, ModelNode &>(properties, aabbNode);
 }
 
-shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {
+std::shared_ptr<GrassClusterSceneNode> SceneGraph::newGrassCluster(GrassSceneNode &grass) {
     return newSceneNode<GrassClusterSceneNode>();
 }
 

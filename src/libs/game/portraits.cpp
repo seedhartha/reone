@@ -23,8 +23,6 @@
 
 #include "reone/game/portrait.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -33,13 +31,13 @@ namespace reone {
 namespace game {
 
 void Portraits::init() {
-    shared_ptr<TwoDa> portraits(_twoDas.get("portraits"));
+    std::shared_ptr<TwoDa> portraits(_twoDas.get("portraits"));
     if (!portraits) {
         return;
     }
 
     for (int row = 0; row < portraits->getRowCount(); ++row) {
-        string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
+        std::string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
 
         Portrait portrait;
         portrait.resRef = resRef;
@@ -53,15 +51,15 @@ void Portraits::init() {
     }
 }
 
-shared_ptr<Texture> Portraits::getTextureByIndex(int index) const {
-    shared_ptr<Texture> result;
+std::shared_ptr<Texture> Portraits::getTextureByIndex(int index) const {
+    std::shared_ptr<Texture> result;
     if (index >= 0 && index < static_cast<int>(_portraits.size())) {
         result = getPortraitTexture(_portraits[index]);
     }
     return std::move(result);
 }
 
-shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {
+std::shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {
     for (auto &portrait : _portraits) {
         if (portrait.appearanceNumber == appearance ||
             portrait.appearanceS == appearance ||
@@ -71,7 +69,7 @@ shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {
     return nullptr;
 }
 
-shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
+std::shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
     return _textures.get(portrait.resRef, TextureUsage::GUI);
 }
 

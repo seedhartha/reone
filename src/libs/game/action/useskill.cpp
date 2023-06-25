@@ -19,27 +19,25 @@
 
 #include "reone/system/logutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void UseSkillAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void UseSkillAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     if (_skill == SkillType::Security) {
         if (!_object || _object->type() != ObjectType::Door) {
-            warn("ActionExecutor: unsupported OpenLock object: " + to_string(_object->id()));
+            warn("ActionExecutor: unsupported OpenLock object: " + std::to_string(_object->id()));
             complete();
             return;
         }
 
-        auto door = static_pointer_cast<Door>(_object);
+        auto door = std::static_pointer_cast<Door>(_object);
         auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
         bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
@@ -51,7 +49,7 @@ void UseSkillAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
                 door->setLocked(false);
                 door->open(creatureActor);
 
-                string onOpen(door->getOnOpen());
+                std::string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
                     _game.scriptRunner().run(onOpen, door->id(), actor.id());
                 }

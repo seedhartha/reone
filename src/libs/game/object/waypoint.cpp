@@ -17,15 +17,13 @@
 
 #include "reone/game/object/waypoint.h"
 
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
 
-#include "reone/game/game.h"
 #include "reone/game/di/services.h"
-
-using namespace std;
+#include "reone/game/game.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -36,7 +34,7 @@ namespace reone {
 namespace game {
 
 void Waypoint::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
     _tag = gffs.getString("Tag");
@@ -48,8 +46,8 @@ void Waypoint::loadFromGIT(const Gff &gffs) {
     loadTransformFromGIT(gffs);
 }
 
-void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
+void Waypoint::loadFromBlueprint(const std::string &resRef) {
+    std::shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }

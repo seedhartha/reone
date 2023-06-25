@@ -17,10 +17,8 @@
 
 #include "reone/scene/node/sound.h"
 
-#include "reone/audio/player.h"
 #include "reone/audio/di/services.h"
-
-using namespace std;
+#include "reone/audio/player.h"
 
 using namespace reone::audio;
 
@@ -35,7 +33,7 @@ void SoundSceneNode::update(float dt) {
     }
 }
 
-void SoundSceneNode::playSound(const string &resRef, float gain, bool positional, bool loop) {
+void SoundSceneNode::playSound(const std::string &resRef, float gain, bool positional, bool loop) {
     _source = _audioSvc.player.play(resRef, AudioType::Sound, loop, gain, positional, getOrigin());
 }
 

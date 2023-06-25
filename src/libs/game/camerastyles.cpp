@@ -20,8 +20,6 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -29,12 +27,12 @@ namespace reone {
 namespace game {
 
 void CameraStyles::init() {
-    shared_ptr<TwoDa> twoDa(_twoDas.get("camerastyle"));
+    std::shared_ptr<TwoDa> twoDa(_twoDas.get("camerastyle"));
     if (!twoDa) {
         return;
     }
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
-        auto style = make_shared<CameraStyle>();
+        auto style = std::make_shared<CameraStyle>();
         style->name = twoDa->getString(row, "name");
         style->distance = twoDa->getFloat(row, "distance");
         style->pitch = twoDa->getFloat(row, "pitch");
@@ -44,11 +42,11 @@ void CameraStyles::init() {
     }
 }
 
-shared_ptr<CameraStyle> CameraStyles::get(int index) const {
+std::shared_ptr<CameraStyle> CameraStyles::get(int index) const {
     return _styles[index];
 }
 
-shared_ptr<CameraStyle> CameraStyles::get(const string &name) const {
+std::shared_ptr<CameraStyle> CameraStyles::get(const std::string &name) const {
     for (auto &style : _styles) {
         if (style->name == name) {
             return style;

@@ -21,10 +21,7 @@
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stringbuilder.h"
 
-
 #include "../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 
@@ -57,13 +54,13 @@ BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
     writer.putInt32(-4);
     writer.putInt64(-5);
     writer.putFloat(1.0f);
-    writer.putString(string("Aa"));
-    writer.putStringExact(string("Bb"), 2);
-    writer.putCString(string("Cc\x00"));
+    writer.putString(std::string("Aa"));
+    writer.putStringExact(std::string("Bb"), 2);
+    writer.putCString(std::string("Cc\x00"));
     writer.putBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
 
     // then
-    auto output = string(bytes.data(), bytes.size());
+    auto output = std::string(bytes.data(), bytes.size());
     BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
 }
 
@@ -94,7 +91,7 @@ BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
     writer.putFloat(1.0f);
 
     // then
-    auto output = string(bytes.data(), bytes.size());
+    auto output = std::string(bytes.data(), bytes.size());
     BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
 }
 

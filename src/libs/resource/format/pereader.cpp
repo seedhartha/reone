@@ -19,8 +19,6 @@
 
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -29,7 +27,7 @@ static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
 void PeReader::onLoad() {
-    checkSignature(string("MZ", 2));
+    checkSignature(std::string("MZ", 2));
     ignore(58);
 
     uint32_t offPeHeader = readUint32();
@@ -51,13 +49,13 @@ void PeReader::onLoad() {
     }
 }
 
-shared_ptr<ByteArray> PeReader::find(uint32_t name, PEResourceType type) {
+std::shared_ptr<ByteArray> PeReader::find(uint32_t name, PEResourceType type) {
     return findInternal([&name, &type](const Resource &res) {
         return res.type == type && res.name == name;
     });
 }
 
-shared_ptr<ByteArray> PeReader::findInternal(function<bool(const Resource &)> pred) {
+std::shared_ptr<ByteArray> PeReader::findInternal(std::function<bool(const Resource &)> pred) {
     auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
     if (maybeResource == _resources.end())
         return nullptr;
@@ -65,8 +63,8 @@ shared_ptr<ByteArray> PeReader::findInternal(function<bool(const Resource &)> pr
     return getResourceData(*maybeResource);
 }
 
-shared_ptr<ByteArray> PeReader::getResourceData(const Resource &res) {
-    return make_shared<ByteArray>(readBytes(res.offset, res.size));
+std::shared_ptr<ByteArray> PeReader::getResourceData(const Resource &res) {
+    return std::make_shared<ByteArray>(readBytes(res.offset, res.size));
 }
 
 void PeReader::loadHeader() {
@@ -87,7 +85,7 @@ void PeReader::loadOptionalHeader() {
 }
 
 void PeReader::loadSection() {
-    string name(readCString(8));
+    std::string name(readCString(8));
 
     ignore(4);
 

@@ -17,15 +17,13 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/2da.h"
+#include "reone/resource/format/2dawriter.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/resource/2da.h"
-#include "reone/resource/format/2dawriter.h"
 
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -54,7 +52,7 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
 
     auto twoDa = TwoDa(
         {"key", "value"},
-        vector<TwoDa::Row> {
+        std::vector<TwoDa::Row> {
             TwoDa::newRow({"unique", "same"}),
             TwoDa::newRow({"same", "same"})});
 
@@ -68,7 +66,7 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
 
     // then
 
-    auto actualOutput = string(&bytes[0], bytes.size());
+    auto actualOutput = std::string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

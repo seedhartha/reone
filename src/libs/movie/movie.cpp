@@ -17,18 +17,16 @@
 
 #include "reone/movie/movie.h"
 
-#include "reone/audio/player.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
-
-using namespace std;
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -41,7 +39,7 @@ void Movie::init() {
     if (!_texture && _videoStream) {
         _width = _videoStream->width();
         _height = _videoStream->height();
-        _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Movie));
+        _texture = std::make_shared<Texture>("video", getTextureProperties(TextureUsage::Movie));
         _texture->clear(1, 1, PixelFormat::RGB8, 1);
         _texture->init();
     }

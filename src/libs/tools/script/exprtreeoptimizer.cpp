@@ -19,14 +19,12 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 void ExpressionTreeOptimizer::optimize(ExpressionTree &tree) {
-    auto ctx = make_unique<OptimizationContext>();
+    auto ctx = std::make_unique<OptimizationContext>();
     analyze(tree, *ctx);
     compact(tree, *ctx);
 }
@@ -38,9 +36,9 @@ void ExpressionTreeOptimizer::analyze(ExpressionTree &tree, OptimizationContext 
 }
 
 void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContext &ctx) {
-    auto exprToAnalyze = stack<tuple<Expression *, Expression *, int>>();
-    exprToAnalyze.push(make_tuple(func.block, nullptr, -1));
-    auto analyzedBlocks = set<BlockExpression *>();
+    auto exprToAnalyze = std::stack<std::tuple<Expression *, Expression *, int>>();
+    exprToAnalyze.push(std::make_tuple(func.block, nullptr, -1));
+    auto analyzedBlocks = std::set<BlockExpression *>();
 
     while (!exprToAnalyze.empty()) {
         auto [expr, container, binaryDir] = exprToAnalyze.top();
@@ -50,7 +48,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
             auto blockExpr = static_cast<BlockExpression *>(expr);
             if (analyzedBlocks.count(blockExpr) == 0) {
                 for (auto it = blockExpr->expressions.rbegin(); it != blockExpr->expressions.rend(); ++it) {
-                    exprToAnalyze.push(make_tuple(*it, blockExpr, binaryDir));
+                    exprToAnalyze.push(std::make_tuple(*it, blockExpr, binaryDir));
                 }
                 analyzedBlocks.insert(blockExpr);
                 ctx.blocksToCompact.push(blockExpr);
@@ -71,9 +69,9 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
             }
         } else if (expr->type == ExpressionType::Conditional) {
             auto conditionalExpr = static_cast<ConditionalExpression *>(expr);
-            exprToAnalyze.push(make_tuple(conditionalExpr->test, conditionalExpr, binaryDir));
+            exprToAnalyze.push(std::make_tuple(conditionalExpr->test, conditionalExpr, binaryDir));
             if (conditionalExpr->ifTrue) {
-                exprToAnalyze.push(make_tuple(conditionalExpr->ifTrue, conditionalExpr, binaryDir));
+                exprToAnalyze.push(std::make_tuple(conditionalExpr->ifTrue, conditionalExpr, binaryDir));
             }
         } else if (expr->type == ExpressionType::Action) {
             auto actionExpr = static_cast<ActionExpression *>(expr);
@@ -86,7 +84,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                     ctx.parameters[paramArg].reads.push_back(std::move(read));
                 } else if (arg->type == ExpressionType::Block) {
                     auto blockArg = static_cast<BlockExpression *>(arg);
-                    exprToAnalyze.push(make_tuple(blockArg, actionExpr, binaryDir));
+                    exprToAnalyze.push(std::make_tuple(blockArg, actionExpr, binaryDir));
                 }
             }
         } else if (expr->type == ExpressionType::Call) {
@@ -130,9 +128,9 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                 auto leftParam = static_cast<ParameterExpression *>(binaryExpr->left);
                 ctx.parameters[leftParam].writes.push_back(ParameterWriteEvent(binaryExpr, binaryExpr->right));
             } else {
-                exprToAnalyze.push(make_tuple(binaryExpr->left, binaryExpr, -1));
+                exprToAnalyze.push(std::make_tuple(binaryExpr->left, binaryExpr, -1));
             }
-            exprToAnalyze.push(make_tuple(binaryExpr->right, binaryExpr, 1));
+            exprToAnalyze.push(std::make_tuple(binaryExpr->right, binaryExpr, 1));
         }
     }
 }
@@ -257,7 +255,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                     auto destination = ctx.callDestinations.at(callExpr);
                     ctx.callDestinations.erase(callExpr);
                     debug(boost::format("Return value stored to variable at %08x in function call at %08x") % destination->offset % callExpr->offset);
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = callExpr->offset;
                     assignExpr->left = destination;
                     assignExpr->right = callExpr;

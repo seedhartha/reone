@@ -25,8 +25,6 @@
 
 #include "engine.h"
 
-using namespace std;
-
 using namespace reone;
 
 int main(int argc, char **argv) {
@@ -40,9 +38,9 @@ int main(int argc, char **argv) {
     try {
         engine.init();
         return engine.run();
-    } catch (const exception &ex) {
+    } catch (const std::exception &ex) {
         try {
-            error("Program terminated exceptionally: " + string(ex.what()));
+            error("Program terminated exceptionally: " + std::string(ex.what()));
         } catch (...) {
         }
         return 1;

@@ -17,13 +17,11 @@
 
 #include "reone/game/action/surrendertoenemies.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void SurrenderToEnemiesAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void SurrenderToEnemiesAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

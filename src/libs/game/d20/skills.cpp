@@ -23,8 +23,6 @@
 #include "reone/resource/strings.h"
 #include "reone/system/collectionutil.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -33,25 +31,25 @@ namespace reone {
 namespace game {
 
 void Skills::init() {
-    shared_ptr<TwoDa> skills(_twoDas.get("skills"));
+    std::shared_ptr<TwoDa> skills(_twoDas.get("skills"));
     if (!skills) {
         return;
     }
 
     for (int row = 0; row < skills->getRowCount(); ++row) {
-        string name(_strings.get(skills->getInt(row, "name", -1)));
-        string description(_strings.get(skills->getInt(row, "description", -1)));
-        shared_ptr<Texture> icon(_textures.get(skills->getString(row, "icon"), TextureUsage::GUI));
+        std::string name(_strings.get(skills->getInt(row, "name", -1)));
+        std::string description(_strings.get(skills->getInt(row, "description", -1)));
+        std::shared_ptr<Texture> icon(_textures.get(skills->getString(row, "icon"), TextureUsage::GUI));
 
-        auto skill = make_shared<Skill>();
+        auto skill = std::make_shared<Skill>();
         skill->name = std::move(name);
         skill->description = std::move(description);
         skill->icon = std::move(icon);
-        _skills.insert(make_pair(static_cast<SkillType>(row), std::move(skill)));
+        _skills.insert(std::make_pair(static_cast<SkillType>(row), std::move(skill)));
     }
 }
 
-shared_ptr<Skill> Skills::get(SkillType type) const {
+std::shared_ptr<Skill> Skills::get(SkillType type) const {
     return getFromLookupOrNull(_skills, type);
 }
 

@@ -17,13 +17,11 @@
 
 #include "reone/game/action/unlockobject.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void UnlockObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void UnlockObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

@@ -25,8 +25,6 @@
 
 #include "../../fixtures/audio.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::audio;
 
@@ -149,7 +147,7 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
                         .build();
     auto wav = ByteArrayInputStream(wavBytes);
 
-    auto mp3Reader = make_shared<MockMp3Reader>();
+    auto mp3Reader = std::make_shared<MockMp3Reader>();
     EXPECT_CALL(*mp3Reader, load(_)).Times(1);
 
     auto mp3ReaderFactory = MockMp3ReaderFactory();

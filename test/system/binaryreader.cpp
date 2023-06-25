@@ -23,8 +23,6 @@
 
 #include "../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(binary_reader)
@@ -75,8 +73,8 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     auto expectedInt64 = -253;
     auto expectedFloat = 1.0f;
     auto expectedDouble = 1.0;
-    auto expectedStr = string("Hello, world!");
-    auto expectedCStr = string("Hello, world!");
+    auto expectedStr = std::string("Hello, world!");
+    auto expectedCStr = std::string("Hello, world!");
     auto expectedBytes = ByteArray({0x01, 0x02, 0x03, 0x04});
 
     // when

@@ -19,8 +19,6 @@
 
 #include "reone/script/instrutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
@@ -34,7 +32,7 @@ void ScriptProgram::add(Instruction instr) {
         instr.nextOffset = instr.offset + size;
     }
     _length += size;
-    _insIdxByOffset.insert(make_pair(instr.offset, static_cast<int>(_instructions.size())));
+    _insIdxByOffset.insert(std::make_pair(instr.offset, static_cast<int>(_instructions.size())));
     _instructions.push_back(std::move(instr));
 }
 
@@ -89,7 +87,7 @@ Instruction Instruction::newCONSTF(float value) {
     return std::move(val);
 }
 
-Instruction Instruction::newCONSTS(string value) {
+Instruction Instruction::newCONSTS(std::string value) {
     Instruction val;
     val.type = InstructionType::CONSTS;
     val.strValue = std::move(value);

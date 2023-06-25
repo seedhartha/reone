@@ -24,18 +24,16 @@
 #include "reone/audio/format/wavreader.h"
 #include "reone/audio/stream.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace audio {
 
-shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
-    shared_ptr<AudioStream> result;
+std::shared_ptr<AudioStream> AudioFiles::doGet(std::string resRef) {
+    std::shared_ptr<AudioStream> result;
 
-    shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
+    std::shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
         auto mp3 = ByteArrayInputStream(*mp3Data);
         auto reader = Mp3Reader();
@@ -43,7 +41,7 @@ shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
         result = reader.stream();
     }
     if (!result) {
-        shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
+        std::shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
         if (wavData) {
             auto wav = ByteArrayInputStream(*wavData);
             auto mp3ReaderFactory = Mp3ReaderFactory();

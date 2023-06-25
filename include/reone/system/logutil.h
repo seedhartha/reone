@@ -38,6 +38,6 @@ bool isLogChannelEnabled(int channel);
 void setLogLevel(LogLevel level);
 void setLogChannels(int mask);
 void setLogToFile(bool log);
-void setLogFilename(boost::filesystem::path filename);
+void setLogFilename(std::string filename);
 
 } // namespace reone

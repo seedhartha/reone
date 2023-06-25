@@ -35,8 +35,6 @@
 
 #include "reone/game/object/factory.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -45,7 +43,7 @@ namespace reone {
 
 namespace game {
 
-void Module::load(string name, const Gff &ifo, bool fromSave) {
+void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     _name = std::move(name);
 
     loadInfo(ifo);
@@ -82,12 +80,12 @@ void Module::loadArea(const Gff &ifo, bool fromSave) {
 
     _area = _game.objectFactory().newArea();
 
-    shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
+    std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
         throw ValidationException("Area ARE file not found");
     }
 
-    shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
+    std::shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
     if (!git) {
         throw ValidationException("Area GIT file not found");
     }
@@ -96,10 +94,10 @@ void Module::loadArea(const Gff &ifo, bool fromSave) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _game.party());
+    _player = std::make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _game.party());
 }
 
-void Module::loadParty(const string &entry, bool fromSave) {
+void Module::loadParty(const std::string &entry, bool fromSave) {
     glm::vec3 position(0.0f);
     float facing = 0.0f;
     getEntryPoint(entry, position, facing);
@@ -113,12 +111,12 @@ void Module::loadParty(const string &entry, bool fromSave) {
     }
 }
 
-void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &facing) const {
+void Module::getEntryPoint(const std::string &waypoint, glm::vec3 &position, float &facing) const {
     position = _info.entryPosition;
     facing = _info.entryFacing;
 
     if (!waypoint.empty()) {
-        shared_ptr<Object> object(_area->getObjectByTag(waypoint));
+        std::shared_ptr<Object> object(_area->getObjectByTag(waypoint));
         if (object) {
             position = object->position();
             facing = object->getFacing();
@@ -208,26 +206,26 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     return true;
 }
 
-void Module::onObjectClick(const shared_ptr<Object> &object) {
+void Module::onObjectClick(const std::shared_ptr<Object> &object) {
     switch (object->type()) {
     case ObjectType::Creature:
-        onCreatureClick(static_pointer_cast<Creature>(object));
+        onCreatureClick(std::static_pointer_cast<Creature>(object));
         break;
     case ObjectType::Door:
-        onDoorClick(static_pointer_cast<Door>(object));
+        onDoorClick(std::static_pointer_cast<Door>(object));
         break;
     case ObjectType::Placeable:
-        onPlaceableClick(static_pointer_cast<Placeable>(object));
+        onPlaceableClick(std::static_pointer_cast<Placeable>(object));
         break;
     default:
         break;
     }
 }
 
-void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
+void Module::onCreatureClick(const std::shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     if (creature->isDead()) {
         if (!creature->items().empty()) {
@@ -246,20 +244,20 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     }
 }
 
-void Module::onDoorClick(const shared_ptr<Door> &door) {
+void Module::onDoorClick(const std::shared_ptr<Door> &door) {
     if (!door->linkedToModule().empty()) {
         _game.scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_game.party().getLeader());
+        std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->clearAllActions();
         partyLeader->addAction(_game.actionFactory().newOpenDoor(door));
     }
 }
 
-void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+void Module::onPlaceableClick(const std::shared_ptr<Placeable> &placeable) {
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
@@ -279,13 +277,13 @@ void Module::update(float dt) {
     _area->update(dt);
 }
 
-vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object) const {
-    vector<ContextAction> actions;
+std::vector<ContextAction> Module::getContextActions(const std::shared_ptr<Object> &object) const {
+    std::vector<ContextAction> actions;
 
     switch (object->type()) {
     case ObjectType::Creature: {
         auto leader = _game.party().getLeader();
-        auto creature = static_pointer_cast<Creature>(object);
+        auto creature = std::static_pointer_cast<Creature>(object);
         if (!creature->isDead() && _services.game.reputes.getIsEnemy(*leader, *creature)) {
             actions.push_back(ContextAction(ActionType::AttackObject));
             auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
@@ -338,7 +336,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
         break;
     }
     case ObjectType::Door: {
-        auto door = static_pointer_cast<Door>(object);
+        auto door = std::static_pointer_cast<Door>(object);
         if (door->isLocked() && !door->isKeyRequired() && _game.party().getLeader()->attributes().hasSkill(SkillType::Security)) {
             actions.push_back(ContextAction(SkillType::Security));
         }

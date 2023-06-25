@@ -23,27 +23,25 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/window.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace graphics {
 
-static unordered_map<string, string> g_fontOverride = {
+static std::unordered_map<std::string, std::string> g_fontOverride = {
     {"fnt_d16x16", "fnt_d16x16b"}};
 
-shared_ptr<Font> Fonts::doGet(string resRef) {
+std::shared_ptr<Font> Fonts::doGet(std::string resRef) {
     auto maybeOverride = g_fontOverride.find(resRef);
     if (maybeOverride != g_fontOverride.end()) {
         resRef = maybeOverride->second;
     }
-    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::Font));
+    std::shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::Font));
     if (!texture)
         return nullptr;
 
-    auto font = make_shared<Font>(_graphicsContext, _meshes, _shaders, _textures, _uniforms);
+    auto font = std::make_shared<Font>(_graphicsContext, _meshes, _shaders, _textures, _uniforms);
     font->load(texture);
 
     return std::move(font);

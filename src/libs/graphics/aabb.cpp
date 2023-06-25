@@ -17,8 +17,6 @@
 
 #include "reone/graphics/aabb.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {

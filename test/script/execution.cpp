@@ -24,8 +24,6 @@
 
 #include "../fixtures/script.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::script;
 
@@ -37,8 +35,8 @@ BOOST_AUTO_TEST_SUITE(script_execution)
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
-    auto context = make_unique<ExecutionContext>();
+    auto program = std::make_shared<ScriptProgram>("some_program");
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -50,7 +48,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));              // 0
     program->add(Instruction::newCONSTI(0));              // 0, 0
     program->add(Instruction(InstructionType::LOGANDII)); // 0
@@ -70,7 +68,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     program->add(Instruction::newCONSTI(1));              // 0, 0, 1, 0, 1, 1, 1
     program->add(Instruction(InstructionType::LOGORII));  // 0, 0, 1, 0, 1, 1
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -89,7 +87,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(-7));              // -7
     program->add(Instruction(InstructionType::NEGI));      // 7
     program->add(Instruction::newCONSTI(1));               // 7, 1
@@ -124,7 +122,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     program->add(Instruction(InstructionType::DIVFF));     // 14.4
     program->add(Instruction(InstructionType::NEGF));      // -14.4
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -138,7 +136,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(2));           // 2
     program->add(Instruction::newCONSTI(2));           // 2, 2
     program->add(Instruction::newCONSTI(3));           // 2, 2, 3
@@ -175,7 +173,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
     program->add(Instruction(InstructionType::ADDII)); // 4, 4
     program->add(Instruction(InstructionType::ADDII)); // 8
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -187,7 +185,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));
     program->add(Instruction::newCONSTI(10));
     program->add(Instruction::newCPTOPSP(-8, 8));
@@ -197,7 +195,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     program->add(Instruction::newJMP(-22));
     program->add(Instruction::newMOVSP(-4));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -209,21 +207,21 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTS("some_tag"));
     program->add(Instruction::newACTION(0, 2));
 
-    auto routine = make_shared<MockRoutine>(
+    auto routine = std::make_shared<MockRoutine>(
         "SomeAction",
         VariableType::Object,
         Variable::ofObject(kObjectInvalid),
-        vector<VariableType> {VariableType::String, VariableType::Int});
+        std::vector<VariableType> {VariableType::String, VariableType::Int});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
         .WillOnce(ReturnRef(*routine));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
     auto execution = ScriptExecution(program, std::move(context));
@@ -235,29 +233,29 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     BOOST_TEST(-1 == result);
     BOOST_TEST(1ll == routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
-    BOOST_TEST(string("some_tag") == get<0>(invocation[0])[0].strValue);
+    BOOST_TEST(std::string("some_tag") == get<0>(invocation[0])[0].strValue);
     BOOST_TEST(1 == get<0>(invocation[0])[1].intValue);
 }
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTF(2.0f));
     program->add(Instruction::newCONSTF(3.0f));
     program->add(Instruction::newCONSTF(4.0f));
     program->add(Instruction::newACTION(0, 2));
 
-    auto routine = make_shared<MockRoutine>(
+    auto routine = std::make_shared<MockRoutine>(
         "SomeAction",
         VariableType::Vector,
         Variable::ofVector(glm::vec3(5.0f, 6.0f, 7.0f)),
-        vector<VariableType> {VariableType::Vector, VariableType::Int});
+        std::vector<VariableType> {VariableType::Vector, VariableType::Int});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
         .WillOnce(ReturnRef(*routine));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
     auto execution = ScriptExecution(program, std::move(context));
@@ -282,7 +280,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTI(2));
     program->add(Instruction::newCONSTI(3));
@@ -296,16 +294,16 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
     program->add(Instruction::newACTION(0, 1));
     program->add(Instruction::newMOVSP(-24));
 
-    auto routine = make_shared<MockRoutine>(
+    auto routine = std::make_shared<MockRoutine>(
         "SomeAction",
         VariableType::Void,
         Variable(),
-        vector<VariableType> {VariableType::Action});
+        std::vector<VariableType> {VariableType::Action});
     auto routines = MockRoutines();
     EXPECT_CALL(routines, get(0))
         .WillOnce(ReturnRef(*routine));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     context->routines = &routines;
 
     auto execution = ScriptExecution(program, std::move(context));
@@ -330,7 +328,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
     program->add(Instruction::newCONSTI(42));
     program->add(Instruction::newCONSTF(1.0f));
@@ -342,7 +340,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
     program->add(Instruction::newCPDOWNBP(-20, 4));
     program->add(Instruction::newMOVSP(-30));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
 
     auto execution = ScriptExecution(program, std::move(context));
 
@@ -355,7 +353,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
     program->add(Instruction::newCONSTI(21));
     program->add(Instruction::newJSR(8));
@@ -367,7 +365,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
     program->add(Instruction::newMOVSP(-8));
     program->add(Instruction(InstructionType::RETN));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
 
     auto execution = ScriptExecution(program, std::move(context));
 
@@ -380,7 +378,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTF(1.0f));        // 1.0
     program->add(Instruction::newCONSTF(2.0f));        // 1.0, 2.0
     program->add(Instruction::newCONSTF(3.0f));        // [1.0, 2.0, 3.0]
@@ -417,7 +415,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     program->add(Instruction(InstructionType::ADDFF)); // 8190.0, 6825.0
     program->add(Instruction(InstructionType::ADDFF)); // 15015.0
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when
@@ -431,7 +429,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
 
 BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     // given
-    auto program = make_shared<ScriptProgram>("some_program");
+    auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
     program->add(Instruction::newCONSTF(2.0f));
     program->add(Instruction::newCONSTS("some_resref"));
@@ -455,7 +453,7 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     program->add(Instruction(InstructionType::LOGORII));
     program->add(Instruction(InstructionType::LOGORII));
 
-    auto context = make_unique<ExecutionContext>();
+    auto context = std::make_unique<ExecutionContext>();
     auto execution = ScriptExecution(program, std::move(context));
 
     // when

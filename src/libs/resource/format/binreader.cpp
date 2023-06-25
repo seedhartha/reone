@@ -19,14 +19,12 @@
 
 #include "reone/system/exception/validation.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 void BinaryResourceReader::load(IInputStream &in) {
-    _reader = make_unique<BinaryReader>(in, _endianess);
+    _reader = std::make_unique<BinaryReader>(in, _endianess);
     querySize();
     onLoad();
 }
@@ -37,7 +35,7 @@ void BinaryResourceReader::querySize() {
     _reader->seek(0, SeekOrigin::Begin);
 }
 
-void BinaryResourceReader::checkSignature(const string &expected) {
+void BinaryResourceReader::checkSignature(const std::string &expected) {
     if (_size < expected.size()) {
         throw ValidationException("Invalid binary resource size");
     }
@@ -87,41 +85,41 @@ float BinaryResourceReader::readFloat() {
     return _reader->getFloat();
 }
 
-string BinaryResourceReader::readCString(int len) {
-    string result(_reader->getString(len));
+std::string BinaryResourceReader::readCString(int len) {
+    std::string result(_reader->getString(len));
     result.erase(find(result.begin(), result.end(), '\0'), result.end());
     return std::move(result);
 }
 
-string BinaryResourceReader::readCString(size_t off, int len) {
+std::string BinaryResourceReader::readCString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(readCString(len));
+    std::string result(readCString(len));
     _reader->seek(pos);
 
     return std::move(result);
 }
 
-string BinaryResourceReader::readCStringAt(size_t off) {
+std::string BinaryResourceReader::readCStringAt(size_t off) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(_reader->getNullTerminatedString());
+    std::string result(_reader->getNullTerminatedString());
     _reader->seek(pos);
 
     return std::move(result);
 }
 
-string BinaryResourceReader::readString(int len) {
+std::string BinaryResourceReader::readString(int len) {
     return _reader->getString(len);
 }
 
-string BinaryResourceReader::readString(size_t off, int len) {
+std::string BinaryResourceReader::readString(size_t off, int len) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(_reader->getString(len));
+    std::string result(_reader->getString(len));
     _reader->seek(pos);
 
     return std::move(result);

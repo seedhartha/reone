@@ -23,8 +23,6 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -34,8 +32,8 @@ namespace scene {
 void TriggerSceneNode::init() {
     size_t numVertices = _geometry.size();
 
-    vector<glm::vec3> normals(numVertices + 1, glm::vec3(0.0f));
-    vector<Mesh::Face> faces;
+    std::vector<glm::vec3> normals(numVertices + 1, glm::vec3(0.0f));
+    std::vector<Mesh::Face> faces;
 
     glm::vec3 centroid(0.0f);
     for (auto &vert : _geometry) {
@@ -65,7 +63,7 @@ void TriggerSceneNode::init() {
         normals[i] = glm::normalize(normals[i]);
     }
 
-    vector<float> vertices;
+    std::vector<float> vertices;
     vertices.push_back(centroid.x);
     vertices.push_back(centroid.y);
     vertices.push_back(centroid.z);
@@ -89,7 +87,7 @@ void TriggerSceneNode::init() {
     spec.offNormals = 3 * sizeof(float);
     spec.offMaterial = 6 * sizeof(float);
 
-    _mesh = make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
+    _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
     _mesh->init();
 
     for (auto &point : _geometry) {

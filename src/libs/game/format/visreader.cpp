@@ -19,8 +19,6 @@
 
 #include "reone/system/stream/input.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
@@ -30,7 +28,7 @@ void VisReader::load(IInputStream &in) {
     do {
         in.readLine(buf, sizeof(buf));
 
-        string line(buf);
+        std::string line(buf);
         boost::trim(line);
 
         if (line.empty())
@@ -40,15 +38,15 @@ void VisReader::load(IInputStream &in) {
     } while (!in.eof());
 }
 
-void VisReader::processLine(const string &line) {
-    vector<string> tokens;
+void VisReader::processLine(const std::string &line) {
+    std::vector<std::string> tokens;
     boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
 
     if (tokens.size() == 2) {
         _roomFrom = boost::to_lower_copy(tokens[0]);
     } else {
-        string room(boost::to_lower_copy(tokens[0]));
-        _visibility.insert(make_pair(_roomFrom, std::move(room)));
+        std::string room(boost::to_lower_copy(tokens[0]));
+        _visibility.insert(std::make_pair(_roomFrom, std::move(room)));
     }
 }
 

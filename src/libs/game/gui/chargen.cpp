@@ -33,8 +33,6 @@
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::gui;
@@ -127,52 +125,52 @@ void CharacterGeneration::bindControls() {
 }
 
 void CharacterGeneration::loadClassSelection() {
-    _classSelection = make_unique<ClassSelection>(*this, _game, _services);
+    _classSelection = std::make_unique<ClassSelection>(*this, _game, _services);
     _classSelection->init();
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(*this, _game, _services);
+    _quickOrCustom = std::make_unique<QuickOrCustom>(*this, _game, _services);
     _quickOrCustom->init();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(*this, _game, _services);
+    _quick = std::make_unique<QuickCharacterGeneration>(*this, _game, _services);
     _quick->init();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(*this, _game, _services);
+    _custom = std::make_unique<CustomCharacterGeneration>(*this, _game, _services);
     _custom->init();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(*this, _game, _services);
+    _portraitSelection = std::make_unique<PortraitSelection>(*this, _game, _services);
     _portraitSelection->init();
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(*this, _game, _services);
+    _abilities = std::make_unique<CharGenAbilities>(*this, _game, _services);
     _abilities->init();
 }
 
 void CharacterGeneration::loadSkills() {
-    _charGenSkills = make_unique<CharGenSkills>(*this, _game, _services);
+    _charGenSkills = std::make_unique<CharGenSkills>(*this, _game, _services);
     _charGenSkills->init();
 }
 
 void CharacterGeneration::loadFeats() {
-    _charGenFeats = make_unique<CharGenFeats>(*this, _game, _services);
+    _charGenFeats = std::make_unique<CharGenFeats>(*this, _game, _services);
     _charGenFeats->init();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(*this, _game, _services);
+    _nameEntry = std::make_unique<NameEntry>(*this, _game, _services);
     _nameEntry->init();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(*this, _game, _services);
+    _levelUp = std::make_unique<LevelUpMenu>(*this, _game, _services);
     _levelUp->init();
 }
 
@@ -206,7 +204,7 @@ GameGUI *CharacterGeneration::getSubGUI() const {
     case CharGenScreen::LevelUp:
         return _levelUp.get();
     default:
-        throw logic_error("Invalid screen: " + to_string(static_cast<int>(_screen)));
+        throw std::logic_error("Invalid screen: " + std::to_string(static_cast<int>(_screen)));
     }
 }
 
@@ -240,7 +238,7 @@ void CharacterGeneration::openQuickOrCustom() {
 }
 
 void CharacterGeneration::setAttributesVisible(bool visible) {
-    vector<Label *> attributesLabels {
+    std::vector<Label *> attributesLabels {
         _binding.lblVit.get(),
         _binding.lblDef.get(),
         _binding.strAbLbl.get(),
@@ -279,7 +277,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
+    std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     Character character;
     character.appearance = partyLeader->appearance();
@@ -363,13 +361,13 @@ void CharacterGeneration::cancel() {
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
         ClassType classType = _character.attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
+        std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _character.attributes.addClassLevels(clazz.get(), 1);
-        shared_ptr<Creature> partyLeader(_game.party().getLeader());
+        std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->attributes() = _character.attributes;
         _game.openInGame();
     } else {
-        shared_ptr<Creature> player(_game.objectFactory().newCreature());
+        std::shared_ptr<Creature> player(_game.objectFactory().newCreature());
         player->setTag(kObjectTagPlayer);
         player->setGender(_character.gender);
         player->setAppearance(_character.appearance);
@@ -383,7 +381,7 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(!_game.isTSL() ? "end_m01aa" : "001ebo");
+        std::string moduleName(!_game.isTSL() ? "end_m01aa" : "001ebo");
         _game.loadModule(moduleName);
     }
 }
@@ -419,8 +417,8 @@ void CharacterGeneration::reloadCharacterModel() {
     _binding.portraitLbl->setBorderFill(_services.game.portraits.getTextureByAppearance(_character.appearance));
 }
 
-shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &sceneGraph) {
-    shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
+std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &sceneGraph) {
+    std::shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");
@@ -435,32 +433,32 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &s
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(_services.game.classes.get(_character.attributes.getEffectiveClass()));
+    std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(_character.attributes.getEffectiveClass()));
     _binding.lblClass->setTextMessage(clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);
-    _binding.lblVit->setTextMessage(to_string(vitality));
+    _binding.lblVit->setTextMessage(std::to_string(vitality));
 
     int defense = _character.attributes.getDefense();
-    _binding.lblDef->setTextMessage(to_string(defense));
+    _binding.lblDef->setTextMessage(std::to_string(defense));
 
-    _binding.strAbLbl->setTextMessage(to_string(_character.attributes.strength()));
-    _binding.dexAbLbl->setTextMessage(to_string(_character.attributes.dexterity()));
-    _binding.conAbLbl->setTextMessage(to_string(_character.attributes.constitution()));
-    _binding.intAbLbl->setTextMessage(to_string(_character.attributes.intelligence()));
-    _binding.wisAbLbl->setTextMessage(to_string(_character.attributes.wisdom()));
-    _binding.chaAbLbl->setTextMessage(to_string(_character.attributes.charisma()));
+    _binding.strAbLbl->setTextMessage(std::to_string(_character.attributes.strength()));
+    _binding.dexAbLbl->setTextMessage(std::to_string(_character.attributes.dexterity()));
+    _binding.conAbLbl->setTextMessage(std::to_string(_character.attributes.constitution()));
+    _binding.intAbLbl->setTextMessage(std::to_string(_character.attributes.intelligence()));
+    _binding.wisAbLbl->setTextMessage(std::to_string(_character.attributes.wisdom()));
+    _binding.chaAbLbl->setTextMessage(std::to_string(_character.attributes.charisma()));
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
     if (_game.isTSL()) {
-        _binding.newFortLbl->setTextMessage(to_string(throws.fortitude));
-        _binding.newReflLbl->setTextMessage(to_string(throws.reflex));
-        _binding.newWillLbl->setTextMessage(to_string(throws.will));
+        _binding.newFortLbl->setTextMessage(std::to_string(throws.fortitude));
+        _binding.newReflLbl->setTextMessage(std::to_string(throws.reflex));
+        _binding.newWillLbl->setTextMessage(std::to_string(throws.will));
     } else {
-        _binding.oldFortLbl->setTextMessage(to_string(throws.fortitude));
-        _binding.oldReflLbl->setTextMessage(to_string(throws.reflex));
-        _binding.oldWillLbl->setTextMessage(to_string(throws.will));
+        _binding.oldFortLbl->setTextMessage(std::to_string(throws.fortitude));
+        _binding.oldReflLbl->setTextMessage(std::to_string(throws.reflex));
+        _binding.oldWillLbl->setTextMessage(std::to_string(throws.will));
     }
 }
 

@@ -21,8 +21,6 @@
 
 #include "reone/graphics/eventhandler.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -42,12 +40,12 @@ void Window::init() {
         _options.width, _options.height,
         getWindowFlags());
     if (!_window) {
-        throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
+        throw std::runtime_error("Failed to create a window: " + std::string(SDL_GetError()));
     }
 
     _context = SDL_GL_CreateContext(_window);
     if (!_context) {
-        throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
+        throw std::runtime_error("Failed to create a GL context: " + std::string(SDL_GetError()));
     }
 
     SDL_GL_SetSwapInterval(_options.vsync ? 1 : 0);

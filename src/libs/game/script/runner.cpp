@@ -24,27 +24,25 @@
 
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
+int ScriptRunner::run(const std::string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
     if (callerId == kObjectSelf) {
-        throw invalid_argument("Invalid callerId");
+        throw std::invalid_argument("Invalid callerId");
     }
     if (triggerrerId == kObjectSelf) {
-        throw invalid_argument("Invalid triggerrerId");
+        throw std::invalid_argument("Invalid triggerrerId");
     }
 
     auto program = _scripts.get(resRef);
     if (!program)
         return -1;
 
-    auto ctx = make_unique<ExecutionContext>();
+    auto ctx = std::make_unique<ExecutionContext>();
     ctx->routines = &_routines;
     ctx->callerId = callerId;
     ctx->triggererId = triggerrerId;

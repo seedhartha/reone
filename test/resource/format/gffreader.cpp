@@ -17,14 +17,12 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/format/gffreader.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/resource/format/gffreader.h"
 
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -218,10 +216,10 @@ BOOST_AUTO_TEST_CASE(should_read_gff) {
     BOOST_TEST(4 == gff->getUint64("Uint64"));
     BOOST_TEST(1.0f == gff->getFloat("Float"));
     BOOST_TEST(1.0 == gff->getDouble("Double"));
-    BOOST_TEST(string("John") == gff->getString("CExoString"));
-    BOOST_TEST(string("Jane") == gff->getString("ResRef"));
+    BOOST_TEST(std::string("John") == gff->getString("CExoString"));
+    BOOST_TEST(std::string("Jane") == gff->getString("ResRef"));
     BOOST_TEST(-1 == gff->getInt("CExoLocString"));
-    BOOST_TEST(string("Jill") == gff->getString("CExoLocString"));
+    BOOST_TEST(std::string("Jill") == gff->getString("CExoLocString"));
     auto actualData = gff->getData("Void");
     BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
     auto actualOrientation = gff->getOrientation("Orientation");

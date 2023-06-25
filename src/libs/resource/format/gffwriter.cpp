@@ -22,8 +22,6 @@
 
 #include "reone/resource/gff.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -35,7 +33,7 @@ enum class FieldClassification {
     List
 };
 
-static const unordered_map<ResourceType, string> g_signatures {
+static const std::unordered_map<ResourceType, std::string> g_signatures {
     {ResourceType::Res, "RES"},
     {ResourceType::Are, "ARE"},
     {ResourceType::Dlg, "DLG"},
@@ -62,7 +60,7 @@ void GffWriter::save(const boost::filesystem::path &path) {
 void GffWriter::save(IOutputStream &out) {
     processTree();
 
-    _writer = make_unique<BinaryWriter>(out);
+    _writer = std::make_unique<BinaryWriter>(out);
 
     writeHeader();
     writeStructArray();
@@ -170,12 +168,12 @@ static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simpl
         return FieldClassification::Complex;
     }
     default:
-        throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(field.type)));
+        throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(field.type)));
     }
 }
 
 void GffWriter::processTree() {
-    queue<const Gff *> aQueue;
+    std::queue<const Gff *> aQueue;
     aQueue.push(_root.get());
 
     int structIdx = 0;
@@ -185,7 +183,7 @@ void GffWriter::processTree() {
         const Gff &aStruct = *aQueue.front();
         aQueue.pop();
 
-        vector<uint32_t> fieldIndices;
+        std::vector<uint32_t> fieldIndices;
 
         for (auto &field : aStruct.fields()) {
             // Current number of fields is a new field index
@@ -255,7 +253,7 @@ void GffWriter::processTree() {
 void GffWriter::writeHeader() {
     auto maybeSignature = g_signatures.find(_resType);
     if (maybeSignature == g_signatures.end()) {
-        throw logic_error("Unsupported GFF resource type: " + to_string(static_cast<int>(_resType)));
+        throw std::logic_error("Unsupported GFF resource type: " + std::to_string(static_cast<int>(_resType)));
     }
 
     uint32_t numStructs = static_cast<int>(_context.structs.size());
@@ -312,7 +310,7 @@ void GffWriter::writeFieldArray() {
 
 void GffWriter::writeLabelArray() {
     for (auto &label : _context.labels) {
-        string tmp;
+        std::string tmp;
         tmp.resize(16);
         strncpy(&tmp[0], label.c_str(), 16);
         _writer->putString(tmp);

@@ -21,16 +21,14 @@
 
 #include "../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(hex_utils)
 
 BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
     // given
-    auto input = string("Hello, world!");
-    auto expectedOutput = string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
+    auto input = std::string("Hello, world!");
+    auto expectedOutput = std::string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
 
     // when
     auto output = hexify(input, " ");
@@ -42,7 +40,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
 BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
     // given
     auto input = ByteArray("Hello, world!", 13);
-    auto expectedOutput = string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
+    auto expectedOutput = std::string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
 
     // when
     auto output = hexify(input, " ");
@@ -53,7 +51,7 @@ BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
 
 BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
     // given
-    auto input = string("48656c6c6f2c20776f726c6421");
+    auto input = std::string("48656c6c6f2c20776f726c6421");
     auto expectedOutput = ByteArray("Hello, world!", 13);
 
     // when

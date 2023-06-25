@@ -27,8 +27,6 @@
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/textwriter.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
@@ -59,7 +57,7 @@ void NssWriter::save(IOutputStream &stream) {
 void NssWriter::writeFunction(const Function &function, TextWriter &writer) {
     auto returnType = describeVariableType(function.returnType);
     auto name = describeFunction(function);
-    auto params = vector<string>();
+    auto params = std::vector<std::string>();
     for (auto &argument : function.arguments) {
         auto type = describeVariableType(argument.type);
         if (argument.pointer) {
@@ -74,7 +72,7 @@ void NssWriter::writeFunction(const Function &function, TextWriter &writer) {
 }
 
 struct BlockLevelCompare {
-    bool operator()(const pair<BlockExpression *, int> &a, const pair<BlockExpression *, int> &b) const {
+    bool operator()(const std::pair<BlockExpression *, int> &a, const std::pair<BlockExpression *, int> &b) const {
         if (a.second > b.second) {
             return true;
         }
@@ -93,21 +91,21 @@ struct BlockLevelCompare {
 
 void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
     debug(boost::format("Writing blocks of function at %08x") % func.block->offset);
-    set<pair<BlockExpression *, int>, BlockLevelCompare> blocksToWrite;
+    std::set<std::pair<BlockExpression *, int>, BlockLevelCompare> blocksToWrite;
 
-    queue<pair<Expression *, int>> exprToVisit;
-    exprToVisit.push(make_pair(func.block, 0));
+    std::queue<std::pair<Expression *, int>> exprToVisit;
+    exprToVisit.push(std::make_pair(func.block, 0));
     while (!exprToVisit.empty()) {
         auto [expr, level] = exprToVisit.front();
         exprToVisit.pop();
         if (expr->type == ExpressionType::Block) {
             auto blockExpr = static_cast<BlockExpression *>(expr);
             debug(boost::format("Visiting block (%p, %d) at %08x") % blockExpr % level % blockExpr->offset);
-            auto blockKey = make_pair(blockExpr, level);
+            auto blockKey = std::make_pair(blockExpr, level);
             if (blocksToWrite.count(blockKey) == 0) {
                 blocksToWrite.insert(blockKey);
                 for (auto nestedExpr : blockExpr->expressions) {
-                    exprToVisit.push(make_pair(nestedExpr, level + 1));
+                    exprToVisit.push(std::make_pair(nestedExpr, level + 1));
                 }
             } else {
                 debug("Ignoring already written block");
@@ -115,35 +113,35 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
         } else if (expr->type == ExpressionType::Return) {
             auto returnExpr = static_cast<ReturnExpression *>(expr);
             if (returnExpr->value) {
-                exprToVisit.push(make_pair(returnExpr->value, level));
+                exprToVisit.push(std::make_pair(returnExpr->value, level));
             }
         } else if (expr->type == ExpressionType::Conditional) {
             auto conditionalExpr = static_cast<ConditionalExpression *>(expr);
-            exprToVisit.push(make_pair(conditionalExpr->test, level));
+            exprToVisit.push(std::make_pair(conditionalExpr->test, level));
             if (conditionalExpr->ifTrue) {
-                exprToVisit.push(make_pair(conditionalExpr->ifTrue, level));
+                exprToVisit.push(std::make_pair(conditionalExpr->ifTrue, level));
             }
         } else if (expr->type == ExpressionType::Action) {
             auto actionExpr = static_cast<ActionExpression *>(expr);
             for (auto &arg : actionExpr->arguments) {
-                exprToVisit.push(make_pair(arg, level));
+                exprToVisit.push(std::make_pair(arg, level));
             }
         } else if (expr->type == ExpressionType::Call) {
             auto callExpr = static_cast<CallExpression *>(expr);
             for (auto &arg : callExpr->arguments) {
-                exprToVisit.push(make_pair(arg, level));
+                exprToVisit.push(std::make_pair(arg, level));
             }
         } else if (ExpressionTree::isUnaryExpression(expr->type)) {
             auto unaryExpr = static_cast<UnaryExpression *>(expr);
-            exprToVisit.push(make_pair(unaryExpr->operand, level));
+            exprToVisit.push(std::make_pair(unaryExpr->operand, level));
         } else if (ExpressionTree::isBinaryExpression(expr->type)) {
             auto binaryExpr = static_cast<BinaryExpression *>(expr);
-            exprToVisit.push(make_pair(binaryExpr->left, level));
-            exprToVisit.push(make_pair(binaryExpr->right, level));
+            exprToVisit.push(std::make_pair(binaryExpr->left, level));
+            exprToVisit.push(std::make_pair(binaryExpr->right, level));
         }
     }
 
-    auto blockString = string();
+    auto blockString = std::string();
     auto blockStream = ByteArrayOutputStream(blockString);
     auto blockWriter = TextWriter(blockStream);
     auto ctx = WriteContext();
@@ -151,10 +149,10 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
         debug(boost::format("Writing block (%p, %d)") % block % level);
         blockString.clear();
         writeBlock(level, *block, ctx, blockWriter);
-        auto blockKey = make_pair(block, level);
+        auto blockKey = std::make_pair(block, level);
         ctx.writtenBlocks[blockKey] = blockString;
     }
-    auto &rootBlock = ctx.writtenBlocks.at(make_pair(func.block, 0));
+    auto &rootBlock = ctx.writtenBlocks.at(std::make_pair(func.block, 0));
     writer.put(rootBlock);
 }
 
@@ -163,7 +161,7 @@ void NssWriter::writeBlock(int level, const BlockExpression &block, WriteContext
     auto indent = indentAtLevel(level);
     auto innerIndent = indentAtLevel(innerLevel);
 
-    writer.putLine(indent + string("{"));
+    writer.putLine(indent + std::string("{"));
     for (auto &innerExpr : block.expressions) {
         if (innerExpr->type == ExpressionType::Label) {
             writer.put(indent);
@@ -179,7 +177,7 @@ void NssWriter::writeBlock(int level, const BlockExpression &block, WriteContext
             writer.put("\n");
         }
     }
-    writer.put(indent + string("}"));
+    writer.put(indent + std::string("}"));
 }
 
 void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &expression, WriteContext &ctx, TextWriter &writer) {
@@ -246,7 +244,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
             if (argExpr->type == ExpressionType::Block) {
                 auto blockArg = static_cast<BlockExpression *>(argExpr);
                 writer.putLine("");
-                auto blockKey = make_pair(blockArg, blockLevel);
+                auto blockKey = std::make_pair(blockArg, blockLevel);
                 if (ctx.writtenBlocks.count(blockKey) > 0) {
                     writer.put(ctx.writtenBlocks.at(blockKey));
                 } else {
@@ -264,7 +262,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
                expression.type == ExpressionType::Increment ||
                expression.type == ExpressionType::Decrement) {
         auto &unaryExpr = static_cast<const UnaryExpression &>(expression);
-        string prefix, suffix;
+        std::string prefix, suffix;
         if (expression.type == ExpressionType::Negate) {
             prefix = "-";
         } else if (expression.type == ExpressionType::OnesComplement) {
@@ -310,7 +308,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
                expression.type == ExpressionType::LessThan ||
                expression.type == ExpressionType::LessThanOrEqual) {
         auto &binaryExpr = static_cast<const BinaryExpression &>(expression);
-        string operation;
+        std::string operation;
         bool declareLeft = false;
         if (binaryExpr.type == ExpressionType::Assign) {
             operation = "=";
@@ -378,7 +376,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         writeExpression(blockLevel, false, *condExpr.test, ctx, writer);
         writer.putLine(")");
         if (condExpr.ifTrue) {
-            auto blockKey = make_pair(condExpr.ifTrue, blockLevel);
+            auto blockKey = std::make_pair(condExpr.ifTrue, blockLevel);
             if (ctx.writtenBlocks.count(blockKey) > 0) {
                 writer.put(ctx.writtenBlocks.at(blockKey));
             } else {
@@ -400,41 +398,41 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
         writer.put(str(boost::format("%s[%d]") % name % indexExpr.index));
 
     } else {
-        throw NotImplementedException("Cannot write expression of type: " + to_string(static_cast<int>(expression.type)));
+        throw NotImplementedException("Cannot write expression of type: " + std::to_string(static_cast<int>(expression.type)));
     }
 }
 
-string NssWriter::indentAtLevel(int level) {
-    return string(4 * level, ' ');
+std::string NssWriter::indentAtLevel(int level) {
+    return std::string(4 * level, ' ');
 }
 
-string NssWriter::describeFunction(const Function &function) {
+std::string NssWriter::describeFunction(const Function &function) {
     return !function.name.empty() ? function.name : str(boost::format("fun_%08x") % function.start);
 }
 
-string NssWriter::describeLabel(const LabelExpression &labelExpr) {
+std::string NssWriter::describeLabel(const LabelExpression &labelExpr) {
     return str(boost::format("loc_%08x") % labelExpr.offset);
 }
 
-string NssWriter::describeConstant(const ConstantExpression &constExpr) {
+std::string NssWriter::describeConstant(const ConstantExpression &constExpr) {
     return describeConstant(constExpr.value);
 }
 
-string NssWriter::describeConstant(const Variable &value) {
+std::string NssWriter::describeConstant(const Variable &value) {
     if (value.type == VariableType::Int) {
-        return to_string(value.intValue);
+        return std::to_string(value.intValue);
     } else if (value.type == VariableType::Float) {
         return str(boost::format("%f") % value.floatValue);
     } else if (value.type == VariableType::String) {
         return str(boost::format("\"%s\"") % value.strValue);
     } else if (value.type == VariableType::Object) {
-        return to_string(value.objectId);
+        return std::to_string(value.objectId);
     } else {
-        throw ArgumentException("Cannot describe constant expression of type: " + to_string(static_cast<int>(value.type)));
+        throw ArgumentException("Cannot describe constant expression of type: " + std::to_string(static_cast<int>(value.type)));
     }
 }
 
-string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
+std::string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
     if (paramExpr.locality == ParameterLocality::Global) {
         return str(boost::format("glob_%08x") % paramExpr.offset);
     } else if (paramExpr.locality == ParameterLocality::Local) {
@@ -452,11 +450,11 @@ string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
     } else if (paramExpr.locality == ParameterLocality::ReturnValue) {
         return str(boost::format("ret_%08x") % paramExpr.outerStackOffset);
     } else {
-        throw ArgumentException("Unsupported parameter locality: " + to_string(static_cast<int>(paramExpr.locality)));
+        throw ArgumentException("Unsupported parameter locality: " + std::to_string(static_cast<int>(paramExpr.locality)));
     }
 }
 
-string NssWriter::describeAction(const ActionExpression &actionExpr) {
+std::string NssWriter::describeAction(const ActionExpression &actionExpr) {
     auto numRoutines = _routines.getNumRoutines();
     if (actionExpr.action >= numRoutines) {
         throw ArgumentException(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));

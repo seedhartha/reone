@@ -30,117 +30,115 @@
 
 #include "reone/game/script/routine/context.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 namespace reone {
 
 namespace game {
 
-static inline void throwIfInvalidObject(uint32_t objectId, const shared_ptr<Object> &object) {
+static inline void throwIfInvalidObject(uint32_t objectId, const std::shared_ptr<Object> &object) {
     if (!object) {
         throw ArgumentException(str(boost::format("Id %u does not reference a valid object") % objectId));
     }
 }
 
-static inline void throwIfObjectNotCreature(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotCreature(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Creature) {
         throw ArgumentException(str(boost::format("Object %u is not a creature") % object->id()));
     }
 }
 
-static inline void throwIfObjectNotDoor(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotDoor(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Door) {
         throw ArgumentException(str(boost::format("Object %u is not a door") % object->id()));
     }
 }
 
-static inline void throwIfObjectNotPlaceable(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotPlaceable(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Placeable) {
         throw ArgumentException(str(boost::format("Object %u is not a placeable") % object->id()));
     }
 }
 
-static inline void throwIfObjectNotItem(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotItem(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Item) {
         throw ArgumentException(str(boost::format("Object %u is not an item") % object->id()));
     }
 }
 
-static inline void throwIfObjectNotSound(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotSound(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Sound) {
         throw ArgumentException(str(boost::format("Object %u is not a sound") % object->id()));
     }
 }
 
-static inline void throwIfObjectNotArea(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotArea(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Area) {
         throw ArgumentException(str(boost::format("Object %u is not an area") % object->id()));
     }
 }
 
-static inline void throwIfInvalidEffect(const shared_ptr<Effect> &effect) {
+static inline void throwIfInvalidEffect(const std::shared_ptr<Effect> &effect) {
     if (!effect || effect->type() == EffectType::Invalid) {
         throw ArgumentException("Invalid effect");
     }
 }
 
-static inline void throwIfInvalidEvent(const shared_ptr<Event> &event) {
+static inline void throwIfInvalidEvent(const std::shared_ptr<Event> &event) {
     if (!event) {
         throw ArgumentException("Invalid event");
     }
 }
 
-static inline void throwIfInvalidLocation(const shared_ptr<Location> &location) {
+static inline void throwIfInvalidLocation(const std::shared_ptr<Location> &location) {
     if (!location) {
         throw ArgumentException("Invalid location");
     }
 }
 
-static inline void throwIfInvalidTalent(const shared_ptr<Talent> &talent) {
+static inline void throwIfInvalidTalent(const std::shared_ptr<Talent> &talent) {
     if (!talent || talent->type() == TalentType::Invalid) {
         throw ArgumentException("Invalid talent");
     }
 }
 
-shared_ptr<Object> getCaller(const RoutineContext &ctx) {
+std::shared_ptr<Object> getCaller(const RoutineContext &ctx) {
     auto object = ctx.game.getObjectById(ctx.execution.callerId);
     throwIfInvalidObject(ctx.execution.callerId, object);
     return std::move(object);
 }
 
-shared_ptr<Object> getTriggerrer(const RoutineContext &ctx) {
+std::shared_ptr<Object> getTriggerrer(const RoutineContext &ctx) {
     auto object = ctx.game.getObjectById(ctx.execution.triggererId);
     throwIfInvalidObject(ctx.execution.triggererId, object);
     return std::move(object);
 }
 
-int getInt(const vector<Variable> &args, int index) {
+int getInt(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Int, args[index].type);
     return args[index].intValue;
 }
 
-float getFloat(const vector<Variable> &args, int index) {
+float getFloat(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Float, args[index].type);
     return args[index].floatValue;
 }
 
-string getString(const vector<Variable> &args, int index) {
+std::string getString(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::String, args[index].type);
     return args[index].strValue;
 }
 
-glm::vec3 getVector(const vector<Variable> &args, int index) {
+glm::vec3 getVector(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Vector, args[index].type);
     return args[index].vecValue;
 }
 
-shared_ptr<Object> getObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Object> getObject(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Object, args[index].type);
 
@@ -154,45 +152,45 @@ shared_ptr<Object> getObject(const vector<Variable> &args, int index, const Rout
     return std::move(object);
 }
 
-shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
+std::shared_ptr<Effect> getEffect(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Effect, args[index].type);
-    auto effect = static_pointer_cast<Effect>(args[index].engineType);
+    auto effect = std::static_pointer_cast<Effect>(args[index].engineType);
     throwIfInvalidEffect(effect);
     return std::move(effect);
 }
 
-shared_ptr<Event> getEvent(const vector<Variable> &args, int index) {
+std::shared_ptr<Event> getEvent(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Event, args[index].type);
-    auto event = static_pointer_cast<Event>(args[index].engineType);
+    auto event = std::static_pointer_cast<Event>(args[index].engineType);
     throwIfInvalidEvent(event);
     return std::move(event);
 }
 
-shared_ptr<Location> getLocationArgument(const vector<Variable> &args, int index) {
+std::shared_ptr<Location> getLocationArgument(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Location, args[index].type);
-    auto location = static_pointer_cast<Location>(args[index].engineType);
+    auto location = std::static_pointer_cast<Location>(args[index].engineType);
     throwIfInvalidLocation(location);
     return std::move(location);
 }
 
-shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
+std::shared_ptr<Talent> getTalent(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Talent, args[index].type);
-    auto talent = static_pointer_cast<Talent>(args[index].engineType);
+    auto talent = std::static_pointer_cast<Talent>(args[index].engineType);
     throwIfInvalidTalent(talent);
     return std::move(talent);
 }
 
-shared_ptr<ExecutionContext> getAction(const vector<Variable> &args, int index) {
+std::shared_ptr<ExecutionContext> getAction(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Action, args[index].type);
     return args[index].context;
 }
 
-int getIntOrElse(const vector<Variable> &args, int index, int defValue) {
+int getIntOrElse(const std::vector<Variable> &args, int index, int defValue) {
     if (isOutOfRange(args, index)) {
         return defValue;
     }
@@ -200,7 +198,7 @@ int getIntOrElse(const vector<Variable> &args, int index, int defValue) {
     return args[index].intValue;
 }
 
-float getFloatOrElse(const vector<Variable> &args, int index, float defValue) {
+float getFloatOrElse(const std::vector<Variable> &args, int index, float defValue) {
     if (isOutOfRange(args, index)) {
         return defValue;
     }
@@ -208,7 +206,7 @@ float getFloatOrElse(const vector<Variable> &args, int index, float defValue) {
     return args[index].floatValue;
 }
 
-string getStringOrElse(const vector<Variable> &args, int index, string defValue) {
+std::string getStringOrElse(const std::vector<Variable> &args, int index, std::string defValue) {
     if (isOutOfRange(args, index)) {
         return defValue;
     }
@@ -216,7 +214,7 @@ string getStringOrElse(const vector<Variable> &args, int index, string defValue)
     return args[index].strValue;
 }
 
-glm::vec3 getVectorOrElse(const vector<Variable> &args, int index, glm::vec3 defValue) {
+glm::vec3 getVectorOrElse(const std::vector<Variable> &args, int index, glm::vec3 defValue) {
     if (isOutOfRange(args, index)) {
         return defValue;
     }
@@ -224,13 +222,13 @@ glm::vec3 getVectorOrElse(const vector<Variable> &args, int index, glm::vec3 def
     return args[index].vecValue;
 }
 
-bool getIntAsBool(const vector<Variable> &args, int index) {
+bool getIntAsBool(const std::vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Int, args[index].type);
     return static_cast<bool>(args[index].intValue);
 }
 
-bool getIntAsBoolOrElse(const vector<Variable> &args, int index, bool defValue) {
+bool getIntAsBoolOrElse(const std::vector<Variable> &args, int index, bool defValue) {
     if (isOutOfRange(args, index)) {
         return defValue;
     }
@@ -238,7 +236,7 @@ bool getIntAsBoolOrElse(const vector<Variable> &args, int index, bool defValue) 
     return static_cast<bool>(args[index].intValue);
 }
 
-shared_ptr<Object> getObjectOrNull(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Object> getObjectOrNull(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         return nullptr;
     } else {
@@ -246,7 +244,7 @@ shared_ptr<Object> getObjectOrNull(const vector<Variable> &args, int index, cons
     }
 }
 
-shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Object> getObjectOrCaller(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         return getCaller(ctx);
     } else {
@@ -254,19 +252,19 @@ shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, co
     }
 }
 
-shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx) {
+std::shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx) {
     auto caller = getCaller(ctx);
     throwIfObjectNotCreature(caller);
-    return static_pointer_cast<Creature>(std::move(caller));
+    return std::static_pointer_cast<Creature>(std::move(caller));
 }
 
-shared_ptr<Creature> getObjectAsCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Creature> getObjectAsCreature(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotCreature(object);
-    return static_pointer_cast<Creature>(std::move(object));
+    return std::static_pointer_cast<Creature>(std::move(object));
 }
 
-shared_ptr<Creature> getObjectOrCallerAsCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Creature> getObjectOrCallerAsCreature(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         return getCallerAsCreature(ctx);
     } else {
@@ -274,25 +272,25 @@ shared_ptr<Creature> getObjectOrCallerAsCreature(const vector<Variable> &args, i
     }
 }
 
-shared_ptr<Door> getObjectAsDoor(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Door> getObjectAsDoor(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotDoor(object);
-    return static_pointer_cast<Door>(std::move(object));
+    return std::static_pointer_cast<Door>(std::move(object));
 }
 
-shared_ptr<Placeable> getObjectAsPlaceable(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Placeable> getObjectAsPlaceable(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotPlaceable(object);
-    return static_pointer_cast<Placeable>(std::move(object));
+    return std::static_pointer_cast<Placeable>(std::move(object));
 }
 
-shared_ptr<Item> getObjectAsItem(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Item> getObjectAsItem(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotItem(object);
-    return static_pointer_cast<Item>(std::move(object));
+    return std::static_pointer_cast<Item>(std::move(object));
 }
 
-shared_ptr<Item> getObjectAsItemOrNull(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Item> getObjectAsItemOrNull(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         return nullptr;
     } else {
@@ -300,13 +298,13 @@ shared_ptr<Item> getObjectAsItemOrNull(const vector<Variable> &args, int index, 
     }
 }
 
-shared_ptr<Sound> getObjectAsSound(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Sound> getObjectAsSound(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
     throwIfObjectNotSound(object);
-    return static_pointer_cast<Sound>(std::move(object));
+    return std::static_pointer_cast<Sound>(std::move(object));
 }
 
-shared_ptr<Area> getObjectAsArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Area> getObjectAsArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx) {
     throwIfOutOfRange(args, 0);
     throwIfUnexpectedType(VariableType::Object, args[index].type);
     uint32_t objectId = args[index].objectId;
@@ -315,10 +313,10 @@ shared_ptr<Area> getObjectAsArea(const vector<script::Variable> &args, int index
     }
     auto object = ctx.game.getObjectById(objectId);
     throwIfObjectNotArea(object);
-    return static_pointer_cast<Area>(object);
+    return std::static_pointer_cast<Area>(object);
 }
 
-shared_ptr<Area> getObjectAsAreaOrCallerArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {
+std::shared_ptr<Area> getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         return ctx.game.module()->area();
     }
@@ -331,7 +329,7 @@ shared_ptr<Area> getObjectAsAreaOrCallerArea(const vector<script::Variable> &arg
     }
     auto object = ctx.game.getObjectById(objectId);
     throwIfObjectNotArea(object);
-    return static_pointer_cast<Area>(object);
+    return std::static_pointer_cast<Area>(object);
 }
 
 } // namespace game

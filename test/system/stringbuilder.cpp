@@ -21,15 +21,13 @@
 
 #include "../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(string_builder)
 
 BOOST_AUTO_TEST_CASE(should_build_a_string) {
     // given
-    auto expectedStr = string("Hello, world!");
+    auto expectedStr = std::string("Hello, world!");
 
     // when
     auto str = StringBuilder()

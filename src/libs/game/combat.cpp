@@ -26,8 +26,6 @@
 #include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -42,8 +40,8 @@ static constexpr float kDeactivateDelay = 8.0f;
 static constexpr char kModelEventDetonate[] = "detonate";
 static constexpr float kProjectileSpeed = 16.0f;
 
-static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
-    auto attack = make_unique<Combat::Attack>();
+static std::unique_ptr<Combat::Attack> makeAttack(std::shared_ptr<Creature> attacker, std::shared_ptr<Object> target, std::shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
+    auto attack = std::make_unique<Combat::Attack>();
     attack->attacker = std::move(attacker);
     attack->target = std::move(target);
     attack->action = std::move(action);
@@ -56,7 +54,7 @@ static bool isRoundPastFirstAttack(float time) {
     return time >= 0.5f * kRoundDuration;
 }
 
-void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
+void Combat::addAttack(std::shared_ptr<Creature> attacker, std::shared_ptr<Object> target, std::shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     RoundMap::iterator maybeRound;
 
     // If attacker has already started a combat round, do nothing
@@ -79,9 +77,9 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target,
     }
 
     // Otherwise, start a new combat round
-    auto round = make_unique<Round>();
+    auto round = std::make_unique<Round>();
     round->attack1 = makeAttack(attacker, target, action, resultType, damage);
-    _roundByAttacker.insert(make_pair(attacker->id(), std::move(round)));
+    _roundByAttacker.insert(std::make_pair(attacker->id(), std::move(round)));
     debug(boost::format("Start round: %s -> %s") % attacker->tag() % target->tag(), LogChannels::combat);
 }
 
@@ -179,7 +177,7 @@ void Combat::startAttack(Attack &attack, bool duel) {
     attack.attacker->playAnimation(animation.attackerAnimation, animation.attackerWieldType, animation.animationVariant);
 
     if (duel) {
-        auto target = static_pointer_cast<Creature>(attack.target);
+        auto target = std::static_pointer_cast<Creature>(attack.target);
         target->face(*attack.attacker);
         target->setMovementType(Creature::MovementType::None);
         target->setMovementRestricted(true);
@@ -225,7 +223,7 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
     // Determine defense of a target
     int defense;
     if (attack.target->type() == ObjectType::Creature) {
-        defense = static_pointer_cast<Creature>(attack.target)->getDefense();
+        defense = std::static_pointer_cast<Creature>(attack.target)->getDefense();
     } else {
         defense = 10;
     }
@@ -241,7 +239,7 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
     // Critical threat
     if (isAttackSuccessful(result)) {
         int criticalThreat;
-        shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+        std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
         if (weapon) {
             criticalThreat = weapon->criticalThreat();
         } else {
@@ -290,7 +288,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
     result.attackerWieldType = attack.attacker->getWieldType();
 
     auto targetWield = CreatureWieldType::None;
-    auto target = dynamic_pointer_cast<Creature>(attack.target);
+    auto target = std::dynamic_pointer_cast<Creature>(attack.target);
     if (target) {
         targetWield = target->getWieldType();
     }
@@ -329,7 +327,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
 void Combat::applyAttackResult(const Attack &attack, bool offHand) {
     // Determine critical hit multiplier
     int criticalHitMultiplier = 2;
-    shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    std::shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
     if (weapon) {
         criticalHitMultiplier = weapon->criticalHitMultiplier();
     }
@@ -351,7 +349,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
+            std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
             attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
@@ -364,18 +362,18 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
+            std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
             attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
     }
     default:
-        throw logic_error("Unsupported attack result");
+        throw std::logic_error("Unsupported attack result");
     }
 }
 
-vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager, bool offHand, int multiplier) const {
-    shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+std::vector<std::shared_ptr<DamageEffect>> Combat::getDamageEffects(std::shared_ptr<Creature> damager, bool offHand, int multiplier) const {
+    std::shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
     int amount = 0;
     auto type = DamageType::Bludgeoning;
 
@@ -386,22 +384,22 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, DamagePower::Normal, std::move(damager)));
+    std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, DamagePower::Normal, std::move(damager)));
 
-    return vector<shared_ptr<DamageEffect>> {std::move(effect)};
+    return std::vector<std::shared_ptr<DamageEffect>> {std::move(effect)};
 }
 
-void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<Object> &target, Round &round) {
-    auto attackerModel = static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
-    auto targetModel = static_pointer_cast<ModelSceneNode>(target->sceneNode());
+void Combat::fireProjectile(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<Object> &target, Round &round) {
+    auto attackerModel = std::static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
+    auto targetModel = std::static_pointer_cast<ModelSceneNode>(target->sceneNode());
     if (!attackerModel || !targetModel)
         return;
 
-    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
+    std::shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
     if (!weapon)
         return;
 
-    shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
+    std::shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
     if (!ammunitionType)
         return;
 

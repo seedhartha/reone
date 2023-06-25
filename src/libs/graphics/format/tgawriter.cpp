@@ -20,15 +20,13 @@
 #include "reone/graphics/dxtutil.h"
 #include "reone/graphics/texture.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 static constexpr int kHeaderSize = 18;
 
-TgaWriter::TgaWriter(shared_ptr<Texture> texture) :
+TgaWriter::TgaWriter(std::shared_ptr<Texture> texture) :
     _texture(std::move(texture)) {
 }
 
@@ -40,7 +38,7 @@ void TgaWriter::save(IOutputStream &out, bool compress) {
 
     TGADataType dataType;
     int depth;
-    vector<uint8_t> pixels(getTexturePixels(compress, dataType, depth));
+    std::vector<uint8_t> pixels(getTexturePixels(compress, dataType, depth));
 
     // Write Header
 
@@ -74,8 +72,8 @@ void TgaWriter::save(IOutputStream &out, bool compress) {
     }
 }
 
-vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType, int &depth) const {
-    vector<uint8_t> result;
+std::vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType, int &depth) const {
+    std::vector<uint8_t> result;
 
     switch (_texture->pixelFormat()) {
     case PixelFormat::R8:
@@ -95,7 +93,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
         depth = 32;
         break;
     default:
-        throw runtime_error("Unsupported texture pixel format: " + to_string(static_cast<int>(_texture->pixelFormat())));
+        throw std::runtime_error("Unsupported texture pixel format: " + std::to_string(static_cast<int>(_texture->pixelFormat())));
     }
 
     int numLayers = static_cast<int>(_texture->layers().size());
@@ -136,7 +134,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
             memcpy(pixels, layerPixelsPtr, 4ll * numPixels);
             break;
         case PixelFormat::DXT1: {
-            vector<uint32_t> decompPixels(numPixels);
+            std::vector<uint32_t> decompPixels(numPixels);
             decompressDXT1(_texture->width(), _texture->height(), layerPixelsPtr, &decompPixels[0]);
             uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
@@ -148,7 +146,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
             break;
         }
         case PixelFormat::DXT5: {
-            vector<uint32_t> decompPixels(numPixels);
+            std::vector<uint32_t> decompPixels(numPixels);
             decompressDXT5(_texture->width(), _texture->height(), layerPixelsPtr, &decompPixels[0]);
             uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {

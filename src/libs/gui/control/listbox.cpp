@@ -32,8 +32,6 @@
 #include "reone/gui/control/imagebutton.h"
 #include "reone/gui/control/scrollbar.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -59,15 +57,15 @@ void ListBox::addItem(Item &&item) {
     updateItemSlots();
 }
 
-void ListBox::addTextLinesAsItems(const string &text) {
+void ListBox::addTextLinesAsItems(const std::string &text) {
     if (!_protoItem)
         return;
 
-    vector<string> lines(breakText(text, *_protoItem->text().font, _protoItem->extent().width));
+    std::vector<std::string> lines(breakText(text, *_protoItem->text().font, _protoItem->extent().width));
     for (auto &line : lines) {
         Item item;
         item.text = line;
-        item._textLines = vector<string> {line};
+        item._textLines = std::vector<std::string> {line};
         _items.push_back(std::move(item));
     }
 
@@ -81,12 +79,12 @@ void ListBox::clearSelection() {
 void ListBox::load(const Gff &gffs) {
     Control::load(gffs);
 
-    shared_ptr<Gff> protoItem(gffs.getStruct("PROTOITEM"));
+    std::shared_ptr<Gff> protoItem(gffs.getStruct("PROTOITEM"));
     if (protoItem) {
         _protoItem = _gui.newControl(getType(*protoItem), getTag(*protoItem));
         _protoItem->load(*protoItem);
     }
-    shared_ptr<Gff> scrollBar(gffs.getStruct("SCROLLBAR"));
+    std::shared_ptr<Gff> scrollBar(gffs.getStruct("SCROLLBAR"));
     if (scrollBar) {
         _scrollBar = _gui.newControl(getType(*scrollBar), getTag(*scrollBar));
         _scrollBar->load(*scrollBar);
@@ -184,7 +182,7 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
+void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
     if (!_visible)
         return;
 
@@ -206,7 +204,7 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         }
         _protoItem->setFocus(_selectedItemIndex == itemIdx);
 
-        auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
+        auto imageButton = std::dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
             imageButton->draw(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
         } else {
@@ -227,7 +225,7 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setScrollState(std::move(state));
-        scrollBar.draw(screenSize, offset, vector<string>());
+        scrollBar.draw(screenSize, offset, std::vector<std::string>());
     }
 }
 

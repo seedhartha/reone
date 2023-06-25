@@ -20,15 +20,13 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/strings.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-shared_ptr<Dialog> Dialogs::doGet(string resRef) {
+std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
     auto dlg = _gffs.get(resRef, ResourceType::Dlg);
     if (!dlg) {
         return nullptr;
@@ -36,8 +34,8 @@ shared_ptr<Dialog> Dialogs::doGet(string resRef) {
     return loadDialog(*dlg);
 }
 
-unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
-    auto dialog = make_unique<Dialog>();
+std::unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
+    auto dialog = std::make_unique<Dialog>();
 
     dialog->skippable = dlg.getBool("Skippable");
     dialog->cameraModel = dlg.getString("CameraModel");

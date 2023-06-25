@@ -17,13 +17,11 @@
 
 #include "reone/game/action/giveitem.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
 
-void GiveItemAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
+void GiveItemAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

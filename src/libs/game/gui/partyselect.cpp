@@ -32,8 +32,6 @@
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -205,7 +203,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
         addNpc(ctx.forceNpc2);
     }
     Party &party = _game.party();
-    vector<Label *> charLabels {
+    std::vector<Label *> charLabels {
         _binding.lblChar0.get(),
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
@@ -216,7 +214,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
         _binding.lblChar7.get(),
         _binding.lblChar8.get(),
     };
-    vector<Label *> naLabels {
+    std::vector<Label *> naLabels {
         _binding.lblNa0.get(),
         _binding.lblNa1.get(),
         _binding.lblNa2.get(),
@@ -241,9 +239,9 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
         Label &lblNa = *naLabels[i];
 
         if (party.isMemberAvailable(i)) {
-            string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<Gff> utc(_services.resource.gffs.get(blueprintResRef, ResourceType::Utc));
-            shared_ptr<Texture> portrait;
+            std::string blueprintResRef(party.getAvailableMember(i));
+            std::shared_ptr<Gff> utc(_services.resource.gffs.get(blueprintResRef, ResourceType::Utc));
+            std::shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
                 portrait = _services.game.portraits.getTextureByIndex(portraitId);
@@ -256,7 +254,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
             lblNa.setVisible(false);
         } else {
             btnNpc.setDisabled(true);
-            lblChar.setBorderFill(shared_ptr<Texture>(nullptr));
+            lblChar.setBorderFill(std::shared_ptr<Texture>(nullptr));
             lblNa.setVisible(true);
         }
     }
@@ -271,7 +269,7 @@ void PartySelection::addNpc(int npc) {
 }
 
 ToggleButton &PartySelection::getNpcButton(int npc) {
-    vector<ToggleButton *> npcButtons {
+    std::vector<ToggleButton *> npcButtons {
         _binding.btnNpc0.get(),
         _binding.btnNpc1.get(),
         _binding.btnNpc2.get(),
@@ -305,11 +303,11 @@ void PartySelection::onAcceptButtonClick() {
 }
 
 void PartySelection::refreshAvailableCount() {
-    _binding.lblCount->setTextMessage(to_string(_availableCount));
+    _binding.lblCount->setTextMessage(std::to_string(_availableCount));
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(_services.resource.strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    std::string text(_services.resource.strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     _binding.btnAccept->setTextMessage(text);
 }
 
@@ -339,22 +337,22 @@ void PartySelection::refreshNpcButtons() {
 }
 
 void PartySelection::changeParty() {
-    shared_ptr<Area> area(_game.module()->area());
+    std::shared_ptr<Area> area(_game.module()->area());
     area->unloadParty();
 
     Party &party = _game.party();
     party.clear();
     party.addMember(kNpcPlayer, party.player());
 
-    shared_ptr<Creature> player(_game.party().player());
+    std::shared_ptr<Creature> player(_game.party().player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i])
             continue;
 
-        string blueprintResRef(party.getAvailableMember(i));
+        std::string blueprintResRef(party.getAvailableMember(i));
 
-        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
+        std::shared_ptr<Creature> creature(_game.objectFactory().newCreature());
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

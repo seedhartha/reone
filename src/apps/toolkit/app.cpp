@@ -25,8 +25,6 @@
 
 #include "mainframe.h"
 
-using namespace std;
-
 namespace reone {
 
 bool ToolkitApp::OnInit() {

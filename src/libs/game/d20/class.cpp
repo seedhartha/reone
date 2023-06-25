@@ -23,8 +23,6 @@
 
 #include "reone/game/d20/classes.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -47,18 +45,18 @@ void CreatureClass::load(const TwoDa &twoDa, int row) {
     _defaultAttributes.setAbilityScore(Ability::Wisdom, twoDa.getInt(row, "wis"));
     _defaultAttributes.setAbilityScore(Ability::Charisma, twoDa.getInt(row, "cha"));
 
-    string skillsTable(boost::to_lower_copy(twoDa.getString(row, "skillstable")));
+    std::string skillsTable(boost::to_lower_copy(twoDa.getString(row, "skillstable")));
     loadClassSkills(skillsTable);
 
-    string savingThrowTable(boost::to_lower_copy(twoDa.getString(row, "savingthrowtable")));
+    std::string savingThrowTable(boost::to_lower_copy(twoDa.getString(row, "savingthrowtable")));
     loadSavingThrows(savingThrowTable);
 
-    string attackBonusTable(boost::to_lower_copy(twoDa.getString(row, "attackbonustable")));
+    std::string attackBonusTable(boost::to_lower_copy(twoDa.getString(row, "attackbonustable")));
     loadAttackBonuses(attackBonusTable);
 }
 
-void CreatureClass::loadClassSkills(const string &skillsTable) {
-    shared_ptr<TwoDa> skills(_twoDas.get(kSkillsTwoDaResRef));
+void CreatureClass::loadClassSkills(const std::string &skillsTable) {
+    std::shared_ptr<TwoDa> skills(_twoDas.get(kSkillsTwoDaResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<SkillType>(row));
@@ -66,8 +64,8 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
     }
 }
 
-void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
-    shared_ptr<TwoDa> twoDa(_twoDas.get(savingThrowTable));
+void CreatureClass::loadSavingThrows(const std::string &savingThrowTable) {
+    std::shared_ptr<TwoDa> twoDa(_twoDas.get(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -76,12 +74,12 @@ void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
         throws.reflex = twoDa->getInt(row, "refsave");
         throws.will = twoDa->getInt(row, "willsave");
 
-        _savingThrowsByLevel.insert(make_pair(level, std::move(throws)));
+        _savingThrowsByLevel.insert(std::make_pair(level, std::move(throws)));
     }
 }
 
-void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
-    shared_ptr<TwoDa> twoDa(_twoDas.get(attackBonusTable));
+void CreatureClass::loadAttackBonuses(const std::string &attackBonusTable) {
+    std::shared_ptr<TwoDa> twoDa(_twoDas.get(attackBonusTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }
@@ -94,14 +92,14 @@ bool CreatureClass::isClassSkill(SkillType skill) const {
 const SavingThrows &CreatureClass::getSavingThrows(int level) const {
     auto maybeThrows = _savingThrowsByLevel.find(level);
     if (maybeThrows == _savingThrowsByLevel.end()) {
-        throw logic_error("Saving throws not found for level " + to_string(level));
+        throw std::logic_error("Saving throws not found for level " + std::to_string(level));
     }
     return maybeThrows->second;
 }
 
 int CreatureClass::getAttackBonus(int level) const {
     if (level < 1 || level > static_cast<int>(_attackBonuses.size())) {
-        throw invalid_argument("level is invalid");
+        throw std::invalid_argument("level is invalid");
     }
     return _attackBonuses[level - 1];
 }

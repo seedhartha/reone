@@ -19,23 +19,21 @@
 
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
-boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const string &relPath, bool logNotFound) {
-    vector<string> tokens;
+boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const std::string &relPath, bool logNotFound) {
+    std::vector<std::string> tokens;
     boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
 
     for (auto &entry : boost::filesystem::directory_iterator(basePath)) {
-        string filename(entry.path().filename().string());
+        std::string filename(entry.path().filename().string());
         boost::to_lower(filename);
 
         if (filename == tokens[0]) {
             if (tokens.size() == 1) {
                 return entry.path();
             }
-            string relPath2(relPath.substr(tokens[0].length() + 1));
+            std::string relPath2(relPath.substr(tokens[0].length() + 1));
 
             return getPathIgnoreCase(entry.path(), relPath2);
         }

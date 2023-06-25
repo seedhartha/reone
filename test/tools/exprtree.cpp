@@ -21,8 +21,6 @@
 #include "reone/tools/script/exprtree.h"
 #include "reone/tools/script/exprtreeoptimizer.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::game;
 using namespace reone::script;

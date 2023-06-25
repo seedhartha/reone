@@ -25,13 +25,11 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
-void Font::load(shared_ptr<Texture> texture) {
+void Font::load(std::shared_ptr<Texture> texture) {
     _texture = texture;
 
     const Texture::Features &features = texture->features();
@@ -54,7 +52,7 @@ void Font::load(shared_ptr<Texture> texture) {
     }
 }
 
-void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
+void Font::draw(const std::string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) {
         return;
     }
@@ -94,7 +92,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     }
 }
 
-glm::vec2 Font::getTextOffset(const string &text, TextGravity gravity) const {
+glm::vec2 Font::getTextOffset(const std::string &text, TextGravity gravity) const {
     float w = measure(text);
 
     switch (gravity) {
@@ -118,7 +116,7 @@ glm::vec2 Font::getTextOffset(const string &text, TextGravity gravity) const {
     }
 };
 
-float Font::measure(const string &text) const {
+float Font::measure(const std::string &text) const {
     float w = 0.0f;
     for (auto &glyph : text) {
         w += _glyphs[static_cast<int>(glyph)].size.x;

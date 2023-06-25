@@ -42,8 +42,6 @@
 #include "reone/gui/control/togglebutton.h"
 #include "reone/system/exception/validation.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -56,7 +54,7 @@ void GUI::load(const Gff &gui) {
     debug("Load " + _resRef, LogChannels::gui);
 
     ControlType type = Control::getType(gui);
-    string tag(Control::getTag(gui));
+    std::string tag(Control::getTag(gui));
 
     _rootControl = newControl(type, tag);
     _rootControl->load(gui);
@@ -90,10 +88,10 @@ void GUI::stretchControl(Control &control) {
 
 void GUI::loadControl(const Gff &gffs) {
     ControlType type = Control::getType(gffs);
-    string tag(Control::getTag(gffs));
-    string parent(Control::getParent(gffs));
+    std::string tag(Control::getTag(gffs));
+    std::string parent(Control::getParent(gffs));
 
-    shared_ptr<Control> control(newControl(type, tag));
+    std::shared_ptr<Control> control(newControl(type, tag));
     if (!control)
         return;
 
@@ -203,7 +201,7 @@ void GUI::updateFocus(int x, int y) {
     }
 }
 
-Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &test) const {
+Control *GUI::getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const {
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
         Control *ctrl = (*it).get();
         if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl))
@@ -266,7 +264,7 @@ void GUI::resetFocus() {
     }
 }
 
-shared_ptr<Control> GUI::getControl(const string &tag) const {
+std::shared_ptr<Control> GUI::getControl(const std::string &tag) const {
     for (auto &control : _controls) {
         if (control->tag() == tag) {
             return control;
@@ -275,40 +273,40 @@ shared_ptr<Control> GUI::getControl(const string &tag) const {
     throw ValidationException(str(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef));
 }
 
-unique_ptr<Control> GUI::newControl(
+std::unique_ptr<Control> GUI::newControl(
     ControlType type,
-    string tag) {
-    unique_ptr<Control> control;
+    std::string tag) {
+    std::unique_ptr<Control> control;
     switch (type) {
     case ControlType::Panel:
-        control = make_unique<Panel>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Panel>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Label:
-        control = make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::LabelHilight:
-        control = make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Button:
-        control = make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ButtonToggle:
-        control = make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Slider:
-        control = make_unique<Slider>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Slider>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ScrollBar:
-        control = make_unique<ScrollBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ScrollBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ProgressBar:
-        control = make_unique<ProgressBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ProgressBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::ListBox:
-        control = make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     default:
-        debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
+        debug("Unsupported control type: " + std::to_string(static_cast<int>(type)), LogChannels::gui);
         return nullptr;
     }
 
@@ -319,7 +317,7 @@ unique_ptr<Control> GUI::newControl(
 
 void GUI::addControl(std::shared_ptr<Control> control) {
     _controls.insert(_controls.begin(), control);
-    _controlByTag.insert(make_pair(control->tag(), control.get()));
+    _controlByTag.insert(std::make_pair(control->tag(), control.get()));
 }
 
 } // namespace gui

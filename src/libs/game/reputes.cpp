@@ -22,8 +22,6 @@
 
 #include "reone/game/object/creature.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
@@ -32,11 +30,11 @@ namespace game {
 
 static constexpr int kDefaultRepute = 50;
 
-static vector<string> g_factionLabels;
-static vector<vector<int>> g_factionValues;
+static std::vector<std::string> g_factionLabels;
+static std::vector<std::vector<int>> g_factionValues;
 
 void Reputes::init() {
-    shared_ptr<TwoDa> repute(_twoDas.get("repute"));
+    std::shared_ptr<TwoDa> repute(_twoDas.get("repute"));
     if (!repute) {
         return;
     }
@@ -46,11 +44,11 @@ void Reputes::init() {
     }
 
     for (int row = 0; row < repute->getRowCount(); ++row) {
-        vector<int> values;
+        std::vector<int> values;
         for (size_t i = 0; i < g_factionLabels.size(); ++i) {
             int value;
 
-            const string &label = g_factionLabels[i];
+            const std::string &label = g_factionLabels[i];
             if (label == "player" || label == "glb_xor") {
                 value = kDefaultRepute;
             } else {

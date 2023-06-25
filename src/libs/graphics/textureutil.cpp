@@ -19,20 +19,18 @@
 
 #include "reone/graphics/dxtutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 static void decompressLayer(int width, int height, Texture::Layer &layer, PixelFormat srcFormat, PixelFormat &dstFormat) {
     if (!isCompressed(srcFormat)) {
-        throw invalid_argument("format must be either DXT1 or DXT5");
+        throw std::invalid_argument("format must be either DXT1 or DXT5");
     }
 
     size_t numPixels = static_cast<size_t>(width) * height;
     const uint8_t *srcPixels = reinterpret_cast<const uint8_t *>(layer.pixels->data());
-    vector<uint32_t> decompPixels(numPixels);
+    std::vector<uint32_t> decompPixels(numPixels);
     uint32_t *decompPixelsPtr = &decompPixels[0];
     bool alpha;
 
@@ -44,7 +42,7 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
         alpha = false;
     }
 
-    auto destPixels = make_shared<ByteArray>((alpha ? 4ll : 3ll) * numPixels, '\0');
+    auto destPixels = std::make_shared<ByteArray>((alpha ? 4ll : 3ll) * numPixels, '\0');
     uint8_t *destPixelsPtr = reinterpret_cast<uint8_t *>(destPixels->data());
     decompPixelsPtr = &decompPixels[0];
 
@@ -64,7 +62,7 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
 
 static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp) {
     if (width != height) {
-        throw invalid_argument(str(boost::format("Invalid texture size: width=%d, height=%d") % width % height));
+        throw std::invalid_argument(str(boost::format("Invalid texture size: width=%d, height=%d") % width % height));
     }
     size_t n = width;
     size_t w = n / 2;
@@ -100,7 +98,7 @@ static int getBitsPerPixel(PixelFormat format) {
     case PixelFormat::BGRA8:
         return 4;
     default:
-        throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
+        throw std::invalid_argument("Unsupported pixel format: " + std::to_string(static_cast<int>(format)));
     }
 }
 
@@ -114,11 +112,11 @@ void prepareCubemap(Texture &texture) {
     auto &layers = texture.layers();
     int numLayers = static_cast<int>(layers.size());
     if (numLayers == kNumCubeFaces) {
-        swap(layers[0], layers[1]);
+        std::swap(layers[0], layers[1]);
         for (int i = 0; i < kNumCubeFaces; ++i) {
             auto &layer = layers[i];
             if (!layer.pixels) {
-                throw invalid_argument(str(boost::format("Layer %d of texture '%s' is empty") % i % texture.name()));
+                throw std::invalid_argument(str(boost::format("Layer %d of texture '%s' is empty") % i % texture.name()));
             }
             if (compressed) {
                 decompressLayer(texture.width(), texture.height(), layer, srcFormat, dstFormat);
@@ -129,7 +127,7 @@ void prepareCubemap(Texture &texture) {
             }
         }
     } else {
-        throw invalid_argument(str(boost::format("Texture '%s' has %d layers, %d expected") % texture.name() % numLayers % kNumCubeFaces));
+        throw std::invalid_argument(str(boost::format("Texture '%s' has %d layers, %d expected") % texture.name() % numLayers % kNumCubeFaces));
     }
 }
 

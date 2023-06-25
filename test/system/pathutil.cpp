@@ -19,8 +19,6 @@
 
 #include "reone/system/pathutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(path_util)
@@ -32,7 +30,7 @@ BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     auto tmpFilePath = tmpDirPath;
     tmpFilePath.append("MiXeD");
     boost::filesystem::create_directory(tmpDirPath);
-    auto tmpFile = boost::filesystem::ofstream(tmpFilePath, ios::binary);
+    auto tmpFile = boost::filesystem::ofstream(tmpFilePath, std::ios::binary);
     tmpFile.flush();
     tmpFile.close();
 

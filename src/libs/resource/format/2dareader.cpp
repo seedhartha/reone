@@ -19,14 +19,12 @@
 
 #include "reone/resource/2da.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
 void TwoDaReader::onLoad() {
-    checkSignature(string("2DA V2.b", 8));
+    checkSignature(std::string("2DA V2.b", 8));
     ignore(1); // newline
     loadHeaders();
 
@@ -38,14 +36,14 @@ void TwoDaReader::onLoad() {
 }
 
 void TwoDaReader::loadHeaders() {
-    string token;
+    std::string token;
     while (readToken(token)) {
         _columns.push_back(token);
     }
 }
 
 void TwoDaReader::loadLabels() {
-    string token;
+    std::string token;
     for (int i = 0; i < _rowCount; ++i) {
         readToken(token);
     }
@@ -56,7 +54,7 @@ void TwoDaReader::loadRows() {
 
     int columnCount = static_cast<int>(_columns.size());
     int cellCount = _rowCount * columnCount;
-    vector<uint16_t> offsets(cellCount);
+    std::vector<uint16_t> offsets(cellCount);
     for (int i = 0; i < cellCount; ++i) {
         offsets[i] = readUint16();
     }
@@ -76,10 +74,10 @@ void TwoDaReader::loadRows() {
 }
 
 void TwoDaReader::loadTable() {
-    _twoDa = make_shared<TwoDa>(_columns, _rows);
+    _twoDa = std::make_shared<TwoDa>(_columns, _rows);
 }
 
-bool TwoDaReader::readToken(string &token) {
+bool TwoDaReader::readToken(std::string &token) {
     size_t pos = tell();
 
     auto bytes = _reader->getBytes(256);
@@ -92,14 +90,14 @@ bool TwoDaReader::readToken(string &token) {
             return false;
         }
         if (*pch == '\t') {
-            string s(start, pch - start);
+            std::string s(start, pch - start);
             seek(pos + pch - start + 1);
             token = std::move(s);
             return true;
         }
     }
 
-    throw runtime_error("2DA token not terminated");
+    throw std::runtime_error("2DA token not terminated");
 }
 
 } // namespace resource

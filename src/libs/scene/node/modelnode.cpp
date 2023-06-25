@@ -17,8 +17,6 @@
 
 #include "reone/scene/node/modelnode.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {

@@ -19,8 +19,6 @@
 
 #include "reone/system/types.h"
 
-using namespace std;
-
 using namespace boost::program_options;
 
 using namespace reone::game;
@@ -30,14 +28,14 @@ namespace reone {
 
 static constexpr char kConfigFilename[] = "reone.cfg";
 
-unique_ptr<Options> OptionsParser::parse() {
-    auto options = make_unique<Options>();
+std::unique_ptr<Options> OptionsParser::parse() {
+    auto options = std::make_unique<Options>();
 
     // Initialize options description
 
     options_description descCommon;
     descCommon.add_options()                                                                                                    //
-        ("game", value<string>(), "path to game directory")                                                                     //
+        ("game", value<std::string>(), "path to game directory")                                                                //
         ("dev", value<bool>()->default_value(options->game.developer), "enable developer mode")                                 //
         ("width", value<int>()->default_value(options->graphics.width), "window width")                                         //
         ("height", value<int>()->default_value(options->graphics.height), "window height")                                      //
@@ -74,7 +72,7 @@ unique_ptr<Options> OptionsParser::parse() {
 
     // Convert Boost options to game options
 
-    options->game.path = vars.count("game") > 0 ? vars["game"].as<string>() : boost::filesystem::current_path();
+    options->game.path = vars.count("game") > 0 ? vars["game"].as<std::string>() : boost::filesystem::current_path();
     options->game.developer = vars["dev"].as<bool>();
     options->graphics.width = vars["width"].as<int>();
     options->graphics.height = vars["height"].as<int>();

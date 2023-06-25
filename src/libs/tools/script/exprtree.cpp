@@ -27,44 +27,42 @@
 #include "reone/system/logutil.h"
 #include "reone/tools/script/exprtreeoptimizer.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace script {
 
 ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutines &routines, IExpressionTreeOptimizer &optimizer) {
-    auto expressions = vector<shared_ptr<Expression>>();
-    auto offsetToFunc = map<uint32_t, shared_ptr<Function>>();
-    auto labels = unordered_map<uint32_t, LabelExpression *>();
+    auto expressions = std::vector<std::shared_ptr<Expression>>();
+    auto offsetToFunc = std::map<uint32_t, std::shared_ptr<Function>>();
+    auto labels = std::unordered_map<uint32_t, LabelExpression *>();
     for (auto &ins : program.instructions()) {
         if ((ins.type == InstructionType::JMP ||
              ins.type == InstructionType::JZ ||
              ins.type == InstructionType::JNZ) &&
             ins.jumpOffset < 0) {
             auto offset = ins.offset + ins.jumpOffset;
-            auto label = make_shared<LabelExpression>();
+            auto label = std::make_shared<LabelExpression>();
             label->offset = offset;
             labels[offset] = label.get();
             expressions.push_back(std::move(label));
         }
     }
 
-    auto startFunc = make_shared<Function>();
+    auto startFunc = std::make_shared<Function>();
     startFunc->name = "__start";
     startFunc->start = 13;
 
-    auto ctx = make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
+    auto ctx = std::make_shared<DecompilationContext>(program, routines, labels, offsetToFunc, expressions);
     ctx->functions[startFunc->start] = startFunc;
     ctx->pushCallStack(startFunc.get());
 
     decompileFunction(*startFunc, ctx);
 
-    auto functions = vector<shared_ptr<Function>>();
+    auto functions = std::vector<std::shared_ptr<Function>>();
     for (auto &[offset, func] : offsetToFunc) {
         functions.push_back(func);
     }
-    auto globals = vector<GlobalVariable>();
+    auto globals = std::vector<GlobalVariable>();
     for (auto &expression : expressions) {
         if (expression->type != ExpressionType::Parameter) {
             continue;
@@ -106,15 +104,15 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
     return tree;
 }
 
-void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationContext> ctx) {
+void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<DecompilationContext> ctx) {
     debug(boost::format("Decompiling function at %08x") % func.start);
 
-    auto mainBlock = make_shared<BlockExpression>();
+    auto mainBlock = std::make_shared<BlockExpression>();
     mainBlock->offset = func.start;
 
-    auto blocksToDecompile = stack<pair<BlockExpression *, shared_ptr<DecompilationContext>>>();
-    blocksToDecompile.push(make_pair(mainBlock.get(), ctx));
-    auto decompiledBlocks = map<pair<uint32_t, size_t>, BlockExpression *>();
+    auto blocksToDecompile = std::stack<std::pair<BlockExpression *, std::shared_ptr<DecompilationContext>>>();
+    blocksToDecompile.push(std::make_pair(mainBlock.get(), ctx));
+    auto decompiledBlocks = std::map<std::pair<uint32_t, size_t>, BlockExpression *>();
 
     func.block = mainBlock.get();
     ctx->expressions.push_back(std::move(mainBlock));
@@ -124,7 +122,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
     while (!blocksToDecompile.empty()) {
         auto [block, ctx] = blocksToDecompile.top();
         blocksToDecompile.pop();
-        decompiledBlocks[make_pair(block->offset, ctx->stack.size())] = block;
+        decompiledBlocks[std::make_pair(block->offset, ctx->stack.size())] = block;
 
         try {
             debug(boost::format("Begin decompiling block at %08x") % block->offset);
@@ -150,7 +148,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     ins.type == InstructionType::NOP2) {
 
                 } else if (ins.type == InstructionType::RETN) {
-                    auto retExpr = make_shared<ReturnExpression>();
+                    auto retExpr = std::make_shared<ReturnExpression>();
                     retExpr->offset = ins.offset;
                     block->append(retExpr.get());
                     ctx->expressions.push_back(std::move(retExpr));
@@ -159,7 +157,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                 } else if (ins.type == InstructionType::JMP) {
                     auto absJumpOffset = ins.offset + ins.jumpOffset;
                     if (ins.jumpOffset < 0) {
-                        auto gotoExpr = make_shared<GotoExpression>();
+                        auto gotoExpr = std::make_shared<GotoExpression>();
                         gotoExpr->offset = ins.offset;
                         gotoExpr->label = ctx->labels.at(absJumpOffset);
                         block->append(gotoExpr.get());
@@ -171,17 +169,17 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                 } else if (ins.type == InstructionType::JSR) {
                     auto absJumpOffset = ins.offset + ins.jumpOffset;
-                    shared_ptr<Function> sub;
+                    std::shared_ptr<Function> sub;
 
                     if (ctx->functions.count(absJumpOffset) == 0) {
-                        sub = make_shared<Function>();
+                        sub = std::make_shared<Function>();
                         sub->start = absJumpOffset;
 
                         ctx->functions[sub->start] = sub;
 
-                        auto outerParams = map<int, ParameterExpression *, std::greater<int>>();
+                        auto outerParams = std::map<int, ParameterExpression *, std::greater<int>>();
 
-                        auto subCtx = make_shared<DecompilationContext>(*ctx);
+                        auto subCtx = std::make_shared<DecompilationContext>(*ctx);
                         subCtx->outerParams = &outerParams;
                         subCtx->pushCallStack(sub.get());
 
@@ -194,7 +192,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         sub = ctx->functions.at(absJumpOffset);
                     }
 
-                    auto callExpr = make_shared<CallExpression>();
+                    auto callExpr = std::make_shared<CallExpression>();
                     callExpr->offset = ins.offset;
                     callExpr->function = sub.get();
 
@@ -214,37 +212,37 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto leftExpr = ctx->stack.back().param;
                     ctx->stack.pop_back();
 
-                    auto rightExpr = make_shared<ConstantExpression>();
+                    auto rightExpr = std::make_shared<ConstantExpression>();
                     rightExpr->offset = ins.offset;
                     rightExpr->value = Variable::ofInt(0);
 
-                    auto testExpr = make_shared<BinaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Equal : ExpressionType::NotEqual);
+                    auto testExpr = std::make_shared<BinaryExpression>(ins.type == InstructionType::JZ ? ExpressionType::Equal : ExpressionType::NotEqual);
                     testExpr->offset = ins.offset;
                     testExpr->left = leftExpr;
                     testExpr->right = rightExpr.get();
 
                     BlockExpression *ifTrueBlockPtr;
                     if (ins.jumpOffset > 0) {
-                        auto blockKey = make_pair(ifTrueOffset, ctx->stack.size());
+                        auto blockKey = std::make_pair(ifTrueOffset, ctx->stack.size());
                         if (decompiledBlocks.count(blockKey) > 0) {
                             ifTrueBlockPtr = decompiledBlocks.at(blockKey);
                         } else {
-                            auto ifTrueCtx = make_shared<DecompilationContext>(*ctx);
-                            auto ifTrueBlock = make_shared<BlockExpression>();
+                            auto ifTrueCtx = std::make_shared<DecompilationContext>(*ctx);
+                            auto ifTrueBlock = std::make_shared<BlockExpression>();
                             ifTrueBlock->offset = ifTrueOffset;
 
-                            blocksToDecompile.push(make_pair(ifTrueBlock.get(), ifTrueCtx));
+                            blocksToDecompile.push(std::make_pair(ifTrueBlock.get(), ifTrueCtx));
                             ifTrueBlockPtr = ifTrueBlock.get();
 
                             ctx->expressions.push_back(std::move(ifTrueBlock));
                         }
 
                     } else {
-                        auto gotoExpr = make_shared<GotoExpression>();
+                        auto gotoExpr = std::make_shared<GotoExpression>();
                         gotoExpr->offset = ins.offset;
                         gotoExpr->label = ctx->labels.at(ifTrueOffset);
 
-                        auto gotoBlockExpr = make_shared<BlockExpression>();
+                        auto gotoBlockExpr = std::make_shared<BlockExpression>();
                         gotoBlockExpr->offset = ins.offset;
                         gotoBlockExpr->append(gotoExpr.get());
                         ifTrueBlockPtr = gotoBlockExpr.get();
@@ -253,7 +251,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         ctx->expressions.push_back(std::move(gotoBlockExpr));
                     }
 
-                    auto condExpr = make_shared<ConditionalExpression>();
+                    auto condExpr = std::make_shared<ConditionalExpression>();
                     condExpr->test = testExpr.get();
                     condExpr->ifTrue = ifTrueBlockPtr;
                     block->append(condExpr.get());
@@ -283,11 +281,11 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                            ins.type == InstructionType::CONSTO) {
                     auto constExpr = constantExpression(ins);
 
-                    auto paramExpr = make_shared<ParameterExpression>();
+                    auto paramExpr = std::make_shared<ParameterExpression>();
                     paramExpr->offset = ins.offset;
                     paramExpr->variableType = constExpr->value.type;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = paramExpr.get();
                     assignExpr->right = constExpr.get();
@@ -302,7 +300,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                 } else if (ins.type == InstructionType::ACTION) {
                     auto &routine = ctx->routines.get(ins.routine);
 
-                    vector<Expression *> arguments;
+                    std::vector<Expression *> arguments;
                     for (int i = 0; i < ins.argCount; ++i) {
                         Expression *argument;
                         auto argType = routine.getArgumentType(i);
@@ -326,17 +324,17 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         arguments.push_back(argument);
                     }
 
-                    auto actionExpr = make_shared<ActionExpression>();
+                    auto actionExpr = std::make_shared<ActionExpression>();
                     actionExpr->offset = ins.offset;
                     actionExpr->action = ins.routine;
                     actionExpr->arguments = std::move(arguments);
 
                     if (routine.returnType() != VariableType::Void) {
-                        auto returnValue = make_shared<ParameterExpression>();
+                        auto returnValue = std::make_shared<ParameterExpression>();
                         returnValue->offset = ins.offset;
                         returnValue->variableType = routine.returnType();
 
-                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                         assignExpr->offset = ins.offset;
                         assignExpr->left = returnValue.get();
                         assignExpr->right = actionExpr.get();
@@ -386,21 +384,21 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                                 destination = ctx->outerParams->at(stackOffset);
                                 destination->outerModified = true;
                             } else {
-                                auto destExpr = make_shared<ParameterExpression>();
+                                auto destExpr = std::make_shared<ParameterExpression>();
                                 destExpr->offset = ins.offset;
                                 destExpr->variableType = left.param->variableType;
                                 destExpr->locality = ParameterLocality::Argument;
                                 destExpr->outerStackOffset = stackOffset;
                                 destExpr->outerModified = true;
                                 destination = destExpr.get();
-                                ctx->outerParams->insert(make_pair(stackOffset, destination));
+                                ctx->outerParams->insert(std::make_pair(stackOffset, destination));
                                 ctx->expressions.push_back(std::move(destExpr));
                             }
                         } else {
                             destination = left.param;
                         }
 
-                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                         assignExpr->offset = ins.offset;
                         assignExpr->left = destination;
                         assignExpr->right = right.param;
@@ -417,7 +415,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     }
                     auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
                     if (startIdx < 0) {
-                        throw ValidationException("Out of bounds stack access: " + to_string(startIdx));
+                        throw ValidationException("Out of bounds stack access: " + std::to_string(startIdx));
                     }
                     auto numFrames = ins.size / 4;
                     for (int i = 0; i < numFrames; ++i) {
@@ -430,28 +428,28 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                                 source = ctx->outerParams->at(stackOffset);
                                 source->outerRead = true;
                             } else {
-                                auto sourceExpr = make_shared<ParameterExpression>();
+                                auto sourceExpr = std::make_shared<ParameterExpression>();
                                 sourceExpr->offset = ins.offset;
                                 sourceExpr->variableType = frame.param->variableType;
                                 sourceExpr->locality = ParameterLocality::Argument;
                                 sourceExpr->outerStackOffset = stackOffset;
                                 sourceExpr->outerRead = true;
                                 source = sourceExpr.get();
-                                ctx->outerParams->insert(make_pair(stackOffset, source));
+                                ctx->outerParams->insert(std::make_pair(stackOffset, source));
                                 ctx->expressions.push_back(std::move(sourceExpr));
                             }
                         } else {
                             source = frame.param;
                         }
 
-                        auto paramExpr = make_shared<ParameterExpression>();
+                        auto paramExpr = std::make_shared<ParameterExpression>();
                         paramExpr->offset = ins.offset;
                         paramExpr->variableType = source->variableType;
                         if (numFrames > 1) {
-                            paramExpr->suffix = to_string(i);
+                            paramExpr->suffix = std::to_string(i);
                         }
 
-                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                         assignExpr->offset = ins.offset;
                         assignExpr->left = paramExpr.get();
                         assignExpr->right = source;
@@ -485,15 +483,15 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     } else if (ins.type == InstructionType::NOTI) {
                         type = ExpressionType::Not;
                     }
-                    auto unaryExpr = make_shared<UnaryExpression>(type);
+                    auto unaryExpr = std::make_shared<UnaryExpression>(type);
                     unaryExpr->offset = ins.offset;
                     unaryExpr->operand = value;
 
-                    auto resultExpr = make_shared<ParameterExpression>();
+                    auto resultExpr = std::make_shared<ParameterExpression>();
                     resultExpr->offset = ins.offset;
                     resultExpr->variableType = value->variableType;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = resultExpr.get();
                     assignExpr->right = unaryExpr.get();
@@ -631,7 +629,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     } else if (ins.type == InstructionType::USHRIGHTII) {
                         type = ExpressionType::RightShiftUnsigned;
                     }
-                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    auto binaryExpr = std::make_shared<BinaryExpression>(type);
                     binaryExpr->offset = ins.offset;
                     binaryExpr->left = left;
                     binaryExpr->right = right;
@@ -653,11 +651,11 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     } else {
                         varType = VariableType::Int;
                     }
-                    auto result = make_shared<ParameterExpression>();
+                    auto result = std::make_shared<ParameterExpression>();
                     result->offset = ins.offset;
                     result->variableType = varType;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = result.get();
                     assignExpr->right = binaryExpr.get();
@@ -688,16 +686,16 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
                     auto type = (ins.type == InstructionType::ADDVV) ? ExpressionType::Add : ExpressionType::Subtract;
-                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    auto binaryExpr = std::make_shared<BinaryExpression>(type);
                     binaryExpr->offset = ins.offset;
                     binaryExpr->left = left;
                     binaryExpr->right = right;
 
-                    auto result = make_shared<ParameterExpression>();
+                    auto result = std::make_shared<ParameterExpression>();
                     result->offset = ins.offset;
                     result->variableType = VariableType::Vector;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = result.get();
                     assignExpr->right = binaryExpr.get();
@@ -730,16 +728,16 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     ctx->stack.pop_back();
 
                     auto type = (ins.type == InstructionType::DIVFV) ? ExpressionType::Divide : ExpressionType::Multiply;
-                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    auto binaryExpr = std::make_shared<BinaryExpression>(type);
                     binaryExpr->offset = ins.offset;
                     binaryExpr->left = left;
                     binaryExpr->right = right;
 
-                    auto result = make_shared<ParameterExpression>();
+                    auto result = std::make_shared<ParameterExpression>();
                     result->offset = ins.offset;
                     result->variableType = VariableType::Vector;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = result.get();
                     assignExpr->right = binaryExpr.get();
@@ -772,16 +770,16 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto left = ctx->appendVectorCompose(ins.offset, *block, *leftX, *leftY, *leftZ);
 
                     auto type = (ins.type == InstructionType::DIVVF) ? ExpressionType::Divide : ExpressionType::Multiply;
-                    auto binaryExpr = make_shared<BinaryExpression>(type);
+                    auto binaryExpr = std::make_shared<BinaryExpression>(type);
                     binaryExpr->offset = ins.offset;
                     binaryExpr->left = left;
                     binaryExpr->right = right;
 
-                    auto result = make_shared<ParameterExpression>();
+                    auto result = std::make_shared<ParameterExpression>();
                     result->offset = ins.offset;
                     result->variableType = VariableType::Vector;
 
-                    auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                    auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = ins.offset;
                     assignExpr->left = result.get();
                     assignExpr->right = binaryExpr.get();
@@ -803,35 +801,35 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                 } else if (ins.type == InstructionType::EQUALTT ||
                            ins.type == InstructionType::NEQUALTT) {
                     auto numFrames = ins.size / 4;
-                    vector<StackFrame> rightFrames;
+                    std::vector<StackFrame> rightFrames;
                     for (int i = 0; i < numFrames; ++i) {
                         rightFrames.push_back(ctx->stack.back());
                         ctx->stack.pop_back();
                     }
-                    vector<StackFrame> leftFrames;
+                    std::vector<StackFrame> leftFrames;
                     for (int i = 0; i < numFrames; ++i) {
                         leftFrames.push_back(ctx->stack.back());
                         ctx->stack.pop_back();
                     }
 
-                    auto resultExpr = make_shared<ParameterExpression>();
+                    auto resultExpr = std::make_shared<ParameterExpression>();
                     resultExpr->offset = ins.offset;
                     resultExpr->variableType = VariableType::Int;
 
                     for (int i = 0; i < numFrames; ++i) {
                         auto firstType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::Equal : ExpressionType::NotEqual;
-                        auto compExpr = make_shared<BinaryExpression>(firstType);
+                        auto compExpr = std::make_shared<BinaryExpression>(firstType);
                         compExpr->offset = ins.offset;
                         compExpr->left = leftFrames[i].param;
                         compExpr->right = rightFrames[i].param;
 
                         auto secondType = (ins.type == InstructionType::EQUALTT) ? ExpressionType::LogicalAnd : ExpressionType::LogicalOr;
-                        auto andOrExpression = make_shared<BinaryExpression>(secondType);
+                        auto andOrExpression = std::make_shared<BinaryExpression>(secondType);
                         andOrExpression->offset = ins.offset;
                         andOrExpression->left = resultExpr.get();
                         andOrExpression->right = compExpr.get();
 
-                        auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+                        auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                         assignExpr->offset = ins.offset;
                         assignExpr->left = resultExpr.get();
                         assignExpr->right = andOrExpression.get();
@@ -848,15 +846,15 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                 } else if (ins.type == InstructionType::STORE_STATE) {
                     auto absJumpOffset = ins.offset + 0x10;
-                    auto blockKey = make_pair(absJumpOffset, ctx->stack.size());
+                    auto blockKey = std::make_pair(absJumpOffset, ctx->stack.size());
                     if (decompiledBlocks.count(blockKey) > 0) {
                         ctx->savedAction = decompiledBlocks.at(blockKey);
                     } else {
-                        auto actionBlock = make_shared<BlockExpression>();
+                        auto actionBlock = std::make_shared<BlockExpression>();
                         actionBlock->offset = absJumpOffset;
-                        auto actionCtx = make_shared<DecompilationContext>(*ctx);
+                        auto actionCtx = std::make_shared<DecompilationContext>(*ctx);
 
-                        blocksToDecompile.push(make_pair(actionBlock.get(), actionCtx));
+                        blocksToDecompile.push(std::make_pair(actionBlock.get(), actionCtx));
                         ctx->savedAction = actionBlock.get();
 
                         ctx->expressions.push_back(std::move(actionBlock));
@@ -890,7 +888,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                             destination->outerRead = true;
                             destination->outerModified = true;
                         } else {
-                            auto destExpr = make_shared<ParameterExpression>();
+                            auto destExpr = std::make_shared<ParameterExpression>();
                             destExpr->offset = ins.offset;
                             destExpr->variableType = frame.param->variableType;
                             destExpr->locality = ParameterLocality::Argument;
@@ -898,7 +896,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                             destExpr->outerRead = true;
                             destExpr->outerModified = true;
                             destination = destExpr.get();
-                            ctx->outerParams->insert(make_pair(stackOffset, destination));
+                            ctx->outerParams->insert(std::make_pair(stackOffset, destination));
                             ctx->expressions.push_back(std::move(destExpr));
                         }
                     } else {
@@ -914,7 +912,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         type = ExpressionType::Increment;
                     }
 
-                    auto unaryExpr = make_shared<UnaryExpression>(type);
+                    auto unaryExpr = std::make_shared<UnaryExpression>(type);
                     unaryExpr->offset = ins.offset;
                     unaryExpr->operand = destination;
                     block->append(unaryExpr.get());
@@ -926,7 +924,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                     auto startNoDestroy = static_cast<int>(ctx->stack.size()) - numFrames + (ins.stackOffset / 4);
                     auto numFramesNoDestroy = ins.sizeNoDestroy / 4;
 
-                    vector<StackFrame> framesNoDestroy;
+                    std::vector<StackFrame> framesNoDestroy;
                     for (int i = 0; i < numFramesNoDestroy; ++i) {
                         auto &frame = ctx->stack[startNoDestroy + i];
                         framesNoDestroy.push_back(frame);
@@ -938,7 +936,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
                         ctx->stack.push_back(frame);
                     }
                 } else {
-                    throw NotImplementedException("Cannot decompile expression of type " + to_string(static_cast<int>(ins.type)));
+                    throw NotImplementedException("Cannot decompile expression of type " + std::to_string(static_cast<int>(ins.type)));
                 }
 
                 offset = ins.nextOffset;
@@ -946,8 +944,8 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
             debug(boost::format("End decompiling block at %08x") % block->offset);
 
-        } catch (const logic_error &e) {
-            error(boost::format("Error decompiling block at %08x: %s") % block->offset % string(e.what()));
+        } catch (const std::logic_error &e) {
+            error(boost::format("Error decompiling block at %08x: %s") % block->offset % std::string(e.what()));
         }
     }
 
@@ -956,13 +954,13 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
     debug(boost::format("End decompiling function at %08x") % func.start);
 }
 
-unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
+std::unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::CONSTI:
     case InstructionType::CONSTF:
     case InstructionType::CONSTS:
     case InstructionType::CONSTO: {
-        auto constExpr = make_unique<ConstantExpression>();
+        auto constExpr = std::make_unique<ConstantExpression>();
         constExpr->offset = ins.offset;
         if (ins.type == InstructionType::CONSTI) {
             constExpr->value = Variable::ofInt(ins.intValue);
@@ -976,11 +974,11 @@ unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruct
         return std::move(constExpr);
     }
     default:
-        throw ArgumentException("Instruction is not of CONSTx type: " + to_string(static_cast<int>(ins.type)));
+        throw ArgumentException("Instruction is not of CONSTx type: " + std::to_string(static_cast<int>(ins.type)));
     }
 }
 
-unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const Instruction &ins) {
+std::unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const Instruction &ins) {
     switch (ins.type) {
     case InstructionType::RSADDI:
     case InstructionType::RSADDF:
@@ -990,7 +988,7 @@ unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const Instru
     case InstructionType::RSADDEVT:
     case InstructionType::RSADDLOC:
     case InstructionType::RSADDTAL: {
-        auto paramExpr = make_unique<ParameterExpression>();
+        auto paramExpr = std::make_unique<ParameterExpression>();
         paramExpr->offset = ins.offset;
         if (ins.type == InstructionType::RSADDI) {
             paramExpr->variableType = VariableType::Int;
@@ -1012,7 +1010,7 @@ unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const Instru
         return std::move(paramExpr);
     }
     default:
-        throw ArgumentException("Instruction is not of RSADDx type: " + to_string(static_cast<int>(ins.type)));
+        throw ArgumentException("Instruction is not of RSADDx type: " + std::to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -1029,7 +1027,7 @@ VectorExpression *ExpressionTree::DecompilationContext::appendVectorCompose(
         throw ArgumentException("Cannot compose a vector of non-floats");
     }
 
-    auto vecExpr = make_shared<VectorExpression>();
+    auto vecExpr = std::make_shared<VectorExpression>();
     vecExpr->offset = offset;
     vecExpr->components.push_back(&x);
     vecExpr->components.push_back(&y);
@@ -1050,17 +1048,17 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     // X
 
-    auto xIndexExpr = make_shared<VectorIndexExpression>();
+    auto xIndexExpr = std::make_shared<VectorIndexExpression>();
     xIndexExpr->offset = offset;
     xIndexExpr->vector = &vec;
     xIndexExpr->index = 0;
 
-    auto xParamExpr = make_shared<ParameterExpression>();
+    auto xParamExpr = std::make_shared<ParameterExpression>();
     xParamExpr->offset = offset;
     xParamExpr->variableType = VariableType::Float;
     xParamExpr->suffix = "x";
 
-    auto xAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    auto xAssignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
     xAssignExpr->offset = offset;
     xAssignExpr->left = xParamExpr.get();
     xAssignExpr->right = xIndexExpr.get();
@@ -1075,17 +1073,17 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     // Y
 
-    auto yIndexExpr = make_shared<VectorIndexExpression>();
+    auto yIndexExpr = std::make_shared<VectorIndexExpression>();
     yIndexExpr->offset = offset;
     yIndexExpr->vector = &vec;
     yIndexExpr->index = 1;
 
-    auto yParamExpr = make_shared<ParameterExpression>();
+    auto yParamExpr = std::make_shared<ParameterExpression>();
     yParamExpr->offset = offset;
     yParamExpr->variableType = VariableType::Float;
     yParamExpr->suffix = "y";
 
-    auto yAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    auto yAssignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
     yAssignExpr->offset = offset;
     yAssignExpr->left = yParamExpr.get();
     yAssignExpr->right = yIndexExpr.get();
@@ -1100,17 +1098,17 @@ void ExpressionTree::DecompilationContext::appendVectorDecompose(
 
     // Z
 
-    auto zIndexExpr = make_shared<VectorIndexExpression>();
+    auto zIndexExpr = std::make_shared<VectorIndexExpression>();
     zIndexExpr->offset = offset;
     zIndexExpr->vector = &vec;
     zIndexExpr->index = 2;
 
-    auto zParamExpr = make_shared<ParameterExpression>();
+    auto zParamExpr = std::make_shared<ParameterExpression>();
     zParamExpr->offset = offset;
     zParamExpr->variableType = VariableType::Float;
     zParamExpr->suffix = "z";
 
-    auto zAssignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
+    auto zAssignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
     zAssignExpr->offset = offset;
     zAssignExpr->left = zParamExpr.get();
     zAssignExpr->right = zIndexExpr.get();

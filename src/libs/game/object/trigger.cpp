@@ -17,20 +17,18 @@
 
 #include "reone/game/object/trigger.h"
 
-#include "reone/system/logutil.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/trigger.h"
-#include "reone/scene/di/services.h"
+#include "reone/system/logutil.h"
 
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/di/services.h"
-
-using namespace std;
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -41,7 +39,7 @@ namespace reone {
 namespace game {
 
 void Trigger::loadFromGIT(const Gff &gffs) {
-    string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
     // _tag = boost::to_lower_copy(gffs.getString("Tag"));
@@ -77,15 +75,15 @@ void Trigger::loadGeometryFromGIT(const Gff &gffs) {
     }
 }
 
-void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
+void Trigger::loadFromBlueprint(const std::string &resRef) {
+    std::shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
 }
 
 void Trigger::update(float dt) {
-    set<shared_ptr<Object>> tenantsToRemove;
+    std::set<std::shared_ptr<Object>> tenantsToRemove;
     for (auto &tenant : _tenants) {
         if (tenant) {
             glm::vec2 position2d(tenant->position());

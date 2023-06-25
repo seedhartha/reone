@@ -20,8 +20,6 @@
 #include "reone/system/logutil.h"
 #include "reone/system/stream/input.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -36,17 +34,17 @@ void TxiReader::load(IInputStream &in) {
             *(pch++) = ch;
         } while (ch != -1 && ch != '\n');
 
-        string line(buf, pch - buf - 1);
+        std::string line(buf, pch - buf - 1);
         boost::trim(line);
 
-        vector<string> tokens;
+        std::vector<std::string> tokens;
         boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
 
         processLine(tokens);
     } while (!in.eof());
 }
 
-static Texture::ProcedureType parseProcedureType(const string &str) {
+static Texture::ProcedureType parseProcedureType(const std::string &str) {
     Texture::ProcedureType result = Texture::ProcedureType::Invalid;
     if (str == "cycle") {
         result = Texture::ProcedureType::Cycle;
@@ -60,8 +58,8 @@ static Texture::ProcedureType parseProcedureType(const string &str) {
     return result;
 }
 
-void TxiReader::processLine(const vector<string> &tokens) {
-    string key;
+void TxiReader::processLine(const std::vector<std::string> &tokens) {
+    std::string key;
     glm::vec3 vec;
 
     switch (_state) {
@@ -130,7 +128,7 @@ void TxiReader::processLine(const vector<string> &tokens) {
     }
 }
 
-Texture::Blending TxiReader::parseBlending(const string &s) const {
+Texture::Blending TxiReader::parseBlending(const std::string &s) const {
     auto lc = boost::to_lower_copy(s);
     if (lc == "default") {
         return Texture::Blending::Default;

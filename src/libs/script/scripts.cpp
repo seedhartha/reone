@@ -21,16 +21,14 @@
 
 #include "reone/script/format/ncsreader.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace script {
 
-shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
-    shared_ptr<ByteArray> data(_resources.get(resRef, ResourceType::Ncs));
+std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
+    std::shared_ptr<ByteArray> data(_resources.get(resRef, ResourceType::Ncs));
     if (!data)
         return nullptr;
 

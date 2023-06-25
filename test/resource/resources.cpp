@@ -17,13 +17,12 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileoutput.h"
-#include "reone/resource/resources.h"
+
 
 #include "../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;

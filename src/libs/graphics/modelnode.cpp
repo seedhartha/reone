@@ -22,15 +22,13 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/texture.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 ModelNode::ModelNode(
     uint16_t number,
-    string name,
+    std::string name,
     glm::vec3 restPosition,
     glm::quat restOrientation,
     bool animated,

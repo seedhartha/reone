@@ -20,8 +20,6 @@
 #include "reone/graphics/barycentricutil.h"
 #include "reone/graphics/triangleutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
@@ -30,7 +28,7 @@ void Mesh::init() {
     if (_inited) {
         return;
     }
-    vector<uint16_t> indices;
+    std::vector<uint16_t> indices;
     indices.reserve(3 * _faces.size());
     for (auto &face : _faces) {
         indices.push_back(face.indices[0]);
@@ -120,7 +118,7 @@ void Mesh::drawInstanced(int count) {
 
 void Mesh::computeFaceData() {
     for (auto &face : _faces) {
-        vector<glm::vec3> verts(getVertexCoords(face));
+        std::vector<glm::vec3> verts(getVertexCoords(face));
         // Normal
         if (face.normal[0] == 0.0f && face.normal[1] == 0.0f && face.normal[2] == 0.0f) {
             face.normal = calculateTriangleNormal(verts);
@@ -147,8 +145,8 @@ void Mesh::computeAABB() {
     }
 }
 
-vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
-    vector<glm::vec3> coords(3);
+std::vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
+    std::vector<glm::vec3> coords(3);
     for (int i = 0; i < 3; ++i) {
         auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         coords[i] = glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]);
@@ -157,7 +155,7 @@ vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
 }
 
 glm::vec2 Mesh::getUV1(const Face &face, const glm::vec3 &baryPosition) const {
-    vector<glm::vec2> uv(3);
+    std::vector<glm::vec2> uv(3);
     for (int i = 0; i < 3; ++i) {
         auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         uv[i] = glm::make_vec2(&vertPtr[_spec.offUV1 / sizeof(float)]);
@@ -166,7 +164,7 @@ glm::vec2 Mesh::getUV1(const Face &face, const glm::vec3 &baryPosition) const {
 }
 
 glm::vec2 Mesh::getUV2(const Face &face, const glm::vec3 &baryPosition) const {
-    vector<glm::vec2> uv(3);
+    std::vector<glm::vec2> uv(3);
     for (int i = 0; i < 3; ++i) {
         auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         uv[i] = glm::make_vec2(&vertPtr[_spec.offUV2 / sizeof(float)]);

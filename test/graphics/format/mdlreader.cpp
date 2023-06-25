@@ -25,8 +25,6 @@
 
 #include "../../fixtures/graphics.h"
 
-using namespace std;
-
 using namespace reone;
 using namespace reone::graphics;
 
@@ -105,8 +103,8 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
     auto mdl = ByteArrayInputStream(mdlBytes);
     auto mdxBytes = StringBuilder().build();
     auto mdx = ByteArrayInputStream(mdxBytes);
-    auto models = make_unique<MockModels>();
-    auto textures = make_unique<MockTextures>();
+    auto models = std::make_unique<MockModels>();
+    auto textures = std::make_unique<MockTextures>();
     auto reader = MdlReader(*models, *textures);
 
     // when
@@ -115,9 +113,9 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
     // then
     auto model = reader.model();
     BOOST_TEST(static_cast<bool>(model));
-    BOOST_TEST(string("some_model") == model->name());
+    BOOST_TEST(std::string("some_model") == model->name());
     auto rootNode = model->rootNode();
-    BOOST_TEST(string("root_node") == rootNode->name());
+    BOOST_TEST(std::string("root_node") == rootNode->name());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

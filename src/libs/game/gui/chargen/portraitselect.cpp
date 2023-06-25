@@ -38,8 +38,6 @@
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -123,10 +121,10 @@ void PortraitSelection::loadHeadModel() {
     _binding.lblHead->setSceneName(kScenePortraitSelect);
 }
 
-shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sceneGraph) {
+std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
+    std::shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");
@@ -136,7 +134,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sce
 
     // Attach creature model to the root scene node
 
-    auto creatureModel = static_pointer_cast<ModelSceneNode>(creature->sceneNode());
+    auto creatureModel = std::static_pointer_cast<ModelSceneNode>(creature->sceneNode());
     auto cameraHook = creatureModel->getNodeByName("camerahook");
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->getOrigin().z));
@@ -186,8 +184,8 @@ void PortraitSelection::resetCurrentPortrait() {
 }
 
 void PortraitSelection::loadCurrentPortrait() {
-    string resRef(_filteredPortraits[_currentPortrait].resRef);
-    shared_ptr<Texture> portrait(_services.graphics.textures.get(resRef, TextureUsage::GUI));
+    std::string resRef(_filteredPortraits[_currentPortrait].resRef);
+    std::shared_ptr<Texture> portrait(_services.graphics.textures.get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
 }
 

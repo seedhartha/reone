@@ -17,15 +17,13 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/format/gffwriter.h"
+#include "reone/resource/gff.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/resource/format/gffwriter.h"
-#include "reone/resource/gff.h"
 
 #include "../../checkutil.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -175,9 +173,9 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
                               .append("\x03\x00\x00\x00", 4)
                               .build();
 
-    auto root = make_shared<Gff>(
+    auto root = std::make_shared<Gff>(
         0xffffffff,
-        vector<Gff::Field> {
+        std::vector<Gff::Field> {
             Gff::Field::newByte("Byte", 0),
             Gff::Field::newInt("Int", 1),
             Gff::Field::newDword("Uint", 2),
@@ -194,12 +192,12 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
             Gff::Field::newStrRef("StrRef", 1),
             Gff::Field::newStruct(
                 "Struct",
-                make_shared<Gff>(1, vector<Gff::Field> {Gff::Field::newChar("Struct1Char", 1)})),
+                std::make_shared<Gff>(1, std::vector<Gff::Field> {Gff::Field::newChar("Struct1Char", 1)})),
             Gff::Field::newList(
                 "List",
-                vector<shared_ptr<Gff>> {
-                    make_shared<Gff>(2, vector<Gff::Field> {Gff::Field::newWord("Struct2Word", 2)}),
-                    make_shared<Gff>(3, vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
+                std::vector<std::shared_ptr<Gff>> {
+                    std::make_shared<Gff>(2, std::vector<Gff::Field> {Gff::Field::newWord("Struct2Word", 2)}),
+                    std::make_shared<Gff>(3, std::vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
@@ -211,7 +209,7 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
 
     // then
 
-    auto actualOutput = string(&bytes[0], bytes.size());
+    auto actualOutput = std::string(&bytes[0], bytes.size());
     BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 

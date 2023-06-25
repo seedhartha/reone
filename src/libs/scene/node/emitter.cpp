@@ -32,8 +32,6 @@
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/particle.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -101,7 +99,7 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
     if (_lifeExpectancy == -1.0f) {
         return;
     }
-    vector<ParticleSceneNode *> expiredParticles;
+    std::vector<ParticleSceneNode *> expiredParticles;
     for (auto &child : _children) {
         if (child->type() != SceneNodeType::Particle) {
             continue;
@@ -118,7 +116,7 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode.emitter());
+    std::shared_ptr<ModelNode::Emitter> emitter(_modelNode.emitter());
     switch (emitter->updateMode) {
     case ModelNode::Emitter::UpdateMode::Fountain:
         if (_birthrate != 0.0f) {
@@ -191,7 +189,7 @@ void EmitterSceneNode::spawnLightningParticles() {
     float segmentLength = distance / static_cast<float>(_lightningSubDiv + 1);
     float halfRadius = 0.5f * _lightningRadius;
 
-    vector<pair<glm::vec3, glm::vec3>> segments;
+    std::vector<std::pair<glm::vec3, glm::vec3>> segments;
     segments.resize(_lightningSubDiv + 1);
     segments[0].first = origin;
     for (int i = 1; i < _lightningSubDiv + 1; ++i) {
@@ -239,7 +237,7 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
+void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }

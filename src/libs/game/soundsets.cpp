@@ -24,8 +24,6 @@
 
 #include "reone/game/format/ssfreader.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::resource;
 
@@ -33,23 +31,23 @@ namespace reone {
 
 namespace game {
 
-shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
+std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     auto data = _resources.get(resRef, ResourceType::Ssf);
     if (!data) {
         return nullptr;
     }
     auto stream = ByteArrayInputStream(*data);
-    auto result = make_shared<SoundSet>();
+    auto result = std::make_shared<SoundSet>();
 
     SsfReader ssf;
     ssf.load(stream);
 
-    vector<int> sounds(ssf.soundSet());
+    std::vector<int> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
-        string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
-        shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));
+        std::string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
+        std::shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));
         if (sound) {
-            result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));
+            result->insert(std::make_pair(static_cast<SoundSetEntry>(i), sound));
         }
     }
 

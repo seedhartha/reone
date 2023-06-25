@@ -22,8 +22,6 @@
 
 #include "../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(text_writer)

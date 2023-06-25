@@ -22,16 +22,14 @@
 #include "reone/resource/resources.h"
 #include "reone/system/stream/bytearrayinput.h"
 
-using namespace std;
-
 using namespace reone::resource;
 
 namespace reone {
 
 namespace graphics {
 
-shared_ptr<LipAnimation> LipAnimations::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
+std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
+    std::shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
     if (!lipData) {
         return nullptr;
     }

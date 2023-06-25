@@ -19,8 +19,6 @@
 
 #include "reone/system/stream/fileinput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
@@ -29,16 +27,16 @@ void LytReader::load(IInputStream &in) {
     char buf[256];
     do {
         in.readLine(buf, sizeof(buf));
-        processLine(string(buf));
+        processLine(std::string(buf));
     } while (!in.eof());
 }
 
-void LytReader::processLine(const string &line) {
-    vector<string> tokens;
-    string trimLine(boost::trim_copy(line));
+void LytReader::processLine(const std::string &line) {
+    std::vector<std::string> tokens;
+    std::string trimLine(boost::trim_copy(line));
     boost::split(tokens, trimLine, boost::is_space(), boost::token_compress_on);
 
-    const string &first = tokens[0];
+    const std::string &first = tokens[0];
     switch (_state) {
     case State::None:
         if (first == "beginlayout") {
@@ -65,7 +63,7 @@ void LytReader::processLine(const string &line) {
     }
 }
 
-void LytReader::appendRoom(const vector<string> &tokens) {
+void LytReader::appendRoom(const std::vector<std::string> &tokens) {
     Layout::Room room;
     room.name = boost::to_lower_copy(tokens[0]);
     room.position = glm::vec3(

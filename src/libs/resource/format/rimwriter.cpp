@@ -20,8 +20,6 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/fileoutput.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
@@ -52,7 +50,7 @@ void RimWriter::save(IOutputStream &out) {
     for (auto &res : _resources) {
         auto size = static_cast<uint32_t>(res.data.size());
 
-        string resRef(res.resRef);
+        std::string resRef(res.resRef);
         resRef.resize(16);
         writer.putString(resRef);
 

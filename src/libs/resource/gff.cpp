@@ -20,13 +20,11 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
-bool Gff::getBool(const string &name, bool defValue) const {
+bool Gff::getBool(const std::string &name, bool defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -34,7 +32,7 @@ bool Gff::getBool(const string &name, bool defValue) const {
     return field->intValue != 0;
 }
 
-const Gff::Field *Gff::get(const string &name) const {
+const Gff::Field *Gff::get(const std::string &name) const {
     auto maybeField = find_if(
         _fields.begin(),
         _fields.end(),
@@ -43,7 +41,7 @@ const Gff::Field *Gff::get(const string &name) const {
     return maybeField != _fields.end() ? &*maybeField : nullptr;
 }
 
-int Gff::getInt(const string &name, int defValue) const {
+int Gff::getInt(const std::string &name, int defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -51,7 +49,7 @@ int Gff::getInt(const string &name, int defValue) const {
     return field->intValue;
 }
 
-int64_t Gff::getInt64(const string &name, int64_t defValue) const {
+int64_t Gff::getInt64(const std::string &name, int64_t defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -59,7 +57,7 @@ int64_t Gff::getInt64(const string &name, int64_t defValue) const {
     return field->int64Value;
 }
 
-uint32_t Gff::getUint(const string &name, uint32_t defValue) const {
+uint32_t Gff::getUint(const std::string &name, uint32_t defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -67,7 +65,7 @@ uint32_t Gff::getUint(const string &name, uint32_t defValue) const {
     return field->uintValue;
 }
 
-uint64_t Gff::getUint64(const string &name, uint64_t defValue) const {
+uint64_t Gff::getUint64(const std::string &name, uint64_t defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -86,7 +84,7 @@ static glm::vec3 colorFromUint32(uint32_t value) {
     return std::move(result);
 }
 
-glm::vec3 Gff::getColor(const string &name, glm::vec3 defValue) const {
+glm::vec3 Gff::getColor(const std::string &name, glm::vec3 defValue) const {
     const Field *field = get(name);
     if (!field)
         return std::move(defValue);
@@ -94,7 +92,7 @@ glm::vec3 Gff::getColor(const string &name, glm::vec3 defValue) const {
     return colorFromUint32(field->uintValue);
 }
 
-float Gff::getFloat(const string &name, float defValue) const {
+float Gff::getFloat(const std::string &name, float defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -102,7 +100,7 @@ float Gff::getFloat(const string &name, float defValue) const {
     return field->floatValue;
 }
 
-double Gff::getDouble(const string &name, double defValue) const {
+double Gff::getDouble(const std::string &name, double defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -110,7 +108,7 @@ double Gff::getDouble(const string &name, double defValue) const {
     return field->doubleValue;
 }
 
-string Gff::getString(const string &name, string defValue) const {
+std::string Gff::getString(const std::string &name, std::string defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -118,7 +116,7 @@ string Gff::getString(const string &name, string defValue) const {
     return field->strValue;
 }
 
-glm::vec3 Gff::getVector(const string &name, glm::vec3 defValue) const {
+glm::vec3 Gff::getVector(const std::string &name, glm::vec3 defValue) const {
     const Field *field = get(name);
     if (!field)
         return std::move(defValue);
@@ -126,7 +124,7 @@ glm::vec3 Gff::getVector(const string &name, glm::vec3 defValue) const {
     return field->vecValue;
 }
 
-glm::quat Gff::getOrientation(const string &name, glm::quat defValue) const {
+glm::quat Gff::getOrientation(const std::string &name, glm::quat defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -134,7 +132,7 @@ glm::quat Gff::getOrientation(const string &name, glm::quat defValue) const {
     return field->quatValue;
 }
 
-shared_ptr<Gff> Gff::getStruct(const string &name) const {
+std::shared_ptr<Gff> Gff::getStruct(const std::string &name) const {
     const Field *field = get(name);
     if (!field)
         return nullptr;
@@ -142,15 +140,15 @@ shared_ptr<Gff> Gff::getStruct(const string &name) const {
     return field->children[0];
 }
 
-vector<shared_ptr<Gff>> Gff::getList(const string &name) const {
+std::vector<std::shared_ptr<Gff>> Gff::getList(const std::string &name) const {
     const Field *field = get(name);
     if (!field)
-        return vector<shared_ptr<Gff>>();
+        return std::vector<std::shared_ptr<Gff>>();
 
     return field->children;
 }
 
-ByteArray Gff::getData(const string &name) const {
+ByteArray Gff::getData(const std::string &name) const {
     const Field *field = get(name);
     if (!field)
         return ByteArray();
@@ -158,142 +156,142 @@ ByteArray Gff::getData(const string &name) const {
     return field->data;
 }
 
-string Gff::Field::toString() const {
+std::string Gff::Field::toString() const {
     switch (type) {
     case FieldType::Byte:
     case FieldType::Word:
     case FieldType::Dword:
-        return to_string(uintValue);
+        return std::to_string(uintValue);
     case FieldType::Char:
     case FieldType::Short:
     case FieldType::Int:
-        return to_string(intValue);
+        return std::to_string(intValue);
     case FieldType::Dword64:
-        return to_string(uint64Value);
+        return std::to_string(uint64Value);
     case FieldType::Int64:
-        return to_string(int64Value);
+        return std::to_string(int64Value);
     case FieldType::Float:
-        return to_string(floatValue);
+        return std::to_string(floatValue);
     case FieldType::Double:
-        return to_string(doubleValue);
+        return std::to_string(doubleValue);
     case FieldType::CExoString:
     case FieldType::ResRef:
         return strValue;
     default:
-        throw ValidationException("Unsupported field type: " + to_string(static_cast<int>(type)));
+        throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(type)));
     }
 }
 
-Gff::Field Gff::Field::newByte(string label, uint32_t val) {
+Gff::Field Gff::Field::newByte(std::string label, uint32_t val) {
     Field tmp(FieldType::Byte, std::move(label));
     tmp.uintValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newChar(string label, int32_t val) {
+Gff::Field Gff::Field::newChar(std::string label, int32_t val) {
     Field tmp(FieldType::Char, std::move(label));
     tmp.intValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newWord(string label, uint32_t val) {
+Gff::Field Gff::Field::newWord(std::string label, uint32_t val) {
     Field tmp(FieldType::Word, std::move(label));
     tmp.uintValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newShort(string label, int32_t val) {
+Gff::Field Gff::Field::newShort(std::string label, int32_t val) {
     Field tmp(FieldType::Short, std::move(label));
     tmp.intValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newDword(string label, uint32_t val) {
+Gff::Field Gff::Field::newDword(std::string label, uint32_t val) {
     Field tmp(FieldType::Dword, std::move(label));
     tmp.uintValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newInt(string label, int32_t val) {
+Gff::Field Gff::Field::newInt(std::string label, int32_t val) {
     Field tmp(FieldType::Int, std::move(label));
     tmp.intValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newDword64(string label, uint64_t val) {
+Gff::Field Gff::Field::newDword64(std::string label, uint64_t val) {
     Field tmp(FieldType::Dword64, std::move(label));
     tmp.uint64Value = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newInt64(string label, int64_t val) {
+Gff::Field Gff::Field::newInt64(std::string label, int64_t val) {
     Field tmp(FieldType::Int64, std::move(label));
     tmp.int64Value = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newFloat(string label, float val) {
+Gff::Field Gff::Field::newFloat(std::string label, float val) {
     Field tmp(FieldType::Float, std::move(label));
     tmp.floatValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newDouble(string label, double val) {
+Gff::Field Gff::Field::newDouble(std::string label, double val) {
     Field tmp(FieldType::Double, std::move(label));
     tmp.doubleValue = val;
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newCExoString(string label, string val) {
+Gff::Field Gff::Field::newCExoString(std::string label, std::string val) {
     Field tmp(FieldType::CExoString, std::move(label));
     tmp.strValue = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newResRef(string label, string val) {
+Gff::Field Gff::Field::newResRef(std::string label, std::string val) {
     Field tmp(FieldType::ResRef, std::move(label));
     tmp.strValue = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newCExoLocString(string label, int32_t strRef, string val) {
+Gff::Field Gff::Field::newCExoLocString(std::string label, int32_t strRef, std::string val) {
     Field tmp(FieldType::CExoLocString, std::move(label));
     tmp.intValue = strRef;
     tmp.strValue = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newVoid(string label, ByteArray val) {
+Gff::Field Gff::Field::newVoid(std::string label, ByteArray val) {
     Field tmp(FieldType::Void, std::move(label));
     tmp.data = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newStruct(string label, shared_ptr<Gff> val) {
+Gff::Field Gff::Field::newStruct(std::string label, std::shared_ptr<Gff> val) {
     Field tmp(FieldType::Struct, std::move(label));
     tmp.children.push_back(std::move(val));
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newList(string label, vector<shared_ptr<Gff>> val) {
+Gff::Field Gff::Field::newList(std::string label, std::vector<std::shared_ptr<Gff>> val) {
     Field tmp(FieldType::List, std::move(label));
     tmp.children = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newOrientation(string label, glm::quat val) {
+Gff::Field Gff::Field::newOrientation(std::string label, glm::quat val) {
     Field tmp(FieldType::Orientation, std::move(label));
     tmp.quatValue = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newVector(string label, glm::vec3 val) {
+Gff::Field Gff::Field::newVector(std::string label, glm::vec3 val) {
     Field tmp(FieldType::Vector, std::move(label));
     tmp.vecValue = std::move(val);
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newStrRef(string label, int32_t val) {
+Gff::Field Gff::Field::newStrRef(std::string label, int32_t val) {
     Field tmp(FieldType::StrRef, std::move(label));
     tmp.intValue = val;
     return std::move(tmp);

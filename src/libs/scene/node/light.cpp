@@ -18,9 +18,9 @@
 #include "reone/scene/node/light.h"
 
 #include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/di/services.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textures.h"
@@ -30,8 +30,6 @@
 #include "reone/scene/graph.h"
 
 #include "reone/scene/node/camera.h"
-
-using namespace std;
 
 using namespace reone::graphics;
 
@@ -69,7 +67,7 @@ void LightSceneNode::update(float dt) {
 }
 
 void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
-    shared_ptr<Camera> camera(_sceneGraph.camera());
+    std::shared_ptr<Camera> camera(_sceneGraph.camera());
     if (!camera) {
         return;
     }

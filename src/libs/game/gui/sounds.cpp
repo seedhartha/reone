@@ -21,8 +21,6 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/format/2dareader.h"
 
-using namespace std;
-
 using namespace reone::audio;
 using namespace reone::resource;
 
@@ -31,7 +29,7 @@ namespace reone {
 namespace game {
 
 void GUISounds::init() {
-    shared_ptr<TwoDa> sounds(_twoDas.get("guisounds"));
+    std::shared_ptr<TwoDa> sounds(_twoDas.get("guisounds"));
     if (!sounds) {
         return;
     }
@@ -39,7 +37,7 @@ void GUISounds::init() {
     loadSound(*sounds, "Entered_Default", _onEnter);
 }
 
-void GUISounds::loadSound(const TwoDa &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
+void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioStream> &sound) {
     int row = twoDa.indexByCellValue("label", label);
     if (row != -1) {
         sound = _audioFiles.get(twoDa.getString(row, "soundresref"));

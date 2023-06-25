@@ -20,8 +20,6 @@
 #include "reone/system/binaryreader.h"
 #include "reone/system/stream/fileinput.h"
 
-using namespace std;
-
 namespace reone {
 
 void AudioTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
@@ -38,7 +36,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     size_t filesize = wav.position();
     wav.seek(0, SeekOrigin::Begin);
 
-    string suffix;
+    std::string suffix;
 
     // Read magic number
     BinaryReader reader(wav);
@@ -50,7 +48,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
         // Read subchunks
         reader.ignore(8); // chunk size + format
         while (!reader.eof()) {
-            string subchunkId(reader.getString(4));
+            std::string subchunkId(reader.getString(4));
             uint32_t subchunkSize = reader.getInt32();
             if (subchunkId == "data") {
                 break;
@@ -60,7 +58,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
         }
         suffix = ".mp3";
     } else {
-        throw runtime_error("Unsupported audio format");
+        throw std::runtime_error("Unsupported audio format");
     }
 
     int dataSize = static_cast<int>(filesize - reader.tell());
@@ -70,7 +68,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     unwrappedPath.replace_extension();
     unwrappedPath += suffix;
 
-    boost::filesystem::ofstream unwrapped(unwrappedPath, ios::binary);
+    boost::filesystem::ofstream unwrapped(unwrappedPath, std::ios::binary);
     unwrapped.write(&data[0], data.size());
 }
 

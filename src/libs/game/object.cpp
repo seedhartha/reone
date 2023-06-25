@@ -26,8 +26,6 @@
 #include "reone/game/object/item.h"
 #include "reone/game/room.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -48,7 +46,7 @@ void Object::update(float dt) {
         executeActions(dt);
     }
     if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
-        static_pointer_cast<ModelSceneNode>(_sceneNode)->setPickable(isSelectable());
+        std::static_pointer_cast<ModelSceneNode>(_sceneNode)->setPickable(isSelectable());
     }
 }
 
@@ -74,15 +72,15 @@ void Object::clearAllActions() {
     }
 }
 
-void Object::addAction(unique_ptr<Action> action) {
+void Object::addAction(std::unique_ptr<Action> action) {
     _actions.push_back(std::move(action));
 }
 
-void Object::addActionOnTop(unique_ptr<Action> action) {
+void Object::addActionOnTop(std::unique_ptr<Action> action) {
     _actions.push_front(std::move(action));
 }
 
-void Object::delayAction(unique_ptr<Action> action, float seconds) {
+void Object::delayAction(std::unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = std::move(action);
     delayed.timer.setTimeout(seconds);
@@ -96,7 +94,7 @@ void Object::updateActions(float dt) {
 
 void Object::removeCompletedActions() {
     while (true) {
-        shared_ptr<Action> action(getCurrentAction());
+        std::shared_ptr<Action> action(getCurrentAction());
         if (!action || !action->isCompleted())
             return;
 
@@ -123,7 +121,7 @@ void Object::executeActions(float dt) {
     if (_actions.empty()) {
         return;
     }
-    shared_ptr<Action> action(_actions.front());
+    std::shared_ptr<Action> action(_actions.front());
     action->execute(action, *this, dt);
 }
 
@@ -136,12 +134,12 @@ bool Object::hasUserActionsPending() const {
     return false;
 }
 
-shared_ptr<Action> Object::getCurrentAction() const {
+std::shared_ptr<Action> Object::getCurrentAction() const {
     return _actions.empty() ? nullptr : _actions.front();
 }
 
-shared_ptr<Item> Object::addItem(const string &resRef, int stackSize, bool dropable) {
-    shared_ptr<Item> result;
+std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, bool dropable) {
+    std::shared_ptr<Item> result;
 
     auto maybeItem = find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
         return item->blueprintResRef() == resRef;
@@ -163,7 +161,7 @@ shared_ptr<Item> Object::addItem(const string &resRef, int stackSize, bool dropa
     return std::move(result);
 }
 
-void Object::addItem(const shared_ptr<Item> &item) {
+void Object::addItem(const std::shared_ptr<Item> &item) {
     auto maybeItem = find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
     if (maybeItem != _items.end()) {
         (*maybeItem)->setStackSize((*maybeItem)->stackSize() + 1);
@@ -172,7 +170,7 @@ void Object::addItem(const shared_ptr<Item> &item) {
     }
 }
 
-bool Object::removeItem(const shared_ptr<Item> &item, bool &last) {
+bool Object::removeItem(const std::shared_ptr<Item> &item, bool &last) {
     auto maybeItem = find(_items.begin(), _items.end(), item);
     if (maybeItem == _items.end())
         return false;
@@ -258,7 +256,7 @@ void Object::moveDropableItemsTo(Object &other) {
     }
 }
 
-void Object::applyEffect(const shared_ptr<Effect> &effect, DurationType durationType, float duration) {
+void Object::applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration) {
     if (durationType == DurationType::Instant) {
         applyInstantEffect(*effect);
     } else {
@@ -298,7 +296,7 @@ bool Object::isSelectable() const {
 }
 
 glm::vec3 Object::getSelectablePosition() const {
-    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    auto model = std::static_pointer_cast<ModelSceneNode>(_sceneNode);
     return model ? model->getWorldCenterOfAABB() : _position;
 }
 
@@ -343,12 +341,12 @@ void Object::setVisible(bool visible) {
     }
 }
 
-shared_ptr<Item> Object::getFirstItem() {
+std::shared_ptr<Item> Object::getFirstItem() {
     _itemIndex = 0;
     return getNextItem();
 }
 
-shared_ptr<Item> Object::getNextItem() {
+std::shared_ptr<Item> Object::getNextItem() {
     int itemCount = static_cast<int>(_items.size());
     if (itemCount > _itemIndex) {
         return _items[_itemIndex++];
@@ -356,7 +354,7 @@ shared_ptr<Item> Object::getNextItem() {
     return nullptr;
 }
 
-shared_ptr<Item> Object::getItemByTag(const string &tag) {
+std::shared_ptr<Item> Object::getItemByTag(const std::string &tag) {
     for (auto &item : _items) {
         if (item->tag() == tag)
             return item;
@@ -390,12 +388,12 @@ void Object::stopStuntMode() {
     _stunt = false;
 }
 
-shared_ptr<Effect> Object::getFirstEffect() {
+std::shared_ptr<Effect> Object::getFirstEffect() {
     _effectIndex = 1;
     return !_effects.empty() ? _effects[0].effect : nullptr;
 }
 
-shared_ptr<Effect> Object::getNextEffect() {
+std::shared_ptr<Effect> Object::getNextEffect() {
     return (_effectIndex < _effects.size()) ? _effects[_effectIndex++].effect : nullptr;
 }
 

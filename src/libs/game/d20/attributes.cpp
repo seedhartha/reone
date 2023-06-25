@@ -21,8 +21,6 @@
 
 #include "reone/game/d20/class.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace game {
@@ -78,7 +76,7 @@ void CreatureAttributes::addClassLevels(CreatureClass *clazz, int levels) {
             return;
         }
     }
-    _classLevels.push_back(make_pair(clazz, levels));
+    _classLevels.push_back(std::make_pair(clazz, levels));
 }
 
 ClassType CreatureAttributes::getClassByPosition(int position) const {

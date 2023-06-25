@@ -26,8 +26,6 @@
 
 #include "tinyxml2.h"
 
-using namespace std;
-
 using namespace tinyxml2;
 
 using namespace reone::game;
@@ -40,7 +38,7 @@ void SsfTool::invoke(
     const boost::filesystem::path &outputDir,
     const boost::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void SsfTool::invokeBatch(
@@ -96,18 +94,18 @@ void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem
 
     auto rootElement = document.RootElement();
     if (!rootElement) {
-        cerr << "XML is empty" << endl;
+        std::cerr << "XML is empty" << std::endl;
         fclose(fp);
         return;
     }
 
-    auto soundSet = vector<uint32_t>();
+    auto soundSet = std::vector<uint32_t>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
         auto strref = element->UnsignedAttribute("strref");
         soundSet.push_back(strref);
     }
 
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     boost::split(
         tokens,
         path.filename().string(),

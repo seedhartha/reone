@@ -17,14 +17,12 @@
 
 #include "reone/graphics/walkmesh.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 const Walkmesh::Face *Walkmesh::raycast(
-    set<uint32_t> surfaces,
+    std::set<uint32_t> surfaces,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
@@ -49,7 +47,7 @@ const Walkmesh::Face *Walkmesh::raycast(
 }
 
 const Walkmesh::Face *Walkmesh::raycastAABB(
-    set<uint32_t> surfaces,
+    std::set<uint32_t> surfaces,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
@@ -57,7 +55,7 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
 
     float distance = 0.0f;
 
-    stack<AABB *> aabbs;
+    std::stack<AABB *> aabbs;
     aabbs.push(_rootAabb.get());
 
     auto invDir = 1.0f / dir;
@@ -94,7 +92,7 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
 }
 
 bool Walkmesh::raycastFace(
-    set<uint32_t> surfaces,
+    std::set<uint32_t> surfaces,
     const Face &face,
     const glm::vec3 &origin,
     const glm::vec3 &dir,

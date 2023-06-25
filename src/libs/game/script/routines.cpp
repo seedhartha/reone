@@ -26,8 +26,6 @@
 #include "reone/game/script/routine/context.h"
 #include "reone/game/script/routine/declarations.h"
 
-using namespace std;
-
 using namespace reone::script;
 
 #define R_VOID script::VariableType::Void
@@ -1743,12 +1741,12 @@ void Routines::initForTSL() {
 
 Routine &Routines::get(int index) {
     if (isOutOfRange(_routines, index)) {
-        throw out_of_range("index is out of range");
+        throw std::out_of_range("index is out of range");
     }
     return _routines[index];
 }
 
-int Routines::getIndexByName(const string &name) const {
+int Routines::getIndexByName(const std::string &name) const {
     for (size_t i = 0; i < _routines.size(); ++i) {
         if (_routines[i].name() == name) {
             return static_cast<int>(i);
@@ -1758,10 +1756,10 @@ int Routines::getIndexByName(const string &name) const {
 }
 
 void Routines::add(
-    string name,
+    std::string name,
     VariableType retType,
-    vector<VariableType> argTypes,
-    Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx)) {
+    std::vector<VariableType> argTypes,
+    Variable (*fn)(const std::vector<Variable> &args, const RoutineContext &ctx)) {
 
     Variable defRetValue;
     defRetValue.type = retType;
@@ -1788,10 +1786,10 @@ void Routines::add(
 }
 
 void Routines::add(
-    string name,
+    std::string name,
     VariableType retType,
-    vector<VariableType> argTypes,
-    Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx),
+    std::vector<VariableType> argTypes,
+    Variable (*fn)(const std::vector<Variable> &args, const RoutineContext &ctx),
     Variable defRetValue) {
 
     _routines.emplace_back(

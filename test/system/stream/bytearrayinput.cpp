@@ -21,8 +21,6 @@
 
 #include "../../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(byte_array_input_stream)
@@ -32,7 +30,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_byte_array) {
     auto bytes = ByteArray("Hello, world!");
     auto stream = ByteArrayInputStream(bytes);
     auto buf = ByteArray(16, '\0');
-    auto expectedContents = string("Hello, world!");
+    auto expectedContents = std::string("Hello, world!");
 
     // when
     stream.seek(0, SeekOrigin::End);
@@ -65,17 +63,17 @@ BOOST_AUTO_TEST_CASE(should_read_lines_from_byte_array) {
 
     // expect
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(string(buf) == string("line1"));
+    BOOST_TEST(std::string(buf) == std::string("line1"));
 
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(string(buf) == string("line2"));
+    BOOST_TEST(std::string(buf) == std::string("line2"));
 
     stream.readLine(buf, 7);
-    BOOST_TEST(string(buf, 7) == string("longlin"));
+    BOOST_TEST(std::string(buf, 7) == std::string("longlin"));
     BOOST_TEST(!stream.eof());
 
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(string(buf) == string("e"));
+    BOOST_TEST(std::string(buf) == std::string("e"));
     BOOST_TEST(stream.eof());
 }
 

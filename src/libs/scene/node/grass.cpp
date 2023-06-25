@@ -32,8 +32,6 @@
 
 #include "reone/scene/node/grasscluster.h"
 
-using namespace std;
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -77,7 +75,7 @@ void GrassSceneNode::update(float dt) {
     glm::vec3 meshSpaceCameraPos(_absTransformInv * glm::vec4(cameraPos, 1.0f));
 
     // Return grass clusters in out-of-distance faces, to the pool
-    set<int> outOfDistance;
+    std::set<int> outOfDistance;
     for (auto &pair : _materializedClusters) {
         auto faceIdx = pair.first;
         auto &face = faces[faceIdx];
@@ -102,7 +100,7 @@ void GrassSceneNode::update(float dt) {
     }
 
     // Sort grass faces by distance to camera
-    multimap<float, int> closestFaces;
+    std::multimap<float, int> closestFaces;
     for (size_t faceIdx = 0; faceIdx < faces.size(); ++faceIdx) {
         auto &face = faces[faceIdx];
         if (_properties.materials.count(face.material) == 0) {
@@ -112,7 +110,7 @@ void GrassSceneNode::update(float dt) {
         if (distance2 > kMaxClusterDistance2) {
             continue;
         }
-        closestFaces.insert(make_pair(distance2, static_cast<int>(faceIdx)));
+        closestFaces.insert(std::make_pair(distance2, static_cast<int>(faceIdx)));
     }
 
     // Materialize grass clusters in closest faces, from the pool
@@ -141,7 +139,7 @@ void GrassSceneNode::update(float dt) {
     }
 }
 
-void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
+void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }

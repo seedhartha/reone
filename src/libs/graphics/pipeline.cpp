@@ -34,8 +34,6 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 
-using namespace std;
-
 #define R_GAUSSIAN_BLUR_HORIZONTAL false
 #define R_GAUSSIAN_BLUR_VERTICAL true
 #define R_GAUSSIAN_BLUR_STRONG true
@@ -61,16 +59,16 @@ static constexpr GLenum kColorAttachments[] {
     GL_COLOR_ATTACHMENT7,
     GL_COLOR_ATTACHMENT8};
 
-static const vector<float> g_shadowCascadeDivisors {
+static const std::vector<float> g_shadowCascadeDivisors {
     0.005f,
     0.015f,
     0.045f,
     0.135f};
 
-static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
+static std::vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
     auto inv = glm::inverse(projection * view);
 
-    vector<glm::vec4> corners;
+    std::vector<glm::vec4> corners;
     for (auto x = 0; x < 2; ++x) {
         for (auto y = 0; y < 2; ++y) {
             for (auto z = 0; z < 2; ++z) {
@@ -105,20 +103,20 @@ static glm::mat4 computeDirectionalLightSpaceMatrix(
 
     auto lightView = glm::lookAt(center - lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
-    float minX = numeric_limits<float>::max();
-    float maxX = numeric_limits<float>::min();
-    float minY = numeric_limits<float>::max();
-    float maxY = numeric_limits<float>::min();
-    float minZ = numeric_limits<float>::max();
-    float maxZ = numeric_limits<float>::min();
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::min();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::min();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::min();
     for (auto &v : corners) {
         auto trf = lightView * v;
-        minX = min(minX, trf.x);
-        maxX = max(maxX, trf.x);
-        minY = min(minY, trf.y);
-        maxY = max(maxY, trf.y);
-        minZ = min(minZ, trf.z);
-        maxZ = max(maxZ, trf.z);
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
     }
     float zMult = 10.0f;
     if (minZ < 0.0f) {
@@ -151,7 +149,7 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
     case CubeMapFace::NegativeZ:
         return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
     default:
-        throw invalid_argument("side is invalid");
+        throw std::invalid_argument("side is invalid");
     }
 }
 
@@ -175,102 +173,102 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
 
     // Reusable attachments
 
-    attachments.dbCommon = make_unique<Renderbuffer>();
+    attachments.dbCommon = std::make_unique<Renderbuffer>();
     attachments.dbCommon->configure(dim.x, dim.y, PixelFormat::Depth32F);
     attachments.dbCommon->init();
 
-    attachments.dbCommonHalf = make_unique<Renderbuffer>();
+    attachments.dbCommonHalf = std::make_unique<Renderbuffer>();
     attachments.dbCommonHalf->configure(halfDim.x, halfDim.y, PixelFormat::Depth32F);
     attachments.dbCommonHalf->init();
 
-    attachments.cbPing = make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPing = std::make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPing->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbPing->init();
 
-    attachments.fbPing = make_unique<Framebuffer>();
+    attachments.fbPing = std::make_unique<Framebuffer>();
     attachments.fbPing->attachColorDepth(attachments.cbPing, attachments.dbCommon);
     attachments.fbPing->init();
 
-    attachments.cbPingHalf = make_unique<Texture>("ping_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPingHalf = std::make_unique<Texture>("ping_color_half", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPingHalf->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
     attachments.cbPingHalf->init();
 
-    attachments.fbPingHalf = make_unique<Framebuffer>();
+    attachments.fbPingHalf = std::make_unique<Framebuffer>();
     attachments.fbPingHalf->attachColorDepth(attachments.cbPingHalf, attachments.dbCommonHalf);
     attachments.fbPingHalf->init();
 
-    attachments.cbPong = make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPong = std::make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPong->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbPong->init();
 
-    attachments.fbPong = make_unique<Framebuffer>();
+    attachments.fbPong = std::make_unique<Framebuffer>();
     attachments.fbPong->attachColorDepth(attachments.cbPong, attachments.dbCommon);
     attachments.fbPong->init();
 
-    attachments.cbPongHalf = make_unique<Texture>("pong_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPongHalf = std::make_unique<Texture>("pong_color_half", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPongHalf->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
     attachments.cbPongHalf->init();
 
-    attachments.fbPongHalf = make_unique<Framebuffer>();
+    attachments.fbPongHalf = std::make_unique<Framebuffer>();
     attachments.fbPongHalf->attachColorDepth(attachments.cbPongHalf, attachments.dbCommonHalf);
     attachments.fbPongHalf->init();
 
     // Directional light shadows framebuffer
 
-    attachments.dbDirectionalLightShadows = make_unique<Texture>("point_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
+    attachments.dbDirectionalLightShadows = std::make_unique<Texture>("point_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
     attachments.dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
     attachments.dbDirectionalLightShadows->init();
 
-    attachments.fbDirectionalLightShadows = make_shared<Framebuffer>();
+    attachments.fbDirectionalLightShadows = std::make_shared<Framebuffer>();
     attachments.fbDirectionalLightShadows->attachDepth(attachments.dbDirectionalLightShadows);
     attachments.fbDirectionalLightShadows->init();
 
     // Point light shadows framebuffer
 
-    attachments.dbPointLightShadows = make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
+    attachments.dbPointLightShadows = std::make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
     attachments.dbPointLightShadows->setCubemap(true);
     attachments.dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
     attachments.dbPointLightShadows->init();
 
-    attachments.fbPointLightShadows = make_shared<Framebuffer>();
+    attachments.fbPointLightShadows = std::make_shared<Framebuffer>();
     attachments.fbPointLightShadows->attachDepth(attachments.dbPointLightShadows);
     attachments.fbPointLightShadows->init();
 
     // G-Buffer framebuffer
 
-    attachments.cbGBufferDiffuse = make_unique<Texture>("gbuffer_color_diffuse", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferDiffuse = std::make_unique<Texture>("gbuffer_color_diffuse", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferDiffuse->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbGBufferDiffuse->init();
 
-    attachments.cbGBufferLightmap = make_unique<Texture>("gbuffer_color_lightmap", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferLightmap = std::make_unique<Texture>("gbuffer_color_lightmap", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferLightmap->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbGBufferLightmap->init();
 
-    attachments.cbGBufferEnvMap = make_unique<Texture>("gbuffer_color_envmap", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEnvMap = std::make_unique<Texture>("gbuffer_color_envmap", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferEnvMap->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbGBufferEnvMap->init();
 
-    attachments.cbGBufferSelfIllum = make_unique<Texture>("gbuffer_color_selfillum", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferSelfIllum = std::make_unique<Texture>("gbuffer_color_selfillum", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferSelfIllum->clear(dim.x, dim.y, PixelFormat::RGB8);
     attachments.cbGBufferSelfIllum->init();
 
-    attachments.cbGBufferFeatures = make_unique<Texture>("gbuffer_color_features", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferFeatures = std::make_unique<Texture>("gbuffer_color_features", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferFeatures->clear(dim.x, dim.y, PixelFormat::RG8);
     attachments.cbGBufferFeatures->init();
 
-    attachments.cbGBufferEyePos = make_unique<Texture>("gbuffer_color_eyepos", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEyePos = std::make_unique<Texture>("gbuffer_color_eyepos", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferEyePos->clear(dim.x, dim.y, PixelFormat::RGB16F);
     attachments.cbGBufferEyePos->init();
 
-    attachments.cbGBufferEyeNormal = make_unique<Texture>("gbuffer_color_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEyeNormal = std::make_unique<Texture>("gbuffer_color_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB8);
     attachments.cbGBufferEyeNormal->init();
 
-    attachments.dbGBuffer = make_shared<Renderbuffer>();
+    attachments.dbGBuffer = std::make_shared<Renderbuffer>();
     attachments.dbGBuffer->configure(dim.x, dim.y, PixelFormat::Depth32F);
     attachments.dbGBuffer->init();
 
-    attachments.fbGBuffer = make_shared<Framebuffer>();
+    attachments.fbGBuffer = std::make_shared<Framebuffer>();
     attachments.fbGBuffer->attachColorsDepth(
         {attachments.cbGBufferDiffuse,
          attachments.cbGBufferLightmap,
@@ -284,29 +282,29 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
 
     // Opaque geometry framebuffer
 
-    attachments.cbOpaqueGeometry1 = make_unique<Texture>("opaque_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbOpaqueGeometry1 = std::make_unique<Texture>("opaque_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbOpaqueGeometry1->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbOpaqueGeometry1->init();
 
-    attachments.cbOpaqueGeometry2 = make_unique<Texture>("opaque_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbOpaqueGeometry2 = std::make_unique<Texture>("opaque_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbOpaqueGeometry2->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbOpaqueGeometry2->init();
 
-    attachments.fbOpaqueGeometry = make_shared<Framebuffer>();
+    attachments.fbOpaqueGeometry = std::make_shared<Framebuffer>();
     attachments.fbOpaqueGeometry->attachColorsDepth({attachments.cbOpaqueGeometry1, attachments.cbOpaqueGeometry2}, attachments.dbCommon);
     attachments.fbOpaqueGeometry->init();
 
     // Transparent geometry framebuffer
 
-    attachments.cbTransparentGeometry1 = make_unique<Texture>("transparent_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbTransparentGeometry1 = std::make_unique<Texture>("transparent_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbTransparentGeometry1->clear(dim.x, dim.y, PixelFormat::RGBA16F);
     attachments.cbTransparentGeometry1->init();
 
-    attachments.cbTransparentGeometry2 = make_unique<Texture>("transparent_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbTransparentGeometry2 = std::make_unique<Texture>("transparent_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbTransparentGeometry2->clear(dim.x, dim.y, PixelFormat::R16F);
     attachments.cbTransparentGeometry2->init();
 
-    attachments.fbTransparentGeometry = make_shared<Framebuffer>();
+    attachments.fbTransparentGeometry = std::make_shared<Framebuffer>();
     attachments.fbTransparentGeometry->attachColorsDepth(
         {attachments.cbTransparentGeometry1, attachments.cbTransparentGeometry2},
         attachments.dbCommon);
@@ -314,31 +312,31 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
 
     // SSAO framebuffer
 
-    attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbSSAO = std::make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbSSAO->clear(halfDim.x, halfDim.y, PixelFormat::R8);
     attachments.cbSSAO->init();
 
-    attachments.fbSSAO = make_shared<Framebuffer>();
+    attachments.fbSSAO = std::make_shared<Framebuffer>();
     attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommonHalf);
     attachments.fbSSAO->init();
 
     // SSR framebuffer
 
-    attachments.cbSSR = make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbSSR = std::make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbSSR->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
     attachments.cbSSR->init();
 
-    attachments.fbSSR = make_shared<Framebuffer>();
+    attachments.fbSSR = std::make_shared<Framebuffer>();
     attachments.fbSSR->attachColorDepth(attachments.cbSSR, attachments.dbCommonHalf);
     attachments.fbSSR->init();
 
     // Output framebuffer
 
-    attachments.cbOutput = make_unique<Texture>("output_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbOutput = std::make_unique<Texture>("output_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbOutput->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbOutput->init();
 
-    attachments.fbOutput = make_unique<Framebuffer>();
+    attachments.fbOutput = std::make_unique<Framebuffer>();
     attachments.fbOutput->attachColorDepth(attachments.cbOutput, attachments.dbCommon);
     attachments.fbOutput->init();
 
@@ -347,7 +345,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     _attachments[dim] = std::move(attachments);
 }
 
-shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
+std::shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
     if (!scene.camera()) {
         return nullptr;
     }
@@ -703,7 +701,7 @@ void Pipeline::computeLightSpaceMatrices(IScene &scene) {
         return;
     }
     if (scene.isShadowLightDirectional()) {
-        auto camera = static_pointer_cast<PerspectiveCamera>(scene.camera());
+        auto camera = std::static_pointer_cast<PerspectiveCamera>(scene.camera());
         auto lightDir = glm::normalize(camera->position() - scene.shadowLightPosition());
         float fovy = camera->fovy();
         float aspect = camera->aspect();

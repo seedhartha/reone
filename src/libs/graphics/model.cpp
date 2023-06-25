@@ -25,18 +25,16 @@
 #include "reone/graphics/modelnode.h"
 #include "reone/graphics/types.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace graphics {
 
 Model::Model(
-    string name,
+    std::string name,
     int classification,
-    shared_ptr<ModelNode> rootNode,
-    vector<shared_ptr<Animation>> animations,
-    shared_ptr<Model> superModel,
+    std::shared_ptr<ModelNode> rootNode,
+    std::vector<std::shared_ptr<Animation>> animations,
+    std::shared_ptr<Model> superModel,
     float animationScale) :
     _name(std::move(name)),
     _classification(classification),
@@ -54,7 +52,7 @@ Model::Model(
     }
 }
 
-void Model::fillLookups(const shared_ptr<ModelNode> &node) {
+void Model::fillLookups(const std::shared_ptr<ModelNode> &node) {
     _nodeByNumber[node->number()] = node;
     _nodeByName[node->name()] = node;
 
@@ -78,15 +76,15 @@ void Model::init() {
     _rootNode->init();
 }
 
-shared_ptr<ModelNode> Model::getNodeByNumber(uint16_t number) const {
+std::shared_ptr<ModelNode> Model::getNodeByNumber(uint16_t number) const {
     return getFromLookupOrNull(_nodeByNumber, number);
 }
 
-shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
+std::shared_ptr<ModelNode> Model::getNodeByName(const std::string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
-shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
+std::shared_ptr<ModelNode> Model::getNodeByNameRecursive(const std::string &name) const {
     auto result = getFromLookupOrNull(_nodeByName, name);
     if (!result && _superModel) {
         result = _superModel->getNodeByNameRecursive(name);
@@ -94,7 +92,7 @@ shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
     return std::move(result);
 }
 
-shared_ptr<ModelNode> Model::getAABBNode() const {
+std::shared_ptr<ModelNode> Model::getAABBNode() const {
     for (auto &node : _nodeByNumber) {
         if (node.second->isAABBMesh())
             return node.second;
@@ -102,11 +100,11 @@ shared_ptr<ModelNode> Model::getAABBNode() const {
     return nullptr;
 }
 
-vector<string> Model::getAnimationNames() const {
-    vector<string> result;
+std::vector<std::string> Model::getAnimationNames() const {
+    std::vector<std::string> result;
 
     if (_superModel) {
-        vector<string> superAnims(_superModel->getAnimationNames());
+        std::vector<std::string> superAnims(_superModel->getAnimationNames());
         for (auto &anim : superAnims) {
             result.push_back(anim);
         }
@@ -118,12 +116,12 @@ vector<string> Model::getAnimationNames() const {
     return std::move(result);
 }
 
-shared_ptr<Animation> Model::getAnimation(const string &name) const {
+std::shared_ptr<Animation> Model::getAnimation(const std::string &name) const {
     auto maybeAnim = _animations.find(name);
     if (maybeAnim != _animations.end())
         return maybeAnim->second;
 
-    shared_ptr<Animation> anim;
+    std::shared_ptr<Animation> anim;
     if (_superModel) {
         anim = _superModel->getAnimation(name);
     }

@@ -17,11 +17,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "reone/resource/strings.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileoutput.h"
-#include "reone/resource/strings.h"
-
-using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
@@ -59,8 +57,8 @@ BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
 
     auto strings = Strings();
 
-    auto expectedText = string("Hello, world!");
-    auto expectedSound = string("some_sound");
+    auto expectedText = std::string("Hello, world!");
+    auto expectedSound = std::string("some_sound");
 
     // when
 

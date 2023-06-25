@@ -28,8 +28,6 @@
 #include "reone/game/object/placeable.h"
 #include "reone/game/party.h"
 
-using namespace std;
-
 using namespace reone::audio;
 
 using namespace reone::gui;
@@ -47,10 +45,10 @@ static constexpr int kInventoryResRef = 393;
 void ContainerGUI::onGUILoaded() {
     bindControls();
 
-    string btnMessage(_services.resource.strings.get(kSwitchToResRef) + " " + _services.resource.strings.get(kGiveItemResRef));
+    std::string btnMessage(_services.resource.strings.get(kSwitchToResRef) + " " + _services.resource.strings.get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    string lblMessage(_services.resource.strings.get(kInventoryResRef));
+    std::string lblMessage(_services.resource.strings.get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {
@@ -81,7 +79,7 @@ void ContainerGUI::configureItemsListBox() {
     protoItem.setText(text);
 }
 
-void ContainerGUI::open(shared_ptr<Object> container) {
+void ContainerGUI::open(std::shared_ptr<Object> container) {
     _binding.lbItems->clearItems();
 
     for (auto &item : container->items()) {
@@ -95,7 +93,7 @@ void ContainerGUI::open(shared_ptr<Object> container) {
         lbItem.iconFrame = getItemFrameTexture(item->stackSize());
 
         if (item->stackSize() > 1) {
-            lbItem.iconText = to_string(item->stackSize());
+            lbItem.iconText = std::to_string(item->stackSize());
         }
         _binding.lbItems->addItem(std::move(lbItem));
     }
@@ -103,8 +101,8 @@ void ContainerGUI::open(shared_ptr<Object> container) {
     _container = std::move(container);
 }
 
-shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
-    string resRef;
+std::shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
+    std::string resRef;
     if (_game.isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
@@ -114,10 +112,10 @@ shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
 }
 
 void ContainerGUI::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_game.party().player());
+    std::shared_ptr<Creature> player(_game.party().player());
     _container->moveDropableItemsTo(*player);
 
-    auto placeable = dynamic_pointer_cast<Placeable>(_container);
+    auto placeable = std::dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {
         placeable->runOnInvDisturbed(player);
     }

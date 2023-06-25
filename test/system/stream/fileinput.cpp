@@ -21,8 +21,6 @@
 
 #include "../../checkutil.h"
 
-using namespace std;
-
 using namespace reone;
 
 BOOST_AUTO_TEST_SUITE(file_input_stream)
@@ -38,7 +36,7 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
 
     auto stream = FileInputStream(tmpPath);
     auto buf = ByteArray(16, '\0');
-    auto expectedContents = string("Hello, world!");
+    auto expectedContents = std::string("Hello, world!");
 
     // when
 

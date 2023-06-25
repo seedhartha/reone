@@ -22,13 +22,11 @@
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/resources.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {
 
-shared_ptr<TwoDa> TwoDas::doGet(const string &resRef) {
+std::shared_ptr<TwoDa> TwoDas::doGet(const std::string &resRef) {
     auto raw = _resources.get(resRef, ResourceType::TwoDa);
     if (!raw) {
         return nullptr;
