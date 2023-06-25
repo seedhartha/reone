@@ -267,17 +267,18 @@ MainFrame::MainFrame() :
         if (!requested) {
             return;
         }
-        auto glAttribs = vector<int> {
-            WX_GL_CORE_PROFILE,     //
-            WX_GL_MAJOR_VERSION, 3, //
-            WX_GL_MINOR_VERSION, 3, //
-            0};
-        _glCanvas = new wxGLCanvas(_renderSplitter, wxID_ANY, &glAttribs[0], wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+        _glCanvas = new wxGLCanvas(_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
         _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
         _glCanvas->Bind(wxEVT_MOTION, &MainFrame::OnGLCanvasMouseMotion, this);
         _glCanvas->Bind(wxEVT_MOUSEWHEEL, &MainFrame::OnGLCanvasMouseWheel, this);
 
+#if wxCHECK_VERSION(3, 1, 0)
+        wxGLContextAttrs glCtxAttrs;
+        glCtxAttrs.CoreProfile().OGLVersion(3, 3).EndList();
+        auto glContext = new wxGLContext(_glCanvas, nullptr, &glCtxAttrs);
+#else
         auto glContext = new wxGLContext(_glCanvas);
+#endif
         glContext->SetCurrent(*_glCanvas);
 
         _animationsListBox = new wxListBox(_renderSplitter, wxID_ANY);

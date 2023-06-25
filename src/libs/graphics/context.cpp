@@ -27,7 +27,10 @@ void GraphicsContext::init() {
     if (_inited) {
         return;
     }
-    glewInit();
+    GLenum error = glewInit();
+    if (error != GLEW_OK) {
+        throw runtime_error(str(boost::format("glewInit failed: %s") % glewGetErrorString(error)));
+    }
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     setDepthTestMode(DepthTestMode::LessOrEqual);
