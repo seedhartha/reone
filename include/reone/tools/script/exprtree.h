@@ -223,7 +223,7 @@ struct Function {
     BlockExpression *block {nullptr};
 
     bool contains(uint32_t offset) const {
-        return start <= offset && offset >= end;
+        return start <= offset && offset <= end;
     }
 };
 
@@ -329,7 +329,7 @@ private:
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
 
-        std::map<int, ParameterExpression *> *outerParams {nullptr};
+        std::map<int, ParameterExpression *, std::greater<int>> *outerParams {nullptr};
 
         DecompilationContext(
             const ScriptProgram &compiled,

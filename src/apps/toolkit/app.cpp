@@ -27,7 +27,6 @@ namespace reone {
 
 bool ToolkitApp::OnInit() {
     initLog();
-    setLogLevel(LogLevel::Debug);
     setLogToFile(true);
 
     wxImage::AddHandler(new wxTGAHandler());

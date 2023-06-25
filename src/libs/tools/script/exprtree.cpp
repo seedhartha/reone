@@ -179,7 +179,7 @@ void ExpressionTree::decompileFunction(Function &func, shared_ptr<DecompilationC
 
                         ctx->functions[sub->start] = sub;
 
-                        auto outerParams = map<int, ParameterExpression *>();
+                        auto outerParams = map<int, ParameterExpression *, std::greater<int>>();
 
                         auto subCtx = make_shared<DecompilationContext>(*ctx);
                         subCtx->outerParams = &outerParams;

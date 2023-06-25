@@ -99,7 +99,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
                     read.callArgIdx = static_cast<int>(i);
                     ctx.parameters[paramArg].reads.push_back(std::move(read));
                     if (callExpr->function->arguments[i].pointer) {
-                        ctx.parameters[paramArg].writes.push_back(ParameterWriteEvent(callExpr, callExpr));
+                        ctx.parameters[paramArg].writes.push_back(ParameterWriteEvent(callExpr, nullptr));
                     }
                 }
             }
@@ -220,6 +220,10 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
             auto expr = *it;
             if (expr->type == ExpressionType::Parameter) {
                 auto paramExpr = static_cast<ParameterExpression *>(expr);
+                if (paramExpr->locality == ParameterLocality::ReturnValue) {
+                    ++it;
+                    continue;
+                }
                 auto &paramEvents = ctx.parameters[paramExpr];
                 if (!paramEvents.writes.empty()) {
                     auto &write = paramEvents.writes.front();
@@ -251,13 +255,31 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                 auto callExpr = static_cast<CallExpression *>(expr);
                 if (ctx.callDestinations.count(callExpr) > 0) {
                     auto destination = ctx.callDestinations.at(callExpr);
+                    ctx.callDestinations.erase(callExpr);
                     debug(boost::format("Return value stored to variable at %08x in function call at %08x") % destination->offset % callExpr->offset);
                     auto assignExpr = make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = callExpr->offset;
                     assignExpr->left = destination;
                     assignExpr->right = callExpr;
+                    auto &destEvents = ctx.parameters[destination];
+                    for (auto readIter = destEvents.reads.begin(); readIter != destEvents.reads.end();) {
+                        auto &read = *readIter;
+                        if (read.expression == callExpr) {
+                            destEvents.reads.erase(readIter);
+                            break;
+                        }
+                        ++readIter;
+                    }
+                    for (auto &write : destEvents.writes) {
+                        if (write.writeExpr == callExpr && !write.value) {
+                            write.writeExpr = assignExpr.get();
+                            write.value = callExpr;
+                            break;
+                        }
+                    }
                     it = block->expressions.erase(it);
-                    it = ++block->expressions.insert(it, assignExpr.get());
+                    block->expressions.insert(it, assignExpr.get());
+                    it = block->expressions.begin();
                     tree.expressions().push_back(std::move(assignExpr));
                     continue;
                 }
@@ -265,10 +287,18 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                 auto binaryExpr = static_cast<BinaryExpression *>(expr);
                 if (binaryExpr->type == ExpressionType::Assign && binaryExpr->declareLeft) {
                     auto leftParam = static_cast<ParameterExpression *>(binaryExpr->left);
+                    if (leftParam->locality == ParameterLocality::ReturnValue) {
+                        ++it;
+                        continue;
+                    }
                     auto &paramEvents = ctx.parameters[leftParam];
                     if (paramEvents.writes.size() == 1ll && paramEvents.reads.size() == 1ll) {
                         auto &read = paramEvents.reads.front();
                         auto &write = paramEvents.writes.front();
+                        if (!write.value) {
+                            ++it;
+                            continue;
+                        }
                         if (read.expression->type == ExpressionType::Action) {
                             debug(boost::format("Write-once / read-once variable at %08x inlined as argument %d in action call at %08x") % leftParam->offset % read.actionArgIdx % read.expression->offset);
                             auto readAction = static_cast<ActionExpression *>(read.expression);
