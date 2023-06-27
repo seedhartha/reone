@@ -520,14 +520,14 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
 
-    auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
+    auto maybeObject = std::find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
     if (maybeObject != _objects.end()) {
         _objects.erase(maybeObject);
     }
     auto maybeTagObjects = _objectsByTag.find(object->tag());
     if (maybeTagObjects != _objectsByTag.end()) {
         auto &tagObjects = maybeTagObjects->second;
-        auto maybeObjectByTag = find_if(tagObjects.begin(), tagObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
+        auto maybeObjectByTag = std::find_if(tagObjects.begin(), tagObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
         if (maybeObjectByTag != tagObjects.end()) {
             tagObjects.erase(maybeObjectByTag);
         }
@@ -536,7 +536,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
     auto &typeObjects = _objectsByType.find(object->type())->second;
-    auto maybeObjectByType = find_if(typeObjects.begin(), typeObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
+    auto maybeObjectByType = std::find_if(typeObjects.begin(), typeObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
     if (maybeObjectByType != typeObjects.end()) {
         typeObjects.erase(maybeObjectByType);
     }

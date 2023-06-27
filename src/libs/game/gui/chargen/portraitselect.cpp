@@ -169,7 +169,7 @@ void PortraitSelection::updatePortraits() {
 
 void PortraitSelection::resetCurrentPortrait() {
     int appearance = _charGen.character().appearance;
-    auto maybePortrait = find_if(_filteredPortraits.begin(), _filteredPortraits.end(), [&appearance](const Portrait &portrait) {
+    auto maybePortrait = std::find_if(_filteredPortraits.begin(), _filteredPortraits.end(), [&appearance](const Portrait &portrait) {
         return portrait.appearanceNumber == appearance ||
                portrait.appearanceS == appearance ||
                portrait.appearanceL == appearance;

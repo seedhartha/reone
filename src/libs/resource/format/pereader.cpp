@@ -42,7 +42,7 @@ void PeReader::onLoad() {
         loadSection();
     }
 
-    auto maybeSection = find_if(_sections.begin(), _sections.end(), [](auto &s) { return s.name == ".rsrc"; });
+    auto maybeSection = std::find_if(_sections.begin(), _sections.end(), [](auto &s) { return s.name == ".rsrc"; });
     if (maybeSection != _sections.end()) {
         seek(maybeSection->offset);
         loadResourceDir(*maybeSection, 0);
@@ -56,7 +56,7 @@ std::shared_ptr<ByteArray> PeReader::find(uint32_t name, PEResourceType type) {
 }
 
 std::shared_ptr<ByteArray> PeReader::findInternal(std::function<bool(const Resource &)> pred) {
-    auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
+    auto maybeResource = std::find_if(_resources.begin(), _resources.end(), pred);
     if (maybeResource == _resources.end())
         return nullptr;
 

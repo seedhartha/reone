@@ -175,7 +175,7 @@ void EmitterSceneNode::doSpawnParticle() {
 
 void EmitterSceneNode::spawnLightningParticles() {
     // Ensure there is a reference node directly under this emitter
-    auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
+    auto ref = std::find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
     if (ref == _children.end()) {
         return;
     }

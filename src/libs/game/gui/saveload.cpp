@@ -257,7 +257,7 @@ static boost::filesystem::path getSaveGamePath(int number) {
 }
 
 void SaveLoad::deleteGame(int number) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
+    auto maybeSave = std::find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
     if (maybeSave != _saves.end()) {
         boost::filesystem::remove(maybeSave->path);
         refresh();

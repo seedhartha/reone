@@ -206,7 +206,7 @@ void Party::setPlayer(const std::shared_ptr<Creature> &player) {
 }
 
 bool Party::removeMember(int npc) {
-    auto maybeMember = find_if(_members.begin(), _members.end(), [&npc](auto &member) { return member.npc == npc; });
+    auto maybeMember = std::find_if(_members.begin(), _members.end(), [&npc](auto &member) { return member.npc == npc; });
     if (maybeMember != _members.end()) {
         _members.erase(maybeMember);
         return true;

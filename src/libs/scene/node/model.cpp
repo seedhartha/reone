@@ -294,7 +294,7 @@ void ModelSceneNode::updateAnimations(float dt) {
     switch (_animBlendMode) {
     case AnimationBlendMode::Single:
     case AnimationBlendMode::Overlay: {
-        auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished && (channel.properties.flags & AnimationFlags::fireForget); });
+        auto channelsToErase = std::remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished && (channel.properties.flags & AnimationFlags::fireForget); });
         _animChannels.erase(channelsToErase, _animChannels.end());
         break;
     }

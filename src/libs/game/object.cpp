@@ -109,7 +109,7 @@ void Object::updateDelayedActions(float dt) {
             _actions.push_back(std::move(delayed.action));
         }
     }
-    auto delayedToRemove = remove_if(
+    auto delayedToRemove = std::remove_if(
         _delayed.begin(),
         _delayed.end(),
         [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
@@ -141,7 +141,7 @@ std::shared_ptr<Action> Object::getCurrentAction() const {
 std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, bool dropable) {
     std::shared_ptr<Item> result;
 
-    auto maybeItem = find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
+    auto maybeItem = std::find_if(_items.begin(), _items.end(), [&resRef](auto &item) {
         return item->blueprintResRef() == resRef;
     });
     if (maybeItem != _items.end()) {
@@ -162,7 +162,7 @@ std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, 
 }
 
 void Object::addItem(const std::shared_ptr<Item> &item) {
-    auto maybeItem = find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
+    auto maybeItem = std::find_if(_items.begin(), _items.end(), [&item](auto &entry) { return entry->blueprintResRef() == item->blueprintResRef(); });
     if (maybeItem != _items.end()) {
         (*maybeItem)->setStackSize((*maybeItem)->stackSize() + 1);
     } else {

@@ -33,7 +33,7 @@ bool Gff::getBool(const std::string &name, bool defValue) const {
 }
 
 const Gff::Field *Gff::get(const std::string &name) const {
-    auto maybeField = find_if(
+    auto maybeField = std::find_if(
         _fields.begin(),
         _fields.end(),
         [&](auto &f) { return f.label == name; });

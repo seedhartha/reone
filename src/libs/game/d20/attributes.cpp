@@ -92,7 +92,7 @@ int CreatureAttributes::getLevelByPosition(int position) const {
 }
 
 int CreatureAttributes::getClassLevel(ClassType clazz) const {
-    auto maybeClassLevel = find_if(
+    auto maybeClassLevel = std::find_if(
         _classLevels.begin(), _classLevels.end(),
         [&clazz](auto &classLevel) { return classLevel.first->type() == clazz; });
 
