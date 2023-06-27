@@ -333,6 +333,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         auto pcodePanel = new wxPanel(_notebook);
         auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
         auto pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+        pcodeTextCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
         pcodeTextCtrl->AppendText(page.pcodeContent);
         pcodeTextCtrl->SetEditable(false);
         pcodeSizer->Add(pcodeTextCtrl, 1, wxEXPAND);

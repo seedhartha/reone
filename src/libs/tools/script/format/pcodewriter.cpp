@@ -50,10 +50,12 @@ void PcodeWriter::save(IOutputStream &pcode) {
 
 void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode, const std::set<uint32_t> &jumpOffsets) {
     if (jumpOffsets.count(ins.offset) > 0) {
-        std::string label(str(boost::format("loc_%08x:") % ins.offset));
-        pcode.write(label);
+        pcode.write(str(boost::format("%08x\t") % ins.offset));
+        pcode.write(str(boost::format("loc_%08x:") % ins.offset));
         pcode.write("\n");
     }
+
+    pcode.write(str(boost::format("%08x\t") % ins.offset));
 
     std::string desc(describeInstructionType(ins.type));
 

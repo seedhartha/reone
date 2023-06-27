@@ -35,15 +35,19 @@ void PcodeReader::load() {
     boost::filesystem::ifstream pcode(_path);
     std::string line;
     boost::smatch what;
-    boost::regex re("^([_\\d\\w]+):$");
+    boost::regex labelRegex("^([_\\d\\w]+):$");
     uint32_t addr = 13;
     while (getline(pcode, line)) {
+        auto addrSepIdx = line.find_first_of("\t");
+        if (addrSepIdx != std::string::npos) {
+            line = line.substr(addrSepIdx + 1);
+        }
         boost::trim(line);
         if (line.empty()) {
             continue;
         }
         int lineIdx = static_cast<int>(insLines.size());
-        if (boost::regex_match(line, what, re)) {
+        if (boost::regex_match(line, what, labelRegex)) {
             labelByLineIdx[lineIdx] = what[1].str();
             continue;
         }
