@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/log/sources/channel_logger.hpp>
-
 #include "types.h"
 
 namespace reone {
@@ -36,7 +34,6 @@ void info(const boost::format &s, LogChannel channel = LogChannel::Global);
 void debug(const std::string &s, LogChannel channel = LogChannel::Global);
 void debug(const boost::format &s, LogChannel channel = LogChannel::Global);
 
-bool isLogSeverityEnabled(LogSeverity severity);
 bool isLogChannelEnabled(LogChannel channel);
 
 } // namespace reone
