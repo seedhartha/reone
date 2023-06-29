@@ -20,15 +20,16 @@
 #include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/pathutil.h"
 
 #include "reone/game/options.h"
 #include "reone/game/types.h"
 
 using namespace reone::graphics;
+using namespace reone::resource;
 
 namespace reone {
 
@@ -67,7 +68,7 @@ void ResourceLayout::init() {
     } else if (_gameId == GameID::TSL) {
         initForTSL();
     } else {
-        throw std::logic_error("Unsupported game ID: " + std::to_string(static_cast<int>(_gameId)));
+        throw std::logic_error("Invalid game ID: " + std::to_string(static_cast<int>(_gameId)));
     }
 }
 
@@ -122,7 +123,7 @@ std::set<std::string> ResourceLayout::moduleNames() {
     auto moduleNames = std::set<std::string>();
     auto modulesPath = getPathIgnoreCase(_options.game.path, kModulesDirectoryName);
     if (modulesPath.empty()) {
-        throw ValidationException("Modules directory not found");
+        throw ResourceNotFoundException("Modules directory not found");
     }
     for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
         auto filename = boost::to_lower_copy(entry.path().filename().string());
@@ -141,7 +142,7 @@ void ResourceLayout::loadModuleResources(const std::string &moduleName) {
 
     boost::filesystem::path modulesPath(getPathIgnoreCase(_options.game.path, kModulesDirectoryName));
     if (modulesPath.empty()) {
-        throw ValidationException("Modules directory not found");
+        throw ResourceNotFoundException("Modules directory not found");
     }
 
     boost::filesystem::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));

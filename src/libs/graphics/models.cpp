@@ -17,10 +17,11 @@
 
 #include "reone/graphics/models.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/resource/resources.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/bytearrayinput.h"
+
 
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/model.h"
@@ -72,7 +73,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
             if (model) {
                 model->init();
             }
-        } catch (const ValidationException &e) {
+        } catch (const FormatException &e) {
             error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannel::Graphics);
         }
     }

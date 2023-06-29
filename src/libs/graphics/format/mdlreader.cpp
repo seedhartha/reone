@@ -17,9 +17,10 @@
 
 #include "reone/graphics/format/mdlreader.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/system/collectionutil.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
+
 
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
@@ -170,7 +171,7 @@ std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *pare
     ArrayDefinition controllerDataArrayDef(readArrayDefinition());
 
     if (flags & 0xf408) {
-        throw ValidationException("Unsupported MDL node flags: " + std::to_string(flags));
+        throw FormatException("Unsupported MDL node flags: " + std::to_string(flags));
     }
     std::string name(_nodeNames[nameIndex]);
     glm::vec3 restPosition(glm::make_vec3(&positionValues[0]));
@@ -856,7 +857,7 @@ MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags)
 
 static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
     if (actual != expected) {
-        throw ValidationException(str(boost::format("Controller %d: number of columns is %d, expected %d") % type % actual % expected));
+        throw FormatException(str(boost::format("Controller %d: number of columns is %d, expected %d") % type % actual % expected));
     }
 }
 
@@ -942,7 +943,7 @@ void MdlReader::readOrientationController(const ControllerKey &key, const std::v
         }
         break;
     default:
-        throw ValidationException("Unexpected number of columns: " + std::to_string(key.numColumns));
+        throw FormatException("Unexpected number of columns: " + std::to_string(key.numColumns));
     }
 
     node.orientation().update();

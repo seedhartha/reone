@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/erfreader.h"
 
-#include "reone/system/exception/validation.h"
+#include "reone/resource/exception/format.h"
 
 namespace reone {
 
@@ -40,13 +40,13 @@ void ErfReader::onLoad() {
 
 void ErfReader::checkSignature() {
     if (_size < 8) {
-        throw ValidationException("Invalid binary resource size");
+        throw FormatException("Invalid binary resource size");
     }
     auto signature = readString(8);
     bool erf = signature == std::string("ERF V1.0", 8);
     bool mod = signature == std::string("MOD V1.0", 8);
     if (!erf && !mod) {
-        throw ValidationException("Invalid ERF/MOD signature: " + signature);
+        throw FormatException("Invalid ERF/MOD signature: " + signature);
     }
 }
 

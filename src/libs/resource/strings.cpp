@@ -17,8 +17,8 @@
 
 #include "reone/resource/strings.h"
 
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/talktable.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
 
@@ -29,7 +29,7 @@ namespace resource {
 void Strings::init(const boost::filesystem::path &gameDir) {
     boost::filesystem::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
     if (tlkPath.empty()) {
-        throw ValidationException("dialog.tlk file not found");
+        throw ResourceNotFoundException("dialog.tlk file not found");
     }
     auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
     auto tlkReader = TlkReader();

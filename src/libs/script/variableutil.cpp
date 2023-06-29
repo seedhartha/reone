@@ -17,8 +17,6 @@
 
 #include "reone/script/variableutil.h"
 
-#include "reone/system/exception/argument.h"
-
 namespace reone {
 
 namespace script {
@@ -48,7 +46,7 @@ std::string describeVariableType(VariableType type) {
     case VariableType::Action:
         return "action";
     default:
-        throw ArgumentException("Cannot describe variable type: " + std::to_string(static_cast<int>(type)));
+        throw std::invalid_argument("Cannot describe variable type: " + std::to_string(static_cast<int>(type)));
     }
 }
 

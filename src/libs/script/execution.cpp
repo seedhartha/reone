@@ -17,14 +17,13 @@
 
 #include "reone/script/execution.h"
 
-#include "reone/system/logutil.h"
-
 #include "reone/script/executioncontext.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/program.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variable.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -259,7 +258,7 @@ void ScriptExecution::executeCONSTO(const Instruction &ins) {
 void ScriptExecution::executeACTION(const Instruction &ins) {
     auto &routine = _context->routines->get(ins.routine);
     if (ins.argCount > routine.getArgumentCount()) {
-        throw std::runtime_error("Too many routine arguments");
+        throw std::invalid_argument("Too many routine arguments");
     }
 
     std::vector<Variable> args;

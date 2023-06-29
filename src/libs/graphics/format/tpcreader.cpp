@@ -17,11 +17,12 @@
 
 #include "reone/graphics/format/tpcreader.h"
 
+#include "reone/graphics/format/txireader.h"
+#include "reone/graphics/textureutil.h"
+#include "reone/resource/exception/format.h"
 #include "reone/system/stream/bytearrayinput.h"
 
-#include "reone/graphics/textureutil.h"
-
-#include "reone/graphics/format/txireader.h"
+using namespace reone::resource;
 
 namespace reone {
 
@@ -140,7 +141,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::RGBA8;
         default:
-            throw std::logic_error("Unsupported uncompressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
+            throw FormatException("Unsupported uncompressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
         }
     } else
         switch (_encoding) {
@@ -149,7 +150,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::DXT5;
         default:
-            throw std::logic_error("Unsupported compressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
+            throw FormatException("Unsupported compressed TPC encoding: " + std::to_string(static_cast<int>(_encoding)));
         }
 }
 

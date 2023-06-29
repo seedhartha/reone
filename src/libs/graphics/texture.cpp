@@ -19,6 +19,7 @@
 
 #include "reone/graphics/pixelutil.h"
 #include "reone/graphics/textureutil.h"
+#include "reone/system/exception/notimplemented.h"
 
 namespace reone {
 
@@ -61,7 +62,7 @@ static uint32_t getPixelFormatGL(PixelFormat format) {
     case PixelFormat::Depth32FStencil8:
         return GL_DEPTH_STENCIL;
     default:
-        throw std::logic_error("Unsupported pixel format: " + std::to_string(static_cast<int>(format)));
+        throw std::invalid_argument("Invalid pixel format: " + std::to_string(static_cast<int>(format)));
     }
 }
 
@@ -83,7 +84,7 @@ static uint32_t getPixelTypeGL(PixelFormat format) {
     case PixelFormat::Depth32FStencil8:
         return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
     default:
-        throw std::logic_error("Unsupported pixel format: " + std::to_string(static_cast<int>(format)));
+        throw std::invalid_argument("Invalid pixel format: " + std::to_string(static_cast<int>(format)));
     }
 }
 
@@ -248,7 +249,7 @@ void Texture::setPixels(int w, int h, PixelFormat format, Layer layer, bool refr
 
 void Texture::setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh) {
     if (layers.empty()) {
-        throw std::invalid_argument("layers is empty");
+        throw std::invalid_argument("layers empty");
     }
     _width = w;
     _height = h;
@@ -262,7 +263,7 @@ void Texture::setPixels(int w, int h, PixelFormat format, std::vector<Layer> lay
 
 void Texture::flushGPUToCPU() {
     if (isCubemap() || is2DArray()) {
-        throw std::logic_error("Flushing cubemap or array textures is not supported");
+        throw NotImplementedException("Flushing cubemap or array textures not implemented");
     }
 
     if (_layers.empty()) {
@@ -301,7 +302,7 @@ void Texture::flushGPUToCPU() {
         bpp = 4 * 4;
         break;
     default:
-        throw std::logic_error(str(boost::format("Flushing texture of pixel format %d is not supported") % static_cast<int>(_pixelFormat)));
+        throw NotImplementedException(str(boost::format("Flushing texture of pixel format %d not implemented") % static_cast<int>(_pixelFormat)));
     }
     layer.pixels->resize(bpp * _width * _height);
 

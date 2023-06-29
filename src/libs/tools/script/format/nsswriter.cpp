@@ -17,12 +17,11 @@
 
 #include "reone/tools/script/format/nsswriter.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variableutil.h"
-#include "reone/system/exception/argument.h"
 #include "reone/system/exception/notimplemented.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/textwriter.h"
@@ -428,7 +427,7 @@ std::string NssWriter::describeConstant(const Variable &value) {
     } else if (value.type == VariableType::Object) {
         return std::to_string(value.objectId);
     } else {
-        throw ArgumentException("Cannot describe constant expression of type: " + std::to_string(static_cast<int>(value.type)));
+        throw std::invalid_argument("Cannot describe constant expression of type: " + std::to_string(static_cast<int>(value.type)));
     }
 }
 
@@ -450,14 +449,14 @@ std::string NssWriter::describeParameter(const ParameterExpression &paramExpr) {
     } else if (paramExpr.locality == ParameterLocality::ReturnValue) {
         return str(boost::format("ret_%08x") % paramExpr.outerStackOffset);
     } else {
-        throw ArgumentException("Unsupported parameter locality: " + std::to_string(static_cast<int>(paramExpr.locality)));
+        throw std::invalid_argument("Unsupported parameter locality: " + std::to_string(static_cast<int>(paramExpr.locality)));
     }
 }
 
 std::string NssWriter::describeAction(const ActionExpression &actionExpr) {
     auto numRoutines = _routines.getNumRoutines();
     if (actionExpr.action >= numRoutines) {
-        throw ArgumentException(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));
+        throw std::invalid_argument(str(boost::format("Action number out of bounds: %d/%d") % actionExpr.action % numRoutines));
     }
     return _routines.get(actionExpr.action).name();
 }

@@ -21,6 +21,8 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2das.h
     ${RESOURCE_INCLUDE_DIR}/di/module.h
     ${RESOURCE_INCLUDE_DIR}/di/services.h
+    ${RESOURCE_INCLUDE_DIR}/exception/format.h
+    ${RESOURCE_INCLUDE_DIR}/exception/notfound.h
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h

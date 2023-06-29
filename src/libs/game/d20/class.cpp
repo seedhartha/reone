@@ -99,7 +99,7 @@ const SavingThrows &CreatureClass::getSavingThrows(int level) const {
 
 int CreatureClass::getAttackBonus(int level) const {
     if (level < 1 || level > static_cast<int>(_attackBonuses.size())) {
-        throw std::invalid_argument("level is invalid");
+        throw std::out_of_range(str(boost::format("Level out of range: %d/%d") % level % static_cast<int>(_attackBonuses.size())));
     }
     return _attackBonuses[level - 1];
 }

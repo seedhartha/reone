@@ -20,8 +20,6 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/di/module.h
     ${SCRIPT_INCLUDE_DIR}/di/services.h
     ${SCRIPT_INCLUDE_DIR}/enginetype.h
-    ${SCRIPT_INCLUDE_DIR}/exception/argument.h
-    ${SCRIPT_INCLUDE_DIR}/exception/unsupportedroutine.h
     ${SCRIPT_INCLUDE_DIR}/execution.h
     ${SCRIPT_INCLUDE_DIR}/executioncontext.h
     ${SCRIPT_INCLUDE_DIR}/executionstate.h
@@ -30,6 +28,8 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/instrutil.h
     ${SCRIPT_INCLUDE_DIR}/program.h
     ${SCRIPT_INCLUDE_DIR}/routine.h
+    ${SCRIPT_INCLUDE_DIR}/routine/exception/argument.h
+    ${SCRIPT_INCLUDE_DIR}/routine/exception/notimplemented.h
     ${SCRIPT_INCLUDE_DIR}/routines.h
     ${SCRIPT_INCLUDE_DIR}/scripts.h
     ${SCRIPT_INCLUDE_DIR}/types.h

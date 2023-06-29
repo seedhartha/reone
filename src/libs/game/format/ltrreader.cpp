@@ -17,6 +17,7 @@
 
 #include "reone/game/format/ltrreader.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/system/randomutil.h"
 
 using namespace reone::resource;
@@ -34,7 +35,7 @@ void LtrReader::onLoad() {
 
     _letterCount = readByte();
     if (_letterCount != 28) {
-        throw std::runtime_error("Unsupported letter count");
+        throw FormatException("Invalid letter count: " + std::to_string(_letterCount));
     }
     readLetterSet(_singleLetters);
 

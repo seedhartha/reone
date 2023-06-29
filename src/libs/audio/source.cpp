@@ -36,7 +36,7 @@ static int getALFormat(AudioFormat format) {
     case AudioFormat::Stereo16:
         return AL_FORMAT_STEREO16;
     default:
-        throw std::logic_error("Unknown audio format: " + std::to_string(static_cast<int>(format)));
+        throw std::invalid_argument("Invalid audio format: " + std::to_string(static_cast<int>(format)));
     }
 }
 

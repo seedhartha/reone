@@ -19,11 +19,19 @@
 
 namespace reone {
 
-class NotFoundException : public std::logic_error {
+namespace resource {
+
+class FormatException : public std::runtime_error {
 public:
-    NotFoundException(const std::string &message) :
-        std::logic_error(message) {
+    FormatException() :
+        std::runtime_error("") {
+    }
+
+    FormatException(const std::string &message) :
+        std::runtime_error(message) {
     }
 };
+
+} // namespace resource
 
 } // namespace reone

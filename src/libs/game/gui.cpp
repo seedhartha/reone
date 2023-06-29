@@ -25,9 +25,8 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/scene/di/services.h"
-#include "reone/system/exception/notfound.h"
-#include "reone/system/exception/validation.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -56,11 +55,11 @@ GameGUI::GameGUI(Game &game,
 
 void GameGUI::init() {
     if (_resRef.empty()) {
-        throw ValidationException("GUI resRef must not be empty");
+        throw std::logic_error("GUI resRef must not be empty");
     }
     _gui = _services.gui.guis.get(_resRef, std::bind(&GameGUI::preload, this, std::placeholders::_1));
     if (!_gui) {
-        throw NotFoundException(str(boost::format("GUI not found: %s") % _resRef));
+        throw ResourceNotFoundException(str(boost::format("GUI not found: %s") % _resRef));
     }
     _gui->setEventListener(*this);
 

@@ -23,12 +23,12 @@
 #include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/lipanimation.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
-#include "reone/system/exception/argument.h"
 #include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
@@ -83,7 +83,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     PageType pageType;
     try {
         pageType = getPageType(id.type);
-    } catch (const ArgumentException &e) {
+    } catch (const std::invalid_argument &e) {
         return;
     }
     auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id, &pageType](auto &page) {
@@ -276,7 +276,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
         if (!mdxBytes) {
-            throw std::runtime_error("Companion MDX file not found");
+            throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
         auto mdx = ByteArrayInputStream(*mdxBytes);
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
@@ -365,7 +365,7 @@ PageType MainViewModel::getPageType(ResourceType type) const {
     case ResourceType::Wav:
         return PageType::Audio;
     default:
-        throw ArgumentException(str(boost::format("Unsupported resource type: %d") % static_cast<int>(type)));
+        throw std::invalid_argument("Invalid resource type: " + std::to_string(static_cast<int>(type)));
     }
 }
 

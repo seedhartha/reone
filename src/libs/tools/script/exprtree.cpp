@@ -17,15 +17,16 @@
 
 #include "reone/tools/script/exprtree.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variableutil.h"
-#include "reone/system/exception/argument.h"
 #include "reone/system/exception/notimplemented.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/tools/script/exprtreeoptimizer.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
@@ -319,7 +320,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                             ctx->stack.pop_back();
                         }
                         if (!argument) {
-                            throw ValidationException("Unable to extract action argument from stack");
+                            throw FormatException("Unable to extract action argument from stack");
                         }
                         arguments.push_back(argument);
                     }
@@ -365,7 +366,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                            ins.type == InstructionType::CPDOWNBP) {
                     auto stackSize = static_cast<int>(ctx->stack.size());
                     if (ins.stackOffset >= 0) {
-                        throw ValidationException("Non-negative stack offsets are not supported");
+                        throw FormatException("Non-negative stack offsets are not supported");
                     }
                     auto startIdx = (ins.type == InstructionType::CPDOWNSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
                     auto numFrames = ins.size / 4;
@@ -411,11 +412,11 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                            ins.type == InstructionType::CPTOPBP) {
                     auto stackSize = static_cast<int>(ctx->stack.size());
                     if (ins.stackOffset >= 0) {
-                        throw ValidationException("Non-negative stack offsets are not supported");
+                        throw FormatException("Non-negative stack offsets are not supported");
                     }
                     auto startIdx = (ins.type == InstructionType::CPTOPSP ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
                     if (startIdx < 0) {
-                        throw ValidationException("Out of bounds stack access: " + std::to_string(startIdx));
+                        throw FormatException("Out of bounds stack access: " + std::to_string(startIdx));
                     }
                     auto numFrames = ins.size / 4;
                     for (int i = 0; i < numFrames; ++i) {
@@ -462,7 +463,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                     }
                 } else if (ins.type == InstructionType::MOVSP) {
                     if (ins.stackOffset >= 0) {
-                        throw ValidationException("Non-negative stack offsets are not supported");
+                        throw FormatException("Non-negative stack offsets are not supported");
                     }
                     for (int i = 0; i < -ins.stackOffset / 4; ++i) {
                         ctx->stack.pop_back();
@@ -874,7 +875,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                            ins.type == InstructionType::INCISP ||
                            ins.type == InstructionType::INCIBP) {
                     if (ins.stackOffset >= 0) {
-                        throw ValidationException("Non-negative stack offsets are not supported");
+                        throw FormatException("Non-negative stack offsets are not supported");
                     }
                     auto stackSize = static_cast<int>(ctx->stack.size());
                     auto frameIdx = ((ins.type == InstructionType::DECISP || ins.type == InstructionType::INCISP) ? stackSize : ctx->numGlobals) + (ins.stackOffset / 4);
@@ -974,7 +975,7 @@ std::unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Ins
         return std::move(constExpr);
     }
     default:
-        throw ArgumentException("Instruction is not of CONSTx type: " + std::to_string(static_cast<int>(ins.type)));
+        throw std::invalid_argument("Instruction is not of CONSTx type: " + std::to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -1010,7 +1011,7 @@ std::unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const I
         return std::move(paramExpr);
     }
     default:
-        throw ArgumentException("Instruction is not of RSADDx type: " + std::to_string(static_cast<int>(ins.type)));
+        throw std::invalid_argument("Instruction is not of RSADDx type: " + std::to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -1024,7 +1025,7 @@ VectorExpression *ExpressionTree::DecompilationContext::appendVectorCompose(
     if ((x.variableType != VariableType::Float) ||
         (y.variableType != VariableType::Float) ||
         (z.variableType != VariableType::Float)) {
-        throw ArgumentException("Cannot compose a vector of non-floats");
+        throw std::invalid_argument("Cannot compose a vector of non-floats");
     }
 
     auto vecExpr = std::make_shared<VectorExpression>();

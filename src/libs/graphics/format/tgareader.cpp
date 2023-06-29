@@ -17,10 +17,12 @@
 
 #include "reone/graphics/format/tgareader.h"
 
-#include "reone/system/logutil.h"
-
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
+#include "reone/resource/exception/format.h"
+#include "reone/system/logutil.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
@@ -49,13 +51,13 @@ void TgaReader::onLoad() {
 
     uint8_t bpp = readByte();
     if ((isRGBA() && bpp != 24 && bpp != 32) || (isGrayscale() && bpp != 8)) {
-        throw std::runtime_error("Unsupported bits per pixel: " + std::to_string(bpp));
+        throw FormatException("Unsupported bits per pixel: " + std::to_string(bpp));
     }
 
     uint8_t descriptor = readByte();
     bool flipY = (descriptor & 0x10) != 0;
     if (flipY) {
-        throw std::runtime_error("Vertically flipped images are not supported");
+        throw FormatException("Vertically flipped images are not supported");
     }
 
     bool cubemap = height / width == kNumCubeFaces;

@@ -20,6 +20,7 @@
 #include "reone/graphics/cursor.h"
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/texture.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/bytearrayinput.h"
 
@@ -72,7 +73,7 @@ std::shared_ptr<Cursor> Cursors::get(CursorType type) {
 const std::pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
     auto maybeGroupNames = g_groupNamesByType.find(type);
     if (maybeGroupNames == g_groupNamesByType.end()) {
-        throw std::logic_error("Cursor groups not found by type " + std::to_string(static_cast<int>(type)));
+        throw ResourceNotFoundException("Cursor group not found: " + std::to_string(static_cast<int>(type)));
     }
     return maybeGroupNames->second;
 }

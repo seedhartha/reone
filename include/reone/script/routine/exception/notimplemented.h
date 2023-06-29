@@ -21,9 +21,13 @@ namespace reone {
 
 namespace script {
 
-class ArgumentException : public std::logic_error {
+class RoutineNotImplementedException : public std::logic_error {
 public:
-    ArgumentException(const std::string &message) :
+    RoutineNotImplementedException() :
+        std::logic_error("") {
+    }
+
+    RoutineNotImplementedException(const std::string &message) :
         std::logic_error(message) {
     }
 };

@@ -24,11 +24,11 @@ namespace audio {
 void AudioContext::init() {
     _device = alcOpenDevice(nullptr);
     if (!_device) {
-        throw std::runtime_error("Failed to open an OpenAL device");
+        throw std::runtime_error("alcOpenDevice failed");
     }
     _context = alcCreateContext(_device, nullptr);
     if (!_context) {
-        throw std::runtime_error("Failed to create an OpenAL context");
+        throw std::runtime_error("alcCreateContext failed");
     }
     alcMakeContextCurrent(_context);
 }

@@ -17,11 +17,10 @@
 
 #include "reone/script/routine.h"
 
-#include "reone/script/exception/argument.h"
-#include "reone/system/exception/notimplemented.h"
-#include "reone/system/logutil.h"
-
+#include "reone/script/routine/exception/argument.h"
+#include "reone/script/routine/exception/notimplemented.h"
 #include "reone/script/variable.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -30,10 +29,10 @@ namespace script {
 Variable Routine::invoke(const std::vector<Variable> &args, ExecutionContext &ctx) {
     try {
         return _func(args, ctx);
-    } catch (const NotImplementedException &ex) {
+    } catch (const RoutineNotImplementedException &ex) {
         std::string msg = "Routine not implemented: " + _name;
         return onException(msg, ex);
-    } catch (const ArgumentException &ex) {
+    } catch (const RoutineArgumentException &ex) {
         std::string msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
         return onException(msg, ex);
     }

@@ -17,14 +17,6 @@
 
 #include "reone/game/script/routine/declarations.h"
 
-#include "reone/resource/di/services.h"
-#include "reone/resource/strings.h"
-#include "reone/script/exception/unsupportedroutine.h"
-#include "reone/script/executioncontext.h"
-#include "reone/system/exception/notimplemented.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-
 #include "reone/game/action/factory.h"
 #include "reone/game/combat.h"
 #include "reone/game/di/services.h"
@@ -35,12 +27,17 @@
 #include "reone/game/object/door.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
-#include "reone/game/script/runner.h"
-#include "reone/game/talent.h"
-
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
 #include "reone/game/script/routine/objectutil.h"
+#include "reone/game/script/runner.h"
+#include "reone/game/talent.h"
+#include "reone/resource/di/services.h"
+#include "reone/resource/strings.h"
+#include "reone/script/executioncontext.h"
+#include "reone/script/routine/exception/notimplemented.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 #define R_FALSE 0
 #define R_TRUE 1
@@ -56,8 +53,8 @@ namespace routine {
 
 static constexpr bool kShipBuild = true;
 
-Variable unsupported(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw UnsupportedRoutineException();
+Variable notImplemented(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException();
 }
 
 Variable random(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -130,7 +127,7 @@ Variable setFacing(const std::vector<Variable> &args, const RoutineContext &ctx)
 Variable switchPlayerCharacter(const std::vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable setPartyLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -295,31 +292,31 @@ Variable getMaxHitPoints(const std::vector<Variable> &args, const RoutineContext
 }
 
 Variable getSubScreenID(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable cancelCombat(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getCurrentForcePoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObjectOrCaller(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getMaxForcePoints(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObjectOrCaller(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable pauseGame(const std::vector<Variable> &args, const RoutineContext &ctx) {
     bool pause = getIntAsBool(args, 0);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable setPlayerRestrictMode(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -394,7 +391,7 @@ Variable getPlayerRestrictMode(const std::vector<Variable> &args, const RoutineC
 Variable getCasterLevel(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getFirstEffect(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -557,7 +554,7 @@ Variable d100(const std::vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getMetaMagicFeat(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getObjectType(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -575,7 +572,7 @@ Variable fortitudeSave(const std::vector<Variable> &args, const RoutineContext &
     auto saveType = getIntAsEnumOrElse(args, 1, SavingThrowType::None);
     auto saveVersus = getObjectOrCaller(args, 2, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable reflexSave(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -583,7 +580,7 @@ Variable reflexSave(const std::vector<Variable> &args, const RoutineContext &ctx
     auto saveType = getIntAsEnumOrElse(args, 1, SavingThrowType::None);
     auto saveVersus = getObjectOrCaller(args, 2, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable willSave(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -591,11 +588,11 @@ Variable willSave(const std::vector<Variable> &args, const RoutineContext &ctx) 
     auto saveType = getIntAsEnumOrElse(args, 1, SavingThrowType::None);
     auto saveVersus = getObjectOrCaller(args, 2, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getSpellSaveDC(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable roundsToSeconds(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -612,7 +609,7 @@ Variable soundObjectSetFixedVariance(const std::vector<Variable> &args, const Ro
     auto sound = getObjectAsSound(args, 0, ctx);
     float fixedVariance = getFloat(args, 1);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getGoodEvilValue(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -630,7 +627,7 @@ Variable getPartyMemberCount(const std::vector<Variable> &args, const RoutineCon
 Variable getAlignmentGoodEvil(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getFirstObjectInShape(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -641,7 +638,7 @@ Variable getFirstObjectInShape(const std::vector<Variable> &args, const RoutineC
     int objectFilter = getIntOrElse(args, 4, static_cast<int>(ObjectType::Creature));
     auto origin = getVectorOrElse(args, 5, glm::vec3(0.0f));
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getNextObjectInShape(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -652,7 +649,7 @@ Variable getNextObjectInShape(const std::vector<Variable> &args, const RoutineCo
     int objectFilter = getIntOrElse(args, 4, static_cast<int>(ObjectType::Creature));
     auto origin = getVectorOrElse(args, 5, glm::vec3(0.0f));
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable signalEvent(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -908,7 +905,7 @@ Variable adjustReputation(const std::vector<Variable> &args, const RoutineContex
 }
 
 Variable getModuleFileName(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -965,7 +962,7 @@ Variable speakString(const std::vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getSpellTargetLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getPositionFromLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1099,7 +1096,7 @@ Variable eventSpellCastAt(const std::vector<Variable> &args, const RoutineContex
     int spell = getInt(args, 1);
     bool harmful = getIntAsBoolOrElse(args, 2, true);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getLastSpellCaster(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1109,7 +1106,7 @@ Variable getLastSpellCaster(const std::vector<Variable> &args, const RoutineCont
 }
 
 Variable getLastSpell(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getUserDefinedEventNumber(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1117,7 +1114,7 @@ Variable getUserDefinedEventNumber(const std::vector<Variable> &args, const Rout
 }
 
 Variable getSpellId(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getLoadFromSaveGame(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1141,7 +1138,7 @@ Variable beginConversation(const std::vector<Variable> &args, const RoutineConte
     std::string resRef = boost::to_lower_copy(getStringOrElse(args, 0, ""));
     auto objectToDialog = getObjectOrNull(args, 1, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getLastPerceived(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1576,7 +1573,7 @@ Variable getLastDamager(const std::vector<Variable> &args, const RoutineContext 
 }
 
 Variable getInventoryDisturbType(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getInventoryDisturbItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1623,7 +1620,7 @@ Variable getTypeFromTalent(const std::vector<Variable> &args, const RoutineConte
 
 Variable getIdFromTalent(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto talent = getTalent(args, 0);
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable playPazaak(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2242,7 +2239,7 @@ Variable getTrapBaseType(const std::vector<Variable> &args, const RoutineContext
 
     // TODO: implement
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getFirstPC(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2260,7 +2257,7 @@ Variable setTrapDetectedBy(const std::vector<Variable> &args, const RoutineConte
     auto trap = getObject(args, 0, ctx);
     auto detector = getObject(args, 1, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getIsTrapped(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2496,7 +2493,7 @@ Variable setLocalNumber(const std::vector<Variable> &args, const RoutineContext 
 Variable soundObjectGetPitchVariance(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getObjectAsSound(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getGlobalLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2700,7 +2697,7 @@ Variable getLastAttackAction(const std::vector<Variable> &args, const RoutineCon
 Variable getLastForcePowerUsed(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto attacker = getObjectOrCaller(args, 0, ctx);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getLastCombatFeatUsed(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2753,7 +2750,7 @@ Variable saveNPCState(const std::vector<Variable> &args, const RoutineContext &c
 Variable getCategoryFromTalent(const std::vector<Variable> &args, const RoutineContext &ctx) {
     auto talent = getTalent(args, 0);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable surrenderByFaction(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2819,7 +2816,7 @@ Variable soundObjectFadeAndStop(const std::vector<Variable> &args, const Routine
     auto sound = getObjectAsSound(args, 0, ctx);
     float seconds = getFloat(args, 1);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable changeItemCost(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3162,7 +3159,7 @@ Variable getRandomDestination(const std::vector<Variable> &args, const RoutineCo
     auto creature = getObjectAsCreature(args, 0, ctx);
     int rangeLimit = getInt(args, 1);
 
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable isFormActive(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -3259,7 +3256,7 @@ Variable modifyWillSavingThrowBase(const std::vector<Variable> &args, const Rout
 }
 
 Variable getScriptStringParameter(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    throw RoutineNotImplementedException();
 }
 
 Variable getObjectPersonalSpace(const std::vector<Variable> &args, const RoutineContext &ctx) {

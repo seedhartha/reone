@@ -19,25 +19,6 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/audio/player.h"
-#include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
-#include "reone/resource/2da.h"
-#include "reone/resource/2das.h"
-#include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/resources.h"
-#include "reone/resource/strings.h"
-#include "reone/scene/di/services.h"
-#include "reone/scene/graphs.h"
-#include "reone/scene/types.h"
-#include "reone/script/types.h"
-#include "reone/system/di/services.h"
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-#include "reone/system/timer.h"
-
 #include "reone/game/action/objectaction.h"
 #include "reone/game/animationutil.h"
 #include "reone/game/d20/classes.h"
@@ -49,6 +30,24 @@
 #include "reone/game/script/runner.h"
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
+#include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
+#include "reone/graphics/textures.h"
+#include "reone/resource/2da.h"
+#include "reone/resource/2das.h"
+#include "reone/resource/di/services.h"
+#include "reone/resource/exception/notfound.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/scene/types.h"
+#include "reone/script/types.h"
+#include "reone/system/di/services.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
+#include "reone/system/timer.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -94,7 +93,7 @@ void Creature::loadFromBlueprint(const std::string &resRef) {
 void Creature::loadAppearance() {
     std::shared_ptr<TwoDa> appearances(_services.resource.twoDas.get("appearance"));
     if (!appearances) {
-        throw ValidationException("appearance 2DA is not found");
+        throw ResourceNotFoundException("appearance 2DA not found");
     }
 
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
@@ -129,7 +128,7 @@ Creature::ModelType Creature::parseModelType(const std::string &s) const {
         return ModelType::Character;
     }
 
-    throw std::logic_error("Model type '" + s + "' is not supported");
+    throw std::invalid_argument(str(boost::format("Model type '%s' is not supported") % s));
 }
 
 void Creature::updateModel() {
@@ -1145,7 +1144,7 @@ std::string Creature::getBodyModelName() const {
 
     std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
-        throw ValidationException("appearance 2DA is not found");
+        throw ResourceNotFoundException("appearance 2DA not found");
     }
 
     std::string modelName(appearance->getString(_appearance, column));
@@ -1173,7 +1172,7 @@ std::string Creature::getBodyTextureName() const {
 
     std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
-        throw ValidationException("appearance 2DA is not found");
+        throw ResourceNotFoundException("appearance 2DA not found");
     }
 
     std::string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
@@ -1204,7 +1203,7 @@ std::string Creature::getHeadModelName() const {
     }
     std::shared_ptr<TwoDa> appearance(_services.resource.twoDas.get("appearance"));
     if (!appearance) {
-        throw ValidationException("appearance 2DA is not found");
+        throw ResourceNotFoundException("appearance 2DA not found");
     }
     int headIdx = appearance->getInt(_appearance, "normalhead", -1);
     if (headIdx == -1) {
@@ -1212,7 +1211,7 @@ std::string Creature::getHeadModelName() const {
     }
     std::shared_ptr<TwoDa> heads(_services.resource.twoDas.get("heads"));
     if (!heads) {
-        throw ValidationException("heads 2DA is not found");
+        throw ResourceNotFoundException("heads 2DA not found");
     }
 
     std::string modelName(heads->getString(headIdx, "head"));

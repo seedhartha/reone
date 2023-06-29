@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "reone/system/collectionutil.h"
-#include "reone/script/exception/argument.h"
+#include "reone/script/routine/exception/argument.h"
 #include "reone/script/types.h"
 #include "reone/script/variable.h"
+#include "reone/system/collectionutil.h"
 
 namespace reone {
 
@@ -89,13 +89,13 @@ std::shared_ptr<Area> getObjectAsAreaOrCallerArea(const std::vector<script::Vari
 
 inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
-        throw script::ArgumentException(str(boost::format("Argument index is out of range: %d/%d") % index % static_cast<int>(args.size())));
+        throw script::RoutineArgumentException(str(boost::format("Argument index out of range: %d/%d") % index % static_cast<int>(args.size())));
     }
 }
 
 inline void throwIfUnexpectedType(script::VariableType expected, script::VariableType actual) {
     if (actual != expected) {
-        throw script::ArgumentException(str(boost::format("Expected argument of type %d, but got %d") % static_cast<int>(expected) % static_cast<int>(actual)));
+        throw script::RoutineArgumentException(str(boost::format("Expected argument of type %d, but got %d") % static_cast<int>(expected) % static_cast<int>(actual)));
     }
 }
 

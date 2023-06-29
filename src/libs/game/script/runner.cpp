@@ -17,12 +17,11 @@
 
 #include "reone/game/script/runner.h"
 
+#include "reone/game/game.h"
 #include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routines.h"
 #include "reone/script/scripts.h"
-
-#include "reone/game/game.h"
 
 using namespace reone::script;
 
@@ -32,10 +31,10 @@ namespace game {
 
 int ScriptRunner::run(const std::string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
     if (callerId == kObjectSelf) {
-        throw std::invalid_argument("Invalid callerId");
+        throw std::invalid_argument("Invalid callerId: " + std::to_string(callerId));
     }
     if (triggerrerId == kObjectSelf) {
-        throw std::invalid_argument("Invalid triggerrerId");
+        throw std::invalid_argument("Invalid triggerrerId: " + std::to_string(triggerrerId));
     }
 
     auto program = _scripts.get(resRef);

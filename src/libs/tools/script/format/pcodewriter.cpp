@@ -26,25 +26,21 @@ namespace reone {
 namespace script {
 
 void PcodeWriter::save(IOutputStream &pcode) {
-    try {
-        std::set<uint32_t> jumpOffsets;
-        for (auto &instr : _program.instructions()) {
-            switch (instr.type) {
-            case InstructionType::JMP:
-            case InstructionType::JSR:
-            case InstructionType::JZ:
-            case InstructionType::JNZ:
-                jumpOffsets.insert(instr.offset + instr.jumpOffset);
-                break;
-            default:
-                break;
-            }
+    std::set<uint32_t> jumpOffsets;
+    for (auto &instr : _program.instructions()) {
+        switch (instr.type) {
+        case InstructionType::JMP:
+        case InstructionType::JSR:
+        case InstructionType::JZ:
+        case InstructionType::JNZ:
+            jumpOffsets.insert(instr.offset + instr.jumpOffset);
+            break;
+        default:
+            break;
         }
-        for (auto &instr : _program.instructions()) {
-            writeInstruction(instr, pcode, jumpOffsets);
-        }
-    } catch (const std::exception &e) {
-        throw std::runtime_error(e.what());
+    }
+    for (auto &instr : _program.instructions()) {
+        writeInstruction(instr, pcode, jumpOffsets);
     }
 }
 

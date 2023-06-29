@@ -21,10 +21,14 @@ namespace reone {
 
 namespace script {
 
-class UnsupportedRoutineException : public std::logic_error {
+class RoutineArgumentException : public std::logic_error {
 public:
-    UnsupportedRoutineException() :
+    RoutineArgumentException() :
         std::logic_error("") {
+    }
+
+    RoutineArgumentException(const std::string &message) :
+        std::logic_error(message) {
     }
 };
 

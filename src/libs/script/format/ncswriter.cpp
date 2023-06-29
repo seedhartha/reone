@@ -17,13 +17,14 @@
 
 #include "reone/script/format/ncswriter.h"
 
+#include "reone/resource/exception/format.h"
+#include "reone/script/program.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/collectionutil.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileoutput.h"
 
-#include "reone/script/program.h"
+using namespace reone::resource;
 
 namespace reone {
 
@@ -42,7 +43,7 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     for (auto &ins : _program.instructions()) {
         auto pos = 13 + static_cast<uint32_t>(writer.tell());
         if (ins.offset != pos) {
-            throw ValidationException(str(boost::format("Instruction offset mismatch: expected=%08x, actual=%08x") % ins.offset % pos));
+            throw FormatException(str(boost::format("Instruction offset mismatch: expected=%08x, actual=%08x") % ins.offset % pos));
         }
 
         writer.putByte(static_cast<int>(ins.type) & 0xff);

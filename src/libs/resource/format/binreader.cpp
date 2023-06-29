@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/binreader.h"
 
-#include "reone/system/exception/validation.h"
+#include "reone/resource/exception/format.h"
 
 namespace reone {
 
@@ -37,11 +37,11 @@ void BinaryResourceReader::querySize() {
 
 void BinaryResourceReader::checkSignature(const std::string &expected) {
     if (_size < expected.size()) {
-        throw ValidationException("Invalid binary resource size");
+        throw FormatException("Invalid binary resource size");
     }
     auto actual = readString(expected.size());
     if (expected != actual) {
-        throw ValidationException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
+        throw FormatException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
     }
 }
 

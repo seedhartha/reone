@@ -19,11 +19,19 @@
 
 namespace reone {
 
-class ValidationException : public std::logic_error {
+namespace resource {
+
+class ResourceNotFoundException : public std::runtime_error {
 public:
-    ValidationException(const std::string &message) :
-        std::logic_error(message) {
+    ResourceNotFoundException() :
+        std::runtime_error("") {
+    }
+
+    ResourceNotFoundException(const std::string &message) :
+        std::runtime_error(message) {
     }
 };
+
+} // namespace resource
 
 } // namespace reone

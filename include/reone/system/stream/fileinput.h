@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/exception/notimplemented.h"
+
 #include "input.h"
 
 namespace reone {
@@ -36,7 +38,7 @@ public:
         } else if (origin == SeekOrigin::End) {
             _stream.seekg(offset, std::ios::end);
         } else {
-            throw std::invalid_argument("Unsupported origin: " + std::to_string(static_cast<int>(origin)));
+            throw std::invalid_argument("Invalid origin: " + std::to_string(static_cast<int>(origin)));
         }
     }
 
@@ -51,7 +53,7 @@ public:
     }
 
     void readLine(char *outData, int maxLen) override {
-        throw std::logic_error("Method not implemented");
+        throw NotImplementedException("readLine not implemented");
     }
 
     void close() {

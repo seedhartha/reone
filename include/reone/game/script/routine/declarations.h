@@ -29,7 +29,7 @@ namespace routine {
 
 #define R_ROUTINE(x) script::Variable(x)(const std::vector<script::Variable> &args, const RoutineContext &ctx);
 
-R_ROUTINE(unsupported)
+R_ROUTINE(notImplemented)
 
 R_ROUTINE(random)
 R_ROUTINE(printString)

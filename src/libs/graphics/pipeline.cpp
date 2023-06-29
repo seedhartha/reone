@@ -149,7 +149,7 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
     case CubeMapFace::NegativeZ:
         return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
     default:
-        throw std::invalid_argument("side is invalid");
+        throw std::invalid_argument("Invalid cube map face: " + std::to_string(static_cast<int>(face)));
     }
 }
 

@@ -18,6 +18,7 @@
 #include "reone/resource/format/2dareader.h"
 
 #include "reone/resource/2da.h"
+#include "reone/resource/exception/format.h"
 
 namespace reone {
 
@@ -97,7 +98,7 @@ bool TwoDaReader::readToken(std::string &token) {
         }
     }
 
-    throw std::runtime_error("2DA token not terminated");
+    throw FormatException("2DA token not terminated");
 }
 
 } // namespace resource

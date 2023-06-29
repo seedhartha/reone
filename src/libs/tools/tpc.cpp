@@ -19,7 +19,7 @@
 
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/format/tpcreader.h"
-#include "reone/system/exception/validation.h"
+#include "reone/resource/exception/format.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"

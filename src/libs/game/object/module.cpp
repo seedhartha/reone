@@ -17,12 +17,6 @@
 
 #include "reone/game/object/module.h"
 
-#include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/resources.h"
-#include "reone/system/exception/validation.h"
-#include "reone/system/logutil.h"
-
 #include "reone/game/action/attack.h"
 #include "reone/game/action/factory.h"
 #include "reone/game/action/opencontainer.h"
@@ -30,10 +24,15 @@
 #include "reone/game/action/startconversation.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
+#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
-
-#include "reone/game/object/factory.h"
+#include "reone/resource/di/services.h"
+#include "reone/resource/exception/format.h"
+#include "reone/resource/exception/notfound.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -63,7 +62,7 @@ void Module::loadInfo(const Gff &ifo) {
 
     _info.entryArea = ifo.getString("Mod_Entry_Area");
     if (_info.entryArea.empty()) {
-        throw ValidationException("Mod_Entry_Area must not be empty");
+        throw FormatException("Mod_Entry_Area must not be empty");
     }
 
     _info.entryPosition.x = ifo.getFloat("Mod_Entry_X");
@@ -82,12 +81,12 @@ void Module::loadArea(const Gff &ifo, bool fromSave) {
 
     std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
-        throw ValidationException("Area ARE file not found");
+        throw ResourceNotFoundException("Area ARE not found: " + _info.entryArea);
     }
 
     std::shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
     if (!git) {
-        throw ValidationException("Area GIT file not found");
+        throw ResourceNotFoundException("Area GIT not found: " + _info.entryArea);
     }
 
     _area->load(_info.entryArea, *are, *git, fromSave);

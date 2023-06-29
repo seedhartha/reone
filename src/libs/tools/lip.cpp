@@ -19,7 +19,7 @@
 
 #include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/format/lipwriter.h"
-#include "reone/system/exception/validation.h"
+#include "reone/resource/exception/format.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"

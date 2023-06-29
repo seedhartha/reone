@@ -17,11 +17,12 @@
 
 #include "reone/audio/format/wavreader.h"
 
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/stream.h"
+#include "reone/resource/exception/format.h"
 #include "reone/system/stream/bytearrayinput.h"
 
-#include "reone/audio/stream.h"
-
-#include "reone/audio/format/mp3reader.h"
+using namespace reone::resource;
 
 namespace reone {
 
@@ -32,13 +33,13 @@ void WavReader::onLoad() {
     if (sign == "\xff\xf3\x60\xc4") {
         seek(0x1da);
     } else if (sign != "RIFF") {
-        throw std::runtime_error("WAV: invalid file signature: " + sign);
+        throw FormatException("WAV: invalid file signature: " + sign);
     }
 
     uint32_t chunkSize = readUint32();
     std::string format(readString(4));
     if (format != "WAVE") {
-        throw std::runtime_error("WAV: invalid chunk format: " + format);
+        throw FormatException("WAV: invalid chunk format: " + format);
     }
     ChunkHeader chunk;
     while (readChunkHeader(chunk)) {
@@ -69,11 +70,11 @@ bool WavReader::readChunkHeader(ChunkHeader &chunk) {
 void WavReader::loadFormat(ChunkHeader chunk) {
     _audioFormat = static_cast<WavAudioFormat>(readUint16());
     if (_audioFormat != WavAudioFormat::PCM && _audioFormat != WavAudioFormat::IMAADPCM) {
-        throw std::runtime_error("WAV: unsupported audio format: " + std::to_string(static_cast<int>(_audioFormat)));
+        throw FormatException("WAV: unsupported audio format: " + std::to_string(static_cast<int>(_audioFormat)));
     }
     _channelCount = readUint16();
     if (_channelCount != 1 && _channelCount != 2) {
-        throw std::runtime_error("WAV: invalid number of channels: " + std::to_string(_channelCount));
+        throw FormatException("WAV: invalid number of channels: " + std::to_string(_channelCount));
     }
     _sampleRate = readUint32();
 
@@ -83,7 +84,7 @@ void WavReader::loadFormat(ChunkHeader chunk) {
     _bitsPerSample = readUint16();
 
     if (_bitsPerSample != 4 && _bitsPerSample != 8 && _bitsPerSample != 16) {
-        throw std::runtime_error("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
+        throw FormatException("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
     }
 
     ignore(chunk.size - 16);
@@ -188,15 +189,15 @@ AudioFormat WavReader::getAudioFormat() const {
         case 8:
             return _channelCount == 2 ? AudioFormat::Stereo8 : AudioFormat::Mono8;
         default:
-            throw std::logic_error("WAV: PCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
+            throw FormatException("WAV: PCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
         }
     case WavAudioFormat::IMAADPCM:
         if (_bitsPerSample != 4) {
-            throw std::logic_error("WAV: IMA ADPCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
+            throw FormatException("WAV: IMA ADPCM: invalid bits per sample: " + std::to_string(_bitsPerSample));
         }
         return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
     default:
-        throw std::logic_error("WAV: invalid audio format: " + std::to_string(static_cast<int>(_audioFormat)));
+        throw FormatException("WAV: invalid audio format: " + std::to_string(static_cast<int>(_audioFormat)));
     }
 }
 

@@ -38,67 +38,67 @@ namespace game {
 
 static inline void throwIfInvalidObject(uint32_t objectId, const std::shared_ptr<Object> &object) {
     if (!object) {
-        throw ArgumentException(str(boost::format("Id %u does not reference a valid object") % objectId));
+        throw RoutineArgumentException(str(boost::format("Id %u does not reference a valid object") % objectId));
     }
 }
 
 static inline void throwIfObjectNotCreature(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Creature) {
-        throw ArgumentException(str(boost::format("Object %u is not a creature") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not a creature") % object->id()));
     }
 }
 
 static inline void throwIfObjectNotDoor(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Door) {
-        throw ArgumentException(str(boost::format("Object %u is not a door") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not a door") % object->id()));
     }
 }
 
 static inline void throwIfObjectNotPlaceable(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Placeable) {
-        throw ArgumentException(str(boost::format("Object %u is not a placeable") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not a placeable") % object->id()));
     }
 }
 
 static inline void throwIfObjectNotItem(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Item) {
-        throw ArgumentException(str(boost::format("Object %u is not an item") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not an item") % object->id()));
     }
 }
 
 static inline void throwIfObjectNotSound(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Sound) {
-        throw ArgumentException(str(boost::format("Object %u is not a sound") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not a sound") % object->id()));
     }
 }
 
 static inline void throwIfObjectNotArea(const std::shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Area) {
-        throw ArgumentException(str(boost::format("Object %u is not an area") % object->id()));
+        throw RoutineArgumentException(str(boost::format("Object %u is not an area") % object->id()));
     }
 }
 
 static inline void throwIfInvalidEffect(const std::shared_ptr<Effect> &effect) {
     if (!effect || effect->type() == EffectType::Invalid) {
-        throw ArgumentException("Invalid effect");
+        throw RoutineArgumentException("Invalid effect");
     }
 }
 
 static inline void throwIfInvalidEvent(const std::shared_ptr<Event> &event) {
     if (!event) {
-        throw ArgumentException("Invalid event");
+        throw RoutineArgumentException("Invalid event");
     }
 }
 
 static inline void throwIfInvalidLocation(const std::shared_ptr<Location> &location) {
     if (!location) {
-        throw ArgumentException("Invalid location");
+        throw RoutineArgumentException("Invalid location");
     }
 }
 
 static inline void throwIfInvalidTalent(const std::shared_ptr<Talent> &talent) {
     if (!talent || talent->type() == TalentType::Invalid) {
-        throw ArgumentException("Invalid talent");
+        throw RoutineArgumentException("Invalid talent");
     }
 }
 

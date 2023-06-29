@@ -21,6 +21,18 @@
 #include "reone/audio/di/services.h"
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
+#include "reone/game/combat.h"
+#include "reone/game/cursors.h"
+#include "reone/game/debug.h"
+#include "reone/game/di/services.h"
+#include "reone/game/dialogs.h"
+#include "reone/game/location.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/party.h"
+#include "reone/game/resourcelayout.h"
+#include "reone/game/script/routines.h"
+#include "reone/game/soundsets.h"
+#include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/format/tgawriter.h"
@@ -39,6 +51,8 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/exception/format.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/format/gffwriter.h"
@@ -51,22 +65,8 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/collectionutil.h"
 #include "reone/system/di/services.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/pathutil.h"
-
-#include "reone/game/combat.h"
-#include "reone/game/cursors.h"
-#include "reone/game/debug.h"
-#include "reone/game/di/services.h"
-#include "reone/game/dialogs.h"
-#include "reone/game/location.h"
-#include "reone/game/object/factory.h"
-#include "reone/game/party.h"
-#include "reone/game/resourcelayout.h"
-#include "reone/game/script/routines.h"
-#include "reone/game/soundsets.h"
-#include "reone/game/surfaces.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -236,7 +236,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
 
                 std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
-                    throw ValidationException("Module IFO file not found");
+                    throw ResourceNotFoundException("Module IFO not found");
                 }
 
                 _module->load(name, *ifo);
@@ -385,7 +385,7 @@ Camera *Game::getActiveCamera() const {
 std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     switch (id) {
     case kObjectSelf:
-        throw std::invalid_argument("id is invalid");
+        throw std::invalid_argument("Invalid id: " + std::to_string(id));
     case kObjectInvalid:
         return nullptr;
     default:

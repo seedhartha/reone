@@ -50,7 +50,7 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
     case PixelFormat::Depth32FStencil8:
         return GL_DEPTH32F_STENCIL8;
     default:
-        throw std::logic_error("Unsupported pixel format: " + std::to_string(static_cast<int>(format)));
+        throw std::invalid_argument("Invalid pixel format: " + std::to_string(static_cast<int>(format)));
     }
 }
 

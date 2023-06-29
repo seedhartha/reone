@@ -27,6 +27,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
@@ -40,7 +41,6 @@
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
 #include "reone/scene/types.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 
@@ -308,7 +308,7 @@ void Area::loadEncounters(const Gff &git) {
 void Area::loadLYT() {
     auto layout = _services.game.layouts.get(_name);
     if (!layout) {
-        throw ValidationException("Area LYT file not found");
+        throw ResourceNotFoundException("Area LYT not found: " + _name);
     }
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     for (auto &lytRoom : layout->rooms) {
@@ -893,7 +893,7 @@ Camera &Area::getCamera(CameraType type) {
     case CameraType::Dialog:
         return *_dialogCamera;
     default:
-        throw std::invalid_argument("Unsupported camera type: " + std::to_string(static_cast<int>(type)));
+        throw std::invalid_argument("Invalid camera type: " + std::to_string(static_cast<int>(type)));
     }
 }
 

@@ -25,12 +25,6 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/gff.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/resources.h"
-#include "reone/system/exception/notfound.h"
-#include "reone/system/logutil.h"
-
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/imagebutton.h"
 #include "reone/gui/control/label.h"
@@ -40,7 +34,12 @@
 #include "reone/gui/control/scrollbar.h"
 #include "reone/gui/control/slider.h"
 #include "reone/gui/control/togglebutton.h"
-#include "reone/system/exception/validation.h"
+#include "reone/resource/exception/format.h"
+#include "reone/resource/exception/notfound.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -270,7 +269,7 @@ std::shared_ptr<Control> GUI::getControl(const std::string &tag) const {
             return control;
         }
     }
-    throw ValidationException(str(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef));
+    throw FormatException(str(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef));
 }
 
 std::unique_ptr<Control> GUI::newControl(

@@ -65,7 +65,7 @@ struct Variable {
         case VariableType::Float:
             return Variable::ofFloat(-floatValue);
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(str(boost::format("Negate operator on variable type %d not implemented") % static_cast<int>(type)));
         }
     }
 

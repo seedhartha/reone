@@ -45,14 +45,14 @@ void Surfaces::init() {
 
 bool Surfaces::isWalkable(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
-        throw std::out_of_range("index is out of range");
+        throw std::out_of_range(str(boost::format("index out of range: %d/%d") % index % static_cast<int>(_surfaces.size())));
     }
     return _surfaces[index].walk;
 }
 
 const Surface &Surfaces::getSurface(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
-        throw std::out_of_range("index is out of range: " + std::to_string(index));
+        throw std::out_of_range(str(boost::format("index out of range: %d/%d") % index % static_cast<int>(_surfaces.size())));
     }
     return _surfaces[index];
 }

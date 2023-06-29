@@ -18,11 +18,12 @@
 #include "reone/movie/format/bikreader.h"
 
 #include "reone/audio/stream.h"
-#include "reone/system/binaryreader.h"
-#include "reone/system/logutil.h"
-
 #include "reone/movie/movie.h"
 #include "reone/movie/videostream.h"
+#include "reone/resource/exception/format.h"
+#include "reone/resource/exception/notfound.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/logutil.h"
 
 #ifdef R_ENABLE_MOVIE
 
@@ -37,6 +38,7 @@ extern "C" {
 #endif
 
 using namespace reone::audio;
+using namespace reone::resource;
 
 namespace reone {
 
@@ -83,7 +85,7 @@ public:
 
     void load() {
         if (avformat_open_input(&_formatCtx, _path.string().c_str(), nullptr, nullptr) != 0) {
-            throw std::runtime_error("Failed to open BIK file: " + _path.string());
+            throw FormatException("Failed to open BIK file: " + _path.string());
         }
         findStreams();
 
@@ -133,7 +135,7 @@ private:
 
     void findStreams() {
         if (avformat_find_stream_info(_formatCtx, nullptr) != 0) {
-            throw std::runtime_error("Failed to find BIK stream info");
+            throw FormatException("Failed to find BIK stream info");
         }
         for (uint32_t i = 0; i < _formatCtx->nb_streams; ++i) {
             AVCodecParameters *codecParams = _formatCtx->streams[i]->codecpar;
@@ -149,7 +151,7 @@ private:
             }
         }
         if (_videoStreamIdx == -1) {
-            throw std::runtime_error("Video stream not found in BIK");
+            throw FormatException("Video stream not found in BIK");
         }
     }
 
@@ -157,14 +159,14 @@ private:
         AVCodecParameters *codecParams = _formatCtx->streams[streamIdx]->codecpar;
         const AVCodec *codec = avcodec_find_decoder(codecParams->codec_id);
         if (!codec) {
-            throw std::runtime_error("BIK codec not found");
+            throw FormatException("BIK codec not found");
         }
         *codecCtx = avcodec_alloc_context3(codec);
         if (avcodec_parameters_to_context(*codecCtx, codecParams) != 0) {
-            throw std::runtime_error("Failed to copy BIK codec parameters");
+            throw FormatException("Failed to copy BIK codec parameters");
         }
         if (avcodec_open2(*codecCtx, codec, nullptr) != 0) {
-            throw std::runtime_error("Failed to open BIK codec");
+            throw FormatException("Failed to open BIK codec");
         }
     }
 
@@ -317,7 +319,7 @@ private:
 void BikReader::load() {
 #ifdef R_ENABLE_MOVIE
     if (!boost::filesystem::exists(_path)) {
-        throw std::runtime_error("BIK: file not found: " + _path.string());
+        throw ResourceNotFoundException("BIK: file not found: " + _path.string());
     }
 
     auto decoder = std::make_shared<BinkVideoDecoder>(_path);

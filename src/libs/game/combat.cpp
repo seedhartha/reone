@@ -368,7 +368,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
         break;
     }
     default:
-        throw std::logic_error("Unsupported attack result");
+        throw std::logic_error("Invalid attack result: " + std::to_string(static_cast<int>(attack.resultType)));
     }
 }
 

@@ -19,8 +19,8 @@
 
 #include "types.h"
 
+#include "reone/resource/exception/format.h"
 #include "reone/system/exception/notimplemented.h"
-#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -39,7 +39,7 @@ public:
         const boost::filesystem::path &outputDir,
         const boost::filesystem::path &gamePath) {
 
-        throw NotImplementedException("Batch tool invocation not implemented");
+        throw NotImplementedException("invokeBatch not implemented");
     }
 
     virtual bool supports(Operation operation, const boost::filesystem::path &input) const = 0;
@@ -57,7 +57,7 @@ protected:
             }
             try {
                 block(path, outDir);
-            } catch (const ValidationException &e) {
+            } catch (const resource::FormatException &e) {
                 error(boost::format("Error while processing '%s': %s") % path % std::string(e.what()));
             }
         }

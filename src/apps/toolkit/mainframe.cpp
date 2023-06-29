@@ -372,7 +372,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         return nssPanel;
     }
     default:
-        throw std::logic_error("Unsupported page type");
+        throw std::invalid_argument("Invalid page type: " + std::to_string(static_cast<int>(page.type)));
     }
 }
 
