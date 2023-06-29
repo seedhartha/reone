@@ -65,8 +65,9 @@
 #include "reone/system/binarywriter.h"
 #include "reone/system/collectionutil.h"
 #include "reone/system/di/services.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
-#include "reone/system/pathutil.h"
+
 
 using namespace reone::audio;
 using namespace reone::graphics;

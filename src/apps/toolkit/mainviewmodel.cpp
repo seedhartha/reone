@@ -29,7 +29,7 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
@@ -75,7 +75,11 @@ static const std::set<ResourceType> kFilesPlaintextResourceTypes {
 
 void MainViewModel::openFile(const GameDirectoryItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
-        openResource(*item.resId, res);
+        try {
+            openResource(*item.resId, res);
+        } catch (const std::exception &e) {
+            error(boost::format("Error opening resource: %s") % std::string(e.what()));
+        }
     });
 }
 
@@ -370,17 +374,17 @@ PageType MainViewModel::getPageType(ResourceType type) const {
 }
 
 void MainViewModel::loadGameDirectory() {
-    auto tslExePath = getPathIgnoreCase(_gamePath, "swkotor2.exe", false);
+    auto tslExePath = findFileIgnoreCase(_gamePath, "swkotor2.exe");
     _gameId = !tslExePath.empty() ? GameID::TSL : GameID::KotOR;
 
-    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
     keyReader.load(key);
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 
-    auto tlkPath = getPathIgnoreCase(_gamePath, "dialog.tlk", false);
+    auto tlkPath = findFileIgnoreCase(_gamePath, "dialog.tlk");
     auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
     auto tlkReader = TlkReader();
     tlkReader.load(tlk);
@@ -452,10 +456,10 @@ void MainViewModel::loadEngine() {
     _audioModule->init();
     _sceneModule->init();
 
-    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
-    auto guiTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf", false);
-    auto tpaTexPackPath = getPathIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf", false);
-    auto overridePath = getPathIgnoreCase(_gamePath, "override", false);
+    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
+    auto guiTexPackPath = findFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf");
+    auto tpaTexPackPath = findFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf");
+    auto overridePath = findFileIgnoreCase(_gamePath, "override");
 
     auto &resources = _resourceModule->resources();
     resources.indexKeyFile(keyPath);
@@ -493,7 +497,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
 void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
-        auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key", false);
+        auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
         auto keyReader = KeyReader();
         auto key = FileInputStream(keyPath, OpenMode::Binary);
         keyReader.load(key);
@@ -522,7 +526,7 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
 void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
-    auto keyPath = getPathIgnoreCase(_gamePath, "chitin.key");
+    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
     auto key = FileInputStream(keyPath, OpenMode::Binary);
     auto keyReader = KeyReader();
     keyReader.load(key);
@@ -535,7 +539,7 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
         auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
-        auto bifPath = getPathIgnoreCase(_gamePath, cleanedFilename);
+        auto bifPath = findFileIgnoreCase(_gamePath, cleanedFilename);
         if (bifPath.empty()) {
             continue;
         }

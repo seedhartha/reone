@@ -19,12 +19,6 @@
 
 namespace reone {
 
-/**
- * @return path to a file or directory, or empty path when not found
- */
-boost::filesystem::path getPathIgnoreCase(
-    const boost::filesystem::path &basePath,
-    const std::string &relPath,
-    bool logNotFound = true);
+boost::filesystem::path findFileIgnoreCase(const boost::filesystem::path &dir, const std::string &filename);
 
 } // namespace reone

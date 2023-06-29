@@ -18,7 +18,7 @@
 #include "gameprobe.h"
 
 #include "reone/resource/exception/format.h"
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 
 using namespace reone::game;
 
@@ -26,13 +26,13 @@ namespace reone {
 
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
-    boost::filesystem::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
+    boost::filesystem::path exePathK1(findFileIgnoreCase(_gamePath, "swkotor.exe"));
     if (!exePathK1.empty()) {
         return GameID::KotOR;
     }
 
     // If there is a TSL executable then game is TSL
-    boost::filesystem::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
+    boost::filesystem::path exePathK2(findFileIgnoreCase(_gamePath, "swkotor2.exe"));
     if (!exePathK2.empty()) {
         return GameID::TSL;
     }

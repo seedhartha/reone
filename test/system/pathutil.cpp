@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 
 using namespace reone;
 
@@ -33,9 +33,9 @@ TEST(path_util, should_get_path_ignoring_case) {
     tmpFile.close();
 
     // when
-    auto lowerPath = getPathIgnoreCase(tmpDirPath, "mixed", false);
-    auto upperPath = getPathIgnoreCase(tmpDirPath, "MIXED", false);
-    auto superPath = getPathIgnoreCase(tmpDirPath, "MiXeDs", false);
+    auto lowerPath = findFileIgnoreCase(tmpDirPath, "mixed");
+    auto upperPath = findFileIgnoreCase(tmpDirPath, "MIXED");
+    auto superPath = findFileIgnoreCase(tmpDirPath, "MiXeDs");
 
     // then
     EXPECT_EQ(tmpFilePath, lowerPath);

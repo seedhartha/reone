@@ -18,7 +18,7 @@
 #include "reone/tools/keybif.h"
 
 #include "reone/resource/typeutil.h"
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
 
 using namespace reone::resource;
@@ -36,7 +36,7 @@ void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &inpu
         listKEY(key);
 
     } else {
-        auto keyPath = getPathIgnoreCase(gamePath, "chitin.key");
+        auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
         auto key = FileInputStream(keyPath, OpenMode::Binary);
 
         auto keyReader = KeyReader();

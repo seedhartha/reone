@@ -15,33 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/system/pathutil.h"
-
-#include "reone/system/logutil.h"
+#include "reone/system/fileutil.h"
 
 namespace reone {
 
-boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const std::string &relPath, bool logNotFound) {
+boost::filesystem::path findFileIgnoreCase(const boost::filesystem::path &dir, const std::string &filename) {
     std::vector<std::string> tokens;
-    boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
+    boost::split(tokens, filename, boost::is_any_of("/"), boost::token_compress_on);
 
-    for (auto &entry : boost::filesystem::directory_iterator(basePath)) {
-        std::string filename(entry.path().filename().string());
-        boost::to_lower(filename);
+    for (auto &entry : boost::filesystem::directory_iterator(dir)) {
+        std::string name(entry.path().filename().string());
+        boost::to_lower(name);
 
-        if (filename == tokens[0]) {
+        if (name == tokens[0]) {
             if (tokens.size() == 1) {
                 return entry.path();
             }
-            std::string relPath2(relPath.substr(tokens[0].length() + 1));
+            std::string relPath2(filename.substr(tokens[0].length() + 1));
 
-            return getPathIgnoreCase(entry.path(), relPath2);
+            return findFileIgnoreCase(entry.path(), relPath2);
         }
-    }
-    if (logNotFound) {
-        boost::filesystem::path path(basePath);
-        path.append(relPath);
-        debug(boost::format("Path not found: %s") % path.string());
     }
 
     return "";

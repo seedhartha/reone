@@ -18,7 +18,7 @@
 #include "reone/resource/provider/keybif.h"
 
 #include "reone/system/collectionutil.h"
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
 
 #include "reone/resource/format/bifreader.h"
@@ -43,7 +43,7 @@ void KeyBifResourceProvider::init() {
 
     for (auto i = 0; i < keyReader.files().size(); ++i) {
         auto &file = keyReader.files()[i];
-        auto bifPath = getPathIgnoreCase(gamePath, file.filename);
+        auto bifPath = findFileIgnoreCase(gamePath, file.filename);
         _bifPaths.push_back(bifPath);
 
         auto bif = FileInputStream(bifPath, OpenMode::Binary);

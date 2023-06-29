@@ -24,11 +24,12 @@
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/binarywriter.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/hexutil.h"
 #include "reone/system/logutil.h"
-#include "reone/system/pathutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
+
 
 using namespace tinyxml2;
 

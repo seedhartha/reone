@@ -18,14 +18,14 @@
 #include "reone/movie/movies.h"
 
 #include "reone/movie/format/bikreader.h"
-#include "reone/system/pathutil.h"
+#include "reone/system/fileutil.h"
 
 namespace reone {
 
 namespace movie {
 
 std::shared_ptr<IMovie> Movies::doGet(std::string name) {
-    auto path = getPathIgnoreCase(_gamePath, "movies/" + name + ".bik");
+    auto path = findFileIgnoreCase(_gamePath, "movies/" + name + ".bik");
     if (path.empty()) {
         return nullptr;
     }

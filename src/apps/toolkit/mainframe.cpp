@@ -36,8 +36,8 @@
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
+#include "reone/system/fileutil.h"
 #include "reone/system/hexutil.h"
-#include "reone/system/pathutil.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
@@ -411,8 +411,8 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
         return;
     }
     auto gamePath = boost::filesystem::path((std::string)dialog->GetPath());
-    auto keyPath = getPathIgnoreCase(gamePath, "chitin.key", false);
-    auto modulesPath = getPathIgnoreCase(gamePath, "modules", false);
+    auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
+    auto modulesPath = findFileIgnoreCase(gamePath, "modules");
     if (keyPath.empty() || modulesPath.empty()) {
         wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
         return;
