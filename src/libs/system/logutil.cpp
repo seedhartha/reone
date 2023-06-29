@@ -52,35 +52,21 @@ static const std::unordered_map<LogChannel, std::string> kChannelToName {
     {LogChannel::Script3, "script"}};
 
 static LogSeverity g_minSeverity = LogSeverity::None;
-
 static std::set<LogChannel> g_enabledChannels;
 
-static SeverityChannelLogger g_loggerGlobal {boost::log::keywords::channel = LogChannel::Global};
-static SeverityChannelLogger g_loggerResources {boost::log::keywords::channel = LogChannel::Resources};
-static SeverityChannelLogger g_loggerResources2 {boost::log::keywords::channel = LogChannel::Resources2};
-static SeverityChannelLogger g_loggerGraphics {boost::log::keywords::channel = LogChannel::Graphics};
-static SeverityChannelLogger g_loggerAudio {boost::log::keywords::channel = LogChannel::Audio};
-static SeverityChannelLogger g_loggerGUI {boost::log::keywords::channel = LogChannel::GUI};
-static SeverityChannelLogger g_loggerPerception {boost::log::keywords::channel = LogChannel::Perception};
-static SeverityChannelLogger g_loggerConversation {boost::log::keywords::channel = LogChannel::Conversation};
-static SeverityChannelLogger g_loggerCombat {boost::log::keywords::channel = LogChannel::Combat};
-static SeverityChannelLogger g_loggerScript {boost::log::keywords::channel = LogChannel::Script};
-static SeverityChannelLogger g_loggerScript2 {boost::log::keywords::channel = LogChannel::Script2};
-static SeverityChannelLogger g_loggerScript3 {boost::log::keywords::channel = LogChannel::Script3};
-
-static std::map<LogChannel, SeverityChannelLogger *> g_channelToLogger {
-    {LogChannel::Global, &g_loggerGlobal},             //
-    {LogChannel::Resources, &g_loggerResources},       //
-    {LogChannel::Resources2, &g_loggerResources2},     //
-    {LogChannel::Graphics, &g_loggerGraphics},         //
-    {LogChannel::Audio, &g_loggerAudio},               //
-    {LogChannel::GUI, &g_loggerGUI},                   //
-    {LogChannel::Perception, &g_loggerPerception},     //
-    {LogChannel::Conversation, &g_loggerConversation}, //
-    {LogChannel::Combat, &g_loggerCombat},             //
-    {LogChannel::Script, &g_loggerScript},             //
-    {LogChannel::Script2, &g_loggerScript2},           //
-    {LogChannel::Script3, &g_loggerScript3},           //
+static std::unordered_map<LogChannel, SeverityChannelLogger> g_channelToLogger {
+    {LogChannel::Global, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Global}},             //
+    {LogChannel::Resources, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Resources}},       //
+    {LogChannel::Resources2, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Resources2}},     //
+    {LogChannel::Graphics, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Graphics}},         //
+    {LogChannel::Audio, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Audio}},               //
+    {LogChannel::GUI, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::GUI}},                   //
+    {LogChannel::Perception, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Perception}},     //
+    {LogChannel::Conversation, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Conversation}}, //
+    {LogChannel::Combat, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Combat}},             //
+    {LogChannel::Script, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script}},             //
+    {LogChannel::Script2, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script2}},           //
+    {LogChannel::Script3, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script3}}            //
 };
 
 static std::ostream &operator<<(std::ostream &stream, LogSeverity severity) {
@@ -116,8 +102,7 @@ static void log(LogSeverity severity, const std::string &s, LogChannel channel) 
     if (!isLogChannelEnabled(channel)) {
         return;
     }
-    auto &logger = *g_channelToLogger.at(channel);
-    BOOST_LOG_SEV(logger, severity) << s;
+    BOOST_LOG_SEV(g_channelToLogger.at(channel), severity) << s;
 }
 
 void error(const std::string &s, LogChannel channel) {
