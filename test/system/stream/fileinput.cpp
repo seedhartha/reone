@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stream/fileinput.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(file_input_stream)
-
-BOOST_AUTO_TEST_CASE(should_read_from_file) {
+TEST(file_input_stream, should_read_from_file) {
     // given
 
     auto tmpPath = boost::filesystem::temp_directory_path();
@@ -54,18 +52,16 @@ BOOST_AUTO_TEST_CASE(should_read_from_file) {
 
     // then
 
-    BOOST_TEST(13ll == position1);
-    BOOST_TEST('H' == readByteResult1);
-    BOOST_TEST(0ll == position2);
-    BOOST_TEST(13 == readResult);
-    BOOST_TEST(16ll == buf.size());
-    BOOST_TEST((expectedContents == contents), notEqualMessage(expectedContents, contents));
-    BOOST_TEST(-1 == readByteResult2);
-    BOOST_TEST(true == eof);
+    EXPECT_EQ(13ll, position1);
+    EXPECT_EQ('H', readByteResult1);
+    EXPECT_EQ(0ll, position2);
+    EXPECT_EQ(13, readResult);
+    EXPECT_EQ(16ll, buf.size());
+    EXPECT_EQ(expectedContents, contents) << notEqualMessage(expectedContents, contents);
+    EXPECT_EQ(-1, readByteResult2);
+    EXPECT_EQ(true, eof);
 
     // cleanup
 
     boost::filesystem::remove(tmpPath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

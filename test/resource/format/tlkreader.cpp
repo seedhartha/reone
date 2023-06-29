@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
@@ -25,9 +25,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(tlk_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_tlk) {
+TEST(tlk_reader, should_read_tlk) {
     // given
 
     auto input = StringBuilder()
@@ -67,11 +65,9 @@ BOOST_AUTO_TEST_CASE(should_read_tlk) {
     // then
 
     auto table = reader.table();
-    BOOST_TEST(2 == table->getStringCount());
-    BOOST_TEST("John" == table->getString(0).text);
-    BOOST_TEST("" == table->getString(0).soundResRef);
-    BOOST_TEST("Jane" == table->getString(1).text);
-    BOOST_TEST("jane" == table->getString(1).soundResRef);
+    EXPECT_EQ(2, table->getStringCount());
+    EXPECT_EQ("John", table->getString(0).text);
+    EXPECT_EQ("", table->getString(0).soundResRef);
+    EXPECT_EQ("Jane", table->getString(1).text);
+    EXPECT_EQ("jane", table->getString(1).soundResRef);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

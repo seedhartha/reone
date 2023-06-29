@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/binarywriter.h"
 #include "reone/system/stream/bytearrayoutput.h"
@@ -25,9 +25,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(binary_writer)
-
-BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
+TEST(binary_writer, should_write_to_little_endian_stream) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
@@ -61,10 +59,10 @@ BOOST_AUTO_TEST_CASE(should_write_to_little_endian_stream) {
 
     // then
     auto output = std::string(bytes.data(), bytes.size());
-    BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
+    EXPECT_EQ(expectedOutput, output) << notEqualMessage(expectedOutput, output);
 }
 
-BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
+TEST(binary_writer, should_write_to_big_endian_stream) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
@@ -92,7 +90,5 @@ BOOST_AUTO_TEST_CASE(should_write_to_big_endian_stream) {
 
     // then
     auto output = std::string(bytes.data(), bytes.size());
-    BOOST_TEST((expectedOutput == output), notEqualMessage(expectedOutput, output));
+    EXPECT_EQ(expectedOutput, output) << notEqualMessage(expectedOutput, output);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

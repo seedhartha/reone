@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/collectionutil.h"
 
@@ -26,9 +26,7 @@ struct Item {
     int value {0};
 };
 
-BOOST_AUTO_TEST_SUITE(collection_util)
-
-BOOST_AUTO_TEST_CASE(should_transform) {
+TEST(collection_util, should_transform) {
     // given
     auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
@@ -36,13 +34,13 @@ BOOST_AUTO_TEST_CASE(should_transform) {
     auto output = transform<Item, int>(input, [](auto &item) { return item.value; });
 
     // then
-    BOOST_TEST(3ll == output.size());
-    BOOST_TEST(2 == output[0]);
-    BOOST_TEST(3 == output[1]);
-    BOOST_TEST(5 == output[2]);
+    EXPECT_EQ(3ll, output.size());
+    EXPECT_EQ(2, output[0]);
+    EXPECT_EQ(3, output[1]);
+    EXPECT_EQ(5, output[2]);
 }
 
-BOOST_AUTO_TEST_CASE(should_group_by_key) {
+TEST(collection_util, should_group_by_key) {
     // given
     auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
@@ -50,14 +48,14 @@ BOOST_AUTO_TEST_CASE(should_group_by_key) {
     auto output = groupBy<int, Item>(input, [](auto &item) { return item.key; });
 
     // then
-    BOOST_TEST(2ll == output.at(1).size());
-    BOOST_TEST(2 == output.at(1)[0].value);
-    BOOST_TEST(3 == output.at(1)[1].value);
-    BOOST_TEST(1ll == output.at(4).size());
-    BOOST_TEST(5 == output.at(4)[0].value);
+    EXPECT_EQ(2ll, output.at(1).size());
+    EXPECT_EQ(2, output.at(1)[0].value);
+    EXPECT_EQ(3, output.at(1)[1].value);
+    EXPECT_EQ(1ll, output.at(4).size());
+    EXPECT_EQ(5, output.at(4)[0].value);
 }
 
-BOOST_AUTO_TEST_CASE(should_group_by_key_and_map_value) {
+TEST(collection_util, should_group_by_key_and_map_value) {
     // given
     auto input = std::vector<Item> {{1, 2}, {1, 3}, {4, 5}};
 
@@ -68,11 +66,9 @@ BOOST_AUTO_TEST_CASE(should_group_by_key_and_map_value) {
         [](auto &item) { return item.value; });
 
     // then
-    BOOST_TEST(2ll == output.at(1).size());
-    BOOST_TEST(2 == output.at(1)[0]);
-    BOOST_TEST(3 == output.at(1)[1]);
-    BOOST_TEST(1ll == output.at(4).size());
-    BOOST_TEST(5 == output.at(4)[0]);
+    EXPECT_EQ(2ll, output.at(1).size());
+    EXPECT_EQ(2, output.at(1)[0]);
+    EXPECT_EQ(3, output.at(1)[1]);
+    EXPECT_EQ(1ll, output.at(4).size());
+    EXPECT_EQ(5, output.at(4)[0]);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

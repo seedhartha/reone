@@ -15,30 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/timer.h"
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(timer)
-
-BOOST_AUTO_TEST_CASE(should_advance_and_time_out) {
+TEST(timer, should_advance_and_time_out) {
     // given
     auto timer = Timer();
     timer.setTimeout(1.0f);
 
     // expect
-    BOOST_TEST(timer.isSet());
-    BOOST_TEST(!timer.isTimedOut());
+    EXPECT_TRUE(timer.isSet());
+    EXPECT_TRUE(!timer.isTimedOut());
 
     timer.advance(0.5f);
-    BOOST_TEST(timer.isSet());
-    BOOST_TEST(!timer.isTimedOut());
+    EXPECT_TRUE(timer.isSet());
+    EXPECT_TRUE(!timer.isTimedOut());
 
     timer.advance(0.5f);
-    BOOST_TEST(!timer.isSet());
-    BOOST_TEST(timer.isTimedOut());
+    EXPECT_TRUE(!timer.isSet());
+    EXPECT_TRUE(timer.isTimedOut());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

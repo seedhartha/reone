@@ -15,16 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/graphics/walkmesh.h"
 
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(walkmesh)
-
-BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__intersection_from_close) {
+TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_close) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});
@@ -52,12 +50,12 @@ BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__intersection_from_cl
     auto face = walkmesh.raycast(std::set<uint32_t> {0}, glm::vec3(-0.5f, 0.25, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(static_cast<bool>(face));
-    BOOST_TEST(0 == face->index);
-    BOOST_CHECK_CLOSE(1.0f, distance, 1e-5);
+    EXPECT_TRUE(static_cast<bool>(face));
+    EXPECT_EQ(0, face->index);
+    EXPECT_NEAR(1.0f, distance, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__intersection_from_far) {
+TEST(walkmesh, should_find_ray_walkmesh_intersection__intersection_from_far) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});
@@ -85,10 +83,10 @@ BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__intersection_from_fa
     auto face = walkmesh.raycast(std::set<uint32_t> {0}, glm::vec3(-0.5f, 0.25, 20.0f), glm::vec3(0.0f, 0.0f, -1.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(!static_cast<bool>(face));
+    EXPECT_TRUE(!static_cast<bool>(face));
 }
 
-BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__no_intersection) {
+TEST(walkmesh, should_find_ray_walkmesh_intersection__no_intersection) {
     // given
     auto walkmesh = Walkmesh();
     walkmesh.add(Walkmesh::Face {0, 0, std::vector<glm::vec3> {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)}, glm::vec3(1.0f, 0.0f, 0.0f)});
@@ -116,7 +114,5 @@ BOOST_AUTO_TEST_CASE(should_find_ray_walkmesh_intersection__no_intersection) {
     auto face = walkmesh.raycast(std::set<uint32_t> {0}, glm::vec3(-0.5f, 0.25, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(!static_cast<bool>(face));
+    EXPECT_TRUE(!static_cast<bool>(face));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

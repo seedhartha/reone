@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
@@ -31,9 +31,7 @@ using namespace reone::audio;
 using testing::_;
 using testing::Return;
 
-BOOST_AUTO_TEST_SUITE(wav_reader)
-
-BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
+TEST(wav_reader, should_load_plain_wav) {
     // given
     auto wavBytes = StringBuilder()
                         // Header
@@ -64,16 +62,16 @@ BOOST_AUTO_TEST_CASE(should_load_plain_wav) {
 
     // then
     auto stream = reader.stream();
-    BOOST_TEST(static_cast<bool>(stream));
-    BOOST_TEST(1 == stream->getFrameCount());
+    EXPECT_TRUE(static_cast<bool>(stream));
+    EXPECT_EQ(1, stream->getFrameCount());
     auto &frame = stream->getFrame(0);
-    BOOST_TEST(static_cast<int>(AudioFormat::Mono8) == static_cast<int>(frame.format));
-    BOOST_TEST(22050 == frame.sampleRate);
+    EXPECT_EQ(static_cast<int>(AudioFormat::Mono8), static_cast<int>(frame.format));
+    EXPECT_EQ(22050, frame.sampleRate);
     auto samples = reinterpret_cast<const int16_t *>(frame.samples.data());
-    BOOST_TEST(32767 == samples[0]);
+    EXPECT_EQ(32767, samples[0]);
 }
 
-BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
+TEST(wav_reader, should_load_obfuscated_wav) {
     // given
     auto wavBytes = StringBuilder()
                         // Header
@@ -106,24 +104,24 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_wav) {
 
     // then
     auto stream = reader.stream();
-    BOOST_TEST(static_cast<bool>(stream));
-    BOOST_TEST(1 == stream->getFrameCount());
+    EXPECT_TRUE(static_cast<bool>(stream));
+    EXPECT_EQ(1, stream->getFrameCount());
     auto &frame = stream->getFrame(0);
-    BOOST_TEST(static_cast<int>(AudioFormat::Mono16) == static_cast<int>(frame.format));
-    BOOST_TEST(22050 == frame.sampleRate);
-    BOOST_TEST(16ll == frame.samples.size());
+    EXPECT_EQ(static_cast<int>(AudioFormat::Mono16), static_cast<int>(frame.format));
+    EXPECT_EQ(22050, frame.sampleRate);
+    EXPECT_EQ(16ll, frame.samples.size());
     auto samples = reinterpret_cast<const uint16_t *>(frame.samples.data());
-    BOOST_TEST(6 == samples[0]);
-    BOOST_TEST(9 == samples[1]);
-    BOOST_TEST(18 == samples[2]);
-    BOOST_TEST(26 == samples[3]);
-    BOOST_TEST(40 == samples[4]);
-    BOOST_TEST(62 == samples[5]);
-    BOOST_TEST(60 == samples[6]);
-    BOOST_TEST(99 == samples[7]);
+    EXPECT_EQ(6, samples[0]);
+    EXPECT_EQ(9, samples[1]);
+    EXPECT_EQ(18, samples[2]);
+    EXPECT_EQ(26, samples[3]);
+    EXPECT_EQ(40, samples[4]);
+    EXPECT_EQ(62, samples[5]);
+    EXPECT_EQ(60, samples[6]);
+    EXPECT_EQ(99, samples[7]);
 }
 
-BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
+TEST(wav_reader, should_load_obfuscated_mp3) {
     // given
     auto wavBytes = StringBuilder()
                         // Header
@@ -159,5 +157,3 @@ BOOST_AUTO_TEST_CASE(should_load_obfuscated_mp3) {
     // expect
     reader.load(wav);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

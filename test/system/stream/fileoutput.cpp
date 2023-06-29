@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stream/fileoutput.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(file_output_stream)
-
-BOOST_AUTO_TEST_CASE(should_write_to_file) {
+TEST(file_output_stream, should_write_to_file) {
     // given
 
     auto tmpPath = boost::filesystem::temp_directory_path();
@@ -55,13 +53,11 @@ BOOST_AUTO_TEST_CASE(should_write_to_file) {
     tmpFile.read(&bytes[0], tmpSize);
     tmpFile.close();
 
-    BOOST_TEST(13ll == position);
-    BOOST_TEST(27ll == tmpSize);
-    BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
+    EXPECT_EQ(13ll, position);
+    EXPECT_EQ(27ll, tmpSize);
+    EXPECT_EQ(expectedOutput, bytes) << notEqualMessage(expectedOutput, bytes);
 
     // cleanup
 
     boost::filesystem::remove(tmpPath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

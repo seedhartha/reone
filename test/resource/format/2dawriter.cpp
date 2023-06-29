@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dawriter.h"
@@ -28,9 +28,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(two_da_writer)
-
-BOOST_AUTO_TEST_CASE(should_write_two_da) {
+TEST(two_da_writer, should_write_two_da) {
     // given
 
     auto expectedOutput = StringBuilder()
@@ -67,7 +65,5 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
     // then
 
     auto actualOutput = std::string(&bytes[0], bytes.size());
-    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
+    EXPECT_EQ(expectedOutput, actualOutput) << notEqualMessage(expectedOutput, actualOutput);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

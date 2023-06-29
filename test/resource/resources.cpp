@@ -15,21 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileoutput.h"
-
 
 #include "../checkutil.h"
 
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(resources)
-
-BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
+TEST(resources, should_index_providers_and_get_resources_without_caching) {
     // given
 
     setLogLevel(LogLevel::None);
@@ -108,15 +105,13 @@ BOOST_AUTO_TEST_CASE(should_index_providers_and_get_resources_without_caching) {
 
     // then
 
-    BOOST_TEST(3ll == numProviders);
-    BOOST_TEST(1ll == numTransientProviders);
-    BOOST_TEST(static_cast<bool>(actualResData1));
-    BOOST_TEST((expectedResData == (*actualResData1)), notEqualMessage(expectedResData, *actualResData1));
-    BOOST_TEST(!static_cast<bool>(actualResData2));
+    EXPECT_EQ(3ll, numProviders);
+    EXPECT_EQ(1ll, numTransientProviders);
+    EXPECT_TRUE(static_cast<bool>(actualResData1));
+    EXPECT_EQ(expectedResData, (*actualResData1)) << notEqualMessage(expectedResData, *actualResData1);
+    EXPECT_TRUE(!static_cast<bool>(actualResData2));
 
     // cleanup
 
     boost::filesystem::remove_all(tmpDirPath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

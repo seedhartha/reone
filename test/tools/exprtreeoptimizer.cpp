@@ -15,20 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/tools/script/exprtreeoptimizer.h"
 
 using namespace reone::script;
 
-BOOST_AUTO_TEST_SUITE(expression_tree_optimizer)
-
-BOOST_AUTO_TEST_CASE(should_optimize_expression_tree) {
+TEST(expression_tree_optimizer, should_optimize_expression_tree) {
     // given
 
     // when
 
     // then
 }
-
-BOOST_AUTO_TEST_SUITE_END()

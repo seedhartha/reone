@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/graphics/format/tgareader.h"
 #include "reone/graphics/texture.h"
@@ -25,9 +25,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(tga_reader)
-
-BOOST_AUTO_TEST_CASE(should_load_tga) {
+TEST(tga_reader, should_load_tga) {
     // given
     auto tgaBytes = StringBuilder()
                         // Header
@@ -50,14 +48,12 @@ BOOST_AUTO_TEST_CASE(should_load_tga) {
 
     // then
     auto texture = reader.texture();
-    BOOST_TEST(static_cast<bool>(texture));
-    BOOST_TEST(std::string("some_texture") == texture->name());
-    BOOST_TEST(1 == texture->width());
-    BOOST_TEST(1 == texture->height());
-    BOOST_TEST(1ll == texture->layers().size());
-    BOOST_TEST(static_cast<bool>(texture->layers()[0].pixels));
+    EXPECT_TRUE(static_cast<bool>(texture));
+    EXPECT_EQ(std::string("some_texture"), texture->name());
+    EXPECT_EQ(1, texture->width());
+    EXPECT_EQ(1, texture->height());
+    EXPECT_EQ(1ll, texture->layers().size());
+    EXPECT_TRUE(static_cast<bool>(texture->layers()[0].pixels));
     auto pixels = reinterpret_cast<unsigned char *>(texture->layers()[0].pixels->data());
-    BOOST_TEST(255 == pixels[0]);
+    EXPECT_EQ(255, pixels[0]);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

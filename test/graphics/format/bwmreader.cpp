@@ -15,18 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
+#include "reone/graphics/format/bwmreader.h"
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/graphics/format/bwmreader.h"
 
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(bwm_reader)
-
-BOOST_AUTO_TEST_CASE(should_load_pwk_dwk) {
+TEST(bwm_reader, should_load_pwk_dwk) {
     // given
     auto bwmBytes = StringBuilder()
                         .append("BWM V1.0")
@@ -63,7 +61,7 @@ BOOST_AUTO_TEST_CASE(should_load_pwk_dwk) {
     auto walkmesh = reader.walkmesh();
 }
 
-BOOST_AUTO_TEST_CASE(should_load_wok) {
+TEST(bwm_reader, should_load_wok) {
     // given
     auto wokBytes = StringBuilder()
                         .append("BWM V1.0")
@@ -109,5 +107,3 @@ BOOST_AUTO_TEST_CASE(should_load_wok) {
     // then
     auto walkmesh = reader.walkmesh();
 }
-
-BOOST_AUTO_TEST_SUITE_END()

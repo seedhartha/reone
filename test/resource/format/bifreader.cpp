@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/bifreader.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -24,9 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(bif_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_bif) {
+TEST(bif_reader, should_read_bif) {
     // given
 
     auto input = StringBuilder()
@@ -54,11 +52,9 @@ BOOST_AUTO_TEST_CASE(should_read_bif) {
     // then
 
     auto &resources = reader.resources();
-    BOOST_TEST(1ll == resources.size());
-    BOOST_TEST(0 == resources[0].id);
-    BOOST_TEST(36 == resources[0].offset);
-    BOOST_TEST(13 == resources[0].fileSize);
-    BOOST_TEST(2022 == resources[0].resType);
+    EXPECT_EQ(1ll, resources.size());
+    EXPECT_EQ(0, resources[0].id);
+    EXPECT_EQ(36, resources[0].offset);
+    EXPECT_EQ(13, resources[0].fileSize);
+    EXPECT_EQ(2022, resources[0].resType);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

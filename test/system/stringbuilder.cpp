@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stringbuilder.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(string_builder)
-
-BOOST_AUTO_TEST_CASE(should_build_a_string) {
+TEST(string_builder, should_build_a_string) {
     // given
     auto expectedStr = std::string("Hello, world!");
 
@@ -37,7 +35,5 @@ BOOST_AUTO_TEST_CASE(should_build_a_string) {
                    .build();
 
     // then
-    BOOST_TEST((expectedStr == str), notEqualMessage(expectedStr, str));
+    EXPECT_EQ(expectedStr, str) << notEqualMessage(expectedStr, str);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

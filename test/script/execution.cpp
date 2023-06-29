@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
@@ -31,9 +31,7 @@ using testing::_;
 using testing::Return;
 using testing::ReturnRef;
 
-BOOST_AUTO_TEST_SUITE(script_execution)
-
-BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
+TEST(script_execution, should_run_script_program__degenerate) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     auto context = std::make_unique<ExecutionContext>();
@@ -43,10 +41,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__degenerate) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
+    EXPECT_EQ(-1, result);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
+TEST(script_execution, should_run_script_program__boolean_logic) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));              // 0
@@ -75,17 +73,17 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__boolean_logic) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(1 == result);
-    BOOST_TEST(6 == execution.getStackSize());
-    BOOST_TEST(0 == execution.getStackVariable(0).intValue);
-    BOOST_TEST(0 == execution.getStackVariable(1).intValue);
-    BOOST_TEST(1 == execution.getStackVariable(2).intValue);
-    BOOST_TEST(0 == execution.getStackVariable(3).intValue);
-    BOOST_TEST(1 == execution.getStackVariable(4).intValue);
-    BOOST_TEST(1 == execution.getStackVariable(5).intValue);
+    EXPECT_EQ(1, result);
+    EXPECT_EQ(6, execution.getStackSize());
+    EXPECT_EQ(0, execution.getStackVariable(0).intValue);
+    EXPECT_EQ(0, execution.getStackVariable(1).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(2).intValue);
+    EXPECT_EQ(0, execution.getStackVariable(3).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(4).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(5).intValue);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
+TEST(script_execution, should_run_script_program__math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(-7));              // -7
@@ -129,12 +127,12 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__math) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
-    BOOST_TEST(1 == execution.getStackSize());
-    BOOST_CHECK_CLOSE(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_EQ(-1, result);
+    EXPECT_EQ(1, execution.getStackSize());
+    EXPECT_NEAR(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
+TEST(script_execution, should_run_script_program__comparisons) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(2));           // 2
@@ -180,10 +178,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__comparisons) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(8 == result);
+    EXPECT_EQ(8, result);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
+TEST(script_execution, should_run_script_program__loop) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(0));
@@ -202,10 +200,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__loop) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(10 == result);
+    EXPECT_EQ(10, result);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
+TEST(script_execution, should_run_script_program__action) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -230,14 +228,14 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
-    BOOST_TEST(1ll == routine->invokeInvocations().size());
+    EXPECT_EQ(-1, result);
+    EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
-    BOOST_TEST(std::string("some_tag") == std::get<0>(invocation[0])[0].strValue);
-    BOOST_TEST(1 == std::get<0>(invocation[0])[1].intValue);
+    EXPECT_EQ(std::string("some_tag"), std::get<0>(invocation[0])[0].strValue);
+    EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
+TEST(script_execution, should_run_script_program__action_with_vectors) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -264,21 +262,21 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_vectors) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
-    BOOST_TEST(3 == execution.getStackSize());
-    BOOST_CHECK_CLOSE(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
-    BOOST_CHECK_CLOSE(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
-    BOOST_CHECK_CLOSE(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
-    BOOST_TEST(1ll == routine->invokeInvocations().size());
+    EXPECT_EQ(-1, result);
+    EXPECT_EQ(3, execution.getStackSize());
+    EXPECT_NEAR(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_NEAR(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
+    EXPECT_NEAR(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
+    EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
     auto inVecValue = std::get<0>(invocation[0])[0].vecValue;
-    BOOST_CHECK_CLOSE(2.0f, inVecValue.x, 1e-5);
-    BOOST_CHECK_CLOSE(3.0f, inVecValue.y, 1e-5);
-    BOOST_CHECK_CLOSE(4.0f, inVecValue.z, 1e-5);
-    BOOST_TEST(1 == std::get<0>(invocation[0])[1].intValue);
+    EXPECT_NEAR(2.0f, inVecValue.x, 1e-5);
+    EXPECT_NEAR(3.0f, inVecValue.y, 1e-5);
+    EXPECT_NEAR(4.0f, inVecValue.z, 1e-5);
+    EXPECT_EQ(1, std::get<0>(invocation[0])[1].intValue);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
+TEST(script_execution, should_run_script_program__action_with_store_state) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -312,21 +310,21 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__action_with_store_state) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
-    BOOST_TEST(0 == execution.getStackSize());
-    BOOST_TEST(1ll == routine->invokeInvocations().size());
+    EXPECT_EQ(-1, result);
+    EXPECT_EQ(0, execution.getStackSize());
+    EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &routineInvocation = routine->invokeInvocations()[0];
     auto &actionContext = std::get<0>(routineInvocation)[0].context;
-    BOOST_TEST(static_cast<bool>(actionContext));
-    BOOST_TEST(static_cast<bool>(actionContext->savedState));
-    BOOST_TEST(2 == actionContext->savedState->globals.size());
-    BOOST_TEST(2 == actionContext->savedState->globals[0].intValue);
-    BOOST_TEST(3 == actionContext->savedState->globals[1].intValue);
-    BOOST_TEST(1 == actionContext->savedState->locals.size());
-    BOOST_TEST(5 == actionContext->savedState->locals[0].intValue);
+    EXPECT_TRUE(static_cast<bool>(actionContext));
+    EXPECT_TRUE(static_cast<bool>(actionContext->savedState));
+    EXPECT_EQ(2, actionContext->savedState->globals.size());
+    EXPECT_EQ(2, actionContext->savedState->globals[0].intValue);
+    EXPECT_EQ(3, actionContext->savedState->globals[1].intValue);
+    EXPECT_EQ(1, actionContext->savedState->locals.size());
+    EXPECT_EQ(5, actionContext->savedState->locals[0].intValue);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
+TEST(script_execution, should_run_script_program__globals) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -348,10 +346,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__globals) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(42 == result);
+    EXPECT_EQ(42, result);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
+TEST(script_execution, should_run_script_program__subroutine) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction(InstructionType::RSADDI));
@@ -373,10 +371,10 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__subroutine) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(42 == result);
+    EXPECT_EQ(42, result);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
+TEST(script_execution, should_run_script_program__vector_math) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTF(1.0f));        // 1.0
@@ -422,12 +420,12 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__vector_math) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(-1 == result);
-    BOOST_TEST(1 == execution.getStackSize());
-    BOOST_CHECK_CLOSE(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_EQ(-1, result);
+    EXPECT_EQ(1, execution.getStackSize());
+    EXPECT_NEAR(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
+TEST(script_execution, should_run_script_program__structs) {
     // given
     auto program = std::make_shared<ScriptProgram>("some_program");
     program->add(Instruction::newCONSTI(1));
@@ -460,7 +458,5 @@ BOOST_AUTO_TEST_CASE(should_run_script_program__structs) {
     auto result = execution.run();
 
     // then
-    BOOST_TEST(1 == result);
+    EXPECT_EQ(1, result);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/model.h"
@@ -28,9 +28,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(mdl_reader)
-
-BOOST_AUTO_TEST_CASE(should_load_mdl) {
+TEST(mdl_reader, should_load_mdl) {
     // given
     auto mdlBytes = StringBuilder()
                         // File Header (0)
@@ -112,10 +110,8 @@ BOOST_AUTO_TEST_CASE(should_load_mdl) {
 
     // then
     auto model = reader.model();
-    BOOST_TEST(static_cast<bool>(model));
-    BOOST_TEST(std::string("some_model") == model->name());
+    EXPECT_TRUE(static_cast<bool>(model));
+    EXPECT_EQ(std::string("some_model"), model->name());
     auto rootNode = model->rootNode();
-    BOOST_TEST(std::string("root_node") == rootNode->name());
+    EXPECT_EQ(std::string("root_node"), rootNode->name());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

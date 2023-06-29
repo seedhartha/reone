@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stream/bytearrayinput.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(byte_array_input_stream)
-
-BOOST_AUTO_TEST_CASE(should_read_from_byte_array) {
+TEST(byte_array_input_stream, should_read_from_byte_array) {
     // given
     auto bytes = ByteArray("Hello, world!");
     auto stream = ByteArrayInputStream(bytes);
@@ -45,17 +43,17 @@ BOOST_AUTO_TEST_CASE(should_read_from_byte_array) {
     bool eof = stream.eof();
 
     // then
-    BOOST_TEST(13ll == position1);
-    BOOST_TEST('H' == readByteResult1);
-    BOOST_TEST(0ll == position2);
-    BOOST_TEST(13 == readResult);
-    BOOST_TEST(16ll == buf.size());
-    BOOST_TEST((expectedContents == contents), notEqualMessage(expectedContents, contents));
-    BOOST_TEST(-1 == readByteResult2);
-    BOOST_TEST(true == eof);
+    EXPECT_EQ(13ll, position1);
+    EXPECT_EQ('H', readByteResult1);
+    EXPECT_EQ(0ll, position2);
+    EXPECT_EQ(13, readResult);
+    EXPECT_EQ(16ll, buf.size());
+    EXPECT_EQ(expectedContents, contents) << notEqualMessage(expectedContents, contents);
+    EXPECT_EQ(-1, readByteResult2);
+    EXPECT_EQ(true, eof);
 }
 
-BOOST_AUTO_TEST_CASE(should_read_lines_from_byte_array) {
+TEST(byte_array_input_stream, should_read_lines_from_byte_array) {
     // given
     auto bytes = ByteArray("line1\r\nline2\nlongline");
     auto stream = ByteArrayInputStream(bytes);
@@ -63,18 +61,16 @@ BOOST_AUTO_TEST_CASE(should_read_lines_from_byte_array) {
 
     // expect
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(std::string(buf) == std::string("line1"));
+    EXPECT_EQ(std::string(buf), std::string("line1"));
 
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(std::string(buf) == std::string("line2"));
+    EXPECT_EQ(std::string(buf), std::string("line2"));
 
     stream.readLine(buf, 7);
-    BOOST_TEST(std::string(buf, 7) == std::string("longlin"));
-    BOOST_TEST(!stream.eof());
+    EXPECT_EQ(std::string(buf, 7), std::string("longlin"));
+    EXPECT_TRUE(!stream.eof());
 
     stream.readLine(buf, sizeof(buf));
-    BOOST_TEST(std::string(buf) == std::string("e"));
-    BOOST_TEST(stream.eof());
+    EXPECT_EQ(std::string(buf), std::string("e"));
+    EXPECT_TRUE(stream.eof());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

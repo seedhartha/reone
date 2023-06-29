@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
@@ -27,9 +27,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(tlk_writer)
-
-BOOST_AUTO_TEST_CASE(should_write_tlk) {
+TEST(tlk_writer, should_write_tlk) {
     // given
 
     auto expectedOutput = StringBuilder()
@@ -76,7 +74,5 @@ BOOST_AUTO_TEST_CASE(should_write_tlk) {
     // then
 
     auto actualOutput = std::string(&bytes[0], bytes.size());
-    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
+    EXPECT_EQ(expectedOutput, actualOutput) << notEqualMessage(expectedOutput, actualOutput);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

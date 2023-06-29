@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stream/bytearrayoutput.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(byte_array_output_stream)
-
-BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
+TEST(byte_array_output_stream, should_write_to_byte_array) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
@@ -40,8 +38,6 @@ BOOST_AUTO_TEST_CASE(should_write_to_byte_array) {
     stream.write(&bytesToWrite[1], 12);
 
     // then
-    BOOST_TEST(13ll == position);
-    BOOST_TEST((expectedOutput == bytes), notEqualMessage(expectedOutput, bytes));
+    EXPECT_EQ(13ll, position);
+    EXPECT_EQ(expectedOutput, bytes) << notEqualMessage(expectedOutput, bytes);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

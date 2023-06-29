@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/strings.h"
 #include "reone/system/logutil.h"
@@ -24,9 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(strings)
-
-BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
+TEST(strings, should_init_talktable_and_get_string_and_sound) {
     // given
 
     setLogLevel(LogLevel::None);
@@ -68,12 +66,10 @@ BOOST_AUTO_TEST_CASE(should_init_talktable_and_get_string_and_sound) {
 
     // then
 
-    BOOST_TEST(expectedText == text);
-    BOOST_TEST(expectedSound == sound);
+    EXPECT_EQ(expectedText, text);
+    EXPECT_EQ(expectedSound, sound);
 
     // cleanup
 
     boost::filesystem::remove_all(tmpDirPath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

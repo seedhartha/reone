@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/game/script/routines.h"
 #include "reone/tools/script/exprtree.h"
@@ -30,9 +30,7 @@ public:
     void optimize(ExpressionTree &tree) {}
 };
 
-BOOST_AUTO_TEST_SUITE(expression_tree)
-
-BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
+TEST(expression_tree, should_decompile_program__minimal) {
     // given
 
     auto program = ScriptProgram("");
@@ -51,7 +49,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__minimal) {
     // then
 }
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_globals) {
+TEST(expression_tree, should_decompile_program__starting_conditional_without_globals) {
     // given
 
     auto program = ScriptProgram("");
@@ -75,7 +73,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__starting_conditional_without_glob
     // then
 }
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
+TEST(expression_tree, should_decompile_program__main_with_globals) {
     // given
 
     auto program = ScriptProgram("");
@@ -103,7 +101,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__main_with_globals) {
     // then
 }
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
+TEST(expression_tree, should_decompile_program__conditionals) {
     // given
 
     auto program = ScriptProgram("");
@@ -132,7 +130,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__conditionals) {
     // then
 }
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
+TEST(expression_tree, should_decompile_program__loop) {
     // given
 
     auto program = ScriptProgram("");
@@ -167,7 +165,7 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__loop) {
     // then
 }
 
-BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
+TEST(expression_tree, should_decompile_program__vectors) {
     // given
 
     auto program = ScriptProgram("");
@@ -229,5 +227,3 @@ BOOST_AUTO_TEST_CASE(should_decompile_program__vectors) {
 
     // then
 }
-
-BOOST_AUTO_TEST_SUITE_END()

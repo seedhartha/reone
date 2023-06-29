@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/game/game.h"
 #include "reone/scene/collision.h"
@@ -46,9 +46,7 @@ using testing::Invoke;
 using testing::Return;
 using testing::ReturnRef;
 
-BOOST_AUTO_TEST_SUITE(game)
-
-BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
+TEST(game, should_play_legal_movie_on_launch) {
     // given
     auto gamePath = boost::filesystem::path();
 
@@ -86,11 +84,11 @@ BOOST_AUTO_TEST_CASE(should_play_legal_movie_on_launch) {
 
     // then
     auto movie = game.movie();
-    BOOST_TEST(static_cast<bool>(movie));
-    BOOST_TEST((movie == legalMovie));
+    EXPECT_TRUE(static_cast<bool>(movie));
+    EXPECT_EQ(movie, legalMovie);
 }
 
-BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) {
+TEST(game, should_present_main_menu_on_launch_when_movie_is_finished) {
     // given
     auto gamePath = boost::filesystem::path();
 
@@ -98,12 +96,10 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     engine->init();
 
     auto sceneNames = std::set<std::string>();
-    EXPECT_CALL(engine->sceneModule().graphs(), sceneNames())
-        .WillOnce(Return(sceneNames));
+    EXPECT_CALL(engine->sceneModule().graphs(), sceneNames()).WillOnce(Return(sceneNames));
 
     auto moduleNames = std::set<std::string>();
-    EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
-        .WillOnce(Return(moduleNames));
+    EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames()).WillOnce(Return(moduleNames));
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();
@@ -111,9 +107,7 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     auto legalMovie = std::make_shared<MockMovie>();
     EXPECT_CALL(*legalMovie, update(_)).Times(1);
     EXPECT_CALL(*legalMovie, isFinished()).WillOnce(Return(true));
-
-    EXPECT_CALL(engine->movieModule().movies(), get(_))
-        .WillOnce(Return(legalMovie));
+    EXPECT_CALL(engine->movieModule().movies(), get(_)).WillOnce(Return(legalMovie));
 
     auto gui = std::make_shared<MockGUI>();
     auto label = std::make_shared<Label>(
@@ -145,31 +139,28 @@ BOOST_AUTO_TEST_CASE(should_present_main_menu_on_launch_when_movie_is_finished) 
     EXPECT_CALL(*gui, getControl("BTN_WARP")).WillOnce(Return(button));
     EXPECT_CALL(*gui, getControl("LBL_MENUBG")).WillOnce(Return(label));
     EXPECT_CALL(*gui, update(_)).Times(1);
-    EXPECT_CALL(*gui, draw()).Times(1);
+    EXPECT_CALL(*gui, draw()).Times(2);
 
-    EXPECT_CALL(engine->guiModule().guis(), get("mainmenu16x12", _))
-        .WillOnce(Return(gui));
+    EXPECT_CALL(engine->guiModule().guis(), get("mainmenu16x12", _)).WillOnce(Return(gui));
+    EXPECT_CALL(engine->guiModule().guis(), get("saveload", _)).WillOnce(Return(nullptr));
 
     auto mainMenuScene = std::make_shared<MockSceneGraph>();
-    EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMainMenu))
-        .WillOnce(ReturnRef(*mainMenuScene));
+    EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMainMenu)).WillOnce(ReturnRef(*mainMenuScene));
 
     EXPECT_CALL(engine->graphicsModule().window(), processEvents(_))
         .WillOnce(Invoke([](bool &quit) { quit = false; }))
-        .WillRepeatedly(Invoke([](bool &quit) { quit = true; }));
-
-    EXPECT_CALL(engine->graphicsModule().window(), isInFocus())
-        .WillOnce(Return(true));
+        .WillOnce(Invoke([](bool &quit) { quit = false; }))
+        .WillOnce(Invoke([](bool &quit) { quit = true; }));
 
     auto mainScene = std::make_shared<MockSceneGraph>();
-    EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMain))
-        .WillOnce(ReturnRef(*mainScene));
+    EXPECT_CALL(engine->sceneModule().graphs(), get(kSceneMain)).WillRepeatedly(ReturnRef(*mainScene));
+
+    EXPECT_CALL(engine->graphicsModule().window(), isInFocus()).WillRepeatedly(Return(true));
+    EXPECT_CALL(engine->graphicsModule().pipeline(), draw(_, _)).WillRepeatedly(Return(nullptr));
 
     // when
     game.run();
 
     // then
-    BOOST_TEST((game.currentScreen() == Game::Screen::MainMenu));
+    EXPECT_EQ(game.currentScreen(), Game::Screen::MainMenu);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

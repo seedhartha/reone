@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/hexutil.h"
 
@@ -23,9 +23,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(hex_utils)
-
-BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
+TEST(hex_util, should_hexify_utf8_string) {
     // given
     auto input = std::string("Hello, world!");
     auto expectedOutput = std::string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
@@ -34,10 +32,10 @@ BOOST_AUTO_TEST_CASE(should_hexify_utf8_string) {
     auto output = hexify(input, " ");
 
     // then
-    BOOST_TEST(expectedOutput == output);
+    EXPECT_EQ(expectedOutput, output);
 }
 
-BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
+TEST(hex_util, should_hexify_byte_array) {
     // given
     auto input = ByteArray("Hello, world!", 13);
     auto expectedOutput = std::string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
@@ -46,10 +44,10 @@ BOOST_AUTO_TEST_CASE(should_hexify_byte_array) {
     auto output = hexify(input, " ");
 
     // then
-    BOOST_TEST(expectedOutput == output);
+    EXPECT_EQ(expectedOutput, output);
 }
 
-BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
+TEST(hex_util, should_unhexify_utf8_string) {
     // given
     auto input = std::string("48656c6c6f2c20776f726c6421");
     auto expectedOutput = ByteArray("Hello, world!", 13);
@@ -58,7 +56,5 @@ BOOST_AUTO_TEST_CASE(should_unhexify_utf8_string) {
     auto output = unhexify(input);
 
     // then
-    BOOST_TEST((expectedOutput == output));
+    EXPECT_EQ(expectedOutput, output);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

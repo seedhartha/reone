@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dareader.h"
@@ -26,9 +26,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(two_da_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_two_da) {
+TEST(two_da_reader, should_read_two_da) {
     // given
 
     auto input = StringBuilder()
@@ -58,12 +56,10 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
     // then
 
     auto twoDa = reader.twoDa();
-    BOOST_TEST(twoDa->getColumnCount() == 2);
-    BOOST_TEST(twoDa->getRowCount() == 2);
-    BOOST_TEST(std::string("unique") == twoDa->getString(0, "key"));
-    BOOST_TEST(std::string("same") == twoDa->getString(0, "value"));
-    BOOST_TEST(std::string("same") == twoDa->getString(1, "key"));
-    BOOST_TEST(std::string("same") == twoDa->getString(1, "value"));
+    EXPECT_EQ(twoDa->getColumnCount(), 2);
+    EXPECT_EQ(twoDa->getRowCount(), 2);
+    EXPECT_EQ(std::string("unique"), twoDa->getString(0, "key"));
+    EXPECT_EQ(std::string("same"), twoDa->getString(0, "value"));
+    EXPECT_EQ(std::string("same"), twoDa->getString(1, "key"));
+    EXPECT_EQ(std::string("same"), twoDa->getString(1, "value"));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

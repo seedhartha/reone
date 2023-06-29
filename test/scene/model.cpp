@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/game/types.h"
 #include "reone/graphics/animation.h"
@@ -33,9 +33,7 @@ using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::scene;
 
-BOOST_AUTO_TEST_SUITE(model_scene_node)
-
-BOOST_AUTO_TEST_CASE(should_build_from_model) {
+TEST(model_scene_node, should_build_from_model) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
@@ -76,28 +74,28 @@ BOOST_AUTO_TEST_CASE(should_build_from_model) {
     modelSceneNode->init();
 
     // then
-    BOOST_TEST(1ll == modelSceneNode->children().size());
+    EXPECT_EQ(1ll, modelSceneNode->children().size());
 
     auto rootNodeSceneNode = modelSceneNode->getNodeByName("root_node");
-    BOOST_REQUIRE(static_cast<bool>(rootNodeSceneNode));
-    BOOST_TEST(static_cast<int>(SceneNodeType::Dummy) == static_cast<int>(rootNodeSceneNode->type()));
+    EXPECT_TRUE(static_cast<bool>(rootNodeSceneNode));
+    EXPECT_EQ(static_cast<int>(SceneNodeType::Dummy), static_cast<int>(rootNodeSceneNode->type()));
 
-    BOOST_TEST(3ll == rootNodeSceneNode->children().size());
+    EXPECT_EQ(3ll, rootNodeSceneNode->children().size());
 
     auto meshSceneNode = modelSceneNode->getNodeByName("mesh_node");
-    BOOST_REQUIRE(static_cast<bool>(meshSceneNode));
-    BOOST_TEST(static_cast<int>(SceneNodeType::Mesh) == static_cast<int>(meshSceneNode->type()));
+    EXPECT_TRUE(static_cast<bool>(meshSceneNode));
+    EXPECT_EQ(static_cast<int>(SceneNodeType::Mesh), static_cast<int>(meshSceneNode->type()));
 
     auto lightSceneNode = modelSceneNode->getNodeByName("light_node");
-    BOOST_REQUIRE(static_cast<bool>(lightSceneNode));
-    BOOST_TEST(static_cast<int>(SceneNodeType::Light) == static_cast<int>(lightSceneNode->type()));
+    EXPECT_TRUE(static_cast<bool>(lightSceneNode));
+    EXPECT_EQ(static_cast<int>(SceneNodeType::Light), static_cast<int>(lightSceneNode->type()));
 
     auto emitterSceneNode = modelSceneNode->getNodeByName("emitter_node");
-    BOOST_REQUIRE(static_cast<bool>(emitterSceneNode));
-    BOOST_TEST(static_cast<int>(SceneNodeType::Emitter) == static_cast<int>(emitterSceneNode->type()));
+    EXPECT_TRUE(static_cast<bool>(emitterSceneNode));
+    EXPECT_EQ(static_cast<int>(SceneNodeType::Emitter), static_cast<int>(emitterSceneNode->type()));
 }
 
-BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
+TEST(model_scene_node, should_play_single_fire_forget_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
@@ -134,18 +132,18 @@ BOOST_AUTO_TEST_CASE(should_play_single_fire_forget_animation) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_TEST(1ll == channels.size());
-    BOOST_TEST(1.0f == channels[0].time);
-    BOOST_TEST(channels[0].finished);
+    EXPECT_EQ(1ll, channels.size());
+    EXPECT_EQ(1.0f, channels[0].time);
+    EXPECT_TRUE(channels[0].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
-    BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
+    EXPECT_TRUE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
-    BOOST_CHECK_CLOSE(1.0f, rootPosition.x, 1e-5);
-    BOOST_CHECK_CLOSE(2.0f, rootPosition.y, 1e-5);
-    BOOST_CHECK_CLOSE(3.0f, rootPosition.z, 1e-5);
+    EXPECT_NEAR(1.0f, rootPosition.x, 1e-5);
+    EXPECT_NEAR(2.0f, rootPosition.y, 1e-5);
+    EXPECT_NEAR(3.0f, rootPosition.z, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
+TEST(model_scene_node, should_play_single_looping_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
@@ -181,18 +179,18 @@ BOOST_AUTO_TEST_CASE(should_play_single_looping_animation) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_TEST(1ll == channels.size());
-    BOOST_CHECK_CLOSE(0.0f, channels[0].time, 1e-5);
-    BOOST_TEST(!channels[0].finished);
+    EXPECT_EQ(1ll, channels.size());
+    EXPECT_NEAR(0.0f, channels[0].time, 1e-5);
+    EXPECT_TRUE(!channels[0].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
-    BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
+    EXPECT_TRUE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
-    BOOST_CHECK_CLOSE(1.0f, rootPosition.x, 1e-5);
-    BOOST_CHECK_CLOSE(2.0f, rootPosition.y, 1e-5);
-    BOOST_CHECK_CLOSE(3.0f, rootPosition.z, 1e-5);
+    EXPECT_NEAR(1.0f, rootPosition.x, 1e-5);
+    EXPECT_NEAR(2.0f, rootPosition.y, 1e-5);
+    EXPECT_NEAR(3.0f, rootPosition.z, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
+TEST(model_scene_node, should_play_two_overlayed_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
@@ -238,26 +236,26 @@ BOOST_AUTO_TEST_CASE(should_play_two_overlayed_animations) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_TEST(2ll == channels.size());
-    BOOST_CHECK_CLOSE(1.25f, channels[0].time, 1e-5);
-    BOOST_CHECK_CLOSE(0.0f, channels[1].time, 1e-5);
-    BOOST_TEST(!channels[0].finished);
-    BOOST_TEST(!channels[1].finished);
+    EXPECT_EQ(2ll, channels.size());
+    EXPECT_NEAR(1.25f, channels[0].time, 1e-5);
+    EXPECT_NEAR(0.0f, channels[1].time, 1e-5);
+    EXPECT_TRUE(!channels[0].finished);
+    EXPECT_TRUE(!channels[1].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
-    BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
+    EXPECT_TRUE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
-    BOOST_CHECK_CLOSE(1.0f, rootPosition.x, 1e-5);
-    BOOST_CHECK_CLOSE(2.0f, rootPosition.y, 1e-5);
-    BOOST_CHECK_CLOSE(3.0f, rootPosition.z, 1e-5);
+    EXPECT_NEAR(1.0f, rootPosition.x, 1e-5);
+    EXPECT_NEAR(2.0f, rootPosition.y, 1e-5);
+    EXPECT_NEAR(3.0f, rootPosition.z, 1e-5);
     auto dummySceneNode = modelSceneNode->getNodeByName("dummy_node");
-    BOOST_REQUIRE(static_cast<bool>(dummySceneNode));
+    EXPECT_TRUE(static_cast<bool>(dummySceneNode));
     auto &dummyPosition = dummySceneNode->localTransform()[3];
-    BOOST_CHECK_CLOSE(2.5f, dummyPosition.x, 1e-5);
-    BOOST_CHECK_CLOSE(3.125f, dummyPosition.y, 1e-5);
-    BOOST_CHECK_CLOSE(3.75f, dummyPosition.z, 1e-5);
+    EXPECT_NEAR(2.5f, dummyPosition.x, 1e-5);
+    EXPECT_NEAR(3.125f, dummyPosition.y, 1e-5);
+    EXPECT_NEAR(3.75f, dummyPosition.z, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
+TEST(model_scene_node, hould_transition_between_two_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
@@ -299,17 +297,15 @@ BOOST_AUTO_TEST_CASE(should_transition_between_two_animations) {
 
     // then
     auto &channels = modelSceneNode->animationChannels();
-    BOOST_TEST(2ll == channels.size());
-    BOOST_CHECK_CLOSE(1.5f, channels[0].time, 1e-5);
-    BOOST_CHECK_CLOSE(0.0f, channels[1].time, 1e-5);
-    BOOST_TEST(!channels[0].finished);
-    BOOST_TEST(!channels[1].finished);
+    EXPECT_EQ(2ll, channels.size());
+    EXPECT_NEAR(1.5f, channels[0].time, 1e-5);
+    EXPECT_NEAR(0.0f, channels[1].time, 1e-5);
+    EXPECT_TRUE(!channels[0].finished);
+    EXPECT_TRUE(!channels[1].finished);
     auto rootSceneNode = modelSceneNode->getNodeByName("root_node");
-    BOOST_REQUIRE(static_cast<bool>(rootSceneNode));
+    EXPECT_TRUE(static_cast<bool>(rootSceneNode));
     auto &rootPosition = rootSceneNode->localTransform()[3];
-    BOOST_CHECK_CLOSE(3.0f, rootPosition.x, 1e-5);
-    BOOST_CHECK_CLOSE(3.75f, rootPosition.y, 1e-5);
-    BOOST_CHECK_CLOSE(4.5f, rootPosition.z, 1e-5);
+    EXPECT_NEAR(3.0f, rootPosition.x, 1e-5);
+    EXPECT_NEAR(3.75f, rootPosition.y, 1e-5);
+    EXPECT_NEAR(4.5f, rootPosition.z, 1e-5);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -15,16 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/graphics/aabb.h"
 
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(aabb)
-
-BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_within) {
+TEST(aabb, should_find_ray_aabb_intersection__intersection_from_within) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -33,11 +31,11 @@ BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_within
     bool intersected = aabb.raycast(glm::vec3(0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), std::numeric_limits<float>::max(), distance);
 
     // then
-    BOOST_REQUIRE(intersected);
-    BOOST_CHECK_CLOSE(0.0f, distance, 1e-5);
+    EXPECT_TRUE(intersected);
+    EXPECT_NEAR(0.0f, distance, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_up_close) {
+TEST(aabb, should_find_ray_aabb_intersection__intersection_from_up_close) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -46,11 +44,11 @@ BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_up_clo
     bool intersected = aabb.raycast(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(intersected);
-    BOOST_CHECK_CLOSE(1.0f, distance, 1e-5);
+    EXPECT_TRUE(intersected);
+    EXPECT_NEAR(1.0f, distance, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_too_far) {
+TEST(aabb, should_find_ray_aabb_intersection__intersection_from_too_far) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -59,10 +57,10 @@ BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__intersection_from_too_fa
     bool intersected = aabb.raycast(glm::vec3(-20.0f, 0.0f, 0.0f), 1.0f / glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(!intersected);
+    EXPECT_TRUE(!intersected);
 }
 
-BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__no_intersection) {
+TEST(aabb, should_find_ray_aabb_intersection__no_intersection) {
     // given
     auto aabb = AABB(glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(3.0f, 2.0f, 1.0f));
 
@@ -71,7 +69,5 @@ BOOST_AUTO_TEST_CASE(should_find_ray_aabb_intersection__no_intersection) {
     bool intersected = aabb.raycast(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f / glm::vec3(0.0f, 0.0f, 1.0f), 10.0f, distance);
 
     // then
-    BOOST_REQUIRE(!intersected);
+    EXPECT_TRUE(!intersected);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

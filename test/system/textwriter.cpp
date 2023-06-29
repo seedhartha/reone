@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/textwriter.h"
@@ -24,9 +24,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(text_writer)
-
-BOOST_AUTO_TEST_CASE(should_write_text) {
+TEST(text_writer, should_write_text) {
     // given
     auto expectedBytes = ByteArray("Hello, world!\nHello, world!");
 
@@ -38,7 +36,5 @@ BOOST_AUTO_TEST_CASE(should_write_text) {
     text.put("Hello, world!");
 
     // then
-    BOOST_TEST((expectedBytes == bytes), notEqualMessage(expectedBytes, bytes));
+    EXPECT_EQ(expectedBytes, bytes) << notEqualMessage(expectedBytes, bytes);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/binaryreader.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -25,9 +25,7 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(binary_reader)
-
-BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
+TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
     auto input = ByteArray("Hello, world!\x00", 13);
     auto stream = ByteArrayInputStream(input);
@@ -40,10 +38,10 @@ BOOST_AUTO_TEST_CASE(should_seek_ignore_and_tell_in_little_endian_stream) {
     auto actualPos = reader.tell();
 
     // then
-    BOOST_TEST(expectedPos == actualPos);
+    EXPECT_EQ(expectedPos, actualPos);
 }
 
-BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
+TEST(binary_reader, should_read_from_little_endian_stream) {
     // given
     auto input = StringBuilder()
                      .append("\xff", 1)
@@ -92,21 +90,21 @@ BOOST_AUTO_TEST_CASE(should_read_from_little_endian_stream) {
     auto actualBytes = reader.getBytes(4);
 
     // then
-    BOOST_TEST(expectedByte == actualByte);
-    BOOST_TEST(expectedUint16 == actualUint16);
-    BOOST_TEST(expectedUint32 == actualUint32);
-    BOOST_TEST(expectedUint64 == actualUint64);
-    BOOST_TEST(expectedInt16 == actualInt16);
-    BOOST_TEST(expectedInt32 == actualInt32);
-    BOOST_TEST(expectedInt64 == actualInt64);
-    BOOST_TEST(expectedFloat == actualFloat);
-    BOOST_TEST(expectedDouble == actualDouble);
-    BOOST_TEST((expectedStr == actualStr), notEqualMessage(expectedStr, actualStr));
-    BOOST_TEST((expectedCStr == actualCStr), notEqualMessage(expectedCStr, actualCStr));
-    BOOST_TEST((expectedBytes == actualBytes), notEqualMessage(expectedBytes, actualBytes));
+    EXPECT_EQ(expectedByte, actualByte);
+    EXPECT_EQ(expectedUint16, actualUint16);
+    EXPECT_EQ(expectedUint32, actualUint32);
+    EXPECT_EQ(expectedUint64, actualUint64);
+    EXPECT_EQ(expectedInt16, actualInt16);
+    EXPECT_EQ(expectedInt32, actualInt32);
+    EXPECT_EQ(expectedInt64, actualInt64);
+    EXPECT_EQ(expectedFloat, actualFloat);
+    EXPECT_EQ(expectedDouble, actualDouble);
+    EXPECT_EQ(expectedStr, actualStr) << notEqualMessage(expectedStr, actualStr);
+    EXPECT_EQ(expectedCStr, actualCStr) << notEqualMessage(expectedCStr, actualCStr);
+    EXPECT_EQ(expectedBytes, actualBytes) << notEqualMessage(expectedBytes, actualBytes);
 }
 
-BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
+TEST(binary_reader, should_read_from_big_endian_stream) {
     // given
     auto input = StringBuilder()
                      .append("\xff\x01", 2)
@@ -143,14 +141,12 @@ BOOST_AUTO_TEST_CASE(should_read_from_big_endian_stream) {
     auto actualDouble = reader.getDouble();
 
     // then
-    BOOST_TEST(expectedUint16 == actualUint16);
-    BOOST_TEST(expectedUint32 == actualUint32);
-    BOOST_TEST(expectedUint64 == actualUint64);
-    BOOST_TEST(expectedInt16 == actualInt16);
-    BOOST_TEST(expectedInt32 == actualInt32);
-    BOOST_TEST(expectedInt64 == actualInt64);
-    BOOST_TEST(expectedFloat == actualFloat);
-    BOOST_TEST(expectedDouble == actualDouble);
+    EXPECT_EQ(expectedUint16, actualUint16);
+    EXPECT_EQ(expectedUint32, actualUint32);
+    EXPECT_EQ(expectedUint64, actualUint64);
+    EXPECT_EQ(expectedInt16, actualInt16);
+    EXPECT_EQ(expectedInt32, actualInt32);
+    EXPECT_EQ(expectedInt64, actualInt64);
+    EXPECT_EQ(expectedFloat, actualFloat);
+    EXPECT_EQ(expectedDouble, actualDouble);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

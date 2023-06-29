@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
@@ -38,9 +38,7 @@ private:
     std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _resources;
 };
 
-BOOST_AUTO_TEST_SUITE(gffs)
-
-BOOST_AUTO_TEST_CASE(should_get_gff_with_caching) {
+TEST(gffs, should_get_gff_with_caching) {
     // given
 
     auto resBytes = std::make_shared<ByteArray>();
@@ -77,9 +75,7 @@ BOOST_AUTO_TEST_CASE(should_get_gff_with_caching) {
 
     // then
 
-    BOOST_TEST(static_cast<bool>(gff1));
-    BOOST_TEST(static_cast<bool>(gff2));
-    BOOST_TEST(gff1.get() == gff2.get());
+    EXPECT_TRUE(static_cast<bool>(gff1));
+    EXPECT_TRUE(static_cast<bool>(gff2));
+    EXPECT_EQ(gff1.get(), gff2.get());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

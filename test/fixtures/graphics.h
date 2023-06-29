@@ -201,6 +201,14 @@ public:
             *_window);
     }
 
+    MockGraphicsContext &context() {
+        return *_context;
+    }
+
+    MockPipeline &pipeline() {
+        return *_pipeline;
+    }
+
     MockWindow &window() {
         return *_window;
     }

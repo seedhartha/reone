@@ -15,15 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/system/pathutil.h"
 
 using namespace reone;
 
-BOOST_AUTO_TEST_SUITE(path_util)
-
-BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
+TEST(path_util, should_get_path_ignoring_case) {
     // given
     auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_path_util");
@@ -40,12 +38,10 @@ BOOST_AUTO_TEST_CASE(should_get_path_ignoring_case) {
     auto superPath = getPathIgnoreCase(tmpDirPath, "MiXeDs", false);
 
     // then
-    BOOST_TEST(tmpFilePath == lowerPath);
-    BOOST_TEST(upperPath.empty());
-    BOOST_TEST(superPath.empty());
+    EXPECT_EQ(tmpFilePath, lowerPath);
+    EXPECT_TRUE(upperPath.empty());
+    EXPECT_TRUE(superPath.empty());
 
     // cleanup
     boost::filesystem::remove_all(tmpDirPath);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

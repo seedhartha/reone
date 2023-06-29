@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/rimreader.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -24,9 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(rim_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_rim) {
+TEST(rim_reader, should_read_rim) {
     // given
 
     auto input = StringBuilder()
@@ -56,11 +54,9 @@ BOOST_AUTO_TEST_CASE(should_read_rim) {
     // then
 
     auto resources = reader.resources();
-    BOOST_TEST(1ll == resources.size());
-    BOOST_TEST("aa" == resources.front().resId.resRef);
-    BOOST_TEST(static_cast<int>(ResourceType::Txi) == static_cast<int>(resources.front().resId.type));
-    BOOST_TEST(152 == resources.front().offset);
-    BOOST_TEST(2 == resources.front().size);
+    EXPECT_EQ(1ll, resources.size());
+    EXPECT_EQ("aa", resources.front().resId.resRef);
+    EXPECT_EQ(static_cast<int>(ResourceType::Txi), static_cast<int>(resources.front().resId.type));
+    EXPECT_EQ(152, resources.front().offset);
+    EXPECT_EQ(2, resources.front().size);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

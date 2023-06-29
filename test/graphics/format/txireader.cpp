@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/graphics/format/txireader.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -24,9 +24,7 @@
 using namespace reone;
 using namespace reone::graphics;
 
-BOOST_AUTO_TEST_SUITE(txi_reader)
-
-BOOST_AUTO_TEST_CASE(should_load_txi) {
+TEST(txi_reader, should_load_txi) {
     // given
     auto txiBytes = StringBuilder()
                         .append("blending additive")
@@ -39,7 +37,5 @@ BOOST_AUTO_TEST_CASE(should_load_txi) {
 
     // then
     auto features = reader.features();
-    BOOST_TEST(static_cast<int>(Texture::Blending::Additive) == static_cast<int>(features.blending));
+    EXPECT_EQ(static_cast<int>(Texture::Blending::Additive), static_cast<int>(features.blending));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

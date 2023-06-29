@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/script/format/ncswriter.h"
 #include "reone/script/program.h"
@@ -27,9 +27,7 @@
 using namespace reone;
 using namespace reone::script;
 
-BOOST_AUTO_TEST_SUITE(ncs_writer)
-
-BOOST_AUTO_TEST_CASE(should_write_ncs) {
+TEST(ncs_writer, should_write_ncs) {
     // given
 
     auto expectedOutput = StringBuilder()
@@ -240,7 +238,5 @@ BOOST_AUTO_TEST_CASE(should_write_ncs) {
     // then
 
     auto actualOutput = std::string(&bytes[0], bytes.size());
-    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
+    EXPECT_EQ(expectedOutput, actualOutput) << notEqualMessage(expectedOutput, actualOutput);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

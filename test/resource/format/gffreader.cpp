@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/gffreader.h"
 #include "reone/system/binarywriter.h"
@@ -27,9 +27,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(gff_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_gff) {
+TEST(gff_reader, should_read_gff) {
     // given
 
     auto input = StringBuilder()
@@ -185,51 +183,49 @@ BOOST_AUTO_TEST_CASE(should_read_gff) {
     // then
 
     auto gff = reader.root();
-    BOOST_TEST(16ll == gff->fields().size());
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Byte) == static_cast<int>(gff->fields()[0].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Int) == static_cast<int>(gff->fields()[1].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Dword) == static_cast<int>(gff->fields()[2].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Int64) == static_cast<int>(gff->fields()[3].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Dword64) == static_cast<int>(gff->fields()[4].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Float) == static_cast<int>(gff->fields()[5].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Double) == static_cast<int>(gff->fields()[6].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::CExoString) == static_cast<int>(gff->fields()[7].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::ResRef) == static_cast<int>(gff->fields()[8].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::CExoLocString) == static_cast<int>(gff->fields()[9].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Void) == static_cast<int>(gff->fields()[10].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Orientation) == static_cast<int>(gff->fields()[11].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Vector) == static_cast<int>(gff->fields()[12].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::StrRef) == static_cast<int>(gff->fields()[13].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Struct) == static_cast<int>(gff->fields()[14].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::List) == static_cast<int>(gff->fields()[15].type));
-    BOOST_TEST(1ll == gff->getStruct("Struct")->fields().size());
-    BOOST_TEST(2ll == gff->getList("List").size());
-    BOOST_TEST(1ll == gff->getList("List")[0]->fields().size());
-    BOOST_TEST(1ll == gff->getList("List")[1]->fields().size());
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Char) == static_cast<int>(gff->getStruct("Struct")->fields()[0].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Word) == static_cast<int>(gff->getList("List")[0]->fields()[0].type));
-    BOOST_TEST(static_cast<int>(Gff::FieldType::Short) == static_cast<int>(gff->getList("List")[1]->fields()[0].type));
-    BOOST_TEST(0 == gff->getUint("Byte"));
-    BOOST_TEST(1 == gff->getInt("Int"));
-    BOOST_TEST(2 == gff->getUint("Uint"));
-    BOOST_TEST(3 == gff->getInt64("Int64"));
-    BOOST_TEST(4 == gff->getUint64("Uint64"));
-    BOOST_TEST(1.0f == gff->getFloat("Float"));
-    BOOST_TEST(1.0 == gff->getDouble("Double"));
-    BOOST_TEST(std::string("John") == gff->getString("CExoString"));
-    BOOST_TEST(std::string("Jane") == gff->getString("ResRef"));
-    BOOST_TEST(-1 == gff->getInt("CExoLocString"));
-    BOOST_TEST(std::string("Jill") == gff->getString("CExoLocString"));
+    EXPECT_EQ(16ll, gff->fields().size());
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Byte), static_cast<int>(gff->fields()[0].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Int), static_cast<int>(gff->fields()[1].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Dword), static_cast<int>(gff->fields()[2].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Int64), static_cast<int>(gff->fields()[3].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Dword64), static_cast<int>(gff->fields()[4].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Float), static_cast<int>(gff->fields()[5].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Double), static_cast<int>(gff->fields()[6].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::CExoString), static_cast<int>(gff->fields()[7].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::ResRef), static_cast<int>(gff->fields()[8].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::CExoLocString), static_cast<int>(gff->fields()[9].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Void), static_cast<int>(gff->fields()[10].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Orientation), static_cast<int>(gff->fields()[11].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Vector), static_cast<int>(gff->fields()[12].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::StrRef), static_cast<int>(gff->fields()[13].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Struct), static_cast<int>(gff->fields()[14].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::List), static_cast<int>(gff->fields()[15].type));
+    EXPECT_EQ(1ll, gff->getStruct("Struct")->fields().size());
+    EXPECT_EQ(2ll, gff->getList("List").size());
+    EXPECT_EQ(1ll, gff->getList("List")[0]->fields().size());
+    EXPECT_EQ(1ll, gff->getList("List")[1]->fields().size());
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Char), static_cast<int>(gff->getStruct("Struct")->fields()[0].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Word), static_cast<int>(gff->getList("List")[0]->fields()[0].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Short), static_cast<int>(gff->getList("List")[1]->fields()[0].type));
+    EXPECT_EQ(0, gff->getUint("Byte"));
+    EXPECT_EQ(1, gff->getInt("Int"));
+    EXPECT_EQ(2, gff->getUint("Uint"));
+    EXPECT_EQ(3, gff->getInt64("Int64"));
+    EXPECT_EQ(4, gff->getUint64("Uint64"));
+    EXPECT_EQ(1.0f, gff->getFloat("Float"));
+    EXPECT_EQ(1.0, gff->getDouble("Double"));
+    EXPECT_EQ(std::string("John"), gff->getString("CExoString"));
+    EXPECT_EQ(std::string("Jane"), gff->getString("ResRef"));
+    EXPECT_EQ(-1, gff->getInt("CExoLocString"));
+    EXPECT_EQ(std::string("Jill"), gff->getString("CExoLocString"));
     auto actualData = gff->getData("Void");
-    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
+    EXPECT_EQ(expectedData, actualData) << notEqualMessage(expectedData, actualData);
     auto actualOrientation = gff->getOrientation("Orientation");
-    BOOST_TEST((expectedOrientation == actualOrientation), notEqualMessage(expectedOrientation, actualOrientation));
+    EXPECT_EQ(expectedOrientation, actualOrientation) << notEqualMessage(expectedOrientation, actualOrientation);
     auto actualVector = gff->getVector("Vector");
-    BOOST_TEST((expectedVector == actualVector), notEqualMessage(expectedVector, actualVector));
-    BOOST_TEST(1 == gff->getInt("StrRef"));
-    BOOST_TEST(1 == gff->getStruct("Struct")->getInt("Struct1Char"));
-    BOOST_TEST(2 == gff->getList("List")[0]->getUint("Struct2Word"));
-    BOOST_TEST(3 == gff->getList("List")[1]->getInt("Struct3Short"));
+    EXPECT_EQ(expectedVector, actualVector) << notEqualMessage(expectedVector, actualVector);
+    EXPECT_EQ(1, gff->getInt("StrRef"));
+    EXPECT_EQ(1, gff->getStruct("Struct")->getInt("Struct1Char"));
+    EXPECT_EQ(2, gff->getList("List")[0]->getUint("Struct2Word"));
+    EXPECT_EQ(3, gff->getList("List")[1]->getInt("Struct3Short"));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

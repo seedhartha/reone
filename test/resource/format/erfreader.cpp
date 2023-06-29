@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "reone/resource/format/erfreader.h"
 #include "reone/system/stream/bytearrayinput.h"
@@ -24,9 +24,7 @@
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(erf_reader)
-
-BOOST_AUTO_TEST_CASE(should_read_erf) {
+TEST(erf_reader, should_read_erf) {
     // given
 
     auto input = StringBuilder()
@@ -63,14 +61,12 @@ BOOST_AUTO_TEST_CASE(should_read_erf) {
 
     // then
 
-    BOOST_TEST(1 == reader.keys().size());
-    BOOST_TEST(1 == reader.resources().size());
+    EXPECT_EQ(1, reader.keys().size());
+    EXPECT_EQ(1, reader.resources().size());
     auto &key = reader.keys().front();
-    BOOST_TEST("aa" == key.resId.resRef);
-    BOOST_TEST(static_cast<int>(ResourceType::Txi) == static_cast<int>(key.resId.type));
+    EXPECT_EQ("aa", key.resId.resRef);
+    EXPECT_EQ(static_cast<int>(ResourceType::Txi), static_cast<int>(key.resId.type));
     auto &resource = reader.resources().front();
-    BOOST_TEST(192 == resource.offset);
-    BOOST_TEST(2 == resource.size);
+    EXPECT_EQ(192, resource.offset);
+    EXPECT_EQ(2, resource.size);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
