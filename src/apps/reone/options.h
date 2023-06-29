@@ -26,9 +26,8 @@ namespace reone {
 
 struct Options {
     struct Logging {
-        LogSeverity level {LogSeverity::Info};
-        int channels {static_cast<int>(LogChannel::General)};
-        bool logToFile {false};
+        LogSeverity severity {LogSeverity::Info};
+        std::set<LogChannel> channels {LogChannel::Global};
     };
 
     game::GameOptions game;

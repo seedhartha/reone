@@ -30,7 +30,7 @@ namespace reone {
 bool ToolkitApp::OnInit() {
     initLog(
         LogSeverity::Debug,
-        std::set<LogChannel> {LogChannel::General},
+        std::set<LogChannel> {LogChannel::Global},
         "toolkit.log");
 
 #ifdef _WIN32

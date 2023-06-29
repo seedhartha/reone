@@ -55,7 +55,7 @@ static SeverityChannelLogger g_loggerScript3;
 static std::set<LogChannel> g_channels;
 
 static std::map<LogChannel, SeverityChannelLogger *> g_channelToLogger {
-    {LogChannel::General, &g_loggerGeneral},           //
+    {LogChannel::Global, &g_loggerGeneral},           //
     {LogChannel::Resources, &g_loggerResources},       //
     {LogChannel::Resources2, &g_loggerResources2},     //
     {LogChannel::Graphics, &g_loggerGraphics},         //

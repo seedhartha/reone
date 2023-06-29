@@ -40,7 +40,7 @@ enum class LogSeverity {
 };
 
 enum class LogChannel {
-    General = 1,
+    Global = 1,
     Resources = 2,
     Resources2 = 4,
     Graphics = 8,

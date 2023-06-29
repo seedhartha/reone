@@ -58,9 +58,8 @@ private:
         int voicevol {85};
         int soundvol {85};
         int movievol {85};
-        int loglevel {static_cast<int>(LogSeverity::Info)};
-        int logch {static_cast<int>(LogChannel::General)};
-        bool logfile {false};
+        int logsev {static_cast<int>(LogSeverity::Info)};
+        int logch {static_cast<int>(LogChannel::Global)};
     } _config;
 
     wxTextCtrl *_textCtrlGameDir;
@@ -83,7 +82,6 @@ private:
     wxSlider *_sliderVolumeMovie;
     wxChoice *_choiceLogSeverity;
     wxCheckListBox *_checkListBoxLogChannels;
-    wxCheckBox *_checkBoxLogFile;
 
     void OnLaunch(wxCommandEvent &event);
     void OnSaveConfig(wxCommandEvent &event);

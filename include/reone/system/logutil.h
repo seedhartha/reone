@@ -24,17 +24,17 @@
 namespace reone {
 
 void initLog(LogSeverity minSeverity = LogSeverity::Info,
-             std::set<LogChannel> channels = std::set<LogChannel> {LogChannel::General},
+             std::set<LogChannel> channels = std::set<LogChannel> {LogChannel::Global},
              std::string filename = "");
 
-void error(const std::string &s, LogChannel channel = LogChannel::General);
-void error(const boost::format &s, LogChannel channel = LogChannel::General);
-void warn(const std::string &s, LogChannel channel = LogChannel::General);
-void warn(const boost::format &s, LogChannel channel = LogChannel::General);
-void info(const std::string &s, LogChannel channel = LogChannel::General);
-void info(const boost::format &s, LogChannel channel = LogChannel::General);
-void debug(const std::string &s, LogChannel channel = LogChannel::General);
-void debug(const boost::format &s, LogChannel channel = LogChannel::General);
+void error(const std::string &s, LogChannel channel = LogChannel::Global);
+void error(const boost::format &s, LogChannel channel = LogChannel::Global);
+void warn(const std::string &s, LogChannel channel = LogChannel::Global);
+void warn(const boost::format &s, LogChannel channel = LogChannel::Global);
+void info(const std::string &s, LogChannel channel = LogChannel::Global);
+void info(const boost::format &s, LogChannel channel = LogChannel::Global);
+void debug(const std::string &s, LogChannel channel = LogChannel::Global);
+void debug(const boost::format &s, LogChannel channel = LogChannel::Global);
 
 bool isLogSeverityEnabled(LogSeverity severity);
 bool isLogChannelEnabled(LogChannel channel);

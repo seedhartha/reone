@@ -235,9 +235,9 @@ LauncherFrame::LauncherFrame() :
     logSeverityChoices.Add("Error");
     logSeverityChoices.Add("None");
 
-    auto labelLogSeverity = new wxStaticText(this, wxID_ANY, "Level", wxDefaultPosition, wxDefaultSize);
+    auto labelLogSeverity = new wxStaticText(this, wxID_ANY, "Minimum Severity", wxDefaultPosition, wxDefaultSize);
     _choiceLogSeverity = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logSeverityChoices);
-    _choiceLogSeverity->SetSelection(_config.loglevel);
+    _choiceLogSeverity->SetSelection(_config.logsev);
 
     wxArrayString logChannelChoices;
     logChannelChoices.Add("Resources");
@@ -267,15 +267,11 @@ LauncherFrame::LauncherFrame() :
     _checkListBoxLogChannels->Check(9, _config.logch & static_cast<int>(LogChannel::Script2));
     _checkListBoxLogChannels->Check(10, _config.logch & static_cast<int>(LogChannel::Script3));
 
-    _checkBoxLogFile = new wxCheckBox(this, wxID_ANY, "Log to File", wxDefaultPosition, wxDefaultSize);
-    _checkBoxLogFile->SetValue(_config.logfile);
-
     auto loggingSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Logging");
     loggingSizer->Add(labelLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(_choiceLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    loggingSizer->Add(_checkBoxLogFile, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Logging
 
@@ -317,9 +313,8 @@ void LauncherFrame::LoadConfiguration() {
         ("voicevol", value<int>()->default_value(_config.voicevol))       //
         ("soundvol", value<int>()->default_value(_config.soundvol))       //
         ("movievol", value<int>()->default_value(_config.movievol))       //
-        ("loglevel", value<int>()->default_value(_config.loglevel))       //
-        ("logch", value<int>()->default_value(_config.logch))             //
-        ("logfile", value<bool>()->default_value(_config.logfile));
+        ("logsev", value<int>()->default_value(_config.logsev))           //
+        ("logch", value<int>()->default_value(_config.logch));
 
     variables_map vars;
     if (!boost::filesystem::exists(kConfigFilename)) {
@@ -348,9 +343,8 @@ void LauncherFrame::LoadConfiguration() {
     _config.voicevol = vars["voicevol"].as<int>();
     _config.soundvol = vars["soundvol"].as<int>();
     _config.movievol = vars["movievol"].as<int>();
-    _config.loglevel = vars["loglevel"].as<int>();
+    _config.logsev = vars["logsev"].as<int>();
     _config.logch = vars["logch"].as<int>();
-    _config.logfile = vars["logfile"].as<bool>();
 }
 
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
@@ -387,15 +381,14 @@ void LauncherFrame::SaveConfiguration() {
         "voicevol=",
         "soundvol=",
         "movievol=",
-        "loglevel=",
-        "logch=",
-        "logfile="};
+        "logsev=",
+        "logch="};
 
     std::string resolution(_choiceResolution->GetStringSelection());
     std::vector<std::string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
-    int logch = static_cast<int>(LogChannel::General);
+    int logch = static_cast<int>(LogChannel::Global);
     if (_checkListBoxLogChannels->IsChecked(0)) {
         logch |= static_cast<int>(LogChannel::Resources);
     }
@@ -449,9 +442,8 @@ void LauncherFrame::SaveConfiguration() {
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
     _config.movievol = _sliderVolumeMovie->GetValue();
-    _config.loglevel = _choiceLogSeverity->GetSelection();
+    _config.logsev = _choiceLogSeverity->GetSelection();
     _config.logch = logch;
-    _config.logfile = _checkBoxLogFile->IsChecked();
 
     std::vector<std::string> lines;
 
@@ -489,9 +481,8 @@ void LauncherFrame::SaveConfiguration() {
     config << "voicevol=" << _config.voicevol << std::endl;
     config << "soundvol=" << _config.soundvol << std::endl;
     config << "movievol=" << _config.movievol << std::endl;
-    config << "loglevel=" << _config.loglevel << std::endl;
+    config << "logsev=" << _config.logsev << std::endl;
     config << "logch=" << _config.logch << std::endl;
-    config << "logfile=" << (_config.logfile ? 1 : 0) << std::endl;
     for (auto &line : lines) {
         config << line << std::endl;
     }

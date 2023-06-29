@@ -31,6 +31,11 @@ static constexpr char kConfigFilename[] = "reone.cfg";
 std::unique_ptr<Options> OptionsParser::parse() {
     auto options = std::make_unique<Options>();
 
+    int defaultLogChannels = 0;
+    for (auto &channel : options->logging.channels) {
+        defaultLogChannels |= static_cast<int>(channel);
+    }
+
     // Initialize options description
 
     options_description descCommon;
@@ -54,9 +59,8 @@ std::unique_ptr<Options> OptionsParser::parse() {
         ("voicevol", value<int>()->default_value(options->audio.voiceVolume), "voice volume in percents")                       //
         ("soundvol", value<int>()->default_value(options->audio.soundVolume), "sound volume in percents")                       //
         ("movievol", value<int>()->default_value(options->audio.movieVolume), "movie volume in percents")                       //
-        ("loglevel", value<int>()->default_value(static_cast<int>(options->logging.level)), "log level")                        //
-        ("logch", value<int>()->default_value(options->logging.channels), "log channel mask")                                   //
-        ("logfile", value<bool>()->default_value(options->logging.logToFile), "log to file");                                   //
+        ("logsev", value<int>()->default_value(static_cast<int>(options->logging.severity)), "minimum log severity")            //
+        ("logch", value<int>()->default_value(defaultLogChannels), "log channel mask");
 
     options_description descCmdLine {"Usage"};
     descCmdLine.add(descCommon);
@@ -91,9 +95,47 @@ std::unique_ptr<Options> OptionsParser::parse() {
     options->audio.voiceVolume = vars["voicevol"].as<int>();
     options->audio.soundVolume = vars["soundvol"].as<int>();
     options->audio.movieVolume = vars["movievol"].as<int>();
-    options->logging.level = static_cast<LogSeverity>(vars["loglevel"].as<int>());
-    options->logging.channels = vars["logch"].as<int>();
-    options->logging.logToFile = vars["logfile"].as<bool>();
+    options->logging.severity = static_cast<LogSeverity>(vars["logsev"].as<int>());
+
+    std::set<LogChannel> logChannels;
+    int logChannelsMask = vars["logch"].as<int>();
+    if ((logChannelsMask & static_cast<int>(LogChannel::Global)) != 0) {
+        logChannels.insert(LogChannel::Global);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Resources)) != 0) {
+        logChannels.insert(LogChannel::Resources);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Resources2)) != 0) {
+        logChannels.insert(LogChannel::Resources2);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Graphics)) != 0) {
+        logChannels.insert(LogChannel::Graphics);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Audio)) != 0) {
+        logChannels.insert(LogChannel::Audio);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::GUI)) != 0) {
+        logChannels.insert(LogChannel::GUI);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Perception)) != 0) {
+        logChannels.insert(LogChannel::Perception);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Conversation)) != 0) {
+        logChannels.insert(LogChannel::Conversation);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Combat)) != 0) {
+        logChannels.insert(LogChannel::Combat);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Script)) != 0) {
+        logChannels.insert(LogChannel::Script);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Script2)) != 0) {
+        logChannels.insert(LogChannel::Script2);
+    }
+    if ((logChannelsMask & static_cast<int>(LogChannel::Script3)) != 0) {
+        logChannels.insert(LogChannel::Script3);
+    }
+    options->logging.channels = std::move(logChannels);
 
     return options;
 }
