@@ -228,16 +228,16 @@ LauncherFrame::LauncherFrame() :
 
     // Logging
 
-    wxArrayString logLevelChoices;
-    logLevelChoices.Add("None");
-    logLevelChoices.Add("Error");
-    logLevelChoices.Add("Warning");
-    logLevelChoices.Add("Info");
-    logLevelChoices.Add("Debug");
+    wxArrayString logSeverityChoices;
+    logSeverityChoices.Add("Debug");
+    logSeverityChoices.Add("Info");
+    logSeverityChoices.Add("Warning");
+    logSeverityChoices.Add("Error");
+    logSeverityChoices.Add("None");
 
-    auto labelLogLevel = new wxStaticText(this, wxID_ANY, "Level", wxDefaultPosition, wxDefaultSize);
-    _choiceLogLevel = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logLevelChoices);
-    _choiceLogLevel->SetSelection(_config.loglevel);
+    auto labelLogSeverity = new wxStaticText(this, wxID_ANY, "Level", wxDefaultPosition, wxDefaultSize);
+    _choiceLogSeverity = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logSeverityChoices);
+    _choiceLogSeverity->SetSelection(_config.loglevel);
 
     wxArrayString logChannelChoices;
     logChannelChoices.Add("Resources");
@@ -255,24 +255,24 @@ LauncherFrame::LauncherFrame() :
     auto labelLogChannels = new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize);
 
     _checkListBoxLogChannels = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logChannelChoices);
-    _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
-    _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::resources2);
-    _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::graphics);
-    _checkListBoxLogChannels->Check(3, _config.logch & LogChannels::audio);
-    _checkListBoxLogChannels->Check(4, _config.logch & LogChannels::gui);
-    _checkListBoxLogChannels->Check(5, _config.logch & LogChannels::perception);
-    _checkListBoxLogChannels->Check(6, _config.logch & LogChannels::conversation);
-    _checkListBoxLogChannels->Check(7, _config.logch & LogChannels::combat);
-    _checkListBoxLogChannels->Check(8, _config.logch & LogChannels::script);
-    _checkListBoxLogChannels->Check(9, _config.logch & LogChannels::script2);
-    _checkListBoxLogChannels->Check(10, _config.logch & LogChannels::script3);
+    _checkListBoxLogChannels->Check(0, _config.logch & static_cast<int>(LogChannel::Resources));
+    _checkListBoxLogChannels->Check(1, _config.logch & static_cast<int>(LogChannel::Resources2));
+    _checkListBoxLogChannels->Check(2, _config.logch & static_cast<int>(LogChannel::Graphics));
+    _checkListBoxLogChannels->Check(3, _config.logch & static_cast<int>(LogChannel::Audio));
+    _checkListBoxLogChannels->Check(4, _config.logch & static_cast<int>(LogChannel::GUI));
+    _checkListBoxLogChannels->Check(5, _config.logch & static_cast<int>(LogChannel::Perception));
+    _checkListBoxLogChannels->Check(6, _config.logch & static_cast<int>(LogChannel::Conversation));
+    _checkListBoxLogChannels->Check(7, _config.logch & static_cast<int>(LogChannel::Combat));
+    _checkListBoxLogChannels->Check(8, _config.logch & static_cast<int>(LogChannel::Script));
+    _checkListBoxLogChannels->Check(9, _config.logch & static_cast<int>(LogChannel::Script2));
+    _checkListBoxLogChannels->Check(10, _config.logch & static_cast<int>(LogChannel::Script3));
 
     _checkBoxLogFile = new wxCheckBox(this, wxID_ANY, "Log to File", wxDefaultPosition, wxDefaultSize);
     _checkBoxLogFile->SetValue(_config.logfile);
 
     auto loggingSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Logging");
-    loggingSizer->Add(labelLogLevel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    loggingSizer->Add(_choiceLogLevel, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(labelLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(_choiceLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
     loggingSizer->Add(_checkBoxLogFile, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -395,39 +395,39 @@ void LauncherFrame::SaveConfiguration() {
     std::vector<std::string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
-    int logch = LogChannels::general;
+    int logch = static_cast<int>(LogChannel::General);
     if (_checkListBoxLogChannels->IsChecked(0)) {
-        logch |= LogChannels::resources;
+        logch |= static_cast<int>(LogChannel::Resources);
     }
     if (_checkListBoxLogChannels->IsChecked(1)) {
-        logch |= LogChannels::resources2;
+        logch |= static_cast<int>(LogChannel::Resources2);
     }
     if (_checkListBoxLogChannels->IsChecked(2)) {
-        logch |= LogChannels::graphics;
+        logch |= static_cast<int>(LogChannel::Graphics);
     }
     if (_checkListBoxLogChannels->IsChecked(3)) {
-        logch |= LogChannels::audio;
+        logch |= static_cast<int>(LogChannel::Audio);
     }
     if (_checkListBoxLogChannels->IsChecked(4)) {
-        logch |= LogChannels::gui;
+        logch |= static_cast<int>(LogChannel::GUI);
     }
     if (_checkListBoxLogChannels->IsChecked(5)) {
-        logch |= LogChannels::perception;
+        logch |= static_cast<int>(LogChannel::Perception);
     }
     if (_checkListBoxLogChannels->IsChecked(6)) {
-        logch |= LogChannels::conversation;
+        logch |= static_cast<int>(LogChannel::Conversation);
     }
     if (_checkListBoxLogChannels->IsChecked(7)) {
-        logch |= LogChannels::combat;
+        logch |= static_cast<int>(LogChannel::Combat);
     }
     if (_checkListBoxLogChannels->IsChecked(8)) {
-        logch |= LogChannels::script;
+        logch |= static_cast<int>(LogChannel::Script);
     }
     if (_checkListBoxLogChannels->IsChecked(9)) {
-        logch |= LogChannels::script2;
+        logch |= static_cast<int>(LogChannel::Script2);
     }
     if (_checkListBoxLogChannels->IsChecked(10)) {
-        logch |= LogChannels::script3;
+        logch |= static_cast<int>(LogChannel::Script3);
     }
 
     _config.gameDir = _textCtrlGameDir->GetValue();
@@ -449,7 +449,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
     _config.movievol = _sliderVolumeMovie->GetValue();
-    _config.loglevel = _choiceLogLevel->GetSelection();
+    _config.loglevel = _choiceLogSeverity->GetSelection();
     _config.logch = logch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 

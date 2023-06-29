@@ -28,9 +28,10 @@
 namespace reone {
 
 bool ToolkitApp::OnInit() {
-    initLog();
-    setLogToFile(true);
-    setLogFilename("toolkit.log");
+    initLog(
+        LogSeverity::Debug,
+        std::set<LogChannel> {LogChannel::General},
+        "toolkit.log");
 
 #ifdef _WIN32
     SetProcessDPIAware();

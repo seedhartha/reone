@@ -49,9 +49,48 @@ void Engine::loadOptions() {
     _options = OptionsParser(_argc, _argv).parse();
     _optionsView = _options->toView();
 
-    setLogLevel(_options->logging.level);
-    setLogChannels(_options->logging.channels);
-    setLogToFile(_options->logging.logToFile);
+    std::set<LogChannel> logChannels;
+    if ((_options->logging.channels & static_cast<int>(LogChannel::General)) != 0) {
+        logChannels.insert(LogChannel::General);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Resources)) != 0) {
+        logChannels.insert(LogChannel::Resources);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Resources2)) != 0) {
+        logChannels.insert(LogChannel::Resources2);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Graphics)) != 0) {
+        logChannels.insert(LogChannel::Graphics);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Audio)) != 0) {
+        logChannels.insert(LogChannel::Audio);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::GUI)) != 0) {
+        logChannels.insert(LogChannel::GUI);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Perception)) != 0) {
+        logChannels.insert(LogChannel::Perception);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Conversation)) != 0) {
+        logChannels.insert(LogChannel::Conversation);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Combat)) != 0) {
+        logChannels.insert(LogChannel::Combat);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Script)) != 0) {
+        logChannels.insert(LogChannel::Script);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Script2)) != 0) {
+        logChannels.insert(LogChannel::Script2);
+    }
+    if ((_options->logging.channels & static_cast<int>(LogChannel::Script3)) != 0) {
+        logChannels.insert(LogChannel::Script3);
+    }
+    std::string logFilename;
+    if (_options->logging.logToFile) {
+        logFilename = "reone.log";
+    }
+    initLog(_options->logging.level, std::move(logChannels), std::move(logFilename));
 }
 
 void Engine::initServices(GameID gameId) {

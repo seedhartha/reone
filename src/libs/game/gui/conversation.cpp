@@ -47,7 +47,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 static bool g_allEntriesSkippable = false;
 
 void Conversation::start(const std::shared_ptr<Dialog> &dialog, const std::shared_ptr<Object> &owner) {
-    debug("Start " + dialog->resRef, LogChannels::conversation);
+    debug("Start " + dialog->resRef, LogChannel::Conversation);
 
     _dialog = dialog;
     _owner = owner;
@@ -86,7 +86,7 @@ void Conversation::onStart() {
 void Conversation::loadStartEntry() {
     int entryIdx = indexOfFirstActive(_dialog->startEntries);
     if (entryIdx == -1) {
-        debug("Finish (no active start entry)", LogChannels::conversation);
+        debug("Finish (no active start entry)", LogChannel::Conversation);
         finish();
         return;
     }
@@ -121,7 +121,7 @@ void Conversation::onFinish() {
 }
 
 void Conversation::loadEntry(int index, bool start) {
-    debug("Load entry " + std::to_string(index), LogChannels::conversation);
+    debug("Load entry " + std::to_string(index), LogChannel::Conversation);
     _currentEntry = &_dialog->getEntry(index);
 
     setMessage(_currentEntry->text);
@@ -232,7 +232,7 @@ void Conversation::refreshReplies() {
 }
 
 void Conversation::pickReply(int index) {
-    debug("Pick reply " + std::to_string(index), LogChannels::conversation);
+    debug("Pick reply " + std::to_string(index), LogChannel::Conversation);
     const Dialog::EntryReply &reply = *_replies[index];
 
     // Run reply script
@@ -242,7 +242,7 @@ void Conversation::pickReply(int index) {
 
     int entryIdx = indexOfFirstActive(reply.entries);
     if (entryIdx == -1) {
-        debug("Finish (no active entries)", LogChannels::conversation);
+        debug("Finish (no active entries)", LogChannel::Conversation);
         finish();
         return;
     }
@@ -292,7 +292,7 @@ void Conversation::endCurrentEntry() {
     if (_autoPickFirstReply) {
         pickReply(0);
     } else if (_replies.empty()) {
-        debug("Finish (no active replies", LogChannels::conversation);
+        debug("Finish (no active replies", LogChannel::Conversation);
         finish();
     }
 }

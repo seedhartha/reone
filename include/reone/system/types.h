@@ -30,27 +30,28 @@ enum class OpenMode {
     Binary
 };
 
-enum class LogLevel {
-    None,
-    Error,
-    Warn,
+enum class LogSeverity {
+    Debug,
     Info,
-    Debug
+    Warn,
+    Error,
+
+    None
 };
 
-struct LogChannels {
-    static constexpr int general = 1;
-    static constexpr int resources = 2;
-    static constexpr int resources2 = 4;
-    static constexpr int graphics = 8;
-    static constexpr int audio = 16;
-    static constexpr int gui = 32;
-    static constexpr int perception = 64;
-    static constexpr int conversation = 128;
-    static constexpr int combat = 256;
-    static constexpr int script = 512;
-    static constexpr int script2 = 1024;
-    static constexpr int script3 = 2048;
+enum class LogChannel {
+    General = 1,
+    Resources = 2,
+    Resources2 = 4,
+    Graphics = 8,
+    Audio = 16,
+    GUI = 32,
+    Perception = 64,
+    Conversation = 128,
+    Combat = 256,
+    Script = 512,
+    Script2 = 1024,
+    Script3 = 2048
 };
 
 typedef std::string ByteArray;

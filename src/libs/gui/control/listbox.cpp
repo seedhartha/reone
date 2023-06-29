@@ -260,6 +260,9 @@ void ListBox::setExtentHeight(int height) {
 }
 
 void ListBox::changeProtoItemType(ControlType type) {
+    // TODO: debug CTD
+    return;
+
     if (!_protoItem) {
         return;
     }

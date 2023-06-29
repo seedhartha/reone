@@ -56,7 +56,7 @@ std::shared_ptr<Model> Models::get(const std::string &resRef) {
 }
 
 std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
-    debug("Load model " + resRef, LogChannels::graphics);
+    debug("Load model " + resRef, LogChannel::Graphics);
 
     std::shared_ptr<ByteArray> mdlData(_resources.get(resRef, ResourceType::Mdl));
     std::shared_ptr<ByteArray> mdxData(_resources.get(resRef, ResourceType::Mdx));
@@ -73,7 +73,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
                 model->init();
             }
         } catch (const ValidationException &e) {
-            error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannels::graphics);
+            error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannel::Graphics);
         }
     }
 

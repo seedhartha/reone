@@ -17,27 +17,26 @@
 
 #pragma once
 
+#include <boost/log/sources/channel_logger.hpp>
+
 #include "types.h"
 
 namespace reone {
 
-void initLog();
+void initLog(LogSeverity minSeverity = LogSeverity::Info,
+             std::set<LogChannel> channels = std::set<LogChannel> {LogChannel::General},
+             std::string filename = "");
 
-void error(const std::string &s, int channel = LogChannels::general);
-void error(const boost::format &s, int channel = LogChannels::general);
-void warn(const std::string &s, int channel = LogChannels::general);
-void warn(const boost::format &s, int channel = LogChannels::general);
-void info(const std::string &s, int channel = LogChannels::general);
-void info(const boost::format &s, int channel = LogChannels::general);
-void debug(const std::string &s, int channel = LogChannels::general);
-void debug(const boost::format &s, int channel = LogChannels::general);
+void error(const std::string &s, LogChannel channel = LogChannel::General);
+void error(const boost::format &s, LogChannel channel = LogChannel::General);
+void warn(const std::string &s, LogChannel channel = LogChannel::General);
+void warn(const boost::format &s, LogChannel channel = LogChannel::General);
+void info(const std::string &s, LogChannel channel = LogChannel::General);
+void info(const boost::format &s, LogChannel channel = LogChannel::General);
+void debug(const std::string &s, LogChannel channel = LogChannel::General);
+void debug(const boost::format &s, LogChannel channel = LogChannel::General);
 
-bool isLogLevelEnabled(LogLevel level);
-bool isLogChannelEnabled(int channel);
-
-void setLogLevel(LogLevel level);
-void setLogChannels(int mask);
-void setLogToFile(bool log);
-void setLogFilename(std::string filename);
+bool isLogSeverityEnabled(LogSeverity severity);
+bool isLogChannelEnabled(LogChannel channel);
 
 } // namespace reone

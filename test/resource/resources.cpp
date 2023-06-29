@@ -29,8 +29,6 @@ using namespace reone::resource;
 TEST(resources, should_index_providers_and_get_resources_without_caching) {
     // given
 
-    setLogLevel(LogLevel::None);
-
     auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_resources");
     boost::filesystem::create_directory(tmpDirPath);

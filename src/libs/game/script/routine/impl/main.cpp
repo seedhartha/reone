@@ -659,7 +659,7 @@ Variable signalEvent(const std::vector<Variable> &args, const RoutineContext &ct
     auto object = getObject(args, 0, ctx);
     auto evToRun = getEvent(args, 1);
 
-    debug(boost::format("Event signalled: %s %s") % object->tag() % evToRun->number(), LogChannels::script);
+    debug(boost::format("Event signalled: %s %s") % object->tag() % evToRun->number(), LogChannel::Script);
     ctx.game.scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, evToRun->number());
 
     return Variable::ofNull();

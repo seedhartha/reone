@@ -91,7 +91,7 @@ std::unique_ptr<Options> OptionsParser::parse() {
     options->audio.voiceVolume = vars["voicevol"].as<int>();
     options->audio.soundVolume = vars["soundvol"].as<int>();
     options->audio.movieVolume = vars["movievol"].as<int>();
-    options->logging.level = static_cast<LogLevel>(vars["loglevel"].as<int>());
+    options->logging.level = static_cast<LogSeverity>(vars["loglevel"].as<int>());
     options->logging.channels = vars["logch"].as<int>();
     options->logging.logToFile = vars["logfile"].as<bool>();
 

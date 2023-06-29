@@ -58,8 +58,8 @@ private:
         int voicevol {85};
         int soundvol {85};
         int movievol {85};
-        int loglevel {static_cast<int>(LogLevel::Info)};
-        int logch {LogChannels::general};
+        int loglevel {static_cast<int>(LogSeverity::Info)};
+        int logch {static_cast<int>(LogChannel::General)};
         bool logfile {false};
     } _config;
 
@@ -81,7 +81,7 @@ private:
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;
     wxSlider *_sliderVolumeMovie;
-    wxChoice *_choiceLogLevel;
+    wxChoice *_choiceLogSeverity;
     wxCheckListBox *_checkListBoxLogChannels;
     wxCheckBox *_checkBoxLogFile;
 

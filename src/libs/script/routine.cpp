@@ -42,10 +42,10 @@ Variable Routine::invoke(const std::vector<Variable> &args, ExecutionContext &ct
 Variable Routine::onException(const std::string &msg, const std::exception &ex) const {
     switch (_returnType) {
     case VariableType::Action:
-        error(msg, LogChannels::script);
+        error(msg, LogChannel::Script);
         throw ex;
     default:
-        warn(msg, LogChannels::script);
+        warn(msg, LogChannel::Script);
         return _defaultReturnValue;
     }
 }

@@ -156,25 +156,25 @@ int ScriptExecution::run() {
               insOff %
               _context->callerId %
               _context->triggererId,
-          LogChannels::script);
+          LogChannel::Script);
 
     while (insOff < _program->length()) {
         const Instruction &ins = _program->getInstruction(insOff);
         auto handler = _handlers.find(ins.type);
 
         if (handler == _handlers.end()) {
-            error(boost::format("Instruction not implemented: %04x") % static_cast<int>(ins.type), LogChannels::script);
+            error(boost::format("Instruction not implemented: %04x") % static_cast<int>(ins.type), LogChannel::Script);
             return -1;
         }
         _nextInstruction = ins.nextOffset;
 
-        if (isLogChannelEnabled(LogChannels::script3)) {
-            debug(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines), LogChannels::script3);
+        if (isLogChannelEnabled(LogChannel::Script3)) {
+            debug(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines), LogChannel::Script3);
         }
         try {
             handler->second(ins);
         } catch (const std::exception &ex) {
-            debug(boost::format("Halt '%s'") % _program->name(), LogChannels::script);
+            debug(boost::format("Halt '%s'") % _program->name(), LogChannel::Script);
             return -1;
         }
 
@@ -288,13 +288,13 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     }
 
     Variable retValue = routine.invoke(args, *_context);
-    if (isLogChannelEnabled(LogChannels::script2)) {
+    if (isLogChannelEnabled(LogChannel::Script2)) {
         std::vector<std::string> argStrings;
         for (auto &arg : args) {
             argStrings.push_back(arg.toString());
         }
         std::string argsString(boost::join(argStrings, ", "));
-        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script2);
+        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannel::Script2);
     }
     switch (routine.returnType()) {
     case VariableType::Void:

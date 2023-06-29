@@ -51,7 +51,7 @@ namespace reone {
 namespace gui {
 
 void GUI::load(const Gff &gui) {
-    debug("Load " + _resRef, LogChannels::gui);
+    debug("Load " + _resRef, LogChannel::GUI);
 
     ControlType type = Control::getType(gui);
     std::string tag(Control::getTag(gui));
@@ -158,7 +158,7 @@ bool GUI::handle(const SDL_Event &event) {
             glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
             Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
             if (control) {
-                debug("Click " + control->tag(), LogChannels::gui);
+                debug("Click " + control->tag(), LogChannel::GUI);
                 onClick(control->tag());
                 return control->handleClick(ctrlCoords.x, ctrlCoords.y);
             }
@@ -306,7 +306,7 @@ std::unique_ptr<Control> GUI::newControl(
         control = std::make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     default:
-        debug("Unsupported control type: " + std::to_string(static_cast<int>(type)), LogChannels::gui);
+        debug("Unsupported control type: " + std::to_string(static_cast<int>(type)), LogChannel::GUI);
         return nullptr;
     }
 

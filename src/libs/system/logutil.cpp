@@ -17,113 +17,137 @@
 
 #include "reone/system/logutil.h"
 
+#include <boost/log/expressions.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_channel_logger.hpp>
+#include <boost/log/utility/setup.hpp>
+
 #include "reone/system/collectionutil.h"
 
 namespace reone {
 
-static std::thread::id g_mainThreadId;
+BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", LogChannel)
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", LogSeverity)
 
-static int g_channels = LogChannels::general;
-static LogLevel g_level = LogLevel::Info;
+typedef boost::log::sources::severity_channel_logger<LogSeverity, LogChannel> SeverityChannelLogger;
 
-static bool g_logToFile = false;
-static std::unique_ptr<boost::filesystem::ofstream> g_logFile;
-static std::string g_logFilename = "reone.log";
+static const std::unordered_map<LogSeverity, std::string> kLogSeverityToName {
+    {LogSeverity::Error, "ERR"},
+    {LogSeverity::Warn, "WRN"},
+    {LogSeverity::Info, "INF"},
+    {LogSeverity::Debug, "DBG"}};
 
-static const std::unordered_map<LogLevel, std::string> g_nameByLogLevel {
-    {LogLevel::Error, "ERR"},
-    {LogLevel::Warn, "WRN"},
-    {LogLevel::Info, "INF"},
-    {LogLevel::Debug, "DBG"}};
+static LogSeverity g_minSeverity = LogSeverity::None;
 
-static std::string describeLogLevel(LogLevel level) {
-    return getFromLookupOrElse(g_nameByLogLevel, level, [&level]() {
-        return std::to_string(static_cast<int>(level));
+static SeverityChannelLogger g_loggerGeneral;
+static SeverityChannelLogger g_loggerResources;
+static SeverityChannelLogger g_loggerResources2;
+static SeverityChannelLogger g_loggerGraphics;
+static SeverityChannelLogger g_loggerAudio;
+static SeverityChannelLogger g_loggerGUI;
+static SeverityChannelLogger g_loggerPerception;
+static SeverityChannelLogger g_loggerConversation;
+static SeverityChannelLogger g_loggerCombat;
+static SeverityChannelLogger g_loggerScript;
+static SeverityChannelLogger g_loggerScript2;
+static SeverityChannelLogger g_loggerScript3;
+
+static std::set<LogChannel> g_channels;
+
+static std::map<LogChannel, SeverityChannelLogger *> g_channelToLogger {
+    {LogChannel::General, &g_loggerGeneral},           //
+    {LogChannel::Resources, &g_loggerResources},       //
+    {LogChannel::Resources2, &g_loggerResources2},     //
+    {LogChannel::Graphics, &g_loggerGraphics},         //
+    {LogChannel::Audio, &g_loggerAudio},               //
+    {LogChannel::GUI, &g_loggerGUI},                   //
+    {LogChannel::Perception, &g_loggerPerception},     //
+    {LogChannel::Conversation, &g_loggerConversation}, //
+    {LogChannel::Combat, &g_loggerCombat},             //
+    {LogChannel::Script, &g_loggerScript},             //
+    {LogChannel::Script2, &g_loggerScript2},           //
+    {LogChannel::Script3, &g_loggerScript3},           //
+};
+
+static std::string describeLogSeverity(LogSeverity severity) {
+    return getFromLookupOrElse(kLogSeverityToName, severity, [&severity]() {
+        return std::to_string(static_cast<int>(severity));
     });
 }
 
-static void log(std::ostream &out, LogLevel level, const std::string &s, int channel) {
-    auto msg = boost::format("%s %s") % describeLogLevel(level) % s;
-    out << msg << std::endl;
+static std::ostream &operator<<(std::ostream &stream, LogSeverity severity) {
+    stream << describeLogSeverity(severity);
+    return stream;
 }
 
-static void log(LogLevel level, const std::string &s, int channel) {
-    if (!isLogLevelEnabled(level)) {
+void initLog(LogSeverity minSeverity,
+             std::set<LogChannel> channels,
+             std::string filename) {
+    g_minSeverity = minSeverity;
+    g_channels = channels;
+
+    boost::log::core::get()->set_filter(severity >= minSeverity);
+    if (!filename.empty()) {
+        boost::log::add_file_log(
+            boost::log::keywords::file_name = filename,
+            boost::log::keywords::format = (boost::log::expressions::stream << severity << " " << boost::log::expressions::smessage));
+    } else {
+        boost::log::add_console_log(
+            std::clog,
+            boost::log::keywords::format = (boost::log::expressions::stream << severity << " " << boost::log::expressions::smessage));
+    }
+    boost::log::add_common_attributes();
+}
+
+static void log(LogSeverity severity, const std::string &s, LogChannel channel) {
+    if (!isLogSeverityEnabled(severity)) {
         return;
     }
     if (!isLogChannelEnabled(channel)) {
         return;
     }
-    if (std::this_thread::get_id() != g_mainThreadId) {
-        throw std::logic_error("Must not log outside the main thread");
-    }
-    if (g_logToFile && !g_logFile) {
-        boost::filesystem::path path(boost::filesystem::current_path());
-        path.append(g_logFilename);
-        g_logFile = std::make_unique<boost::filesystem::ofstream>(path);
-    }
-    auto &out = g_logToFile ? *g_logFile : std::cout;
-    log(out, level, s, channel);
+    auto &logger = *g_channelToLogger.at(channel);
+    BOOST_LOG_SEV(logger, severity) << s;
 }
 
-void initLog() {
-    g_mainThreadId = std::this_thread::get_id();
+void error(const std::string &s, LogChannel channel) {
+    log(LogSeverity::Error, s, channel);
 }
 
-void error(const std::string &s, int channel) {
-    log(LogLevel::Error, s, channel);
+void error(const boost::format &s, LogChannel channel) {
+    log(LogSeverity::Error, str(s), channel);
 }
 
-void error(const boost::format &s, int channel) {
-    log(LogLevel::Error, str(s), channel);
+void warn(const std::string &s, LogChannel channel) {
+    log(LogSeverity::Warn, s, channel);
 }
 
-void warn(const std::string &s, int channel) {
-    log(LogLevel::Warn, s, channel);
+void warn(const boost::format &s, LogChannel channel) {
+    log(LogSeverity::Warn, str(s), channel);
 }
 
-void warn(const boost::format &s, int channel) {
-    log(LogLevel::Warn, str(s), channel);
+void info(const std::string &s, LogChannel channel) {
+    log(LogSeverity::Info, s, channel);
 }
 
-void info(const std::string &s, int channel) {
-    log(LogLevel::Info, s, channel);
+void info(const boost::format &s, LogChannel channel) {
+    log(LogSeverity::Info, str(s), channel);
 }
 
-void info(const boost::format &s, int channel) {
-    log(LogLevel::Info, str(s), channel);
+void debug(const std::string &s, LogChannel channel) {
+    log(LogSeverity::Debug, s, channel);
 }
 
-void debug(const std::string &s, int channel) {
-    log(LogLevel::Debug, s, channel);
-}
-
-void debug(const boost::format &s, int channel) {
+void debug(const boost::format &s, LogChannel channel) {
     return debug(str(s), channel);
 }
 
-bool isLogLevelEnabled(LogLevel level) {
-    return static_cast<int>(level) <= static_cast<int>(g_level);
+bool isLogSeverityEnabled(LogSeverity severity) {
+    return severity >= g_minSeverity;
 }
 
-bool isLogChannelEnabled(int channel) {
-    return g_channels & channel;
-}
-
-void setLogLevel(LogLevel level) {
-    g_level = level;
-}
-
-void setLogChannels(int mask) {
-    g_channels = mask;
-}
-
-void setLogToFile(bool log) {
-    g_logToFile = log;
-}
-
-void setLogFilename(std::string filename) {
-    g_logFilename = filename;
+bool isLogChannelEnabled(LogChannel channel) {
+    return g_channels.count(channel) > 0;
 }
 
 } // namespace reone

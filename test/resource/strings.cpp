@@ -27,8 +27,6 @@ using namespace reone::resource;
 TEST(strings, should_init_talktable_and_get_string_and_sound) {
     // given
 
-    setLogLevel(LogLevel::None);
-
     auto tmpDirPath = boost::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_strings");
     boost::filesystem::create_directory(tmpDirPath);

@@ -178,7 +178,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         texture->setAnisotropy(anisotropy);
         texture->init();
     } else {
-        warn("Texture not found: " + resRef, LogChannels::graphics);
+        warn("Texture not found: " + resRef, LogChannel::Graphics);
     }
 
     return std::move(texture);

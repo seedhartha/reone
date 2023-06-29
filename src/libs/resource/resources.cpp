@@ -74,11 +74,11 @@ void Resources::indexExeFile(const boost::filesystem::path &path) {
         return;
     }
     _exePath = path;
-    debug("Index executable " + path.string(), LogChannels::resources);
+    debug("Index executable " + path.string(), LogChannel::Resources);
 }
 
 void Resources::indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient) {
-    debug(boost::format("Index provider %d at '%s'") % provider->id() % path.string(), LogChannels::resources);
+    debug(boost::format("Index provider %d at '%s'") % provider->id() % path.string(), LogChannel::Resources);
     if (transient) {
         _transientProviders.push_back(std::move(provider));
     } else {
@@ -93,7 +93,7 @@ void Resources::clearAllProviders() {
 
 void Resources::clearTransientProviders() {
     for (auto &provider : _transientProviders) {
-        debug("Remove provider " + std::to_string(provider->id()), LogChannels::resources);
+        debug("Remove provider " + std::to_string(provider->id()), LogChannel::Resources);
     }
     _transientProviders.clear();
 }
@@ -108,7 +108,7 @@ std::shared_ptr<ByteArray> Resources::get(const std::string &resRef, ResourceTyp
         data = getFromProviders(id, _transientProviders);
     }
     if (!data && logNotFound) {
-        warn("Resource '" + id.string() + "' not found", LogChannels::resources);
+        warn("Resource '" + id.string() + "' not found", LogChannel::Resources);
     }
     return std::move(data);
 }
@@ -121,7 +121,7 @@ std::shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType t
 
     auto data = peReader.find(name, type);
     if (!data) {
-        warn(boost::format("Resource %u of type %d not found in EXE") % name % static_cast<int>(type), LogChannels::resources);
+        warn(boost::format("Resource %u of type %d not found in EXE") % name % static_cast<int>(type), LogChannel::Resources);
         return nullptr;
     }
 
@@ -132,7 +132,7 @@ std::shared_ptr<ByteArray> Resources::getFromProviders(const ResourceId &id, con
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
         std::shared_ptr<ByteArray> data((*provider)->find(id));
         if (data) {
-            debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->id(), LogChannels::resources2);
+            debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->id(), LogChannel::Resources2);
             return data;
         }
     }

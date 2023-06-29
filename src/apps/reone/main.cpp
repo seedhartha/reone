@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/system/logutil.h"
-
 #ifdef _WIN32
 #include <windows.h>
 #undef max
@@ -28,8 +26,6 @@
 using namespace reone;
 
 int main(int argc, char **argv) {
-    initLog();
-
 #ifdef _WIN32
     SetProcessDPIAware();
 #endif

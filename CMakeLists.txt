@@ -33,7 +33,7 @@ option(ENABLE_ASAN "enable address sanitizer" OFF)
 # Dependencies
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options regex system)
+find_package(Boost REQUIRED COMPONENTS filesystem log program_options regex system)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)

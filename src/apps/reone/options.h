@@ -22,13 +22,12 @@
 #include "reone/graphics/options.h"
 #include "reone/system/types.h"
 
-
 namespace reone {
 
 struct Options {
     struct Logging {
-        LogLevel level {LogLevel::Info};
-        int channels {LogChannels::general};
+        LogSeverity level {LogSeverity::Info};
+        int channels {static_cast<int>(LogChannel::General)};
         bool logToFile {false};
     };
 
