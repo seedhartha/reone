@@ -745,6 +745,8 @@ void MainViewModel::onNotebookPageClose(int page) {
 
 void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
     _gamePath = path;
+    _gameDirItems.clear();
+    _idToGameDirItem.clear();
 
     loadGameDirectory();
     loadTools();
