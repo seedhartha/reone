@@ -130,6 +130,7 @@ class MainViewModel : boost::noncopyable {
 public:
     void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId, bool optimize = true);
+    void exportFile(GameDirectoryItemId itemId, const boost::filesystem::path &destPath);
 
     void extractAllBifs(const boost::filesystem::path &destPath);
     void batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);

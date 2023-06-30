@@ -33,6 +33,7 @@
 #include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/audio.h"
 #include "reone/tools/erf.h"
@@ -521,6 +522,25 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
         rimReader.load(rim);
         RimTool().extract(rimReader, srcPath, destPath);
     }
+}
+
+void MainViewModel::exportFile(GameDirectoryItemId itemId, const boost::filesystem::path &destPath) {
+    auto &item = *_idToGameDirItem.at(itemId);
+    withResourceStream(item, [&destPath, &item](auto &res) {
+        auto exportedPath = destPath;
+        exportedPath.append(item.resId->string());
+        auto exported = FileOutputStream(exportedPath, OpenMode::Binary);
+        auto buffer = std::make_unique<ByteArray>();
+        buffer->resize(8192);
+        bool eof = false;
+        while (!eof) {
+            int bytesRead = res.read(&(*buffer)[0], buffer->size());
+            if (bytesRead < buffer->size()) {
+                eof = true;
+            }
+            exported.write(&(*buffer)[0], bytesRead);
+        }
+    });
 }
 
 void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {

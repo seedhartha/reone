@@ -96,6 +96,7 @@ struct CommandID {
     static constexpr int extract = 1;
     static constexpr int decompile = 2;
     static constexpr int decompileNoOptimize = 3;
+    static constexpr int exportFile = 4;
 };
 
 struct TimerID {
@@ -538,10 +539,13 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
 void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     auto &item = _viewModel->getGameDirItemById(itemId);
-    if (item.resId && item.resId->type == ResourceType::Ncs) {
+    if (item.resId) {
         auto menu = wxMenu();
-        menu.Append(CommandID::decompile, "Decompile");
-        menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
+        menu.Append(CommandID::exportFile, "Export...");
+        if (item.resId->type == ResourceType::Ncs) {
+            menu.Append(CommandID::decompile, "Decompile");
+            menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
+        }
         menu.SetClientData(itemId);
         menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
@@ -619,6 +623,16 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     } else if (event.GetId() == CommandID::decompileNoOptimize) {
         auto itemId = menu->GetClientData();
         _viewModel->decompile(itemId, false);
+
+    } else if (event.GetId() == CommandID::exportFile) {
+        auto itemId = menu->GetClientData();
+        auto dialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+        if (dialog->ShowModal() != wxID_OK) {
+            return;
+        }
+        auto destPath = boost::filesystem::path(std::string(dialog->GetPath()));
+        _viewModel->exportFile(itemId, destPath);
+        wxMessageBox("Operation completed successfully", "Success");
     }
 }
 
