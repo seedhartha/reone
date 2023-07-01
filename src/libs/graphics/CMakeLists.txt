@@ -43,10 +43,6 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/format/tpcreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/txireader.h
     ${GRAPHICS_INCLUDE_DIR}/framebuffer.h
-    ${GRAPHICS_INCLUDE_DIR}/glsl/common.h
-    ${GRAPHICS_INCLUDE_DIR}/glsl/fragment.h
-    ${GRAPHICS_INCLUDE_DIR}/glsl/geometry.h
-    ${GRAPHICS_INCLUDE_DIR}/glsl/vertex.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimations.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h

@@ -84,6 +84,7 @@ private:
     bool _inited {false};
 
     ShaderProgramId _usedProgram {ShaderProgramId::None};
+    std::map<std::string, std::string> _sourceFiles;
 
     // Shader Programs
 
@@ -117,7 +118,7 @@ private:
 
     // END Shader Programs
 
-    std::shared_ptr<Shader> initShader(ShaderType type, std::list<std::string> sources);
+    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sourceFiles);
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
 
     ShaderProgram &getProgram(ShaderProgramId id);
