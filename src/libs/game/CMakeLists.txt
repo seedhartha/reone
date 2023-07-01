@@ -228,7 +228,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/savedgame.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
     ${GAME_INCLUDE_DIR}/script/routine/context.h
-    ${GAME_INCLUDE_DIR}/script/routine/declarations.h
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
     ${GAME_INCLUDE_DIR}/script/routines.h
     ${GAME_INCLUDE_DIR}/script/runner.h

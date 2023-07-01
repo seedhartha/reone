@@ -28,6 +28,8 @@ struct ExecutionContext;
 
 class Routine {
 public:
+    Routine() = default;
+
     Routine(
         std::string name,
         VariableType retType,

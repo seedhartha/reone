@@ -41,6 +41,13 @@ public:
 
     void init();
 
+    void insert(
+        int index,
+        std::string name,
+        script::VariableType retType,
+        std::vector<script::VariableType> argTypes,
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx));
+
     script::Routine &get(int index) override;
 
     int getNumRoutines() const override { return static_cast<int>(_routines.size()); }
@@ -51,23 +58,10 @@ private:
     Game *_game;
     ServicesView *_services;
 
-    std::vector<script::Routine> _routines;
+    std::map<int, script::Routine> _routines;
 
     void initForKotOR();
     void initForTSL();
-
-    void add(
-        std::string name,
-        script::VariableType retType,
-        std::vector<script::VariableType> argTypes,
-        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx));
-
-    void add(
-        std::string name,
-        script::VariableType retType,
-        std::vector<script::VariableType> argTypes,
-        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx),
-        script::Variable defRetValue);
 };
 
 } // namespace game

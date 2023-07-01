@@ -29,7 +29,7 @@ public:
     }
 
     ByteArrayInputStream(ByteArray &bytes) :
-        _data(&bytes[0]),
+        _data(!bytes.empty() ? &bytes[0] : nullptr),
         _size(bytes.size()) {
     }
 

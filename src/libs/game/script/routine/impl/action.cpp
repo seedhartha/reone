@@ -15,20 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  Implementation of action factory routines.
- */
-
-#include "reone/game/script/routine/declarations.h"
-
-#include "reone/system/logutil.h"
-
-#include "reone/game/action/factory.h"
-#include "reone/game/game.h"
-#include "reone/game/object/creature.h"
-
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
+#include "reone/game/script/routines.h"
+#include "reone/script/routine/exception/notimplemented.h"
+#include "reone/script/variable.h"
+
+#define R_VOID script::VariableType::Void
+#define R_INT script::VariableType::Int
+#define R_FLOAT script::VariableType::Float
+#define R_OBJECT script::VariableType::Object
+#define R_STRING script::VariableType::String
+#define R_EFFECT script::VariableType::Effect
+#define R_EVENT script::VariableType::Event
+#define R_LOCATION script::VariableType::Location
+#define R_TALENT script::VariableType::Talent
+#define R_VECTOR script::VariableType::Vector
+#define R_ACTION script::VariableType::Action
 
 using namespace reone::script;
 
@@ -38,392 +41,427 @@ namespace game {
 
 namespace routine {
 
-Variable actionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newRandomWalk();
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+static Variable ActionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionRandomWalk");
 }
 
-Variable actionMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto destination = getLocationArgument(args, 0);
-    bool run = getIntAsBoolOrElse(args, 1, false);
+static Variable ActionMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto lDestination = getLocationArgument(args, 0);
+    auto bRun = getIntOrElse(args, 1, 0);
 
-    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(destination), run);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionMoveToLocation");
 }
 
-Variable actionMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto moveTo = getObject(args, 0, ctx);
-    bool run = getIntAsBoolOrElse(args, 1, false);
-    float range = getFloatOrElse(args, 2, 1.0f);
+static Variable ActionMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oMoveTo = getObject(args, 0, ctx);
+    auto bRun = getIntOrElse(args, 1, 0);
+    auto fRange = getFloatOrElse(args, 2, 1.0f);
 
-    auto action = ctx.game.actionFactory().newMoveToObject(std::move(moveTo), run, range);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionMoveToObject");
 }
 
-Variable actionMoveAwayFromObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto fleeFrom = getObject(args, 0, ctx);
-    bool run = getIntAsBoolOrElse(args, 1, false);
-    float range = getFloatOrElse(args, 2, 40.0f);
+static Variable ActionMoveAwayFromObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oFleeFrom = getObject(args, 0, ctx);
+    auto bRun = getIntOrElse(args, 1, 0);
+    auto fMoveAwayRange = getFloatOrElse(args, 2, 40.0f);
 
-    auto action = ctx.game.actionFactory().newMoveAwayFromObject(std::move(fleeFrom), run, range);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionMoveAwayFromObject");
 }
 
-Variable actionEquipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getObjectAsItem(args, 0, ctx);
-    int inventorySlot = getInt(args, 1);
-    bool instant = getIntAsBoolOrElse(args, 2, false);
+static Variable ActionEquipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
+    auto nInventorySlot = getInt(args, 1);
+    auto bInstant = getIntOrElse(args, 2, 0);
 
-    auto action = ctx.game.actionFactory().newEquipItem(std::move(item), inventorySlot, instant);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionEquipItem");
 }
 
-Variable actionUnequipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getObjectAsItem(args, 0, ctx);
-    bool instant = getIntAsBoolOrElse(args, 1, false);
+static Variable ActionUnequipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
+    auto bInstant = getIntOrElse(args, 1, 0);
 
-    auto action = ctx.game.actionFactory().newUnequipItem(std::move(item), instant);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionUnequipItem");
 }
 
-Variable actionAttack(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto attackee = getObject(args, 0, ctx);
-    bool passive = getIntAsBoolOrElse(args, 1, false);
+static Variable ActionPickUpItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
 
-    auto caller = getCallerAsCreature(ctx);
-    auto action = ctx.game.actionFactory().newAttack(attackee, caller->getAttackRange(), false, passive);
-    caller->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionPickUpItem");
 }
 
-Variable actionPlayAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto animation = getIntAsEnum<AnimationType>(args, 0);
-    float speed = getFloatOrElse(args, 1, 1.0f);
-    float durationSeconds = getFloatOrElse(args, 2, 0.0f);
+static Variable ActionPutDownItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newPlayAnimation(animation, speed, durationSeconds);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionPutDownItem");
 }
 
-Variable actionOpenDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto door = getObjectAsDoor(args, 0, ctx);
+static Variable ActionAttack(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oAttackee = getObject(args, 0, ctx);
+    auto bPassive = getIntOrElse(args, 1, 0);
 
-    auto action = ctx.game.actionFactory().newOpenDoor(std::move(door));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionAttack");
 }
 
-Variable actionCloseDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto door = getObjectAsDoor(args, 0, ctx);
+static Variable ActionSpeakString(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto sStringToSpeak = getString(args, 0);
+    auto nTalkVolume = getIntOrElse(args, 1, 0);
 
-    auto action = ctx.game.actionFactory().newCloseDoor(std::move(door));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionSpeakString");
 }
 
-Variable actionCastSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getIntAsEnum<SpellType>(args, 0);
-    auto target = getObject(args, 1, ctx);
-    int metaMagic = getIntOrElse(args, 2, 0);
-    bool cheat = getIntAsBoolOrElse(args, 3, false);
-    int domainLevel = getIntOrElse(args, 4, 0);
-    auto projectilePathType = getIntAsEnumOrElse(args, 5, ProjectilePathType::Default);
-    bool instantSpell = getIntAsBoolOrElse(args, 6, false);
+static Variable ActionPlayAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nAnimation = getInt(args, 0);
+    auto fSpeed = getFloatOrElse(args, 1, 1.0);
+    auto fDurationSeconds = getFloatOrElse(args, 2, 0.0);
 
-    auto action = ctx.game.actionFactory().newCastSpellAtObject(spell, std::move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionPlayAnimation");
 }
 
-Variable actionGiveItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getObjectAsItem(args, 0, ctx);
-    auto giveTo = getObject(args, 1, ctx);
+static Variable ActionOpenDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oDoor = getObject(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newGiveItem(std::move(item), std::move(giveTo));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionOpenDoor");
 }
 
-Variable actionTakeItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getObjectAsItem(args, 0, ctx);
-    auto takeFrom = getObject(args, 1, ctx);
+static Variable ActionCloseDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oDoor = getObject(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newTakeItem(std::move(item), std::move(takeFrom));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionCloseDoor");
 }
 
-Variable actionJumpToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto jumpTo = getObject(args, 0, ctx);
-    bool walkStraightLine = getIntAsBoolOrElse(args, 1, true);
+static Variable ActionCastSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nSpell = getInt(args, 0);
+    auto oTarget = getObject(args, 1, ctx);
+    auto nMetaMagic = getIntOrElse(args, 2, 0);
+    auto bCheat = getIntOrElse(args, 3, 0);
+    auto nDomainLevel = getIntOrElse(args, 4, 0);
+    auto nProjectilePathType = getIntOrElse(args, 5, 0);
+    auto bInstantSpell = getIntOrElse(args, 6, 0);
 
-    auto action = ctx.game.actionFactory().newJumpToObject(std::move(jumpTo), walkStraightLine);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionCastSpellAtObject");
 }
 
-Variable actionWait(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    float seconds = getFloat(args, 0);
+static Variable ActionGiveItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
+    auto oGiveTo = getObject(args, 1, ctx);
 
-    auto action = ctx.game.actionFactory().newWait(seconds);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionGiveItem");
 }
 
-Variable actionStartConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto objectToConverse = getObject(args, 0, ctx);
-    std::string dialogResRef = getStringOrElse(args, 1, "");
-    bool privateConversation = getIntAsBoolOrElse(args, 2, false);
-    auto conversationType = getIntAsEnumOrElse(args, 3, ConversationType::Cinematic);
-    bool ignoreStartRange = getIntAsBoolOrElse(args, 4, false);
-    std::string nameObjectToIgnore1 = getStringOrElse(args, 5, "");
-    std::string nameObjectToIgnore2 = getStringOrElse(args, 6, "");
-    std::string nameObjectToIgnore3 = getStringOrElse(args, 7, "");
-    std::string nameObjectToIgnore4 = getStringOrElse(args, 8, "");
-    std::string nameObjectToIgnore5 = getStringOrElse(args, 9, "");
-    std::string nameObjectToIgnore6 = getStringOrElse(args, 10, "");
-    bool useLeader = getIntAsBoolOrElse(args, 11, false);
-    int barkX = getIntOrElse(args, 12, -1);
-    int barkY = getIntOrElse(args, 13, -1);
-    bool dontClearAllActions = getIntAsBoolOrElse(args, 14, false);
+static Variable ActionTakeItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oItem = getObject(args, 0, ctx);
+    auto oTakeFrom = getObject(args, 1, ctx);
 
-    auto caller = getCaller(ctx);
-    if (dialogResRef.empty()) {
-        dialogResRef = caller->conversation();
-    }
-    auto action = ctx.game.actionFactory().newStartConversation(
-        std::move(objectToConverse),
-        std::move(dialogResRef),
-        privateConversation,
-        conversationType,
-        ignoreStartRange,
-        nameObjectToIgnore1,
-        nameObjectToIgnore2,
-        nameObjectToIgnore3,
-        nameObjectToIgnore4,
-        nameObjectToIgnore5,
-        nameObjectToIgnore6,
-        useLeader,
-        barkX,
-        barkY,
-        dontClearAllActions);
-    caller->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionTakeItem");
 }
 
-Variable actionPauseConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newPauseConversation();
-    getCaller(ctx)->addAction(std::move(action));
+static Variable ActionForceFollowObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oFollow = getObject(args, 0, ctx);
+    auto fFollowDistance = getFloatOrElse(args, 1, 0.0f);
 
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionForceFollowObject");
 }
 
-Variable actionResumeConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newResumeConversation();
-    getCaller(ctx)->addAction(std::move(action));
+static Variable ActionJumpToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oToJumpTo = getObject(args, 0, ctx);
+    auto bWalkStraightLineToPoint = getIntOrElse(args, 1, 1);
 
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionJumpToObject");
 }
 
-Variable actionJumpToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto location = getLocationArgument(args, 0);
+static Variable ActionWait(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto fSeconds = getFloat(args, 0);
 
-    auto action = ctx.game.actionFactory().newJumpToLocation(std::move(location));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionWait");
 }
 
-Variable actionUseSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto skill = getIntAsEnum<SkillType>(args, 0);
-    auto target = getObject(args, 1, ctx);
-    int subSkill = getIntOrElse(args, 2, 0);
-    auto itemUsed = getObjectAsItemOrNull(args, 3, ctx);
+static Variable ActionStartConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oObjectToConverse = getObject(args, 0, ctx);
+    auto sDialogResRef = getStringOrElse(args, 1, "");
+    auto bPrivateConversation = getIntOrElse(args, 2, 0);
+    auto nConversationType = getIntOrElse(args, 3, 0);
+    auto bIgnoreStartRange = getIntOrElse(args, 4, 0);
+    auto sNameObjectToIgnore1 = getStringOrElse(args, 5, "");
+    auto sNameObjectToIgnore2 = getStringOrElse(args, 6, "");
+    auto sNameObjectToIgnore3 = getStringOrElse(args, 7, "");
+    auto sNameObjectToIgnore4 = getStringOrElse(args, 8, "");
+    auto sNameObjectToIgnore5 = getStringOrElse(args, 9, "");
+    auto sNameObjectToIgnore6 = getStringOrElse(args, 10, "");
+    auto bUseLeader = getIntOrElse(args, 11, 0);
+    auto nBarkX = getIntOrElse(args, 12, -1);
+    auto nBarkY = getIntOrElse(args, 13, -1);
+    auto bDontClearAllActions = getIntOrElse(args, 14, 0);
 
-    auto action = ctx.game.actionFactory().newUseSkill(std::move(target), skill, subSkill, std::move(itemUsed));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionStartConversation");
 }
 
-Variable actionDoCommand(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = getAction(args, 0);
-
-    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(action));
-    getCaller(ctx)->addAction(std::move(commandAction));
-
-    return Variable::ofNull();
+static Variable ActionPauseConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionPauseConversation");
 }
 
-Variable actionUseTalentOnObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto chosenTalent = getTalent(args, 0);
-    auto target = getObject(args, 1, ctx);
-
-    auto action = ctx.game.actionFactory().newUseTalentOnObject(std::move(chosenTalent), std::move(target));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+static Variable ActionResumeConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionResumeConversation");
 }
 
-Variable actionInteractObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto placeable = getObjectAsPlaceable(args, 0, ctx);
+static Variable ActionJumpToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto lLocation = getLocationArgument(args, 0);
 
-    auto action = ctx.game.actionFactory().newInteractObject(std::move(placeable));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionJumpToLocation");
 }
 
-Variable actionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newSurrenderToEnemies();
-    getCaller(ctx)->addAction(std::move(action));
+static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nSpell = getInt(args, 0);
+    auto lTargetLocation = getLocationArgument(args, 1);
+    auto nMetaMagic = getIntOrElse(args, 2, 0);
+    auto bCheat = getIntOrElse(args, 3, 0);
+    auto nProjectilePathType = getIntOrElse(args, 4, 0);
+    auto bInstantSpell = getIntOrElse(args, 5, 0);
 
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionCastSpellAtLocation");
 }
 
-Variable actionForceMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto destination = getLocationArgument(args, 0);
-    bool run = getIntAsBoolOrElse(args, 1, false);
-    float timeout = getFloatOrElse(args, 2, 30.0f);
+static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nStrRef = getInt(args, 0);
+    auto nTalkVolume = getIntOrElse(args, 1, 0);
 
-    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(destination), run, timeout, true);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionSpeakStringByStrRef");
 }
 
-Variable actionForceMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto moveTo = getObject(args, 0, ctx);
-    bool run = getIntAsBoolOrElse(args, 1, false);
-    float range = getFloatOrElse(args, 2, 1.0f);
-    float timeout = getFloatOrElse(args, 3, 30.0f);
+static Variable ActionUseFeat(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nFeat = getInt(args, 0);
+    auto oTarget = getObject(args, 1, ctx);
 
-    auto action = ctx.game.actionFactory().newMoveToObject(std::move(moveTo), run, range, timeout, true);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionUseFeat");
 }
 
-Variable actionEquipMostDamagingMelee(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto versus = getObjectOrNull(args, 0, ctx);
-    bool offHand = getIntAsBoolOrElse(args, 1, false);
+static Variable ActionUseSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nSkill = getInt(args, 0);
+    auto oTarget = getObject(args, 1, ctx);
+    auto nSubSkill = getIntOrElse(args, 2, 0);
+    auto oItemUsed = getObjectOrNull(args, 3, ctx);
 
-    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee(std::move(versus), offHand);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionUseSkill");
 }
 
-Variable actionEquipMostDamagingRanged(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto versus = getObjectOrNull(args, 0, ctx);
+static Variable ActionDoCommand(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto aActionToDo = getAction(args, 0);
 
-    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged(std::move(versus));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionDoCommand");
 }
 
-Variable actionUnlockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObject(args, 0, ctx);
+static Variable ActionUseTalentOnObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto tChosenTalent = getTalent(args, 0);
+    auto oTarget = getObject(args, 1, ctx);
 
-    auto action = ctx.game.actionFactory().newUnlockObject(std::move(target));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionUseTalentOnObject");
 }
 
-Variable actionLockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObject(args, 0, ctx);
+static Variable ActionUseTalentAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto tChosenTalent = getTalent(args, 0);
+    auto lTargetLocation = getLocationArgument(args, 1);
 
-    auto action = ctx.game.actionFactory().newLockObject(std::move(target));
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionUseTalentAtLocation");
 }
 
-Variable actionCastFakeSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getIntAsEnum<SpellType>(args, 0);
-    auto target = getObject(args, 1, ctx);
-    auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
+static Variable ActionInteractObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oPlaceable = getObject(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject(spell, std::move(target), projectilePathType);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionInteractObject");
 }
 
-Variable actionCastFakeSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getIntAsEnum<SpellType>(args, 0);
-    auto location = getLocationArgument(args, 1);
-    auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
+static Variable ActionMoveAwayFromLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto lMoveAwayFrom = getLocationArgument(args, 0);
+    auto bRun = getIntOrElse(args, 1, 0);
+    auto fMoveAwayRange = getFloatOrElse(args, 2, 40.0f);
 
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation(spell, std::move(location), projectilePathType);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionMoveAwayFromLocation");
 }
 
-Variable actionBarkString(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    int strRef = getInt(args, 0);
-
-    auto action = ctx.game.actionFactory().newBarkString(strRef);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+static Variable ActionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionSurrenderToEnemies");
 }
 
-Variable actionFollowLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newFollowLeader();
-    getCaller(ctx)->addAction(std::move(action));
+static Variable ActionForceMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto lDestination = getLocationArgument(args, 0);
+    auto bRun = getIntOrElse(args, 1, 0);
+    auto fTimeout = getFloatOrElse(args, 2, 30.0f);
 
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionForceMoveToLocation");
 }
 
-// TSL
+static Variable ActionForceMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oMoveTo = getObject(args, 0, ctx);
+    auto bRun = getIntOrElse(args, 1, 0);
+    auto fRange = getFloatOrElse(args, 2, 1.0f);
+    auto fTimeout = getFloatOrElse(args, 3, 30.0f);
 
-Variable actionFollowOwner(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    float range = getFloatOrElse(args, 0, 2.5f);
-
-    auto action = ctx.game.actionFactory().newFollowOwner(range);
-    getCaller(ctx)->addAction(std::move(action));
-
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionForceMoveToObject");
 }
 
-Variable actionSwitchWeapons(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.game.actionFactory().newSwitchWeapons();
-    getCaller(ctx)->addAction(std::move(action));
+static Variable ActionEquipMostDamagingMelee(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oVersus = getObjectOrNull(args, 0, ctx);
+    auto bOffHand = getIntOrElse(args, 1, 0);
 
-    return Variable::ofNull();
+    throw RoutineNotImplementedException("ActionEquipMostDamagingMelee");
 }
 
-// END TSL
+static Variable ActionEquipMostDamagingRanged(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oVersus = getObjectOrNull(args, 0, ctx);
+
+    throw RoutineNotImplementedException("ActionEquipMostDamagingRanged");
+}
+
+static Variable ActionEquipMostEffectiveArmor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionEquipMostEffectiveArmor");
+}
+
+static Variable ActionUnlockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oTarget = getObject(args, 0, ctx);
+
+    throw RoutineNotImplementedException("ActionUnlockObject");
+}
+
+static Variable ActionLockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto oTarget = getObject(args, 0, ctx);
+
+    throw RoutineNotImplementedException("ActionLockObject");
+}
+
+static Variable ActionCastFakeSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nSpell = getInt(args, 0);
+    auto oTarget = getObject(args, 1, ctx);
+    auto nProjectilePathType = getIntOrElse(args, 2, 0);
+
+    throw RoutineNotImplementedException("ActionCastFakeSpellAtObject");
+}
+
+static Variable ActionCastFakeSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto nSpell = getInt(args, 0);
+    auto lTarget = getLocationArgument(args, 1);
+    auto nProjectilePathType = getIntOrElse(args, 2, 0);
+
+    throw RoutineNotImplementedException("ActionCastFakeSpellAtLocation");
+}
+
+static Variable ActionBarkString(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto strRef = getInt(args, 0);
+
+    throw RoutineNotImplementedException("ActionBarkString");
+}
+
+static Variable ActionFollowLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionFollowLeader");
+}
+
+static Variable ActionFollowOwner(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    auto fRange = getFloatOrElse(args, 0, 2.5);
+
+    throw RoutineNotImplementedException("ActionFollowOwner");
+}
+
+static Variable ActionSwitchWeapons(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    throw RoutineNotImplementedException("ActionSwitchWeapons");
+}
 
 } // namespace routine
+
+void registerActionKotorRoutines(Routines &routines) {
+    routines.insert(20, "ActionRandomWalk", R_VOID, {}, &routine::ActionRandomWalk);
+    routines.insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &routine::ActionMoveToLocation);
+    routines.insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveToObject);
+    routines.insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromObject);
+    routines.insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &routine::ActionEquipItem);
+    routines.insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &routine::ActionUnequipItem);
+    routines.insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &routine::ActionPickUpItem);
+    routines.insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &routine::ActionPutDownItem);
+    routines.insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &routine::ActionAttack);
+    routines.insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::ActionSpeakString);
+    routines.insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::ActionPlayAnimation);
+    routines.insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::ActionOpenDoor);
+    routines.insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::ActionCloseDoor);
+    routines.insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtObject);
+    routines.insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionGiveItem);
+    routines.insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionTakeItem);
+    routines.insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::ActionForceFollowObject);
+    routines.insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &routine::ActionJumpToObject);
+    routines.insert(202, "ActionWait", R_VOID, {R_FLOAT}, &routine::ActionWait);
+    routines.insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT}, &routine::ActionStartConversation);
+    routines.insert(205, "ActionPauseConversation", R_VOID, {}, &routine::ActionPauseConversation);
+    routines.insert(206, "ActionResumeConversation", R_VOID, {}, &routine::ActionResumeConversation);
+    routines.insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &routine::ActionJumpToLocation);
+    routines.insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtLocation);
+    routines.insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &routine::ActionSpeakStringByStrRef);
+    routines.insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &routine::ActionUseFeat);
+    routines.insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &routine::ActionUseSkill);
+    routines.insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &routine::ActionDoCommand);
+    routines.insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &routine::ActionUseTalentOnObject);
+    routines.insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &routine::ActionUseTalentAtLocation);
+    routines.insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &routine::ActionInteractObject);
+    routines.insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromLocation);
+    routines.insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &routine::ActionSurrenderToEnemies);
+    routines.insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionForceMoveToLocation);
+    routines.insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &routine::ActionForceMoveToObject);
+    routines.insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::ActionEquipMostDamagingMelee);
+    routines.insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::ActionEquipMostDamagingRanged);
+    routines.insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &routine::ActionEquipMostEffectiveArmor);
+    routines.insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &routine::ActionUnlockObject);
+    routines.insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &routine::ActionLockObject);
+    routines.insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &routine::ActionCastFakeSpellAtObject);
+    routines.insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &routine::ActionCastFakeSpellAtLocation);
+    routines.insert(700, "ActionBarkString", R_VOID, {R_INT}, &routine::ActionBarkString);
+    routines.insert(730, "ActionFollowLeader", R_VOID, {}, &routine::ActionFollowLeader);
+}
+
+void registerActionTslRoutines(Routines &routines) {
+    routines.insert(20, "ActionRandomWalk", R_VOID, {}, &routine::ActionRandomWalk);
+    routines.insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &routine::ActionMoveToLocation);
+    routines.insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveToObject);
+    routines.insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromObject);
+    routines.insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &routine::ActionEquipItem);
+    routines.insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &routine::ActionUnequipItem);
+    routines.insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &routine::ActionPickUpItem);
+    routines.insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &routine::ActionPutDownItem);
+    routines.insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &routine::ActionAttack);
+    routines.insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::ActionSpeakString);
+    routines.insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::ActionPlayAnimation);
+    routines.insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::ActionOpenDoor);
+    routines.insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::ActionCloseDoor);
+    routines.insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtObject);
+    routines.insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionGiveItem);
+    routines.insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionTakeItem);
+    routines.insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::ActionForceFollowObject);
+    routines.insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &routine::ActionJumpToObject);
+    routines.insert(202, "ActionWait", R_VOID, {R_FLOAT}, &routine::ActionWait);
+    routines.insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT, R_INT, R_INT, R_INT}, &routine::ActionStartConversation);
+    routines.insert(205, "ActionPauseConversation", R_VOID, {}, &routine::ActionPauseConversation);
+    routines.insert(206, "ActionResumeConversation", R_VOID, {}, &routine::ActionResumeConversation);
+    routines.insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &routine::ActionJumpToLocation);
+    routines.insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtLocation);
+    routines.insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &routine::ActionSpeakStringByStrRef);
+    routines.insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &routine::ActionUseFeat);
+    routines.insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &routine::ActionUseSkill);
+    routines.insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &routine::ActionDoCommand);
+    routines.insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &routine::ActionUseTalentOnObject);
+    routines.insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &routine::ActionUseTalentAtLocation);
+    routines.insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &routine::ActionInteractObject);
+    routines.insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromLocation);
+    routines.insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &routine::ActionSurrenderToEnemies);
+    routines.insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionForceMoveToLocation);
+    routines.insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &routine::ActionForceMoveToObject);
+    routines.insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::ActionEquipMostDamagingMelee);
+    routines.insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::ActionEquipMostDamagingRanged);
+    routines.insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &routine::ActionEquipMostEffectiveArmor);
+    routines.insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &routine::ActionUnlockObject);
+    routines.insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &routine::ActionLockObject);
+    routines.insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &routine::ActionCastFakeSpellAtObject);
+    routines.insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &routine::ActionCastFakeSpellAtLocation);
+    routines.insert(700, "ActionBarkString", R_VOID, {R_INT}, &routine::ActionBarkString);
+    routines.insert(730, "ActionFollowLeader", R_VOID, {}, &routine::ActionFollowLeader);
+    routines.insert(843, "ActionFollowOwner", R_VOID, {R_FLOAT}, &routine::ActionFollowOwner);
+    routines.insert(853, "ActionSwitchWeapons", R_VOID, {}, &routine::ActionSwitchWeapons);
+}
 
 } // namespace game
 
 } // namespace reone
+

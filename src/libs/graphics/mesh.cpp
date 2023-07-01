@@ -43,10 +43,14 @@ void Mesh::init() {
 
     glGenVertexArrays(1, &_vaoId);
     glBindVertexArray(_vaoId);
-    glBindBuffer(GL_ARRAY_BUFFER, _vboId);
-    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iboId);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), &indices[0], GL_STATIC_DRAW);
+    if (!_vertices.empty()) {
+        glBindBuffer(GL_ARRAY_BUFFER, _vboId);
+        glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
+    }
+    if (!indices.empty()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iboId);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), &indices[0], GL_STATIC_DRAW);
+    }
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(0));
