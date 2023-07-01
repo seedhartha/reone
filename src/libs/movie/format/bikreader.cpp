@@ -195,11 +195,10 @@ private:
     }
 
     void initResamplingContext() {
-        AVChannelLayout outChLayout = AV_CHANNEL_LAYOUT_MONO;
-        swr_alloc_set_opts2(
-            &_swrContext,
-            &outChLayout, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
-            &_audioCodecCtx->ch_layout, _audioCodecCtx->sample_fmt, _audioCodecCtx->sample_rate,
+        _swrContext = swr_alloc_set_opts(
+            nullptr,
+            AV_CH_LAYOUT_MONO, AV_SAMPLE_FMT_S16, _audioCodecCtx->sample_rate,
+            _audioCodecCtx->channel_layout, _audioCodecCtx->sample_fmt, _audioCodecCtx->sample_rate,
             0, nullptr);
 
         swr_init(_swrContext);
