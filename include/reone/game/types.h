@@ -828,6 +828,8 @@ enum class SpellType {
 };
 
 enum class CreatureType {
+    Invalid = -1,
+
     RacialType = 0,
     PlayerChar = 1,
     Class = 2,

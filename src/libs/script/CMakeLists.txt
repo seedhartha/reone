@@ -28,6 +28,7 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/instrutil.h
     ${SCRIPT_INCLUDE_DIR}/program.h
     ${SCRIPT_INCLUDE_DIR}/routine.h
+    ${SCRIPT_INCLUDE_DIR}/routine/exception/argmissing.h
     ${SCRIPT_INCLUDE_DIR}/routine/exception/argument.h
     ${SCRIPT_INCLUDE_DIR}/routine/exception/notimplemented.h
     ${SCRIPT_INCLUDE_DIR}/routines.h

@@ -17,10 +17,8 @@
 
 #pragma once
 
-#include "reone/script/routine/exception/argument.h"
 #include "reone/script/types.h"
 #include "reone/script/variable.h"
-#include "reone/system/collectionutil.h"
 
 namespace reone {
 
@@ -35,8 +33,8 @@ namespace game {
 struct RoutineContext;
 
 class Area;
-class Door;
 class Creature;
+class Door;
 class Effect;
 class Event;
 class Item;
@@ -64,56 +62,15 @@ int getIntOrElse(const std::vector<script::Variable> &args, int index, int defVa
 float getFloatOrElse(const std::vector<script::Variable> &args, int index, float defValue);
 std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue);
 glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue);
-
-bool getIntAsBool(const std::vector<script::Variable> &args, int index);
-bool getIntAsBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
-
 std::shared_ptr<Object> getObjectOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
-std::shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx);
-std::shared_ptr<Creature> getObjectAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Creature> getObjectOrCallerAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<Door> getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<Placeable> getObjectAsPlaceable(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<Item> getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Item> getObjectAsItemOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<Sound> getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<Area> getObjectAsArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Area> getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {
-    if (isOutOfRange(args, index)) {
-        throw script::RoutineArgumentException(str(boost::format("Argument index out of range: %d/%d") % index % static_cast<int>(args.size())));
-    }
-}
-
-inline void throwIfUnexpectedType(script::VariableType expected, script::VariableType actual) {
-    if (actual != expected) {
-        throw script::RoutineArgumentException(str(boost::format("Expected argument of type %d, but got %d") % static_cast<int>(expected) % static_cast<int>(actual)));
-    }
-}
-
-template <class T>
-inline T getIntAsEnum(const std::vector<script::Variable> &args, int index) {
-    throwIfOutOfRange(args, index);
-    throwIfUnexpectedType(script::VariableType::Int, args[index].type);
-    return static_cast<T>(args[index].intValue);
-}
-
-template <class T>
-inline T getIntAsEnumOrElse(const std::vector<script::Variable> &args, int index, T defValue) {
-    if (isOutOfRange(args, index)) {
-        return defValue;
-    }
-    throwIfUnexpectedType(script::VariableType::Int, args[index].type);
-    return static_cast<T>(args[index].intValue);
-}
+std::shared_ptr<Creature> checkCreature(const std::shared_ptr<Object> &object);
+std::shared_ptr<Door> checkDoor(const std::shared_ptr<Object> &object);
+std::shared_ptr<Placeable> checkPlaceable(const std::shared_ptr<Object> &object);
+std::shared_ptr<Item> checkItem(const std::shared_ptr<Object> &object);
+std::shared_ptr<Sound> checkSound(const std::shared_ptr<Object> &object);
+std::shared_ptr<Area> checkArea(const std::shared_ptr<Object> &object);
 
 } // namespace game
 

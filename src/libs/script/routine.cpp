@@ -17,6 +17,7 @@
 
 #include "reone/script/routine.h"
 
+#include "reone/script/routine/exception/argmissing.h"
 #include "reone/script/routine/exception/argument.h"
 #include "reone/script/routine/exception/notimplemented.h"
 #include "reone/script/variable.h"
@@ -33,7 +34,7 @@ Variable Routine::invoke(const std::vector<Variable> &args, ExecutionContext &ct
         std::string msg = "Routine not implemented: " + _name;
         return onException(msg, ex);
     } catch (const RoutineArgumentException &ex) {
-        std::string msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
+        std::string msg = str(boost::format("Invalid routine '%s' argument: %s") % _name % ex.what());
         return onException(msg, ex);
     }
 }

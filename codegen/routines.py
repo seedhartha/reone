@@ -225,10 +225,14 @@ def write_reone_routine_impl(func: Function, constants: dict, code: StringIO):
             func.name
         )
     )
+    if func.args:
+        code.write(REONE_INDENT + "// Load\n")
     for idx, arg in enumerate(func.args):
         write_reone_routine_init_arg_expr(idx, arg, constants, code)
     if func.args:
         code.write("\n")
+        code.write(REONE_INDENT + "// Transform\n\n")
+    code.write(REONE_INDENT + "// Execute\n")
     code.write(
         '{}throw RoutineNotImplementedException("{}");\n'.format(
             REONE_INDENT, func.name

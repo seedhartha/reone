@@ -156,8 +156,8 @@ public:
         return std::make_unique<DamageEffect>(amount, type, power, std::move(damager));
     }
 
-    std::unique_ptr<DamageDecreaseEffect> newDamageDecrease(int penalty, AttackBonus modifierType) {
-        return std::make_unique<DamageDecreaseEffect>(penalty, modifierType);
+    std::unique_ptr<DamageDecreaseEffect> newDamageDecrease(int penalty, DamageType damageType) {
+        return std::make_unique<DamageDecreaseEffect>(penalty, damageType);
     }
 
     std::unique_ptr<DamageForcePointsEffect> newDamageForcePoints(int damage) {

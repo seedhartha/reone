@@ -17,27 +17,23 @@
 
 #pragma once
 
-#include "../effect.h"
+#include "argument.h"
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-class DamageDecreaseEffect : public Effect {
+class RoutineArgumentMissingException : public RoutineArgumentException {
 public:
-    DamageDecreaseEffect(int penalty, DamageType damageType) :
-        Effect(EffectType::DamageDecrease),
-        _penalty(penalty),
-        _damageType(damageType) {
+    RoutineArgumentMissingException() :
+        RoutineArgumentException("") {
     }
 
-    void applyTo(Object &object) override;
-
-private:
-    int _penalty;
-    DamageType _damageType;
+    RoutineArgumentMissingException(const std::string &message) :
+        RoutineArgumentException(message) {
+    }
 };
 
-} // namespace game
+} // namespace script
 
 } // namespace reone

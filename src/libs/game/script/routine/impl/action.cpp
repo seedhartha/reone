@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "reone/game/game.h"
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
 #include "reone/game/script/routines.h"
@@ -42,94 +43,174 @@ namespace game {
 namespace routine {
 
 static Variable ActionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionRandomWalk");
+    // Execute
+    auto action = ctx.game.actionFactory().newRandomWalk();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto lDestination = getLocationArgument(args, 0);
     auto bRun = getIntOrElse(args, 1, 0);
 
-    throw RoutineNotImplementedException("ActionMoveToLocation");
+    // Transform
+    auto run = static_cast<bool>(bRun);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oMoveTo = getObject(args, 0, ctx);
     auto bRun = getIntOrElse(args, 1, 0);
     auto fRange = getFloatOrElse(args, 2, 1.0f);
 
-    throw RoutineNotImplementedException("ActionMoveToObject");
+    // Transform
+    auto run = static_cast<bool>(bRun);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionMoveAwayFromObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oFleeFrom = getObject(args, 0, ctx);
     auto bRun = getIntOrElse(args, 1, 0);
     auto fMoveAwayRange = getFloatOrElse(args, 2, 40.0f);
 
-    throw RoutineNotImplementedException("ActionMoveAwayFromObject");
+    // Transform
+    auto run = static_cast<bool>(bRun);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newMoveAwayFromObject(std::move(oFleeFrom), run, fMoveAwayRange);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionEquipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
     auto nInventorySlot = getInt(args, 1);
     auto bInstant = getIntOrElse(args, 2, 0);
 
-    throw RoutineNotImplementedException("ActionEquipItem");
+    // Transform
+    auto item = checkItem(oItem);
+    auto instant = static_cast<bool>(bInstant);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newEquipItem(std::move(item), nInventorySlot, instant);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionUnequipItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
     auto bInstant = getIntOrElse(args, 1, 0);
 
-    throw RoutineNotImplementedException("ActionUnequipItem");
+    // Transform
+    auto item = checkItem(oItem);
+    auto instant = static_cast<bool>(bInstant);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newUnequipItem(std::move(item), instant);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionPickUpItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionPickUpItem");
 }
 
 static Variable ActionPutDownItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionPutDownItem");
 }
 
 static Variable ActionAttack(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oAttackee = getObject(args, 0, ctx);
     auto bPassive = getIntOrElse(args, 1, 0);
 
-    throw RoutineNotImplementedException("ActionAttack");
+    // Transform
+    auto passive = static_cast<bool>(bPassive);
+
+    // Execute
+    auto caller = checkCreature(getCaller(ctx));
+    auto action = ctx.game.actionFactory().newAttack(std::move(oAttackee), caller->getAttackRange(), false, passive);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionSpeakString(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto sStringToSpeak = getString(args, 0);
     auto nTalkVolume = getIntOrElse(args, 1, 0);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionSpeakString");
 }
 
 static Variable ActionPlayAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nAnimation = getInt(args, 0);
-    auto fSpeed = getFloatOrElse(args, 1, 1.0);
-    auto fDurationSeconds = getFloatOrElse(args, 2, 0.0);
+    auto fSpeed = getFloatOrElse(args, 1, 1.0f);
+    auto fDurationSeconds = getFloatOrElse(args, 2, 0.0f);
 
-    throw RoutineNotImplementedException("ActionPlayAnimation");
+    // Transform
+    auto animation = static_cast<AnimationType>(nAnimation);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newPlayAnimation(animation, fSpeed, fDurationSeconds);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionOpenDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oDoor = getObject(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionOpenDoor");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newOpenDoor(std::move(oDoor));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionCloseDoor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oDoor = getObject(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionCloseDoor");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newCloseDoor(std::move(oDoor));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionCastSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nSpell = getInt(args, 0);
     auto oTarget = getObject(args, 1, ctx);
     auto nMetaMagic = getIntOrElse(args, 2, 0);
@@ -138,44 +219,85 @@ static Variable ActionCastSpellAtObject(const std::vector<Variable> &args, const
     auto nProjectilePathType = getIntOrElse(args, 5, 0);
     auto bInstantSpell = getIntOrElse(args, 6, 0);
 
-    throw RoutineNotImplementedException("ActionCastSpellAtObject");
+    // Transform
+    auto spell = static_cast<SpellType>(nSpell);
+    auto cheat = static_cast<bool>(bCheat);
+    auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
+    auto instantSpell = static_cast<bool>(bInstantSpell);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newCastSpellAtObject(spell, std::move(oTarget), nMetaMagic, cheat, nDomainLevel, projectilePathType, instantSpell);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionGiveItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
     auto oGiveTo = getObject(args, 1, ctx);
 
-    throw RoutineNotImplementedException("ActionGiveItem");
+    // Transform
+    auto item = checkItem(oItem);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newGiveItem(std::move(item), std::move(oGiveTo));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionTakeItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oItem = getObject(args, 0, ctx);
     auto oTakeFrom = getObject(args, 1, ctx);
 
-    throw RoutineNotImplementedException("ActionTakeItem");
+    // Transform
+    auto item = checkItem(oItem);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newTakeItem(std::move(item), std::move(oTakeFrom));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionForceFollowObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oFollow = getObject(args, 0, ctx);
     auto fFollowDistance = getFloatOrElse(args, 1, 0.0f);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionForceFollowObject");
 }
 
 static Variable ActionJumpToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oToJumpTo = getObject(args, 0, ctx);
     auto bWalkStraightLineToPoint = getIntOrElse(args, 1, 1);
 
-    throw RoutineNotImplementedException("ActionJumpToObject");
+    // Transform
+    auto walkStraightLine = static_cast<bool>(bWalkStraightLineToPoint);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newJumpToObject(std::move(oToJumpTo), walkStraightLine);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionWait(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto fSeconds = getFloat(args, 0);
 
-    throw RoutineNotImplementedException("ActionWait");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newWait(fSeconds);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionStartConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oObjectToConverse = getObject(args, 0, ctx);
     auto sDialogResRef = getStringOrElse(args, 1, "");
     auto bPrivateConversation = getIntOrElse(args, 2, 0);
@@ -192,24 +314,69 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
     auto nBarkY = getIntOrElse(args, 13, -1);
     auto bDontClearAllActions = getIntOrElse(args, 14, 0);
 
-    throw RoutineNotImplementedException("ActionStartConversation");
+    // Transform
+    std::string dialogResRef;
+    auto caller = getCaller(ctx);
+    if (!sDialogResRef.empty()) {
+        dialogResRef = sDialogResRef;
+    } else {
+        dialogResRef = caller->conversation();
+    }
+    auto privateConversation = static_cast<bool>(bPrivateConversation);
+    auto conversationType = static_cast<ConversationType>(nConversationType);
+    auto ignoreStartRange = static_cast<bool>(bIgnoreStartRange);
+    auto useLeader = static_cast<bool>(bUseLeader);
+    auto dontClearAllActions = static_cast<bool>(bDontClearAllActions);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newStartConversation(
+        std::move(oObjectToConverse),
+        dialogResRef,
+        privateConversation,
+        conversationType,
+        ignoreStartRange,
+        sNameObjectToIgnore1,
+        sNameObjectToIgnore2,
+        sNameObjectToIgnore3,
+        sNameObjectToIgnore4,
+        sNameObjectToIgnore5,
+        sNameObjectToIgnore6,
+        useLeader,
+        nBarkX,
+        nBarkY,
+        dontClearAllActions);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionPauseConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionPauseConversation");
+    // Execute
+    auto action = ctx.game.actionFactory().newPauseConversation();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionResumeConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionResumeConversation");
+    // Execute
+    auto action = ctx.game.actionFactory().newResumeConversation();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionJumpToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto lLocation = getLocationArgument(args, 0);
 
-    throw RoutineNotImplementedException("ActionJumpToLocation");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newJumpToLocation(std::move(lLocation));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nSpell = getInt(args, 0);
     auto lTargetLocation = getLocationArgument(args, 1);
     auto nMetaMagic = getIntOrElse(args, 2, 0);
@@ -217,150 +384,271 @@ static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, con
     auto nProjectilePathType = getIntOrElse(args, 4, 0);
     auto bInstantSpell = getIntOrElse(args, 5, 0);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionCastSpellAtLocation");
 }
 
 static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nStrRef = getInt(args, 0);
     auto nTalkVolume = getIntOrElse(args, 1, 0);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionSpeakStringByStrRef");
 }
 
 static Variable ActionUseFeat(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nFeat = getInt(args, 0);
     auto oTarget = getObject(args, 1, ctx);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionUseFeat");
 }
 
 static Variable ActionUseSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nSkill = getInt(args, 0);
     auto oTarget = getObject(args, 1, ctx);
     auto nSubSkill = getIntOrElse(args, 2, 0);
     auto oItemUsed = getObjectOrNull(args, 3, ctx);
 
-    throw RoutineNotImplementedException("ActionUseSkill");
+    // Transform
+    auto skill = static_cast<SkillType>(nSkill);
+    auto itemUsed = checkItem(oItemUsed);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newUseSkill(std::move(oTarget), skill, nSubSkill, std::move(itemUsed));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionDoCommand(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto aActionToDo = getAction(args, 0);
 
-    throw RoutineNotImplementedException("ActionDoCommand");
+    // Transform
+
+    // Execute
+    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(aActionToDo));
+    getCaller(ctx)->addAction(std::move(commandAction));
+    return Variable::ofNull();
 }
 
 static Variable ActionUseTalentOnObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto tChosenTalent = getTalent(args, 0);
     auto oTarget = getObject(args, 1, ctx);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionUseTalentOnObject");
 }
 
 static Variable ActionUseTalentAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto tChosenTalent = getTalent(args, 0);
     auto lTargetLocation = getLocationArgument(args, 1);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionUseTalentAtLocation");
 }
 
 static Variable ActionInteractObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oPlaceable = getObject(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionInteractObject");
+    // Transform
+    auto placeable = checkPlaceable(oPlaceable);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newInteractObject(std::move(placeable));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionMoveAwayFromLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto lMoveAwayFrom = getLocationArgument(args, 0);
     auto bRun = getIntOrElse(args, 1, 0);
     auto fMoveAwayRange = getFloatOrElse(args, 2, 40.0f);
 
+    // Transform
+
+    // Execute
     throw RoutineNotImplementedException("ActionMoveAwayFromLocation");
 }
 
 static Variable ActionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionSurrenderToEnemies");
+    // Execute
+    auto action = ctx.game.actionFactory().newSurrenderToEnemies();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionForceMoveToLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto lDestination = getLocationArgument(args, 0);
     auto bRun = getIntOrElse(args, 1, 0);
     auto fTimeout = getFloatOrElse(args, 2, 30.0f);
 
-    throw RoutineNotImplementedException("ActionForceMoveToLocation");
+    // Transform
+    auto run = static_cast<bool>(bRun);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run, fTimeout, true);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionForceMoveToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oMoveTo = getObject(args, 0, ctx);
     auto bRun = getIntOrElse(args, 1, 0);
     auto fRange = getFloatOrElse(args, 2, 1.0f);
     auto fTimeout = getFloatOrElse(args, 3, 30.0f);
 
-    throw RoutineNotImplementedException("ActionForceMoveToObject");
+    // Transform
+    auto run = static_cast<bool>(bRun);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange, fTimeout, true);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionEquipMostDamagingMelee(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oVersus = getObjectOrNull(args, 0, ctx);
     auto bOffHand = getIntOrElse(args, 1, 0);
 
-    throw RoutineNotImplementedException("ActionEquipMostDamagingMelee");
+    // Transform
+    auto offHand = static_cast<bool>(bOffHand);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee(std::move(oVersus), offHand);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionEquipMostDamagingRanged(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oVersus = getObjectOrNull(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionEquipMostDamagingRanged");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged(std::move(oVersus));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionEquipMostEffectiveArmor(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Execute
     throw RoutineNotImplementedException("ActionEquipMostEffectiveArmor");
 }
 
 static Variable ActionUnlockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oTarget = getObject(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionUnlockObject");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newUnlockObject(std::move(oTarget));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionLockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto oTarget = getObject(args, 0, ctx);
 
-    throw RoutineNotImplementedException("ActionLockObject");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newLockObject(std::move(oTarget));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionCastFakeSpellAtObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nSpell = getInt(args, 0);
     auto oTarget = getObject(args, 1, ctx);
     auto nProjectilePathType = getIntOrElse(args, 2, 0);
 
-    throw RoutineNotImplementedException("ActionCastFakeSpellAtObject");
+    // Transform
+    auto spell = static_cast<SpellType>(nSpell);
+    auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject(spell, std::move(oTarget), projectilePathType);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionCastFakeSpellAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto nSpell = getInt(args, 0);
     auto lTarget = getLocationArgument(args, 1);
     auto nProjectilePathType = getIntOrElse(args, 2, 0);
 
-    throw RoutineNotImplementedException("ActionCastFakeSpellAtLocation");
+    // Transform
+    auto spell = static_cast<SpellType>(nSpell);
+    auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
+
+    // Execute
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation(spell, std::move(lTarget), projectilePathType);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionBarkString(const std::vector<Variable> &args, const RoutineContext &ctx) {
+    // Load
     auto strRef = getInt(args, 0);
 
-    throw RoutineNotImplementedException("ActionBarkString");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newBarkString(strRef);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionFollowLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionFollowLeader");
+    // Execute
+    auto action = ctx.game.actionFactory().newFollowLeader();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionFollowOwner(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    auto fRange = getFloatOrElse(args, 0, 2.5);
+    // Load
+    auto fRange = getFloatOrElse(args, 0, 2.5f);
 
-    throw RoutineNotImplementedException("ActionFollowOwner");
+    // Transform
+
+    // Execute
+    auto action = ctx.game.actionFactory().newFollowOwner(fRange);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionSwitchWeapons(const std::vector<Variable> &args, const RoutineContext &ctx) {
-    throw RoutineNotImplementedException("ActionSwitchWeapons");
+    // Execute
+    auto action = ctx.game.actionFactory().newSwitchWeapons();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 } // namespace routine
@@ -464,4 +752,3 @@ void registerActionTslRoutines(Routines &routines) {
 } // namespace game
 
 } // namespace reone
-
