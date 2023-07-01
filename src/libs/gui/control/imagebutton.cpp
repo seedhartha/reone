@@ -100,7 +100,7 @@ void ImageButton::drawIcon(
             general.model = std::move(transform);
             general.color = glm::vec4(color, 1.0f);
         });
-        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+        _graphicsSvc.shaders.use(ShaderProgramId::GUI);
         _graphicsSvc.meshes.quad().draw();
     }
 
@@ -116,7 +116,7 @@ void ImageButton::drawIcon(
             general.projection = _graphicsSvc.window.getOrthoProjection();
             general.model = std::move(transform);
         });
-        _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+        _graphicsSvc.shaders.use(ShaderProgramId::GUI);
         _graphicsSvc.meshes.quad().draw();
     }
 

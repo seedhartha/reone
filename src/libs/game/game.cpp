@@ -341,7 +341,7 @@ void Game::drawWorld() {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
+    _services.graphics.shaders.use(ShaderProgramId::SimpleTexture);
     _services.graphics.textures.bind(*output);
     _services.graphics.meshes.quadNDC().draw();
 }

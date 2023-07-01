@@ -79,7 +79,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         general.alpha = 0.5f;
         general.color = glm::vec4(_color, 1.0f);
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.billboard());
+    _graphicsSvc.shaders.use(ShaderProgramId::Billboard);
     _graphicsSvc.textures.bind(*flare.texture);
     _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
         _graphicsSvc.meshes.billboard().draw();

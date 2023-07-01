@@ -444,7 +444,7 @@ void HUD::drawHealth(int memberIndex) {
         general.model = std::move(transform);
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
-    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.shaders.use(ShaderProgramId::SimpleColor);
     _services.graphics.meshes.quad().draw();
 }
 

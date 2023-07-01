@@ -161,7 +161,7 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
             grass.clusters[i].lightmapUV = cluster->lightmapUV();
         }
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.grass());
+    _graphicsSvc.shaders.use(ShaderProgramId::Grass);
     _graphicsSvc.meshes.grass().drawInstanced(leafs.size());
 }
 

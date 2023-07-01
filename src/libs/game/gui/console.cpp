@@ -203,7 +203,7 @@ void Console::drawBackground() {
         general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         general.alpha = 0.5f;
     });
-    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.shaders.use(ShaderProgramId::SimpleColor);
     _services.graphics.meshes.quad().draw();
 }
 

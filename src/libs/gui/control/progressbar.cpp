@@ -64,7 +64,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 

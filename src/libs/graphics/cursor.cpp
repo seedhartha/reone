@@ -43,7 +43,7 @@ void Cursor::draw() {
         general.projection = _window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _shaders.use(_shaders.gui());
+    _shaders.use(ShaderProgramId::GUI);
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {
         _meshes.quad().draw();
     });

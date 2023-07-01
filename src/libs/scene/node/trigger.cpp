@@ -100,7 +100,7 @@ void TriggerSceneNode::draw() {
         general.resetLocals();
         general.model = _absTransform;
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.walkmesh());
+    _graphicsSvc.shaders.use(ShaderProgramId::Walkmesh);
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {
         _mesh->draw();
     });

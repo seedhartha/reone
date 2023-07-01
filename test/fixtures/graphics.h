@@ -86,35 +86,7 @@ public:
 
 class MockShaders : public IShaders, boost::noncopyable {
 public:
-    MOCK_METHOD(void, use, (ShaderProgram & program), (override));
-
-    MOCK_METHOD(ShaderProgram &, simpleColor, (), (const override));
-    MOCK_METHOD(ShaderProgram &, simpleTexture, (), (const override));
-    MOCK_METHOD(ShaderProgram &, gui, (), (const override));
-    MOCK_METHOD(ShaderProgram &, text, (), (const override));
-    MOCK_METHOD(ShaderProgram &, points, (), (const override));
-
-    MOCK_METHOD(ShaderProgram &, pointLightShadows, (), (const override));
-    MOCK_METHOD(ShaderProgram &, directionalLightShadows, (), (const override));
-    MOCK_METHOD(ShaderProgram &, modelOpaque, (), (const override));
-    MOCK_METHOD(ShaderProgram &, modelTransparent, (), (const override));
-    MOCK_METHOD(ShaderProgram &, aabb, (), (const override));
-    MOCK_METHOD(ShaderProgram &, walkmesh, (), (const override));
-    MOCK_METHOD(ShaderProgram &, particle, (), (const override));
-    MOCK_METHOD(ShaderProgram &, grass, (), (const override));
-    MOCK_METHOD(ShaderProgram &, billboard, (), (const override));
-    MOCK_METHOD(ShaderProgram &, ssao, (), (const override));
-    MOCK_METHOD(ShaderProgram &, ssr, (), (const override));
-    MOCK_METHOD(ShaderProgram &, combineOpaque, (), (const override));
-    MOCK_METHOD(ShaderProgram &, combineGeometry, (), (const override));
-
-    MOCK_METHOD(ShaderProgram &, boxBlur4, (), (const override));
-    MOCK_METHOD(ShaderProgram &, gaussianBlur9, (), (const override));
-    MOCK_METHOD(ShaderProgram &, gaussianBlur13, (), (const override));
-    MOCK_METHOD(ShaderProgram &, medianFilter3, (), (const override));
-    MOCK_METHOD(ShaderProgram &, medianFilter5, (), (const override));
-    MOCK_METHOD(ShaderProgram &, fxaa, (), (const override));
-    MOCK_METHOD(ShaderProgram &, sharpen, (), (const override));
+    MOCK_METHOD(void, use, (ShaderProgramId programId), (override));
 };
 
 class MockTextures : public ITextures, boost::noncopyable {
@@ -166,7 +138,7 @@ public:
     MOCK_METHOD(void, swapBuffers, (), (const override));
     MOCK_METHOD(bool, isInFocus, (), (const override));
     MOCK_METHOD(glm::mat4, getOrthoProjection, (float near, float far), (const override));
-    MOCK_METHOD(void, setEventHandler, (IEventHandler *eventHandler), (override));
+    MOCK_METHOD(void, setEventHandler, (IEventHandler * eventHandler), (override));
     MOCK_METHOD(void, setRelativeMouseMode, (bool enabled), (override));
     MOCK_METHOD(uint32_t, mouseState, (int *x, int *y), (override));
     MOCK_METHOD(void, showCursor, (bool show), (override));

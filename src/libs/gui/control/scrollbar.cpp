@@ -64,7 +64,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         return;
     }
 
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
     _graphicsSvc.textures.bind(*_thumb.image);
 
     // Top edge
@@ -137,7 +137,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 
@@ -152,7 +152,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(_graphicsSvc.shaders.gui());
+    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 

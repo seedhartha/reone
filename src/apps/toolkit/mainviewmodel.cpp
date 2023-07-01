@@ -650,7 +650,7 @@ void MainViewModel::render3D(int w, int h) {
     });
     _graphicsModule->graphicsContext().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->graphicsContext().clearColorDepth();
-        _graphicsModule->shaders().use(_graphicsModule->shaders().simpleTexture());
+        _graphicsModule->shaders().use(ShaderProgramId::SimpleTexture);
         _graphicsModule->textures().bind(*output);
         _graphicsModule->meshes().quadNDC().draw();
     });

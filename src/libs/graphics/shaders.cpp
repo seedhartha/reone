@@ -136,11 +136,14 @@ void Shaders::deinit() {
     _inited = false;
 }
 
-void Shaders::use(ShaderProgram &program) {
-    if (_usedProgram != &program) {
-        program.use();
-        _usedProgram = &program;
+void Shaders::use(ShaderProgramId programId) {
+    if (_usedProgram == programId) {
+        return;
     }
+    if (programId != ShaderProgramId::None) {
+        getProgram(programId).use();
+    }
+    _usedProgram = programId;
 }
 
 std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::list<std::string> sources) {
@@ -199,6 +202,63 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
 
     return std::move(program);
+}
+
+ShaderProgram &Shaders::getProgram(ShaderProgramId id) {
+    switch (id) {
+    case ShaderProgramId::SimpleColor:
+        return *_spSimpleColor;
+    case ShaderProgramId::SimpleTexture:
+        return *_spSimpleTexture;
+    case ShaderProgramId::GUI:
+        return *_spGUI;
+    case ShaderProgramId::Text:
+        return *_spText;
+    case ShaderProgramId::Points:
+        return *_spPoints;
+    case ShaderProgramId::PointLightShadows:
+        return *_spPointLightShadows;
+    case ShaderProgramId::DirectionalLightShadows:
+        return *_spDirectionalLightShadows;
+    case ShaderProgramId::ModelOpaque:
+        return *_spModelOpaque;
+    case ShaderProgramId::ModelTransparent:
+        return *_spModelTransparent;
+    case ShaderProgramId::AABB:
+        return *_spAABB;
+    case ShaderProgramId::Walkmesh:
+        return *_spWalkmesh;
+    case ShaderProgramId::Particle:
+        return *_spParticle;
+    case ShaderProgramId::Grass:
+        return *_spGrass;
+    case ShaderProgramId::Billboard:
+        return *_spBillboard;
+    case ShaderProgramId::SSAO:
+        return *_spSSAO;
+    case ShaderProgramId::SSR:
+        return *_spSSR;
+    case ShaderProgramId::CombineOpaque:
+        return *_spCombineOpaque;
+    case ShaderProgramId::CombineGeometry:
+        return *_spCombineGeometry;
+    case ShaderProgramId::BoxBlur4:
+        return *_spBoxBlur4;
+    case ShaderProgramId::GaussianBlur9:
+        return *_spGaussianBlur9;
+    case ShaderProgramId::GaussianBlur13:
+        return *_spGaussianBlur13;
+    case ShaderProgramId::MedianFilter3:
+        return *_spMedianFilter3;
+    case ShaderProgramId::MedianFilter5:
+        return *_spMedianFilter5;
+    case ShaderProgramId::FXAA:
+        return *_spFXAA;
+    case ShaderProgramId::Sharpen:
+        return *_spSharpen;
+    default:
+        throw std::invalid_argument("Invalid shader program id: " + std::to_string(static_cast<int>(id)));
+    }
 }
 
 } // namespace graphics
