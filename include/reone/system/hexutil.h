@@ -21,6 +21,7 @@
 
 namespace reone {
 
+std::string hexify(const ByteArray &ba, std::string separator = " ");
 std::string hexify(const std::string &s, std::string separator = " ");
 
 ByteArray unhexify(const std::string &s);

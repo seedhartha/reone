@@ -25,25 +25,25 @@ void ByteArrayInputStream::seek(int64_t offset, SeekOrigin origin) {
     } else if (origin == SeekOrigin::Current) {
         _position += offset;
     } else if (origin == SeekOrigin::End) {
-        _position = _bytes.size() - offset;
+        _position = _size - offset;
     } else {
         throw std::invalid_argument("Unsupported origin: " + std::to_string(static_cast<int>(origin)));
     }
 }
 
 int ByteArrayInputStream::readByte() {
-    if (_position >= _bytes.size()) {
+    if (_position >= _size) {
         return -1;
     }
-    return _bytes[_position++];
+    return _data[_position++];
 }
 
 int ByteArrayInputStream::read(char *outData, int length) {
-    size_t available = _bytes.size() - _position;
+    size_t available = _size - _position;
     size_t toRead = std::min(available, static_cast<size_t>(length));
-    std::memcpy(outData, &_bytes[_position], toRead);
+    std::memcpy(outData, &_data[_position], toRead);
     if (toRead < length) {
-        _position = _bytes.size();
+        _position = _size;
     } else {
         _position += length;
     }
@@ -52,22 +52,22 @@ int ByteArrayInputStream::read(char *outData, int length) {
 
 void ByteArrayInputStream::readLine(char *outData, int maxLen) {
     size_t endPos;
-    for (endPos = _position; endPos < _bytes.size(); ++endPos) {
-        if (_bytes[endPos] == '\r' || _bytes[endPos] == '\n') {
+    for (endPos = _position; endPos < _size; ++endPos) {
+        if (_data[endPos] == '\r' || _data[endPos] == '\n') {
             break;
         }
     }
     size_t toRead = std::min(endPos - _position, static_cast<size_t>(maxLen));
-    std::memcpy(outData, &_bytes[_position], toRead);
+    std::memcpy(outData, &_data[_position], toRead);
     if (toRead < maxLen) {
         outData[toRead] = '\0';
     }
     _position += toRead;
-    if (endPos >= _bytes.size()) {
+    if (endPos >= _size) {
         // do nothing
-    } else if (_bytes[endPos] == '\r') {
+    } else if (_data[endPos] == '\r') {
         _position += 2;
-    } else if (_bytes[endPos] == '\n') {
+    } else if (_data[endPos] == '\n') {
         _position += 1;
     }
 }

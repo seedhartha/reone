@@ -83,7 +83,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto resources = Resources();
 
-    auto expectedResData = ByteArray("Hello, world!");
+    auto expectedResData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
 

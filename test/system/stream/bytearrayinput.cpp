@@ -25,7 +25,7 @@ using namespace reone;
 
 TEST(byte_array_input_stream, should_read_from_byte_array) {
     // given
-    auto bytes = ByteArray("Hello, world!");
+    auto bytes = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto stream = ByteArrayInputStream(bytes);
     auto buf = ByteArray(16, '\0');
     auto expectedContents = std::string("Hello, world!");
@@ -38,7 +38,8 @@ TEST(byte_array_input_stream, should_read_from_byte_array) {
     stream.seek(-1, SeekOrigin::Current);
     size_t position2 = stream.position();
     int readResult = stream.read(&buf[0], 16);
-    auto contents = buf.substr(0, 13);
+    std::string contents;
+    contents.insert(contents.begin(), buf.begin(), buf.begin() + 13);
     int readByteResult2 = stream.readByte();
     bool eof = stream.eof();
 
@@ -55,7 +56,7 @@ TEST(byte_array_input_stream, should_read_from_byte_array) {
 
 TEST(byte_array_input_stream, should_read_lines_from_byte_array) {
     // given
-    auto bytes = ByteArray("line1\r\nline2\nlongline");
+    auto bytes = ByteArray {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
     auto stream = ByteArrayInputStream(bytes);
     char buf[8];
 

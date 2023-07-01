@@ -35,6 +35,10 @@ public:
         _stream.write(&bytes[0], bytes.size());
     }
 
+    void write(const std::string &str) override {
+        _stream.write(&str[0], str.size());
+    }
+
     void write(const char *data, int length) override {
         _stream.write(data, length);
     }

@@ -140,16 +140,19 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
         }
     }
 
-    auto blockString = std::string();
-    auto blockStream = ByteArrayOutputStream(blockString);
+    auto blockBytes = std::make_unique<ByteArray>();
+    auto blockStream = ByteArrayOutputStream(*blockBytes);
     auto blockWriter = TextWriter(blockStream);
     auto ctx = WriteContext();
     for (auto [block, level] : blocksToWrite) {
         debug(boost::format("Writing block (%p, %d)") % block % level);
-        blockString.clear();
+        blockBytes->clear();
         writeBlock(level, *block, ctx, blockWriter);
         auto blockKey = std::make_pair(block, level);
-        ctx.writtenBlocks[blockKey] = blockString;
+        std::string blockString;
+        blockString.reserve(blockBytes->size());
+        blockString.insert(blockString.begin(), blockBytes->begin(), blockBytes->end());
+        ctx.writtenBlocks[blockKey] = std::move(blockString);
     }
     auto &rootBlock = ctx.writtenBlocks.at(std::make_pair(func.block, 0));
     writer.put(rootBlock);

@@ -23,8 +23,14 @@ namespace reone {
 
 class ByteArrayInputStream : public IInputStream {
 public:
+    ByteArrayInputStream(std::string &str) :
+        _data(&str[0]),
+        _size(str.size()) {
+    }
+
     ByteArrayInputStream(ByteArray &bytes) :
-        _bytes(bytes) {
+        _data(&bytes[0]),
+        _size(bytes.size()) {
     }
 
     void seek(int64_t offset, SeekOrigin origin) override;
@@ -38,11 +44,13 @@ public:
     }
 
     bool eof() override {
-        return _position >= _bytes.size();
+        return _position >= _size;
     }
 
 private:
-    ByteArray &_bytes;
+    char *_data;
+    size_t _size;
+
     size_t _position {0};
 };
 

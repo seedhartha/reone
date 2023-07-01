@@ -26,7 +26,7 @@ using namespace reone;
 
 TEST(text_writer, should_write_text) {
     // given
-    auto expectedBytes = ByteArray("Hello, world!\nHello, world!");
+    auto expectedBytes = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
     auto bytes = ByteArray();

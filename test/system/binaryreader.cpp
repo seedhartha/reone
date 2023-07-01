@@ -27,7 +27,7 @@ using namespace reone;
 
 TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
-    auto input = ByteArray("Hello, world!\x00", 13);
+    auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
     auto stream = ByteArrayInputStream(input);
     auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;

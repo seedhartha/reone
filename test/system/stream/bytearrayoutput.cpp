@@ -27,8 +27,8 @@ TEST(byte_array_output_stream, should_write_to_byte_array) {
     // given
     auto bytes = ByteArray();
     auto stream = ByteArrayOutputStream(bytes);
-    auto bytesToWrite = ByteArray("Hello, world!");
-    auto expectedOutput = ByteArray("Hello, world!\nHello, world!");
+    auto bytesToWrite = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
     stream.write(bytesToWrite);

@@ -213,7 +213,7 @@ MainFrame::MainFrame() :
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
         _image = std::make_unique<wxBitmap>(image);
         _imageInfoCtrl->Clear();
-        _imageInfoCtrl->AppendText(*data.txiBytes);
+        _imageInfoCtrl->AppendText(std::string(data.txiBytes->begin(), data.txiBytes->end()));
         if (!data.txiBytes->empty()) {
             _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
         } else {

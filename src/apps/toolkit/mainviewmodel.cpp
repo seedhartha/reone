@@ -178,7 +178,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
         auto page = std::make_shared<Page>(PageType::NCS, id.string(), id);
-        page->pcodeContent = *pcodeBytes;
+        page->pcodeContent = std::string(pcodeBytes->begin(), pcodeBytes->end());
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
@@ -489,7 +489,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
         auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
-        page->nssContent = *nssBytes;
+        page->nssContent = std::string(nssBytes->begin(), nssBytes->end());
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
     });

@@ -24,6 +24,10 @@ inline std::string describe(const std::string &s) {
     return str(boost::format("%s (%d)") % reone::hexify(s) % s.length());
 }
 
+inline std::string describe(const reone::ByteArray &ba) {
+    return str(boost::format("%s (%d)") % reone::hexify(ba) % ba.size());
+}
+
 inline std::string describe(const glm::vec2 &v) {
     std::ostringstream ss;
     ss << "[";

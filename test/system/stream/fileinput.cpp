@@ -45,7 +45,8 @@ TEST(file_input_stream, should_read_from_file) {
     stream.seek(-1, SeekOrigin::Current);
     size_t position2 = stream.position();
     int readResult = stream.read(&buf[0], 16);
-    auto contents = buf.substr(0, 13);
+    std::string contents;
+    contents.insert(contents.begin(), buf.begin(), buf.begin() + 13);
     int readByteResult2 = stream.readByte();
     bool eof = stream.eof();
     stream.close();

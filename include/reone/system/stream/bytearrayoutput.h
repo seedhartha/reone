@@ -35,6 +35,10 @@ public:
         _bytes.insert(_bytes.end(), bytes.begin(), bytes.end());
     }
 
+    void write(const std::string &str) override {
+        _bytes.insert(_bytes.end(), str.begin(), str.end());
+    }
+
     void write(const char *data, int length) override {
         size_t position = _bytes.size();
         _bytes.resize(position + static_cast<size_t>(length));
