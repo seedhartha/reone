@@ -21,7 +21,6 @@
 #include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
-
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
@@ -666,7 +665,11 @@ std::shared_ptr<ModelNode::Reference> MdlReader::readReference() {
 void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node) {
     uint16_t nodeFlags;
     if (animNode) {
-        nodeFlags = _nodeFlags.find(node.number())->second;
+        if (_nodeFlags.count(node.number()) == 0) {
+            return;
+        } else {
+            nodeFlags = 0;
+        }
     } else {
         nodeFlags = node.flags();
     }

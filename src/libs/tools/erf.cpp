@@ -41,7 +41,7 @@ void ErfTool::invoke(Operation operation, const boost::filesystem::path &input, 
     }
     case Operation::ToERF:
     case Operation::ToMOD:
-        toERF(operation, input);
+        toERF(operation, input, outputDir);
         break;
     }
 }
@@ -80,7 +80,7 @@ void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, co
     }
 }
 
-void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) {
+void ErfTool::toERF(Operation operation, const boost::filesystem::path &target, const boost::filesystem::path &destPath) {
     ErfWriter erf;
 
     for (auto &entry : boost::filesystem::directory_iterator(target)) {
@@ -124,7 +124,7 @@ void ErfTool::toERF(Operation operation, const boost::filesystem::path &target) 
         ext = ".erf";
     }
 
-    boost::filesystem::path erfPath(target.parent_path());
+    auto erfPath = destPath;
     erfPath.append(target.filename().string() + ext);
     erf.save(type, erfPath);
 }

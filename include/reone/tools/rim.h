@@ -37,7 +37,7 @@ public:
 
 private:
     void list(const resource::RimReader &rim);
-    void toRIM(const boost::filesystem::path &target);
+    void toRIM(const boost::filesystem::path &target, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

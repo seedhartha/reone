@@ -99,29 +99,7 @@ add_subdirectory(extern/tinyxml2) # tinyxml2 static library
 
 # Shaders
 
-file(GLOB GLSL_COMMON_FILES ${CMAKE_SOURCE_DIR}/glsl/common/*)
-foreach(FILE ${GLSL_COMMON_FILES})
-    get_filename_component(FILENAME ${FILE} NAME)
-    file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/glsl/common/${FILENAME} INPUT ${CMAKE_SOURCE_DIR}/glsl/common/${FILENAME})
-endforeach()
-
-file(GLOB GLSL_VERTEX_FILES ${CMAKE_SOURCE_DIR}/glsl/vertex/*)
-foreach(FILE ${GLSL_VERTEX_FILES})
-    get_filename_component(FILENAME ${FILE} NAME)
-    file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/glsl/vertex/${FILENAME} INPUT ${CMAKE_SOURCE_DIR}/glsl/vertex/${FILENAME})
-endforeach()
-
-file(GLOB GLSL_FRAGMENT_FILES ${CMAKE_SOURCE_DIR}/glsl/fragment/*)
-foreach(FILE ${GLSL_FRAGMENT_FILES})
-    get_filename_component(FILENAME ${FILE} NAME)
-    file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/glsl/fragment/${FILENAME} INPUT ${CMAKE_SOURCE_DIR}/glsl/fragment/${FILENAME})
-endforeach()
-
-file(GLOB GLSL_GEOMETRY_FILES ${CMAKE_SOURCE_DIR}/glsl/geometry/*)
-foreach(FILE ${GLSL_GEOMETRY_FILES})
-    get_filename_component(FILENAME ${FILE} NAME)
-    file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/glsl/geometry/${FILENAME} INPUT ${CMAKE_SOURCE_DIR}/glsl/geometry/${FILENAME})
-endforeach()
+add_custom_target(copy_shaders ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/shaders.erf ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/shaders.erf)
 
 # END Shaders
 

@@ -40,7 +40,7 @@ void RimTool::invoke(Operation operation, const boost::filesystem::path &input, 
         break;
     }
     case Operation::ToRIM:
-        toRIM(input);
+        toRIM(input, outputDir);
         break;
     default:
         break;
@@ -80,7 +80,7 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
     }
 }
 
-void RimTool::toRIM(const boost::filesystem::path &target) {
+void RimTool::toRIM(const boost::filesystem::path &target, const boost::filesystem::path &destPath) {
     RimWriter rim;
 
     for (auto &entry : boost::filesystem::directory_iterator(target)) {
@@ -113,7 +113,7 @@ void RimTool::toRIM(const boost::filesystem::path &target) {
         rim.add(std::move(res));
     }
 
-    boost::filesystem::path rimPath(target.parent_path());
+    auto rimPath = destPath;
     rimPath.append(target.filename().string() + ".rim");
     rim.save(rimPath);
 }

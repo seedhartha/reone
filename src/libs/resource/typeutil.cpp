@@ -77,7 +77,8 @@ static std::unordered_map<ResourceType, std::string> g_extByType {
     {ResourceType::Lip, "lip"},
     {ResourceType::Tpc, "tpc"},
     {ResourceType::Mdx, "mdx"},
-    {ResourceType::Mp3, "mp3"}};
+    {ResourceType::Mp3, "mp3"},
+    {ResourceType::Glsl, "glsl"}};
 
 static std::unordered_map<std::string, ResourceType> g_typeByExt;
 static bool g_typeByExtInited = false;

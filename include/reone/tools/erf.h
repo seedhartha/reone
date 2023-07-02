@@ -37,7 +37,7 @@ public:
 
 private:
     void list(const resource::ErfReader &erf);
-    void toERF(Operation operation, const boost::filesystem::path &target);
+    void toERF(Operation operation, const boost::filesystem::path &target, const boost::filesystem::path &destPath);
 };
 
 } // namespace reone

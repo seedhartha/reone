@@ -79,6 +79,7 @@ enum class ResourceType : uint16_t {
     Mdx = 3008,
 
     Mp3 = 0x1000,
+    Glsl = 0x1001,
 
     Invalid = 0xffff
 };

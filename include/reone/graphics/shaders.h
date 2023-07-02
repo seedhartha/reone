@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/resource/provider/erf.h"
+
 #include "shader.h"
 #include "shaderprogram.h"
 
@@ -84,7 +86,9 @@ private:
     bool _inited {false};
 
     ShaderProgramId _usedProgram {ShaderProgramId::None};
-    std::map<std::string, std::string> _sourceFiles;
+
+    std::unique_ptr<resource::ErfResourceProvider> _sourceProvider;
+    std::map<std::string, std::string> _resRefToSource;
 
     // Shader Programs
 
@@ -118,7 +122,7 @@ private:
 
     // END Shader Programs
 
-    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sourceFiles);
+    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sourceResRefs);
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
 
     ShaderProgram &getProgram(ShaderProgramId id);

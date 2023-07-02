@@ -48,6 +48,14 @@ public:
         return _stream.str();
     }
 
+    bool empty() {
+        auto pos = _stream.tellp();
+        _stream.seekp(0, std::ios::end);
+        auto empty = _stream.tellp() == 0;
+        _stream.seekp(pos);
+        return empty;
+    }
+
 private:
     std::ostringstream _stream;
 };

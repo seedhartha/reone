@@ -49,7 +49,7 @@ void Shader::init() {
     GLint success;
     glGetShaderiv(_nameGL, GL_COMPILE_STATUS, &success);
     if (!success) {
-        char log[512];
+        char log[4096];
         GLsizei logSize;
         glGetShaderInfoLog(_nameGL, sizeof(log), &logSize, log);
         throw std::runtime_error(str(boost::format("Failed compiling shader %d: %s") % static_cast<int>(_nameGL) % std::string(log, logSize)));

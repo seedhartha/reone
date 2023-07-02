@@ -18,116 +18,125 @@
 #include "reone/graphics/shaders.h"
 
 #include "reone/graphics/options.h"
-#include "reone/system/stream/fileinput.h"
 #include "reone/system/stringbuilder.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace graphics {
 
-static const std::string kGlslHeader = "common/header.glsl";
-static const std::string kGlslGeneralUniforms = "common/generaluniforms.glsl";
-static const std::string kGlslSkeletalUniforms = "common/skeletaluniforms.glsl";
-static const std::string kGlslWalkmeshUniforms = "common/walkmeshuniforms.glsl";
-static const std::string kGlslParticleUniforms = "common/particleuniforms.glsl";
-static const std::string kGlslGrassUniforms = "common/grassuniforms.glsl";
-static const std::string kGlslTextUniforms = "common/textuniforms.glsl";
-static const std::string kGlslPointsUniforms = "common/pointsuniforms.glsl";
-static const std::string kGlslSSAOUniforms = "common/ssaouniforms.glsl";
-static const std::string kGlslLightingUniforms = "common/lightinguniforms.glsl";
-static const std::string kGlslMath = "common/math.glsl";
-static const std::string kGlslHash = "common/hash.glsl";
-static const std::string kGlslHashedAlphaTest = "common/hashedalphatest.glsl";
-static const std::string kGlslEnvironmentMapping = "common/environmentmapping.glsl";
-static const std::string kGlslNormalMapping = "common/normalmapping.glsl";
-static const std::string kGlslOIT = "common/oit.glsl";
-static const std::string kGlslLuma = "common/luma.glsl";
-static const std::string kGlslBRDF = "common/brdf.glsl";
-static const std::string kGlslLighting = "common/lighting.glsl";
-static const std::string kGlslShadowMapping = "common/shadowmapping.glsl";
-static const std::string kGlslFog = "common/fog.glsl";
+static const std::string kResRefBRDF = "brdf";
+static const std::string kResRefEnvMap = "envmap";
+static const std::string kResRefFog = "fog";
+static const std::string kResRefHash = "hash";
+static const std::string kResRefHashedAlphaTest = "hashedalphatest";
+static const std::string kResRefLighting = "lighting";
+static const std::string kResRefLuma = "luma";
+static const std::string kResRefMath = "math";
+static const std::string kResRefNormalMap = "normalmap";
+static const std::string kResRefOIT = "oit";
+static const std::string kResRefShadowMap = "shadowmap";
 
-static const std::string kVsObjectSpace = "vertex/objectspace.glsl";
-static const std::string kVsClipSpace = "vertex/clipspace.glsl";
-static const std::string kVsShadows = "vertex/shadows.glsl";
-static const std::string kVsModel = "vertex/model.glsl";
-static const std::string kVsWalkmesh = "vertex/walkmesh.glsl";
-static const std::string kVsBillboard = "vertex/billboard.glsl";
-static const std::string kVsParticle = "vertex/particle.glsl";
-static const std::string kVsGrass = "vertex/grass.glsl";
-static const std::string kVsText = "vertex/text.glsl";
-static const std::string kVsPoints = "vertex/points.glsl";
+static const std::string kResRefUniformsGeneral = "u_general";
+static const std::string kResRefUniformsGrass = "u_grass";
+static const std::string kResRefUniformsLighting = "u_lighting";
+static const std::string kResRefUniformsParticle = "u_particle";
+static const std::string kResRefUniformsPoints = "u_points";
+static const std::string kResRefUniformsSkeletal = "u_skeletal";
+static const std::string kResRefUniformsSSAO = "u_ssao";
+static const std::string kResRefUniformsText = "u_text";
+static const std::string kResRefUniformsWalkmesh = "u_walkmesh";
 
-static const std::string kGsPointLightShadows = "geometry/pointlightshadows.glsl";
-static const std::string kGsDirectionalLightShadows = "geometry/directionallightshadows.glsl";
+static const std::string kResRefVertexBillboard = "v_billboard";
+static const std::string kResRefVertexClipSpace = "v_clipspace";
+static const std::string kResRefVertexGrass = "v_grass";
+static const std::string kResRefVertexModel = "v_model";
+static const std::string kResRefVertexObjectSpace = "v_objectspace";
+static const std::string kResRefVertexParticle = "v_particle";
+static const std::string kResRefVertexPoints = "v_points";
+static const std::string kResRefVertexShadows = "v_shadows";
+static const std::string kResRefVertexText = "v_text";
+static const std::string kResRefVertexWalkmesh = "v_walkmesh";
 
-static const std::string kFsColor = "fragment/color.glsl";
-static const std::string kFsTexture = "fragment/texture.glsl";
-static const std::string kFsGUI = "fragment/gui.glsl";
-static const std::string kFsText = "fragment/text.glsl";
-static const std::string kFsPointLightShadows = "fragment/pointlightshadows.glsl";
-static const std::string kFsDirectionalLightShadows = "fragment/directionallightshadows.glsl";
-static const std::string kFsModelOpaque = "fragment/modelopaque.glsl";
-static const std::string kFsModelTransparent = "fragment/modeltransparent.glsl";
-static const std::string kFsAABB = "fragment/aabb.glsl";
-static const std::string kFsWalkmesh = "fragment/walkmesh.glsl";
-static const std::string kFsBillboard = "fragment/billboard.glsl";
-static const std::string kFsParticle = "fragment/particle.glsl";
-static const std::string kFsGrass = "fragment/grass.glsl";
-static const std::string kFsSSAO = "fragment/ssao.glsl";
-static const std::string kFsSSR = "fragment/ssr.glsl";
-static const std::string kFsCombineOpaque = "fragment/combineopaque.glsl";
-static const std::string kFsCombineGeometry = "fragment/combinegeometry.glsl";
-static const std::string kFsBoxBlur4 = "fragment/boxblur4.glsl";
-static const std::string kFsGaussianBlur9 = "fragment/gaussianblur9.glsl";
-static const std::string kFsGaussianBlur13 = "fragment/gaussianblur13.glsl";
-static const std::string kFsMedianFilter3 = "fragment/medianfilter3.glsl";
-static const std::string kFsMedianFilter5 = "fragment/medianfilter5.glsl";
-static const std::string kFsFXAA = "fragment/fxaa.glsl";
-static const std::string kFsSharpen = "fragment/sharpen.glsl";
+static const std::string kResRefGeometryDirLightShadows = "g_dirlightshadow";
+static const std::string kResRefGeometryPointLightShadows = "g_ptlightshadow";
+
+static const std::string kResRefFragmentAABB = "f_aabb";
+static const std::string kResRefFragmentBillboard = "f_billboard";
+static const std::string kResRefFragmentBoxBlur4 = "f_boxblur4";
+static const std::string kResRefFragmentColor = "f_color";
+static const std::string kResRefFragmentCombineGeometry = "f_combinegeom";
+static const std::string kResRefFragmentCombineOpaque = "f_combineopaque";
+static const std::string kResRefFragmentDirLightShadows = "f_dirlightshadow";
+static const std::string kResRefFragmentFXAA = "f_fxaa";
+static const std::string kResRefFragmentGaussianBlur13 = "f_gaussianblur13";
+static const std::string kResRefFragmentGaussianBlur9 = "f_gaussianblur9";
+static const std::string kResRefFragmentGrass = "f_grass";
+static const std::string kResRefFragmentGUI = "f_gui";
+static const std::string kResRefFragmentMedianFilter3 = "f_medianfilter3";
+static const std::string kResRefFragmentMedianFilter5 = "f_medianfilter5";
+static const std::string kResRefFragmentModelOpaque = "f_modelopaque";
+static const std::string kResRefFragmentModelTransparent = "f_modeltransp";
+static const std::string kResRefFragmentParticle = "f_particle";
+static const std::string kResRefFragmentPointLightShadows = "f_ptlightshadow";
+static const std::string kResRefFragmentSharpen = "f_sharpen";
+static const std::string kResRefFragmentSSAO = "f_ssao";
+static const std::string kResRefFragmentSSR = "f_ssr";
+static const std::string kResRefFragmentText = "f_text";
+static const std::string kResRefFragmentTexture = "f_texture";
+static const std::string kResRefFragmentWalkmesh = "f_walkmesh";
 
 void Shaders::init() {
     if (_inited) {
         return;
     }
 
+    auto shadersErfPath = boost::filesystem::current_path();
+    shadersErfPath.append("shaders.erf");
+    if (!boost::filesystem::exists(shadersErfPath)) {
+        throw std::runtime_error("File not found: " + shadersErfPath.string());
+    }
+    _sourceProvider = std::make_unique<ErfResourceProvider>(shadersErfPath);
+    _sourceProvider->init();
+
     // Shaders
-    auto vsObjectSpace = initShader(ShaderType::Vertex, {kVsObjectSpace});
-    auto vsClipSpace = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kVsClipSpace});
-    auto vsShadows = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kVsShadows});
-    auto vsModel = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslSkeletalUniforms, kVsModel});
-    auto vsWalkmesh = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslWalkmeshUniforms, kVsWalkmesh});
-    auto vsBillboard = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kVsBillboard});
-    auto vsParticle = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslParticleUniforms, kVsParticle});
-    auto vsGrass = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslGrassUniforms, kVsGrass});
-    auto vsText = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslTextUniforms, kVsText});
-    auto vsPoints = initShader(ShaderType::Vertex, {kGlslGeneralUniforms, kGlslPointsUniforms, kVsPoints});
-    auto gsPointLightShadows = initShader(ShaderType::Geometry, {kGlslGeneralUniforms, kGsPointLightShadows});
-    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {kGlslGeneralUniforms, kGsDirectionalLightShadows});
-    auto fsColor = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsColor});
-    auto fsTexture = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsTexture});
-    auto fsGUI = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsGUI});
-    auto fsText = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslTextUniforms, kFsText});
-    auto fsPointLightShadows = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsPointLightShadows});
-    auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {kFsDirectionalLightShadows});
-    auto fsModelOpaque = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslMath, kGlslHash, kGlslHashedAlphaTest, kGlslEnvironmentMapping, kGlslNormalMapping, kFsModelOpaque});
-    auto fsModelTransparent = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslMath, kGlslEnvironmentMapping, kGlslNormalMapping, kGlslOIT, kGlslLuma, kFsModelTransparent});
-    auto fsAABB = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsAABB});
-    auto fsWalkmesh = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslWalkmeshUniforms, kFsWalkmesh});
-    auto fsBillboard = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsBillboard});
-    auto fsParticle = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslParticleUniforms, kGlslOIT, kGlslLuma, kFsParticle});
-    auto fsGrass = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslGrassUniforms, kGlslHash, kGlslHashedAlphaTest, kFsGrass});
-    auto fsSSAO = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslSSAOUniforms, kFsSSAO});
-    auto fsSSR = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslLightingUniforms, kGlslMath, kGlslBRDF, kGlslLighting, kGlslLuma, kGlslShadowMapping, kGlslFog, kFsCombineOpaque});
-    auto fsCombineGeometry = initShader(ShaderType::Fragment, {kFsCombineGeometry});
-    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsBoxBlur4});
-    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsGaussianBlur9});
-    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsGaussianBlur13});
-    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsMedianFilter3});
-    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsMedianFilter5});
-    auto fsFXAA = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kGlslLuma, kFsFXAA});
-    auto fsSharpen = initShader(ShaderType::Fragment, {kGlslGeneralUniforms, kFsSharpen});
+    auto vsObjectSpace = initShader(ShaderType::Vertex, {kResRefVertexObjectSpace});
+    auto vsClipSpace = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefVertexClipSpace});
+    auto vsShadows = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefVertexShadows});
+    auto vsModel = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsSkeletal, kResRefVertexModel});
+    auto vsWalkmesh = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsWalkmesh, kResRefVertexWalkmesh});
+    auto vsBillboard = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefVertexBillboard});
+    auto vsParticle = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsParticle, kResRefVertexParticle});
+    auto vsGrass = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsGrass, kResRefVertexGrass});
+    auto vsText = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsText, kResRefVertexText});
+    auto vsPoints = initShader(ShaderType::Vertex, {kResRefUniformsGeneral, kResRefUniformsPoints, kResRefVertexPoints});
+    auto gsPointLightShadows = initShader(ShaderType::Geometry, {kResRefUniformsGeneral, kResRefGeometryPointLightShadows});
+    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {kResRefUniformsGeneral, kResRefGeometryDirLightShadows});
+    auto fsColor = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentColor});
+    auto fsTexture = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentTexture});
+    auto fsGUI = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentGUI});
+    auto fsText = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsText, kResRefFragmentText});
+    auto fsPointLightShadows = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentPointLightShadows});
+    auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {kResRefFragmentDirLightShadows});
+    auto fsModelOpaque = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefMath, kResRefHash, kResRefHashedAlphaTest, kResRefEnvMap, kResRefNormalMap, kResRefFragmentModelOpaque});
+    auto fsModelTransparent = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefMath, kResRefEnvMap, kResRefNormalMap, kResRefOIT, kResRefLuma, kResRefFragmentModelTransparent});
+    auto fsAABB = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentAABB});
+    auto fsWalkmesh = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsWalkmesh, kResRefFragmentWalkmesh});
+    auto fsBillboard = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentBillboard});
+    auto fsParticle = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsParticle, kResRefOIT, kResRefLuma, kResRefFragmentParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsGrass, kResRefHash, kResRefHashedAlphaTest, kResRefFragmentGrass});
+    auto fsSSAO = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsSSAO, kResRefFragmentSSAO});
+    auto fsSSR = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentSSR});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefUniformsLighting, kResRefMath, kResRefBRDF, kResRefLighting, kResRefLuma, kResRefShadowMap, kResRefFog, kResRefFragmentCombineOpaque});
+    auto fsCombineGeometry = initShader(ShaderType::Fragment, {kResRefFragmentCombineGeometry});
+    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentBoxBlur4});
+    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentGaussianBlur9});
+    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentGaussianBlur13});
+    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentMedianFilter3});
+    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentMedianFilter5});
+    auto fsFXAA = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefLuma, kResRefFragmentFXAA});
+    auto fsSharpen = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentSharpen});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsClipSpace, fsColor});
@@ -203,37 +212,31 @@ void Shaders::use(ShaderProgramId programId) {
     _usedProgram = programId;
 }
 
-std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::string> sourceFiles) {
+std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::string> sourceResRefs) {
     std::list<std::string> sources;
-    sources.push_back("#version 330 core");
+    sources.push_back("#version 330 core\n\n");
     auto defines = StringBuilder();
-    defines.append("\n");
     if (_options.ssr) {
         defines.append("#define R_SSR\n");
     }
     if (_options.ssao) {
         defines.append("#define R_SSAO\n");
     }
-    defines.append("\n");
-    sources.push_back(defines.build());
-    for (auto &file : sourceFiles) {
+    if (!defines.empty()) {
+        defines.append("\n");
+        sources.push_back(defines.build());
+    }
+    for (auto &resRef : sourceResRefs) {
         std::string source;
-        if (_sourceFiles.count(file) > 0) {
-            source = _sourceFiles.at(file);
+        if (_resRefToSource.count(resRef) > 0) {
+            source = _resRefToSource.at(resRef);
         } else {
-            auto path = boost::filesystem::current_path();
-            path.append("glsl");
-            path.append(file);
-            if (!boost::filesystem::exists(path)) {
-                throw std::runtime_error("GLSL file not found: " + path.string());
+            auto bytes = _sourceProvider->find(ResourceId(resRef, ResourceType::Glsl));
+            if (!bytes) {
+                throw std::runtime_error("Shader source not found: " + resRef);
             }
-            auto stream = FileInputStream(path);
-            stream.seek(0, SeekOrigin::End);
-            auto filesize = stream.position();
-            stream.seek(0, SeekOrigin::Begin);
-            source.resize(filesize);
-            stream.read(&source[0], filesize);
-            _sourceFiles[file] = source;
+            source = std::string(bytes->begin(), bytes->end());
+            _resRefToSource[resRef] = source;
         }
         sources.push_back(std::move(source));
     }

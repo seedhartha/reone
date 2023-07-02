@@ -35,10 +35,9 @@ void ShaderProgram::init() {
 
     GLint success;
     glGetProgramiv(_nameGL, GL_LINK_STATUS, &success);
-
-    char log[512];
-    GLsizei logSize;
     if (!success) {
+        char log[4096];
+        GLsizei logSize;
         glGetProgramInfoLog(_nameGL, sizeof(log), &logSize, log);
         throw std::runtime_error("Failed linking shader program: " + std::string(log, logSize));
     }
