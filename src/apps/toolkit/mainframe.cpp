@@ -775,17 +775,35 @@ void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
 }
 
 void MainFrame::InvokeTool(Operation operation) {
-    auto srcFileDialog = new wxFileDialog(
-        nullptr,
-        "Choose source file",
-        "",
-        "",
-        wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
-        wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
-    if (srcFileDialog->ShowModal() != wxID_OK) {
-        return;
+    boost::filesystem::path srcPath;
+    switch (operation) {
+    case Operation::ToERF:
+    case Operation::ToRIM:
+    case Operation::ToMOD: {
+        auto srcDirDialog = new wxDirDialog(
+            nullptr,
+            "Choose source directory",
+            "",
+            wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+        if (srcDirDialog->ShowModal() != wxID_OK) {
+            return;
+        }
+        srcPath = (std::string)srcDirDialog->GetPath();
+    } break;
+    default: {
+        auto srcFileDialog = new wxFileDialog(
+            nullptr,
+            "Choose source file",
+            "",
+            "",
+            wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
+            wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
+        if (srcFileDialog->ShowModal() != wxID_OK) {
+            return;
+        }
+        srcPath = (std::string)srcFileDialog->GetPath();
+    } break;
     }
-    auto srcPath = boost::filesystem::path((std::string)srcFileDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
