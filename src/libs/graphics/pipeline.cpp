@@ -632,7 +632,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(ShaderProgramId::GaussianBlur9);
+    _shaders.use(strong ? ShaderProgramId::GaussianBlur13 : ShaderProgramId::GaussianBlur9);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
@@ -645,7 +645,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(ShaderProgramId::MedianFilter3);
+    _shaders.use(strong ? ShaderProgramId::MedianFilter5 : ShaderProgramId::MedianFilter3);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();

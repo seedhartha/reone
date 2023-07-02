@@ -280,7 +280,7 @@ void MeshSceneNode::draw() {
         });
     }
 
-    _graphicsSvc.shaders.use(ShaderProgramId::ModelOpaque);
+    _graphicsSvc.shaders.use(transparent ? ShaderProgramId::ModelTransparent : ShaderProgramId::ModelOpaque);
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [&mesh]() {
         mesh->mesh->draw();
     });
@@ -297,7 +297,7 @@ void MeshSceneNode::drawShadow() {
         general.modelInv = _absTransformInv;
         general.alpha = _alpha;
     });
-    _graphicsSvc.shaders.use(ShaderProgramId::PointLightShadows);
+    _graphicsSvc.shaders.use(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::DirectionalLightShadows : ShaderProgramId::PointLightShadows);
     mesh->mesh->draw();
 }
 
