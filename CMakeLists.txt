@@ -21,6 +21,7 @@ set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 
 # Options
 
+option(BUILD_CODEGEN "build codegen application" ON)
 option(BUILD_TOOLKIT "build toolkit application" ON)
 option(BUILD_LAUNCHER "build launcher application" ON)
 option(BUILD_TESTS "build tests" ON)
@@ -101,6 +102,10 @@ add_subdirectory(extern/tinyxml2) # tinyxml2 static library
 
 add_subdirectory(src/apps/shaderpack) # shaderpack application
 add_subdirectory(src/apps/reone) # reone application
+
+if(BUILD_CODEGEN)
+    add_subdirectory(src/apps/codegen) # codegen application
+endif()
 
 if(BUILD_TOOLKIT)
     add_subdirectory(src/apps/toolkit) # toolkit application
