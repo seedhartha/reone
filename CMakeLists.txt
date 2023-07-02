@@ -73,13 +73,13 @@ endif()
 
 # END Dependencies
 
-# Compile Options
+# Compile options
 
 if(ENABLE_ASAN AND MSVC)
     add_compile_options("/fsanitize=address")
 endif()
 
-# END Compile Options
+# END Compile options
 
 # Libraries
 
@@ -97,14 +97,9 @@ add_subdirectory(extern/tinyxml2) # tinyxml2 static library
 
 # END Libraries
 
-# Shaders
-
-add_custom_target(copy_shaders ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/shaders.erf ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin/shaders.erf)
-
-# END Shaders
-
 # Applications
 
+add_subdirectory(src/apps/shaderpack) # shaderpack application
 add_subdirectory(src/apps/reone) # reone application
 
 if(BUILD_TOOLKIT)

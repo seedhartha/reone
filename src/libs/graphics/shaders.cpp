@@ -92,12 +92,12 @@ void Shaders::init() {
         return;
     }
 
-    auto shadersErfPath = boost::filesystem::current_path();
-    shadersErfPath.append("shaders.erf");
-    if (!boost::filesystem::exists(shadersErfPath)) {
-        throw std::runtime_error("File not found: " + shadersErfPath.string());
+    auto shaderpackPath = boost::filesystem::current_path();
+    shaderpackPath.append("shaderpack.erf");
+    if (!boost::filesystem::exists(shaderpackPath)) {
+        throw std::runtime_error("File not found: " + shaderpackPath.string());
     }
-    _sourceProvider = std::make_unique<ErfResourceProvider>(shadersErfPath);
+    _sourceProvider = std::make_unique<ErfResourceProvider>(shaderpackPath);
     _sourceProvider->init();
 
     // Shaders
