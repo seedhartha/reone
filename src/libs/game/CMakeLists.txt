@@ -212,6 +212,15 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/placeable.h
     ${GAME_INCLUDE_DIR}/object/placeablecamera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
+    ${GAME_INCLUDE_DIR}/object/template/utc.h
+    ${GAME_INCLUDE_DIR}/object/template/utd.h
+    ${GAME_INCLUDE_DIR}/object/template/ute.h
+    ${GAME_INCLUDE_DIR}/object/template/uti.h
+    ${GAME_INCLUDE_DIR}/object/template/utm.h
+    ${GAME_INCLUDE_DIR}/object/template/utp.h
+    ${GAME_INCLUDE_DIR}/object/template/uts.h
+    ${GAME_INCLUDE_DIR}/object/template/utt.h
+    ${GAME_INCLUDE_DIR}/object/template/utw.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
     ${GAME_INCLUDE_DIR}/options.h
@@ -417,6 +426,15 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/placeable.cpp
     ${GAME_SOURCE_DIR}/object/placeablecamera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
+    ${GAME_SOURCE_DIR}/object/template/utc.cpp
+    ${GAME_SOURCE_DIR}/object/template/utd.cpp
+    ${GAME_SOURCE_DIR}/object/template/ute.cpp
+    ${GAME_SOURCE_DIR}/object/template/uti.cpp
+    ${GAME_SOURCE_DIR}/object/template/utm.cpp
+    ${GAME_SOURCE_DIR}/object/template/utp.cpp
+    ${GAME_SOURCE_DIR}/object/template/uts.cpp
+    ${GAME_SOURCE_DIR}/object/template/utt.cpp
+    ${GAME_SOURCE_DIR}/object/template/utw.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp
     ${GAME_SOURCE_DIR}/object.cpp

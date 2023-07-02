@@ -153,7 +153,7 @@ static void writeField(const std::string &structPrefix,
         writer.put(str(boost::format("%s%s %s {0.0};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Char:
-        writer.put(str(boost::format("%s%s %s {'\0'};\n") % kIndent % typeStr % field.cppName));
+        writer.put(str(boost::format("%s%s %s {'\\0'};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Orientation:
         writer.put(str(boost::format("%s%s %s {1.0f, 0.0f, 0.0f, 0.0f};\n") % kIndent % typeStr % field.cppName));
