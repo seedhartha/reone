@@ -25,12 +25,20 @@ namespace resource {
 
 class ErfResourceProvider : public IResourceProvider {
 public:
+    struct Resource {
+        ResourceId id;
+        uint32_t offset {0};
+        uint32_t fileSize {0};
+    };
+
     ErfResourceProvider(boost::filesystem::path path, int id = kDefaultProviderId) :
         _path(std::move(path)),
         _id(id) {
     }
 
     void init();
+
+    const std::unordered_map<ResourceId, Resource, ResourceIdHasher> &resources() const { return _resources; }
 
     // IResourceProvider
 
@@ -41,12 +49,6 @@ public:
     // END IResourceProvider
 
 private:
-    struct Resource {
-        ResourceId id;
-        uint32_t offset {0};
-        uint32_t fileSize {0};
-    };
-
     boost::filesystem::path _path;
     int _id;
 

@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
             if (vars.count("destdir") == 0) {
                 throw std::runtime_error("Required destdir argument not specified");
             }
-            auto &destdirValue = vars["destdir"].as<boost::filesystem::path>();
+            auto &destdirValue = vars["destdir"].as<std::string>();
             auto destdir = boost::filesystem::path(destdirValue);
             if (!boost::filesystem::exists(destdir) || !boost::filesystem::is_directory(destdir)) {
                 throw std::runtime_error("Destination directory does not exist: " + destdir.string());
@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
             if (vars.count("destdir") == 0) {
                 throw std::runtime_error("Required destdir argument not specified");
             }
-            auto &destdirValue = vars["destdir"].as<boost::filesystem::path>();
+            auto &destdirValue = vars["destdir"].as<std::string>();
             auto destdir = boost::filesystem::path(destdirValue);
             if (!boost::filesystem::exists(destdir) || !boost::filesystem::is_directory(destdir)) {
                 throw std::runtime_error("Destination directory does not exist: " + destdir.string());

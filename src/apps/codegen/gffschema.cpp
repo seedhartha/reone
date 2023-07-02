@@ -17,12 +17,281 @@
 
 #include "gffschema.h"
 
+#include "reone/resource/format/gffreader.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/provider/erf.h"
+#include "reone/resource/provider/keybif.h"
+#include "reone/resource/provider/rim.h"
+#include "reone/resource/typeutil.h"
+#include "reone/system/fileutil.h"
+#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/fileoutput.h"
+#include "reone/system/textwriter.h"
+
+#include "templates.h"
+
+using namespace reone::resource;
+
 namespace reone {
+
+struct SchemaStruct;
+
+struct SchemaField {
+    Gff::FieldType type {Gff::FieldType::Void};
+    std::string name;
+    bool optional {false};
+    std::unique_ptr<SchemaStruct> subStruct;
+};
+
+struct SchemaStruct {
+    int index {0};
+    std::map<std::string, SchemaField> fields;
+};
+
+static void appendGffToSchema(Gff &tree, SchemaStruct &schemaStruct, int &structIdxCnt) {
+    std::set<std::string> fields;
+    for (auto &field : tree.fields()) {
+        if (schemaStruct.fields.count(field.label) == 0) {
+            SchemaField sf;
+            sf.type = field.type;
+            sf.name = field.label;
+            schemaStruct.fields[field.label] = std::move(sf);
+        }
+        auto &schemaField = schemaStruct.fields.at(field.label);
+        if ((field.type == Gff::FieldType::Struct || field.type == Gff::FieldType::List) && !field.children.empty()) {
+            if (!schemaField.subStruct) {
+                schemaField.subStruct = std::make_unique<SchemaStruct>();
+                schemaField.subStruct->index = ++structIdxCnt;
+            }
+            for (auto &child : field.children) {
+                appendGffToSchema(*field.children[0], *schemaField.subStruct, structIdxCnt);
+            }
+        }
+        fields.insert(field.label);
+    }
+    for (auto &[name, schemaField] : schemaStruct.fields) {
+        if (fields.count(name) == 0) {
+            schemaField.optional = true;
+        }
+    }
+}
+
+static std::string describeFieldType(const std::string &structPrefix, const SchemaField &field) {
+    switch (field.type) {
+    case Gff::FieldType::Byte:
+        return "uint8_t";
+    case Gff::FieldType::Char:
+        return "char";
+    case Gff::FieldType::Word:
+        return "uint16_t";
+    case Gff::FieldType::Short:
+        return "int16_t";
+    case Gff::FieldType::Dword:
+        return "uint32_t";
+    case Gff::FieldType::Int:
+        return "int";
+    case Gff::FieldType::Dword64:
+        return "uint64_t";
+    case Gff::FieldType::Int64:
+        return "int64_t";
+    case Gff::FieldType::Float:
+        return "float";
+    case Gff::FieldType::Double:
+        return "double";
+    case Gff::FieldType::CExoString:
+        return "std::string";
+    case Gff::FieldType::ResRef:
+        return "std::string";
+    case Gff::FieldType::CExoLocString:
+        return "std::pair<int, std::string>";
+    case Gff::FieldType::Void:
+        return "std::vector<char>";
+    case Gff::FieldType::Struct:
+        if (field.subStruct) {
+            return str(boost::format("%s_%03d") % structPrefix % field.subStruct->index);
+        } else {
+            return "void *";
+        }
+    case Gff::FieldType::List:
+        if (field.subStruct) {
+            return str(boost::format("std::vector<%s_%03d>") % structPrefix % field.subStruct->index);
+        } else {
+            return "std::vector<void *>";
+        }
+    case Gff::FieldType::Orientation:
+        return "glm::quat";
+    case Gff::FieldType::Vector:
+        return "glm::vec3";
+    case Gff::FieldType::StrRef:
+        return "int";
+    default:
+        throw std::invalid_argument("Invalid GFF field type: " + std::to_string(static_cast<int>(field.type)));
+    }
+}
+
+static void writeField(const std::string &structPrefix,
+                       const SchemaField &field,
+                       TextWriter &writer) {
+    auto typeStr = describeFieldType(structPrefix, field);
+    if (field.optional) {
+        writer.put(str(boost::format("%sstd::unique_ptr<%s> %s;\n") % kIndent % typeStr % field.name));
+    } else {
+        switch (field.type) {
+        case Gff::FieldType::Byte:
+        case Gff::FieldType::Word:
+        case Gff::FieldType::Short:
+        case Gff::FieldType::Dword:
+        case Gff::FieldType::Int:
+        case Gff::FieldType::Dword64:
+        case Gff::FieldType::Int64:
+        case Gff::FieldType::StrRef:
+            writer.put(str(boost::format("%s%s %s {0};\n") % kIndent % typeStr % field.name));
+            break;
+        case Gff::FieldType::Float:
+            writer.put(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.name));
+            break;
+        case Gff::FieldType::Double:
+            writer.put(str(boost::format("%s%s %s {0.0};\n") % kIndent % typeStr % field.name));
+            break;
+        case Gff::FieldType::Char:
+            writer.put(str(boost::format("%s%s %s {'\0'};\n") % kIndent % typeStr % field.name));
+            break;
+        case Gff::FieldType::Orientation:
+            writer.put(str(boost::format("%s%s %s {1.0f, 0.0f, 0.0f, 0.0f};\n") % kIndent % typeStr % field.name));
+            break;
+        case Gff::FieldType::Vector:
+            writer.put(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.name));
+            break;
+        default:
+            writer.put(str(boost::format("%s%s %s;\n") % kIndent % typeStr % field.name));
+            break;
+        }
+    }
+}
+
+static void writeStruct(const std::string &structPrefix,
+                        const SchemaStruct &schemaStruct,
+                        TextWriter &writer) {
+    writer.put(str(boost::format("struct %s_%03d {\n") % structPrefix % schemaStruct.index));
+    std::vector<const SchemaField *> optionalFields;
+    for (auto &[_, field] : schemaStruct.fields) {
+        if (!field.optional) {
+            writeField(structPrefix, field, writer);
+        } else {
+            optionalFields.push_back(&field);
+        }
+    }
+    if (!optionalFields.empty()) {
+        writer.put("\n");
+        for (auto &field : optionalFields) {
+            writeField(structPrefix, *field, writer);
+        }
+    }
+    writer.put("};\n\n");
+}
+
+static void writeSchemaFile(const std::string &structPrefix,
+                            const std::vector<std::pair<int, SchemaStruct *>> &structs,
+                            const boost::filesystem::path &path) {
+    auto stream = FileOutputStream(path);
+    auto writer = TextWriter(stream);
+    writer.put(kCopyrightNotice);
+    writer.put("\n\n");
+    writer.put("#pragma once\n\n");
+    writer.put("namespace reone {\n\n");
+    writer.put("namespace game {\n\n");
+    writer.put("namespace schema {\n\n");
+    for (auto &[_, schemaStruct] : structs) {
+        writeStruct(structPrefix, *schemaStruct, writer);
+    }
+    writer.put("} // namespace schema\n\n");
+    writer.put("} // namespace game\n\n");
+    writer.put("} // namespace reone\n");
+}
 
 void generateGffSchema(resource::ResourceType resType,
                        const boost::filesystem::path &k1dir,
                        const boost::filesystem::path &k2dir,
                        const boost::filesystem::path &destDir) {
+    std::map<std::string, std::shared_ptr<Gff>> trees;
+
+    auto keyPath = findFileIgnoreCase(k2dir, "chitin.key");
+    auto keyBif = KeyBifResourceProvider(keyPath);
+    keyBif.init();
+    for (auto &res : keyBif.resources()) {
+        if (res.first.type != resType) {
+            continue;
+        }
+        auto bytes = keyBif.find(res.first);
+        auto stream = ByteArrayInputStream(*bytes);
+        auto reader = GffReader();
+        reader.load(stream);
+        trees[res.first.resRef] = reader.root();
+    }
+
+    auto modulesPath = findFileIgnoreCase(k2dir, "modules");
+    for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
+        if (!boost::filesystem::is_regular_file(entry)) {
+            continue;
+        }
+        auto extension = boost::to_lower_copy(entry.path().extension().string());
+        if (extension == ".rim") {
+            auto rim = RimResourceProvider(entry.path());
+            rim.init();
+            for (auto &res : rim.resources()) {
+                if (res.first.type != resType) {
+                    continue;
+                }
+                auto bytes = rim.find(res.first);
+                auto stream = ByteArrayInputStream(*bytes);
+                auto reader = GffReader();
+                reader.load(stream);
+                trees[res.first.resRef] = reader.root();
+            }
+        } else if (extension == ".erf") {
+            auto erf = ErfResourceProvider(entry.path());
+            erf.init();
+            for (auto &res : erf.resources()) {
+                if (res.first.type != resType) {
+                    continue;
+                }
+                auto bytes = erf.find(res.first);
+                auto stream = ByteArrayInputStream(*bytes);
+                auto reader = GffReader();
+                reader.load(stream);
+                trees[res.first.resRef] = reader.root();
+            }
+        }
+    }
+
+    SchemaStruct schemaStruct;
+    int structIdxCnt = 0;
+    for (auto &tree : trees) {
+        appendGffToSchema(*tree.second, schemaStruct, structIdxCnt);
+    }
+    std::vector<std::pair<int, SchemaStruct *>> structs;
+    std::stack<std::pair<int, SchemaStruct *>> structStack;
+    structStack.push(std::make_pair(0, &schemaStruct));
+    while (!structStack.empty()) {
+        auto [depth, strct] = structStack.top();
+        structStack.pop();
+
+        structs.push_back(std::make_pair(depth, strct));
+
+        for (auto &[_, field] : strct->fields) {
+            if (field.subStruct) {
+                structStack.push(std::make_pair(depth + 1, field.subStruct.get()));
+            }
+        }
+    }
+    std::sort(structs.begin(), structs.end(), [](auto &l, auto &r) {
+        return l.first > r.first;
+    });
+
+    auto schemaFile = destDir;
+    schemaFile.append(getExtByResType(resType) + ".h");
+    auto structPrefix = boost::to_upper_copy(getExtByResType(resType));
+    writeSchemaFile(structPrefix, structs, schemaFile);
 }
 
 } // namespace reone

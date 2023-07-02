@@ -22,7 +22,8 @@ set(CODEGEN_SOURCES
 
 set(CODEGEN_HEADERS
     ${CODEGEN_SOURCE_DIR}/gffschema.h
-    ${CODEGEN_SOURCE_DIR}/routines.h)
+    ${CODEGEN_SOURCE_DIR}/routines.h
+    ${CODEGEN_SOURCE_DIR}/templates.h)
 
 add_executable(codegen ${CODEGEN_SOURCES} ${CODEGEN_HEADERS} ${CLANG_FORMAT_PATH})
 set_target_properties(codegen PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)

@@ -27,6 +27,8 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/textwriter.h"
 
+#include "templates.h"
+
 using namespace reone::resource;
 
 namespace reone {
@@ -37,25 +39,6 @@ static const boost::regex kConstVecRegex = boost::regex("^\\[\\s*([\\.\\d]+f?),\
 static const boost::regex kFuncDeclRegex = boost::regex("^(\\w+)\\s+(\\w+)\\s*\\((.*)\\);$");
 static const boost::regex kFuncArgRegEx = boost::regex("^(\\w+)\\s+(\\w+)(.*)$");
 static const boost::regex kFuncArgDefValRegEx = boost::regex("^(\\w+)\\s+(\\w+)\\s*=(.*)$");
-
-static const std::string kReoneCopyrightNotice = R"END(/*
- * Copyright (c) 2020-2023 The reone project contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */)END";
-
-static const std::string kReoneIndent = "    ";
 
 struct Constant {
     std::string type;
@@ -257,7 +240,7 @@ static void writeReoneRoutineInitArgExpr(int idx,
                                          const FunctionArgument &arg,
                                          const std::map<std::string, Constant> &constants,
                                          TextWriter &code) {
-    code.put(kReoneIndent + "auto " + arg.name + " = ");
+    code.put(kIndent + "auto " + arg.name + " = ");
     writeReoneRoutineGetArgExpr(idx, arg, constants, code);
     code.put(";\n");
 }
@@ -267,7 +250,7 @@ static void writeReoneRoutineImpl(const Function &func,
                                   TextWriter &code) {
     code.put(str(boost::format("static Variable %s(const std::vector<Variable> &args, const RoutineContext &ctx) {\n") % func.name));
     if (!func.args.empty()) {
-        code.put(kReoneIndent + "// Load\n");
+        code.put(kIndent + "// Load\n");
     }
     for (size_t i = 0; i < func.args.size(); ++i) {
         auto &arg = func.args[i];
@@ -275,10 +258,10 @@ static void writeReoneRoutineImpl(const Function &func,
     }
     if (!func.args.empty()) {
         code.put("\n");
-        code.put(kReoneIndent + "// Transform\n\n");
+        code.put(kIndent + "// Transform\n\n");
     }
-    code.put(kReoneIndent + "// Execute\n");
-    code.put(str(boost::format("%sthrow RoutineNotImplementedException(\"%s\");\n") % kReoneIndent % func.name));
+    code.put(kIndent + "// Execute\n");
+    code.put(str(boost::format("%sthrow RoutineNotImplementedException(\"%s\");\n") % kIndent % func.name));
     code.put("}\n\n");
 }
 
@@ -323,7 +306,7 @@ static void writeReoneRegisterRoutinesFunc(const std::string &category,
             args.push_back(nssTypeToMacro(arg.type));
         }
         auto argsStr = boost::join(args, ", ");
-        code.put(str(boost::format("%sroutines.insert(%d, \"%s\", %s, {%s}, &routine::%s);\n") % kReoneIndent % idx % func.name % retType % argsStr % func.name));
+        code.put(str(boost::format("%sroutines.insert(%d, \"%s\", %s, {%s}, &routine::%s);\n") % kIndent % idx % func.name % retType % argsStr % func.name));
     }
     code.put("}\n\n");
 }
@@ -335,12 +318,12 @@ static void writeReoneRoutineImplFile(const std::string &category,
                                       const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto code = TextWriter(stream);
-    code.put(kReoneCopyrightNotice + "\n\n");
-    code.put("#include \"reone/game/script/routine/argutil.h\"\n");
-    code.put("#include \"reone/game/script/routine/context.h\"\n");
-    code.put("#include \"reone/game/script/routines.h\"\n");
-    code.put("#include \"reone/script/routine/exception/notimplemented.h\"\n");
-    code.put("#include \"reone/script/variable.h\"\n");
+    code.put(kCopyrightNotice + "\n\n");
+    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/argutil.h"));
+    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/context.h"));
+    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routines.h"));
+    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/script/routine/exception/notimplemented.h"));
+    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/script/variable.h"));
     code.put("\n");
     code.put("#define R_VOID script::VariableType::Void\n");
     code.put("#define R_INT script::VariableType::Int\n");

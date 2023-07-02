@@ -27,12 +27,20 @@ class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:
+    struct Resource {
+        int bifIdx {0};
+        uint32_t bifOffset {0};
+        uint32_t fileSize {0};
+    };
+
     KeyBifResourceProvider(boost::filesystem::path keyPath, int id = kDefaultProviderId) :
         _keyPath(std::move(keyPath)),
         _id(id) {
     }
 
     void init();
+
+    const std::unordered_map<ResourceId, Resource, ResourceIdHasher> &resources() const { return _resources; }
 
     // IResourceProvider
 
@@ -43,12 +51,6 @@ public:
     // END IResourceProvider
 
 private:
-    struct Resource {
-        int bifIdx {0};
-        uint32_t bifOffset {0};
-        uint32_t fileSize {0};
-    };
-
     boost::filesystem::path _keyPath;
     int _id;
 
