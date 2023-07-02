@@ -14,7 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(CODEGEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/codegen)
-set(CODEGEN_SOURCES ${CODEGEN_SOURCE_DIR}/main.cpp)
+
+set(CODEGEN_SOURCES
+    ${CODEGEN_SOURCE_DIR}/main.cpp
+    ${CODEGEN_SOURCE_DIR}/routines.cpp)
 
 add_executable(codegen ${CODEGEN_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(codegen PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
