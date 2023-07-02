@@ -16,10 +16,15 @@
 set(CODEGEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/codegen)
 
 set(CODEGEN_SOURCES
+    ${CODEGEN_SOURCE_DIR}/gffschema.cpp
     ${CODEGEN_SOURCE_DIR}/main.cpp
     ${CODEGEN_SOURCE_DIR}/routines.cpp)
 
-add_executable(codegen ${CODEGEN_SOURCES} ${CLANG_FORMAT_PATH})
+set(CODEGEN_HEADERS
+    ${CODEGEN_SOURCE_DIR}/gffschema.h
+    ${CODEGEN_SOURCE_DIR}/routines.h)
+
+add_executable(codegen ${CODEGEN_SOURCES} ${CODEGEN_HEADERS} ${CLANG_FORMAT_PATH})
 set_target_properties(codegen PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(codegen PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(codegen PRIVATE resource system ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
