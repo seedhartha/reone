@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/template/utc.h"
+#include "reone/game/object/schema/utc.h"
 
 #include "reone/resource/gff.h"
 
