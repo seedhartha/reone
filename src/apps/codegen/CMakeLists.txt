@@ -17,11 +17,13 @@ set(CODEGEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/codegen)
 
 set(CODEGEN_SOURCES
     ${CODEGEN_SOURCE_DIR}/gffschema.cpp
+    ${CODEGEN_SOURCE_DIR}/guis.cpp
     ${CODEGEN_SOURCE_DIR}/main.cpp
     ${CODEGEN_SOURCE_DIR}/routines.cpp)
 
 set(CODEGEN_HEADERS
     ${CODEGEN_SOURCE_DIR}/gffschema.h
+    ${CODEGEN_SOURCE_DIR}/guis.h
     ${CODEGEN_SOURCE_DIR}/routines.h
     ${CODEGEN_SOURCE_DIR}/templates.h)
 

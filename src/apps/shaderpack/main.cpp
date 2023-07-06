@@ -15,9 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "reone/resource/format/erfwriter.h"

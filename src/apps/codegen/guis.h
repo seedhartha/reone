@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include "reone/resource/types.h"
+#include <boost/filesystem/path.hpp>
 
 namespace reone {
 
-void generateGffSchema(resource::ResourceType resType,
-                       const boost::filesystem::path &k1dir,
-                       const boost::filesystem::path &k2dir,
-                       const boost::filesystem::path &destDir);
+void generateGuis(const boost::filesystem::path &k1dir,
+                  const boost::filesystem::path &k2dir,
+                  const boost::filesystem::path &destDir);
 
 } // namespace reone

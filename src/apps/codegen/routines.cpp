@@ -17,9 +17,6 @@
 
 #include "routines.h"
 
-#include <iostream>
-
-#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
 #include "reone/resource/format/erfwriter.h"

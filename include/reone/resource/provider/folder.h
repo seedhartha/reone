@@ -28,12 +28,19 @@ namespace resource {
 
 class Folder : public IResourceProvider {
 public:
+    struct Resource {
+        boost::filesystem::path path;
+        ResourceType type;
+    };
+
     Folder(boost::filesystem::path path, int id = kDefaultProviderId) :
         _path(std::move(path)),
         _id(id) {
     }
 
     void init();
+
+    const std::multimap<std::string, Resource> &resources() const { return _resources; }
 
     // IResourceProvider
 
@@ -44,11 +51,6 @@ public:
     // END IResourceProvider
 
 private:
-    struct Resource {
-        boost::filesystem::path path;
-        ResourceType type;
-    };
-
     boost::filesystem::path _path;
     int _id;
 

@@ -290,11 +290,13 @@ static void writeParseFunction(const std::string &structPrefix,
 
 static void writeSchemaImplFile(const std::string &structPrefix,
                                 const std::vector<std::pair<int, SchemaStruct *>> &structs,
+                                const std::string &schemaHeaderFilename,
                                 const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
     writer.put(kCopyrightNotice);
     writer.put("\n\n");
+    writer.put(str(boost::format(kIncludeFormat + "\n\n") % schemaHeaderFilename));
     writer.put(str(boost::format(kIncludeFormat + "\n\n") % "reone/resource/gff.h"));
     writer.put("using namespace reone::resource;\n\n");
     writer.put("namespace reone {\n\n");
@@ -388,14 +390,15 @@ void generateGffSchema(resource::ResourceType resType,
     });
 
     auto structPrefix = boost::to_upper_copy(getExtByResType(resType));
+    auto schemaHeaderFilename = getExtByResType(resType) + ".h";
 
     auto schemaHeaderFile = destDir;
-    schemaHeaderFile.append(getExtByResType(resType) + ".h");
+    schemaHeaderFile.append(schemaHeaderFilename);
     writeSchemaHeaderFile(structPrefix, structs, schemaHeaderFile);
 
     auto schemaImplFile = destDir;
     schemaImplFile.append(getExtByResType(resType) + ".cpp");
-    writeSchemaImplFile(structPrefix, structs, schemaImplFile);
+    writeSchemaImplFile(structPrefix, structs, schemaHeaderFilename, schemaImplFile);
 }
 
 } // namespace reone

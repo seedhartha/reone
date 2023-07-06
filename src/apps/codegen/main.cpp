@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "reone/resource/types.h"
 #include "reone/resource/typeutil.h"
 
 #include "gffschema.h"
+#include "guis.h"
 #include "routines.h"
 
 using namespace reone;
@@ -105,6 +105,33 @@ int main(int argc, char **argv) {
                 throw std::runtime_error("Resource type not GFF compatible: " + restypeValue);
             }
             generateGffSchema(restype, k1dir, k2dir, destdir);
+
+        } else if (generator == "guis") {
+            if (vars.count("destdir") == 0) {
+                throw std::runtime_error("Required destdir argument not specified");
+            }
+            auto &destdirValue = vars["destdir"].as<std::string>();
+            auto destdir = boost::filesystem::path(destdirValue);
+            if (!boost::filesystem::exists(destdir) || !boost::filesystem::is_directory(destdir)) {
+                throw std::runtime_error("Destination directory does not exist: " + destdir.string());
+            }
+            if (vars.count("k1dir") == 0) {
+                throw std::runtime_error("Required k1dir argument not specified");
+            }
+            auto &k1dirValue = vars["k1dir"].as<std::string>();
+            auto k1dir = boost::filesystem::path(k1dirValue);
+            if (!boost::filesystem::exists(k1dir) || !boost::filesystem::is_directory(k1dir)) {
+                throw std::runtime_error("Directory not found: " + k1dir.string());
+            }
+            if (vars.count("k2dir") == 0) {
+                throw std::runtime_error("Required k2dir argument not specified");
+            }
+            auto &k2dirValue = vars["k2dir"].as<std::string>();
+            auto k2dir = boost::filesystem::path(k2dirValue);
+            if (!boost::filesystem::exists(k2dir) || !boost::filesystem::is_directory(k2dir)) {
+                throw std::runtime_error("Directory not found: " + k2dir.string());
+            }
+            generateGuis(k1dir, k2dir, destdir);
 
         } else {
             throw std::runtime_error("Invalid generator argument: " + generator);
