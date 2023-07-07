@@ -19,7 +19,6 @@
 
 #include "reone/resource/types.h"
 #include "reone/resource/typeutil.h"
-#include "reone/system/fileutil.h"
 
 #include "gffschema.h"
 #include "guis.h"
@@ -63,15 +62,7 @@ int main(int argc, char **argv) {
         }
 
         if (generator == "routines") {
-            auto k1NssPath = findFileIgnoreCase(k1Dir, "nwscript.nss");
-            if (k1NssPath.empty()) {
-                throw std::runtime_error("File not found: " + k1NssPath.string());
-            }
-            auto k2NssPath = findFileIgnoreCase(k1Dir, "nwscript.nss");
-            if (k2NssPath.empty()) {
-                throw std::runtime_error("File not found: " + k2NssPath.string());
-            }
-            generateRoutines(k1NssPath, k2NssPath, destDir);
+            generateRoutines(k1Dir, k2Dir, destDir);
 
         } else if (generator == "gffschema") {
             if (vars.count("restype") == 0) {

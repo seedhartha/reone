@@ -19,8 +19,10 @@
 
 #include <boost/regex.hpp>
 
-#include "reone/resource/format/erfwriter.h"
+#include "reone/resource/provider/keybif.h"
 #include "reone/system/exception/notimplemented.h"
+#include "reone/system/fileutil.h"
+#include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/textwriter.h"
 
@@ -145,11 +147,13 @@ static Function parseFunction(const boost::smatch &match) {
     return Function(retType, name, std::move(args));
 }
 
-static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseNwscriptNss(const boost::filesystem::path &path) {
+static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseNwscriptNss(IInputStream &nss) {
     std::map<std::string, Constant> constants;
     std::vector<Function> functions;
-    auto f = boost::filesystem::ifstream(path);
-    for (std::string line; std::getline(f, line);) {
+    char buf[8192];
+    while (!nss.eof()) {
+        nss.readLine(buf, sizeof(buf));
+        auto line = std::string(buf);
         boost::smatch constMatch;
         if (boost::regex_search(line, constMatch, kConstRegex)) {
             auto constant = parseConstant(constMatch);
@@ -347,10 +351,21 @@ static void writeReoneRoutineImplFile(const std::string &category,
     code.put("} // namespace reone\n\n");
 }
 
-void generateRoutines(const boost::filesystem::path &k1nssfile,
-                      const boost::filesystem::path &k2nssfile,
+void generateRoutines(const boost::filesystem::path &k1Dir,
+                      const boost::filesystem::path &k2Dir,
                       const boost::filesystem::path &destDir) {
-    auto [_, k1functions] = parseNwscriptNss(k1nssfile);
+    auto k1KeyPath = findFileIgnoreCase(k1Dir, "chitin.key");
+    if (k1KeyPath.empty()) {
+        throw std::runtime_error("File not found: " + k1KeyPath.string());
+    }
+    auto k1KeyBif = KeyBifResourceProvider(k1KeyPath);
+    k1KeyBif.init();
+    auto k1NssBytes = k1KeyBif.find(ResourceId("nwscript", ResourceType::Nss));
+    if (!k1NssBytes) {
+        throw std::runtime_error("KotOR nwscript.nss resource not found");
+    }
+    auto k1Nss = ByteArrayInputStream(*k1NssBytes);
+    auto [_, k1functions] = parseNwscriptNss(k1Nss);
     std::vector<std::tuple<int, Function>> k1mainFunctions;
     std::vector<std::tuple<int, Function>> k1actionFunctions;
     std::vector<std::tuple<int, Function>> k1effectFunctions;
@@ -368,7 +383,18 @@ void generateRoutines(const boost::filesystem::path &k1nssfile,
         }
     }
 
-    auto [k2constants, k2functions] = parseNwscriptNss(k2nssfile);
+    auto k2KeyPath = findFileIgnoreCase(k2Dir, "chitin.key");
+    if (k2KeyPath.empty()) {
+        throw std::runtime_error("File not found: " + k2KeyPath.string());
+    }
+    auto k2KeyBif = KeyBifResourceProvider(k1KeyPath);
+    k2KeyBif.init();
+    auto k2NssBytes = k2KeyBif.find(ResourceId("nwscript", ResourceType::Nss));
+    if (!k2NssBytes) {
+        throw std::runtime_error("TSL nwscript.nss resource not found");
+    }
+    auto k2Nss = ByteArrayInputStream(*k2NssBytes);
+    auto [k2constants, k2functions] = parseNwscriptNss(k2Nss);
     std::vector<std::tuple<int, Function>> k2mainFunctions;
     std::vector<std::tuple<int, Function>> k2actionFunctions;
     std::vector<std::tuple<int, Function>> k2effectFunctions;
