@@ -27,31 +27,41 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
-struct UTM_ItemList {
-    uint8_t Infinite {0};
-    std::string InventoryRes;
-    uint16_t Repos_PosX {0};
-    uint16_t Repos_Posy {0};
+struct UTI_PropertiesList {
+    uint8_t ChanceAppear {0};
+    uint8_t CostTable {0};
+    uint16_t CostValue {0};
+    uint8_t Param1 {0};
+    uint8_t Param1Value {0};
+    uint16_t PropertyName {0};
+    uint16_t Subtype {0};
+    uint8_t UpgradeType {0};
 };
 
-struct UTM {
-    uint8_t BuySellFlag {0};
+struct UTI {
+    uint32_t AddCost {0};
+    int BaseItem {0};
+    uint8_t BodyVariation {0};
+    uint8_t Charges {0};
     std::string Comment;
-    uint8_t ID {0};
-    std::vector<UTM_ItemList> ItemList;
-    std::pair<int, std::string> LocName;
-    int MarkDown {0};
-    int MarkUp {0};
-    std::string OnOpenStore;
-    std::string ResRef;
+    uint32_t Cost {0};
+    std::pair<int, std::string> DescIdentified;
+    std::pair<int, std::string> Description;
+    uint8_t Identified {0};
+    std::pair<int, std::string> LocalizedName;
+    uint8_t ModelVariation {0};
+    uint8_t PaletteID {0};
+    uint8_t Plot {0};
+    std::vector<UTI_PropertiesList> PropertiesList;
+    uint16_t StackSize {0};
+    uint8_t Stolen {0};
     std::string Tag;
+    std::string TemplateResRef;
+    uint8_t TextureVar {0};
+    uint8_t UpgradeLevel {0};
 };
 
-UTM parseUTM(const resource::Gff &gff);
-
-} // namespace schema
+UTI parseUTI(const resource::Gff &gff);
 
 } // namespace game
 

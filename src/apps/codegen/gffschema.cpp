@@ -187,7 +187,6 @@ static void writeSchemaHeaderFile(const std::string &topStructName,
     writer.put("class Gff;\n\n");
     writer.put("}\n\n");
     writer.put("namespace game {\n\n");
-    writer.put("namespace schema {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeStruct(*schemaStruct, writer);
     }
@@ -197,7 +196,6 @@ static void writeSchemaHeaderFile(const std::string &topStructName,
         }
     }
     writer.put("\n");
-    writer.put("} // namespace schema\n\n");
     writer.put("} // namespace game\n\n");
     writer.put("} // namespace reone\n");
 }
@@ -284,11 +282,9 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
     writer.put("using namespace reone::resource;\n\n");
     writer.put("namespace reone {\n\n");
     writer.put("namespace game {\n\n");
-    writer.put("namespace schema {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeParseFunction(*schemaStruct, writer);
     }
-    writer.put("} // namespace schema\n\n");
     writer.put("} // namespace game\n\n");
     writer.put("} // namespace reone\n");
 }

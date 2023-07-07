@@ -212,15 +212,15 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/placeable.h
     ${GAME_INCLUDE_DIR}/object/placeablecamera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
-    ${GAME_INCLUDE_DIR}/object/schema/utc.h
-    ${GAME_INCLUDE_DIR}/object/schema/utd.h
-    ${GAME_INCLUDE_DIR}/object/schema/ute.h
-    ${GAME_INCLUDE_DIR}/object/schema/uti.h
-    ${GAME_INCLUDE_DIR}/object/schema/utm.h
-    ${GAME_INCLUDE_DIR}/object/schema/utp.h
-    ${GAME_INCLUDE_DIR}/object/schema/uts.h
-    ${GAME_INCLUDE_DIR}/object/schema/utt.h
-    ${GAME_INCLUDE_DIR}/object/schema/utw.h
+    ${GAME_INCLUDE_DIR}/object/template/utc.h
+    ${GAME_INCLUDE_DIR}/object/template/utd.h
+    ${GAME_INCLUDE_DIR}/object/template/ute.h
+    ${GAME_INCLUDE_DIR}/object/template/uti.h
+    ${GAME_INCLUDE_DIR}/object/template/utm.h
+    ${GAME_INCLUDE_DIR}/object/template/utp.h
+    ${GAME_INCLUDE_DIR}/object/template/uts.h
+    ${GAME_INCLUDE_DIR}/object/template/utt.h
+    ${GAME_INCLUDE_DIR}/object/template/utw.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
     ${GAME_INCLUDE_DIR}/options.h
@@ -426,15 +426,15 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/placeable.cpp
     ${GAME_SOURCE_DIR}/object/placeablecamera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utc.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utd.cpp
-    ${GAME_SOURCE_DIR}/object/schema/ute.cpp
-    ${GAME_SOURCE_DIR}/object/schema/uti.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utm.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utp.cpp
-    ${GAME_SOURCE_DIR}/object/schema/uts.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utt.cpp
-    ${GAME_SOURCE_DIR}/object/schema/utw.cpp
+    ${GAME_SOURCE_DIR}/object/template/utc.cpp
+    ${GAME_SOURCE_DIR}/object/template/utd.cpp
+    ${GAME_SOURCE_DIR}/object/template/ute.cpp
+    ${GAME_SOURCE_DIR}/object/template/uti.cpp
+    ${GAME_SOURCE_DIR}/object/template/utm.cpp
+    ${GAME_SOURCE_DIR}/object/template/utp.cpp
+    ${GAME_SOURCE_DIR}/object/template/uts.cpp
+    ${GAME_SOURCE_DIR}/object/template/utt.cpp
+    ${GAME_SOURCE_DIR}/object/template/utw.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp
     ${GAME_SOURCE_DIR}/object.cpp

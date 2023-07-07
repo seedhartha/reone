@@ -27,43 +27,27 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
-struct UTS_Sounds {
-    std::string Sound;
+struct UTM_ItemList {
+    uint8_t Infinite {0};
+    std::string InventoryRes;
+    uint16_t Repos_PosX {0};
+    uint16_t Repos_Posy {0};
 };
 
-struct UTS {
-    uint8_t Active {0};
+struct UTM {
+    uint8_t BuySellFlag {0};
     std::string Comment;
-    uint8_t Continuous {0};
-    float Elevation {0.0f};
-    uint32_t Hours {0};
-    uint32_t Interval {0};
-    uint32_t IntervalVrtn {0};
+    uint8_t ID {0};
+    std::vector<UTM_ItemList> ItemList;
     std::pair<int, std::string> LocName;
-    uint8_t Looping {0};
-    float MaxDistance {0.0f};
-    float MinDistance {0.0f};
-    uint8_t PaletteID {0};
-    float PitchVariation {0.0f};
-    uint8_t Positional {0};
-    uint8_t Priority {0};
-    uint8_t Random {0};
-    uint8_t RandomPosition {0};
-    float RandomRangeX {0.0f};
-    float RandomRangeY {0.0f};
-    std::vector<UTS_Sounds> Sounds;
+    int MarkDown {0};
+    int MarkUp {0};
+    std::string OnOpenStore;
+    std::string ResRef;
     std::string Tag;
-    std::string TemplateResRef;
-    uint8_t Times {0};
-    uint8_t Volume {0};
-    uint8_t VolumeVrtn {0};
 };
 
-UTS parseUTS(const resource::Gff &gff);
-
-} // namespace schema
+UTM parseUTM(const resource::Gff &gff);
 
 } // namespace game
 

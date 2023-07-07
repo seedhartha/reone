@@ -27,8 +27,6 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
 struct UTC_ClassList_KnownList0 {
     uint16_t Spell {0};
     uint8_t SpellFlags {0};
@@ -146,8 +144,6 @@ struct UTC {
 };
 
 UTC parseUTC(const resource::Gff &gff);
-
-} // namespace schema
 
 } // namespace game
 

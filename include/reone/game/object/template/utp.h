@@ -27,8 +27,6 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
 struct UTP_ItemList {
     std::string InventoryRes;
     uint16_t Repos_PosX {0};
@@ -101,8 +99,6 @@ struct UTP {
 };
 
 UTP parseUTP(const resource::Gff &gff);
-
-} // namespace schema
 
 } // namespace game
 

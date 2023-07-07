@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/schema/ute.h"
+#include "reone/game/object/template/ute.h"
 
 #include "reone/resource/gff.h"
 
@@ -24,8 +24,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
-
-namespace schema {
 
 static UTE_CreatureList parseUTE_CreatureList(const Gff &gff) {
     UTE_CreatureList strct;
@@ -65,8 +63,6 @@ UTE parseUTE(const Gff &gff) {
     strct.TemplateResRef = gff.getString("TemplateResRef");
     return strct;
 }
-
-} // namespace schema
 
 } // namespace game
 

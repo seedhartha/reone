@@ -27,45 +27,39 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
-struct UTI_PropertiesList {
-    uint8_t ChanceAppear {0};
-    uint8_t CostTable {0};
-    uint16_t CostValue {0};
-    uint8_t Param1 {0};
-    uint8_t Param1Value {0};
-    uint16_t PropertyName {0};
-    uint16_t Subtype {0};
-    uint8_t UpgradeType {0};
+struct UTS_Sounds {
+    std::string Sound;
 };
 
-struct UTI {
-    uint32_t AddCost {0};
-    int BaseItem {0};
-    uint8_t BodyVariation {0};
-    uint8_t Charges {0};
+struct UTS {
+    uint8_t Active {0};
     std::string Comment;
-    uint32_t Cost {0};
-    std::pair<int, std::string> DescIdentified;
-    std::pair<int, std::string> Description;
-    uint8_t Identified {0};
-    std::pair<int, std::string> LocalizedName;
-    uint8_t ModelVariation {0};
+    uint8_t Continuous {0};
+    float Elevation {0.0f};
+    uint32_t Hours {0};
+    uint32_t Interval {0};
+    uint32_t IntervalVrtn {0};
+    std::pair<int, std::string> LocName;
+    uint8_t Looping {0};
+    float MaxDistance {0.0f};
+    float MinDistance {0.0f};
     uint8_t PaletteID {0};
-    uint8_t Plot {0};
-    std::vector<UTI_PropertiesList> PropertiesList;
-    uint16_t StackSize {0};
-    uint8_t Stolen {0};
+    float PitchVariation {0.0f};
+    uint8_t Positional {0};
+    uint8_t Priority {0};
+    uint8_t Random {0};
+    uint8_t RandomPosition {0};
+    float RandomRangeX {0.0f};
+    float RandomRangeY {0.0f};
+    std::vector<UTS_Sounds> Sounds;
     std::string Tag;
     std::string TemplateResRef;
-    uint8_t TextureVar {0};
-    uint8_t UpgradeLevel {0};
+    uint8_t Times {0};
+    uint8_t Volume {0};
+    uint8_t VolumeVrtn {0};
 };
 
-UTI parseUTI(const resource::Gff &gff);
-
-} // namespace schema
+UTS parseUTS(const resource::Gff &gff);
 
 } // namespace game
 

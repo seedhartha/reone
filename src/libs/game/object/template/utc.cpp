@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/schema/utc.h"
+#include "reone/game/object/template/utc.h"
 
 #include "reone/resource/gff.h"
 
@@ -24,8 +24,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
-
-namespace schema {
 
 static UTC_ClassList_KnownList0 parseUTC_ClassList_KnownList0(const Gff &gff) {
     UTC_ClassList_KnownList0 strct;
@@ -171,8 +169,6 @@ UTC parseUTC(const Gff &gff) {
     strct.willbonus = gff.getInt("willbonus");
     return strct;
 }
-
-} // namespace schema
 
 } // namespace game
 

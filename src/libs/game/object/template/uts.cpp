@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/schema/uts.h"
+#include "reone/game/object/template/uts.h"
 
 #include "reone/resource/gff.h"
 
@@ -24,8 +24,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
-
-namespace schema {
 
 static UTS_Sounds parseUTS_Sounds(const Gff &gff) {
     UTS_Sounds strct;
@@ -64,8 +62,6 @@ UTS parseUTS(const Gff &gff) {
     strct.VolumeVrtn = gff.getUint("VolumeVrtn");
     return strct;
 }
-
-} // namespace schema
 
 } // namespace game
 

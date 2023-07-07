@@ -27,44 +27,21 @@ class Gff;
 
 namespace game {
 
-namespace schema {
-
-struct UTE_CreatureList {
-    int Appearance {0};
-    float CR {0.0f};
-    int GuaranteedCount {0};
-    std::string ResRef;
-    uint8_t SingleSpawn {0};
-};
-
-struct UTE {
-    uint8_t Active {0};
+struct UTW {
+    uint8_t Appearance {0};
     std::string Comment;
-    std::vector<UTE_CreatureList> CreatureList;
-    int Difficulty {0};
-    int DifficultyIndex {0};
-    uint32_t Faction {0};
+    std::pair<int, std::string> Description;
+    uint8_t HasMapNote {0};
+    std::string LinkedTo;
     std::pair<int, std::string> LocalizedName;
-    int MaxCreatures {0};
-    std::string OnEntered;
-    std::string OnExhausted;
-    std::string OnExit;
-    std::string OnHeartbeat;
-    std::string OnUserDefined;
+    std::pair<int, std::string> MapNote;
+    uint8_t MapNoteEnabled {0};
     uint8_t PaletteID {0};
-    uint8_t PlayerOnly {0};
-    int RecCreatures {0};
-    uint8_t Reset {0};
-    int ResetTime {0};
-    int Respawns {0};
-    int SpawnOption {0};
     std::string Tag;
     std::string TemplateResRef;
 };
 
-UTE parseUTE(const resource::Gff &gff);
-
-} // namespace schema
+UTW parseUTW(const resource::Gff &gff);
 
 } // namespace game
 

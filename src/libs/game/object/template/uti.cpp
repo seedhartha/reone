@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/schema/uti.h"
+#include "reone/game/object/template/uti.h"
 
 #include "reone/resource/gff.h"
 
@@ -24,8 +24,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
-
-namespace schema {
 
 static UTI_PropertiesList parseUTI_PropertiesList(const Gff &gff) {
     UTI_PropertiesList strct;
@@ -66,8 +64,6 @@ UTI parseUTI(const Gff &gff) {
     strct.UpgradeLevel = gff.getUint("UpgradeLevel");
     return strct;
 }
-
-} // namespace schema
 
 } // namespace game
 
