@@ -59,16 +59,16 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
     tgaPath.replace_extension("tga");
 
     auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
-    auto txiBytes = std::make_unique<ByteArray>();
-    auto txiMemory = ByteArrayOutputStream(*txiBytes);
+    auto txiBytes = ByteArray();
+    auto txiMemory = ByteArrayOutputStream(txiBytes);
     toTGA(tpc, tga, txiMemory, true);
 
-    if (!txiBytes->empty()) {
+    if (!txiBytes.empty()) {
         auto txiPath = tgaPath;
         txiPath.replace_extension("txi");
 
         auto txi = FileOutputStream(txiPath, OpenMode::Binary);
-        txi.write(&(*txiBytes)[0], txiBytes->size());
+        txi.write(&txiBytes[0], txiBytes.size());
     }
 }
 
