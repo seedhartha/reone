@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static UTP_001 parseUTP_001(const Gff &gff) {
-    UTP_001 strct;
+static UTP_ItemList parseUTP_ItemList(const Gff &gff) {
+    UTP_ItemList strct;
     strct.InventoryRes = gff.getString("InventoryRes");
     strct.Repos_PosX = gff.getUint("Repos_PosX");
     strct.Repos_Posy = gff.getUint("Repos_Posy");
@@ -55,7 +55,7 @@ UTP parseUTP(const Gff &gff) {
     strct.Interruptable = gff.getUint("Interruptable");
     strct.IsComputer = gff.getUint("IsComputer");
     for (auto &item : gff.getList("ItemList")) {
-        strct.ItemList.push_back(parseUTP_001(*item));
+        strct.ItemList.push_back(parseUTP_ItemList(*item));
     }
     strct.KeyName = gff.getString("KeyName");
     strct.KeyRequired = gff.getUint("KeyRequired");

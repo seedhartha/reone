@@ -27,30 +27,30 @@ namespace game {
 
 namespace schema {
 
-static UTC_007 parseUTC_007(const Gff &gff) {
-    UTC_007 strct;
+static UTC_ClassList_KnownList0 parseUTC_ClassList_KnownList0(const Gff &gff) {
+    UTC_ClassList_KnownList0 strct;
     strct.Spell = gff.getUint("Spell");
     strct.SpellFlags = gff.getUint("SpellFlags");
     strct.SpellMetaMagic = gff.getUint("SpellMetaMagic");
     return strct;
 }
 
-static UTC_006 parseUTC_006(const Gff &gff) {
-    UTC_006 strct;
+static UTC_SpecAbilityList parseUTC_SpecAbilityList(const Gff &gff) {
+    UTC_SpecAbilityList strct;
     strct.Spell = gff.getUint("Spell");
     strct.SpellCasterLevel = gff.getUint("SpellCasterLevel");
     strct.SpellFlags = gff.getUint("SpellFlags");
     return strct;
 }
 
-static UTC_001 parseUTC_001(const Gff &gff) {
-    UTC_001 strct;
+static UTC_SkillList parseUTC_SkillList(const Gff &gff) {
+    UTC_SkillList strct;
     strct.Rank = gff.getUint("Rank");
     return strct;
 }
 
-static UTC_005 parseUTC_005(const Gff &gff) {
-    UTC_005 strct;
+static UTC_ItemList parseUTC_ItemList(const Gff &gff) {
+    UTC_ItemList strct;
     strct.Dropable = gff.getUint("Dropable");
     strct.InventoryRes = gff.getString("InventoryRes");
     strct.Repos_PosX = gff.getUint("Repos_PosX");
@@ -58,25 +58,25 @@ static UTC_005 parseUTC_005(const Gff &gff) {
     return strct;
 }
 
-static UTC_002 parseUTC_002(const Gff &gff) {
-    UTC_002 strct;
+static UTC_FeatList parseUTC_FeatList(const Gff &gff) {
+    UTC_FeatList strct;
     strct.Feat = gff.getUint("Feat");
     return strct;
 }
 
-static UTC_004 parseUTC_004(const Gff &gff) {
-    UTC_004 strct;
+static UTC_Equip_ItemList parseUTC_Equip_ItemList(const Gff &gff) {
+    UTC_Equip_ItemList strct;
     strct.Dropable = gff.getUint("Dropable");
     strct.EquippedRes = gff.getString("EquippedRes");
     return strct;
 }
 
-static UTC_003 parseUTC_003(const Gff &gff) {
-    UTC_003 strct;
+static UTC_ClassList parseUTC_ClassList(const Gff &gff) {
+    UTC_ClassList strct;
     strct.Class = gff.getInt("Class");
     strct.ClassLevel = gff.getInt("ClassLevel");
     for (auto &item : gff.getList("KnownList0")) {
-        strct.KnownList0.push_back(parseUTC_007(*item));
+        strct.KnownList0.push_back(parseUTC_ClassList_KnownList0(*item));
     }
     return strct;
 }
@@ -90,7 +90,7 @@ UTC parseUTC(const Gff &gff) {
     strct.Cha = gff.getUint("Cha");
     strct.ChallengeRating = gff.getFloat("ChallengeRating");
     for (auto &item : gff.getList("ClassList")) {
-        strct.ClassList.push_back(parseUTC_003(*item));
+        strct.ClassList.push_back(parseUTC_ClassList(*item));
     }
     strct.Comment = gff.getString("Comment");
     strct.Con = gff.getUint("Con");
@@ -102,11 +102,11 @@ UTC parseUTC(const Gff &gff) {
     strct.Dex = gff.getUint("Dex");
     strct.Disarmable = gff.getUint("Disarmable");
     for (auto &item : gff.getList("Equip_ItemList")) {
-        strct.Equip_ItemList.push_back(parseUTC_004(*item));
+        strct.Equip_ItemList.push_back(parseUTC_Equip_ItemList(*item));
     }
     strct.FactionID = gff.getUint("FactionID");
     for (auto &item : gff.getList("FeatList")) {
-        strct.FeatList.push_back(parseUTC_002(*item));
+        strct.FeatList.push_back(parseUTC_FeatList(*item));
     }
     strct.FirstName = std::make_pair(gff.getInt("FirstName"), gff.getString("FirstName"));
     strct.ForcePoints = gff.getInt("ForcePoints");
@@ -119,7 +119,7 @@ UTC parseUTC(const Gff &gff) {
     strct.Interruptable = gff.getUint("Interruptable");
     strct.IsPC = gff.getUint("IsPC");
     for (auto &item : gff.getList("ItemList")) {
-        strct.ItemList.push_back(parseUTC_005(*item));
+        strct.ItemList.push_back(parseUTC_ItemList(*item));
     }
     strct.LastName = std::make_pair(gff.getInt("LastName"), gff.getString("LastName"));
     strct.LawfulChaotic = gff.getUint("LawfulChaotic");
@@ -151,11 +151,11 @@ UTC parseUTC(const Gff &gff) {
     strct.ScriptSpellAt = gff.getString("ScriptSpellAt");
     strct.ScriptUserDefine = gff.getString("ScriptUserDefine");
     for (auto &item : gff.getList("SkillList")) {
-        strct.SkillList.push_back(parseUTC_001(*item));
+        strct.SkillList.push_back(parseUTC_SkillList(*item));
     }
     strct.SoundSetFile = gff.getUint("SoundSetFile");
     for (auto &item : gff.getList("SpecAbilityList")) {
-        strct.SpecAbilityList.push_back(parseUTC_006(*item));
+        strct.SpecAbilityList.push_back(parseUTC_SpecAbilityList(*item));
     }
     strct.Str = gff.getUint("Str");
     strct.Subrace = gff.getString("Subrace");

@@ -29,7 +29,7 @@ namespace game {
 
 namespace schema {
 
-struct UTM_001 {
+struct UTM_ItemList {
     uint8_t Infinite {0};
     std::string InventoryRes;
     uint16_t Repos_PosX {0};
@@ -40,7 +40,7 @@ struct UTM {
     uint8_t BuySellFlag {0};
     std::string Comment;
     uint8_t ID {0};
-    std::vector<UTM_001> ItemList;
+    std::vector<UTM_ItemList> ItemList;
     std::pair<int, std::string> LocName;
     int MarkDown {0};
     int MarkUp {0};

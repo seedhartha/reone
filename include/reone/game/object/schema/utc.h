@@ -29,42 +29,42 @@ namespace game {
 
 namespace schema {
 
-struct UTC_007 {
+struct UTC_ClassList_KnownList0 {
     uint16_t Spell {0};
     uint8_t SpellFlags {0};
     uint8_t SpellMetaMagic {0};
 };
 
-struct UTC_006 {
+struct UTC_SpecAbilityList {
     uint16_t Spell {0};
     uint8_t SpellCasterLevel {0};
     uint8_t SpellFlags {0};
 };
 
-struct UTC_001 {
+struct UTC_SkillList {
     uint8_t Rank {0};
 };
 
-struct UTC_005 {
+struct UTC_ItemList {
     uint8_t Dropable {0};
     std::string InventoryRes;
     uint16_t Repos_PosX {0};
     uint16_t Repos_Posy {0};
 };
 
-struct UTC_002 {
+struct UTC_FeatList {
     uint16_t Feat {0};
 };
 
-struct UTC_004 {
+struct UTC_Equip_ItemList {
     uint8_t Dropable {0};
     std::string EquippedRes;
 };
 
-struct UTC_003 {
+struct UTC_ClassList {
     int Class {0};
     int16_t ClassLevel {0};
-    std::vector<UTC_007> KnownList0;
+    std::vector<UTC_ClassList_KnownList0> KnownList0;
 };
 
 struct UTC {
@@ -74,7 +74,7 @@ struct UTC {
     uint8_t BodyVariation {0};
     uint8_t Cha {0};
     float ChallengeRating {0.0f};
-    std::vector<UTC_003> ClassList;
+    std::vector<UTC_ClassList> ClassList;
     std::string Comment;
     uint8_t Con {0};
     std::string Conversation;
@@ -84,9 +84,9 @@ struct UTC {
     std::pair<int, std::string> Description;
     uint8_t Dex {0};
     uint8_t Disarmable {0};
-    std::vector<UTC_004> Equip_ItemList;
+    std::vector<UTC_Equip_ItemList> Equip_ItemList;
     uint16_t FactionID {0};
-    std::vector<UTC_002> FeatList;
+    std::vector<UTC_FeatList> FeatList;
     std::pair<int, std::string> FirstName;
     int16_t ForcePoints {0};
     uint8_t Gender {0};
@@ -97,7 +97,7 @@ struct UTC {
     uint8_t Int {0};
     uint8_t Interruptable {0};
     uint8_t IsPC {0};
-    std::vector<UTC_005> ItemList;
+    std::vector<UTC_ItemList> ItemList;
     std::pair<int, std::string> LastName;
     uint8_t LawfulChaotic {0};
     int16_t MaxHitPoints {0};
@@ -127,9 +127,9 @@ struct UTC {
     std::string ScriptSpawn;
     std::string ScriptSpellAt;
     std::string ScriptUserDefine;
-    std::vector<UTC_001> SkillList;
+    std::vector<UTC_SkillList> SkillList;
     uint16_t SoundSetFile {0};
-    std::vector<UTC_006> SpecAbilityList;
+    std::vector<UTC_SpecAbilityList> SpecAbilityList;
     uint8_t Str {0};
     std::string Subrace;
     uint8_t SubraceIndex {0};

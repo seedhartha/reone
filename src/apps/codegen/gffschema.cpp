@@ -45,11 +45,12 @@ struct SchemaField {
 };
 
 struct SchemaStruct {
-    int index {0};
+    std::string name;
     std::map<std::string, SchemaField> fields;
+    bool top {false};
 };
 
-static void appendGffToSchema(Gff &tree, SchemaStruct &schemaStruct, int &structIdxCnt) {
+static void appendGffToSchema(Gff &tree, SchemaStruct &schemaStruct) {
     std::set<std::string> fields;
     for (auto &field : tree.fields()) {
         if (schemaStruct.fields.count(field.label) == 0) {
@@ -63,10 +64,10 @@ static void appendGffToSchema(Gff &tree, SchemaStruct &schemaStruct, int &struct
         if ((field.type == Gff::FieldType::Struct || field.type == Gff::FieldType::List) && !field.children.empty()) {
             if (!schemaField.subStruct) {
                 schemaField.subStruct = std::make_unique<SchemaStruct>();
-                schemaField.subStruct->index = ++structIdxCnt;
+                schemaField.subStruct->name = str(boost::format("%s_%s") % schemaStruct.name % schemaField.cppName);
             }
             for (auto &child : field.children) {
-                appendGffToSchema(*field.children[0], *schemaField.subStruct, structIdxCnt);
+                appendGffToSchema(*field.children[0], *schemaField.subStruct);
             }
         }
         fields.insert(field.label);
@@ -78,7 +79,7 @@ static void appendGffToSchema(Gff &tree, SchemaStruct &schemaStruct, int &struct
     }
 }
 
-static std::string describeFieldType(const std::string &structPrefix, const SchemaField &field) {
+static std::string describeFieldType(const SchemaField &field) {
     switch (field.type) {
     case Gff::FieldType::Byte:
         return "uint8_t";
@@ -110,13 +111,13 @@ static std::string describeFieldType(const std::string &structPrefix, const Sche
         return "std::vector<char>";
     case Gff::FieldType::Struct:
         if (field.subStruct) {
-            return str(boost::format("%s_%03d") % structPrefix % field.subStruct->index);
+            return field.subStruct->name;
         } else {
             return "void *";
         }
     case Gff::FieldType::List:
         if (field.subStruct) {
-            return str(boost::format("std::vector<%s_%03d>") % structPrefix % field.subStruct->index);
+            return str(boost::format("std::vector<%s>") % field.subStruct->name);
         } else {
             return "std::vector<void *>";
         }
@@ -131,10 +132,8 @@ static std::string describeFieldType(const std::string &structPrefix, const Sche
     }
 }
 
-static void writeField(const std::string &structPrefix,
-                       const SchemaField &field,
-                       TextWriter &writer) {
-    auto typeStr = describeFieldType(structPrefix, field);
+static void writeField(const SchemaField &field, TextWriter &writer) {
+    auto typeStr = describeFieldType(field);
     switch (field.type) {
     case Gff::FieldType::Byte:
     case Gff::FieldType::Word:
@@ -167,26 +166,15 @@ static void writeField(const std::string &structPrefix,
     }
 }
 
-static std::string describeStruct(const std::string &structPrefix, const SchemaStruct &schemaStruct) {
-    if (schemaStruct.index > 0) {
-        return str(boost::format("%s_%03d") % structPrefix % schemaStruct.index);
-    } else {
-        return structPrefix;
-    }
-}
-
-static void writeStruct(const std::string &structPrefix,
-                        const SchemaStruct &schemaStruct,
-                        TextWriter &writer) {
-    auto structName = describeStruct(structPrefix, schemaStruct);
-    writer.put(str(boost::format("struct %s {\n") % structName));
+static void writeStruct(const SchemaStruct &schemaStruct, TextWriter &writer) {
+    writer.put(str(boost::format("struct %s {\n") % schemaStruct.name));
     for (auto &[_, field] : schemaStruct.fields) {
-        writeField(structPrefix, field, writer);
+        writeField(field, writer);
     }
     writer.put("};\n\n");
 }
 
-static void writeSchemaHeaderFile(const std::string &structPrefix,
+static void writeSchemaHeaderFile(const std::string &topStructName,
                                   const std::vector<std::pair<int, SchemaStruct *>> &structs,
                                   const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
@@ -201,13 +189,12 @@ static void writeSchemaHeaderFile(const std::string &structPrefix,
     writer.put("namespace game {\n\n");
     writer.put("namespace schema {\n\n");
     for (auto &[_, schemaStruct] : structs) {
-        writeStruct(structPrefix, *schemaStruct, writer);
+        writeStruct(*schemaStruct, writer);
     }
     for (auto &[_, schemaStruct] : structs) {
-        if (schemaStruct->index > 0) {
-            continue;
+        if (schemaStruct->top) {
+            writer.put(str(boost::format("%1% parse%1%(const resource::Gff &gff);\n") % topStructName));
         }
-        writer.put(str(boost::format("%1% parse%1%(const resource::Gff &gff);\n") % structPrefix));
     }
     writer.put("\n");
     writer.put("} // namespace schema\n\n");
@@ -215,16 +202,13 @@ static void writeSchemaHeaderFile(const std::string &structPrefix,
     writer.put("} // namespace reone\n");
 }
 
-static void writeParseFunction(const std::string &structPrefix,
-                               const SchemaStruct &schemaStruct,
-                               TextWriter &writer) {
-    auto structName = describeStruct(structPrefix, schemaStruct);
-    if (schemaStruct.index > 0) {
-        writer.put(str(boost::format("static %1% parse%1%(const Gff &gff) {\n") % structName));
+static void writeParseFunction(const SchemaStruct &schemaStruct, TextWriter &writer) {
+    if (schemaStruct.top) {
+        writer.put(str(boost::format("%1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
     } else {
-        writer.put(str(boost::format("%1% parse%1%(const Gff &gff) {\n") % structName));
+        writer.put(str(boost::format("static %1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
     }
-    writer.put(str(boost::format("%s%s strct;\n") % kIndent % structName));
+    writer.put(str(boost::format("%s%s strct;\n") % kIndent % schemaStruct.name));
     for (auto &[_, field] : schemaStruct.fields) {
         switch (field.type) {
         case Gff::FieldType::Byte:
@@ -264,13 +248,13 @@ static void writeParseFunction(const std::string &structPrefix,
         case Gff::FieldType::Struct:
             writer.put(str(boost::format("%1%auto %2% = gff.getStruct(\"%3%\");\n") % kIndent % field.cppName % field.name));
             writer.put(str(boost::format("%1%if (%2%) {\n") % kIndent % field.cppName));
-            writer.put(str(boost::format("%1%%1%strct.%2% = parse%3%(*%2%);\n") % kIndent % field.cppName % describeStruct(structPrefix, *field.subStruct)));
+            writer.put(str(boost::format("%1%%1%strct.%2% = parse%3%(*%2%);\n") % kIndent % field.cppName % field.subStruct->name));
             writer.put(str(boost::format("%1%}\n") % kIndent));
             break;
         case Gff::FieldType::List:
             if (field.subStruct) {
                 writer.put(str(boost::format("%1%for (auto &item : gff.getList(\"%2%\")) {\n") % kIndent % field.name));
-                writer.put(str(boost::format("%1%%1%strct.%2%.push_back(parse%3%(*item));\n") % kIndent % field.cppName % describeStruct(structPrefix, *field.subStruct)));
+                writer.put(str(boost::format("%1%%1%strct.%2%.push_back(parse%3%(*item));\n") % kIndent % field.cppName % field.subStruct->name));
                 writer.put(str(boost::format("%1%}\n") % kIndent));
             }
             break;
@@ -288,8 +272,7 @@ static void writeParseFunction(const std::string &structPrefix,
     writer.put("}\n\n");
 }
 
-static void writeSchemaImplFile(const std::string &structPrefix,
-                                const std::vector<std::pair<int, SchemaStruct *>> &structs,
+static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>> &structs,
                                 const std::string &schemaHeaderFilename,
                                 const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
@@ -303,7 +286,7 @@ static void writeSchemaImplFile(const std::string &structPrefix,
     writer.put("namespace game {\n\n");
     writer.put("namespace schema {\n\n");
     for (auto &[_, schemaStruct] : structs) {
-        writeParseFunction(structPrefix, *schemaStruct, writer);
+        writeParseFunction(*schemaStruct, writer);
     }
     writer.put("} // namespace schema\n\n");
     writer.put("} // namespace game\n\n");
@@ -365,10 +348,12 @@ void generateGffSchema(resource::ResourceType resType,
         }
     }
 
+    auto topStructName = boost::to_upper_copy(getExtByResType(resType));
     SchemaStruct schemaStruct;
-    int structIdxCnt = 0;
+    schemaStruct.name = topStructName;
+    schemaStruct.top = true;
     for (auto &tree : trees) {
-        appendGffToSchema(*tree.second, schemaStruct, structIdxCnt);
+        appendGffToSchema(*tree.second, schemaStruct);
     }
     std::vector<std::pair<int, SchemaStruct *>> structs;
     std::stack<std::pair<int, SchemaStruct *>> structStack;
@@ -389,16 +374,14 @@ void generateGffSchema(resource::ResourceType resType,
         return l.first > r.first;
     });
 
-    auto structPrefix = boost::to_upper_copy(getExtByResType(resType));
     auto schemaHeaderFilename = getExtByResType(resType) + ".h";
-
     auto schemaHeaderFile = destDir;
     schemaHeaderFile.append(schemaHeaderFilename);
-    writeSchemaHeaderFile(structPrefix, structs, schemaHeaderFile);
+    writeSchemaHeaderFile(topStructName, structs, schemaHeaderFile);
 
     auto schemaImplFile = destDir;
     schemaImplFile.append(getExtByResType(resType) + ".cpp");
-    writeSchemaImplFile(structPrefix, structs, schemaHeaderFilename, schemaImplFile);
+    writeSchemaImplFile(structs, schemaHeaderFilename, schemaImplFile);
 }
 
 } // namespace reone

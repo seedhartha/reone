@@ -29,7 +29,7 @@ namespace game {
 
 namespace schema {
 
-struct UTS_001 {
+struct UTS_Sounds {
     std::string Sound;
 };
 
@@ -53,7 +53,7 @@ struct UTS {
     uint8_t RandomPosition {0};
     float RandomRangeX {0.0f};
     float RandomRangeY {0.0f};
-    std::vector<UTS_001> Sounds;
+    std::vector<UTS_Sounds> Sounds;
     std::string Tag;
     std::string TemplateResRef;
     uint8_t Times {0};

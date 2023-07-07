@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static UTI_001 parseUTI_001(const Gff &gff) {
-    UTI_001 strct;
+static UTI_PropertiesList parseUTI_PropertiesList(const Gff &gff) {
+    UTI_PropertiesList strct;
     strct.ChanceAppear = gff.getUint("ChanceAppear");
     strct.CostTable = gff.getUint("CostTable");
     strct.CostValue = gff.getUint("CostValue");
@@ -56,7 +56,7 @@ UTI parseUTI(const Gff &gff) {
     strct.PaletteID = gff.getUint("PaletteID");
     strct.Plot = gff.getUint("Plot");
     for (auto &item : gff.getList("PropertiesList")) {
-        strct.PropertiesList.push_back(parseUTI_001(*item));
+        strct.PropertiesList.push_back(parseUTI_PropertiesList(*item));
     }
     strct.StackSize = gff.getUint("StackSize");
     strct.Stolen = gff.getUint("Stolen");

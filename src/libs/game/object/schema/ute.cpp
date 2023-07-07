@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static UTE_001 parseUTE_001(const Gff &gff) {
-    UTE_001 strct;
+static UTE_CreatureList parseUTE_CreatureList(const Gff &gff) {
+    UTE_CreatureList strct;
     strct.Appearance = gff.getInt("Appearance");
     strct.CR = gff.getFloat("CR");
     strct.GuaranteedCount = gff.getInt("GuaranteedCount");
@@ -42,7 +42,7 @@ UTE parseUTE(const Gff &gff) {
     strct.Active = gff.getUint("Active");
     strct.Comment = gff.getString("Comment");
     for (auto &item : gff.getList("CreatureList")) {
-        strct.CreatureList.push_back(parseUTE_001(*item));
+        strct.CreatureList.push_back(parseUTE_CreatureList(*item));
     }
     strct.Difficulty = gff.getInt("Difficulty");
     strct.DifficultyIndex = gff.getInt("DifficultyIndex");

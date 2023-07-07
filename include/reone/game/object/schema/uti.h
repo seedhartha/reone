@@ -29,7 +29,7 @@ namespace game {
 
 namespace schema {
 
-struct UTI_001 {
+struct UTI_PropertiesList {
     uint8_t ChanceAppear {0};
     uint8_t CostTable {0};
     uint16_t CostValue {0};
@@ -54,7 +54,7 @@ struct UTI {
     uint8_t ModelVariation {0};
     uint8_t PaletteID {0};
     uint8_t Plot {0};
-    std::vector<UTI_001> PropertiesList;
+    std::vector<UTI_PropertiesList> PropertiesList;
     uint16_t StackSize {0};
     uint8_t Stolen {0};
     std::string Tag;

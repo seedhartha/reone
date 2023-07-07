@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static UTS_001 parseUTS_001(const Gff &gff) {
-    UTS_001 strct;
+static UTS_Sounds parseUTS_Sounds(const Gff &gff) {
+    UTS_Sounds strct;
     strct.Sound = gff.getString("Sound");
     return strct;
 }
@@ -55,7 +55,7 @@ UTS parseUTS(const Gff &gff) {
     strct.RandomRangeX = gff.getFloat("RandomRangeX");
     strct.RandomRangeY = gff.getFloat("RandomRangeY");
     for (auto &item : gff.getList("Sounds")) {
-        strct.Sounds.push_back(parseUTS_001(*item));
+        strct.Sounds.push_back(parseUTS_Sounds(*item));
     }
     strct.Tag = gff.getString("Tag");
     strct.TemplateResRef = gff.getString("TemplateResRef");

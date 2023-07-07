@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static UTM_001 parseUTM_001(const Gff &gff) {
-    UTM_001 strct;
+static UTM_ItemList parseUTM_ItemList(const Gff &gff) {
+    UTM_ItemList strct;
     strct.Infinite = gff.getUint("Infinite");
     strct.InventoryRes = gff.getString("InventoryRes");
     strct.Repos_PosX = gff.getUint("Repos_PosX");
@@ -42,7 +42,7 @@ UTM parseUTM(const Gff &gff) {
     strct.Comment = gff.getString("Comment");
     strct.ID = gff.getUint("ID");
     for (auto &item : gff.getList("ItemList")) {
-        strct.ItemList.push_back(parseUTM_001(*item));
+        strct.ItemList.push_back(parseUTM_ItemList(*item));
     }
     strct.LocName = std::make_pair(gff.getInt("LocName"), gff.getString("LocName"));
     strct.MarkDown = gff.getInt("MarkDown");

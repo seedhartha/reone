@@ -29,7 +29,7 @@ namespace game {
 
 namespace schema {
 
-struct UTE_001 {
+struct UTE_CreatureList {
     int Appearance {0};
     float CR {0.0f};
     int GuaranteedCount {0};
@@ -40,7 +40,7 @@ struct UTE_001 {
 struct UTE {
     uint8_t Active {0};
     std::string Comment;
-    std::vector<UTE_001> CreatureList;
+    std::vector<UTE_CreatureList> CreatureList;
     int Difficulty {0};
     int DifficultyIndex {0};
     uint32_t Faction {0};

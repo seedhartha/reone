@@ -29,7 +29,7 @@ namespace game {
 
 namespace schema {
 
-struct UTP_001 {
+struct UTP_ItemList {
     std::string InventoryRes;
     uint16_t Repos_PosX {0};
     uint16_t Repos_Posy {0};
@@ -53,7 +53,7 @@ struct UTP {
     uint8_t HasInventory {0};
     uint8_t Interruptable {0};
     uint8_t IsComputer {0};
-    std::vector<UTP_001> ItemList;
+    std::vector<UTP_ItemList> ItemList;
     std::string KeyName;
     uint8_t KeyRequired {0};
     std::pair<int, std::string> LocName;
