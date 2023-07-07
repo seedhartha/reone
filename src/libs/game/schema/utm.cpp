@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/template/utm.h"
+#include "reone/game/schema/utm.h"
 
 #include "reone/resource/gff.h"
 

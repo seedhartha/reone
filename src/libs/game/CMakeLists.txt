@@ -212,15 +212,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/placeable.h
     ${GAME_INCLUDE_DIR}/object/placeablecamera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
-    ${GAME_INCLUDE_DIR}/object/template/utc.h
-    ${GAME_INCLUDE_DIR}/object/template/utd.h
-    ${GAME_INCLUDE_DIR}/object/template/ute.h
-    ${GAME_INCLUDE_DIR}/object/template/uti.h
-    ${GAME_INCLUDE_DIR}/object/template/utm.h
-    ${GAME_INCLUDE_DIR}/object/template/utp.h
-    ${GAME_INCLUDE_DIR}/object/template/uts.h
-    ${GAME_INCLUDE_DIR}/object/template/utt.h
-    ${GAME_INCLUDE_DIR}/object/template/utw.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
     ${GAME_INCLUDE_DIR}/options.h
@@ -235,6 +226,20 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/resourcelayout.h
     ${GAME_INCLUDE_DIR}/room.h
     ${GAME_INCLUDE_DIR}/savedgame.h
+    ${GAME_INCLUDE_DIR}/schema/are.h
+    ${GAME_INCLUDE_DIR}/schema/dlg.h
+    ${GAME_INCLUDE_DIR}/schema/git.h
+    ${GAME_INCLUDE_DIR}/schema/ifo.h
+    ${GAME_INCLUDE_DIR}/schema/pth.h
+    ${GAME_INCLUDE_DIR}/schema/utc.h
+    ${GAME_INCLUDE_DIR}/schema/utd.h
+    ${GAME_INCLUDE_DIR}/schema/ute.h
+    ${GAME_INCLUDE_DIR}/schema/uti.h
+    ${GAME_INCLUDE_DIR}/schema/utm.h
+    ${GAME_INCLUDE_DIR}/schema/utp.h
+    ${GAME_INCLUDE_DIR}/schema/uts.h
+    ${GAME_INCLUDE_DIR}/schema/utt.h
+    ${GAME_INCLUDE_DIR}/schema/utw.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
     ${GAME_INCLUDE_DIR}/script/routine/context.h
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
@@ -416,6 +421,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
     ${GAME_SOURCE_DIR}/gui/sounds.cpp
     ${GAME_SOURCE_DIR}/layouts.cpp
+    ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp
@@ -426,18 +432,8 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/placeable.cpp
     ${GAME_SOURCE_DIR}/object/placeablecamera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
-    ${GAME_SOURCE_DIR}/object/template/utc.cpp
-    ${GAME_SOURCE_DIR}/object/template/utd.cpp
-    ${GAME_SOURCE_DIR}/object/template/ute.cpp
-    ${GAME_SOURCE_DIR}/object/template/uti.cpp
-    ${GAME_SOURCE_DIR}/object/template/utm.cpp
-    ${GAME_SOURCE_DIR}/object/template/utp.cpp
-    ${GAME_SOURCE_DIR}/object/template/uts.cpp
-    ${GAME_SOURCE_DIR}/object/template/utt.cpp
-    ${GAME_SOURCE_DIR}/object/template/utw.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp
-    ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/party.cpp
     ${GAME_SOURCE_DIR}/pathfinder.cpp
     ${GAME_SOURCE_DIR}/paths.cpp
@@ -446,6 +442,20 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/reputes.cpp
     ${GAME_SOURCE_DIR}/resourcelayout.cpp
     ${GAME_SOURCE_DIR}/room.cpp
+    ${GAME_SOURCE_DIR}/schema/are.cpp
+    ${GAME_SOURCE_DIR}/schema/dlg.cpp
+    ${GAME_SOURCE_DIR}/schema/git.cpp
+    ${GAME_SOURCE_DIR}/schema/ifo.cpp
+    ${GAME_SOURCE_DIR}/schema/pth.cpp
+    ${GAME_SOURCE_DIR}/schema/utc.cpp
+    ${GAME_SOURCE_DIR}/schema/utd.cpp
+    ${GAME_SOURCE_DIR}/schema/ute.cpp
+    ${GAME_SOURCE_DIR}/schema/uti.cpp
+    ${GAME_SOURCE_DIR}/schema/utm.cpp
+    ${GAME_SOURCE_DIR}/schema/utp.cpp
+    ${GAME_SOURCE_DIR}/schema/uts.cpp
+    ${GAME_SOURCE_DIR}/schema/utt.cpp
+    ${GAME_SOURCE_DIR}/schema/utw.cpp
     ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/effect.cpp
