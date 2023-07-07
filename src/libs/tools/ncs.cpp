@@ -17,8 +17,6 @@
 
 #include "reone/tools/ncs.h"
 
-#include <boost/regex.hpp>
-
 #include "reone/game/script/routines.h"
 #include "reone/resource/exception/format.h"
 #include "reone/script/format/ncsreader.h"
@@ -26,7 +24,6 @@
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
-
 
 #include "reone/tools/script/exprtree.h"
 #include "reone/tools/script/exprtreeoptimizer.h"

@@ -17,8 +17,6 @@
 
 #include "frame.h"
 
-#include <boost/program_options.hpp>
-
 #include "reone/graphics/types.h"
 
 using namespace boost::program_options;

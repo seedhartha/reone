@@ -17,8 +17,6 @@
 
 #include "reone/tools/script/format/pcodereader.h"
 
-#include <boost/regex.hpp>
-
 #include "reone/resource/exception/format.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/routines.h"

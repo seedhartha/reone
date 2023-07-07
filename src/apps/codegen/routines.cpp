@@ -17,8 +17,6 @@
 
 #include "routines.h"
 
-#include <boost/regex.hpp>
-
 #include "reone/resource/provider/keybif.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/fileutil.h"

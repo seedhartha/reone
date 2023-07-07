@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-
 namespace reone {
 
 void generateRoutines(const boost::filesystem::path &k1nssfile,

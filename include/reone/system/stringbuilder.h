@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <sstream>
-#include <string>
-
 namespace reone {
 
 class StringBuilder {
