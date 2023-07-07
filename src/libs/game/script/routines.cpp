@@ -31,36 +31,26 @@ namespace game {
 
 static constexpr int kBaseItemInvalid = 256;
 
-extern void registerMainKotorRoutines(Routines &routines);
-extern void registerActionKotorRoutines(Routines &routines);
-extern void registerEffectKotorRoutines(Routines &routines);
-extern void registerMinigameKotorRoutines(Routines &routines);
-
-extern void registerMainTslRoutines(Routines &routines);
-extern void registerActionTslRoutines(Routines &routines);
-extern void registerEffectTslRoutines(Routines &routines);
-extern void registerMinigameTslRoutines(Routines &routines);
-
 void Routines::init() {
     if (_gameId == GameID::TSL) {
-        initForTSL();
+        registerTslRoutines();
     } else {
-        initForKotOR();
+        registerKotorRoutines();
     }
 }
 
-void Routines::initForKotOR() {
-    registerMainKotorRoutines(*this);
-    registerActionKotorRoutines(*this);
-    registerEffectKotorRoutines(*this);
-    registerMinigameKotorRoutines(*this);
+void Routines::registerKotorRoutines() {
+    registerMainKotorRoutines();
+    registerActionKotorRoutines();
+    registerEffectKotorRoutines();
+    registerMinigameKotorRoutines();
 }
 
-void Routines::initForTSL() {
-    registerMainTslRoutines(*this);
-    registerActionTslRoutines(*this);
-    registerEffectTslRoutines(*this);
-    registerMinigameTslRoutines(*this);
+void Routines::registerTslRoutines() {
+    registerMainTslRoutines();
+    registerActionTslRoutines();
+    registerEffectTslRoutines();
+    registerMinigameTslRoutines();
 }
 
 Routine &Routines::get(int index) {

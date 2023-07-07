@@ -295,7 +295,7 @@ static void writeReoneRegisterRoutinesFunc(const std::string &category,
                                            const std::string &game,
                                            const std::vector<std::tuple<int, Function>> &functions,
                                            TextWriter &code) {
-    code.put(str(boost::format("void register%s%sRoutines(Routines &routines) {\n") % category % game));
+    code.put(str(boost::format("void Routines::register%s%sRoutines() {\n") % category % game));
     for (auto &[idx, func] : functions) {
         auto retType = nssTypeToMacro(func.retType);
         std::vector<std::string> args;
@@ -303,7 +303,7 @@ static void writeReoneRegisterRoutinesFunc(const std::string &category,
             args.push_back(nssTypeToMacro(arg.type));
         }
         auto argsStr = boost::join(args, ", ");
-        code.put(str(boost::format("%sroutines.insert(%d, \"%s\", %s, {%s}, &routine::%s);\n") % kIndent % idx % func.name % retType % argsStr % func.name));
+        code.put(str(boost::format("%sinsert(%d, \"%s\", %s, {%s}, &%s);\n") % kIndent % idx % func.name % retType % argsStr % func.name));
     }
     code.put("}\n\n");
 }
@@ -338,11 +338,9 @@ static void writeReoneRoutineImplFile(const std::string &category,
     code.put("\n");
     code.put("namespace reone {\n\n");
     code.put("namespace game {\n\n");
-    code.put("namespace routine {\n\n");
     for (auto &[_, func] : k2functions) {
         writeReoneRoutineImpl(func, constants, code);
     }
-    code.put("} // namespace routine\n\n");
     writeReoneRegisterRoutinesFunc(category, "Kotor", k1functions, code);
     writeReoneRegisterRoutinesFunc(category, "Tsl", k2functions, code);
     code.put("} // namespace game\n\n");

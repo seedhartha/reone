@@ -60,8 +60,18 @@ private:
 
     std::map<int, script::Routine> _routines;
 
-    void initForKotOR();
-    void initForTSL();
+    void registerKotorRoutines();
+    void registerTslRoutines();
+
+    void registerMainKotorRoutines();
+    void registerActionKotorRoutines();
+    void registerEffectKotorRoutines();
+    void registerMinigameKotorRoutines();
+
+    void registerMainTslRoutines();
+    void registerActionTslRoutines();
+    void registerEffectTslRoutines();
+    void registerMinigameTslRoutines();
 };
 
 } // namespace game

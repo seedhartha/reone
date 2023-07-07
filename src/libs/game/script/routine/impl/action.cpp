@@ -40,8 +40,6 @@ namespace reone {
 
 namespace game {
 
-namespace routine {
-
 static Variable ActionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
     auto action = ctx.game.actionFactory().newRandomWalk();
@@ -651,102 +649,100 @@ static Variable ActionSwitchWeapons(const std::vector<Variable> &args, const Rou
     return Variable::ofNull();
 }
 
-} // namespace routine
-
-void registerActionKotorRoutines(Routines &routines) {
-    routines.insert(20, "ActionRandomWalk", R_VOID, {}, &routine::ActionRandomWalk);
-    routines.insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &routine::ActionMoveToLocation);
-    routines.insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveToObject);
-    routines.insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromObject);
-    routines.insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &routine::ActionEquipItem);
-    routines.insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &routine::ActionUnequipItem);
-    routines.insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &routine::ActionPickUpItem);
-    routines.insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &routine::ActionPutDownItem);
-    routines.insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &routine::ActionAttack);
-    routines.insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::ActionSpeakString);
-    routines.insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::ActionPlayAnimation);
-    routines.insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::ActionOpenDoor);
-    routines.insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::ActionCloseDoor);
-    routines.insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtObject);
-    routines.insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionGiveItem);
-    routines.insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionTakeItem);
-    routines.insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::ActionForceFollowObject);
-    routines.insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &routine::ActionJumpToObject);
-    routines.insert(202, "ActionWait", R_VOID, {R_FLOAT}, &routine::ActionWait);
-    routines.insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT}, &routine::ActionStartConversation);
-    routines.insert(205, "ActionPauseConversation", R_VOID, {}, &routine::ActionPauseConversation);
-    routines.insert(206, "ActionResumeConversation", R_VOID, {}, &routine::ActionResumeConversation);
-    routines.insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &routine::ActionJumpToLocation);
-    routines.insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtLocation);
-    routines.insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &routine::ActionSpeakStringByStrRef);
-    routines.insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &routine::ActionUseFeat);
-    routines.insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &routine::ActionUseSkill);
-    routines.insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &routine::ActionDoCommand);
-    routines.insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &routine::ActionUseTalentOnObject);
-    routines.insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &routine::ActionUseTalentAtLocation);
-    routines.insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &routine::ActionInteractObject);
-    routines.insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromLocation);
-    routines.insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &routine::ActionSurrenderToEnemies);
-    routines.insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionForceMoveToLocation);
-    routines.insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &routine::ActionForceMoveToObject);
-    routines.insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::ActionEquipMostDamagingMelee);
-    routines.insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::ActionEquipMostDamagingRanged);
-    routines.insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &routine::ActionEquipMostEffectiveArmor);
-    routines.insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &routine::ActionUnlockObject);
-    routines.insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &routine::ActionLockObject);
-    routines.insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &routine::ActionCastFakeSpellAtObject);
-    routines.insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &routine::ActionCastFakeSpellAtLocation);
-    routines.insert(700, "ActionBarkString", R_VOID, {R_INT}, &routine::ActionBarkString);
-    routines.insert(730, "ActionFollowLeader", R_VOID, {}, &routine::ActionFollowLeader);
+void Routines::registerActionKotorRoutines() {
+    insert(20, "ActionRandomWalk", R_VOID, {}, &ActionRandomWalk);
+    insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &ActionMoveToLocation);
+    insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &ActionMoveToObject);
+    insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &ActionMoveAwayFromObject);
+    insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &ActionEquipItem);
+    insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &ActionUnequipItem);
+    insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &ActionPickUpItem);
+    insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &ActionPutDownItem);
+    insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &ActionAttack);
+    insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &ActionSpeakString);
+    insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &ActionPlayAnimation);
+    insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &ActionOpenDoor);
+    insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &ActionCloseDoor);
+    insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &ActionCastSpellAtObject);
+    insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &ActionGiveItem);
+    insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &ActionTakeItem);
+    insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &ActionForceFollowObject);
+    insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &ActionJumpToObject);
+    insert(202, "ActionWait", R_VOID, {R_FLOAT}, &ActionWait);
+    insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT}, &ActionStartConversation);
+    insert(205, "ActionPauseConversation", R_VOID, {}, &ActionPauseConversation);
+    insert(206, "ActionResumeConversation", R_VOID, {}, &ActionResumeConversation);
+    insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &ActionJumpToLocation);
+    insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &ActionCastSpellAtLocation);
+    insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &ActionSpeakStringByStrRef);
+    insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &ActionUseFeat);
+    insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &ActionUseSkill);
+    insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &ActionDoCommand);
+    insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &ActionUseTalentOnObject);
+    insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &ActionUseTalentAtLocation);
+    insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &ActionInteractObject);
+    insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &ActionMoveAwayFromLocation);
+    insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &ActionSurrenderToEnemies);
+    insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &ActionForceMoveToLocation);
+    insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &ActionForceMoveToObject);
+    insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &ActionEquipMostDamagingMelee);
+    insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &ActionEquipMostDamagingRanged);
+    insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &ActionEquipMostEffectiveArmor);
+    insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &ActionUnlockObject);
+    insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &ActionLockObject);
+    insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &ActionCastFakeSpellAtObject);
+    insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &ActionCastFakeSpellAtLocation);
+    insert(700, "ActionBarkString", R_VOID, {R_INT}, &ActionBarkString);
+    insert(730, "ActionFollowLeader", R_VOID, {}, &ActionFollowLeader);
 }
 
-void registerActionTslRoutines(Routines &routines) {
-    routines.insert(20, "ActionRandomWalk", R_VOID, {}, &routine::ActionRandomWalk);
-    routines.insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &routine::ActionMoveToLocation);
-    routines.insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveToObject);
-    routines.insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromObject);
-    routines.insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &routine::ActionEquipItem);
-    routines.insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &routine::ActionUnequipItem);
-    routines.insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &routine::ActionPickUpItem);
-    routines.insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &routine::ActionPutDownItem);
-    routines.insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &routine::ActionAttack);
-    routines.insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::ActionSpeakString);
-    routines.insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::ActionPlayAnimation);
-    routines.insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::ActionOpenDoor);
-    routines.insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::ActionCloseDoor);
-    routines.insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtObject);
-    routines.insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionGiveItem);
-    routines.insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &routine::ActionTakeItem);
-    routines.insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::ActionForceFollowObject);
-    routines.insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &routine::ActionJumpToObject);
-    routines.insert(202, "ActionWait", R_VOID, {R_FLOAT}, &routine::ActionWait);
-    routines.insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT, R_INT, R_INT, R_INT}, &routine::ActionStartConversation);
-    routines.insert(205, "ActionPauseConversation", R_VOID, {}, &routine::ActionPauseConversation);
-    routines.insert(206, "ActionResumeConversation", R_VOID, {}, &routine::ActionResumeConversation);
-    routines.insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &routine::ActionJumpToLocation);
-    routines.insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &routine::ActionCastSpellAtLocation);
-    routines.insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &routine::ActionSpeakStringByStrRef);
-    routines.insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &routine::ActionUseFeat);
-    routines.insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &routine::ActionUseSkill);
-    routines.insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &routine::ActionDoCommand);
-    routines.insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &routine::ActionUseTalentOnObject);
-    routines.insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &routine::ActionUseTalentAtLocation);
-    routines.insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &routine::ActionInteractObject);
-    routines.insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionMoveAwayFromLocation);
-    routines.insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &routine::ActionSurrenderToEnemies);
-    routines.insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &routine::ActionForceMoveToLocation);
-    routines.insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &routine::ActionForceMoveToObject);
-    routines.insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::ActionEquipMostDamagingMelee);
-    routines.insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::ActionEquipMostDamagingRanged);
-    routines.insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &routine::ActionEquipMostEffectiveArmor);
-    routines.insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &routine::ActionUnlockObject);
-    routines.insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &routine::ActionLockObject);
-    routines.insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &routine::ActionCastFakeSpellAtObject);
-    routines.insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &routine::ActionCastFakeSpellAtLocation);
-    routines.insert(700, "ActionBarkString", R_VOID, {R_INT}, &routine::ActionBarkString);
-    routines.insert(730, "ActionFollowLeader", R_VOID, {}, &routine::ActionFollowLeader);
-    routines.insert(843, "ActionFollowOwner", R_VOID, {R_FLOAT}, &routine::ActionFollowOwner);
-    routines.insert(853, "ActionSwitchWeapons", R_VOID, {}, &routine::ActionSwitchWeapons);
+void Routines::registerActionTslRoutines() {
+    insert(20, "ActionRandomWalk", R_VOID, {}, &ActionRandomWalk);
+    insert(21, "ActionMoveToLocation", R_VOID, {R_LOCATION, R_INT}, &ActionMoveToLocation);
+    insert(22, "ActionMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &ActionMoveToObject);
+    insert(23, "ActionMoveAwayFromObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &ActionMoveAwayFromObject);
+    insert(32, "ActionEquipItem", R_VOID, {R_OBJECT, R_INT, R_INT}, &ActionEquipItem);
+    insert(33, "ActionUnequipItem", R_VOID, {R_OBJECT, R_INT}, &ActionUnequipItem);
+    insert(34, "ActionPickUpItem", R_VOID, {R_OBJECT}, &ActionPickUpItem);
+    insert(35, "ActionPutDownItem", R_VOID, {R_OBJECT}, &ActionPutDownItem);
+    insert(37, "ActionAttack", R_VOID, {R_OBJECT, R_INT}, &ActionAttack);
+    insert(39, "ActionSpeakString", R_VOID, {R_STRING, R_INT}, &ActionSpeakString);
+    insert(40, "ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &ActionPlayAnimation);
+    insert(43, "ActionOpenDoor", R_VOID, {R_OBJECT}, &ActionOpenDoor);
+    insert(44, "ActionCloseDoor", R_VOID, {R_OBJECT}, &ActionCloseDoor);
+    insert(48, "ActionCastSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &ActionCastSpellAtObject);
+    insert(135, "ActionGiveItem", R_VOID, {R_OBJECT, R_OBJECT}, &ActionGiveItem);
+    insert(136, "ActionTakeItem", R_VOID, {R_OBJECT, R_OBJECT}, &ActionTakeItem);
+    insert(167, "ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &ActionForceFollowObject);
+    insert(196, "ActionJumpToObject", R_VOID, {R_OBJECT, R_INT}, &ActionJumpToObject);
+    insert(202, "ActionWait", R_VOID, {R_FLOAT}, &ActionWait);
+    insert(204, "ActionStartConversation", R_VOID, {R_OBJECT, R_STRING, R_INT, R_INT, R_INT, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_STRING, R_INT, R_INT, R_INT, R_INT}, &ActionStartConversation);
+    insert(205, "ActionPauseConversation", R_VOID, {}, &ActionPauseConversation);
+    insert(206, "ActionResumeConversation", R_VOID, {}, &ActionResumeConversation);
+    insert(214, "ActionJumpToLocation", R_VOID, {R_LOCATION}, &ActionJumpToLocation);
+    insert(234, "ActionCastSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT}, &ActionCastSpellAtLocation);
+    insert(240, "ActionSpeakStringByStrRef", R_VOID, {R_INT, R_INT}, &ActionSpeakStringByStrRef);
+    insert(287, "ActionUseFeat", R_VOID, {R_INT, R_OBJECT}, &ActionUseFeat);
+    insert(288, "ActionUseSkill", R_VOID, {R_INT, R_OBJECT, R_INT, R_OBJECT}, &ActionUseSkill);
+    insert(294, "ActionDoCommand", R_VOID, {R_ACTION}, &ActionDoCommand);
+    insert(309, "ActionUseTalentOnObject", R_VOID, {R_TALENT, R_OBJECT}, &ActionUseTalentOnObject);
+    insert(310, "ActionUseTalentAtLocation", R_VOID, {R_TALENT, R_LOCATION}, &ActionUseTalentAtLocation);
+    insert(329, "ActionInteractObject", R_VOID, {R_OBJECT}, &ActionInteractObject);
+    insert(360, "ActionMoveAwayFromLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &ActionMoveAwayFromLocation);
+    insert(379, "ActionSurrenderToEnemies", R_VOID, {}, &ActionSurrenderToEnemies);
+    insert(382, "ActionForceMoveToLocation", R_VOID, {R_LOCATION, R_INT, R_FLOAT}, &ActionForceMoveToLocation);
+    insert(383, "ActionForceMoveToObject", R_VOID, {R_OBJECT, R_INT, R_FLOAT, R_FLOAT}, &ActionForceMoveToObject);
+    insert(399, "ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &ActionEquipMostDamagingMelee);
+    insert(400, "ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &ActionEquipMostDamagingRanged);
+    insert(404, "ActionEquipMostEffectiveArmor", R_VOID, {}, &ActionEquipMostEffectiveArmor);
+    insert(483, "ActionUnlockObject", R_VOID, {R_OBJECT}, &ActionUnlockObject);
+    insert(484, "ActionLockObject", R_VOID, {R_OBJECT}, &ActionLockObject);
+    insert(501, "ActionCastFakeSpellAtObject", R_VOID, {R_INT, R_OBJECT, R_INT}, &ActionCastFakeSpellAtObject);
+    insert(502, "ActionCastFakeSpellAtLocation", R_VOID, {R_INT, R_LOCATION, R_INT}, &ActionCastFakeSpellAtLocation);
+    insert(700, "ActionBarkString", R_VOID, {R_INT}, &ActionBarkString);
+    insert(730, "ActionFollowLeader", R_VOID, {}, &ActionFollowLeader);
+    insert(843, "ActionFollowOwner", R_VOID, {R_FLOAT}, &ActionFollowOwner);
+    insert(853, "ActionSwitchWeapons", R_VOID, {}, &ActionSwitchWeapons);
 }
 
 } // namespace game
