@@ -55,16 +55,6 @@ void BinaryWriter::writeString(const std::string &str) {
     _stream.write(&str[0], str.length());
 }
 
-void BinaryWriter::writeStringExact(const std::string &str, int len) {
-    int strLen = std::min(len, static_cast<int>(str.length()));
-    if (strLen > 0) {
-        _stream.write(&str[0], strLen);
-    }
-    for (int i = 0; i < len - strLen; ++i) {
-        _stream.writeByte('\0');
-    }
-}
-
 void BinaryWriter::writeCString(const std::string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream.write(&str[0], len);

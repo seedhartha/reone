@@ -27,8 +27,12 @@ public:
         _bytes(bytes) {
     }
 
-    void writeByte(char c) override {
-        _bytes.push_back(c);
+    void writeByte(uint8_t val) override {
+        _bytes.push_back(*reinterpret_cast<char *>(&val));
+    }
+
+    void writeChar(char ch) override {
+        _bytes.push_back(ch);
     }
 
     void write(const ByteArray &bytes) override {
@@ -39,10 +43,10 @@ public:
         _bytes.insert(_bytes.end(), str.begin(), str.end());
     }
 
-    void write(const char *data, int length) override {
-        size_t position = _bytes.size();
-        _bytes.resize(position + static_cast<size_t>(length));
-        std::memcpy(&_bytes[position], data, length);
+    void write(const char *data, int len) override {
+        size_t pos = _bytes.size();
+        _bytes.resize(pos + static_cast<size_t>(len));
+        std::memcpy(&_bytes[pos], data, len);
     }
 
     size_t position() override {

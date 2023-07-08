@@ -40,7 +40,6 @@ public:
     void writeInt64(int64_t val);
     void writeFloat(float val);
     void writeString(const std::string &str);
-    void writeStringExact(const std::string &str, int len);
     void writeCString(const std::string &str);
     void writeBytes(const ByteArray &bytes);
     void writeBytes(int count, uint8_t val);

@@ -39,7 +39,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
                               .append("\xfc\xff\xff\xff", 4)
                               .append("\xfb\xff\xff\xff\xff\xff\xff\xff", 8)
                               .append("\x00\x00\x80\x3f", 4)
-                              .append("AaBbCc\x00", 7)
+                              .append("AaBb\x00", 5)
                               .append("\x01\x02\x03\x04", 4)
                               .build();
 
@@ -53,8 +53,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
     writer.writeInt64(-5);
     writer.writeFloat(1.0f);
     writer.writeString(std::string("Aa"));
-    writer.writeStringExact(std::string("Bb"), 2);
-    writer.writeCString(std::string("Cc\x00"));
+    writer.writeCString(std::string("Bb\x00"));
     writer.writeBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
 
     // then

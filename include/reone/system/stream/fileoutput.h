@@ -27,8 +27,12 @@ public:
         _stream(path, mode == OpenMode::Binary ? std::ios::binary : static_cast<std::ios::openmode>(0)) {
     }
 
-    void writeByte(char c) override {
-        _stream.put(c);
+    void writeByte(uint8_t val) override {
+        _stream.put(*reinterpret_cast<char *>(&val));
+    }
+
+    void writeChar(char ch) override {
+        _stream.put(ch);
     }
 
     void write(const ByteArray &bytes) override {
@@ -39,8 +43,8 @@ public:
         _stream.write(&str[0], str.size());
     }
 
-    void write(const char *data, int length) override {
-        _stream.write(data, length);
+    void write(const char *data, int len) override {
+        _stream.write(data, len);
     }
 
     void close() {
