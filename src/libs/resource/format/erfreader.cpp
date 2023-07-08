@@ -60,7 +60,7 @@ void ErfReader::loadKeys() {
 }
 
 ErfReader::KeyEntry ErfReader::readKeyEntry() {
-    auto resRef = boost::to_lower_copy(_erf.readCString(16));
+    auto resRef = boost::to_lower_copy(_erf.readString(16));
     auto resId = _erf.readUint32();
     auto resType = _erf.readUint16();
     _erf.ignore(2); // unused

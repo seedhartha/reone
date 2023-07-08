@@ -67,7 +67,7 @@ void NcsReader::readInstruction(size_t &offset) {
         break;
     case InstructionType::CONSTS: {
         uint16_t len = _ncs.readUint16();
-        ins.strValue = _ncs.readCString(len);
+        ins.strValue = _ncs.readString(len);
         break;
     }
     case InstructionType::CONSTO:

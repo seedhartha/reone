@@ -86,7 +86,7 @@ void PeReader::loadOptionalHeader() {
 }
 
 void PeReader::loadSection() {
-    std::string name(_pe.readCString(8));
+    std::string name(_pe.readString(8));
 
     _pe.ignore(4);
 

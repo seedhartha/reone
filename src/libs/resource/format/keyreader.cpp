@@ -52,7 +52,7 @@ KeyReader::FileEntry KeyReader::readFileEntry() {
     auto drives = _key.readUint16();
 
     auto entry = FileEntry();
-    entry.filename = boost::replace_all_copy(_key.readCStringAt(offFilename, filenameSize), "\\", "/");
+    entry.filename = boost::replace_all_copy(_key.readStringAt(offFilename, filenameSize), "\\", "/");
     entry.fileSize = fileSize;
 
     return std::move(entry);
@@ -68,7 +68,7 @@ void KeyReader::loadKeys() {
 }
 
 KeyReader::KeyEntry KeyReader::readKeyEntry() {
-    auto resRef = boost::to_lower_copy(_key.readCString(16));
+    auto resRef = boost::to_lower_copy(_key.readString(16));
     auto resType = _key.readUint16();
     auto resId = _key.readUint32();
 

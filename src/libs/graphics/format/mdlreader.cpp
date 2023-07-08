@@ -64,7 +64,7 @@ void MdlReader::load() {
     // Geometry Header
     uint32_t funcPtr1 = _mdl.readUint32();
     uint32_t funcPtr2 = _mdl.readUint32();
-    std::string name(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string name(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offRootNode = _mdl.readUint32();
     uint32_t numNodes = _mdl.readUint32();
     _mdl.ignore(6 * 4); // unknown
@@ -83,7 +83,7 @@ void MdlReader::load() {
     std::vector<float> boundingBox(_mdl.readFloatArray(6));
     float radius = _mdl.readFloat();
     float animationScale = _mdl.readFloat();
-    std::string superModelName(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string superModelName(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offAnimRoot = _mdl.readUint32();
     _mdl.ignore(4); // unknown
     uint32_t mdxSize2 = _mdl.readUint32();
@@ -212,10 +212,10 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     std::vector<float> diffuse(_mdl.readFloatArray(3));
     std::vector<float> ambient(_mdl.readFloatArray(3));
     uint32_t transprencyHint = _mdl.readUint32();
-    std::string texture1(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string texture2(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string texture3(boost::to_lower_copy(_mdl.readCString(12)));
-    std::string texture4(boost::to_lower_copy(_mdl.readCString(12)));
+    std::string texture1(boost::to_lower_copy(_mdl.readString(32)));
+    std::string texture2(boost::to_lower_copy(_mdl.readString(32)));
+    std::string texture3(boost::to_lower_copy(_mdl.readString(12)));
+    std::string texture4(boost::to_lower_copy(_mdl.readString(12)));
     ArrayDefinition indicesCountArrayDef(readArrayDefinition());
     ArrayDefinition indicesOffsetArrayDef(readArrayDefinition());
     ArrayDefinition invCounterArrayDef(readArrayDefinition());
@@ -537,7 +537,7 @@ std::shared_ptr<ModelNode::Light> MdlReader::readLight() {
         std::vector<std::shared_ptr<Texture>> flareTextures;
         for (int i = 0; i < numFlares; ++i) {
             _mdl.seek(kMdlDataOffset + texNameOffsets[i]);
-            std::string textureName(boost::to_lower_copy(_mdl.readCString(12)));
+            std::string textureName(boost::to_lower_copy(_mdl.readString(12)));
             std::shared_ptr<Texture> texture(_textures.get(textureName));
             flareTextures.push_back(std::move(texture));
         }
@@ -610,16 +610,16 @@ std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     uint32_t xGrid = _mdl.readUint32();
     uint32_t yGrid = _mdl.readUint32();
     _mdl.ignore(4); // unknown
-    std::string update(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string render(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string blend(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string texture(boost::to_lower_copy(_mdl.readCString(32)));
-    std::string chunkName(boost::to_lower_copy(_mdl.readCString(16)));
+    std::string update(boost::to_lower_copy(_mdl.readString(32)));
+    std::string render(boost::to_lower_copy(_mdl.readString(32)));
+    std::string blend(boost::to_lower_copy(_mdl.readString(32)));
+    std::string texture(boost::to_lower_copy(_mdl.readString(32)));
+    std::string chunkName(boost::to_lower_copy(_mdl.readString(16)));
     uint32_t twosided = _mdl.readUint32();
     uint32_t loop = _mdl.readUint32();
     uint32_t renderOrder = _mdl.readUint32();
     uint32_t frameBlending = _mdl.readUint32();
-    std::string depthTexture(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string depthTexture(boost::to_lower_copy(_mdl.readString(32)));
     _mdl.ignore(1); // padding
     uint32_t flags = _mdl.readUint32();
 
@@ -639,7 +639,7 @@ std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
 }
 
 std::shared_ptr<ModelNode::Reference> MdlReader::readReference() {
-    std::string modelResRef(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string modelResRef(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t reattachable = _mdl.readUint32();
 
     auto reference = std::make_shared<ModelNode::Reference>();
@@ -726,7 +726,7 @@ std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     // Geometry Header
     uint32_t funcPtr1 = _mdl.readUint32();
     uint32_t funcPtr2 = _mdl.readUint32();
-    std::string name(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string name(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offRootNode = _mdl.readUint32();
     uint32_t numNodes = _mdl.readUint32();
     _mdl.ignore(6 * 4); // unknown
@@ -737,7 +737,7 @@ std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     // Animation Header
     float length = _mdl.readFloat();
     float transitionTime = _mdl.readFloat();
-    std::string root(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string root(boost::to_lower_copy(_mdl.readString(32)));
     ArrayDefinition eventArrayDef(readArrayDefinition());
     _mdl.ignore(4); // unknown
 
@@ -750,7 +750,7 @@ std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
         for (uint32_t i = 0; i < eventArrayDef.count; ++i) {
             Animation::Event event;
             event.time = _mdl.readFloat();
-            event.name = boost::to_lower_copy(_mdl.readCString(32));
+            event.name = boost::to_lower_copy(_mdl.readString(32));
             events.push_back(std::move(event));
         }
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });

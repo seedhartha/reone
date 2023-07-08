@@ -43,7 +43,7 @@ void RimReader::loadResources() {
 }
 
 RimReader::ResourceEntry RimReader::readResource() {
-    auto resRef = boost::to_lower_copy(_rim.readCString(16));
+    auto resRef = boost::to_lower_copy(_rim.readString(16));
     auto type = _rim.readUint16();
     _rim.ignore(4 + 2);
     auto offset = _rim.readUint32();

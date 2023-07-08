@@ -46,7 +46,7 @@ void TlkReader::loadStrings() {
     for (uint32_t i = 0; i < _stringCount; ++i) {
         uint32_t flags = _tlk.readUint32();
 
-        std::string soundResRef(_tlk.readCString(16));
+        std::string soundResRef(_tlk.readString(16));
         boost::to_lower(soundResRef);
 
         _tlk.ignore(8);

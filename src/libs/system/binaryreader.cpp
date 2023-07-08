@@ -20,9 +20,7 @@
 namespace reone {
 
 uint8_t BinaryReader::readByte() {
-    uint8_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 1);
-    return val;
+    return static_cast<uint8_t>(_stream.readByte());
 }
 
 char BinaryReader::readChar() {
@@ -88,78 +86,39 @@ double BinaryReader::readDouble() {
 }
 
 std::string BinaryReader::readString(int len) {
-    std::string val;
-    val.resize(len);
-    _stream.read(&val[0], len);
-    return std::move(val);
-}
-
-std::string BinaryReader::readStringAt(size_t off, int len) {
-    size_t pos = position();
-    seek(off);
-
-    std::string result(readString(len));
-    seek(pos);
-
-    return std::move(result);
+    std::vector<char> buf;
+    buf.resize(len + 1, '\0');
+    _stream.read(&buf[0], len);
+    return std::string(&buf[0]);
 }
 
 std::string BinaryReader::readCString() {
-    std::ostringstream ss;
-
-    char ch;
-    do {
-        ch = _stream.readByte();
-        if (ch && ch != -1) {
-            ss << ch;
-        }
-    } while (ch);
-
-    return ss.str();
+    return readCString(8192);
 }
 
-std::string BinaryReader::readCString(int len) {
-    std::string result(readString(len));
-    result.erase(find(result.begin(), result.end(), '\0'), result.end());
-    return std::move(result);
-}
+std::string BinaryReader::readCString(int maxlen) {
+    auto pos = _stream.position();
 
-std::string BinaryReader::readCStringAt(size_t off, int len) {
-    size_t pos = position();
-    seek(off);
+    std::vector<char> buf;
+    buf.resize(maxlen, '\0');
+    _stream.read(&buf[0], maxlen);
 
-    std::string result(readCString(len));
-    seek(pos);
+    auto termIter = std::find(buf.begin(), buf.end(), '\0');
+    if (termIter == buf.end()) {
+        throw std::runtime_error("C string too long");
+    }
+    auto len = std::distance(buf.begin(), termIter);
+    _stream.seek(pos + len + 1, SeekOrigin::Begin);
 
-    return std::move(result);
-}
-
-std::string BinaryReader::readCStringAt(size_t off) {
-    size_t pos = position();
-    seek(off);
-
-    std::string result(readCString());
-    seek(pos);
-
-    return std::move(result);
+    return std::string(&buf[0], len);
 }
 
 ByteArray BinaryReader::readBytes(int count) {
-    ByteArray buffer;
-    buffer.resize(count);
-    int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
-    buffer.resize(numRead);
-    return buffer;
-}
-
-ByteArray BinaryReader::readBytesAt(size_t off, int count) {
-    size_t pos = position();
-    seek(off);
-
-    ByteArray result(readBytes(count));
-    seek(pos);
-
-    return std::move(result);
+    ByteArray buf;
+    buf.resize(count);
+    int numRead = _stream.read(reinterpret_cast<char *>(&buf[0]), count);
+    buf.resize(numRead);
+    return buf;
 }
 
 } // namespace reone

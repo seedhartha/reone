@@ -150,7 +150,7 @@ Gff::Field GffReader::readField(int idx) {
 
 std::string GffReader::readLabel(int idx) {
     uint32_t off = _labelOffset + 16 * idx;
-    return _gff.readCStringAt(off, 16);
+    return _gff.readStringAt(off, 16);
 }
 
 std::vector<uint32_t> GffReader::readFieldIndices(uint32_t off, int count) {
@@ -158,83 +158,57 @@ std::vector<uint32_t> GffReader::readFieldIndices(uint32_t off, int count) {
 }
 
 uint64_t GffReader::readQWordFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
-    uint64_t val = _gff.readUint64();
-    _gff.seek(pos);
-
-    return val;
+    return _gff.readAt<uint64_t>(_fieldDataOffset + off, [this]() {
+        return _gff.readUint64();
+    });
 }
 
 std::string GffReader::readStringFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
-
-    uint32_t size = _gff.readUint32();
-    std::string s(_gff.readCString(size));
-    _gff.seek(pos);
-
-    return std::move(s);
+    return _gff.readAt<std::string>(_fieldDataOffset + off, [this]() {
+        uint32_t size = _gff.readUint32();
+        return _gff.readString(size);
+    });
 }
 
 std::string GffReader::readResRefFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
-
-    uint8_t size = _gff.readByte();
-    std::string s(_gff.readCString(size));
-    _gff.seek(pos);
-
-    return std::move(s);
+    return _gff.readAt<std::string>(_fieldDataOffset + off, [this]() {
+        uint8_t size = _gff.readByte();
+        return _gff.readString(size);
+    });
 }
 
 GffReader::LocString GffReader::readCExoLocStringFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
+    return _gff.readAt<LocString>(_fieldDataOffset + off, [this]() {
+        uint32_t size = _gff.readUint32();
+        int32_t ref = _gff.readInt32();
+        uint32_t count = _gff.readUint32();
 
-    uint32_t size = _gff.readUint32();
-    int32_t ref = _gff.readInt32();
-    uint32_t count = _gff.readUint32();
-
-    LocString loc;
-    loc.strRef = ref;
-
-    if (count > 0) {
-        int32_t type = _gff.readInt32();
-        uint32_t ssSize = _gff.readUint32();
-        loc.subString = _gff.readCString(ssSize);
-
-        if (count > 1) {
+        LocString loc;
+        loc.strRef = ref;
+        if (count == 1) {
+            int32_t type = _gff.readInt32();
+            uint32_t ssSize = _gff.readUint32();
+            loc.subString = _gff.readString(ssSize);
+        } else if (count > 1) {
             warn("GFF: more than one substring in CExoLocString, ignoring");
         }
-    }
-
-    _gff.seek(pos);
-
-    return std::move(loc);
+        return loc;
+    });
 }
 
 int32_t GffReader::readStrRefFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
-
-    uint32_t size = _gff.readUint32();
-    int32_t ref = _gff.readInt32();
-
-    _gff.seek(pos);
-
-    return ref;
+    return _gff.readAt<int32_t>(_fieldDataOffset + off, [this]() {
+        uint32_t size = _gff.readUint32();
+        int32_t ref = _gff.readInt32();
+        return ref;
+    });
 }
 
 ByteArray GffReader::readByteArrayFieldData(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(_fieldDataOffset + off);
-
-    uint32_t size = _gff.readUint32();
-    ByteArray arr(_gff.readBytes(size));
-    _gff.seek(pos);
-
-    return std::move(arr);
+    return _gff.readAt<ByteArray>(_fieldDataOffset + off, [this]() {
+        uint32_t size = _gff.readUint32();
+        return _gff.readBytes(size);
+    });
 }
 
 ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
@@ -242,14 +216,10 @@ ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
 }
 
 std::vector<uint32_t> GffReader::readList(uint32_t off) {
-    size_t pos = _gff.position();
-    _gff.seek(static_cast<size_t>(_listIndicesOffset) + off);
-
-    uint32_t count = _gff.readUint32();
-    std::vector<uint32_t> arr(_gff.readUint32Array(count));
-    _gff.seek(pos);
-
-    return std::move(arr);
+    return _gff.readAt<std::vector<uint32_t>>(_listIndicesOffset + off, [this]() {
+        uint32_t count = _gff.readUint32();
+        return _gff.readUint32Array(count);
+    });
 }
 
 } // namespace resource

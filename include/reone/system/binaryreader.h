@@ -31,11 +31,11 @@ public:
         _endianess(endianess) {
     }
 
-    void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin) {
+    inline void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin) {
         _stream.seek(pos, origin);
     }
 
-    void ignore(int count) {
+    inline void ignore(int count) {
         _stream.seek(count, SeekOrigin::Current);
     }
 
@@ -58,15 +58,35 @@ public:
     float readFloat();
     double readDouble();
     std::string readString(int len);
-    std::string readStringAt(size_t off, int len);
     std::string readCString();
-    std::string readCString(int len);
-    std::string readCStringAt(size_t off, int len);
-    std::string readCStringAt(size_t off);
+    std::string readCString(int maxlen);
     ByteArray readBytes(int count);
-    ByteArray readBytesAt(size_t off, int count);
 
-    inline std::vector<uint16_t> readUint16Array(int count) {
+    std::string readStringAt(size_t offset, int len) {
+        return readAt<std::string>(offset, [this, &len]() {
+            return readString(len);
+        });
+    }
+
+    std::string readCStringAt(size_t offset, int len) {
+        return readAt<std::string>(offset, [this, &len]() {
+            return readCString(len);
+        });
+    }
+
+    std::string readCStringAt(size_t offset) {
+        return readAt<std::string>(offset, [this]() {
+            return readCString();
+        });
+    }
+
+    ByteArray readBytesAt(size_t offset, int count) {
+        return readAt<ByteArray>(offset, [this, &count]() {
+            return readBytes(count);
+        });
+    }
+
+    std::vector<uint16_t> readUint16Array(int count) {
         std::vector<uint16_t> elems;
         elems.reserve(count);
         for (int i = 0; i < count; ++i) {
@@ -75,59 +95,68 @@ public:
         return elems;
     }
 
-    inline std::vector<uint32_t> readUint32Array(int count) {
-        std::vector<uint32_t> elems;
-        elems.reserve(count);
-        for (int i = 0; i < count; ++i) {
-            elems.push_back(readUint32());
-        }
-        return elems;
+    std::vector<uint32_t> readUint32Array(int count) {
+        return readArray<uint32_t>(count, [this]() {
+            return readUint32();
+        });
     }
 
-    inline std::vector<uint32_t> readUint32ArrayAt(size_t offset, int count) {
-        size_t pos = position();
-        seek(offset);
-
-        auto elems = readUint32Array(count);
-        seek(pos);
-
-        return elems;
+    std::vector<uint32_t> readUint32ArrayAt(size_t offset, int count) {
+        return readArrayAt<uint32_t>(offset, count, [this]() {
+            return readUint32();
+        });
     }
 
-    inline std::vector<int32_t> readInt32Array(int count) {
-        std::vector<int32_t> elems;
-        elems.reserve(count);
-        for (int i = 0; i < count; ++i) {
-            elems.push_back(readInt32());
-        }
-        return elems;
+    std::vector<int32_t> readInt32Array(int count) {
+        return readArray<int32_t>(count, [this]() {
+            return readInt32();
+        });
     }
 
-    inline std::vector<float> readFloatArray(int count) {
-        std::vector<float> elems;
-        elems.reserve(count);
-        for (int i = 0; i < count; ++i) {
-            elems.push_back(readFloat());
-        }
-        return elems;
+    std::vector<float> readFloatArray(int count) {
+        return readArray<float>(count, [this]() {
+            return readFloat();
+        });
     }
 
-    inline std::vector<float> readFloatArrayAt(size_t offset, int count) {
-        size_t pos = position();
-        seek(offset);
-
-        auto elems = readFloatArray(count);
-        seek(pos);
-
-        return elems;
+    std::vector<float> readFloatArrayAt(size_t offset, int count) {
+        return readArrayAt<float>(offset, count, [this]() {
+            return readFloat();
+        });
     }
 
-    size_t position() const {
+    inline size_t position() const {
         return _stream.position();
     }
 
-    bool eof() const {
+    inline bool eof() const {
         return _stream.eof();
+    }
+
+    template <class T>
+    T readAt(size_t offset, std::function<T()> read) {
+        size_t pos = _stream.position();
+        seek(offset);
+        auto retval = read();
+        seek(pos);
+        return retval;
+    }
+
+    template <class T>
+    std::vector<T> readArray(int size, std::function<T()> read) {
+        std::vector<T> array;
+        array.reserve(size);
+        for (int i = 0; i < size; ++i) {
+            array.push_back(read());
+        }
+        return array;
+    }
+
+    template <class T>
+    std::vector<T> readArrayAt(size_t offset, int size, std::function<T()> read) {
+        return readAt<std::vector<T>>(offset, [this, &size, &read]() {
+            return readArray<T>(size, read);
+        });
     }
 
 private:
