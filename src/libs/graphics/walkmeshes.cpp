@@ -54,8 +54,8 @@ std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResourceT
 
     if (data) {
         auto bwm = MemoryInputStream(*data);
-        auto reader = BwmReader();
-        reader.load(bwm);
+        auto reader = BwmReader(bwm);
+        reader.load();
         walkmesh = reader.walkmesh();
     }
 

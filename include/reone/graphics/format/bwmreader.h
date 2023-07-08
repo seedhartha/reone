@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -25,8 +26,14 @@ namespace graphics {
 
 class Walkmesh;
 
-class BwmReader : public resource::BinaryResourceReader {
+class BwmReader : boost::noncopyable {
 public:
+    BwmReader(IInputStream &bwm) :
+        _bwm(BinaryReader(bwm)) {
+    }
+
+    void load();
+
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
 private:
@@ -34,6 +41,8 @@ private:
         PWK_DWK = 0,
         WOK = 1
     };
+
+    BinaryReader _bwm;
 
     WalkmeshType _type {WalkmeshType::WOK};
     glm::vec3 _position {0.0f};
@@ -60,8 +69,6 @@ private:
     std::vector<float> _normals;
 
     std::shared_ptr<Walkmesh> _walkmesh;
-
-    void onLoad() override;
 
     void loadVertices();
     void loadIndices();

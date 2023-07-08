@@ -52,10 +52,10 @@ TEST(bwm_reader, should_load_pwk_dwk) {
                         .append("\x00\x00\x00\x00", 4) // offset to planar distances
                         .build();
     auto bwm = MemoryInputStream(bwmBytes);
-    auto reader = BwmReader();
+    auto reader = BwmReader(bwm);
 
     // when
-    reader.load(bwm);
+    reader.load();
 
     // then
     auto walkmesh = reader.walkmesh();
@@ -99,10 +99,10 @@ TEST(bwm_reader, should_load_wok) {
                         .append("\x00\x00\x00\x00", 4) // offset to perimeters
                         .build();
     auto wok = MemoryInputStream(wokBytes);
-    auto reader = BwmReader();
+    auto reader = BwmReader(wok);
 
     // when
-    reader.load(wok);
+    reader.load();
 
     // then
     auto walkmesh = reader.walkmesh();
