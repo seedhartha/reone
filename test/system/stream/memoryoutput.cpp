@@ -17,16 +17,16 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 
 #include "../../checkutil.h"
 
 using namespace reone;
 
-TEST(byte_array_output_stream, should_write_to_byte_array) {
+TEST(memory_output_stream, should_write_to_byte_array) {
     // given
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto bytesToWrite = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 

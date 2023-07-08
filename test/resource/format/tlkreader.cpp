@@ -19,7 +19,7 @@
 
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -55,7 +55,7 @@ TEST(tlk_reader, should_read_tlk) {
                      .append("Jane")
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = TlkReader();
 
     // when

@@ -23,7 +23,7 @@
 #include "reone/resource/provider/erf.h"
 #include "reone/resource/strings.h"
 #include "reone/system/logutil.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/game/game.h"
 
@@ -192,14 +192,14 @@ static SavedGame peekSavedGame(const boost::filesystem::path &path) {
     auto erfResourceProvider = ErfResourceProvider(path);
 
     auto nfoData = erfResourceProvider.find(ResourceId("savenfo", ResourceType::Res));
-    auto nfoStream = ByteArrayInputStream(*nfoData);
+    auto nfoStream = MemoryInputStream(*nfoData);
     GffReader nfo;
     nfo.load(nfoStream);
 
     std::shared_ptr<Texture> screen;
     auto screenData = erfResourceProvider.find(ResourceId("screen", ResourceType::Tga));
     if (screenData) {
-        auto tgaStream = ByteArrayInputStream(*screenData);
+        auto tgaStream = MemoryInputStream(*screenData);
         TgaReader tga("screen", TextureUsage::GUI);
         tga.load(tgaStream);
         screen = tga.texture();

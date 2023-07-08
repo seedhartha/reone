@@ -19,7 +19,7 @@
 
 #include "reone/script/format/ncsreader.h"
 #include "reone/script/program.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -128,7 +128,7 @@ TEST(ncs_reader, should_read_ncs) {
                      .append("\x2d\x00", 2)                                  // NOP2
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = NcsReader("");
 
     // when

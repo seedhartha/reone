@@ -24,8 +24,8 @@
 #include "reone/resource/provider/rim.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/fileutil.h"
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
 #include "templates.h"
@@ -303,7 +303,7 @@ void generateGffSchema(resource::ResourceType resType,
             continue;
         }
         auto bytes = keyBif.find(res.first);
-        auto stream = ByteArrayInputStream(*bytes);
+        auto stream = MemoryInputStream(*bytes);
         auto reader = GffReader();
         reader.load(stream);
         trees[res.first.resRef] = reader.root();
@@ -323,7 +323,7 @@ void generateGffSchema(resource::ResourceType resType,
                     continue;
                 }
                 auto bytes = rim.find(res.first);
-                auto stream = ByteArrayInputStream(*bytes);
+                auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader();
                 reader.load(stream);
                 trees[res.first.resRef] = reader.root();
@@ -336,7 +336,7 @@ void generateGffSchema(resource::ResourceType resType,
                     continue;
                 }
                 auto bytes = erf.find(res.first);
-                auto stream = ByteArrayInputStream(*bytes);
+                auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader();
                 reader.load(stream);
                 trees[res.first.resRef] = reader.root();

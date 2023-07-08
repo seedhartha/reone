@@ -20,7 +20,7 @@
 #include "reone/audio/files.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/game/format/ssfreader.h"
 
@@ -36,7 +36,7 @@ std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     if (!data) {
         return nullptr;
     }
-    auto stream = ByteArrayInputStream(*data);
+    auto stream = MemoryInputStream(*data);
     auto result = std::make_shared<SoundSet>();
 
     SsfReader ssf;

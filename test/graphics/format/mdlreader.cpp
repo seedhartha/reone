@@ -20,7 +20,7 @@
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/scene.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../fixtures/graphics.h"
@@ -98,9 +98,9 @@ TEST(mdl_reader, should_load_mdl) {
                         .append("\x00\x00\x00\x00", 4) // number of controller values
                         .append("\x00\x00\x00\x00", 4) // number of controller values
                         .build();
-    auto mdl = ByteArrayInputStream(mdlBytes);
+    auto mdl = MemoryInputStream(mdlBytes);
     auto mdxBytes = StringBuilder().build();
-    auto mdx = ByteArrayInputStream(mdxBytes);
+    auto mdx = MemoryInputStream(mdxBytes);
     auto models = std::make_unique<MockModels>();
     auto textures = std::make_unique<MockTextures>();
     auto reader = MdlReader(*models, *textures);

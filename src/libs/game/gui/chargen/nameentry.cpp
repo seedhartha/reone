@@ -19,7 +19,7 @@
 
 #include "reone/gui/control/button.h"
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
@@ -64,7 +64,7 @@ void NameEntry::bindControls() {
 
 void NameEntry::loadLtrFile(const std::string &resRef, LtrReader &ltr) {
     auto data = _services.resource.resources.get(resRef, ResourceType::Ltr);
-    auto stream = ByteArrayInputStream(*data);
+    auto stream = MemoryInputStream(*data);
     ltr.load(stream);
 }
 

@@ -19,7 +19,7 @@
 
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -58,7 +58,7 @@ TEST(tlk_writer, should_write_tlk) {
                               .build();
 
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
 
     auto strings = std::vector<TalkTable::String> {
         TalkTable::String {"John", ""},

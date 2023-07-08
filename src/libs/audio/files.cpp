@@ -18,7 +18,7 @@
 #include "reone/audio/files.h"
 
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
@@ -35,7 +35,7 @@ std::shared_ptr<AudioStream> AudioFiles::doGet(std::string resRef) {
 
     std::shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
-        auto mp3 = ByteArrayInputStream(*mp3Data);
+        auto mp3 = MemoryInputStream(*mp3Data);
         auto reader = Mp3Reader();
         reader.load(mp3);
         result = reader.stream();
@@ -43,7 +43,7 @@ std::shared_ptr<AudioStream> AudioFiles::doGet(std::string resRef) {
     if (!result) {
         std::shared_ptr<ByteArray> wavData(_resources.get(resRef, ResourceType::Wav));
         if (wavData) {
-            auto wav = ByteArrayInputStream(*wavData);
+            auto wav = MemoryInputStream(*wavData);
             auto mp3ReaderFactory = Mp3ReaderFactory();
             auto reader = WavReader(mp3ReaderFactory);
             reader.load(wav);

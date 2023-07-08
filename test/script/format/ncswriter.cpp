@@ -19,7 +19,7 @@
 
 #include "reone/script/format/ncswriter.h"
 #include "reone/script/program.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -229,7 +229,7 @@ TEST(ncs_writer, should_write_ncs) {
 
     auto writer = NcsWriter(program);
     auto bytes = ByteArray();
-    auto stream = std::make_shared<ByteArrayOutputStream>(bytes);
+    auto stream = std::make_shared<MemoryOutputStream>(bytes);
 
     // when
 

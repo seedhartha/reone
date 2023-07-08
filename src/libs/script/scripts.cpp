@@ -17,7 +17,7 @@
 
 #include "reone/script/scripts.h"
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/script/format/ncsreader.h"
 
@@ -32,7 +32,7 @@ std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
     if (!data)
         return nullptr;
 
-    auto ncs = ByteArrayInputStream(*data);
+    auto ncs = MemoryInputStream(*data);
     auto reader = NcsReader(resRef);
     reader.load(ncs);
 

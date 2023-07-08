@@ -19,7 +19,7 @@
 
 #include "reone/graphics/format/tgareader.h"
 #include "reone/graphics/texture.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -40,7 +40,7 @@ TEST(tga_reader, should_load_tga) {
                         // Pixels
                         .append("\xff", 1)
                         .build();
-    auto tga = ByteArrayInputStream(tgaBytes);
+    auto tga = MemoryInputStream(tgaBytes);
     auto reader = TgaReader("some_texture", TextureUsage::Default);
 
     // when

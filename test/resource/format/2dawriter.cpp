@@ -20,7 +20,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dawriter.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -55,7 +55,7 @@ TEST(two_da_writer, should_write_two_da) {
             TwoDa::newRow({"same", "same"})});
 
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto writer = TwoDaWriter(twoDa);
 
     // when

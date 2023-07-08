@@ -21,7 +21,7 @@
 
 #include "reone/game/format/visreader.h"
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 
@@ -34,7 +34,7 @@ std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
     if (!data) {
         return nullptr;
     }
-    auto stream = ByteArrayInputStream(*data);
+    auto stream = MemoryInputStream(*data);
 
     VisReader vis;
     vis.load(stream);

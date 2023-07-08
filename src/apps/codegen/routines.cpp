@@ -20,8 +20,8 @@
 #include "reone/resource/provider/keybif.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/fileutil.h"
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
 #include "templates.h"
@@ -362,7 +362,7 @@ void generateRoutines(const boost::filesystem::path &k1Dir,
     if (!k1NssBytes) {
         throw std::runtime_error("KotOR nwscript.nss resource not found");
     }
-    auto k1Nss = ByteArrayInputStream(*k1NssBytes);
+    auto k1Nss = MemoryInputStream(*k1NssBytes);
     auto [_, k1functions] = parseNwscriptNss(k1Nss);
     std::vector<std::tuple<int, Function>> k1mainFunctions;
     std::vector<std::tuple<int, Function>> k1actionFunctions;
@@ -391,7 +391,7 @@ void generateRoutines(const boost::filesystem::path &k1Dir,
     if (!k2NssBytes) {
         throw std::runtime_error("TSL nwscript.nss resource not found");
     }
-    auto k2Nss = ByteArrayInputStream(*k2NssBytes);
+    auto k2Nss = MemoryInputStream(*k2NssBytes);
     auto [k2constants, k2functions] = parseNwscriptNss(k2Nss);
     std::vector<std::tuple<int, Function>> k2mainFunctions;
     std::vector<std::tuple<int, Function>> k2actionFunctions;

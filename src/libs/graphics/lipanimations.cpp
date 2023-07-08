@@ -20,7 +20,7 @@
 
 #include "reone/graphics/format/lipreader.h"
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 
@@ -33,7 +33,7 @@ std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
     if (!lipData) {
         return nullptr;
     }
-    auto lip = ByteArrayInputStream(*lipData);
+    auto lip = MemoryInputStream(*lipData);
     auto reader = LipReader(resRef);
     reader.load(lip);
 

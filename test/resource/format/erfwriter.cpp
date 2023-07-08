@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/format/erfwriter.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -55,7 +55,7 @@ TEST(erf_writer, should_write_erf) {
                               .build();
 
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
 
     auto writer = ErfWriter();
     writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});

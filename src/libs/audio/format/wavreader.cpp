@@ -20,7 +20,7 @@
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/stream.h"
 #include "reone/resource/exception/format.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 
@@ -94,7 +94,7 @@ void WavReader::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
         size_t pos = tell();
         ByteArray data(_reader->readBytes(static_cast<int>(_size - pos)));
-        auto mp3 = ByteArrayInputStream(data);
+        auto mp3 = MemoryInputStream(data);
         auto mp3Reader = _mp3ReaderFactory.create();
         mp3Reader->load(mp3);
         _stream = mp3Reader->stream();

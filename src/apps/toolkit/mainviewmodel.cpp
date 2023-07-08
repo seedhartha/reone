@@ -30,10 +30,10 @@
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
 #include "reone/system/fileutil.h"
-#include "reone/system/stream/bytearrayinput.h"
-#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryinput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/tools/2da.h"
 #include "reone/tools/audio.h"
 #include "reone/tools/erf.h"
@@ -174,7 +174,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
     } else if (id.type == ResourceType::Ncs) {
         auto pcodeBytes = ByteArray();
-        auto pcode = ByteArrayOutputStream(pcodeBytes);
+        auto pcode = MemoryOutputStream(pcodeBytes);
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
         auto page = std::make_shared<Page>(PageType::NCS, id.string(), id);
@@ -250,8 +250,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         auto tgaBytes = std::make_shared<ByteArray>();
         auto txiBytes = std::make_shared<ByteArray>();
         if (id.type == ResourceType::Tpc) {
-            auto tga = ByteArrayOutputStream(*tgaBytes);
-            auto txi = ByteArrayOutputStream(*txiBytes);
+            auto tga = MemoryOutputStream(*tgaBytes);
+            auto txi = MemoryOutputStream(*txiBytes);
             TpcTool().toTGA(data, tga, txi, false);
         } else {
             data.seek(0, SeekOrigin::End);
@@ -283,7 +283,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         if (!mdxBytes) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
-        auto mdx = ByteArrayInputStream(*mdxBytes);
+        auto mdx = MemoryInputStream(*mdxBytes);
         auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
         reader.load(data, mdx);
 
@@ -485,7 +485,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
 
     withResourceStream(item, [this, &item, &optimize](auto &res) {
         auto nssBytes = ByteArray();
-        auto nss = ByteArrayOutputStream(nssBytes);
+        auto nss = MemoryOutputStream(nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
         auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
@@ -697,7 +697,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             resBytes.resize(bifEntry.fileSize);
             bif.seek(bifEntry.offset, SeekOrigin::Begin);
             bif.read(&resBytes[0], bifEntry.fileSize);
-            auto res = ByteArrayInputStream(resBytes);
+            auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
             auto erf = FileInputStream(item.path, OpenMode::Binary);
@@ -715,7 +715,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             resBytes.resize(erfEntry.size);
             erf.seek(erfEntry.offset, SeekOrigin::Begin);
             erf.read(&resBytes[0], erfEntry.size);
-            auto res = ByteArrayInputStream(resBytes);
+            auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".rim") {
             auto rim = FileInputStream(item.path, OpenMode::Binary);
@@ -732,7 +732,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             resBytes.resize(rimRes.size);
             rim.seek(rimRes.offset, SeekOrigin::Begin);
             rim.read(&resBytes[0], rimRes.size);
-            auto res = ByteArrayInputStream(resBytes);
+            auto res = MemoryInputStream(resBytes);
             block(res);
         }
     } else {

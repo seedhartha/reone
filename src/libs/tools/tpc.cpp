@@ -21,9 +21,9 @@
 #include "reone/graphics/format/tpcreader.h"
 #include "reone/resource/exception/format.h"
 #include "reone/system/logutil.h"
-#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 
 using namespace reone::graphics;
 
@@ -60,7 +60,7 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
 
     auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
     auto txiBytes = ByteArray();
-    auto txiMemory = ByteArrayOutputStream(txiBytes);
+    auto txiMemory = MemoryOutputStream(txiBytes);
     toTGA(tpc, tga, txiMemory, true);
 
     if (!txiBytes.empty()) {

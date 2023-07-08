@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/format/erfreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -52,7 +52,7 @@ TEST(erf_reader, should_read_erf) {
                      .append("Bb")
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = ErfReader();
 
     // when

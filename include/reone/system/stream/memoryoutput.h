@@ -21,9 +21,9 @@
 
 namespace reone {
 
-class ByteArrayOutputStream : public IOutputStream {
+class MemoryOutputStream : public IOutputStream {
 public:
-    ByteArrayOutputStream(ByteArray &bytes) :
+    MemoryOutputStream(ByteArray &bytes) :
         _bytes(bytes) {
     }
 

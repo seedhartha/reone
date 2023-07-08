@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/graphics/format/bwmreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -51,7 +51,7 @@ TEST(bwm_reader, should_load_pwk_dwk) {
                         .append("\x00\x00\x00\x00", 4) // offset to normals
                         .append("\x00\x00\x00\x00", 4) // offset to planar distances
                         .build();
-    auto bwm = ByteArrayInputStream(bwmBytes);
+    auto bwm = MemoryInputStream(bwmBytes);
     auto reader = BwmReader();
 
     // when
@@ -98,7 +98,7 @@ TEST(bwm_reader, should_load_wok) {
                         .append("\x00\x00\x00\x00", 4) // number of perimeters
                         .append("\x00\x00\x00\x00", 4) // offset to perimeters
                         .build();
-    auto wok = ByteArrayInputStream(wokBytes);
+    auto wok = MemoryInputStream(wokBytes);
     auto reader = BwmReader();
 
     // when

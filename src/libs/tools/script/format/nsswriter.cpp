@@ -23,7 +23,7 @@
 #include "reone/script/variableutil.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/logutil.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/textwriter.h"
 
 namespace reone {
@@ -141,7 +141,7 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
     }
 
     auto blockBytes = ByteArray();
-    auto blockStream = ByteArrayOutputStream(blockBytes);
+    auto blockStream = MemoryOutputStream(blockBytes);
     auto blockWriter = TextWriter(blockStream);
     auto ctx = WriteContext();
     for (auto [block, level] : blocksToWrite) {

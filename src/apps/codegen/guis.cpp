@@ -22,8 +22,8 @@
 #include "reone/resource/provider/folder.h"
 #include "reone/resource/provider/keybif.h"
 #include "reone/system/fileutil.h"
-#include "reone/system/stream/bytearrayinput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
 #include "templates.h"
@@ -49,7 +49,7 @@ struct ParsedGUI {
 };
 
 static ParsedGUI parseGui(ByteArray &guiBytes) {
-    auto guiStream = ByteArrayInputStream(guiBytes);
+    auto guiStream = MemoryInputStream(guiBytes);
     auto guiReader = GffReader();
     guiReader.load(guiStream);
     auto gff = guiReader.root();

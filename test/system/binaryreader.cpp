@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/system/binaryreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../checkutil.h"
@@ -28,7 +28,7 @@ using namespace reone;
 TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
     auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;
 
@@ -60,7 +60,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
     auto inputBytes = ByteArray();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
-    auto stream = ByteArrayInputStream(inputBytes);
+    auto stream = MemoryInputStream(inputBytes);
     auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedByte = 255u;
     auto expectedUint16 = 65281u;
@@ -119,7 +119,7 @@ TEST(binary_reader, should_read_from_big_endian_stream) {
     auto inputBytes = ByteArray();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
-    auto stream = ByteArrayInputStream(inputBytes);
+    auto stream = MemoryInputStream(inputBytes);
     auto reader = BinaryReader(stream, boost::endian::order::big);
     auto expectedUint16 = 65281u;
     auto expectedUint32 = 4294967042u;

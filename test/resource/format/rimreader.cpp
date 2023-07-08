@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/format/rimreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -44,7 +44,7 @@ TEST(rim_reader, should_read_rim) {
                      .append("Bb", 2)
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = RimReader();
 
     // when

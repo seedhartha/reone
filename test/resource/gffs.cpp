@@ -19,7 +19,7 @@
 
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 
 using namespace reone;
 using namespace reone::resource;
@@ -42,7 +42,7 @@ TEST(gffs, should_get_gff_with_caching) {
     // given
 
     auto resBytes = std::make_shared<ByteArray>();
-    auto res = ByteArrayOutputStream(*resBytes);
+    auto res = MemoryOutputStream(*resBytes);
     res.write("GFF V3.2");
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);

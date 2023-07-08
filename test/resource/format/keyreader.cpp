@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/format/keyreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -61,7 +61,7 @@ TEST(key_reader, should_read_key) {
                      .append("\xd3\x07\xc0\x00", 4)
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = KeyReader();
 
     // when

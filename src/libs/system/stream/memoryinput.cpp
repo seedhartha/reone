@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 namespace reone {
 
-void ByteArrayInputStream::seek(int64_t offset, SeekOrigin origin) {
+void MemoryInputStream::seek(int64_t offset, SeekOrigin origin) {
     if (origin == SeekOrigin::Begin) {
         _position = offset;
     } else if (origin == SeekOrigin::Current) {
@@ -31,14 +31,14 @@ void ByteArrayInputStream::seek(int64_t offset, SeekOrigin origin) {
     }
 }
 
-int ByteArrayInputStream::readByte() {
+int MemoryInputStream::readByte() {
     if (_position >= _size) {
         return -1;
     }
     return _data[_position++];
 }
 
-int ByteArrayInputStream::read(char *outData, int length) {
+int MemoryInputStream::read(char *outData, int length) {
     size_t available = _size - _position;
     size_t toRead = std::min(available, static_cast<size_t>(length));
     std::memcpy(outData, &_data[_position], toRead);
@@ -50,7 +50,7 @@ int ByteArrayInputStream::read(char *outData, int length) {
     return toRead;
 }
 
-void ByteArrayInputStream::readLine(char *outData, int maxLen) {
+void MemoryInputStream::readLine(char *outData, int maxLen) {
     size_t endPos;
     for (endPos = _position; endPos < _size; ++endPos) {
         if (_data[endPos] == '\r' || _data[endPos] == '\n') {

@@ -20,7 +20,7 @@
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/gff.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -198,7 +198,7 @@ TEST(gff_writer, should_write_gff) {
                     std::make_shared<Gff>(3, std::vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto writer = GffWriter(ResourceType::Res, root);
 
     // when

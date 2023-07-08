@@ -18,7 +18,7 @@
 #include "reone/graphics/walkmeshes.h"
 
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/graphics/format/bwmreader.h"
 
@@ -53,7 +53,7 @@ std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResourceT
     std::shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
-        auto bwm = ByteArrayInputStream(*data);
+        auto bwm = MemoryInputStream(*data);
         auto reader = BwmReader();
         reader.load(bwm);
         walkmesh = reader.walkmesh();

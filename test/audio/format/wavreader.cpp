@@ -20,7 +20,7 @@
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/audio/stream.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../fixtures/audio.h"
@@ -53,7 +53,7 @@ TEST(wav_reader, should_load_plain_wav) {
                         // Samples
                         .append("\xff\x7f", 2)
                         .build();
-    auto wav = ByteArrayInputStream(wavBytes);
+    auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
     auto reader = WavReader(mp3ReaderFactory);
 
@@ -95,7 +95,7 @@ TEST(wav_reader, should_load_obfuscated_wav) {
                         // IMA Blocks
                         .append("\x00\x00\x03\x00\x12\x34\x56\x78", 8)
                         .build();
-    auto wav = ByteArrayInputStream(wavBytes);
+    auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
     auto reader = WavReader(mp3ReaderFactory);
 
@@ -143,7 +143,7 @@ TEST(wav_reader, should_load_obfuscated_mp3) {
                         // MP3
                         .append("\x00", 1)
                         .build();
-    auto wav = ByteArrayInputStream(wavBytes);
+    auto wav = MemoryInputStream(wavBytes);
 
     auto mp3Reader = std::make_shared<MockMp3Reader>();
     EXPECT_CALL(*mp3Reader, load(_)).Times(1);

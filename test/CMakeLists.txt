@@ -42,8 +42,8 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/system/collectionutil.cpp
     ${TESTS_SOURCE_DIR}/system/hexutil.cpp
     ${TESTS_SOURCE_DIR}/system/pathutil.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/bytearrayinput.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/bytearrayoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
     ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp

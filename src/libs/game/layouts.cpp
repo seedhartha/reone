@@ -18,7 +18,7 @@
 #include "reone/game/layouts.h"
 
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/game/format/lytreader.h"
 
@@ -33,7 +33,7 @@ std::shared_ptr<Layout> Layouts::doGet(std::string resRef) {
     if (!data) {
         return nullptr;
     }
-    auto stream = ByteArrayInputStream(*data);
+    auto stream = MemoryInputStream(*data);
     LytReader lyt;
     lyt.load(stream);
     return std::make_shared<Layout>(lyt.layout());

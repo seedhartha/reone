@@ -17,16 +17,16 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "../../checkutil.h"
 
 using namespace reone;
 
-TEST(byte_array_input_stream, should_read_from_byte_array) {
+TEST(memory_input_stream, should_read_from_byte_array) {
     // given
     auto bytes = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
-    auto stream = ByteArrayInputStream(bytes);
+    auto stream = MemoryInputStream(bytes);
     auto buf = ByteArray(16, '\0');
     auto expectedContents = std::string("Hello, world!");
 
@@ -54,10 +54,10 @@ TEST(byte_array_input_stream, should_read_from_byte_array) {
     EXPECT_EQ(true, eof);
 }
 
-TEST(byte_array_input_stream, should_read_lines_from_byte_array) {
+TEST(memory_input_stream, should_read_lines_from_byte_array) {
     // given
     auto bytes = ByteArray {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
-    auto stream = ByteArrayInputStream(bytes);
+    auto stream = MemoryInputStream(bytes);
     char buf[8];
 
     // expect

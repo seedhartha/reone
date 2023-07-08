@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/format/bifreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -42,7 +42,7 @@ TEST(bif_reader, should_read_bif) {
                      .append("Hello, world!")
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = BifReader();
 
     // when

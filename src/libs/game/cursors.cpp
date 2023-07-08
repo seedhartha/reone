@@ -22,7 +22,7 @@
 #include "reone/graphics/texture.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::game;
 using namespace reone::graphics;
@@ -83,7 +83,7 @@ std::vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
     if (!bytes) {
         return std::vector<uint32_t>();
     }
-    auto stream = ByteArrayInputStream(*bytes);
+    auto stream = MemoryInputStream(*bytes);
     auto reader = BinaryReader(stream);
 
     reader.ignore(4); // Reserved, ResType
@@ -101,7 +101,7 @@ std::vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
 
 std::shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     auto bytes = _resources.getFromExe(name, PEResourceType::Cursor);
-    auto stream = ByteArrayInputStream(*bytes);
+    auto stream = MemoryInputStream(*bytes);
 
     CurReader cur;
     cur.load(stream);

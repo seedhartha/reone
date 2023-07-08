@@ -28,8 +28,8 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
     ${SYSTEM_INCLUDE_DIR}/logutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
-    ${SYSTEM_INCLUDE_DIR}/stream/bytearrayinput.h
-    ${SYSTEM_INCLUDE_DIR}/stream/bytearrayoutput.h
+    ${SYSTEM_INCLUDE_DIR}/stream/memoryinput.h
+    ${SYSTEM_INCLUDE_DIR}/stream/memoryoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileinput.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/input.h
@@ -48,7 +48,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/hexutil.cpp
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
-    ${SYSTEM_SOURCE_DIR}/stream/bytearrayinput.cpp
+    ${SYSTEM_SOURCE_DIR}/stream/memoryinput.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})

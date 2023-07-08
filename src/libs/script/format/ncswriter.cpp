@@ -21,8 +21,8 @@
 #include "reone/script/program.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/collectionutil.h"
-#include "reone/system/stream/bytearrayoutput.h"
 #include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 
 using namespace reone::resource;
 
@@ -37,7 +37,7 @@ void NcsWriter::save(const boost::filesystem::path &path) {
 
 void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     BinaryWriter writer(stream, boost::endian::order::big);
 
     for (auto &ins : _program.instructions()) {

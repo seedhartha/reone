@@ -17,7 +17,7 @@
 
 #include "reone/resource/2das.h"
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/resources.h"
@@ -31,7 +31,7 @@ std::shared_ptr<TwoDa> TwoDas::doGet(const std::string &resRef) {
     if (!raw) {
         return nullptr;
     }
-    auto stream = ByteArrayInputStream(*raw);
+    auto stream = MemoryInputStream(*raw);
 
     TwoDaReader twoDa;
     twoDa.load(stream);

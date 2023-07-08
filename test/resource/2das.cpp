@@ -20,7 +20,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/resources.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 
 using namespace reone;
 using namespace reone::resource;
@@ -43,7 +43,7 @@ TEST(two_das, should_get_2da_with_caching) {
     // given
 
     auto resBytes = std::make_shared<ByteArray>();
-    auto res = ByteArrayOutputStream(*resBytes);
+    auto res = MemoryOutputStream(*resBytes);
     res.write("2DA V2.b\n");
     res.write("label\t\0");
     res.write("\x00\x00\x00\x00", 4);

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/textwriter.h"
 
 #include "../checkutil.h"
@@ -30,7 +30,7 @@ TEST(text_writer, should_write_text) {
 
     // when
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto text = TextWriter(stream);
     text.putLine("Hello, world!");
     text.put("Hello, world!");

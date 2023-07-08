@@ -17,7 +17,7 @@
 
 #include "reone/resource/gffs.h"
 
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/resources.h"
@@ -35,7 +35,7 @@ std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
     std::shared_ptr<Gff> gff;
     auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
-        auto stream = ByteArrayInputStream(*maybeRaw);
+        auto stream = MemoryInputStream(*maybeRaw);
         auto reader = GffReader();
         reader.load(stream);
         gff = reader.root();

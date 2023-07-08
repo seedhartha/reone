@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/graphics/format/tpcreader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -38,7 +38,7 @@ TEST(tpc_reader, should_load_tpc) {
                         // Mip Map 1
                         .append("\xff", 1)
                         .build();
-    auto tpc = ByteArrayInputStream(tpcBytes);
+    auto tpc = MemoryInputStream(tpcBytes);
     auto reader = TpcReader("some_texture", TextureUsage::Default);
 
     // when

@@ -21,14 +21,14 @@
 
 namespace reone {
 
-class ByteArrayInputStream : public IInputStream {
+class MemoryInputStream : public IInputStream {
 public:
-    ByteArrayInputStream(std::string &str) :
+    MemoryInputStream(std::string &str) :
         _data(&str[0]),
         _size(str.size()) {
     }
 
-    ByteArrayInputStream(ByteArray &bytes) :
+    MemoryInputStream(ByteArray &bytes) :
         _data(!bytes.empty() ? &bytes[0] : nullptr),
         _size(bytes.size()) {
     }

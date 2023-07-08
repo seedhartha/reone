@@ -20,7 +20,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -46,7 +46,7 @@ TEST(two_da_reader, should_read_two_da) {
                      .append("same\x00", 5)
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = TwoDaReader();
 
     // when

@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/graphics/format/txireader.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
@@ -29,7 +29,7 @@ TEST(txi_reader, should_load_txi) {
     auto txiBytes = StringBuilder()
                         .append("blending additive")
                         .build();
-    auto txi = ByteArrayInputStream(txiBytes);
+    auto txi = MemoryInputStream(txiBytes);
     auto reader = TxiReader();
 
     // when

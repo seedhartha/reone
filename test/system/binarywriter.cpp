@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/system/binarywriter.h"
-#include "reone/system/stream/bytearrayoutput.h"
+#include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../checkutil.h"
@@ -28,7 +28,7 @@ using namespace reone;
 TEST(binary_writer, should_write_to_little_endian_stream) {
     // given
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto writer = BinaryWriter(stream, boost::endian::order::little);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)
@@ -65,7 +65,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
 TEST(binary_writer, should_write_to_big_endian_stream) {
     // given
     auto bytes = ByteArray();
-    auto stream = ByteArrayOutputStream(bytes);
+    auto stream = MemoryOutputStream(bytes);
     auto writer = BinaryWriter(stream, boost::endian::order::big);
     auto expectedOutput = StringBuilder()
                               .append("\x40", 1)

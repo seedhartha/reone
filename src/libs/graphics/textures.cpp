@@ -20,7 +20,7 @@
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/format/tgareader.h"
@@ -144,7 +144,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
 
     auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
-        auto tga = ByteArrayInputStream(*tgaData);
+        auto tga = MemoryInputStream(*tgaData);
         auto tgaReader = TgaReader(resRef, usage);
         tgaReader.load(tga);
         texture = tgaReader.texture();
@@ -152,7 +152,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         if (texture) {
             auto txiData = _resources.get(resRef, ResourceType::Txi, false);
             if (txiData) {
-                auto txi = ByteArrayInputStream(*txiData);
+                auto txi = MemoryInputStream(*txiData);
                 auto txiReader = TxiReader();
                 txiReader.load(txi);
                 texture->setFeatures(txiReader.features());
@@ -163,7 +163,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
     if (!texture) {
         auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
         if (tpcData) {
-            auto tpc = ByteArrayInputStream(*tpcData);
+            auto tpc = MemoryInputStream(*tpcData);
             auto tpcReader = TpcReader(resRef, usage);
             tpcReader.load(tpc);
             texture = tpcReader.texture();

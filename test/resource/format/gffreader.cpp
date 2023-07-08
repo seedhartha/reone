@@ -19,7 +19,7 @@
 
 #include "reone/resource/format/gffreader.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 #include "../../checkutil.h"
@@ -170,7 +170,7 @@ TEST(gff_reader, should_read_gff) {
                      .append("\x03\x00\x00\x00", 4)
                      .build();
 
-    auto stream = ByteArrayInputStream(input);
+    auto stream = MemoryInputStream(input);
     auto reader = GffReader();
     auto expectedData = ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)};
     auto expectedOrientation = glm::quat {1.0f, 1.0f, 1.0f, 1.0f};

@@ -20,8 +20,7 @@
 #include "reone/resource/exception/format.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
-#include "reone/system/stream/bytearrayinput.h"
-
+#include "reone/system/stream/memoryinput.h"
 
 #include "reone/graphics/format/mdlreader.h"
 #include "reone/graphics/model.h"
@@ -64,8 +63,8 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     std::shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        auto mdl = ByteArrayInputStream(*mdlData);
-        auto mdx = ByteArrayInputStream(*mdxData);
+        auto mdl = MemoryInputStream(*mdlData);
+        auto mdx = MemoryInputStream(*mdxData);
         auto reader = MdlReader(*this, _textures);
         try {
             reader.load(mdl, mdx);

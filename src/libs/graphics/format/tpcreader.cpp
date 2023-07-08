@@ -20,7 +20,7 @@
 #include "reone/graphics/format/txireader.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/resource/exception/format.h"
-#include "reone/system/stream/bytearrayinput.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 
@@ -89,7 +89,7 @@ void TpcReader::loadFeatures() {
     }
     _txiData = _reader->readBytes(static_cast<int>(_size - pos));
 
-    auto txi = ByteArrayInputStream(_txiData);
+    auto txi = MemoryInputStream(_txiData);
     auto reader = TxiReader();
     reader.load(txi);
 
