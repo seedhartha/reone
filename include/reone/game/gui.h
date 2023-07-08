@@ -67,8 +67,8 @@ protected:
     std::string guiResRef(const std::string &base) const;
 
     template <class T>
-    std::shared_ptr<T> getControl(const std::string &tag) const {
-        auto ctrl = _gui->getControl(tag);
+    std::shared_ptr<T> findControl(const std::string &tag) const {
+        auto ctrl = _gui->findControl(tag);
         return std::static_pointer_cast<T>(ctrl);
     }
 };

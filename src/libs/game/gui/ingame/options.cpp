@@ -47,9 +47,9 @@ void OptionsMenu::onGUILoaded() {
 }
 
 void OptionsMenu::bindControls() {
-    _binding.btnLoadGame = getControl<Button>("BTN_LOADGAME");
-    _binding.btnSaveGame = getControl<Button>("BTN_SAVEGAME");
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
+    _binding.btnLoadGame = findControl<Button>("BTN_LOADGAME");
+    _binding.btnSaveGame = findControl<Button>("BTN_SAVEGAME");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
 }
 
 } // namespace game

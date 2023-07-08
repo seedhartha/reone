@@ -124,26 +124,26 @@ void SaveLoad::onGUILoaded() {
 }
 
 void SaveLoad::bindControls() {
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnDelete = getControl<Button>("BTN_DELETE");
-    _binding.btnSaveLoad = getControl<Button>("BTN_SAVELOAD");
-    _binding.lblAreaName = getControl<Label>("LBL_AREANAME");
-    _binding.lblPanelName = getControl<Label>("LBL_PANELNAME");
-    _binding.lblPlanetName = getControl<Label>("LBL_PLANETNAME");
-    _binding.lblPm1 = getControl<Label>("LBL_PM1");
-    _binding.lblPm2 = getControl<Label>("LBL_PM2");
-    _binding.lblPm3 = getControl<Label>("LBL_PM3");
-    _binding.lblScreenshot = getControl<Label>("LBL_SCREENSHOT");
-    _binding.lbGames = getControl<ListBox>("LB_GAMES");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnDelete = findControl<Button>("BTN_DELETE");
+    _binding.btnSaveLoad = findControl<Button>("BTN_SAVELOAD");
+    _binding.lblAreaName = findControl<Label>("LBL_AREANAME");
+    _binding.lblPanelName = findControl<Label>("LBL_PANELNAME");
+    _binding.lblPlanetName = findControl<Label>("LBL_PLANETNAME");
+    _binding.lblPm1 = findControl<Label>("LBL_PM1");
+    _binding.lblPm2 = findControl<Label>("LBL_PM2");
+    _binding.lblPm3 = findControl<Label>("LBL_PM3");
+    _binding.lblScreenshot = findControl<Label>("LBL_SCREENSHOT");
+    _binding.lbGames = findControl<ListBox>("LB_GAMES");
 
     if (_game.isTSL()) {
-        _binding.btnFilter = getControl<Button>("BTN_FILTER");
-        _binding.lblBar1 = getControl<Label>("LBL_BAR1");
-        _binding.lblBar2 = getControl<Label>("LBL_BAR2");
-        _binding.lblBar3 = getControl<Label>("LBL_BAR3");
-        _binding.lblBar4 = getControl<Label>("LBL_BAR4");
-        _binding.lblPcName = getControl<Label>("LBL_PCNAME");
-        _binding.lblTimePlayed = getControl<Label>("LBL_TIMEPLAYED");
+        _binding.btnFilter = findControl<Button>("BTN_FILTER");
+        _binding.lblBar1 = findControl<Label>("LBL_BAR1");
+        _binding.lblBar2 = findControl<Label>("LBL_BAR2");
+        _binding.lblBar3 = findControl<Label>("LBL_BAR3");
+        _binding.lblBar4 = findControl<Label>("LBL_BAR4");
+        _binding.lblPcName = findControl<Label>("LBL_PCNAME");
+        _binding.lblTimePlayed = findControl<Label>("LBL_TIMEPLAYED");
     }
 }
 

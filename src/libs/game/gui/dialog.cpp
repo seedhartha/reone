@@ -101,8 +101,8 @@ void DialogGUI::onGUILoaded() {
 }
 
 void DialogGUI::bindControls() {
-    _binding.lblMessage = getControl<Label>("LBL_MESSAGE");
-    _binding.lbReplies = getControl<ListBox>("LB_REPLIES");
+    _binding.lblMessage = findControl<Label>("LBL_MESSAGE");
+    _binding.lbReplies = findControl<ListBox>("LB_REPLIES");
 }
 
 void DialogGUI::loadFrames() {

@@ -47,12 +47,12 @@ void JournalMenu::onGUILoaded() {
 }
 
 void JournalMenu::bindControls() {
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
+    _binding.btnSwapText = findControl<Button>("BTN_SWAPTEXT");
 
     if (!_game.isTSL()) {
-        _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
-        _binding.btnSort = getControl<Button>("BTN_SORT");
+        _binding.btnQuestItems = findControl<Button>("BTN_QUESTITEMS");
+        _binding.btnSort = findControl<Button>("BTN_SORT");
     }
 }
 

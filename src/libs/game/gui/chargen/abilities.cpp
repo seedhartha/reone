@@ -158,43 +158,43 @@ void CharGenAbilities::onGUILoaded() {
 }
 
 void CharGenAbilities::bindControls() {
-    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
-    _binding.costPointsLbl = getControl<Label>("COST_POINTS_LBL");
-    _binding.lbDesc = getControl<ListBox>("LB_DESC");
-    _binding.remainingSelectionsLbl = getControl<Label>("REMAINING_SELECTIONS_LBL");
+    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnRecommended = findControl<Button>("BTN_RECOMMENDED");
+    _binding.costPointsLbl = findControl<Label>("COST_POINTS_LBL");
+    _binding.lbDesc = findControl<ListBox>("LB_DESC");
+    _binding.remainingSelectionsLbl = findControl<Label>("REMAINING_SELECTIONS_LBL");
 
-    _binding.strLbl = getControl<Label>("STR_LBL");
-    _binding.dexLbl = getControl<Label>("DEX_LBL");
-    _binding.conLbl = getControl<Label>("CON_LBL");
-    _binding.intLbl = getControl<Label>("INT_LBL");
-    _binding.wisLbl = getControl<Label>("WIS_LBL");
-    _binding.chaLbl = getControl<Label>("CHA_LBL");
+    _binding.strLbl = findControl<Label>("STR_LBL");
+    _binding.dexLbl = findControl<Label>("DEX_LBL");
+    _binding.conLbl = findControl<Label>("CON_LBL");
+    _binding.intLbl = findControl<Label>("INT_LBL");
+    _binding.wisLbl = findControl<Label>("WIS_LBL");
+    _binding.chaLbl = findControl<Label>("CHA_LBL");
 
-    _binding.strPointsBtn = getControl<Button>("STR_POINTS_BTN");
-    _binding.dexPointsBtn = getControl<Button>("DEX_POINTS_BTN");
-    _binding.conPointsBtn = getControl<Button>("CON_POINTS_BTN");
-    _binding.intPointsBtn = getControl<Button>("INT_POINTS_BTN");
-    _binding.wisPointsBtn = getControl<Button>("WIS_POINTS_BTN");
-    _binding.chaPointsBtn = getControl<Button>("CHA_POINTS_BTN");
+    _binding.strPointsBtn = findControl<Button>("STR_POINTS_BTN");
+    _binding.dexPointsBtn = findControl<Button>("DEX_POINTS_BTN");
+    _binding.conPointsBtn = findControl<Button>("CON_POINTS_BTN");
+    _binding.intPointsBtn = findControl<Button>("INT_POINTS_BTN");
+    _binding.wisPointsBtn = findControl<Button>("WIS_POINTS_BTN");
+    _binding.chaPointsBtn = findControl<Button>("CHA_POINTS_BTN");
 
-    _binding.strMinusBtn = getControl<Button>("STR_MINUS_BTN");
-    _binding.dexMinusBtn = getControl<Button>("DEX_MINUS_BTN");
-    _binding.conMinusBtn = getControl<Button>("CON_MINUS_BTN");
-    _binding.intMinusBtn = getControl<Button>("INT_MINUS_BTN");
-    _binding.wisMinusBtn = getControl<Button>("WIS_MINUS_BTN");
-    _binding.chaMinusBtn = getControl<Button>("CHA_MINUS_BTN");
+    _binding.strMinusBtn = findControl<Button>("STR_MINUS_BTN");
+    _binding.dexMinusBtn = findControl<Button>("DEX_MINUS_BTN");
+    _binding.conMinusBtn = findControl<Button>("CON_MINUS_BTN");
+    _binding.intMinusBtn = findControl<Button>("INT_MINUS_BTN");
+    _binding.wisMinusBtn = findControl<Button>("WIS_MINUS_BTN");
+    _binding.chaMinusBtn = findControl<Button>("CHA_MINUS_BTN");
 
-    _binding.strPlusBtn = getControl<Button>("STR_PLUS_BTN");
-    _binding.dexPlusBtn = getControl<Button>("DEX_PLUS_BTN");
-    _binding.conPlusBtn = getControl<Button>("CON_PLUS_BTN");
-    _binding.intPlusBtn = getControl<Button>("INT_PLUS_BTN");
-    _binding.wisPlusBtn = getControl<Button>("WIS_PLUS_BTN");
-    _binding.chaPlusBtn = getControl<Button>("CHA_PLUS_BTN");
+    _binding.strPlusBtn = findControl<Button>("STR_PLUS_BTN");
+    _binding.dexPlusBtn = findControl<Button>("DEX_PLUS_BTN");
+    _binding.conPlusBtn = findControl<Button>("CON_PLUS_BTN");
+    _binding.intPlusBtn = findControl<Button>("INT_PLUS_BTN");
+    _binding.wisPlusBtn = findControl<Button>("WIS_PLUS_BTN");
+    _binding.chaPlusBtn = findControl<Button>("CHA_PLUS_BTN");
 
     if (!_game.isTSL()) {
-        _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
+        _binding.lblAbilityMod = findControl<Label>("LBL_ABILITY_MOD");
     }
 }
 

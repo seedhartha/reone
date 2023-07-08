@@ -48,10 +48,10 @@ void CharGenFeats::onGUILoaded() {
 }
 
 void CharGenFeats::bindControls() {
-    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnSelect = getControl<Button>("BTN_SELECT");
-    _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
+    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnSelect = findControl<Button>("BTN_SELECT");
+    _binding.btnRecommended = findControl<Button>("BTN_RECOMMENDED");
 }
 
 } // namespace game

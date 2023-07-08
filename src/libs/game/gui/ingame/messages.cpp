@@ -45,10 +45,10 @@ void MessagesMenu::onGUILoaded() {
 }
 
 void MessagesMenu::bindControls() {
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
 
     if (!_game.isTSL()) {
-        _binding.btnShow = getControl<Button>("BTN_SHOW");
+        _binding.btnShow = findControl<Button>("BTN_SHOW");
     }
 }
 

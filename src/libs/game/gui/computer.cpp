@@ -44,34 +44,34 @@ void ComputerGUI::onGUILoaded() {
 }
 
 void ComputerGUI::bindControls() {
-    _binding.lblCompSkill = getControl<Label>("LBL_COMP_SKILL");
-    _binding.lblCompSkillVal = getControl<Label>("LBL_COMP_SKILL_VAL");
-    _binding.lblCompSpikes = getControl<Label>("LBL_COMP_SPIKES");
-    _binding.lblCompSpikesVal = getControl<Label>("LBL_COMP_SPIKES_VAL");
-    _binding.lblRepSkill = getControl<Label>("LBL_REP_SKILL");
-    _binding.lblRepSkillVal = getControl<Label>("LBL_REP_SKILL_VAL");
-    _binding.lblRepUnits = getControl<Label>("LBL_REP_UNITS");
-    _binding.lblRepUnitsVal = getControl<Label>("LBL_REP_UNITS_VAL");
-    _binding.lbMessage = getControl<ListBox>("LB_MESSAGE");
-    _binding.lbReplies = getControl<ListBox>("LB_REPLIES");
+    _binding.lblCompSkill = findControl<Label>("LBL_COMP_SKILL");
+    _binding.lblCompSkillVal = findControl<Label>("LBL_COMP_SKILL_VAL");
+    _binding.lblCompSpikes = findControl<Label>("LBL_COMP_SPIKES");
+    _binding.lblCompSpikesVal = findControl<Label>("LBL_COMP_SPIKES_VAL");
+    _binding.lblRepSkill = findControl<Label>("LBL_REP_SKILL");
+    _binding.lblRepSkillVal = findControl<Label>("LBL_REP_SKILL_VAL");
+    _binding.lblRepUnits = findControl<Label>("LBL_REP_UNITS");
+    _binding.lblRepUnitsVal = findControl<Label>("LBL_REP_UNITS_VAL");
+    _binding.lbMessage = findControl<ListBox>("LB_MESSAGE");
+    _binding.lbReplies = findControl<ListBox>("LB_REPLIES");
 
     if (_game.isTSL()) {
-        _binding.lblBar1 = getControl<Label>("LBL_BAR1");
-        _binding.lblBar2 = getControl<Label>("LBL_BAR2");
-        _binding.lblBar3 = getControl<Label>("LBL_BAR3");
-        _binding.lblBar4 = getControl<Label>("LBL_BAR4");
-        _binding.lblBar5 = getControl<Label>("LBL_BAR5");
-        _binding.lblBar6 = getControl<Label>("LBL_BAR6");
+        _binding.lblBar1 = findControl<Label>("LBL_BAR1");
+        _binding.lblBar2 = findControl<Label>("LBL_BAR2");
+        _binding.lblBar3 = findControl<Label>("LBL_BAR3");
+        _binding.lblBar4 = findControl<Label>("LBL_BAR4");
+        _binding.lblBar5 = findControl<Label>("LBL_BAR5");
+        _binding.lblBar6 = findControl<Label>("LBL_BAR6");
     } else {
-        _binding.lblCompSkillIcon = getControl<Label>("LBL_COMP_SKILL_ICON");
-        _binding.lblCompSpikesIcon = getControl<Label>("LBL_COMP_SPIKES_ICON");
-        _binding.lblRepSkillIcon = getControl<Label>("LBL_REP_SKILL_ICON");
-        _binding.lblRepUnitsIcon = getControl<Label>("LBL_REP_UNITS_ICON");
-        _binding.lblStatic1 = getControl<Label>("LBL_STATIC1");
-        _binding.lblStatic2 = getControl<Label>("LBL_STATIC2");
-        _binding.lblStatic3 = getControl<Label>("LBL_STATIC3");
-        _binding.lblStatic4 = getControl<Label>("LBL_STATIC4");
-        _binding.lblObscure = getControl<Label>("LBL_OBSCURE");
+        _binding.lblCompSkillIcon = findControl<Label>("LBL_COMP_SKILL_ICON");
+        _binding.lblCompSpikesIcon = findControl<Label>("LBL_COMP_SPIKES_ICON");
+        _binding.lblRepSkillIcon = findControl<Label>("LBL_REP_SKILL_ICON");
+        _binding.lblRepUnitsIcon = findControl<Label>("LBL_REP_UNITS_ICON");
+        _binding.lblStatic1 = findControl<Label>("LBL_STATIC1");
+        _binding.lblStatic2 = findControl<Label>("LBL_STATIC2");
+        _binding.lblStatic3 = findControl<Label>("LBL_STATIC3");
+        _binding.lblStatic4 = findControl<Label>("LBL_STATIC4");
+        _binding.lblObscure = findControl<Label>("LBL_OBSCURE");
     }
 }
 

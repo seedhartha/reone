@@ -66,18 +66,18 @@ void QuickCharacterGeneration::onGUILoaded() {
 }
 
 void QuickCharacterGeneration::bindControls() {
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnCancel = getControl<Button>("BTN_CANCEL");
-    _binding.btnStepName1 = getControl<Button>("BTN_STEPNAME1");
-    _binding.btnStepName2 = getControl<Button>("BTN_STEPNAME2");
-    _binding.btnStepName3 = getControl<Button>("BTN_STEPNAME3");
-    _binding.lbl1 = getControl<Label>("LBL_1");
-    _binding.lbl2 = getControl<Label>("LBL_2");
-    _binding.lbl3 = getControl<Label>("LBL_3");
-    _binding.lblDecoration = getControl<Label>("LBL_DECORATION");
-    _binding.lblNum1 = getControl<Label>("LBL_NUM1");
-    _binding.lblNum2 = getControl<Label>("LBL_NUM2");
-    _binding.lblNum3 = getControl<Label>("LBL_NUM3");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnCancel = findControl<Button>("BTN_CANCEL");
+    _binding.btnStepName1 = findControl<Button>("BTN_STEPNAME1");
+    _binding.btnStepName2 = findControl<Button>("BTN_STEPNAME2");
+    _binding.btnStepName3 = findControl<Button>("BTN_STEPNAME3");
+    _binding.lbl1 = findControl<Label>("LBL_1");
+    _binding.lbl2 = findControl<Label>("LBL_2");
+    _binding.lbl3 = findControl<Label>("LBL_3");
+    _binding.lblDecoration = findControl<Label>("LBL_DECORATION");
+    _binding.lblNum1 = findControl<Label>("LBL_NUM1");
+    _binding.lblNum2 = findControl<Label>("LBL_NUM2");
+    _binding.lblNum3 = findControl<Label>("LBL_NUM3");
 }
 
 void QuickCharacterGeneration::setStep(int step) {

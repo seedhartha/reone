@@ -77,21 +77,21 @@ void ClassSelection::onGUILoaded() {
 }
 
 void ClassSelection::bindControls() {
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnSel1 = getControl<Button>("BTN_SEL1");
-    _binding.btnSel2 = getControl<Button>("BTN_SEL2");
-    _binding.btnSel3 = getControl<Button>("BTN_SEL3");
-    _binding.btnSel4 = getControl<Button>("BTN_SEL4");
-    _binding.btnSel5 = getControl<Button>("BTN_SEL5");
-    _binding.btnSel6 = getControl<Button>("BTN_SEL6");
-    _binding.lblClass = getControl<Label>("LBL_CLASS");
-    _binding.lblDesc = getControl<Label>("LBL_DESC");
-    _binding.threeDModel1 = getControl<Label>("3D_MODEL1");
-    _binding.threeDModel2 = getControl<Label>("3D_MODEL2");
-    _binding.threeDModel3 = getControl<Label>("3D_MODEL3");
-    _binding.threeDModel4 = getControl<Label>("3D_MODEL4");
-    _binding.threeDModel5 = getControl<Label>("3D_MODEL5");
-    _binding.threeDModel6 = getControl<Label>("3D_MODEL6");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnSel1 = findControl<Button>("BTN_SEL1");
+    _binding.btnSel2 = findControl<Button>("BTN_SEL2");
+    _binding.btnSel3 = findControl<Button>("BTN_SEL3");
+    _binding.btnSel4 = findControl<Button>("BTN_SEL4");
+    _binding.btnSel5 = findControl<Button>("BTN_SEL5");
+    _binding.btnSel6 = findControl<Button>("BTN_SEL6");
+    _binding.lblClass = findControl<Label>("LBL_CLASS");
+    _binding.lblDesc = findControl<Label>("LBL_DESC");
+    _binding.threeDModel1 = findControl<Label>("3D_MODEL1");
+    _binding.threeDModel2 = findControl<Label>("3D_MODEL2");
+    _binding.threeDModel3 = findControl<Label>("3D_MODEL3");
+    _binding.threeDModel4 = findControl<Label>("3D_MODEL4");
+    _binding.threeDModel5 = findControl<Label>("3D_MODEL5");
+    _binding.threeDModel6 = findControl<Label>("3D_MODEL6");
 }
 
 void ClassSelection::setupClassButtons() {

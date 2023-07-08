@@ -56,10 +56,10 @@ void NameEntry::onGUILoaded() {
 }
 
 void NameEntry::bindControls() {
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnRandom = getControl<Button>("BTN_RANDOM");
-    _binding.endBtn = getControl<Button>("END_BTN");
-    _binding.nameBoxEdit = getControl<Control>("NAME_BOX_EDIT");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnRandom = findControl<Button>("BTN_RANDOM");
+    _binding.endBtn = findControl<Button>("END_BTN");
+    _binding.nameBoxEdit = findControl<Control>("NAME_BOX_EDIT");
 }
 
 void NameEntry::loadLtrFile(const std::string &resRef, LtrReader &ltr) {

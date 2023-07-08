@@ -109,25 +109,25 @@ void MainMenu::onGUILoaded() {
 }
 
 void MainMenu::bindControls() {
-    _binding.lbModules = getControl<ListBox>("LB_MODULES");
-    _binding.lbl3dView = getControl<Label>("LBL_3DVIEW");
-    _binding.lblGameLogo = getControl<Label>("LBL_GAMELOGO");
-    _binding.lblBw = getControl<Label>("LBL_BW");
-    _binding.lblLucas = getControl<Label>("LBL_LUCAS");
-    _binding.btnLoadGame = getControl<Button>("BTN_LOADGAME");
-    _binding.btnNewGame = getControl<Button>("BTN_NEWGAME");
-    _binding.btnMovies = getControl<Button>("BTN_MOVIES");
-    _binding.btnOptions = getControl<Button>("BTN_OPTIONS");
-    _binding.lblNewContent = getControl<Label>("LBL_NEWCONTENT");
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnWarp = getControl<Button>("BTN_WARP");
+    _binding.lbModules = findControl<ListBox>("LB_MODULES");
+    _binding.lbl3dView = findControl<Label>("LBL_3DVIEW");
+    _binding.lblGameLogo = findControl<Label>("LBL_GAMELOGO");
+    _binding.lblBw = findControl<Label>("LBL_BW");
+    _binding.lblLucas = findControl<Label>("LBL_LUCAS");
+    _binding.btnLoadGame = findControl<Button>("BTN_LOADGAME");
+    _binding.btnNewGame = findControl<Button>("BTN_NEWGAME");
+    _binding.btnMovies = findControl<Button>("BTN_MOVIES");
+    _binding.btnOptions = findControl<Button>("BTN_OPTIONS");
+    _binding.lblNewContent = findControl<Label>("LBL_NEWCONTENT");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
+    _binding.btnWarp = findControl<Button>("BTN_WARP");
 
     if (_game.isTSL()) {
-        _binding.btnMusic = getControl<Button>("BTN_MUSIC");
-        _binding.btnMoreGames = getControl<Button>("BTN_MOREGAMES");
-        _binding.btnTslrcm = getControl<Button>("BTN_TSLRCM");
+        _binding.btnMusic = findControl<Button>("BTN_MUSIC");
+        _binding.btnMoreGames = findControl<Button>("BTN_MOREGAMES");
+        _binding.btnTslrcm = findControl<Button>("BTN_TSLRCM");
     } else {
-        _binding.lblMenuBg = getControl<Label>("LBL_MENUBG");
+        _binding.lblMenuBg = findControl<Label>("LBL_MENUBG");
     }
 }
 

@@ -50,7 +50,7 @@ public:
     MOCK_METHOD(std::unique_ptr<Control>, newControl, (ControlType, std::string), (override));
     MOCK_METHOD(void, addControl, (std::shared_ptr<Control>), (override));
 
-    MOCK_METHOD(std::shared_ptr<Control>, getControl, (const std::string &), (const override));
+    MOCK_METHOD(std::shared_ptr<Control>, findControl, (const std::string &), (const override));
 };
 
 class MockGUIs : public IGUIs, boost::noncopyable {

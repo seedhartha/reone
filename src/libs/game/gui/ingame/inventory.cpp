@@ -56,38 +56,38 @@ void InventoryMenu::onGUILoaded() {
 }
 
 void InventoryMenu::bindControls() {
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnUseItem = getControl<Button>("BTN_USEITEM");
-    _binding.lblCredits = getControl<Label>("LBL_CREDITS");
-    _binding.lblCreditsValue = getControl<Label>("LBL_CREDITS_VALUE");
-    _binding.lblInv = getControl<Label>("LBL_INV");
-    _binding.lbDescription = getControl<ListBox>("LB_DESCRIPTION");
-    _binding.lbItems = getControl<ListBox>("LB_ITEMS");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
+    _binding.btnUseItem = findControl<Button>("BTN_USEITEM");
+    _binding.lblCredits = findControl<Label>("LBL_CREDITS");
+    _binding.lblCreditsValue = findControl<Label>("LBL_CREDITS_VALUE");
+    _binding.lblInv = findControl<Label>("LBL_INV");
+    _binding.lbDescription = findControl<ListBox>("LB_DESCRIPTION");
+    _binding.lbItems = findControl<ListBox>("LB_ITEMS");
 
     if (!_game.isTSL()) {
-        _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
-        _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
-        _binding.lblBgPort = getControl<Label>("LBL_BGPORT");
-        _binding.lblBgStats = getControl<Label>("LBL_BGSTATS");
-        _binding.lblDef = getControl<Label>("LBL_DEF");
-        _binding.lblPort = getControl<Label>("LBL_PORT");
-        _binding.lblVit = getControl<Label>("LBL_VIT");
+        _binding.btnChange1 = findControl<Button>("BTN_CHANGE1");
+        _binding.btnChange2 = findControl<Button>("BTN_CHANGE2");
+        _binding.btnQuestItems = findControl<Button>("BTN_QUESTITEMS");
+        _binding.lblBgPort = findControl<Label>("LBL_BGPORT");
+        _binding.lblBgStats = findControl<Label>("LBL_BGSTATS");
+        _binding.lblDef = findControl<Label>("LBL_DEF");
+        _binding.lblPort = findControl<Label>("LBL_PORT");
+        _binding.lblVit = findControl<Label>("LBL_VIT");
     } else {
-        _binding.btnAll = getControl<Button>("BTN_ALL");
-        _binding.btnArmor = getControl<Button>("BTN_ARMOR");
-        _binding.btnDatapads = getControl<Button>("BTN_DATAPADS");
-        _binding.btnMisc = getControl<Button>("BTN_MISC");
-        _binding.btnQuests = getControl<Button>("BTN_QUESTS");
-        _binding.btnUseable = getControl<Button>("BTN_USEABLE");
-        _binding.btnWeapons = getControl<Button>("BTN_WEAPONS");
-        _binding.lblBar1 = getControl<Label>("LBL_BAR1");
-        _binding.lblBar2 = getControl<Label>("LBL_BAR2");
-        _binding.lblBar3 = getControl<Label>("LBL_BAR3");
-        _binding.lblBar4 = getControl<Label>("LBL_BAR4");
-        _binding.lblBar5 = getControl<Label>("LBL_BAR5");
-        _binding.lblBar6 = getControl<Label>("LBL_BAR6");
-        _binding.lblFilter = getControl<Label>("LBL_FILTER");
+        _binding.btnAll = findControl<Button>("BTN_ALL");
+        _binding.btnArmor = findControl<Button>("BTN_ARMOR");
+        _binding.btnDatapads = findControl<Button>("BTN_DATAPADS");
+        _binding.btnMisc = findControl<Button>("BTN_MISC");
+        _binding.btnQuests = findControl<Button>("BTN_QUESTS");
+        _binding.btnUseable = findControl<Button>("BTN_USEABLE");
+        _binding.btnWeapons = findControl<Button>("BTN_WEAPONS");
+        _binding.lblBar1 = findControl<Label>("LBL_BAR1");
+        _binding.lblBar2 = findControl<Label>("LBL_BAR2");
+        _binding.lblBar3 = findControl<Label>("LBL_BAR3");
+        _binding.lblBar4 = findControl<Label>("LBL_BAR4");
+        _binding.lblBar5 = findControl<Label>("LBL_BAR5");
+        _binding.lblBar6 = findControl<Label>("LBL_BAR6");
+        _binding.lblFilter = findControl<Label>("LBL_FILTER");
     }
 }
 

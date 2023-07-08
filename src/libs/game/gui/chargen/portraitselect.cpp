@@ -88,12 +88,12 @@ void PortraitSelection::onGUILoaded() {
 }
 
 void PortraitSelection::bindControls() {
-    _binding.lblHead = getControl<Label>("LBL_HEAD");
-    _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
-    _binding.btnArrL = getControl<Button>("BTN_ARRL");
-    _binding.btnArrR = getControl<Button>("BTN_ARRR");
-    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.lblHead = findControl<Label>("LBL_HEAD");
+    _binding.lblPortrait = findControl<Label>("LBL_PORTRAIT");
+    _binding.btnArrL = findControl<Button>("BTN_ARRL");
+    _binding.btnArrR = findControl<Button>("BTN_ARRR");
+    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
 }
 
 void PortraitSelection::setButtonColors(Control &control) {

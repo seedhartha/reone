@@ -77,7 +77,7 @@ public:
     virtual std::unique_ptr<Control> newControl(ControlType type, std::string tag) = 0;
     virtual void addControl(std::shared_ptr<Control> control) = 0;
 
-    virtual std::shared_ptr<Control> getControl(const std::string &tag) const = 0;
+    virtual std::shared_ptr<Control> findControl(const std::string &tag) const = 0;
 };
 
 class GUI : public IGUI, boost::noncopyable {
@@ -147,7 +147,7 @@ public:
 
     void addControl(std::shared_ptr<Control> control) override;
 
-    std::shared_ptr<Control> getControl(const std::string &tag) const override;
+    std::shared_ptr<Control> findControl(const std::string &tag) const override;
 
 private:
     graphics::GraphicsOptions &_options;

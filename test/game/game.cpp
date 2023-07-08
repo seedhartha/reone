@@ -125,19 +125,19 @@ TEST(game, should_present_main_menu_on_launch_when_movie_is_finished) {
         engine->sceneModule().graphs(),
         engine->graphicsModule().services(),
         engine->resourceModule().strings());
-    EXPECT_CALL(*gui, getControl("LB_MODULES")).WillOnce(Return(listBox));
-    EXPECT_CALL(*gui, getControl("LBL_3DVIEW")).WillOnce(Return(label));
-    EXPECT_CALL(*gui, getControl("LBL_GAMELOGO")).WillOnce(Return(label));
-    EXPECT_CALL(*gui, getControl("LBL_BW")).WillOnce(Return(label));
-    EXPECT_CALL(*gui, getControl("LBL_LUCAS")).WillOnce(Return(label));
-    EXPECT_CALL(*gui, getControl("BTN_LOADGAME")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("BTN_NEWGAME")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("BTN_MOVIES")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("BTN_OPTIONS")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("LBL_NEWCONTENT")).WillOnce(Return(label));
-    EXPECT_CALL(*gui, getControl("BTN_EXIT")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("BTN_WARP")).WillOnce(Return(button));
-    EXPECT_CALL(*gui, getControl("LBL_MENUBG")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("LB_MODULES")).WillOnce(Return(listBox));
+    EXPECT_CALL(*gui, findControl("LBL_3DVIEW")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("LBL_GAMELOGO")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("LBL_BW")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("LBL_LUCAS")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("BTN_LOADGAME")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_NEWGAME")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_MOVIES")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_OPTIONS")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("LBL_NEWCONTENT")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("BTN_EXIT")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_WARP")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("LBL_MENUBG")).WillOnce(Return(label));
     EXPECT_CALL(*gui, update(_)).Times(1);
     EXPECT_CALL(*gui, draw()).Times(2);
 

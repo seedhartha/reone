@@ -85,23 +85,23 @@ void InGameMenu::onGUILoaded() {
 }
 
 void InGameMenu::bindControls() {
-    _binding.lblhEqu = getControl<Label>("LBLH_EQU");
-    _binding.lblhInv = getControl<Label>("LBLH_INV");
-    _binding.lblhCha = getControl<Label>("LBLH_CHA");
-    _binding.lblhAbi = getControl<Label>("LBLH_ABI");
-    _binding.lblhMsg = getControl<Label>("LBLH_MSG");
-    _binding.lblhJou = getControl<Label>("LBLH_JOU");
-    _binding.lblhMap = getControl<Label>("LBLH_MAP");
-    _binding.lblhOpt = getControl<Label>("LBLH_OPT");
+    _binding.lblhEqu = findControl<Label>("LBLH_EQU");
+    _binding.lblhInv = findControl<Label>("LBLH_INV");
+    _binding.lblhCha = findControl<Label>("LBLH_CHA");
+    _binding.lblhAbi = findControl<Label>("LBLH_ABI");
+    _binding.lblhMsg = findControl<Label>("LBLH_MSG");
+    _binding.lblhJou = findControl<Label>("LBLH_JOU");
+    _binding.lblhMap = findControl<Label>("LBLH_MAP");
+    _binding.lblhOpt = findControl<Label>("LBLH_OPT");
 
-    _binding.btnEqu = getControl<Button>("BTN_EQU");
-    _binding.btnInv = getControl<Button>("BTN_INV");
-    _binding.btnChar = getControl<Button>("BTN_CHAR");
-    _binding.btnAbi = getControl<Button>("BTN_ABI");
-    _binding.btnMsg = getControl<Button>("BTN_MSG");
-    _binding.btnJou = getControl<Button>("BTN_JOU");
-    _binding.btnMap = getControl<Button>("BTN_MAP");
-    _binding.btnOpt = getControl<Button>("BTN_OPT");
+    _binding.btnEqu = findControl<Button>("BTN_EQU");
+    _binding.btnInv = findControl<Button>("BTN_INV");
+    _binding.btnChar = findControl<Button>("BTN_CHAR");
+    _binding.btnAbi = findControl<Button>("BTN_ABI");
+    _binding.btnMsg = findControl<Button>("BTN_MSG");
+    _binding.btnJou = findControl<Button>("BTN_JOU");
+    _binding.btnMap = findControl<Button>("BTN_MAP");
+    _binding.btnOpt = findControl<Button>("BTN_OPT");
 }
 
 void InGameMenu::setTabLabelsFocusable(bool focusable) {
@@ -264,11 +264,11 @@ void InGameMenu::openOptions() {
 }
 
 std::shared_ptr<Button> InGameMenu::getBtnChange2() {
-    return _game.isTSL() ? getControl<Button>("BTN_CHANGE2") : nullptr;
+    return _game.isTSL() ? findControl<Button>("BTN_CHANGE2") : nullptr;
 }
 
 std::shared_ptr<Button> InGameMenu::getBtnChange3() {
-    return _game.isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
+    return _game.isTSL() ? findControl<Button>("BTN_CHANGE3") : nullptr;
 }
 
 } // namespace game

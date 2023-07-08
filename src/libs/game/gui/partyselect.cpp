@@ -133,58 +133,58 @@ void PartySelection::onGUILoaded() {
 }
 
 void PartySelection::bindControls() {
-    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.btnDone = getControl<Button>("BTN_DONE");
-    _binding.btnNpc0 = getControl<ToggleButton>("BTN_NPC0");
-    _binding.btnNpc1 = getControl<ToggleButton>("BTN_NPC1");
-    _binding.btnNpc2 = getControl<ToggleButton>("BTN_NPC2");
-    _binding.btnNpc3 = getControl<ToggleButton>("BTN_NPC3");
-    _binding.btnNpc4 = getControl<ToggleButton>("BTN_NPC4");
-    _binding.btnNpc5 = getControl<ToggleButton>("BTN_NPC5");
-    _binding.btnNpc6 = getControl<ToggleButton>("BTN_NPC6");
-    _binding.btnNpc7 = getControl<ToggleButton>("BTN_NPC7");
-    _binding.btnNpc8 = getControl<ToggleButton>("BTN_NPC8");
-    _binding.lbl3d = getControl<Label>("LBL_3D");
-    _binding.lblBevelL = getControl<Label>("LBL_BEVEL_L");
-    _binding.lblBevelM = getControl<Label>("LBL_BEVEL_M");
-    _binding.lblChar0 = getControl<Label>("LBL_CHAR0");
-    _binding.lblChar1 = getControl<Label>("LBL_CHAR1");
-    _binding.lblChar2 = getControl<Label>("LBL_CHAR2");
-    _binding.lblChar3 = getControl<Label>("LBL_CHAR3");
-    _binding.lblChar4 = getControl<Label>("LBL_CHAR4");
-    _binding.lblChar5 = getControl<Label>("LBL_CHAR5");
-    _binding.lblChar6 = getControl<Label>("LBL_CHAR6");
-    _binding.lblChar7 = getControl<Label>("LBL_CHAR7");
-    _binding.lblChar8 = getControl<Label>("LBL_CHAR8");
-    _binding.lblCount = getControl<Label>("LBL_COUNT");
-    _binding.lblNa0 = getControl<Label>("LBL_NA0");
-    _binding.lblNa1 = getControl<Label>("LBL_NA1");
-    _binding.lblNa2 = getControl<Label>("LBL_NA2");
-    _binding.lblNa3 = getControl<Label>("LBL_NA3");
-    _binding.lblNa4 = getControl<Label>("LBL_NA4");
-    _binding.lblNa5 = getControl<Label>("LBL_NA5");
-    _binding.lblNa6 = getControl<Label>("LBL_NA6");
-    _binding.lblNa7 = getControl<Label>("LBL_NA7");
-    _binding.lblNa8 = getControl<Label>("LBL_NA8");
-    _binding.lblNpcLevel = getControl<Label>("LBL_NPC_LEVEL");
-    _binding.lblNpcName = getControl<Label>("LBL_NPC_NAME");
-    _binding.lblTitle = getControl<Label>("LBL_TITLE");
+    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.btnDone = findControl<Button>("BTN_DONE");
+    _binding.btnNpc0 = findControl<ToggleButton>("BTN_NPC0");
+    _binding.btnNpc1 = findControl<ToggleButton>("BTN_NPC1");
+    _binding.btnNpc2 = findControl<ToggleButton>("BTN_NPC2");
+    _binding.btnNpc3 = findControl<ToggleButton>("BTN_NPC3");
+    _binding.btnNpc4 = findControl<ToggleButton>("BTN_NPC4");
+    _binding.btnNpc5 = findControl<ToggleButton>("BTN_NPC5");
+    _binding.btnNpc6 = findControl<ToggleButton>("BTN_NPC6");
+    _binding.btnNpc7 = findControl<ToggleButton>("BTN_NPC7");
+    _binding.btnNpc8 = findControl<ToggleButton>("BTN_NPC8");
+    _binding.lbl3d = findControl<Label>("LBL_3D");
+    _binding.lblBevelL = findControl<Label>("LBL_BEVEL_L");
+    _binding.lblBevelM = findControl<Label>("LBL_BEVEL_M");
+    _binding.lblChar0 = findControl<Label>("LBL_CHAR0");
+    _binding.lblChar1 = findControl<Label>("LBL_CHAR1");
+    _binding.lblChar2 = findControl<Label>("LBL_CHAR2");
+    _binding.lblChar3 = findControl<Label>("LBL_CHAR3");
+    _binding.lblChar4 = findControl<Label>("LBL_CHAR4");
+    _binding.lblChar5 = findControl<Label>("LBL_CHAR5");
+    _binding.lblChar6 = findControl<Label>("LBL_CHAR6");
+    _binding.lblChar7 = findControl<Label>("LBL_CHAR7");
+    _binding.lblChar8 = findControl<Label>("LBL_CHAR8");
+    _binding.lblCount = findControl<Label>("LBL_COUNT");
+    _binding.lblNa0 = findControl<Label>("LBL_NA0");
+    _binding.lblNa1 = findControl<Label>("LBL_NA1");
+    _binding.lblNa2 = findControl<Label>("LBL_NA2");
+    _binding.lblNa3 = findControl<Label>("LBL_NA3");
+    _binding.lblNa4 = findControl<Label>("LBL_NA4");
+    _binding.lblNa5 = findControl<Label>("LBL_NA5");
+    _binding.lblNa6 = findControl<Label>("LBL_NA6");
+    _binding.lblNa7 = findControl<Label>("LBL_NA7");
+    _binding.lblNa8 = findControl<Label>("LBL_NA8");
+    _binding.lblNpcLevel = findControl<Label>("LBL_NPC_LEVEL");
+    _binding.lblNpcName = findControl<Label>("LBL_NPC_NAME");
+    _binding.lblTitle = findControl<Label>("LBL_TITLE");
 
     if (_game.isTSL()) {
-        _binding.btnNpc9 = getControl<ToggleButton>("BTN_NPC9");
-        _binding.btnNpc10 = getControl<ToggleButton>("BTN_NPC10");
-        _binding.btnNpc11 = getControl<ToggleButton>("BTN_NPC11");
-        _binding.lblChar9 = getControl<Label>("LBL_CHAR9");
-        _binding.lblChar10 = getControl<Label>("LBL_CHAR10");
-        _binding.lblChar11 = getControl<Label>("LBL_CHAR11");
-        _binding.lblNa9 = getControl<Label>("LBL_NA9");
-        _binding.lblNa10 = getControl<Label>("LBL_NA10");
-        _binding.lblNa11 = getControl<Label>("LBL_NA11");
-        _binding.lblNameBack = getControl<Label>("LBL_NAMEBACK");
+        _binding.btnNpc9 = findControl<ToggleButton>("BTN_NPC9");
+        _binding.btnNpc10 = findControl<ToggleButton>("BTN_NPC10");
+        _binding.btnNpc11 = findControl<ToggleButton>("BTN_NPC11");
+        _binding.lblChar9 = findControl<Label>("LBL_CHAR9");
+        _binding.lblChar10 = findControl<Label>("LBL_CHAR10");
+        _binding.lblChar11 = findControl<Label>("LBL_CHAR11");
+        _binding.lblNa9 = findControl<Label>("LBL_NA9");
+        _binding.lblNa10 = findControl<Label>("LBL_NA10");
+        _binding.lblNa11 = findControl<Label>("LBL_NA11");
+        _binding.lblNameBack = findControl<Label>("LBL_NAMEBACK");
     } else {
-        _binding.lblAvailable = getControl<Label>("LBL_AVAILABLE");
-        _binding.lblBevelR = getControl<Label>("LBL_BEVEL_R");
+        _binding.lblAvailable = findControl<Label>("LBL_AVAILABLE");
+        _binding.lblBevelR = findControl<Label>("LBL_BEVEL_R");
     }
 }
 

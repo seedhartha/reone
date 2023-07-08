@@ -76,11 +76,11 @@ void QuickOrCustom::onGUILoaded() {
 }
 
 void QuickOrCustom::bindControls() {
-    _binding.btnBack = getControl<Button>("BTN_BACK");
-    _binding.custCharBtn = getControl<Button>("CUST_CHAR_BTN");
-    _binding.quickCharBtn = getControl<Button>("QUICK_CHAR_BTN");
-    _binding.lblRbg = getControl<Label>("LBL_RBG");
-    _binding.lbDesc = getControl<ListBox>("LB_DESC");
+    _binding.btnBack = findControl<Button>("BTN_BACK");
+    _binding.custCharBtn = findControl<Button>("CUST_CHAR_BTN");
+    _binding.quickCharBtn = findControl<Button>("QUICK_CHAR_BTN");
+    _binding.lblRbg = findControl<Label>("LBL_RBG");
+    _binding.lbDesc = findControl<ListBox>("LB_DESC");
 }
 
 } // namespace game

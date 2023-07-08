@@ -39,7 +39,7 @@ void BarkBubble::onGUILoaded() {
 }
 
 void BarkBubble::bindControls() {
-    _binding.lblBarkText = getControl<Label>("LBL_BARKTEXT");
+    _binding.lblBarkText = findControl<Label>("LBL_BARKTEXT");
 }
 
 void BarkBubble::update(float dt) {

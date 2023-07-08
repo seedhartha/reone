@@ -63,11 +63,11 @@ void ContainerGUI::onGUILoaded() {
 }
 
 void ContainerGUI::bindControls() {
-    _binding.lblMessage = getControl<Label>("LBL_MESSAGE");
-    _binding.lbItems = getControl<ListBox>("LB_ITEMS");
-    _binding.btnOk = getControl<Button>("BTN_OK");
-    _binding.btnGiveItems = getControl<Button>("BTN_GIVEITEMS");
-    _binding.btnCancel = getControl<Button>("BTN_CANCEL");
+    _binding.lblMessage = findControl<Label>("LBL_MESSAGE");
+    _binding.lbItems = findControl<ListBox>("LB_ITEMS");
+    _binding.btnOk = findControl<Button>("BTN_OK");
+    _binding.btnGiveItems = findControl<Button>("BTN_GIVEITEMS");
+    _binding.btnCancel = findControl<Button>("BTN_CANCEL");
 }
 
 void ContainerGUI::configureItemsListBox() {

@@ -48,10 +48,10 @@ void LoadingScreen::onGUILoaded() {
 }
 
 void LoadingScreen::bindControls() {
-    _binding.pbProgress = getControl<ProgressBar>("PB_PROGRESS");
-    _binding.lblHint = getControl<Label>("LBL_HINT");
-    _binding.lblLogo = getControl<Label>("LBL_LOGO");
-    _binding.lblLoading = getControl<Label>("LBL_LOADING");
+    _binding.pbProgress = findControl<ProgressBar>("PB_PROGRESS");
+    _binding.lblHint = findControl<Label>("LBL_HINT");
+    _binding.lblLogo = findControl<Label>("LBL_LOGO");
+    _binding.lblLoading = findControl<Label>("LBL_LOADING");
 }
 
 void LoadingScreen::setImage(const std::string &resRef) {

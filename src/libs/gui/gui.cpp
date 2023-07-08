@@ -263,13 +263,13 @@ void GUI::resetFocus() {
     }
 }
 
-std::shared_ptr<Control> GUI::getControl(const std::string &tag) const {
+std::shared_ptr<Control> GUI::findControl(const std::string &tag) const {
     for (auto &control : _controls) {
         if (control->tag() == tag) {
             return control;
         }
     }
-    throw FormatException(str(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef));
+    return nullptr;
 }
 
 std::unique_ptr<Control> GUI::newControl(

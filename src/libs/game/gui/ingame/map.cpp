@@ -66,16 +66,16 @@ void MapMenu::onGUILoaded() {
 }
 
 void MapMenu::bindControls() {
-    _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnUp = getControl<Button>("BTN_UP");
-    _binding.btnDown = getControl<Button>("BTN_DOWN");
-    _binding.btnReturn = getControl<Button>("BTN_RETURN");
-    _binding.lblArea = getControl<Label>("LBL_Area");
-    _binding.lblMap = getControl<Label>("LBL_Map");
-    _binding.lblMapNote = getControl<Label>("LBL_MapNote");
+    _binding.btnExit = findControl<Button>("BTN_EXIT");
+    _binding.btnUp = findControl<Button>("BTN_UP");
+    _binding.btnDown = findControl<Button>("BTN_DOWN");
+    _binding.btnReturn = findControl<Button>("BTN_RETURN");
+    _binding.lblArea = findControl<Label>("LBL_Area");
+    _binding.lblMap = findControl<Label>("LBL_Map");
+    _binding.lblMapNote = findControl<Label>("LBL_MapNote");
 
     if (!_game.isTSL()) {
-        _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
+        _binding.btnPrtySlct = findControl<Button>("BTN_PRTYSLCT");
     }
 }
 
