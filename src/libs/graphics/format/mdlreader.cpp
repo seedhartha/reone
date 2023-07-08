@@ -95,7 +95,7 @@ void MdlReader::load() {
     _offAnimRoot = offAnimRoot;
 
     // Read node names
-    std::vector<uint32_t> nameOffsets(_mdl.readUint32Array(kMdlDataOffset + nameArrayDef.offset, nameArrayDef.count));
+    std::vector<uint32_t> nameOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + nameArrayDef.offset, nameArrayDef.count));
     readNodeNames(nameOffsets);
 
     // Read nodes
@@ -109,7 +109,7 @@ void MdlReader::load() {
     }
 
     // Read animations
-    std::vector<uint32_t> animOffsets(_mdl.readUint32Array(kMdlDataOffset + animationArrayDef.offset, animationArrayDef.count));
+    std::vector<uint32_t> animOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + animationArrayDef.offset, animationArrayDef.count));
     std::vector<std::shared_ptr<Animation>> animations(readAnimations(animOffsets));
 
     _model = std::make_unique<Model>(
@@ -190,10 +190,10 @@ std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *pare
         _nodeFlags.insert(std::make_pair(nodeNumber, flags));
     }
 
-    std::vector<float> controllerData(_mdl.readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
+    std::vector<float> controllerData(_mdl.readFloatArrayAt(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
     readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, animNode, *node);
 
-    std::vector<uint32_t> childOffsets(_mdl.readUint32Array(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
+    std::vector<uint32_t> childOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
     for (uint32_t offset : childOffsets) {
         node->addChild(readNodes(offset, node.get(), animated, animNode));
     }
@@ -280,9 +280,9 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         std::vector<uint16_t> boneNodeSerial(_mdl.readUint16Array(16));
         _mdl.ignore(4); // padding
 
-        std::vector<float> boneMap(_mdl.readFloatArray(kMdlDataOffset + offBones, numBones));
-        std::vector<float> qBoneValues(_mdl.readFloatArray(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
-        std::vector<float> tBoneValues(_mdl.readFloatArray(kMdlDataOffset + tBoneArrayDef.offset, 3 * numBones));
+        std::vector<float> boneMap(_mdl.readFloatArrayAt(kMdlDataOffset + offBones, numBones));
+        std::vector<float> qBoneValues(_mdl.readFloatArrayAt(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
+        std::vector<float> tBoneValues(_mdl.readFloatArrayAt(kMdlDataOffset + tBoneArrayDef.offset, 3 * numBones));
 
         std::vector<glm::mat4> boneMatrices;
         boneMatrices.resize(numBones);
@@ -523,9 +523,9 @@ std::shared_ptr<ModelNode::Light> MdlReader::readLight() {
 
     int numFlares = static_cast<int>(flareTexturesArrayDef.count);
     if (numFlares > 0) {
-        std::vector<float> flareSizes(_mdl.readFloatArray(kMdlDataOffset + flareSizesArrayDef.offset, flareSizesArrayDef.count));
-        std::vector<float> flarePositions(_mdl.readFloatArray(kMdlDataOffset + flarePositionsArrayDef.offset, flarePositionsArrayDef.count));
-        std::vector<uint32_t> texNameOffsets(_mdl.readUint32Array(kMdlDataOffset + flareTexturesArrayDef.offset, flareTexturesArrayDef.count));
+        std::vector<float> flareSizes(_mdl.readFloatArrayAt(kMdlDataOffset + flareSizesArrayDef.offset, flareSizesArrayDef.count));
+        std::vector<float> flarePositions(_mdl.readFloatArrayAt(kMdlDataOffset + flarePositionsArrayDef.offset, flarePositionsArrayDef.count));
+        std::vector<uint32_t> texNameOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + flareTexturesArrayDef.offset, flareTexturesArrayDef.count));
 
         std::vector<glm::vec3> colorShifts;
         for (int i = 0; i < numFlares; ++i) {

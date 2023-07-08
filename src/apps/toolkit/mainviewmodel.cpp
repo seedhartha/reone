@@ -138,8 +138,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (isGFFCompatibleResType(id.type)) {
-        auto reader = GffReader();
-        reader.load(data);
+        auto reader = GffReader(data);
+        reader.load();
 
         auto page = std::make_shared<Page>(PageType::GFF, id.string(), id);
         page->gffContent = reader.root();
@@ -147,8 +147,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Tlk) {
-        auto reader = TlkReader();
-        reader.load(data);
+        auto reader = TlkReader(data);
+        reader.load();
         auto tlk = reader.table();
 
         auto columns = std::vector<std::string>();
@@ -380,15 +380,15 @@ void MainViewModel::loadGameDirectory() {
 
     auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
     auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
+    auto keyReader = KeyReader(key);
+    keyReader.load();
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 
     auto tlkPath = findFileIgnoreCase(_gamePath, "dialog.tlk");
     auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
-    auto tlkReader = TlkReader();
-    tlkReader.load(tlk);
+    auto tlkReader = TlkReader(tlk);
+    tlkReader.load();
     _talkTable = tlkReader.table();
 
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
@@ -499,9 +499,9 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
         auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-        auto keyReader = KeyReader();
         auto key = FileInputStream(keyPath, OpenMode::Binary);
-        keyReader.load(key);
+        auto keyReader = KeyReader(key);
+        keyReader.load();
         auto filename = boost::to_lower_copy(srcPath.filename().string());
         auto maybeBif = std::find_if(keyReader.files().begin(), keyReader.files().end(), [&filename](auto &file) {
             return boost::contains(boost::to_lower_copy(file.filename), filename);
@@ -548,8 +548,8 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
 
     auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
     auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
+    auto keyReader = KeyReader(key);
+    keyReader.load();
 
     auto progress = Progress();
     progress.visible = true;

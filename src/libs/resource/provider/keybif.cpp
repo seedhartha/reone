@@ -30,8 +30,8 @@ namespace resource {
 
 void KeyBifResourceProvider::init() {
     auto key = FileInputStream(_keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
+    auto keyReader = KeyReader(key);
+    keyReader.load();
 
     auto gamePath = _keyPath.parent_path();
     auto &files = keyReader.files();

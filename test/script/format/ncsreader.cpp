@@ -129,11 +129,11 @@ TEST(ncs_reader, should_read_ncs) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = NcsReader("");
+    auto reader = NcsReader(stream, "");
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

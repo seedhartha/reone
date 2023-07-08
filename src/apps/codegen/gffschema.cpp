@@ -304,8 +304,8 @@ void generateGffSchema(resource::ResourceType resType,
         }
         auto bytes = keyBif.find(res.first);
         auto stream = MemoryInputStream(*bytes);
-        auto reader = GffReader();
-        reader.load(stream);
+        auto reader = GffReader(stream);
+        reader.load();
         trees[res.first.resRef] = reader.root();
     }
 
@@ -324,8 +324,8 @@ void generateGffSchema(resource::ResourceType resType,
                 }
                 auto bytes = rim.find(res.first);
                 auto stream = MemoryInputStream(*bytes);
-                auto reader = GffReader();
-                reader.load(stream);
+                auto reader = GffReader(stream);
+                reader.load();
                 trees[res.first.resRef] = reader.root();
             }
         } else if (extension == ".erf") {
@@ -337,8 +337,8 @@ void generateGffSchema(resource::ResourceType resType,
                 }
                 auto bytes = erf.find(res.first);
                 auto stream = MemoryInputStream(*bytes);
-                auto reader = GffReader();
-                reader.load(stream);
+                auto reader = GffReader(stream);
+                reader.load();
                 trees[res.first.resRef] = reader.root();
             }
         }

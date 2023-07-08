@@ -17,16 +17,17 @@
 
 #pragma once
 
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
+
 #include "../id.h"
 #include "../types.h"
-
-#include "binreader.h"
 
 namespace reone {
 
 namespace resource {
 
-class KeyReader : public BinaryResourceReader {
+class KeyReader : boost::noncopyable {
 public:
     struct FileEntry {
         std::string filename;
@@ -39,10 +40,18 @@ public:
         int resIdx {0};
     };
 
+    KeyReader(IInputStream &key) :
+        _key(BinaryReader(key)) {
+    }
+
+    void load();
+
     const std::vector<FileEntry> &files() const { return _files; }
     const std::vector<KeyEntry> &keys() const { return _keys; }
 
 private:
+    BinaryReader _key;
+
     uint32_t _numBifs {0};
     uint32_t _numKeys {0};
     uint32_t _offFiles {0};
@@ -50,8 +59,6 @@ private:
 
     std::vector<FileEntry> _files;
     std::vector<KeyEntry> _keys;
-
-    void onLoad() override;
 
     void loadFiles();
     void loadKeys();

@@ -33,8 +33,8 @@ std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
         return nullptr;
 
     auto ncs = MemoryInputStream(*data);
-    auto reader = NcsReader(resRef);
-    reader.load(ncs);
+    auto reader = NcsReader(ncs, resRef);
+    reader.load();
 
     return reader.program();
 }

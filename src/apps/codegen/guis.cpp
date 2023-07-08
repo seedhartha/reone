@@ -50,8 +50,8 @@ struct ParsedGUI {
 
 static ParsedGUI parseGui(ByteArray &guiBytes) {
     auto guiStream = MemoryInputStream(guiBytes);
-    auto guiReader = GffReader();
-    guiReader.load(guiStream);
+    auto guiReader = GffReader(guiStream);
+    guiReader.load();
     auto gff = guiReader.root();
 
     ParsedGUI parsed;

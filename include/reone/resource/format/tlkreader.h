@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -25,16 +26,23 @@ namespace resource {
 
 class TalkTable;
 
-class TlkReader : public BinaryResourceReader {
+class TlkReader : boost::noncopyable {
 public:
+    TlkReader(IInputStream &tlk) :
+        _tlk(tlk) {
+    }
+
+    void load();
+
     std::shared_ptr<TalkTable> table() const { return _table; }
 
 private:
+    BinaryReader _tlk;
+
     uint32_t _stringCount {0};
     uint32_t _stringsOffset {0};
     std::shared_ptr<TalkTable> _table;
 
-    void onLoad() override;
     void loadStrings();
 };
 

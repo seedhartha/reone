@@ -21,7 +21,6 @@
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 
-
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/rimreader.h"
@@ -117,8 +116,8 @@ std::shared_ptr<ByteArray> Resources::get(const std::string &resRef, ResourceTyp
 std::shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
     auto pe = FileInputStream(_exePath, OpenMode::Binary);
 
-    auto peReader = PeReader();
-    peReader.load(pe);
+    auto peReader = PeReader(pe);
+    peReader.load();
 
     auto data = peReader.find(name, type);
     if (!data) {

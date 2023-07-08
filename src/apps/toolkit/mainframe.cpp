@@ -421,8 +421,8 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     _viewModel->onGameDirectoryChanged(gamePath);
 
     auto key = FileInputStream(keyPath, OpenMode::Binary);
-    auto keyReader = KeyReader();
-    keyReader.load(key);
+    auto keyReader = KeyReader(key);
+    keyReader.load();
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 

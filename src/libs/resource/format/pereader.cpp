@@ -17,6 +17,7 @@
 
 #include "reone/resource/format/pereader.h"
 
+#include "reone/resource/format/signutil.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -26,14 +27,14 @@ namespace resource {
 static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
-void PeReader::onLoad() {
-    checkSignature(std::string("MZ", 2));
-    ignore(58);
+void PeReader::load() {
+    checkSignature(_pe, std::string("MZ", 2));
+    _pe.ignore(58);
 
-    uint32_t offPeHeader = readUint32();
-    seek(offPeHeader);
+    uint32_t offPeHeader = _pe.readUint32();
+    _pe.seek(offPeHeader);
 
-    uint32_t imageType = readUint32();
+    uint32_t imageType = _pe.readUint32();
 
     loadHeader();
     loadOptionalHeader();
@@ -44,7 +45,7 @@ void PeReader::onLoad() {
 
     auto maybeSection = std::find_if(_sections.begin(), _sections.end(), [](auto &s) { return s.name == ".rsrc"; });
     if (maybeSection != _sections.end()) {
-        seek(maybeSection->offset);
+        _pe.seek(maybeSection->offset);
         loadResourceDir(*maybeSection, 0);
     }
 }
@@ -64,45 +65,45 @@ std::shared_ptr<ByteArray> PeReader::findInternal(std::function<bool(const Resou
 }
 
 std::shared_ptr<ByteArray> PeReader::getResourceData(const Resource &res) {
-    return std::make_shared<ByteArray>(readBytes(res.offset, res.size));
+    return std::make_shared<ByteArray>(_pe.readBytesAt(res.offset, res.size));
 }
 
 void PeReader::loadHeader() {
-    ignore(2);
+    _pe.ignore(2);
 
-    _sectionCount = readUint16();
+    _sectionCount = _pe.readUint16();
     _sections.reserve(_sectionCount);
 
-    ignore(16);
+    _pe.ignore(16);
 }
 
 void PeReader::loadOptionalHeader() {
-    ignore(92);
+    _pe.ignore(92);
 
-    uint32_t dirCount = readUint32();
+    uint32_t dirCount = _pe.readUint32();
 
-    ignore(dirCount * 8);
+    _pe.ignore(dirCount * 8);
 }
 
 void PeReader::loadSection() {
-    std::string name(readCString(8));
+    std::string name(_pe.readCString(8));
 
-    ignore(4);
+    _pe.ignore(4);
 
-    uint32_t virtAddr = readUint32();
-    uint32_t sizeRaw = readUint32();
-    uint32_t offRaw = readUint32();
+    uint32_t virtAddr = _pe.readUint32();
+    uint32_t sizeRaw = _pe.readUint32();
+    uint32_t offRaw = _pe.readUint32();
 
-    ignore(16);
+    _pe.ignore(16);
 
     _sections.push_back({name, virtAddr, offRaw});
 }
 
 void PeReader::loadResourceDir(const Section &section, int level) {
-    ignore(12);
+    _pe.ignore(12);
 
-    uint16_t namedEntryCount = readUint16();
-    uint16_t idEntryCount = readUint16();
+    uint16_t namedEntryCount = _pe.readUint16();
+    uint16_t idEntryCount = _pe.readUint16();
     int entryCount = namedEntryCount + idEntryCount;
 
     for (int i = 0; i < entryCount; ++i) {
@@ -111,7 +112,7 @@ void PeReader::loadResourceDir(const Section &section, int level) {
 }
 
 void PeReader::loadResourceDirEntry(const Section &section, int level) {
-    uint32_t name = readUint32();
+    uint32_t name = _pe.readUint32();
 
     switch (level) {
     case 0:
@@ -127,12 +128,12 @@ void PeReader::loadResourceDirEntry(const Section &section, int level) {
         break;
     }
 
-    uint32_t sibling = readUint32();
+    uint32_t sibling = _pe.readUint32();
     bool siblingDir = (sibling & kSiblingMaskDir) != 0;
 
-    size_t pos = tell();
+    size_t pos = _pe.position();
     uint32_t offSibling = section.offset + (sibling & 0x7fffffff);
-    seek(offSibling);
+    _pe.seek(offSibling);
 
     if (siblingDir) {
         loadResourceDir(section, level + 1);
@@ -140,14 +141,14 @@ void PeReader::loadResourceDirEntry(const Section &section, int level) {
         loadResourceDataEntry(section);
     }
 
-    seek(pos);
+    _pe.seek(pos);
 }
 
 void PeReader::loadResourceDataEntry(const Section &section) {
-    uint32_t offData = readUint32();
-    uint32_t sizeData = readUint32();
+    uint32_t offData = _pe.readUint32();
+    uint32_t sizeData = _pe.readUint32();
 
-    ignore(8);
+    _pe.ignore(8);
 
     Resource res;
     res.type = _currentType;

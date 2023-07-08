@@ -30,8 +30,8 @@ void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &inpu
     if (isKey) {
         auto stream = FileInputStream(input, OpenMode::Binary);
 
-        KeyReader key;
-        key.load(stream);
+        KeyReader key(stream);
+        key.load();
 
         listKEY(key);
 
@@ -39,8 +39,8 @@ void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &inpu
         auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
         auto key = FileInputStream(keyPath, OpenMode::Binary);
 
-        auto keyReader = KeyReader();
-        keyReader.load(key);
+        auto keyReader = KeyReader(key);
+        keyReader.load();
 
         int bifIdx = -1;
         for (size_t i = 0; i < keyReader.files().size(); ++i) {

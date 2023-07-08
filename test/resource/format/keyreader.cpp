@@ -62,11 +62,11 @@ TEST(key_reader, should_read_key) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = KeyReader();
+    auto reader = KeyReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     auto keys = reader.keys();
     auto files = reader.files();

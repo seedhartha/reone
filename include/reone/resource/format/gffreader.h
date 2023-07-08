@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 #include "../gff.h"
 
@@ -25,15 +26,25 @@ namespace reone {
 
 namespace resource {
 
-class GffReader : public BinaryResourceReader {
+class GffReader : boost::noncopyable {
 public:
-    std::shared_ptr<Gff> root() const { return _root; }
+    GffReader(IInputStream &gff) :
+        _gff(gff) {
+    }
+
+    void load();
+
+    std::shared_ptr<Gff> root() const {
+        return _root;
+    }
 
 private:
     struct LocString {
         int32_t strRef {-1};
         std::string subString;
     };
+
+    BinaryReader _gff;
 
     uint32_t _structOffset {0};
     int _structCount {0};
@@ -48,8 +59,6 @@ private:
     uint32_t _listIndicesOffset {0};
     int _listIndicesCount {0};
     std::shared_ptr<Gff> _root;
-
-    void onLoad() override;
 
     std::unique_ptr<Gff> readStruct(int idx);
     Gff::Field readField(int idx);

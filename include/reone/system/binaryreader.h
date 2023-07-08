@@ -58,11 +58,13 @@ public:
     float readFloat();
     double readDouble();
     std::string readString(int len);
+    std::string readStringAt(size_t off, int len);
     std::string readCString();
     std::string readCString(int len);
-    std::string readCString(size_t off, int len);
+    std::string readCStringAt(size_t off, int len);
     std::string readCStringAt(size_t off);
     ByteArray readBytes(int count);
+    ByteArray readBytesAt(size_t off, int count);
 
     inline std::vector<uint16_t> readUint16Array(int count) {
         std::vector<uint16_t> elems;
@@ -82,7 +84,7 @@ public:
         return elems;
     }
 
-    inline std::vector<uint32_t> readUint32Array(size_t offset, int count) {
+    inline std::vector<uint32_t> readUint32ArrayAt(size_t offset, int count) {
         size_t pos = position();
         seek(offset);
 
@@ -110,7 +112,7 @@ public:
         return elems;
     }
 
-    inline std::vector<float> readFloatArray(size_t offset, int count) {
+    inline std::vector<float> readFloatArrayAt(size_t offset, int count) {
         size_t pos = position();
         seek(offset);
 

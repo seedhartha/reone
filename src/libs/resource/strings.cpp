@@ -32,8 +32,8 @@ void Strings::init(const boost::filesystem::path &gameDir) {
         throw ResourceNotFoundException("dialog.tlk file not found");
     }
     auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
-    auto tlkReader = TlkReader();
-    tlkReader.load(tlk);
+    auto tlkReader = TlkReader(tlk);
+    tlkReader.load();
     _table = tlkReader.table();
 }
 

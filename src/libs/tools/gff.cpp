@@ -30,7 +30,6 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 
-
 using namespace tinyxml2;
 
 using namespace reone::resource;
@@ -137,8 +136,8 @@ void GffTool::toXML(const boost::filesystem::path &input, const boost::filesyste
 }
 
 void GffTool::toXML(IInputStream &gff, IOutputStream &xml) {
-    auto reader = GffReader();
-    reader.load(gff);
+    auto reader = GffReader(gff);
+    reader.load();
 
     auto gffStruct = reader.root();
 

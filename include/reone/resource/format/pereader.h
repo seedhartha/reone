@@ -17,18 +17,24 @@
 
 #pragma once
 
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 #include "reone/system/types.h"
 
 #include "../types.h"
-
-#include "binreader.h"
 
 namespace reone {
 
 namespace resource {
 
-class PeReader : public BinaryResourceReader {
+class PeReader : boost::noncopyable {
 public:
+    PeReader(IInputStream &pe) :
+        _pe(BinaryReader(pe)) {
+    }
+
+    void load();
+
     std::shared_ptr<ByteArray> find(uint32_t name, PEResourceType type);
 
 private:
@@ -46,14 +52,14 @@ private:
         uint32_t size {0};
     };
 
+    BinaryReader _pe;
+
     int _sectionCount {0};
     PEResourceType _currentType {PEResourceType::Cursor};
     uint32_t _currentName {0};
     uint32_t _currentLangId {0};
     std::vector<Section> _sections;
     std::vector<Resource> _resources;
-
-    void onLoad() override;
 
     void loadHeader();
     void loadOptionalHeader();

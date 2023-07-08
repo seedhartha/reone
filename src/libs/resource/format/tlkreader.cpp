@@ -17,6 +17,7 @@
 
 #include "reone/resource/format/tlkreader.h"
 
+#include "reone/resource/format/signutil.h"
 #include "reone/resource/talktable.h"
 
 namespace reone {
@@ -29,12 +30,12 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-void TlkReader::onLoad() {
-    checkSignature(std::string("TLK V3.0", 8));
+void TlkReader::load() {
+    checkSignature(_tlk, std::string("TLK V3.0", 8));
 
-    uint32_t languageId = readUint32();
-    _stringCount = readUint32();
-    _stringsOffset = readUint32();
+    uint32_t languageId = _tlk.readUint32();
+    _stringCount = _tlk.readUint32();
+    _stringsOffset = _tlk.readUint32();
 
     loadStrings();
 }
@@ -43,20 +44,20 @@ void TlkReader::loadStrings() {
     auto strings = std::vector<TalkTable::String>();
 
     for (uint32_t i = 0; i < _stringCount; ++i) {
-        uint32_t flags = readUint32();
+        uint32_t flags = _tlk.readUint32();
 
-        std::string soundResRef(readCString(16));
+        std::string soundResRef(_tlk.readCString(16));
         boost::to_lower(soundResRef);
 
-        ignore(8);
+        _tlk.ignore(8);
 
-        uint32_t stringOffset = readUint32();
-        uint32_t stringSize = readUint32();
-        float soundLength = readFloat();
+        uint32_t stringOffset = _tlk.readUint32();
+        uint32_t stringSize = _tlk.readUint32();
+        float soundLength = _tlk.readFloat();
 
         std::string text;
         if (flags & StringFlags::textPresent) {
-            text = readString(_stringsOffset + stringOffset, stringSize);
+            text = _tlk.readStringAt(_stringsOffset + stringOffset, stringSize);
         }
 
         strings.push_back(TalkTable::String {std::move(text), std::move(soundResRef)});

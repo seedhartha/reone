@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -25,18 +26,20 @@ namespace script {
 
 class ScriptProgram;
 
-class NcsReader : public resource::BinaryResourceReader {
+class NcsReader : boost::noncopyable {
 public:
-    NcsReader(std::string resRef) :
-        resource::BinaryResourceReader(boost::endian::order::big),
+    NcsReader(IInputStream &ncs, std::string resRef) :
+        _ncs(BinaryReader(ncs, boost::endian::order::big)),
         _resRef(std::move(resRef)) {
     }
 
-    void onLoad() override;
+    void load();
 
     std::shared_ptr<ScriptProgram> program() const { return _program; }
 
 private:
+    BinaryReader _ncs;
+
     std::string _resRef;
     std::shared_ptr<ScriptProgram> _program;
 

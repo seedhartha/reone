@@ -36,8 +36,8 @@ std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
     auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
         auto stream = MemoryInputStream(*maybeRaw);
-        auto reader = GffReader();
-        reader.load(stream);
+        auto reader = GffReader(stream);
+        reader.load();
         gff = reader.root();
     }
     auto inserted = _cache.insert(std::make_pair(id, gff));

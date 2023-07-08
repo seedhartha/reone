@@ -17,17 +17,19 @@
 
 #include "reone/resource/format/keyreader.h"
 
+#include "reone/resource/format/signutil.h"
+
 namespace reone {
 
 namespace resource {
 
-void KeyReader::onLoad() {
-    checkSignature(std::string("KEY V1  ", 8));
+void KeyReader::load() {
+    checkSignature(_key, std::string("KEY V1  ", 8));
 
-    _numBifs = readUint32();
-    _numKeys = readUint32();
-    _offFiles = readUint32();
-    _offKeys = readUint32();
+    _numBifs = _key.readUint32();
+    _numKeys = _key.readUint32();
+    _offFiles = _key.readUint32();
+    _offKeys = _key.readUint32();
 
     loadFiles();
     loadKeys();
@@ -36,7 +38,7 @@ void KeyReader::onLoad() {
 void KeyReader::loadFiles() {
     _files.reserve(_numBifs);
 
-    seek(_offFiles);
+    _key.seek(_offFiles);
 
     for (int i = 0; i < _numBifs; ++i) {
         _files.push_back(readFileEntry());
@@ -44,13 +46,13 @@ void KeyReader::loadFiles() {
 }
 
 KeyReader::FileEntry KeyReader::readFileEntry() {
-    auto fileSize = readUint32();
-    auto offFilename = readUint32();
-    auto filenameSize = readUint16();
-    auto drives = readUint16();
+    auto fileSize = _key.readUint32();
+    auto offFilename = _key.readUint32();
+    auto filenameSize = _key.readUint16();
+    auto drives = _key.readUint16();
 
     auto entry = FileEntry();
-    entry.filename = boost::replace_all_copy(readCString(offFilename, filenameSize), "\\", "/");
+    entry.filename = boost::replace_all_copy(_key.readCStringAt(offFilename, filenameSize), "\\", "/");
     entry.fileSize = fileSize;
 
     return std::move(entry);
@@ -58,7 +60,7 @@ KeyReader::FileEntry KeyReader::readFileEntry() {
 
 void KeyReader::loadKeys() {
     _keys.reserve(_numKeys);
-    seek(_offKeys);
+    _key.seek(_offKeys);
 
     for (int i = 0; i < _numKeys; ++i) {
         _keys.push_back(readKeyEntry());
@@ -66,9 +68,9 @@ void KeyReader::loadKeys() {
 }
 
 KeyReader::KeyEntry KeyReader::readKeyEntry() {
-    auto resRef = boost::to_lower_copy(readCString(16));
-    auto resType = readUint16();
-    auto resId = readUint32();
+    auto resRef = boost::to_lower_copy(_key.readCString(16));
+    auto resType = _key.readUint16();
+    auto resId = _key.readUint32();
 
     auto entry = KeyEntry();
     entry.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));

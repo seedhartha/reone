@@ -26,7 +26,6 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/binreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/gffreader.h
@@ -59,7 +58,6 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/binreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/gffreader.cpp

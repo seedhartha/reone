@@ -69,8 +69,8 @@ void TlkTool::toXML(const boost::filesystem::path &path, const boost::filesystem
 }
 
 void TlkTool::toXML(IInputStream &tlk, IOutputStream &xml) {
-    auto reader = TlkReader();
-    reader.load(tlk);
+    auto reader = TlkReader(tlk);
+    reader.load();
 
     auto table = reader.table();
     auto printer = XMLPrinter();

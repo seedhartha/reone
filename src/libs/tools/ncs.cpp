@@ -77,8 +77,8 @@ void NcsTool::toPCODE(const boost::filesystem::path &input, const boost::filesys
 }
 
 void NcsTool::toPCODE(IInputStream &ncs, IOutputStream &pcode, Routines &routines) {
-    auto reader = NcsReader("");
-    reader.load(ncs);
+    auto reader = NcsReader(ncs, "");
+    reader.load();
 
     auto writer = PcodeWriter(*reader.program(), routines);
     writer.save(pcode);
@@ -108,8 +108,8 @@ void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesyste
 }
 
 void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines, bool optimize) {
-    auto reader = NcsReader("");
-    reader.load(ncs);
+    auto reader = NcsReader(ncs, "");
+    reader.load();
 
     std::unique_ptr<IExpressionTreeOptimizer> optimizer;
     if (optimize) {

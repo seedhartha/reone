@@ -56,11 +56,11 @@ TEST(tlk_reader, should_read_tlk) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = TlkReader();
+    auto reader = TlkReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

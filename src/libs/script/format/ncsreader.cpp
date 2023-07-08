@@ -17,33 +17,35 @@
 
 #include "reone/script/format/ncsreader.h"
 
+#include "reone/resource/format/signutil.h"
+#include "reone/script/program.h"
 #include "reone/system/logutil.h"
 
-#include "reone/script/program.h"
+using namespace reone::resource;
 
 namespace reone {
 
 namespace script {
 
-void NcsReader::onLoad() {
-    checkSignature(std::string("NCS V1.0", 8));
+void NcsReader::load() {
+    checkSignature(_ncs, std::string("NCS V1.0", 8));
 
-    uint8_t byteCode = readByte();
-    uint32_t length = readUint32();
+    uint8_t byteCode = _ncs.readByte();
+    uint32_t length = _ncs.readUint32();
 
     _program = std::make_unique<ScriptProgram>(_resRef);
 
-    size_t off = tell();
+    size_t off = _ncs.position();
     while (off < length) {
         readInstruction(off);
     }
 }
 
 void NcsReader::readInstruction(size_t &offset) {
-    seek(offset);
+    _ncs.seek(offset);
 
-    uint8_t byteCode = readByte();
-    uint8_t qualifier = readByte();
+    uint8_t byteCode = _ncs.readByte();
+    uint8_t qualifier = _ncs.readByte();
 
     Instruction ins;
     ins.offset = static_cast<uint32_t>(offset);
@@ -54,54 +56,54 @@ void NcsReader::readInstruction(size_t &offset) {
     case InstructionType::CPTOPSP:
     case InstructionType::CPDOWNBP:
     case InstructionType::CPTOPBP:
-        ins.stackOffset = readInt32();
-        ins.size = readUint16();
+        ins.stackOffset = _ncs.readInt32();
+        ins.size = _ncs.readUint16();
         break;
     case InstructionType::CONSTI:
-        ins.intValue = readInt32();
+        ins.intValue = _ncs.readInt32();
         break;
     case InstructionType::CONSTF:
-        ins.floatValue = readFloat();
+        ins.floatValue = _ncs.readFloat();
         break;
     case InstructionType::CONSTS: {
-        uint16_t len = readUint16();
-        ins.strValue = readCString(len);
+        uint16_t len = _ncs.readUint16();
+        ins.strValue = _ncs.readCString(len);
         break;
     }
     case InstructionType::CONSTO:
-        ins.objectId = readInt32();
+        ins.objectId = _ncs.readInt32();
         break;
     case InstructionType::ACTION:
-        ins.routine = readUint16();
-        ins.argCount = readByte();
+        ins.routine = _ncs.readUint16();
+        ins.argCount = _ncs.readByte();
         break;
     case InstructionType::MOVSP:
-        ins.stackOffset = readInt32();
+        ins.stackOffset = _ncs.readInt32();
         break;
     case InstructionType::JMP:
     case InstructionType::JSR:
     case InstructionType::JZ:
     case InstructionType::JNZ:
-        ins.jumpOffset = readInt32();
+        ins.jumpOffset = _ncs.readInt32();
         break;
     case InstructionType::DESTRUCT:
-        ins.size = readUint16();
-        ins.stackOffset = readInt16();
-        ins.sizeNoDestroy = readUint16();
+        ins.size = _ncs.readUint16();
+        ins.stackOffset = _ncs.readInt16();
+        ins.sizeNoDestroy = _ncs.readUint16();
         break;
     case InstructionType::DECISP:
     case InstructionType::INCISP:
     case InstructionType::DECIBP:
     case InstructionType::INCIBP:
-        ins.stackOffset = readInt32();
+        ins.stackOffset = _ncs.readInt32();
         break;
     case InstructionType::STORE_STATE:
-        ins.size = readUint32();
-        ins.sizeLocals = readUint32();
+        ins.size = _ncs.readUint32();
+        ins.sizeLocals = _ncs.readUint32();
         break;
     case InstructionType::EQUALTT:
     case InstructionType::NEQUALTT:
-        ins.size = readUint16();
+        ins.size = _ncs.readUint16();
         break;
     case InstructionType::NOP:
     case InstructionType::RSADDI:
@@ -181,7 +183,7 @@ void NcsReader::readInstruction(size_t &offset) {
         throw std::runtime_error(str(boost::format("Unsupported instruction type: %04x") % static_cast<int>(ins.type)));
     }
 
-    size_t pos = tell();
+    size_t pos = _ncs.position();
     ins.nextOffset = static_cast<uint32_t>(pos);
 
     _program->add(std::move(ins));

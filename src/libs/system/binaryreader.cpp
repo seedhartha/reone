@@ -94,6 +94,16 @@ std::string BinaryReader::readString(int len) {
     return std::move(val);
 }
 
+std::string BinaryReader::readStringAt(size_t off, int len) {
+    size_t pos = position();
+    seek(off);
+
+    std::string result(readString(len));
+    seek(pos);
+
+    return std::move(result);
+}
+
 std::string BinaryReader::readCString() {
     std::ostringstream ss;
 
@@ -114,7 +124,7 @@ std::string BinaryReader::readCString(int len) {
     return std::move(result);
 }
 
-std::string BinaryReader::readCString(size_t off, int len) {
+std::string BinaryReader::readCStringAt(size_t off, int len) {
     size_t pos = position();
     seek(off);
 
@@ -140,6 +150,16 @@ ByteArray BinaryReader::readBytes(int count) {
     int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
     buffer.resize(numRead);
     return buffer;
+}
+
+ByteArray BinaryReader::readBytesAt(size_t off, int count) {
+    size_t pos = position();
+    seek(off);
+
+    ByteArray result(readBytes(count));
+    seek(pos);
+
+    return std::move(result);
 }
 
 } // namespace reone
