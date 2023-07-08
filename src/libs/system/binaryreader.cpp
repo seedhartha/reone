@@ -94,7 +94,7 @@ std::string BinaryReader::readString(int len) {
     return std::move(val);
 }
 
-std::string BinaryReader::readNullTerminatedString() {
+std::string BinaryReader::readCString() {
     std::ostringstream ss;
 
     char ch;
@@ -106,6 +106,32 @@ std::string BinaryReader::readNullTerminatedString() {
     } while (ch);
 
     return ss.str();
+}
+
+std::string BinaryReader::readCString(int len) {
+    std::string result(readString(len));
+    result.erase(find(result.begin(), result.end(), '\0'), result.end());
+    return std::move(result);
+}
+
+std::string BinaryReader::readCString(size_t off, int len) {
+    size_t pos = position();
+    seek(off);
+
+    std::string result(readCString(len));
+    seek(pos);
+
+    return std::move(result);
+}
+
+std::string BinaryReader::readCStringAt(size_t off) {
+    size_t pos = position();
+    seek(off);
+
+    std::string result(readCString());
+    seek(pos);
+
+    return std::move(result);
 }
 
 ByteArray BinaryReader::readBytes(int count) {

@@ -103,10 +103,10 @@ TEST(mdl_reader, should_load_mdl) {
     auto mdx = MemoryInputStream(mdxBytes);
     auto models = std::make_unique<MockModels>();
     auto textures = std::make_unique<MockTextures>();
-    auto reader = MdlReader(*models, *textures);
+    auto reader = MdlReader(mdl, mdx, *models, *textures);
 
     // when
-    reader.load(mdl, mdx);
+    reader.load();
 
     // then
     auto model = reader.model();

@@ -58,7 +58,10 @@ public:
     float readFloat();
     double readDouble();
     std::string readString(int len);
-    std::string readNullTerminatedString();
+    std::string readCString();
+    std::string readCString(int len);
+    std::string readCString(size_t off, int len);
+    std::string readCStringAt(size_t off);
     ByteArray readBytes(int count);
 
     inline std::vector<uint16_t> readUint16Array(int count) {

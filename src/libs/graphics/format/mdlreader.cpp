@@ -51,56 +51,43 @@ struct EmitterFlags {
     static constexpr int flag13 = 0x1000;
 };
 
-MdlReader::MdlReader(IModels &models, ITextures &textures) :
-    _models(models),
-    _textures(textures) {
-
-    initControllerFn();
-}
-
-void MdlReader::load(IInputStream &mdl, IInputStream &mdx) {
-    _mdxReader = std::make_unique<BinaryReader>(mdx);
-
-    BinaryResourceReader::load(mdl);
-}
-
 static bool isTSLFunctionPointer(uint32_t ptr) {
     return ptr == kMdlModelFuncPtr1TslPC || ptr == kMdlModelFuncPtr1TslXbox;
 }
 
-void MdlReader::onLoad() {
+void MdlReader::load() {
     // File Header
-    ignore(4); // unknown
-    uint32_t mdlSize = readUint32();
-    uint32_t mdxSize = readUint32();
+    _mdl.ignore(4); // unknown
+    uint32_t mdlSize = _mdl.readUint32();
+    uint32_t mdxSize = _mdl.readUint32();
 
     // Geometry Header
-    uint32_t funcPtr1 = readUint32();
-    uint32_t funcPtr2 = readUint32();
-    std::string name(boost::to_lower_copy(readCString(32)));
-    uint32_t offRootNode = readUint32();
-    uint32_t numNodes = readUint32();
-    ignore(6 * 4); // unknown
-    uint32_t refCount = readUint32();
-    uint8_t modelType = readByte();
-    ignore(3); // padding
+    uint32_t funcPtr1 = _mdl.readUint32();
+    uint32_t funcPtr2 = _mdl.readUint32();
+    std::string name(boost::to_lower_copy(_mdl.readCString(32)));
+    uint32_t offRootNode = _mdl.readUint32();
+    uint32_t numNodes = _mdl.readUint32();
+    _mdl.ignore(6 * 4); // unknown
+    uint32_t refCount = _mdl.readUint32();
+    uint8_t modelType = _mdl.readByte();
+    _mdl.ignore(3); // padding
 
     // Model Header
-    uint8_t classification = readByte();
-    uint8_t subclassification = readByte();
-    ignore(1); // unknown
-    uint8_t affectedByFog = readByte();
-    uint32_t numChildModels = readUint32();
+    uint8_t classification = _mdl.readByte();
+    uint8_t subclassification = _mdl.readByte();
+    _mdl.ignore(1); // unknown
+    uint8_t affectedByFog = _mdl.readByte();
+    uint32_t numChildModels = _mdl.readUint32();
     ArrayDefinition animationArrayDef(readArrayDefinition());
-    uint32_t superModelRef = readUint32();
-    std::vector<float> boundingBox(readFloatArray(6));
-    float radius = readFloat();
-    float animationScale = readFloat();
-    std::string superModelName(boost::to_lower_copy(readCString(32)));
-    uint32_t offAnimRoot = readUint32();
-    ignore(4); // unknown
-    uint32_t mdxSize2 = readUint32();
-    uint32_t mdxOffset = readUint32();
+    uint32_t superModelRef = _mdl.readUint32();
+    std::vector<float> boundingBox(_mdl.readFloatArray(6));
+    float radius = _mdl.readFloat();
+    float animationScale = _mdl.readFloat();
+    std::string superModelName(boost::to_lower_copy(_mdl.readCString(32)));
+    uint32_t offAnimRoot = _mdl.readUint32();
+    _mdl.ignore(4); // unknown
+    uint32_t mdxSize2 = _mdl.readUint32();
+    uint32_t mdxOffset = _mdl.readUint32();
     ArrayDefinition nameArrayDef(readArrayDefinition());
 
     _tsl = isTSLFunctionPointer(funcPtr1);
@@ -108,7 +95,7 @@ void MdlReader::onLoad() {
     _offAnimRoot = offAnimRoot;
 
     // Read node names
-    std::vector<uint32_t> nameOffsets(readUint32Array(kMdlDataOffset + nameArrayDef.offset, nameArrayDef.count));
+    std::vector<uint32_t> nameOffsets(_mdl.readUint32Array(kMdlDataOffset + nameArrayDef.offset, nameArrayDef.count));
     readNodeNames(nameOffsets);
 
     // Read nodes
@@ -122,7 +109,7 @@ void MdlReader::onLoad() {
     }
 
     // Read animations
-    std::vector<uint32_t> animOffsets(readUint32Array(kMdlDataOffset + animationArrayDef.offset, animationArrayDef.count));
+    std::vector<uint32_t> animOffsets(_mdl.readUint32Array(kMdlDataOffset + animationArrayDef.offset, animationArrayDef.count));
     std::vector<std::shared_ptr<Animation>> animations(readAnimations(animOffsets));
 
     _model = std::make_unique<Model>(
@@ -138,33 +125,33 @@ void MdlReader::onLoad() {
 
 MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {
     ArrayDefinition result;
-    result.offset = readUint32();
-    result.count = readUint32();
-    result.count2 = readUint32();
+    result.offset = _mdl.readUint32();
+    result.count = _mdl.readUint32();
+    result.count2 = _mdl.readUint32();
     return std::move(result);
 }
 
 void MdlReader::readNodeNames(const std::vector<uint32_t> &offsets) {
     for (uint32_t offset : offsets) {
-        std::string name(boost::to_lower_copy(readCStringAt(kMdlDataOffset + offset)));
+        std::string name(boost::to_lower_copy(_mdl.readCStringAt(kMdlDataOffset + offset)));
         _nodeNames.push_back(std::move(name));
     }
 }
 
 std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode) {
-    seek(kMdlDataOffset + offset);
+    _mdl.seek(kMdlDataOffset + offset);
     if (!animated && offset == _offAnimRoot) {
         animated = true;
     }
 
-    uint16_t flags = readUint16();
-    uint16_t nodeNumber = readUint16();
-    uint16_t nameIndex = readUint16();
-    ignore(2); // padding
-    uint32_t offRootNode = readUint32();
-    uint32_t offParentNode = readUint32();
-    std::vector<float> positionValues(readFloatArray(3));
-    std::vector<float> orientationValues(readFloatArray(4));
+    uint16_t flags = _mdl.readUint16();
+    uint16_t nodeNumber = _mdl.readUint16();
+    uint16_t nameIndex = _mdl.readUint16();
+    _mdl.ignore(2); // padding
+    uint32_t offRootNode = _mdl.readUint32();
+    uint32_t offParentNode = _mdl.readUint32();
+    std::vector<float> positionValues(_mdl.readFloatArray(3));
+    std::vector<float> orientationValues(_mdl.readFloatArray(4));
     ArrayDefinition childArrayDef(readArrayDefinition());
     ArrayDefinition controllerArrayDef(readArrayDefinition());
     ArrayDefinition controllerDataArrayDef(readArrayDefinition());
@@ -203,10 +190,10 @@ std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *pare
         _nodeFlags.insert(std::make_pair(nodeNumber, flags));
     }
 
-    std::vector<float> controllerData(readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
+    std::vector<float> controllerData(_mdl.readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
     readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, animNode, *node);
 
-    std::vector<uint32_t> childOffsets(readUint32Array(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
+    std::vector<uint32_t> childOffsets(_mdl.readUint32Array(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
     for (uint32_t offset : childOffsets) {
         node->addChild(readNodes(offset, node.get(), animated, animNode));
     }
@@ -216,55 +203,55 @@ std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *pare
 
 std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     // Common Mesh Header
-    uint32_t funcPtr1 = readUint32();
-    uint32_t funcPtr2 = readUint32();
+    uint32_t funcPtr1 = _mdl.readUint32();
+    uint32_t funcPtr2 = _mdl.readUint32();
     ArrayDefinition faceArrayDef(readArrayDefinition());
-    std::vector<float> boundingBox(readFloatArray(6));
-    float radius = readFloat();
-    std::vector<float> average(readFloatArray(3));
-    std::vector<float> diffuse(readFloatArray(3));
-    std::vector<float> ambient(readFloatArray(3));
-    uint32_t transprencyHint = readUint32();
-    std::string texture1(boost::to_lower_copy(readCString(32)));
-    std::string texture2(boost::to_lower_copy(readCString(32)));
-    std::string texture3(boost::to_lower_copy(readCString(12)));
-    std::string texture4(boost::to_lower_copy(readCString(12)));
+    std::vector<float> boundingBox(_mdl.readFloatArray(6));
+    float radius = _mdl.readFloat();
+    std::vector<float> average(_mdl.readFloatArray(3));
+    std::vector<float> diffuse(_mdl.readFloatArray(3));
+    std::vector<float> ambient(_mdl.readFloatArray(3));
+    uint32_t transprencyHint = _mdl.readUint32();
+    std::string texture1(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string texture2(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string texture3(boost::to_lower_copy(_mdl.readCString(12)));
+    std::string texture4(boost::to_lower_copy(_mdl.readCString(12)));
     ArrayDefinition indicesCountArrayDef(readArrayDefinition());
     ArrayDefinition indicesOffsetArrayDef(readArrayDefinition());
     ArrayDefinition invCounterArrayDef(readArrayDefinition());
-    ignore(3 * 4 + 8); // unknown
-    uint32_t animateUV = readUint32();
-    float uvDirectionX = readFloat();
-    float uvDirectionY = readFloat();
-    float uvJitter = readFloat();
-    float uvJitterSpeed = readFloat();
-    uint32_t mdxVertexSize = readUint32();
-    uint32_t mdxDataFlags = readUint32();
-    int offMdxVertices = readInt32();
-    int offMdxNormals = readInt32();
-    int offMdxVertexColors = readInt32();
-    int offMdxTexCoords1 = readInt32();
-    int offMdxTexCoords2 = readInt32();
-    int offMdxTexCoords3 = readInt32();
-    int offMdxTexCoords4 = readInt32();
-    int offMdxTanSpace = readInt32();
-    ignore(3 * 4); // unknown
-    uint16_t numVertices = readUint16();
-    uint16_t numTextures = readUint16();
-    uint8_t lightmapped = readByte();
-    uint8_t rotateTexture = readByte();
-    uint8_t backgroundGeometry = readByte();
-    uint8_t shadow = readByte();
-    uint8_t beaming = readByte();
-    uint8_t render = readByte();
-    ignore(2); // unknown
-    float totalArea = readFloat();
-    ignore(4); // unknown
+    _mdl.ignore(3 * 4 + 8); // unknown
+    uint32_t animateUV = _mdl.readUint32();
+    float uvDirectionX = _mdl.readFloat();
+    float uvDirectionY = _mdl.readFloat();
+    float uvJitter = _mdl.readFloat();
+    float uvJitterSpeed = _mdl.readFloat();
+    uint32_t mdxVertexSize = _mdl.readUint32();
+    uint32_t mdxDataFlags = _mdl.readUint32();
+    int offMdxVertices = _mdl.readInt32();
+    int offMdxNormals = _mdl.readInt32();
+    int offMdxVertexColors = _mdl.readInt32();
+    int offMdxTexCoords1 = _mdl.readInt32();
+    int offMdxTexCoords2 = _mdl.readInt32();
+    int offMdxTexCoords3 = _mdl.readInt32();
+    int offMdxTexCoords4 = _mdl.readInt32();
+    int offMdxTanSpace = _mdl.readInt32();
+    _mdl.ignore(3 * 4); // unknown
+    uint16_t numVertices = _mdl.readUint16();
+    uint16_t numTextures = _mdl.readUint16();
+    uint8_t lightmapped = _mdl.readByte();
+    uint8_t rotateTexture = _mdl.readByte();
+    uint8_t backgroundGeometry = _mdl.readByte();
+    uint8_t shadow = _mdl.readByte();
+    uint8_t beaming = _mdl.readByte();
+    uint8_t render = _mdl.readByte();
+    _mdl.ignore(2); // unknown
+    float totalArea = _mdl.readFloat();
+    _mdl.ignore(4); // unknown
     if (_tsl) {
-        ignore(8);
+        _mdl.ignore(8);
     }
-    uint32_t offMdxData = readUint32();
-    uint32_t offVertices = readUint32();
+    uint32_t offMdxData = _mdl.readUint32();
+    uint32_t offVertices = _mdl.readUint32();
 
     std::vector<float> vertices;
     std::vector<uint16_t> indices;
@@ -282,20 +269,20 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
 
     if (flags & MdlNodeFlags::skin) {
         // Skin Mesh Header
-        ignore(3 * 4); // unknown
-        uint32_t offMdxBoneWeights = readUint32();
-        uint32_t offMdxBoneIndices = readUint32();
-        uint32_t offBones = readUint32();
-        uint32_t numBones = readUint32();
+        _mdl.ignore(3 * 4); // unknown
+        uint32_t offMdxBoneWeights = _mdl.readUint32();
+        uint32_t offMdxBoneIndices = _mdl.readUint32();
+        uint32_t offBones = _mdl.readUint32();
+        uint32_t numBones = _mdl.readUint32();
         ArrayDefinition qBoneArrayDef(readArrayDefinition());
         ArrayDefinition tBoneArrayDef(readArrayDefinition());
-        ignore(3 * 4); // unknown
-        std::vector<uint16_t> boneNodeSerial(readUint16Array(16));
-        ignore(4); // padding
+        _mdl.ignore(3 * 4); // unknown
+        std::vector<uint16_t> boneNodeSerial(_mdl.readUint16Array(16));
+        _mdl.ignore(4); // padding
 
-        std::vector<float> boneMap(readFloatArray(kMdlDataOffset + offBones, numBones));
-        std::vector<float> qBoneValues(readFloatArray(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
-        std::vector<float> tBoneValues(readFloatArray(kMdlDataOffset + tBoneArrayDef.offset, 3 * numBones));
+        std::vector<float> boneMap(_mdl.readFloatArray(kMdlDataOffset + offBones, numBones));
+        std::vector<float> qBoneValues(_mdl.readFloatArray(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
+        std::vector<float> tBoneValues(_mdl.readFloatArray(kMdlDataOffset + tBoneArrayDef.offset, 3 * numBones));
 
         std::vector<glm::mat4> boneMatrices;
         boneMatrices.resize(numBones);
@@ -317,10 +304,10 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     } else if (flags & MdlNodeFlags::dangly) {
         // Dangly Mesh Header
         ArrayDefinition constraintArrayDef(readArrayDefinition());
-        float displacement = readFloat();
-        float tightness = readFloat();
-        float period = readFloat();
-        uint32_t offDanglyVertices = readUint32();
+        float displacement = _mdl.readFloat();
+        float tightness = _mdl.readFloat();
+        float period = _mdl.readFloat();
+        uint32_t offDanglyVertices = _mdl.readUint32();
 
         danglymesh = std::make_shared<ModelNode::Danglymesh>();
         danglymesh->displacement = 0.5f * displacement; // displacement is allegedly 1/2 meters per unit
@@ -328,20 +315,20 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         danglymesh->period = period;
 
         danglymesh->constraints.resize(constraintArrayDef.count);
-        seek(kMdlDataOffset + constraintArrayDef.offset);
+        _mdl.seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-            float multiplier = readFloat();
+            float multiplier = _mdl.readFloat();
             danglymesh->constraints[i].multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
         }
-        seek(kMdlDataOffset + offDanglyVertices);
+        _mdl.seek(kMdlDataOffset + offDanglyVertices);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-            std::vector<float> positionValues(readFloatArray(3));
+            std::vector<float> positionValues(_mdl.readFloatArray(3));
             danglymesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
         }
 
     } else if (flags & MdlNodeFlags::aabb) {
         // AABB Mesh Header
-        uint32_t offTree = readUint32();
+        uint32_t offTree = _mdl.readUint32();
         aabbTree = readAABBTree(offTree);
 
     } else if (flags & MdlNodeFlags::saber) {
@@ -354,21 +341,21 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         // procedurally generated based on vertices 0-7 and 88-95.
 
         // Saber Mesh Header
-        uint32_t offSaberVertices = readUint32();
-        uint32_t offTexCoords = readUint32();
-        uint32_t offNormals = readUint32();
-        ignore(2 * 4); // unknown
+        uint32_t offSaberVertices = _mdl.readUint32();
+        uint32_t offTexCoords = _mdl.readUint32();
+        uint32_t offNormals = _mdl.readUint32();
+        _mdl.ignore(2 * 4); // unknown
 
         static int referenceIndices[] {0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95};
 
-        seek(static_cast<size_t>(kMdlDataOffset) + offSaberVertices);
-        std::vector<float> saberVertices(readFloatArray(3 * numVertices));
+        _mdl.seek(static_cast<size_t>(kMdlDataOffset) + offSaberVertices);
+        std::vector<float> saberVertices(_mdl.readFloatArray(3 * numVertices));
 
-        seek(static_cast<size_t>(kMdlDataOffset) + offTexCoords);
-        std::vector<float> texCoords(readFloatArray(2 * numVertices));
+        _mdl.seek(static_cast<size_t>(kMdlDataOffset) + offTexCoords);
+        std::vector<float> texCoords(_mdl.readFloatArray(2 * numVertices));
 
-        seek(static_cast<size_t>(kMdlDataOffset) + offNormals);
-        std::vector<float> normals(readFloatArray(3 * numVertices));
+        _mdl.seek(static_cast<size_t>(kMdlDataOffset) + offNormals);
+        std::vector<float> normals(_mdl.readFloatArray(3 * numVertices));
 
         int numVertices = 16;
         vertices.resize(8ll * numVertices);
@@ -403,8 +390,8 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
 
     // Read vertices
     if (!(flags & MdlNodeFlags::saber) && mdxVertexSize > 0) {
-        _mdxReader->seek(offMdxData);
-        vertices = _mdxReader->readFloatArray(numVertices * mdxVertexSize / sizeof(float));
+        _mdx.seek(offMdxData);
+        vertices = _mdx.readFloatArray(numVertices * mdxVertexSize / sizeof(float));
     }
 
     std::vector<Mesh::Face> faces;
@@ -412,13 +399,13 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         faces.resize(faceArrayDef.count);
 
         // Faces
-        seek(kMdlDataOffset + faceArrayDef.offset);
+        _mdl.seek(kMdlDataOffset + faceArrayDef.offset);
         for (uint32_t i = 0; i < faceArrayDef.count; ++i) {
-            std::vector<float> normalValues(readFloatArray(3));
-            float distance = readFloat();
-            uint32_t material = readUint32();
-            std::vector<uint16_t> adjacentFaces(readUint16Array(3));
-            std::vector<uint16_t> faceIndices(readUint16Array(3));
+            std::vector<float> normalValues(_mdl.readFloatArray(3));
+            float distance = _mdl.readFloat();
+            uint32_t material = _mdl.readUint32();
+            std::vector<uint16_t> adjacentFaces(_mdl.readUint16Array(3));
+            std::vector<uint16_t> faceIndices(_mdl.readUint16Array(3));
 
             Mesh::Face face;
             face.indices[0] = faceIndices[0];
@@ -433,10 +420,10 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         }
 
         // Indices
-        seek(kMdlDataOffset + indicesOffsetArrayDef.offset);
-        uint32_t offIndices = readUint32();
-        seek(kMdlDataOffset + offIndices);
-        indices = readUint16Array(3 * faceArrayDef.count);
+        _mdl.seek(kMdlDataOffset + indicesOffsetArrayDef.offset);
+        uint32_t offIndices = _mdl.readUint32();
+        _mdl.seek(kMdlDataOffset + offIndices);
+        indices = _mdl.readUint16Array(3 * faceArrayDef.count);
 
     } else if (flags & MdlNodeFlags::saber) {
         faces.emplace_back(0, 13, 12);
@@ -488,13 +475,13 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
 }
 
 std::shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
-    seek(kMdlDataOffset + offset);
+    _mdl.seek(kMdlDataOffset + offset);
 
-    std::vector<float> boundingBox(readFloatArray(6));
-    uint32_t offChildLeft = readUint32();
-    uint32_t offChildRight = readUint32();
-    int faceIndex = readInt32();
-    uint32_t mostSignificantPlane = readUint32();
+    std::vector<float> boundingBox(_mdl.readFloatArray(6));
+    uint32_t offChildLeft = _mdl.readUint32();
+    uint32_t offChildRight = _mdl.readUint32();
+    int faceIndex = _mdl.readInt32();
+    uint32_t mostSignificantPlane = _mdl.readUint32();
 
     auto node = std::make_shared<ModelNode::AABBTree>();
     node->faceIndex = faceIndex;
@@ -511,19 +498,19 @@ std::shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
 }
 
 std::shared_ptr<ModelNode::Light> MdlReader::readLight() {
-    float flareRadius = readFloat();
-    ignore(3 * 4); // unknown
+    float flareRadius = _mdl.readFloat();
+    _mdl.ignore(3 * 4); // unknown
     ArrayDefinition flareSizesArrayDef(readArrayDefinition());
     ArrayDefinition flarePositionsArrayDef(readArrayDefinition());
     ArrayDefinition flareColorShiftsArrayDef(readArrayDefinition());
     ArrayDefinition flareTexturesArrayDef(readArrayDefinition());
-    uint32_t priority = readUint32();
-    uint32_t ambientOnly = readUint32();
-    uint32_t dynamicType = readUint32();
-    uint32_t affectDynamic = readUint32();
-    uint32_t shadow = readUint32();
-    uint32_t flare = readUint32();
-    uint32_t fading = readUint32();
+    uint32_t priority = _mdl.readUint32();
+    uint32_t ambientOnly = _mdl.readUint32();
+    uint32_t dynamicType = _mdl.readUint32();
+    uint32_t affectDynamic = _mdl.readUint32();
+    uint32_t shadow = _mdl.readUint32();
+    uint32_t flare = _mdl.readUint32();
+    uint32_t fading = _mdl.readUint32();
 
     auto light = std::make_shared<ModelNode::Light>();
     light->priority = priority;
@@ -536,21 +523,21 @@ std::shared_ptr<ModelNode::Light> MdlReader::readLight() {
 
     int numFlares = static_cast<int>(flareTexturesArrayDef.count);
     if (numFlares > 0) {
-        std::vector<float> flareSizes(readFloatArray(kMdlDataOffset + flareSizesArrayDef.offset, flareSizesArrayDef.count));
-        std::vector<float> flarePositions(readFloatArray(kMdlDataOffset + flarePositionsArrayDef.offset, flarePositionsArrayDef.count));
-        std::vector<uint32_t> texNameOffsets(readUint32Array(kMdlDataOffset + flareTexturesArrayDef.offset, flareTexturesArrayDef.count));
+        std::vector<float> flareSizes(_mdl.readFloatArray(kMdlDataOffset + flareSizesArrayDef.offset, flareSizesArrayDef.count));
+        std::vector<float> flarePositions(_mdl.readFloatArray(kMdlDataOffset + flarePositionsArrayDef.offset, flarePositionsArrayDef.count));
+        std::vector<uint32_t> texNameOffsets(_mdl.readUint32Array(kMdlDataOffset + flareTexturesArrayDef.offset, flareTexturesArrayDef.count));
 
         std::vector<glm::vec3> colorShifts;
         for (int i = 0; i < numFlares; ++i) {
-            seek(kMdlDataOffset + flareColorShiftsArrayDef.offset + 12 * i);
-            glm::vec3 colorShift(readFloat(), readFloat(), readFloat());
+            _mdl.seek(kMdlDataOffset + flareColorShiftsArrayDef.offset + 12 * i);
+            glm::vec3 colorShift(_mdl.readFloat(), _mdl.readFloat(), _mdl.readFloat());
             colorShifts.push_back(std::move(colorShift));
         }
 
         std::vector<std::shared_ptr<Texture>> flareTextures;
         for (int i = 0; i < numFlares; ++i) {
-            seek(kMdlDataOffset + texNameOffsets[i]);
-            std::string textureName(boost::to_lower_copy(readCString(12)));
+            _mdl.seek(kMdlDataOffset + texNameOffsets[i]);
+            std::string textureName(boost::to_lower_copy(_mdl.readCString(12)));
             std::shared_ptr<Texture> texture(_textures.get(textureName));
             flareTextures.push_back(std::move(texture));
         }
@@ -615,26 +602,26 @@ static ModelNode::Emitter::BlendMode parseEmitterBlend(const std::string &str) {
 }
 
 std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
-    float deadSpace = readFloat();
-    float blastRadius = readFloat();
-    float blastLength = readFloat();
-    uint32_t branchCount = readUint32();
-    float controlPointSmoothing = readFloat();
-    uint32_t xGrid = readUint32();
-    uint32_t yGrid = readUint32();
-    ignore(4); // unknown
-    std::string update(boost::to_lower_copy(readCString(32)));
-    std::string render(boost::to_lower_copy(readCString(32)));
-    std::string blend(boost::to_lower_copy(readCString(32)));
-    std::string texture(boost::to_lower_copy(readCString(32)));
-    std::string chunkName(boost::to_lower_copy(readCString(16)));
-    uint32_t twosided = readUint32();
-    uint32_t loop = readUint32();
-    uint32_t renderOrder = readUint32();
-    uint32_t frameBlending = readUint32();
-    std::string depthTexture(boost::to_lower_copy(readCString(32)));
-    ignore(1); // padding
-    uint32_t flags = readUint32();
+    float deadSpace = _mdl.readFloat();
+    float blastRadius = _mdl.readFloat();
+    float blastLength = _mdl.readFloat();
+    uint32_t branchCount = _mdl.readUint32();
+    float controlPointSmoothing = _mdl.readFloat();
+    uint32_t xGrid = _mdl.readUint32();
+    uint32_t yGrid = _mdl.readUint32();
+    _mdl.ignore(4); // unknown
+    std::string update(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string render(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string blend(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string texture(boost::to_lower_copy(_mdl.readCString(32)));
+    std::string chunkName(boost::to_lower_copy(_mdl.readCString(16)));
+    uint32_t twosided = _mdl.readUint32();
+    uint32_t loop = _mdl.readUint32();
+    uint32_t renderOrder = _mdl.readUint32();
+    uint32_t frameBlending = _mdl.readUint32();
+    std::string depthTexture(boost::to_lower_copy(_mdl.readCString(32)));
+    _mdl.ignore(1); // padding
+    uint32_t flags = _mdl.readUint32();
 
     auto emitter = std::make_shared<ModelNode::Emitter>();
     emitter->updateMode = parseEmitterUpdate(update);
@@ -652,8 +639,8 @@ std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
 }
 
 std::shared_ptr<ModelNode::Reference> MdlReader::readReference() {
-    std::string modelResRef(boost::to_lower_copy(readCString(32)));
-    uint32_t reattachable = readUint32();
+    std::string modelResRef(boost::to_lower_copy(_mdl.readCString(32)));
+    uint32_t reattachable = _mdl.readUint32();
 
     auto reference = std::make_shared<ModelNode::Reference>();
     reference->model = _models.get(modelResRef);
@@ -674,15 +661,15 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std
         nodeFlags = node.flags();
     }
 
-    seek(kMdlDataOffset + keyOffset);
+    _mdl.seek(kMdlDataOffset + keyOffset);
     for (uint32_t i = 0; i < keyCount; ++i) {
-        uint32_t type = readUint32();
-        ignore(2); // unknown
-        uint16_t numRows = readUint16();
-        uint16_t timeIndex = readUint16();
-        uint16_t dataIndex = readUint16();
-        uint8_t numColumns = readByte();
-        ignore(3); // padding
+        uint32_t type = _mdl.readUint32();
+        _mdl.ignore(2); // unknown
+        uint16_t numRows = _mdl.readUint16();
+        uint16_t timeIndex = _mdl.readUint16();
+        uint16_t dataIndex = _mdl.readUint16();
+        uint8_t numColumns = _mdl.readByte();
+        _mdl.ignore(3); // padding
 
         ControllerKey key;
         key.type = type;
@@ -734,36 +721,36 @@ std::vector<std::shared_ptr<Animation>> MdlReader::readAnimations(const std::vec
 }
 
 std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
-    seek(kMdlDataOffset + offset);
+    _mdl.seek(kMdlDataOffset + offset);
 
     // Geometry Header
-    uint32_t funcPtr1 = readUint32();
-    uint32_t funcPtr2 = readUint32();
-    std::string name(boost::to_lower_copy(readCString(32)));
-    uint32_t offRootNode = readUint32();
-    uint32_t numNodes = readUint32();
-    ignore(6 * 4); // unknown
-    uint32_t refCount = readUint32();
-    uint8_t modelType = readByte();
-    ignore(3); // padding
+    uint32_t funcPtr1 = _mdl.readUint32();
+    uint32_t funcPtr2 = _mdl.readUint32();
+    std::string name(boost::to_lower_copy(_mdl.readCString(32)));
+    uint32_t offRootNode = _mdl.readUint32();
+    uint32_t numNodes = _mdl.readUint32();
+    _mdl.ignore(6 * 4); // unknown
+    uint32_t refCount = _mdl.readUint32();
+    uint8_t modelType = _mdl.readByte();
+    _mdl.ignore(3); // padding
 
     // Animation Header
-    float length = readFloat();
-    float transitionTime = readFloat();
-    std::string root(boost::to_lower_copy(readCString(32)));
+    float length = _mdl.readFloat();
+    float transitionTime = _mdl.readFloat();
+    std::string root(boost::to_lower_copy(_mdl.readCString(32)));
     ArrayDefinition eventArrayDef(readArrayDefinition());
-    ignore(4); // unknown
+    _mdl.ignore(4); // unknown
 
     std::shared_ptr<ModelNode> rootNode(readNodes(offRootNode, nullptr, false, true));
 
     // Events
     std::vector<Animation::Event> events;
     if (eventArrayDef.count > 0) {
-        seek(kMdlDataOffset + eventArrayDef.offset);
+        _mdl.seek(kMdlDataOffset + eventArrayDef.offset);
         for (uint32_t i = 0; i < eventArrayDef.count; ++i) {
             Animation::Event event;
-            event.time = readFloat();
-            event.name = boost::to_lower_copy(readCString(32));
+            event.time = _mdl.readFloat();
+            event.name = boost::to_lower_copy(_mdl.readCString(32));
             events.push_back(std::move(event));
         }
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });

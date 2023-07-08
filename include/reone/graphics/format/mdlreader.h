@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 #include "../modelnode.h"
 
@@ -32,11 +33,21 @@ class IModels;
 class ITextures;
 class Model;
 
-class MdlReader : public resource::BinaryResourceReader {
+class MdlReader : boost::noncopyable {
 public:
-    MdlReader(IModels &models, ITextures &textures);
+    MdlReader(IInputStream &mdl,
+              IInputStream &mdx,
+              IModels &models,
+              ITextures &textures) :
+        _mdl(BinaryReader(mdl)),
+        _mdx(BinaryReader(mdx)),
+        _models(models),
+        _textures(textures) {
 
-    void load(IInputStream &mdl, IInputStream &mdx);
+        initControllerFn();
+    }
+
+    void load();
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
 
@@ -58,6 +69,8 @@ private:
     typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
     typedef std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)> ControllerFn;
 
+    BinaryReader _mdl;
+    BinaryReader _mdx;
     IModels &_models;
     ITextures &_textures;
 
@@ -66,7 +79,6 @@ private:
     std::unordered_map<uint32_t, ControllerFn> _lightControllers;
     std::unordered_map<uint32_t, ControllerFn> _emitterControllers;
 
-    std::unique_ptr<BinaryReader> _mdxReader;
     bool _tsl {false};
     std::vector<std::string> _nodeNames;
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in depth-first order */
@@ -74,8 +86,6 @@ private:
     std::shared_ptr<graphics::Model> _model;
     std::string _modelName;
     uint32_t _offAnimRoot {0};
-
-    void onLoad() override;
 
     ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);

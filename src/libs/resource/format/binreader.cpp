@@ -105,7 +105,7 @@ std::string BinaryResourceReader::readCStringAt(size_t off) {
     size_t pos = _reader->position();
     _reader->seek(off);
 
-    std::string result(_reader->readNullTerminatedString());
+    std::string result(_reader->readCString());
     _reader->seek(pos);
 
     return std::move(result);

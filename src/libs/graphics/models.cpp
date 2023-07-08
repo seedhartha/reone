@@ -65,9 +65,9 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     if (mdlData && mdxData) {
         auto mdl = MemoryInputStream(*mdlData);
         auto mdx = MemoryInputStream(*mdxData);
-        auto reader = MdlReader(*this, _textures);
+        auto reader = MdlReader(mdl, mdx, *this, _textures);
         try {
-            reader.load(mdl, mdx);
+            reader.load();
             model = reader.model();
             if (model) {
                 model->init();

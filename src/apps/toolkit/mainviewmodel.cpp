@@ -284,8 +284,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
         auto mdx = MemoryInputStream(*mdxBytes);
-        auto reader = MdlReader(_graphicsModule->models(), _graphicsModule->textures());
-        reader.load(data, mdx);
+        auto reader = MdlReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
+        reader.load();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);
         scene.clear();
