@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 #include "../types.h"
 
@@ -27,16 +28,20 @@ namespace graphics {
 
 class Texture;
 
-class TgaReader : public resource::BinaryResourceReader {
+class TgaReader : boost::noncopyable {
 public:
-    TgaReader(std::string resRef, TextureUsage usage) :
+    TgaReader(IInputStream &tga, std::string resRef, TextureUsage usage) :
+        _tga(BinaryReader(tga)),
         _resRef(std::move(resRef)),
         _usage(usage) {
     }
 
+    void load();
+
     std::shared_ptr<graphics::Texture> texture() const { return _texture; }
 
 private:
+    BinaryReader _tga;
     std::string _resRef;
     TextureUsage _usage;
 
@@ -47,8 +52,6 @@ private:
     bool _alpha {false};
 
     std::shared_ptr<Texture> _texture;
-
-    void onLoad() override;
 
     void loadTexture();
 

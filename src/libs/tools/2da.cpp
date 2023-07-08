@@ -26,7 +26,6 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 
-
 #include "tinyxml2.h"
 
 using namespace tinyxml2;
@@ -70,8 +69,8 @@ void TwoDaTool::toXML(const boost::filesystem::path &input, const boost::filesys
 }
 
 void TwoDaTool::toXML(IInputStream &twoDa, IOutputStream &xml) {
-    auto reader = TwoDaReader();
-    reader.load(twoDa);
+    auto reader = TwoDaReader(twoDa);
+    reader.load();
 
     auto table = reader.twoDa();
     auto printer = XMLPrinter();

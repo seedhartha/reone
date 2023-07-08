@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 #include "../texture.h"
 
@@ -25,12 +26,15 @@ namespace reone {
 
 namespace graphics {
 
-class TpcReader : public resource::BinaryResourceReader {
+class TpcReader : boost::noncopyable {
 public:
-    TpcReader(std::string resRef, TextureUsage usage) :
+    TpcReader(IInputStream &tpc, std::string resRef, TextureUsage usage) :
+        _tpc(BinaryReader(tpc)),
         _resRef(std::move(resRef)),
         _usage(usage) {
     }
+
+    void load();
 
     std::shared_ptr<Texture> texture() const { return _texture; }
     const ByteArray &txiData() const { return _txiData; }
@@ -42,6 +46,7 @@ private:
         RGBA = 4
     };
 
+    BinaryReader _tpc;
     std::string _resRef;
     TextureUsage _usage;
 
@@ -58,8 +63,6 @@ private:
 
     std::shared_ptr<Texture> _texture;
     ByteArray _txiData;
-
-    void onLoad() override;
 
     void loadLayers();
     void loadFeatures();

@@ -28,15 +28,15 @@ namespace reone {
 
 namespace graphics {
 
-void TpcReader::onLoad() {
-    uint32_t dataSize = readUint32();
+void TpcReader::load() {
+    uint32_t dataSize = _tpc.readUint32();
 
-    ignore(4);
+    _tpc.ignore(4);
 
-    uint16_t width = readUint16();
-    uint16_t height = readUint16();
-    _encoding = static_cast<EncodingType>(readByte());
-    _numMipMaps = readByte();
+    uint16_t width = _tpc.readUint16();
+    uint16_t height = _tpc.readUint16();
+    _encoding = static_cast<EncodingType>(_tpc.readByte());
+    _numMipMaps = _tpc.readByte();
 
     bool cubemap = height / width == kNumCubeFaces;
     if (cubemap) {
@@ -64,18 +64,18 @@ void TpcReader::onLoad() {
 }
 
 void TpcReader::loadLayers() {
-    seek(128);
+    _tpc.seek(128);
 
     _layers.reserve(_numLayers);
 
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = std::make_shared<ByteArray>(_reader->readBytes(_dataSize));
+        auto pixels = std::make_shared<ByteArray>(_tpc.readBytes(_dataSize));
 
         // Ignore mip maps
         for (int j = 1; j < _numMipMaps; ++j) {
             int w, h;
             getMipMapSize(j, w, h);
-            _reader->ignore(getMipMapDataSize(w, h));
+            _tpc.ignore(getMipMapDataSize(w, h));
         }
 
         _layers.push_back(Texture::Layer {std::move(pixels)});
@@ -83,11 +83,12 @@ void TpcReader::loadLayers() {
 }
 
 void TpcReader::loadFeatures() {
-    size_t pos = tell();
-    if (pos >= _size) {
+    auto pos = _tpc.position();
+    auto length = _tpc.streamLength();
+    if (pos >= length) {
         return;
     }
-    _txiData = _reader->readBytes(static_cast<int>(_size - pos));
+    _txiData = _tpc.readBytes(static_cast<int>(length - pos));
 
     auto txi = MemoryInputStream(_txiData);
     auto reader = TxiReader();

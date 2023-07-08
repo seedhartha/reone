@@ -41,10 +41,10 @@ TEST(tga_reader, should_load_tga) {
                         .append("\xff", 1)
                         .build();
     auto tga = MemoryInputStream(tgaBytes);
-    auto reader = TgaReader("some_texture", TextureUsage::Default);
+    auto reader = TgaReader(tga, "some_texture", TextureUsage::Default);
 
     // when
-    reader.load(tga);
+    reader.load();
 
     // then
     auto texture = reader.texture();

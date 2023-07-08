@@ -19,17 +19,18 @@
 
 #include "reone/resource/2da.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/signutil.h"
 
 namespace reone {
 
 namespace resource {
 
-void TwoDaReader::onLoad() {
-    checkSignature(std::string("2DA V2.b", 8));
-    ignore(1); // newline
+void TwoDaReader::load() {
+    checkSignature(_reader, std::string("2DA V2.b", 8));
+    _reader.ignore(1); // newline
     loadHeaders();
 
-    _rowCount = readUint32();
+    _rowCount = _reader.readUint32();
 
     loadLabels();
     loadRows();
@@ -57,18 +58,18 @@ void TwoDaReader::loadRows() {
     int cellCount = _rowCount * columnCount;
     std::vector<uint16_t> offsets(cellCount);
     for (int i = 0; i < cellCount; ++i) {
-        offsets[i] = readUint16();
+        offsets[i] = _reader.readUint16();
     }
 
-    uint16_t dataSize = readUint16();
-    size_t pos = tell();
+    uint16_t dataSize = _reader.readUint16();
+    size_t pos = _reader.position();
 
     for (int i = 0; i < _rowCount; ++i) {
         TwoDa::Row row;
         for (int j = 0; j < columnCount; ++j) {
             int cellIdx = i * columnCount + j;
             size_t off = pos + offsets[cellIdx];
-            row.values.push_back(readCStringAt(off));
+            row.values.push_back(_reader.readCStringAt(off));
         }
         _rows.push_back(row);
     }
@@ -79,20 +80,20 @@ void TwoDaReader::loadTable() {
 }
 
 bool TwoDaReader::readToken(std::string &token) {
-    size_t pos = tell();
+    size_t pos = _reader.position();
 
-    auto bytes = _reader->readBytes(256);
+    auto bytes = _reader.readBytes(256);
     auto start = &bytes[0];
     auto pch = start;
 
     for (; pch - start < bytes.size(); ++pch) {
         if (*pch == '\0') {
-            seek(pos + pch - start + 1);
+            _reader.seek(pos + pch - start + 1);
             return false;
         }
         if (*pch == '\t') {
             std::string s(start, pch - start);
-            seek(pos + pch - start + 1);
+            _reader.seek(pos + pch - start + 1);
             token = std::move(s);
             return true;
         }

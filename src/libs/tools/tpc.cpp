@@ -73,8 +73,8 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
 }
 
 void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi, bool compress) {
-    auto reader = TpcReader("", TextureUsage::GUI);
-    reader.load(tpc);
+    auto reader = TpcReader(tpc, "", TextureUsage::GUI);
+    reader.load();
 
     auto tgaWriter = TgaWriter(reader.texture());
     tgaWriter.save(tga, compress);

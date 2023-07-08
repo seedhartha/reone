@@ -47,11 +47,11 @@ TEST(two_da_reader, should_read_two_da) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = TwoDaReader();
+    auto reader = TwoDaReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

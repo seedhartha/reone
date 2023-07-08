@@ -28,12 +28,12 @@ namespace reone {
 
 namespace graphics {
 
-void TgaReader::onLoad() {
-    auto idLength = readByte();
+void TgaReader::load() {
+    auto idLength = _tga.readByte();
 
-    ignore(1);
+    _tga.ignore(1);
 
-    _dataType = static_cast<TGADataType>(readByte());
+    _dataType = static_cast<TGADataType>(_tga.readByte());
     switch (_dataType) {
     case TGADataType::Grayscale:
     case TGADataType::RGBA:
@@ -44,17 +44,17 @@ void TgaReader::onLoad() {
         return;
     }
 
-    ignore(9);
+    _tga.ignore(9);
 
-    auto width = readUint16();
-    auto height = readUint16();
+    auto width = _tga.readUint16();
+    auto height = _tga.readUint16();
 
-    uint8_t bpp = readByte();
+    uint8_t bpp = _tga.readByte();
     if ((isRGBA() && bpp != 24 && bpp != 32) || (isGrayscale() && bpp != 8)) {
         throw FormatException("Unsupported bits per pixel: " + std::to_string(bpp));
     }
 
-    uint8_t descriptor = readByte();
+    uint8_t descriptor = _tga.readByte();
     bool flipY = (descriptor & 0x10) != 0;
     if (flipY) {
         throw FormatException("Vertically flipped images are not supported");
@@ -72,7 +72,7 @@ void TgaReader::onLoad() {
     }
     _alpha = isRGBA() && bpp == 32;
 
-    ignore(idLength);
+    _tga.ignore(idLength);
     loadTexture();
 }
 
@@ -94,7 +94,7 @@ ByteArray TgaReader::readPixels(int w, int h) {
         return readPixelsRLE(w, h);
     }
     int dataSize = (isRGBA() ? (_alpha ? 4 : 3) : 1) * w * h;
-    return _reader->readBytes(dataSize);
+    return _tga.readBytes(dataSize);
 }
 
 ByteArray TgaReader::readPixelsRLE(int w, int h) {
@@ -102,16 +102,16 @@ ByteArray TgaReader::readPixelsRLE(int w, int h) {
 
     int count = w * h;
     while (count > 0) {
-        uint8_t code = readByte();
+        uint8_t code = _tga.readByte();
         int length = glm::min((code & 0x7f) + 1, count);
 
         count -= length;
 
         if (code & 0x80) {
-            uint8_t b = readByte();
-            uint8_t g = readByte();
-            uint8_t r = readByte();
-            uint8_t a = _alpha ? readByte() : 0;
+            uint8_t b = _tga.readByte();
+            uint8_t g = _tga.readByte();
+            uint8_t r = _tga.readByte();
+            uint8_t a = _alpha ? _tga.readByte() : 0;
             while (length--) {
                 result.push_back(b);
                 result.push_back(g);
@@ -122,10 +122,10 @@ ByteArray TgaReader::readPixelsRLE(int w, int h) {
             }
         } else {
             while (length--) {
-                uint8_t b = readByte();
-                uint8_t g = readByte();
-                uint8_t r = readByte();
-                uint8_t a = _alpha ? readByte() : 0;
+                uint8_t b = _tga.readByte();
+                uint8_t g = _tga.readByte();
+                uint8_t r = _tga.readByte();
+                uint8_t a = _alpha ? _tga.readByte() : 0;
                 result.push_back(b);
                 result.push_back(g);
                 result.push_back(r);

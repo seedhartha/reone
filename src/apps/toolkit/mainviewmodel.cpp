@@ -112,8 +112,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::TwoDa) {
-        auto reader = TwoDaReader();
-        reader.load(data);
+        auto reader = TwoDaReader(data);
+        reader.load();
         auto twoDa = reader.twoDa();
 
         auto columns = std::vector<std::string>();

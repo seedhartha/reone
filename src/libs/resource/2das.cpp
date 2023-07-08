@@ -33,8 +33,8 @@ std::shared_ptr<TwoDa> TwoDas::doGet(const std::string &resRef) {
     }
     auto stream = MemoryInputStream(*raw);
 
-    TwoDaReader twoDa;
-    twoDa.load(stream);
+    TwoDaReader twoDa(stream);
+    twoDa.load();
 
     return twoDa.twoDa();
 }

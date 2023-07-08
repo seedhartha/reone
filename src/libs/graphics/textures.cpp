@@ -145,8 +145,8 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
     auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
         auto tga = MemoryInputStream(*tgaData);
-        auto tgaReader = TgaReader(resRef, usage);
-        tgaReader.load(tga);
+        auto tgaReader = TgaReader(tga, resRef, usage);
+        tgaReader.load();
         texture = tgaReader.texture();
 
         if (texture) {
@@ -164,8 +164,8 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
         if (tpcData) {
             auto tpc = MemoryInputStream(*tpcData);
-            auto tpcReader = TpcReader(resRef, usage);
-            tpcReader.load(tpc);
+            auto tpcReader = TpcReader(tpc, resRef, usage);
+            tpcReader.load();
             texture = tpcReader.texture();
         }
     }

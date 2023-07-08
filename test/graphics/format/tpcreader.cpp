@@ -39,10 +39,10 @@ TEST(tpc_reader, should_load_tpc) {
                         .append("\xff", 1)
                         .build();
     auto tpc = MemoryInputStream(tpcBytes);
-    auto reader = TpcReader("some_texture", TextureUsage::Default);
+    auto reader = TpcReader(tpc, "some_texture", TextureUsage::Default);
 
     // when
-    reader.load(tpc);
+    reader.load();
 
     // then
     auto texture = reader.texture();

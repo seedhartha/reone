@@ -199,10 +199,10 @@ static SavedGame peekSavedGame(const boost::filesystem::path &path) {
     std::shared_ptr<Texture> screen;
     auto screenData = erfResourceProvider.find(ResourceId("screen", ResourceType::Tga));
     if (screenData) {
-        auto tgaStream = MemoryInputStream(*screenData);
-        TgaReader tga("screen", TextureUsage::GUI);
-        tga.load(tgaStream);
-        screen = tga.texture();
+        auto tga = MemoryInputStream(*screenData);
+        TgaReader tgaReader(tga, "screen", TextureUsage::GUI);
+        tgaReader.load();
+        screen = tgaReader.texture();
     }
 
     SavedGame result;
