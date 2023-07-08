@@ -17,23 +17,25 @@
 
 #include "reone/resource/format/rimreader.h"
 
+#include "reone/resource/format/signutil.h"
+
 namespace reone {
 
 namespace resource {
 
-void RimReader::onLoad() {
-    checkSignature(std::string("RIM V1.0", 8));
-    ignore(4);
+void RimReader::load() {
+    checkSignature(_rim, std::string("RIM V1.0", 8));
+    _rim.ignore(4);
 
-    _numResources = readUint32();
-    _offResources = readUint32();
+    _numResources = _rim.readUint32();
+    _offResources = _rim.readUint32();
 
     loadResources();
 }
 
 void RimReader::loadResources() {
     _resources.reserve(_numResources);
-    seek(_offResources);
+    _rim.seek(_offResources);
 
     for (int i = 0; i < _numResources; ++i) {
         _resources.push_back(readResource());
@@ -41,11 +43,11 @@ void RimReader::loadResources() {
 }
 
 RimReader::ResourceEntry RimReader::readResource() {
-    auto resRef = boost::to_lower_copy(readCString(16));
-    auto type = readUint16();
-    ignore(4 + 2);
-    auto offset = readUint32();
-    auto size = readUint32();
+    auto resRef = boost::to_lower_copy(_rim.readCString(16));
+    auto type = _rim.readUint16();
+    _rim.ignore(4 + 2);
+    auto offset = _rim.readUint32();
+    auto size = _rim.readUint32();
 
     ResourceEntry resource;
     resource.resId = ResourceId(resRef, static_cast<ResourceType>(type));

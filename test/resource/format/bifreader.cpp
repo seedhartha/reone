@@ -43,11 +43,11 @@ TEST(bif_reader, should_read_bif) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = BifReader();
+    auto reader = BifReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

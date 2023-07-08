@@ -17,15 +17,16 @@
 
 #pragma once
 
-#include "../id.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
-#include "binreader.h"
+#include "../id.h"
 
 namespace reone {
 
 namespace resource {
 
-class ErfReader : public BinaryResourceReader {
+class ErfReader : boost::noncopyable {
 public:
     struct KeyEntry {
         ResourceId resId;
@@ -36,18 +37,24 @@ public:
         uint32_t size {0};
     };
 
+    ErfReader(IInputStream &erf) :
+        _erf(BinaryReader(erf)) {
+    }
+
+    void load();
+
     const std::vector<KeyEntry> &keys() const { return _keys; }
     const std::vector<ResourceEntry> &resources() const { return _resources; }
 
 private:
+    BinaryReader _erf;
+
     int _numEntries {0};
     uint32_t _offKeys {0};
     uint32_t _offResources {0};
 
     std::vector<KeyEntry> _keys;
     std::vector<ResourceEntry> _resources;
-
-    void onLoad() override;
 
     void checkSignature();
     void loadKeys();

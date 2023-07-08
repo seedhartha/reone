@@ -17,20 +17,22 @@
 
 #include "reone/resource/format/bifreader.h"
 
+#include "reone/resource/format/signutil.h"
+
 namespace reone {
 
 namespace resource {
 
-void BifReader::onLoad() {
-    checkSignature(std::string("BIFFV1  ", 8));
+void BifReader::load() {
+    checkSignature(_bif, std::string("BIFFV1  ", 8));
     loadHeader();
     loadResources();
 }
 
 void BifReader::loadHeader() {
-    auto numVariableResources = readUint32();
-    auto numFixedResources = readUint32();
-    auto offVariableTable = readUint32();
+    auto numVariableResources = _bif.readUint32();
+    auto numFixedResources = _bif.readUint32();
+    auto offVariableTable = _bif.readUint32();
 
     _numResources = numVariableResources;
     _offResources = offVariableTable;
@@ -38,7 +40,7 @@ void BifReader::loadHeader() {
 
 void BifReader::loadResources() {
     _resources.reserve(_numResources);
-    seek(_offResources);
+    _bif.seek(_offResources);
 
     for (auto i = 0; i < _numResources; ++i) {
         _resources.push_back(readResourceEntry());
@@ -46,10 +48,10 @@ void BifReader::loadResources() {
 }
 
 BifReader::ResourceEntry BifReader::readResourceEntry() {
-    uint32_t id = readUint32();
-    uint32_t offset = readUint32();
-    uint32_t fileSize = readUint32();
-    uint32_t resType = readUint32();
+    uint32_t id = _bif.readUint32();
+    uint32_t offset = _bif.readUint32();
+    uint32_t fileSize = _bif.readUint32();
+    uint32_t resType = _bif.readUint32();
 
     auto entry = ResourceEntry();
     entry.id = id;

@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
 namespace resource {
 
-class BifReader : public BinaryResourceReader {
+class BifReader : boost::noncopyable {
 public:
     struct ResourceEntry {
         uint32_t id {0};
@@ -32,17 +33,23 @@ public:
         uint32_t resType {0};
     };
 
+    BifReader(IInputStream &bif) :
+        _bif(BinaryReader(bif)) {
+    }
+
+    void load();
+
     const std::vector<ResourceEntry> &resources() const {
         return _resources;
     }
 
 private:
+    BinaryReader _bif;
+
     int _numResources {0};
     uint32_t _offResources {0};
 
     std::vector<ResourceEntry> _resources;
-
-    void onLoad() override;
 
     void loadHeader();
     void loadResources();

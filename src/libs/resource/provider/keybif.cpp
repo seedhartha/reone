@@ -47,8 +47,8 @@ void KeyBifResourceProvider::init() {
         _bifPaths.push_back(bifPath);
 
         auto bif = FileInputStream(bifPath, OpenMode::Binary);
-        auto bifReader = BifReader();
-        bifReader.load(bif);
+        auto bifReader = BifReader(bif);
+        bifReader.load();
 
         auto &keys = keysByBifIdx.at(i);
         auto &bifResources = bifReader.resources();

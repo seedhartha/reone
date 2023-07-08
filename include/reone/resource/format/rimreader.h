@@ -17,15 +17,16 @@
 
 #pragma once
 
-#include "../id.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
-#include "binreader.h"
+#include "../id.h"
 
 namespace reone {
 
 namespace resource {
 
-class RimReader : public BinaryResourceReader {
+class RimReader : boost::noncopyable {
 public:
     struct ResourceEntry {
         ResourceId resId;
@@ -33,17 +34,22 @@ public:
         uint32_t size {0};
     };
 
+    RimReader(IInputStream &rim) :
+        _rim(rim) {
+    }
+
+    void load();
+
     const std::vector<ResourceEntry> &resources() const { return _resources; }
 
 private:
-    int _id;
+    BinaryReader _rim;
 
+    int _id {0};
     int _numResources {0};
     uint32_t _offResources {0};
 
     std::vector<ResourceEntry> _resources;
-
-    void onLoad() override;
 
     void loadResources();
 

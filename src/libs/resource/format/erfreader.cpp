@@ -23,26 +23,26 @@ namespace reone {
 
 namespace resource {
 
-void ErfReader::onLoad() {
+void ErfReader::load() {
     checkSignature();
-    ignore(8);
+    _erf.ignore(8);
 
-    _numEntries = readUint32();
+    _numEntries = _erf.readUint32();
 
-    ignore(4);
+    _erf.ignore(4);
 
-    _offKeys = readUint32();
-    _offResources = readUint32();
+    _offKeys = _erf.readUint32();
+    _offResources = _erf.readUint32();
 
     loadKeys();
     loadResources();
 }
 
 void ErfReader::checkSignature() {
-    if (_size < 8) {
+    if (_erf.streamLength() < 8) {
         throw FormatException("Invalid binary resource size");
     }
-    auto signature = readString(8);
+    auto signature = _erf.readString(8);
     bool erf = signature == std::string("ERF V1.0", 8);
     bool mod = signature == std::string("MOD V1.0", 8);
     if (!erf && !mod) {
@@ -52,7 +52,7 @@ void ErfReader::checkSignature() {
 
 void ErfReader::loadKeys() {
     _keys.reserve(_numEntries);
-    seek(_offKeys);
+    _erf.seek(_offKeys);
 
     for (int i = 0; i < _numEntries; ++i) {
         _keys.push_back(readKeyEntry());
@@ -60,10 +60,10 @@ void ErfReader::loadKeys() {
 }
 
 ErfReader::KeyEntry ErfReader::readKeyEntry() {
-    auto resRef = boost::to_lower_copy(readCString(16));
-    auto resId = readUint32();
-    auto resType = readUint16();
-    ignore(2); // unused
+    auto resRef = boost::to_lower_copy(_erf.readCString(16));
+    auto resId = _erf.readUint32();
+    auto resType = _erf.readUint16();
+    _erf.ignore(2); // unused
 
     auto key = KeyEntry();
     key.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
@@ -73,7 +73,7 @@ ErfReader::KeyEntry ErfReader::readKeyEntry() {
 
 void ErfReader::loadResources() {
     _resources.reserve(_numEntries);
-    seek(_offResources);
+    _erf.seek(_offResources);
 
     for (int i = 0; i < _numEntries; ++i) {
         _resources.push_back(readResourceEntry());
@@ -81,8 +81,8 @@ void ErfReader::loadResources() {
 }
 
 ErfReader::ResourceEntry ErfReader::readResourceEntry() {
-    auto offset = readUint32();
-    auto size = readUint32();
+    auto offset = _erf.readUint32();
+    auto size = _erf.readUint32();
 
     ResourceEntry resource;
     resource.offset = offset;

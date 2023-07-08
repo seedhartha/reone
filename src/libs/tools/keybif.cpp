@@ -86,8 +86,8 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::files
 
     auto bif = FileInputStream(bifPath, OpenMode::Binary);
 
-    auto bifReader = BifReader();
-    bifReader.load(bif);
+    auto bifReader = BifReader(bif);
+    bifReader.load();
 
     auto &bifResources = bifReader.resources();
 

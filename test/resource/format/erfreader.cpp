@@ -53,11 +53,11 @@ TEST(erf_reader, should_read_erf) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = ErfReader();
+    auto reader = ErfReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

@@ -28,8 +28,8 @@ namespace resource {
 void ErfResourceProvider::init() {
     auto erf = FileInputStream(_path, OpenMode::Binary);
 
-    auto reader = ErfReader();
-    reader.load(erf);
+    auto reader = ErfReader(erf);
+    reader.load();
 
     auto &keys = reader.keys();
     auto &erfResources = reader.resources();

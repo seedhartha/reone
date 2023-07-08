@@ -45,11 +45,11 @@ TEST(rim_reader, should_read_rim) {
                      .build();
 
     auto stream = MemoryInputStream(input);
-    auto reader = RimReader();
+    auto reader = RimReader(stream);
 
     // when
 
-    reader.load(stream);
+    reader.load();
 
     // then
 

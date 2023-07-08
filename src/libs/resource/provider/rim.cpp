@@ -28,8 +28,8 @@ namespace resource {
 void RimResourceProvider::init() {
     auto rim = FileInputStream(_path, OpenMode::Binary);
 
-    auto reader = RimReader();
-    reader.load(rim);
+    auto reader = RimReader(rim);
+    reader.load();
 
     for (auto &rimResource : reader.resources()) {
         auto resource = Resource();

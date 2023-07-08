@@ -30,8 +30,8 @@ void ErfTool::invoke(Operation operation, const boost::filesystem::path &input, 
     case Operation::List:
     case Operation::Extract: {
         auto stream = FileInputStream(input, OpenMode::Binary);
-        ErfReader erf;
-        erf.load(stream);
+        ErfReader erf(stream);
+        erf.load();
         if (operation == Operation::Extract) {
             extract(erf, input, outputDir);
         } else {
