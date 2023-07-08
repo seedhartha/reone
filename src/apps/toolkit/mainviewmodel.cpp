@@ -320,8 +320,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     } else if (id.type == ResourceType::Wav) {
         loadEngine();
         auto mp3ReaderFactory = Mp3ReaderFactory();
-        auto reader = WavReader(mp3ReaderFactory);
-        reader.load(data);
+        auto reader = WavReader(data, mp3ReaderFactory);
+        reader.load();
         _audioStream.invoke(reader.stream());
 
         auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {

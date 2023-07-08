@@ -28,16 +28,18 @@ namespace reone {
 
 namespace audio {
 
-void WavReader::onLoad() {
-    std::string sign(readString(4));
+void WavReader::load() {
+    _wavLength = _wav.streamLength();
+
+    std::string sign(_wav.readString(4));
     if (sign == "\xff\xf3\x60\xc4") {
-        seek(0x1da);
+        _wav.seek(0x1da);
     } else if (sign != "RIFF") {
         throw FormatException("WAV: invalid file signature: " + sign);
     }
 
-    uint32_t chunkSize = readUint32();
-    std::string format(readString(4));
+    uint32_t chunkSize = _wav.readUint32();
+    std::string format(_wav.readString(4));
     if (format != "WAVE") {
         throw FormatException("WAV: invalid chunk format: " + format);
     }
@@ -49,17 +51,17 @@ void WavReader::onLoad() {
             loadData(chunk);
             break;
         } else {
-            ignore(chunk.size);
+            _wav.ignore(chunk.size);
         }
     }
 }
 
 bool WavReader::readChunkHeader(ChunkHeader &chunk) {
-    if (_reader->eof())
+    if (_wav.eof())
         return false;
 
-    std::string id(readString(4));
-    uint32_t size = readUint32();
+    std::string id(_wav.readString(4));
+    uint32_t size = _wav.readUint32();
 
     chunk.id = std::move(id);
     chunk.size = size;
@@ -68,32 +70,32 @@ bool WavReader::readChunkHeader(ChunkHeader &chunk) {
 }
 
 void WavReader::loadFormat(ChunkHeader chunk) {
-    _audioFormat = static_cast<WavAudioFormat>(readUint16());
+    _audioFormat = static_cast<WavAudioFormat>(_wav.readUint16());
     if (_audioFormat != WavAudioFormat::PCM && _audioFormat != WavAudioFormat::IMAADPCM) {
         throw FormatException("WAV: unsupported audio format: " + std::to_string(static_cast<int>(_audioFormat)));
     }
-    _channelCount = readUint16();
+    _channelCount = _wav.readUint16();
     if (_channelCount != 1 && _channelCount != 2) {
         throw FormatException("WAV: invalid number of channels: " + std::to_string(_channelCount));
     }
-    _sampleRate = readUint32();
+    _sampleRate = _wav.readUint32();
 
-    uint32_t byteRate = readUint32();
+    uint32_t byteRate = _wav.readUint32();
 
-    _blockAlign = readUint16();
-    _bitsPerSample = readUint16();
+    _blockAlign = _wav.readUint16();
+    _bitsPerSample = _wav.readUint16();
 
     if (_bitsPerSample != 4 && _bitsPerSample != 8 && _bitsPerSample != 16) {
         throw FormatException("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
     }
 
-    ignore(chunk.size - 16);
+    _wav.ignore(chunk.size - 16);
 }
 
 void WavReader::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
-        size_t pos = tell();
-        ByteArray data(_reader->readBytes(static_cast<int>(_size - pos)));
+        size_t pos = _wav.position();
+        ByteArray data(_wav.readBytes(static_cast<int>(_wavLength - pos)));
         auto mp3 = MemoryInputStream(data);
         auto mp3Reader = _mp3ReaderFactory.create();
         mp3Reader->load(mp3);
@@ -112,7 +114,7 @@ void WavReader::loadData(ChunkHeader chunk) {
 }
 
 void WavReader::loadPCM(uint32_t chunkSize) {
-    ByteArray data(_reader->readBytes(chunkSize));
+    ByteArray data(_wav.readBytes(chunkSize));
 
     AudioStream::Frame frame;
     frame.format = getAudioFormat();
@@ -138,7 +140,7 @@ static constexpr int kIMAStepTable[] = {
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
 void WavReader::loadIMAADPCM(uint32_t chunkSize) {
-    ByteArray chunk(_reader->readBytes(chunkSize));
+    ByteArray chunk(_wav.readBytes(chunkSize));
 
     AudioStream::Frame frame;
     frame.format = getAudioFormat();

@@ -40,8 +40,8 @@ void RimWriter::save(IOutputStream &out) {
     writer.writeString("RIM V1.0");
     writer.writeUint32(0); // reserved
     writer.writeUint32(numResources);
-    writer.writeUint32(0x78); // offset to resource headers
-    writer.writeBytes(100);   // reserved
+    writer.writeUint32(0x78);  // offset to resource headers
+    writer.writeBytes(100, 0); // reserved
 
     uint32_t id = 0;
     uint32_t offset = 0x78 + numResources * 32;

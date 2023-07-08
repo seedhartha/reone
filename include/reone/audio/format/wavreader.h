@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
-
 #include "reone/audio/types.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -34,11 +34,14 @@ class IMp3ReaderFactory;
 
 class AudioStream;
 
-class WavReader : public resource::BinaryResourceReader {
+class WavReader : public boost::noncopyable {
 public:
-    WavReader(IMp3ReaderFactory &mp3ReaderFactory) :
+    WavReader(IInputStream &wav, IMp3ReaderFactory &mp3ReaderFactory) :
+        _wav(BinaryReader(wav)),
         _mp3ReaderFactory(mp3ReaderFactory) {
     }
+
+    void load();
 
     std::shared_ptr<AudioStream> stream() const { return _stream; }
 
@@ -53,7 +56,10 @@ private:
         int16_t stepIndex {0};
     };
 
+    BinaryReader _wav;
     IMp3ReaderFactory &_mp3ReaderFactory;
+
+    size_t _wavLength {0};
 
     WavAudioFormat _audioFormat {WavAudioFormat::PCM};
     uint16_t _channelCount {0};
@@ -63,8 +69,6 @@ private:
     IMA _ima[2];
 
     std::shared_ptr<AudioStream> _stream;
-
-    void onLoad() override;
 
     int16_t getIMASample(int channel, uint8_t nibble);
     void getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, int16_t &sample2);

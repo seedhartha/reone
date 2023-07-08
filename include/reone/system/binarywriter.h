@@ -31,7 +31,7 @@ public:
         _endianess(endianess) {
     }
 
-    void writeBytes(uint8_t val);
+    void writeByte(uint8_t val);
     void writeChar(char val);
     void writeUint16(uint16_t val);
     void writeUint32(uint32_t val);
@@ -43,16 +43,16 @@ public:
     void writeStringExact(const std::string &str, int len);
     void writeCString(const std::string &str);
     void writeBytes(const ByteArray &bytes);
-    void writeBytes(int count, uint8_t val = 0);
+    void writeBytes(int count, uint8_t val);
 
-    size_t tell() const;
+    size_t position() const;
 
 private:
     IOutputStream &_stream;
     boost::endian::order _endianess;
 
     template <class T>
-    void put(T val) {
+    void write(T val) {
         boost::endian::conditional_reverse_inplace(val, boost::endian::order::native, _endianess);
         char buf[sizeof(T)];
         memcpy(buf, &val, sizeof(T));

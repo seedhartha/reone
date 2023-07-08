@@ -19,7 +19,7 @@
 
 namespace reone {
 
-void BinaryWriter::writeBytes(uint8_t val) {
+void BinaryWriter::writeByte(uint8_t val) {
     _stream.writeByte(val);
 }
 
@@ -28,27 +28,27 @@ void BinaryWriter::writeChar(char val) {
 }
 
 void BinaryWriter::writeUint16(uint16_t val) {
-    put(val);
+    write(val);
 }
 
 void BinaryWriter::writeUint32(uint32_t val) {
-    put(val);
+    write(val);
 }
 
 void BinaryWriter::writeInt16(int16_t val) {
-    put(val);
+    write(val);
 }
 
 void BinaryWriter::writeInt32(int32_t val) {
-    put(val);
+    write(val);
 }
 
 void BinaryWriter::writeInt64(int64_t val) {
-    put(val);
+    write(val);
 }
 
 void BinaryWriter::writeFloat(float val) {
-    put(*reinterpret_cast<uint32_t *>(&val));
+    write(*reinterpret_cast<uint32_t *>(&val));
 }
 
 void BinaryWriter::writeString(const std::string &str) {
@@ -80,7 +80,7 @@ void BinaryWriter::writeBytes(int count, uint8_t val) {
     _stream.write(&data[0], count);
 }
 
-size_t BinaryWriter::tell() const {
+size_t BinaryWriter::position() const {
     return _stream.position();
 }
 

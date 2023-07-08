@@ -41,13 +41,13 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     BinaryWriter writer(stream, boost::endian::order::big);
 
     for (auto &ins : _program.instructions()) {
-        auto pos = 13 + static_cast<uint32_t>(writer.tell());
+        auto pos = 13 + static_cast<uint32_t>(writer.position());
         if (ins.offset != pos) {
             throw FormatException(str(boost::format("Instruction offset mismatch: expected=%08x, actual=%08x") % ins.offset % pos));
         }
 
-        writer.writeBytes(static_cast<int>(ins.type) & 0xff);
-        writer.writeBytes((static_cast<int>(ins.type) >> 8) & 0xff);
+        writer.writeByte(static_cast<int>(ins.type) & 0xff);
+        writer.writeByte((static_cast<int>(ins.type) >> 8) & 0xff);
 
         switch (ins.type) {
         case InstructionType::CPDOWNSP:
@@ -73,7 +73,7 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
             break;
         case InstructionType::ACTION:
             writer.writeUint16(ins.routine);
-            writer.writeBytes(ins.argCount);
+            writer.writeByte(ins.argCount);
             break;
         case InstructionType::EQUALTT:
         case InstructionType::NEQUALTT:
@@ -111,8 +111,8 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     BinaryWriter ncsWriter(*out, boost::endian::order::big);
 
     ncsWriter.writeString(std::string("NCS V1.0", 8));
-    ncsWriter.writeBytes(0x42);
-    ncsWriter.writeUint32(13 + writer.tell());
+    ncsWriter.writeByte(0x42);
+    ncsWriter.writeUint32(13 + writer.position());
     ncsWriter.writeString(std::string(&bytes[0], bytes.size()));
 }
 

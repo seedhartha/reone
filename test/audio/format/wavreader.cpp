@@ -55,10 +55,10 @@ TEST(wav_reader, should_load_plain_wav) {
                         .build();
     auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
-    auto reader = WavReader(mp3ReaderFactory);
+    auto reader = WavReader(wav, mp3ReaderFactory);
 
     // when
-    reader.load(wav);
+    reader.load();
 
     // then
     auto stream = reader.stream();
@@ -97,10 +97,10 @@ TEST(wav_reader, should_load_obfuscated_wav) {
                         .build();
     auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
-    auto reader = WavReader(mp3ReaderFactory);
+    auto reader = WavReader(wav, mp3ReaderFactory);
 
     // when
-    reader.load(wav);
+    reader.load();
 
     // then
     auto stream = reader.stream();
@@ -152,8 +152,8 @@ TEST(wav_reader, should_load_obfuscated_mp3) {
     EXPECT_CALL(mp3ReaderFactory, create())
         .WillOnce(Return(mp3Reader));
 
-    auto reader = WavReader(mp3ReaderFactory);
+    auto reader = WavReader(wav, mp3ReaderFactory);
 
     // expect
-    reader.load(wav);
+    reader.load();
 }

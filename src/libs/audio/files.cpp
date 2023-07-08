@@ -45,8 +45,8 @@ std::shared_ptr<AudioStream> AudioFiles::doGet(std::string resRef) {
         if (wavData) {
             auto wav = MemoryInputStream(*wavData);
             auto mp3ReaderFactory = Mp3ReaderFactory();
-            auto reader = WavReader(mp3ReaderFactory);
-            reader.load(wav);
+            auto reader = WavReader(wav, mp3ReaderFactory);
+            reader.load();
             result = reader.stream();
         }
     }

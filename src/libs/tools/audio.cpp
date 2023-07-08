@@ -64,7 +64,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
         throw FormatException("Unsupported audio format");
     }
 
-    int dataSize = static_cast<int>(filesize - reader.tell());
+    int dataSize = static_cast<int>(filesize - reader.position());
     ByteArray data(reader.readBytes(dataSize));
 
     boost::filesystem::path unwrappedPath(path);

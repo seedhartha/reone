@@ -31,11 +31,24 @@ public:
         _endianess(endianess) {
     }
 
-    size_t tell();
-    void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin);
-    void ignore(int count);
+    void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin) {
+        _stream.seek(pos, origin);
+    }
+
+    void ignore(int count) {
+        _stream.seek(count, SeekOrigin::Current);
+    }
+
+    size_t streamLength() {
+        size_t pos = _stream.position();
+        _stream.seek(0, SeekOrigin::End);
+        size_t length = _stream.position();
+        _stream.seek(pos, SeekOrigin::Begin);
+        return length;
+    }
 
     uint8_t readByte();
+    char readChar();
     uint16_t readUint16();
     uint32_t readUint32();
     uint64_t readUint64();
@@ -48,62 +61,68 @@ public:
     std::string readNullTerminatedString();
     ByteArray readBytes(int count);
 
-    bool eof() const;
-
     inline std::vector<uint16_t> readUint16Array(int count) {
-        std::vector<uint16_t> result;
-        result.reserve(count);
+        std::vector<uint16_t> elems;
+        elems.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(readUint16());
+            elems.push_back(readUint16());
         }
-        return std::move(result);
+        return elems;
     }
 
     inline std::vector<uint32_t> readUint32Array(int count) {
-        std::vector<uint32_t> result;
-        result.reserve(count);
+        std::vector<uint32_t> elems;
+        elems.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(readUint32());
+            elems.push_back(readUint32());
         }
-        return std::move(result);
+        return elems;
     }
 
     inline std::vector<uint32_t> readUint32Array(size_t offset, int count) {
-        size_t pos = tell();
+        size_t pos = position();
         seek(offset);
 
-        std::vector<uint32_t> result(readUint32Array(count));
+        auto elems = readUint32Array(count);
         seek(pos);
 
-        return std::move(result);
+        return elems;
     }
 
     inline std::vector<int32_t> readInt32Array(int count) {
-        std::vector<int32_t> result;
-        result.reserve(count);
+        std::vector<int32_t> elems;
+        elems.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(readInt32());
+            elems.push_back(readInt32());
         }
-        return std::move(result);
+        return elems;
     }
 
     inline std::vector<float> readFloatArray(int count) {
-        std::vector<float> result;
-        result.reserve(count);
+        std::vector<float> elems;
+        elems.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(readFloat());
+            elems.push_back(readFloat());
         }
-        return std::move(result);
+        return elems;
     }
 
     inline std::vector<float> readFloatArray(size_t offset, int count) {
-        size_t pos = tell();
+        size_t pos = position();
         seek(offset);
 
-        std::vector<float> result(readFloatArray(count));
+        auto elems = readFloatArray(count);
         seek(pos);
 
-        return std::move(result);
+        return elems;
+    }
+
+    size_t position() const {
+        return _stream.position();
+    }
+
+    bool eof() const {
+        return _stream.eof();
     }
 
 private:

@@ -44,7 +44,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
                               .build();
 
     // when
-    writer.writeBytes(0x40);
+    writer.writeByte(0x40);
     writer.writeChar('A');
     writer.writeUint16(1);
     writer.writeUint32(2);
@@ -79,7 +79,7 @@ TEST(binary_writer, should_write_to_big_endian_stream) {
                               .build();
 
     // when
-    writer.writeBytes(0x40);
+    writer.writeByte(0x40);
     writer.writeChar('A');
     writer.writeUint16(1);
     writer.writeUint32(2);

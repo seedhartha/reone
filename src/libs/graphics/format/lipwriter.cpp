@@ -37,7 +37,7 @@ void LipWriter::save(const boost::filesystem::path &path) {
     writer.writeUint32(static_cast<uint32_t>(_animation.keyframes().size()));
     for (auto &keyframe : _animation.keyframes()) {
         writer.writeFloat(keyframe.time);
-        writer.writeBytes(keyframe.shape);
+        writer.writeByte(keyframe.shape);
     }
 }
 

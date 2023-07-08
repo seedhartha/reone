@@ -31,7 +31,7 @@ void BinaryResourceReader::load(IInputStream &in) {
 
 void BinaryResourceReader::querySize() {
     _reader->seek(0, SeekOrigin::End);
-    _size = _reader->tell();
+    _size = _reader->position();
     _reader->seek(0, SeekOrigin::Begin);
 }
 
@@ -46,7 +46,7 @@ void BinaryResourceReader::checkSignature(const std::string &expected) {
 }
 
 size_t BinaryResourceReader::tell() const {
-    return _reader->tell();
+    return _reader->position();
 }
 
 void BinaryResourceReader::seek(size_t pos) {
@@ -92,7 +92,7 @@ std::string BinaryResourceReader::readCString(int len) {
 }
 
 std::string BinaryResourceReader::readCString(size_t off, int len) {
-    size_t pos = _reader->tell();
+    size_t pos = _reader->position();
     _reader->seek(off);
 
     std::string result(readCString(len));
@@ -102,7 +102,7 @@ std::string BinaryResourceReader::readCString(size_t off, int len) {
 }
 
 std::string BinaryResourceReader::readCStringAt(size_t off) {
-    size_t pos = _reader->tell();
+    size_t pos = _reader->position();
     _reader->seek(off);
 
     std::string result(_reader->readNullTerminatedString());
@@ -116,7 +116,7 @@ std::string BinaryResourceReader::readString(int len) {
 }
 
 std::string BinaryResourceReader::readString(size_t off, int len) {
-    size_t pos = _reader->tell();
+    size_t pos = _reader->position();
     _reader->seek(off);
 
     std::string result(_reader->readString(len));
@@ -130,7 +130,7 @@ ByteArray BinaryResourceReader::readBytes(int count) {
 }
 
 ByteArray BinaryResourceReader::readBytes(size_t off, int count) {
-    size_t pos = _reader->tell();
+    size_t pos = _reader->position();
     _reader->seek(off);
 
     ByteArray result(_reader->readBytes(count));

@@ -19,21 +19,15 @@
 
 namespace reone {
 
-size_t BinaryReader::tell() {
-    return _stream.position();
-}
-
-void BinaryReader::seek(size_t pos, SeekOrigin origin) {
-    _stream.seek(pos, origin);
-}
-
-void BinaryReader::ignore(int count) {
-    _stream.seek(count, SeekOrigin::Current);
-}
-
 uint8_t BinaryReader::readByte() {
     uint8_t val;
     _stream.read(reinterpret_cast<char *>(&val), 1);
+    return val;
+}
+
+char BinaryReader::readChar() {
+    char val;
+    _stream.read(&val, 1);
     return val;
 }
 
@@ -119,11 +113,7 @@ ByteArray BinaryReader::readBytes(int count) {
     buffer.resize(count);
     int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
     buffer.resize(numRead);
-    return std::move(buffer);
-}
-
-bool BinaryReader::eof() const {
-    return _stream.eof();
+    return buffer;
 }
 
 } // namespace reone
