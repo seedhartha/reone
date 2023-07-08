@@ -35,72 +35,72 @@ public:
     void seek(size_t pos, SeekOrigin origin = SeekOrigin::Begin);
     void ignore(int count);
 
-    uint8_t getByte();
-    uint16_t getUint16();
-    uint32_t getUint32();
-    uint64_t getUint64();
-    int16_t getInt16();
-    int32_t getInt32();
-    int64_t getInt64();
-    float getFloat();
-    double getDouble();
-    std::string getString(int len);
-    std::string getNullTerminatedString();
-    ByteArray getBytes(int count);
+    uint8_t readByte();
+    uint16_t readUint16();
+    uint32_t readUint32();
+    uint64_t readUint64();
+    int16_t readInt16();
+    int32_t readInt32();
+    int64_t readInt64();
+    float readFloat();
+    double readDouble();
+    std::string readString(int len);
+    std::string readNullTerminatedString();
+    ByteArray readBytes(int count);
 
     bool eof() const;
 
-    inline std::vector<uint16_t> getUint16Array(int count) {
+    inline std::vector<uint16_t> readUint16Array(int count) {
         std::vector<uint16_t> result;
         result.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(getUint16());
+            result.push_back(readUint16());
         }
         return std::move(result);
     }
 
-    inline std::vector<uint32_t> getUint32Array(int count) {
+    inline std::vector<uint32_t> readUint32Array(int count) {
         std::vector<uint32_t> result;
         result.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(getUint32());
+            result.push_back(readUint32());
         }
         return std::move(result);
     }
 
-    inline std::vector<uint32_t> getUint32Array(size_t offset, int count) {
+    inline std::vector<uint32_t> readUint32Array(size_t offset, int count) {
         size_t pos = tell();
         seek(offset);
 
-        std::vector<uint32_t> result(getUint32Array(count));
+        std::vector<uint32_t> result(readUint32Array(count));
         seek(pos);
 
         return std::move(result);
     }
 
-    inline std::vector<int32_t> getInt32Array(int count) {
+    inline std::vector<int32_t> readInt32Array(int count) {
         std::vector<int32_t> result;
         result.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(getInt32());
+            result.push_back(readInt32());
         }
         return std::move(result);
     }
 
-    inline std::vector<float> getFloatArray(int count) {
+    inline std::vector<float> readFloatArray(int count) {
         std::vector<float> result;
         result.reserve(count);
         for (int i = 0; i < count; ++i) {
-            result.push_back(getFloat());
+            result.push_back(readFloat());
         }
         return std::move(result);
     }
 
-    inline std::vector<float> getFloatArray(size_t offset, int count) {
+    inline std::vector<float> readFloatArray(size_t offset, int count) {
         size_t pos = tell();
         seek(offset);
 
-        std::vector<float> result(getFloatArray(count));
+        std::vector<float> result(readFloatArray(count));
         seek(pos);
 
         return std::move(result);

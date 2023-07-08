@@ -221,10 +221,10 @@ static void writeParseFunction(const SchemaStruct &schemaStruct, TextWriter &wri
             writer.put(str(boost::format("%1%strct.%2% = gff.getInt(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Dword64:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getUint64(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.put(str(boost::format("%1%strct.%2% = gff.readUint64(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Int64: {
-            writer.put(str(boost::format("%1%strct.%2% = gff.getInt64(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.put(str(boost::format("%1%strct.%2% = gff.readInt64(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         }
         case Gff::FieldType::Float:

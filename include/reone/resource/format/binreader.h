@@ -65,27 +65,27 @@ protected:
     ByteArray readBytes(size_t off, int count);
 
     inline std::vector<uint16_t> readUint16Array(int count) {
-        return _reader->getUint16Array(count);
+        return _reader->readUint16Array(count);
     }
 
     inline std::vector<uint32_t> readUint32Array(int count) {
-        return _reader->getUint32Array(count);
+        return _reader->readUint32Array(count);
     }
 
     inline std::vector<uint32_t> readUint32Array(size_t offset, int count) {
-        return _reader->getUint32Array(offset, count);
+        return _reader->readUint32Array(offset, count);
     }
 
     inline std::vector<int32_t> readInt32Array(int count) {
-        return _reader->getInt32Array(count);
+        return _reader->readInt32Array(count);
     }
 
     inline std::vector<float> readFloatArray(int count) {
-        return _reader->getFloatArray(count);
+        return _reader->readFloatArray(count);
     }
 
     inline std::vector<float> readFloatArray(size_t offset, int count) {
-        return _reader->getFloatArray(offset, count);
+        return _reader->readFloatArray(offset, count);
     }
 
 private:

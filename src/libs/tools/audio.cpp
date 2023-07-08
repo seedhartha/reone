@@ -43,7 +43,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
 
     // Read magic number
     BinaryReader reader(wav);
-    uint32_t magic = reader.getUint32();
+    uint32_t magic = reader.readUint32();
     if (magic == 0xc460f3ff) { // WAV in MP3
         reader.seek(0x1d6);
         suffix = "-unwrap.wav";
@@ -51,8 +51,8 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
         // Read subchunks
         reader.ignore(8); // chunk size + format
         while (!reader.eof()) {
-            std::string subchunkId(reader.getString(4));
-            uint32_t subchunkSize = reader.getInt32();
+            std::string subchunkId(reader.readString(4));
+            uint32_t subchunkSize = reader.readInt32();
             if (subchunkId == "data") {
                 break;
             } else {
@@ -65,7 +65,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     }
 
     int dataSize = static_cast<int>(filesize - reader.tell());
-    ByteArray data(reader.getBytes(dataSize));
+    ByteArray data(reader.readBytes(dataSize));
 
     boost::filesystem::path unwrappedPath(path);
     unwrappedPath.replace_extension();

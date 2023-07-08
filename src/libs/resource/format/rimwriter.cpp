@@ -37,11 +37,11 @@ void RimWriter::save(IOutputStream &out) {
     BinaryWriter writer(out);
     uint32_t numResources = static_cast<uint32_t>(_resources.size());
 
-    writer.putString("RIM V1.0");
-    writer.putUint32(0); // reserved
-    writer.putUint32(numResources);
-    writer.putUint32(0x78); // offset to resource headers
-    writer.putBytes(100);   // reserved
+    writer.writeString("RIM V1.0");
+    writer.writeUint32(0); // reserved
+    writer.writeUint32(numResources);
+    writer.writeUint32(0x78); // offset to resource headers
+    writer.writeBytes(100);   // reserved
 
     uint32_t id = 0;
     uint32_t offset = 0x78 + numResources * 32;
@@ -52,19 +52,19 @@ void RimWriter::save(IOutputStream &out) {
 
         std::string resRef(res.resRef);
         resRef.resize(16);
-        writer.putString(resRef);
+        writer.writeString(resRef);
 
-        writer.putUint32(static_cast<uint32_t>(res.resType));
-        writer.putUint32(id++);
-        writer.putUint32(offset);
-        writer.putUint32(size);
+        writer.writeUint32(static_cast<uint32_t>(res.resType));
+        writer.writeUint32(id++);
+        writer.writeUint32(offset);
+        writer.writeUint32(size);
 
         offset += size;
     }
 
     // Write resources data
     for (auto &res : _resources) {
-        writer.putBytes(res.data);
+        writer.writeBytes(res.data);
     }
 }
 

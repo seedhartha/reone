@@ -46,62 +46,62 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
             throw FormatException(str(boost::format("Instruction offset mismatch: expected=%08x, actual=%08x") % ins.offset % pos));
         }
 
-        writer.putByte(static_cast<int>(ins.type) & 0xff);
-        writer.putByte((static_cast<int>(ins.type) >> 8) & 0xff);
+        writer.writeBytes(static_cast<int>(ins.type) & 0xff);
+        writer.writeBytes((static_cast<int>(ins.type) >> 8) & 0xff);
 
         switch (ins.type) {
         case InstructionType::CPDOWNSP:
         case InstructionType::CPTOPSP:
         case InstructionType::CPDOWNBP:
         case InstructionType::CPTOPBP:
-            writer.putInt32(ins.stackOffset);
-            writer.putUint16(ins.size);
+            writer.writeInt32(ins.stackOffset);
+            writer.writeUint16(ins.size);
             break;
         case InstructionType::CONSTI:
-            writer.putInt32(ins.intValue);
+            writer.writeInt32(ins.intValue);
             break;
         case InstructionType::CONSTF:
-            writer.putFloat(ins.floatValue);
+            writer.writeFloat(ins.floatValue);
             break;
         case InstructionType::CONSTS: {
-            writer.putUint16(ins.strValue.length());
-            writer.putString(ins.strValue);
+            writer.writeUint16(ins.strValue.length());
+            writer.writeString(ins.strValue);
             break;
         }
         case InstructionType::CONSTO:
-            writer.putInt32(ins.objectId);
+            writer.writeInt32(ins.objectId);
             break;
         case InstructionType::ACTION:
-            writer.putUint16(ins.routine);
-            writer.putByte(ins.argCount);
+            writer.writeUint16(ins.routine);
+            writer.writeBytes(ins.argCount);
             break;
         case InstructionType::EQUALTT:
         case InstructionType::NEQUALTT:
-            writer.putUint16(ins.size);
+            writer.writeUint16(ins.size);
             break;
         case InstructionType::MOVSP:
-            writer.putInt32(ins.stackOffset);
+            writer.writeInt32(ins.stackOffset);
             break;
         case InstructionType::JMP:
         case InstructionType::JSR:
         case InstructionType::JZ:
         case InstructionType::JNZ:
-            writer.putInt32(ins.jumpOffset);
+            writer.writeInt32(ins.jumpOffset);
             break;
         case InstructionType::DESTRUCT:
-            writer.putUint16(ins.size);
-            writer.putInt16(ins.stackOffset);
-            writer.putUint16(ins.sizeNoDestroy);
+            writer.writeUint16(ins.size);
+            writer.writeInt16(ins.stackOffset);
+            writer.writeUint16(ins.sizeNoDestroy);
             break;
         case InstructionType::DECISP:
         case InstructionType::INCISP:
         case InstructionType::DECIBP:
         case InstructionType::INCIBP:
-            writer.putInt32(ins.stackOffset);
+            writer.writeInt32(ins.stackOffset);
             break;
         case InstructionType::STORE_STATE:
-            writer.putUint32(ins.size);
-            writer.putUint32(ins.sizeLocals);
+            writer.writeUint32(ins.size);
+            writer.writeUint32(ins.sizeLocals);
             break;
         default:
             break;
@@ -110,10 +110,10 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
 
     BinaryWriter ncsWriter(*out, boost::endian::order::big);
 
-    ncsWriter.putString(std::string("NCS V1.0", 8));
-    ncsWriter.putByte(0x42);
-    ncsWriter.putUint32(13 + writer.tell());
-    ncsWriter.putString(std::string(&bytes[0], bytes.size()));
+    ncsWriter.writeString(std::string("NCS V1.0", 8));
+    ncsWriter.writeBytes(0x42);
+    ncsWriter.writeUint32(13 + writer.tell());
+    ncsWriter.writeString(std::string(&bytes[0], bytes.size()));
 }
 
 } // namespace script

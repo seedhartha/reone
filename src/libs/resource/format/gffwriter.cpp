@@ -276,35 +276,35 @@ void GffWriter::writeHeader() {
     uint32_t offFieldIndices = offFieldData + sizeFieldData;
     uint32_t offListIndices = offFieldIndices + sizeFieldIndices;
 
-    _writer->putString(maybeSignature->second);
-    _writer->putString(" V3.2");
-    _writer->putUint32(offStructs);       // struct array offset
-    _writer->putUint32(numStructs);       // number of structs
-    _writer->putUint32(offFields);        // field array offset
-    _writer->putUint32(numFields);        // number of fields
-    _writer->putUint32(offLabels);        // label array offset
-    _writer->putUint32(numLabels);        // number of labels
-    _writer->putUint32(offFieldData);     // field data array offset
-    _writer->putUint32(sizeFieldData);    // number of bytes in field data
-    _writer->putUint32(offFieldIndices);  // field indices array offset
-    _writer->putUint32(sizeFieldIndices); // number of bytes in field indices array
-    _writer->putUint32(offListIndices);   // list indices array offset
-    _writer->putUint32(sizeListIndices);  // number of bytes in list indices array
+    _writer->writeString(maybeSignature->second);
+    _writer->writeString(" V3.2");
+    _writer->writeUint32(offStructs);       // struct array offset
+    _writer->writeUint32(numStructs);       // number of structs
+    _writer->writeUint32(offFields);        // field array offset
+    _writer->writeUint32(numFields);        // number of fields
+    _writer->writeUint32(offLabels);        // label array offset
+    _writer->writeUint32(numLabels);        // number of labels
+    _writer->writeUint32(offFieldData);     // field data array offset
+    _writer->writeUint32(sizeFieldData);    // number of bytes in field data
+    _writer->writeUint32(offFieldIndices);  // field indices array offset
+    _writer->writeUint32(sizeFieldIndices); // number of bytes in field indices array
+    _writer->writeUint32(offListIndices);   // list indices array offset
+    _writer->writeUint32(sizeListIndices);  // number of bytes in list indices array
 }
 
 void GffWriter::writeStructArray() {
     for (auto &writeStruct : _context.structs) {
-        _writer->putUint32(writeStruct.type);
-        _writer->putUint32(writeStruct.dataOrDataOffset);
-        _writer->putUint32(writeStruct.fieldCount);
+        _writer->writeUint32(writeStruct.type);
+        _writer->writeUint32(writeStruct.dataOrDataOffset);
+        _writer->writeUint32(writeStruct.fieldCount);
     }
 }
 
 void GffWriter::writeFieldArray() {
     for (auto &field : _context.fields) {
-        _writer->putUint32(field.type);
-        _writer->putUint32(field.labelIndex);
-        _writer->putUint32(field.dataOrDataOffset);
+        _writer->writeUint32(field.type);
+        _writer->writeUint32(field.labelIndex);
+        _writer->writeUint32(field.dataOrDataOffset);
     }
 }
 
@@ -313,23 +313,23 @@ void GffWriter::writeLabelArray() {
         std::string tmp;
         tmp.resize(16);
         strncpy(&tmp[0], label.c_str(), 16);
-        _writer->putString(tmp);
+        _writer->writeString(tmp);
     }
 }
 
 void GffWriter::writeFieldData() {
-    _writer->putBytes(_context.fieldData);
+    _writer->writeBytes(_context.fieldData);
 }
 
 void GffWriter::writeFieldIndices() {
     for (auto &index : _context.fieldIndices) {
-        _writer->putUint32(index);
+        _writer->writeUint32(index);
     }
 }
 
 void GffWriter::writeListIndices() {
     for (auto &index : _context.listIndices) {
-        _writer->putUint32(index);
+        _writer->writeUint32(index);
     }
 }
 

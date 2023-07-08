@@ -19,43 +19,43 @@
 
 namespace reone {
 
-void BinaryWriter::putByte(uint8_t val) {
+void BinaryWriter::writeBytes(uint8_t val) {
     _stream.writeByte(val);
 }
 
-void BinaryWriter::putChar(char val) {
+void BinaryWriter::writeChar(char val) {
     _stream.writeByte(*reinterpret_cast<uint8_t *>(&val));
 }
 
-void BinaryWriter::putUint16(uint16_t val) {
+void BinaryWriter::writeUint16(uint16_t val) {
     put(val);
 }
 
-void BinaryWriter::putUint32(uint32_t val) {
+void BinaryWriter::writeUint32(uint32_t val) {
     put(val);
 }
 
-void BinaryWriter::putInt16(int16_t val) {
+void BinaryWriter::writeInt16(int16_t val) {
     put(val);
 }
 
-void BinaryWriter::putInt32(int32_t val) {
+void BinaryWriter::writeInt32(int32_t val) {
     put(val);
 }
 
-void BinaryWriter::putInt64(int64_t val) {
+void BinaryWriter::writeInt64(int64_t val) {
     put(val);
 }
 
-void BinaryWriter::putFloat(float val) {
+void BinaryWriter::writeFloat(float val) {
     put(*reinterpret_cast<uint32_t *>(&val));
 }
 
-void BinaryWriter::putString(const std::string &str) {
+void BinaryWriter::writeString(const std::string &str) {
     _stream.write(&str[0], str.length());
 }
 
-void BinaryWriter::putStringExact(const std::string &str, int len) {
+void BinaryWriter::writeStringExact(const std::string &str, int len) {
     int strLen = std::min(len, static_cast<int>(str.length()));
     if (strLen > 0) {
         _stream.write(&str[0], strLen);
@@ -65,17 +65,17 @@ void BinaryWriter::putStringExact(const std::string &str, int len) {
     }
 }
 
-void BinaryWriter::putCString(const std::string &str) {
+void BinaryWriter::writeCString(const std::string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream.write(&str[0], len);
     _stream.writeByte('\0');
 }
 
-void BinaryWriter::putBytes(const ByteArray &bytes) {
+void BinaryWriter::writeBytes(const ByteArray &bytes) {
     _stream.write(&bytes[0], bytes.size());
 }
 
-void BinaryWriter::putBytes(int count, uint8_t val) {
+void BinaryWriter::writeBytes(int count, uint8_t val) {
     ByteArray data(count, val);
     _stream.write(&data[0], count);
 }

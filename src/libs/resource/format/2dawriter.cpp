@@ -34,12 +34,12 @@ void TwoDaWriter::save(const boost::filesystem::path &path) {
 
 void TwoDaWriter::save(IOutputStream &out) {
     _writer = std::make_unique<BinaryWriter>(out);
-    _writer->putString(kSignature);
-    _writer->putChar('\n');
+    _writer->writeString(kSignature);
+    _writer->writeChar('\n');
 
     writeHeaders();
 
-    _writer->putUint32(_twoDa.getRowCount());
+    _writer->writeUint32(_twoDa.getRowCount());
 
     writeLabels();
     writeData();
@@ -47,16 +47,16 @@ void TwoDaWriter::save(IOutputStream &out) {
 
 void TwoDaWriter::writeHeaders() {
     for (auto &column : _twoDa.columns()) {
-        _writer->putString(column);
-        _writer->putChar('\t');
+        _writer->writeString(column);
+        _writer->writeChar('\t');
     }
-    _writer->putChar('\0');
+    _writer->writeChar('\0');
 }
 
 void TwoDaWriter::writeLabels() {
     for (int i = 0; i < _twoDa.getRowCount(); ++i) {
-        _writer->putString(std::to_string(i));
-        _writer->putChar('\t');
+        _writer->writeString(std::to_string(i));
+        _writer->writeChar('\t');
     }
 }
 
@@ -72,20 +72,20 @@ void TwoDaWriter::writeData() {
             const std::string &value = _twoDa.rows()[i].values[j];
             auto maybeData = std::find_if(data.begin(), data.end(), [&](auto &pair) { return pair.first == value; });
             if (maybeData != data.end()) {
-                _writer->putUint16(maybeData->second);
+                _writer->writeUint16(maybeData->second);
             } else {
                 data.push_back(std::make_pair(value, dataSize));
-                _writer->putUint16(dataSize);
+                _writer->writeUint16(dataSize);
                 int len = static_cast<int>(strnlen(&value[0], value.length()));
                 dataSize += len + 1;
             }
         }
     }
 
-    _writer->putUint16(dataSize);
+    _writer->writeUint16(dataSize);
 
     for (auto &pair : data) {
-        _writer->putCString(pair.first);
+        _writer->writeCString(pair.first);
     }
 }
 

@@ -31,19 +31,19 @@ public:
         _endianess(endianess) {
     }
 
-    void putByte(uint8_t val);
-    void putChar(char val);
-    void putUint16(uint16_t val);
-    void putUint32(uint32_t val);
-    void putInt16(int16_t val);
-    void putInt32(int32_t val);
-    void putInt64(int64_t val);
-    void putFloat(float val);
-    void putString(const std::string &str);
-    void putStringExact(const std::string &str, int len);
-    void putCString(const std::string &str);
-    void putBytes(const ByteArray &bytes);
-    void putBytes(int count, uint8_t val = 0);
+    void writeBytes(uint8_t val);
+    void writeChar(char val);
+    void writeUint16(uint16_t val);
+    void writeUint32(uint32_t val);
+    void writeInt16(int16_t val);
+    void writeInt32(int32_t val);
+    void writeInt64(int64_t val);
+    void writeFloat(float val);
+    void writeString(const std::string &str);
+    void writeStringExact(const std::string &str, int len);
+    void writeCString(const std::string &str);
+    void writeBytes(const ByteArray &bytes);
+    void writeBytes(int count, uint8_t val = 0);
 
     size_t tell() const;
 

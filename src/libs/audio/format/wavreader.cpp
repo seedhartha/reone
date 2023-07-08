@@ -93,7 +93,7 @@ void WavReader::loadFormat(ChunkHeader chunk) {
 void WavReader::loadData(ChunkHeader chunk) {
     if (chunk.size == 0) {
         size_t pos = tell();
-        ByteArray data(_reader->getBytes(static_cast<int>(_size - pos)));
+        ByteArray data(_reader->readBytes(static_cast<int>(_size - pos)));
         auto mp3 = ByteArrayInputStream(data);
         auto mp3Reader = _mp3ReaderFactory.create();
         mp3Reader->load(mp3);
@@ -112,7 +112,7 @@ void WavReader::loadData(ChunkHeader chunk) {
 }
 
 void WavReader::loadPCM(uint32_t chunkSize) {
-    ByteArray data(_reader->getBytes(chunkSize));
+    ByteArray data(_reader->readBytes(chunkSize));
 
     AudioStream::Frame frame;
     frame.format = getAudioFormat();
@@ -138,7 +138,7 @@ static constexpr int kIMAStepTable[] = {
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
 void WavReader::loadIMAADPCM(uint32_t chunkSize) {
-    ByteArray chunk(_reader->getBytes(chunkSize));
+    ByteArray chunk(_reader->readBytes(chunkSize));
 
     AudioStream::Frame frame;
     frame.format = getAudioFormat();

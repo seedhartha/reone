@@ -76,18 +76,18 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
     auto expectedBytes = ByteArray({0x01, 0x02, 0x03, 0x04});
 
     // when
-    auto actualByte = reader.getByte();
-    auto actualUint16 = reader.getUint16();
-    auto actualUint32 = reader.getUint32();
-    auto actualUint64 = reader.getUint64();
-    auto actualInt16 = reader.getInt16();
-    auto actualInt32 = reader.getInt32();
-    auto actualInt64 = reader.getInt64();
-    auto actualFloat = reader.getFloat();
-    auto actualDouble = reader.getDouble();
-    auto actualStr = reader.getString(13);
-    auto actualCStr = reader.getNullTerminatedString();
-    auto actualBytes = reader.getBytes(4);
+    auto actualByte = reader.readByte();
+    auto actualUint16 = reader.readUint16();
+    auto actualUint32 = reader.readUint32();
+    auto actualUint64 = reader.readUint64();
+    auto actualInt16 = reader.readInt16();
+    auto actualInt32 = reader.readInt32();
+    auto actualInt64 = reader.readInt64();
+    auto actualFloat = reader.readFloat();
+    auto actualDouble = reader.readDouble();
+    auto actualStr = reader.readString(13);
+    auto actualCStr = reader.readNullTerminatedString();
+    auto actualBytes = reader.readBytes(4);
 
     // then
     EXPECT_EQ(expectedByte, actualByte);
@@ -131,14 +131,14 @@ TEST(binary_reader, should_read_from_big_endian_stream) {
     auto expectedDouble = 1.0;
 
     // when
-    auto actualUint16 = reader.getUint16();
-    auto actualUint32 = reader.getUint32();
-    auto actualUint64 = reader.getUint64();
-    auto actualInt16 = reader.getInt16();
-    auto actualInt32 = reader.getInt32();
-    auto actualInt64 = reader.getInt64();
-    auto actualFloat = reader.getFloat();
-    auto actualDouble = reader.getDouble();
+    auto actualUint16 = reader.readUint16();
+    auto actualUint32 = reader.readUint32();
+    auto actualUint64 = reader.readUint64();
+    auto actualInt16 = reader.readInt16();
+    auto actualInt32 = reader.readInt32();
+    auto actualInt64 = reader.readInt64();
+    auto actualFloat = reader.readFloat();
+    auto actualDouble = reader.readDouble();
 
     // then
     EXPECT_EQ(expectedUint16, actualUint16);

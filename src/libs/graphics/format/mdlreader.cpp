@@ -404,7 +404,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     // Read vertices
     if (!(flags & MdlNodeFlags::saber) && mdxVertexSize > 0) {
         _mdxReader->seek(offMdxData);
-        vertices = _mdxReader->getFloatArray(numVertices * mdxVertexSize / sizeof(float));
+        vertices = _mdxReader->readFloatArray(numVertices * mdxVertexSize / sizeof(float));
     }
 
     std::vector<Mesh::Face> faces;

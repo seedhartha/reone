@@ -55,28 +55,28 @@ void TlkWriter::save(IOutputStream &out) {
     }
 
     BinaryWriter writer(out);
-    writer.putString("TLK V3.0");
-    writer.putUint32(0); // language id
-    writer.putUint32(_talkTable.getStringCount());
-    writer.putUint32(20 + 40 * _talkTable.getStringCount()); // offset to std::string entries
+    writer.writeString("TLK V3.0");
+    writer.writeUint32(0); // language id
+    writer.writeUint32(_talkTable.getStringCount());
+    writer.writeUint32(20 + 40 * _talkTable.getStringCount()); // offset to std::string entries
 
     for (int i = 0; i < _talkTable.getStringCount(); ++i) {
         const StringDataElement &strDataElem = strData[i];
-        writer.putUint32(7); // flags
+        writer.writeUint32(7); // flags
 
         std::string soundResRef(strDataElem.soundResRef);
         soundResRef.resize(16);
-        writer.putString(soundResRef);
+        writer.writeString(soundResRef);
 
-        writer.putUint32(0); // volume variance
-        writer.putUint32(0); // pitch variance
-        writer.putUint32(strDataElem.offString);
-        writer.putUint32(strDataElem.stringSize);
-        writer.putFloat(0.0f); // sound length
+        writer.writeUint32(0); // volume variance
+        writer.writeUint32(0); // pitch variance
+        writer.writeUint32(strDataElem.offString);
+        writer.writeUint32(strDataElem.stringSize);
+        writer.writeFloat(0.0f); // sound length
     }
 
     for (int i = 0; i < _talkTable.getStringCount(); ++i) {
-        writer.putString(_talkTable.getString(i).text);
+        writer.writeString(_talkTable.getString(i).text);
     }
 }
 

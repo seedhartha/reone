@@ -69,7 +69,7 @@ void TpcReader::loadLayers() {
     _layers.reserve(_numLayers);
 
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = std::make_shared<ByteArray>(_reader->getBytes(_dataSize));
+        auto pixels = std::make_shared<ByteArray>(_reader->readBytes(_dataSize));
 
         // Ignore mip maps
         for (int j = 1; j < _numMipMaps; ++j) {
@@ -87,7 +87,7 @@ void TpcReader::loadFeatures() {
     if (pos >= _size) {
         return;
     }
-    _txiData = _reader->getBytes(static_cast<int>(_size - pos));
+    _txiData = _reader->readBytes(static_cast<int>(_size - pos));
 
     auto txi = ByteArrayInputStream(_txiData);
     auto reader = TxiReader();

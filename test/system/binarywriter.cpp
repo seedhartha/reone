@@ -44,18 +44,18 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
                               .build();
 
     // when
-    writer.putByte(0x40);
-    writer.putChar('A');
-    writer.putUint16(1);
-    writer.putUint32(2);
-    writer.putInt16(-3);
-    writer.putInt32(-4);
-    writer.putInt64(-5);
-    writer.putFloat(1.0f);
-    writer.putString(std::string("Aa"));
-    writer.putStringExact(std::string("Bb"), 2);
-    writer.putCString(std::string("Cc\x00"));
-    writer.putBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
+    writer.writeBytes(0x40);
+    writer.writeChar('A');
+    writer.writeUint16(1);
+    writer.writeUint32(2);
+    writer.writeInt16(-3);
+    writer.writeInt32(-4);
+    writer.writeInt64(-5);
+    writer.writeFloat(1.0f);
+    writer.writeString(std::string("Aa"));
+    writer.writeStringExact(std::string("Bb"), 2);
+    writer.writeCString(std::string("Cc\x00"));
+    writer.writeBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
 
     // then
     auto output = std::string(bytes.data(), bytes.size());
@@ -79,14 +79,14 @@ TEST(binary_writer, should_write_to_big_endian_stream) {
                               .build();
 
     // when
-    writer.putByte(0x40);
-    writer.putChar('A');
-    writer.putUint16(1);
-    writer.putUint32(2);
-    writer.putInt16(-3);
-    writer.putInt32(-4);
-    writer.putInt64(-5);
-    writer.putFloat(1.0f);
+    writer.writeBytes(0x40);
+    writer.writeChar('A');
+    writer.writeUint16(1);
+    writer.writeUint32(2);
+    writer.writeInt16(-3);
+    writer.writeInt32(-4);
+    writer.writeInt64(-5);
+    writer.writeFloat(1.0f);
 
     // then
     auto output = std::string(bytes.data(), bytes.size());

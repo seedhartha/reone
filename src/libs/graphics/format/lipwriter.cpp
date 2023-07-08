@@ -32,12 +32,12 @@ void LipWriter::save(const boost::filesystem::path &path) {
     auto lip = std::make_shared<FileOutputStream>(path, OpenMode::Binary);
 
     BinaryWriter writer(*lip);
-    writer.putString("LIP V1.0");
-    writer.putFloat(_animation.length());
-    writer.putUint32(static_cast<uint32_t>(_animation.keyframes().size()));
+    writer.writeString("LIP V1.0");
+    writer.writeFloat(_animation.length());
+    writer.writeUint32(static_cast<uint32_t>(_animation.keyframes().size()));
     for (auto &keyframe : _animation.keyframes()) {
-        writer.putFloat(keyframe.time);
-        writer.putByte(keyframe.shape);
+        writer.writeFloat(keyframe.time);
+        writer.writeBytes(keyframe.shape);
     }
 }
 

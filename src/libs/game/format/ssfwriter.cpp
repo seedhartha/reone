@@ -28,11 +28,11 @@ void SsfWriter::save(const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path, OpenMode::Binary);
     auto writer = BinaryWriter(stream);
 
-    writer.putString("SSF V1.1");
-    writer.putUint32(12); // offset to entries
+    writer.writeString("SSF V1.1");
+    writer.writeUint32(12); // offset to entries
 
     for (auto val : _soundSet) {
-        writer.putUint32(val);
+        writer.writeUint32(val);
     }
 }
 

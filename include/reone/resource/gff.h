@@ -121,9 +121,9 @@ public:
 
     bool getBool(const std::string &name, bool defValue = false) const;
     int getInt(const std::string &name, int defValue = 0) const;
-    int64_t getInt64(const std::string &name, int64_t defValue = 0) const;
+    int64_t readInt64(const std::string &name, int64_t defValue = 0) const;
     uint32_t getUint(const std::string &name, uint32_t defValue = 0) const;
-    uint64_t getUint64(const std::string &name, uint64_t defValue = 0) const;
+    uint64_t readUint64(const std::string &name, uint64_t defValue = 0) const;
     glm::vec3 getColor(const std::string &name, glm::vec3 defValue = glm::vec3(0.0f)) const;
     float getFloat(const std::string &name, float defValue = 0.0f) const;
     double getDouble(const std::string &name, double defValue = 0.0) const;

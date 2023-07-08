@@ -49,7 +49,7 @@ int Gff::getInt(const std::string &name, int defValue) const {
     return field->intValue;
 }
 
-int64_t Gff::getInt64(const std::string &name, int64_t defValue) const {
+int64_t Gff::readInt64(const std::string &name, int64_t defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;
@@ -65,7 +65,7 @@ uint32_t Gff::getUint(const std::string &name, uint32_t defValue) const {
     return field->uintValue;
 }
 
-uint64_t Gff::getUint64(const std::string &name, uint64_t defValue) const {
+uint64_t Gff::readUint64(const std::string &name, uint64_t defValue) const {
     const Field *field = get(name);
     if (!field)
         return defValue;

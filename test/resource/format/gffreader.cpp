@@ -210,8 +210,8 @@ TEST(gff_reader, should_read_gff) {
     EXPECT_EQ(0, gff->getUint("Byte"));
     EXPECT_EQ(1, gff->getInt("Int"));
     EXPECT_EQ(2, gff->getUint("Uint"));
-    EXPECT_EQ(3, gff->getInt64("Int64"));
-    EXPECT_EQ(4, gff->getUint64("Uint64"));
+    EXPECT_EQ(3, gff->readInt64("Int64"));
+    EXPECT_EQ(4, gff->readUint64("Uint64"));
     EXPECT_EQ(1.0f, gff->getFloat("Float"));
     EXPECT_EQ(1.0, gff->getDouble("Double"));
     EXPECT_EQ(std::string("John"), gff->getString("CExoString"));

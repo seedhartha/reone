@@ -42,20 +42,20 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
     uint32_t offResources = 0xa0 + kKeyStructSize * numResources;
 
     if (type == FileType::MOD) {
-        writer.putString("MOD V1.0");
+        writer.writeString("MOD V1.0");
     } else {
-        writer.putString("ERF V1.0");
+        writer.writeString("ERF V1.0");
     }
-    writer.putUint32(0); // language count
-    writer.putUint32(0); // localized std::string size
-    writer.putUint32(numResources);
-    writer.putUint32(0xa0);         // offset to localized string
-    writer.putUint32(0xa0);         // offset to key list
-    writer.putUint32(offResources); // offset to resource list
-    writer.putUint32(0);            // build year since 1900
-    writer.putUint32(0);            // build day since January 1st
-    writer.putInt32(-1);            // StrRef for file description
-    writer.putBytes(116);           // padding
+    writer.writeUint32(0); // language count
+    writer.writeUint32(0); // localized std::string size
+    writer.writeUint32(numResources);
+    writer.writeUint32(0xa0);         // offset to localized string
+    writer.writeUint32(0xa0);         // offset to key list
+    writer.writeUint32(offResources); // offset to resource list
+    writer.writeUint32(0);            // build year since 1900
+    writer.writeUint32(0);            // build day since January 1st
+    writer.writeInt32(-1);            // StrRef for file description
+    writer.writeBytes(116);           // padding
 
     uint32_t id = 0;
 
@@ -63,11 +63,11 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
     for (auto &res : _resources) {
         std::string resRef(res.resRef);
         resRef.resize(16);
-        writer.putString(resRef);
+        writer.writeString(resRef);
 
-        writer.putUint32(id++);
-        writer.putUint16(static_cast<uint16_t>(res.resType));
-        writer.putUint16(0); // unused
+        writer.writeUint32(id++);
+        writer.writeUint16(static_cast<uint16_t>(res.resType));
+        writer.writeUint16(0); // unused
     }
 
     uint32_t offset = 0xa0 + (kKeyStructSize + kResourceStructSize) * numResources;
@@ -75,14 +75,14 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
     // Write resources
     for (auto &res : _resources) {
         auto size = static_cast<uint32_t>(res.data.size());
-        writer.putUint32(offset);
-        writer.putUint32(size);
+        writer.writeUint32(offset);
+        writer.writeUint32(size);
         offset += size;
     }
 
     // Write resource data
     for (auto &res : _resources) {
-        writer.putBytes(res.data);
+        writer.writeBytes(res.data);
     }
 }
 

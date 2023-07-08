@@ -81,7 +81,7 @@ void TwoDaReader::loadTable() {
 bool TwoDaReader::readToken(std::string &token) {
     size_t pos = tell();
 
-    auto bytes = _reader->getBytes(256);
+    auto bytes = _reader->readBytes(256);
     auto start = &bytes[0];
     auto pch = start;
 

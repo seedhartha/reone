@@ -31,76 +31,76 @@ void BinaryReader::ignore(int count) {
     _stream.seek(count, SeekOrigin::Current);
 }
 
-uint8_t BinaryReader::getByte() {
+uint8_t BinaryReader::readByte() {
     uint8_t val;
     _stream.read(reinterpret_cast<char *>(&val), 1);
     return val;
 }
 
-uint16_t BinaryReader::getUint16() {
+uint16_t BinaryReader::readUint16() {
     uint16_t val;
     _stream.read(reinterpret_cast<char *>(&val), 2);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-uint32_t BinaryReader::getUint32() {
+uint32_t BinaryReader::readUint32() {
     uint32_t val;
     _stream.read(reinterpret_cast<char *>(&val), 4);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-uint64_t BinaryReader::getUint64() {
+uint64_t BinaryReader::readUint64() {
     uint64_t val;
     _stream.read(reinterpret_cast<char *>(&val), 8);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-int16_t BinaryReader::getInt16() {
+int16_t BinaryReader::readInt16() {
     int16_t val;
     _stream.read(reinterpret_cast<char *>(&val), 2);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-int32_t BinaryReader::getInt32() {
+int32_t BinaryReader::readInt32() {
     int32_t val;
     _stream.read(reinterpret_cast<char *>(&val), 4);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-int64_t BinaryReader::getInt64() {
+int64_t BinaryReader::readInt64() {
     int64_t val;
     _stream.read(reinterpret_cast<char *>(&val), 8);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
-float BinaryReader::getFloat() {
+float BinaryReader::readFloat() {
     uint32_t val;
     _stream.read(reinterpret_cast<char *>(&val), 4);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return *reinterpret_cast<float *>(&val);
 }
 
-double BinaryReader::getDouble() {
+double BinaryReader::readDouble() {
     uint64_t val;
     _stream.read(reinterpret_cast<char *>(&val), 8);
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return *reinterpret_cast<double *>(&val);
 }
 
-std::string BinaryReader::getString(int len) {
+std::string BinaryReader::readString(int len) {
     std::string val;
     val.resize(len);
     _stream.read(&val[0], len);
     return std::move(val);
 }
 
-std::string BinaryReader::getNullTerminatedString() {
+std::string BinaryReader::readNullTerminatedString() {
     std::ostringstream ss;
 
     char ch;
@@ -114,7 +114,7 @@ std::string BinaryReader::getNullTerminatedString() {
     return ss.str();
 }
 
-ByteArray BinaryReader::getBytes(int count) {
+ByteArray BinaryReader::readBytes(int count) {
     ByteArray buffer;
     buffer.resize(count);
     int numRead = _stream.read(reinterpret_cast<char *>(&buffer[0]), count);
