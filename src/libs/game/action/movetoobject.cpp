@@ -20,7 +20,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object.h"
-#include "reone/game/object/factory.h"
 
 namespace reone {
 
@@ -28,7 +27,7 @@ namespace game {
 
 void MoveToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto dest = _object->position();
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(dest, _run, _range, dt);
     if (reached) {

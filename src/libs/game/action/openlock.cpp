@@ -22,7 +22,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/door.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/script/runner.h"
 
 namespace reone {
@@ -37,7 +36,7 @@ void OpenLockAction::execute(std::shared_ptr<Action> self, Object &actor, float 
     }
 
     auto door = std::static_pointer_cast<Door>(_object);
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {

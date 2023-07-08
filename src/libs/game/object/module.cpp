@@ -78,6 +78,7 @@ void Module::loadArea(const Gff &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _game.objectFactory().newArea();
+    _game.addObject(_area);
 
     std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
@@ -154,7 +155,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 
     auto object = _area->getObjectAt(event.x, event.y);
     if (object && object->isSelectable()) {
-        auto objectPtr = _game.objectFactory().getObjectById(object->id());
+        auto objectPtr = _game.getObjectById(object->id());
         _area->hilightObject(objectPtr);
 
         switch (object->type()) {
@@ -194,7 +195,7 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (!object || !object->isSelectable()) {
         return false;
     }
-    auto objectPtr = _game.objectFactory().getObjectById(object->id());
+    auto objectPtr = _game.getObjectById(object->id());
     auto selectedObject = _area->selectedObject();
     if (objectPtr != selectedObject) {
         _area->selectObject(objectPtr);

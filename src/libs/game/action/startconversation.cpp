@@ -29,7 +29,7 @@ namespace game {
 static constexpr float kMaxConversationDistance = 4.0f;
 
 void StartConversationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    auto actorPtr = _game.objectFactory().getObjectById(actor.id());
+    auto actorPtr = _game.getObjectById(actor.id());
     auto creatureActor = std::static_pointer_cast<Creature>(actorPtr);
 
     bool reached =

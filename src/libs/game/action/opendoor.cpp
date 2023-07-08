@@ -28,7 +28,7 @@ namespace reone {
 namespace game {
 
 void OpenDoorAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    std::shared_ptr<Object> actorPtr(_game.objectFactory().getObjectById(actor.id()));
+    std::shared_ptr<Object> actorPtr(_game.getObjectById(actor.id()));
     auto creatureActor = std::dynamic_pointer_cast<Creature>(actorPtr);
     auto door = std::dynamic_pointer_cast<Door>(_object);
 

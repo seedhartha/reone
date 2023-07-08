@@ -242,7 +242,8 @@ void Area::loadProperties(const Gff &git) {
 
 void Area::loadCreatures(const Gff &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        std::shared_ptr<Creature> creature(_game.objectFactory().newCreature(_sceneName));
+        std::shared_ptr<Creature> creature = _game.objectFactory().newCreature(_sceneName);
+        _game.addObject(creature);
         creature->loadFromGIT(*gffs);
         landObject(*creature);
         add(creature);
@@ -251,7 +252,8 @@ void Area::loadCreatures(const Gff &git) {
 
 void Area::loadDoors(const Gff &git) {
     for (auto &gffs : git.getList("Door List")) {
-        std::shared_ptr<Door> door(_game.objectFactory().newDoor(_sceneName));
+        std::shared_ptr<Door> door = _game.objectFactory().newDoor(_sceneName);
+        _game.addObject(door);
         door->loadFromGIT(*gffs);
         add(door);
     }
@@ -259,7 +261,8 @@ void Area::loadDoors(const Gff &git) {
 
 void Area::loadPlaceables(const Gff &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        std::shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable(_sceneName));
+        std::shared_ptr<Placeable> placeable = _game.objectFactory().newPlaceable(_sceneName);
+        _game.addObject(placeable);
         placeable->loadFromGIT(*gffs);
         add(placeable);
     }
@@ -267,7 +270,8 @@ void Area::loadPlaceables(const Gff &git) {
 
 void Area::loadWaypoints(const Gff &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        std::shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint(_sceneName));
+        std::shared_ptr<Waypoint> waypoint = _game.objectFactory().newWaypoint(_sceneName);
+        _game.addObject(waypoint);
         waypoint->loadFromGIT(*gffs);
         add(waypoint);
     }
@@ -275,7 +279,8 @@ void Area::loadWaypoints(const Gff &git) {
 
 void Area::loadTriggers(const Gff &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        std::shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger(_sceneName));
+        std::shared_ptr<Trigger> trigger = _game.objectFactory().newTrigger(_sceneName);
+        _game.addObject(trigger);
         trigger->loadFromGIT(*gffs);
         add(trigger);
     }
@@ -283,7 +288,8 @@ void Area::loadTriggers(const Gff &git) {
 
 void Area::loadSounds(const Gff &git) {
     for (auto &gffs : git.getList("SoundList")) {
-        std::shared_ptr<Sound> sound(_game.objectFactory().newSound(_sceneName));
+        std::shared_ptr<Sound> sound = _game.objectFactory().newSound(_sceneName);
+        _game.addObject(sound);
         sound->loadFromGIT(*gffs);
         add(sound);
     }
@@ -291,7 +297,8 @@ void Area::loadSounds(const Gff &git) {
 
 void Area::loadCameras(const Gff &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        std::shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera(_sceneName));
+        std::shared_ptr<PlaceableCamera> camera = _game.objectFactory().newCamera(_sceneName);
+        _game.addObject(camera);
         camera->loadFromGIT(*gffs);
         add(camera);
     }
@@ -299,7 +306,8 @@ void Area::loadCameras(const Gff &git) {
 
 void Area::loadEncounters(const Gff &git) {
     for (auto &gffs : git.getList("Encounter List")) {
-        std::shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter(_sceneName));
+        std::shared_ptr<Encounter> encounter = _game.objectFactory().newEncounter(_sceneName);
+        _game.addObject(encounter);
         encounter->loadFromGIT(*gffs);
         add(encounter);
     }
@@ -478,7 +486,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    auto object = _game.objectFactory().getObjectById(objectId);
+    auto object = _game.getObjectById(objectId);
     if (!object) {
         return;
     }
@@ -942,13 +950,15 @@ std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &b
     std::shared_ptr<Object> object;
     switch (type) {
     case ObjectType::Item: {
-        auto item = _game.objectFactory().newItem();
+        std::shared_ptr<Item> item = _game.objectFactory().newItem();
+        _game.addObject(item);
         item->loadFromBlueprint(blueprintResRef);
         object = std::move(item);
         break;
     }
     case ObjectType::Creature: {
-        auto creature = _game.objectFactory().newCreature();
+        std::shared_ptr<Creature> creature = _game.objectFactory().newCreature();
+        _game.addObject(creature);
         creature->loadFromBlueprint(blueprintResRef);
         creature->setPosition(location->position());
         creature->setFacing(location->facing());
@@ -956,7 +966,8 @@ std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &b
         break;
     }
     case ObjectType::Placeable: {
-        auto placeable = _game.objectFactory().newPlaceable();
+        std::shared_ptr<Placeable> placeable = _game.objectFactory().newPlaceable();
+        _game.addObject(placeable);
         placeable->loadFromBlueprint(blueprintResRef);
         object = std::move(placeable);
         break;

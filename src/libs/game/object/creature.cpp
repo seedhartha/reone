@@ -311,7 +311,8 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
 }
 
 bool Creature::equip(const std::string &resRef) {
-    std::shared_ptr<Item> item(_game.objectFactory().newItem());
+    std::shared_ptr<Item> item = _game.objectFactory().newItem();
+    _game.addObject(item);
     item->loadFromBlueprint(resRef);
 
     bool equipped = false;
@@ -761,7 +762,7 @@ void Creature::advanceOnPath(bool run, float dt) {
     if (distToDest <= 1.0f) {
         _path->selectNextPoint();
     } else {
-        std::shared_ptr<Creature> creature(_game.objectFactory().getObjectById<Creature>(_id));
+        std::shared_ptr<Creature> creature(_game.getObjectById<Creature>(_id));
         if (_game.module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
             setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
         } else {

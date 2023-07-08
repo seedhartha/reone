@@ -20,14 +20,13 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/location.h"
-#include "reone/game/object/factory.h"
 
 namespace reone {
 
 namespace game {
 
 void MoveToLocationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
     glm::vec3 destination(_location->position());
 
     bool reached = creatureActor->navigateTo(destination, _run, 1.0f, dt);

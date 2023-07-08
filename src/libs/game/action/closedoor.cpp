@@ -20,14 +20,13 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/door.h"
-#include "reone/game/object/factory.h"
 
 namespace reone {
 
 namespace game {
 
 void CloseDoorAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
     auto door = std::dynamic_pointer_cast<Door>(_object);
 
     bool reached = !creatureActor || creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);

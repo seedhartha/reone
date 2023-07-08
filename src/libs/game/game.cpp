@@ -68,7 +68,6 @@
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
 
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::gui;
@@ -234,6 +233,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
                 _module = maybeModule->second;
             } else {
                 _module = _objectFactory.newModule();
+                _objectById.insert(std::make_pair(_module->id(), _module));
 
                 std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
@@ -273,7 +273,8 @@ void Game::loadDefaultParty() {
     _party.defaultMembers(member1, member2, member3);
 
     if (!member1.empty()) {
-        std::shared_ptr<Creature> player(_objectFactory.newCreature());
+        std::shared_ptr<Creature> player = _objectFactory.newCreature();
+        _objectById.insert(std::make_pair(player->id(), player));
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -281,13 +282,15 @@ void Game::loadDefaultParty() {
         _party.setPlayer(player);
     }
     if (!member2.empty()) {
-        std::shared_ptr<Creature> companion(_objectFactory.newCreature());
+        std::shared_ptr<Creature> companion = _objectFactory.newCreature();
+        _objectById.insert(std::make_pair(companion->id(), companion));
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
         _party.addMember(0, companion);
     }
     if (!member3.empty()) {
-        std::shared_ptr<Creature> companion(_objectFactory.newCreature());
+        std::shared_ptr<Creature> companion = _objectFactory.newCreature();
+        _objectById.insert(std::make_pair(companion->id(), companion));
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);
         _party.addMember(1, companion);
@@ -390,7 +393,7 @@ std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     case kObjectInvalid:
         return nullptr;
     default:
-        return _objectFactory.getObjectById(id);
+        return getFromLookupOrNull(_objectById, id);
     }
 }
 

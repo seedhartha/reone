@@ -151,6 +151,7 @@ std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, 
 
     } else {
         result = _game.objectFactory().newItem();
+        _game.addObject(result);
         result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);
         result->setDropable(dropable);

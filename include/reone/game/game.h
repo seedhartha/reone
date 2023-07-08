@@ -104,7 +104,6 @@ public:
     bool isTSL() const { return _gameId == GameID::TSL; }
 
     Camera *getActiveCamera() const;
-    std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     OptionsView &options() { return _options; }
     const OptionsView &options() const { return _options; }
@@ -163,6 +162,21 @@ public:
 
     // END Module loading
 
+    // Objects
+
+    void addObject(std::shared_ptr<Object> object) {
+        _objectById.insert(std::make_pair(object->id(), std::move(object)));
+    }
+
+    std::shared_ptr<Object> getObjectById(uint32_t id) const;
+
+    template <class T>
+    std::shared_ptr<T> getObjectById(uint32_t id) const {
+        return std::dynamic_pointer_cast<T>(getObjectById(id));
+    }
+
+    // END Objects
+
     // Global variables
 
     bool getGlobalBoolean(const std::string &name) const;
@@ -205,6 +219,8 @@ private:
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
+
+    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
 
     // Services
 

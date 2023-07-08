@@ -21,7 +21,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object.h"
-#include "reone/game/object/factory.h"
 
 namespace reone {
 
@@ -33,7 +32,7 @@ void UseFeatAction::execute(std::shared_ptr<Action> self, Object &actor, float d
         return;
     }
 
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {

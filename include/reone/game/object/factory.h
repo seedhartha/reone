@@ -46,39 +46,28 @@ public:
         _services(services) {
     }
 
-    std::shared_ptr<Module> newModule();
-    std::shared_ptr<Item> newItem();
+    std::unique_ptr<Module> newModule();
+    std::unique_ptr<Item> newItem();
 
-    std::shared_ptr<Area> newArea(std::string sceneName = kSceneMain);
-    std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneMain);
-    std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain);
-    std::shared_ptr<Door> newDoor(std::string sceneName = kSceneMain);
-    std::shared_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain);
-    std::shared_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain);
-    std::shared_ptr<Sound> newSound(std::string sceneName = kSceneMain);
-    std::shared_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain);
-    std::shared_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain);
-
-    std::shared_ptr<Object> getObjectById(uint32_t id) const;
-
-    template <class T>
-    std::shared_ptr<T> getObjectById(uint32_t id) const {
-        return std::dynamic_pointer_cast<T>(getObjectById(id));
-    }
+    std::unique_ptr<Area> newArea(std::string sceneName = kSceneMain);
+    std::unique_ptr<Creature> newCreature(std::string sceneName = kSceneMain);
+    std::unique_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain);
+    std::unique_ptr<Door> newDoor(std::string sceneName = kSceneMain);
+    std::unique_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain);
+    std::unique_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain);
+    std::unique_ptr<Sound> newSound(std::string sceneName = kSceneMain);
+    std::unique_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain);
+    std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain);
 
 private:
     Game &_game;
     ServicesView &_services;
 
     uint32_t _counter {2}; // ids 0 and 1 are reserved
-    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
 
     template <class T, class... Args>
-    std::shared_ptr<T> newObject(Args &&...args) {
-        uint32_t id = _counter++;
-        std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));
-        _objectById.insert(std::make_pair(id, object));
-        return std::move(object);
+    std::unique_ptr<T> newObject(Args &&...args) {
+        return std::make_unique<T>(_counter++, std::forward<Args>(args)...);
     }
 };
 

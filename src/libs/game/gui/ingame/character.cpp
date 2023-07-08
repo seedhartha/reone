@@ -239,7 +239,8 @@ void CharacterMenu::refresh3D() {
 std::shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph) const {
     auto partyLeader = _game.party().getLeader();
 
-    auto character = _game.objectFactory().newCreature(sceneGraph.name());
+    std::shared_ptr<Creature> character = _game.objectFactory().newCreature(sceneGraph.name());
+    _game.addObject(character);
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(partyLeader->appearance());
 
