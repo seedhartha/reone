@@ -68,6 +68,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/signutil.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp

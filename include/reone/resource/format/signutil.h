@@ -24,16 +24,7 @@ namespace reone {
 
 namespace resource {
 
-void checkSignature(BinaryReader &reader, const std::string &expected) {
-    auto len = reader.streamLength();
-    if (len < expected.size()) {
-        throw FormatException("Invalid binary resource size");
-    }
-    auto actual = reader.readString(expected.size());
-    if (expected != actual) {
-        throw FormatException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
-    }
-}
+void checkSignature(BinaryReader &reader, const std::string &expected);
 
 } // namespace resource
 

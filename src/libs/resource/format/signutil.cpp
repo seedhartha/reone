@@ -15,31 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "reone/system/binaryreader.h"
-#include "reone/system/stream/input.h"
+#include "reone/resource/format/signutil.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class SsfReader : boost::noncopyable {
-public:
-    SsfReader(IInputStream &ssf) :
-        _ssf(BinaryReader(ssf)) {
+void checkSignature(BinaryReader &reader, const std::string &expected) {
+    auto len = reader.streamLength();
+    if (len < expected.size()) {
+        throw FormatException("Invalid binary resource size");
     }
+    auto actual = reader.readString(expected.size());
+    if (expected != actual) {
+        throw FormatException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
+    }
+}
 
-    void load();
-
-    const std::vector<int> &soundSet() const { return _soundSet; }
-
-private:
-    BinaryReader _ssf;
-
-    std::vector<int> _soundSet;
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

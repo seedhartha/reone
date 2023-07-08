@@ -67,8 +67,8 @@ void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem
 }
 
 void SsfTool::toXML(IInputStream &ssf, IOutputStream &xml) {
-    auto reader = SsfReader();
-    reader.load(ssf);
+    auto reader = SsfReader(ssf);
+    reader.load();
 
     auto soundSet = reader.soundSet();
 

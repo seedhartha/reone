@@ -216,8 +216,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Ssf) {
-        auto reader = SsfReader();
-        reader.load(data);
+        auto reader = SsfReader(data);
+        reader.load();
         auto &soundSet = reader.soundSet();
 
         auto columns = std::vector<std::string>();

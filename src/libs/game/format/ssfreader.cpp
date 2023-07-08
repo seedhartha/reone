@@ -17,18 +17,20 @@
 
 #include "reone/game/format/ssfreader.h"
 
+#include "reone/resource/format/signutil.h"
+
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-void SsfReader::onLoad() {
-    checkSignature(std::string("SSF V1.1", 8));
-    uint32_t tableOffset = readUint32();
-    int entryCount = static_cast<int>((_size - tableOffset) / 4);
-    seek(tableOffset);
-    _soundSet = readInt32Array(entryCount);
+void SsfReader::load() {
+    checkSignature(_ssf, std::string("SSF V1.1", 8));
+    uint32_t tableOffset = _ssf.readUint32();
+    int entryCount = static_cast<int>((_ssf.streamLength() - tableOffset) / 4);
+    _ssf.seek(tableOffset);
+    _soundSet = _ssf.readInt32Array(entryCount);
 }
 
 } // namespace game

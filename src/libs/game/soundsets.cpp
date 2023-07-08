@@ -39,8 +39,8 @@ std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     auto stream = MemoryInputStream(*data);
     auto result = std::make_shared<SoundSet>();
 
-    SsfReader ssf;
-    ssf.load(stream);
+    SsfReader ssf(stream);
+    ssf.load();
 
     std::vector<int> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
