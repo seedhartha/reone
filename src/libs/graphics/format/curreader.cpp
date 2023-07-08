@@ -19,40 +19,43 @@
 
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
+#include "reone/resource/format/signutil.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace graphics {
 
-void CurReader::onLoad() {
+void CurReader::load() {
     loadHeader();
     loadData();
 }
 
 void CurReader::loadHeader() {
-    ignore(4);
+    _cur.ignore(4);
 
-    uint32_t size = readUint32();
+    uint32_t size = _cur.readUint32();
 
-    _width = readInt32();
-    _height = readInt32();
+    _width = _cur.readInt32();
+    _height = _cur.readInt32();
 
-    uint16_t planes = readUint16();
+    uint16_t planes = _cur.readUint16();
 
-    _bitCount = readUint16();
+    _bitCount = _cur.readUint16();
 
-    uint32_t compression = readUint32();
+    uint32_t compression = _cur.readUint32();
 }
 
 void CurReader::loadData() {
-    seek(44);
+    _cur.seek(44);
 
     int numPixels = _width * _width;
     int colorCount = _bitCount == 8 ? 256 : 16;
 
-    ByteArray palette(_reader->readBytes(4 * colorCount));
-    ByteArray xorData(_reader->readBytes(numPixels));
-    ByteArray andData(_reader->readBytes(numPixels / 8));
+    ByteArray palette(_cur.readBytes(4 * colorCount));
+    ByteArray xorData(_cur.readBytes(numPixels));
+    ByteArray andData(_cur.readBytes(numPixels / 8));
 
     auto pixels = std::make_shared<ByteArray>(4 * numPixels, '\0');
 

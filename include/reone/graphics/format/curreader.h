@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -25,17 +26,24 @@ namespace graphics {
 
 class Texture;
 
-class CurReader : public resource::BinaryResourceReader {
+class CurReader : boost::noncopyable {
 public:
+    CurReader(IInputStream &cur) :
+        _cur(BinaryReader(cur)) {
+    }
+
+    void load();
+
     std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
+    BinaryReader _cur;
+
     uint16_t _bitCount {0};
     int _width {0};
     int _height {0};
     std::shared_ptr<Texture> _texture;
 
-    void onLoad() override;
     void loadHeader();
     void loadData();
 };

@@ -103,8 +103,8 @@ std::shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     auto bytes = _resources.getFromExe(name, PEResourceType::Cursor);
     auto stream = MemoryInputStream(*bytes);
 
-    CurReader cur;
-    cur.load(stream);
+    CurReader cur(stream);
+    cur.load();
 
     return cur.texture();
 }
