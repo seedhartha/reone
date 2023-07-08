@@ -84,7 +84,7 @@ void TpcReader::loadLayers() {
 
 void TpcReader::loadFeatures() {
     auto pos = _tpc.position();
-    auto length = _tpc.streamLength();
+    auto length = _tpc.length();
     if (pos >= length) {
         return;
     }

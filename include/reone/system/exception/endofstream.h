@@ -17,42 +17,17 @@
 
 #pragma once
 
-#include "reone/system/binaryreader.h"
-#include "reone/system/stream/input.h"
-
-#include "../2da.h"
-
 namespace reone {
 
-namespace resource {
-
-class TwoDaReader : boost::noncopyable {
+class EndOfStreamException : public std::runtime_error {
 public:
-    TwoDaReader(IInputStream &stream) :
-        _reader(BinaryReader(stream)) {
+    EndOfStreamException() :
+        std::runtime_error("") {
     }
 
-    void load();
-
-    const std::shared_ptr<TwoDa> &twoDa() const { return _twoDa; }
-
-private:
-    BinaryReader _reader;
-
-    int _rowCount {0};
-    int _dataSize {0};
-
-    std::vector<std::string> _columns;
-    std::vector<TwoDa::Row> _rows;
-
-    std::shared_ptr<TwoDa> _twoDa;
-
-    void loadRows();
-    void loadTable();
-
-    std::vector<std::string> readTokens(int maxCount = std::numeric_limits<int>::max());
+    EndOfStreamException(const std::string &message) :
+        std::runtime_error(message) {
+    }
 };
-
-} // namespace resource
 
 } // namespace reone

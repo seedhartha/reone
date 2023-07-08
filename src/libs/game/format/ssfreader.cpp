@@ -28,7 +28,7 @@ namespace game {
 void SsfReader::load() {
     checkSignature(_ssf, std::string("SSF V1.1", 8));
     uint32_t tableOffset = _ssf.readUint32();
-    int entryCount = static_cast<int>((_ssf.streamLength() - tableOffset) / 4);
+    int entryCount = static_cast<int>((_ssf.length() - tableOffset) / 4);
     _ssf.seek(tableOffset);
     _soundSet = _ssf.readInt32Array(entryCount);
 }

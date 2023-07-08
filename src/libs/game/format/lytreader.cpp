@@ -18,17 +18,17 @@
 #include "reone/game/format/lytreader.h"
 
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/textutil.h"
 
 namespace reone {
 
 namespace game {
 
 void LytReader::load(IInputStream &in) {
-    char buf[256];
-    do {
-        in.readLine(buf, sizeof(buf));
-        processLine(std::string(buf));
-    } while (!in.eof());
+    std::string line;
+    for (bool read = readLine(in, line); read; read = readLine(in, line)) {
+        processLine(line);
+    }
 }
 
 void LytReader::processLine(const std::string &line) {

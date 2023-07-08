@@ -20,6 +20,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/format/signutil.h"
+#include "reone/system/stringbuilder.h"
 
 namespace reone {
 
@@ -27,28 +28,14 @@ namespace resource {
 
 void TwoDaReader::load() {
     checkSignature(_reader, std::string("2DA V2.b", 8));
+
     _reader.ignore(1); // newline
-    loadHeaders();
-
+    _columns = readTokens();
     _rowCount = _reader.readUint32();
+    readTokens(_rowCount);
 
-    loadLabels();
     loadRows();
     loadTable();
-}
-
-void TwoDaReader::loadHeaders() {
-    std::string token;
-    while (readToken(token)) {
-        _columns.push_back(token);
-    }
-}
-
-void TwoDaReader::loadLabels() {
-    std::string token;
-    for (int i = 0; i < _rowCount; ++i) {
-        readToken(token);
-    }
 }
 
 void TwoDaReader::loadRows() {
@@ -79,27 +66,23 @@ void TwoDaReader::loadTable() {
     _twoDa = std::make_shared<TwoDa>(_columns, _rows);
 }
 
-bool TwoDaReader::readToken(std::string &token) {
-    size_t pos = _reader.position();
-
-    auto bytes = _reader.readBytes(256);
-    auto start = &bytes[0];
-    auto pch = start;
-
-    for (; pch - start < bytes.size(); ++pch) {
-        if (*pch == '\0') {
-            _reader.seek(pos + pch - start + 1);
-            return false;
-        }
-        if (*pch == '\t') {
-            std::string s(start, pch - start);
-            _reader.seek(pos + pch - start + 1);
-            token = std::move(s);
-            return true;
+std::vector<std::string> TwoDaReader::readTokens(int maxCount) {
+    std::vector<std::string> tokens;
+    StringBuilder str;
+    for (auto ch = _reader.readChar();; ch = _reader.readChar()) {
+        if (ch == '\t') {
+            tokens.push_back(str.build());
+            if (tokens.size() == maxCount) {
+                break;
+            }
+            str.clear();
+        } else if (ch == '\0') {
+            break;
+        } else {
+            str.append(ch);
         }
     }
-
-    throw FormatException("2DA token not terminated");
+    return tokens;
 }
 
 } // namespace resource

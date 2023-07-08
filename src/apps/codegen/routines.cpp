@@ -22,6 +22,7 @@
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
+#include "reone/system/stream/textutil.h"
 #include "reone/system/textwriter.h"
 
 #include "templates.h"
@@ -148,10 +149,8 @@ static Function parseFunction(const boost::smatch &match) {
 static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseNwscriptNss(IInputStream &nss) {
     std::map<std::string, Constant> constants;
     std::vector<Function> functions;
-    char buf[8192];
-    while (!nss.eof()) {
-        nss.readLine(buf, sizeof(buf));
-        auto line = std::string(buf);
+    std::string line;
+    for (bool read = readLine(nss, line); read; read = readLine(nss, line)) {
         boost::smatch constMatch;
         if (boost::regex_search(line, constMatch, kConstRegex)) {
             auto constant = parseConstant(constMatch);

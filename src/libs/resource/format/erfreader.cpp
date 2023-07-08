@@ -39,7 +39,7 @@ void ErfReader::load() {
 }
 
 void ErfReader::checkSignature() {
-    if (_erf.streamLength() < 8) {
+    if (_erf.length() < 8) {
         throw FormatException("Invalid binary resource size");
     }
     auto signature = _erf.readString(8);

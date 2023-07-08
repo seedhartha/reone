@@ -23,6 +23,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/collectionutil.h
     ${SYSTEM_INCLUDE_DIR}/di/module.h
     ${SYSTEM_INCLUDE_DIR}/di/services.h
+    ${SYSTEM_INCLUDE_DIR}/exception/endofstream.h
     ${SYSTEM_INCLUDE_DIR}/exception/notimplemented.h
     ${SYSTEM_INCLUDE_DIR}/fileutil.h
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
@@ -34,6 +35,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/stream/fileoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/input.h
     ${SYSTEM_INCLUDE_DIR}/stream/output.h
+    ${SYSTEM_INCLUDE_DIR}/stream/textutil.h
     ${SYSTEM_INCLUDE_DIR}/stringbuilder.h
     ${SYSTEM_INCLUDE_DIR}/textwriter.h
     ${SYSTEM_INCLUDE_DIR}/timer.h
@@ -49,6 +51,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
     ${SYSTEM_SOURCE_DIR}/stream/memoryinput.cpp
+    ${SYSTEM_SOURCE_DIR}/stream/textutil.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})

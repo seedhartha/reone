@@ -43,17 +43,13 @@ public:
     }
 
     int readByte() override {
-        int c = _stream.get();
-        return !_stream.eof() ? c : -1;
+        int ch = _stream.get();
+        return ch != std::char_traits<char>::eof() ? ch : -1;
     }
 
-    int read(char *outData, int length) override {
-        _stream.read(outData, length);
+    int read(char *buf, int len) override {
+        _stream.read(buf, len);
         return _stream.gcount();
-    }
-
-    void readLine(char *outData, int maxLen) override {
-        throw NotImplementedException("readLine not implemented");
     }
 
     void close() {
@@ -64,8 +60,12 @@ public:
         return static_cast<size_t>(_stream.tellg());
     }
 
-    bool eof() override {
-        return _stream.eof();
+    size_t length() override {
+        auto pos = position();
+        seek(0, SeekOrigin::End);
+        auto len = position();
+        seek(pos, SeekOrigin::Begin);
+        return len;
     }
 
 private:

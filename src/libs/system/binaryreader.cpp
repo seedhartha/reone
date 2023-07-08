@@ -16,6 +16,7 @@
  */
 
 #include "reone/system/binaryreader.h"
+#include "reone/system/exception/endofstream.h"
 
 namespace reone {
 
@@ -25,62 +26,80 @@ uint8_t BinaryReader::readByte() {
 
 char BinaryReader::readChar() {
     char val;
-    _stream.read(&val, 1);
+    if (_stream.read(&val, 1) != 1) {
+        throw EndOfStreamException();
+    }
     return val;
 }
 
 uint16_t BinaryReader::readUint16() {
     uint16_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 2);
+    if (_stream.read(reinterpret_cast<char *>(&val), 2) != 2) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 uint32_t BinaryReader::readUint32() {
     uint32_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 4);
+    if (_stream.read(reinterpret_cast<char *>(&val), 4) != 4) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 uint64_t BinaryReader::readUint64() {
     uint64_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 8);
+    if (_stream.read(reinterpret_cast<char *>(&val), 8) != 8) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 int16_t BinaryReader::readInt16() {
     int16_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 2);
+    if (_stream.read(reinterpret_cast<char *>(&val), 2) != 2) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 int32_t BinaryReader::readInt32() {
     int32_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 4);
+    if (_stream.read(reinterpret_cast<char *>(&val), 4) != 4) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 int64_t BinaryReader::readInt64() {
     int64_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 8);
+    if (_stream.read(reinterpret_cast<char *>(&val), 8) != 8) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return val;
 }
 
 float BinaryReader::readFloat() {
     uint32_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 4);
+    if (_stream.read(reinterpret_cast<char *>(&val), 4) != 4) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return *reinterpret_cast<float *>(&val);
 }
 
 double BinaryReader::readDouble() {
     uint64_t val;
-    _stream.read(reinterpret_cast<char *>(&val), 8);
+    if (_stream.read(reinterpret_cast<char *>(&val), 8) != 8) {
+        throw EndOfStreamException();
+    }
     boost::endian::conditional_reverse_inplace(val, _endianess, boost::endian::order::native);
     return *reinterpret_cast<double *>(&val);
 }
@@ -88,12 +107,14 @@ double BinaryReader::readDouble() {
 std::string BinaryReader::readString(int len) {
     std::vector<char> buf;
     buf.resize(len + 1, '\0');
-    _stream.read(&buf[0], len);
+    if (_stream.read(&buf[0], len) != len) {
+        throw EndOfStreamException();
+    }
     return std::string(&buf[0]);
 }
 
 std::string BinaryReader::readCString() {
-    return readCString(8192);
+    return readCString(256);
 }
 
 std::string BinaryReader::readCString(int maxlen) {
@@ -105,10 +126,10 @@ std::string BinaryReader::readCString(int maxlen) {
 
     auto termIter = std::find(buf.begin(), buf.end(), '\0');
     if (termIter == buf.end()) {
-        throw std::runtime_error("C string too long");
+        throw std::runtime_error("String not null-terminated");
     }
     auto len = std::distance(buf.begin(), termIter);
-    _stream.seek(pos + len + 1, SeekOrigin::Begin);
+    _stream.seek(pos + len + 1);
 
     return std::string(&buf[0], len);
 }
@@ -116,8 +137,9 @@ std::string BinaryReader::readCString(int maxlen) {
 ByteArray BinaryReader::readBytes(int count) {
     ByteArray buf;
     buf.resize(count);
-    int numRead = _stream.read(reinterpret_cast<char *>(&buf[0]), count);
-    buf.resize(numRead);
+    if (_stream.read(reinterpret_cast<char *>(&buf[0]), count) != count) {
+        throw EndOfStreamException();
+    }
     return buf;
 }
 

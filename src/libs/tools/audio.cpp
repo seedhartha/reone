@@ -19,6 +19,7 @@
 
 #include "reone/resource/exception/format.h"
 #include "reone/system/binaryreader.h"
+#include "reone/system/exception/endofstream.h"
 #include "reone/system/stream/fileinput.h"
 
 using namespace reone::resource;
@@ -33,16 +34,11 @@ void AudioTool::invoke(Operation operation, const boost::filesystem::path &input
 
 void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
     auto wav = FileInputStream(path, OpenMode::Binary);
-
-    // Determine filesize
-    wav.seek(0, SeekOrigin::End);
-    size_t filesize = wav.position();
-    wav.seek(0, SeekOrigin::Begin);
-
+    BinaryReader reader(wav);
+    size_t filesize = reader.length();
     std::string suffix;
 
     // Read magic number
-    BinaryReader reader(wav);
     uint32_t magic = reader.readUint32();
     if (magic == 0xc460f3ff) { // WAV in MP3
         reader.seek(0x1d6);
@@ -50,8 +46,13 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     } else if (magic == 0x46464952) { // MP3 in WAV
         // Read subchunks
         reader.ignore(8); // chunk size + format
-        while (!reader.eof()) {
-            std::string subchunkId(reader.readString(4));
+        while (true) {
+            std::string subchunkId;
+            try {
+                subchunkId = reader.readString(4);
+            } catch (const EndOfStreamException &ignored) {
+                break;
+            }
             uint32_t subchunkSize = reader.readInt32();
             if (subchunkId == "data") {
                 break;

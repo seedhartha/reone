@@ -20,6 +20,7 @@
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/stream.h"
 #include "reone/resource/exception/format.h"
+#include "reone/system/exception/endofstream.h"
 #include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
@@ -29,7 +30,7 @@ namespace reone {
 namespace audio {
 
 void WavReader::load() {
-    _wavLength = _wav.streamLength();
+    _wavLength = _wav.length();
 
     std::string sign(_wav.readString(4));
     if (sign == "\xff\xf3\x60\xc4") {
@@ -57,10 +58,13 @@ void WavReader::load() {
 }
 
 bool WavReader::readChunkHeader(ChunkHeader &chunk) {
-    if (_wav.eof())
+    std::string id;
+    try {
+        id = _wav.readString(4);
+    } catch (const EndOfStreamException &ignored) {
         return false;
+    }
 
-    std::string id(_wav.readString(4));
     uint32_t size = _wav.readUint32();
 
     chunk.id = std::move(id);

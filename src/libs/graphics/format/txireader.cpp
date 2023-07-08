@@ -19,29 +19,22 @@
 
 #include "reone/system/logutil.h"
 #include "reone/system/stream/input.h"
+#include "reone/system/stream/textutil.h"
 
 namespace reone {
 
 namespace graphics {
 
 void TxiReader::load(IInputStream &in) {
-    char buf[64];
-    do {
-        char *pch = buf;
-        int ch;
-        do {
-            ch = in.readByte();
-            *(pch++) = ch;
-        } while (ch != -1 && ch != '\n');
-
-        std::string line(buf, pch - buf - 1);
+    std::string line;
+    for (auto read = readLine(in, line); read; read = readLine(in, line)) {
         boost::trim(line);
 
         std::vector<std::string> tokens;
         boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
 
         processLine(tokens);
-    } while (!in.eof());
+    }
 }
 
 static Texture::ProcedureType parseProcedureType(const std::string &str) {

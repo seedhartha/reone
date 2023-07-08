@@ -22,7 +22,7 @@ namespace reone {
 namespace resource {
 
 void checkSignature(BinaryReader &reader, const std::string &expected) {
-    auto len = reader.streamLength();
+    auto len = reader.length();
     if (len < expected.size()) {
         throw FormatException("Invalid binary resource size");
     }

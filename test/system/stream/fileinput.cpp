@@ -48,7 +48,6 @@ TEST(file_input_stream, should_read_from_file) {
     std::string contents;
     contents.insert(contents.begin(), buf.begin(), buf.begin() + 13);
     int readByteResult2 = stream.readByte();
-    bool eof = stream.eof();
     stream.close();
 
     // then
@@ -60,7 +59,6 @@ TEST(file_input_stream, should_read_from_file) {
     EXPECT_EQ(16ll, buf.size());
     EXPECT_EQ(expectedContents, contents) << notEqualMessage(expectedContents, contents);
     EXPECT_EQ(-1, readByteResult2);
-    EXPECT_EQ(true, eof);
 
     // cleanup
 

@@ -18,24 +18,21 @@
 #include "reone/game/format/visreader.h"
 
 #include "reone/system/stream/input.h"
+#include "reone/system/stream/textutil.h"
 
 namespace reone {
 
 namespace game {
 
 void VisReader::load(IInputStream &in) {
-    char buf[32];
-    do {
-        in.readLine(buf, sizeof(buf));
-
-        std::string line(buf);
+    std::string line;
+    for (bool read = readLine(in, line); read; read = readLine(in, line)) {
         boost::trim(line);
-
-        if (line.empty())
+        if (line.empty()) {
             continue;
-
+        }
         processLine(line);
-    } while (!in.eof());
+    }
 }
 
 void VisReader::processLine(const std::string &line) {

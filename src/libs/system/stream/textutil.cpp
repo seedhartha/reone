@@ -15,44 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "reone/system/binaryreader.h"
-#include "reone/system/stream/input.h"
-
-#include "../2da.h"
+#include "reone/system/stream/textutil.h"
 
 namespace reone {
 
-namespace resource {
+bool readLine(IInputStream &stream, std::string &str) {
+    auto pos = stream.position();
 
-class TwoDaReader : boost::noncopyable {
-public:
-    TwoDaReader(IInputStream &stream) :
-        _reader(BinaryReader(stream)) {
+    std::vector<char> buf;
+    buf.resize(256);
+    int numRead = stream.read(&buf[0], buf.size());
+    if (numRead == 0) {
+        str.clear();
+        return false;
     }
 
-    void load();
+    size_t len;
+    for (len = 0; len < numRead; ++len) {
+        if (buf[len] == '\r' || buf[len] == '\n') {
+            break;
+        }
+    }
+    if (buf[len] == '\r') {
+        buf[len] = '\0';
+        stream.seek(pos + len + 2);
+    } else if (buf[len] == '\n') {
+        buf[len] = '\0';
+        stream.seek(pos + len + 1);
+    } else {
+        stream.seek(pos + len);
+    }
 
-    const std::shared_ptr<TwoDa> &twoDa() const { return _twoDa; }
-
-private:
-    BinaryReader _reader;
-
-    int _rowCount {0};
-    int _dataSize {0};
-
-    std::vector<std::string> _columns;
-    std::vector<TwoDa::Row> _rows;
-
-    std::shared_ptr<TwoDa> _twoDa;
-
-    void loadRows();
-    void loadTable();
-
-    std::vector<std::string> readTokens(int maxCount = std::numeric_limits<int>::max());
-};
-
-} // namespace resource
+    str = std::string(&buf[0], len);
+    return true;
+}
 
 } // namespace reone

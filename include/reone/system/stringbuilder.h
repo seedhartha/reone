@@ -21,6 +21,16 @@ namespace reone {
 
 class StringBuilder {
 public:
+    void clear() {
+        _stream.str("");
+        _stream.clear();
+    }
+
+    StringBuilder &append(char ch) {
+        _stream << ch;
+        return *this;
+    }
+
     StringBuilder &append(const char *str) {
         _stream << str;
         return *this;

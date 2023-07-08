@@ -24,32 +24,42 @@ namespace reone {
 class MemoryInputStream : public IInputStream {
 public:
     MemoryInputStream(std::string &str) :
-        _data(&str[0]),
-        _size(str.size()) {
+        _data(!str.empty() ? &str[0] : nullptr),
+        _length(str.length()) {
     }
 
     MemoryInputStream(ByteArray &bytes) :
         _data(!bytes.empty() ? &bytes[0] : nullptr),
-        _size(bytes.size()) {
+        _length(bytes.size()) {
     }
 
-    void seek(int64_t offset, SeekOrigin origin) override;
-
-    int readByte() override;
-    int read(char *outData, int length) override;
-    void readLine(char *outData, int maxLen) override;
-
-    size_t position() override {
-        return _position;
+    void seek(int64_t off, SeekOrigin origin) override {
+        if (origin == SeekOrigin::Begin) {
+            _position = off;
+        } else if (origin == SeekOrigin::Current) {
+            _position += off;
+        } else if (origin == SeekOrigin::End) {
+            _position = _length - off;
+        } else {
+            throw std::invalid_argument("Invalid origin: " + std::to_string(static_cast<int>(origin)));
+        }
     }
 
-    bool eof() override {
-        return _position >= _size;
+    int readByte() override {
+        if (_position >= _length) {
+            return -1;
+        }
+        return _data[_position++];
     }
+
+    int read(char *buf, int length) override;
+
+    size_t position() override { return _position; }
+    size_t length() override { return _length; }
 
 private:
     char *_data;
-    size_t _size;
+    size_t _length;
 
     size_t _position {0};
 };
