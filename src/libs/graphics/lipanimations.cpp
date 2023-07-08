@@ -34,8 +34,8 @@ std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
         return nullptr;
     }
     auto lip = MemoryInputStream(*lipData);
-    auto reader = LipReader(resRef);
-    reader.load(lip);
+    auto reader = LipReader(lip, resRef);
+    reader.load();
 
     return reader.animation();
 }

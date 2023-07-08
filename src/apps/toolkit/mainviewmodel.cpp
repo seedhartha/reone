@@ -195,8 +195,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Lip) {
-        auto reader = LipReader("");
-        reader.load(data);
+        auto reader = LipReader(data, "");
+        reader.load();
         auto animation = reader.animation();
 
         auto columns = std::vector<std::string>();

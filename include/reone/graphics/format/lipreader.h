@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/format/binreader.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
@@ -25,20 +26,23 @@ namespace graphics {
 
 class LipAnimation;
 
-class LipReader : public resource::BinaryResourceReader {
+class LipReader : boost::noncopyable {
 public:
-    LipReader(std::string name) :
+    LipReader(IInputStream &lip, std::string name) :
+        _lip(BinaryReader(lip)),
         _name(std::move(name)) {
     }
+
+    void load();
 
     std::shared_ptr<LipAnimation> animation() const { return _animation; }
 
 private:
+    BinaryReader _lip;
+
     std::string _name;
 
     std::shared_ptr<LipAnimation> _animation;
-
-    void onLoad() override;
 };
 
 } // namespace graphics

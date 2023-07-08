@@ -67,8 +67,8 @@ void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem
 }
 
 void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
-    auto reader = LipReader("");
-    reader.load(lip);
+    auto reader = LipReader(lip, "");
+    reader.load();
 
     auto animation = reader.animation();
 

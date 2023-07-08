@@ -18,24 +18,27 @@
 #include "reone/graphics/format/lipreader.h"
 
 #include "reone/graphics/lipanimation.h"
+#include "reone/resource/format/signutil.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
 namespace graphics {
 
-void LipReader::onLoad() {
+void LipReader::load() {
     // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
 
-    checkSignature(std::string("LIP V1.0", 8));
+    checkSignature(_lip, std::string("LIP V1.0", 8));
 
-    float length = readFloat();
-    uint32_t entryCount = readUint32();
+    float length = _lip.readFloat();
+    uint32_t entryCount = _lip.readUint32();
 
     std::vector<LipAnimation::Keyframe> keyframes;
     for (uint32_t i = 0; i < entryCount; ++i) {
         LipAnimation::Keyframe keyframe;
-        keyframe.time = readFloat();
-        keyframe.shape = readByte();
+        keyframe.time = _lip.readFloat();
+        keyframe.shape = _lip.readByte();
         keyframes.push_back(std::move(keyframe));
     }
 
