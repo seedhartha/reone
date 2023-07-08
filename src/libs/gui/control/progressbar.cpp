@@ -40,7 +40,7 @@ namespace gui {
 void ProgressBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    std::shared_ptr<Gff> dir(gffs.getStruct("PROGRESS"));
+    std::shared_ptr<Gff> dir(gffs.findStruct("PROGRESS"));
     if (dir) {
         std::string fill(dir->getString("FILL"));
         _progress.fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);

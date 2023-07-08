@@ -155,18 +155,18 @@ static GUI_CONTROLS_TEXT parseGUI_CONTROLS_TEXT(const Gff &gff) {
 
 static GUI_CONTROLS_SCROLLBAR parseGUI_CONTROLS_SCROLLBAR(const Gff &gff) {
     GUI_CONTROLS_SCROLLBAR strct;
-    auto BORDER = gff.getStruct("BORDER");
+    auto BORDER = gff.findStruct("BORDER");
     if (BORDER) {
         strct.BORDER = parseGUI_CONTROLS_SCROLLBAR_BORDER(*BORDER);
     }
     strct.CONTROLTYPE = gff.getInt("CONTROLTYPE");
     strct.CURVALUE = gff.getInt("CURVALUE");
-    auto DIR = gff.getStruct("DIR");
+    auto DIR = gff.findStruct("DIR");
     if (DIR) {
         strct.DIR = parseGUI_CONTROLS_SCROLLBAR_DIR(*DIR);
     }
     strct.DRAWMODE = gff.getUint("DRAWMODE");
-    auto EXTENT = gff.getStruct("EXTENT");
+    auto EXTENT = gff.findStruct("EXTENT");
     if (EXTENT) {
         strct.EXTENT = parseGUI_CONTROLS_SCROLLBAR_EXTENT(*EXTENT);
     }
@@ -174,7 +174,7 @@ static GUI_CONTROLS_SCROLLBAR parseGUI_CONTROLS_SCROLLBAR(const Gff &gff) {
     strct.Obj_Parent = gff.getString("Obj_Parent");
     strct.Obj_ParentID = gff.getInt("Obj_ParentID");
     strct.TAG = gff.getString("TAG");
-    auto THUMB = gff.getStruct("THUMB");
+    auto THUMB = gff.findStruct("THUMB");
     if (THUMB) {
         strct.THUMB = parseGUI_CONTROLS_SCROLLBAR_THUMB(*THUMB);
     }
@@ -184,32 +184,32 @@ static GUI_CONTROLS_SCROLLBAR parseGUI_CONTROLS_SCROLLBAR(const Gff &gff) {
 
 static GUI_CONTROLS_PROTOITEM parseGUI_CONTROLS_PROTOITEM(const Gff &gff) {
     GUI_CONTROLS_PROTOITEM strct;
-    auto BORDER = gff.getStruct("BORDER");
+    auto BORDER = gff.findStruct("BORDER");
     if (BORDER) {
         strct.BORDER = parseGUI_CONTROLS_PROTOITEM_BORDER(*BORDER);
     }
     strct.CONTROLTYPE = gff.getInt("CONTROLTYPE");
-    auto EXTENT = gff.getStruct("EXTENT");
+    auto EXTENT = gff.findStruct("EXTENT");
     if (EXTENT) {
         strct.EXTENT = parseGUI_CONTROLS_PROTOITEM_EXTENT(*EXTENT);
     }
-    auto HILIGHT = gff.getStruct("HILIGHT");
+    auto HILIGHT = gff.findStruct("HILIGHT");
     if (HILIGHT) {
         strct.HILIGHT = parseGUI_CONTROLS_PROTOITEM_HILIGHT(*HILIGHT);
     }
-    auto HILIGHTSELECTED = gff.getStruct("HILIGHTSELECTED");
+    auto HILIGHTSELECTED = gff.findStruct("HILIGHTSELECTED");
     if (HILIGHTSELECTED) {
         strct.HILIGHTSELECTED = parseGUI_CONTROLS_PROTOITEM_HILIGHTSELECTED(*HILIGHTSELECTED);
     }
     strct.ISSELECTED = gff.getUint("ISSELECTED");
     strct.Obj_Parent = gff.getString("Obj_Parent");
     strct.Obj_ParentID = gff.getInt("Obj_ParentID");
-    auto SELECTED = gff.getStruct("SELECTED");
+    auto SELECTED = gff.findStruct("SELECTED");
     if (SELECTED) {
         strct.SELECTED = parseGUI_CONTROLS_PROTOITEM_SELECTED(*SELECTED);
     }
     strct.TAG = gff.getString("TAG");
-    auto TEXT = gff.getStruct("TEXT");
+    auto TEXT = gff.findStruct("TEXT");
     if (TEXT) {
         strct.TEXT = parseGUI_CONTROLS_PROTOITEM_TEXT(*TEXT);
     }
@@ -287,18 +287,18 @@ static GUI_EXTENT parseGUI_EXTENT(const Gff &gff) {
 
 static GUI_CONTROLS parseGUI_CONTROLS(const Gff &gff) {
     GUI_CONTROLS strct;
-    auto BORDER = gff.getStruct("BORDER");
+    auto BORDER = gff.findStruct("BORDER");
     if (BORDER) {
         strct.BORDER = parseGUI_CONTROLS_BORDER(*BORDER);
     }
     strct.COLOR = gff.getVector("COLOR");
     strct.CONTROLTYPE = gff.getInt("CONTROLTYPE");
     strct.CURVALUE = gff.getInt("CURVALUE");
-    auto EXTENT = gff.getStruct("EXTENT");
+    auto EXTENT = gff.findStruct("EXTENT");
     if (EXTENT) {
         strct.EXTENT = parseGUI_CONTROLS_EXTENT(*EXTENT);
     }
-    auto HILIGHT = gff.getStruct("HILIGHT");
+    auto HILIGHT = gff.findStruct("HILIGHT");
     if (HILIGHT) {
         strct.HILIGHT = parseGUI_CONTROLS_HILIGHT(*HILIGHT);
     }
@@ -306,7 +306,7 @@ static GUI_CONTROLS parseGUI_CONTROLS(const Gff &gff) {
     strct.LEFTSCROLLBAR = gff.getUint("LEFTSCROLLBAR");
     strct.LOOPING = gff.getUint("LOOPING");
     strct.MAXVALUE = gff.getInt("MAXVALUE");
-    auto MOVETO = gff.getStruct("MOVETO");
+    auto MOVETO = gff.findStruct("MOVETO");
     if (MOVETO) {
         strct.MOVETO = parseGUI_CONTROLS_MOVETO(*MOVETO);
     }
@@ -314,21 +314,21 @@ static GUI_CONTROLS parseGUI_CONTROLS(const Gff &gff) {
     strct.Obj_Parent = gff.getString("Obj_Parent");
     strct.Obj_ParentID = gff.getInt("Obj_ParentID");
     strct.PADDING = gff.getInt("PADDING");
-    auto PROGRESS = gff.getStruct("PROGRESS");
+    auto PROGRESS = gff.findStruct("PROGRESS");
     if (PROGRESS) {
         strct.PROGRESS = parseGUI_CONTROLS_PROGRESS(*PROGRESS);
     }
-    auto PROTOITEM = gff.getStruct("PROTOITEM");
+    auto PROTOITEM = gff.findStruct("PROTOITEM");
     if (PROTOITEM) {
         strct.PROTOITEM = parseGUI_CONTROLS_PROTOITEM(*PROTOITEM);
     }
-    auto SCROLLBAR = gff.getStruct("SCROLLBAR");
+    auto SCROLLBAR = gff.findStruct("SCROLLBAR");
     if (SCROLLBAR) {
         strct.SCROLLBAR = parseGUI_CONTROLS_SCROLLBAR(*SCROLLBAR);
     }
     strct.STARTFROMLEFT = gff.getUint("STARTFROMLEFT");
     strct.TAG = gff.getString("TAG");
-    auto TEXT = gff.getStruct("TEXT");
+    auto TEXT = gff.findStruct("TEXT");
     if (TEXT) {
         strct.TEXT = parseGUI_CONTROLS_TEXT(*TEXT);
     }
@@ -352,7 +352,7 @@ static GUI_BORDER parseGUI_BORDER(const Gff &gff) {
 GUI parseGUI(const Gff &gff) {
     GUI strct;
     strct.ALPHA = gff.getFloat("ALPHA");
-    auto BORDER = gff.getStruct("BORDER");
+    auto BORDER = gff.findStruct("BORDER");
     if (BORDER) {
         strct.BORDER = parseGUI_BORDER(*BORDER);
     }
@@ -361,7 +361,7 @@ GUI parseGUI(const Gff &gff) {
         strct.CONTROLS.push_back(parseGUI_CONTROLS(*item));
     }
     strct.CONTROLTYPE = gff.getInt("CONTROLTYPE");
-    auto EXTENT = gff.getStruct("EXTENT");
+    auto EXTENT = gff.findStruct("EXTENT");
     if (EXTENT) {
         strct.EXTENT = parseGUI_EXTENT(*EXTENT);
     }

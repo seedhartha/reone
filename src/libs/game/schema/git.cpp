@@ -193,7 +193,7 @@ static GIT_AreaProperties parseGIT_AreaProperties(const Gff &gff) {
 
 GIT parseGIT(const Gff &gff) {
     GIT strct;
-    auto AreaProperties = gff.getStruct("AreaProperties");
+    auto AreaProperties = gff.findStruct("AreaProperties");
     if (AreaProperties) {
         strct.AreaProperties = parseGIT_AreaProperties(*AreaProperties);
     }

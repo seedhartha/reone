@@ -71,14 +71,14 @@ void Control::load(const Gff &gffs) {
     _id = gffs.getInt("ID", -1);
     _padding = gffs.getInt("PADDING", 0);
 
-    loadExtent(*gffs.getStruct("EXTENT"));
-    loadBorder(*gffs.getStruct("BORDER"));
+    loadExtent(*gffs.findStruct("EXTENT"));
+    loadBorder(*gffs.findStruct("BORDER"));
 
-    std::shared_ptr<Gff> text(gffs.getStruct("TEXT"));
+    std::shared_ptr<Gff> text(gffs.findStruct("TEXT"));
     if (text) {
         loadText(*text);
     }
-    std::shared_ptr<Gff> hilight(gffs.getStruct("HILIGHT"));
+    std::shared_ptr<Gff> hilight(gffs.findStruct("HILIGHT"));
     if (hilight) {
         loadHilight(*hilight);
     }

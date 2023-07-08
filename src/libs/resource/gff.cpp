@@ -132,7 +132,7 @@ glm::quat Gff::getOrientation(const std::string &name, glm::quat defValue) const
     return field->quatValue;
 }
 
-std::shared_ptr<Gff> Gff::getStruct(const std::string &name) const {
+std::shared_ptr<Gff> Gff::findStruct(const std::string &name) const {
     const Field *field = get(name);
     if (!field)
         return nullptr;

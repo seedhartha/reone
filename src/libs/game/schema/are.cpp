@@ -84,7 +84,7 @@ static ARE_MiniGame_Player_Models parseARE_MiniGame_Player_Models(const Gff &gff
 static ARE_MiniGame_Player_Gun_Banks parseARE_MiniGame_Player_Gun_Banks(const Gff &gff) {
     ARE_MiniGame_Player_Gun_Banks strct;
     strct.BankID = gff.getUint("BankID");
-    auto Bullet = gff.getStruct("Bullet");
+    auto Bullet = gff.findStruct("Bullet");
     if (Bullet) {
         strct.Bullet = parseARE_MiniGame_Player_Gun_Banks_Bullet(*Bullet);
     }
@@ -138,7 +138,7 @@ static ARE_MiniGame_Enemies_Models parseARE_MiniGame_Enemies_Models(const Gff &g
 static ARE_MiniGame_Enemies_Gun_Banks parseARE_MiniGame_Enemies_Gun_Banks(const Gff &gff) {
     ARE_MiniGame_Enemies_Gun_Banks strct;
     strct.BankID = gff.getUint("BankID");
-    auto Bullet = gff.getStruct("Bullet");
+    auto Bullet = gff.findStruct("Bullet");
     if (Bullet) {
         strct.Bullet = parseARE_MiniGame_Enemies_Gun_Banks_Bullet(*Bullet);
     }
@@ -169,11 +169,11 @@ static ARE_MiniGame_Player parseARE_MiniGame_Player(const Gff &gff) {
         strct.Models.push_back(parseARE_MiniGame_Player_Models(*item));
     }
     strct.Num_Loops = gff.getInt("Num_Loops");
-    auto Scripts = gff.getStruct("Scripts");
+    auto Scripts = gff.findStruct("Scripts");
     if (Scripts) {
         strct.Scripts = parseARE_MiniGame_Player_Scripts(*Scripts);
     }
-    auto Sounds = gff.getStruct("Sounds");
+    auto Sounds = gff.findStruct("Sounds");
     if (Sounds) {
         strct.Sounds = parseARE_MiniGame_Player_Sounds(*Sounds);
     }
@@ -198,7 +198,7 @@ static ARE_MiniGame_Player parseARE_MiniGame_Player(const Gff &gff) {
 static ARE_MiniGame_Obstacles parseARE_MiniGame_Obstacles(const Gff &gff) {
     ARE_MiniGame_Obstacles strct;
     strct.Name = gff.getString("Name");
-    auto Scripts = gff.getStruct("Scripts");
+    auto Scripts = gff.findStruct("Scripts");
     if (Scripts) {
         strct.Scripts = parseARE_MiniGame_Obstacles_Scripts(*Scripts);
     }
@@ -227,11 +227,11 @@ static ARE_MiniGame_Enemies parseARE_MiniGame_Enemies(const Gff &gff) {
         strct.Models.push_back(parseARE_MiniGame_Enemies_Models(*item));
     }
     strct.Num_Loops = gff.getInt("Num_Loops");
-    auto Scripts = gff.getStruct("Scripts");
+    auto Scripts = gff.findStruct("Scripts");
     if (Scripts) {
         strct.Scripts = parseARE_MiniGame_Enemies_Scripts(*Scripts);
     }
-    auto Sounds = gff.getStruct("Sounds");
+    auto Sounds = gff.findStruct("Sounds");
     if (Sounds) {
         strct.Sounds = parseARE_MiniGame_Enemies_Sounds(*Sounds);
     }
@@ -262,7 +262,7 @@ static ARE_MiniGame parseARE_MiniGame(const Gff &gff) {
     }
     strct.Far_Clip = gff.getFloat("Far_Clip");
     strct.LateralAccel = gff.getFloat("LateralAccel");
-    auto Mouse = gff.getStruct("Mouse");
+    auto Mouse = gff.findStruct("Mouse");
     if (Mouse) {
         strct.Mouse = parseARE_MiniGame_Mouse(*Mouse);
     }
@@ -272,7 +272,7 @@ static ARE_MiniGame parseARE_MiniGame(const Gff &gff) {
     for (auto &item : gff.getList("Obstacles")) {
         strct.Obstacles.push_back(parseARE_MiniGame_Obstacles(*item));
     }
-    auto Player = gff.getStruct("Player");
+    auto Player = gff.findStruct("Player");
     if (Player) {
         strct.Player = parseARE_MiniGame_Player(*Player);
     }
@@ -337,11 +337,11 @@ ARE parseARE(const Gff &gff) {
     strct.IsNight = gff.getUint("IsNight");
     strct.LightingScheme = gff.getUint("LightingScheme");
     strct.LoadScreenID = gff.getUint("LoadScreenID");
-    auto Map = gff.getStruct("Map");
+    auto Map = gff.findStruct("Map");
     if (Map) {
         strct.Map = parseARE_Map(*Map);
     }
-    auto MiniGame = gff.getStruct("MiniGame");
+    auto MiniGame = gff.findStruct("MiniGame");
     if (MiniGame) {
         strct.MiniGame = parseARE_MiniGame(*MiniGame);
     }

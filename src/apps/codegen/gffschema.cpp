@@ -244,7 +244,7 @@ static void writeParseFunction(const SchemaStruct &schemaStruct, TextWriter &wri
             writer.put(str(boost::format("%1%strct.%2% = gff.getData(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Struct:
-            writer.put(str(boost::format("%1%auto %2% = gff.getStruct(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.put(str(boost::format("%1%auto %2% = gff.findStruct(\"%3%\");\n") % kIndent % field.cppName % field.name));
             writer.put(str(boost::format("%1%if (%2%) {\n") % kIndent % field.cppName));
             writer.put(str(boost::format("%1%%1%strct.%2% = parse%3%(*%2%);\n") % kIndent % field.cppName % field.subStruct->name));
             writer.put(str(boost::format("%1%}\n") % kIndent));

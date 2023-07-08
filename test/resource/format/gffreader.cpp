@@ -200,11 +200,11 @@ TEST(gff_reader, should_read_gff) {
     EXPECT_EQ(static_cast<int>(Gff::FieldType::StrRef), static_cast<int>(gff->fields()[13].type));
     EXPECT_EQ(static_cast<int>(Gff::FieldType::Struct), static_cast<int>(gff->fields()[14].type));
     EXPECT_EQ(static_cast<int>(Gff::FieldType::List), static_cast<int>(gff->fields()[15].type));
-    EXPECT_EQ(1ll, gff->getStruct("Struct")->fields().size());
+    EXPECT_EQ(1ll, gff->findStruct("Struct")->fields().size());
     EXPECT_EQ(2ll, gff->getList("List").size());
     EXPECT_EQ(1ll, gff->getList("List")[0]->fields().size());
     EXPECT_EQ(1ll, gff->getList("List")[1]->fields().size());
-    EXPECT_EQ(static_cast<int>(Gff::FieldType::Char), static_cast<int>(gff->getStruct("Struct")->fields()[0].type));
+    EXPECT_EQ(static_cast<int>(Gff::FieldType::Char), static_cast<int>(gff->findStruct("Struct")->fields()[0].type));
     EXPECT_EQ(static_cast<int>(Gff::FieldType::Word), static_cast<int>(gff->getList("List")[0]->fields()[0].type));
     EXPECT_EQ(static_cast<int>(Gff::FieldType::Short), static_cast<int>(gff->getList("List")[1]->fields()[0].type));
     EXPECT_EQ(0, gff->getUint("Byte"));
@@ -225,7 +225,7 @@ TEST(gff_reader, should_read_gff) {
     auto actualVector = gff->getVector("Vector");
     EXPECT_EQ(expectedVector, actualVector) << notEqualMessage(expectedVector, actualVector);
     EXPECT_EQ(1, gff->getInt("StrRef"));
-    EXPECT_EQ(1, gff->getStruct("Struct")->getInt("Struct1Char"));
+    EXPECT_EQ(1, gff->findStruct("Struct")->getInt("Struct1Char"));
     EXPECT_EQ(2, gff->getList("List")[0]->getUint("Struct2Word"));
     EXPECT_EQ(3, gff->getList("List")[1]->getInt("Struct3Short"));
 }

@@ -130,7 +130,7 @@ public:
     std::string getString(const std::string &name, std::string defValue = "") const;
     glm::vec3 getVector(const std::string &name, glm::vec3 defValue = glm::vec3(0.0f)) const;
     glm::quat getOrientation(const std::string &name, glm::quat defValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) const;
-    std::shared_ptr<Gff> getStruct(const std::string &name) const;
+    std::shared_ptr<Gff> findStruct(const std::string &name) const;
     std::vector<std::shared_ptr<Gff>> getList(const std::string &name) const;
     ByteArray getData(const std::string &name) const;
 

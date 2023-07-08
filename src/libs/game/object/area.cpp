@@ -171,7 +171,7 @@ void Area::loadScripts(const Gff &are) {
 }
 
 void Area::loadMap(const Gff &are) {
-    auto mapStruct = are.getStruct("Map");
+    auto mapStruct = are.findStruct("Map");
     if (!mapStruct) {
         warn("Map properties not found in ARE");
         return;
@@ -228,7 +228,7 @@ void Area::loadGIT(const Gff &git) {
 }
 
 void Area::loadProperties(const Gff &git) {
-    std::shared_ptr<Gff> props(git.getStruct("AreaProperties"));
+    std::shared_ptr<Gff> props(git.findStruct("AreaProperties"));
     if (!props) {
         warn("Area properties not found in GIT");
         return;

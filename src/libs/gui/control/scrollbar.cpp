@@ -41,13 +41,13 @@ namespace gui {
 void ScrollBar::load(const Gff &gffs) {
     Control::load(gffs);
 
-    std::shared_ptr<Gff> dir(gffs.getStruct("DIR"));
+    std::shared_ptr<Gff> dir(gffs.findStruct("DIR"));
     if (dir) {
         std::string image(dir->getString("IMAGE"));
         _dir.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
     }
 
-    std::shared_ptr<Gff> thumb(gffs.getStruct("THUMB"));
+    std::shared_ptr<Gff> thumb(gffs.findStruct("THUMB"));
     if (thumb) {
         std::string image(thumb->getString("IMAGE"));
         _thumb.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);

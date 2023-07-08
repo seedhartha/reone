@@ -79,12 +79,12 @@ void ListBox::clearSelection() {
 void ListBox::load(const Gff &gffs) {
     Control::load(gffs);
 
-    std::shared_ptr<Gff> protoItem(gffs.getStruct("PROTOITEM"));
+    std::shared_ptr<Gff> protoItem(gffs.findStruct("PROTOITEM"));
     if (protoItem) {
         _protoItem = _gui.newControl(getType(*protoItem), getTag(*protoItem));
         _protoItem->load(*protoItem);
     }
-    std::shared_ptr<Gff> scrollBar(gffs.getStruct("SCROLLBAR"));
+    std::shared_ptr<Gff> scrollBar(gffs.findStruct("SCROLLBAR"));
     if (scrollBar) {
         _scrollBar = _gui.newControl(getType(*scrollBar), getTag(*scrollBar));
         _scrollBar->load(*scrollBar);
