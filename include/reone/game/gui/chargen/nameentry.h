@@ -60,15 +60,16 @@ private:
 
     CharacterGeneration &_charGen;
     gui::TextInput _input;
-    LtrReader _maleLtr;
-    LtrReader _femaleLtr;
-    LtrReader _lastNameLtr;
+
+    std::unique_ptr<LtrReader> _maleLtr;
+    std::unique_ptr<LtrReader> _femaleLtr;
+    std::unique_ptr<LtrReader> _lastNameLtr;
 
     void onGUILoaded() override;
 
     void bindControls();
 
-    void loadLtrFile(const std::string &resRef, LtrReader &ltr);
+    void loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr);
 
     std::string getRandomName() const;
 };

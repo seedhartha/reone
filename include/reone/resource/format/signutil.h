@@ -17,43 +17,24 @@
 
 #pragma once
 
+#include "reone/resource/exception/format.h"
 #include "reone/system/binaryreader.h"
-#include "reone/system/stream/input.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-/**
- * LTR contains rules for random name generation.
- */
-class LtrReader : boost::noncopyable {
-public:
-    LtrReader(IInputStream &ltr) :
-        _ltr(BinaryReader(ltr)) {
+void checkSignature(BinaryReader &reader, const std::string &expected) {
+    auto len = reader.streamLength();
+    if (len < expected.size()) {
+        throw FormatException("Invalid binary resource size");
     }
+    auto actual = reader.readString(expected.size());
+    if (expected != actual) {
+        throw FormatException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
+    }
+}
 
-    void load();
-
-    std::string getRandomName(int maxLength) const;
-
-private:
-    struct LetterSet {
-        std::vector<float> start;
-        std::vector<float> mid;
-        std::vector<float> end;
-    };
-
-    BinaryReader _ltr;
-
-    int _letterCount {0};
-    LetterSet _singleLetters;
-    std::vector<LetterSet> _doubleLetters;
-    std::vector<std::vector<LetterSet>> _trippleLetters;
-
-    void readLetterSet(LetterSet &set);
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

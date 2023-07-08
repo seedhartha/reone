@@ -62,10 +62,11 @@ void NameEntry::bindControls() {
     _binding.nameBoxEdit = findControl<Control>("NAME_BOX_EDIT");
 }
 
-void NameEntry::loadLtrFile(const std::string &resRef, LtrReader &ltr) {
+void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr) {
     auto data = _services.resource.resources.get(resRef, ResourceType::Ltr);
     auto stream = MemoryInputStream(*data);
-    ltr.load(stream);
+    ltr = std::make_unique<LtrReader>(stream);
+    ltr->load();
 }
 
 bool NameEntry::handle(const SDL_Event &event) {
@@ -82,8 +83,8 @@ void NameEntry::loadRandomName() {
 
 std::string NameEntry::getRandomName() const {
     Gender gender = _charGen.character().gender;
-    const LtrReader &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
-    return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
+    auto &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
+    return nameLtr->getRandomName(8) + " " + _lastNameLtr->getRandomName(8);
 }
 
 } // namespace game

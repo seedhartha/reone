@@ -18,6 +18,7 @@
 #include "reone/game/format/ltrreader.h"
 
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/signutil.h"
 #include "reone/system/randomutil.h"
 
 using namespace reone::resource;
@@ -30,10 +31,10 @@ static const std::vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
     'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '\'', '-'};
 
-void LtrReader::onLoad() {
-    checkSignature(std::string("LTR V1.0", 8));
+void LtrReader::load() {
+    checkSignature(_ltr, std::string("LTR V1.0", 8));
 
-    _letterCount = readByte();
+    _letterCount = _ltr.readByte();
     if (_letterCount != 28) {
         throw FormatException("Invalid letter count: " + std::to_string(_letterCount));
     }
@@ -56,17 +57,17 @@ void LtrReader::onLoad() {
 void LtrReader::readLetterSet(LetterSet &set) {
     set.start.resize(_letterCount);
     for (int i = 0; i < _letterCount; ++i) {
-        set.start[i] = readFloat();
+        set.start[i] = _ltr.readFloat();
     }
 
     set.mid.resize(_letterCount);
     for (int i = 0; i < _letterCount; ++i) {
-        set.mid[i] = readFloat();
+        set.mid[i] = _ltr.readFloat();
     }
 
     set.end.resize(_letterCount);
     for (int i = 0; i < _letterCount; ++i) {
-        set.end[i] = readFloat();
+        set.end[i] = _ltr.readFloat();
     }
 }
 

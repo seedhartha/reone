@@ -35,6 +35,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/signutil.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
     ${RESOURCE_INCLUDE_DIR}/gff.h
