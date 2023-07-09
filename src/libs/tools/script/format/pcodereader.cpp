@@ -34,8 +34,8 @@ void PcodeReader::load() {
 
     std::ifstream pcode(_path);
     std::string line;
-    boost::smatch what;
-    boost::regex labelRegex("^([_\\d\\w]+):$");
+    std::smatch what;
+    std::regex labelRegex("^([_\\d\\w]+):$");
     uint32_t addr = 13;
     while (getline(pcode, line)) {
         auto addrSepIdx = line.find_first_of("\t");
@@ -47,7 +47,7 @@ void PcodeReader::load() {
             continue;
         }
         int lineIdx = static_cast<int>(insLines.size());
-        if (boost::regex_match(line, what, labelRegex)) {
+        if (std::regex_match(line, what, labelRegex)) {
             labelByLineIdx[lineIdx] = what[1].str();
             continue;
         }
@@ -224,9 +224,9 @@ Instruction PcodeReader::parseInstruction(const std::string &line, uint32_t addr
 }
 
 void PcodeReader::applyArguments(const std::string &line, const std::string &restr, int numArgs, const std::function<void(const std::vector<std::string> &)> &fn) const {
-    boost::smatch what;
-    boost::regex re(restr);
-    if (!boost::regex_match(line, what, re)) {
+    std::smatch what;
+    std::regex re(restr);
+    if (!std::regex_match(line, what, re)) {
         throw FormatException(str(boost::format("Arguments line '%s' must match regular expression '%s'") % line % restr));
     }
     std::vector<std::string> args;

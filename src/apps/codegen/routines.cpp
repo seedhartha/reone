@@ -31,12 +31,12 @@ using namespace reone::resource;
 
 namespace reone {
 
-static const boost::regex kConstRegex = boost::regex("^(\\w+)\\s+(\\w+)\\s*=(.*);.*");
-static const boost::regex kConstVecRegex = boost::regex("^\\[\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?)\\s*\\]$");
+static const std::regex kConstRegex = std::regex("^(\\w+)\\s+(\\w+)\\s*=(.*);.*");
+static const std::regex kConstVecRegex = std::regex("^\\[\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?)\\s*\\]$");
 
-static const boost::regex kFuncDeclRegex = boost::regex("^(\\w+)\\s+(\\w+)\\s*\\((.*)\\);$");
-static const boost::regex kFuncArgRegEx = boost::regex("^(\\w+)\\s+(\\w+)(.*)$");
-static const boost::regex kFuncArgDefValRegEx = boost::regex("^(\\w+)\\s+(\\w+)\\s*=(.*)$");
+static const std::regex kFuncDeclRegex = std::regex("^(\\w+)\\s+(\\w+)\\s*\\((.*)\\);$");
+static const std::regex kFuncArgRegEx = std::regex("^(\\w+)\\s+(\\w+)(.*)$");
+static const std::regex kFuncArgDefValRegEx = std::regex("^(\\w+)\\s+(\\w+)\\s*=(.*)$");
 
 struct Constant {
     std::string type;
@@ -74,7 +74,7 @@ struct Function {
     }
 };
 
-static Constant parseConstant(const boost::smatch &match) {
+static Constant parseConstant(const std::smatch &match) {
     auto type = boost::to_lower_copy(match[1].str());
     auto name = match[2].str();
     auto value = boost::trim_copy(match[3].str());
@@ -82,15 +82,15 @@ static Constant parseConstant(const boost::smatch &match) {
 }
 
 static FunctionArgument parseFunctionArgument(const std::string &str) {
-    boost::smatch match;
-    if (!boost::regex_search(str, match, kFuncArgRegEx)) {
+    std::smatch match;
+    if (!std::regex_search(str, match, kFuncArgRegEx)) {
         throw std::invalid_argument("Invalid function argument format: " + str);
     }
     auto type = boost::to_lower_copy(match[1].str());
     auto name = match[2].str();
-    boost::smatch defValMatch;
+    std::smatch defValMatch;
     std::string defVal;
-    if (boost::regex_search(str, defValMatch, kFuncArgDefValRegEx)) {
+    if (std::regex_search(str, defValMatch, kFuncArgDefValRegEx)) {
         defVal = boost::trim_copy(defValMatch[3].str());
     }
     return FunctionArgument(type, name, defVal);
@@ -135,7 +135,7 @@ static std::vector<FunctionArgument> parseFunctionArguments(const std::string &s
     return args;
 }
 
-static Function parseFunction(const boost::smatch &match) {
+static Function parseFunction(const std::smatch &match) {
     auto retType = boost::to_lower_copy(match[1].str());
     auto name = match[2].str();
     auto argsStr = match[3].str();
@@ -154,13 +154,13 @@ static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseN
         if (!line) {
             break;
         }
-        boost::smatch constMatch;
-        if (boost::regex_search(*line, constMatch, kConstRegex)) {
+        std::smatch constMatch;
+        if (std::regex_search(*line, constMatch, kConstRegex)) {
             auto constant = parseConstant(constMatch);
             constants[constant.name] = std::move(constant);
         }
-        boost::smatch funcMatch;
-        if (boost::regex_search(*line, funcMatch, kFuncDeclRegex)) {
+        std::smatch funcMatch;
+        if (std::regex_search(*line, funcMatch, kFuncDeclRegex)) {
             functions.push_back(parseFunction(funcMatch));
         }
     }
@@ -171,8 +171,8 @@ static std::string evaluateConstant(const std::string &constStr, const std::map<
     if (constants.count(constStr) > 0) {
         return constants.at(constStr).value;
     } else {
-        boost::smatch vecMatch;
-        if (boost::regex_search(constStr, vecMatch, kConstVecRegex)) {
+        std::smatch vecMatch;
+        if (std::regex_search(constStr, vecMatch, kConstVecRegex)) {
             auto x = vecMatch[1].str();
             auto y = vecMatch[2].str();
             auto z = vecMatch[3].str();

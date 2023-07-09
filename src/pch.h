@@ -39,6 +39,7 @@
 #include <ostream>
 #include <queue>
 #include <random>
+#include <regex>
 #include <set>
 #include <sstream>
 #include <stack>
@@ -56,7 +57,6 @@
 #include <boost/functional/hash.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/program_options.hpp>
-#include <boost/regex.hpp>
 
 #include "GL/glew.h"
 #include "SDL2/SDL_events.h"
