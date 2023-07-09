@@ -27,7 +27,7 @@ class Resources;
 
 namespace audio {
 
-class AudioStream;
+class AudioBuffer;
 
 class IAudioFiles {
 public:
@@ -35,7 +35,7 @@ public:
 
     virtual void invalidate() = 0;
 
-    virtual std::shared_ptr<AudioStream> get(const std::string &key) = 0;
+    virtual std::shared_ptr<AudioBuffer> get(const std::string &key) = 0;
 };
 
 class AudioFiles : public IAudioFiles {
@@ -48,7 +48,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<AudioStream> get(const std::string &key) override {
+    std::shared_ptr<AudioBuffer> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -60,9 +60,9 @@ public:
 private:
     resource::Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<AudioStream>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<AudioBuffer>> _objects;
 
-    std::shared_ptr<AudioStream> doGet(std::string resRef);
+    std::shared_ptr<AudioBuffer> doGet(std::string resRef);
 };
 
 } // namespace audio

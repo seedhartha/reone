@@ -29,7 +29,7 @@ class TwoDas;
 namespace audio {
 
 class AudioFiles;
-class AudioStream;
+class AudioBuffer;
 
 } // namespace audio
 
@@ -39,8 +39,8 @@ class IGUISounds {
 public:
     virtual ~IGUISounds() = default;
 
-    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
-    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
+    virtual std::shared_ptr<audio::AudioBuffer> getOnClick() const = 0;
+    virtual std::shared_ptr<audio::AudioBuffer> getOnEnter() const = 0;
 };
 
 class GUISounds : public IGUISounds, boost::noncopyable {
@@ -55,17 +55,17 @@ public:
     void init();
     void deinit();
 
-    std::shared_ptr<audio::AudioStream> getOnClick() const override { return _onClick; }
-    std::shared_ptr<audio::AudioStream> getOnEnter() const override { return _onEnter; }
+    std::shared_ptr<audio::AudioBuffer> getOnClick() const override { return _onClick; }
+    std::shared_ptr<audio::AudioBuffer> getOnEnter() const override { return _onEnter; }
 
 private:
     audio::AudioFiles &_audioFiles;
     resource::TwoDas &_twoDas;
 
-    std::shared_ptr<audio::AudioStream> _onClick;
-    std::shared_ptr<audio::AudioStream> _onEnter;
+    std::shared_ptr<audio::AudioBuffer> _onClick;
+    std::shared_ptr<audio::AudioBuffer> _onEnter;
 
-    void loadSound(const resource::TwoDa &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
+    void loadSound(const resource::TwoDa &twoDa, const std::string &label, std::shared_ptr<audio::AudioBuffer> &sound);
 };
 
 } // namespace game

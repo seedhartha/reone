@@ -15,24 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/stream.h"
+#pragma once
+
+#include "reone/system/types.h"
+
+#include "types.h"
 
 namespace reone {
 
 namespace audio {
 
-void AudioStream::add(Frame &&frame) {
-    _duration += frame.samples.size() / static_cast<float>(frame.sampleRate);
-    _frames.push_back(std::move(frame));
-}
+class AudioBuffer : boost::noncopyable {
+public:
+    struct Frame {
+        AudioFormat format {AudioFormat::Mono8};
+        int sampleRate {0};
+        ByteArray samples;
+    };
 
-int AudioStream::getFrameCount() const {
-    return static_cast<int>(_frames.size());
-}
+    void add(Frame &&frame);
 
-const AudioStream::Frame &AudioStream::getFrame(int index) const {
-    return _frames[index];
-}
+    int getFrameCount() const;
+    const Frame &getFrame(int index) const;
+
+    float duration() const { return _duration; }
+
+private:
+    float _duration {0};
+    std::vector<Frame> _frames;
+
+    int getALAudioFormat(AudioFormat format) const;
+};
 
 } // namespace audio
 

@@ -32,7 +32,7 @@ enum class WavAudioFormat {
 
 class IMp3ReaderFactory;
 
-class AudioStream;
+class AudioBuffer;
 
 class WavReader : public boost::noncopyable {
 public:
@@ -43,7 +43,7 @@ public:
 
     void load();
 
-    std::shared_ptr<AudioStream> stream() const { return _stream; }
+    std::shared_ptr<AudioBuffer> stream() const { return _stream; }
 
 private:
     struct ChunkHeader {
@@ -68,7 +68,7 @@ private:
     uint16_t _bitsPerSample {0};
     IMA _ima[2];
 
-    std::shared_ptr<AudioStream> _stream;
+    std::shared_ptr<AudioBuffer> _stream;
 
     int16_t getIMASample(int channel, uint8_t nibble);
     void getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, int16_t &sample2);

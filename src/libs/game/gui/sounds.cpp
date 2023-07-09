@@ -37,7 +37,7 @@ void GUISounds::init() {
     loadSound(*sounds, "Entered_Default", _onEnter);
 }
 
-void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioStream> &sound) {
+void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioBuffer> &sound) {
     int row = twoDa.indexByCellValue("label", label);
     if (row != -1) {
         sound = _audioFiles.get(twoDa.getString(row, "soundresref"));

@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/di/module.h"
-#include "reone/audio/stream.h"
 #include "reone/game/script/routines.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/module.h"
@@ -167,7 +167,7 @@ public:
     EventHandler<int> &pageSelected() { return _pageSelected; }
     EventHandler<ImageContent> &imageChanged() { return _imageChanged; }
     EventHandler<std::vector<std::string>> &animations() { return _animations; }
-    EventHandler<std::shared_ptr<audio::AudioStream>> &audioStream() { return _audioStream; }
+    EventHandler<std::shared_ptr<audio::AudioBuffer>> &audioStream() { return _audioStream; }
     EventHandler<Progress> &progress() { return _progress; }
     EventHandler<bool> &engineLoadRequested() { return _engineLoadRequested; }
 
@@ -218,7 +218,7 @@ private:
     EventHandler<int> _pageSelected;
     EventHandler<ImageContent> _imageChanged;
     EventHandler<std::vector<std::string>> _animations;
-    EventHandler<std::shared_ptr<audio::AudioStream>> _audioStream;
+    EventHandler<std::shared_ptr<audio::AudioBuffer>> _audioStream;
     EventHandler<Progress> _progress;
     EventHandler<bool> _engineLoadRequested;
 

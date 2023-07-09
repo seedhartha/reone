@@ -20,9 +20,9 @@
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
-#include "reone/audio/stream.h"
 
 using namespace reone::resource;
 
@@ -30,8 +30,8 @@ namespace reone {
 
 namespace audio {
 
-std::shared_ptr<AudioStream> AudioFiles::doGet(std::string resRef) {
-    std::shared_ptr<AudioStream> result;
+std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
+    std::shared_ptr<AudioBuffer> result;
 
     std::shared_ptr<ByteArray> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
     if (mp3Data) {

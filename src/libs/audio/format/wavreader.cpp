@@ -17,8 +17,8 @@
 
 #include "reone/audio/format/wavreader.h"
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
-#include "reone/audio/stream.h"
 #include "reone/resource/exception/format.h"
 #include "reone/system/exception/endofstream.h"
 #include "reone/system/stream/memoryinput.h"
@@ -120,13 +120,13 @@ void WavReader::loadData(ChunkHeader chunk) {
 void WavReader::loadPCM(uint32_t chunkSize) {
     ByteArray data(_wav.readBytes(chunkSize));
 
-    AudioStream::Frame frame;
+    AudioBuffer::Frame frame;
     frame.format = getAudioFormat();
     frame.sampleRate = _sampleRate;
     frame.samples.resize(chunkSize);
     frame.samples = std::move(data);
 
-    _stream = std::make_shared<AudioStream>();
+    _stream = std::make_shared<AudioBuffer>();
     _stream->add(std::move(frame));
 }
 
@@ -146,7 +146,7 @@ static constexpr int kIMAStepTable[] = {
 void WavReader::loadIMAADPCM(uint32_t chunkSize) {
     ByteArray chunk(_wav.readBytes(chunkSize));
 
-    AudioStream::Frame frame;
+    AudioBuffer::Frame frame;
     frame.format = getAudioFormat();
     frame.sampleRate = _sampleRate;
     frame.samples.reserve(2 * (chunkSize - 4 * _channelCount * chunkSize / _blockAlign));
@@ -182,7 +182,7 @@ void WavReader::loadIMAADPCM(uint32_t chunkSize) {
         }
     }
 
-    _stream = std::make_shared<AudioStream>();
+    _stream = std::make_shared<AudioBuffer>();
     _stream->add(std::move(frame));
 }
 

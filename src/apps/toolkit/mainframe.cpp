@@ -20,9 +20,9 @@
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
-#include "reone/audio/stream.h"
 #include "reone/game/format/ssfreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
@@ -52,6 +52,7 @@
 #include "reone/tools/ssf.h"
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
+
 
 using namespace reone::audio;
 using namespace reone::game;

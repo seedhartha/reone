@@ -26,14 +26,14 @@ namespace reone {
 namespace audio {
 
 class AudioFiles;
-class AudioStream;
+class AudioBuffer;
 
 class IAudioPlayer {
 public:
     virtual ~IAudioPlayer() = default;
 
     virtual std::shared_ptr<AudioSource> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
-    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioStream> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
+    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
 };
 
 class AudioPlayer : public IAudioPlayer, boost::noncopyable {
@@ -44,7 +44,7 @@ public:
     }
 
     std::shared_ptr<AudioSource> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
-    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioStream> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
+    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
 
 private:
     AudioOptions &_options;

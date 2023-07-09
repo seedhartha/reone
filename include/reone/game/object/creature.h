@@ -17,9 +17,8 @@
 
 #pragma once
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/source.h"
-#include "reone/audio/stream.h"
-#include "reone/system/timer.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
@@ -27,6 +26,7 @@
 #include "reone/scene/animeventlistener.h"
 #include "reone/scene/node/model.h"
 #include "reone/script/types.h"
+#include "reone/system/timer.h"
 
 #include "../d20/attributes.h"
 #include "../object.h"

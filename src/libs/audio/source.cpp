@@ -17,7 +17,7 @@
 
 #include "reone/audio/source.h"
 
-#include "reone/audio/stream.h"
+#include "reone/audio/buffer.h"
 
 namespace reone {
 
@@ -40,7 +40,7 @@ static int getALFormat(AudioFormat format) {
     }
 }
 
-static void fillBuffer(const AudioStream::Frame &frame, uint32_t buffer) {
+static void fillBuffer(const AudioBuffer::Frame &frame, uint32_t buffer) {
     alBufferData(
         buffer,
         getALFormat(frame.format),

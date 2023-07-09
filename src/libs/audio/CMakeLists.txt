@@ -17,6 +17,7 @@ set(AUDIO_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/audio)
 set(AUDIO_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/audio)
 
 set(AUDIO_HEADERS
+    ${AUDIO_INCLUDE_DIR}/buffer.h
     ${AUDIO_INCLUDE_DIR}/context.h
     ${AUDIO_INCLUDE_DIR}/di/module.h
     ${AUDIO_INCLUDE_DIR}/di/services.h
@@ -26,18 +27,17 @@ set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/options.h
     ${AUDIO_INCLUDE_DIR}/player.h
     ${AUDIO_INCLUDE_DIR}/source.h
-    ${AUDIO_INCLUDE_DIR}/stream.h
     ${AUDIO_INCLUDE_DIR}/types.h)
 
 set(AUDIO_SOURCES
+    ${AUDIO_SOURCE_DIR}/buffer.cpp
     ${AUDIO_SOURCE_DIR}/context.cpp
     ${AUDIO_SOURCE_DIR}/di/module.cpp
     ${AUDIO_SOURCE_DIR}/files.cpp
     ${AUDIO_SOURCE_DIR}/format/mp3reader.cpp
     ${AUDIO_SOURCE_DIR}/format/wavreader.cpp
     ${AUDIO_SOURCE_DIR}/player.cpp
-    ${AUDIO_SOURCE_DIR}/source.cpp
-    ${AUDIO_SOURCE_DIR}/stream.cpp)
+    ${AUDIO_SOURCE_DIR}/source.cpp)
 
 add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(audio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

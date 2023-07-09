@@ -17,11 +17,12 @@
 
 #include <gtest/gtest.h>
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
-#include "reone/audio/stream.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
+
 
 #include "../../fixtures/audio.h"
 

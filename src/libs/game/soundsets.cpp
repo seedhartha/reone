@@ -45,7 +45,7 @@ std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     std::vector<int> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
         std::string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
-        std::shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));
+        std::shared_ptr<AudioBuffer> sound(_audioFiles.get(soundResRef));
         if (sound) {
             result->insert(std::make_pair(static_cast<SoundSetEntry>(i), sound));
         }

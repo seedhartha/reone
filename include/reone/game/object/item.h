@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include "reone/audio/buffer.h"
 #include "reone/audio/source.h"
-#include "reone/audio/stream.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/texture.h"
 #include "reone/resource/format/gffreader.h"
@@ -37,10 +37,10 @@ class Item : public Object {
 public:
     struct AmmunitionType {
         std::shared_ptr<graphics::Model> model;
-        std::shared_ptr<audio::AudioStream> shotSound1;
-        std::shared_ptr<audio::AudioStream> shotSound2;
-        std::shared_ptr<audio::AudioStream> impactSound1;
-        std::shared_ptr<audio::AudioStream> impactSound2;
+        std::shared_ptr<audio::AudioBuffer> shotSound1;
+        std::shared_ptr<audio::AudioBuffer> shotSound2;
+        std::shared_ptr<audio::AudioBuffer> impactSound1;
+        std::shared_ptr<audio::AudioBuffer> impactSound2;
     };
 
     Item(

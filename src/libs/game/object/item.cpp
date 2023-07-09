@@ -58,7 +58,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     if (!_ammunitionType) {
         return;
     }
-    std::shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
+    std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
     if (sound) {
         _audioSource = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }
@@ -68,7 +68,7 @@ void Item::playImpactSound(int variant, glm::vec3 position) {
     if (!_ammunitionType) {
         return;
     }
-    std::shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+    std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
     if (sound) {
         _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }

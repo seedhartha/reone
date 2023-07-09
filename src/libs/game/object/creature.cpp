@@ -671,7 +671,7 @@ void Creature::onEventSignalled(const std::string &name) {
         return;
     }
     const Surface &surface = _services.game.surfaces.getSurface(_walkmeshMaterial);
-    std::vector<std::shared_ptr<AudioStream>> materialSounds;
+    std::vector<std::shared_ptr<AudioBuffer>> materialSounds;
     if (surface.sound == "DT") {
         materialSounds = sounds->dirt;
     } else if (surface.sound == "GR") {
@@ -693,7 +693,7 @@ void Creature::onEventSignalled(const std::string &name) {
     if (index >= static_cast<int>(materialSounds.size())) {
         return;
     }
-    std::shared_ptr<AudioStream> sound(materialSounds[index]);
+    std::shared_ptr<AudioBuffer> sound(materialSounds[index]);
     if (sound) {
         _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }

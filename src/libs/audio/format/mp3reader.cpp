@@ -19,7 +19,7 @@
 
 #include "reone/system/stream/input.h"
 
-#include "reone/audio/stream.h"
+#include "reone/audio/buffer.h"
 
 namespace reone {
 
@@ -49,7 +49,7 @@ void Mp3Reader::load(IInputStream &stream) {
     stream.read(&data[0], size);
 
     _input = data;
-    _stream = std::make_shared<AudioStream>();
+    _stream = std::make_shared<AudioBuffer>();
 
     mad_decoder decoder;
     mad_decoder_init(
@@ -87,7 +87,7 @@ mad_flow Mp3Reader::outputFunc(void *playbuf, mad_header const *header, mad_pcm 
     mad_fixed_t *chLeft = pcm->samples[0];
     mad_fixed_t *chRight = pcm->samples[1];
 
-    AudioStream::Frame frame;
+    AudioBuffer::Frame frame;
     frame.format = pcm->channels == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
     frame.sampleRate = pcm->samplerate;
     frame.samples.reserve(static_cast<uint64_t>(pcm->channels) * sampleCount * sizeof(int16_t));

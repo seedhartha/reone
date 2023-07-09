@@ -44,13 +44,13 @@ public:
 class MockAudioFiles : public IAudioFiles, boost::noncopyable {
 public:
     MOCK_METHOD(void, invalidate, (), (override));
-    MOCK_METHOD(std::shared_ptr<AudioStream>, get, (const std::string &key), (override));
+    MOCK_METHOD(std::shared_ptr<AudioBuffer>, get, (const std::string &key), (override));
 };
 
 class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
 public:
     MOCK_METHOD(std::shared_ptr<AudioSource>, play, (const std::string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
-    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioStream> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioBuffer> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
 };
 
 class TestAudioModule : boost::noncopyable {

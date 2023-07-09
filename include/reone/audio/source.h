@@ -21,11 +21,11 @@ namespace reone {
 
 namespace audio {
 
-class AudioStream;
+class AudioBuffer;
 
 class AudioSource {
 public:
-    AudioSource(std::shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
+    AudioSource(std::shared_ptr<AudioBuffer> stream, bool loop, float gain, bool positional, glm::vec3 position) :
         _stream(std::move(stream)),
         _loop(loop),
         _gain(gain),
@@ -51,7 +51,7 @@ public:
     void setPosition(glm::vec3 position);
 
 private:
-    std::shared_ptr<AudioStream> _stream;
+    std::shared_ptr<AudioBuffer> _stream;
     bool _loop;
     float _gain;
     bool _positional;
