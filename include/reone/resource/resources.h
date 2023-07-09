@@ -17,60 +17,54 @@
 
 #pragma once
 
-#include "reone/system/stream/fileinput.h"
 #include "reone/system/types.h"
 
-#include "format/pereader.h"
 #include "id.h"
 #include "provider.h"
-#include "types.h"
 
 namespace reone {
 
 namespace resource {
 
+typedef std::list<std::unique_ptr<IResourceProvider>> ResourceProviderList;
+
 class IResources {
 public:
     virtual ~IResources() = default;
 
-    virtual void clearTransientProviders() = 0;
+    virtual void indexKEY(const boost::filesystem::path &path) = 0;
+    virtual void indexERF(const boost::filesystem::path &path) = 0;
+    virtual void indexRIM(const boost::filesystem::path &path) = 0;
+    virtual void indexEXE(const boost::filesystem::path &path) = 0;
+    virtual void indexFolder(const boost::filesystem::path &path) = 0;
 
-    virtual void indexKeyFile(const boost::filesystem::path &path) = 0;
-    virtual void indexErfFile(const boost::filesystem::path &path, bool transient = false) = 0;
-    virtual void indexRimFile(const boost::filesystem::path &path, bool transient = false) = 0;
-    virtual void indexDirectory(const boost::filesystem::path &path) = 0;
-    virtual void indexExeFile(const boost::filesystem::path &path) = 0;
-
-    virtual std::shared_ptr<ByteBuffer> get(const std::string &resRef, ResourceType type, bool logNotFound = true) = 0;
+    virtual std::shared_ptr<ByteBuffer> get(const ResourceId &id) = 0;
+    virtual std::shared_ptr<ByteBuffer> find(const ResourceId &id) = 0;
 };
 
 class Resources : public IResources, boost::noncopyable {
 public:
-    typedef std::vector<std::unique_ptr<IResourceProvider>> ProviderList;
+    void clearProviders() {
+        _providers.clear();
+    }
 
-    void indexKeyFile(const boost::filesystem::path &path) override;
-    void indexErfFile(const boost::filesystem::path &path, bool transient = false) override;
-    void indexRimFile(const boost::filesystem::path &path, bool transient = false) override;
-    void indexDirectory(const boost::filesystem::path &path) override;
-    void indexExeFile(const boost::filesystem::path &path) override;
+    void addProvider(std::unique_ptr<IResourceProvider> provider) {
+        _providers.push_front(std::move(provider));
+    }
 
-    void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
+    void indexKEY(const boost::filesystem::path &path) override;
+    void indexERF(const boost::filesystem::path &path) override;
+    void indexRIM(const boost::filesystem::path &path) override;
+    void indexEXE(const boost::filesystem::path &path) override;
+    void indexFolder(const boost::filesystem::path &path) override;
 
-    void clearAllProviders();
-    void clearTransientProviders() override;
+    std::shared_ptr<ByteBuffer> get(const ResourceId &id) override;
+    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
 
-    std::shared_ptr<ByteBuffer> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override;
-    std::shared_ptr<ByteBuffer> getFromExe(uint32_t name, PEResourceType type);
-
-    const ProviderList &providers() const { return _providers; }
-    const ProviderList &transientProviders() const { return _transientProviders; }
+    const ResourceProviderList &providers() const { return _providers; }
 
 private:
-    boost::filesystem::path _exePath;
-    ProviderList _providers;
-    ProviderList _transientProviders; /**< transient providers are replaced when switching between modules */
-
-    std::shared_ptr<ByteBuffer> getFromProviders(const ResourceId &id, const ProviderList &providers);
+    ResourceProviderList _providers;
 };
 
 } // namespace resource

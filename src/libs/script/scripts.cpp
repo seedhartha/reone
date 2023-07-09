@@ -28,14 +28,13 @@ namespace reone {
 namespace script {
 
 std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
-    std::shared_ptr<ByteBuffer> data(_resources.get(resRef, ResourceType::Ncs));
-    if (!data)
+    auto data = _resources.find(ResourceId(resRef, ResourceType::Ncs));
+    if (!data) {
         return nullptr;
-
-    auto ncs = MemoryInputStream(*data);
-    auto reader = NcsReader(ncs, resRef);
+    }
+    auto stream = MemoryInputStream(*data);
+    auto reader = NcsReader(stream, resRef);
     reader.load();
-
     return reader.program();
 }
 

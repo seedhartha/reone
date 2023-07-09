@@ -33,15 +33,14 @@ public:
 
 class MockResources : public IResources, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clearTransientProviders, (), (override));
+    MOCK_METHOD(void, indexKEY, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexERF, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexRIM, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexEXE, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexFolder, (const boost::filesystem::path &path), (override));
 
-    MOCK_METHOD(void, indexKeyFile, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexErfFile, (const boost::filesystem::path &path, bool transient), (override));
-    MOCK_METHOD(void, indexRimFile, (const boost::filesystem::path &path, bool transient), (override));
-    MOCK_METHOD(void, indexDirectory, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexExeFile, (const boost::filesystem::path &path), (override));
-
-    MOCK_METHOD(std::shared_ptr<ByteBuffer>, get, (const std::string &resRef, ResourceType type, bool logNotFound), (override));
+    MOCK_METHOD(std::shared_ptr<ByteBuffer>, get, (const ResourceId &id), (override));
+    MOCK_METHOD(std::shared_ptr<ByteBuffer>, find, (const ResourceId &id), (override));
 };
 
 class MockStrings : public IStrings, boost::noncopyable {

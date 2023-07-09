@@ -50,24 +50,6 @@ void PeReader::load() {
     }
 }
 
-std::shared_ptr<ByteBuffer> PeReader::find(uint32_t name, PEResourceType type) {
-    return findInternal([&name, &type](const Resource &res) {
-        return res.type == type && res.name == name;
-    });
-}
-
-std::shared_ptr<ByteBuffer> PeReader::findInternal(std::function<bool(const Resource &)> pred) {
-    auto maybeResource = std::find_if(_resources.begin(), _resources.end(), pred);
-    if (maybeResource == _resources.end())
-        return nullptr;
-
-    return getResourceData(*maybeResource);
-}
-
-std::shared_ptr<ByteBuffer> PeReader::getResourceData(const Resource &res) {
-    return std::make_shared<ByteBuffer>(_pe.readBytesAt(res.offset, res.size));
-}
-
 void PeReader::loadHeader() {
     _pe.ignore(2);
 

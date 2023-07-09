@@ -279,7 +279,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         _renderEnabled = false;
 
-        auto mdxBytes = _resourceModule->resources().get(id.resRef, ResourceType::Mdx, false);
+        auto mdxBytes = _resourceModule->resources().find(ResourceId(id.resRef, ResourceType::Mdx));
         if (!mdxBytes) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
@@ -463,10 +463,10 @@ void MainViewModel::loadEngine() {
     auto overridePath = findFileIgnoreCase(_gamePath, "override");
 
     auto &resources = _resourceModule->resources();
-    resources.indexKeyFile(keyPath);
-    resources.indexErfFile(guiTexPackPath);
-    resources.indexErfFile(tpaTexPackPath);
-    resources.indexDirectory(overridePath);
+    resources.indexKEY(keyPath);
+    resources.indexERF(guiTexPackPath);
+    resources.indexERF(tpaTexPackPath);
+    resources.indexFolder(overridePath);
 
     auto &sceneGraphs = _sceneModule->graphs();
     sceneGraphs.reserve(kSceneMain);

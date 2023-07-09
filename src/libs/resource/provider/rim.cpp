@@ -17,9 +17,8 @@
 
 #include "reone/resource/provider/rim.h"
 
-#include "reone/system/stream/fileinput.h"
-
 #include "reone/resource/format/rimreader.h"
+#include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
@@ -27,7 +26,6 @@ namespace resource {
 
 void RimResourceProvider::init() {
     auto rim = FileInputStream(_path);
-
     auto reader = RimReader(rim);
     reader.load();
 
@@ -36,22 +34,28 @@ void RimResourceProvider::init() {
         resource.id = rimResource.resId;
         resource.offset = rimResource.offset;
         resource.fileSize = rimResource.size;
-        _resources[rimResource.resId] = std::move(resource);
+        _resourceIds.insert(resource.id);
+        _idToResource.insert(std::make_pair(resource.id, std::move(resource)));
     }
 }
 
-std::shared_ptr<ByteBuffer> RimResourceProvider::find(const ResourceId &id) {
-    auto maybeResource = _resources.find(id);
-    if (maybeResource == _resources.end()) {
+std::shared_ptr<ByteBuffer> RimResourceProvider::findResourceData(const ResourceId &id) {
+    auto it = _idToResource.find(id);
+    if (it == _idToResource.end()) {
         return nullptr;
     }
-    auto &resource = maybeResource->second;
+    auto &resource = it->second;
+    if (resource.fileSize == 0) {
+        return std::make_shared<ByteBuffer>();
+    }
 
-    auto buffer = std::make_shared<ByteBuffer>(resource.fileSize, '\0');
     auto rim = FileInputStream(_path);
     rim.seek(resource.offset, SeekOrigin::Begin);
-    rim.read(buffer->data(), buffer->size());
-    return std::move(buffer);
+    auto buf = std::make_shared<ByteBuffer>();
+    buf->resize(resource.fileSize);
+    rim.read(&(*buf)[0], buf->size());
+
+    return buf;
 }
 
 } // namespace resource

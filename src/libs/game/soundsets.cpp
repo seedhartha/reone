@@ -32,7 +32,7 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
-    auto data = _resources.get(resRef, ResourceType::Ssf);
+    auto data = _resources.find(ResourceId(resRef, ResourceType::Ssf));
     if (!data) {
         return nullptr;
     }
@@ -51,7 +51,7 @@ std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 } // namespace game

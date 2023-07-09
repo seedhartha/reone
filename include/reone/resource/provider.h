@@ -20,7 +20,6 @@
 #include "reone/system/types.h"
 
 #include "id.h"
-#include "types.h"
 
 namespace reone {
 
@@ -31,9 +30,9 @@ public:
     virtual ~IResourceProvider() {
     }
 
-    virtual std::shared_ptr<ByteBuffer> find(const ResourceId &id) = 0;
+    virtual std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) = 0;
 
-    virtual int id() const = 0;
+    virtual const ResourceIdSet &resourceIds() const = 0;
 };
 
 } // namespace resource

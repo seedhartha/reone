@@ -17,9 +17,8 @@
 
 #include "reone/resource/provider/erf.h"
 
-#include "reone/system/stream/fileinput.h"
-
 #include "reone/resource/format/erfreader.h"
+#include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
@@ -27,7 +26,6 @@ namespace resource {
 
 void ErfResourceProvider::init() {
     auto erf = FileInputStream(_path);
-
     auto reader = ErfReader(erf);
     reader.load();
 
@@ -39,22 +37,28 @@ void ErfResourceProvider::init() {
         resource.id = keys[i].resId;
         resource.offset = erfResources[i].offset;
         resource.fileSize = erfResources[i].size;
-        _resources[keys[i].resId] = std::move(resource);
+        _resourceIds.insert(resource.id);
+        _idToResource.insert(std::make_pair(keys[i].resId, std::move(resource)));
     }
 }
 
-std::shared_ptr<ByteBuffer> ErfResourceProvider::find(const ResourceId &id) {
-    auto maybeResource = _resources.find(id);
-    if (maybeResource == _resources.end()) {
+std::shared_ptr<ByteBuffer> ErfResourceProvider::findResourceData(const ResourceId &id) {
+    auto it = _idToResource.find(id);
+    if (it == _idToResource.end()) {
         return nullptr;
     }
-    auto &resource = maybeResource->second;
+    auto &resource = it->second;
+    if (resource.fileSize == 0) {
+        return std::make_shared<ByteBuffer>();
+    }
 
-    auto buffer = std::make_shared<ByteBuffer>(resource.fileSize, '\0');
     auto erf = FileInputStream(_path);
     erf.seek(resource.offset, SeekOrigin::Begin);
-    erf.read(buffer->data(), buffer->size());
-    return std::move(buffer);
+    auto buf = std::make_shared<ByteBuffer>();
+    buf->resize(resource.fileSize);
+    erf.read(&(*buf)[0], buf->size());
+
+    return buf;
 }
 
 } // namespace resource

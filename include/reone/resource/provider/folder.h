@@ -26,35 +26,32 @@ namespace reone {
 
 namespace resource {
 
-class Folder : public IResourceProvider {
+class Folder : public IResourceProvider, boost::noncopyable {
 public:
+    Folder(boost::filesystem::path path) :
+        _path(std::move(path)) {
+    }
+
+    void init();
+
+    // IResourceProvider
+
+    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override;
+
+    const ResourceIdSet &resourceIds() const override { return _resourceIds; }
+
+    // END IResourceProvider
+
+private:
     struct Resource {
         boost::filesystem::path path;
         ResourceType type;
     };
 
-    Folder(boost::filesystem::path path, int id = kDefaultProviderId) :
-        _path(std::move(path)),
-        _id(id) {
-    }
-
-    void init();
-
-    const std::multimap<std::string, Resource> &resources() const { return _resources; }
-
-    // IResourceProvider
-
-    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
-
-    int id() const override { return _id; }
-
-    // END IResourceProvider
-
-private:
     boost::filesystem::path _path;
-    int _id;
 
-    std::multimap<std::string, Resource> _resources;
+    ResourceIdSet _resourceIds;
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
 
     void loadDirectory(const boost::filesystem::path &path);
 };

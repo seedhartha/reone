@@ -15,56 +15,52 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/folder.h"
+#include "reone/resource/provider/exe.h"
 
-#include "reone/resource/typeutil.h"
+#include "reone/resource/format/pereader.h"
 #include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
 namespace resource {
 
-void Folder::init() {
-    loadDirectory(_path);
-}
+static std::unordered_map<PEResourceType, ResourceType> kPEResTypeToResType {
+    {PEResourceType::Cursor, ResourceType::Cursor}, //
+    {PEResourceType::CursorGroup, ResourceType::CursorGroup}};
 
-void Folder::loadDirectory(const boost::filesystem::path &path) {
-    for (auto &entry : boost::filesystem::directory_iterator(path)) {
-        if (boost::filesystem::is_directory(entry.path())) {
-            loadDirectory(entry.path());
+void ExeResourceProvider::init() {
+    auto exe = FileInputStream(_path);
+    auto reader = PeReader(exe);
+    reader.load();
+
+    for (auto &peRes : reader.resources()) {
+        auto resType = kPEResTypeToResType.find(peRes.type);
+        if (resType == kPEResTypeToResType.end()) {
             continue;
         }
-        auto resRef = boost::to_lower_copy(entry.path().filename().replace_extension("").string());
-        auto ext = boost::to_lower_copy(entry.path().extension().string().substr(1));
-        auto resType = getResTypeByExt(ext);
-        auto resId = ResourceId(resRef, resType);
-
-        Resource res;
-        res.path = entry.path();
-        res.type = resType;
-
+        auto resId = ResourceId(std::to_string(peRes.name), resType->second);
         _resourceIds.insert(resId);
+        Resource res;
+        res.offset = peRes.offset;
+        res.size = peRes.size;
         _idToResource.insert(std::make_pair(resId, std::move(res)));
     }
 }
 
-std::shared_ptr<ByteBuffer> Folder::findResourceData(const ResourceId &id) {
+std::shared_ptr<ByteBuffer> ExeResourceProvider::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return nullptr;
     }
-    auto &resource = it->second;
-
-    auto stream = FileInputStream(resource.path);
-    auto len = stream.length();
-    if (len == 0) {
+    auto &res = it->second;
+    if (res.size == 0) {
         return std::make_shared<ByteBuffer>();
     }
-
+    auto exe = FileInputStream(_path);
+    exe.seek(res.offset, SeekOrigin::Begin);
     auto buf = std::make_shared<ByteBuffer>();
-    buf->resize(len);
-    stream.read(&(*buf)[0], buf->size());
-
+    buf->resize(res.size);
+    exe.read(&(*buf)[0], buf->size());
     return buf;
 }
 

@@ -23,33 +23,32 @@ namespace reone {
 
 namespace resource {
 
-class RimResourceProvider : public IResourceProvider, boost::noncopyable {
+class MemoryResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    RimResourceProvider(boost::filesystem::path path) :
-        _path(std::move(path)) {
+    void clear() {
+        _resourceIds.clear();
+        _idToResource.clear();
     }
 
-    void init();
+    void add(const ResourceId &id, std::shared_ptr<ByteBuffer> data) {
+        _resourceIds.insert(id);
+        _idToResource.insert(std::make_pair(id, std::move(data)));
+    }
 
     // IResourceProvider
 
-    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override;
+    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override {
+        auto it = _idToResource.find(id);
+        return it != _idToResource.end() ? it->second : nullptr;
+    }
 
     const ResourceIdSet &resourceIds() const override { return _resourceIds; }
 
     // END IResourceProvider
 
 private:
-    struct Resource {
-        ResourceId id;
-        uint32_t offset {0};
-        uint32_t fileSize {0};
-    };
-
-    boost::filesystem::path _path;
-
     ResourceIdSet _resourceIds;
-    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
+    std::unordered_map<ResourceId, std::shared_ptr<ByteBuffer>, ResourceIdHasher> _idToResource;
 };
 
 } // namespace resource

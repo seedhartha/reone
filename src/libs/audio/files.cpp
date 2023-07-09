@@ -31,27 +31,27 @@ namespace reone {
 namespace audio {
 
 std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
-    std::shared_ptr<AudioBuffer> result;
+    std::shared_ptr<AudioBuffer> buffer;
 
-    std::shared_ptr<ByteBuffer> mp3Data(_resources.get(resRef, ResourceType::Mp3, false));
+    auto mp3Data = _resources.find(ResourceId(resRef, ResourceType::Mp3));
     if (mp3Data) {
-        auto mp3 = MemoryInputStream(*mp3Data);
+        auto stream = MemoryInputStream(*mp3Data);
         auto reader = Mp3Reader();
-        reader.load(mp3);
-        result = reader.stream();
+        reader.load(stream);
+        buffer = reader.stream();
     }
-    if (!result) {
-        std::shared_ptr<ByteBuffer> wavData(_resources.get(resRef, ResourceType::Wav));
+    if (!buffer) {
+        auto wavData = _resources.find(ResourceId(resRef, ResourceType::Wav));
         if (wavData) {
-            auto wav = MemoryInputStream(*wavData);
+            auto stream = MemoryInputStream(*wavData);
             auto mp3ReaderFactory = Mp3ReaderFactory();
-            auto reader = WavReader(wav, mp3ReaderFactory);
+            auto reader = WavReader(stream, mp3ReaderFactory);
             reader.load();
-            result = reader.stream();
+            buffer = reader.stream();
         }
     }
 
-    return std::move(result);
+    return buffer;
 }
 
 } // namespace audio

@@ -89,24 +89,19 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     // when
 
-    resources.indexKeyFile(keyPath);
-    resources.indexErfFile(erfPath);
-    resources.indexDirectory(overridePath);
-    resources.indexRimFile(rimPath, true);
+    resources.indexKEY(keyPath);
+    resources.indexERF(erfPath);
+    resources.indexFolder(overridePath);
+    resources.indexRIM(rimPath);
 
     auto numProviders = resources.providers().size();
-    auto numTransientProviders = resources.transientProviders().size();
-
-    auto actualResData1 = resources.get("sample", ResourceType::Txt, false);
-
-    resources.clearAllProviders();
-
-    auto actualResData2 = resources.get("sample", ResourceType::Txt, false);
+    auto actualResData1 = resources.find(ResourceId("sample", ResourceType::Txt));
+    resources.clearProviders();
+    auto actualResData2 = resources.find(ResourceId("sample", ResourceType::Txt));
 
     // then
 
-    EXPECT_EQ(3ll, numProviders);
-    EXPECT_EQ(1ll, numTransientProviders);
+    EXPECT_EQ(4ll, numProviders);
     EXPECT_TRUE(static_cast<bool>(actualResData1));
     EXPECT_EQ(expectedResData, (*actualResData1)) << notEqualMessage(expectedResData, *actualResData1);
     EXPECT_TRUE(!static_cast<bool>(actualResData2));

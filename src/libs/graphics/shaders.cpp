@@ -231,7 +231,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
         if (_resRefToSource.count(resRef) > 0) {
             source = _resRefToSource.at(resRef);
         } else {
-            auto bytes = _sourceProvider->find(ResourceId(resRef, ResourceType::Glsl));
+            auto bytes = _sourceProvider->findResourceData(ResourceId(resRef, ResourceType::Glsl));
             if (!bytes) {
                 throw std::runtime_error("Shader source not found: " + resRef);
             }

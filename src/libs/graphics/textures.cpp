@@ -17,11 +17,6 @@
 
 #include "reone/graphics/textures.h"
 
-#include "reone/resource/resources.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-#include "reone/system/stream/memoryinput.h"
-
 #include "reone/graphics/format/curreader.h"
 #include "reone/graphics/format/tgareader.h"
 #include "reone/graphics/format/tpcreader.h"
@@ -30,6 +25,10 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/types.h"
+#include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 
@@ -142,7 +141,7 @@ std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage u
 std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage usage) {
     std::shared_ptr<Texture> texture;
 
-    auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
+    auto tgaData = _resources.find(ResourceId(resRef, ResourceType::Tga));
     if (tgaData) {
         auto tga = MemoryInputStream(*tgaData);
         auto tgaReader = TgaReader(tga, resRef, usage);
@@ -150,7 +149,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         texture = tgaReader.texture();
 
         if (texture) {
-            auto txiData = _resources.get(resRef, ResourceType::Txi, false);
+            auto txiData = _resources.find(ResourceId(resRef, ResourceType::Txi));
             if (txiData) {
                 auto txi = MemoryInputStream(*txiData);
                 auto txiReader = TxiReader();
@@ -161,7 +160,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
     }
 
     if (!texture) {
-        auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
+        auto tpcData = _resources.find(ResourceId(resRef, ResourceType::Tpc));
         if (tpcData) {
             auto tpc = MemoryInputStream(*tpcData);
             auto tpcReader = TpcReader(tpc, resRef, usage);
@@ -181,7 +180,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         warn("Texture not found: " + resRef, LogChannel::Graphics);
     }
 
-    return std::move(texture);
+    return texture;
 }
 
 } // namespace graphics

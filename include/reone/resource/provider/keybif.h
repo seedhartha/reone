@@ -25,37 +25,34 @@ namespace resource {
 
 class BifReader;
 
-class KeyBifResourceProvider : public IResourceProvider {
+class KeyBifResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
+    KeyBifResourceProvider(boost::filesystem::path keyPath) :
+        _keyPath(std::move(keyPath)) {
+    }
+
+    void init();
+
+    // IResourceProvider
+
+    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override;
+
+    const ResourceIdSet &resourceIds() const override { return _resourceIds; }
+
+    // END IResourceProvider
+
+private:
     struct Resource {
         int bifIdx {0};
         uint32_t bifOffset {0};
         uint32_t fileSize {0};
     };
 
-    KeyBifResourceProvider(boost::filesystem::path keyPath, int id = kDefaultProviderId) :
-        _keyPath(std::move(keyPath)),
-        _id(id) {
-    }
-
-    void init();
-
-    const std::unordered_map<ResourceId, Resource, ResourceIdHasher> &resources() const { return _resources; }
-
-    // IResourceProvider
-
-    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
-
-    int id() const override { return _id; }
-
-    // END IResourceProvider
-
-private:
     boost::filesystem::path _keyPath;
-    int _id;
 
     std::vector<boost::filesystem::path> _bifPaths;
-    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _resources;
+    ResourceIdSet _resourceIds;
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
 };
 
 } // namespace resource

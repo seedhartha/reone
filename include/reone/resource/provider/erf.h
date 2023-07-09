@@ -23,36 +23,33 @@ namespace reone {
 
 namespace resource {
 
-class ErfResourceProvider : public IResourceProvider {
+class ErfResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
+    ErfResourceProvider(boost::filesystem::path path) :
+        _path(std::move(path)) {
+    }
+
+    void init();
+
+    // IResourceProvider
+
+    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override;
+
+    const ResourceIdSet &resourceIds() const override { return _resourceIds; }
+
+    // END IResourceProvider
+
+private:
     struct Resource {
         ResourceId id;
         uint32_t offset {0};
         uint32_t fileSize {0};
     };
 
-    ErfResourceProvider(boost::filesystem::path path, int id = kDefaultProviderId) :
-        _path(std::move(path)),
-        _id(id) {
-    }
-
-    void init();
-
-    const std::unordered_map<ResourceId, Resource, ResourceIdHasher> &resources() const { return _resources; }
-
-    // IResourceProvider
-
-    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
-
-    int id() const override { return _id; }
-
-    // END IResourceProvider
-
-private:
     boost::filesystem::path _path;
-    int _id;
 
-    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _resources;
+    ResourceIdSet _resourceIds;
+    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
 };
 
 } // namespace resource

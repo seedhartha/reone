@@ -17,11 +17,10 @@
 
 #include "reone/resource/provider/keybif.h"
 
-#include "reone/system/fileutil.h"
-#include "reone/system/stream/fileinput.h"
-
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/system/fileutil.h"
+#include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
@@ -60,26 +59,30 @@ void KeyBifResourceProvider::init() {
             resource.bifOffset = bifResource.offset;
             resource.fileSize = bifResource.fileSize;
 
-            _resources[key->resId] = std::move(resource);
+            _resourceIds.insert(key->resId);
+            _idToResource.insert(std::make_pair(key->resId, std::move(resource)));
         }
     }
 }
 
-std::shared_ptr<ByteBuffer> KeyBifResourceProvider::find(const ResourceId &id) {
-    auto maybeResource = _resources.find(id);
-    if (maybeResource == _resources.end()) {
+std::shared_ptr<ByteBuffer> KeyBifResourceProvider::findResourceData(const ResourceId &id) {
+    auto it = _idToResource.find(id);
+    if (it == _idToResource.end()) {
         return nullptr;
     }
-    auto &resource = maybeResource->second;
+    auto &resource = it->second;
+    if (resource.fileSize == 0) {
+        return std::make_shared<ByteBuffer>();
+    }
 
-    auto buffer = std::make_shared<ByteBuffer>(resource.fileSize, '\0');
-
-    auto &bifPath = _bifPaths.at(resource.bifIdx);
-    auto bif = FileInputStream(bifPath);
+    auto &path = _bifPaths.at(resource.bifIdx);
+    auto bif = FileInputStream(path);
     bif.seek(resource.bifOffset, SeekOrigin::Begin);
-    bif.read(buffer->data(), resource.fileSize);
+    auto buf = std::make_shared<ByteBuffer>();
+    buf->resize(resource.fileSize);
+    bif.read(&(*buf)[0], buf->size());
 
-    return std::move(buffer);
+    return buf;
 }
 
 } // namespace resource

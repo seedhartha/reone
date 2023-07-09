@@ -57,6 +57,8 @@ struct ResourceIdHasher {
     }
 };
 
+typedef std::unordered_set<ResourceId, ResourceIdHasher> ResourceIdSet;
+
 } // namespace resource
 
 } // namespace reone

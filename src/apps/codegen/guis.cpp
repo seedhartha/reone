@@ -169,7 +169,7 @@ void generateGuis(const boost::filesystem::path &k1dir,
     auto k1KeyPath = findFileIgnoreCase(k1dir, "chitin.key");
     auto k1KeyBifProvider = KeyBifResourceProvider(k1KeyPath);
     k1KeyBifProvider.init();
-    for (auto &[resId, _] : k1KeyBifProvider.resources()) {
+    for (auto &resId : k1KeyBifProvider.resourceIds()) {
         if (resId.type == ResourceType::Gui) {
             guiResRefs.insert(resId.resRef);
         }
@@ -178,7 +178,7 @@ void generateGuis(const boost::filesystem::path &k1dir,
     auto k2KeyPath = findFileIgnoreCase(k2dir, "chitin.key");
     auto k2KeyBifProvider = KeyBifResourceProvider(k2KeyPath);
     k2KeyBifProvider.init();
-    for (auto &[resId, _] : k2KeyBifProvider.resources()) {
+    for (auto &resId : k2KeyBifProvider.resourceIds()) {
         if (resId.type != ResourceType::Gui) {
             continue;
         }
@@ -192,14 +192,14 @@ void generateGuis(const boost::filesystem::path &k1dir,
     auto k2OverridePath = findFileIgnoreCase(k2dir, "override");
     auto k2OverrideFolder = Folder(k2OverridePath);
     k2OverrideFolder.init();
-    for (auto &[resRef, res] : k2OverrideFolder.resources()) {
-        if (res.type != ResourceType::Gui) {
+    for (auto &resId : k2OverrideFolder.resourceIds()) {
+        if (resId.type != ResourceType::Gui) {
             continue;
         }
-        if (!boost::ends_with(resRef, "_x") && !boost::ends_with(resRef, "_p")) {
+        if (!boost::ends_with(resId.resRef, "_x") && !boost::ends_with(resId.resRef, "_p")) {
             throw std::runtime_error("Invalid TSL GUI ResRef");
         }
-        auto strippedResRef = resRef.substr(0, resRef.length() - 2);
+        auto strippedResRef = resId.resRef.substr(0, resId.resRef.length() - 2);
         guiResRefs.insert(std::move(strippedResRef));
     }
 
@@ -208,7 +208,7 @@ void generateGuis(const boost::filesystem::path &k1dir,
     for (auto &resRef : guiResRefs) {
         std::unique_ptr<ParsedGUI> k1Gui;
         for (auto &provider : k1Providers) {
-            auto bytes = provider->find(ResourceId(resRef, ResourceType::Gui));
+            auto bytes = provider->findResourceData(ResourceId(resRef, ResourceType::Gui));
             if (bytes) {
                 k1Gui = std::make_unique<ParsedGUI>(parseGui(*bytes));
                 break;
@@ -217,7 +217,7 @@ void generateGuis(const boost::filesystem::path &k1dir,
 
         std::unique_ptr<ParsedGUI> k2Gui;
         for (auto &provider : k2Providers) {
-            auto bytes = provider->find(ResourceId(resRef + "_p", ResourceType::Gui));
+            auto bytes = provider->findResourceData(ResourceId(resRef + "_p", ResourceType::Gui));
             if (bytes) {
                 k2Gui = std::make_unique<ParsedGUI>(parseGui(*bytes));
                 break;

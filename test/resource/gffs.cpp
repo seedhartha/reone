@@ -18,25 +18,12 @@
 #include <gtest/gtest.h>
 
 #include "reone/resource/gffs.h"
+#include "reone/resource/provider/memory.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryoutput.h"
 
 using namespace reone;
 using namespace reone::resource;
-
-class StubProvider : public IResourceProvider {
-public:
-    void add(ResourceId id, std::shared_ptr<ByteBuffer> res) {
-        _resources.insert(std::make_pair(id, std::move(res)));
-    }
-
-    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override { return _resources.at(id); }
-
-    int id() const override { return 0; };
-
-private:
-    std::unordered_map<ResourceId, std::shared_ptr<ByteBuffer>, ResourceIdHasher> _resources;
-};
 
 TEST(gffs, should_get_gff_with_caching) {
     // given
@@ -57,11 +44,10 @@ TEST(gffs, should_get_gff_with_caching) {
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);
 
-    auto provider = std::make_unique<StubProvider>();
-    provider->add(ResourceId("sample", ResourceType::Gff), resBytes);
-
     auto resources = Resources();
-    resources.indexProvider(std::move(provider), "[stub]", false);
+    auto provider = std::make_unique<MemoryResourceProvider>();
+    provider->add(ResourceId("sample", ResourceType::Gff), resBytes);
+    resources.addProvider(std::move(provider));
 
     auto gffs = Gffs(resources);
 
@@ -69,7 +55,7 @@ TEST(gffs, should_get_gff_with_caching) {
 
     auto gff1 = gffs.get("sample", ResourceType::Gff);
 
-    resources.clearAllProviders();
+    resources.clearProviders();
 
     auto gff2 = gffs.get("sample", ResourceType::Gff);
 

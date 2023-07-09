@@ -298,15 +298,15 @@ void generateGffSchema(resource::ResourceType resType,
     auto keyPath = findFileIgnoreCase(k2dir, "chitin.key");
     auto keyBif = KeyBifResourceProvider(keyPath);
     keyBif.init();
-    for (auto &res : keyBif.resources()) {
-        if (res.first.type != resType) {
+    for (auto &resId : keyBif.resourceIds()) {
+        if (resId.type != resType) {
             continue;
         }
-        auto bytes = keyBif.find(res.first);
+        auto bytes = keyBif.findResourceData(resId);
         auto stream = MemoryInputStream(*bytes);
         auto reader = GffReader(stream);
         reader.load();
-        trees[res.first.resRef] = reader.root();
+        trees[resId.resRef] = reader.root();
     }
 
     auto modulesPath = findFileIgnoreCase(k2dir, "modules");
@@ -318,28 +318,28 @@ void generateGffSchema(resource::ResourceType resType,
         if (extension == ".rim") {
             auto rim = RimResourceProvider(entry.path());
             rim.init();
-            for (auto &res : rim.resources()) {
-                if (res.first.type != resType) {
+            for (auto &res : rim.resourceIds()) {
+                if (res.type != resType) {
                     continue;
                 }
-                auto bytes = rim.find(res.first);
+                auto bytes = rim.findResourceData(res);
                 auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader(stream);
                 reader.load();
-                trees[res.first.resRef] = reader.root();
+                trees[res.resRef] = reader.root();
             }
         } else if (extension == ".erf") {
             auto erf = ErfResourceProvider(entry.path());
             erf.init();
-            for (auto &res : erf.resources()) {
-                if (res.first.type != resType) {
+            for (auto &res : erf.resourceIds()) {
+                if (res.type != resType) {
                     continue;
                 }
-                auto bytes = erf.find(res.first);
+                auto bytes = erf.findResourceData(res);
                 auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader(stream);
                 reader.load();
-                trees[res.first.resRef] = reader.root();
+                trees[res.resRef] = reader.root();
             }
         }
     }

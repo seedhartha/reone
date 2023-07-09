@@ -58,8 +58,8 @@ std::shared_ptr<Model> Models::get(const std::string &resRef) {
 std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     debug("Load model " + resRef, LogChannel::Graphics);
 
-    std::shared_ptr<ByteBuffer> mdlData(_resources.get(resRef, ResourceType::Mdl));
-    std::shared_ptr<ByteBuffer> mdxData(_resources.get(resRef, ResourceType::Mdx));
+    auto mdlData = _resources.find(ResourceId(resRef, ResourceType::Mdl));
+    auto mdxData = _resources.find(ResourceId(resRef, ResourceType::Mdx));
     std::shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
@@ -77,7 +77,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
         }
     }
 
-    return std::move(model);
+    return model;
 }
 
 } // namespace graphics

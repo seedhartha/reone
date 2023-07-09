@@ -27,20 +27,20 @@ namespace reone {
 namespace resource {
 
 std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
-    ResourceId id(resRef, type);
-    auto maybeGff = _cache.find(id);
-    if (maybeGff != _cache.end()) {
-        return maybeGff->second;
+    auto resId = ResourceId(resRef, type);
+    auto cached = _cache.find(resId);
+    if (cached != _cache.end()) {
+        return cached->second;
     }
     std::shared_ptr<Gff> gff;
-    auto maybeRaw = _resources.get(resRef, type);
-    if (maybeRaw) {
-        auto stream = MemoryInputStream(*maybeRaw);
+    auto data = _resources.find(resId);
+    if (data) {
+        auto stream = MemoryInputStream(*data);
         auto reader = GffReader(stream);
         reader.load();
         gff = reader.root();
     }
-    auto inserted = _cache.insert(std::make_pair(id, gff));
+    auto inserted = _cache.insert(std::make_pair(resId, gff));
     return inserted.first->second;
 }
 

@@ -27,29 +27,38 @@ namespace reone {
 
 namespace resource {
 
+enum class PEResourceType {
+    Cursor = 1,
+    Icon = 3,
+    CursorGroup = 12,
+    IconGroup = 14,
+    Version = 16,
+    Manifest = 24
+};
+
 class PeReader : boost::noncopyable {
 public:
-    PeReader(IInputStream &pe) :
-        _pe(BinaryReader(pe)) {
-    }
-
-    void load();
-
-    std::shared_ptr<ByteBuffer> find(uint32_t name, PEResourceType type);
-
-private:
-    struct Section {
-        std::string name;
-        uint32_t virtualAddress {0};
-        uint32_t offset {0};
-    };
-
     struct Resource {
         PEResourceType type {PEResourceType::Cursor};
         uint32_t name {0};
         uint32_t langId {0};
         uint32_t offset {0};
         uint32_t size {0};
+    };
+
+    PeReader(IInputStream &pe) :
+        _pe(BinaryReader(pe)) {
+    }
+
+    void load();
+
+    const std::vector<Resource> &resources() const { return _resources; }
+
+private:
+    struct Section {
+        std::string name;
+        uint32_t virtualAddress {0};
+        uint32_t offset {0};
     };
 
     BinaryReader _pe;
@@ -67,10 +76,6 @@ private:
     void loadResourceDir(const Section &section, int level = 0);
     void loadResourceDirEntry(const Section &section, int level = 0);
     void loadResourceDataEntry(const Section &section);
-
-    std::shared_ptr<ByteBuffer> findInternal(std::function<bool(const Resource &)> pred);
-
-    std::shared_ptr<ByteBuffer> getResourceData(const Resource &res);
 };
 
 } // namespace resource

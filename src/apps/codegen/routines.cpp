@@ -358,7 +358,7 @@ void generateRoutines(const boost::filesystem::path &k1Dir,
     }
     auto k1KeyBif = KeyBifResourceProvider(k1KeyPath);
     k1KeyBif.init();
-    auto k1NssBytes = k1KeyBif.find(ResourceId("nwscript", ResourceType::Nss));
+    auto k1NssBytes = k1KeyBif.findResourceData(ResourceId("nwscript", ResourceType::Nss));
     if (!k1NssBytes) {
         throw std::runtime_error("KotOR nwscript.nss resource not found");
     }
@@ -387,7 +387,7 @@ void generateRoutines(const boost::filesystem::path &k1Dir,
     }
     auto k2KeyBif = KeyBifResourceProvider(k1KeyPath);
     k2KeyBif.init();
-    auto k2NssBytes = k2KeyBif.find(ResourceId("nwscript", ResourceType::Nss));
+    auto k2NssBytes = k2KeyBif.findResourceData(ResourceId("nwscript", ResourceType::Nss));
     if (!k2NssBytes) {
         throw std::runtime_error("TSL nwscript.nss resource not found");
     }

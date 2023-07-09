@@ -23,9 +23,9 @@ namespace reone {
 
 namespace resource {
 
-class RimResourceProvider : public IResourceProvider, boost::noncopyable {
+class ExeResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    RimResourceProvider(boost::filesystem::path path) :
+    ExeResourceProvider(boost::filesystem::path path) :
         _path(std::move(path)) {
     }
 
@@ -41,9 +41,8 @@ public:
 
 private:
     struct Resource {
-        ResourceId id;
         uint32_t offset {0};
-        uint32_t fileSize {0};
+        uint32_t size {0};
     };
 
     boost::filesystem::path _path;

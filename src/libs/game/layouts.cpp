@@ -29,7 +29,7 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Layout> Layouts::doGet(std::string resRef) {
-    auto data = _resources.get(resRef, ResourceType::Lyt);
+    auto data = _resources.find(ResourceId(resRef, ResourceType::Lyt));
     if (!data) {
         return nullptr;
     }

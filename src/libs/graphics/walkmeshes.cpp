@@ -49,7 +49,7 @@ std::shared_ptr<Walkmesh> Walkmeshes::get(const std::string &resRef, ResourceTyp
 }
 
 std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResourceType type) {
-    std::shared_ptr<ByteBuffer> data(_resources.get(resRef, type));
+    auto data = _resources.find(ResourceId(resRef, type));
     std::shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
@@ -59,7 +59,7 @@ std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResourceT
         walkmesh = reader.walkmesh();
     }
 
-    return std::move(walkmesh);
+    return walkmesh;
 }
 
 } // namespace graphics

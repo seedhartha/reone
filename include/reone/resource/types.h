@@ -21,8 +21,6 @@ namespace reone {
 
 namespace resource {
 
-constexpr int kDefaultProviderId = -1;
-
 enum class ResourceType : uint16_t {
     Res = 0,
     Bmp = 1,
@@ -78,19 +76,15 @@ enum class ResourceType : uint16_t {
     Tpc = 3007,
     Mdx = 3008,
 
+    // Mods and engine-specific
     Mp3 = 0x1000,
     Glsl = 0x1001,
 
-    Invalid = 0xffff
-};
+    // Windows executable
+    Cursor = 0x2000,
+    CursorGroup = 0x2001,
 
-enum class PEResourceType {
-    Cursor = 1,
-    Icon = 3,
-    CursorGroup = 12,
-    IconGroup = 14,
-    Version = 16,
-    Manifest = 24
+    Invalid = 0xffff
 };
 
 } // namespace resource

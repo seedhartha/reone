@@ -42,7 +42,9 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/provider.h
     ${RESOURCE_INCLUDE_DIR}/provider/erf.h
+    ${RESOURCE_INCLUDE_DIR}/provider/exe.h
     ${RESOURCE_INCLUDE_DIR}/provider/folder.h
+    ${RESOURCE_INCLUDE_DIR}/provider/memory.h
     ${RESOURCE_INCLUDE_DIR}/provider/keybif.h
     ${RESOURCE_INCLUDE_DIR}/provider/rim.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
@@ -72,6 +74,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/gffs.cpp
     ${RESOURCE_SOURCE_DIR}/provider/erf.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/exe.cpp
     ${RESOURCE_SOURCE_DIR}/provider/folder.cpp
     ${RESOURCE_SOURCE_DIR}/provider/keybif.cpp
     ${RESOURCE_SOURCE_DIR}/provider/rim.cpp
