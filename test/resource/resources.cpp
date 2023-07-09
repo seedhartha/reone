@@ -35,7 +35,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto keyPath = tmpDirPath;
     keyPath.append("sample.key");
-    auto key = FileOutputStream(keyPath, OpenMode::Binary);
+    auto key = FileOutputStream(keyPath);
     key.write("KEY V1  ");
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
@@ -48,7 +48,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto erfPath = tmpDirPath;
     erfPath.append("sample.erf");
-    auto erf = FileOutputStream(erfPath, OpenMode::Binary);
+    auto erf = FileOutputStream(erfPath);
     erf.write("ERF V1.0");
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
@@ -64,7 +64,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto rimPath = tmpDirPath;
     rimPath.append("sample.rim");
-    auto rim = FileOutputStream(rimPath, OpenMode::Binary);
+    auto rim = FileOutputStream(rimPath);
     rim.write("RIM V1.0");
     rim.write("\x00\x00\x00\x00", 4);
     rim.write("\x00\x00\x00\x00", 4);
@@ -77,7 +77,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto resPath = overridePath;
     resPath.append("sample.txt");
-    auto res = FileOutputStream(resPath, OpenMode::Binary);
+    auto res = FileOutputStream(resPath);
     res.write("Hello, world!");
     res.close();
 

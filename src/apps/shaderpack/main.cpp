@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
             if (entry.path().extension() != ".glsl") {
                 continue;
             }
-            auto glslStream = FileInputStream(entry.path(), OpenMode::Binary);
+            auto glslStream = FileInputStream(entry.path());
             glslStream.seek(0, SeekOrigin::End);
             auto filesize = glslStream.position();
             glslStream.seek(0, SeekOrigin::Begin);
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
         auto erfPath = destdir;
         erfPath.append("shaderpack.erf");
 
-        auto erfStream = FileOutputStream(erfPath, OpenMode::Binary);
+        auto erfStream = FileOutputStream(erfPath);
         writer.save(ErfWriter::FileType::ERF, erfStream);
 
         return 0;

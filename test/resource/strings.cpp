@@ -33,7 +33,7 @@ TEST(strings, should_init_talktable_and_get_string_and_sound) {
 
     auto tlkPath = tmpDirPath;
     tlkPath.append("dialog.tlk");
-    auto tlk = FileOutputStream(tlkPath, OpenMode::Binary);
+    auto tlk = FileOutputStream(tlkPath);
     tlk.write("TLK V3.0");
     tlk.write("\x00\x00\x00\x00", 4);
     tlk.write("\x01\x00\x00\x00", 4);

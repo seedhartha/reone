@@ -379,14 +379,14 @@ void MainViewModel::loadGameDirectory() {
     _gameId = !tslExePath.empty() ? GameID::TSL : GameID::KotOR;
 
     auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 
     auto tlkPath = findFileIgnoreCase(_gamePath, "dialog.tlk");
-    auto tlk = FileInputStream(tlkPath, OpenMode::Binary);
+    auto tlk = FileInputStream(tlkPath);
     auto tlkReader = TlkReader(tlk);
     tlkReader.load();
     _talkTable = tlkReader.table();
@@ -499,7 +499,7 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
         auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-        auto key = FileInputStream(keyPath, OpenMode::Binary);
+        auto key = FileInputStream(keyPath);
         auto keyReader = KeyReader(key);
         keyReader.load();
         auto filename = boost::to_lower_copy(srcPath.filename().string());
@@ -512,12 +512,12 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
         auto bifIdx = std::distance(keyReader.files().begin(), maybeBif);
         KeyBifTool().extractBIF(keyReader, bifIdx, srcPath, destPath);
     } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-        auto erf = FileInputStream(srcPath, OpenMode::Binary);
+        auto erf = FileInputStream(srcPath);
         auto erfReader = ErfReader(erf);
         erfReader.load();
         ErfTool().extract(erfReader, srcPath, destPath);
     } else if (extension == ".rim") {
-        auto rim = FileInputStream(srcPath, OpenMode::Binary);
+        auto rim = FileInputStream(srcPath);
         auto rimReader = RimReader(rim);
         rimReader.load();
         RimTool().extract(rimReader, srcPath, destPath);
@@ -529,7 +529,7 @@ void MainViewModel::exportFile(GameDirectoryItemId itemId, const boost::filesyst
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
         exportedPath.append(item.resId->string());
-        auto exported = FileOutputStream(exportedPath, OpenMode::Binary);
+        auto exported = FileOutputStream(exportedPath);
         auto buffer = ByteArray();
         buffer.resize(8192);
         bool eof = false;
@@ -547,7 +547,7 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
     auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
 
@@ -686,7 +686,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
                 return;
             }
             auto resIdx = maybeKey->resIdx;
-            auto bif = FileInputStream(item.path, OpenMode::Binary);
+            auto bif = FileInputStream(item.path);
             auto bifReader = BifReader(bif);
             bifReader.load();
             if (bifReader.resources().size() <= resIdx) {
@@ -700,7 +700,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-            auto erf = FileInputStream(item.path, OpenMode::Binary);
+            auto erf = FileInputStream(item.path);
             auto erfReader = ErfReader(erf);
             erfReader.load();
             auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&item](auto &key) {
@@ -718,7 +718,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".rim") {
-            auto rim = FileInputStream(item.path, OpenMode::Binary);
+            auto rim = FileInputStream(item.path);
             auto rimReader = RimReader(rim);
             rimReader.load();
             auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&item](auto &res) {
@@ -736,7 +736,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             block(res);
         }
     } else {
-        auto res = FileInputStream(item.path, OpenMode::Binary);
+        auto res = FileInputStream(item.path);
         block(res);
     }
 }
@@ -832,7 +832,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                 }
             }
         } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
-            auto erf = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto erf = FileInputStream(expandingItem.path);
             auto erfReader = ErfReader(erf);
             erfReader.load();
             auto &keys = erfReader.keys();
@@ -846,7 +846,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                 _gameDirItems.push_back(std::move(item));
             }
         } else if (boost::ends_with(extension, ".rim")) {
-            auto rim = FileInputStream(expandingItem.path, OpenMode::Binary);
+            auto rim = FileInputStream(expandingItem.path);
             auto rimReader = RimReader(rim);
             rimReader.load();
             auto &resources = rimReader.resources();

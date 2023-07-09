@@ -57,11 +57,11 @@ void SsfTool::invokeBatch(
 }
 
 void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto ssf = FileInputStream(path, OpenMode::Binary);
+    auto ssf = FileInputStream(path);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
-    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
+    auto xml = FileOutputStream(xmlPath);
 
     toXML(ssf, xml);
 }

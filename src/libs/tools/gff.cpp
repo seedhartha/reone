@@ -126,11 +126,11 @@ static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1
 }
 
 void GffTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
-    auto gff = FileInputStream(input, OpenMode::Binary);
+    auto gff = FileInputStream(input);
 
     auto xmlPath = outputDir;
     xmlPath.append(input.filename().string() + ".xml");
-    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
+    auto xml = FileOutputStream(xmlPath);
 
     toXML(gff, xml);
 }

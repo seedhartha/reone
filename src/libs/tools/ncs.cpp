@@ -67,11 +67,11 @@ void NcsTool::invokeBatch(
 }
 
 void NcsTool::toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
-    auto ncs = FileInputStream(input, OpenMode::Binary);
+    auto ncs = FileInputStream(input);
 
     auto pcodePath = outputDir;
     pcodePath.append(input.filename().string() + ".pcode");
-    auto pcode = FileOutputStream(pcodePath, OpenMode::Text);
+    auto pcode = FileOutputStream(pcodePath);
 
     toPCODE(ncs, pcode, routines);
 }
@@ -98,11 +98,11 @@ void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesyste
 }
 
 void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
-    auto ncs = FileInputStream(input, OpenMode::Binary);
+    auto ncs = FileInputStream(input);
 
     auto nssPath = outputDir;
     nssPath.append(input.filename().string() + ".nss");
-    auto nss = FileOutputStream(nssPath, OpenMode::Text);
+    auto nss = FileOutputStream(nssPath);
 
     toNSS(ncs, nss, routines);
 }

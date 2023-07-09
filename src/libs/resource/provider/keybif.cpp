@@ -29,7 +29,7 @@ namespace reone {
 namespace resource {
 
 void KeyBifResourceProvider::init() {
-    auto key = FileInputStream(_keyPath, OpenMode::Binary);
+    auto key = FileInputStream(_keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
 
@@ -46,7 +46,7 @@ void KeyBifResourceProvider::init() {
         auto bifPath = findFileIgnoreCase(gamePath, file.filename);
         _bifPaths.push_back(bifPath);
 
-        auto bif = FileInputStream(bifPath, OpenMode::Binary);
+        auto bif = FileInputStream(bifPath);
         auto bifReader = BifReader(bif);
         bifReader.load();
 
@@ -76,7 +76,7 @@ std::shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
     auto buffer = std::make_shared<ByteArray>(resource.fileSize, '\0');
 
     auto &bifPath = _bifPaths.at(resource.bifIdx);
-    auto bif = FileInputStream(bifPath, OpenMode::Binary);
+    auto bif = FileInputStream(bifPath);
     bif.seek(resource.bifOffset, SeekOrigin::Begin);
     bif.read(buffer->data(), resource.fileSize);
 

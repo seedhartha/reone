@@ -29,7 +29,7 @@ TEST(file_output_stream, should_write_to_file) {
     auto tmpPath = boost::filesystem::temp_directory_path();
     tmpPath.append("reone_test_file_output");
 
-    auto stream = FileOutputStream(tmpPath, OpenMode::Binary);
+    auto stream = FileOutputStream(tmpPath);
     auto bytesToWrite = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 

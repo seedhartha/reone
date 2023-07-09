@@ -29,7 +29,7 @@ void RimWriter::add(Resource &&res) {
 }
 
 void RimWriter::save(const boost::filesystem::path &path) {
-    auto rim = FileOutputStream(path, OpenMode::Binary);
+    auto rim = FileOutputStream(path);
     save(rim);
 }
 

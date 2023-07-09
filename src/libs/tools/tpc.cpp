@@ -52,13 +52,13 @@ void TpcTool::invokeBatch(
 }
 
 void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto tpc = FileInputStream(path, OpenMode::Binary);
+    auto tpc = FileInputStream(path);
 
     auto tgaPath = destPath;
     tgaPath.append(path.filename().string());
     tgaPath.replace_extension("tga");
 
-    auto tga = FileOutputStream(tgaPath, OpenMode::Binary);
+    auto tga = FileOutputStream(tgaPath);
     auto txiBytes = ByteArray();
     auto txiMemory = MemoryOutputStream(txiBytes);
     toTGA(tpc, tga, txiMemory, true);
@@ -67,7 +67,7 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
         auto txiPath = tgaPath;
         txiPath.replace_extension("txi");
 
-        auto txi = FileOutputStream(txiPath, OpenMode::Binary);
+        auto txi = FileOutputStream(txiPath);
         txi.write(&txiBytes[0], txiBytes.size());
     }
 }

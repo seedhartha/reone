@@ -28,7 +28,7 @@ namespace reone {
 void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
     bool isKey = input.extension() == ".key";
     if (isKey) {
-        auto stream = FileInputStream(input, OpenMode::Binary);
+        auto stream = FileInputStream(input);
 
         KeyReader key(stream);
         key.load();
@@ -37,7 +37,7 @@ void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &inpu
 
     } else {
         auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
-        auto key = FileInputStream(keyPath, OpenMode::Binary);
+        auto key = FileInputStream(keyPath);
 
         auto keyReader = KeyReader(key);
         keyReader.load();
@@ -84,7 +84,7 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::files
         return;
     }
 
-    auto bif = FileInputStream(bifPath, OpenMode::Binary);
+    auto bif = FileInputStream(bifPath);
 
     auto bifReader = BifReader(bif);
     bifReader.load();

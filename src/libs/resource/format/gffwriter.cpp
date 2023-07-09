@@ -53,7 +53,7 @@ static const std::unordered_map<ResourceType, std::string> g_signatures {
     {ResourceType::Pth, "PTH"}};
 
 void GffWriter::save(const boost::filesystem::path &path) {
-    auto out = FileOutputStream(path, OpenMode::Binary);
+    auto out = FileOutputStream(path);
     save(out);
 }
 

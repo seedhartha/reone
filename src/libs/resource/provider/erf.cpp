@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 void ErfResourceProvider::init() {
-    auto erf = FileInputStream(_path, OpenMode::Binary);
+    auto erf = FileInputStream(_path);
 
     auto reader = ErfReader(erf);
     reader.load();
@@ -51,7 +51,7 @@ std::shared_ptr<ByteArray> ErfResourceProvider::find(const ResourceId &id) {
     auto &resource = maybeResource->second;
 
     auto buffer = std::make_shared<ByteArray>(resource.fileSize, '\0');
-    auto erf = FileInputStream(_path, OpenMode::Binary);
+    auto erf = FileInputStream(_path);
     erf.seek(resource.offset, SeekOrigin::Begin);
     erf.read(buffer->data(), buffer->size());
     return std::move(buffer);

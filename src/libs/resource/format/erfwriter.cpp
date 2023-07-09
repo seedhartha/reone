@@ -32,7 +32,7 @@ void ErfWriter::add(Resource &&res) {
 }
 
 void ErfWriter::save(FileType type, const boost::filesystem::path &path) {
-    auto out = FileOutputStream(path, OpenMode::Binary);
+    auto out = FileOutputStream(path);
     save(type, out);
 }
 

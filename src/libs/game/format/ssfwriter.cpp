@@ -25,7 +25,7 @@ namespace reone {
 namespace game {
 
 void SsfWriter::save(const boost::filesystem::path &path) {
-    auto stream = FileOutputStream(path, OpenMode::Binary);
+    auto stream = FileOutputStream(path);
     auto writer = BinaryWriter(stream);
 
     writer.writeString("SSF V1.1");

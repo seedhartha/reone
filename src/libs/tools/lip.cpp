@@ -57,11 +57,11 @@ void LipTool::invokeBatch(
 }
 
 void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto lip = FileInputStream(path, OpenMode::Binary);
+    auto lip = FileInputStream(path);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
-    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
+    auto xml = FileOutputStream(xmlPath);
 
     toXML(lip, xml);
 }

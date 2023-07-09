@@ -25,11 +25,6 @@ enum class SeekOrigin {
     End
 };
 
-enum class OpenMode {
-    Text,
-    Binary
-};
-
 enum class LogSeverity {
     Debug,
     Info,

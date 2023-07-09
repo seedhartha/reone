@@ -29,7 +29,7 @@ LipWriter::LipWriter(LipAnimation &&animation) :
 }
 
 void LipWriter::save(const boost::filesystem::path &path) {
-    auto lip = std::make_shared<FileOutputStream>(path, OpenMode::Binary);
+    auto lip = std::make_shared<FileOutputStream>(path);
 
     BinaryWriter writer(*lip);
     writer.writeString("LIP V1.0");

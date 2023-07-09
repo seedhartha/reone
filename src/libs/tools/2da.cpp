@@ -59,11 +59,11 @@ void TwoDaTool::invokeBatch(
 }
 
 void TwoDaTool::toXML(const boost::filesystem::path &input, const boost::filesystem::path &outputDir) {
-    auto twoDa = FileInputStream(input, OpenMode::Binary);
+    auto twoDa = FileInputStream(input);
 
     auto xmlPath = outputDir;
     xmlPath.append(input.filename().string() + ".xml");
-    auto xml = FileOutputStream(xmlPath, OpenMode::Binary);
+    auto xml = FileOutputStream(xmlPath);
 
     toXML(twoDa, xml);
 }

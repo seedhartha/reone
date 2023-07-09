@@ -33,7 +33,7 @@ void AudioTool::invoke(Operation operation, const boost::filesystem::path &input
 }
 
 void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
-    auto wav = FileInputStream(path, OpenMode::Binary);
+    auto wav = FileInputStream(path);
     BinaryReader reader(wav);
     size_t filesize = reader.length();
     std::string suffix;

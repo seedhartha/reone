@@ -29,7 +29,7 @@ void ErfTool::invoke(Operation operation, const boost::filesystem::path &input, 
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto stream = FileInputStream(input, OpenMode::Binary);
+        auto stream = FileInputStream(input);
         ErfReader erf(stream);
         erf.load();
         if (operation == Operation::Extract) {
@@ -67,7 +67,7 @@ void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, co
         debug("Extracting " + key.resId.string());
 
         auto buffer = ByteArray(erfResource.size, '\0');
-        auto erf = FileInputStream(erfPath, OpenMode::Binary);
+        auto erf = FileInputStream(erfPath);
         erf.seek(erfResource.offset, SeekOrigin::Begin);
         erf.read(&buffer[0], buffer.size());
 

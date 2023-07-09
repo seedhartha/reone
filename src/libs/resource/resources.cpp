@@ -114,7 +114,7 @@ std::shared_ptr<ByteArray> Resources::get(const std::string &resRef, ResourceTyp
 }
 
 std::shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
-    auto pe = FileInputStream(_exePath, OpenMode::Binary);
+    auto pe = FileInputStream(_exePath);
 
     auto peReader = PeReader(pe);
     peReader.load();

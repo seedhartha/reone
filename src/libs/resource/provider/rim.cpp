@@ -26,7 +26,7 @@ namespace reone {
 namespace resource {
 
 void RimResourceProvider::init() {
-    auto rim = FileInputStream(_path, OpenMode::Binary);
+    auto rim = FileInputStream(_path);
 
     auto reader = RimReader(rim);
     reader.load();
@@ -48,7 +48,7 @@ std::shared_ptr<ByteArray> RimResourceProvider::find(const ResourceId &id) {
     auto &resource = maybeResource->second;
 
     auto buffer = std::make_shared<ByteArray>(resource.fileSize, '\0');
-    auto rim = FileInputStream(_path, OpenMode::Binary);
+    auto rim = FileInputStream(_path);
     rim.seek(resource.offset, SeekOrigin::Begin);
     rim.read(buffer->data(), buffer->size());
     return std::move(buffer);

@@ -420,7 +420,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     }
     _viewModel->onGameDirectoryChanged(gamePath);
 
-    auto key = FileInputStream(keyPath, OpenMode::Binary);
+    auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
     _keyKeys = keyReader.keys();

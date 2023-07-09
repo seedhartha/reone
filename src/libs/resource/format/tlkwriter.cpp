@@ -33,7 +33,7 @@ struct StringFlags {
 };
 
 void TlkWriter::save(const boost::filesystem::path &path) {
-    auto tlk = FileOutputStream(path, OpenMode::Binary);
+    auto tlk = FileOutputStream(path);
     save(tlk);
 }
 

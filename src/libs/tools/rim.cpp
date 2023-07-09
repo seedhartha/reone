@@ -29,7 +29,7 @@ void RimTool::invoke(Operation operation, const boost::filesystem::path &input, 
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        auto rim = FileInputStream(input, OpenMode::Binary);
+        auto rim = FileInputStream(input);
         auto rimReader = RimReader(rim);
         rimReader.load();
         if (operation == Operation::List) {
@@ -67,7 +67,7 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
         debug("Extracting " + rimResource.resId.string());
 
         auto buffer = ByteArray(rimResource.size, '\0');
-        auto rim = FileInputStream(rimPath, OpenMode::Binary);
+        auto rim = FileInputStream(rimPath);
         rim.seek(rimResource.offset, SeekOrigin::Begin);
         rim.read(&buffer[0], buffer.size());
 
