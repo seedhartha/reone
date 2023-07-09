@@ -32,11 +32,11 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
-    auto data = _resources.find(ResourceId(resRef, ResourceType::Ssf));
-    if (!data) {
+    auto res = _resources.find(ResourceId(resRef, ResourceType::Ssf));
+    if (!res) {
         return nullptr;
     }
-    auto stream = MemoryInputStream(*data);
+    auto stream = MemoryInputStream(res->data);
     auto result = std::make_shared<SoundSet>();
 
     SsfReader ssf(stream);

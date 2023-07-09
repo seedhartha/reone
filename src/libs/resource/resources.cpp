@@ -58,7 +58,7 @@ void Resources::addFolder(const std::filesystem::path &path) {
     _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
 }
 
-ByteBuffer Resources::get(const ResourceId &id) {
+Resource Resources::get(const ResourceId &id) {
     auto data = find(id);
     if (!data) {
         throw ResourceNotFoundException(id.string());
@@ -66,11 +66,11 @@ ByteBuffer Resources::get(const ResourceId &id) {
     return *data;
 }
 
-std::optional<ByteBuffer> Resources::find(const ResourceId &id) {
+std::optional<Resource> Resources::find(const ResourceId &id) {
     for (auto &[provider, local] : _providers) {
         auto data = provider->findResourceData(id);
         if (data) {
-            return *data;
+            return Resource {*data, local};
         }
     }
     return std::nullopt;

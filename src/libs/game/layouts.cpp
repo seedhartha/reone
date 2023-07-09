@@ -29,11 +29,11 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Layout> Layouts::doGet(std::string resRef) {
-    auto data = _resources.find(ResourceId(resRef, ResourceType::Lyt));
-    if (!data) {
+    auto res = _resources.find(ResourceId(resRef, ResourceType::Lyt));
+    if (!res) {
         return nullptr;
     }
-    auto stream = MemoryInputStream(*data);
+    auto stream = MemoryInputStream(res->data);
     LytReader lyt;
     lyt.load(stream);
     return std::make_shared<Layout>(lyt.layout());

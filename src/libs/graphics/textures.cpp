@@ -141,17 +141,17 @@ std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage u
 std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage usage) {
     std::shared_ptr<Texture> texture;
 
-    auto tgaData = _resources.find(ResourceId(resRef, ResourceType::Tga));
-    if (tgaData) {
-        auto tga = MemoryInputStream(*tgaData);
+    auto tgaRes = _resources.find(ResourceId(resRef, ResourceType::Tga));
+    if (tgaRes) {
+        auto tga = MemoryInputStream(tgaRes->data);
         auto tgaReader = TgaReader(tga, resRef, usage);
         tgaReader.load();
         texture = tgaReader.texture();
 
         if (texture) {
-            auto txiData = _resources.find(ResourceId(resRef, ResourceType::Txi));
-            if (txiData) {
-                auto txi = MemoryInputStream(*txiData);
+            auto txiRes = _resources.find(ResourceId(resRef, ResourceType::Txi));
+            if (txiRes) {
+                auto txi = MemoryInputStream(txiRes->data);
                 auto txiReader = TxiReader();
                 txiReader.load(txi);
                 texture->setFeatures(txiReader.features());
@@ -160,9 +160,9 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
     }
 
     if (!texture) {
-        auto tpcData = _resources.find(ResourceId(resRef, ResourceType::Tpc));
-        if (tpcData) {
-            auto tpc = MemoryInputStream(*tpcData);
+        auto tpcRes = _resources.find(ResourceId(resRef, ResourceType::Tpc));
+        if (tpcRes) {
+            auto tpc = MemoryInputStream(tpcRes->data);
             auto tpcReader = TpcReader(tpc, resRef, usage);
             tpcReader.load();
             texture = tpcReader.texture();

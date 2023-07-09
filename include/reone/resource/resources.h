@@ -21,6 +21,7 @@
 
 #include "id.h"
 #include "provider.h"
+#include "resource.h"
 
 namespace reone {
 
@@ -46,8 +47,8 @@ public:
     virtual void addEXE(const std::filesystem::path &path) = 0;
     virtual void addFolder(const std::filesystem::path &path) = 0;
 
-    virtual ByteBuffer get(const ResourceId &id) = 0;
-    virtual std::optional<ByteBuffer> find(const ResourceId &id) = 0;
+    virtual Resource get(const ResourceId &id) = 0;
+    virtual std::optional<Resource> find(const ResourceId &id) = 0;
 };
 
 class Resources : public IResources, boost::noncopyable {
@@ -73,8 +74,8 @@ public:
     void addEXE(const std::filesystem::path &path) override;
     void addFolder(const std::filesystem::path &path) override;
 
-    ByteBuffer get(const ResourceId &id) override;
-    std::optional<ByteBuffer> find(const ResourceId &id) override;
+    Resource get(const ResourceId &id) override;
+    std::optional<Resource> find(const ResourceId &id) override;
 
     const ResourceProviderList &providers() const { return _providers; }
 

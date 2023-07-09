@@ -29,11 +29,11 @@ namespace reone {
 namespace graphics {
 
 std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
-    auto data = _resources.find(ResourceId(resRef, ResourceType::Lip));
-    if (!data) {
+    auto res = _resources.find(ResourceId(resRef, ResourceType::Lip));
+    if (!res) {
         return nullptr;
     }
-    auto stream = MemoryInputStream(*data);
+    auto stream = MemoryInputStream(res->data);
     auto reader = LipReader(stream, resRef);
     reader.load();
     return reader.animation();

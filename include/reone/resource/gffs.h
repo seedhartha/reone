@@ -46,11 +46,11 @@ public:
         _cache.clear();
     }
 
-    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) override;
-
     void add(ResourceId resId, std::shared_ptr<Gff> gff) {
-        _cache[resId] = std::move(gff);
+        _cache.insert(std::make_pair(resId, std::move(gff)));
     }
+
+    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) override;
 
 private:
     Resources &_resources;

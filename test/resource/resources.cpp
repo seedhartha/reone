@@ -95,16 +95,16 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     resources.addRIM(rimPath);
 
     auto numProviders = resources.providers().size();
-    auto actualResData1 = resources.find(ResourceId("sample", ResourceType::Txt));
+    auto actualRes1 = resources.find(ResourceId("sample", ResourceType::Txt));
     resources.clear();
-    auto actualResData2 = resources.find(ResourceId("sample", ResourceType::Txt));
+    auto actualRes2 = resources.find(ResourceId("sample", ResourceType::Txt));
 
     // then
 
     EXPECT_EQ(4ll, numProviders);
-    EXPECT_TRUE(static_cast<bool>(actualResData1));
-    EXPECT_EQ(expectedResData, (*actualResData1)) << notEqualMessage(expectedResData, *actualResData1);
-    EXPECT_TRUE(!static_cast<bool>(actualResData2));
+    EXPECT_TRUE(static_cast<bool>(actualRes1));
+    EXPECT_EQ(expectedResData, actualRes1->data) << notEqualMessage(expectedResData, actualRes1->data);
+    EXPECT_TRUE(!static_cast<bool>(actualRes2));
 
     // cleanup
 

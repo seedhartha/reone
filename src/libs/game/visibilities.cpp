@@ -30,11 +30,11 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
-    auto data = _resources.find(ResourceId(resRef, ResourceType::Vis));
-    if (!data) {
+    auto res = _resources.find(ResourceId(resRef, ResourceType::Vis));
+    if (!res) {
         return nullptr;
     }
-    auto stream = MemoryInputStream(*data);
+    auto stream = MemoryInputStream(res->data);
 
     VisReader vis;
     vis.load(stream);

@@ -41,8 +41,8 @@ public:
     MOCK_METHOD(void, addEXE, (const std::filesystem::path &path), (override));
     MOCK_METHOD(void, addFolder, (const std::filesystem::path &path), (override));
 
-    MOCK_METHOD(ByteBuffer, get, (const ResourceId &id), (override));
-    MOCK_METHOD(std::optional<ByteBuffer>, find, (const ResourceId &id), (override));
+    MOCK_METHOD(Resource, get, (const ResourceId &id), (override));
+    MOCK_METHOD(std::optional<Resource>, find, (const ResourceId &id), (override));
 };
 
 class MockStrings : public IStrings, boost::noncopyable {

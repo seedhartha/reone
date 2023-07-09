@@ -279,11 +279,11 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         _renderEnabled = false;
 
-        auto mdxBytes = _resourceModule->resources().find(ResourceId(id.resRef, ResourceType::Mdx));
-        if (!mdxBytes) {
+        auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResourceType::Mdx));
+        if (!mdxRes) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
-        auto mdx = MemoryInputStream(*mdxBytes);
+        auto mdx = MemoryInputStream(mdxRes->data);
         auto reader = MdlReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
         reader.load();
 

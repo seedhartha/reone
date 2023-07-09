@@ -47,6 +47,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/provider/memory.h
     ${RESOURCE_INCLUDE_DIR}/provider/keybif.h
     ${RESOURCE_INCLUDE_DIR}/provider/rim.h
+    ${RESOURCE_INCLUDE_DIR}/resource.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
     ${RESOURCE_INCLUDE_DIR}/strings.h
     ${RESOURCE_INCLUDE_DIR}/talktable.h

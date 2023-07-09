@@ -57,6 +57,16 @@ struct ResourceIdHasher {
     }
 };
 
+struct ResourceIdComparer {
+    bool operator()(const ResourceId &lhs, const ResourceId &rhs) const {
+        if (lhs.resRef < rhs.resRef)
+            return true;
+        if (lhs.resRef > rhs.resRef)
+            return false;
+        return lhs.type < rhs.type;
+    }
+};
+
 typedef std::unordered_set<ResourceId, ResourceIdHasher> ResourceIdSet;
 
 } // namespace resource

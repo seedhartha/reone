@@ -15,29 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/script/scripts.h"
+#pragma once
 
-#include "reone/system/stream/memoryinput.h"
-
-#include "reone/script/format/ncsreader.h"
-
-using namespace reone::resource;
+#include "reone/system/types.h"
 
 namespace reone {
 
-namespace script {
+namespace resource {
 
-std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
-    auto res = _resources.find(ResourceId(resRef, ResourceType::Ncs));
-    if (!res) {
-        return nullptr;
-    }
-    auto stream = MemoryInputStream(res->data);
-    auto reader = NcsReader(stream, resRef);
-    reader.load();
-    return reader.program();
-}
+struct Resource {
+    ByteBuffer data;
+    bool local {false};
+};
 
-} // namespace script
+} // namespace resource
 
 } // namespace reone

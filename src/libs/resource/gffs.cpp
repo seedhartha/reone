@@ -33,14 +33,14 @@ std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
         return cached->second;
     }
     std::shared_ptr<Gff> gff;
-    auto data = _resources.find(resId);
-    if (data) {
-        auto stream = MemoryInputStream(*data);
+    auto res = _resources.find(resId);
+    if (res) {
+        auto stream = MemoryInputStream(res->data);
         auto reader = GffReader(stream);
         reader.load();
         gff = reader.root();
     }
-    auto inserted = _cache.insert(std::make_pair(resId, gff));
+    auto inserted = _cache.insert(std::make_pair(resId, std::move(gff)));
     return inserted.first->second;
 }
 
