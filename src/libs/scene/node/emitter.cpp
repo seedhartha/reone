@@ -153,14 +153,14 @@ void EmitterSceneNode::doSpawnParticle() {
 
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
-    glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
+    glm::vec3 position(randomFloat(-halfW, halfW), randomFloat(-halfH, halfH), 0.0f);
     particle->setLocalTransform(glm::translate(position));
 
     float halfSpread = 0.5f * _spread;
-    float angle1 = random(-halfSpread, halfSpread);
-    float angle2 = random(-halfSpread, halfSpread);
+    float angle1 = randomFloat(-halfSpread, halfSpread);
+    float angle2 = randomFloat(-halfSpread, halfSpread);
     glm::vec3 dir(glm::sin(angle1), glm::sin(angle2), glm::cos(angle1) * glm::cos(angle2));
-    glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
+    glm::vec3 velocity((_velocity + randomFloat(0.0f, _randomVelocity)) * dir);
     particle->setVelocity(std::move(velocity));
 
     particle->setFrame(_frameStart);
@@ -182,7 +182,7 @@ void EmitterSceneNode::spawnLightningParticles() {
 
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
-    glm::vec3 origin(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
+    glm::vec3 origin(randomFloat(-halfW, halfW), randomFloat(-halfH, halfH), 0.0f);
     glm::vec3 emitterSpaceRefPos(_absTransformInv * glm::vec4((*ref)->getOrigin(), 1.0f));
     glm::vec3 refToOrigin(emitterSpaceRefPos - origin);
     float distance = glm::abs(refToOrigin.z);
@@ -195,8 +195,8 @@ void EmitterSceneNode::spawnLightningParticles() {
     for (int i = 1; i < _lightningSubDiv + 1; ++i) {
         glm::vec3 dir(glm::normalize(emitterSpaceRefPos - segments[i - 1].first));
         glm::vec3 offset(
-            random(-halfRadius, halfRadius),
-            random(-halfRadius, halfRadius),
+            randomFloat(-halfRadius, halfRadius),
+            randomFloat(-halfRadius, halfRadius),
             0.0f);
         segments[i - 1].second = segments[i - 1].first + segmentLength * dir + offset;
         segments[i].first = segments[i - 1].second;

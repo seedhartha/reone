@@ -171,7 +171,7 @@ int GrassSceneNode::getNumClustersInFace(float area) const {
 
 int GrassSceneNode::getRandomGrassVariant() const {
     float sum = _properties.probabilities[0] + _properties.probabilities[1] + _properties.probabilities[2] + _properties.probabilities[3];
-    float val = random(0.0f, 1.0f) * sum;
+    float val = randomFloat(0.0f, 1.0f) * sum;
     float upper = 0.0f;
     for (int i = 0; i < 3; ++i) {
         upper += _properties.probabilities[i];

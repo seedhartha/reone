@@ -51,8 +51,8 @@ inline glm::vec3 barycentricToCartesian(const glm::vec3 &a, const glm::vec3 &b, 
 }
 
 inline glm::vec3 getRandomBarycentric() {
-    float r1sqrt = glm::sqrt(random(0.0f, 1.0f));
-    float r2 = random(0.0f, 1.0f);
+    float r1sqrt = glm::sqrt(randomFloat(0.0f, 1.0f));
+    float r2 = randomFloat(0.0f, 1.0f);
     return glm::vec3(1.0f - r1sqrt, r1sqrt * (1.0f - r2), r2 * r1sqrt);
 }
 

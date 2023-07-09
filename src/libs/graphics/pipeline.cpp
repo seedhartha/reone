@@ -159,7 +159,7 @@ void Pipeline::init() {
         for (int i = 0; i < kNumSSAOSamples; ++i) {
             float scale = i / static_cast<float>(kNumSSAOSamples);
             scale = glm::mix(0.1f, 1.0f, scale * scale);
-            auto sample = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(0.0f, 1.0f));
+            auto sample = glm::vec3(randomFloat(-1.0f, 1.0f), randomFloat(-1.0f, 1.0f), randomFloat(0.0f, 1.0f));
             sample = glm::normalize(sample);
             sample *= scale;
             ssao.samples[i] = glm::vec4(std::move(sample), 0.0f);

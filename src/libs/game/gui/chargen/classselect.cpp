@@ -193,7 +193,7 @@ std::vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
 int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz) {
     int result = 0;
     std::vector<Portrait> portraits(getPCPortraitsByGender(gender));
-    int portraitIdx = random(0, static_cast<int>(portraits.size()) - 1);
+    int portraitIdx = randomInt(0, static_cast<int>(portraits.size()) - 1);
     const Portrait &portrait = portraits[portraitIdx];
 
     switch (clazz) {

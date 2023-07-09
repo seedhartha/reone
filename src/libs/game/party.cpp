@@ -118,7 +118,7 @@ void Party::switchLeader() {
 }
 
 void Party::onLeaderChanged() {
-    auto entry = static_cast<SoundSetEntry>(static_cast<int>(SoundSetEntry::Select1) + random(0, 2));
+    auto entry = static_cast<SoundSetEntry>(static_cast<int>(SoundSetEntry::Select1) + randomInt(0, 2));
     _members[0].creature->playSound(entry, false);
 
     for (auto &member : _members) {

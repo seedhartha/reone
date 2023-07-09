@@ -80,7 +80,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
 
     // First three letters
 
-    probability = random(0.0f, 1.0f);
+    probability = randomFloat(0.0f, 1.0f);
     for (int i = 0; i < _letterCount; ++i) {
         if (_singleLetters.start[i] > probability) {
             name += toupper(g_letters[i]);
@@ -89,7 +89,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
         }
     }
 
-    probability = random(0.0f, 1.0f);
+    probability = randomFloat(0.0f, 1.0f);
     for (int i = 0; i < _letterCount; ++i) {
         if (_doubleLetters[firstLetterIdx].start[i] > probability) {
             name += g_letters[i];
@@ -98,7 +98,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
         }
     }
 
-    probability = random(0.0f, 1.0f);
+    probability = randomFloat(0.0f, 1.0f);
     for (int i = 0; i < _letterCount; ++i) {
         if (_trippleLetters[firstLetterIdx][secondLetterIdx].start[i] > probability) {
             name += g_letters[i];
@@ -115,9 +115,9 @@ std::string LtrReader::getRandomName(int maxLength) const {
 
     // Middle letters
 
-    int length = random(0, maxLength - 3);
+    int length = randomInt(0, maxLength - 3);
     for (int i = 0; i < length; ++i) {
-        probability = random(0.0f, 1.0f);
+        probability = randomFloat(0.0f, 1.0f);
         for (int j = 0; j < _letterCount; ++j) {
             if (_trippleLetters[firstLetterIdx][secondLetterIdx].mid[j] > probability) {
                 name += g_letters[j];
@@ -132,7 +132,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
 
     // Final letter
 
-    probability = random(0.0f, 1.0f);
+    probability = randomFloat(0.0f, 1.0f);
     for (int i = 0; i < _letterCount; ++i) {
         if (_trippleLetters[firstLetterIdx][secondLetterIdx].end[i] > probability) {
             name += g_letters[i];

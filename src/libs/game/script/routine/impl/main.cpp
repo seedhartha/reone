@@ -60,7 +60,7 @@ static Variable Random(const std::vector<Variable> &args, const RoutineContext &
     // Transform
 
     // Execute
-    return Variable::ofInt(random(0, nMaxInteger - 1));
+    return Variable::ofInt(randomInt(0, nMaxInteger - 1));
 }
 
 static Variable PrintString(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -850,7 +850,7 @@ static Variable d2(const std::vector<Variable> &args, const RoutineContext &ctx)
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 2);
+        total += reone::randomInt(1, 2);
     }
     return Variable::ofInt(total);
 }
@@ -865,7 +865,7 @@ static Variable d3(const std::vector<Variable> &args, const RoutineContext &ctx)
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 3);
+        total += reone::randomInt(1, 3);
     }
     return Variable::ofInt(total);
 }
@@ -880,7 +880,7 @@ static Variable d4(const std::vector<Variable> &args, const RoutineContext &ctx)
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 4);
+        total += reone::randomInt(1, 4);
     }
     return Variable::ofInt(total);
 }
@@ -895,7 +895,7 @@ static Variable d6(const std::vector<Variable> &args, const RoutineContext &ctx)
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 6);
+        total += reone::randomInt(1, 6);
     }
     return Variable::ofInt(total);
 }
@@ -910,7 +910,7 @@ static Variable d8(const std::vector<Variable> &args, const RoutineContext &ctx)
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 8);
+        total += reone::randomInt(1, 8);
     }
     return Variable::ofInt(total);
 }
@@ -925,7 +925,7 @@ static Variable d10(const std::vector<Variable> &args, const RoutineContext &ctx
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 10);
+        total += reone::randomInt(1, 10);
     }
     return Variable::ofInt(total);
 }
@@ -940,7 +940,7 @@ static Variable d12(const std::vector<Variable> &args, const RoutineContext &ctx
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 12);
+        total += reone::randomInt(1, 12);
     }
     return Variable::ofInt(total);
 }
@@ -955,7 +955,7 @@ static Variable d20(const std::vector<Variable> &args, const RoutineContext &ctx
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 20);
+        total += reone::randomInt(1, 20);
     }
     return Variable::ofInt(total);
 }
@@ -970,7 +970,7 @@ static Variable d100(const std::vector<Variable> &args, const RoutineContext &ct
     // Execute
     int total = 0;
     for (int i = 0; i < numDice; ++i) {
-        total += reone::random(1, 100);
+        total += reone::randomInt(1, 100);
     }
     return Variable::ofInt(total);
 }

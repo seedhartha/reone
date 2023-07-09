@@ -23,12 +23,12 @@ namespace reone {
  * @param min lower bound (inclusive)
  * @param max upper bound (inclusive)
  */
-int random(int min, int max);
+int randomInt(int min, int max);
 
 /**
  * @param min lower bound (inclusive)
  * @param max upper bound (inclusive)
  */
-float random(float min, float max);
+float randomFloat(float min, float max);
 
 } // namespace reone

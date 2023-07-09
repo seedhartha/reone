@@ -689,7 +689,7 @@ void Creature::onEventSignalled(const std::string &name) {
     } else if (surface.sound == "LV") {
         materialSounds = sounds->leaves;
     }
-    int index = random(0, 3);
+    int index = randomInt(0, 3);
     if (index >= static_cast<int>(materialSounds.size())) {
         return;
     }

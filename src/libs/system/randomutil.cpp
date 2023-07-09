@@ -21,12 +21,12 @@ namespace reone {
 
 static std::default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
 
-int random(int min, int max) {
+int randomInt(int min, int max) {
     std::uniform_int_distribution<int> dist(min, max);
     return dist(g_generator);
 }
 
-float random(float min, float max) {
+float randomFloat(float min, float max) {
     std::uniform_real_distribution<float> distr(min, max);
     return distr(g_generator);
 }

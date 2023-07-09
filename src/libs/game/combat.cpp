@@ -229,7 +229,7 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
     }
 
     // Attack roll
-    int roll = random(1, 20);
+    int roll = randomInt(1, 20);
     if (roll == 20) {
         result = AttackResultType::AutomaticHit;
     } else if (roll > 1 && roll + attack.attacker->getAttackBonus(offHand) >= defense) { // 1 is automatic miss
@@ -247,7 +247,7 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
         }
         if (roll > 20 - criticalThreat) {
             // Critical hit roll
-            int criticalRoll = random(1, 20);
+            int criticalRoll = randomInt(1, 20);
             if (criticalRoll + attack.attacker->getAttackBonus() >= defense) {
                 result = AttackResultType::CriticalHit;
             }
@@ -298,18 +298,18 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
     if (duel) {
         if (isMeleeWieldType(result.attackerWieldType) && isMeleeWieldType(targetWield)) {
             result.attackerAnimation = CombatAnimation::CinematicMeleeAttack;
-            result.animationVariant = random(1, 5);
+            result.animationVariant = randomInt(1, 5);
             result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::CinematicMeleeDamage : CombatAnimation::CinematicMeleeParry;
         } else if (isMeleeWieldType(result.attackerWieldType)) {
             result.attackerAnimation = CombatAnimation::MeleeAttack;
-            result.animationVariant = random(1, 2);
+            result.animationVariant = randomInt(1, 2);
             result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::MeleeDamage : CombatAnimation::MeleeDodge;
         } else if (isRangedWieldType(result.attackerWieldType)) {
             result.attackerAnimation = CombatAnimation::BlasterAttack;
             result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::Damage : CombatAnimation::Dodge;
         } else {
             result.attackerAnimation = CombatAnimation::Attack;
-            result.animationVariant = random(1, 2);
+            result.animationVariant = randomInt(1, 2);
             result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::Damage : CombatAnimation::Dodge;
         }
     } else {
@@ -317,7 +317,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
             result.attackerAnimation = CombatAnimation::BlasterAttack;
         } else {
             result.attackerAnimation = CombatAnimation::Attack;
-            result.animationVariant = random(1, 2);
+            result.animationVariant = randomInt(1, 2);
         }
     }
 
@@ -379,7 +379,7 @@ std::vector<std::shared_ptr<DamageEffect>> Combat::getDamageEffects(std::shared_
 
     if (weapon) {
         for (int i = 0; i < weapon->numDice(); ++i) {
-            amount += random(1, weapon->dieToRoll());
+            amount += randomInt(1, weapon->dieToRoll());
         }
         type = static_cast<DamageType>(weapon->damageFlags());
     }

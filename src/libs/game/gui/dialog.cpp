@@ -254,7 +254,7 @@ glm::vec3 DialogGUI::getTalkPosition(const Object &object) const {
 }
 
 DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
-    int r = random(0, 2);
+    int r = randomInt(0, 2);
     switch (r) {
     case 0:
         return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
