@@ -76,7 +76,7 @@ std::unique_ptr<Options> OptionsParser::parse() {
 
     // Convert Boost options to game options
 
-    options->game.path = vars.count("game") > 0 ? vars["game"].as<std::string>() : std::filesystem::current_path();
+    options->game.path = vars.count("game") > 0 ? std::filesystem::path(vars["game"].as<std::string>()) : std::filesystem::current_path();
     options->game.developer = vars["dev"].as<bool>();
     options->graphics.width = vars["width"].as<int>();
     options->graphics.height = vars["height"].as<int>();

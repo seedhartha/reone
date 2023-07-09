@@ -42,10 +42,8 @@ void KeyBifResourceProvider::init() {
     for (auto i = 0; i < keyReader.files().size(); ++i) {
         auto &file = keyReader.files()[i];
         auto bifPath = findFileIgnoreCase(gamePath, file.filename);
-        _bifPaths.push_back(bifPath);
-
-        auto bif = FileInputStream(bifPath);
-        auto bifReader = BifReader(bif);
+        auto bif = std::make_unique<FileInputStream>(bifPath);
+        auto bifReader = BifReader(*bif);
         bifReader.load();
 
         auto &keys = bifIdxToKey.at(i);
@@ -62,6 +60,8 @@ void KeyBifResourceProvider::init() {
             _resourceIds.insert(key->resId);
             _idToResource.insert(std::make_pair(key->resId, std::move(resource)));
         }
+
+        _bifs.push_back(std::move(bif));
     }
 }
 
@@ -75,12 +75,11 @@ std::shared_ptr<ByteBuffer> KeyBifResourceProvider::findResourceData(const Resou
         return std::make_shared<ByteBuffer>();
     }
 
-    auto &path = _bifPaths.at(resource.bifIdx);
-    auto bif = FileInputStream(path);
-    bif.seek(resource.bifOffset, SeekOrigin::Begin);
+    auto &bif = _bifs.at(resource.bifIdx);
+    bif->seek(resource.bifOffset, SeekOrigin::Begin);
     auto buf = std::make_shared<ByteBuffer>();
     buf->resize(resource.fileSize);
-    bif.read(&(*buf)[0], buf->size());
+    bif->read(&(*buf)[0], buf->size());
 
     return buf;
 }

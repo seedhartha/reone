@@ -18,15 +18,15 @@
 #include "reone/resource/provider/erf.h"
 
 #include "reone/resource/format/erfreader.h"
-#include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
 namespace resource {
 
 void ErfResourceProvider::init() {
-    auto erf = FileInputStream(_path);
-    auto reader = ErfReader(erf);
+    _erf = std::make_unique<FileInputStream>(_path);
+
+    auto reader = ErfReader(*_erf);
     reader.load();
 
     auto &keys = reader.keys();
@@ -52,11 +52,10 @@ std::shared_ptr<ByteBuffer> ErfResourceProvider::findResourceData(const Resource
         return std::make_shared<ByteBuffer>();
     }
 
-    auto erf = FileInputStream(_path);
-    erf.seek(resource.offset, SeekOrigin::Begin);
+    _erf->seek(resource.offset, SeekOrigin::Begin);
     auto buf = std::make_shared<ByteBuffer>();
     buf->resize(resource.fileSize);
-    erf.read(&(*buf)[0], buf->size());
+    _erf->read(&(*buf)[0], buf->size());
 
     return buf;
 }

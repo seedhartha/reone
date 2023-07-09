@@ -29,8 +29,9 @@ static std::unordered_map<PEResourceType, ResourceType> kPEResTypeToResType {
     {PEResourceType::CursorGroup, ResourceType::CursorGroup}};
 
 void ExeResourceProvider::init() {
-    auto exe = FileInputStream(_path);
-    auto reader = PeReader(exe);
+    _exe = std::make_unique<FileInputStream>(_path);
+
+    auto reader = PeReader(*_exe);
     reader.load();
 
     for (auto &peRes : reader.resources()) {
@@ -56,11 +57,12 @@ std::shared_ptr<ByteBuffer> ExeResourceProvider::findResourceData(const Resource
     if (res.size == 0) {
         return std::make_shared<ByteBuffer>();
     }
-    auto exe = FileInputStream(_path);
-    exe.seek(res.offset, SeekOrigin::Begin);
+
+    _exe->seek(res.offset, SeekOrigin::Begin);
     auto buf = std::make_shared<ByteBuffer>();
     buf->resize(res.size);
-    exe.read(&(*buf)[0], buf->size());
+    _exe->read(&(*buf)[0], buf->size());
+
     return buf;
 }
 

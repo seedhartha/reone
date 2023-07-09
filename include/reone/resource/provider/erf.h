@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/stream/fileinput.h"
+
 #include "../provider.h"
 
 namespace reone {
@@ -47,6 +49,7 @@ private:
     };
 
     std::filesystem::path _path;
+    std::unique_ptr<FileInputStream> _erf;
 
     ResourceIdSet _resourceIds;
     std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
