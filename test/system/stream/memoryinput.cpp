@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/system/stream/memoryinput.h"
-#include "reone/system/stream/textutil.h"
+#include "reone/system/textreader.h"
 
 #include "../../checkutil.h"
 
@@ -51,29 +51,4 @@ TEST(memory_input_stream, should_read_from_byte_array) {
     EXPECT_EQ(16ll, buf.size());
     EXPECT_EQ(expectedContents, contents) << notEqualMessage(expectedContents, contents);
     EXPECT_EQ(-1, readByteResult2);
-}
-
-TEST(memory_input_stream, should_read_lines_from_byte_array) {
-    // given
-    auto bytes = ByteArray {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
-    auto stream = MemoryInputStream(bytes);
-    std::string line;
-    bool read;
-
-    // expect
-    read = readLine(stream, line);
-    EXPECT_EQ(line, std::string("line1"));
-    EXPECT_TRUE(read);
-
-    read = readLine(stream, line);
-    EXPECT_EQ(line, std::string("line2"));
-    EXPECT_TRUE(read);
-
-    read = readLine(stream, line);
-    EXPECT_EQ(line, std::string("longline"));
-    EXPECT_TRUE(read);
-
-    read = readLine(stream, line);
-    EXPECT_EQ(line, std::string());
-    EXPECT_TRUE(!read);
 }

@@ -19,6 +19,7 @@
 
 #include "reone/script/program.h"
 #include "reone/system/stream/output.h"
+#include "reone/system/textwriter.h"
 
 namespace reone {
 
@@ -39,7 +40,7 @@ private:
     ScriptProgram &_program;
     IRoutines &_routines;
 
-    void writeInstruction(const Instruction &ins, IOutputStream &pcode, const std::set<uint32_t> &jumpOffsets);
+    void writeInstruction(const Instruction &ins, TextWriter &pcode, const std::set<uint32_t> &jumpOffsets);
 };
 
 } // namespace script

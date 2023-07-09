@@ -86,7 +86,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
     auto actualFloat = reader.readFloat();
     auto actualDouble = reader.readDouble();
     auto actualStr = reader.readString(13);
-    auto actualCStr = reader.readCString();
+    auto actualCStr = reader.readCString(128);
     auto actualBytes = reader.readBytes(4);
 
     // then

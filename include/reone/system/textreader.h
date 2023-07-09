@@ -15,26 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include "reone/system/stream/memoryoutput.h"
-#include "reone/system/textwriter.h"
+#include "stream/input.h"
 
-#include "../checkutil.h"
+namespace reone {
 
-using namespace reone;
+class TextReader : boost::noncopyable {
+public:
+    TextReader(IInputStream &stream) :
+        _stream(stream) {
+    }
 
-TEST(text_writer, should_write_text) {
-    // given
-    auto expectedBytes = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    bool readLine(std::string &str);
 
-    // when
-    auto bytes = ByteArray();
-    auto stream = MemoryOutputStream(bytes);
-    auto text = TextWriter(stream);
-    text.writeLine("Hello, world!");
-    text.write("Hello, world!");
+private:
+    IInputStream &_stream;
+};
 
-    // then
-    EXPECT_EQ(expectedBytes, bytes) << notEqualMessage(expectedBytes, bytes);
-}
+} // namespace reone

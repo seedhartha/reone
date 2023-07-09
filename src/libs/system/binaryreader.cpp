@@ -113,10 +113,6 @@ std::string BinaryReader::readString(int len) {
     return std::string(&buf[0]);
 }
 
-std::string BinaryReader::readCString() {
-    return readCString(256);
-}
-
 std::string BinaryReader::readCString(int maxlen) {
     auto pos = _stream.position();
 

@@ -36,20 +36,21 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     auto keyPath = tmpDirPath;
     keyPath.append("sample.key");
     auto key = FileOutputStream(keyPath);
-    key.write("KEY V1  ");
+    key.write("KEY V1  ", 8);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
-    key.write(ByteArray(32, '\0'));
+    auto keyPadding = ByteArray(32, '\0');
+    key.write(&keyPadding[0], keyPadding.size());
     key.close();
 
     auto erfPath = tmpDirPath;
     erfPath.append("sample.erf");
     auto erf = FileOutputStream(erfPath);
-    erf.write("ERF V1.0");
+    erf.write("ERF V1.0", 8);
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
@@ -59,13 +60,14 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
-    erf.write(ByteArray(116, '\0'));
+    auto erfPadding = ByteArray(116, '\0');
+    erf.write(&erfPadding[0], erfPadding.size());
     erf.close();
 
     auto rimPath = tmpDirPath;
     rimPath.append("sample.rim");
     auto rim = FileOutputStream(rimPath);
-    rim.write("RIM V1.0");
+    rim.write("RIM V1.0", 8);
     rim.write("\x00\x00\x00\x00", 4);
     rim.write("\x00\x00\x00\x00", 4);
     rim.write("\x00\x00\x00\x00", 4);
@@ -78,7 +80,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     auto resPath = overridePath;
     resPath.append("sample.txt");
     auto res = FileOutputStream(resPath);
-    res.write("Hello, world!");
+    res.write("Hello, world!", 13);
     res.close();
 
     auto resources = Resources();

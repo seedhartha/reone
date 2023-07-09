@@ -15,12 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "input.h"
+#include "reone/system/textreader.h"
 
 namespace reone {
 
-bool readLine(IInputStream &stream, std::string &str);
+bool TextReader::readLine(std::string &str) {
+    auto pos = _stream.position();
+
+    std::vector<char> buf;
+    buf.resize(256);
+    int numRead = _stream.read(&buf[0], buf.size());
+    if (numRead == 0) {
+        str.clear();
+        return false;
+    }
+
+    size_t len;
+    for (len = 0; len < numRead; ++len) {
+        if (buf[len] == '\r' || buf[len] == '\n') {
+            break;
+        }
+    }
+    if (buf[len] == '\r') {
+        buf[len] = '\0';
+        _stream.seek(pos + len + 2);
+    } else if (buf[len] == '\n') {
+        buf[len] = '\0';
+        _stream.seek(pos + len + 1);
+    } else {
+        _stream.seek(pos + len);
+    }
+
+    str = std::string(&buf[0], len);
+    return true;
+}
 
 } // namespace reone

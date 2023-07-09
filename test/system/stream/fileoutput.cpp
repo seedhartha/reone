@@ -35,7 +35,7 @@ TEST(file_output_stream, should_write_to_file) {
 
     // when
 
-    stream.write(bytesToWrite);
+    stream.write(&bytesToWrite[0], bytesToWrite.size());
     auto position = stream.position();
     stream.writeByte('\n');
     stream.writeByte('H');

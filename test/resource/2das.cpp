@@ -44,8 +44,8 @@ TEST(two_das, should_get_2da_with_caching) {
 
     auto resBytes = std::make_shared<ByteArray>();
     auto res = MemoryOutputStream(*resBytes);
-    res.write("2DA V2.b\n");
-    res.write("label\t\0");
+    res.write("2DA V2.b\n", 9);
+    res.write("label\t\0", 7);
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);
 

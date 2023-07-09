@@ -19,7 +19,7 @@
 
 #include "reone/system/logutil.h"
 #include "reone/system/stream/input.h"
-#include "reone/system/stream/textutil.h"
+#include "reone/system/textreader.h"
 
 namespace reone {
 
@@ -27,7 +27,8 @@ namespace graphics {
 
 void TxiReader::load(IInputStream &in) {
     std::string line;
-    for (auto read = readLine(in, line); read; read = readLine(in, line)) {
+    auto reader = TextReader(in);
+    while (reader.readLine(line)) {
         boost::trim(line);
 
         std::vector<std::string> tokens;

@@ -18,7 +18,7 @@
 #include "reone/game/format/lytreader.h"
 
 #include "reone/system/stream/fileinput.h"
-#include "reone/system/stream/textutil.h"
+#include "reone/system/textreader.h"
 
 namespace reone {
 
@@ -26,7 +26,8 @@ namespace game {
 
 void LytReader::load(IInputStream &in) {
     std::string line;
-    for (bool read = readLine(in, line); read; read = readLine(in, line)) {
+    auto reader = TextReader(in);
+    while (reader.readLine(line)) {
         processLine(line);
     }
 }

@@ -31,7 +31,7 @@ TEST(memory_output_stream, should_write_to_byte_array) {
     auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
-    stream.write(bytesToWrite);
+    stream.write(&bytesToWrite[0], bytesToWrite.size());
     auto position = stream.position();
     stream.writeByte('\n');
     stream.writeByte('H');

@@ -50,7 +50,6 @@ public:
     float readFloat();
     double readDouble();
     std::string readString(int len);
-    std::string readCString();
     std::string readCString(int maxlen);
     ByteArray readBytes(int count);
 
@@ -60,15 +59,9 @@ public:
         });
     }
 
-    std::string readCStringAt(size_t off, int len) {
-        return readAt<std::string>(off, [this, &len]() {
-            return readCString(len);
-        });
-    }
-
-    std::string readCStringAt(size_t off) {
-        return readAt<std::string>(off, [this]() {
-            return readCString();
+    std::string readCStringAt(size_t off, int maxlen) {
+        return readAt<std::string>(off, [this, &maxlen]() {
+            return readCString(maxlen);
         });
     }
 

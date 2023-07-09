@@ -39,12 +39,13 @@ void PcodeWriter::save(IOutputStream &pcode) {
             break;
         }
     }
+    auto writer = TextWriter(pcode);
     for (auto &instr : _program.instructions()) {
-        writeInstruction(instr, pcode, jumpOffsets);
+        writeInstruction(instr, writer, jumpOffsets);
     }
 }
 
-void PcodeWriter::writeInstruction(const Instruction &ins, IOutputStream &pcode, const std::set<uint32_t> &jumpOffsets) {
+void PcodeWriter::writeInstruction(const Instruction &ins, TextWriter &pcode, const std::set<uint32_t> &jumpOffsets) {
     if (jumpOffsets.count(ins.offset) > 0) {
         pcode.write(str(boost::format("%08x\t") % ins.offset));
         pcode.write(str(boost::format("loc_%08x:") % ins.offset));

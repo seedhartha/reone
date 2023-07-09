@@ -43,7 +43,7 @@ TEST(gffs, should_get_gff_with_caching) {
 
     auto resBytes = std::make_shared<ByteArray>();
     auto res = MemoryOutputStream(*resBytes);
-    res.write("GFF V3.2");
+    res.write("GFF V3.2", 8);
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);

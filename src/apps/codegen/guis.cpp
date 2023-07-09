@@ -85,7 +85,7 @@ static ParsedGUI mergeGuis(const ParsedGUI &k1Gui, const ParsedGUI &k2Gui) {
 static void writeControlDeclaration(const std::string &typeName,
                                     const std::string &tag,
                                     TextWriter &writer) {
-    writer.put(str(boost::format("std::shared_ptr<%s> %s;\n") % typeName % tag));
+    writer.write(str(boost::format("std::shared_ptr<%s> %s;\n") % typeName % tag));
 }
 
 static std::string controlTypeToTypeName(ControlType type) {
@@ -131,34 +131,34 @@ static void writeHeaderFile(const std::string &resRef,
     path.append(resRef + ".h");
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
-    writer.put(kCopyrightNotice + "\n\n");
-    writer.put("#pragma once\n\n");
-    writer.put(str(boost::format(kIncludeFormat + "\n\n") % "reone/gui/gui.h"));
-    writer.put("namespace reone {\n\n");
-    writer.put("namespace game {\n\n");
-    writer.put(str(boost::format("class GUI_%s : gui::IGUI, boost::noncopyable {\n") % resRef));
-    writer.put("public:\n");
-    writer.put(kIndent + "void bindControls() {\n");
+    writer.write(kCopyrightNotice + "\n\n");
+    writer.write("#pragma once\n\n");
+    writer.write(str(boost::format(kIncludeFormat + "\n\n") % "reone/gui/gui.h"));
+    writer.write("namespace reone {\n\n");
+    writer.write("namespace game {\n\n");
+    writer.write(str(boost::format("class GUI_%s : gui::IGUI, boost::noncopyable {\n") % resRef));
+    writer.write("public:\n");
+    writer.write(kIndent + "void bindControls() {\n");
     for (auto &[tag, control] : gui.controls) {
         auto typeName = controlTypeToTypeName(control.type);
-        writer.put(str(boost::format("%1%%1%_controls.%2% = findControl<%3%>(\"%2%\");\n") % kIndent % tag % typeName));
+        writer.write(str(boost::format("%1%%1%_controls.%2% = findControl<%3%>(\"%2%\");\n") % kIndent % tag % typeName));
     }
-    writer.put(kIndent + "}\n");
-    writer.put("\n");
-    writer.put("private:\n");
-    writer.put(kIndent + "struct Controls {\n");
+    writer.write(kIndent + "}\n");
+    writer.write("\n");
+    writer.write("private:\n");
+    writer.write(kIndent + "struct Controls {\n");
     for (auto &[tag, control] : gui.controls) {
-        writer.put(kIndent);
-        writer.put(kIndent);
+        writer.write(kIndent);
+        writer.write(kIndent);
         auto typeName = controlTypeToTypeName(control.type);
         writeControlDeclaration(typeName, tag, writer);
     }
-    writer.put(kIndent + "};\n");
-    writer.put("\n");
-    writer.put(kIndent + "Controls _controls;\n");
-    writer.put("};\n\n");
-    writer.put("} // namespace game\n\n");
-    writer.put("} // namespace reone\n");
+    writer.write(kIndent + "};\n");
+    writer.write("\n");
+    writer.write(kIndent + "Controls _controls;\n");
+    writer.write("};\n\n");
+    writer.write("} // namespace game\n\n");
+    writer.write("} // namespace reone\n");
 }
 
 void generateGuis(const boost::filesystem::path &k1dir,

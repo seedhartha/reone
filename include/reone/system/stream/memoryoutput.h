@@ -24,37 +24,25 @@ namespace reone {
 class MemoryOutputStream : public IOutputStream {
 public:
     MemoryOutputStream(ByteArray &bytes) :
-        _bytes(bytes) {
+        _buffer(bytes) {
     }
 
     void writeByte(uint8_t val) override {
-        _bytes.push_back(*reinterpret_cast<char *>(&val));
+        _buffer.push_back(*reinterpret_cast<char *>(&val));
     }
 
-    void writeChar(char ch) override {
-        _bytes.push_back(ch);
-    }
-
-    void write(const ByteArray &bytes) override {
-        _bytes.insert(_bytes.end(), bytes.begin(), bytes.end());
-    }
-
-    void write(const std::string &str) override {
-        _bytes.insert(_bytes.end(), str.begin(), str.end());
-    }
-
-    void write(const char *data, int len) override {
-        size_t pos = _bytes.size();
-        _bytes.resize(pos + static_cast<size_t>(len));
-        std::memcpy(&_bytes[pos], data, len);
+    void write(const char *buf, int len) override {
+        size_t pos = _buffer.size();
+        _buffer.resize(pos + static_cast<size_t>(len));
+        std::memcpy(&_buffer[pos], buf, len);
     }
 
     size_t position() override {
-        return _bytes.size();
+        return _buffer.size();
     }
 
 private:
-    ByteArray &_bytes;
+    ByteArray &_buffer;
 };
 
 } // namespace reone

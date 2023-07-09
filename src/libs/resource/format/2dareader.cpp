@@ -56,7 +56,7 @@ void TwoDaReader::loadRows() {
         for (int j = 0; j < columnCount; ++j) {
             int cellIdx = i * columnCount + j;
             size_t off = pos + offsets[cellIdx];
-            row.values.push_back(_reader.readCStringAt(off));
+            row.values.push_back(_reader.readCStringAt(off, 128));
         }
         _rows.push_back(row);
     }

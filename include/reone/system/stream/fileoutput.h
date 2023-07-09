@@ -31,20 +31,8 @@ public:
         _stream.put(*reinterpret_cast<char *>(&val));
     }
 
-    void writeChar(char ch) override {
-        _stream.put(ch);
-    }
-
-    void write(const ByteArray &bytes) override {
-        _stream.write(&bytes[0], bytes.size());
-    }
-
-    void write(const std::string &str) override {
-        _stream.write(&str[0], str.size());
-    }
-
-    void write(const char *data, int len) override {
-        _stream.write(data, len);
+    void write(const char *buf, int len) override {
+        _stream.write(buf, len);
     }
 
     void close() {

@@ -318,7 +318,7 @@ void GffWriter::writeLabelArray() {
 }
 
 void GffWriter::writeFieldData() {
-    _writer->writeBytes(_context.fieldData);
+    _writer->write(_context.fieldData);
 }
 
 void GffWriter::writeFieldIndices() {

@@ -22,7 +22,7 @@
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
-#include "reone/system/stream/textutil.h"
+#include "reone/system/textreader.h"
 #include "reone/system/textwriter.h"
 
 #include "templates.h"
@@ -150,7 +150,8 @@ static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseN
     std::map<std::string, Constant> constants;
     std::vector<Function> functions;
     std::string line;
-    for (bool read = readLine(nss, line); read; read = readLine(nss, line)) {
+    auto reader = TextReader(nss);
+    while (reader.readLine(line)) {
         boost::smatch constMatch;
         if (boost::regex_search(line, constMatch, kConstRegex)) {
             auto constant = parseConstant(constMatch);
@@ -187,18 +188,18 @@ static void writeReoneRoutineGetArgExpr(int idx,
     if (!arg.defVal.empty()) {
         auto evaluated = evaluateConstant(arg.defVal, constants);
         if (arg.type == "int") {
-            code.put(str(boost::format("getIntOrElse(args, %d, %s)") % idx % evaluated));
+            code.write(str(boost::format("getIntOrElse(args, %d, %s)") % idx % evaluated));
         } else if (arg.type == "float") {
-            code.put(str(boost::format("getFloatOrElse(args, %d, %s)") % idx % evaluated));
+            code.write(str(boost::format("getFloatOrElse(args, %d, %s)") % idx % evaluated));
         } else if (arg.type == "string") {
-            code.put(str(boost::format("getStringOrElse(args, %d, %s)") % idx % evaluated));
+            code.write(str(boost::format("getStringOrElse(args, %d, %s)") % idx % evaluated));
         } else if (arg.type == "vector") {
-            code.put(str(boost::format("getVectorOrElse(args, %d, %s)") % idx % evaluated));
+            code.write(str(boost::format("getVectorOrElse(args, %d, %s)") % idx % evaluated));
         } else if (arg.type == "object") {
             if (arg.defVal == "0" || arg.defVal == "OBJECT_SELF") {
-                code.put(str(boost::format("getObjectOrCaller(args, %d, ctx)") % idx));
+                code.write(str(boost::format("getObjectOrCaller(args, %d, ctx)") % idx));
             } else if (arg.defVal == "1" || arg.defVal == "OBJECT_INVALID" || arg.defVal == "OBJECT_TYPE_INVALID") {
-                code.put(str(boost::format("getObjectOrNull(args, %d, ctx)") % idx));
+                code.write(str(boost::format("getObjectOrNull(args, %d, ctx)") % idx));
             } else {
                 throw NotImplementedException(arg.defVal);
             }
@@ -207,27 +208,27 @@ static void writeReoneRoutineGetArgExpr(int idx,
         }
     } else {
         if (arg.type == "int") {
-            code.put(str(boost::format("getInt(args, %d)") % idx));
+            code.write(str(boost::format("getInt(args, %d)") % idx));
         } else if (arg.type == "float") {
-            code.put(str(boost::format("getFloat(args, %d)") % idx));
+            code.write(str(boost::format("getFloat(args, %d)") % idx));
         } else if (arg.type == "string") {
-            code.put(str(boost::format("getString(args, %d)") % idx));
+            code.write(str(boost::format("getString(args, %d)") % idx));
         } else if (arg.type == "vector") {
-            code.put(str(boost::format("getVector(args, %d)") % idx));
+            code.write(str(boost::format("getVector(args, %d)") % idx));
         } else if (arg.type == "object") {
-            code.put(str(boost::format("getObject(args, %d, ctx)") % idx));
+            code.write(str(boost::format("getObject(args, %d, ctx)") % idx));
         } else if (arg.type == "object_id") {
-            code.put(str(boost::format("getObject(args, %d, ctx)") % idx));
+            code.write(str(boost::format("getObject(args, %d, ctx)") % idx));
         } else if (arg.type == "effect") {
-            code.put(str(boost::format("getEffect(args, %d)") % idx));
+            code.write(str(boost::format("getEffect(args, %d)") % idx));
         } else if (arg.type == "event") {
-            code.put(str(boost::format("getEvent(args, %d)") % idx));
+            code.write(str(boost::format("getEvent(args, %d)") % idx));
         } else if (arg.type == "location") {
-            code.put(str(boost::format("getLocationArgument(args, %d)") % idx));
+            code.write(str(boost::format("getLocationArgument(args, %d)") % idx));
         } else if (arg.type == "talent") {
-            code.put(str(boost::format("getTalent(args, %d)") % idx));
+            code.write(str(boost::format("getTalent(args, %d)") % idx));
         } else if (arg.type == "action") {
-            code.put(str(boost::format("getAction(args, %d)") % idx));
+            code.write(str(boost::format("getAction(args, %d)") % idx));
         } else {
             throw NotImplementedException(arg.type);
         }
@@ -238,29 +239,29 @@ static void writeReoneRoutineInitArgExpr(int idx,
                                          const FunctionArgument &arg,
                                          const std::map<std::string, Constant> &constants,
                                          TextWriter &code) {
-    code.put(kIndent + "auto " + arg.name + " = ");
+    code.write(kIndent + "auto " + arg.name + " = ");
     writeReoneRoutineGetArgExpr(idx, arg, constants, code);
-    code.put(";\n");
+    code.write(";\n");
 }
 
 static void writeReoneRoutineImpl(const Function &func,
                                   const std::map<std::string, Constant> &constants,
                                   TextWriter &code) {
-    code.put(str(boost::format("static Variable %s(const std::vector<Variable> &args, const RoutineContext &ctx) {\n") % func.name));
+    code.write(str(boost::format("static Variable %s(const std::vector<Variable> &args, const RoutineContext &ctx) {\n") % func.name));
     if (!func.args.empty()) {
-        code.put(kIndent + "// Load\n");
+        code.write(kIndent + "// Load\n");
     }
     for (size_t i = 0; i < func.args.size(); ++i) {
         auto &arg = func.args[i];
         writeReoneRoutineInitArgExpr(i, arg, constants, code);
     }
     if (!func.args.empty()) {
-        code.put("\n");
-        code.put(kIndent + "// Transform\n\n");
+        code.write("\n");
+        code.write(kIndent + "// Transform\n\n");
     }
-    code.put(kIndent + "// Execute\n");
-    code.put(str(boost::format("%sthrow RoutineNotImplementedException(\"%s\");\n") % kIndent % func.name));
-    code.put("}\n\n");
+    code.write(kIndent + "// Execute\n");
+    code.write(str(boost::format("%sthrow RoutineNotImplementedException(\"%s\");\n") % kIndent % func.name));
+    code.write("}\n\n");
 }
 
 static std::string nssTypeToMacro(const std::string &type) {
@@ -296,7 +297,7 @@ static void writeReoneRegisterRoutinesFunc(const std::string &category,
                                            const std::string &game,
                                            const std::vector<std::tuple<int, Function>> &functions,
                                            TextWriter &code) {
-    code.put(str(boost::format("void Routines::register%s%sRoutines() {\n") % category % game));
+    code.write(str(boost::format("void Routines::register%s%sRoutines() {\n") % category % game));
     for (auto &[idx, func] : functions) {
         auto retType = nssTypeToMacro(func.retType);
         std::vector<std::string> args;
@@ -304,9 +305,9 @@ static void writeReoneRegisterRoutinesFunc(const std::string &category,
             args.push_back(nssTypeToMacro(arg.type));
         }
         auto argsStr = boost::join(args, ", ");
-        code.put(str(boost::format("%sinsert(%d, \"%s\", %s, {%s}, &%s);\n") % kIndent % idx % func.name % retType % argsStr % func.name));
+        code.write(str(boost::format("%sinsert(%d, \"%s\", %s, {%s}, &%s);\n") % kIndent % idx % func.name % retType % argsStr % func.name));
     }
-    code.put("}\n\n");
+    code.write("}\n\n");
 }
 
 static void writeReoneRoutineImplFile(const std::string &category,
@@ -316,36 +317,36 @@ static void writeReoneRoutineImplFile(const std::string &category,
                                       const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto code = TextWriter(stream);
-    code.put(kCopyrightNotice + "\n\n");
-    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/argutil.h"));
-    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/context.h"));
-    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routines.h"));
-    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/script/routine/exception/notimplemented.h"));
-    code.put(str(boost::format(kIncludeFormat + "\n") % "reone/script/variable.h"));
-    code.put("\n");
-    code.put("#define R_VOID script::VariableType::Void\n");
-    code.put("#define R_INT script::VariableType::Int\n");
-    code.put("#define R_FLOAT script::VariableType::Float\n");
-    code.put("#define R_OBJECT script::VariableType::Object\n");
-    code.put("#define R_STRING script::VariableType::String\n");
-    code.put("#define R_EFFECT script::VariableType::Effect\n");
-    code.put("#define R_EVENT script::VariableType::Event\n");
-    code.put("#define R_LOCATION script::VariableType::Location\n");
-    code.put("#define R_TALENT script::VariableType::Talent\n");
-    code.put("#define R_VECTOR script::VariableType::Vector\n");
-    code.put("#define R_ACTION script::VariableType::Action\n");
-    code.put("\n");
-    code.put("using namespace reone::script;\n");
-    code.put("\n");
-    code.put("namespace reone {\n\n");
-    code.put("namespace game {\n\n");
+    code.write(kCopyrightNotice + "\n\n");
+    code.write(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/argutil.h"));
+    code.write(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routine/context.h"));
+    code.write(str(boost::format(kIncludeFormat + "\n") % "reone/game/script/routines.h"));
+    code.write(str(boost::format(kIncludeFormat + "\n") % "reone/script/routine/exception/notimplemented.h"));
+    code.write(str(boost::format(kIncludeFormat + "\n") % "reone/script/variable.h"));
+    code.write("\n");
+    code.write("#define R_VOID script::VariableType::Void\n");
+    code.write("#define R_INT script::VariableType::Int\n");
+    code.write("#define R_FLOAT script::VariableType::Float\n");
+    code.write("#define R_OBJECT script::VariableType::Object\n");
+    code.write("#define R_STRING script::VariableType::String\n");
+    code.write("#define R_EFFECT script::VariableType::Effect\n");
+    code.write("#define R_EVENT script::VariableType::Event\n");
+    code.write("#define R_LOCATION script::VariableType::Location\n");
+    code.write("#define R_TALENT script::VariableType::Talent\n");
+    code.write("#define R_VECTOR script::VariableType::Vector\n");
+    code.write("#define R_ACTION script::VariableType::Action\n");
+    code.write("\n");
+    code.write("using namespace reone::script;\n");
+    code.write("\n");
+    code.write("namespace reone {\n\n");
+    code.write("namespace game {\n\n");
     for (auto &[_, func] : k2functions) {
         writeReoneRoutineImpl(func, constants, code);
     }
     writeReoneRegisterRoutinesFunc(category, "Kotor", k1functions, code);
     writeReoneRegisterRoutinesFunc(category, "Tsl", k2functions, code);
-    code.put("} // namespace game\n\n");
-    code.put("} // namespace reone\n\n");
+    code.write("} // namespace game\n\n");
+    code.write("} // namespace reone\n\n");
 }
 
 void generateRoutines(const boost::filesystem::path &k1Dir,

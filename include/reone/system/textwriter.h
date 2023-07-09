@@ -27,8 +27,8 @@ public:
         _stream(stream) {
     }
 
-    void put(const std::string &s);
-    void putLine(const std::string &s);
+    void write(const std::string &s);
+    void writeLine(const std::string &s);
 
 private:
     IOutputStream &_stream;

@@ -54,7 +54,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
     writer.writeFloat(1.0f);
     writer.writeString(std::string("Aa"));
     writer.writeCString(std::string("Bb\x00"));
-    writer.writeBytes(ByteArray {0x01, 0x02, 0x03, 0x04});
+    writer.write(ByteArray {0x01, 0x02, 0x03, 0x04});
 
     // then
     auto output = std::string(bytes.data(), bytes.size());

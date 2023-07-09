@@ -61,11 +61,11 @@ void BinaryWriter::writeCString(const std::string &str) {
     _stream.writeByte('\0');
 }
 
-void BinaryWriter::writeBytes(const ByteArray &bytes) {
+void BinaryWriter::write(const ByteArray &bytes) {
     _stream.write(&bytes[0], bytes.size());
 }
 
-void BinaryWriter::writeBytes(int count, uint8_t val) {
+void BinaryWriter::write(int count, uint8_t val) {
     ByteArray data(count, val);
     _stream.write(&data[0], count);
 }

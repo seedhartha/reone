@@ -47,6 +47,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
     ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
+    ${TESTS_SOURCE_DIR}/system/textreader.cpp
     ${TESTS_SOURCE_DIR}/system/textwriter.cpp
     ${TESTS_SOURCE_DIR}/system/timer.cpp
     ${TESTS_SOURCE_DIR}/game/game.cpp

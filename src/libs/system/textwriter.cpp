@@ -19,11 +19,11 @@
 
 namespace reone {
 
-void TextWriter::put(const std::string &s) {
+void TextWriter::write(const std::string &s) {
     _stream.write(&s[0], s.length());
 }
 
-void TextWriter::putLine(const std::string &s) {
+void TextWriter::writeLine(const std::string &s) {
     _stream.write(&s[0], s.length());
     _stream.writeByte('\n');
 }

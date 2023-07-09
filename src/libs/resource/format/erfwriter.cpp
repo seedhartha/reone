@@ -55,7 +55,7 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
     writer.writeUint32(0);            // build year since 1900
     writer.writeUint32(0);            // build day since January 1st
     writer.writeInt32(-1);            // StrRef for file description
-    writer.writeBytes(116, 0);        // padding
+    writer.write(116, 0);        // padding
 
     uint32_t id = 0;
 
@@ -82,7 +82,7 @@ void ErfWriter::save(FileType type, IOutputStream &out) {
 
     // Write resource data
     for (auto &res : _resources) {
-        writer.writeBytes(res.data);
+        writer.write(res.data);
     }
 }
 

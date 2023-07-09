@@ -41,8 +41,9 @@ public:
     void writeFloat(float val);
     void writeString(const std::string &str);
     void writeCString(const std::string &str);
-    void writeBytes(const ByteArray &bytes);
-    void writeBytes(int count, uint8_t val);
+
+    void write(const ByteArray &bytes);
+    void write(int count, uint8_t val);
 
     size_t position() const;
 

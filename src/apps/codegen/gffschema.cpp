@@ -143,35 +143,35 @@ static void writeField(const SchemaField &field, TextWriter &writer) {
     case Gff::FieldType::Dword64:
     case Gff::FieldType::Int64:
     case Gff::FieldType::StrRef:
-        writer.put(str(boost::format("%s%s %s {0};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {0};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Float:
-        writer.put(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Double:
-        writer.put(str(boost::format("%s%s %s {0.0};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {0.0};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Char:
-        writer.put(str(boost::format("%s%s %s {'\\0'};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {'\\0'};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Orientation:
-        writer.put(str(boost::format("%s%s %s {1.0f, 0.0f, 0.0f, 0.0f};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {1.0f, 0.0f, 0.0f, 0.0f};\n") % kIndent % typeStr % field.cppName));
         break;
     case Gff::FieldType::Vector:
-        writer.put(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s {0.0f};\n") % kIndent % typeStr % field.cppName));
         break;
     default:
-        writer.put(str(boost::format("%s%s %s;\n") % kIndent % typeStr % field.cppName));
+        writer.write(str(boost::format("%s%s %s;\n") % kIndent % typeStr % field.cppName));
         break;
     }
 }
 
 static void writeStruct(const SchemaStruct &schemaStruct, TextWriter &writer) {
-    writer.put(str(boost::format("struct %s {\n") % schemaStruct.name));
+    writer.write(str(boost::format("struct %s {\n") % schemaStruct.name));
     for (auto &[_, field] : schemaStruct.fields) {
         writeField(field, writer);
     }
-    writer.put("};\n\n");
+    writer.write("};\n\n");
 }
 
 static void writeSchemaHeaderFile(const std::string &topStructName,
@@ -179,95 +179,95 @@ static void writeSchemaHeaderFile(const std::string &topStructName,
                                   const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
-    writer.put(kCopyrightNotice);
-    writer.put("\n\n");
-    writer.put("#pragma once\n\n");
-    writer.put("namespace reone {\n\n");
-    writer.put("namespace resource {\n\n");
-    writer.put("class Gff;\n\n");
-    writer.put("}\n\n");
-    writer.put("namespace game {\n\n");
+    writer.write(kCopyrightNotice);
+    writer.write("\n\n");
+    writer.write("#pragma once\n\n");
+    writer.write("namespace reone {\n\n");
+    writer.write("namespace resource {\n\n");
+    writer.write("class Gff;\n\n");
+    writer.write("}\n\n");
+    writer.write("namespace game {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeStruct(*schemaStruct, writer);
     }
     for (auto &[_, schemaStruct] : structs) {
         if (schemaStruct->top) {
-            writer.put(str(boost::format("%1% parse%1%(const resource::Gff &gff);\n") % topStructName));
+            writer.write(str(boost::format("%1% parse%1%(const resource::Gff &gff);\n") % topStructName));
         }
     }
-    writer.put("\n");
-    writer.put("} // namespace game\n\n");
-    writer.put("} // namespace reone\n");
+    writer.write("\n");
+    writer.write("} // namespace game\n\n");
+    writer.write("} // namespace reone\n");
 }
 
 static void writeParseFunction(const SchemaStruct &schemaStruct, TextWriter &writer) {
     if (schemaStruct.top) {
-        writer.put(str(boost::format("%1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
+        writer.write(str(boost::format("%1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
     } else {
-        writer.put(str(boost::format("static %1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
+        writer.write(str(boost::format("static %1% parse%1%(const Gff &gff) {\n") % schemaStruct.name));
     }
-    writer.put(str(boost::format("%s%s strct;\n") % kIndent % schemaStruct.name));
+    writer.write(str(boost::format("%s%s strct;\n") % kIndent % schemaStruct.name));
     for (auto &[_, field] : schemaStruct.fields) {
         switch (field.type) {
         case Gff::FieldType::Byte:
         case Gff::FieldType::Word:
         case Gff::FieldType::Dword:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getUint(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getUint(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Char:
         case Gff::FieldType::Short:
         case Gff::FieldType::Int:
         case Gff::FieldType::StrRef:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getInt(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getInt(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Dword64:
-            writer.put(str(boost::format("%1%strct.%2% = gff.readUint64(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.readUint64(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Int64: {
-            writer.put(str(boost::format("%1%strct.%2% = gff.readInt64(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.readInt64(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         }
         case Gff::FieldType::Float:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getFloat(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getFloat(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Double:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getDouble(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getDouble(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::CExoString:
         case Gff::FieldType::ResRef:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getString(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getString(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::CExoLocString:
-            writer.put(str(boost::format("%1%strct.%2% = std::make_pair(gff.getInt(\"%3%\"), gff.getString(\"%3%\"));\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = std::make_pair(gff.getInt(\"%3%\"), gff.getString(\"%3%\"));\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Void:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getData(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getData(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Struct:
-            writer.put(str(boost::format("%1%auto %2% = gff.findStruct(\"%3%\");\n") % kIndent % field.cppName % field.name));
-            writer.put(str(boost::format("%1%if (%2%) {\n") % kIndent % field.cppName));
-            writer.put(str(boost::format("%1%%1%strct.%2% = parse%3%(*%2%);\n") % kIndent % field.cppName % field.subStruct->name));
-            writer.put(str(boost::format("%1%}\n") % kIndent));
+            writer.write(str(boost::format("%1%auto %2% = gff.findStruct(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%if (%2%) {\n") % kIndent % field.cppName));
+            writer.write(str(boost::format("%1%%1%strct.%2% = parse%3%(*%2%);\n") % kIndent % field.cppName % field.subStruct->name));
+            writer.write(str(boost::format("%1%}\n") % kIndent));
             break;
         case Gff::FieldType::List:
             if (field.subStruct) {
-                writer.put(str(boost::format("%1%for (auto &item : gff.getList(\"%2%\")) {\n") % kIndent % field.name));
-                writer.put(str(boost::format("%1%%1%strct.%2%.push_back(parse%3%(*item));\n") % kIndent % field.cppName % field.subStruct->name));
-                writer.put(str(boost::format("%1%}\n") % kIndent));
+                writer.write(str(boost::format("%1%for (auto &item : gff.getList(\"%2%\")) {\n") % kIndent % field.name));
+                writer.write(str(boost::format("%1%%1%strct.%2%.push_back(parse%3%(*item));\n") % kIndent % field.cppName % field.subStruct->name));
+                writer.write(str(boost::format("%1%}\n") % kIndent));
             }
             break;
         case Gff::FieldType::Orientation:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getOrientation(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getOrientation(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         case Gff::FieldType::Vector:
-            writer.put(str(boost::format("%1%strct.%2% = gff.getVector(\"%3%\");\n") % kIndent % field.cppName % field.name));
+            writer.write(str(boost::format("%1%strct.%2% = gff.getVector(\"%3%\");\n") % kIndent % field.cppName % field.name));
             break;
         default:
             throw std::logic_error("Invalid field type: " + std::to_string(static_cast<int>(field.type)));
         }
     }
-    writer.put(str(boost::format("%sreturn strct;\n") % kIndent));
-    writer.put("}\n\n");
+    writer.write(str(boost::format("%sreturn strct;\n") % kIndent));
+    writer.write("}\n\n");
 }
 
 static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>> &structs,
@@ -275,18 +275,18 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
                                 const boost::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
-    writer.put(kCopyrightNotice);
-    writer.put("\n\n");
-    writer.put(str(boost::format(kIncludeFormat + "\n\n") % schemaHeaderFilename));
-    writer.put(str(boost::format(kIncludeFormat + "\n\n") % "reone/resource/gff.h"));
-    writer.put("using namespace reone::resource;\n\n");
-    writer.put("namespace reone {\n\n");
-    writer.put("namespace game {\n\n");
+    writer.write(kCopyrightNotice);
+    writer.write("\n\n");
+    writer.write(str(boost::format(kIncludeFormat + "\n\n") % schemaHeaderFilename));
+    writer.write(str(boost::format(kIncludeFormat + "\n\n") % "reone/resource/gff.h"));
+    writer.write("using namespace reone::resource;\n\n");
+    writer.write("namespace reone {\n\n");
+    writer.write("namespace game {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeParseFunction(*schemaStruct, writer);
     }
-    writer.put("} // namespace game\n\n");
-    writer.put("} // namespace reone\n");
+    writer.write("} // namespace game\n\n");
+    writer.write("} // namespace reone\n");
 }
 
 void generateGffSchema(resource::ResourceType resType,

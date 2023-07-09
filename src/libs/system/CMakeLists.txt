@@ -35,8 +35,8 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/stream/fileoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/input.h
     ${SYSTEM_INCLUDE_DIR}/stream/output.h
-    ${SYSTEM_INCLUDE_DIR}/stream/textutil.h
     ${SYSTEM_INCLUDE_DIR}/stringbuilder.h
+    ${SYSTEM_INCLUDE_DIR}/textreader.h
     ${SYSTEM_INCLUDE_DIR}/textwriter.h
     ${SYSTEM_INCLUDE_DIR}/timer.h
     ${SYSTEM_INCLUDE_DIR}/types.h)
@@ -51,7 +51,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/logutil.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
     ${SYSTEM_SOURCE_DIR}/stream/memoryinput.cpp
-    ${SYSTEM_SOURCE_DIR}/stream/textutil.cpp
+    ${SYSTEM_SOURCE_DIR}/textreader.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})

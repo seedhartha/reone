@@ -41,7 +41,7 @@ void RimWriter::save(IOutputStream &out) {
     writer.writeUint32(0); // reserved
     writer.writeUint32(numResources);
     writer.writeUint32(0x78);  // offset to resource headers
-    writer.writeBytes(100, 0); // reserved
+    writer.write(100, 0); // reserved
 
     uint32_t id = 0;
     uint32_t offset = 0x78 + numResources * 32;
@@ -64,7 +64,7 @@ void RimWriter::save(IOutputStream &out) {
 
     // Write resources data
     for (auto &res : _resources) {
-        writer.writeBytes(res.data);
+        writer.write(res.data);
     }
 }
 
