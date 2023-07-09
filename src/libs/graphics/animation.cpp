@@ -17,8 +17,6 @@
 
 #include "reone/graphics/animation.h"
 
-#include "reone/system/collectionutil.h"
-
 #include "reone/graphics/modelnode.h"
 
 namespace reone {
@@ -60,11 +58,13 @@ void Animation::fillLookups() {
 }
 
 std::shared_ptr<ModelNode> Animation::getNodeByNumber(uint16_t number) const {
-    return getFromLookupOrNull(_nodeByNumber, number);
+    auto it = _nodeByNumber.find(number);
+    return it != _nodeByNumber.end() ? it->second : nullptr;
 }
 
 std::shared_ptr<ModelNode> Animation::getNodeByName(const std::string &name) const {
-    return getFromLookupOrNull(_nodeByName, name);
+    auto it = _nodeByName.find(name);
+    return it != _nodeByName.end() ? it->second : nullptr;
 }
 
 } // namespace graphics

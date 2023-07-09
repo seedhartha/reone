@@ -29,7 +29,6 @@
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine/exception/argmissing.h"
 #include "reone/script/routine/exception/argument.h"
-#include "reone/system/collectionutil.h"
 
 using namespace reone::script;
 
@@ -38,7 +37,7 @@ namespace reone {
 namespace game {
 
 static void throwIfMissing(const std::vector<Variable> &args, int index) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         throw RoutineArgumentMissingException(str(boost::format("Argument index out of range: %d/%d") % index % static_cast<int>(args.size())));
     }
 }
@@ -204,7 +203,7 @@ std::shared_ptr<ExecutionContext> getAction(const std::vector<Variable> &args, i
 }
 
 int getIntOrElse(const std::vector<Variable> &args, int index, int defValue) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return defValue;
     }
     throwIfUnexpectedType(VariableType::Int, args[index].type);
@@ -212,7 +211,7 @@ int getIntOrElse(const std::vector<Variable> &args, int index, int defValue) {
 }
 
 float getFloatOrElse(const std::vector<Variable> &args, int index, float defValue) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return defValue;
     }
     throwIfUnexpectedType(VariableType::Float, args[index].type);
@@ -220,7 +219,7 @@ float getFloatOrElse(const std::vector<Variable> &args, int index, float defValu
 }
 
 std::string getStringOrElse(const std::vector<Variable> &args, int index, std::string defValue) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return defValue;
     }
     throwIfUnexpectedType(VariableType::String, args[index].type);
@@ -228,7 +227,7 @@ std::string getStringOrElse(const std::vector<Variable> &args, int index, std::s
 }
 
 glm::vec3 getVectorOrElse(const std::vector<Variable> &args, int index, glm::vec3 defValue) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return defValue;
     }
     throwIfUnexpectedType(VariableType::Vector, args[index].type);
@@ -236,7 +235,7 @@ glm::vec3 getVectorOrElse(const std::vector<Variable> &args, int index, glm::vec
 }
 
 std::shared_ptr<Object> getObjectOrNull(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return nullptr;
     } else {
         return getObject(args, index, ctx);
@@ -244,7 +243,7 @@ std::shared_ptr<Object> getObjectOrNull(const std::vector<Variable> &args, int i
 }
 
 std::shared_ptr<Object> getObjectOrCaller(const std::vector<Variable> &args, int index, const RoutineContext &ctx) {
-    if (isOutOfRange(args, index)) {
+    if (index < 0 || index >= args.size()) {
         return getCaller(ctx);
     } else {
         return getObject(args, index, ctx);

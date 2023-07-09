@@ -17,7 +17,6 @@
 
 #include "reone/resource/provider/keybif.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
 
@@ -36,10 +35,10 @@ void KeyBifResourceProvider::init() {
     auto gamePath = _keyPath.parent_path();
     auto &files = keyReader.files();
 
-    auto keysByBifIdx = groupBy<KeyReader::KeyEntry, int, const KeyReader::KeyEntry *>(
-        keyReader.keys(),
-        [](auto &item) { return item.bifIdx; },
-        [](auto &item) { return &item; });
+    std::unordered_map<int, std::vector<const KeyReader::KeyEntry *>> bifIdxToKey;
+    for (auto &key : keyReader.keys()) {
+        bifIdxToKey[key.bifIdx].push_back(&key);
+    }
 
     for (auto i = 0; i < keyReader.files().size(); ++i) {
         auto &file = keyReader.files()[i];
@@ -50,7 +49,7 @@ void KeyBifResourceProvider::init() {
         auto bifReader = BifReader(bif);
         bifReader.load();
 
-        auto &keys = keysByBifIdx.at(i);
+        auto &keys = bifIdxToKey.at(i);
         auto &bifResources = bifReader.resources();
 
         for (auto &key : keys) {

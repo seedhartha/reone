@@ -21,7 +21,6 @@
 #include "reone/game/script/routine/context.h"
 #include "reone/game/types.h"
 #include "reone/script/variable.h"
-#include "reone/system/collectionutil.h"
 
 using namespace reone::script;
 

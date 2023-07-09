@@ -18,7 +18,7 @@
 #include "reone/graphics/format/mdlreader.h"
 
 #include "reone/resource/exception/format.h"
-#include "reone/system/collectionutil.h"
+
 #include "reone/system/logutil.h"
 
 #include "reone/graphics/animation.h"
@@ -833,14 +833,18 @@ void MdlReader::initControllerFn() {
 MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
     if (nodeFlags & MdlNodeFlags::mesh) {
-        fn = getFromLookupOrNull(_meshControllers, type);
+        auto it = _meshControllers.find(type);
+        fn = it != _meshControllers.end() ? it->second : nullptr;
     } else if (nodeFlags & MdlNodeFlags::light) {
-        fn = getFromLookupOrNull(_lightControllers, type);
+        auto it = _lightControllers.find(type);
+        fn = it != _lightControllers.end() ? it->second : nullptr;
     } else if (nodeFlags & MdlNodeFlags::emitter) {
-        fn = getFromLookupOrNull(_emitterControllers, type);
+        auto it = _emitterControllers.find(type);
+        fn = it != _emitterControllers.end() ? it->second : nullptr;
     }
     if (!fn) {
-        fn = getFromLookupOrNull(_genericControllers, type);
+        auto it = _genericControllers.find(type);
+        fn = it != _genericControllers.end() ? it->second : nullptr;
     }
     return std::move(fn);
 }

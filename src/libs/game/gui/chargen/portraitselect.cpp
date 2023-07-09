@@ -27,7 +27,7 @@
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-#include "reone/system/collectionutil.h"
+
 #include "reone/system/randomutil.h"
 
 #include "reone/game/di/services.h"

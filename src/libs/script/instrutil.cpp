@@ -17,8 +17,6 @@
 
 #include "reone/script/instrutil.h"
 
-#include "reone/system/collectionutil.h"
-
 #include "reone/script/program.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
@@ -27,7 +25,7 @@ namespace reone {
 
 namespace script {
 
-static std::unordered_map<InstructionType, std::string> g_descByInstrType {
+static std::unordered_map<InstructionType, std::string> g_instrTypeToDesc {
     {InstructionType::NOP, "NOP"},
     {InstructionType::CPDOWNSP, "CPDOWNSP"},
     {InstructionType::RSADDI, "RSADDI"},
@@ -124,10 +122,15 @@ static std::unordered_map<InstructionType, std::string> g_descByInstrType {
     {InstructionType::STORE_STATE, "STORE_STATE"},
     {InstructionType::NOP2, "NOP2"}};
 
-static std::map<std::string, InstructionType> g_instrTypeByDesc = associate<std::pair<InstructionType, std::string>, std::string, InstructionType>(
-    mapToEntries(g_descByInstrType),
-    [](auto &pair) { return pair.second; },
-    [](auto &pair) { return pair.first; });
+static std::unordered_map<std::string, InstructionType> mapDescToInstrType() {
+    std::unordered_map<std::string, InstructionType> map;
+    for (auto &[type, desc] : g_instrTypeToDesc) {
+        map.insert(std::make_pair(desc, type));
+    }
+    return map;
+}
+
+static std::unordered_map<std::string, InstructionType> g_instrTypeByDesc = mapDescToInstrType();
 
 std::string describeInstruction(const Instruction &ins, IRoutines &routines) {
     std::string desc(str(boost::format("%08x %s") % ins.offset % describeInstructionType(ins.type)));
@@ -189,8 +192,8 @@ std::string describeInstruction(const Instruction &ins, IRoutines &routines) {
 }
 
 const std::string &describeInstructionType(InstructionType type) {
-    auto maybeDesc = g_descByInstrType.find(type);
-    if (maybeDesc == g_descByInstrType.end()) {
+    auto maybeDesc = g_instrTypeToDesc.find(type);
+    if (maybeDesc == g_instrTypeToDesc.end()) {
         throw std::invalid_argument("Unsupported instruction type: " + std::to_string(static_cast<int>(type)));
     }
     return maybeDesc->second;

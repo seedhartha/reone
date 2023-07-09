@@ -39,7 +39,6 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
     ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
-    ${TESTS_SOURCE_DIR}/system/collectionutil.cpp
     ${TESTS_SOURCE_DIR}/system/hexutil.cpp
     ${TESTS_SOURCE_DIR}/system/pathutil.cpp
     ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp

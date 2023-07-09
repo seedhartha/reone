@@ -24,7 +24,6 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
 #include "reone/scene/graph.h"
@@ -185,16 +184,22 @@ void ModelSceneNode::attach(const std::string &parentName, SceneNode &node) {
 }
 
 ModelNodeSceneNode *ModelSceneNode::getNodeByNumber(uint16_t number) {
-    return getFromLookupOrNull(_nodeByNumber, number);
+    auto it = _nodeByNumber.find(number);
+    return it != _nodeByNumber.end() ? it->second : nullptr;
 }
 
 ModelNodeSceneNode *ModelSceneNode::getNodeByName(const std::string &name) {
-    return getFromLookupOrNull(_nodeByName, name);
+    auto it = _nodeByName.find(name);
+    return it != _nodeByName.end() ? it->second : nullptr;
 }
 
 SceneNode *ModelSceneNode::getAttachment(const std::string &parentName) {
     auto parent = _model->getNodeByName(parentName);
-    return parent ? getFromLookupOrNull(_attachments, parent->name()) : nullptr;
+    if (!parent) {
+        return nullptr;
+    }
+    auto it = _attachments.find(parent->name());
+    return it != _attachments.end() ? it->second : nullptr;
 }
 
 void ModelSceneNode::setDiffuseMap(Texture *texture) {
@@ -463,10 +468,18 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
         switch (_animBlendMode) {
         case AnimationBlendMode::Single:
         case AnimationBlendMode::Blend: {
-            auto state1 = getFromLookupOrElse(_animChannels[0].stateByNodeNumber, modelNode.number(), AnimationState());
+            AnimationState state1;
+            auto state1Iter = _animChannels[0].stateByNodeNumber.find(modelNode.number());
+            if (state1Iter != _animChannels[0].stateByNodeNumber.end()) {
+                state1 = state1Iter->second;
+            }
             bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition && _animChannels.size() > 1ll;
             if (blend) {
-                auto state2 = getFromLookupOrElse(_animChannels[1].stateByNodeNumber, modelNode.number(), AnimationState());
+                AnimationState state2;
+                auto state2Iter = _animChannels[1].stateByNodeNumber.find(modelNode.number());
+                if (state2Iter != _animChannels[1].stateByNodeNumber.end()) {
+                    state2 = state2Iter->second;
+                }
                 if (state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
                     float factor = glm::min(1.0f, _animChannels[0].time / _animChannels[0].anim->transitionTime());
                     glm::vec3 scale1, scale2, translation1, translation2, skew;

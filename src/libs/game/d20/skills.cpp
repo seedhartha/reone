@@ -21,7 +21,6 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
-#include "reone/system/collectionutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -50,7 +49,8 @@ void Skills::init() {
 }
 
 std::shared_ptr<Skill> Skills::get(SkillType type) const {
-    return getFromLookupOrNull(_skills, type);
+    auto it = _skills.find(type);
+    return it != _skills.end() ? it->second : nullptr;
 }
 
 } // namespace game

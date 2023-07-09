@@ -63,7 +63,6 @@
 #include "reone/script/di/services.h"
 #include "reone/script/scripts.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/collectionutil.h"
 #include "reone/system/di/services.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
@@ -392,8 +391,10 @@ std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
         throw std::invalid_argument("Invalid id: " + std::to_string(id));
     case kObjectInvalid:
         return nullptr;
-    default:
-        return getFromLookupOrNull(_objectById, id);
+    default: {
+        auto it = _objectById.find(id);
+        return it != _objectById.end() ? it->second : nullptr;
+    }
     }
 }
 
@@ -609,20 +610,23 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 bool Game::getGlobalBoolean(const std::string &name) const {
-    return getFromLookupOrElse(_globalBooleans, name, false);
+    auto it = _globalBooleans.find(name);
+    return it != _globalBooleans.end() ? it->second : false;
 }
 
 int Game::getGlobalNumber(const std::string &name) const {
-    return getFromLookupOrElse(_globalNumbers, name, 0);
+    auto it = _globalNumbers.find(name);
+    return it != _globalNumbers.end() ? it->second : 0;
 }
 
 std::string Game::getGlobalString(const std::string &name) const {
-    static std::string empty;
-    return getFromLookupOrElse(_globalStrings, name, empty);
+    auto it = _globalStrings.find(name);
+    return it != _globalStrings.end() ? it->second : "";
 }
 
 std::shared_ptr<Location> Game::getGlobalLocation(const std::string &name) const {
-    return getFromLookupOrNull(_globalLocations, name);
+    auto it = _globalLocations.find(name);
+    return it != _globalLocations.end() ? it->second : nullptr;
 }
 
 void Game::setGlobalBoolean(const std::string &name, bool value) {

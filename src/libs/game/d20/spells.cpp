@@ -21,7 +21,6 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
-#include "reone/system/collectionutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -51,7 +50,8 @@ void Spells::init() {
 }
 
 std::shared_ptr<Spell> Spells::get(SpellType type) const {
-    return getFromLookupOrNull(_spells, type);
+    auto it = _spells.find(type);
+    return it != _spells.end() ? it->second : nullptr;
 }
 
 } // namespace game

@@ -17,8 +17,6 @@
 
 #include "reone/game/d20/attributes.h"
 
-#include "reone/system/collectionutil.h"
-
 #include "reone/game/d20/class.h"
 
 namespace reone {
@@ -33,7 +31,8 @@ int CreatureAttributes::getDefense() const {
 }
 
 int CreatureAttributes::getAbilityScore(Ability ability) const {
-    return getFromLookupOrElse(_abilityScores, ability, kDefaultAbilityScore);
+    auto it = _abilityScores.find(ability);
+    return it != _abilityScores.end() ? it->second : kDefaultAbilityScore;
 }
 
 int CreatureAttributes::getAbilityModifier(Ability ability) const {
@@ -142,7 +141,8 @@ bool CreatureAttributes::hasSkill(SkillType skill) const {
 }
 
 int CreatureAttributes::getSkillRank(SkillType skill) const {
-    return getFromLookupOrElse(_skillRanks, skill, kDefaultSkillRank);
+    auto it = _skillRanks.find(skill);
+    return it != _skillRanks.end() ? it->second : kDefaultSkillRank;
 }
 
 int CreatureAttributes::computerUse() const {

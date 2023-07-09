@@ -20,7 +20,6 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/binaryreader.h
     ${SYSTEM_INCLUDE_DIR}/binarywriter.h
     ${SYSTEM_INCLUDE_DIR}/clock.h
-    ${SYSTEM_INCLUDE_DIR}/collectionutil.h
     ${SYSTEM_INCLUDE_DIR}/di/module.h
     ${SYSTEM_INCLUDE_DIR}/di/services.h
     ${SYSTEM_INCLUDE_DIR}/exception/endofstream.h

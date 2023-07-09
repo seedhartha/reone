@@ -22,8 +22,6 @@
 #include <boost/log/sources/severity_channel_logger.hpp>
 #include <boost/log/utility/setup.hpp>
 
-#include "reone/system/collectionutil.h"
-
 namespace reone {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", LogChannel)

@@ -17,7 +17,6 @@
 
 #include "reone/resource/2da.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -49,7 +48,11 @@ int TwoDa::getColumnIndex(const std::string &column) const {
 }
 
 static std::vector<std::string> getColumnNames(const std::vector<std::pair<std::string, std::string>> &values) {
-    return transform<std::pair<std::string, std::string>, std::string>(values, [](auto &pair) { return pair.first; });
+    std::vector<std::string> names;
+    for (auto &val : values) {
+        names.push_back(val.first);
+    }
+    return names;
 }
 
 int TwoDa::indexByCellValues(const std::vector<std::pair<std::string, std::string>> &values) const {

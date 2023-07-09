@@ -17,14 +17,12 @@
 
 #include "reone/game/object.h"
 
-#include "reone/system/collectionutil.h"
-#include "reone/system/logutil.h"
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/room.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::graphics;
 using namespace reone::scene;
@@ -51,11 +49,13 @@ void Object::update(float dt) {
 }
 
 bool Object::getLocalBoolean(int index) const {
-    return getFromLookupOrElse(_localBooleans, index, false);
+    auto it = _localBooleans.find(index);
+    return it != _localBooleans.end() ? it->second : false;
 }
 
 int Object::getLocalNumber(int index) const {
-    return getFromLookupOrElse(_localNumbers, index, 0);
+    auto it = _localNumbers.find(index);
+    return it != _localNumbers.end() ? it->second : 0;
 }
 
 void Object::setLocalBoolean(int index, bool value) {

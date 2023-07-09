@@ -20,7 +20,7 @@
 #include "reone/resource/exception/format.h"
 #include "reone/script/program.h"
 #include "reone/system/binarywriter.h"
-#include "reone/system/collectionutil.h"
+
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryoutput.h"
 

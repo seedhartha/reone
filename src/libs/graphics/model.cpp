@@ -17,7 +17,6 @@
 
 #include "reone/graphics/model.h"
 
-#include "reone/system/collectionutil.h"
 #include "reone/system/logutil.h"
 
 #include "reone/graphics/animation.h"
@@ -77,19 +76,25 @@ void Model::init() {
 }
 
 std::shared_ptr<ModelNode> Model::getNodeByNumber(uint16_t number) const {
-    return getFromLookupOrNull(_nodeByNumber, number);
+    auto it = _nodeByNumber.find(number);
+    return it != _nodeByNumber.end() ? it->second : nullptr;
 }
 
 std::shared_ptr<ModelNode> Model::getNodeByName(const std::string &name) const {
-    return getFromLookupOrNull(_nodeByName, name);
+    auto it = _nodeByName.find(name);
+    return it != _nodeByName.end() ? it->second : nullptr;
 }
 
 std::shared_ptr<ModelNode> Model::getNodeByNameRecursive(const std::string &name) const {
-    auto result = getFromLookupOrNull(_nodeByName, name);
-    if (!result && _superModel) {
-        result = _superModel->getNodeByNameRecursive(name);
+    auto it = _nodeByName.find(name);
+    if (it != _nodeByName.end()) {
+        return it->second;
     }
-    return std::move(result);
+    if (_superModel) {
+        return _superModel->getNodeByNameRecursive(name);
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<ModelNode> Model::getAABBNode() const {
