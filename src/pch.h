@@ -55,7 +55,6 @@
 #include <boost/format.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/optional.hpp>
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 
