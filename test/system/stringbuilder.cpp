@@ -30,9 +30,9 @@ TEST(string_builder, should_build_a_string) {
     // when
     auto str = StringBuilder()
                    .append("He")
-                   .repeat('l', 2)
+                   .append('l', 2)
                    .append("o, world!")
-                   .build();
+                   .string();
 
     // then
     EXPECT_EQ(expectedStr, str) << notEqualMessage(expectedStr, str);

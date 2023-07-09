@@ -59,7 +59,7 @@ TEST(key_reader, should_read_key) {
                      .append("Dd\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16)
                      .append("\xf5\x07", 2)
                      .append("\xd3\x07\xc0\x00", 4)
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = KeyReader(stream);

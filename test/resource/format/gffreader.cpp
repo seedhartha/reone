@@ -168,7 +168,7 @@ TEST(gff_reader, should_read_gff) {
                      .append("\x02\x00\x00\x00", 4)
                      .append("\x02\x00\x00\x00", 4)
                      .append("\x03\x00\x00\x00", 4)
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = GffReader(stream);

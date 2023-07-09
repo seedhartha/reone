@@ -55,7 +55,7 @@ TEST(tlk_writer, should_write_tlk) {
                               // std::string entries
                               .append("John")
                               .append("Jane")
-                              .build();
+                              .string();
 
     auto bytes = ByteArray();
     auto stream = MemoryOutputStream(bytes);

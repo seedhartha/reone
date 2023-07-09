@@ -41,7 +41,7 @@ TEST(mdl_reader, should_load_mdl) {
                         .append("some_model\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32) // model name
                         .append("\xd2\x00\x00\x00", 4)                                                                                    // offset to root node
                         .append("\x01\x00\x00\x00", 4)                                                                                    // number of nodes
-                        .repeat('\x00', 6 * 4)                                                                                            // unknown
+                        .append('\x00', 6 * 4)                                                                                            // unknown
                         .append("\x00\x00\x00\x00", 4)                                                                                    // reference counter
                         .append("\x00\x00\x00\x00", 4)                                                                                    // model type
                         // Model Header (92)
@@ -97,9 +97,9 @@ TEST(mdl_reader, should_load_mdl) {
                         .append("\x00\x00\x00\x00", 4) // offset to controller values
                         .append("\x00\x00\x00\x00", 4) // number of controller values
                         .append("\x00\x00\x00\x00", 4) // number of controller values
-                        .build();
+                        .string();
     auto mdl = MemoryInputStream(mdlBytes);
-    auto mdxBytes = StringBuilder().build();
+    auto mdxBytes = StringBuilder().string();
     auto mdx = MemoryInputStream(mdxBytes);
     auto models = std::make_unique<MockModels>();
     auto textures = std::make_unique<MockTextures>();

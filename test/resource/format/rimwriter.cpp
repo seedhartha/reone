@@ -35,7 +35,7 @@ TEST(rim_writer, should_write_rim) {
                               .append("\x00\x00\x00\x00", 4) // reserved
                               .append("\x01\x00\x00\x00", 4) // number of resources
                               .append("\x78\x00\x00\x00", 4) // offset to resources
-                              .repeat('\x00', 100)           // reserved
+                              .append('\x00', 100)           // reserved
                               // resources
                               .append("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // resref
                               .append("\xe6\x07\x00\x00", 4)                                            // type
@@ -44,7 +44,7 @@ TEST(rim_writer, should_write_rim) {
                               .append("\x02\x00\x00\x00", 4)                                            // size
                               // resource data
                               .append("Bb", 2)
-                              .build();
+                              .string();
 
     auto bytes = ByteArray();
     auto stream = MemoryOutputStream(bytes);

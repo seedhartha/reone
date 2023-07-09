@@ -34,10 +34,10 @@ TEST(tpc_reader, should_load_tpc) {
                         .append("\x01\x00", 2)         // height
                         .append("\x01\x00", 2)         // encoding
                         .append("\x01\x00", 2)         // number of mip maps
-                        .repeat('\x00', 112)           // padding
+                        .append('\x00', 112)           // padding
                         // Mip Map 1
                         .append("\xff", 1)
-                        .build();
+                        .string();
     auto tpc = MemoryInputStream(tpcBytes);
     auto reader = TpcReader(tpc, "some_texture", TextureUsage::Default);
 

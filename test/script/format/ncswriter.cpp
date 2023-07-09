@@ -128,7 +128,7 @@ TEST(ncs_writer, should_write_ncs) {
                               .append("\x2a\x00", 2)                                  // SAVEBP
                               .append("\x2b\x00", 2)                                  // RESTOREBP
                               .append("\x2d\x00", 2)                                  // NOP2
-                              .build();
+                              .string();
 
     auto program = ScriptProgram("");
     program.add(Instruction::newCPDOWNSP(-4, 4));

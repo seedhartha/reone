@@ -46,7 +46,7 @@ TEST(two_da_writer, should_write_two_da) {
                               .append("\x0c\x00", 2)
                               .append("unique\x00", 7)
                               .append("same\x00", 5)
-                              .build();
+                              .string();
 
     auto twoDa = TwoDa(
         {"key", "value"},

@@ -53,7 +53,7 @@ TEST(tlk_reader, should_read_tlk) {
                      // std::string entries
                      .append("John")
                      .append("Jane")
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = TlkReader(stream);

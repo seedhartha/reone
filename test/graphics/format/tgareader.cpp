@@ -32,14 +32,14 @@ TEST(tga_reader, should_load_tga) {
                         .append("\x00", 1)     // id length
                         .append("\x00", 1)     // unknown
                         .append("\x03", 1)     // data type
-                        .repeat('\x00', 9)     // unknown
+                        .append('\x00', 9)     // unknown
                         .append("\x01\x00", 2) // width
                         .append("\x01\x00", 2) // height
                         .append("\x08", 1)     // bits per pixel
                         .append("\x00", 1)     // descriptor
                         // Pixels
                         .append("\xff", 1)
-                        .build();
+                        .string();
     auto tga = MemoryInputStream(tgaBytes);
     auto reader = TgaReader(tga, "some_texture", TextureUsage::Default);
 

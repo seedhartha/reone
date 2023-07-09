@@ -71,7 +71,7 @@ std::vector<std::string> TwoDaReader::readTokens(int maxCount) {
     StringBuilder str;
     for (auto ch = _reader.readChar();; ch = _reader.readChar()) {
         if (ch == '\t') {
-            tokens.push_back(str.build());
+            tokens.push_back(str.string());
             if (tokens.size() == maxCount) {
                 break;
             }

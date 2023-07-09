@@ -52,7 +52,7 @@ TEST(wav_reader, should_load_plain_wav) {
                         .append("\x02\x00\x00\x00", 4) // chunk size
                         // Samples
                         .append("\xff\x7f", 2)
-                        .build();
+                        .string();
     auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
     auto reader = WavReader(wav, mp3ReaderFactory);
@@ -76,7 +76,7 @@ TEST(wav_reader, should_load_obfuscated_wav) {
     auto wavBytes = StringBuilder()
                         // Header
                         .append("\xff\xf3\x60\xc4", 4) // fake signature
-                        .repeat('\x00', 466)           // padding
+                        .append('\x00', 466)           // padding
                         .append("RIFF")                // real signature
                         .append("\x00\x00\x00\x00", 4) // chunk size
                         .append("WAVE")                // format
@@ -94,7 +94,7 @@ TEST(wav_reader, should_load_obfuscated_wav) {
                         .append("\x08\x00\x00\x00", 4) // chunk size
                         // IMA Blocks
                         .append("\x00\x00\x03\x00\x12\x34\x56\x78", 8)
-                        .build();
+                        .string();
     auto wav = MemoryInputStream(wavBytes);
     auto mp3ReaderFactory = MockMp3ReaderFactory();
     auto reader = WavReader(wav, mp3ReaderFactory);
@@ -142,7 +142,7 @@ TEST(wav_reader, should_load_obfuscated_mp3) {
                         .append("\x00\x00\x00\x00", 4) // chunk size
                         // MP3
                         .append("\x00", 1)
-                        .build();
+                        .string();
     auto wav = MemoryInputStream(wavBytes);
 
     auto mp3Reader = std::make_shared<MockMp3Reader>();

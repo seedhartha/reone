@@ -41,7 +41,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
                               .append("\x00\x00\x80\x3f", 4)
                               .append("AaBb\x00", 5)
                               .append("\x01\x02\x03\x04", 4)
-                              .build();
+                              .string();
 
     // when
     writer.writeByte(0x40);
@@ -75,7 +75,7 @@ TEST(binary_writer, should_write_to_big_endian_stream) {
                               .append("\xff\xff\xff\xfc", 4)
                               .append("\xff\xff\xff\xff\xff\xff\xff\xfb", 8)
                               .append("\x3f\x80\x00\x00", 4)
-                              .build();
+                              .string();
 
     // when
     writer.writeByte(0x40);

@@ -39,7 +39,7 @@ TEST(erf_reader, should_read_erf) {
                      .append("\x00\x00\x00\x00", 4) // build year
                      .append("\x00\x00\x00\x00", 4) // build day
                      .append("\xff\xff\xff\xff", 4) // description strref
-                     .repeat('\x00', 116)           // reserved
+                     .append('\x00', 116)           // reserved
                      // key list
                      .append("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16) // resref
                      .append("\x00\x00\x00\x00", 4)                                            // resid
@@ -50,7 +50,7 @@ TEST(erf_reader, should_read_erf) {
                      .append("\x02\x00\x00\x00", 4) // resource size
                      // resource data
                      .append("Bb")
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = ErfReader(stream);

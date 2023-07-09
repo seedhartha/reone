@@ -40,7 +40,7 @@ TEST(bif_reader, should_read_bif) {
                      .append("\xe6\x07\x00\x00", 4) // type
                      // variable resource data
                      .append("Hello, world!")
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = BifReader(stream);

@@ -56,7 +56,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
                      .append("Hello, world!")
                      .append("Hello, world!\x00", 14)
                      .append("\x01\x02\x03\x04", 4)
-                     .build();
+                     .string();
     auto inputBytes = ByteArray();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
@@ -115,7 +115,7 @@ TEST(binary_reader, should_read_from_big_endian_stream) {
                      .append("\xff\xff\xff\xff\xff\xff\xff\x03", 8)
                      .append("\x3f\x80\x00\x00", 4)
                      .append("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8)
-                     .build();
+                     .string();
     auto inputBytes = ByteArray();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());

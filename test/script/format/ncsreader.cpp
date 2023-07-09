@@ -126,7 +126,7 @@ TEST(ncs_reader, should_read_ncs) {
                      .append("\x2a\x00", 2)                                  // SAVEBP
                      .append("\x2b\x00", 2)                                  // RESTOREBP
                      .append("\x2d\x00", 2)                                  // NOP2
-                     .build();
+                     .string();
 
     auto stream = MemoryInputStream(input);
     auto reader = NcsReader(stream, "");

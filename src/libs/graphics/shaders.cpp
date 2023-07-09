@@ -224,7 +224,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
     }
     if (!defines.empty()) {
         defines.append("\n");
-        sources.push_back(defines.build());
+        sources.push_back(defines.string());
     }
     for (auto &resRef : sourceResRefs) {
         std::string source;

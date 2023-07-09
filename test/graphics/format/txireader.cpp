@@ -28,7 +28,7 @@ TEST(txi_reader, should_load_txi) {
     // given
     auto txiBytes = StringBuilder()
                         .append("blending additive")
-                        .build();
+                        .string();
     auto txi = MemoryInputStream(txiBytes);
     auto reader = TxiReader();
 

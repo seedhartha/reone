@@ -31,6 +31,11 @@ public:
         return *this;
     }
 
+    StringBuilder &append(char ch, int times) {
+        _stream << std::string(times, ch);
+        return *this;
+    }
+
     StringBuilder &append(const char *str) {
         _stream << str;
         return *this;
@@ -46,12 +51,7 @@ public:
         return *this;
     }
 
-    StringBuilder &repeat(char ch, int times) {
-        _stream << std::string(times, ch);
-        return *this;
-    }
-
-    std::string build() {
+    std::string string() {
         return _stream.str();
     }
 

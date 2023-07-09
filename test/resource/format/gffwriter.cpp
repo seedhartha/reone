@@ -169,7 +169,7 @@ TEST(gff_writer, should_write_gff) {
                               .append("\x02\x00\x00\x00", 4)
                               .append("\x02\x00\x00\x00", 4)
                               .append("\x03\x00\x00\x00", 4)
-                              .build();
+                              .string();
 
     auto root = std::make_shared<Gff>(
         0xffffffff,
