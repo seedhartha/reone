@@ -26,7 +26,7 @@ using namespace reone;
 TEST(file_output_stream, should_write_to_file) {
     // given
 
-    auto tmpPath = boost::filesystem::temp_directory_path();
+    auto tmpPath = std::filesystem::temp_directory_path();
     tmpPath.append("reone_test_file_output");
 
     auto stream = FileOutputStream(tmpPath);
@@ -44,7 +44,7 @@ TEST(file_output_stream, should_write_to_file) {
 
     // then
 
-    auto tmpFile = boost::filesystem::ifstream(tmpPath, std::ios::binary);
+    auto tmpFile = std::ifstream(tmpPath, std::ios::binary);
     tmpFile.seekg(0, std::ios::end);
     auto tmpSize = tmpFile.tellg();
     auto bytes = ByteBuffer();
@@ -59,5 +59,5 @@ TEST(file_output_stream, should_write_to_file) {
 
     // cleanup
 
-    boost::filesystem::remove(tmpPath);
+    std::filesystem::remove(tmpPath);
 }

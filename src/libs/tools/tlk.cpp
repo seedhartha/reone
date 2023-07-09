@@ -35,18 +35,18 @@ namespace reone {
 
 void TlkTool::invoke(
     Operation operation,
-    const boost::filesystem::path &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::filesystem::path &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TlkTool::invokeBatch(
     Operation operation,
-    const std::vector<boost::filesystem::path> &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::vector<std::filesystem::path> &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -57,7 +57,7 @@ void TlkTool::invokeBatch(
     });
 }
 
-void TlkTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void TlkTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto tlk = FileInputStream(path);
 
     auto xmlPath = destPath;
@@ -87,7 +87,7 @@ void TlkTool::toXML(IInputStream &tlk, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void TlkTool::toTLK(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -115,15 +115,15 @@ void TlkTool::toTLK(const boost::filesystem::path &path, const boost::filesystem
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto tlkPath = boost::filesystem::path(destPath);
+    auto tlkPath = std::filesystem::path(destPath);
     tlkPath.append(tokens[0] + ".tlk");
 
     auto writer = TlkWriter(table);
     writer.save(tlkPath);
 }
 
-bool TlkTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    return !boost::filesystem::is_directory(input) &&
+bool TlkTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
            ((input.extension() == ".tlk" && operation == Operation::ToXML) ||
             (input.extension() == ".xml" && operation == Operation::ToTLK));
 }

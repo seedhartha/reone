@@ -27,7 +27,7 @@ class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    KeyBifResourceProvider(boost::filesystem::path keyPath) :
+    KeyBifResourceProvider(std::filesystem::path keyPath) :
         _keyPath(std::move(keyPath)) {
     }
 
@@ -48,9 +48,9 @@ private:
         uint32_t fileSize {0};
     };
 
-    boost::filesystem::path _keyPath;
+    std::filesystem::path _keyPath;
 
-    std::vector<boost::filesystem::path> _bifPaths;
+    std::vector<std::filesystem::path> _bifPaths;
     ResourceIdSet _resourceIds;
     std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
 };

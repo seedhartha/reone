@@ -27,7 +27,7 @@ class LipWriter {
 public:
     LipWriter(LipAnimation &&animation);
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
 
 private:
     LipAnimation _animation;

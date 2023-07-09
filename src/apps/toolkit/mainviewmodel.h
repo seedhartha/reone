@@ -44,7 +44,7 @@ struct GameDirectoryItem {
     GameDirectoryItemId id {nullptr};
     GameDirectoryItemId parentId {nullptr};
     std::string displayName;
-    boost::filesystem::path path;
+    std::filesystem::path path;
     std::shared_ptr<resource::ResourceId> resId;
     bool container {false};
     bool loaded {false};
@@ -128,16 +128,16 @@ struct Progress {
 
 class MainViewModel : boost::noncopyable {
 public:
-    void extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
+    void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId, bool optimize = true);
-    void exportFile(GameDirectoryItemId itemId, const boost::filesystem::path &destPath);
+    void exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath);
 
-    void extractAllBifs(const boost::filesystem::path &destPath);
-    void batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath);
+    void extractAllBifs(const std::filesystem::path &destPath);
+    void batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
 
     bool invokeTool(Operation operation,
-                    const boost::filesystem::path &srcPath,
-                    const boost::filesystem::path &destPath);
+                    const std::filesystem::path &srcPath,
+                    const std::filesystem::path &destPath);
 
     void playAnimation(const std::string &anim);
 
@@ -145,7 +145,7 @@ public:
     void render3D(int w, int h);
 
     game::GameID gameId() const { return _gameId; }
-    const boost::filesystem::path &gamePath() const { return _gamePath; }
+    const std::filesystem::path &gamePath() const { return _gamePath; }
 
     int getGameDirItemCount() const { return static_cast<int>(_gameDirItems.size()); }
     GameDirectoryItem &getGameDirItem(int index) { return *_gameDirItems[index]; }
@@ -176,7 +176,7 @@ public:
 
     void onNotebookPageClose(int page);
 
-    void onGameDirectoryChanged(boost::filesystem::path path);
+    void onGameDirectoryChanged(std::filesystem::path path);
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
     void onGameDirectoryItemExpanding(GameDirectoryItemId id);
     void onGameDirectoryItemActivated(GameDirectoryItemId id);
@@ -185,7 +185,7 @@ public:
     void onGLCanvasMouseWheel(int delta);
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
     game::GameID _gameId {game::GameID::KotOR};
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;

@@ -32,7 +32,7 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-void TlkWriter::save(const boost::filesystem::path &path) {
+void TlkWriter::save(const std::filesystem::path &path) {
     auto tlk = FileOutputStream(path);
     save(tlk);
 }

@@ -26,13 +26,13 @@ using namespace reone::resource;
 
 namespace reone {
 
-void AudioTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
+void AudioTool::invoke(Operation operation, const std::filesystem::path &input, const std::filesystem::path &outputDir, const std::filesystem::path &gamePath) {
     if (operation == Operation::Unwrap) {
         unwrap(input, outputDir);
     }
 }
 
-void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto wav = FileInputStream(path);
     BinaryReader reader(wav);
     size_t filesize = reader.length();
@@ -68,16 +68,16 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     int dataSize = static_cast<int>(filesize - reader.position());
     ByteBuffer data(reader.readBytes(dataSize));
 
-    boost::filesystem::path unwrappedPath(path);
+    std::filesystem::path unwrappedPath(path);
     unwrappedPath.replace_extension();
     unwrappedPath += suffix;
 
-    boost::filesystem::ofstream unwrapped(unwrappedPath, std::ios::binary);
+    std::ofstream unwrapped(unwrappedPath, std::ios::binary);
     unwrapped.write(&data[0], data.size());
 }
 
-bool AudioTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    return !boost::filesystem::is_directory(input) &&
+bool AudioTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
            input.extension() == ".wav" &&
            operation == Operation::Unwrap;
 }

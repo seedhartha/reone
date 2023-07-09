@@ -394,14 +394,14 @@ void MainViewModel::loadGameDirectory() {
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
 
-    for (auto &file : boost::filesystem::directory_iterator(_gamePath)) {
+    for (auto &file : std::filesystem::directory_iterator(_gamePath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         bool container;
-        if ((file.status().type() == boost::filesystem::directory_file && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
-            (file.status().type() == boost::filesystem::regular_file && kFilesArchiveExtensions.count(extension) > 0)) {
+        if ((file.is_directory() && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
+            (file.is_regular_file() && kFilesArchiveExtensions.count(extension) > 0)) {
             container = true;
-        } else if (file.status().type() == boost::filesystem::regular_file && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
+        } else if (file.is_regular_file() && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
             container = false;
         } else {
             continue;
@@ -495,7 +495,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     });
 }
 
-void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
+void MainViewModel::extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
         auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
@@ -524,7 +524,7 @@ void MainViewModel::extractArchive(const boost::filesystem::path &srcPath, const
     }
 }
 
-void MainViewModel::exportFile(GameDirectoryItemId itemId, const boost::filesystem::path &destPath) {
+void MainViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath) {
     auto &item = *_idToGameDirItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
@@ -543,7 +543,7 @@ void MainViewModel::exportFile(GameDirectoryItemId itemId, const boost::filesyst
     });
 }
 
-void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
+void MainViewModel::extractAllBifs(const std::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
     auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
@@ -572,10 +572,10 @@ void MainViewModel::extractAllBifs(const boost::filesystem::path &destPath) {
     _progress.invoke(progress);
 }
 
-void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath, const boost::filesystem::path &destPath) {
-    std::vector<boost::filesystem::path> tpcFiles;
-    for (auto &file : boost::filesystem::directory_iterator(srcPath)) {
-        if (file.status().type() != boost::filesystem::regular_file) {
+void MainViewModel::batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
+    std::vector<std::filesystem::path> tpcFiles;
+    for (auto &file : std::filesystem::directory_iterator(srcPath)) {
+        if (!file.is_regular_file()) {
             continue;
         }
         auto extension = boost::to_lower_copy(file.path().extension().string());
@@ -603,8 +603,8 @@ void MainViewModel::batchConvertTpcToTga(const boost::filesystem::path &srcPath,
 }
 
 bool MainViewModel::invokeTool(Operation operation,
-                               const boost::filesystem::path &srcPath,
-                               const boost::filesystem::path &destPath) {
+                               const std::filesystem::path &srcPath,
+                               const std::filesystem::path &destPath) {
     for (auto &tool : _tools) {
         if (!tool->supports(operation, srcPath)) {
             continue;
@@ -763,7 +763,7 @@ void MainViewModel::onNotebookPageClose(int page) {
     }
 }
 
-void MainViewModel::onGameDirectoryChanged(boost::filesystem::path path) {
+void MainViewModel::onGameDirectoryChanged(std::filesystem::path path) {
     _gamePath = path;
     _gameDirItems.clear();
     _idToGameDirItem.clear();
@@ -783,14 +783,14 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
         return;
     }
     auto &expandingItem = *_idToGameDirItem.at(id);
-    if (boost::filesystem::is_directory(expandingItem.path)) {
-        for (auto &file : boost::filesystem::directory_iterator(expandingItem.path)) {
+    if (std::filesystem::is_directory(expandingItem.path)) {
+        for (auto &file : std::filesystem::directory_iterator(expandingItem.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
             auto extension = boost::to_lower_copy(file.path().extension().string());
             bool container;
-            if (file.status().type() == boost::filesystem::directory_file || kFilesArchiveExtensions.count(extension) > 0) {
+            if (file.is_directory() || kFilesArchiveExtensions.count(extension) > 0) {
                 container = true;
-            } else if (file.status().type() == boost::filesystem::regular_file && kFilesExtensionBlacklist.count(extension) == 0) {
+            } else if (file.is_regular_file() && kFilesExtensionBlacklist.count(extension) == 0) {
                 container = false;
             } else {
                 continue;

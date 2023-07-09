@@ -32,7 +32,7 @@ void PcodeReader::load() {
     std::map<int, std::string> labelByLineIdx;
     std::map<int, uint32_t> addrByLineIdx;
 
-    boost::filesystem::ifstream pcode(_path);
+    std::ifstream pcode(_path);
     std::string line;
     boost::smatch what;
     boost::regex labelRegex("^([_\\d\\w]+):$");
@@ -56,7 +56,7 @@ void PcodeReader::load() {
         insLines.push_back(line);
     }
 
-    boost::filesystem::path filename(_path.filename());
+    std::filesystem::path filename(_path.filename());
     filename.replace_extension(); // drop .pcode
     filename.replace_extension(); // drop .ncs
 

@@ -39,18 +39,18 @@ namespace reone {
 
 void NcsTool::invoke(
     Operation operation,
-    const boost::filesystem::path &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::filesystem::path &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
-    invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void NcsTool::invokeBatch(
     Operation operation,
-    const std::vector<boost::filesystem::path> &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::vector<std::filesystem::path> &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
     auto routines = Routines(_gameId, nullptr, nullptr);
     routines.init();
@@ -66,7 +66,7 @@ void NcsTool::invokeBatch(
     });
 }
 
-void NcsTool::toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
+void NcsTool::toPCODE(const std::filesystem::path &input, const std::filesystem::path &outputDir, Routines &routines) {
     auto ncs = FileInputStream(input);
 
     auto pcodePath = outputDir;
@@ -84,12 +84,12 @@ void NcsTool::toPCODE(IInputStream &ncs, IOutputStream &pcode, Routines &routine
     writer.save(pcode);
 }
 
-void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
+void NcsTool::toNCS(const std::filesystem::path &input, const std::filesystem::path &outputDir, Routines &routines) {
     PcodeReader pcode(input, routines);
     pcode.load();
     auto program = pcode.program();
 
-    boost::filesystem::path ncsPath(outputDir);
+    std::filesystem::path ncsPath(outputDir);
     ncsPath.append(input.filename().string());
     ncsPath.replace_extension(); // drop .pcode
 
@@ -97,7 +97,7 @@ void NcsTool::toNCS(const boost::filesystem::path &input, const boost::filesyste
     writer.save(ncsPath);
 }
 
-void NcsTool::toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, Routines &routines) {
+void NcsTool::toNSS(const std::filesystem::path &input, const std::filesystem::path &outputDir, Routines &routines) {
     auto ncs = FileInputStream(input);
 
     auto nssPath = outputDir;
@@ -123,8 +123,8 @@ void NcsTool::toNSS(IInputStream &ncs, IOutputStream &nss, Routines &routines, b
     writer.save(nss);
 }
 
-bool NcsTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    return !boost::filesystem::is_directory(input) &&
+bool NcsTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
            ((input.extension() == ".ncs" && (operation == Operation::ToPCODE || operation == Operation::ToNSS)) ||
             (input.extension() == ".pcode" && operation == Operation::ToNCS));
 }

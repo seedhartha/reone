@@ -34,18 +34,18 @@ namespace reone {
 
 void SsfTool::invoke(
     Operation operation,
-    const boost::filesystem::path &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::filesystem::path &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void SsfTool::invokeBatch(
     Operation operation,
-    const std::vector<boost::filesystem::path> &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::vector<std::filesystem::path> &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -56,7 +56,7 @@ void SsfTool::invokeBatch(
     });
 }
 
-void SsfTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void SsfTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto ssf = FileInputStream(path);
 
     auto xmlPath = destPath;
@@ -86,7 +86,7 @@ void SsfTool::toXML(IInputStream &ssf, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void SsfTool::toSSF(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -112,14 +112,14 @@ void SsfTool::toSSF(const boost::filesystem::path &path, const boost::filesystem
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto ssfPath = boost::filesystem::path(destPath);
+    auto ssfPath = std::filesystem::path(destPath);
     ssfPath.append(tokens[0] + ".ssf");
 
     auto writer = SsfWriter(std::move(soundSet));
     writer.save(ssfPath);
 }
 
-bool SsfTool::supports(Operation operation, const boost::filesystem::path &input) const {
+bool SsfTool::supports(Operation operation, const std::filesystem::path &input) const {
     return (operation == Operation::ToXML && input.extension() == ".ssf") ||
            (operation == Operation::ToSSF && input.extension() == ".xml");
 }

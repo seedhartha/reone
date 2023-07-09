@@ -48,7 +48,7 @@ using testing::ReturnRef;
 
 TEST(game, should_play_legal_movie_on_launch) {
     // given
-    auto gamePath = boost::filesystem::path();
+    auto gamePath = std::filesystem::path();
 
     auto engine = std::make_unique<TestEngine>();
     engine->init();
@@ -90,7 +90,7 @@ TEST(game, should_play_legal_movie_on_launch) {
 
 TEST(game, should_present_main_menu_on_launch_when_movie_is_finished) {
     // given
-    auto gamePath = boost::filesystem::path();
+    auto gamePath = std::filesystem::path();
 
     auto engine = std::make_unique<TestEngine>();
     engine->init();

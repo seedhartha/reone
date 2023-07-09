@@ -29,26 +29,26 @@ class Tool {
 public:
     virtual void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) = 0;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) = 0;
 
     virtual void invokeBatch(
         Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) {
+        const std::vector<std::filesystem::path> &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) {
 
         throw NotImplementedException("invokeBatch not implemented");
     }
 
-    virtual bool supports(Operation operation, const boost::filesystem::path &input) const = 0;
+    virtual bool supports(Operation operation, const std::filesystem::path &input) const = 0;
 
 protected:
     void doInvokeBatch(
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        std::function<void(const boost::filesystem::path &, const boost::filesystem::path &)> block) {
+        const std::vector<std::filesystem::path> &input,
+        const std::filesystem::path &outputDir,
+        std::function<void(const std::filesystem::path &, const std::filesystem::path &)> block) {
 
         for (auto &path : input) {
             auto outDir = outputDir;

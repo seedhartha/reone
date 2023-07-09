@@ -69,14 +69,14 @@ std::unique_ptr<Options> OptionsParser::parse() {
 
     variables_map vars;
     store(parse_command_line(_argc, _argv, descCmdLine), vars);
-    if (boost::filesystem::exists(kConfigFilename)) {
+    if (std::filesystem::exists(kConfigFilename)) {
         store(parse_config_file<char>(kConfigFilename, descCommon, true), vars);
     }
     notify(vars);
 
     // Convert Boost options to game options
 
-    options->game.path = vars.count("game") > 0 ? vars["game"].as<std::string>() : boost::filesystem::current_path();
+    options->game.path = vars.count("game") > 0 ? vars["game"].as<std::string>() : std::filesystem::current_path();
     options->game.developer = vars["dev"].as<bool>();
     options->graphics.width = vars["width"].as<int>();
     options->graphics.height = vars["height"].as<int>();

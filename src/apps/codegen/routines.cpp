@@ -316,7 +316,7 @@ static void writeReoneRoutineImplFile(const std::string &category,
                                       const std::map<std::string, Constant> &constants,
                                       const std::vector<std::tuple<int, Function>> &k1functions,
                                       const std::vector<std::tuple<int, Function>> &k2functions,
-                                      const boost::filesystem::path &path) {
+                                      const std::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto code = TextWriter(stream);
     code.write(kCopyrightNotice + "\n\n");
@@ -351,9 +351,9 @@ static void writeReoneRoutineImplFile(const std::string &category,
     code.write("} // namespace reone\n\n");
 }
 
-void generateRoutines(const boost::filesystem::path &k1Dir,
-                      const boost::filesystem::path &k2Dir,
-                      const boost::filesystem::path &destDir) {
+void generateRoutines(const std::filesystem::path &k1Dir,
+                      const std::filesystem::path &k2Dir,
+                      const std::filesystem::path &destDir) {
     auto k1KeyPath = findFileIgnoreCase(k1Dir, "chitin.key");
     if (k1KeyPath.empty()) {
         throw std::runtime_error("File not found: " + k1KeyPath.string());

@@ -26,7 +26,7 @@ namespace reone {
 namespace game {
 
 struct GameOptions {
-    boost::filesystem::path path;
+    std::filesystem::path path;
     bool developer {false};
     bool neo {false};
 };

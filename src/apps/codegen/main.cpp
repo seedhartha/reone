@@ -42,20 +42,20 @@ int main(int argc, char **argv) {
         auto &generator = vars["generator"].as<std::string>();
 
         auto &destDirValue = vars["destdir"].as<std::string>();
-        auto destDir = boost::filesystem::path(destDirValue);
-        if (!boost::filesystem::exists(destDir) || !boost::filesystem::is_directory(destDir)) {
+        auto destDir = std::filesystem::path(destDirValue);
+        if (!std::filesystem::exists(destDir) || !std::filesystem::is_directory(destDir)) {
             throw std::runtime_error("Destination directory does not exist: " + destDir.string());
         }
 
         auto &k1DirValue = vars["k1dir"].as<std::string>();
-        auto k1Dir = boost::filesystem::path(k1DirValue);
-        if (!boost::filesystem::exists(k1Dir) || !boost::filesystem::is_directory(k1Dir)) {
+        auto k1Dir = std::filesystem::path(k1DirValue);
+        if (!std::filesystem::exists(k1Dir) || !std::filesystem::is_directory(k1Dir)) {
             throw std::runtime_error("Directory not found: " + k1Dir.string());
         }
 
         auto &k2DirValue = vars["k2dir"].as<std::string>();
-        auto k2Dir = boost::filesystem::path(k2DirValue);
-        if (!boost::filesystem::exists(k2Dir) || !boost::filesystem::is_directory(k2Dir)) {
+        auto k2Dir = std::filesystem::path(k2DirValue);
+        if (!std::filesystem::exists(k2Dir) || !std::filesystem::is_directory(k2Dir)) {
             throw std::runtime_error("Directory not found: " + k2Dir.string());
         }
 

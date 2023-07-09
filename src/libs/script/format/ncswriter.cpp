@@ -30,7 +30,7 @@ namespace reone {
 
 namespace script {
 
-void NcsWriter::save(const boost::filesystem::path &path) {
+void NcsWriter::save(const std::filesystem::path &path) {
     auto ncs = std::make_shared<FileOutputStream>(path);
     save(ncs);
 }

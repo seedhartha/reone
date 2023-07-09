@@ -25,7 +25,7 @@ namespace reone {
 
 class FileInputStream : public IInputStream {
 public:
-    FileInputStream(const boost::filesystem::path &path) :
+    FileInputStream(const std::filesystem::path &path) :
         _stream(path, std::ios::binary) {
     }
 
@@ -69,7 +69,7 @@ public:
     }
 
 private:
-    boost::filesystem::ifstream _stream;
+    std::ifstream _stream;
 };
 
 } // namespace reone

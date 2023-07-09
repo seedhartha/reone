@@ -28,23 +28,23 @@ class SsfTool : public Tool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
     void invokeBatch(
         Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::vector<std::filesystem::path> &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
     void toXML(IInputStream &ssf, IOutputStream &xml);
 
 private:
-    void toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-    void toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toXML(const std::filesystem::path &path, const std::filesystem::path &destPath);
+    void toSSF(const std::filesystem::path &path, const std::filesystem::path &destPath);
 };
 
 } // namespace reone

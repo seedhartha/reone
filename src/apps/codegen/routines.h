@@ -19,8 +19,8 @@
 
 namespace reone {
 
-void generateRoutines(const boost::filesystem::path &k1nssfile,
-                      const boost::filesystem::path &k2nssfile,
-                      const boost::filesystem::path &destDir);
+void generateRoutines(const std::filesystem::path &k1nssfile,
+                      const std::filesystem::path &k2nssfile,
+                      const std::filesystem::path &destDir);
 
 }

@@ -76,7 +76,7 @@ public:
 
     Game(
         GameID gameId,
-        boost::filesystem::path path,
+        std::filesystem::path path,
         OptionsView &options,
         ServicesView &services) :
         _gameId(gameId),
@@ -204,7 +204,7 @@ public:
 
 private:
     GameID _gameId;
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
 

@@ -24,14 +24,14 @@ namespace reone {
 class AudioTool : public Tool {
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
 private:
-    void unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void unwrap(const std::filesystem::path &path, const std::filesystem::path &destPath);
 };
 
 } // namespace reone

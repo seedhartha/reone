@@ -19,6 +19,6 @@
 
 namespace reone {
 
-boost::filesystem::path findFileIgnoreCase(const boost::filesystem::path &dir, const std::string &filename);
+std::filesystem::path findFileIgnoreCase(const std::filesystem::path &dir, const std::string &filename);
 
 } // namespace reone

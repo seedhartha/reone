@@ -27,17 +27,17 @@ class ErfTool : public Tool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
-    void extract(resource::ErfReader &erf, const boost::filesystem::path &erfPath, const boost::filesystem::path &destPath);
+    void extract(resource::ErfReader &erf, const std::filesystem::path &erfPath, const std::filesystem::path &destPath);
 
 private:
     void list(const resource::ErfReader &erf);
-    void toERF(Operation operation, const boost::filesystem::path &target, const boost::filesystem::path &destPath);
+    void toERF(Operation operation, const std::filesystem::path &target, const std::filesystem::path &destPath);
 };
 
 } // namespace reone

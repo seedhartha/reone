@@ -43,7 +43,7 @@ private:
     struct SavedGameDescriptor {
         int number {0};
         SavedGame save;
-        boost::filesystem::path path;
+        std::filesystem::path path;
     };
 
     struct Binding {
@@ -77,7 +77,7 @@ private:
 
     void bindControls();
     void refreshSavedGames();
-    void indexSavedGame(boost::filesystem::path path);
+    void indexSavedGame(std::filesystem::path path);
 
     void saveGame(int number) {}
     void loadGame(int number) {}

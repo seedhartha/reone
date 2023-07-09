@@ -37,7 +37,7 @@ public:
 
 class Movies : public IMovies, boost::noncopyable {
 public:
-    Movies(boost::filesystem::path gamePath,
+    Movies(std::filesystem::path gamePath,
            graphics::GraphicsServices &graphicsSvc,
            audio::AudioServices &audioSvc) :
         _gamePath(gamePath),
@@ -59,7 +59,7 @@ public:
     }
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 

@@ -19,8 +19,8 @@
 
 namespace reone {
 
-void generateGuis(const boost::filesystem::path &k1dir,
-                  const boost::filesystem::path &k2dir,
-                  const boost::filesystem::path &destDir);
+void generateGuis(const std::filesystem::path &k1dir,
+                  const std::filesystem::path &k2dir,
+                  const std::filesystem::path &destDir);
 
 } // namespace reone

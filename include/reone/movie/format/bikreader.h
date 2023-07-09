@@ -38,7 +38,7 @@ class Movie;
 class BikReader {
 public:
     BikReader(
-        boost::filesystem::path path,
+        std::filesystem::path path,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc) :
         _path(std::move(path)),
@@ -51,7 +51,7 @@ public:
     std::shared_ptr<Movie> movie() const { return _movie; }
 
 private:
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 

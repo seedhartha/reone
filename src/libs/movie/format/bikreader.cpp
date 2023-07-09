@@ -48,7 +48,7 @@ namespace movie {
 
 class BinkVideoDecoder : public VideoStream {
 public:
-    BinkVideoDecoder(boost::filesystem::path path) :
+    BinkVideoDecoder(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
@@ -116,7 +116,7 @@ public:
     std::shared_ptr<audio::AudioBuffer> audioStream() const { return _audioStream; }
 
 private:
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
 
     int _videoStreamIdx {-1};
     int _audioStreamIdx {-1};
@@ -318,7 +318,7 @@ private:
 
 void BikReader::load() {
 #ifdef R_ENABLE_MOVIE
-    if (!boost::filesystem::exists(_path)) {
+    if (!std::filesystem::exists(_path)) {
         throw ResourceNotFoundException("BIK: file not found: " + _path.string());
     }
 

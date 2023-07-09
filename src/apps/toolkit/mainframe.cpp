@@ -412,7 +412,7 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     if (dialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto gamePath = boost::filesystem::path((std::string)dialog->GetPath());
+    auto gamePath = std::filesystem::path((std::string)dialog->GetPath());
     auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
     auto modulesPath = findFileIgnoreCase(gamePath, "modules");
     if (keyPath.empty() || modulesPath.empty()) {
@@ -551,7 +551,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
     } else {
-        if (item.archived || !boost::filesystem::is_regular_file(item.path)) {
+        if (item.archived || !std::filesystem::is_regular_file(item.path)) {
             return;
         }
         auto extension = item.path.extension().string();
@@ -612,7 +612,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         if (dialog->ShowModal() != wxID_OK) {
             return;
         }
-        auto destPath = boost::filesystem::path(std::string(dialog->GetPath()));
+        auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
 
         _viewModel->extractArchive(item.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
@@ -631,7 +631,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         if (dialog->ShowModal() != wxID_OK) {
             return;
         }
-        auto destPath = boost::filesystem::path(std::string(dialog->GetPath()));
+        auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
         _viewModel->exportFile(itemId, destPath);
         wxMessageBox("Operation completed successfully", "Success");
     }
@@ -695,7 +695,7 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
+    auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
     _viewModel->extractAllBifs(destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
@@ -705,12 +705,12 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto srcPath = boost::filesystem::path((std::string)srcDirDialog->GetPath());
+    auto srcPath = std::filesystem::path((std::string)srcDirDialog->GetPath());
     auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
+    auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
     _viewModel->batchConvertTpcToTga(srcPath, destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
@@ -776,7 +776,7 @@ void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
 }
 
 void MainFrame::InvokeTool(Operation operation) {
-    boost::filesystem::path srcPath;
+    std::filesystem::path srcPath;
     switch (operation) {
     case Operation::ToERF:
     case Operation::ToRIM:
@@ -809,7 +809,7 @@ void MainFrame::InvokeTool(Operation operation) {
     if (destDirDialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto destPath = boost::filesystem::path((std::string)destDirDialog->GetPath());
+    auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
     if (_viewModel->invokeTool(operation, srcPath, destPath)) {
         wxMessageBox("Operation completed successfully", "Success");
     } else {

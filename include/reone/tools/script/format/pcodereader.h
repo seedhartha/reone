@@ -27,7 +27,7 @@ class IRoutines;
 
 class PcodeReader {
 public:
-    PcodeReader(boost::filesystem::path path, IRoutines &routines) :
+    PcodeReader(std::filesystem::path path, IRoutines &routines) :
         _path(std::move(path)),
         _routines(routines) {
     }
@@ -37,7 +37,7 @@ public:
     std::shared_ptr<ScriptProgram> program() { return _program; }
 
 private:
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
     IRoutines &_routines;
 
     std::shared_ptr<ScriptProgram> _program;

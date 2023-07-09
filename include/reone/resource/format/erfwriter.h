@@ -42,7 +42,7 @@ public:
 
     void add(Resource &&res);
 
-    void save(FileType type, const boost::filesystem::path &path);
+    void save(FileType type, const std::filesystem::path &path);
     void save(FileType type, IOutputStream &out);
 
 private:

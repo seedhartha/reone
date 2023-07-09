@@ -28,19 +28,19 @@ class TpcTool : public Tool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
     void invokeBatch(
         Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::vector<std::filesystem::path> &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
-    void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+    void toTGA(const std::filesystem::path &path, const std::filesystem::path &destPath);
     void toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi, bool compress);
 };
 

@@ -37,7 +37,7 @@ class Strings : public IStrings {
 public:
     Strings() = default;
 
-    void init(const boost::filesystem::path &gameDir);
+    void init(const std::filesystem::path &gameDir);
 
     std::string get(int strRef) override;
     std::string getSound(int strRef) override;

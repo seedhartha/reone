@@ -25,7 +25,7 @@ namespace resource {
 
 class ResourceModule : boost::noncopyable {
 public:
-    ResourceModule(boost::filesystem::path gamePath) :
+    ResourceModule(std::filesystem::path gamePath) :
         _gamePath(std::move(gamePath)) {
     }
 
@@ -42,7 +42,7 @@ public:
     ResourceServices &services() { return *_services; }
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
 
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;

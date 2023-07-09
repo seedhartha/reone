@@ -25,7 +25,7 @@ namespace resource {
 
 class ExeResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    ExeResourceProvider(boost::filesystem::path path) :
+    ExeResourceProvider(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
@@ -45,7 +45,7 @@ private:
         uint32_t size {0};
     };
 
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
 
     ResourceIdSet _resourceIds;
     std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;

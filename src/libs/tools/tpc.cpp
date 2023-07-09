@@ -31,18 +31,18 @@ namespace reone {
 
 void TpcTool::invoke(
     Operation operation,
-    const boost::filesystem::path &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::filesystem::path &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
-    invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void TpcTool::invokeBatch(
     Operation operation,
-    const std::vector<boost::filesystem::path> &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::vector<std::filesystem::path> &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToTGA) {
@@ -51,7 +51,7 @@ void TpcTool::invokeBatch(
     });
 }
 
-void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void TpcTool::toTGA(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto tpc = FileInputStream(path);
 
     auto tgaPath = destPath;
@@ -84,8 +84,8 @@ void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi, b
     }
 }
 
-bool TpcTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    return !boost::filesystem::is_directory(input) &&
+bool TpcTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
            input.extension() == ".tpc" &&
            operation == Operation::ToTGA;
 }

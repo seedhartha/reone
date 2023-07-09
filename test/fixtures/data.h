@@ -26,26 +26,26 @@ public:
     };
 
     void init() {
-        auto gamePath = boost::filesystem::temp_directory_path();
+        auto gamePath = std::filesystem::temp_directory_path();
         gamePath.append("reone_test_game");
-        boost::filesystem::create_directory(gamePath);
+        std::filesystem::create_directory(gamePath);
         _gamePath = gamePath;
 
         auto modulesPath = gamePath;
         modulesPath.append("modules");
-        boost::filesystem::create_directory(modulesPath);
+        std::filesystem::create_directory(modulesPath);
     }
 
     void deinit() {
-        boost::filesystem::remove_all(_gamePath);
+        std::filesystem::remove_all(_gamePath);
     }
 
-    const boost::filesystem::path &gamePath() const {
+    const std::filesystem::path &gamePath() const {
         return _gamePath;
     }
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
 };
 
 } // namespace reone

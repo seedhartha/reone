@@ -23,14 +23,14 @@ namespace reone {
 
 class GameProbe {
 public:
-    GameProbe(boost::filesystem::path gamePath) :
+    GameProbe(std::filesystem::path gamePath) :
         _gamePath(std::move(gamePath)) {
     }
 
     game::GameID probe();
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
 };
 
 } // namespace reone

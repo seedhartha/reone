@@ -25,7 +25,7 @@ namespace resource {
 
 class RimResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    RimResourceProvider(boost::filesystem::path path) :
+    RimResourceProvider(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
@@ -46,7 +46,7 @@ private:
         uint32_t fileSize {0};
     };
 
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
 
     ResourceIdSet _resourceIds;
     std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;

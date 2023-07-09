@@ -28,7 +28,7 @@ namespace movie {
 
 class MovieModule : boost::noncopyable {
 public:
-    MovieModule(boost::filesystem::path gamePath,
+    MovieModule(std::filesystem::path gamePath,
                 graphics::GraphicsModule &graphics,
                 audio::AudioModule &audio) :
         _gamePath(gamePath),
@@ -46,7 +46,7 @@ public:
     MovieServices &services() { return *_services; }
 
 private:
-    boost::filesystem::path _gamePath;
+    std::filesystem::path _gamePath;
     graphics::GraphicsModule &_graphics;
     audio::AudioModule &_audio;
 

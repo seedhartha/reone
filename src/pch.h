@@ -26,6 +26,8 @@
 #include <cstring>
 #include <ctime>
 #include <deque>
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -50,8 +52,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/endian/conversion.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/format.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/noncopyable.hpp>

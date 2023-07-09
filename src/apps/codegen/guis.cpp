@@ -126,7 +126,7 @@ static std::string controlTypeToTypeName(ControlType type) {
 
 static void writeHeaderFile(const std::string &resRef,
                             const ParsedGUI &gui,
-                            const boost::filesystem::path &destDir) {
+                            const std::filesystem::path &destDir) {
     auto path = destDir;
     path.append(resRef + ".h");
     auto stream = FileOutputStream(path);
@@ -161,9 +161,9 @@ static void writeHeaderFile(const std::string &resRef,
     writer.write("} // namespace reone\n");
 }
 
-void generateGuis(const boost::filesystem::path &k1dir,
-                  const boost::filesystem::path &k2dir,
-                  const boost::filesystem::path &destDir) {
+void generateGuis(const std::filesystem::path &k1dir,
+                  const std::filesystem::path &k2dir,
+                  const std::filesystem::path &destDir) {
     std::set<std::string> guiResRefs;
 
     auto k1KeyPath = findFileIgnoreCase(k1dir, "chitin.key");

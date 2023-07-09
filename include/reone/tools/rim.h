@@ -27,17 +27,17 @@ class RimTool : public Tool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
-    void extract(resource::RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath);
+    void extract(resource::RimReader &rim, const std::filesystem::path &rimPath, const std::filesystem::path &destPath);
 
 private:
     void list(const resource::RimReader &rim);
-    void toRIM(const boost::filesystem::path &target, const boost::filesystem::path &destPath);
+    void toRIM(const std::filesystem::path &target, const std::filesystem::path &destPath);
 };
 
 } // namespace reone

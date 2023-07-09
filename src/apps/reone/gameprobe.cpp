@@ -26,13 +26,13 @@ namespace reone {
 
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
-    boost::filesystem::path exePathK1(findFileIgnoreCase(_gamePath, "swkotor.exe"));
+    std::filesystem::path exePathK1(findFileIgnoreCase(_gamePath, "swkotor.exe"));
     if (!exePathK1.empty()) {
         return GameID::KotOR;
     }
 
     // If there is a TSL executable then game is TSL
-    boost::filesystem::path exePathK2(findFileIgnoreCase(_gamePath, "swkotor2.exe"));
+    std::filesystem::path exePathK2(findFileIgnoreCase(_gamePath, "swkotor2.exe"));
     if (!exePathK2.empty()) {
         return GameID::TSL;
     }

@@ -39,7 +39,7 @@ public:
         _root(std::move(root)) {
     }
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
     void save(IOutputStream &out);
 
 private:

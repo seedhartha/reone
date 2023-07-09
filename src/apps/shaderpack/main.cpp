@@ -26,8 +26,8 @@ int main(int argc, char **argv) {
     try {
         boost::program_options::options_description description;
         description.add_options()                                                              //
-            ("srcdir", boost::program_options::value<boost::filesystem::path>()->required())   //
-            ("destdir", boost::program_options::value<boost::filesystem::path>()->required()); //
+            ("srcdir", boost::program_options::value<std::filesystem::path>()->required())   //
+            ("destdir", boost::program_options::value<std::filesystem::path>()->required()); //
 
         boost::program_options::positional_options_description positionalDesc;
         positionalDesc.add("srcdir", 1);
@@ -42,20 +42,20 @@ int main(int argc, char **argv) {
         boost::program_options::store(options, vars);
         boost::program_options::notify(vars);
 
-        auto &srcdir = vars["srcdir"].as<boost::filesystem::path>();
-        if (!boost::filesystem::exists(srcdir) || !boost::filesystem::is_directory(srcdir)) {
+        auto &srcdir = vars["srcdir"].as<std::filesystem::path>();
+        if (!std::filesystem::exists(srcdir) || !std::filesystem::is_directory(srcdir)) {
             throw std::runtime_error("Source directory does not exist: " + srcdir.string());
         }
 
-        auto &destdir = vars["destdir"].as<boost::filesystem::path>();
-        if (!boost::filesystem::exists(destdir) || !boost::filesystem::is_directory(destdir)) {
+        auto &destdir = vars["destdir"].as<std::filesystem::path>();
+        if (!std::filesystem::exists(destdir) || !std::filesystem::is_directory(destdir)) {
             throw std::runtime_error("Destination directory does not exist: " + destdir.string());
         }
 
         auto writer = ErfWriter();
 
-        for (auto &entry : boost::filesystem::directory_iterator(srcdir)) {
-            if (!boost::filesystem::is_regular_file(entry.status())) {
+        for (auto &entry : std::filesystem::directory_iterator(srcdir)) {
+            if (!std::filesystem::is_regular_file(entry.status())) {
                 continue;
             }
             if (entry.path().extension() != ".glsl") {

@@ -39,17 +39,17 @@ public:
 
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
     void invokeBatch(
         Operation operation,
-        const std::vector<boost::filesystem::path> &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::vector<std::filesystem::path> &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
     void toPCODE(IInputStream &ncs, IOutputStream &pcode, game::Routines &routines);
     void toNSS(IInputStream &ncs, IOutputStream &nss, game::Routines &routines, bool optimize = true);
@@ -57,9 +57,9 @@ public:
 private:
     game::GameID _gameId;
 
-    void toPCODE(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
-    void toNCS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
-    void toNSS(const boost::filesystem::path &input, const boost::filesystem::path &outputDir, game::Routines &routines);
+    void toPCODE(const std::filesystem::path &input, const std::filesystem::path &outputDir, game::Routines &routines);
+    void toNCS(const std::filesystem::path &input, const std::filesystem::path &outputDir, game::Routines &routines);
+    void toNSS(const std::filesystem::path &input, const std::filesystem::path &outputDir, game::Routines &routines);
 };
 
 } // namespace reone

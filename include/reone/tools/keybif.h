@@ -28,13 +28,13 @@ class KeyBifTool : public Tool {
 public:
     void invoke(
         Operation operation,
-        const boost::filesystem::path &input,
-        const boost::filesystem::path &outputDir,
-        const boost::filesystem::path &gamePath) override;
+        const std::filesystem::path &input,
+        const std::filesystem::path &outputDir,
+        const std::filesystem::path &gamePath) override;
 
-    bool supports(Operation operation, const boost::filesystem::path &input) const override;
+    bool supports(Operation operation, const std::filesystem::path &input) const override;
 
-    void extractBIF(const resource::KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath);
+    void extractBIF(const resource::KeyReader &key, int bifIdx, const std::filesystem::path &bifPath, const std::filesystem::path &destPath);
 
 private:
     void listKEY(const resource::KeyReader &key);

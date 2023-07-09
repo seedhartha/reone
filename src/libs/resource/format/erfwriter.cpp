@@ -31,7 +31,7 @@ void ErfWriter::add(Resource &&res) {
     _resources.push_back(res);
 }
 
-void ErfWriter::save(FileType type, const boost::filesystem::path &path) {
+void ErfWriter::save(FileType type, const std::filesystem::path &path) {
     auto out = FileOutputStream(path);
     save(type, out);
 }

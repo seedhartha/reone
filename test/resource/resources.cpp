@@ -29,9 +29,9 @@ using namespace reone::resource;
 TEST(resources, should_index_providers_and_get_resources_without_caching) {
     // given
 
-    auto tmpDirPath = boost::filesystem::temp_directory_path();
+    auto tmpDirPath = std::filesystem::temp_directory_path();
     tmpDirPath.append("reone_test_resources");
-    boost::filesystem::create_directory(tmpDirPath);
+    std::filesystem::create_directory(tmpDirPath);
 
     auto keyPath = tmpDirPath;
     keyPath.append("sample.key");
@@ -75,7 +75,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto overridePath = tmpDirPath;
     overridePath.append("override");
-    boost::filesystem::create_directory(overridePath);
+    std::filesystem::create_directory(overridePath);
 
     auto resPath = overridePath;
     resPath.append("sample.txt");
@@ -108,5 +108,5 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     // cleanup
 
-    boost::filesystem::remove_all(tmpDirPath);
+    std::filesystem::remove_all(tmpDirPath);
 }

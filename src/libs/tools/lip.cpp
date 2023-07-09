@@ -34,18 +34,18 @@ namespace reone {
 
 void LipTool::invoke(
     Operation operation,
-    const boost::filesystem::path &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::filesystem::path &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
-    return invokeBatch(operation, std::vector<boost::filesystem::path> {input}, outputDir, gamePath);
+    return invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
 void LipTool::invokeBatch(
     Operation operation,
-    const std::vector<boost::filesystem::path> &input,
-    const boost::filesystem::path &outputDir,
-    const boost::filesystem::path &gamePath) {
+    const std::vector<std::filesystem::path> &input,
+    const std::filesystem::path &outputDir,
+    const std::filesystem::path &gamePath) {
 
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
@@ -56,7 +56,7 @@ void LipTool::invokeBatch(
     });
 }
 
-void LipTool::toXML(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void LipTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto lip = FileInputStream(path);
 
     auto xmlPath = destPath;
@@ -87,7 +87,7 @@ void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath) {
+void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -116,15 +116,15 @@ void LipTool::toLIP(const boost::filesystem::path &path, const boost::filesystem
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto lipPath = boost::filesystem::path(destPath);
+    auto lipPath = std::filesystem::path(destPath);
     lipPath.append(tokens[0] + ".lip");
 
     auto writer = LipWriter(std::move(animation));
     writer.save(lipPath);
 }
 
-bool LipTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    return !boost::filesystem::is_directory(input) &&
+bool LipTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
            ((input.extension() == ".lip" && operation == Operation::ToXML) ||
             (input.extension() == ".xml" && operation == Operation::ToLIP));
 }

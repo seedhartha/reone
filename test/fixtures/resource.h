@@ -33,11 +33,11 @@ public:
 
 class MockResources : public IResources, boost::noncopyable {
 public:
-    MOCK_METHOD(void, indexKEY, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexERF, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexRIM, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexEXE, (const boost::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexFolder, (const boost::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexKEY, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexERF, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexRIM, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexEXE, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, indexFolder, (const std::filesystem::path &path), (override));
 
     MOCK_METHOD(std::shared_ptr<ByteBuffer>, get, (const ResourceId &id), (override));
     MOCK_METHOD(std::shared_ptr<ByteBuffer>, find, (const ResourceId &id), (override));

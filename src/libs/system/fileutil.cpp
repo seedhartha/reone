@@ -19,11 +19,11 @@
 
 namespace reone {
 
-boost::filesystem::path findFileIgnoreCase(const boost::filesystem::path &dir, const std::string &filename) {
+std::filesystem::path findFileIgnoreCase(const std::filesystem::path &dir, const std::string &filename) {
     std::vector<std::string> tokens;
     boost::split(tokens, filename, boost::is_any_of("/"), boost::token_compress_on);
 
-    for (auto &entry : boost::filesystem::directory_iterator(dir)) {
+    for (auto &entry : std::filesystem::directory_iterator(dir)) {
         std::string name(entry.path().filename().string());
         boost::to_lower(name);
 

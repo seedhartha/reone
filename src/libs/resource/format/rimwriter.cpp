@@ -28,7 +28,7 @@ void RimWriter::add(Resource &&res) {
     _resources.push_back(res);
 }
 
-void RimWriter::save(const boost::filesystem::path &path) {
+void RimWriter::save(const std::filesystem::path &path) {
     auto rim = FileOutputStream(path);
     save(rim);
 }

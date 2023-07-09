@@ -27,7 +27,7 @@ public:
         _soundSet(std::move(soundSet)) {
     }
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
 
 private:
     std::vector<uint32_t> _soundSet;

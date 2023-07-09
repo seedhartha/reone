@@ -26,8 +26,8 @@ namespace reone {
 
 namespace resource {
 
-void Strings::init(const boost::filesystem::path &gameDir) {
-    boost::filesystem::path tlkPath(findFileIgnoreCase(gameDir, "dialog.tlk"));
+void Strings::init(const std::filesystem::path &gameDir) {
+    std::filesystem::path tlkPath(findFileIgnoreCase(gameDir, "dialog.tlk"));
     if (tlkPath.empty()) {
         throw ResourceNotFoundException("dialog.tlk file not found");
     }

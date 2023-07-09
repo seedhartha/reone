@@ -176,7 +176,7 @@ static void writeStruct(const SchemaStruct &schemaStruct, TextWriter &writer) {
 
 static void writeSchemaHeaderFile(const std::string &topStructName,
                                   const std::vector<std::pair<int, SchemaStruct *>> &structs,
-                                  const boost::filesystem::path &path) {
+                                  const std::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
     writer.write(kCopyrightNotice);
@@ -272,7 +272,7 @@ static void writeParseFunction(const SchemaStruct &schemaStruct, TextWriter &wri
 
 static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>> &structs,
                                 const std::string &schemaHeaderFilename,
-                                const boost::filesystem::path &path) {
+                                const std::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = TextWriter(stream);
     writer.write(kCopyrightNotice);
@@ -290,9 +290,9 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
 }
 
 void generateGffSchema(resource::ResourceType resType,
-                       const boost::filesystem::path &k1dir,
-                       const boost::filesystem::path &k2dir,
-                       const boost::filesystem::path &destDir) {
+                       const std::filesystem::path &k1dir,
+                       const std::filesystem::path &k2dir,
+                       const std::filesystem::path &destDir) {
     std::map<std::string, std::shared_ptr<Gff>> trees;
 
     auto keyPath = findFileIgnoreCase(k2dir, "chitin.key");
@@ -310,8 +310,8 @@ void generateGffSchema(resource::ResourceType resType,
     }
 
     auto modulesPath = findFileIgnoreCase(k2dir, "modules");
-    for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
-        if (!boost::filesystem::is_regular_file(entry)) {
+    for (auto &entry : std::filesystem::directory_iterator(modulesPath)) {
+        if (!std::filesystem::is_regular_file(entry)) {
             continue;
         }
         auto extension = boost::to_lower_copy(entry.path().extension().string());

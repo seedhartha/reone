@@ -25,7 +25,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-void KeyBifTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
+void KeyBifTool::invoke(Operation operation, const std::filesystem::path &input, const std::filesystem::path &outputDir, const std::filesystem::path &gamePath) {
     bool isKey = input.extension() == ".key";
     if (isKey) {
         auto stream = FileInputStream(input);
@@ -75,11 +75,11 @@ void KeyBifTool::listBIF(const KeyReader &key, int bifIdx) {
     }
 }
 
-void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::filesystem::path &bifPath, const boost::filesystem::path &destPath) {
-    if (!boost::filesystem::exists(destPath)) {
+void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const std::filesystem::path &bifPath, const std::filesystem::path &destPath) {
+    if (!std::filesystem::exists(destPath)) {
         // Create destination directory if it does not exist
-        boost::filesystem::create_directory(destPath);
-    } else if (!boost::filesystem::is_directory(destPath)) {
+        std::filesystem::create_directory(destPath);
+    } else if (!std::filesystem::is_directory(destPath)) {
         // Return if destination exists, but is not a directory
         return;
     }
@@ -102,17 +102,17 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const boost::files
         bif.seek(bifResource.offset, SeekOrigin::Begin);
         bif.read(&buffer[0], buffer.size());
 
-        auto resPath = boost::filesystem::path(destPath);
+        auto resPath = std::filesystem::path(destPath);
         auto &ext = getExtByResType(keyEntry.resId.type);
         resPath.append(keyEntry.resId.resRef + "." + ext);
 
-        auto out = boost::filesystem::ofstream(resPath, std::ios::binary);
+        auto out = std::ofstream(resPath, std::ios::binary);
         out.write(&buffer[0], buffer.size());
     }
 }
 
-bool KeyBifTool::supports(Operation operation, const boost::filesystem::path &input) const {
-    if (boost::filesystem::is_directory(input))
+bool KeyBifTool::supports(Operation operation, const std::filesystem::path &input) const {
+    if (std::filesystem::is_directory(input))
         return false;
 
     bool key = input.extension() == ".key";

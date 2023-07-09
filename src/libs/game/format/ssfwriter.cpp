@@ -24,7 +24,7 @@ namespace reone {
 
 namespace game {
 
-void SsfWriter::save(const boost::filesystem::path &path) {
+void SsfWriter::save(const std::filesystem::path &path) {
     auto stream = FileOutputStream(path);
     auto writer = BinaryWriter(stream);
 

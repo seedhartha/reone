@@ -32,11 +32,11 @@ class IResources {
 public:
     virtual ~IResources() = default;
 
-    virtual void indexKEY(const boost::filesystem::path &path) = 0;
-    virtual void indexERF(const boost::filesystem::path &path) = 0;
-    virtual void indexRIM(const boost::filesystem::path &path) = 0;
-    virtual void indexEXE(const boost::filesystem::path &path) = 0;
-    virtual void indexFolder(const boost::filesystem::path &path) = 0;
+    virtual void indexKEY(const std::filesystem::path &path) = 0;
+    virtual void indexERF(const std::filesystem::path &path) = 0;
+    virtual void indexRIM(const std::filesystem::path &path) = 0;
+    virtual void indexEXE(const std::filesystem::path &path) = 0;
+    virtual void indexFolder(const std::filesystem::path &path) = 0;
 
     virtual std::shared_ptr<ByteBuffer> get(const ResourceId &id) = 0;
     virtual std::shared_ptr<ByteBuffer> find(const ResourceId &id) = 0;
@@ -52,11 +52,11 @@ public:
         _providers.push_front(std::move(provider));
     }
 
-    void indexKEY(const boost::filesystem::path &path) override;
-    void indexERF(const boost::filesystem::path &path) override;
-    void indexRIM(const boost::filesystem::path &path) override;
-    void indexEXE(const boost::filesystem::path &path) override;
-    void indexFolder(const boost::filesystem::path &path) override;
+    void indexKEY(const std::filesystem::path &path) override;
+    void indexERF(const std::filesystem::path &path) override;
+    void indexRIM(const std::filesystem::path &path) override;
+    void indexEXE(const std::filesystem::path &path) override;
+    void indexFolder(const std::filesystem::path &path) override;
 
     std::shared_ptr<ByteBuffer> get(const ResourceId &id) override;
     std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;

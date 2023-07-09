@@ -31,7 +31,7 @@ public:
         _program(program) {
     }
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
     void save(std::shared_ptr<IOutputStream> out);
 
 private:

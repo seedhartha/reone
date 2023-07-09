@@ -125,7 +125,7 @@ std::set<std::string> ResourceLayout::moduleNames() {
     if (modulesPath.empty()) {
         throw ResourceNotFoundException("Modules directory not found");
     }
-    for (auto &entry : boost::filesystem::directory_iterator(modulesPath)) {
+    for (auto &entry : std::filesystem::directory_iterator(modulesPath)) {
         auto filename = boost::to_lower_copy(entry.path().filename().string());
         if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
             auto moduleName = boost::to_lower_copy(filename.substr(0, filename.size() - 4));
@@ -138,12 +138,12 @@ std::set<std::string> ResourceLayout::moduleNames() {
 void ResourceLayout::loadModuleResources(const std::string &moduleName) {
     _resourceSvc.gffs.invalidate();
 
-    boost::filesystem::path modulesPath(findFileIgnoreCase(_options.game.path, kModulesDirectoryName));
+    std::filesystem::path modulesPath(findFileIgnoreCase(_options.game.path, kModulesDirectoryName));
     if (modulesPath.empty()) {
         throw ResourceNotFoundException("Modules directory not found");
     }
 
-    boost::filesystem::path modPath(findFileIgnoreCase(modulesPath, moduleName + ".mod"));
+    std::filesystem::path modPath(findFileIgnoreCase(modulesPath, moduleName + ".mod"));
     if (!modPath.empty()) {
         _resourceSvc.resources.indexERF(findFileIgnoreCase(modulesPath, moduleName + ".mod"));
     } else {
@@ -151,7 +151,7 @@ void ResourceLayout::loadModuleResources(const std::string &moduleName) {
         _resourceSvc.resources.indexRIM(findFileIgnoreCase(modulesPath, moduleName + "_s.rim"));
     }
 
-    boost::filesystem::path lipsPath(findFileIgnoreCase(_options.game.path, kLipsDirectoryName));
+    std::filesystem::path lipsPath(findFileIgnoreCase(_options.game.path, kLipsDirectoryName));
     if (!lipsPath.empty()) {
         _resourceSvc.resources.indexERF(findFileIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }

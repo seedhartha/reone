@@ -28,7 +28,7 @@ namespace resource {
 
 class Folder : public IResourceProvider, boost::noncopyable {
 public:
-    Folder(boost::filesystem::path path) :
+    Folder(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
@@ -44,16 +44,16 @@ public:
 
 private:
     struct Resource {
-        boost::filesystem::path path;
+        std::filesystem::path path;
         ResourceType type;
     };
 
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
 
     ResourceIdSet _resourceIds;
     std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
 
-    void loadDirectory(const boost::filesystem::path &path);
+    void loadDirectory(const std::filesystem::path &path);
 };
 
 } // namespace resource

@@ -37,7 +37,7 @@ private:
         Rooms
     };
 
-    boost::filesystem::path _path;
+    std::filesystem::path _path;
     State _state {State::None};
     int _roomCount {0};
 

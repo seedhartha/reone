@@ -27,7 +27,7 @@ namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
 
-void TwoDaWriter::save(const boost::filesystem::path &path) {
+void TwoDaWriter::save(const std::filesystem::path &path) {
     auto out = FileOutputStream(path);
     save(out);
 }

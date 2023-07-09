@@ -25,7 +25,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-void RimTool::invoke(Operation operation, const boost::filesystem::path &input, const boost::filesystem::path &outputDir, const boost::filesystem::path &gamePath) {
+void RimTool::invoke(Operation operation, const std::filesystem::path &input, const std::filesystem::path &outputDir, const std::filesystem::path &gamePath) {
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
@@ -53,11 +53,11 @@ void RimTool::list(const RimReader &rim) {
     }
 }
 
-void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, const boost::filesystem::path &destPath) {
-    if (!boost::filesystem::exists(destPath)) {
+void RimTool::extract(RimReader &rim, const std::filesystem::path &rimPath, const std::filesystem::path &destPath) {
+    if (!std::filesystem::exists(destPath)) {
         // Create destination directory if it does not exist
-        boost::filesystem::create_directory(destPath);
-    } else if (!boost::filesystem::is_directory(destPath)) {
+        std::filesystem::create_directory(destPath);
+    } else if (!std::filesystem::is_directory(destPath)) {
         // Return if destination exists, but is not a directory
         return;
     }
@@ -75,17 +75,17 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
         auto &ext = getExtByResType(rimResource.resId.type);
         resPath.append(rimResource.resId.resRef + "." + ext);
 
-        auto res = boost::filesystem::ofstream(resPath, std::ios::binary);
+        auto res = std::ofstream(resPath, std::ios::binary);
         res.write(&buffer[0], buffer.size());
     }
 }
 
-void RimTool::toRIM(const boost::filesystem::path &target, const boost::filesystem::path &destPath) {
+void RimTool::toRIM(const std::filesystem::path &target, const std::filesystem::path &destPath) {
     RimWriter rim;
 
-    for (auto &entry : boost::filesystem::directory_iterator(target)) {
-        boost::filesystem::path path(entry);
-        if (boost::filesystem::is_directory(path))
+    for (auto &entry : std::filesystem::directory_iterator(target)) {
+        std::filesystem::path path(entry);
+        if (std::filesystem::is_directory(path))
             continue;
 
         std::string ext(path.extension().string());
@@ -95,14 +95,14 @@ void RimTool::toRIM(const boost::filesystem::path &target, const boost::filesyst
         if (resType == ResourceType::Invalid)
             continue;
 
-        boost::filesystem::ifstream in(path, std::ios::binary);
+        std::ifstream in(path, std::ios::binary);
         in.seekg(0, std::ios::end);
         size_t size = in.tellg();
         ByteBuffer data(size, '\0');
         in.seekg(0);
         in.read(&data[0], size);
 
-        boost::filesystem::path resRef(path.filename());
+        std::filesystem::path resRef(path.filename());
         resRef.replace_extension("");
 
         RimWriter::Resource res;
@@ -118,13 +118,13 @@ void RimTool::toRIM(const boost::filesystem::path &target, const boost::filesyst
     rim.save(rimPath);
 }
 
-bool RimTool::supports(Operation operation, const boost::filesystem::path &input) const {
+bool RimTool::supports(Operation operation, const std::filesystem::path &input) const {
     switch (operation) {
     case Operation::List:
     case Operation::Extract:
-        return !boost::filesystem::is_directory(input) && input.extension() == ".rim";
+        return !std::filesystem::is_directory(input) && input.extension() == ".rim";
     case Operation::ToRIM:
-        return boost::filesystem::is_directory(input);
+        return std::filesystem::is_directory(input);
     default:
         return false;
     }

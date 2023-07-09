@@ -28,9 +28,9 @@ void Folder::init() {
     loadDirectory(_path);
 }
 
-void Folder::loadDirectory(const boost::filesystem::path &path) {
-    for (auto &entry : boost::filesystem::directory_iterator(path)) {
-        if (boost::filesystem::is_directory(entry.path())) {
+void Folder::loadDirectory(const std::filesystem::path &path) {
+    for (auto &entry : std::filesystem::directory_iterator(path)) {
+        if (std::filesystem::is_directory(entry.path())) {
             loadDirectory(entry.path());
             continue;
         }

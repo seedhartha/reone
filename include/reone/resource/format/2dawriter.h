@@ -33,7 +33,7 @@ public:
         _twoDa(twoDa) {
     }
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
     void save(IOutputStream &out);
 
 private:

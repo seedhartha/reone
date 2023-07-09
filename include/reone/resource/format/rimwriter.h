@@ -37,7 +37,7 @@ public:
 
     void add(Resource &&res);
 
-    void save(const boost::filesystem::path &path);
+    void save(const std::filesystem::path &path);
     void save(IOutputStream &out);
 
 private:

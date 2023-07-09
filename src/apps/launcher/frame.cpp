@@ -315,7 +315,7 @@ void LauncherFrame::LoadConfiguration() {
         ("logch", value<int>()->default_value(_config.logch));
 
     variables_map vars;
-    if (!boost::filesystem::exists(kConfigFilename)) {
+    if (!std::filesystem::exists(kConfigFilename)) {
         return;
     }
 
@@ -445,7 +445,7 @@ void LauncherFrame::SaveConfiguration() {
 
     std::vector<std::string> lines;
 
-    boost::filesystem::ifstream in(kConfigFilename);
+    std::ifstream in(kConfigFilename);
     for (std::string line; getline(in, line);) {
         bool add = true;
         for (auto &opt : recognized) {
@@ -459,7 +459,7 @@ void LauncherFrame::SaveConfiguration() {
         }
     }
 
-    boost::filesystem::ofstream config(kConfigFilename);
+    std::ofstream config(kConfigFilename);
     config << "game=" << _config.gameDir << std::endl;
     config << "dev=" << (_config.devMode ? 1 : 0) << std::endl;
     config << "width=" << _config.width << std::endl;
