@@ -39,7 +39,7 @@
 #include "../paths.h"
 #include "../portraits.h"
 #include "../reputes.h"
-#include "../resourcelayout.h"
+#include "../resourcedirector.h"
 #include "../soundsets.h"
 #include "../surfaces.h"
 #include "../visibilities.h"
@@ -60,7 +60,7 @@ struct GameServices {
     IPaths &paths;
     IPortraits &portraits;
     IReputes &reputes;
-    IResourceLayout &resourceLayout;
+    IResourceDirector &resourceDirector;
     ISkills &skills;
     ISoundSets &soundSets;
     ISpells &spells;
@@ -79,7 +79,7 @@ struct GameServices {
         IPaths &paths,
         IPortraits &portraits,
         IReputes &reputes,
-        IResourceLayout &resourceLayout,
+        IResourceDirector &resourceDirector,
         ISkills &skills,
         ISoundSets &soundSets,
         ISpells &spells,
@@ -96,7 +96,7 @@ struct GameServices {
         paths(paths),
         portraits(portraits),
         reputes(reputes),
-        resourceLayout(resourceLayout),
+        resourceDirector(resourceDirector),
         skills(skills),
         soundSets(soundSets),
         spells(spells),

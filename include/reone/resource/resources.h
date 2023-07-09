@@ -32,11 +32,13 @@ class IResources {
 public:
     virtual ~IResources() = default;
 
-    virtual void indexKEY(const std::filesystem::path &path) = 0;
-    virtual void indexERF(const std::filesystem::path &path) = 0;
-    virtual void indexRIM(const std::filesystem::path &path) = 0;
-    virtual void indexEXE(const std::filesystem::path &path) = 0;
-    virtual void indexFolder(const std::filesystem::path &path) = 0;
+    virtual void clear() = 0;
+
+    virtual void addKEY(const std::filesystem::path &path) = 0;
+    virtual void addERF(const std::filesystem::path &path) = 0;
+    virtual void addRIM(const std::filesystem::path &path) = 0;
+    virtual void addEXE(const std::filesystem::path &path) = 0;
+    virtual void addFolder(const std::filesystem::path &path) = 0;
 
     virtual ByteBuffer get(const ResourceId &id) = 0;
     virtual std::optional<ByteBuffer> find(const ResourceId &id) = 0;
@@ -44,19 +46,19 @@ public:
 
 class Resources : public IResources, boost::noncopyable {
 public:
-    void clearProviders() {
+    void clear() override {
         _providers.clear();
     }
 
-    void addProvider(std::unique_ptr<IResourceProvider> provider) {
+    void add(std::unique_ptr<IResourceProvider> provider) {
         _providers.push_front(std::move(provider));
     }
 
-    void indexKEY(const std::filesystem::path &path) override;
-    void indexERF(const std::filesystem::path &path) override;
-    void indexRIM(const std::filesystem::path &path) override;
-    void indexEXE(const std::filesystem::path &path) override;
-    void indexFolder(const std::filesystem::path &path) override;
+    void addKEY(const std::filesystem::path &path) override;
+    void addERF(const std::filesystem::path &path) override;
+    void addRIM(const std::filesystem::path &path) override;
+    void addEXE(const std::filesystem::path &path) override;
+    void addFolder(const std::filesystem::path &path) override;
 
     ByteBuffer get(const ResourceId &id) override;
     std::optional<ByteBuffer> find(const ResourceId &id) override;

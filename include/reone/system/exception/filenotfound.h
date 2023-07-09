@@ -19,7 +19,15 @@
 
 namespace reone {
 
-std::filesystem::path getFileIgnoreCase(const std::filesystem::path &dir, const std::string &relPath);
-std::optional<std::filesystem::path> findFileIgnoreCase(const std::filesystem::path &dir, const std::string &relPath);
+class FileNotFoundException : public std::runtime_error {
+public:
+    FileNotFoundException() :
+        std::runtime_error("") {
+    }
+
+    FileNotFoundException(const std::string &message) :
+        std::runtime_error(message) {
+    }
+};
 
 } // namespace reone

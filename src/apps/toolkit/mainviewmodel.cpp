@@ -378,15 +378,15 @@ void MainViewModel::loadGameDirectory() {
     auto tslExePath = findFileIgnoreCase(_gamePath, "swkotor2.exe");
     _gameId = tslExePath ? GameID::TSL : GameID::KotOR;
 
-    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-    auto key = FileInputStream(*keyPath);
+    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
     _keyKeys = keyReader.keys();
     _keyFiles = keyReader.files();
 
-    auto tlkPath = findFileIgnoreCase(_gamePath, "dialog.tlk");
-    auto tlk = FileInputStream(*tlkPath);
+    auto tlkPath = getFileIgnoreCase(_gamePath, "dialog.tlk");
+    auto tlk = FileInputStream(tlkPath);
     auto tlkReader = TlkReader(tlk);
     tlkReader.load();
     _talkTable = tlkReader.table();
@@ -457,16 +457,16 @@ void MainViewModel::loadEngine() {
     _audioModule->init();
     _sceneModule->init();
 
-    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-    auto guiTexPackPath = findFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf");
-    auto tpaTexPackPath = findFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf");
-    auto overridePath = findFileIgnoreCase(_gamePath, "override");
+    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto guiTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf");
+    auto tpaTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf");
+    auto overridePath = getFileIgnoreCase(_gamePath, "override");
 
     auto &resources = _resourceModule->resources();
-    resources.indexKEY(*keyPath);
-    resources.indexERF(*guiTexPackPath);
-    resources.indexERF(*tpaTexPackPath);
-    resources.indexFolder(*overridePath);
+    resources.addKEY(keyPath);
+    resources.addERF(guiTexPackPath);
+    resources.addERF(tpaTexPackPath);
+    resources.addFolder(overridePath);
 
     auto &sceneGraphs = _sceneModule->graphs();
     sceneGraphs.reserve(kSceneMain);
@@ -498,8 +498,8 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
 void MainViewModel::extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
-        auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-        auto key = FileInputStream(*keyPath);
+        auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+        auto key = FileInputStream(keyPath);
         auto keyReader = KeyReader(key);
         keyReader.load();
         auto filename = boost::to_lower_copy(srcPath.filename().string());
@@ -546,8 +546,8 @@ void MainViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem
 void MainViewModel::extractAllBifs(const std::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
-    auto keyPath = findFileIgnoreCase(_gamePath, "chitin.key");
-    auto key = FileInputStream(*keyPath);
+    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
 

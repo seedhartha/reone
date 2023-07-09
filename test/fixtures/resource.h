@@ -27,17 +27,18 @@ namespace resource {
 
 class MockGffs : public IGffs, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<Gff>, get, (const std::string &resRef, ResourceType type), (override));
 };
 
 class MockResources : public IResources, boost::noncopyable {
 public:
-    MOCK_METHOD(void, indexKEY, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexERF, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexRIM, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexEXE, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, indexFolder, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(void, addKEY, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, addERF, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, addRIM, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, addEXE, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, addFolder, (const std::filesystem::path &path), (override));
 
     MOCK_METHOD(ByteBuffer, get, (const ResourceId &id), (override));
     MOCK_METHOD(std::optional<ByteBuffer>, find, (const ResourceId &id), (override));
@@ -51,7 +52,7 @@ public:
 
 class MockTwoDas : public ITwoDas, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<TwoDa>, get, (const std::string &key), (override));
 };
 

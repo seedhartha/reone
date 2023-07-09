@@ -89,14 +89,14 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     // when
 
-    resources.indexKEY(keyPath);
-    resources.indexERF(erfPath);
-    resources.indexFolder(overridePath);
-    resources.indexRIM(rimPath);
+    resources.addKEY(keyPath);
+    resources.addERF(erfPath);
+    resources.addFolder(overridePath);
+    resources.addRIM(rimPath);
 
     auto numProviders = resources.providers().size();
     auto actualResData1 = resources.find(ResourceId("sample", ResourceType::Txt));
-    resources.clearProviders();
+    resources.clear();
     auto actualResData2 = resources.find(ResourceId("sample", ResourceType::Txt));
 
     // then

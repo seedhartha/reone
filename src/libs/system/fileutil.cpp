@@ -17,7 +17,27 @@
 
 #include "reone/system/fileutil.h"
 
+#include "reone/system/exception/filenotfound.h"
+
 namespace reone {
+
+std::filesystem::path getFileIgnoreCase(const std::filesystem::path &dir, const std::string &relPath) {
+    std::vector<std::string> tokens;
+    boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
+
+    for (auto &entry : std::filesystem::directory_iterator(dir)) {
+        auto filename = boost::to_lower_copy(entry.path().filename().string());
+        if (filename == tokens[0]) {
+            if (tokens.size() == 1) {
+                return entry.path();
+            }
+            auto subPath = relPath.substr(tokens[0].length() + 1);
+            return getFileIgnoreCase(entry.path(), subPath);
+        }
+    }
+
+    throw FileNotFoundException((dir / relPath).string());
+}
 
 std::optional<std::filesystem::path> findFileIgnoreCase(const std::filesystem::path &dir, const std::string &relPath) {
     std::vector<std::string> tokens;

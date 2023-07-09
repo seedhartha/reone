@@ -78,7 +78,7 @@ private:
     std::unique_ptr<Paths> _paths;
     std::unique_ptr<Portraits> _portraits;
     std::unique_ptr<Reputes> _reputes;
-    std::unique_ptr<ResourceLayout> _resourceLayout;
+    std::unique_ptr<ResourceDirector> _resourceDirector;
     std::unique_ptr<Skills> _skills;
     std::unique_ptr<SoundSets> _soundSets;
     std::unique_ptr<Spells> _spells;

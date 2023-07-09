@@ -33,7 +33,7 @@ void GameModule::init() {
     _paths = std::make_unique<Paths>(_resource.gffs());
     _portraits = std::make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = std::make_unique<Reputes>(_resource.twoDas());
-    _resourceLayout = std::make_unique<ResourceLayout>(_gameId, _options, _resource.services());
+    _resourceDirector = std::make_unique<ResourceDirector>(_gameId, _options, *_dialogs, *_paths, _script.services(), _graphics.services(), _resource.services());
     _skills = std::make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _soundSets = std::make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
     _spells = std::make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -52,14 +52,14 @@ void GameModule::init() {
         *_paths,
         *_portraits,
         *_reputes,
-        *_resourceLayout,
+        *_resourceDirector,
         *_skills,
         *_soundSets,
         *_spells,
         *_surfaces,
         *_visibilities);
 
-    _resourceLayout->init();
+    _resourceDirector->init();
     _cameraStyles->init();
     _guiSounds->init();
     _portraits->init();
@@ -72,7 +72,7 @@ void GameModule::deinit() {
     _visibilities.reset();
     _surfaces.reset();
     _soundSets.reset();
-    _resourceLayout.reset();
+    _resourceDirector.reset();
     _portraits.reset();
     _paths.reset();
     _layouts.reset();

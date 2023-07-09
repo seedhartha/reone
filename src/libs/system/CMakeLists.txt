@@ -23,6 +23,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/di/module.h
     ${SYSTEM_INCLUDE_DIR}/di/services.h
     ${SYSTEM_INCLUDE_DIR}/exception/endofstream.h
+    ${SYSTEM_INCLUDE_DIR}/exception/filenotfound.h
     ${SYSTEM_INCLUDE_DIR}/exception/notimplemented.h
     ${SYSTEM_INCLUDE_DIR}/fileutil.h
     ${SYSTEM_INCLUDE_DIR}/hexutil.h

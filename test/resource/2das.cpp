@@ -39,7 +39,7 @@ TEST(two_das, should_get_2da_with_caching) {
     auto resources = Resources();
     auto provider = std::make_unique<MemoryResourceProvider>();
     provider->add(ResourceId("sample", ResourceType::TwoDa), std::move(resBytes));
-    resources.addProvider(std::move(provider));
+    resources.add(std::move(provider));
 
     auto twoDas = TwoDas(resources);
 
@@ -47,7 +47,7 @@ TEST(two_das, should_get_2da_with_caching) {
 
     auto twoDa1 = twoDas.get("sample");
 
-    resources.clearProviders();
+    resources.clear();
 
     auto twoDa2 = twoDas.get("sample");
 

@@ -27,40 +27,69 @@ struct ResourceServices;
 
 }
 
+namespace graphics {
+
+struct GraphicsServices;
+
+}
+
+namespace script {
+
+struct ScriptServices;
+
+}
+
 namespace game {
 
 struct OptionsView;
 
-class IResourceLayout {
+class IDialogs;
+class IPaths;
+
+class IResourceDirector {
 public:
-    virtual ~IResourceLayout() = default;
+    virtual ~IResourceDirector() = default;
+
+    virtual void init() = 0;
+    virtual void onModuleLoad(const std::string &name) = 0;
 
     virtual std::set<std::string> moduleNames() = 0;
-
-    virtual void loadModuleResources(const std::string &moduleName) = 0;
 };
 
-class ResourceLayout : public IResourceLayout, boost::noncopyable {
+class ResourceDirector : public IResourceDirector, boost::noncopyable {
 public:
-    ResourceLayout(GameID gameId, OptionsView &options, resource::ResourceServices &resourceSvc) :
+    ResourceDirector(GameID gameId,
+                     OptionsView &options,
+                     IDialogs &dialogs,
+                     IPaths &paths,
+                     script::ScriptServices &scriptSvc,
+                     graphics::GraphicsServices &graphicsSvc,
+                     resource::ResourceServices &resourceSvc) :
         _gameId(gameId),
         _options(options),
+        _dialogs(dialogs),
+        _paths(paths),
+        _scriptSvc(scriptSvc),
+        _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc) {
     }
 
-    void init();
+    void init() override;
+    void onModuleLoad(const std::string &name) override;
 
     std::set<std::string> moduleNames() override;
-
-    void loadModuleResources(const std::string &moduleName) override;
 
 private:
     GameID _gameId;
     OptionsView &_options;
+    IDialogs &_dialogs;
+    IPaths &_paths;
+    script::ScriptServices &_scriptSvc;
+    graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;
 
-    void initForKotOR();
-    void initForTSL();
+    void loadGlobalResources();
+    void loadModuleResources(const std::string &name);
 };
 
 } // namespace game

@@ -58,7 +58,7 @@ TEST(game, should_play_legal_movie_on_launch) {
         .WillOnce(Return(sceneNames));
 
     auto moduleNames = std::set<std::string>();
-    EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames())
+    EXPECT_CALL(engine->gameModule().resourceDirector(), moduleNames())
         .WillOnce(Return(moduleNames));
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
@@ -99,7 +99,7 @@ TEST(game, should_present_main_menu_on_launch_when_movie_is_finished) {
     EXPECT_CALL(engine->sceneModule().graphs(), sceneNames()).WillOnce(Return(sceneNames));
 
     auto moduleNames = std::set<std::string>();
-    EXPECT_CALL(engine->gameModule().resourceLayout(), moduleNames()).WillOnce(Return(moduleNames));
+    EXPECT_CALL(engine->gameModule().resourceDirector(), moduleNames()).WillOnce(Return(moduleNames));
 
     auto game = Game(GameID::KotOR, gamePath, engine->options(), engine->services());
     game.init();

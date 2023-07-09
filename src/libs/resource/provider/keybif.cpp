@@ -41,8 +41,8 @@ void KeyBifResourceProvider::init() {
 
     for (auto i = 0; i < keyReader.files().size(); ++i) {
         auto &file = keyReader.files()[i];
-        auto bifPath = findFileIgnoreCase(gamePath, file.filename);
-        auto bif = std::make_unique<FileInputStream>(*bifPath);
+        auto bifPath = getFileIgnoreCase(gamePath, file.filename);
+        auto bif = std::make_unique<FileInputStream>(bifPath);
         auto bifReader = BifReader(*bif);
         bifReader.load();
 

@@ -29,7 +29,7 @@
 #include "reone/game/location.h"
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
-#include "reone/game/resourcelayout.h"
+#include "reone/game/resourcedirector.h"
 #include "reone/game/script/routines.h"
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
@@ -85,7 +85,7 @@ void Game::init() {
     setCursorType(CursorType::Default);
 
     _services.graphics.window.setEventHandler(this);
-    _moduleNames = _services.game.resourceLayout.moduleNames();
+    _moduleNames = _services.game.resourceDirector.moduleNames();
 }
 
 void Game::initLocalServices() {
@@ -217,7 +217,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
                 _module->area()->unloadParty();
             }
 
-            _services.game.resourceLayout.loadModuleResources(name);
+            _services.game.resourceDirector.onModuleLoad(name);
 
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
