@@ -75,9 +75,8 @@ void ResourceDirector::onModuleLoad(const std::string &name) {
     _scriptSvc.scripts.clear();
     _graphicsSvc.lipAnimations.clear();
     _resourceSvc.gffs.clear();
-    _resourceSvc.resources.clear();
+    _resourceSvc.resources.clearLocal();
 
-    loadGlobalResources();
     loadModuleResources(name);
 }
 
@@ -144,20 +143,20 @@ void ResourceDirector::loadModuleResources(const std::string &name) {
     }
 
     auto &resources = _resourceSvc.resources;
-    resources.addRIM(getFileIgnoreCase(*modulesPath, name + ".rim"));
-    resources.addRIM(getFileIgnoreCase(*modulesPath, name + "_s.rim"));
+    resources.addRIM(getFileIgnoreCase(*modulesPath, name + ".rim"), true);
+    resources.addRIM(getFileIgnoreCase(*modulesPath, name + "_s.rim"), true);
     auto modPath = findFileIgnoreCase(*modulesPath, name + ".mod");
     if (modPath) {
-        resources.addERF(*modPath);
+        resources.addERF(*modPath, true);
     }
 
     auto lipsPath = findFileIgnoreCase(_options.game.path, kLipsDirectoryName);
     if (lipsPath) {
-        resources.addERF(getFileIgnoreCase(*lipsPath, name + "_loc.mod"));
+        resources.addERF(getFileIgnoreCase(*lipsPath, name + "_loc.mod"), true);
     }
 
     if (_gameId == GameID::TSL) {
-        resources.addERF(getFileIgnoreCase(*modulesPath, name + "_dlg.erf"));
+        resources.addERF(getFileIgnoreCase(*modulesPath, name + "_dlg.erf"), true);
     }
 }
 

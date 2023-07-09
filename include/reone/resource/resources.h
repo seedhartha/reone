@@ -26,17 +26,23 @@ namespace reone {
 
 namespace resource {
 
-typedef std::list<std::unique_ptr<IResourceProvider>> ResourceProviderList;
+struct ResourceProviderLocalPair {
+    std::unique_ptr<IResourceProvider> provider;
+    bool local {false};
+};
+
+typedef std::list<ResourceProviderLocalPair> ResourceProviderList;
 
 class IResources {
 public:
     virtual ~IResources() = default;
 
     virtual void clear() = 0;
+    virtual void clearLocal() = 0;
 
     virtual void addKEY(const std::filesystem::path &path) = 0;
-    virtual void addERF(const std::filesystem::path &path) = 0;
-    virtual void addRIM(const std::filesystem::path &path) = 0;
+    virtual void addERF(const std::filesystem::path &path, bool local = false) = 0;
+    virtual void addRIM(const std::filesystem::path &path, bool local = false) = 0;
     virtual void addEXE(const std::filesystem::path &path) = 0;
     virtual void addFolder(const std::filesystem::path &path) = 0;
 
@@ -50,13 +56,20 @@ public:
         _providers.clear();
     }
 
-    void add(std::unique_ptr<IResourceProvider> provider) {
-        _providers.push_front(std::move(provider));
+    void clearLocal() override {
+        auto toErase = std::remove_if(_providers.begin(), _providers.end(), [](auto &pair) {
+            return pair.local;
+        });
+        _providers.erase(toErase, _providers.end());
+    }
+
+    void add(std::unique_ptr<IResourceProvider> provider, bool local = false) {
+        _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
     }
 
     void addKEY(const std::filesystem::path &path) override;
-    void addERF(const std::filesystem::path &path) override;
-    void addRIM(const std::filesystem::path &path) override;
+    void addERF(const std::filesystem::path &path, bool local = false) override;
+    void addRIM(const std::filesystem::path &path, bool local = false) override;
     void addEXE(const std::filesystem::path &path) override;
     void addFolder(const std::filesystem::path &path) override;
 

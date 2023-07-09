@@ -31,31 +31,31 @@ namespace resource {
 void Resources::addKEY(const std::filesystem::path &path) {
     auto provider = std::make_unique<KeyBifResourceProvider>(path);
     provider->init();
-    _providers.push_front(std::move(provider));
+    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
 }
 
-void Resources::addERF(const std::filesystem::path &path) {
+void Resources::addERF(const std::filesystem::path &path, bool local) {
     auto provider = std::make_unique<ErfResourceProvider>(path);
     provider->init();
-    _providers.push_front(std::move(provider));
+    _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
 }
 
-void Resources::addRIM(const std::filesystem::path &path) {
+void Resources::addRIM(const std::filesystem::path &path, bool local) {
     auto provider = std::make_unique<RimResourceProvider>(path);
     provider->init();
-    _providers.push_front(std::move(provider));
+    _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
 }
 
 void Resources::addEXE(const std::filesystem::path &path) {
     auto provider = std::make_unique<ExeResourceProvider>(path);
     provider->init();
-    _providers.push_front(std::move(provider));
+    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
 }
 
 void Resources::addFolder(const std::filesystem::path &path) {
     auto provider = std::make_unique<Folder>(path);
     provider->init();
-    _providers.push_front(std::move(provider));
+    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
 }
 
 ByteBuffer Resources::get(const ResourceId &id) {
@@ -67,7 +67,7 @@ ByteBuffer Resources::get(const ResourceId &id) {
 }
 
 std::optional<ByteBuffer> Resources::find(const ResourceId &id) {
-    for (auto &provider : _providers) {
+    for (auto &[provider, local] : _providers) {
         auto data = provider->findResourceData(id);
         if (data) {
             return *data;

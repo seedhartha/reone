@@ -34,9 +34,10 @@ public:
 class MockResources : public IResources, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(void, clearLocal, (), (override));
     MOCK_METHOD(void, addKEY, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, addERF, (const std::filesystem::path &path), (override));
-    MOCK_METHOD(void, addRIM, (const std::filesystem::path &path), (override));
+    MOCK_METHOD(void, addERF, (const std::filesystem::path &path, bool local), (override));
+    MOCK_METHOD(void, addRIM, (const std::filesystem::path &path, bool local), (override));
     MOCK_METHOD(void, addEXE, (const std::filesystem::path &path), (override));
     MOCK_METHOD(void, addFolder, (const std::filesystem::path &path), (override));
 
