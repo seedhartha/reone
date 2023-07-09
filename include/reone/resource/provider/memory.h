@@ -30,16 +30,19 @@ public:
         _idToResource.clear();
     }
 
-    void add(const ResourceId &id, std::shared_ptr<ByteBuffer> data) {
+    void add(const ResourceId &id, ByteBuffer data) {
         _resourceIds.insert(id);
         _idToResource.insert(std::make_pair(id, std::move(data)));
     }
 
     // IResourceProvider
 
-    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override {
+    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override {
         auto it = _idToResource.find(id);
-        return it != _idToResource.end() ? it->second : nullptr;
+        if (it == _idToResource.end()) {
+            return std::nullopt;
+        }
+        return it->second;
     }
 
     const ResourceIdSet &resourceIds() const override { return _resourceIds; }
@@ -48,7 +51,7 @@ public:
 
 private:
     ResourceIdSet _resourceIds;
-    std::unordered_map<ResourceId, std::shared_ptr<ByteBuffer>, ResourceIdHasher> _idToResource;
+    std::unordered_map<ResourceId, ByteBuffer, ResourceIdHasher> _idToResource;
 };
 
 } // namespace resource

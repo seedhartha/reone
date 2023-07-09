@@ -65,21 +65,21 @@ void KeyBifResourceProvider::init() {
     }
 }
 
-std::shared_ptr<ByteBuffer> KeyBifResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> KeyBifResourceProvider::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
-        return nullptr;
+        return std::nullopt;
     }
     auto &resource = it->second;
     if (resource.fileSize == 0) {
-        return std::make_shared<ByteBuffer>();
+        return ByteBuffer();
     }
+    ByteBuffer buf;
+    buf.resize(resource.fileSize);
 
     auto &bif = _bifs.at(resource.bifIdx);
     bif->seek(resource.bifOffset, SeekOrigin::Begin);
-    auto buf = std::make_shared<ByteBuffer>();
-    buf->resize(resource.fileSize);
-    bif->read(&(*buf)[0], buf->size());
+    bif->read(&buf[0], buf.size());
 
     return buf;
 }

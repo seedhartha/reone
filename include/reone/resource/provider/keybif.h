@@ -37,7 +37,7 @@ public:
 
     // IResourceProvider
 
-    std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) override;
+    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
 
     const ResourceIdSet &resourceIds() const override { return _resourceIds; }
 

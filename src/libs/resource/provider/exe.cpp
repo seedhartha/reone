@@ -48,20 +48,20 @@ void ExeResourceProvider::init() {
     }
 }
 
-std::shared_ptr<ByteBuffer> ExeResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> ExeResourceProvider::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
-        return nullptr;
+        return std::nullopt;
     }
     auto &res = it->second;
     if (res.size == 0) {
-        return std::make_shared<ByteBuffer>();
+        return ByteBuffer();
     }
+    ByteBuffer buf;
+    buf.resize(res.size);
 
     _exe->seek(res.offset, SeekOrigin::Begin);
-    auto buf = std::make_shared<ByteBuffer>();
-    buf->resize(res.size);
-    _exe->read(&(*buf)[0], buf->size());
+    _exe->read(&buf[0], buf.size());
 
     return buf;
 }

@@ -38,8 +38,8 @@ public:
     virtual void indexEXE(const std::filesystem::path &path) = 0;
     virtual void indexFolder(const std::filesystem::path &path) = 0;
 
-    virtual std::shared_ptr<ByteBuffer> get(const ResourceId &id) = 0;
-    virtual std::shared_ptr<ByteBuffer> find(const ResourceId &id) = 0;
+    virtual ByteBuffer get(const ResourceId &id) = 0;
+    virtual std::optional<ByteBuffer> find(const ResourceId &id) = 0;
 };
 
 class Resources : public IResources, boost::noncopyable {
@@ -58,8 +58,8 @@ public:
     void indexEXE(const std::filesystem::path &path) override;
     void indexFolder(const std::filesystem::path &path) override;
 
-    std::shared_ptr<ByteBuffer> get(const ResourceId &id) override;
-    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
+    ByteBuffer get(const ResourceId &id) override;
+    std::optional<ByteBuffer> find(const ResourceId &id) override;
 
     const ResourceProviderList &providers() const { return _providers; }
 

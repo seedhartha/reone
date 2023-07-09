@@ -58,22 +58,22 @@ void Resources::indexFolder(const std::filesystem::path &path) {
     _providers.push_front(std::move(provider));
 }
 
-std::shared_ptr<ByteBuffer> Resources::get(const ResourceId &id) {
+ByteBuffer Resources::get(const ResourceId &id) {
     auto data = find(id);
     if (!data) {
         throw ResourceNotFoundException(id.string());
     }
-    return data;
+    return *data;
 }
 
-std::shared_ptr<ByteBuffer> Resources::find(const ResourceId &id) {
+std::optional<ByteBuffer> Resources::find(const ResourceId &id) {
     for (auto &provider : _providers) {
         auto data = provider->findResourceData(id);
         if (data) {
-            return data;
+            return *data;
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 } // namespace resource

@@ -29,8 +29,8 @@ using namespace reone::resource;
 TEST(two_das, should_get_2da_with_caching) {
     // given
 
-    auto resBytes = std::make_shared<ByteBuffer>();
-    auto res = MemoryOutputStream(*resBytes);
+    auto resBytes = ByteBuffer();
+    auto res = MemoryOutputStream(resBytes);
     res.write("2DA V2.b\n", 9);
     res.write("label\t\0", 7);
     res.write("\x00\x00\x00\x00", 4);
@@ -38,7 +38,7 @@ TEST(two_das, should_get_2da_with_caching) {
 
     auto resources = Resources();
     auto provider = std::make_unique<MemoryResourceProvider>();
-    provider->add(ResourceId("sample", ResourceType::TwoDa), resBytes);
+    provider->add(ResourceId("sample", ResourceType::TwoDa), std::move(resBytes));
     resources.addProvider(std::move(provider));
 
     auto twoDas = TwoDas(resources);

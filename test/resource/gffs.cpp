@@ -28,8 +28,8 @@ using namespace reone::resource;
 TEST(gffs, should_get_gff_with_caching) {
     // given
 
-    auto resBytes = std::make_shared<ByteBuffer>();
-    auto res = MemoryOutputStream(*resBytes);
+    auto resBytes = ByteBuffer();
+    auto res = MemoryOutputStream(resBytes);
     res.write("GFF V3.2", 8);
     res.write("\x00\x00\x00\x00", 4);
     res.write("\x00\x00\x00\x00", 4);
@@ -46,7 +46,7 @@ TEST(gffs, should_get_gff_with_caching) {
 
     auto resources = Resources();
     auto provider = std::make_unique<MemoryResourceProvider>();
-    provider->add(ResourceId("sample", ResourceType::Gff), resBytes);
+    provider->add(ResourceId("sample", ResourceType::Gff), std::move(resBytes));
     resources.addProvider(std::move(provider));
 
     auto gffs = Gffs(resources);

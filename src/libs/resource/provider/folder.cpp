@@ -48,22 +48,22 @@ void Folder::loadDirectory(const std::filesystem::path &path) {
     }
 }
 
-std::shared_ptr<ByteBuffer> Folder::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> Folder::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
-        return nullptr;
+        return std::nullopt;
     }
     auto &resource = it->second;
 
     auto stream = FileInputStream(resource.path);
     auto len = stream.length();
     if (len == 0) {
-        return std::make_shared<ByteBuffer>();
+        return ByteBuffer();
     }
 
-    auto buf = std::make_shared<ByteBuffer>();
-    buf->resize(len);
-    stream.read(&(*buf)[0], buf->size());
+    ByteBuffer buf;
+    buf.resize(len);
+    stream.read(&buf[0], buf.size());
 
     return buf;
 }

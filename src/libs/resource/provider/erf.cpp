@@ -42,20 +42,20 @@ void ErfResourceProvider::init() {
     }
 }
 
-std::shared_ptr<ByteBuffer> ErfResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> ErfResourceProvider::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
-        return nullptr;
+        return std::nullopt;
     }
     auto &resource = it->second;
     if (resource.fileSize == 0) {
-        return std::make_shared<ByteBuffer>();
+        return ByteBuffer();
     }
+    ByteBuffer buf;
+    buf.resize(resource.fileSize);
 
     _erf->seek(resource.offset, SeekOrigin::Begin);
-    auto buf = std::make_shared<ByteBuffer>();
-    buf->resize(resource.fileSize);
-    _erf->read(&(*buf)[0], buf->size());
+    _erf->read(&buf[0], buf.size());
 
     return buf;
 }

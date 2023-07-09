@@ -64,7 +64,7 @@ void NameEntry::bindControls() {
 
 void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr) {
     auto data = _services.resource.resources.get(ResourceId(resRef, ResourceType::Ltr));
-    auto stream = MemoryInputStream(*data);
+    auto stream = MemoryInputStream(data);
     ltr = std::make_unique<LtrReader>(stream);
     ltr->load();
 }

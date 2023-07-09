@@ -30,7 +30,7 @@ public:
     virtual ~IResourceProvider() {
     }
 
-    virtual std::shared_ptr<ByteBuffer> findResourceData(const ResourceId &id) = 0;
+    virtual std::optional<ByteBuffer> findResourceData(const ResourceId &id) = 0;
 
     virtual const ResourceIdSet &resourceIds() const = 0;
 };
