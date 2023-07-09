@@ -22,7 +22,8 @@ namespace reone {
 namespace game {
 
 void WaitAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    if (advance(dt)) {
+    _timer.update(dt);
+    if (_timer.elapsed()) {
         complete();
     }
 }

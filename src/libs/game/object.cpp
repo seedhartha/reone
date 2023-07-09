@@ -83,7 +83,7 @@ void Object::addActionOnTop(std::unique_ptr<Action> action) {
 void Object::delayAction(std::unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = std::move(action);
-    delayed.timer.setTimeout(seconds);
+    delayed.timer = std::make_unique<Timer>(seconds);
     _delayed.push_back(std::move(delayed));
 }
 
@@ -104,15 +104,15 @@ void Object::removeCompletedActions() {
 
 void Object::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
-        delayed.timer.advance(dt);
-        if (delayed.timer.isTimedOut()) {
+        delayed.timer->update(dt);
+        if (delayed.timer->elapsed()) {
             _actions.push_back(std::move(delayed.action));
         }
     }
     auto delayedToRemove = std::remove_if(
         _delayed.begin(),
         _delayed.end(),
-        [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
+        [](const DelayedAction &delayed) { return delayed.timer->elapsed(); });
 
     _delayed.erase(delayedToRemove, _delayed.end());
 }

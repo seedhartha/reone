@@ -43,7 +43,8 @@ void BarkBubble::bindControls() {
 }
 
 void BarkBubble::update(float dt) {
-    if (_timer.advance(dt)) {
+    _timer.update(dt);
+    if (_timer.elapsed()) {
         setBarkText("", 0.0f);
     }
 }
@@ -68,7 +69,7 @@ void BarkBubble::setBarkText(const std::string &text, float duration) {
     }
 
     if (duration > 0.0f) {
-        _timer.setTimeout(duration);
+        _timer.reset(duration);
     }
 }
 

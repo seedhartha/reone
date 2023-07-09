@@ -19,29 +19,28 @@
 
 namespace reone {
 
-class Timer {
+class Timer : boost::noncopyable {
 public:
-    /**
-     * @return true when timer have timed out
-     */
-    bool advance(float seconds) {
-        _timeout = std::max(0.0f, _timeout - seconds);
-        return isTimedOut();
+    Timer() = default;
+
+    Timer(float intervalSeconds) {
+        reset(intervalSeconds);
     }
 
-    void cancel() {
-        _timeout = 0.0f;
+    inline void reset(float intervalSecs) {
+        _timeToElapse = intervalSecs;
     }
 
-    bool isSet() const { return _timeout > 0.0f; }
-    bool isTimedOut() const { return _timeout == 0.0f; }
+    inline void update(float dt) {
+        _timeToElapse = std::max(0.0f, _timeToElapse - dt);
+    }
 
-    void setTimeout(float timeout) {
-        _timeout = timeout;
+    inline bool elapsed() const {
+        return _timeToElapse == 0.0f;
     }
 
 private:
-    float _timeout {0.0f};
+    float _timeToElapse {0.0f};
 };
 
 } // namespace reone

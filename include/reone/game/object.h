@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "reone/system/timer.h"
 #include "reone/scene/animproperties.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node.h"
 #include "reone/scene/user.h"
+#include "reone/system/timer.h"
 
 #include "action.h"
 #include "action/playanimation.h"
@@ -199,7 +199,7 @@ public:
 protected:
     struct DelayedAction {
         std::unique_ptr<Action> action;
-        Timer timer;
+        std::unique_ptr<Timer> timer;
     };
 
     struct AppliedEffect {

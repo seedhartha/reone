@@ -53,7 +53,7 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
         _enabled = !_enabled;
         if (_enabled) {
             _counter = _services.system.clock.performanceCounter();
-            _refreshTimer.setTimeout(kRefreshDelay);
+            _refreshTimer.reset(kRefreshDelay);
         }
         return true;
     }
@@ -68,12 +68,13 @@ void ProfileOverlay::update(float dt) {
 
     ++_numFrames;
 
-    if (_refreshTimer.advance(dt)) {
+    _refreshTimer.update(dt);
+    if (_refreshTimer.elapsed()) {
         uint64_t counter = _services.system.clock.performanceCounter();
         _fps = static_cast<int>(_numFrames * _frequency / (counter - _counter));
         _numFrames = 0;
         _counter = counter;
-        _refreshTimer.setTimeout(kRefreshPeriod);
+        _refreshTimer.reset(kRefreshPeriod);
     }
 }
 

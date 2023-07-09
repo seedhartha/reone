@@ -200,7 +200,7 @@ void Conversation::scheduleEndOfEntry() {
 
     _entryEnded = false;
     _entryDuration = duration;
-    _endEntryTimer.setTimeout(duration);
+    _endEntryTimer.reset(duration);
 }
 
 void Conversation::loadReplies() {
@@ -315,14 +315,14 @@ bool Conversation::handleKeyUp(const SDL_KeyboardEvent &event) {
 
 void Conversation::update(float dt) {
     GameGUI::update(dt);
-
     if (_currentVoice) {
         _currentVoice->update();
     }
-    if (!_entryEnded &&
-        ((_currentVoice && !_currentVoice->isPlaying()) || _endEntryTimer.advance(dt))) {
-
-        endCurrentEntry();
+    if (!_entryEnded) {
+        _endEntryTimer.update(dt);
+        if (_endEntryTimer.elapsed() || (_currentVoice && !_currentVoice->isPlaying())) {
+            endCurrentEntry();
+        }
     }
 }
 

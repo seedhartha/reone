@@ -21,20 +21,17 @@
 
 using namespace reone;
 
-TEST(timer, should_advance_and_time_out) {
+TEST(timer, should_elapse_after_update) {
     // given
-    auto timer = Timer();
-    timer.setTimeout(1.0f);
+    Timer timer;
+    timer.reset(0.9f);
 
     // expect
-    EXPECT_TRUE(timer.isSet());
-    EXPECT_TRUE(!timer.isTimedOut());
+    EXPECT_FALSE(timer.elapsed());
 
-    timer.advance(0.5f);
-    EXPECT_TRUE(timer.isSet());
-    EXPECT_TRUE(!timer.isTimedOut());
+    timer.update(0.5f);
+    EXPECT_FALSE(timer.elapsed());
 
-    timer.advance(0.5f);
-    EXPECT_TRUE(!timer.isSet());
-    EXPECT_TRUE(timer.isTimedOut());
+    timer.update(0.5f);
+    EXPECT_TRUE(timer.elapsed());
 }

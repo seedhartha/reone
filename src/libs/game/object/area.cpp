@@ -96,7 +96,7 @@ Area::Area(
     _sceneName(std::move(sceneName)) {
 
     init();
-    _heartbeatTimer.setTimeout(kHeartbeatInterval);
+    _heartbeatTimer.reset(kHeartbeatInterval);
 }
 
 void Area::init() {
@@ -874,7 +874,8 @@ void Area::checkTriggersIntersection(const std::shared_ptr<Object> &triggerrer) 
 }
 
 void Area::updateHeartbeat(float dt) {
-    if (_heartbeatTimer.advance(dt)) {
+    _heartbeatTimer.update(dt);
+    if (_heartbeatTimer.elapsed()) {
         if (!_onHeartbeat.empty()) {
             _game.scriptRunner().run(_onHeartbeat, _id);
         }
@@ -884,7 +885,7 @@ void Area::updateHeartbeat(float dt) {
                 _game.scriptRunner().run(heartbeat, object->id());
             }
         }
-        _heartbeatTimer.setTimeout(kHeartbeatInterval);
+        _heartbeatTimer.reset(kHeartbeatInterval);
     }
 }
 
@@ -1154,9 +1155,10 @@ std::shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &loc
 }
 
 void Area::updatePerception(float dt) {
-    if (_perceptionTimer.advance(dt)) {
+    _perceptionTimer.update(dt);
+    if (_perceptionTimer.elapsed()) {
         doUpdatePerception();
-        _perceptionTimer.setTimeout(kUpdatePerceptionInterval);
+        _perceptionTimer.reset(kUpdatePerceptionInterval);
     }
 }
 

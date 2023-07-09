@@ -29,16 +29,7 @@ class WaitAction : public Action {
 public:
     WaitAction(Game &game, ServicesView &services, float seconds) :
         Action(game, services, ActionType::Wait) {
-        _timer.setTimeout(seconds);
-    }
-
-    /**
-     * Advances an internal timer.
-     *
-     * @return `true` if timer times out, `false` otherwise
-     */
-    bool advance(float dt) {
-        return _timer.advance(dt);
+        _timer.reset(seconds);
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;

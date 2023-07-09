@@ -120,9 +120,10 @@ void EmitterSceneNode::spawnParticles(float dt) {
     switch (emitter->updateMode) {
     case ModelNode::Emitter::UpdateMode::Fountain:
         if (_birthrate != 0.0f) {
-            if (_birthTimer.advance(dt)) {
+            _birthTimer.update(dt);
+            if (_birthTimer.elapsed()) {
                 doSpawnParticle();
-                _birthTimer.setTimeout(_birthInterval);
+                _birthTimer.reset(_birthInterval);
             }
         }
         break;
@@ -133,9 +134,10 @@ void EmitterSceneNode::spawnParticles(float dt) {
         }
         break;
     case ModelNode::Emitter::UpdateMode::Lightning:
-        if (_birthTimer.advance(dt)) {
+        _birthTimer.update(dt);
+        if (_birthTimer.elapsed()) {
             spawnLightningParticles();
-            _birthTimer.setTimeout(_lightningDelay);
+            _birthTimer.reset(_lightningDelay);
         }
         break;
     default:
