@@ -23,7 +23,7 @@ namespace reone {
 
 class MemoryOutputStream : public IOutputStream {
 public:
-    MemoryOutputStream(ByteArray &bytes) :
+    MemoryOutputStream(ByteBuffer &bytes) :
         _buffer(bytes) {
     }
 
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    ByteArray &_buffer;
+    ByteBuffer &_buffer;
 };
 
 } // namespace reone

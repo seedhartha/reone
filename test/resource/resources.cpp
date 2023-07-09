@@ -43,7 +43,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
     key.write("\x00\x00\x00\x00", 4);
-    auto keyPadding = ByteArray(32, '\0');
+    auto keyPadding = ByteBuffer(32, '\0');
     key.write(&keyPadding[0], keyPadding.size());
     key.close();
 
@@ -60,7 +60,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
     erf.write("\x00\x00\x00\x00", 4);
-    auto erfPadding = ByteArray(116, '\0');
+    auto erfPadding = ByteBuffer(116, '\0');
     erf.write(&erfPadding[0], erfPadding.size());
     erf.close();
 
@@ -85,7 +85,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
 
     auto resources = Resources();
 
-    auto expectedResData = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto expectedResData = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
 

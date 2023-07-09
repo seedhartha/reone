@@ -42,7 +42,7 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
         alpha = false;
     }
 
-    auto destPixels = std::make_shared<ByteArray>((alpha ? 4ll : 3ll) * numPixels, '\0');
+    auto destPixels = std::make_shared<ByteBuffer>((alpha ? 4ll : 3ll) * numPixels, '\0');
     uint8_t *destPixelsPtr = reinterpret_cast<uint8_t *>(destPixels->data());
     decompPixelsPtr = &decompPixels[0];
 

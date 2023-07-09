@@ -24,7 +24,7 @@ namespace movie {
 class VideoStream {
 public:
     struct Frame {
-        std::shared_ptr<ByteArray> pixels;
+        std::shared_ptr<ByteBuffer> pixels;
     };
 
     virtual void seek(float time) = 0;

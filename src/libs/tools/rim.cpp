@@ -66,7 +66,7 @@ void RimTool::extract(RimReader &rim, const boost::filesystem::path &rimPath, co
         auto &rimResource = rim.resources()[i];
         debug("Extracting " + rimResource.resId.string());
 
-        auto buffer = ByteArray(rimResource.size, '\0');
+        auto buffer = ByteBuffer(rimResource.size, '\0');
         auto rim = FileInputStream(rimPath);
         rim.seek(rimResource.offset, SeekOrigin::Begin);
         rim.read(&buffer[0], buffer.size());
@@ -98,7 +98,7 @@ void RimTool::toRIM(const boost::filesystem::path &target, const boost::filesyst
         boost::filesystem::ifstream in(path, std::ios::binary);
         in.seekg(0, std::ios::end);
         size_t size = in.tellg();
-        ByteArray data(size, '\0');
+        ByteBuffer data(size, '\0');
         in.seekg(0);
         in.read(&data[0], size);
 

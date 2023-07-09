@@ -56,7 +56,7 @@ void Textures::init() {
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
-    auto noisePixels = std::make_shared<ByteArray>();
+    auto noisePixels = std::make_shared<ByteBuffer>();
     noisePixels->resize(4 * 4 * 2 * sizeof(float));
     for (int i = 0; i < 4 * 4 * 2; ++i) {
         float *pixel = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
@@ -67,7 +67,7 @@ void Textures::init() {
     _noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
     _noiseRG->init();
 
-    auto ssaoPixels = std::make_shared<ByteArray>();
+    auto ssaoPixels = std::make_shared<ByteBuffer>();
     ssaoPixels->resize(3);
     (*ssaoPixels)[0] = 0xff;
     (*ssaoPixels)[1] = 0xff;
@@ -77,7 +77,7 @@ void Textures::init() {
     _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
     _ssaoRGB->init();
 
-    auto ssrPixels = std::make_shared<ByteArray>();
+    auto ssrPixels = std::make_shared<ByteBuffer>();
     ssrPixels->resize(4);
     (*ssrPixels)[0] = 0;
     (*ssrPixels)[1] = 0;

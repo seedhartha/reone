@@ -140,7 +140,7 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
         }
     }
 
-    auto blockBytes = ByteArray();
+    auto blockBytes = ByteBuffer();
     auto blockStream = MemoryOutputStream(blockBytes);
     auto blockWriter = TextWriter(blockStream);
     auto ctx = WriteContext();

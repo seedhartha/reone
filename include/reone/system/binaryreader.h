@@ -51,7 +51,7 @@ public:
     double readDouble();
     std::string readString(int len);
     std::string readCString(int maxlen);
-    ByteArray readBytes(int count);
+    ByteBuffer readBytes(int count);
 
     std::string readStringAt(size_t off, int len) {
         return readAt<std::string>(off, [this, &len]() {
@@ -65,8 +65,8 @@ public:
         });
     }
 
-    ByteArray readBytesAt(size_t off, int count) {
-        return readAt<ByteArray>(off, [this, &count]() {
+    ByteBuffer readBytesAt(size_t off, int count) {
+        return readAt<ByteBuffer>(off, [this, &count]() {
             return readBytes(count);
         });
     }

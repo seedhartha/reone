@@ -19,7 +19,7 @@
 
 namespace reone {
 
-std::string hexify(const ByteArray &ba, std::string separator) {
+std::string hexify(const ByteBuffer &ba, std::string separator) {
     std::ostringstream ss;
     for (auto &ch : ba) {
         ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(ch & 0xff) << separator;
@@ -35,8 +35,8 @@ std::string hexify(const std::string &s, std::string separator) {
     return ss.str();
 }
 
-ByteArray unhexify(const std::string &s) {
-    auto bytes = ByteArray();
+ByteBuffer unhexify(const std::string &s) {
+    auto bytes = ByteBuffer();
     for (size_t i = 0; i < s.size(); i += 2) {
         uint8_t byte;
         sscanf(&s[i], "%02hhx", &byte);

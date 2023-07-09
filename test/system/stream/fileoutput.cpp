@@ -30,8 +30,8 @@ TEST(file_output_stream, should_write_to_file) {
     tmpPath.append("reone_test_file_output");
 
     auto stream = FileOutputStream(tmpPath);
-    auto bytesToWrite = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
-    auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto bytesToWrite = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto expectedOutput = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
 
@@ -47,7 +47,7 @@ TEST(file_output_stream, should_write_to_file) {
     auto tmpFile = boost::filesystem::ifstream(tmpPath, std::ios::binary);
     tmpFile.seekg(0, std::ios::end);
     auto tmpSize = tmpFile.tellg();
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     bytes.resize(tmpSize);
     tmpFile.seekg(0);
     tmpFile.read(&bytes[0], tmpSize);

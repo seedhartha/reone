@@ -36,7 +36,7 @@ public:
     std::shared_ptr<AudioBuffer> stream() const { return _stream; }
 
 private:
-    ByteArray _input;
+    ByteBuffer _input;
     std::shared_ptr<AudioBuffer> _stream;
     bool _done {false};
 

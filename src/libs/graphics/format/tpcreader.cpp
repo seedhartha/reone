@@ -69,7 +69,7 @@ void TpcReader::loadLayers() {
     _layers.reserve(_numLayers);
 
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = std::make_shared<ByteArray>(_tpc.readBytes(_dataSize));
+        auto pixels = std::make_shared<ByteBuffer>(_tpc.readBytes(_dataSize));
 
         // Ignore mip maps
         for (int j = 1; j < _numMipMaps; ++j) {

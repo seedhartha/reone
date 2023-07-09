@@ -23,9 +23,9 @@
 
 using namespace reone;
 
-TEST(text_reader, should_read_lines_from_byte_array) {
+TEST(text_reader, should_read_lines_from_byte_buffer) {
     // given
-    auto bytes = ByteArray {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
+    auto bytes = ByteBuffer {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
     auto stream = MemoryInputStream(bytes);
     auto reader = TextReader(stream);
     std::string line;

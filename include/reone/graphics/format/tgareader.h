@@ -55,8 +55,8 @@ private:
 
     void loadTexture();
 
-    ByteArray readPixels(int w, int h);
-    ByteArray readPixelsRLE(int w, int h);
+    ByteBuffer readPixels(int w, int h);
+    ByteBuffer readPixelsRLE(int w, int h);
 
     bool isRGBA() const;
     bool isGrayscale() const;

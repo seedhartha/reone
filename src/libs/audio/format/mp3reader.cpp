@@ -44,7 +44,7 @@ void Mp3Reader::load(IInputStream &stream) {
     stream.seek(0, SeekOrigin::End);
     size_t size = stream.position();
 
-    ByteArray data(size, '\0');
+    ByteBuffer data(size, '\0');
     stream.seek(0, SeekOrigin::Begin);
     stream.read(&data[0], size);
 

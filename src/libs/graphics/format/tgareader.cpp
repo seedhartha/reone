@@ -80,7 +80,7 @@ void TgaReader::loadTexture() {
     std::vector<Texture::Layer> layers;
     layers.reserve(_numLayers);
     for (int i = 0; i < _numLayers; ++i) {
-        auto pixels = std::make_shared<ByteArray>(readPixels(_width, _height));
+        auto pixels = std::make_shared<ByteBuffer>(readPixels(_width, _height));
         layers.push_back(Texture::Layer {std::move(pixels)});
     }
 
@@ -89,7 +89,7 @@ void TgaReader::loadTexture() {
     _texture->setPixels(_width, _height, format, std::move(layers));
 }
 
-ByteArray TgaReader::readPixels(int w, int h) {
+ByteBuffer TgaReader::readPixels(int w, int h) {
     if (isRLE()) {
         return readPixelsRLE(w, h);
     }
@@ -97,8 +97,8 @@ ByteArray TgaReader::readPixels(int w, int h) {
     return _tga.readBytes(dataSize);
 }
 
-ByteArray TgaReader::readPixelsRLE(int w, int h) {
-    ByteArray result;
+ByteBuffer TgaReader::readPixelsRLE(int w, int h) {
+    ByteBuffer result;
 
     int count = w * h;
     while (count > 0) {

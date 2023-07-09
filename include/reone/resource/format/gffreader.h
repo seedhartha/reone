@@ -69,8 +69,8 @@ private:
     std::string readResRefFieldData(uint32_t off);
     LocString readCExoLocStringFieldData(uint32_t off);
     int32_t readStrRefFieldData(uint32_t off);
-    ByteArray readByteArrayFieldData(uint32_t off);
-    ByteArray readByteArrayFieldData(uint32_t off, int size);
+    ByteBuffer readByteBufferFieldData(uint32_t off);
+    ByteBuffer readByteBufferFieldData(uint32_t off, int size);
     std::vector<uint32_t> readList(uint32_t off);
 };
 

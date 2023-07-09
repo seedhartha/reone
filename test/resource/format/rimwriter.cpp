@@ -46,11 +46,11 @@ TEST(rim_writer, should_write_rim) {
                               .append("Bb", 2)
                               .string();
 
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
 
     auto writer = RimWriter();
-    writer.add(RimWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
+    writer.add(RimWriter::Resource {"Aa", ResourceType::Txi, ByteBuffer {'B', 'b'}});
 
     // when
 

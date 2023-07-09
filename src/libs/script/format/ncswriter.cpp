@@ -36,7 +36,7 @@ void NcsWriter::save(const boost::filesystem::path &path) {
 }
 
 void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
     BinaryWriter writer(stream, boost::endian::order::big);
 

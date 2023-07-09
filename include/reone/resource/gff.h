@@ -53,7 +53,7 @@ public:
         std::string strValue; /**< covers CExoString and ResRef */
         glm::vec3 vecValue {0.0f};
         glm::quat quatValue {1.0f, 0.0f, 0.0f, 0.0f};
-        ByteArray data;
+        ByteBuffer data;
         std::vector<std::shared_ptr<Gff>> children;
 
         union {
@@ -86,7 +86,7 @@ public:
         static Field newCExoString(std::string label, std::string val);
         static Field newResRef(std::string label, std::string val);
         static Field newCExoLocString(std::string label, int32_t strRef, std::string val);
-        static Field newVoid(std::string label, ByteArray val);
+        static Field newVoid(std::string label, ByteBuffer val);
         static Field newStruct(std::string label, std::shared_ptr<Gff> val);
         static Field newList(std::string label, std::vector<std::shared_ptr<Gff>> val);
         static Field newOrientation(std::string label, glm::quat val);
@@ -132,7 +132,7 @@ public:
     glm::quat getOrientation(const std::string &name, glm::quat defValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) const;
     std::shared_ptr<Gff> findStruct(const std::string &name) const;
     std::vector<std::shared_ptr<Gff>> getList(const std::string &name) const;
-    ByteArray getData(const std::string &name) const;
+    ByteBuffer getData(const std::string &name) const;
 
     uint32_t type() const { return _type; }
     const std::vector<Field> &fields() const { return _fields; }

@@ -29,7 +29,7 @@ namespace reone {
 namespace graphics {
 
 std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
-    std::shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
+    std::shared_ptr<ByteBuffer> lipData(_resources.get(resRef, ResourceType::Lip));
     if (!lipData) {
         return nullptr;
     }

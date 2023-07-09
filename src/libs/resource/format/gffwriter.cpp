@@ -71,7 +71,7 @@ void GffWriter::save(IOutputStream &out) {
     writeListIndices();
 }
 
-static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simple, ByteArray &complex) {
+static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simple, ByteBuffer &complex) {
     switch (field.type) {
     case Gff::FieldType::Byte:
     case Gff::FieldType::Word:
@@ -201,7 +201,7 @@ void GffWriter::processTree() {
 
             // Retrieve and save field data
             uint32_t dataOrDataOffset;
-            ByteArray complexData;
+            ByteBuffer complexData;
             FieldClassification fieldClass = getFieldData(field, dataOrDataOffset, complexData);
             switch (fieldClass) {
             case FieldClassification::Complex:

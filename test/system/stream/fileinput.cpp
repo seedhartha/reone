@@ -33,7 +33,7 @@ TEST(file_input_stream, should_read_from_file) {
     tmpFile.close();
 
     auto stream = FileInputStream(tmpPath);
-    auto buf = ByteArray(16, '\0');
+    auto buf = ByteBuffer(16, '\0');
     auto expectedContents = std::string("Hello, world!");
 
     // when

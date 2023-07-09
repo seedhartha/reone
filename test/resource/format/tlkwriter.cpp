@@ -57,7 +57,7 @@ TEST(tlk_writer, should_write_tlk) {
                               .append("Jane")
                               .string();
 
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
 
     auto strings = std::vector<TalkTable::String> {

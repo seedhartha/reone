@@ -54,11 +54,11 @@ TEST(erf_writer, should_write_erf) {
                               .append("Bb")
                               .string();
 
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
 
     auto writer = ErfWriter();
-    writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
+    writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteBuffer {'B', 'b'}});
 
     // when
 

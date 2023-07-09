@@ -130,8 +130,8 @@ std::string BinaryReader::readCString(int maxlen) {
     return std::string(&buf[0], len);
 }
 
-ByteArray BinaryReader::readBytes(int count) {
-    ByteArray buf;
+ByteBuffer BinaryReader::readBytes(int count) {
+    ByteBuffer buf;
     buf.resize(count);
     if (_stream.read(reinterpret_cast<char *>(&buf[0]), count) != count) {
         throw EndOfStreamException();

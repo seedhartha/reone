@@ -49,7 +49,7 @@ void Folder::loadDirectory(const boost::filesystem::path &path) {
     }
 }
 
-std::shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
+std::shared_ptr<ByteBuffer> Folder::find(const ResourceId &id) {
     boost::filesystem::path path;
     for (auto &res : _resources) {
         if (res.first == id.resRef && res.second.type == id.type) {
@@ -58,7 +58,7 @@ std::shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
         }
     }
     if (path.empty()) {
-        return std::shared_ptr<ByteArray>();
+        return std::shared_ptr<ByteBuffer>();
     }
     boost::filesystem::ifstream in(path, std::ios::binary);
 
@@ -66,10 +66,10 @@ std::shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     size_t size = in.tellg();
 
     in.seekg(std::ios::beg);
-    ByteArray data(size, '\0');
+    ByteBuffer data(size, '\0');
     in.read(&data[0], size);
 
-    return std::make_shared<ByteArray>(std::move(data));
+    return std::make_shared<ByteBuffer>(std::move(data));
 }
 
 } // namespace resource

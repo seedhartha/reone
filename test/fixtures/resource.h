@@ -41,7 +41,7 @@ public:
     MOCK_METHOD(void, indexDirectory, (const boost::filesystem::path &path), (override));
     MOCK_METHOD(void, indexExeFile, (const boost::filesystem::path &path), (override));
 
-    MOCK_METHOD(std::shared_ptr<ByteArray>, get, (const std::string &resRef, ResourceType type, bool logNotFound), (override));
+    MOCK_METHOD(std::shared_ptr<ByteBuffer>, get, (const std::string &resRef, ResourceType type, bool logNotFound), (override));
 };
 
 class MockStrings : public IStrings, boost::noncopyable {

@@ -35,7 +35,7 @@ public:
 
     void load();
 
-    std::shared_ptr<ByteArray> find(uint32_t name, PEResourceType type);
+    std::shared_ptr<ByteBuffer> find(uint32_t name, PEResourceType type);
 
 private:
     struct Section {
@@ -68,9 +68,9 @@ private:
     void loadResourceDirEntry(const Section &section, int level = 0);
     void loadResourceDataEntry(const Section &section);
 
-    std::shared_ptr<ByteArray> findInternal(std::function<bool(const Resource &)> pred);
+    std::shared_ptr<ByteBuffer> findInternal(std::function<bool(const Resource &)> pred);
 
-    std::shared_ptr<ByteArray> getResourceData(const Resource &res);
+    std::shared_ptr<ByteBuffer> getResourceData(const Resource &res);
 };
 
 } // namespace resource

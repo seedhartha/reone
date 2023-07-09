@@ -115,7 +115,7 @@ Gff::Field GffReader::readField(int idx) {
         break;
     }
     case Gff::FieldType::Void:
-        field.data = readByteArrayFieldData(dataOrDataOffset);
+        field.data = readByteBufferFieldData(dataOrDataOffset);
         break;
     case Gff::FieldType::Struct:
         field.children.push_back(readStruct(dataOrDataOffset));
@@ -128,13 +128,13 @@ Gff::Field GffReader::readField(int idx) {
         break;
     }
     case Gff::FieldType::Orientation: {
-        ByteArray data(readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float)));
+        ByteBuffer data(readByteBufferFieldData(dataOrDataOffset, 4 * sizeof(float)));
         auto floatData = reinterpret_cast<float *>(&data[0]);
         field.quatValue = glm::quat(floatData[0], floatData[1], floatData[2], floatData[3]);
         break;
     }
     case Gff::FieldType::Vector: {
-        ByteArray data(readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float)));
+        ByteBuffer data(readByteBufferFieldData(dataOrDataOffset, 3 * sizeof(float)));
         field.vecValue = glm::make_vec3(reinterpret_cast<float *>(&data[0]));
         break;
     }
@@ -204,14 +204,14 @@ int32_t GffReader::readStrRefFieldData(uint32_t off) {
     });
 }
 
-ByteArray GffReader::readByteArrayFieldData(uint32_t off) {
-    return _gff.readAt<ByteArray>(_fieldDataOffset + off, [this]() {
+ByteBuffer GffReader::readByteBufferFieldData(uint32_t off) {
+    return _gff.readAt<ByteBuffer>(_fieldDataOffset + off, [this]() {
         uint32_t size = _gff.readUint32();
         return _gff.readBytes(size);
     });
 }
 
-ByteArray GffReader::readByteArrayFieldData(uint32_t off, int size) {
+ByteBuffer GffReader::readByteBufferFieldData(uint32_t off, int size) {
     return _gff.readBytesAt(_fieldDataOffset + off, size);
 }
 

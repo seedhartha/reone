@@ -66,7 +66,7 @@ void AudioTool::unwrap(const boost::filesystem::path &path, const boost::filesys
     }
 
     int dataSize = static_cast<int>(filesize - reader.position());
-    ByteArray data(reader.readBytes(dataSize));
+    ByteBuffer data(reader.readBytes(dataSize));
 
     boost::filesystem::path unwrappedPath(path);
     unwrappedPath.replace_extension();

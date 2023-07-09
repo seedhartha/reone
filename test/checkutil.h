@@ -24,7 +24,7 @@ inline std::string describe(const std::string &s) {
     return str(boost::format("%s (%d)") % reone::hexify(s) % s.length());
 }
 
-inline std::string describe(const reone::ByteArray &ba) {
+inline std::string describe(const reone::ByteBuffer &ba) {
     return str(boost::format("%s (%d)") % reone::hexify(ba) % ba.size());
 }
 

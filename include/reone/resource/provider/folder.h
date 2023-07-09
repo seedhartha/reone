@@ -44,7 +44,7 @@ public:
 
     // IResourceProvider
 
-    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
+    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override;
 
     int id() const override { return _id; }
 

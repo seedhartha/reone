@@ -37,7 +37,7 @@ public:
     void load();
 
     std::shared_ptr<Texture> texture() const { return _texture; }
-    const ByteArray &txiData() const { return _txiData; }
+    const ByteBuffer &txiData() const { return _txiData; }
 
 private:
     enum class EncodingType {
@@ -62,7 +62,7 @@ private:
     Texture::Features _features;
 
     std::shared_ptr<Texture> _texture;
-    ByteArray _txiData;
+    ByteBuffer _txiData;
 
     void loadLayers();
     void loadFeatures();

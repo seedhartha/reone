@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
             glslStream.seek(0, SeekOrigin::End);
             auto filesize = glslStream.position();
             glslStream.seek(0, SeekOrigin::Begin);
-            auto glslBytes = ByteArray();
+            auto glslBytes = ByteBuffer();
             glslBytes.resize(filesize);
             glslStream.read(&glslBytes[0], filesize);
 

@@ -184,7 +184,7 @@ TEST(gff_writer, should_write_gff) {
             Gff::Field::newCExoString("CExoString", "John"),
             Gff::Field::newResRef("ResRef", "Jane"),
             Gff::Field::newCExoLocString("CExoLocString", -1, "Jill"),
-            Gff::Field::newVoid("Void", ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)}),
+            Gff::Field::newVoid("Void", ByteBuffer {static_cast<char>(0xff), static_cast<char>(0xff)}),
             Gff::Field::newOrientation("Orientation", glm::quat(1.0f, 1.0f, 1.0f, 1.0f)),
             Gff::Field::newVector("Vector", glm::vec3(1.0f, 1.0f, 1.0f)),
             Gff::Field::newStrRef("StrRef", 1),
@@ -197,7 +197,7 @@ TEST(gff_writer, should_write_gff) {
                     std::make_shared<Gff>(2, std::vector<Gff::Field> {Gff::Field::newWord("Struct2Word", 2)}),
                     std::make_shared<Gff>(3, std::vector<Gff::Field> {Gff::Field::newShort("Struct3Short", 3)})})});
 
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
     auto writer = GffWriter(ResourceType::Res, root);
 

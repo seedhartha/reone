@@ -66,7 +66,7 @@ void ErfTool::extract(ErfReader &erf, const boost::filesystem::path &erfPath, co
         auto &erfResource = erf.resources()[i];
         debug("Extracting " + key.resId.string());
 
-        auto buffer = ByteArray(erfResource.size, '\0');
+        auto buffer = ByteBuffer(erfResource.size, '\0');
         auto erf = FileInputStream(erfPath);
         erf.seek(erfResource.offset, SeekOrigin::Begin);
         erf.read(&buffer[0], buffer.size());
@@ -98,7 +98,7 @@ void ErfTool::toERF(Operation operation, const boost::filesystem::path &target, 
         boost::filesystem::ifstream in(path, std::ios::binary);
         in.seekg(0, std::ios::end);
         size_t size = in.tellg();
-        ByteArray data(size, '\0');
+        ByteBuffer data(size, '\0');
         in.seekg(0);
         in.read(&data[0], size);
 

@@ -98,12 +98,12 @@ void Resources::clearTransientProviders() {
     _transientProviders.clear();
 }
 
-std::shared_ptr<ByteArray> Resources::get(const std::string &resRef, ResourceType type, bool logNotFound) {
+std::shared_ptr<ByteBuffer> Resources::get(const std::string &resRef, ResourceType type, bool logNotFound) {
     if (resRef.empty()) {
         return nullptr;
     }
     ResourceId id(resRef, type);
-    std::shared_ptr<ByteArray> data(getFromProviders(id, _providers));
+    std::shared_ptr<ByteBuffer> data(getFromProviders(id, _providers));
     if (!data) {
         data = getFromProviders(id, _transientProviders);
     }
@@ -113,7 +113,7 @@ std::shared_ptr<ByteArray> Resources::get(const std::string &resRef, ResourceTyp
     return std::move(data);
 }
 
-std::shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
+std::shared_ptr<ByteBuffer> Resources::getFromExe(uint32_t name, PEResourceType type) {
     auto pe = FileInputStream(_exePath);
 
     auto peReader = PeReader(pe);
@@ -128,9 +128,9 @@ std::shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType t
     return std::move(data);
 }
 
-std::shared_ptr<ByteArray> Resources::getFromProviders(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers) {
+std::shared_ptr<ByteBuffer> Resources::getFromProviders(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
-        std::shared_ptr<ByteArray> data((*provider)->find(id));
+        std::shared_ptr<ByteBuffer> data((*provider)->find(id));
         if (data) {
             debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->id(), LogChannel::Resources2);
             return data;

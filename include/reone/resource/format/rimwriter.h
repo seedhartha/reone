@@ -32,7 +32,7 @@ public:
     struct Resource {
         std::string resRef;
         ResourceType resType {ResourceType::Invalid};
-        ByteArray data;
+        ByteBuffer data;
     };
 
     void add(Resource &&res);

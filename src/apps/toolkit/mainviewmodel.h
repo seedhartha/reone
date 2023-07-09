@@ -107,13 +107,13 @@ struct PageRemovingEventData {
 };
 
 struct ImageContent {
-    std::shared_ptr<ByteArray> tgaBytes;
-    std::shared_ptr<ByteArray> txiBytes;
+    std::shared_ptr<ByteBuffer> tgaBytes;
+    std::shared_ptr<ByteBuffer> txiBytes;
 
     ImageContent() {
     }
 
-    ImageContent(std::shared_ptr<ByteArray> tgaBytes, std::shared_ptr<ByteArray> txiBytes) :
+    ImageContent(std::shared_ptr<ByteBuffer> tgaBytes, std::shared_ptr<ByteBuffer> txiBytes) :
         tgaBytes(tgaBytes),
         txiBytes(txiBytes) {
     }

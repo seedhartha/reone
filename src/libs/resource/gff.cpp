@@ -148,10 +148,10 @@ std::vector<std::shared_ptr<Gff>> Gff::getList(const std::string &name) const {
     return field->children;
 }
 
-ByteArray Gff::getData(const std::string &name) const {
+ByteBuffer Gff::getData(const std::string &name) const {
     const Field *field = get(name);
     if (!field)
-        return ByteArray();
+        return ByteBuffer();
 
     return field->data;
 }
@@ -261,7 +261,7 @@ Gff::Field Gff::Field::newCExoLocString(std::string label, int32_t strRef, std::
     return std::move(tmp);
 }
 
-Gff::Field Gff::Field::newVoid(std::string label, ByteArray val) {
+Gff::Field Gff::Field::newVoid(std::string label, ByteBuffer val) {
     Field tmp(FieldType::Void, std::move(label));
     tmp.data = std::move(val);
     return std::move(tmp);

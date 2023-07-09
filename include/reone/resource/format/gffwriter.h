@@ -59,7 +59,7 @@ private:
         std::vector<WriteStruct> structs;
         std::vector<WriteField> fields;
         std::vector<std::string> labels;
-        ByteArray fieldData;
+        ByteBuffer fieldData;
         std::vector<uint32_t> fieldIndices;
         std::vector<uint32_t> listIndices;
     };

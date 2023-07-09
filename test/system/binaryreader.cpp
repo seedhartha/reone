@@ -27,7 +27,7 @@ using namespace reone;
 
 TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
     // given
-    auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
+    auto input = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\x00'};
     auto stream = MemoryInputStream(input);
     auto reader = BinaryReader(stream, boost::endian::order::little);
     auto expectedPos = 7ll;
@@ -57,7 +57,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
                      .append("Hello, world!\x00", 14)
                      .append("\x01\x02\x03\x04", 4)
                      .string();
-    auto inputBytes = ByteArray();
+    auto inputBytes = ByteBuffer();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
     auto stream = MemoryInputStream(inputBytes);
@@ -73,7 +73,7 @@ TEST(binary_reader, should_read_from_little_endian_stream) {
     auto expectedDouble = 1.0;
     auto expectedStr = std::string("Hello, world!");
     auto expectedCStr = std::string("Hello, world!");
-    auto expectedBytes = ByteArray({0x01, 0x02, 0x03, 0x04});
+    auto expectedBytes = ByteBuffer({0x01, 0x02, 0x03, 0x04});
 
     // when
     auto actualByte = reader.readByte();
@@ -116,7 +116,7 @@ TEST(binary_reader, should_read_from_big_endian_stream) {
                      .append("\x3f\x80\x00\x00", 4)
                      .append("\x3f\xf0\x00\x00\x00\x00\x00\x00", 8)
                      .string();
-    auto inputBytes = ByteArray();
+    auto inputBytes = ByteBuffer();
     inputBytes.resize(input.size());
     inputBytes.insert(inputBytes.begin(), input.begin(), input.end());
     auto stream = MemoryInputStream(inputBytes);

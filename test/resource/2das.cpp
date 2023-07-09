@@ -27,22 +27,22 @@ using namespace reone::resource;
 
 class StubProvider : public IResourceProvider {
 public:
-    void add(ResourceId id, std::shared_ptr<ByteArray> res) {
+    void add(ResourceId id, std::shared_ptr<ByteBuffer> res) {
         _resources.insert(std::make_pair(id, std::move(res)));
     }
 
-    std::shared_ptr<ByteArray> find(const ResourceId &id) override { return _resources.at(id); }
+    std::shared_ptr<ByteBuffer> find(const ResourceId &id) override { return _resources.at(id); }
 
     int id() const override { return 0; };
 
 private:
-    std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _resources;
+    std::unordered_map<ResourceId, std::shared_ptr<ByteBuffer>, ResourceIdHasher> _resources;
 };
 
 TEST(two_das, should_get_2da_with_caching) {
     // given
 
-    auto resBytes = std::make_shared<ByteArray>();
+    auto resBytes = std::make_shared<ByteBuffer>();
     auto res = MemoryOutputStream(*resBytes);
     res.write("2DA V2.b\n", 9);
     res.write("label\t\0", 7);

@@ -100,7 +100,7 @@ public:
     };
 
     struct Layer {
-        std::shared_ptr<ByteArray> pixels;
+        std::shared_ptr<ByteBuffer> pixels;
     };
 
     Texture(std::string name, Properties properties) :

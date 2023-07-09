@@ -228,7 +228,7 @@ TEST(ncs_writer, should_write_ncs) {
     program.add(Instruction(InstructionType::NOP2));
 
     auto writer = NcsWriter(program);
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = std::make_shared<MemoryOutputStream>(bytes);
 
     // when

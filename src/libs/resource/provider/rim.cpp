@@ -40,14 +40,14 @@ void RimResourceProvider::init() {
     }
 }
 
-std::shared_ptr<ByteArray> RimResourceProvider::find(const ResourceId &id) {
+std::shared_ptr<ByteBuffer> RimResourceProvider::find(const ResourceId &id) {
     auto maybeResource = _resources.find(id);
     if (maybeResource == _resources.end()) {
         return nullptr;
     }
     auto &resource = maybeResource->second;
 
-    auto buffer = std::make_shared<ByteArray>(resource.fileSize, '\0');
+    auto buffer = std::make_shared<ByteBuffer>(resource.fileSize, '\0');
     auto rim = FileInputStream(_path);
     rim.seek(resource.offset, SeekOrigin::Begin);
     rim.read(buffer->data(), buffer->size());

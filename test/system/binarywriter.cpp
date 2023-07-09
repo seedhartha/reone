@@ -27,7 +27,7 @@ using namespace reone;
 
 TEST(binary_writer, should_write_to_little_endian_stream) {
     // given
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
     auto writer = BinaryWriter(stream, boost::endian::order::little);
     auto expectedOutput = StringBuilder()
@@ -54,7 +54,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
     writer.writeFloat(1.0f);
     writer.writeString(std::string("Aa"));
     writer.writeCString(std::string("Bb\x00"));
-    writer.write(ByteArray {0x01, 0x02, 0x03, 0x04});
+    writer.write(ByteBuffer {0x01, 0x02, 0x03, 0x04});
 
     // then
     auto output = std::string(bytes.data(), bytes.size());
@@ -63,7 +63,7 @@ TEST(binary_writer, should_write_to_little_endian_stream) {
 
 TEST(binary_writer, should_write_to_big_endian_stream) {
     // given
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
     auto writer = BinaryWriter(stream, boost::endian::order::big);
     auto expectedOutput = StringBuilder()

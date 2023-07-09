@@ -53,11 +53,11 @@ void CurReader::loadData() {
     int numPixels = _width * _width;
     int colorCount = _bitCount == 8 ? 256 : 16;
 
-    ByteArray palette(_cur.readBytes(4 * colorCount));
-    ByteArray xorData(_cur.readBytes(numPixels));
-    ByteArray andData(_cur.readBytes(numPixels / 8));
+    ByteBuffer palette(_cur.readBytes(4 * colorCount));
+    ByteBuffer xorData(_cur.readBytes(numPixels));
+    ByteBuffer andData(_cur.readBytes(numPixels / 8));
 
-    auto pixels = std::make_shared<ByteArray>(4 * numPixels, '\0');
+    auto pixels = std::make_shared<ByteBuffer>(4 * numPixels, '\0');
 
     for (int y = 0; y < _width; ++y) {
         for (int x = 0; x < _width; ++x) {

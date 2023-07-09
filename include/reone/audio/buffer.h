@@ -30,7 +30,7 @@ public:
     struct Frame {
         AudioFormat format {AudioFormat::Mono8};
         int sampleRate {0};
-        ByteArray samples;
+        ByteBuffer samples;
     };
 
     void add(Frame &&frame);

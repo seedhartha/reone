@@ -173,7 +173,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Ncs) {
-        auto pcodeBytes = ByteArray();
+        auto pcodeBytes = ByteBuffer();
         auto pcode = MemoryOutputStream(pcodeBytes);
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
@@ -247,8 +247,8 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pageAdded.invoke(_pages.back().get());
 
     } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
-        auto tgaBytes = std::make_shared<ByteArray>();
-        auto txiBytes = std::make_shared<ByteArray>();
+        auto tgaBytes = std::make_shared<ByteBuffer>();
+        auto txiBytes = std::make_shared<ByteBuffer>();
         if (id.type == ResourceType::Tpc) {
             auto tga = MemoryOutputStream(*tgaBytes);
             auto txi = MemoryOutputStream(*txiBytes);
@@ -484,7 +484,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     auto &item = *_idToGameDirItem.at(itemId);
 
     withResourceStream(item, [this, &item, &optimize](auto &res) {
-        auto nssBytes = ByteArray();
+        auto nssBytes = ByteBuffer();
         auto nss = MemoryOutputStream(nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
@@ -530,7 +530,7 @@ void MainViewModel::exportFile(GameDirectoryItemId itemId, const boost::filesyst
         auto exportedPath = destPath;
         exportedPath.append(item.resId->string());
         auto exported = FileOutputStream(exportedPath);
-        auto buffer = ByteArray();
+        auto buffer = ByteBuffer();
         buffer.resize(8192);
         bool eof = false;
         while (!eof) {
@@ -693,7 +693,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
                 return;
             }
             auto &bifEntry = bifReader.resources().at(resIdx);
-            auto resBytes = ByteArray();
+            auto resBytes = ByteBuffer();
             resBytes.resize(bifEntry.fileSize);
             bif.seek(bifEntry.offset, SeekOrigin::Begin);
             bif.read(&resBytes[0], bifEntry.fileSize);
@@ -711,7 +711,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
             }
             auto resIdx = std::distance(erfReader.keys().begin(), maybeKey);
             auto &erfEntry = erfReader.resources().at(resIdx);
-            auto resBytes = ByteArray();
+            auto resBytes = ByteBuffer();
             resBytes.resize(erfEntry.size);
             erf.seek(erfEntry.offset, SeekOrigin::Begin);
             erf.read(&resBytes[0], erfEntry.size);
@@ -728,7 +728,7 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
                 return;
             }
             auto &rimRes = *maybeRes;
-            auto resBytes = ByteArray();
+            auto resBytes = ByteBuffer();
             resBytes.resize(rimRes.size);
             rim.seek(rimRes.offset, SeekOrigin::Begin);
             rim.read(&resBytes[0], rimRes.size);

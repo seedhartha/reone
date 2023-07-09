@@ -48,7 +48,7 @@ struct ParsedGUI {
     std::map<std::string, ParsedControl> controls;
 };
 
-static ParsedGUI parseGui(ByteArray &guiBytes) {
+static ParsedGUI parseGui(ByteBuffer &guiBytes) {
     auto guiStream = MemoryInputStream(guiBytes);
     auto guiReader = GffReader(guiStream);
     guiReader.load();

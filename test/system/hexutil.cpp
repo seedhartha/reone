@@ -35,9 +35,9 @@ TEST(hex_util, should_hexify_utf8_string) {
     EXPECT_EQ(expectedOutput, output);
 }
 
-TEST(hex_util, should_hexify_byte_array) {
+TEST(hex_util, should_hexify_byte_buffer) {
     // given
-    auto input = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto input = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto expectedOutput = std::string("48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 ");
 
     // when
@@ -50,7 +50,7 @@ TEST(hex_util, should_hexify_byte_array) {
 TEST(hex_util, should_unhexify_utf8_string) {
     // given
     auto input = std::string("48656c6c6f2c20776f726c6421");
-    auto expectedOutput = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto expectedOutput = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
 
     // when
     auto output = unhexify(input);

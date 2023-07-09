@@ -31,7 +31,7 @@ public:
     virtual ~IResourceProvider() {
     }
 
-    virtual std::shared_ptr<ByteArray> find(const ResourceId &id) = 0;
+    virtual std::shared_ptr<ByteBuffer> find(const ResourceId &id) = 0;
 
     virtual int id() const = 0;
 };

@@ -271,7 +271,7 @@ void Texture::flushGPUToCPU() {
     }
     auto &layer = _layers.front();
     if (!layer.pixels) {
-        layer.pixels = std::make_shared<ByteArray>();
+        layer.pixels = std::make_shared<ByteBuffer>();
     }
     int bpp;
     switch (_pixelFormat) {

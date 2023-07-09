@@ -54,7 +54,7 @@ TEST(two_da_writer, should_write_two_da) {
             TwoDa::newRow({"unique", "same"}),
             TwoDa::newRow({"same", "same"})});
 
-    auto bytes = ByteArray();
+    auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
     auto writer = TwoDaWriter(twoDa);
 

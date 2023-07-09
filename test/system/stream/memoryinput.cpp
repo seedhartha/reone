@@ -24,11 +24,11 @@
 
 using namespace reone;
 
-TEST(memory_input_stream, should_read_from_byte_array) {
+TEST(memory_input_stream, should_read_from_byte_buffer) {
     // given
-    auto bytes = ByteArray {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
+    auto bytes = ByteBuffer {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!'};
     auto stream = MemoryInputStream(bytes);
-    auto buf = ByteArray(16, '\0');
+    auto buf = ByteBuffer(16, '\0');
     auto expectedContents = std::string("Hello, world!");
 
     // when

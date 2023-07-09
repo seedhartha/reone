@@ -59,7 +59,7 @@ void TpcTool::toTGA(const boost::filesystem::path &path, const boost::filesystem
     tgaPath.replace_extension("tga");
 
     auto tga = FileOutputStream(tgaPath);
-    auto txiBytes = ByteArray();
+    auto txiBytes = ByteBuffer();
     auto txiMemory = MemoryOutputStream(txiBytes);
     toTGA(tpc, tga, txiMemory, true);
 

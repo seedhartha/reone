@@ -28,7 +28,7 @@ public:
         _length(str.length()) {
     }
 
-    MemoryInputStream(ByteArray &bytes) :
+    MemoryInputStream(ByteBuffer &bytes) :
         _data(!bytes.empty() ? &bytes[0] : nullptr),
         _length(bytes.size()) {
     }

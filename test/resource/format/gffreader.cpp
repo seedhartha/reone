@@ -172,7 +172,7 @@ TEST(gff_reader, should_read_gff) {
 
     auto stream = MemoryInputStream(input);
     auto reader = GffReader(stream);
-    auto expectedData = ByteArray {static_cast<char>(0xff), static_cast<char>(0xff)};
+    auto expectedData = ByteBuffer {static_cast<char>(0xff), static_cast<char>(0xff)};
     auto expectedOrientation = glm::quat {1.0f, 1.0f, 1.0f, 1.0f};
     auto expectedVector = glm::vec3 {1.0f, 1.0f, 1.0f};
 

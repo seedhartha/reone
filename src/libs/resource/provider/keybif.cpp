@@ -66,14 +66,14 @@ void KeyBifResourceProvider::init() {
     }
 }
 
-std::shared_ptr<ByteArray> KeyBifResourceProvider::find(const ResourceId &id) {
+std::shared_ptr<ByteBuffer> KeyBifResourceProvider::find(const ResourceId &id) {
     auto maybeResource = _resources.find(id);
     if (maybeResource == _resources.end()) {
         return nullptr;
     }
     auto &resource = maybeResource->second;
 
-    auto buffer = std::make_shared<ByteArray>(resource.fileSize, '\0');
+    auto buffer = std::make_shared<ByteBuffer>(resource.fileSize, '\0');
 
     auto &bifPath = _bifPaths.at(resource.bifIdx);
     auto bif = FileInputStream(bifPath);

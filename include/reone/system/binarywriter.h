@@ -42,7 +42,7 @@ public:
     void writeString(const std::string &str);
     void writeCString(const std::string &str);
 
-    void write(const ByteArray &bytes);
+    void write(const ByteBuffer &bytes);
     void write(int count, uint8_t val);
 
     size_t position() const;

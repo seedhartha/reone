@@ -41,7 +41,7 @@ public:
     virtual void indexDirectory(const boost::filesystem::path &path) = 0;
     virtual void indexExeFile(const boost::filesystem::path &path) = 0;
 
-    virtual std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) = 0;
+    virtual std::shared_ptr<ByteBuffer> get(const std::string &resRef, ResourceType type, bool logNotFound = true) = 0;
 };
 
 class Resources : public IResources, boost::noncopyable {
@@ -59,8 +59,8 @@ public:
     void clearAllProviders();
     void clearTransientProviders() override;
 
-    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override;
-    std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
+    std::shared_ptr<ByteBuffer> get(const std::string &resRef, ResourceType type, bool logNotFound = true) override;
+    std::shared_ptr<ByteBuffer> getFromExe(uint32_t name, PEResourceType type);
 
     const ProviderList &providers() const { return _providers; }
     const ProviderList &transientProviders() const { return _transientProviders; }
@@ -70,7 +70,7 @@ private:
     ProviderList _providers;
     ProviderList _transientProviders; /**< transient providers are replaced when switching between modules */
 
-    std::shared_ptr<ByteArray> getFromProviders(const ResourceId &id, const ProviderList &providers);
+    std::shared_ptr<ByteBuffer> getFromProviders(const ResourceId &id, const ProviderList &providers);
 };
 
 } // namespace resource
