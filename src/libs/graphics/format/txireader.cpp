@@ -26,14 +26,14 @@ namespace reone {
 namespace graphics {
 
 void TxiReader::load(IInputStream &in) {
-    std::string line;
     auto reader = TextReader(in);
-    while (reader.readLine(line)) {
-        boost::trim(line);
-
+    while (auto line = reader.readLine()) {
+        if (!line) {
+            break;
+        }
         std::vector<std::string> tokens;
-        boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
-
+        auto trimmed = boost::trim_copy(*line);
+        boost::split(tokens, trimmed, boost::is_space(), boost::token_compress_on);
         processLine(tokens);
     }
 }

@@ -27,7 +27,7 @@ public:
         _stream(stream) {
     }
 
-    bool readLine(std::string &str);
+    boost::optional<std::string> readLine();
 
 private:
     IInputStream &_stream;

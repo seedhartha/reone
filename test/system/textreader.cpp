@@ -28,23 +28,22 @@ TEST(text_reader, should_read_lines_from_byte_buffer) {
     auto bytes = ByteBuffer {'l', 'i', 'n', 'e', '1', '\r', '\n', 'l', 'i', 'n', 'e', '2', '\n', 'l', 'o', 'n', 'g', 'l', 'i', 'n', 'e'};
     auto stream = MemoryInputStream(bytes);
     auto reader = TextReader(stream);
-    std::string line;
-    bool read;
+    boost::optional<std::string> line;
 
     // expect
-    read = reader.readLine(line);
-    EXPECT_EQ(line, std::string("line1"));
-    EXPECT_TRUE(read);
+    line = reader.readLine();
+    EXPECT_TRUE(line);
+    EXPECT_EQ(*line, std::string("line1"));
 
-    read = reader.readLine(line);
-    EXPECT_EQ(line, std::string("line2"));
-    EXPECT_TRUE(read);
+    line = reader.readLine();
+    EXPECT_TRUE(line);
+    EXPECT_EQ(*line, std::string("line2"));
 
-    read = reader.readLine(line);
-    EXPECT_EQ(line, std::string("longline"));
-    EXPECT_TRUE(read);
+    line = reader.readLine();
+    EXPECT_TRUE(line);
+    EXPECT_EQ(*line, std::string("longline"));
 
-    read = reader.readLine(line);
-    EXPECT_EQ(line, std::string());
-    EXPECT_TRUE(!read);
+    line = reader.readLine();
+    EXPECT_TRUE(!line);
+    EXPECT_EQ(*line, std::string());
 }

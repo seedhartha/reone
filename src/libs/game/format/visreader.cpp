@@ -25,14 +25,16 @@ namespace reone {
 namespace game {
 
 void VisReader::load(IInputStream &in) {
-    std::string line;
     auto reader = TextReader(in);
-    while (reader.readLine(line)) {
-        boost::trim(line);
-        if (line.empty()) {
+    while (auto line = reader.readLine()) {
+        if (!line) {
+            break;
+        }
+        auto trimmed = boost::trim_copy(*line);
+        if (trimmed.empty()) {
             continue;
         }
-        processLine(line);
+        processLine(trimmed);
     }
 }
 

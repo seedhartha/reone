@@ -25,10 +25,12 @@ namespace reone {
 namespace game {
 
 void LytReader::load(IInputStream &in) {
-    std::string line;
     auto reader = TextReader(in);
-    while (reader.readLine(line)) {
-        processLine(line);
+    while (auto line = reader.readLine()) {
+        if (!line) {
+            break;
+        }
+        processLine(*line);
     }
 }
 

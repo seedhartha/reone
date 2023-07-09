@@ -19,15 +19,14 @@
 
 namespace reone {
 
-bool TextReader::readLine(std::string &str) {
+boost::optional<std::string> TextReader::readLine() {
     auto pos = _stream.position();
 
     std::vector<char> buf;
     buf.resize(256);
     int numRead = _stream.read(&buf[0], buf.size());
     if (numRead == 0) {
-        str.clear();
-        return false;
+        return boost::none;
     }
 
     size_t len;
@@ -46,8 +45,7 @@ bool TextReader::readLine(std::string &str) {
         _stream.seek(pos + len);
     }
 
-    str = std::string(&buf[0], len);
-    return true;
+    return std::string(&buf[0], len);
 }
 
 } // namespace reone

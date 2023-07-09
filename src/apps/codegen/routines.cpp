@@ -149,16 +149,18 @@ static Function parseFunction(const boost::smatch &match) {
 static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseNwscriptNss(IInputStream &nss) {
     std::map<std::string, Constant> constants;
     std::vector<Function> functions;
-    std::string line;
     auto reader = TextReader(nss);
-    while (reader.readLine(line)) {
+    while (auto line = reader.readLine()) {
+        if (!line) {
+            break;
+        }
         boost::smatch constMatch;
-        if (boost::regex_search(line, constMatch, kConstRegex)) {
+        if (boost::regex_search(*line, constMatch, kConstRegex)) {
             auto constant = parseConstant(constMatch);
             constants[constant.name] = std::move(constant);
         }
         boost::smatch funcMatch;
-        if (boost::regex_search(line, funcMatch, kFuncDeclRegex)) {
+        if (boost::regex_search(*line, funcMatch, kFuncDeclRegex)) {
             functions.push_back(parseFunction(funcMatch));
         }
     }
