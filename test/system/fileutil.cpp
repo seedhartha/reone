@@ -21,10 +21,10 @@
 
 using namespace reone;
 
-TEST(path_util, should_get_path_ignoring_case) {
+TEST(fil_util, should_get_path_ignoring_case) {
     // given
     auto tmpDirPath = std::filesystem::temp_directory_path();
-    tmpDirPath.append("reone_test_path_util");
+    tmpDirPath.append("reone_test_file_util");
     auto tmpFilePath = tmpDirPath;
     tmpFilePath.append("MiXeD");
     std::filesystem::create_directory(tmpDirPath);
@@ -38,9 +38,9 @@ TEST(path_util, should_get_path_ignoring_case) {
     auto superPath = findFileIgnoreCase(tmpDirPath, "MiXeDs");
 
     // then
-    EXPECT_EQ(tmpFilePath, lowerPath);
-    EXPECT_TRUE(upperPath.empty());
-    EXPECT_TRUE(superPath.empty());
+    EXPECT_EQ(tmpFilePath, *lowerPath);
+    EXPECT_FALSE(upperPath);
+    EXPECT_FALSE(superPath);
 
     // cleanup
     std::filesystem::remove_all(tmpDirPath);

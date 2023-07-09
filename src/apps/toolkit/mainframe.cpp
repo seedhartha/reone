@@ -53,7 +53,6 @@
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
 
-
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -415,13 +414,13 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     auto gamePath = std::filesystem::path((std::string)dialog->GetPath());
     auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
     auto modulesPath = findFileIgnoreCase(gamePath, "modules");
-    if (keyPath.empty() || modulesPath.empty()) {
+    if (!keyPath || !modulesPath) {
         wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
         return;
     }
     _viewModel->onGameDirectoryChanged(gamePath);
 
-    auto key = FileInputStream(keyPath);
+    auto key = FileInputStream(*keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
     _keyKeys = keyReader.keys();

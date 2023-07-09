@@ -37,7 +37,7 @@ void KeyBifTool::invoke(Operation operation, const std::filesystem::path &input,
 
     } else {
         auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
-        auto key = FileInputStream(keyPath);
+        auto key = FileInputStream(*keyPath);
 
         auto keyReader = KeyReader(key);
         keyReader.load();

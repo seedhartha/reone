@@ -29,45 +29,30 @@ namespace reone {
 namespace resource {
 
 void Resources::indexKEY(const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) {
-        return;
-    }
     auto provider = std::make_unique<KeyBifResourceProvider>(path);
     provider->init();
     _providers.push_front(std::move(provider));
 }
 
 void Resources::indexERF(const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) {
-        return;
-    }
     auto provider = std::make_unique<ErfResourceProvider>(path);
     provider->init();
     _providers.push_front(std::move(provider));
 }
 
 void Resources::indexRIM(const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) {
-        return;
-    }
     auto provider = std::make_unique<RimResourceProvider>(path);
     provider->init();
     _providers.push_front(std::move(provider));
 }
 
 void Resources::indexEXE(const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) {
-        return;
-    }
     auto provider = std::make_unique<ExeResourceProvider>(path);
     provider->init();
     _providers.push_front(std::move(provider));
 }
 
 void Resources::indexFolder(const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) {
-        return;
-    }
     auto provider = std::make_unique<Folder>(path);
     provider->init();
     _providers.push_front(std::move(provider));

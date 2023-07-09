@@ -26,11 +26,11 @@ namespace movie {
 
 std::shared_ptr<IMovie> Movies::doGet(std::string name) {
     auto path = findFileIgnoreCase(_gamePath, "movies/" + name + ".bik");
-    if (path.empty()) {
+    if (!path) {
         return nullptr;
     }
 
-    BikReader bik(path, _graphicsSvc, _audioSvc);
+    BikReader bik(*path, _graphicsSvc, _audioSvc);
     bik.load();
 
     return bik.movie();

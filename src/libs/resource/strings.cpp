@@ -27,11 +27,11 @@ namespace reone {
 namespace resource {
 
 void Strings::init(const std::filesystem::path &gameDir) {
-    std::filesystem::path tlkPath(findFileIgnoreCase(gameDir, "dialog.tlk"));
-    if (tlkPath.empty()) {
+    auto tlkPath = findFileIgnoreCase(gameDir, "dialog.tlk");
+    if (!tlkPath) {
         throw ResourceNotFoundException("dialog.tlk file not found");
     }
-    auto tlk = FileInputStream(tlkPath);
+    auto tlk = FileInputStream(*tlkPath);
     auto tlkReader = TlkReader(tlk);
     tlkReader.load();
     _table = tlkReader.table();

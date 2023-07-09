@@ -355,10 +355,10 @@ void generateRoutines(const std::filesystem::path &k1Dir,
                       const std::filesystem::path &k2Dir,
                       const std::filesystem::path &destDir) {
     auto k1KeyPath = findFileIgnoreCase(k1Dir, "chitin.key");
-    if (k1KeyPath.empty()) {
-        throw std::runtime_error("File not found: " + k1KeyPath.string());
+    if (!k1KeyPath) {
+        throw std::runtime_error("KotOR chitin.key file not found");
     }
-    auto k1KeyBif = KeyBifResourceProvider(k1KeyPath);
+    auto k1KeyBif = KeyBifResourceProvider(*k1KeyPath);
     k1KeyBif.init();
     auto k1NssBytes = k1KeyBif.findResourceData(ResourceId("nwscript", ResourceType::Nss));
     if (!k1NssBytes) {
@@ -384,10 +384,10 @@ void generateRoutines(const std::filesystem::path &k1Dir,
     }
 
     auto k2KeyPath = findFileIgnoreCase(k2Dir, "chitin.key");
-    if (k2KeyPath.empty()) {
-        throw std::runtime_error("File not found: " + k2KeyPath.string());
+    if (!k2KeyPath) {
+        throw std::runtime_error("TSL chitin.key file not found");
     }
-    auto k2KeyBif = KeyBifResourceProvider(k1KeyPath);
+    auto k2KeyBif = KeyBifResourceProvider(*k1KeyPath);
     k2KeyBif.init();
     auto k2NssBytes = k2KeyBif.findResourceData(ResourceId("nwscript", ResourceType::Nss));
     if (!k2NssBytes) {

@@ -167,7 +167,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     std::set<std::string> guiResRefs;
 
     auto k1KeyPath = findFileIgnoreCase(k1dir, "chitin.key");
-    auto k1KeyBifProvider = KeyBifResourceProvider(k1KeyPath);
+    auto k1KeyBifProvider = KeyBifResourceProvider(*k1KeyPath);
     k1KeyBifProvider.init();
     for (auto &resId : k1KeyBifProvider.resourceIds()) {
         if (resId.type == ResourceType::Gui) {
@@ -176,7 +176,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     }
 
     auto k2KeyPath = findFileIgnoreCase(k2dir, "chitin.key");
-    auto k2KeyBifProvider = KeyBifResourceProvider(k2KeyPath);
+    auto k2KeyBifProvider = KeyBifResourceProvider(*k2KeyPath);
     k2KeyBifProvider.init();
     for (auto &resId : k2KeyBifProvider.resourceIds()) {
         if (resId.type != ResourceType::Gui) {
@@ -190,7 +190,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     }
 
     auto k2OverridePath = findFileIgnoreCase(k2dir, "override");
-    auto k2OverrideFolder = Folder(k2OverridePath);
+    auto k2OverrideFolder = Folder(*k2OverridePath);
     k2OverrideFolder.init();
     for (auto &resId : k2OverrideFolder.resourceIds()) {
         if (resId.type != ResourceType::Gui) {

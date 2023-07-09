@@ -296,7 +296,7 @@ void generateGffSchema(resource::ResourceType resType,
     std::map<std::string, std::shared_ptr<Gff>> trees;
 
     auto keyPath = findFileIgnoreCase(k2dir, "chitin.key");
-    auto keyBif = KeyBifResourceProvider(keyPath);
+    auto keyBif = KeyBifResourceProvider(*keyPath);
     keyBif.init();
     for (auto &resId : keyBif.resourceIds()) {
         if (resId.type != resType) {
@@ -310,7 +310,7 @@ void generateGffSchema(resource::ResourceType resType,
     }
 
     auto modulesPath = findFileIgnoreCase(k2dir, "modules");
-    for (auto &entry : std::filesystem::directory_iterator(modulesPath)) {
+    for (auto &entry : std::filesystem::directory_iterator(*modulesPath)) {
         if (!std::filesystem::is_regular_file(entry)) {
             continue;
         }

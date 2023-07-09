@@ -19,25 +19,22 @@
 
 namespace reone {
 
-std::filesystem::path findFileIgnoreCase(const std::filesystem::path &dir, const std::string &filename) {
+std::optional<std::filesystem::path> findFileIgnoreCase(const std::filesystem::path &dir, const std::string &relPath) {
     std::vector<std::string> tokens;
-    boost::split(tokens, filename, boost::is_any_of("/"), boost::token_compress_on);
+    boost::split(tokens, relPath, boost::is_any_of("/"), boost::token_compress_on);
 
     for (auto &entry : std::filesystem::directory_iterator(dir)) {
-        std::string name(entry.path().filename().string());
-        boost::to_lower(name);
-
-        if (name == tokens[0]) {
+        auto filename = boost::to_lower_copy(entry.path().filename().string());
+        if (filename == tokens[0]) {
             if (tokens.size() == 1) {
                 return entry.path();
             }
-            std::string relPath2(filename.substr(tokens[0].length() + 1));
-
-            return findFileIgnoreCase(entry.path(), relPath2);
+            auto subPath = relPath.substr(tokens[0].length() + 1);
+            return findFileIgnoreCase(entry.path(), subPath);
         }
     }
 
-    return "";
+    return std::nullopt;
 }
 
 } // namespace reone
