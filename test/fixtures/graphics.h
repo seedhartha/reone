@@ -39,7 +39,7 @@ namespace graphics {
 
 class MockFonts : public IFonts, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<Font>, get, (const std::string &key), (override));
 };
 
@@ -59,7 +59,7 @@ public:
 
 class MockLipAnimations : public ILipAnimations, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<LipAnimation>, get, (const std::string &key), (override));
 };
 
@@ -91,7 +91,7 @@ public:
 
 class MockTextures : public ITextures, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
 
     MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
     MOCK_METHOD(void, bindBuiltIn, (), (override));
@@ -127,7 +127,7 @@ public:
 
 class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
 
     MOCK_METHOD(std::shared_ptr<Walkmesh>, get, (const std::string &resRef, resource::ResourceType type), (override));
 };

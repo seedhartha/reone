@@ -29,7 +29,7 @@ class ITwoDas {
 public:
     virtual ~ITwoDas() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<TwoDa> get(const std::string &key) = 0;
 };
@@ -40,7 +40,7 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

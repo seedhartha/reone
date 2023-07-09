@@ -43,7 +43,7 @@ public:
 
 class MockAudioFiles : public IAudioFiles, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<AudioBuffer>, get, (const std::string &key), (override));
 };
 

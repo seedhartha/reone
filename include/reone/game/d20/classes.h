@@ -36,7 +36,7 @@ class IClasses {
 public:
     virtual ~IClasses() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<CreatureClass> get(ClassType key) = 0;
 };
@@ -48,7 +48,7 @@ public:
         _twoDas(twoDas) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

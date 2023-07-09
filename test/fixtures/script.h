@@ -67,7 +67,7 @@ public:
 
 class MockScripts : public IScripts, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<ScriptProgram>, get, (const std::string &key), (override));
 };
 

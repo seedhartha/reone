@@ -34,7 +34,7 @@ class IPaths {
 public:
     virtual ~IPaths() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<Path> get(const std::string &key) = 0;
 };
@@ -45,7 +45,7 @@ public:
         _gffs(gffs) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

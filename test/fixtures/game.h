@@ -34,7 +34,7 @@ public:
 
 class MockClasses : public IClasses, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<CreatureClass>, get, (ClassType key), (override));
 };
 
@@ -45,7 +45,7 @@ public:
 
 class MockDialogs : public IDialogs, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<Dialog>, get, (const std::string &key), (override));
 };
 
@@ -57,7 +57,7 @@ public:
 
 class MockFootstepSounds : public IFootstepSounds, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<FootstepTypeSounds>, get, (uint32_t key), (override));
 };
 
@@ -69,13 +69,13 @@ public:
 
 class MockLayouts : public ILayouts, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<Layout>, get, (const std::string &key), (override));
 };
 
 class MockPaths : public IPaths, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<Path>, get, (const std::string &key), (override));
 };
 
@@ -106,7 +106,7 @@ public:
 
 class MockSoundSets : public ISoundSets, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<SoundSet>, get, (const std::string &key), (override));
 };
 
@@ -128,7 +128,7 @@ public:
 
 class MockVisiblities : public IVisibilities, boost::noncopyable {
 public:
-    MOCK_METHOD(void, invalidate, (), (override));
+    MOCK_METHOD(void, clear,(), (override));
     MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
 };
 

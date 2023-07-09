@@ -33,7 +33,7 @@ class IFonts {
 public:
     virtual ~IFonts() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<Font> get(const std::string &key) = 0;
 };
@@ -53,7 +53,7 @@ public:
         _uniforms(uniforms) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

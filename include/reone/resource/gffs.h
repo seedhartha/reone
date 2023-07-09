@@ -31,7 +31,7 @@ class IGffs {
 public:
     virtual ~IGffs() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) = 0;
 };
@@ -42,7 +42,7 @@ public:
         _resources(resources) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _cache.clear();
     }
 

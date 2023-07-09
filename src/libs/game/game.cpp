@@ -202,13 +202,13 @@ void Game::loadModule(const std::string &name, std::string entry) {
         loadInGameMenus();
 
         /*
-        _services.game.soundSets.invalidate();
-        _services.graphics.textures.invalidate();
-        _services.graphics.models.invalidate();
-        _services.graphics.walkmeshes.invalidate();
-        _services.graphics.lipAnimations.invalidate();
-        _services.audio.files.invalidate();
-        _services.script.scripts.invalidate();
+        _services.game.soundSets.clear();
+        _services.graphics.textures.clear();
+        _services.graphics.models.clear();
+        _services.graphics.walkmeshes.clear();
+        _services.graphics.lipAnimations.clear();
+        _services.audio.files.clear();
+        _services.script.scripts.clear();
         */
 
         try {

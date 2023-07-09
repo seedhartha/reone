@@ -90,7 +90,7 @@ void Textures::init() {
     bindBuiltIn();
 }
 
-void Textures::invalidate() {
+void Textures::clear() {
     _cache.clear();
 }
 

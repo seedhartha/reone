@@ -37,7 +37,7 @@ public:
     virtual ~ITextures() {
     }
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual void bind(Texture &texture, int unit = TextureUnits::mainTex) = 0;
     virtual void bindBuiltIn() = 0;
@@ -67,7 +67,7 @@ public:
 
     void init();
 
-    void invalidate() override;
+    void clear() override;
 
     void bind(Texture &texture, int unit = TextureUnits::mainTex) override;
     void bindBuiltIn() override;

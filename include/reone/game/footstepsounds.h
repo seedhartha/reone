@@ -50,7 +50,7 @@ class IFootstepSounds {
 public:
     virtual ~IFootstepSounds() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<FootstepTypeSounds> get(uint32_t key) = 0;
 };
@@ -64,7 +64,7 @@ public:
         _twoDas(twoDas) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

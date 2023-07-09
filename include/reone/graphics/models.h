@@ -44,7 +44,7 @@ class Models : public IModels, boost::noncopyable {
 public:
     Models(Textures &textures, resource::Resources &resources);
 
-    void invalidate();
+    void clear();
 
     std::shared_ptr<Model> get(const std::string &resRef) override;
 

@@ -136,7 +136,7 @@ std::set<std::string> ResourceLayout::moduleNames() {
 }
 
 void ResourceLayout::loadModuleResources(const std::string &moduleName) {
-    _resourceSvc.gffs.invalidate();
+    _resourceSvc.gffs.clear();
 
     auto modulesPath = findFileIgnoreCase(_options.game.path, kModulesDirectoryName);
     if (!modulesPath) {

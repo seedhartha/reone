@@ -30,7 +30,7 @@ class IMovies {
 public:
     virtual ~IMovies() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<IMovie> get(const std::string &name) = 0;
 };
@@ -45,7 +45,7 @@ public:
         _audioSvc(audioSvc) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _objects.clear();
     }
 

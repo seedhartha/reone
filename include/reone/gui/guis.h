@@ -33,7 +33,7 @@ class IGUIs {
 public:
     virtual ~IGUIs() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<IGUI> get(const std::string &resRef, std::function<void(IGUI &)> preload = nullptr) = 0;
 };
@@ -50,7 +50,7 @@ public:
         _resourceSvc(resourceSvc) {
     }
 
-    void invalidate() override {
+    void clear() override {
         _guis.clear();
     }
 

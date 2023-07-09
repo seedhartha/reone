@@ -37,7 +37,7 @@ class IWalkmeshes {
 public:
     virtual ~IWalkmeshes() = default;
 
-    virtual void invalidate() = 0;
+    virtual void clear() = 0;
 
     virtual std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) = 0;
 };
@@ -46,7 +46,7 @@ class Walkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
     Walkmeshes(resource::Resources &resources);
 
-    void invalidate() override;
+    void clear() override;
 
     std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) override;
 
