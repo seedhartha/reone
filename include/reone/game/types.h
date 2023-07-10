@@ -275,7 +275,7 @@ enum class EffectType {
     ForcePushTargeted = 0x108,
     DamageForcePoints = 0x109,
     HealForcePoints = 0x10a,
-    HitPointsChangeWhenDying = 0x10b,
+    HitPointChangeWhenDying = 0x10b,
     DroidStun = 0x10c,
     ForcePushed = 0x10d,
     ForceResisted = 0x10e,

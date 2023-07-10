@@ -21,14 +21,19 @@
 #include "abilityincrease.h"
 #include "acdecrease.h"
 #include "acincrease.h"
+#include "areaofeffect.h"
+#include "assureddeflection.h"
 #include "assuredhit.h"
 #include "attackdecrease.h"
 #include "attackincrease.h"
 #include "beam.h"
+#include "blasterdeflectiondecrease.h"
 #include "blasterdeflectionincrease.h"
 #include "blind.h"
 #include "bodyfuel.h"
 #include "choke.h"
+#include "concealment.h"
+#include "confused.h"
 #include "crush.h"
 #include "cutscenehorrified.h"
 #include "cutsceneparalyze.h"
@@ -36,32 +41,47 @@
 #include "damage.h"
 #include "damagedecrease.h"
 #include "damageforcepoints.h"
+#include "damageimmunitydecrease.h"
 #include "damageimmunityincrease.h"
 #include "damageincrease.h"
+#include "damagereduction.h"
 #include "damageresistance.h"
+#include "damageshield.h"
 #include "death.h"
 #include "disguise.h"
+#include "dispelmagicall.h"
+#include "dispelmagicbest.h"
+#include "droidconfused.h"
 #include "droidscramble.h"
 #include "droidstun.h"
 #include "entangle.h"
 #include "factionmodifier.h"
 #include "forcebody.h"
+#include "forcedrain.h"
 #include "forcefizzle.h"
+#include "forcejump.h"
 #include "forcepushed.h"
 #include "forcepushtargeted.h"
+#include "forceresistancedecrease.h"
 #include "forceresistanceincrease.h"
 #include "forceresisted.h"
 #include "forceshield.h"
 #include "forcesight.h"
+#include "fpregenmodifier.h"
+#include "frightened.h"
 #include "fury.h"
+#include "haste.h"
 #include "heal.h"
 #include "healforcepoints.h"
+#include "hitpointchangewhendying.h"
 #include "horrified.h"
 #include "immunity.h"
 #include "invisibility.h"
+#include "knockdown.h"
 #include "lightsaberthrow.h"
 #include "linkeffects.h"
 #include "mindtrick.h"
+#include "misschance.h"
 #include "modifyattacks.h"
 #include "movementspeeddecrease.h"
 #include "movementspeedincrease.h"
@@ -72,11 +92,16 @@
 #include "resurrection.h"
 #include "savingthrowdecrease.h"
 #include "savingthrowincrease.h"
+#include "seeinvisible.h"
+#include "skilldecrease.h"
 #include "skillincrease.h"
 #include "sleep.h"
+#include "spellimmunity.h"
+#include "spelllevelabsorption.h"
 #include "stunned.h"
 #include "temporaryforcepoints.h"
 #include "temporaryhitpoints.h"
+#include "timestop.h"
 #include "trueseeing.h"
 #include "visual.h"
 #include "vpregenmodifier.h"
@@ -104,6 +129,14 @@ public:
         return std::make_unique<ACIncreaseEffect>(value, modifyType, damageType);
     }
 
+    std::unique_ptr<AreaOfEffectEffect> newAreaOfEffect(int areaEffectId, std::string onEnterScript, std::string heartbeatScript, std::string onExitScript) {
+        return std::make_unique<AreaOfEffectEffect>(areaEffectId, std::move(onEnterScript), std::move(heartbeatScript), std::move(onExitScript));
+    }
+
+    std::unique_ptr<AssuredDeflectionEffect> newAssuredDeflection(int returnDamage) {
+        return std::make_unique<AssuredDeflectionEffect>(returnDamage);
+    }
+
     std::unique_ptr<AssuredHitEffect> newAssuredHit() {
         return std::make_unique<AssuredHitEffect>();
     }
@@ -120,6 +153,10 @@ public:
         return std::make_unique<BeamEffect>(beamVisualEffect, std::move(effector), bodyPart, missEffect);
     }
 
+    std::unique_ptr<BlasterDeflectionDecreaseEffect> newBlasterDeflectionDecrease(int change) {
+        return std::make_unique<BlasterDeflectionDecreaseEffect>(change);
+    }
+
     std::unique_ptr<BlasterDeflectionIncreaseEffect> newBlasterDeflectionIncrease(int change) {
         return std::make_unique<BlasterDeflectionIncreaseEffect>(change);
     }
@@ -134,6 +171,14 @@ public:
 
     std::unique_ptr<ChokeEffect> newChoke() {
         return std::make_unique<ChokeEffect>();
+    }
+
+    std::unique_ptr<ConcealmentEffect> newConcealment(int percentage) {
+        return std::make_unique<ConcealmentEffect>(percentage);
+    }
+
+    std::unique_ptr<ConfusedEffect> newConfused() {
+        return std::make_unique<ConfusedEffect>();
     }
 
     std::unique_ptr<CrushEffect> newCrush() {
@@ -164,6 +209,10 @@ public:
         return std::make_unique<DamageForcePointsEffect>(damage);
     }
 
+    std::unique_ptr<DamageImmunityDecreaseEffect> newDamageImmunityDecrease(DamageType damageType, int percentImmunity) {
+        return std::make_unique<DamageImmunityDecreaseEffect>(damageType, percentImmunity);
+    }
+
     std::unique_ptr<DamageImmunityIncreaseEffect> newDamageImmunityIncrease(DamageType damageType, int percentImmunity) {
         return std::make_unique<DamageImmunityIncreaseEffect>(damageType, percentImmunity);
     }
@@ -172,8 +221,16 @@ public:
         return std::make_unique<DamageIncreaseEffect>(bonus, damageType);
     }
 
+    std::unique_ptr<DamageReductionEffect> newDamageReduction(int amount, DamagePower damagePower, int limit) {
+        return std::make_unique<DamageReductionEffect>(amount, damagePower, limit);
+    }
+
     std::unique_ptr<DamageResistanceEffect> newDamageResistance(DamageType damageType, int amount, int limit) {
         return std::make_unique<DamageResistanceEffect>(damageType, amount, limit);
+    }
+
+    std::unique_ptr<DamageShieldEffect> newDamageShield(int damageAmount, int randomAmount, DamageType damageType) {
+        return std::make_unique<DamageShieldEffect>(damageAmount, randomAmount, damageType);
     }
 
     std::unique_ptr<DeathEffect> newDeath(bool spectacularDeath, bool displayFeedback, bool noFadeAway) {
@@ -182,6 +239,18 @@ public:
 
     std::unique_ptr<DisguiseEffect> newDisguise(int appearance) {
         return std::make_unique<DisguiseEffect>(appearance);
+    }
+
+    std::unique_ptr<DispelMagicAllEffect> newDispelMagicAll(int casterLevel) {
+        return std::make_unique<DispelMagicAllEffect>(casterLevel);
+    }
+
+    std::unique_ptr<DispelMagicBestEffect> newDispelMagicBest(int casterLevel) {
+        return std::make_unique<DispelMagicBestEffect>(casterLevel);
+    }
+
+    std::unique_ptr<DroidConfusedEffect> newDroidConfused() {
+        return std::make_unique<DroidConfusedEffect>();
     }
 
     std::unique_ptr<DroidScrambleEffect> newDroidScramble() {
@@ -204,8 +273,16 @@ public:
         return std::make_unique<ForceBodyEffect>(level);
     }
 
+    std::unique_ptr<ForceDrainEffect> newForceDrain(int damage) {
+        return std::make_unique<ForceDrainEffect>(damage);
+    }
+
     std::unique_ptr<ForceFizzleEffect> newForceFizzle() {
         return std::make_unique<ForceFizzleEffect>();
+    }
+
+    std::unique_ptr<ForceJumpEffect> newForceJump(std::shared_ptr<Object> target, int advanced) {
+        return std::make_unique<ForceJumpEffect>(std::move(target), advanced);
     }
 
     std::unique_ptr<ForcePushedEffect> newForcePushed() {
@@ -214,6 +291,10 @@ public:
 
     std::unique_ptr<ForcePushTargetedEffect> newForcePushTargeted(std::shared_ptr<Location> centre, bool ignoreTestDirectLine) {
         return std::make_unique<ForcePushTargetedEffect>(std::move(centre), ignoreTestDirectLine);
+    }
+
+    std::unique_ptr<ForceResistanceDecreaseEffect> newForceResistanceDecrease(int value) {
+        return std::make_unique<ForceResistanceDecreaseEffect>(value);
     }
 
     std::unique_ptr<ForceResistanceIncreaseEffect> newForceResistanceIncrease(int value) {
@@ -232,8 +313,20 @@ public:
         return std::make_unique<ForceSightEffect>();
     }
 
+    std::unique_ptr<FPRegenModifierEffect> newFPRegenModifier(int percent) {
+        return std::make_unique<FPRegenModifierEffect>(percent);
+    }
+
+    std::unique_ptr<FrightenedEffect> newFrightened() {
+        return std::make_unique<FrightenedEffect>();
+    }
+
     std::unique_ptr<FuryEffect> newFury() {
         return std::make_unique<FuryEffect>();
+    }
+
+    std::unique_ptr<HasteEffect> newHaste() {
+        return std::make_unique<HasteEffect>();
     }
 
     std::unique_ptr<HealEffect> newHeal(int damageToHeal) {
@@ -242,6 +335,10 @@ public:
 
     std::unique_ptr<HealForcePointsEffect> newHealForcePoints(int heal) {
         return std::make_unique<HealForcePointsEffect>(heal);
+    }
+
+    std::unique_ptr<HitPointChangeWhenDyingEffect> newHitPointChangeWhenDying(float hitPointChangePerRound) {
+        return std::make_unique<HitPointChangeWhenDyingEffect>(hitPointChangePerRound);
     }
 
     std::unique_ptr<HorrifiedEffect> newHorrified() {
@@ -256,6 +353,10 @@ public:
         return std::make_unique<InvisibilityEffect>(type);
     }
 
+    std::unique_ptr<KnockdownEffect> newKnockdown() {
+        return std::make_unique<KnockdownEffect>();
+    }
+
     std::unique_ptr<LightsaberThrowEffect> newLightsaberThrow(std::shared_ptr<Object> target1, std::shared_ptr<Object> target2, std::shared_ptr<Object> target3, int advancedDamage) {
         return std::make_unique<LightsaberThrowEffect>(std::move(target1), std::move(target2), std::move(target3), advancedDamage);
     }
@@ -266,6 +367,10 @@ public:
 
     std::unique_ptr<MindTrickEffect> newMindTrick() {
         return std::make_unique<MindTrickEffect>();
+    }
+
+    std::unique_ptr<MissChanceEffect> newMissChance(int percentage) {
+        return std::make_unique<MissChanceEffect>(percentage);
     }
 
     std::unique_ptr<ModifyAttacksEffect> newModifyAttacks(int attacks) {
@@ -308,12 +413,28 @@ public:
         return std::make_unique<SavingThrowIncreaseEffect>(save, value, savingThrowType);
     }
 
+    std::unique_ptr<SeeInvisibleEffect> newSeeInvisible() {
+        return std::make_unique<SeeInvisibleEffect>();
+    }
+
+    std::unique_ptr<SkillDecreaseEffect> newSkillDecrease(SkillType skill, int value) {
+        return std::make_unique<SkillDecreaseEffect>(skill, value);
+    }
+
     std::unique_ptr<SkillIncreaseEffect> newSkillIncrease(SkillType skill, int value) {
         return std::make_unique<SkillIncreaseEffect>(skill, value);
     }
 
     std::unique_ptr<SleepEffect> newSleep() {
         return std::make_unique<SleepEffect>();
+    }
+
+    std::unique_ptr<SpellImmunityEffect> newSpellImmunity(SpellType immunityToSpell) {
+        return std::make_unique<SpellImmunityEffect>(immunityToSpell);
+    }
+
+    std::unique_ptr<SpellLevelAbsorptionEffect> newSpellLevelAbsorption(int maxSpellLevelAbsorbed, int totalSpellLevelsAbsorbed, int spellSchool) {
+        return std::make_unique<SpellLevelAbsorptionEffect>(maxSpellLevelAbsorbed, totalSpellLevelsAbsorbed, spellSchool);
     }
 
     std::unique_ptr<StunnedEffect> newStunned() {
@@ -326,6 +447,10 @@ public:
 
     std::unique_ptr<TemporaryHitPointsEffect> newTemporaryHitPoints(int hitPoints) {
         return std::make_unique<TemporaryHitPointsEffect>(hitPoints);
+    }
+
+    std::unique_ptr<TimeStopEffect> newTimeStop() {
+        return std::make_unique<TimeStopEffect>();
     }
 
     std::unique_ptr<TrueSeeingEffect> newTrueSeeing() {

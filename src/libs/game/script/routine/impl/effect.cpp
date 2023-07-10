@@ -158,9 +158,11 @@ static Variable EffectDamageReduction(const std::vector<Variable> &args, const R
     auto nLimit = getIntOrElse(args, 2, 0);
 
     // Transform
+    auto damagePower = static_cast<DamagePower>(nDamagePower);
 
     // Execute
-    throw RoutineNotImplementedException("EffectDamageReduction");
+    auto effect = ctx.game.effectFactory().newDamageReduction(nAmount, damagePower, nLimit);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectDamageIncrease(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -200,7 +202,8 @@ static Variable EffectDeath(const std::vector<Variable> &args, const RoutineCont
 
 static Variable EffectKnockdown(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectKnockdown");
+    auto effect = ctx.game.effectFactory().newKnockdown();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectParalyze(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -214,9 +217,11 @@ static Variable EffectSpellImmunity(const std::vector<Variable> &args, const Rou
     auto nImmunityToSpell = getIntOrElse(args, 0, -1);
 
     // Transform
+    auto immunityToSpell = static_cast<SpellType>(nImmunityToSpell);
 
     // Execute
-    throw RoutineNotImplementedException("EffectSpellImmunity");
+    auto effect = ctx.game.effectFactory().newSpellImmunity(immunityToSpell);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForceJump(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -227,7 +232,8 @@ static Variable EffectForceJump(const std::vector<Variable> &args, const Routine
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectForceJump");
+    auto effect = ctx.game.effectFactory().newForceJump(oTarget, nAdvanced);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectSleep(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -249,12 +255,14 @@ static Variable EffectTemporaryForcePoints(const std::vector<Variable> &args, co
 
 static Variable EffectConfused(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectConfused");
+    auto effect = ctx.game.effectFactory().newConfused();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectFrightened(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectFrightened");
+    auto effect = ctx.game.effectFactory().newFrightened();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectChoke(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -302,7 +310,8 @@ static Variable EffectAreaOfEffect(const std::vector<Variable> &args, const Rout
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectAreaOfEffect");
+    auto effect = ctx.game.effectFactory().newAreaOfEffect(nAreaEffectId, sOnEnterScript, sHeartbeatScript, sOnExitScript);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectVisualEffect(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -382,7 +391,8 @@ static Variable EffectAssuredDeflection(const std::vector<Variable> &args, const
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectAssuredDeflection");
+    auto effect = ctx.game.effectFactory().newAssuredDeflection(nReturn);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForcePushTargeted(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -400,7 +410,8 @@ static Variable EffectForcePushTargeted(const std::vector<Variable> &args, const
 
 static Variable EffectHaste(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectHaste");
+    auto effect = ctx.game.effectFactory().newHaste();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectImmunity(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -481,7 +492,8 @@ static Variable EffectHitPointChangeWhenDying(const std::vector<Variable> &args,
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectHitPointChangeWhenDying");
+    auto effect = ctx.game.effectFactory().newHitPointChangeWhenDying(fHitPointChangePerRound);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectDroidStun(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -558,9 +570,11 @@ static Variable EffectDamageImmunityDecrease(const std::vector<Variable> &args, 
     auto nPercentImmunity = getInt(args, 1);
 
     // Transform
+    auto damageType = static_cast<DamageType>(nDamageType);
 
     // Execute
-    throw RoutineNotImplementedException("EffectDamageImmunityDecrease");
+    auto effect = ctx.game.effectFactory().newDamageImmunityDecrease(damageType, nPercentImmunity);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectACDecrease(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -608,9 +622,11 @@ static Variable EffectSkillDecrease(const std::vector<Variable> &args, const Rou
     auto nValue = getInt(args, 1);
 
     // Transform
+    auto skill = static_cast<SkillType>(nSkill);
 
     // Execute
-    throw RoutineNotImplementedException("EffectSkillDecrease");
+    auto effect = ctx.game.effectFactory().newSkillDecrease(skill, nValue);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForceResistanceDecrease(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -620,7 +636,8 @@ static Variable EffectForceResistanceDecrease(const std::vector<Variable> &args,
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectForceResistanceDecrease");
+    auto effect = ctx.game.effectFactory().newForceResistanceDecrease(nValue);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectInvisibility(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -642,7 +659,8 @@ static Variable EffectConcealment(const std::vector<Variable> &args, const Routi
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectConcealment");
+    auto effect = ctx.game.effectFactory().newConcealment(nPercentage);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForceShield(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -663,7 +681,8 @@ static Variable EffectDispelMagicAll(const std::vector<Variable> &args, const Ro
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectDispelMagicAll");
+    auto effect = ctx.game.effectFactory().newDispelMagicAll(nCasterLevel);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectDisguise(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -685,12 +704,14 @@ static Variable EffectTrueSeeing(const std::vector<Variable> &args, const Routin
 
 static Variable EffectSeeInvisible(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectSeeInvisible");
+    auto effect = ctx.game.effectFactory().newSeeInvisible();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectTimeStop(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectTimeStop");
+    auto effect = ctx.game.effectFactory().newTimeStop();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectBlasterDeflectionIncrease(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -711,7 +732,8 @@ static Variable EffectBlasterDeflectionDecrease(const std::vector<Variable> &arg
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectBlasterDeflectionDecrease");
+    auto effect = ctx.game.effectFactory().newBlasterDeflectionDecrease(nChange);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectHorrified(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -729,7 +751,8 @@ static Variable EffectSpellLevelAbsorption(const std::vector<Variable> &args, co
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectSpellLevelAbsorption");
+    auto effect = ctx.game.effectFactory().newSpellLevelAbsorption(nMaxSpellLevelAbsorbed, nTotalSpellLevelsAbsorbed, nSpellSchool);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectDispelMagicBest(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -739,7 +762,8 @@ static Variable EffectDispelMagicBest(const std::vector<Variable> &args, const R
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectDispelMagicBest");
+    auto effect = ctx.game.effectFactory().newDispelMagicBest(nCasterLevel);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectMissChance(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -749,7 +773,8 @@ static Variable EffectMissChance(const std::vector<Variable> &args, const Routin
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectMissChance");
+    auto effect = ctx.game.effectFactory().newMissChance(nPercentage);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectModifyAttacks(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -770,9 +795,11 @@ static Variable EffectDamageShield(const std::vector<Variable> &args, const Rout
     auto nDamageType = getInt(args, 2);
 
     // Transform
+    auto damageType = static_cast<DamageType>(nDamageType);
 
     // Execute
-    throw RoutineNotImplementedException("EffectDamageShield");
+    auto effect = ctx.game.effectFactory().newDamageShield(nDamageAmount, nRandomAmount, damageType);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForceDrain(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -782,7 +809,8 @@ static Variable EffectForceDrain(const std::vector<Variable> &args, const Routin
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectForceDrain");
+    auto effect = ctx.game.effectFactory().newForceDrain(nDamage);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectPsychicStatic(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -863,7 +891,7 @@ static Variable EffectFPRegenModifier(const std::vector<Variable> &args, const R
     // Transform
 
     // Execute
-    auto effect = ctx.game.effectFactory().newVPRegenModifier(nPercent);
+    auto effect = ctx.game.effectFactory().newFPRegenModifier(nPercent);
     return Variable::ofEffect(std::move(effect));
 }
 
@@ -874,7 +902,8 @@ static Variable EffectVPRegenModifier(const std::vector<Variable> &args, const R
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("EffectVPRegenModifier");
+    auto effect = ctx.game.effectFactory().newVPRegenModifier(nPercent);
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectCrush(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -885,7 +914,8 @@ static Variable EffectCrush(const std::vector<Variable> &args, const RoutineCont
 
 static Variable EffectDroidConfused(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("EffectDroidConfused");
+    auto effect = ctx.game.effectFactory().newDroidConfused();
+    return Variable::ofEffect(std::move(effect));
 }
 
 static Variable EffectForceSight(const std::vector<Variable> &args, const RoutineContext &ctx) {

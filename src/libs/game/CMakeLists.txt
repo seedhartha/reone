@@ -99,14 +99,19 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/abilityincrease.h
     ${GAME_INCLUDE_DIR}/effect/acdecrease.h
     ${GAME_INCLUDE_DIR}/effect/acincrease.h
+    ${GAME_INCLUDE_DIR}/effect/areaofeffect.h
+    ${GAME_INCLUDE_DIR}/effect/assureddeflection.h
     ${GAME_INCLUDE_DIR}/effect/assuredhit.h
     ${GAME_INCLUDE_DIR}/effect/attackdecrease.h
     ${GAME_INCLUDE_DIR}/effect/attackincrease.h
     ${GAME_INCLUDE_DIR}/effect/beam.h
+    ${GAME_INCLUDE_DIR}/effect/blasterdeflectiondecrease.h
     ${GAME_INCLUDE_DIR}/effect/blasterdeflectionincrease.h
     ${GAME_INCLUDE_DIR}/effect/blind.h
     ${GAME_INCLUDE_DIR}/effect/bodyfuel.h
     ${GAME_INCLUDE_DIR}/effect/choke.h
+    ${GAME_INCLUDE_DIR}/effect/concealment.h
+    ${GAME_INCLUDE_DIR}/effect/confused.h
     ${GAME_INCLUDE_DIR}/effect/crush.h
     ${GAME_INCLUDE_DIR}/effect/cutscenehorrified.h
     ${GAME_INCLUDE_DIR}/effect/cutsceneparalyze.h
@@ -114,33 +119,49 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/damage.h
     ${GAME_INCLUDE_DIR}/effect/damagedecrease.h
     ${GAME_INCLUDE_DIR}/effect/damageforcepoints.h
+    ${GAME_INCLUDE_DIR}/effect/damageimmunitydecrease.h
+    ${GAME_INCLUDE_DIR}/effect/damageimmunityincrease.h
     ${GAME_INCLUDE_DIR}/effect/damageimmunityincrease.h
     ${GAME_INCLUDE_DIR}/effect/damageincrease.h
+    ${GAME_INCLUDE_DIR}/effect/damagereduction.h
     ${GAME_INCLUDE_DIR}/effect/damageresistance.h
+    ${GAME_INCLUDE_DIR}/effect/damageshield.h
     ${GAME_INCLUDE_DIR}/effect/death.h
     ${GAME_INCLUDE_DIR}/effect/disguise.h
+    ${GAME_INCLUDE_DIR}/effect/dispelmagicall.h
+    ${GAME_INCLUDE_DIR}/effect/dispelmagicbest.h
+    ${GAME_INCLUDE_DIR}/effect/droidconfused.h
     ${GAME_INCLUDE_DIR}/effect/droidscramble.h
     ${GAME_INCLUDE_DIR}/effect/droidstun.h
     ${GAME_INCLUDE_DIR}/effect/entangle.h
     ${GAME_INCLUDE_DIR}/effect/factionmodifier.h
     ${GAME_INCLUDE_DIR}/effect/factory.h
     ${GAME_INCLUDE_DIR}/effect/forcebody.h
+    ${GAME_INCLUDE_DIR}/effect/forcedrain.h
     ${GAME_INCLUDE_DIR}/effect/forcefizzle.h
+    ${GAME_INCLUDE_DIR}/effect/forcejump.h
     ${GAME_INCLUDE_DIR}/effect/forcepushed.h
     ${GAME_INCLUDE_DIR}/effect/forcepushtargeted.h
+    ${GAME_INCLUDE_DIR}/effect/forceresistancedecrease.h
     ${GAME_INCLUDE_DIR}/effect/forceresistanceincrease.h
     ${GAME_INCLUDE_DIR}/effect/forceresisted.h
     ${GAME_INCLUDE_DIR}/effect/forceshield.h
     ${GAME_INCLUDE_DIR}/effect/forcesight.h
+    ${GAME_INCLUDE_DIR}/effect/fpregenmodifier.h
+    ${GAME_INCLUDE_DIR}/effect/frightened.h
     ${GAME_INCLUDE_DIR}/effect/fury.h
+    ${GAME_INCLUDE_DIR}/effect/haste.h
     ${GAME_INCLUDE_DIR}/effect/heal.h
     ${GAME_INCLUDE_DIR}/effect/healforcepoints.h
+    ${GAME_INCLUDE_DIR}/effect/hitpointchangewhendying.h
     ${GAME_INCLUDE_DIR}/effect/horrified.h
     ${GAME_INCLUDE_DIR}/effect/immunity.h
     ${GAME_INCLUDE_DIR}/effect/invisibility.h
+    ${GAME_INCLUDE_DIR}/effect/knockdown.h
     ${GAME_INCLUDE_DIR}/effect/lightsaberthrow.h
     ${GAME_INCLUDE_DIR}/effect/linkeffects.h
     ${GAME_INCLUDE_DIR}/effect/mindtrick.h
+    ${GAME_INCLUDE_DIR}/effect/misschance.h
     ${GAME_INCLUDE_DIR}/effect/modifyattacks.h
     ${GAME_INCLUDE_DIR}/effect/movementspeeddecrease.h
     ${GAME_INCLUDE_DIR}/effect/movementspeedincrease.h
@@ -151,11 +172,16 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/resurrection.h
     ${GAME_INCLUDE_DIR}/effect/savingthrowdecrease.h
     ${GAME_INCLUDE_DIR}/effect/savingthrowincrease.h
+    ${GAME_INCLUDE_DIR}/effect/seeinvisible.h
+    ${GAME_INCLUDE_DIR}/effect/skilldecrease.h
     ${GAME_INCLUDE_DIR}/effect/skillincrease.h
     ${GAME_INCLUDE_DIR}/effect/sleep.h
+    ${GAME_INCLUDE_DIR}/effect/spellimmunity.h
+    ${GAME_INCLUDE_DIR}/effect/spelllevelabsorption.h
     ${GAME_INCLUDE_DIR}/effect/stunned.h
     ${GAME_INCLUDE_DIR}/effect/temporaryforcepoints.h
     ${GAME_INCLUDE_DIR}/effect/temporaryhitpoints.h
+    ${GAME_INCLUDE_DIR}/effect/timestop.h
     ${GAME_INCLUDE_DIR}/effect/trueseeing.h
     ${GAME_INCLUDE_DIR}/effect/visual.h
     ${GAME_INCLUDE_DIR}/effect/vpregenmodifier.h
