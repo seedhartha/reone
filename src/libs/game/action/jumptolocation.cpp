@@ -17,7 +17,6 @@
 
 #include "reone/game/action/jumptolocation.h"
 
-#include "reone/game/location.h"
 #include "reone/game/object.h"
 
 namespace reone {

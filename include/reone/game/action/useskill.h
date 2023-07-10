@@ -19,23 +19,23 @@
 
 #include "../object/item.h"
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class UseSkillAction : public ObjectAction {
+class UseSkillAction : public Action {
 public:
-    UseSkillAction(
-        Game &game,
-        ServicesView &services,
-        std::shared_ptr<Object> object,
-        SkillType skill,
-        int subSkill,
-        std::shared_ptr<Item> itemUsed) :
-        ObjectAction(game, services, ActionType::UseSkill, std::move(object)),
+    UseSkillAction(Game &game,
+                   ServicesView &services,
+                   SkillType skill,
+                   std::shared_ptr<Object> target,
+                   int subSkill,
+                   std::shared_ptr<Item> itemUsed) :
+        Action(game, services, ActionType::UseSkill),
         _skill(skill),
+        _target(std::move(target)),
         _subSkill(subSkill),
         _itemUsed(std::move(itemUsed)) {
     }
@@ -46,6 +46,7 @@ public:
 
 private:
     SkillType _skill;
+    std::shared_ptr<Object> _target;
     int _subSkill;
     std::shared_ptr<Item> _itemUsed;
 };

@@ -17,19 +17,26 @@
 
 #pragma once
 
-#include "locationaction.h"
+#include "../action.h"
+#include "../location.h"
 
 namespace reone {
 
 namespace game {
 
-class MoveToLocationAction : public LocationAction {
+class MoveToLocationAction : public Action {
 public:
-    MoveToLocationAction(Game &game, ServicesView &services, std::shared_ptr<Location> destination, bool run, float timeout, bool force) :
-        LocationAction(game, services, ActionType::MoveToLocation, std::move(destination)),
+    MoveToLocationAction(Game &game,
+                         ServicesView &services,
+                         std::shared_ptr<Location> destination,
+                         bool run,
+                         bool force,
+                         float timeout) :
+        Action(game, services, ActionType::MoveToLocation),
+        _destination(std::move(destination)),
         _run(run),
-        _timeout(timeout),
-        _force(force) {
+        _force(force),
+        _timeout(timeout) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
@@ -37,9 +44,10 @@ public:
     bool isRun() const { return _run; }
 
 private:
+    std::shared_ptr<Location> _destination;
     bool _run;
-    float _timeout;
     bool _force;
+    float _timeout;
 };
 
 } // namespace game

@@ -26,11 +26,11 @@ namespace game {
 
 void FollowAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.getObjectById<Creature>(actor.id());
-    auto dest = _object->position();
+    auto dest = _follow->position();
     float distance2 = creatureActor->getSquareDistanceTo(glm::vec2(dest));
     bool run = distance2 > kDistanceWalk * kDistanceWalk;
 
-    creatureActor->navigateTo(dest, run, _distance, dt);
+    creatureActor->navigateTo(dest, run, _followDistance, dt);
 }
 
 } // namespace game

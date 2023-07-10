@@ -18,7 +18,7 @@ set(GAME_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/game)
 
 set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action.h
-    ${GAME_INCLUDE_DIR}/action/attack.h
+    ${GAME_INCLUDE_DIR}/action/attackobject.h
     ${GAME_INCLUDE_DIR}/action/barkstring.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatlocation.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatobject.h
@@ -36,13 +36,11 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/interactobject.h
     ${GAME_INCLUDE_DIR}/action/jumptolocation.h
     ${GAME_INCLUDE_DIR}/action/jumptoobject.h
-    ${GAME_INCLUDE_DIR}/action/locationaction.h
     ${GAME_INCLUDE_DIR}/action/lockobject.h
     ${GAME_INCLUDE_DIR}/action/moveawayfromobject.h
     ${GAME_INCLUDE_DIR}/action/movetolocation.h
     ${GAME_INCLUDE_DIR}/action/movetoobject.h
     ${GAME_INCLUDE_DIR}/action/movetopoint.h
-    ${GAME_INCLUDE_DIR}/action/objectaction.h
     ${GAME_INCLUDE_DIR}/action/opencontainer.h
     ${GAME_INCLUDE_DIR}/action/opendoor.h
     ${GAME_INCLUDE_DIR}/action/openlock.h
@@ -253,7 +251,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/visibilities.h)
 
 set(GAME_SOURCES
-    ${GAME_SOURCE_DIR}/action/attack.cpp
+    ${GAME_SOURCE_DIR}/action/attackobject.cpp
     ${GAME_SOURCE_DIR}/action/barkstring.cpp
     ${GAME_SOURCE_DIR}/action/castfakespellatlocation.cpp
     ${GAME_SOURCE_DIR}/action/castfakespellatobject.cpp

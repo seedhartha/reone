@@ -17,7 +17,7 @@
 
 #include "reone/game/object/module.h"
 
-#include "reone/game/action/attack.h"
+#include "reone/game/action/attackobject.h"
 #include "reone/game/action/factory.h"
 #include "reone/game/action/opencontainer.h"
 #include "reone/game/action/opendoor.h"
@@ -236,7 +236,9 @@ void Module::onCreatureClick(const std::shared_ptr<Creature> &creature) {
         bool isEnemy = _services.game.reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game.actionFactory().newAttack(creature));
+            auto action = _game.actionFactory().newAttackObject(creature);
+            action->setUserAction(true);
+            partyLeader->addAction(std::move(action));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
             partyLeader->addAction(_game.actionFactory().newStartConversation(creature, creature->conversation()));

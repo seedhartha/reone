@@ -30,7 +30,7 @@
 #include "reone/graphics/window.h"
 #include "reone/resource/resources.h"
 
-#include "reone/game/action/attack.h"
+#include "reone/game/action/attackobject.h"
 #include "reone/game/action/factory.h"
 #include "reone/game/action/usefeat.h"
 #include "reone/game/action/useskill.h"
@@ -132,19 +132,24 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     if (slot.indexSelected >= slot.actions.size())
         return false;
 
-    const ContextAction &action = slot.actions[slot.indexSelected];
-    switch (action.type) {
+    const ContextAction &ctxAction = slot.actions[slot.indexSelected];
+    std::unique_ptr<Action> action;
+    switch (ctxAction.type) {
     case ActionType::AttackObject:
-        leader->addAction(_game.actionFactory().newAttack(selectedObject, leader->getAttackRange(), true));
+        action = _game.actionFactory().newAttackObject(selectedObject);
         break;
     case ActionType::UseFeat:
-        leader->addAction(_game.actionFactory().newUseFeat(selectedObject, action.feat));
+        action = _game.actionFactory().newUseFeat(ctxAction.feat, selectedObject);
         break;
     case ActionType::UseSkill:
-        leader->addAction(_game.actionFactory().newUseSkill(selectedObject, action.skill));
+        action = _game.actionFactory().newUseSkill(ctxAction.skill, selectedObject);
         break;
     default:
         break;
+    }
+    if (action) {
+        action->setUserAction(true);
+        leader->addAction(std::move(action));
     }
 
     return true;

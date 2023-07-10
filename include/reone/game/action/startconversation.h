@@ -17,33 +17,28 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class StartConversationAction : public ObjectAction {
+class StartConversationAction : public Action {
 public:
-    StartConversationAction(
-        Game &game,
-        ServicesView &services,
-        std::shared_ptr<Object> object,
-        std::string dialogResRef,
-        bool privateConversation,
-        ConversationType conversationType,
-        bool ignoreStartRange,
-        std::string nameToIgnore1,
-        std::string nameToIgnore2,
-        std::string nameToIgnore3,
-        std::string nameToIgnore4,
-        std::string nameToIgnore5,
-        std::string nameToIgnore6,
-        bool useLeader,
-        int barkX,
-        int barkY,
-        bool dontClearAllActions) :
-        ObjectAction(game, services, ActionType::StartConversation, std::move(object)),
+    StartConversationAction(Game &game,
+                            ServicesView &services,
+                            std::shared_ptr<Object> objectToConverse,
+                            std::string dialogResRef,
+                            bool privateConversation,
+                            ConversationType conversationType,
+                            bool ignoreStartRange,
+                            std::vector<std::string> namesToIgnore,
+                            bool useLeader,
+                            int barkX,
+                            int barkY,
+                            bool dontClearAllActions) :
+        Action(game, services, ActionType::StartConversation),
+        _objectToConverse(std::move(objectToConverse)),
         _dialogResRef(std::move(dialogResRef)),
         _ignoreStartRange(ignoreStartRange) {
     }
@@ -55,16 +50,12 @@ public:
     const std::string &dialogResRef() const { return _dialogResRef; }
 
 private:
+    std::shared_ptr<Object> _objectToConverse;
     std::string _dialogResRef;
     bool _privateConversation;
     ConversationType _conversationType;
     bool _ignoreStartRange;
-    std::string _nameToIgnore1;
-    std::string _nameToIgnore2;
-    std::string _nameToIgnore3;
-    std::string _nameToIgnore4;
-    std::string _nameToIgnore5;
-    std::string _nameToIgnore6;
+    std::vector<std::string> _namesToIgnore;
     bool _useLeader;
     int _barkX;
     int _barkY;

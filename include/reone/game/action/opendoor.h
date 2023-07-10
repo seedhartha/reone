@@ -17,19 +17,25 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class OpenDoorAction : public ObjectAction {
+class OpenDoorAction : public Action {
 public:
-    OpenDoorAction(Game &game, ServicesView &services, std::shared_ptr<Object> object) :
-        ObjectAction(game, services, ActionType::OpenDoor, std::move(object)) {
+    OpenDoorAction(Game &game,
+                   ServicesView &services,
+                   std::shared_ptr<Object> door) :
+        Action(game, services, ActionType::OpenDoor),
+        _door(std::move(door)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Object> _door;
 };
 
 } // namespace game

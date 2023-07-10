@@ -26,7 +26,7 @@ namespace reone {
 namespace game {
 
 void MoveToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    auto dest = _object->position();
+    auto dest = _moveTo->position();
     auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(dest, _run, _range, dt);

@@ -27,7 +27,7 @@ namespace reone {
 namespace game {
 
 void UseFeatAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    if (_object->isDead()) {
+    if (_target->isDead()) {
         complete();
         return;
     }
@@ -35,8 +35,8 @@ void UseFeatAction::execute(std::shared_ptr<Action> self, Object &actor, float d
     auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
     // Make the actor follow its target. When reached, register an attack
-    if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {
-        _game.combat().addAttack(std::move(creatureActor), _object, std::static_pointer_cast<ObjectAction>(self));
+    if (creatureActor->navigateTo(_target->position(), true, creatureActor->getAttackRange(), dt)) {
+        _game.combat().addAttack(std::move(creatureActor), _target, self);
     }
 }
 

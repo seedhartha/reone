@@ -17,19 +17,26 @@
 
 #pragma once
 
-#include "locationaction.h"
+#include "../action.h"
+#include "../location.h"
 
 namespace reone {
 
 namespace game {
 
-class JumpToLocationAction : public LocationAction {
+class JumpToLocationAction : public Action {
 public:
-    JumpToLocationAction(Game &game, ServicesView &services, std::shared_ptr<Location> location) :
-        LocationAction(game, services, ActionType::JumpToLocation, std::move(location)) {
+    JumpToLocationAction(Game &game,
+                         ServicesView &services,
+                         std::shared_ptr<Location> location) :
+        Action(game, services, ActionType::JumpToLocation),
+        _location(std::move(location)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Location> _location;
 };
 
 } // namespace game

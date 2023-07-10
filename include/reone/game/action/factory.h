@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "attack.h"
+#include "attackobject.h"
 #include "barkstring.h"
 #include "castfakespellatlocation.h"
 #include "castfakespellatobject.h"
@@ -72,16 +72,16 @@ public:
         _services(services) {
     }
 
-    std::unique_ptr<AttackAction> newAttack(std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false, bool passive = false) {
-        return std::make_unique<AttackAction>(_game, _services, std::move(object), range, userAction, passive);
+    std::unique_ptr<AttackObjectAction> newAttackObject(std::shared_ptr<Object> attackee, bool passive = false) {
+        return std::make_unique<AttackObjectAction>(_game, _services, std::move(attackee), passive);
     }
 
     std::unique_ptr<BarkStringAction> newBarkString(int strRef) {
         return std::make_unique<BarkStringAction>(_game, _services, strRef);
     }
 
-    std::unique_ptr<CastFakeSpellAtLocationAction> newCastFakeSpellAtLocation(SpellType spell, std::shared_ptr<Location> location, ProjectilePathType projectilePathType) {
-        return std::make_unique<CastFakeSpellAtLocationAction>(_game, _services, spell, std::move(location), projectilePathType);
+    std::unique_ptr<CastFakeSpellAtLocationAction> newCastFakeSpellAtLocation(SpellType spell, std::shared_ptr<Location> target, ProjectilePathType projectilePathType) {
+        return std::make_unique<CastFakeSpellAtLocationAction>(_game, _services, spell, std::move(target), projectilePathType);
     }
 
     std::unique_ptr<CastFakeSpellAtObjectAction> newCastFakeSpellAtObject(SpellType spell, std::shared_ptr<Object> target, ProjectilePathType projectilePathType) {
@@ -92,12 +92,12 @@ public:
         return std::make_unique<CastSpellAtObjectAction>(_game, _services, spell, std::move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
     }
 
-    std::unique_ptr<CloseDoorAction> newCloseDoor(std::shared_ptr<Object> object) {
-        return std::make_unique<CloseDoorAction>(_game, _services, std::move(object));
+    std::unique_ptr<CloseDoorAction> newCloseDoor(std::shared_ptr<Object> door) {
+        return std::make_unique<CloseDoorAction>(_game, _services, std::move(door));
     }
 
-    std::unique_ptr<CommandAction> newDoCommand(std::shared_ptr<script::ExecutionContext> context) {
-        return std::make_unique<CommandAction>(_game, _services, std::move(context));
+    std::unique_ptr<CommandAction> newDoCommand(std::shared_ptr<script::ExecutionContext> actionToDo) {
+        return std::make_unique<CommandAction>(_game, _services, std::move(actionToDo));
     }
 
     std::unique_ptr<EquipItemAction> newEquipItem(std::shared_ptr<Item> item, int inventorySlot, bool instant) {
@@ -112,8 +112,8 @@ public:
         return std::make_unique<EquipMostDamagingRangedAction>(_game, _services, std::move(versus));
     }
 
-    std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> object, float distance) {
-        return std::make_unique<FollowAction>(_game, _services, std::move(object), distance);
+    std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> follow, float followDistance) {
+        return std::make_unique<FollowAction>(_game, _services, std::move(follow), followDistance);
     }
 
     std::unique_ptr<FollowLeaderAction> newFollowLeader() {
@@ -136,24 +136,24 @@ public:
         return std::make_unique<JumpToLocationAction>(_game, _services, std::move(location));
     }
 
-    std::unique_ptr<JumpToObjectAction> newJumpToObject(std::shared_ptr<Object> object, bool walkStraightLine) {
-        return std::make_unique<JumpToObjectAction>(_game, _services, std::move(object), walkStraightLine);
+    std::unique_ptr<JumpToObjectAction> newJumpToObject(std::shared_ptr<Object> toJumpTo, bool walkStraightLine) {
+        return std::make_unique<JumpToObjectAction>(_game, _services, std::move(toJumpTo), walkStraightLine);
     }
 
     std::unique_ptr<LockObjectAction> newLockObject(std::shared_ptr<Object> target) {
         return std::make_unique<LockObjectAction>(_game, _services, std::move(target));
     }
 
-    std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float range) {
-        return std::make_unique<MoveAwayFromObject>(_game, _services, std::move(fleeFrom), run, range);
+    std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float moveAwayRange) {
+        return std::make_unique<MoveAwayFromObject>(_game, _services, std::move(fleeFrom), run, moveAwayRange);
     }
 
-    std::unique_ptr<MoveToLocationAction> newMoveToLocation(std::shared_ptr<Location> destination, bool run = false, float timeout = 30.0f, bool force = false) {
-        return std::make_unique<MoveToLocationAction>(_game, _services, std::move(destination), run, timeout, force);
+    std::unique_ptr<MoveToLocationAction> newMoveToLocation(std::shared_ptr<Location> destination, bool run, bool force = false, float timeout = -1.0f) {
+        return std::make_unique<MoveToLocationAction>(_game, _services, std::move(destination), run, force, timeout);
     }
 
-    std::unique_ptr<MoveToObjectAction> newMoveToObject(std::shared_ptr<Object> object, bool run, float range, float timeout = 30.0f, bool force = false) {
-        return std::make_unique<MoveToObjectAction>(_game, _services, std::move(object), run, range, timeout, force);
+    std::unique_ptr<MoveToObjectAction> newMoveToObject(std::shared_ptr<Object> moveTo, bool run, float range, bool force = false, float timeout = -1.0f) {
+        return std::make_unique<MoveToObjectAction>(_game, _services, std::move(moveTo), run, range, force, timeout);
     }
 
     std::unique_ptr<MoveToPointAction> newMoveToPoint(glm::vec3 point) {
@@ -164,8 +164,8 @@ public:
         return std::make_unique<OpenContainerAction>(_game, _services, std::move(object));
     }
 
-    std::unique_ptr<OpenDoorAction> newOpenDoor(std::shared_ptr<Object> object) {
-        return std::make_unique<OpenDoorAction>(_game, _services, std::move(object));
+    std::unique_ptr<OpenDoorAction> newOpenDoor(std::shared_ptr<Object> door) {
+        return std::make_unique<OpenDoorAction>(_game, _services, std::move(door));
     }
 
     std::unique_ptr<OpenLockAction> newOpenLock(std::shared_ptr<Object> object) {
@@ -176,8 +176,8 @@ public:
         return std::make_unique<PauseConversationAction>(_game, _services);
     }
 
-    std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType anim, float speed = 1.0f, float durationSeconds = 0.0f) {
-        return std::make_unique<PlayAnimationAction>(_game, _services, anim, speed, durationSeconds);
+    std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType animation, float speed, float durationSeconds) {
+        return std::make_unique<PlayAnimationAction>(_game, _services, animation, speed, durationSeconds);
     }
 
     std::unique_ptr<RandomWalkAction> newRandomWalk() {
@@ -188,36 +188,25 @@ public:
         return std::make_unique<ResumeConversationAction>(_game, _services);
     }
 
-    std::unique_ptr<StartConversationAction> newStartConversation(
-        std::shared_ptr<Object> object,
-        std::string dialogResRef,
-        bool privateConversation = false,
-        ConversationType conversationType = ConversationType::Cinematic,
-        bool ignoreStartRange = false,
-        std::string nameToIgnore1 = "",
-        std::string nameToIgnore2 = "",
-        std::string nameToIgnore3 = "",
-        std::string nameToIgnore4 = "",
-        std::string nameToIgnore5 = "",
-        std::string nameToIgnore6 = "",
-        bool useLeader = false,
-        int barkX = -1,
-        int barkY = -1,
-        bool dontClearAllActions = false) {
+    std::unique_ptr<StartConversationAction> newStartConversation(std::shared_ptr<Object> objectToConverse,
+                                                                  std::string dialogResRef,
+                                                                  bool privateConversation = false,
+                                                                  ConversationType conversationType = ConversationType::Cinematic,
+                                                                  bool ignoreStartRange = false,
+                                                                  std::vector<std::string> namesToIgnore = {},
+                                                                  bool useLeader = false,
+                                                                  int barkX = -1,
+                                                                  int barkY = -1,
+                                                                  bool dontClearAllActions = false) {
         return std::make_unique<StartConversationAction>(
             _game,
             _services,
-            std::move(object),
+            std::move(objectToConverse),
             std::move(dialogResRef),
             privateConversation,
             conversationType,
             ignoreStartRange,
-            std::move(nameToIgnore1),
-            std::move(nameToIgnore2),
-            std::move(nameToIgnore3),
-            std::move(nameToIgnore4),
-            std::move(nameToIgnore5),
-            std::move(nameToIgnore6),
+            std::move(namesToIgnore),
             useLeader,
             barkX,
             barkY,
@@ -244,12 +233,12 @@ public:
         return std::make_unique<UnlockObjectAction>(_game, _services, std::move(target));
     }
 
-    std::unique_ptr<UseFeatAction> newUseFeat(std::shared_ptr<Object> object, FeatType feat) {
-        return std::make_unique<UseFeatAction>(_game, _services, std::move(object), feat);
+    std::unique_ptr<UseFeatAction> newUseFeat(FeatType feat, std::shared_ptr<Object> target) {
+        return std::make_unique<UseFeatAction>(_game, _services, feat, std::move(target));
     }
 
-    std::unique_ptr<UseSkillAction> newUseSkill(std::shared_ptr<Object> object, SkillType skill, int subSkill = 0, std::shared_ptr<Item> itemUsed = nullptr) {
-        return std::make_unique<UseSkillAction>(_game, _services, std::move(object), skill, subSkill, std::move(itemUsed));
+    std::unique_ptr<UseSkillAction> newUseSkill(SkillType skill, std::shared_ptr<Object> target, int subSkill = 0, std::shared_ptr<Item> itemUsed = nullptr) {
+        return std::make_unique<UseSkillAction>(_game, _services, skill, std::move(target), subSkill, std::move(itemUsed));
     }
 
     std::unique_ptr<UseTalentOnObjectAction> newUseTalentOnObject(std::shared_ptr<Talent> chosenTalent, std::shared_ptr<Object> target) {

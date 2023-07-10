@@ -53,8 +53,7 @@ static Variable EffectHeal(const std::vector<Variable> &args, const RoutineConte
     // Transform
 
     // Execute
-    int damageToHeal = getInt(args, 0);
-    auto effect = ctx.game.effectFactory().newHeal(damageToHeal);
+    auto effect = ctx.game.effectFactory().newHeal(nDamageToHeal);
     return Variable::ofEffect(std::move(effect));
 }
 

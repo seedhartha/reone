@@ -17,17 +17,21 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class UseFeatAction : public ObjectAction {
+class UseFeatAction : public Action {
 public:
-    UseFeatAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, FeatType feat) :
-        ObjectAction(game, services, ActionType::UseFeat, std::move(object)),
-        _feat(feat) {
+    UseFeatAction(Game &game,
+                  ServicesView &services,
+                  FeatType feat,
+                  std::shared_ptr<Object> target) :
+        Action(game, services, ActionType::UseFeat),
+        _feat(feat),
+        _target(std::move(target)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
@@ -36,6 +40,7 @@ public:
 
 private:
     FeatType _feat;
+    std::shared_ptr<Object> _target;
 };
 
 } // namespace game

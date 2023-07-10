@@ -17,9 +17,8 @@
 
 #include "reone/game/action/playanimation.h"
 
-#include "reone/scene/animproperties.h"
-
 #include "reone/game/object.h"
+#include "reone/scene/animproperties.h"
 
 using namespace reone::scene;
 
@@ -28,7 +27,7 @@ namespace reone {
 namespace game {
 
 void PlayAnimationAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    std::string animName = actor.getAnimationName(_anim);
+    std::string animName = actor.getAnimationName(_animation);
     if (_playing) {
         if (actor.getActiveAnimationName() != animName) {
             complete();
@@ -40,7 +39,7 @@ void PlayAnimationAction::execute(std::shared_ptr<Action> self, Object &actor, f
     properties.speed = _speed;
     properties.duration = _durationSeconds;
 
-    actor.playAnimation(_anim, std::move(properties));
+    actor.playAnimation(_animation, std::move(properties));
 
     _playing = true;
 }

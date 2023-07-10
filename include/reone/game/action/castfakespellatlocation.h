@@ -30,11 +30,11 @@ public:
         Game &game,
         ServicesView &services,
         SpellType spell,
-        std::shared_ptr<Location> location,
+        std::shared_ptr<Location> target,
         ProjectilePathType projectilePathType) :
         Action(game, services, ActionType::CastFakeSpellAtLocation),
         _spell(spell),
-        _location(std::move(location)),
+        _target(std::move(target)),
         _projectilePathType(projectilePathType) {
     }
 
@@ -42,7 +42,7 @@ public:
 
 private:
     SpellType _spell;
-    std::shared_ptr<Location> _location;
+    std::shared_ptr<Location> _target;
     ProjectilePathType _projectilePathType;
 };
 

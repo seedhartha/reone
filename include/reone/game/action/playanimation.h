@@ -27,9 +27,13 @@ namespace game {
 
 class PlayAnimationAction : public Action {
 public:
-    PlayAnimationAction(Game &game, ServicesView &services, AnimationType anim, float speed, float durationSeconds) :
+    PlayAnimationAction(Game &game,
+                        ServicesView &services,
+                        AnimationType animation,
+                        float speed,
+                        float durationSeconds) :
         Action(game, services, ActionType::PlayAnimation),
-        _anim(anim),
+        _animation(animation),
         _speed(speed),
         _durationSeconds(durationSeconds) {
     }
@@ -37,7 +41,7 @@ public:
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
 private:
-    AnimationType _anim;
+    AnimationType _animation;
     float _speed;
     float _durationSeconds;
 

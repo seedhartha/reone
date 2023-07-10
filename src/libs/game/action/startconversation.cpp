@@ -35,11 +35,11 @@ void StartConversationAction::execute(std::shared_ptr<Action> self, Object &acto
     bool reached =
         !creatureActor ||
         _ignoreStartRange ||
-        creatureActor->navigateTo(_object->position(), true, kMaxConversationDistance, dt);
+        creatureActor->navigateTo(_objectToConverse->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
         bool isActorLeader = _game.party().getLeader() == actorPtr;
-        _game.module()->area()->startDialog(isActorLeader ? _object : actorPtr, _dialogResRef);
+        _game.module()->area()->startDialog(isActorLeader ? _objectToConverse : actorPtr, _dialogResRef);
         complete();
     }
 }

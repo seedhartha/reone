@@ -15,28 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/game/action/attackobject.h"
 
-#include "../action.h"
+#include "reone/game/combat.h"
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/object/creature.h"
 
 namespace reone {
 
 namespace game {
 
-class Location;
-
-class LocationAction : public Action {
-public:
-    std::shared_ptr<Location> location() const { return _location; }
-
-protected:
-    std::shared_ptr<Location> _location;
-
-    LocationAction(Game &game, ServicesView &services, ActionType type, const std::shared_ptr<Location> &location) :
-        Action(game, services, type),
-        _location(location) {
+void AttackObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
+    if (_attackee->isDead()) {
+        complete();
+        return;
     }
-};
+
+    auto creatureActor = _game.getObjectById<Creature>(actor.id());
+
+    // Make the actor follow its target. When reached, register an attack.
+    if (creatureActor->navigateTo(_attackee->position(), true, creatureActor->getAttackRange(), dt)) {
+        _game.combat().addAttack(std::move(creatureActor), _attackee, self);
+    }
+}
 
 } // namespace game
 

@@ -152,7 +152,7 @@ static Variable ActionAttack(const std::vector<Variable> &args, const RoutineCon
 
     // Execute
     auto caller = checkCreature(getCaller(ctx));
-    auto action = ctx.game.actionFactory().newAttack(std::move(oAttackee), caller->getAttackRange(), false, passive);
+    auto action = ctx.game.actionFactory().newAttackObject(std::move(oAttackee), passive);
     caller->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -323,6 +323,12 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
     auto privateConversation = static_cast<bool>(bPrivateConversation);
     auto conversationType = static_cast<ConversationType>(nConversationType);
     auto ignoreStartRange = static_cast<bool>(bIgnoreStartRange);
+    auto namesToIgnore = std::vector<std::string> {sNameObjectToIgnore1,
+                                                   sNameObjectToIgnore2,
+                                                   sNameObjectToIgnore3,
+                                                   sNameObjectToIgnore4,
+                                                   sNameObjectToIgnore5,
+                                                   sNameObjectToIgnore6};
     auto useLeader = static_cast<bool>(bUseLeader);
     auto dontClearAllActions = static_cast<bool>(bDontClearAllActions);
 
@@ -333,12 +339,7 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
         privateConversation,
         conversationType,
         ignoreStartRange,
-        sNameObjectToIgnore1,
-        sNameObjectToIgnore2,
-        sNameObjectToIgnore3,
-        sNameObjectToIgnore4,
-        sNameObjectToIgnore5,
-        sNameObjectToIgnore6,
+        namesToIgnore,
         useLeader,
         nBarkX,
         nBarkY,
@@ -422,7 +423,7 @@ static Variable ActionUseSkill(const std::vector<Variable> &args, const RoutineC
     auto itemUsed = checkItem(oItemUsed);
 
     // Execute
-    auto action = ctx.game.actionFactory().newUseSkill(std::move(oTarget), skill, nSubSkill, std::move(itemUsed));
+    auto action = ctx.game.actionFactory().newUseSkill(skill, std::move(oTarget), nSubSkill, std::move(itemUsed));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -503,7 +504,7 @@ static Variable ActionForceMoveToLocation(const std::vector<Variable> &args, con
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run, fTimeout, true);
+    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run, true, fTimeout);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -519,7 +520,7 @@ static Variable ActionForceMoveToObject(const std::vector<Variable> &args, const
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange, fTimeout, true);
+    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange, true, fTimeout);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }

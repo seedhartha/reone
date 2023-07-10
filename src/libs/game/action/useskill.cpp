@@ -17,12 +17,11 @@
 
 #include "reone/game/action/useskill.h"
 
-#include "reone/system/logutil.h"
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/script/runner.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -30,13 +29,13 @@ namespace game {
 
 void UseSkillAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     if (_skill == SkillType::Security) {
-        if (!_object || _object->type() != ObjectType::Door) {
-            warn("ActionExecutor: unsupported OpenLock object: " + std::to_string(_object->id()));
+        if (!_target || _target->type() != ObjectType::Door) {
+            warn("ActionExecutor: unsupported OpenLock object: " + std::to_string(_target->id()));
             complete();
             return;
         }
 
-        auto door = std::static_pointer_cast<Door>(_object);
+        auto door = std::static_pointer_cast<Door>(_target);
         auto creatureActor = _game.getObjectById<Creature>(actor.id());
 
         bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);

@@ -19,7 +19,7 @@
 
 #include "reone/system/timer.h"
 
-#include "action/objectaction.h"
+#include "action.h"
 #include "effect/damage.h"
 #include "object/creature.h"
 #include "types.h"
@@ -38,7 +38,7 @@ public:
     struct Attack {
         std::shared_ptr<Creature> attacker;
         std::shared_ptr<Object> target;
-        std::shared_ptr<ObjectAction> action; /**< action to complete on round end */
+        std::shared_ptr<Action> action; /**< action to complete on round end */
         AttackResultType resultType {AttackResultType::Invalid};
         int damage {-1};
     };
@@ -60,7 +60,7 @@ public:
     void addAttack(
         std::shared_ptr<Creature> attacker,
         std::shared_ptr<Object> target,
-        std::shared_ptr<ObjectAction> action,
+        std::shared_ptr<Action> action,
         AttackResultType resultType = AttackResultType::Invalid,
         int damage = -1);
 

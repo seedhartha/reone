@@ -31,17 +31,17 @@ namespace game {
 
 class CommandAction : public Action {
 public:
-    CommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> context) :
+    CommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> actionToDo) :
         Action(game, services, ActionType::DoCommand),
-        _context(std::move(context)) {
+        _actionToDo(std::move(actionToDo)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
-    std::shared_ptr<script::ExecutionContext> context() const { return _context; }
+    std::shared_ptr<script::ExecutionContext> actionToDo() const { return _actionToDo; }
 
 private:
-    std::shared_ptr<script::ExecutionContext> _context;
+    std::shared_ptr<script::ExecutionContext> _actionToDo;
 };
 
 } // namespace game

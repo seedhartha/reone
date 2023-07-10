@@ -30,10 +30,10 @@ namespace reone {
 namespace game {
 
 void CommandAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    auto executionCtx = std::make_unique<ExecutionContext>(*_context);
+    auto executionCtx = std::make_unique<ExecutionContext>(*_actionToDo);
     executionCtx->callerId = actor.id();
 
-    std::shared_ptr<ScriptProgram> program(_context->savedState->program);
+    std::shared_ptr<ScriptProgram> program(_actionToDo->savedState->program);
     ScriptExecution(program, std::move(executionCtx)).run();
     complete();
 }

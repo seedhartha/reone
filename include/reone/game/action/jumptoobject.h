@@ -17,22 +17,27 @@
 
 #pragma once
 
-#include "objectaction.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-class JumpToObjectAction : public ObjectAction {
+class JumpToObjectAction : public Action {
 public:
-    JumpToObjectAction(Game &game, ServicesView &services, std::shared_ptr<Object> object, bool walkStraightLine) :
-        ObjectAction(game, services, ActionType::JumpToObject, std::move(object)),
+    JumpToObjectAction(Game &game,
+                       ServicesView &services,
+                       std::shared_ptr<Object> toJumpTo,
+                       bool walkStraightLine) :
+        Action(game, services, ActionType::JumpToObject),
+        _toJumpTo(std::move(toJumpTo)),
         _walkStraightLine(walkStraightLine) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
 private:
+    std::shared_ptr<Object> _toJumpTo;
     bool _walkStraightLine;
 };
 

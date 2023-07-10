@@ -19,7 +19,7 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/audio/player.h"
-#include "reone/game/action/objectaction.h"
+#include "reone/game/action.h"
 #include "reone/game/animationutil.h"
 #include "reone/game/d20/classes.h"
 #include "reone/game/di/services.h"
@@ -594,14 +594,19 @@ bool Creature::isTwoWeaponFighting() const {
 }
 
 std::shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
-    std::shared_ptr<Object> result;
-
-    auto attackAction = std::dynamic_pointer_cast<ObjectAction>(getCurrentAction());
-    if (attackAction) {
-        result = attackAction->object();
+    auto action = getCurrentAction();
+    if (!action) {
+        return nullptr;
     }
-
-    return std::move(result);
+    std::shared_ptr<Object> target;
+    switch (action->type()) {
+    case ActionType::AttackObject:
+        target = static_cast<AttackObjectAction *>(action.get())->attackee();
+        break;
+    default:
+        break;
+    }
+    return target;
 }
 
 int Creature::getAttackBonus(bool offHand) const {

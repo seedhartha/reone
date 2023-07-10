@@ -17,12 +17,10 @@
 
 #include "reone/game/party.h"
 
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-
-#include "reone/game/action/follow.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 namespace reone {
 

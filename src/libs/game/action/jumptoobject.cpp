@@ -24,8 +24,8 @@ namespace reone {
 namespace game {
 
 void JumpToObjectAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    actor.setPosition(_object->position());
-    actor.setFacing(_object->getFacing());
+    actor.setPosition(_toJumpTo->position());
+    actor.setFacing(_toJumpTo->getFacing());
 
     complete();
 }

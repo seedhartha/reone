@@ -15,30 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/action/attack.h"
+#pragma once
 
-#include "reone/game/combat.h"
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/object/creature.h"
+#include "../action.h"
 
 namespace reone {
 
 namespace game {
 
-void AttackAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
-    if (_object->isDead()) {
-        complete();
-        return;
+class AttackObjectAction : public Action {
+public:
+    AttackObjectAction(Game &game,
+                       ServicesView &services,
+                       std::shared_ptr<Object> attackee,
+                       bool passive) :
+        Action(game, services, ActionType::AttackObject),
+        _attackee(std::move(attackee)),
+        _passive(passive) {
     }
 
-    auto creatureActor = _game.getObjectById<Creature>(actor.id());
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
-    // Make the actor follow its target. When reached, register an attack
-    if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {
-        _game.combat().addAttack(std::move(creatureActor), _object, std::static_pointer_cast<ObjectAction>(self));
-    }
-}
+    std::shared_ptr<Object> attackee() const { return _attackee; }
+
+private:
+    std::shared_ptr<Object> _attackee;
+    bool _passive;
+};
 
 } // namespace game
 

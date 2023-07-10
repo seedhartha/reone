@@ -37,10 +37,12 @@ public:
 
     void complete() { _completed = true; }
 
-    bool isCompleted() const { return _completed; }
-    bool isUserAction() const { return _userAction; }
-
     ActionType type() const { return _type; }
+
+    bool isUserAction() const { return _userAction; }
+    bool isCompleted() const { return _completed; }
+
+    void setUserAction(bool val) { _userAction = val; }
 
 protected:
     const float kDefaultMaxObjectDistance = 2.0f;
@@ -49,19 +51,17 @@ protected:
     Game &_game;
     ServicesView &_services;
     ActionType _type;
-    bool _userAction;
 
+    bool _userAction {false};
     bool _completed {false};
 
     Action(
         Game &game,
         ServicesView &services,
-        ActionType type,
-        bool userAction = false) :
+        ActionType type) :
         _game(game),
         _services(services),
-        _type(type),
-        _userAction(userAction) {
+        _type(type) {
     }
 };
 
