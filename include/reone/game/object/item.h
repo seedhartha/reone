@@ -31,8 +31,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class Item : public Object {
 public:
     struct AmmunitionType {

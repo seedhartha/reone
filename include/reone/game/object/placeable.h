@@ -26,9 +26,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-class ObjectFactory;
-
 class Placeable : public Object {
 public:
     Placeable(

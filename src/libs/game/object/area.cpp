@@ -313,6 +313,14 @@ void Area::loadEncounters(const Gff &git) {
     }
 }
 
+void Area::loadStores(const Gff &git) {
+    for (auto &gffs : git.getList("StoreList")) {
+        std::shared_ptr<Store> store = _game.objectFactory().newStore(_sceneName);
+        _game.addObject(store);
+        add(store);
+    }
+}
+
 void Area::loadLYT() {
     auto layout = _services.game.layouts.get(_name);
     if (!layout) {

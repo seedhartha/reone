@@ -29,8 +29,6 @@ class Gff;
 
 namespace game {
 
-class Game;
-
 class Sound : public Object {
 public:
     Sound(

@@ -67,6 +67,10 @@ std::unique_ptr<Encounter> ObjectFactory::newEncounter(std::string sceneName) {
     return newObject<Encounter>(std::move(sceneName), _game, _services);
 }
 
+std::unique_ptr<Store> ObjectFactory::newStore(std::string sceneName) {
+    return newObject<Store>(std::move(sceneName), _game, _services);
+}
+
 } // namespace game
 
 } // namespace reone

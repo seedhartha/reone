@@ -244,6 +244,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/placeable.h
     ${GAME_INCLUDE_DIR}/object/placeablecamera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
+    ${GAME_INCLUDE_DIR}/object/store.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
     ${GAME_INCLUDE_DIR}/object/waypoint.h
     ${GAME_INCLUDE_DIR}/options.h

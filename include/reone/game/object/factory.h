@@ -30,6 +30,7 @@
 #include "placeable.h"
 #include "placeablecamera.h"
 #include "sound.h"
+#include "store.h"
 #include "trigger.h"
 #include "waypoint.h"
 
@@ -58,6 +59,7 @@ public:
     std::unique_ptr<Sound> newSound(std::string sceneName = kSceneMain);
     std::unique_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain);
     std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain);
+    std::unique_ptr<Store> newStore(std::string sceneName = kSceneMain);
 
 private:
     Game &_game;

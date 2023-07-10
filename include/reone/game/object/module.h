@@ -22,9 +22,9 @@
 #include "reone/resource/types.h"
 
 #include "../contextaction.h"
+#include "../object.h"
 #include "../player.h"
 
-#include "../object.h"
 #include "area.h"
 
 namespace reone {
@@ -44,8 +44,6 @@ struct ModuleInfo {
 };
 
 class Door;
-class Game;
-class ObjectFactory;
 class Placeable;
 
 class Module : public Object {

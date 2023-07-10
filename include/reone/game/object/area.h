@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "reone/system/timer.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/types.h"
+#include "reone/system/timer.h"
 
 #include "../camera/animated.h"
 #include "../camera/dialog.h"
@@ -46,7 +46,6 @@ namespace game {
 const float kHeartbeatInterval = 6.0f;
 
 class Creature;
-class Game;
 class Location;
 class Object;
 class Room;
@@ -330,6 +329,7 @@ private:
     void loadSounds(const resource::Gff &git);
     void loadCameras(const resource::Gff &git);
     void loadEncounters(const resource::Gff &git);
+    void loadStores(const resource::Gff &git);
 
     // END Loading GIT
 

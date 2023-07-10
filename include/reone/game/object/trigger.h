@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class Trigger : public Object {
 public:
     Trigger(
