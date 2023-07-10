@@ -17,40 +17,34 @@
 
 #pragma once
 
-#include "button.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class ToggleButton : public Button {
+class GUI_gameover : gui::IGUI, boost::noncopyable {
 public:
-    ToggleButton(
-        IGUI &gui,
-        scene::ISceneGraphs &sceneGraphs,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
-        Button(
-            gui,
-            ControlType::ToggleButton,
-            sceneGraphs,
-            graphicsSvc,
-            strings) {
+    void bindControls() {
+        _controls.BTN_LASTSAVE = findControl<gui::Button>("BTN_LASTSAVE");
+        _controls.BTN_LOADGAME = findControl<gui::Button>("BTN_LOADGAME");
+        _controls.BTN_QUIT = findControl<gui::Button>("BTN_QUIT");
+        _controls.LBL_MESSAGE = findControl<gui::Label>("LBL_MESSAGE");
     }
 
-    const glm::vec3 &getBorderColor() const override;
-
-    void toggle();
-
-    bool isOn() const { return _on; }
-
-    void setOnColor(const glm::vec3 &color);
-
 private:
-    bool _on {false};
-    glm::vec3 _onColor {1.0f};
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_LASTSAVE;
+        std::shared_ptr<gui::Button> BTN_LOADGAME;
+        std::shared_ptr<gui::Button> BTN_QUIT;
+        std::shared_ptr<gui::Label> LBL_MESSAGE;
+    };
+
+    Controls _controls;
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

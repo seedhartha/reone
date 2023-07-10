@@ -32,7 +32,7 @@ public:
         resource::IStrings &strings) :
         Control(
             gui,
-            ControlType::LabelHilight,
+            ControlType::ImageButton,
             sceneGraphs,
             graphicsSvc,
             strings) {

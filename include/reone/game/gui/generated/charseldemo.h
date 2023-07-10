@@ -17,40 +17,24 @@
 
 #pragma once
 
-#include "button.h"
+#include "reone/gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class ToggleButton : public Button {
+class GUI_charseldemo : gui::IGUI, boost::noncopyable {
 public:
-    ToggleButton(
-        IGUI &gui,
-        scene::ISceneGraphs &sceneGraphs,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
-        Button(
-            gui,
-            ControlType::ToggleButton,
-            sceneGraphs,
-            graphicsSvc,
-            strings) {
+    void bindControls() {
     }
 
-    const glm::vec3 &getBorderColor() const override;
-
-    void toggle();
-
-    bool isOn() const { return _on; }
-
-    void setOnColor(const glm::vec3 &color);
-
 private:
-    bool _on {false};
-    glm::vec3 _onColor {1.0f};
+    struct Controls {
+    };
+
+    Controls _controls;
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

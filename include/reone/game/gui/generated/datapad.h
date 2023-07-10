@@ -17,40 +17,32 @@
 
 #pragma once
 
-#include "button.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/listbox.h"
+#include "reone/gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class ToggleButton : public Button {
+class GUI_datapad : gui::IGUI, boost::noncopyable {
 public:
-    ToggleButton(
-        IGUI &gui,
-        scene::ISceneGraphs &sceneGraphs,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
-        Button(
-            gui,
-            ControlType::ToggleButton,
-            sceneGraphs,
-            graphicsSvc,
-            strings) {
+    void bindControls() {
+        _controls.BTN_CANCEL = findControl<gui::Button>("BTN_CANCEL");
+        _controls.BTN_OK = findControl<gui::Button>("BTN_OK");
+        _controls.LB_MESSAGE = findControl<gui::ListBox>("LB_MESSAGE");
     }
 
-    const glm::vec3 &getBorderColor() const override;
-
-    void toggle();
-
-    bool isOn() const { return _on; }
-
-    void setOnColor(const glm::vec3 &color);
-
 private:
-    bool _on {false};
-    glm::vec3 _onColor {1.0f};
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_CANCEL;
+        std::shared_ptr<gui::Button> BTN_OK;
+        std::shared_ptr<gui::ListBox> LB_MESSAGE;
+    };
+
+    Controls _controls;
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone

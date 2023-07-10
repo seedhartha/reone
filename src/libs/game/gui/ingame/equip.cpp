@@ -167,7 +167,7 @@ void Equipment::bindControls() {
 }
 
 void Equipment::configureItemsListBox() {
-    _binding.lbItems->changeProtoItemType(ControlType::LabelHilight);
+    _binding.lbItems->changeProtoItemType(ControlType::ImageButton);
     _binding.lbItems->setPadding(5);
     _binding.lbItems->setOnItemClick([this](const std::string &item) {
         onItemsListBoxItemClick(item);

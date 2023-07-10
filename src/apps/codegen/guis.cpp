@@ -36,11 +36,15 @@ namespace reone {
 struct ParsedControl {
     ControlType type {ControlType::Invalid};
     std::string tag;
+    std::string cppName;
 
     ParsedControl() = default;
 
     ParsedControl(ControlType type, std::string tag) :
-        type(type), tag(tag) {
+        type(type), tag(tag), cppName(tag) {
+        if (boost::starts_with(cppName, "3D")) {
+            cppName.replace(0, 2, "THREE_D");
+        }
     }
 };
 
@@ -83,9 +87,9 @@ static ParsedGUI mergeGuis(const ParsedGUI &k1Gui, const ParsedGUI &k2Gui) {
 }
 
 static void writeControlDeclaration(const std::string &typeName,
-                                    const std::string &tag,
+                                    const std::string &cppName,
                                     TextWriter &writer) {
-    writer.write(str(boost::format("std::shared_ptr<%s> %s;\n") % typeName % tag));
+    writer.write(str(boost::format("std::shared_ptr<%s> %s;\n") % typeName % cppName));
 }
 
 static std::string controlTypeToTypeName(ControlType type) {
@@ -97,14 +101,14 @@ static std::string controlTypeToTypeName(ControlType type) {
     case ControlType::Label:
         typeName = "gui::Label";
         break;
-    case ControlType::LabelHilight:
-        typeName = "gui::LabelHilight";
+    case ControlType::ImageButton:
+        typeName = "gui::ImageButton";
         break;
     case ControlType::Button:
         typeName = "gui::Button";
         break;
-    case ControlType::ButtonToggle:
-        typeName = "gui::ButtonToggle";
+    case ControlType::ToggleButton:
+        typeName = "gui::ToggleButton";
         break;
     case ControlType::Slider:
         typeName = "gui::Slider";
@@ -124,6 +128,42 @@ static std::string controlTypeToTypeName(ControlType type) {
     return typeName;
 }
 
+static std::string controlTypeToInclude(ControlType type) {
+    std::string include;
+    switch (type) {
+    case ControlType::Panel:
+        include = "reone/gui/control/panel.h";
+        break;
+    case ControlType::Label:
+        include = "reone/gui/control/label.h";
+        break;
+    case ControlType::ImageButton:
+        include = "reone/gui/control/imagebutton.h";
+        break;
+    case ControlType::Button:
+        include = "reone/gui/control/button.h";
+        break;
+    case ControlType::ToggleButton:
+        include = "reone/gui/control/togglebutton.h";
+        break;
+    case ControlType::Slider:
+        include = "reone/gui/control/slider.h";
+        break;
+    case ControlType::ScrollBar:
+        include = "reone/gui/control/scrollbar.h";
+        break;
+    case ControlType::ProgressBar:
+        include = "reone/gui/control/progressbar.h";
+        break;
+    case ControlType::ListBox:
+        include = "reone/gui/control/listbox.h";
+        break;
+    default:
+        throw std::runtime_error("Invalid control type: " + std::to_string(static_cast<int>(type)));
+    }
+    return include;
+}
+
 static void writeHeaderFile(const std::string &resRef,
                             const ParsedGUI &gui,
                             const std::filesystem::path &destDir) {
@@ -133,7 +173,15 @@ static void writeHeaderFile(const std::string &resRef,
     auto writer = TextWriter(stream);
     writer.write(kCopyrightNotice + "\n\n");
     writer.write("#pragma once\n\n");
-    writer.write(str(boost::format(kIncludeFormat + "\n\n") % "reone/gui/gui.h"));
+    std::set<std::string> includes;
+    includes.insert("reone/gui/gui.h");
+    for (auto &[_, control] : gui.controls) {
+        includes.insert(controlTypeToInclude(control.type));
+    }
+    for (auto &include : includes) {
+        writer.write(str(boost::format(kIncludeFormat + "\n") % include));
+    }
+    writer.write("\n");
     writer.write("namespace reone {\n\n");
     writer.write("namespace game {\n\n");
     writer.write(str(boost::format("class GUI_%s : gui::IGUI, boost::noncopyable {\n") % resRef));
@@ -141,17 +189,17 @@ static void writeHeaderFile(const std::string &resRef,
     writer.write(kIndent + "void bindControls() {\n");
     for (auto &[tag, control] : gui.controls) {
         auto typeName = controlTypeToTypeName(control.type);
-        writer.write(str(boost::format("%1%%1%_controls.%2% = findControl<%3%>(\"%2%\");\n") % kIndent % tag % typeName));
+        writer.write(str(boost::format("%1%%1%_controls.%2% = findControl<%3%>(\"%4%\");\n") % kIndent % control.cppName % typeName % tag));
     }
     writer.write(kIndent + "}\n");
     writer.write("\n");
     writer.write("private:\n");
     writer.write(kIndent + "struct Controls {\n");
-    for (auto &[tag, control] : gui.controls) {
+    for (auto &[_, control] : gui.controls) {
         writer.write(kIndent);
         writer.write(kIndent);
         auto typeName = controlTypeToTypeName(control.type);
-        writeControlDeclaration(typeName, tag, writer);
+        writeControlDeclaration(typeName, control.cppName, writer);
     }
     writer.write(kIndent + "};\n");
     writer.write("\n");

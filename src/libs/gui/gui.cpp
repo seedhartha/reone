@@ -285,13 +285,13 @@ std::unique_ptr<Control> GUI::newControl(
     case ControlType::Label:
         control = std::make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
-    case ControlType::LabelHilight:
+    case ControlType::ImageButton:
         control = std::make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Button:
         control = std::make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
-    case ControlType::ButtonToggle:
+    case ControlType::ToggleButton:
         control = std::make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
         break;
     case ControlType::Slider:

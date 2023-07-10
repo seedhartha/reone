@@ -17,40 +17,27 @@
 
 #pragma once
 
-#include "button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/gui.h"
 
 namespace reone {
 
-namespace gui {
+namespace game {
 
-class ToggleButton : public Button {
+class GUI_tooltip12x9 : gui::IGUI, boost::noncopyable {
 public:
-    ToggleButton(
-        IGUI &gui,
-        scene::ISceneGraphs &sceneGraphs,
-        graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
-        Button(
-            gui,
-            ControlType::ToggleButton,
-            sceneGraphs,
-            graphicsSvc,
-            strings) {
+    void bindControls() {
+        _controls.tooltip = findControl<gui::Label>("tooltip");
     }
 
-    const glm::vec3 &getBorderColor() const override;
-
-    void toggle();
-
-    bool isOn() const { return _on; }
-
-    void setOnColor(const glm::vec3 &color);
-
 private:
-    bool _on {false};
-    glm::vec3 _onColor {1.0f};
+    struct Controls {
+        std::shared_ptr<gui::Label> tooltip;
+    };
+
+    Controls _controls;
 };
 
-} // namespace gui
+} // namespace game
 
 } // namespace reone
