@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static DLG_ReplyList_EntriesList parseDLG_ReplyList_EntriesList(const Gff &gff) {
     DLG_ReplyList_EntriesList strct;
     strct.Active = gff.getString("Active");
@@ -268,6 +270,8 @@ DLG parseDLG(const Gff &gff) {
     strct.VO_ID = gff.getString("VO_ID");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

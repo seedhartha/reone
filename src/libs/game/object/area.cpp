@@ -17,6 +17,20 @@
 
 #include "reone/game/object/area.h"
 
+#include "reone/game/camerastyles.h"
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/layouts.h"
+#include "reone/game/location.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/party.h"
+#include "reone/game/paths.h"
+#include "reone/game/reputes.h"
+#include "reone/game/room.h"
+#include "reone/game/script/runner.h"
+#include "reone/game/surfaces.h"
+#include "reone/game/types.h"
+#include "reone/game/visibilities.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
@@ -43,22 +57,6 @@
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-
-#include "reone/game/camerastyles.h"
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/layouts.h"
-#include "reone/game/location.h"
-#include "reone/game/party.h"
-#include "reone/game/paths.h"
-#include "reone/game/reputes.h"
-#include "reone/game/room.h"
-#include "reone/game/script/runner.h"
-#include "reone/game/surfaces.h"
-#include "reone/game/types.h"
-#include "reone/game/visibilities.h"
-
-#include "reone/game/object/factory.h"
 
 using namespace reone::audio;
 using namespace reone::gui;
@@ -117,7 +115,7 @@ void Area::init() {
 
 void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave) {
     _name = std::move(name);
-    _are = std::make_unique<ARE>(parseARE(are));
+    _are = std::make_unique<schema::ARE>(schema::parseARE(are));
 
     loadARE(are);
     loadGIT(git);

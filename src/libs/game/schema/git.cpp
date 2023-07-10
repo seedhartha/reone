@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static GIT_TriggerList_Geometry parseGIT_TriggerList_Geometry(const Gff &gff) {
     GIT_TriggerList_Geometry strct;
     strct.PointX = gff.getFloat("PointX");
@@ -227,6 +229,8 @@ GIT parseGIT(const Gff &gff) {
     }
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

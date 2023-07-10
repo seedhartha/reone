@@ -65,7 +65,7 @@ void Waypoint::loadTransformFromGIT(const Gff &gffs) {
 }
 
 void Waypoint::loadUTW(const Gff &utw) {
-    _utw = std::make_unique<UTW>(parseUTW(utw));
+    _utw = std::make_unique<schema::UTW>(schema::parseUTW(utw));
 
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));

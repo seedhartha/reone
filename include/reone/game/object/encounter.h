@@ -69,7 +69,7 @@ private:
     std::vector<glm::vec3> _geometry;
     std::vector<SpawnPoint> _spawnPoints;
 
-    std::unique_ptr<UTE> _ute;
+    std::unique_ptr<schema::UTE> _ute;
 
     // Scripts
 

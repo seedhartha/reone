@@ -37,7 +37,7 @@ std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
 
 std::unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
     auto dialog = std::make_unique<Dialog>();
-    auto parsed = parseDLG(dlg);
+    auto parsed = schema::parseDLG(dlg);
 
     dialog->skippable = dlg.getBool("Skippable");
     dialog->cameraModel = dlg.getString("CameraModel");

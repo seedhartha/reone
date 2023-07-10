@@ -99,7 +99,7 @@ void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
 }
 
 void Placeable::loadUTP(const Gff &utp) {
-    _utp = std::make_unique<UTP>(parseUTP(utp));
+    _utp = std::make_unique<schema::UTP>(schema::parseUTP(utp));
 
     _tag = boost::to_lower_copy(utp.getString("Tag"));
     _name = _services.resource.strings.get(utp.getInt("LocName"));

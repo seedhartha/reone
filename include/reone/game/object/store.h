@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    std::unique_ptr<UTM> _utm;
+    std::unique_ptr<schema::UTM> _utm;
 };
 
 } // namespace game

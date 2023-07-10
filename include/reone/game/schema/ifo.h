@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct IFO_Mod_Area_list {
     std::string Area_Name;
 };
@@ -78,6 +80,8 @@ struct IFO {
 };
 
 IFO parseIFO(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

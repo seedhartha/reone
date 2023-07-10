@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct GIT_TriggerList_Geometry {
     float PointX {0.0f};
     float PointY {0.0f};
@@ -177,6 +179,8 @@ struct GIT {
 };
 
 GIT parseGIT(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

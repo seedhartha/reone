@@ -230,8 +230,8 @@ private:
     std::shared_ptr<Object> _hilightedObject;
     std::shared_ptr<Object> _selectedObject;
 
-    std::unique_ptr<ARE> _are;
-    std::unique_ptr<GIT> _git;
+    std::unique_ptr<schema::ARE> _are;
+    std::unique_ptr<schema::GIT> _git;
 
     // Scripts
 

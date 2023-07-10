@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static IFO_Mod_Area_list parseIFO_Mod_Area_list(const Gff &gff) {
     IFO_Mod_Area_list strct;
     strct.Area_Name = gff.getString("Area_Name");
@@ -77,6 +79,8 @@ IFO parseIFO(const Gff &gff) {
     strct.Mod_XPScale = gff.getUint("Mod_XPScale");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

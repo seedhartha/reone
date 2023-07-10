@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTD {
     uint8_t AnimationState {0};
     uint32_t Appearance {0};
@@ -89,6 +91,8 @@ struct UTD {
 };
 
 UTD parseUTD(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

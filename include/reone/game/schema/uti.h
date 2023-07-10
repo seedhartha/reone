@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTI_PropertiesList {
     uint8_t ChanceAppear {0};
     uint8_t CostTable {0};
@@ -62,6 +64,8 @@ struct UTI {
 };
 
 UTI parseUTI(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

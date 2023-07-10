@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTE_CreatureList parseUTE_CreatureList(const Gff &gff) {
     UTE_CreatureList strct;
     strct.Appearance = gff.getInt("Appearance");
@@ -63,6 +65,8 @@ UTE parseUTE(const Gff &gff) {
     strct.TemplateResRef = gff.getString("TemplateResRef");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

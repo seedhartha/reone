@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTW {
     uint8_t Appearance {0};
     std::string Comment;
@@ -42,6 +44,8 @@ struct UTW {
 };
 
 UTW parseUTW(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

@@ -36,7 +36,7 @@ std::shared_ptr<Path> Paths::doGet(std::string resRef) {
 
 std::unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
     auto path = std::make_unique<Path>();
-    auto parsed = parsePTH(pth);
+    auto parsed = schema::parsePTH(pth);
 
     std::vector<int> connections;
     for (auto &connection : pth.getList("Path_Conections")) {

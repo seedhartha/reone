@@ -54,7 +54,7 @@ void Sound::loadFromBlueprint(const std::string &resRef) {
 }
 
 void Sound::loadUTS(const Gff &uts) {
-    _uts = std::make_unique<UTS>(parseUTS(uts));
+    _uts = std::make_unique<schema::UTS>(schema::parseUTS(uts));
 
     _tag = boost::to_lower_copy(uts.getString("Tag"));
     _name = _services.resource.strings.get(uts.getInt("LocName"));

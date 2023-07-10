@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 UTW parseUTW(const Gff &gff) {
     UTW strct;
     strct.Appearance = gff.getUint("Appearance");
@@ -40,6 +42,8 @@ UTW parseUTW(const Gff &gff) {
     strct.TemplateResRef = gff.getString("TemplateResRef");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

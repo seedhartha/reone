@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct DLG_ReplyList_EntriesList {
     std::string Active;
     std::string Active2;
@@ -238,6 +240,8 @@ struct DLG {
 };
 
 DLG parseDLG(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

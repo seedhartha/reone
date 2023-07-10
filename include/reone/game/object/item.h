@@ -124,7 +124,7 @@ private:
 
     std::shared_ptr<audio::AudioSource> _audioSource;
 
-    std::unique_ptr<UTI> _uti;
+    std::unique_ptr<schema::UTI> _uti;
 
     // Blueprint
 

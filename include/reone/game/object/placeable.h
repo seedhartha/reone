@@ -76,7 +76,7 @@ private:
 
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
 
-    std::unique_ptr<UTP> _utp;
+    std::unique_ptr<schema::UTP> _utp;
 
     // Scripts
 

@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTC_ClassList_KnownList0 parseUTC_ClassList_KnownList0(const Gff &gff) {
     UTC_ClassList_KnownList0 strct;
     strct.Spell = gff.getUint("Spell");
@@ -169,6 +171,8 @@ UTC parseUTC(const Gff &gff) {
     strct.willbonus = gff.getInt("willbonus");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

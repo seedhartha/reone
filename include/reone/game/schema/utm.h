@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTM_ItemList {
     uint8_t Infinite {0};
     std::string InventoryRes;
@@ -48,6 +50,8 @@ struct UTM {
 };
 
 UTM parseUTM(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

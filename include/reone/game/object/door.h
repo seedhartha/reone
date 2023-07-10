@@ -88,7 +88,7 @@ private:
     bool _lockable {false};
     std::string _keyName;
 
-    std::unique_ptr<UTD> _utd;
+    std::unique_ptr<schema::UTD> _utd;
 
     // Walkmeshes
 

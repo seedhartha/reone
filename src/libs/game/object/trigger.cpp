@@ -113,7 +113,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
 }
 
 void Trigger::loadUTT(const Gff &utt) {
-    _utt = std::make_unique<UTT>(parseUTT(utt));
+    _utt = std::make_unique<schema::UTT>(schema::parseUTT(utt));
 
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));

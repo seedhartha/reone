@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTS_Sounds {
     std::string Sound;
 };
@@ -60,6 +62,8 @@ struct UTS {
 };
 
 UTS parseUTS(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

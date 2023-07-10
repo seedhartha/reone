@@ -98,7 +98,7 @@ void Item::setEquipped(bool equipped) {
 }
 
 void Item::loadUTI(const Gff &uti) {
-    _uti = std::make_unique<UTI>(parseUTI(uti));
+    _uti = std::make_unique<schema::UTI>(schema::parseUTI(uti));
 
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
     _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da

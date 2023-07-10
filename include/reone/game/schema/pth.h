@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct PTH_Path_Points {
     uint32_t Conections {0};
     uint32_t First_Conection {0};
@@ -44,6 +46,8 @@ struct PTH {
 };
 
 PTH parsePTH(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

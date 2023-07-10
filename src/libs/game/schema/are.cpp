@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static ARE_MiniGame_Player_Gun_Banks_Bullet parseARE_MiniGame_Player_Gun_Banks_Bullet(const Gff &gff) {
     ARE_MiniGame_Player_Gun_Banks_Bullet strct;
     strct.Bullet_Model = gff.getString("Bullet_Model");
@@ -383,6 +385,8 @@ ARE parseARE(const Gff &gff) {
     strct.WindPower = gff.getInt("WindPower");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

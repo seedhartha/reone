@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct ARE_MiniGame_Player_Gun_Banks_Bullet {
     std::string Bullet_Model;
     std::string Collision_Sound;
@@ -303,6 +305,8 @@ struct ARE {
 };
 
 ARE parseARE(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

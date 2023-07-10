@@ -153,7 +153,7 @@ void Door::setLocked(bool locked) {
 }
 
 void Door::loadUTD(const Gff &utd) {
-    _utd = std::make_unique<UTD>(parseUTD(utd));
+    _utd = std::make_unique<schema::UTD>(schema::parseUTD(utd));
 
     _tag = boost::to_lower_copy(utd.getString("Tag"));
     _name = _services.resource.strings.get(utd.getInt("LocName"));

@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTP_ItemList parseUTP_ItemList(const Gff &gff) {
     UTP_ItemList strct;
     strct.InventoryRes = gff.getString("InventoryRes");
@@ -101,6 +103,8 @@ UTP parseUTP(const Gff &gff) {
     strct.Will = gff.getUint("Will");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTE_CreatureList {
     int Appearance {0};
     float CR {0.0f};
@@ -61,6 +63,8 @@ struct UTE {
 };
 
 UTE parseUTE(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

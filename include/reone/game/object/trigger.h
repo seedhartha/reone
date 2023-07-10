@@ -75,7 +75,7 @@ private:
     std::set<std::shared_ptr<Object>> _tenants;
     std::string _keyName;
 
-    std::unique_ptr<UTT> _utt;
+    std::unique_ptr<schema::UTT> _utt;
 
     // Scripts
 

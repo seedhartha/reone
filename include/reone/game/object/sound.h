@@ -87,7 +87,7 @@ private:
 
     std::vector<std::string> _sounds;
 
-    std::unique_ptr<UTS> _uts;
+    std::unique_ptr<schema::UTS> _uts;
 
     void loadTransformFromGIT(const resource::Gff &gffs);
 

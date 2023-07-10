@@ -54,7 +54,7 @@ private:
     std::string _mapNote;
     bool _mapNoteEnabled {false};
 
-    std::unique_ptr<UTW> _utw;
+    std::unique_ptr<schema::UTW> _utw;
 
     void loadTransformFromGIT(const resource::Gff &gffs);
 

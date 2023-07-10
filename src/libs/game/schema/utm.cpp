@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTM_ItemList parseUTM_ItemList(const Gff &gff) {
     UTM_ItemList strct;
     strct.Infinite = gff.getUint("Infinite");
@@ -50,6 +52,8 @@ UTM parseUTM(const Gff &gff) {
     strct.Tag = gff.getString("Tag");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

@@ -1249,7 +1249,7 @@ std::string Creature::getWeaponModelName(int slot) const {
 }
 
 void Creature::loadUTC(const Gff &utc) {
-    _utc = std::make_unique<UTC>(parseUTC(utc));
+    _utc = std::make_unique<schema::UTC>(schema::parseUTC(utc));
 
     _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
     _race = utc.getEnum("Race", RacialType::Invalid);      // index into racialtypes.2da

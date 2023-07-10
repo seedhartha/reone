@@ -289,7 +289,7 @@ private:
     std::shared_ptr<audio::AudioSource> _audioSourceVoice;
     std::shared_ptr<audio::AudioSource> _audioSourceFootstep;
 
-    std::unique_ptr<UTC> _utc;
+    std::unique_ptr<schema::UTC> _utc;
 
     // Animation
 

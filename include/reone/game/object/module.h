@@ -80,7 +80,7 @@ private:
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
 
-    std::unique_ptr<IFO> _ifo;
+    std::unique_ptr<schema::IFO> _ifo;
 
     void onCreatureClick(const std::shared_ptr<Creature> &creature);
     void onDoorClick(const std::shared_ptr<Door> &door);

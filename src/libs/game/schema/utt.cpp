@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 UTT parseUTT(const Gff &gff) {
     UTT strct;
     strct.AutoRemoveKey = gff.getUint("AutoRemoveKey");
@@ -60,6 +62,8 @@ UTT parseUTT(const Gff &gff) {
     strct.Type = gff.getInt("Type");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

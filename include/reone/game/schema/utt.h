@@ -27,6 +27,8 @@ class Gff;
 
 namespace game {
 
+namespace schema {
+
 struct UTT {
     uint8_t AutoRemoveKey {0};
     std::string Comment;
@@ -62,6 +64,8 @@ struct UTT {
 };
 
 UTT parseUTT(const resource::Gff &gff);
+
+} // namespace schema
 
 } // namespace game
 

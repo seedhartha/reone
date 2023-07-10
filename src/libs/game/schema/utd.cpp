@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 UTD parseUTD(const Gff &gff) {
     UTD strct;
     strct.AnimationState = gff.getUint("AnimationState");
@@ -87,6 +89,8 @@ UTD parseUTD(const Gff &gff) {
     strct.Will = gff.getUint("Will");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

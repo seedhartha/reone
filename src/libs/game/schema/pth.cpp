@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static PTH_Path_Points parsePTH_Path_Points(const Gff &gff) {
     PTH_Path_Points strct;
     strct.Conections = gff.getUint("Conections");
@@ -50,6 +52,8 @@ PTH parsePTH(const Gff &gff) {
     }
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

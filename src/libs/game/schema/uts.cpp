@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTS_Sounds parseUTS_Sounds(const Gff &gff) {
     UTS_Sounds strct;
     strct.Sound = gff.getString("Sound");
@@ -62,6 +64,8 @@ UTS parseUTS(const Gff &gff) {
     strct.VolumeVrtn = gff.getUint("VolumeVrtn");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 

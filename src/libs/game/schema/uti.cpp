@@ -25,6 +25,8 @@ namespace reone {
 
 namespace game {
 
+namespace schema {
+
 static UTI_PropertiesList parseUTI_PropertiesList(const Gff &gff) {
     UTI_PropertiesList strct;
     strct.ChanceAppear = gff.getUint("ChanceAppear");
@@ -64,6 +66,8 @@ UTI parseUTI(const Gff &gff) {
     strct.UpgradeLevel = gff.getUint("UpgradeLevel");
     return strct;
 }
+
+} // namespace schema
 
 } // namespace game
 
