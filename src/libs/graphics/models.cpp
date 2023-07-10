@@ -22,7 +22,7 @@
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
 
-#include "reone/graphics/format/mdlreader.h"
+#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/textures.h"
 
@@ -65,7 +65,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     if (mdlRes && mdxRes) {
         auto mdl = MemoryInputStream(mdlRes->data);
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlReader(mdl, mdx, *this, _textures);
+        auto reader = MdlMdxReader(mdl, mdx, *this, _textures);
         try {
             reader.load();
             model = reader.model();

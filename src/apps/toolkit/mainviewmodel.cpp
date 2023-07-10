@@ -21,7 +21,7 @@
 #include "reone/audio/format/wavreader.h"
 #include "reone/game/format/ssfreader.h"
 #include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/format/mdlreader.h"
+#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/format/2dareader.h"
@@ -284,7 +284,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
+        auto reader = MdlMdxReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
         reader.load();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);

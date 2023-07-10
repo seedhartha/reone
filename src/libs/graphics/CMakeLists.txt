@@ -37,7 +37,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/format/curreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/lipreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/lipwriter.h
-    ${GRAPHICS_INCLUDE_DIR}/format/mdlreader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/mdlmdxreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/tgareader.h
     ${GRAPHICS_INCLUDE_DIR}/format/tgawriter.h
     ${GRAPHICS_INCLUDE_DIR}/format/tpcreader.h
@@ -84,7 +84,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/format/curreader.cpp
     ${GRAPHICS_SOURCE_DIR}/format/lipreader.cpp
     ${GRAPHICS_SOURCE_DIR}/format/lipwriter.cpp
-    ${GRAPHICS_SOURCE_DIR}/format/mdlreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/mdlmdxreader.cpp
     ${GRAPHICS_SOURCE_DIR}/format/tgareader.cpp
     ${GRAPHICS_SOURCE_DIR}/format/tgawriter.cpp
     ${GRAPHICS_SOURCE_DIR}/format/tpcreader.cpp

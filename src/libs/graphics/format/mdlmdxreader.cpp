@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/mdlreader.h"
+#include "reone/graphics/format/mdlmdxreader.h"
 
 #include "reone/resource/exception/format.h"
 
@@ -55,7 +55,7 @@ static bool isTSLFunctionPointer(uint32_t ptr) {
     return ptr == kMdlModelFuncPtr1TslPC || ptr == kMdlModelFuncPtr1TslXbox;
 }
 
-void MdlReader::load() {
+void MdlMdxReader::load() {
     // File Header
     _mdl.ignore(4); // unknown
     uint32_t mdlSize = _mdl.readUint32();
@@ -123,7 +123,7 @@ void MdlReader::load() {
     _model->setAffectedByFog(affectedByFog != 0);
 }
 
-MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {
+MdlMdxReader::ArrayDefinition MdlMdxReader::readArrayDefinition() {
     ArrayDefinition result;
     result.offset = _mdl.readUint32();
     result.count = _mdl.readUint32();
@@ -131,14 +131,14 @@ MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {
     return std::move(result);
 }
 
-void MdlReader::readNodeNames(const std::vector<uint32_t> &offsets) {
+void MdlMdxReader::readNodeNames(const std::vector<uint32_t> &offsets) {
     for (uint32_t offset : offsets) {
         std::string name(boost::to_lower_copy(_mdl.readCStringAt(kMdlDataOffset + offset, 32)));
         _nodeNames.push_back(std::move(name));
     }
 }
 
-std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode) {
+std::shared_ptr<ModelNode> MdlMdxReader::readNodes(uint32_t offset, ModelNode *parent, bool animated, bool animNode) {
     _mdl.seek(kMdlDataOffset + offset);
     if (!animated && offset == _offAnimRoot) {
         animated = true;
@@ -201,7 +201,7 @@ std::shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, ModelNode *pare
     return std::move(node);
 }
 
-std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
+std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     // Common Mesh Header
     uint32_t funcPtr1 = _mdl.readUint32();
     uint32_t funcPtr2 = _mdl.readUint32();
@@ -474,7 +474,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     return std::move(nodeMesh);
 }
 
-std::shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
+std::shared_ptr<ModelNode::AABBTree> MdlMdxReader::readAABBTree(uint32_t offset) {
     _mdl.seek(kMdlDataOffset + offset);
 
     std::vector<float> boundingBox(_mdl.readFloatArray(6));
@@ -497,7 +497,7 @@ std::shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
     return std::move(node);
 }
 
-std::shared_ptr<ModelNode::Light> MdlReader::readLight() {
+std::shared_ptr<ModelNode::Light> MdlMdxReader::readLight() {
     float flareRadius = _mdl.readFloat();
     _mdl.ignore(3 * 4); // unknown
     ArrayDefinition flareSizesArrayDef(readArrayDefinition());
@@ -601,7 +601,7 @@ static ModelNode::Emitter::BlendMode parseEmitterBlend(const std::string &str) {
     return result;
 }
 
-std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
+std::shared_ptr<ModelNode::Emitter> MdlMdxReader::readEmitter() {
     float deadSpace = _mdl.readFloat();
     float blastRadius = _mdl.readFloat();
     float blastLength = _mdl.readFloat();
@@ -638,7 +638,7 @@ std::shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     return std::move(emitter);
 }
 
-std::shared_ptr<ModelNode::Reference> MdlReader::readReference() {
+std::shared_ptr<ModelNode::Reference> MdlMdxReader::readReference() {
     std::string modelResRef(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t reattachable = _mdl.readUint32();
 
@@ -649,7 +649,7 @@ std::shared_ptr<ModelNode::Reference> MdlReader::readReference() {
     return std::move(reference);
 }
 
-void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node) {
+void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node) {
     uint16_t nodeFlags;
     if (animNode) {
         if (_nodeFlags.count(node.number()) == 0) {
@@ -687,7 +687,7 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std
     }
 }
 
-void MdlReader::prepareSkinMeshes() {
+void MdlMdxReader::prepareSkinMeshes() {
     for (auto &node : _nodes) {
         if (!node->isSkinMesh()) {
             continue;
@@ -709,7 +709,7 @@ void MdlReader::prepareSkinMeshes() {
     }
 }
 
-std::vector<std::shared_ptr<Animation>> MdlReader::readAnimations(const std::vector<uint32_t> &offsets) {
+std::vector<std::shared_ptr<Animation>> MdlMdxReader::readAnimations(const std::vector<uint32_t> &offsets) {
     std::vector<std::shared_ptr<Animation>> anims;
     anims.reserve(offsets.size());
 
@@ -720,7 +720,7 @@ std::vector<std::shared_ptr<Animation>> MdlReader::readAnimations(const std::vec
     return std::move(anims);
 }
 
-std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
+std::unique_ptr<Animation> MdlMdxReader::readAnimation(uint32_t offset) {
     _mdl.seek(kMdlDataOffset + offset);
 
     // Geometry Header
@@ -765,7 +765,7 @@ std::unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
         std::move(events));
 }
 
-void MdlReader::initControllerFn() {
+void MdlMdxReader::initControllerFn() {
     _genericControllers = std::unordered_map<uint32_t, ControllerFn> {
         {8, &readPositionController},
         {20, &readOrientationController},
@@ -830,7 +830,7 @@ void MdlReader::initControllerFn() {
         {502, &readDetonateController}};
 }
 
-MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags) {
+MdlMdxReader::ControllerFn MdlMdxReader::getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
     if (nodeFlags & MdlNodeFlags::mesh) {
         auto it = _meshControllers.find(type);
@@ -855,7 +855,7 @@ static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
     }
 }
 
-void MdlReader::readFloatController(const ControllerKey &key, const std::vector<float> &data, AnimatedProperty<float> &prop) {
+void MdlMdxReader::readFloatController(const ControllerKey &key, const std::vector<float> &data, AnimatedProperty<float> &prop) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
     ensureNumColumnsEquals(key.type, 1, numColumns);
@@ -868,7 +868,7 @@ void MdlReader::readFloatController(const ControllerKey &key, const std::vector<
     prop.update();
 }
 
-void MdlReader::readVectorController(const ControllerKey &key, const std::vector<float> &data, AnimatedProperty<glm::vec3> &prop) {
+void MdlMdxReader::readVectorController(const ControllerKey &key, const std::vector<float> &data, AnimatedProperty<glm::vec3> &prop) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
 
@@ -887,11 +887,11 @@ void MdlReader::readVectorController(const ControllerKey &key, const std::vector
     prop.update();
 }
 
-void MdlReader::readPositionController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readPositionController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.position());
 }
 
-void MdlReader::readOrientationController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readOrientationController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     switch (key.numColumns) {
     case 2:
         for (uint16_t i = 0; i < key.numRows; ++i) {
@@ -943,227 +943,227 @@ void MdlReader::readOrientationController(const ControllerKey &key, const std::v
     node.orientation().update();
 }
 
-void MdlReader::readScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.scale());
 }
 
-void MdlReader::readSelfIllumColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSelfIllumColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.selfIllumColor());
 }
 
-void MdlReader::readAlphaController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readAlphaController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.alpha());
 }
 
-void MdlReader::readColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readColorController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.color());
 }
 
-void MdlReader::readRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.radius());
 }
 
-void MdlReader::readShadowRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readShadowRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.shadowRadius());
 }
 
-void MdlReader::readVerticalDisplacementController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readVerticalDisplacementController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.verticalDisplacement());
 }
 
-void MdlReader::readMultiplierController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readMultiplierController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.multiplier());
 }
 
-void MdlReader::readAlphaEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readAlphaEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.alphaEnd());
 }
 
-void MdlReader::readAlphaStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readAlphaStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.alphaStart());
 }
 
-void MdlReader::readBirthrateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readBirthrateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.birthrate());
 }
 
-void MdlReader::readBounceCoController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readBounceCoController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.bounceCo());
 }
 
-void MdlReader::readCombineTimeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readCombineTimeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.combineTime());
 }
 
-void MdlReader::readDragController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readDragController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.drag());
 }
 
-void MdlReader::readFPSController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readFPSController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.fps());
 }
 
-void MdlReader::readFrameEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readFrameEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.frameEnd());
 }
 
-void MdlReader::readFrameStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readFrameStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.frameStart());
 }
 
-void MdlReader::readGravController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readGravController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.grav());
 }
 
-void MdlReader::readLifeExpController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLifeExpController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lifeExp());
 }
 
-void MdlReader::readMassController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readMassController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.mass());
 }
 
-void MdlReader::readP2PBezier2Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readP2PBezier2Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.p2pBezier2());
 }
 
-void MdlReader::readP2PBezier3Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readP2PBezier3Controller(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.p2pBezier3());
 }
 
-void MdlReader::readParticleRotController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readParticleRotController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.particleRot());
 }
 
-void MdlReader::readRandVelController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readRandVelController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.randVel());
 }
 
-void MdlReader::readSizeStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeStart());
 }
 
-void MdlReader::readSizeEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeEnd());
 }
 
-void MdlReader::readSizeStartYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeStartYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeStartY());
 }
 
-void MdlReader::readSizeEndYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeEndYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeEndY());
 }
 
-void MdlReader::readSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.spread());
 }
 
-void MdlReader::readThresholdController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readThresholdController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.threshold());
 }
 
-void MdlReader::readVelocityController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readVelocityController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.velocity());
 }
 
-void MdlReader::readXSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readXSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.xSize());
 }
 
-void MdlReader::readYSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readYSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.ySize());
 }
 
-void MdlReader::readBlurLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readBlurLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.blurLength());
 }
 
-void MdlReader::readLightingDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLightingDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lightingDelay());
 }
 
-void MdlReader::readLightingRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLightingRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lightingRadius());
 }
 
-void MdlReader::readLightingScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLightingScaleController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lightingScale());
 }
 
-void MdlReader::readLightingSubDivController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLightingSubDivController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lightingSubDiv());
 }
 
-void MdlReader::readLightingZigZagController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readLightingZigZagController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.lightingZigZag());
 }
 
-void MdlReader::readAlphaMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readAlphaMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.alphaMid());
 }
 
-void MdlReader::readPercentStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readPercentStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.percentStart());
 }
 
-void MdlReader::readPercentMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readPercentMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.percentMid());
 }
 
-void MdlReader::readPercentEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readPercentEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.percentEnd());
 }
 
-void MdlReader::readSizeMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeMid());
 }
 
-void MdlReader::readSizeMidYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readSizeMidYController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.sizeMidY());
 }
 
-void MdlReader::readRandomBirthRateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readRandomBirthRateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.randomBirthRate());
 }
 
-void MdlReader::readTargetSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readTargetSizeController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.targetSize());
 }
 
-void MdlReader::readNumControlPtsController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readNumControlPtsController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.numControlPts());
 }
 
-void MdlReader::readControlPtRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readControlPtRadiusController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.controlPtRadius());
 }
 
-void MdlReader::readControlPtDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readControlPtDelayController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.controlPtDelay());
 }
 
-void MdlReader::readTangentSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readTangentSpreadController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.tangentSpread());
 }
 
-void MdlReader::readTangentLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readTangentLengthController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.tangentLength());
 }
 
-void MdlReader::readColorMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readColorMidController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.colorMid());
 }
 
-void MdlReader::readColorEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readColorEndController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.colorEnd());
 }
 
-void MdlReader::readColorStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readColorStartController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readVectorController(key, data, node.colorStart());
 }
 
-void MdlReader::readDetonateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
+void MdlMdxReader::readDetonateController(const ControllerKey &key, const std::vector<float> &data, ModelNode &node) {
     readFloatController(key, data, node.detonate());
 }
 

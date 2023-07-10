@@ -33,12 +33,12 @@ class IModels;
 class ITextures;
 class Model;
 
-class MdlReader : boost::noncopyable {
+class MdlMdxReader : boost::noncopyable {
 public:
-    MdlReader(IInputStream &mdl,
-              IInputStream &mdx,
-              IModels &models,
-              ITextures &textures) :
+    MdlMdxReader(IInputStream &mdl,
+                 IInputStream &mdx,
+                 IModels &models,
+                 ITextures &textures) :
         _mdl(BinaryReader(mdl)),
         _mdx(BinaryReader(mdx)),
         _models(models),

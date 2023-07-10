@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/graphics/format/mdlreader.h"
+#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/scene.h"
 #include "reone/system/stream/memoryinput.h"
@@ -103,7 +103,7 @@ TEST(mdl_reader, should_load_mdl) {
     auto mdx = MemoryInputStream(mdxBytes);
     auto models = std::make_unique<MockModels>();
     auto textures = std::make_unique<MockTextures>();
-    auto reader = MdlReader(mdl, mdx, *models, *textures);
+    auto reader = MdlMdxReader(mdl, mdx, *models, *textures);
 
     // when
     reader.load();
