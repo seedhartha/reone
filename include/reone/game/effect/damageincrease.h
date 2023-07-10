@@ -25,11 +25,17 @@ namespace game {
 
 class DamageIncreaseEffect : public Effect {
 public:
-    DamageIncreaseEffect() :
-        Effect(EffectType::DamageIncrease) {
+    DamageIncreaseEffect(int bonus, DamageType damageType) :
+        Effect(EffectType::DamageIncrease),
+        _bonus(bonus),
+        _damageType(damageType) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _bonus;
+    DamageType _damageType;
 };
 
 } // namespace game

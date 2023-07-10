@@ -169,9 +169,10 @@ static Variable EffectDamageIncrease(const std::vector<Variable> &args, const Ro
     auto nDamageType = getIntOrElse(args, 1, 8);
 
     // Transform
+    auto damageType = static_cast<DamageType>(nDamageType);
 
     // Execute
-    auto effect = ctx.game.effectFactory().newDamageIncrease();
+    auto effect = ctx.game.effectFactory().newDamageIncrease(nBonus, damageType);
     return Variable::ofEffect(std::move(effect));
 }
 
@@ -502,7 +503,7 @@ static Variable EffectForceResisted(const std::vector<Variable> &args, const Rou
     // Transform
 
     // Execute
-    auto effect = ctx.game.effectFactory().newForceResisted();
+    auto effect = ctx.game.effectFactory().newForceResisted(*oSource);
     return Variable::ofEffect(std::move(effect));
 }
 
@@ -531,9 +532,10 @@ static Variable EffectAttackDecrease(const std::vector<Variable> &args, const Ro
     auto nModifierType = getIntOrElse(args, 1, 0);
 
     // Transform
+    auto modifierType = static_cast<AttackBonus>(nModifierType);
 
     // Execute
-    auto effect = ctx.game.effectFactory().newAttackDecrease();
+    auto effect = ctx.game.effectFactory().newAttackDecrease(nPenalty, modifierType);
     return Variable::ofEffect(std::move(effect));
 }
 

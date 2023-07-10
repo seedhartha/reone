@@ -108,8 +108,8 @@ public:
         return std::make_unique<AssuredHitEffect>();
     }
 
-    std::unique_ptr<AttackDecreaseEffect> newAttackDecrease() {
-        return std::make_unique<AttackDecreaseEffect>();
+    std::unique_ptr<AttackDecreaseEffect> newAttackDecrease(int penalty, AttackBonus modifierType) {
+        return std::make_unique<AttackDecreaseEffect>(penalty, modifierType);
     }
 
     std::unique_ptr<AttackIncreaseEffect> newAttackIncrease(int bonus, AttackBonus modifierType) {
@@ -168,8 +168,8 @@ public:
         return std::make_unique<DamageImmunityIncreaseEffect>(damageType, percentImmunity);
     }
 
-    std::unique_ptr<DamageIncreaseEffect> newDamageIncrease() {
-        return std::make_unique<DamageIncreaseEffect>();
+    std::unique_ptr<DamageIncreaseEffect> newDamageIncrease(int bonus, DamageType damageType) {
+        return std::make_unique<DamageIncreaseEffect>(bonus, damageType);
     }
 
     std::unique_ptr<DamageResistanceEffect> newDamageResistance(DamageType damageType, int amount, int limit) {
@@ -220,8 +220,8 @@ public:
         return std::make_unique<ForceResistanceIncreaseEffect>(value);
     }
 
-    std::unique_ptr<ForceResistedEffect> newForceResisted() {
-        return std::make_unique<ForceResistedEffect>();
+    std::unique_ptr<ForceResistedEffect> newForceResisted(Object &source) {
+        return std::make_unique<ForceResistedEffect>(source);
     }
 
     std::unique_ptr<ForceShieldEffect> newForceShield(int shield) {
