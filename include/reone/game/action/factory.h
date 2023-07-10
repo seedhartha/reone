@@ -21,12 +21,14 @@
 #include "barkstring.h"
 #include "castfakespellatlocation.h"
 #include "castfakespellatobject.h"
+#include "castspellatlocation.h"
 #include "castspellatobject.h"
 #include "closedoor.h"
 #include "docommand.h"
 #include "equipitem.h"
 #include "equipmostdamagingmelee.h"
 #include "equipmostdamagingranged.h"
+#include "equipmosteffectivearmor.h"
 #include "follow.h"
 #include "followleader.h"
 #include "followowner.h"
@@ -35,6 +37,7 @@
 #include "jumptolocation.h"
 #include "jumptoobject.h"
 #include "lockobject.h"
+#include "moveawayfromlocation.h"
 #include "moveawayfromobject.h"
 #include "movetolocation.h"
 #include "movetoobject.h"
@@ -43,9 +46,13 @@
 #include "opendoor.h"
 #include "openlock.h"
 #include "pauseconversation.h"
+#include "pickupitem.h"
 #include "playanimation.h"
+#include "putdownitem.h"
 #include "randomwalk.h"
 #include "resumeconversation.h"
+#include "speakstring.h"
+#include "speakstringbystrref.h"
 #include "startconversation.h"
 #include "surrendertoenemies.h"
 #include "switchweapons.h"
@@ -54,6 +61,7 @@
 #include "unlockobject.h"
 #include "usefeat.h"
 #include "useskill.h"
+#include "usetalentatlocation.h"
 #include "usetalentonobject.h"
 #include "wait.h"
 
@@ -88,6 +96,10 @@ public:
         return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services, spell, std::move(target), projectilePathType);
     }
 
+    std::unique_ptr<CastSpellAtLocationAction> newCastSpellAtLocation(SpellType spell, std::shared_ptr<Location> targetLocation, int metaMagic, bool cheat, ProjectilePathType projectilePathType, bool instantSpell) {
+        return std::make_unique<CastSpellAtLocationAction>(_game, _services, spell, std::move(targetLocation), metaMagic, cheat, projectilePathType, instantSpell);
+    }
+
     std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject(SpellType spell, std::shared_ptr<Object> target, int metaMagic, bool cheat, int domainLevel, ProjectilePathType projectilePathType, bool instantSpell) {
         return std::make_unique<CastSpellAtObjectAction>(_game, _services, spell, std::move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
     }
@@ -110,6 +122,10 @@ public:
 
     std::unique_ptr<EquipMostDamagingRangedAction> newEquipMostDamagingRanged(std::shared_ptr<Object> versus) {
         return std::make_unique<EquipMostDamagingRangedAction>(_game, _services, std::move(versus));
+    }
+
+    std::unique_ptr<EquipMostEffectiveArmorAction> newEquipMostEffectiveArmor() {
+        return std::make_unique<EquipMostEffectiveArmorAction>(_game, _services);
     }
 
     std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> follow, float followDistance) {
@@ -144,6 +160,10 @@ public:
         return std::make_unique<LockObjectAction>(_game, _services, std::move(target));
     }
 
+    std::unique_ptr<MoveAwayFromLocation> newMoveAwayFromLocation(std::shared_ptr<Location> moveAwayFrom, bool run, float moveAwayRange) {
+        return std::make_unique<MoveAwayFromLocation>(_game, _services, std::move(moveAwayFrom), run, moveAwayRange);
+    }
+
     std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float moveAwayRange) {
         return std::make_unique<MoveAwayFromObject>(_game, _services, std::move(fleeFrom), run, moveAwayRange);
     }
@@ -176,8 +196,16 @@ public:
         return std::make_unique<PauseConversationAction>(_game, _services);
     }
 
+    std::unique_ptr<PickUpItemAction> newPickUpItem(std::shared_ptr<Item> item) {
+        return std::make_unique<PickUpItemAction>(_game, _services, std::move(item));
+    }
+
     std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType animation, float speed, float durationSeconds) {
         return std::make_unique<PlayAnimationAction>(_game, _services, animation, speed, durationSeconds);
+    }
+
+    std::unique_ptr<PutDownItemAction> newPutDownItem(std::shared_ptr<Item> item) {
+        return std::make_unique<PutDownItemAction>(_game, _services, std::move(item));
     }
 
     std::unique_ptr<RandomWalkAction> newRandomWalk() {
@@ -186,6 +214,14 @@ public:
 
     std::unique_ptr<ResumeConversationAction> newResumeConversation() {
         return std::make_unique<ResumeConversationAction>(_game, _services);
+    }
+
+    std::unique_ptr<SpeakStringAction> newSpeakString(std::string stringToSpeak, int talkVolume) {
+        return std::make_unique<SpeakStringAction>(_game, _services, stringToSpeak, talkVolume);
+    }
+
+    std::unique_ptr<SpeakStringByStrRefAction> newSpeakStringByStrRef(int strRef, int talkVolume) {
+        return std::make_unique<SpeakStringByStrRefAction>(_game, _services, strRef, talkVolume);
     }
 
     std::unique_ptr<StartConversationAction> newStartConversation(std::shared_ptr<Object> objectToConverse,
@@ -239,6 +275,10 @@ public:
 
     std::unique_ptr<UseSkillAction> newUseSkill(SkillType skill, std::shared_ptr<Object> target, int subSkill = 0, std::shared_ptr<Item> itemUsed = nullptr) {
         return std::make_unique<UseSkillAction>(_game, _services, skill, std::move(target), subSkill, std::move(itemUsed));
+    }
+
+    std::unique_ptr<UseTalentAtLocationAction> newUseTalentAtLocation(std::shared_ptr<Talent> chosenTalent, std::shared_ptr<Location> targetLocation) {
+        return std::make_unique<UseTalentAtLocationAction>(_game, _services, std::move(chosenTalent), std::move(targetLocation));
     }
 
     std::unique_ptr<UseTalentOnObjectAction> newUseTalentOnObject(std::shared_ptr<Talent> chosenTalent, std::shared_ptr<Object> target) {

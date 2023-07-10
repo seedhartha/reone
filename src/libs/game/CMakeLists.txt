@@ -22,12 +22,14 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/barkstring.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatlocation.h
     ${GAME_INCLUDE_DIR}/action/castfakespellatobject.h
+    ${GAME_INCLUDE_DIR}/action/castspellatlocation.h
     ${GAME_INCLUDE_DIR}/action/castspellatobject.h
     ${GAME_INCLUDE_DIR}/action/closedoor.h
     ${GAME_INCLUDE_DIR}/action/docommand.h
     ${GAME_INCLUDE_DIR}/action/equipitem.h
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingmelee.h
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingranged.h
+    ${GAME_INCLUDE_DIR}/action/equipmosteffectivearmor.h
     ${GAME_INCLUDE_DIR}/action/factory.h
     ${GAME_INCLUDE_DIR}/action/follow.h
     ${GAME_INCLUDE_DIR}/action/followleader.h
@@ -37,6 +39,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/jumptolocation.h
     ${GAME_INCLUDE_DIR}/action/jumptoobject.h
     ${GAME_INCLUDE_DIR}/action/lockobject.h
+    ${GAME_INCLUDE_DIR}/action/moveawayfromlocation.h
     ${GAME_INCLUDE_DIR}/action/moveawayfromobject.h
     ${GAME_INCLUDE_DIR}/action/movetolocation.h
     ${GAME_INCLUDE_DIR}/action/movetoobject.h
@@ -45,9 +48,13 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/opendoor.h
     ${GAME_INCLUDE_DIR}/action/openlock.h
     ${GAME_INCLUDE_DIR}/action/pauseconversation.h
+    ${GAME_INCLUDE_DIR}/action/pickupitem.h
     ${GAME_INCLUDE_DIR}/action/playanimation.h
+    ${GAME_INCLUDE_DIR}/action/putdownitem.h
     ${GAME_INCLUDE_DIR}/action/randomwalk.h
     ${GAME_INCLUDE_DIR}/action/resumeconversation.h
+    ${GAME_INCLUDE_DIR}/action/speakstring.h
+    ${GAME_INCLUDE_DIR}/action/speakstringbystrref.h
     ${GAME_INCLUDE_DIR}/action/startconversation.h
     ${GAME_INCLUDE_DIR}/action/surrendertoenemies.h
     ${GAME_INCLUDE_DIR}/action/switchweapons.h
@@ -56,6 +63,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/unlockobject.h
     ${GAME_INCLUDE_DIR}/action/usefeat.h
     ${GAME_INCLUDE_DIR}/action/useskill.h
+    ${GAME_INCLUDE_DIR}/action/usetalentatlocation.h
     ${GAME_INCLUDE_DIR}/action/usetalentonobject.h
     ${GAME_INCLUDE_DIR}/action/wait.h
     ${GAME_INCLUDE_DIR}/animationutil.h

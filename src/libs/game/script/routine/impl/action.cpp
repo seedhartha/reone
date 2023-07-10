@@ -127,9 +127,12 @@ static Variable ActionPickUpItem(const std::vector<Variable> &args, const Routin
     auto oItem = getObject(args, 0, ctx);
 
     // Transform
+    auto item = checkItem(oItem);
 
     // Execute
-    throw RoutineNotImplementedException("ActionPickUpItem");
+    auto action = ctx.game.actionFactory().newPickUpItem(std::move(item));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionPutDownItem(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -137,9 +140,12 @@ static Variable ActionPutDownItem(const std::vector<Variable> &args, const Routi
     auto oItem = getObject(args, 0, ctx);
 
     // Transform
+    auto item = checkItem(oItem);
 
     // Execute
-    throw RoutineNotImplementedException("ActionPutDownItem");
+    auto action = ctx.game.actionFactory().newPutDownItem(std::move(item));
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionAttack(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -165,7 +171,10 @@ static Variable ActionSpeakString(const std::vector<Variable> &args, const Routi
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("ActionSpeakString");
+    auto action = ctx.game.actionFactory().newSpeakString(sStringToSpeak, nTalkVolume);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionPlayAnimation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -265,7 +274,10 @@ static Variable ActionForceFollowObject(const std::vector<Variable> &args, const
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("ActionForceFollowObject");
+    auto action = ctx.game.actionFactory().newFollow(oFollow, fFollowDistance);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionJumpToObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -384,9 +396,16 @@ static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, con
     auto bInstantSpell = getIntOrElse(args, 5, 0);
 
     // Transform
+    auto spell = static_cast<SpellType>(nSpell);
+    auto cheat = static_cast<bool>(bCheat);
+    auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
+    auto instantSpell = static_cast<bool>(bInstantSpell);
 
     // Execute
-    throw RoutineNotImplementedException("ActionCastSpellAtLocation");
+    auto action = ctx.game.actionFactory().newCastSpellAtLocation(spell, lTargetLocation, nMetaMagic, cheat, projectilePathType, instantSpell);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -397,7 +416,10 @@ static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, con
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("ActionSpeakStringByStrRef");
+    auto action = ctx.game.actionFactory().newSpeakStringByStrRef(nStrRef, nTalkVolume);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionUseFeat(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -406,9 +428,13 @@ static Variable ActionUseFeat(const std::vector<Variable> &args, const RoutineCo
     auto oTarget = getObject(args, 1, ctx);
 
     // Transform
+    auto feat = static_cast<FeatType>(nFeat);
 
     // Execute
-    throw RoutineNotImplementedException("ActionUseFeat");
+    auto action = ctx.game.actionFactory().newUseFeat(feat, oTarget);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionUseSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -448,7 +474,10 @@ static Variable ActionUseTalentOnObject(const std::vector<Variable> &args, const
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("ActionUseTalentOnObject");
+    auto action = ctx.game.actionFactory().newUseTalentOnObject(tChosenTalent, oTarget);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionUseTalentAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -459,7 +488,10 @@ static Variable ActionUseTalentAtLocation(const std::vector<Variable> &args, con
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("ActionUseTalentAtLocation");
+    auto action = ctx.game.actionFactory().newUseTalentAtLocation(tChosenTalent, lTargetLocation);
+    auto caller = getCaller(ctx);
+    caller->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionInteractObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -482,9 +514,12 @@ static Variable ActionMoveAwayFromLocation(const std::vector<Variable> &args, co
     auto fMoveAwayRange = getFloatOrElse(args, 2, 40.0f);
 
     // Transform
+    auto run = static_cast<bool>(bRun);
 
     // Execute
-    throw RoutineNotImplementedException("ActionMoveAwayFromLocation");
+    auto action = ctx.game.actionFactory().newMoveAwayFromLocation(std::move(lMoveAwayFrom), run, fMoveAwayRange);
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -553,7 +588,9 @@ static Variable ActionEquipMostDamagingRanged(const std::vector<Variable> &args,
 
 static Variable ActionEquipMostEffectiveArmor(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    throw RoutineNotImplementedException("ActionEquipMostEffectiveArmor");
+    auto action = ctx.game.actionFactory().newEquipMostEffectiveArmor();
+    getCaller(ctx)->addAction(std::move(action));
+    return Variable::ofNull();
 }
 
 static Variable ActionUnlockObject(const std::vector<Variable> &args, const RoutineContext &ctx) {
