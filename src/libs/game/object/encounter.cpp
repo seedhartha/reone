@@ -17,13 +17,12 @@
 
 #include "reone/game/object/encounter.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
 
 using namespace reone::resource;
 using namespace reone::scene;
@@ -79,6 +78,8 @@ void Encounter::loadSpawnPointsFromGIT(const Gff &gffs) {
 }
 
 void Encounter::loadUTE(const Gff &ute) {
+    _ute = std::make_unique<UTE>(parseUTE(ute));
+
     _tag = boost::to_lower_copy(ute.getString("Tag"));
     _name = _services.resource.strings.get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));

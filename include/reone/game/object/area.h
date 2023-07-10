@@ -28,10 +28,11 @@
 #include "../camera/firstperson.h"
 #include "../camera/static.h"
 #include "../camera/thirdperson.h"
-#include "../pathfinder.h"
-#include "../types.h"
-
 #include "../object.h"
+#include "../pathfinder.h"
+#include "../schema/are.h"
+#include "../schema/git.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -228,6 +229,9 @@ private:
     Timer _perceptionTimer;
     std::shared_ptr<Object> _hilightedObject;
     std::shared_ptr<Object> _selectedObject;
+
+    std::unique_ptr<ARE> _are;
+    std::unique_ptr<GIT> _git;
 
     // Scripts
 

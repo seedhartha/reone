@@ -44,6 +44,7 @@ namespace game {
 
 void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     _name = std::move(name);
+    _ifo = std::make_unique<IFO>(parseIFO(ifo));
 
     loadInfo(ifo);
     loadArea(ifo);

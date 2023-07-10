@@ -23,7 +23,9 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace gui {
+
+namespace schema {
 
 static GUI_CONTROLS_SCROLLBAR_THUMB parseGUI_CONTROLS_SCROLLBAR_THUMB(const Gff &gff) {
     GUI_CONTROLS_SCROLLBAR_THUMB strct;
@@ -371,6 +373,8 @@ GUI parseGUI(const Gff &gff) {
     return strct;
 }
 
-} // namespace game
+} // namespace schema
+
+} // namespace gui
 
 } // namespace reone

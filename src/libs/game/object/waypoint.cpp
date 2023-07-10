@@ -17,13 +17,12 @@
 
 #include "reone/game/object/waypoint.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -66,6 +65,8 @@ void Waypoint::loadTransformFromGIT(const Gff &gffs) {
 }
 
 void Waypoint::loadUTW(const Gff &utw) {
+    _utw = std::make_unique<UTW>(parseUTW(utw));
+
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));

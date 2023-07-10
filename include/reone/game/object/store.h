@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../object.h"
+#include "../schema/utm.h"
 
 namespace reone {
 
@@ -37,6 +38,9 @@ public:
             game,
             services) {
     }
+
+private:
+    std::unique_ptr<UTM> _utm;
 };
 
 } // namespace game

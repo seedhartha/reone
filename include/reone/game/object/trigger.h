@@ -20,6 +20,7 @@
 #include "reone/resource/format/gffreader.h"
 
 #include "../object.h"
+#include "../schema/utt.h"
 
 namespace reone {
 
@@ -73,6 +74,8 @@ private:
     std::vector<glm::vec3> _geometry;
     std::set<std::shared_ptr<Object>> _tenants;
     std::string _keyName;
+
+    std::unique_ptr<UTT> _utt;
 
     // Scripts
 

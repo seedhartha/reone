@@ -25,7 +25,9 @@ class Gff;
 
 }
 
-namespace game {
+namespace gui {
+
+namespace schema {
 
 struct GUI_CONTROLS_SCROLLBAR_THUMB {
     int ALIGNMENT {0};
@@ -269,6 +271,8 @@ struct GUI {
 
 GUI parseGUI(const resource::Gff &gff);
 
-} // namespace game
+} // namespace schema
+
+} // namespace gui
 
 } // namespace reone

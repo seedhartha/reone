@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../object.h"
+#include "../schema/uts.h"
 
 namespace reone {
 
@@ -85,6 +86,8 @@ private:
     int _volumeVrtn {0};
 
     std::vector<std::string> _sounds;
+
+    std::unique_ptr<UTS> _uts;
 
     void loadTransformFromGIT(const resource::Gff &gffs);
 

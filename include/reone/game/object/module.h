@@ -24,6 +24,7 @@
 #include "../contextaction.h"
 #include "../object.h"
 #include "../player.h"
+#include "../schema/ifo.h"
 
 #include "area.h"
 
@@ -78,6 +79,8 @@ private:
     ModuleInfo _info;
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
+
+    std::unique_ptr<IFO> _ifo;
 
     void onCreatureClick(const std::shared_ptr<Creature> &creature);
     void onDoorClick(const std::shared_ptr<Door> &door);

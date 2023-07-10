@@ -20,6 +20,8 @@
 #include "reone/audio/di/services.h"
 #include "reone/audio/files.h"
 #include "reone/audio/player.h"
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/textures.h"
@@ -29,9 +31,6 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -99,6 +98,8 @@ void Item::setEquipped(bool equipped) {
 }
 
 void Item::loadUTI(const Gff &uti) {
+    _uti = std::make_unique<UTI>(parseUTI(uti));
+
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
     _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
     _localizedName = _services.resource.strings.get(uti.getInt("LocalizedName"));

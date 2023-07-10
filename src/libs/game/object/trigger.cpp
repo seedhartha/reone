@@ -17,6 +17,9 @@
 
 #include "reone/game/object/trigger.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/script/runner.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
@@ -25,10 +28,6 @@
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/trigger.h"
 #include "reone/system/logutil.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/script/runner.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -114,6 +113,8 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
 }
 
 void Trigger::loadUTT(const Gff &utt) {
+    _utt = std::make_unique<UTT>(parseUTT(utt));
+
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
     _name = _services.resource.strings.get(utt.getInt("LocalizedName"));

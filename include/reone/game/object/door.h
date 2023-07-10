@@ -21,6 +21,7 @@
 #include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
+#include "../schema/utd.h"
 
 namespace reone {
 
@@ -86,6 +87,8 @@ private:
     int _fortitude {0};
     bool _lockable {false};
     std::string _keyName;
+
+    std::unique_ptr<UTD> _utd;
 
     // Walkmeshes
 

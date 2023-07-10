@@ -23,9 +23,9 @@
 #include "reone/graphics/texture.h"
 #include "reone/resource/format/gffreader.h"
 
-#include "../types.h"
-
 #include "../object.h"
+#include "../schema/uti.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -123,6 +123,8 @@ private:
     bool _stolen {false};
 
     std::shared_ptr<audio::AudioSource> _audioSource;
+
+    std::unique_ptr<UTI> _uti;
 
     // Blueprint
 

@@ -30,6 +30,7 @@
 
 #include "../d20/attributes.h"
 #include "../object.h"
+#include "../schema/utc.h"
 
 #include "item.h"
 
@@ -287,6 +288,8 @@ private:
 
     std::shared_ptr<audio::AudioSource> _audioSourceVoice;
     std::shared_ptr<audio::AudioSource> _audioSourceFootstep;
+
+    std::unique_ptr<UTC> _utc;
 
     // Animation
 

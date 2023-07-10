@@ -117,6 +117,7 @@ void Area::init() {
 
 void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave) {
     _name = std::move(name);
+    _are = std::make_unique<ARE>(parseARE(are));
 
     loadARE(are);
     loadGIT(git);

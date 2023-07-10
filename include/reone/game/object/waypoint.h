@@ -20,6 +20,7 @@
 #include "reone/resource/format/gffreader.h"
 
 #include "../object.h"
+#include "../schema/utw.h"
 
 namespace reone {
 
@@ -52,6 +53,8 @@ private:
     bool _hasMapNote {false};
     std::string _mapNote;
     bool _mapNoteEnabled {false};
+
+    std::unique_ptr<UTW> _utw;
 
     void loadTransformFromGIT(const resource::Gff &gffs);
 

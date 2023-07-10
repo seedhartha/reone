@@ -21,6 +21,7 @@
 #include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
+#include "../schema/utp.h"
 
 namespace reone {
 
@@ -74,6 +75,8 @@ private:
     bool _static {false};
 
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
+
+    std::unique_ptr<UTP> _utp;
 
     // Scripts
 

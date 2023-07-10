@@ -17,6 +17,9 @@
 
 #include "reone/game/object/placeable.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/script/runner.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/walkmeshes.h"
@@ -30,10 +33,6 @@
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
 #include "reone/script/types.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/script/runner.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -100,6 +99,8 @@ void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
 }
 
 void Placeable::loadUTP(const Gff &utp) {
+    _utp = std::make_unique<UTP>(parseUTP(utp));
+
     _tag = boost::to_lower_copy(utp.getString("Tag"));
     _name = _services.resource.strings.get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
