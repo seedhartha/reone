@@ -73,17 +73,6 @@ uint64_t Gff::readUint64(const std::string &name, uint64_t defValue) const {
     return field->uint64Value;
 }
 
-static glm::vec3 colorFromUint32(uint32_t value) {
-    glm::vec3 result(
-        value & 0xff,
-        (value >> 8) & 0xff,
-        (value >> 16) & 0xff);
-
-    result /= 255.0f;
-
-    return std::move(result);
-}
-
 glm::vec3 Gff::getColor(const std::string &name, glm::vec3 defValue) const {
     const Field *field = get(name);
     if (!field)

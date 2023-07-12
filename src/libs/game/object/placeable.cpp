@@ -43,10 +43,10 @@ namespace reone {
 
 namespace game {
 
-void Placeable::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Placeable::loadFromGIT(const schema::GIT_Placeable_List &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
 void Placeable::loadFromBlueprint(const std::string &resRef) {
@@ -54,7 +54,8 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     if (!utp) {
         return;
     }
-    loadUTP(*utp);
+    auto utpParsed = schema::parseUTP(*utp);
+    loadUTP(utpParsed);
     std::shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
     std::string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
@@ -76,12 +77,12 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     }
 }
 
-void Placeable::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("X");
-    _position[1] = gffs.getFloat("Y");
-    _position[2] = gffs.getFloat("Z");
+void Placeable::loadTransformFromGIT(const schema::GIT_Placeable_List &git) {
+    _position[0] = git.X;
+    _position[1] = git.Y;
+    _position[2] = git.Z;
 
-    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, git.Bearing));
 
     updateTransform();
 }
@@ -98,48 +99,46 @@ void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
     }
 }
 
-void Placeable::loadUTP(const Gff &utp) {
-    _utp = std::make_unique<schema::UTP>(schema::parseUTP(utp));
+void Placeable::loadUTP(const schema::UTP &utp) {
+    _tag = boost::to_lower_copy(utp.Tag);
+    _name = _services.resource.strings.get(utp.LocName.first);
+    _blueprintResRef = boost::to_lower_copy(utp.TemplateResRef);
+    _conversation = boost::to_lower_copy(utp.Conversation);
+    _interruptable = utp.Interruptable;
+    _faction = static_cast<Faction>(utp.Faction);
+    _plot = utp.Plot;
+    _minOneHP = utp.Min1HP;
+    _keyRequired = utp.KeyRequired;
+    _lockable = utp.Lockable;
+    _locked = utp.Locked;
+    _openLockDC = utp.OpenLockDC;
+    _animationState = utp.AnimationState;
+    _appearance = utp.Appearance;
+    _hitPoints = utp.HP;
+    _currentHitPoints = utp.CurrentHP;
+    _hardness = utp.Hardness;
+    _fortitude = utp.Fort;
+    _hasInventory = utp.HasInventory;
+    _partyInteract = utp.PartyInteract;
+    _static = utp.Static;
+    _usable = utp.Useable;
 
-    _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _services.resource.strings.get(utp.getInt("LocName"));
-    _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
-    _conversation = boost::to_lower_copy(utp.getString("Conversation"));
-    _interruptable = utp.getBool("Interruptable");
-    _faction = utp.getEnum("Faction", Faction::Invalid);
-    _plot = utp.getBool("Plot");
-    _minOneHP = utp.getBool("Min1HP");
-    _keyRequired = utp.getBool("KeyRequired");
-    _lockable = utp.getBool("Lockable");
-    _locked = utp.getBool("Locked");
-    _openLockDC = utp.getInt("OpenLockDC");
-    _animationState = utp.getInt("AnimationState");
-    _appearance = utp.getInt("Appearance");
-    _hitPoints = utp.getInt("HP");
-    _currentHitPoints = utp.getInt("CurrentHP");
-    _hardness = utp.getInt("Hardness");
-    _fortitude = utp.getInt("Fort");
-    _hasInventory = utp.getBool("HasInventory");
-    _partyInteract = utp.getBool("PartyInteract");
-    _static = utp.getBool("Static");
-    _usable = utp.getBool("Useable");
+    _onClosed = boost::to_lower_copy(utp.OnClosed);
+    _onDamaged = boost::to_lower_copy(utp.OnDamaged); // always empty, but could be useful
+    _onDeath = boost::to_lower_copy(utp.OnDeath);
+    _onHeartbeat = boost::to_lower_copy(utp.OnHeartbeat);
+    _onLock = boost::to_lower_copy(utp.OnLock);                   // always empty, but could be useful
+    _onMeleeAttacked = boost::to_lower_copy(utp.OnMeleeAttacked); // always empty, but could be useful
+    _onOpen = boost::to_lower_copy(utp.OnOpen);
+    _onSpellCastAt = boost::to_lower_copy(utp.OnSpellCastAt);
+    _onUnlock = boost::to_lower_copy(utp.OnUnlock); // always empty, but could be useful
+    _onUserDefined = boost::to_lower_copy(utp.OnUserDefined);
+    _onEndDialogue = boost::to_lower_copy(utp.OnEndDialogue);
+    _onInvDisturbed = boost::to_lower_copy(utp.OnInvDisturbed);
+    _onUsed = boost::to_lower_copy(utp.OnUsed);
 
-    _onClosed = boost::to_lower_copy(utp.getString("OnClosed"));
-    _onDamaged = boost::to_lower_copy(utp.getString("OnDamaged")); // always empty, but could be useful
-    _onDeath = boost::to_lower_copy(utp.getString("OnDeath"));
-    _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
-    _onLock = boost::to_lower_copy(utp.getString("OnLock"));                   // always empty, but could be useful
-    _onMeleeAttacked = boost::to_lower_copy(utp.getString("OnMeleeAttacked")); // always empty, but could be useful
-    _onOpen = boost::to_lower_copy(utp.getString("OnOpen"));
-    _onSpellCastAt = boost::to_lower_copy(utp.getString("OnSpellCastAt"));
-    _onUnlock = boost::to_lower_copy(utp.getString("OnUnlock")); // always empty, but could be useful
-    _onUserDefined = boost::to_lower_copy(utp.getString("OnUserDefined"));
-    _onEndDialogue = boost::to_lower_copy(utp.getString("OnEndDialogue"));
-    _onInvDisturbed = boost::to_lower_copy(utp.getString("OnInvDisturbed"));
-    _onUsed = boost::to_lower_copy(utp.getString("OnUsed"));
-
-    for (auto &itemGffs : utp.getList("ItemList")) {
-        std::string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
+    for (auto &itemStrct : utp.ItemList) {
+        std::string resRef(boost::to_lower_copy(itemStrct.InventoryRes));
         addItem(resRef, 1, true);
     }
 

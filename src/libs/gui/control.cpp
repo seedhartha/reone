@@ -42,16 +42,16 @@ namespace reone {
 
 namespace gui {
 
-ControlType Control::getType(const Gff &gffs) {
-    return static_cast<ControlType>(gffs.getInt("CONTROLTYPE"));
+ControlType Control::getType(const schema::GUI_BASECONTROL &gui) {
+    return static_cast<ControlType>(gui.CONTROLTYPE);
 }
 
-std::string Control::getTag(const Gff &gffs) {
-    return gffs.getString("TAG");
+std::string Control::getTag(const schema::GUI_BASECONTROL &gui) {
+    return gui.TAG;
 }
 
-std::string Control::getParent(const Gff &gffs) {
-    return gffs.getString("Obj_Parent");
+std::string Control::getParent(const schema::GUI_BASECONTROL &gui) {
+    return gui.Obj_Parent;
 }
 
 Control::Extent::Extent(int left, int top, int width, int height) :
@@ -67,36 +67,48 @@ void Control::Extent::getCenter(int &x, int &y) const {
     y = top + height / 2;
 }
 
-void Control::load(const Gff &gffs) {
-    _id = gffs.getInt("ID", -1);
-    _padding = gffs.getInt("PADDING", 0);
+void Control::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+    loadExtent(gui.EXTENT);
+    loadBorder(gui.BORDER);
 
-    loadExtent(*gffs.findStruct("EXTENT"));
-    loadBorder(*gffs.findStruct("BORDER"));
-
-    std::shared_ptr<Gff> text(gffs.findStruct("TEXT"));
-    if (text) {
-        loadText(*text);
-    }
-    std::shared_ptr<Gff> hilight(gffs.findStruct("HILIGHT"));
-    if (hilight) {
-        loadHilight(*hilight);
+    if (static_cast<ControlType>(gui.CONTROLTYPE) == ControlType::Panel) {
+        _id = -1;
+    } else if (static_cast<ControlType>(gui.CONTROLTYPE) == ControlType::ScrollBar) {
+        // do nothing
+    } else if (protoItem) {
+        auto &protoItem = *static_cast<const schema::GUI_CONTROLS_PROTOITEM *>(&gui);
+        if (protoItem.TEXT) {
+            loadText(*protoItem.TEXT);
+        }
+        if (protoItem.HILIGHT) {
+            loadHilight(*protoItem.HILIGHT);
+        }
+    } else {
+        auto &controlStruct = *static_cast<const schema::GUI_CONTROLS *>(&gui);
+        _id = controlStruct.ID;
+        _padding = controlStruct.PADDING;
+        if (controlStruct.TEXT) {
+            loadText(*controlStruct.TEXT);
+        }
+        if (controlStruct.HILIGHT) {
+            loadHilight(*controlStruct.HILIGHT);
+        }
     }
 
     updateTransform();
 }
 
-void Control::loadExtent(const Gff &gffs) {
-    _extent.left = gffs.getInt("LEFT");
-    _extent.top = gffs.getInt("TOP");
-    _extent.width = gffs.getInt("WIDTH");
-    _extent.height = gffs.getInt("HEIGHT");
+void Control::loadExtent(const schema::GUI_EXTENT &gui) {
+    _extent.left = gui.LEFT;
+    _extent.top = gui.TOP;
+    _extent.width = gui.WIDTH;
+    _extent.height = gui.HEIGHT;
 }
 
-void Control::loadBorder(const Gff &gffs) {
-    std::string corner(gffs.getString("CORNER"));
-    std::string edge(gffs.getString("EDGE"));
-    std::string fill(gffs.getString("FILL"));
+void Control::loadBorder(const schema::GUI_BORDER &gui) {
+    std::string corner(gui.CORNER);
+    std::string edge(gui.EDGE);
+    std::string fill(gui.FILL);
 
     _border = std::make_shared<Border>();
 
@@ -110,18 +122,18 @@ void Control::loadBorder(const Gff &gffs) {
         _border->fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
     }
 
-    _border->dimension = gffs.getInt("DIMENSION", 0);
-    _border->color = gffs.getVector("COLOR");
+    _border->dimension = gui.DIMENSION;
+    _border->color = gui.COLOR;
 }
 
-void Control::loadText(const Gff &gffs) {
-    _text.font = _graphicsSvc.fonts.get(gffs.getString("FONT"));
+void Control::loadText(const schema::GUI_TEXT &gui) {
+    _text.font = _graphicsSvc.fonts.get(gui.FONT);
 
-    int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? gffs.getString("TEXT") : _strings.get(strRef);
+    int strRef = gui.STRREF;
+    _text.text = strRef == -1 ? gui.TEXT : _strings.get(strRef);
 
-    _text.color = gffs.getVector("COLOR");
-    _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
+    _text.color = gui.COLOR;
+    _text.align = static_cast<TextAlign>(gui.ALIGNMENT);
 
     updateTextLines();
 }
@@ -133,10 +145,10 @@ void Control::updateTextLines() {
     }
 }
 
-void Control::loadHilight(const Gff &gffs) {
-    std::string corner(gffs.getString("CORNER"));
-    std::string edge(gffs.getString("EDGE"));
-    std::string fill(gffs.getString("FILL"));
+void Control::loadHilight(const schema::GUI_BORDER &gui) {
+    std::string corner(gui.CORNER);
+    std::string edge(gui.EDGE);
+    std::string fill(gui.FILL);
 
     _hilight = std::make_shared<Border>();
 
@@ -150,8 +162,8 @@ void Control::loadHilight(const Gff &gffs) {
         _hilight->fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
     }
 
-    _hilight->dimension = gffs.getInt("DIMENSION", 0);
-    _hilight->color = gffs.getVector("COLOR");
+    _hilight->dimension = gui.DIMENSION;
+    _hilight->color = gui.COLOR;
 }
 
 void Control::updateTransform() {

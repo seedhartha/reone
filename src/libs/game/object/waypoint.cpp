@@ -32,48 +32,47 @@ namespace reone {
 
 namespace game {
 
-void Waypoint::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Waypoint::loadFromGIT(const schema::GIT_WaypointList &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
 
-    _tag = gffs.getString("Tag");
-    _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = _services.resource.strings.get(gffs.getInt("MapNote"));
-    _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
-    _tag = boost::to_lower_copy(gffs.getString("Tag"));
+    _tag = git.Tag;
+    _hasMapNote = git.HasMapNote;
+    _mapNote = _services.resource.strings.get(git.MapNote.first);
+    _mapNoteEnabled = git.MapNoteEnabled;
+    _tag = boost::to_lower_copy(git.Tag);
 
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
 void Waypoint::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
     if (utw) {
-        loadUTW(*utw);
+        auto utwParsed = schema::parseUTW(*utw);
+        loadUTW(utwParsed);
     }
 }
 
-void Waypoint::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
+void Waypoint::loadTransformFromGIT(const schema::GIT_WaypointList &git) {
+    _position[0] = git.XPosition;
+    _position[1] = git.YPosition;
+    _position[2] = git.ZPosition;
 
-    float cosine = gffs.getFloat("XOrientation");
-    float sine = gffs.getFloat("YOrientation");
+    float cosine = git.XOrientation;
+    float sine = git.YOrientation;
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(cosine, sine)));
 
     updateTransform();
 }
 
-void Waypoint::loadUTW(const Gff &utw) {
-    _utw = std::make_unique<schema::UTW>(schema::parseUTW(utw));
-
-    _appearance = utw.getInt("Appearance");
-    _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
-    _tag = boost::to_lower_copy(utw.getString("Tag"));
-    _name = _services.resource.strings.get(utw.getInt("LocalizedName"));
-    _hasMapNote = utw.getBool("HasMapNote");
-    _mapNote = _services.resource.strings.get(utw.getInt("MapNote"));
-    _mapNoteEnabled = utw.getInt("MapNoteEnabled");
+void Waypoint::loadUTW(const schema::UTW &utw) {
+    _appearance = utw.Appearance;
+    _blueprintResRef = boost::to_lower_copy(utw.TemplateResRef);
+    _tag = boost::to_lower_copy(utw.Tag);
+    _name = _services.resource.strings.get(utw.LocalizedName.first);
+    _hasMapNote = utw.HasMapNote;
+    _mapNote = _services.resource.strings.get(utw.MapNote.first);
+    _mapNoteEnabled = utw.MapNoteEnabled;
 
     // Unused fields:
     //

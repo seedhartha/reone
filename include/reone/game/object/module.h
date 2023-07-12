@@ -80,8 +80,6 @@ private:
     std::shared_ptr<Area> _area;
     std::unique_ptr<Player> _player;
 
-    std::unique_ptr<schema::IFO> _ifo;
-
     void onCreatureClick(const std::shared_ptr<Creature> &creature);
     void onDoorClick(const std::shared_ptr<Door> &door);
     void onObjectClick(const std::shared_ptr<Object> &object);
@@ -91,8 +89,8 @@ private:
 
     // Loading
 
-    void loadInfo(const resource::Gff &ifo);
-    void loadArea(const resource::Gff &ifo, bool fromSave = false);
+    void loadInfo(const schema::IFO &ifo);
+    void loadArea(const schema::IFO &ifo, bool fromSave = false);
     void loadPlayer();
 
     // END Loading

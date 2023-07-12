@@ -76,18 +76,17 @@ void ListBox::clearSelection() {
     _selectedItemIndex = -1;
 }
 
-void ListBox::load(const Gff &gffs) {
-    Control::load(gffs);
+void ListBox::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+    Control::load(gui, protoItem);
 
-    std::shared_ptr<Gff> protoItem(gffs.findStruct("PROTOITEM"));
-    if (protoItem) {
-        _protoItem = _gui.newControl(getType(*protoItem), getTag(*protoItem));
-        _protoItem->load(*protoItem);
+    auto &controlStruct = *static_cast<const schema::GUI_CONTROLS *>(&gui);
+    if (controlStruct.PROTOITEM) {
+        _protoItem = _gui.newControl(getType(*controlStruct.PROTOITEM), getTag(*controlStruct.PROTOITEM));
+        _protoItem->load(*controlStruct.PROTOITEM, true);
     }
-    std::shared_ptr<Gff> scrollBar(gffs.findStruct("SCROLLBAR"));
-    if (scrollBar) {
-        _scrollBar = _gui.newControl(getType(*scrollBar), getTag(*scrollBar));
-        _scrollBar->load(*scrollBar);
+    if (controlStruct.SCROLLBAR) {
+        _scrollBar = _gui.newControl(getType(*controlStruct.SCROLLBAR), getTag(*controlStruct.SCROLLBAR));
+        _scrollBar->load(*controlStruct.SCROLLBAR);
     }
 }
 

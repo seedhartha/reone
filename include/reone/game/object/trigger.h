@@ -20,6 +20,7 @@
 #include "reone/resource/format/gffreader.h"
 
 #include "../object.h"
+#include "../schema/git.h"
 #include "../schema/utt.h"
 
 namespace reone {
@@ -41,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromGIT(const schema::GIT_TriggerList &git);
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
@@ -75,8 +76,6 @@ private:
     std::set<std::shared_ptr<Object>> _tenants;
     std::string _keyName;
 
-    std::unique_ptr<schema::UTT> _utt;
-
     // Scripts
 
     std::string _onEnter;
@@ -86,10 +85,10 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const resource::Gff &gffs);
-    void loadGeometryFromGIT(const resource::Gff &gffs);
+    void loadTransformFromGIT(const schema::GIT_TriggerList &git);
+    void loadGeometryFromGIT(const schema::GIT_TriggerList &git);
 
-    void loadUTT(const resource::Gff &utt);
+    void loadUTT(const schema::UTT &utt);
 };
 
 } // namespace game

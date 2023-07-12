@@ -230,9 +230,6 @@ private:
     std::shared_ptr<Object> _hilightedObject;
     std::shared_ptr<Object> _selectedObject;
 
-    std::unique_ptr<schema::ARE> _are;
-    std::unique_ptr<schema::GIT> _git;
-
     // Scripts
 
     std::string _onEnter;
@@ -308,32 +305,32 @@ private:
 
     // Loading ARE
 
-    void loadARE(const resource::Gff &are);
+    void loadARE(const schema::ARE &are);
 
-    void loadCameraStyle(const resource::Gff &are);
-    void loadAmbientColor(const resource::Gff &are);
-    void loadScripts(const resource::Gff &are);
-    void loadMap(const resource::Gff &are);
-    void loadStealthXP(const resource::Gff &are);
-    void loadGrass(const resource::Gff &are);
-    void loadFog(const resource::Gff &are);
+    void loadCameraStyle(const schema::ARE &are);
+    void loadAmbientColor(const schema::ARE &are);
+    void loadScripts(const schema::ARE &are);
+    void loadMap(const schema::ARE &are);
+    void loadStealthXP(const schema::ARE &are);
+    void loadGrass(const schema::ARE &are);
+    void loadFog(const schema::ARE &are);
 
     // END Loading ARE
 
     // Loading GIT
 
-    void loadGIT(const resource::Gff &gffs);
+    void loadGIT(const schema::GIT &git);
 
-    void loadProperties(const resource::Gff &git);
-    void loadCreatures(const resource::Gff &git);
-    void loadDoors(const resource::Gff &git);
-    void loadPlaceables(const resource::Gff &git);
-    void loadWaypoints(const resource::Gff &git);
-    void loadTriggers(const resource::Gff &git);
-    void loadSounds(const resource::Gff &git);
-    void loadCameras(const resource::Gff &git);
-    void loadEncounters(const resource::Gff &git);
-    void loadStores(const resource::Gff &git);
+    void loadProperties(const schema::GIT &git);
+    void loadCreatures(const schema::GIT &git);
+    void loadDoors(const schema::GIT &git);
+    void loadPlaceables(const schema::GIT &git);
+    void loadWaypoints(const schema::GIT &git);
+    void loadTriggers(const schema::GIT &git);
+    void loadSounds(const schema::GIT &git);
+    void loadCameras(const schema::GIT &git);
+    void loadEncounters(const schema::GIT &git);
+    void loadStores(const schema::GIT &git);
 
     // END Loading GIT
 

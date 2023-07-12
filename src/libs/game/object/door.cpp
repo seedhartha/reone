@@ -44,16 +44,16 @@ namespace reone {
 
 namespace game {
 
-void Door::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Door::loadFromGIT(const schema::GIT_Door_List &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
 
-    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
-    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
-    _linkedToFlags = gffs.getInt("LinkedToFlags");
-    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
+    _linkedToModule = boost::to_lower_copy(git.LinkedToModule);
+    _linkedTo = boost::to_lower_copy(git.LinkedTo);
+    _linkedToFlags = git.LinkedToFlags;
+    _transitionDestin = _services.resource.strings.get(git.TransitionDestin.first);
 
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
 void Door::loadFromBlueprint(const std::string &resRef) {
@@ -61,7 +61,8 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     if (!utd) {
         return;
     }
-    loadUTD(*utd);
+    auto utdParsed = schema::parseUTD(*utd);
+    loadUTD(utdParsed);
     std::shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
     std::string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
@@ -98,12 +99,12 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     }
 }
 
-void Door::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("X");
-    _position[1] = gffs.getFloat("Y");
-    _position[2] = gffs.getFloat("Z");
+void Door::loadTransformFromGIT(const schema::GIT_Door_List &git) {
+    _position[0] = git.X;
+    _position[1] = git.Y;
+    _position[2] = git.Z;
 
-    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
+    _orientation = glm::quat(glm::vec3(0.0f, 0.0f, git.Bearing));
 
     updateTransform();
 }
@@ -152,42 +153,40 @@ void Door::setLocked(bool locked) {
     _locked = locked;
 }
 
-void Door::loadUTD(const Gff &utd) {
-    _utd = std::make_unique<schema::UTD>(schema::parseUTD(utd));
+void Door::loadUTD(const schema::UTD &utd) {
+    _tag = boost::to_lower_copy(utd.Tag);
+    _name = _services.resource.strings.get(utd.LocName.first);
+    _blueprintResRef = boost::to_lower_copy(utd.TemplateResRef);
+    _autoRemoveKey = utd.AutoRemoveKey;
+    _conversation = boost::to_lower_copy(utd.Conversation);
+    _interruptable = utd.Interruptable;
+    _faction = static_cast<Faction>(utd.Faction);
+    _plot = utd.Plot;
+    _minOneHP = utd.Min1HP;
+    _keyRequired = utd.KeyRequired;
+    _lockable = utd.Lockable;
+    _locked = utd.Locked;
+    _openLockDC = utd.OpenLockDC;
+    _keyName = utd.KeyName;
+    _hitPoints = utd.HP;
+    _currentHitPoints = utd.CurrentHP;
+    _hardness = utd.Hardness;
+    _fortitude = utd.Fort;
+    _genericType = utd.GenericType;
+    _static = utd.Static;
 
-    _tag = boost::to_lower_copy(utd.getString("Tag"));
-    _name = _services.resource.strings.get(utd.getInt("LocName"));
-    _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
-    _autoRemoveKey = utd.getBool("AutoRemoveKey");
-    _conversation = boost::to_lower_copy(utd.getString("Conversation"));
-    _interruptable = utd.getBool("Interruptable");
-    _faction = utd.getEnum("Faction", Faction::Invalid);
-    _plot = utd.getBool("Plot");
-    _minOneHP = utd.getBool("Min1HP");
-    _keyRequired = utd.getBool("KeyRequired");
-    _lockable = utd.getBool("Lockable");
-    _locked = utd.getBool("Locked");
-    _openLockDC = utd.getInt("OpenLockDC");
-    _keyName = utd.getString("KeyName");
-    _hitPoints = utd.getInt("HP");
-    _currentHitPoints = utd.getInt("CurrentHP");
-    _hardness = utd.getInt("Hardness");
-    _fortitude = utd.getInt("Fort");
-    _genericType = utd.getInt("GenericType");
-    _static = utd.getBool("Static");
-
-    _onClosed = utd.getString("OnClosed");   // always empty, but could be useful
-    _onDamaged = utd.getString("OnDamaged"); // always empty, but could be useful
-    _onDeath = utd.getString("OnDeath");
-    _onHeartbeat = utd.getString("OnHeartbeat");
-    _onLock = utd.getString("OnLock");                   // always empty, but could be useful
-    _onMeleeAttacked = utd.getString("OnMeleeAttacked"); // always empty, but could be useful
-    _onOpen = utd.getString("OnOpen");
-    _onSpellCastAt = utd.getString("OnSpellCastAt"); // always empty, but could be useful
-    _onUnlock = utd.getString("OnUnlock");           // always empty, but could be useful
-    _onUserDefined = utd.getString("OnUserDefined");
-    _onClick = utd.getString("OnClick");
-    _onFailToOpen = utd.getString("OnFailToOpen");
+    _onClosed = utd.OnClosed;   // always empty, but could be useful
+    _onDamaged = utd.OnDamaged; // always empty, but could be useful
+    _onDeath = utd.OnDeath;
+    _onHeartbeat = utd.OnHeartbeat;
+    _onLock = utd.OnLock;                   // always empty, but could be useful
+    _onMeleeAttacked = utd.OnMeleeAttacked; // always empty, but could be useful
+    _onOpen = utd.OnOpen;
+    _onSpellCastAt = utd.OnSpellCastAt; // always empty, but could be useful
+    _onUnlock = utd.OnUnlock;           // always empty, but could be useful
+    _onUserDefined = utd.OnUserDefined;
+    _onClick = utd.OnClick;
+    _onFailToOpen = utd.OnFailToOpen;
 
     // Unused fields:
     //

@@ -44,10 +44,10 @@ namespace game {
 
 void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     _name = std::move(name);
-    _ifo = std::make_unique<schema::IFO>(schema::parseIFO(ifo));
 
-    loadInfo(ifo);
-    loadArea(ifo);
+    auto ifoParsed = schema::parseIFO(ifo);
+    loadInfo(ifoParsed);
+    loadArea(ifoParsed);
 
     _area->initCameras(_info.entryPosition, _info.entryFacing);
 
@@ -58,24 +58,24 @@ void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     }
 }
 
-void Module::loadInfo(const Gff &ifo) {
+void Module::loadInfo(const schema::IFO &ifo) {
     // Entry location
 
-    _info.entryArea = ifo.getString("Mod_Entry_Area");
+    _info.entryArea = ifo.Mod_Entry_Area;
     if (_info.entryArea.empty()) {
         throw FormatException("Mod_Entry_Area must not be empty");
     }
 
-    _info.entryPosition.x = ifo.getFloat("Mod_Entry_X");
-    _info.entryPosition.y = ifo.getFloat("Mod_Entry_Y");
-    _info.entryPosition.z = ifo.getFloat("Mod_Entry_Z");
+    _info.entryPosition.x = ifo.Mod_Entry_X;
+    _info.entryPosition.y = ifo.Mod_Entry_Y;
+    _info.entryPosition.z = ifo.Mod_Entry_Z;
 
-    float dirX = ifo.getFloat("Mod_Entry_Dir_X");
-    float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
+    float dirX = ifo.Mod_Entry_Dir_X;
+    float dirY = ifo.Mod_Entry_Dir_Y;
     _info.entryFacing = -glm::atan(dirX, dirY);
 }
 
-void Module::loadArea(const Gff &ifo, bool fromSave) {
+void Module::loadArea(const schema::IFO &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _game.objectFactory().newArea();

@@ -38,9 +38,6 @@ public:
             game,
             services) {
     }
-
-private:
-    std::unique_ptr<schema::UTM> _utm;
 };
 
 } // namespace game

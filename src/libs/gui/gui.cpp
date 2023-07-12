@@ -52,13 +52,13 @@ namespace gui {
 
 void GUI::load(const Gff &gui) {
     debug("Load " + _resRef, LogChannel::GUI);
-    auto parsed = schema::parseGUI(gui);
+    auto guiParsed = schema::parseGUI(gui);
 
-    ControlType type = Control::getType(gui);
-    std::string tag(Control::getTag(gui));
+    ControlType type = Control::getType(guiParsed);
+    std::string tag(Control::getTag(guiParsed));
 
     _rootControl = newControl(type, tag);
-    _rootControl->load(gui);
+    _rootControl->load(guiParsed);
     _controlByTag[tag] = _rootControl.get();
 
     switch (_scaling) {
@@ -76,8 +76,8 @@ void GUI::load(const Gff &gui) {
     const Control::Extent &rootExtent = _rootControl->extent();
     _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
-    for (auto &ctrlGffs : gui.getList("CONTROLS")) {
-        loadControl(*ctrlGffs);
+    for (auto &controlStruct : guiParsed.CONTROLS) {
+        loadControl(controlStruct);
     }
 }
 
@@ -87,16 +87,16 @@ void GUI::stretchControl(Control &control) {
     control.stretch(aspectX, aspectY);
 }
 
-void GUI::loadControl(const Gff &gffs) {
-    ControlType type = Control::getType(gffs);
-    std::string tag(Control::getTag(gffs));
-    std::string parent(Control::getParent(gffs));
+void GUI::loadControl(const schema::GUI_CONTROLS &gui) {
+    ControlType type = Control::getType(gui);
+    std::string tag(Control::getTag(gui));
+    std::string parent(Control::getParent(gui));
 
     std::shared_ptr<Control> control(newControl(type, tag));
     if (!control)
         return;
 
-    control->load(gffs);
+    control->load(gui);
     if (_hasDefaultHilightColor) {
         control->setHilightColor(_defaultHilightColor);
     }

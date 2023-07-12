@@ -39,10 +39,10 @@ namespace reone {
 
 namespace game {
 
-void Sound::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Sound::loadFromGIT(const schema::GIT_SoundList &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
 void Sound::loadFromBlueprint(const std::string &resRef) {
@@ -50,36 +50,35 @@ void Sound::loadFromBlueprint(const std::string &resRef) {
     if (!uts) {
         return;
     }
-    loadUTS(*uts);
+    auto utsParsed = schema::parseUTS(*uts);
+    loadUTS(utsParsed);
 }
 
-void Sound::loadUTS(const Gff &uts) {
-    _uts = std::make_unique<schema::UTS>(schema::parseUTS(uts));
-
-    _tag = boost::to_lower_copy(uts.getString("Tag"));
-    _name = _services.resource.strings.get(uts.getInt("LocName"));
-    _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
-    _active = uts.getBool("Active");
-    _continuous = uts.getBool("Continuous");
-    _looping = uts.getBool("Looping");
-    _positional = uts.getBool("Positional");
-    _randomPosition = uts.getBool("RandomPosition");
-    _random = uts.getInt("Random");
-    _elevation = uts.getFloat("Elevation");
-    _maxDistance = uts.getFloat("MaxDistance");
-    _minDistance = uts.getFloat("MinDistance");
-    _randomRangeX = uts.getFloat("RandomRangeX");
-    _randomRangeY = uts.getFloat("RandomRangeY");
-    _interval = uts.getInt("Interval");
-    _intervalVrtn = uts.getInt("IntervalVrtn");
-    _pitchVariation = uts.getFloat("PitchVariation");
-    _volume = uts.getInt("Volume");
-    _volumeVrtn = uts.getInt("VolumeVrtn");
+void Sound::loadUTS(const schema::UTS &uts) {
+    _tag = boost::to_lower_copy(uts.Tag);
+    _name = _services.resource.strings.get(uts.LocName.first);
+    _blueprintResRef = boost::to_lower_copy(uts.TemplateResRef);
+    _active = uts.Active;
+    _continuous = uts.Continuous;
+    _looping = uts.Looping;
+    _positional = uts.Positional;
+    _randomPosition = uts.RandomPosition;
+    _random = uts.Random;
+    _elevation = uts.Elevation;
+    _maxDistance = uts.MaxDistance;
+    _minDistance = uts.MinDistance;
+    _randomRangeX = uts.RandomRangeX;
+    _randomRangeY = uts.RandomRangeY;
+    _interval = uts.Interval;
+    _intervalVrtn = uts.IntervalVrtn;
+    _pitchVariation = uts.PitchVariation;
+    _volume = uts.Volume;
+    _volumeVrtn = uts.VolumeVrtn;
 
     loadPriorityFromUTS(uts);
 
-    for (auto &soundGffs : uts.getList("Sounds")) {
-        _sounds.push_back(boost::to_lower_copy(soundGffs->getString("Sound")));
+    for (auto &soundStruct : uts.Sounds) {
+        _sounds.push_back(boost::to_lower_copy(soundStruct.Sound));
     }
 
     // Unused fields:
@@ -90,16 +89,16 @@ void Sound::loadUTS(const Gff &uts) {
     // - Comment (toolset only)
 }
 
-void Sound::loadPriorityFromUTS(const Gff &uts) {
+void Sound::loadPriorityFromUTS(const schema::UTS &uts) {
     std::shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
-    int priorityIdx = uts.getInt("Priority");
+    int priorityIdx = uts.Priority;
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }
 
-void Sound::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
+void Sound::loadTransformFromGIT(const schema::GIT_SoundList &git) {
+    _position[0] = git.XPosition;
+    _position[1] = git.YPosition;
+    _position[2] = git.ZPosition;
 
     updateTransform();
 

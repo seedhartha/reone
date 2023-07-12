@@ -76,18 +76,19 @@ void Creature::Path::selectNextPoint() {
     }
 }
 
-void Creature::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Creature::loadFromGIT(const schema::GIT_Creature_List &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
 void Creature::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> utc(_services.resource.gffs.get(resRef, ResourceType::Utc));
-    if (utc) {
-        loadUTC(*utc);
-        loadAppearance();
+    auto utc = _services.resource.gffs.get(resRef, ResourceType::Utc);
+    if (!utc) {
+        return;
     }
+    loadUTC(schema::parseUTC(*utc));
+    loadAppearance();
 }
 
 void Creature::loadAppearance() {
@@ -152,13 +153,13 @@ void Creature::updateModel() {
     _animDirty = true;
 }
 
-void Creature::loadTransformFromGIT(const Gff &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
+void Creature::loadTransformFromGIT(const schema::GIT_Creature_List &git) {
+    _position[0] = git.XPosition;
+    _position[1] = git.YPosition;
+    _position[2] = git.ZPosition;
 
-    float cosine = gffs.getFloat("XOrientation");
-    float sine = gffs.getFloat("YOrientation");
+    float cosine = git.XOrientation;
+    float sine = git.YOrientation;
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(cosine, sine)));
 
     updateTransform();
@@ -1248,54 +1249,52 @@ std::string Creature::getWeaponModelName(int slot) const {
     return std::move(modelName);
 }
 
-void Creature::loadUTC(const Gff &utc) {
-    _utc = std::make_unique<schema::UTC>(schema::parseUTC(utc));
+void Creature::loadUTC(const schema::UTC &utc) {
+    _blueprintResRef = boost::to_lower_copy(utc.TemplateResRef);
+    _race = static_cast<RacialType>(utc.Race);         // index into racialtypes.2da
+    _subrace = static_cast<Subrace>(utc.SubraceIndex); // index into subrace.2da
+    _appearance = utc.Appearance_Type;                 // index into appearance.2da
+    _gender = static_cast<Gender>(utc.Gender);         // index into gender.2da
+    _portraitId = utc.PortraitId;                      // index into portrait.2da
+    _tag = boost::to_lower_copy(utc.Tag);
+    _conversation = boost::to_lower_copy(utc.Conversation);
+    _isPC = utc.IsPC;                               // always 0
+    _faction = static_cast<Faction>(utc.FactionID); // index into repute.2da
+    _disarmable = utc.Disarmable;
+    _plot = utc.Plot;
+    _interruptable = utc.Interruptable;
+    _noPermDeath = utc.NoPermDeath;
+    _notReorienting = utc.NotReorienting;
+    _bodyVariation = utc.BodyVariation;
+    _textureVar = utc.TextureVar;
+    _minOneHP = utc.Min1HP;
+    _partyInteract = utc.PartyInteract;
+    _walkRate = utc.WalkRate; // index into creaturespeed.2da
+    _naturalAC = utc.NaturalAC;
+    _hitPoints = utc.HitPoints;
+    _currentHitPoints = utc.CurrentHitPoints;
+    _maxHitPoints = utc.MaxHitPoints;
+    _forcePoints = utc.ForcePoints;
+    _currentForce = utc.CurrentForce;
+    _refBonus = utc.refbonus;
+    _willBonus = utc.willbonus;
+    _fortBonus = utc.fortbonus;
+    _goodEvil = utc.GoodEvil;
+    _challengeRating = utc.ChallengeRating;
 
-    _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
-    _race = utc.getEnum("Race", RacialType::Invalid);      // index into racialtypes.2da
-    _subrace = utc.getEnum("SubraceIndex", Subrace::None); // index into subrace.2da
-    _appearance = utc.getInt("Appearance_Type");           // index into appearance.2da
-    _gender = utc.getEnum("Gender", Gender::None);         // index into gender.2da
-    _portraitId = utc.getInt("PortraitId");                // index into portrait.2da
-    _tag = boost::to_lower_copy(utc.getString("Tag"));
-    _conversation = boost::to_lower_copy(utc.getString("Conversation"));
-    _isPC = utc.getBool("IsPC");                           // always 0
-    _faction = utc.getEnum("FactionID", Faction::Invalid); // index into repute.2da
-    _disarmable = utc.getBool("Disarmable");
-    _plot = utc.getBool("Plot");
-    _interruptable = utc.getBool("Interruptable");
-    _noPermDeath = utc.getBool("NoPermDeath");
-    _notReorienting = utc.getBool("NotReorienting");
-    _bodyVariation = utc.getInt("BodyVariation");
-    _textureVar = utc.getInt("TextureVar");
-    _minOneHP = utc.getBool("Min1HP");
-    _partyInteract = utc.getBool("PartyInteract");
-    _walkRate = utc.getInt("WalkRate"); // index into creaturespeed.2da
-    _naturalAC = utc.getInt("NaturalAC");
-    _hitPoints = utc.getInt("HitPoints");
-    _currentHitPoints = utc.getInt("CurrentHitPoints");
-    _maxHitPoints = utc.getInt("MaxHitPoints");
-    _forcePoints = utc.getInt("ForcePoints");
-    _currentForce = utc.getInt("CurrentForce");
-    _refBonus = utc.getInt("refbonus");
-    _willBonus = utc.getInt("willbonus");
-    _fortBonus = utc.getInt("fortbonus");
-    _goodEvil = utc.getInt("GoodEvil");
-    _challengeRating = utc.getInt("ChallengeRating");
-
-    _onHeartbeat = boost::to_lower_copy(utc.getString("ScriptHeartbeat"));
-    _onNotice = boost::to_lower_copy(utc.getString("ScriptOnNotice"));
-    _onSpellAt = boost::to_lower_copy(utc.getString("ScriptSpellAt"));
-    _onAttacked = boost::to_lower_copy(utc.getString("ScriptAttacked"));
-    _onDamaged = boost::to_lower_copy(utc.getString("ScriptDamaged"));
-    _onDisturbed = boost::to_lower_copy(utc.getString("ScriptDisturbed"));
-    _onEndRound = boost::to_lower_copy(utc.getString("ScriptEndRound"));
-    _onEndDialogue = boost::to_lower_copy(utc.getString("ScriptEndDialogu"));
-    _onDialogue = boost::to_lower_copy(utc.getString("ScriptDialogue"));
-    _onSpawn = boost::to_lower_copy(utc.getString("ScriptSpawn"));
-    _onDeath = boost::to_lower_copy(utc.getString("ScriptDeath"));
-    _onUserDefined = boost::to_lower_copy(utc.getString("ScriptUserDefine"));
-    _onBlocked = boost::to_lower_copy(utc.getString("ScriptOnBlocked"));
+    _onHeartbeat = boost::to_lower_copy(utc.ScriptHeartbeat);
+    _onNotice = boost::to_lower_copy(utc.ScriptOnNotice);
+    _onSpellAt = boost::to_lower_copy(utc.ScriptSpellAt);
+    _onAttacked = boost::to_lower_copy(utc.ScriptAttacked);
+    _onDamaged = boost::to_lower_copy(utc.ScriptDamaged);
+    _onDisturbed = boost::to_lower_copy(utc.ScriptDisturbed);
+    _onEndRound = boost::to_lower_copy(utc.ScriptEndRound);
+    _onEndDialogue = boost::to_lower_copy(utc.ScriptEndDialogu);
+    _onDialogue = boost::to_lower_copy(utc.ScriptDialogue);
+    _onSpawn = boost::to_lower_copy(utc.ScriptSpawn);
+    _onDeath = boost::to_lower_copy(utc.ScriptDeath);
+    _onUserDefined = boost::to_lower_copy(utc.ScriptUserDefine);
+    _onBlocked = boost::to_lower_copy(utc.ScriptOnBlocked);
 
     loadNameFromUTC(utc);
     loadSoundSetFromUTC(utc);
@@ -1303,12 +1302,12 @@ void Creature::loadUTC(const Gff &utc) {
     loadAttributesFromUTC(utc);
     loadPerceptionRangeFromUTC(utc);
 
-    for (auto &item : utc.getList("Equip_ItemList")) {
-        equip(boost::to_lower_copy(item->getString("EquippedRes")));
+    for (auto &item : utc.Equip_ItemList) {
+        equip(boost::to_lower_copy(item.EquippedRes));
     }
-    for (auto &itemGffs : utc.getList("ItemList")) {
-        std::string resRef(boost::to_lower_copy(itemGffs->getString("InventoryRes")));
-        bool dropable = itemGffs->getBool("Dropable");
+    for (auto &item : utc.ItemList) {
+        std::string resRef(boost::to_lower_copy(item.InventoryRes));
+        bool dropable = item.Dropable;
         addItem(resRef, 1, dropable);
     }
 
@@ -1324,9 +1323,9 @@ void Creature::loadUTC(const Gff &utc) {
     // - Comment (toolset only)
 }
 
-void Creature::loadNameFromUTC(const Gff &utc) {
-    std::string firstName(_services.resource.strings.get(utc.getInt("FirstName")));
-    std::string lastName(_services.resource.strings.get(utc.getInt("LastName")));
+void Creature::loadNameFromUTC(const schema::UTC &utc) {
+    std::string firstName(_services.resource.strings.get(utc.FirstName.first));
+    std::string lastName(_services.resource.strings.get(utc.LastName.first));
     if (!firstName.empty() && !lastName.empty()) {
         _name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
@@ -1334,8 +1333,8 @@ void Creature::loadNameFromUTC(const Gff &utc) {
     }
 }
 
-void Creature::loadSoundSetFromUTC(const Gff &utc) {
-    uint32_t soundSetIdx = utc.getUint("SoundSetFile", 0xffff);
+void Creature::loadSoundSetFromUTC(const schema::UTC &utc) {
+    uint32_t soundSetIdx = utc.SoundSetFile;
     if (soundSetIdx == 0xffff) {
         return;
     }
@@ -1349,54 +1348,53 @@ void Creature::loadSoundSetFromUTC(const Gff &utc) {
     }
 }
 
-void Creature::loadBodyBagFromUTC(const Gff &utc) {
+void Creature::loadBodyBagFromUTC(const schema::UTC &utc) {
     std::shared_ptr<TwoDa> bodyBags(_services.resource.twoDas.get("bodybag"));
     if (!bodyBags) {
         return;
     }
-    int bodyBag = utc.getInt("BodyBag");
+    int bodyBag = utc.BodyBag;
     _bodyBag.name = _services.resource.strings.get(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
 
-void Creature::loadAttributesFromUTC(const Gff &utc) {
+void Creature::loadAttributesFromUTC(const schema::UTC &utc) {
     CreatureAttributes &attributes = _attributes;
-    attributes.setAbilityScore(Ability::Strength, utc.getInt("Str"));
-    attributes.setAbilityScore(Ability::Dexterity, utc.getInt("Dex"));
-    attributes.setAbilityScore(Ability::Constitution, utc.getInt("Con"));
-    attributes.setAbilityScore(Ability::Intelligence, utc.getInt("Int"));
-    attributes.setAbilityScore(Ability::Wisdom, utc.getInt("Wis"));
-    attributes.setAbilityScore(Ability::Charisma, utc.getInt("Cha"));
+    attributes.setAbilityScore(Ability::Strength, utc.Str);
+    attributes.setAbilityScore(Ability::Dexterity, utc.Dex);
+    attributes.setAbilityScore(Ability::Constitution, utc.Con);
+    attributes.setAbilityScore(Ability::Intelligence, utc.Int);
+    attributes.setAbilityScore(Ability::Wisdom, utc.Wis);
+    attributes.setAbilityScore(Ability::Charisma, utc.Cha);
 
-    for (auto &classGffs : utc.getList("ClassList")) {
-        int clazz = classGffs->getInt("Class");
-        int level = classGffs->getInt("ClassLevel");
-        attributes.addClassLevels(_services.game.classes.get(static_cast<ClassType>(clazz)).get(), level);
-        for (auto &spellGffs : classGffs->getList("KnownList0")) {
-            auto spell = static_cast<SpellType>(spellGffs->getUint("Spell"));
+    for (auto &classStrct : utc.ClassList) {
+        auto clazz = static_cast<ClassType>(classStrct.Class);
+        int level = classStrct.ClassLevel;
+        attributes.addClassLevels(_services.game.classes.get(clazz).get(), level);
+        for (auto &spellStrct : classStrct.KnownList0) {
+            auto spell = static_cast<SpellType>(spellStrct.Spell);
             attributes.addSpell(spell);
         }
     }
 
-    std::vector<std::shared_ptr<Gff>> skillsUtc(utc.getList("SkillList"));
-    for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
+    for (size_t i = 0; i < utc.SkillList.size(); ++i) {
         SkillType skill = static_cast<SkillType>(i);
-        attributes.setSkillRank(skill, skillsUtc[i]->getInt("Rank"));
+        attributes.setSkillRank(skill, utc.SkillList[i].Rank);
     }
 
-    for (auto &featGffs : utc.getList("FeatList")) {
-        auto feat = static_cast<FeatType>(featGffs->getUint("Feat"));
+    for (auto &featStrct : utc.FeatList) {
+        auto feat = static_cast<FeatType>(featStrct.Feat);
         _attributes.addFeat(feat);
     }
 }
 
-void Creature::loadPerceptionRangeFromUTC(const Gff &utc) {
+void Creature::loadPerceptionRangeFromUTC(const schema::UTC &utc) {
     std::shared_ptr<TwoDa> ranges(_services.resource.twoDas.get("ranges"));
     if (!ranges) {
         return;
     }
-    int rangeIdx = utc.getInt("PerceptionRange");
+    int rangeIdx = utc.PerceptionRange;
     _perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
     _perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");
 }

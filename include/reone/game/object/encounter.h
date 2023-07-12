@@ -20,6 +20,7 @@
 #include "reone/resource/gff.h"
 
 #include "../object.h"
+#include "../schema/git.h"
 #include "../schema/ute.h"
 
 namespace reone {
@@ -41,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromGIT(const schema::GIT_Encounter_List &git);
 
 private:
     struct SpawnPoint {
@@ -69,8 +70,6 @@ private:
     std::vector<glm::vec3> _geometry;
     std::vector<SpawnPoint> _spawnPoints;
 
-    std::unique_ptr<schema::UTE> _ute;
-
     // Scripts
 
     std::string _onEntered;
@@ -80,12 +79,12 @@ private:
     // END Scripts
 
     void loadFromBlueprint(const std::string &blueprintResRef);
-    void loadPositionFromGIT(const resource::Gff &gffs);
-    void loadGeometryFromGIT(const resource::Gff &gffs);
-    void loadSpawnPointsFromGIT(const resource::Gff &gffs);
+    void loadPositionFromGIT(const schema::GIT_Encounter_List &gffs);
+    void loadGeometryFromGIT(const schema::GIT_Encounter_List &gffs);
+    void loadSpawnPointsFromGIT(const schema::GIT_Encounter_List &gffs);
 
-    void loadUTE(const resource::Gff &ute);
-    void loadCreaturesFromUTE(const resource::Gff &ute);
+    void loadUTE(const schema::UTE &ute);
+    void loadCreaturesFromUTE(const schema::UTE &ute);
 };
 
 } // namespace game

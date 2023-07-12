@@ -43,7 +43,8 @@ namespace game {
 void Item::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
     if (uti) {
-        loadUTI(*uti);
+        auto utiParsed = schema::parseUTI(*uti);
+        loadUTI(utiParsed);
     }
 }
 
@@ -97,25 +98,23 @@ void Item::setEquipped(bool equipped) {
     _equipped = equipped;
 }
 
-void Item::loadUTI(const Gff &uti) {
-    _uti = std::make_unique<schema::UTI>(schema::parseUTI(uti));
-
-    _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
-    _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
-    _localizedName = _services.resource.strings.get(uti.getInt("LocalizedName"));
-    _description = _services.resource.strings.get(uti.getInt("Description"));
-    _descIdentified = _services.resource.strings.get(uti.getInt("DescIdentified"));
-    _tag = boost::to_lower_copy(uti.getString("Tag"));
-    _charges = uti.getInt("Charges");
-    _cost = uti.getInt("Cost");
-    _stolen = uti.getBool("Stolen");
-    _stackSize = uti.getInt("StackSize");
-    _plot = uti.getBool("Plot");
-    _addCost = uti.getInt("AddCost");
-    _identified = uti.getInt("Identified");
-    _modelVariation = uti.getInt("ModelVariation", 1);
-    _textureVariation = uti.getInt("TextureVar", 1);
-    _bodyVariation = uti.getInt("BodyVariation", 1);
+void Item::loadUTI(const schema::UTI &uti) {
+    _blueprintResRef = boost::to_lower_copy(uti.TemplateResRef);
+    _baseItem = uti.BaseItem; // index into baseitems.2da
+    _localizedName = _services.resource.strings.get(uti.LocalizedName.first);
+    _description = _services.resource.strings.get(uti.Description.first);
+    _descIdentified = _services.resource.strings.get(uti.DescIdentified.first);
+    _tag = boost::to_lower_copy(uti.Tag);
+    _charges = uti.Charges;
+    _cost = uti.Cost;
+    _stolen = uti.Stolen;
+    _stackSize = uti.StackSize;
+    _plot = uti.Plot;
+    _addCost = uti.AddCost;
+    _identified = uti.Identified;
+    _modelVariation = uti.ModelVariation;
+    _textureVariation = uti.TextureVar;
+    _bodyVariation = uti.BodyVariation;
 
     std::shared_ptr<TwoDa> baseItems(_services.resource.twoDas.get("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");

@@ -17,7 +17,6 @@
 
 #include "reone/game/paths.h"
 
-#include "reone/game/schema/pth.h"
 #include "reone/resource/gffs.h"
 
 using namespace reone::resource;
@@ -31,23 +30,23 @@ std::shared_ptr<Path> Paths::doGet(std::string resRef) {
     if (!pth) {
         return nullptr;
     }
-    return loadPath(*pth);
+    auto pthParsed = schema::parsePTH(*pth);
+    return loadPath(pthParsed);
 }
 
-std::unique_ptr<Path> Paths::loadPath(const Gff &pth) const {
+std::unique_ptr<Path> Paths::loadPath(const schema::PTH &pth) const {
     auto path = std::make_unique<Path>();
-    auto parsed = schema::parsePTH(pth);
 
     std::vector<int> connections;
-    for (auto &connection : pth.getList("Path_Conections")) {
-        int destination = connection->getInt("Destination");
+    for (auto &connection : pth.Path_Conections) {
+        int destination = connection.Destination;
         connections.push_back(destination);
     }
-    for (auto &pointGffs : pth.getList("Path_Points")) {
-        int connectionCount = pointGffs->getInt("Conections");
-        int firstConnection = pointGffs->getInt("First_Conection");
-        float x = pointGffs->getFloat("X");
-        float y = pointGffs->getFloat("Y");
+    for (auto &pointStruct : pth.Path_Points) {
+        int connectionCount = pointStruct.Conections;
+        int firstConnection = pointStruct.First_Conection;
+        float x = pointStruct.X;
+        float y = pointStruct.Y;
 
         Path::Point point;
         point.x = x;

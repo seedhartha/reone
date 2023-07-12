@@ -27,8 +27,8 @@ namespace game {
 
 namespace schema {
 
-static DLG_ReplyList_EntriesList parseDLG_ReplyList_EntriesList(const Gff &gff) {
-    DLG_ReplyList_EntriesList strct;
+static DLG_EntryReplyList_EntriesRepliesList parseDLG_EntryReplyList_EntriesRepliesList(const Gff &gff) {
+    DLG_EntryReplyList_EntriesRepliesList strct;
     strct.Active = gff.getString("Active");
     strct.Active2 = gff.getString("Active2");
     strct.Index = gff.getUint("Index");
@@ -52,40 +52,8 @@ static DLG_ReplyList_EntriesList parseDLG_ReplyList_EntriesList(const Gff &gff) 
     return strct;
 }
 
-static DLG_ReplyList_AnimList parseDLG_ReplyList_AnimList(const Gff &gff) {
-    DLG_ReplyList_AnimList strct;
-    strct.Animation = gff.getUint("Animation");
-    strct.Participant = gff.getString("Participant");
-    return strct;
-}
-
-static DLG_EntryList_RepliesList parseDLG_EntryList_RepliesList(const Gff &gff) {
-    DLG_EntryList_RepliesList strct;
-    strct.Active = gff.getString("Active");
-    strct.Active2 = gff.getString("Active2");
-    strct.Index = gff.getUint("Index");
-    strct.IsChild = gff.getUint("IsChild");
-    strct.LinkComment = gff.getString("LinkComment");
-    strct.Logic = gff.getInt("Logic");
-    strct.Not = gff.getUint("Not");
-    strct.Not2 = gff.getUint("Not2");
-    strct.Param1 = gff.getInt("Param1");
-    strct.Param1b = gff.getInt("Param1b");
-    strct.Param2 = gff.getInt("Param2");
-    strct.Param2b = gff.getInt("Param2b");
-    strct.Param3 = gff.getInt("Param3");
-    strct.Param3b = gff.getInt("Param3b");
-    strct.Param4 = gff.getInt("Param4");
-    strct.Param4b = gff.getInt("Param4b");
-    strct.Param5 = gff.getInt("Param5");
-    strct.Param5b = gff.getInt("Param5b");
-    strct.ParamStrA = gff.getString("ParamStrA");
-    strct.ParamStrB = gff.getString("ParamStrB");
-    return strct;
-}
-
-static DLG_EntryList_AnimList parseDLG_EntryList_AnimList(const Gff &gff) {
-    DLG_EntryList_AnimList strct;
+static DLG_EntryReplyList_AnimList parseDLG_EntryReplyList_AnimList(const Gff &gff) {
+    DLG_EntryReplyList_AnimList strct;
     strct.Animation = gff.getUint("Animation");
     strct.Participant = gff.getString("Participant");
     return strct;
@@ -98,31 +66,8 @@ static DLG_StuntList parseDLG_StuntList(const Gff &gff) {
     return strct;
 }
 
-static DLG_StartingList parseDLG_StartingList(const Gff &gff) {
-    DLG_StartingList strct;
-    strct.Active = gff.getString("Active");
-    strct.Active2 = gff.getString("Active2");
-    strct.Index = gff.getUint("Index");
-    strct.Logic = gff.getInt("Logic");
-    strct.Not = gff.getUint("Not");
-    strct.Not2 = gff.getUint("Not2");
-    strct.Param1 = gff.getInt("Param1");
-    strct.Param1b = gff.getInt("Param1b");
-    strct.Param2 = gff.getInt("Param2");
-    strct.Param2b = gff.getInt("Param2b");
-    strct.Param3 = gff.getInt("Param3");
-    strct.Param3b = gff.getInt("Param3b");
-    strct.Param4 = gff.getInt("Param4");
-    strct.Param4b = gff.getInt("Param4b");
-    strct.Param5 = gff.getInt("Param5");
-    strct.Param5b = gff.getInt("Param5b");
-    strct.ParamStrA = gff.getString("ParamStrA");
-    strct.ParamStrB = gff.getString("ParamStrB");
-    return strct;
-}
-
-static DLG_ReplyList parseDLG_ReplyList(const Gff &gff) {
-    DLG_ReplyList strct;
+static DLG_EntryReplyList parseDLG_EntryReplyList(const Gff &gff) {
+    DLG_EntryReplyList strct;
     strct.ActionParam1 = gff.getInt("ActionParam1");
     strct.ActionParam1b = gff.getInt("ActionParam1b");
     strct.ActionParam2 = gff.getInt("ActionParam2");
@@ -137,60 +82,7 @@ static DLG_ReplyList parseDLG_ReplyList(const Gff &gff) {
     strct.ActionParamStrB = gff.getString("ActionParamStrB");
     strct.AlienRaceNode = gff.getInt("AlienRaceNode");
     for (auto &item : gff.getList("AnimList")) {
-        strct.AnimList.push_back(parseDLG_ReplyList_AnimList(*item));
-    }
-    strct.CamHeightOffset = gff.getFloat("CamHeightOffset");
-    strct.CamVidEffect = gff.getInt("CamVidEffect");
-    strct.CameraAngle = gff.getUint("CameraAngle");
-    strct.CameraID = gff.getInt("CameraID");
-    strct.Comment = gff.getString("Comment");
-    strct.Delay = gff.getUint("Delay");
-    strct.Emotion = gff.getInt("Emotion");
-    for (auto &item : gff.getList("EntriesList")) {
-        strct.EntriesList.push_back(parseDLG_ReplyList_EntriesList(*item));
-    }
-    strct.FacialAnim = gff.getInt("FacialAnim");
-    strct.FadeColor = gff.getVector("FadeColor");
-    strct.FadeDelay = gff.getFloat("FadeDelay");
-    strct.FadeLength = gff.getFloat("FadeLength");
-    strct.FadeType = gff.getUint("FadeType");
-    strct.Listener = gff.getString("Listener");
-    strct.NodeUnskippable = gff.getInt("NodeUnskippable");
-    strct.PlotIndex = gff.getInt("PlotIndex");
-    strct.PlotXPPercentage = gff.getFloat("PlotXPPercentage");
-    strct.PostProcNode = gff.getInt("PostProcNode");
-    strct.Quest = gff.getString("Quest");
-    strct.QuestEntry = gff.getUint("QuestEntry");
-    strct.RecordNoVOOverri = gff.getInt("RecordNoVOOverri");
-    strct.RecordVO = gff.getInt("RecordVO");
-    strct.Script = gff.getString("Script");
-    strct.Script2 = gff.getString("Script2");
-    strct.Sound = gff.getString("Sound");
-    strct.SoundExists = gff.getUint("SoundExists");
-    strct.TarHeightOffset = gff.getFloat("TarHeightOffset");
-    strct.Text = std::make_pair(gff.getInt("Text"), gff.getString("Text"));
-    strct.VO_ResRef = gff.getString("VO_ResRef");
-    strct.WaitFlags = gff.getUint("WaitFlags");
-    return strct;
-}
-
-static DLG_EntryList parseDLG_EntryList(const Gff &gff) {
-    DLG_EntryList strct;
-    strct.ActionParam1 = gff.getInt("ActionParam1");
-    strct.ActionParam1b = gff.getInt("ActionParam1b");
-    strct.ActionParam2 = gff.getInt("ActionParam2");
-    strct.ActionParam2b = gff.getInt("ActionParam2b");
-    strct.ActionParam3 = gff.getInt("ActionParam3");
-    strct.ActionParam3b = gff.getInt("ActionParam3b");
-    strct.ActionParam4 = gff.getInt("ActionParam4");
-    strct.ActionParam4b = gff.getInt("ActionParam4b");
-    strct.ActionParam5 = gff.getInt("ActionParam5");
-    strct.ActionParam5b = gff.getInt("ActionParam5b");
-    strct.ActionParamStrA = gff.getString("ActionParamStrA");
-    strct.ActionParamStrB = gff.getString("ActionParamStrB");
-    strct.AlienRaceNode = gff.getInt("AlienRaceNode");
-    for (auto &item : gff.getList("AnimList")) {
-        strct.AnimList.push_back(parseDLG_EntryList_AnimList(*item));
+        strct.AnimList.push_back(parseDLG_EntryReplyList_AnimList(*item));
     }
     strct.CamFieldOfView = gff.getFloat("CamFieldOfView");
     strct.CamHeightOffset = gff.getFloat("CamHeightOffset");
@@ -202,6 +94,9 @@ static DLG_EntryList parseDLG_EntryList(const Gff &gff) {
     strct.Comment = gff.getString("Comment");
     strct.Delay = gff.getUint("Delay");
     strct.Emotion = gff.getInt("Emotion");
+    for (auto &item : gff.getList("EntriesList")) {
+        strct.EntriesList.push_back(parseDLG_EntryReplyList_EntriesRepliesList(*item));
+    }
     strct.FacialAnim = gff.getInt("FacialAnim");
     strct.FadeColor = gff.getVector("FadeColor");
     strct.FadeDelay = gff.getFloat("FadeDelay");
@@ -218,7 +113,7 @@ static DLG_EntryList parseDLG_EntryList(const Gff &gff) {
     strct.RecordNoVOOverri = gff.getInt("RecordNoVOOverri");
     strct.RecordVO = gff.getInt("RecordVO");
     for (auto &item : gff.getList("RepliesList")) {
-        strct.RepliesList.push_back(parseDLG_EntryList_RepliesList(*item));
+        strct.RepliesList.push_back(parseDLG_EntryReplyList_EntriesRepliesList(*item));
     }
     strct.Script = gff.getString("Script");
     strct.Script2 = gff.getString("Script2");
@@ -248,7 +143,7 @@ DLG parseDLG(const Gff &gff) {
     strct.EndConverAbort = gff.getString("EndConverAbort");
     strct.EndConversation = gff.getString("EndConversation");
     for (auto &item : gff.getList("EntryList")) {
-        strct.EntryList.push_back(parseDLG_EntryList(*item));
+        strct.EntryList.push_back(parseDLG_EntryReplyList(*item));
     }
     strct.NextNodeID = gff.getInt("NextNodeID");
     strct.NumWords = gff.getUint("NumWords");
@@ -256,11 +151,11 @@ DLG parseDLG(const Gff &gff) {
     strct.PostProcOwner = gff.getInt("PostProcOwner");
     strct.RecordNoVO = gff.getInt("RecordNoVO");
     for (auto &item : gff.getList("ReplyList")) {
-        strct.ReplyList.push_back(parseDLG_ReplyList(*item));
+        strct.ReplyList.push_back(parseDLG_EntryReplyList(*item));
     }
     strct.Skippable = gff.getUint("Skippable");
     for (auto &item : gff.getList("StartingList")) {
-        strct.StartingList.push_back(parseDLG_StartingList(*item));
+        strct.StartingList.push_back(parseDLG_EntryReplyList_EntriesRepliesList(*item));
     }
     for (auto &item : gff.getList("StuntList")) {
         strct.StuntList.push_back(parseDLG_StuntList(*item));

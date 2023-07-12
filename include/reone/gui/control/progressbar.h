@@ -38,7 +38,7 @@ public:
             strings) {
     }
 
-    void load(const resource::Gff &gffs) override;
+    void load(const schema::GUI_BASECONTROL &gui, bool protoItem) override;
     void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
     void setValue(int value);

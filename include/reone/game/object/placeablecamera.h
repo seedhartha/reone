@@ -21,6 +21,7 @@
 
 #include "../camera.h"
 #include "../object.h"
+#include "../schema/git.h"
 
 namespace reone {
 
@@ -41,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromGIT(const schema::GIT_CameraList &git);
 
     int cameraId() const { return _cameraId; }
     float fieldOfView() const { return _fieldOfView; }
@@ -50,7 +51,7 @@ private:
     int _cameraId {0};
     float _fieldOfView {0.0f};
 
-    void loadTransformFromGIT(const resource::Gff &gffs);
+    void loadTransformFromGIT(const schema::GIT_CameraList &git);
 };
 
 } // namespace game

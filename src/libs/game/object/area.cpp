@@ -115,17 +115,19 @@ void Area::init() {
 
 void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave) {
     _name = std::move(name);
-    _are = std::make_unique<schema::ARE>(schema::parseARE(are));
 
-    loadARE(are);
-    loadGIT(git);
+    auto areParsed = schema::parseARE(are);
+    auto gitParsed = schema::parseGIT(git);
+
+    loadARE(areParsed);
+    loadGIT(gitParsed);
     loadLYT();
     loadVIS();
     loadPTH();
 }
 
-void Area::loadARE(const Gff &are) {
-    _localizedName = _services.resource.strings.get(are.getInt("Name"));
+void Area::loadARE(const schema::ARE &are) {
+    _localizedName = _services.resource.strings.get(are.Name.first);
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -136,9 +138,9 @@ void Area::loadARE(const Gff &are) {
     loadFog(are);
 }
 
-void Area::loadCameraStyle(const Gff &are) {
+void Area::loadCameraStyle(const schema::ARE &are) {
     // Area
-    int areaStyleIdx = are.getInt("CameraStyle");
+    int areaStyleIdx = are.CameraStyle;
     std::shared_ptr<CameraStyle> areaStyle(_services.game.cameraStyles.get(areaStyleIdx));
     if (areaStyle) {
         _camStyleDefault = *areaStyle;
@@ -155,55 +157,50 @@ void Area::loadCameraStyle(const Gff &are) {
     }
 }
 
-void Area::loadAmbientColor(const Gff &are) {
-    _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
+void Area::loadAmbientColor(const schema::ARE &are) {
+    _ambientColor = are.DynAmbientColor > 0 ? Gff::colorFromUint32(are.DynAmbientColor) : g_defaultAmbientColor;
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     sceneGraph.setAmbientLightColor(_ambientColor);
 }
 
-void Area::loadScripts(const Gff &are) {
-    _onEnter = are.getString("OnEnter");
-    _onExit = are.getString("OnExit");
-    _onHeartbeat = are.getString("OnHeartbeat");
-    _onUserDefined = are.getString("OnUserDefined");
+void Area::loadScripts(const schema::ARE &are) {
+    _onEnter = are.OnEnter;
+    _onExit = are.OnExit;
+    _onHeartbeat = are.OnHeartbeat;
+    _onUserDefined = are.OnUserDefined;
 }
 
-void Area::loadMap(const Gff &are) {
-    auto mapStruct = are.findStruct("Map");
-    if (!mapStruct) {
-        warn("Map properties not found in ARE");
-        return;
-    }
-    _game.map().load(_name, *mapStruct);
+void Area::loadMap(const schema::ARE &are) {
+    _game.map().load(_name, are.Map);
 }
 
-void Area::loadStealthXP(const Gff &are) {
-    _stealthXPEnabled = are.getBool("StealthXPEnabled");
-    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
-    _maxStealthXP = are.getInt("StealthXPMax");
+void Area::loadStealthXP(const schema::ARE &are) {
+    _stealthXPEnabled = are.StealthXPEnabled;
+    _stealthXPDecrement = are.StealthXPLoss; // TODO: loss = decrement?
+    _maxStealthXP = are.StealthXPMax;
 }
 
-void Area::loadGrass(const Gff &are) {
-    std::string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
+void Area::loadGrass(const schema::ARE &are) {
+    std::string texName(boost::to_lower_copy(are.Grass_TexName));
     if (!texName.empty()) {
         _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
     }
-    _grass.density = are.getFloat("Grass_Density");
-    _grass.quadSize = are.getFloat("Grass_QuadSize");
-    _grass.ambient = are.getInt("Grass_Ambient");
-    _grass.diffuse = are.getInt("Grass_Diffuse");
-    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
-    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
-    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
-    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
+    _grass.density = are.Grass_Density;
+    _grass.quadSize = are.Grass_QuadSize;
+    _grass.ambient = are.Grass_Ambient;
+    _grass.diffuse = are.Grass_Diffuse;
+    _grass.probabilities[0] = are.Grass_Prob_UL;
+    _grass.probabilities[1] = are.Grass_Prob_UR;
+    _grass.probabilities[2] = are.Grass_Prob_LL;
+    _grass.probabilities[3] = are.Grass_Prob_LR;
 }
 
-void Area::loadFog(const Gff &are) {
-    _fogEnabled = are.getBool("SunFogOn");
-    _fogNear = are.getFloat("SunFogNear");
-    _fogFar = are.getFloat("SunFogFar");
-    _fogColor = are.getColor("SunFogColor");
+void Area::loadFog(const schema::ARE &are) {
+    _fogEnabled = are.SunFogOn;
+    _fogNear = are.SunFogNear;
+    _fogFar = are.SunFogFar;
+    _fogColor = Gff::colorFromUint32(are.SunFogColor);
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     auto fogProperties = FogProperties();
@@ -214,7 +211,7 @@ void Area::loadFog(const Gff &are) {
     sceneGraph.setFog(fogProperties);
 }
 
-void Area::loadGIT(const Gff &git) {
+void Area::loadGIT(const schema::GIT &git) {
     loadProperties(git);
     loadCreatures(git);
     loadDoors(git);
@@ -226,94 +223,89 @@ void Area::loadGIT(const Gff &git) {
     loadEncounters(git);
 }
 
-void Area::loadProperties(const Gff &git) {
-    std::shared_ptr<Gff> props(git.findStruct("AreaProperties"));
-    if (!props) {
-        warn("Area properties not found in GIT");
-        return;
-    }
-    int musicIdx = props->getInt("MusicDay");
+void Area::loadProperties(const schema::GIT &git) {
+    int musicIdx = git.AreaProperties.MusicDay;
     if (musicIdx) {
         std::shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
 
-void Area::loadCreatures(const Gff &git) {
-    for (auto &gffs : git.getList("Creature List")) {
+void Area::loadCreatures(const schema::GIT &git) {
+    for (auto &creatureStruct : git.Creature_List) {
         std::shared_ptr<Creature> creature = _game.objectFactory().newCreature(_sceneName);
         _game.addObject(creature);
-        creature->loadFromGIT(*gffs);
+        creature->loadFromGIT(creatureStruct);
         landObject(*creature);
         add(creature);
     }
 }
 
-void Area::loadDoors(const Gff &git) {
-    for (auto &gffs : git.getList("Door List")) {
+void Area::loadDoors(const schema::GIT &git) {
+    for (auto &doorStruct : git.Door_List) {
         std::shared_ptr<Door> door = _game.objectFactory().newDoor(_sceneName);
         _game.addObject(door);
-        door->loadFromGIT(*gffs);
+        door->loadFromGIT(doorStruct);
         add(door);
     }
 }
 
-void Area::loadPlaceables(const Gff &git) {
-    for (auto &gffs : git.getList("Placeable List")) {
+void Area::loadPlaceables(const schema::GIT &git) {
+    for (auto &placeableStruct : git.Placeable_List) {
         std::shared_ptr<Placeable> placeable = _game.objectFactory().newPlaceable(_sceneName);
         _game.addObject(placeable);
-        placeable->loadFromGIT(*gffs);
+        placeable->loadFromGIT(placeableStruct);
         add(placeable);
     }
 }
 
-void Area::loadWaypoints(const Gff &git) {
-    for (auto &gffs : git.getList("WaypointList")) {
+void Area::loadWaypoints(const schema::GIT &git) {
+    for (auto &waypointStruct : git.WaypointList) {
         std::shared_ptr<Waypoint> waypoint = _game.objectFactory().newWaypoint(_sceneName);
         _game.addObject(waypoint);
-        waypoint->loadFromGIT(*gffs);
+        waypoint->loadFromGIT(waypointStruct);
         add(waypoint);
     }
 }
 
-void Area::loadTriggers(const Gff &git) {
-    for (auto &gffs : git.getList("TriggerList")) {
+void Area::loadTriggers(const schema::GIT &git) {
+    for (auto &gffs : git.TriggerList) {
         std::shared_ptr<Trigger> trigger = _game.objectFactory().newTrigger(_sceneName);
         _game.addObject(trigger);
-        trigger->loadFromGIT(*gffs);
+        trigger->loadFromGIT(gffs);
         add(trigger);
     }
 }
 
-void Area::loadSounds(const Gff &git) {
-    for (auto &gffs : git.getList("SoundList")) {
+void Area::loadSounds(const schema::GIT &git) {
+    for (auto &soundStruct : git.SoundList) {
         std::shared_ptr<Sound> sound = _game.objectFactory().newSound(_sceneName);
         _game.addObject(sound);
-        sound->loadFromGIT(*gffs);
+        sound->loadFromGIT(soundStruct);
         add(sound);
     }
 }
 
-void Area::loadCameras(const Gff &git) {
-    for (auto &gffs : git.getList("CameraList")) {
+void Area::loadCameras(const schema::GIT &git) {
+    for (auto &cameraStruct : git.CameraList) {
         std::shared_ptr<PlaceableCamera> camera = _game.objectFactory().newCamera(_sceneName);
         _game.addObject(camera);
-        camera->loadFromGIT(*gffs);
+        camera->loadFromGIT(cameraStruct);
         add(camera);
     }
 }
 
-void Area::loadEncounters(const Gff &git) {
-    for (auto &gffs : git.getList("Encounter List")) {
+void Area::loadEncounters(const schema::GIT &git) {
+    for (auto &encounterStruct : git.Encounter_List) {
         std::shared_ptr<Encounter> encounter = _game.objectFactory().newEncounter(_sceneName);
         _game.addObject(encounter);
-        encounter->loadFromGIT(*gffs);
+        encounter->loadFromGIT(encounterStruct);
         add(encounter);
     }
 }
 
-void Area::loadStores(const Gff &git) {
-    for (auto &gffs : git.getList("StoreList")) {
+void Area::loadStores(const schema::GIT &git) {
+    for (auto &storeStruct : git.StoreList) {
         std::shared_ptr<Store> store = _game.objectFactory().newStore(_sceneName);
         _game.addObject(store);
         add(store);

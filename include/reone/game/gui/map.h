@@ -19,6 +19,8 @@
 
 #include "reone/graphics/texture.h"
 
+#include "../schema/are.h"
+
 namespace reone {
 
 namespace resource {
@@ -43,7 +45,7 @@ public:
 
     Map(Game &game, ServicesView &services);
 
-    void load(const std::string &area, const resource::Gff &gffs);
+    void load(const std::string &area, const schema::ARE_Map &map);
 
     void draw(Mode mode, const glm::vec4 &bounds);
 
@@ -68,7 +70,7 @@ private:
     std::string _arrowResRef;
     std::shared_ptr<Waypoint> _selectedNote;
 
-    void loadProperties(const resource::Gff &gffs);
+    void loadProperties(const schema::ARE_Map &map);
     void loadTextures(const std::string &area);
 
     void drawArea(Mode mode, const glm::vec4 &bounds);

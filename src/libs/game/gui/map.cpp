@@ -17,6 +17,8 @@
 
 #include "reone/game/gui/map.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshes.h"
@@ -26,9 +28,6 @@
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
 #include "reone/system/logutil.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -51,17 +50,17 @@ Map::Map(Game &game, ServicesView &services) :
     }
 }
 
-void Map::load(const std::string &area, const Gff &gffs) {
-    loadProperties(gffs);
+void Map::load(const std::string &area, const schema::ARE_Map &map) {
+    loadProperties(map);
     loadTextures(area);
 }
 
-void Map::loadProperties(const Gff &gffs) {
-    _northAxis = gffs.getInt("NorthAxis");
-    _worldPoint1 = glm::vec2(gffs.getFloat("WorldPt1X"), gffs.getFloat("WorldPt1Y"));
-    _worldPoint2 = glm::vec2(gffs.getFloat("WorldPt2X"), gffs.getFloat("WorldPt2Y"));
-    _mapPoint1 = glm::vec2(gffs.getFloat("MapPt1X"), gffs.getFloat("MapPt1Y"));
-    _mapPoint2 = glm::vec2(gffs.getFloat("MapPt2X"), gffs.getFloat("MapPt2Y"));
+void Map::loadProperties(const schema::ARE_Map &map) {
+    _northAxis = map.NorthAxis;
+    _worldPoint1 = glm::vec2(map.WorldPt1X, map.WorldPt1Y);
+    _worldPoint2 = glm::vec2(map.WorldPt2X, map.WorldPt2Y);
+    _mapPoint1 = glm::vec2(map.MapPt1X, map.MapPt1Y);
+    _mapPoint2 = glm::vec2(map.MapPt2X, map.MapPt2Y);
 }
 
 void Map::loadTextures(const std::string &area) {

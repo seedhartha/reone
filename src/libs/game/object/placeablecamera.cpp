@@ -24,21 +24,21 @@ namespace reone {
 
 namespace game {
 
-void PlaceableCamera::loadFromGIT(const Gff &gffs) {
-    _cameraId = gffs.getInt("CameraID");
-    _fieldOfView = gffs.getFloat("FieldOfView");
+void PlaceableCamera::loadFromGIT(const schema::GIT_CameraList &git) {
+    _cameraId = git.CameraID;
+    _fieldOfView = git.FieldOfView;
 
-    loadTransformFromGIT(gffs);
+    loadTransformFromGIT(git);
 }
 
-void PlaceableCamera::loadTransformFromGIT(const Gff &gffs) {
-    glm::vec3 position(gffs.getVector("Position"));
-    float height = gffs.getFloat("Height");
+void PlaceableCamera::loadTransformFromGIT(const schema::GIT_CameraList &git) {
+    glm::vec3 position(git.Position);
+    float height = git.Height;
 
     _position = glm::vec3(position.x, position.y, position.z + height);
 
-    glm::quat orientation(gffs.getOrientation("Orientation"));
-    float pitch = gffs.getFloat("Pitch");
+    glm::quat orientation(git.Orientation);
+    float pitch = git.Pitch;
 
     _orientation = std::move(orientation);
     _orientation *= glm::quat_cast(glm::eulerAngleX(glm::radians(pitch)));

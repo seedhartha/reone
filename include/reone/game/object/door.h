@@ -21,6 +21,7 @@
 #include "reone/scene/node/walkmesh.h"
 
 #include "../object.h"
+#include "../schema/git.h"
 #include "../schema/utd.h"
 
 namespace reone {
@@ -42,7 +43,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromGIT(const schema::GIT_Door_List &git);
     void loadFromBlueprint(const std::string &resRef);
 
     bool isSelectable() const override;
@@ -88,8 +89,6 @@ private:
     bool _lockable {false};
     std::string _keyName;
 
-    std::unique_ptr<schema::UTD> _utd;
-
     // Walkmeshes
 
     std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
@@ -112,8 +111,8 @@ private:
 
     // END Scripts
 
-    void loadUTD(const resource::Gff &utd);
-    void loadTransformFromGIT(const resource::Gff &gffs);
+    void loadUTD(const schema::UTD &utd);
+    void loadTransformFromGIT(const schema::GIT_Door_List &git);
 
     void updateTransform() override;
 };

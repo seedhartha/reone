@@ -30,6 +30,7 @@
 
 #include "../d20/attributes.h"
 #include "../object.h"
+#include "../schema/git.h"
 #include "../schema/utc.h"
 
 #include "item.h"
@@ -98,7 +99,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const resource::Gff &gffs);
+    void loadFromGIT(const schema::GIT_Creature_List &git);
     void loadFromBlueprint(const std::string &resRef);
     void loadAppearance();
 
@@ -289,8 +290,6 @@ private:
     std::shared_ptr<audio::AudioSource> _audioSourceVoice;
     std::shared_ptr<audio::AudioSource> _audioSourceFootstep;
 
-    std::unique_ptr<schema::UTC> _utc;
-
     // Animation
 
     bool _animDirty {true};
@@ -315,7 +314,7 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const resource::Gff &gffs);
+    void loadTransformFromGIT(const schema::GIT_Creature_List &git);
 
     void updateModel();
     void updateHealth();
@@ -368,13 +367,13 @@ private:
 
     // Blueprint
 
-    void loadUTC(const resource::Gff &utc);
+    void loadUTC(const schema::UTC &utc);
 
-    void loadNameFromUTC(const resource::Gff &utc);
-    void loadSoundSetFromUTC(const resource::Gff &utc);
-    void loadBodyBagFromUTC(const resource::Gff &utc);
-    void loadAttributesFromUTC(const resource::Gff &utc);
-    void loadPerceptionRangeFromUTC(const resource::Gff &utc);
+    void loadNameFromUTC(const schema::UTC &utc);
+    void loadSoundSetFromUTC(const schema::UTC &utc);
+    void loadBodyBagFromUTC(const schema::UTC &utc);
+    void loadAttributesFromUTC(const schema::UTC &utc);
+    void loadPerceptionRangeFromUTC(const schema::UTC &utc);
 
     // END Blueprint
 };

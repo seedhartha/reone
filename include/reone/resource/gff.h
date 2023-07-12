@@ -137,6 +137,15 @@ public:
     uint32_t type() const { return _type; }
     const std::vector<Field> &fields() const { return _fields; }
 
+    static inline glm::vec3 colorFromUint32(uint32_t value) {
+        auto color = glm::vec3(
+            value & 0xff,
+            (value >> 8) & 0xff,
+            (value >> 16) & 0xff);
+
+        return color / 255.0f;
+    }
+
     template <class T>
     T getEnum(const std::string &name, T defValue) const {
         return static_cast<T>(getInt(name, static_cast<int>(defValue)));

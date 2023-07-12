@@ -124,11 +124,9 @@ private:
 
     std::shared_ptr<audio::AudioSource> _audioSource;
 
-    std::unique_ptr<schema::UTI> _uti;
-
     // Blueprint
 
-    void loadUTI(const resource::Gff &uti);
+    void loadUTI(const schema::UTI &uti);
 
     void loadAmmunitionType();
 

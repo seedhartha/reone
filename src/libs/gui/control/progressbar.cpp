@@ -26,9 +26,8 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/gff.h"
-
 #include "reone/gui/gui.h"
+#include "reone/resource/gff.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -37,13 +36,12 @@ namespace reone {
 
 namespace gui {
 
-void ProgressBar::load(const Gff &gffs) {
-    Control::load(gffs);
+void ProgressBar::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+    Control::load(gui, protoItem);
 
-    std::shared_ptr<Gff> dir(gffs.findStruct("PROGRESS"));
-    if (dir) {
-        std::string fill(dir->getString("FILL"));
-        _progress.fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
+    auto &controlStruct = *static_cast<const schema::GUI_CONTROLS *>(&gui);
+    if (controlStruct.PROGRESS) {
+        _progress.fill = _graphicsSvc.textures.get(controlStruct.PROGRESS->FILL, TextureUsage::GUI);
     }
 }
 

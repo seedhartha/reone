@@ -37,39 +37,39 @@ namespace reone {
 
 namespace game {
 
-void Trigger::loadFromGIT(const Gff &gffs) {
-    std::string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
+void Trigger::loadFromGIT(const schema::GIT_TriggerList &git) {
+    std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
 
     // _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
-    _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
-    _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
-    _linkedToFlags = gffs.getInt("LinkedToFlags");
+    _transitionDestin = _services.resource.strings.get(git.TransitionDestin.first);
+    _linkedToModule = boost::to_lower_copy(git.LinkedToModule);
+    _linkedTo = boost::to_lower_copy(git.LinkedTo);
+    _linkedToFlags = git.LinkedToFlags;
 
-    loadTransformFromGIT(gffs);
-    loadGeometryFromGIT(gffs);
+    loadTransformFromGIT(git);
+    loadGeometryFromGIT(git);
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     _sceneNode = sceneGraph.newTrigger(_geometry);
     _sceneNode->setLocalTransform(glm::translate(_position));
 }
 
-void Trigger::loadTransformFromGIT(const Gff &gffs) {
-    _position.x = gffs.getFloat("XPosition");
-    _position.y = gffs.getFloat("YPosition");
-    _position.z = gffs.getFloat("ZPosition");
+void Trigger::loadTransformFromGIT(const schema::GIT_TriggerList &git) {
+    _position.x = git.XPosition;
+    _position.y = git.YPosition;
+    _position.z = git.ZPosition;
 
     // Orientation is ignored as per Bioware specification
 
     updateTransform();
 }
 
-void Trigger::loadGeometryFromGIT(const Gff &gffs) {
-    for (auto &child : gffs.getList("Geometry")) {
-        float x = child->getFloat("PointX");
-        float y = child->getFloat("PointY");
-        float z = child->getFloat("PointZ");
+void Trigger::loadGeometryFromGIT(const schema::GIT_TriggerList &git) {
+    for (auto &pointStruct : git.Geometry) {
+        float x = pointStruct.PointX;
+        float y = pointStruct.PointY;
+        float z = pointStruct.PointZ;
         _geometry.push_back(glm::vec3(x, y, z));
     }
 }
@@ -77,7 +77,8 @@ void Trigger::loadGeometryFromGIT(const Gff &gffs) {
 void Trigger::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
-        loadUTT(*utt);
+        auto uttParsed = schema::parseUTT(*utt);
+        loadUTT(uttParsed);
     }
 }
 
@@ -112,29 +113,27 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
     return maybeTenant != _tenants.end();
 }
 
-void Trigger::loadUTT(const Gff &utt) {
-    _utt = std::make_unique<schema::UTT>(schema::parseUTT(utt));
+void Trigger::loadUTT(const schema::UTT &utt) {
+    _tag = boost::to_lower_copy(utt.Tag);
+    _blueprintResRef = boost::to_lower_copy(utt.TemplateResRef);
+    _name = _services.resource.strings.get(utt.LocalizedName.first);
+    _autoRemoveKey = utt.AutoRemoveKey; // always 0, but could be useful
+    _faction = static_cast<Faction>(utt.Faction);
+    _keyName = utt.KeyName;
+    _triggerType = utt.Type; // could be Generic, Area Transition or Trap
+    _trapDetectable = utt.TrapDetectable;
+    _trapDetectDC = utt.TrapDetectDC;
+    _trapDisarmable = utt.TrapDisarmable;
+    _disarmDC = utt.DisarmDC;
+    _trapFlag = utt.TrapFlag;
+    _trapType = utt.TrapType; // index into traps.2da
 
-    _tag = boost::to_lower_copy(utt.getString("Tag"));
-    _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _services.resource.strings.get(utt.getInt("LocalizedName"));
-    _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
-    _faction = utt.getEnum("Faction", Faction::Invalid);
-    _keyName = utt.getString("KeyName");
-    _triggerType = utt.getInt("Type"); // could be Generic, Area Transition or Trap
-    _trapDetectable = utt.getBool("TrapDetectable");
-    _trapDetectDC = utt.getInt("TrapDetectDC");
-    _trapDisarmable = utt.getBool("TrapDisarmable");
-    _disarmDC = utt.getInt("DisarmDC");
-    _trapFlag = utt.getBool("TrapFlag");
-    _trapType = utt.getInt("TrapType"); // index into traps.2da
-
-    _onDisarm = boost::to_lower_copy(utt.getString("OnDisarm"));               // always empty, but could be useful
-    _onTrapTriggered = boost::to_lower_copy(utt.getString("OnTrapTriggered")); // always empty, but could be useful
-    _onHeartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
-    _onEnter = boost::to_lower_copy(utt.getString("ScriptOnEnter"));
-    _onExit = boost::to_lower_copy(utt.getString("ScriptOnExit"));
-    _onUserDefined = boost::to_lower_copy(utt.getString("ScriptUserDefine"));
+    _onDisarm = boost::to_lower_copy(utt.OnDisarm);               // always empty, but could be useful
+    _onTrapTriggered = boost::to_lower_copy(utt.OnTrapTriggered); // always empty, but could be useful
+    _onHeartbeat = boost::to_lower_copy(utt.ScriptHeartbeat);
+    _onEnter = boost::to_lower_copy(utt.ScriptOnEnter);
+    _onExit = boost::to_lower_copy(utt.ScriptOnExit);
+    _onUserDefined = boost::to_lower_copy(utt.ScriptUserDefine);
 
     // Unused fields:
     //

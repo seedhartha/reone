@@ -17,7 +17,6 @@
 
 #include "reone/game/dialogs.h"
 
-#include "reone/game/schema/dlg.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/strings.h"
 
@@ -32,88 +31,88 @@ std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
     if (!dlg) {
         return nullptr;
     }
-    return loadDialog(*dlg);
+    auto dlgParsed = schema::parseDLG(*dlg);
+    return loadDialog(dlgParsed);
 }
 
-std::unique_ptr<Dialog> Dialogs::loadDialog(const Gff &dlg) {
+std::unique_ptr<Dialog> Dialogs::loadDialog(const schema::DLG &dlg) {
     auto dialog = std::make_unique<Dialog>();
-    auto parsed = schema::parseDLG(dlg);
 
-    dialog->skippable = dlg.getBool("Skippable");
-    dialog->cameraModel = dlg.getString("CameraModel");
-    dialog->endScript = dlg.getString("EndConversation");
-    dialog->animatedCutscene = dlg.getBool("AnimatedCut");
-    dialog->conversationType = dlg.getEnum("ConversationType", ConversationType::Cinematic);
-    dialog->computerType = dlg.getEnum("ComputerType", ComputerType::Normal);
+    dialog->skippable = dlg.Skippable;
+    dialog->cameraModel = dlg.CameraModel;
+    dialog->endScript = dlg.EndConversation;
+    dialog->animatedCutscene = dlg.AnimatedCut;
+    dialog->conversationType = static_cast<ConversationType>(dlg.ConversationType);
+    dialog->computerType = static_cast<ComputerType>(dlg.ComputerType);
 
-    for (auto &entry : dlg.getList("EntryList")) {
-        dialog->entries.push_back(getEntryReply(*entry));
+    for (auto &entry : dlg.EntryList) {
+        dialog->entries.push_back(getEntryReply(entry));
     }
-    for (auto &reply : dlg.getList("ReplyList")) {
-        dialog->replies.push_back(getEntryReply(*reply));
+    for (auto &reply : dlg.ReplyList) {
+        dialog->replies.push_back(getEntryReply(reply));
     }
-    for (auto &entry : dlg.getList("StartingList")) {
-        dialog->startEntries.push_back(getEntryReplyLink(*entry));
+    for (auto &entry : dlg.StartingList) {
+        dialog->startEntries.push_back(getEntryReplyLink(entry));
     }
-    for (auto &stunt : dlg.getList("StuntList")) {
-        dialog->stunts.push_back(getStunt(*stunt));
+    for (auto &stunt : dlg.StuntList) {
+        dialog->stunts.push_back(getStunt(stunt));
     }
 
     return std::move(dialog);
 }
 
-Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const Gff &gffs) const {
+Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const schema::DLG_EntryReplyList_EntriesRepliesList &dlg) const {
     Dialog::EntryReplyLink link;
-    link.index = gffs.getInt("Index");
-    link.active = gffs.getString("Active");
+    link.index = dlg.Index;
+    link.active = dlg.Active;
 
     return std::move(link);
 }
 
-Dialog::EntryReply Dialogs::getEntryReply(const Gff &gffs) const {
-    int strRef = gffs.getInt("Text");
+Dialog::EntryReply Dialogs::getEntryReply(const schema::DLG_EntryReplyList &dlg) const {
+    int strRef = dlg.Text.first;
 
     Dialog::EntryReply entry;
-    entry.speaker = gffs.getString("Speaker");
+    entry.speaker = dlg.Speaker;
     entry.text = strRef == -1 ? "" : _strings.get(strRef);
-    entry.voResRef = gffs.getString("VO_ResRef");
-    entry.script = gffs.getString("Script");
-    entry.sound = gffs.getString("Sound");
-    entry.listener = gffs.getString("Listener");
-    entry.delay = gffs.getInt("Delay");
-    entry.waitFlags = gffs.getInt("WaitFlags");
-    entry.cameraId = gffs.getInt("CameraID", -1);
-    entry.cameraAngle = gffs.getInt("CameraAngle");
-    entry.cameraAnimation = gffs.getInt("CameraAnimation", 0);
-    entry.camFieldOfView = gffs.getFloat("CamFieldOfView", 0.0f);
+    entry.voResRef = dlg.VO_ResRef;
+    entry.script = dlg.Script;
+    entry.sound = dlg.Sound;
+    entry.listener = dlg.Listener;
+    entry.delay = dlg.Delay;
+    entry.waitFlags = dlg.WaitFlags;
+    entry.cameraId = dlg.CameraID;
+    entry.cameraAngle = dlg.CameraAngle;
+    entry.cameraAnimation = dlg.CameraAnimation;
+    entry.camFieldOfView = dlg.CamFieldOfView;
 
     boost::to_lower(entry.speaker);
     boost::to_lower(entry.listener);
 
-    for (auto &link : gffs.getList("RepliesList")) {
-        entry.replies.push_back(getEntryReplyLink(*link));
+    for (auto &link : dlg.RepliesList) {
+        entry.replies.push_back(getEntryReplyLink(link));
     }
-    for (auto &link : gffs.getList("EntriesList")) {
-        entry.entries.push_back(getEntryReplyLink(*link));
+    for (auto &link : dlg.EntriesList) {
+        entry.entries.push_back(getEntryReplyLink(link));
     }
-    for (auto &anim : gffs.getList("AnimList")) {
-        entry.animations.push_back(getParticipantAnimation(*anim));
+    for (auto &anim : dlg.AnimList) {
+        entry.animations.push_back(getParticipantAnimation(anim));
     }
 
     return std::move(entry);
 }
 
-Dialog::Stunt Dialogs::getStunt(const Gff &gffs) const {
+Dialog::Stunt Dialogs::getStunt(const schema::DLG_StuntList &dlg) const {
     Dialog::Stunt stunt;
-    stunt.participant = boost::to_lower_copy(gffs.getString("Participant"));
-    stunt.stuntModel = boost::to_lower_copy(gffs.getString("StuntModel"));
-    return std::move(stunt);
+    stunt.participant = boost::to_lower_copy(dlg.Participant);
+    stunt.stuntModel = boost::to_lower_copy(dlg.StuntModel);
+    return stunt;
 }
 
-Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const Gff &gffs) const {
+Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const schema::DLG_EntryReplyList_AnimList &dlg) const {
     Dialog::ParticipantAnimation anim;
-    anim.participant = boost::to_lower_copy(gffs.getString("Participant"));
-    anim.animation = gffs.getInt("Animation");
+    anim.participant = boost::to_lower_copy(dlg.Participant);
+    anim.animation = dlg.Animation;
     return std::move(anim);
 }
 

@@ -38,19 +38,17 @@ namespace reone {
 
 namespace gui {
 
-void ScrollBar::load(const Gff &gffs) {
-    Control::load(gffs);
+void ScrollBar::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+    Control::load(gui, protoItem);
 
-    std::shared_ptr<Gff> dir(gffs.findStruct("DIR"));
-    if (dir) {
-        std::string image(dir->getString("IMAGE"));
-        _dir.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
+    auto &scrollbarStruct = *static_cast<const schema::GUI_CONTROLS_SCROLLBAR *>(&gui);
+    if (scrollbarStruct.DIR) {
+        auto &dirImage = scrollbarStruct.DIR->IMAGE;
+        _dir.image = _graphicsSvc.textures.get(dirImage, TextureUsage::GUI);
     }
-
-    std::shared_ptr<Gff> thumb(gffs.findStruct("THUMB"));
-    if (thumb) {
-        std::string image(thumb->getString("IMAGE"));
-        _thumb.image = _graphicsSvc.textures.get(image, TextureUsage::GUI);
+    if (scrollbarStruct.THUMB) {
+        auto &thumbImage = scrollbarStruct.THUMB->IMAGE;
+        _thumb.image = _graphicsSvc.textures.get(thumbImage, TextureUsage::GUI);
     }
 }
 
