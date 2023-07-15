@@ -40,26 +40,4 @@ void ThreadPool::deinit() {
     _threads.clear();
 }
 
-void ThreadPool::enqueue(std::function<void()> block) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _tasks.emplace(block);
-    _condVar.notify_one();
-}
-
-void ThreadPool::workerThreadFunc() {
-    while (_running) {
-        Task task;
-        {
-            std::unique_lock<std::mutex> lock(_mutex);
-            _condVar.wait(lock, [this]() { return !_running || !_tasks.empty(); });
-            if (!_running) {
-                return;
-            }
-            task = std::move(_tasks.front());
-            _tasks.pop();
-        }
-        task();
-    }
-}
-
 } // namespace reone

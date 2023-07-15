@@ -26,25 +26,52 @@ TEST(thread_pool, should_execute_enqueued_tasks_in_parallel) {
     ThreadPool pool;
     pool.init();
 
-    // expect
+    // when
     std::atomic_int shared {0};
-    pool.enqueue([&shared]() {
+    pool.enqueue([&shared](auto &_) {
         while (shared != 0) {
             // busy wait
         }
         ++shared;
     });
-    pool.enqueue([&shared]() {
+    pool.enqueue([&shared](auto &_) {
         while (shared != 1) {
             // busy wait
         }
         ++shared;
     });
     for (int i = 0; i < 10; ++i) {
-        if (static_cast<int>(shared) == 2) {
+        if (shared == 2) {
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(i));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2 << i));
     }
-    EXPECT_EQ(2, static_cast<int>(shared));
+
+    // then
+    EXPECT_EQ(2, shared);
+}
+
+TEST(thread_pool, should_cancel_enqueued_task) {
+    // given
+    ThreadPool pool;
+    pool.init();
+
+    // when
+    std::atomic_bool exited {false};
+    auto task = pool.enqueue([&exited](auto &canceled) {
+        while (!canceled) {
+            std::this_thread::yield();
+        }
+        exited = true;
+    });
+    task->cancel();
+    for (int i = 0; i < 10; ++i) {
+        if (exited) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(2 << i));
+    }
+
+    // then
+    EXPECT_TRUE(exited);
 }

@@ -19,7 +19,30 @@
 
 namespace reone {
 
-class ThreadPool {
+using TaskFunc = std::function<void(const std::atomic_bool &canceled)>;
+
+class Task : boost::noncopyable {
+public:
+    Task(TaskFunc func) :
+        _func(std::move(func)) {
+    }
+
+    inline void cancel() {
+        _canceled = true;
+    }
+
+private:
+    TaskFunc _func;
+    std::atomic_bool _canceled {false};
+
+    inline void operator()() {
+        _func(_canceled);
+    }
+
+    friend class ThreadPool;
+};
+
+class ThreadPool : boost::noncopyable {
 public:
     ~ThreadPool() {
         deinit();
@@ -28,19 +51,39 @@ public:
     void init();
     void deinit();
 
-    void enqueue(std::function<void()> block);
+    std::shared_ptr<Task> enqueue(TaskFunc func) {
+        std::lock_guard<std::mutex> lock(_mutex);
+        auto task = std::make_shared<Task>(std::move(func));
+        _tasks.push(task);
+        _condVar.notify_one();
+        return task;
+    }
 
 private:
-    using Task = std::function<void()>;
-
     std::vector<std::thread> _threads;
     std::atomic_bool _running {false};
 
-    std::queue<Task> _tasks;
+    std::queue<std::shared_ptr<Task>> _tasks;
     std::mutex _mutex;
     std::condition_variable _condVar;
 
-    void workerThreadFunc();
+    void workerThreadFunc() {
+        while (_running) {
+            std::shared_ptr<Task> task;
+            {
+                std::unique_lock<std::mutex> lock(_mutex);
+                _condVar.wait(lock, [this]() { return !_running || !_tasks.empty(); });
+                if (!_running) {
+                    return;
+                }
+                task = _tasks.front();
+                _tasks.pop();
+            }
+            if (task) {
+                (*task)();
+            }
+        }
+    }
 };
 
 } // namespace reone
