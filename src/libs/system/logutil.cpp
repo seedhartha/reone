@@ -27,7 +27,7 @@ namespace reone {
 BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", LogChannel)
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", LogSeverity)
 
-using SeverityChannelLogger = boost::log::sources::severity_channel_logger<LogSeverity, LogChannel>;
+using SeverityChannelLogger = boost::log::sources::severity_channel_logger_mt<LogSeverity, LogChannel>;
 
 static const std::unordered_map<LogSeverity, std::string> kSeverityToName {
     {LogSeverity::Error, "ERROR"},

@@ -37,18 +37,6 @@ set(TESTS_HEADERS
 
 set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
-    ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
-    ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
-    ${TESTS_SOURCE_DIR}/system/fileutil.cpp
-    ${TESTS_SOURCE_DIR}/system/hexutil.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/memoryoutput.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
-    ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
-    ${TESTS_SOURCE_DIR}/system/textreader.cpp
-    ${TESTS_SOURCE_DIR}/system/textwriter.cpp
-    ${TESTS_SOURCE_DIR}/system/timer.cpp
     ${TESTS_SOURCE_DIR}/game/game.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
@@ -78,7 +66,20 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/tools/exprtree.cpp
-    ${TESTS_SOURCE_DIR}/tools/exprtreeoptimizer.cpp)
+    ${TESTS_SOURCE_DIR}/tools/exprtreeoptimizer.cpp
+    ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
+    ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
+    ${TESTS_SOURCE_DIR}/system/fileutil.cpp
+    ${TESTS_SOURCE_DIR}/system/hexutil.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
+    ${TESTS_SOURCE_DIR}/system/textreader.cpp
+    ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/system/threadpool.cpp
+    ${TESTS_SOURCE_DIR}/system/timer.cpp)
 
 add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
