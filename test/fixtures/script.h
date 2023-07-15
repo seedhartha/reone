@@ -30,7 +30,7 @@ namespace script {
 
 class MockRoutine : public Routine {
 public:
-    usinsg InvokeInvocation = std::tuple<std::vector<Variable>, ExecutionContext>;
+    using InvokeInvocation = std::tuple<std::vector<Variable>, ExecutionContext>;
 
     MockRoutine(
         std::string name,
