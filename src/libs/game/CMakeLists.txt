@@ -212,42 +212,24 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/container.h
     ${GAME_INCLUDE_DIR}/gui/conversation.h
     ${GAME_INCLUDE_DIR}/gui/dialog.h
-    ${GAME_INCLUDE_DIR}/gui/generated/abchrgen.h
-    ${GAME_INCLUDE_DIR}/gui/generated/abilities.h
     ${GAME_INCLUDE_DIR}/gui/generated/areatrans.h
     ${GAME_INCLUDE_DIR}/gui/generated/areatransition.h
-    ${GAME_INCLUDE_DIR}/gui/generated/barkbubble.h
-    ${GAME_INCLUDE_DIR}/gui/generated/character.h
     ${GAME_INCLUDE_DIR}/gui/generated/chemical.h
-    ${GAME_INCLUDE_DIR}/gui/generated/classsel.h
     ${GAME_INCLUDE_DIR}/gui/generated/component.h
-    ${GAME_INCLUDE_DIR}/gui/generated/computer.h
     ${GAME_INCLUDE_DIR}/gui/generated/computercam.h
     ${GAME_INCLUDE_DIR}/gui/generated/confirm.h
-    ${GAME_INCLUDE_DIR}/gui/generated/container.h
     ${GAME_INCLUDE_DIR}/gui/generated/credits.h
-    ${GAME_INCLUDE_DIR}/gui/generated/custpnl.h
     ${GAME_INCLUDE_DIR}/gui/generated/datapad.h
     ${GAME_INCLUDE_DIR}/gui/generated/debug.h
-    ${GAME_INCLUDE_DIR}/gui/generated/dialog.h
-    ${GAME_INCLUDE_DIR}/gui/generated/equip.h
     ${GAME_INCLUDE_DIR}/gui/generated/fade.h
-    ${GAME_INCLUDE_DIR}/gui/generated/ftchrgen.h
     ${GAME_INCLUDE_DIR}/gui/generated/galaxymap.h
     ${GAME_INCLUDE_DIR}/gui/generated/gameover.h
-    ${GAME_INCLUDE_DIR}/gui/generated/inventory.h
-    ${GAME_INCLUDE_DIR}/gui/generated/journal.h
-    ${GAME_INCLUDE_DIR}/gui/generated/leveluppnl.h
-    ${GAME_INCLUDE_DIR}/gui/generated/loadscreen.h
-    ${GAME_INCLUDE_DIR}/gui/generated/maincg.h
     ${GAME_INCLUDE_DIR}/gui/generated/maininterface.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu10x7.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu12x9.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu16x12.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu8x6.h
-    ${GAME_INCLUDE_DIR}/gui/generated/map.h
-    ${GAME_INCLUDE_DIR}/gui/generated/messages.h
     ${GAME_INCLUDE_DIR}/gui/generated/mi8x6.h
     ${GAME_INCLUDE_DIR}/gui/generated/mipc10x7.h
     ${GAME_INCLUDE_DIR}/gui/generated/mipc12x9.h
@@ -257,7 +239,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/mipc216x12.h
     ${GAME_INCLUDE_DIR}/gui/generated/mipc28x6.h
     ${GAME_INCLUDE_DIR}/gui/generated/mipc8x6.h
-    ${GAME_INCLUDE_DIR}/gui/generated/name.h
     ${GAME_INCLUDE_DIR}/gui/generated/ntscpat.h
     ${GAME_INCLUDE_DIR}/gui/generated/optautopause.h
     ${GAME_INCLUDE_DIR}/gui/generated/optfeedback.h
@@ -265,7 +246,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/optgraphicadv.h
     ${GAME_INCLUDE_DIR}/gui/generated/optgraphics.h
     ${GAME_INCLUDE_DIR}/gui/generated/optgraphicsadv.h
-    ${GAME_INCLUDE_DIR}/gui/generated/optionsingame.h
     ${GAME_INCLUDE_DIR}/gui/generated/optionsmain.h
     ${GAME_INCLUDE_DIR}/gui/generated/optkeyentry.h
     ${GAME_INCLUDE_DIR}/gui/generated/optkeymapping.h
@@ -273,20 +253,14 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/optresolution.h
     ${GAME_INCLUDE_DIR}/gui/generated/optsound.h
     ${GAME_INCLUDE_DIR}/gui/generated/optsoundadv.h
-    ${GAME_INCLUDE_DIR}/gui/generated/partyselect.h
     ${GAME_INCLUDE_DIR}/gui/generated/pause.h
     ${GAME_INCLUDE_DIR}/gui/generated/pazaakgame.h
     ${GAME_INCLUDE_DIR}/gui/generated/pazaaksetup.h
     ${GAME_INCLUDE_DIR}/gui/generated/pazaakwager.h
-    ${GAME_INCLUDE_DIR}/gui/generated/portcust.h
     ${GAME_INCLUDE_DIR}/gui/generated/pwrlvlup.h
-    ${GAME_INCLUDE_DIR}/gui/generated/qorcpnl.h
     ${GAME_INCLUDE_DIR}/gui/generated/questitem.h
-    ${GAME_INCLUDE_DIR}/gui/generated/quickpnl.h
-    ${GAME_INCLUDE_DIR}/gui/generated/saveload.h
     ${GAME_INCLUDE_DIR}/gui/generated/savename.h
     ${GAME_INCLUDE_DIR}/gui/generated/scriptselect.h
-    ${GAME_INCLUDE_DIR}/gui/generated/skchrgen.h
     ${GAME_INCLUDE_DIR}/gui/generated/skillinfo.h
     ${GAME_INCLUDE_DIR}/gui/generated/splashscreen.h
     ${GAME_INCLUDE_DIR}/gui/generated/startscreen.h
@@ -300,7 +274,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/tooltip16x12.h
     ${GAME_INCLUDE_DIR}/gui/generated/tooltip6x4.h
     ${GAME_INCLUDE_DIR}/gui/generated/tooltip8x6.h
-    ${GAME_INCLUDE_DIR}/gui/generated/top.h
     ${GAME_INCLUDE_DIR}/gui/generated/upgrade.h
     ${GAME_INCLUDE_DIR}/gui/generated/upgradeitems.h
     ${GAME_INCLUDE_DIR}/gui/generated/upgradesel.h
