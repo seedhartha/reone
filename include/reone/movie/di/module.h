@@ -20,6 +20,8 @@
 #include "reone/audio/di/module.h"
 #include "reone/graphics/di/module.h"
 
+#include "../movies.h"
+
 #include "services.h"
 
 namespace reone {

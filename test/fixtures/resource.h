@@ -19,7 +19,11 @@
 
 #include <gmock/gmock.h>
 
+#include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/strings.h"
 
 namespace reone {
 

@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../movies.h"
-
 namespace reone {
 
 namespace movie {
+
+class IMovies;
 
 struct MovieServices {
     IMovies &movies;

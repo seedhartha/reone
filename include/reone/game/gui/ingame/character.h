@@ -21,6 +21,7 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/gui/control/slider.h"
+#include "reone/scene/graph.h"
 #include "reone/scene/node/model.h"
 
 #include "../../gui.h"

@@ -17,6 +17,7 @@
 
 #include "reone/game/gui/profileoverlay.h"
 
+#include "reone/game/di/services.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/fonts.h"
@@ -25,9 +26,8 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/window.h"
+#include "reone/system/clock.h"
 #include "reone/system/di/services.h"
-
-#include "reone/game/di/services.h"
 
 using namespace reone::graphics;
 

@@ -19,7 +19,9 @@
 
 #include <gmock/gmock.h>
 
+#include "reone/system/clock.h"
 #include "reone/system/di/services.h"
+#include "reone/system/threadpool.h"
 
 namespace reone {
 

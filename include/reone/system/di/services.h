@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "../clock.h"
-#include "../threadpool.h"
-
 namespace reone {
+
+class IClock;
+class IThreadPool;
 
 struct SystemServices {
     IClock &clock;

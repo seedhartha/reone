@@ -44,6 +44,7 @@
 #include "reone/scene/graphs.h"
 #include "reone/scene/types.h"
 #include "reone/script/types.h"
+#include "reone/system/clock.h"
 #include "reone/system/di/services.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"

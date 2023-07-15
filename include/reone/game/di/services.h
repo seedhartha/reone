@@ -26,27 +26,27 @@
 #include "reone/script/di/services.h"
 #include "reone/system/di/services.h"
 
-#include "../camerastyles.h"
-#include "../cursors.h"
-#include "../d20/classes.h"
-#include "../d20/feats.h"
-#include "../d20/skills.h"
-#include "../d20/spells.h"
-#include "../dialogs.h"
-#include "../footstepsounds.h"
-#include "../gui/sounds.h"
-#include "../layouts.h"
-#include "../paths.h"
-#include "../portraits.h"
-#include "../reputes.h"
-#include "../resourcedirector.h"
-#include "../soundsets.h"
-#include "../surfaces.h"
-#include "../visibilities.h"
-
 namespace reone {
 
 namespace game {
+
+class ICameraStyles;
+class IClasses;
+class ICursors;
+class IDialogs;
+class IFeats;
+class IFootstepSounds;
+class IGUISounds;
+class ILayouts;
+class IPaths;
+class IPortraits;
+class IReputes;
+class IResourceDirector;
+class ISkills;
+class ISoundSets;
+class ISpells;
+class ISurfaces;
+class IVisibilities;
 
 struct GameServices {
     ICameraStyles &cameraStyles;

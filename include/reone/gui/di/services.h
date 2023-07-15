@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../guis.h"
-
 namespace reone {
 
 namespace gui {
+
+class IGUIs;
 
 struct GUIServices {
     IGUIs &guis;

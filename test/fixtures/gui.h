@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "reone/gui/di/services.h"
+#include "reone/gui/guis.h"
 
 namespace reone {
 

@@ -24,6 +24,12 @@
 
 namespace reone {
 
+namespace scene {
+
+class ISceneGraph;
+
+}
+
 namespace gui {
 
 class Button;

@@ -21,6 +21,8 @@
 #include "reone/resource/di/module.h"
 #include "reone/scene/di/module.h"
 
+#include "../guis.h"
+
 #include "services.h"
 
 namespace reone {

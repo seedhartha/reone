@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../context.h"
-#include "../files.h"
-#include "../player.h"
-
 namespace reone {
 
 namespace audio {
+
+class IAudioContext;
+class IAudioFiles;
+class IAudioPlayer;
 
 struct AudioServices {
     IAudioContext &context;

@@ -21,6 +21,8 @@
 #include "reone/graphics/di/module.h"
 #include "reone/graphics/options.h"
 
+#include "../graphs.h"
+
 #include "services.h"
 
 namespace reone {

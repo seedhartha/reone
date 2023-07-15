@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../scripts.h"
-
 namespace reone {
 
 namespace script {
+
+class IScripts;
 
 struct ScriptServices {
     IScripts &scripts;

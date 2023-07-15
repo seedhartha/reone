@@ -19,6 +19,8 @@
 
 #include "reone/resource/di/module.h"
 
+#include "../scripts.h"
+
 #include "services.h"
 
 namespace reone {

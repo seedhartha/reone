@@ -17,10 +17,12 @@
 
 #include "reone/game/event.h"
 #include "reone/game/game.h"
+#include "reone/game/reputes.h"
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
 #include "reone/game/script/routine/objectutil.h"
 #include "reone/game/script/routines.h"
+#include "reone/resource/strings.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine/exception/argument.h"
 #include "reone/script/routine/exception/notimplemented.h"

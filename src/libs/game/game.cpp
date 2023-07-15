@@ -48,6 +48,7 @@
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/movie/format/bikreader.h"
+#include "reone/movie/movies.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
@@ -63,6 +64,7 @@
 #include "reone/script/di/services.h"
 #include "reone/script/scripts.h"
 #include "reone/system/binarywriter.h"
+#include "reone/system/clock.h"
 #include "reone/system/di/services.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
@@ -206,7 +208,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
         _services.graphics.textures.clear();
         _services.graphics.models.clear();
         _services.graphics.walkmeshes.clear();
-        _services.graphics.lipAnimations.clear();
+        _services.graphics.lips.clear();
         _services.audio.files.clear();
         _services.script.scripts.clear();
         */

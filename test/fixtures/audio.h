@@ -19,8 +19,11 @@
 
 #include <gmock/gmock.h>
 
+#include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/files.h"
 #include "reone/audio/format/mp3reader.h"
+#include "reone/audio/player.h"
 
 namespace reone {
 

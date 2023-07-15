@@ -19,7 +19,10 @@
 
 #include "reone/resource/di/module.h"
 
+#include "../context.h"
+#include "../files.h"
 #include "../options.h"
+#include "../player.h"
 
 #include "services.h"
 

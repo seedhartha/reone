@@ -22,6 +22,7 @@
 #include "reone/game/paths.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/lipanimations.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
@@ -29,6 +30,7 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/script/di/services.h"
+#include "reone/script/scripts.h"
 #include "reone/system/fileutil.h"
 
 using namespace reone::graphics;
@@ -73,7 +75,7 @@ void ResourceDirector::onModuleLoad(const std::string &name) {
     _dialogs.clear();
     _paths.clear();
     _scriptSvc.scripts.clear();
-    _graphicsSvc.lipAnimations.clear();
+    _graphicsSvc.lips.clear();
     _resourceSvc.gffs.clear();
     _resourceSvc.resources.clearLocal();
 

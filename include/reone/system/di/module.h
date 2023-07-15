@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "../clock.h"
+#include "../threadpool.h"
+
 #include "services.h"
 
 namespace reone {

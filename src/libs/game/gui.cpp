@@ -24,6 +24,7 @@
 #include "reone/game/gui/sounds.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
+#include "reone/gui/guis.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/scene/di/services.h"

@@ -22,6 +22,26 @@
 #include "reone/game/di/services.h"
 #include "reone/system/exception/notimplemented.h"
 
+#include "reone/game/camerastyles.h"
+#include "reone/game/cursors.h"
+#include "reone/game/d20/classes.h"
+#include "reone/game/d20/feats.h"
+#include "reone/game/d20/skills.h"
+#include "reone/game/d20/spells.h"
+#include "reone/game/dialogs.h"
+#include "reone/game/footstepsounds.h"
+#include "reone/game/gui/sounds.h"
+#include "reone/game/layouts.h"
+#include "reone/game/options.h"
+#include "reone/game/paths.h"
+#include "reone/game/portraits.h"
+#include "reone/game/reputes.h"
+#include "reone/game/resourcedirector.h"
+#include "reone/game/soundsets.h"
+#include "reone/game/surfaces.h"
+#include "reone/game/types.h"
+#include "reone/game/visibilities.h"
+
 namespace reone {
 
 namespace game {

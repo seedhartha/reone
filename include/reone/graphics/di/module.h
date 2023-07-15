@@ -19,6 +19,18 @@
 
 #include "reone/resource/di/module.h"
 
+#include "../context.h"
+#include "../fonts.h"
+#include "../lipanimations.h"
+#include "../meshes.h"
+#include "../models.h"
+#include "../pipeline.h"
+#include "../shaders.h"
+#include "../textures.h"
+#include "../uniforms.h"
+#include "../walkmeshes.h"
+#include "../window.h"
+
 #include "services.h"
 
 namespace reone {
@@ -38,8 +50,8 @@ public:
     void deinit();
 
     graphics::Fonts &fonts() { return *_fonts; }
-    graphics::GraphicsContext &graphicsContext() { return *_graphicsContext; }
-    graphics::LipAnimations &lipAnimations() { return *_lipAnimations; }
+    graphics::GraphicsContext &context() { return *_context; }
+    graphics::LipAnimations &lips() { return *_lips; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Models &models() { return *_models; }
     graphics::Pipeline &pipeline() { return *_pipeline; }
@@ -56,8 +68,8 @@ protected:
     resource::ResourceModule &_resource;
 
     std::unique_ptr<graphics::Fonts> _fonts;
-    std::unique_ptr<graphics::GraphicsContext> _graphicsContext;
-    std::unique_ptr<graphics::LipAnimations> _lipAnimations;
+    std::unique_ptr<graphics::GraphicsContext> _context;
+    std::unique_ptr<graphics::LipAnimations> _lips;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Pipeline> _pipeline;

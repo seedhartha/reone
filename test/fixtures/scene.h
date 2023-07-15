@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 
 namespace reone {
 

@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../graphs.h"
-
 namespace reone {
 
 namespace scene {
+
+class ISceneGraphs;
 
 struct SceneServices {
     ISceneGraphs &graphs;

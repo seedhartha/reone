@@ -17,26 +17,26 @@
 
 #pragma once
 
-#include "../context.h"
-#include "../fonts.h"
-#include "../lipanimations.h"
-#include "../meshes.h"
-#include "../models.h"
-#include "../pipeline.h"
-#include "../shaders.h"
-#include "../textures.h"
-#include "../uniforms.h"
-#include "../walkmeshes.h"
-#include "../window.h"
-
 namespace reone {
 
 namespace graphics {
 
+class IFonts;
+class IGraphicsContext;
+class ILipAnimations;
+class IMeshes;
+class IModels;
+class IPipeline;
+class IShaders;
+class ITextures;
+class IUniforms;
+class IWalkmeshes;
+class IWindow;
+
 struct GraphicsServices {
     IFonts &fonts;
     IGraphicsContext &context;
-    ILipAnimations &lipAnimations;
+    ILipAnimations &lips;
     IMeshes &meshes;
     IModels &models;
     IPipeline &pipeline;
@@ -48,8 +48,8 @@ struct GraphicsServices {
 
     GraphicsServices(
         IFonts &fonts,
-        IGraphicsContext &graphicsContext,
-        ILipAnimations &lipAnimations,
+        IGraphicsContext &context,
+        ILipAnimations &lips,
         IMeshes &meshes,
         IModels &models,
         IPipeline &pipeline,
@@ -59,8 +59,8 @@ struct GraphicsServices {
         IWalkmeshes &walkmeshes,
         IWindow &window) :
         fonts(fonts),
-        context(graphicsContext),
-        lipAnimations(lipAnimations),
+        context(context),
+        lips(lips),
         meshes(meshes),
         models(models),
         pipeline(pipeline),
