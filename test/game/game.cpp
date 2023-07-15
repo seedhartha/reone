@@ -138,6 +138,9 @@ TEST(game, should_present_main_menu_on_launch_when_movie_is_finished) {
     EXPECT_CALL(*gui, findControl("BTN_EXIT")).WillOnce(Return(button));
     EXPECT_CALL(*gui, findControl("BTN_WARP")).WillOnce(Return(button));
     EXPECT_CALL(*gui, findControl("LBL_MENUBG")).WillOnce(Return(label));
+    EXPECT_CALL(*gui, findControl("BTN_MUSIC")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_MOREGAMES")).WillOnce(Return(button));
+    EXPECT_CALL(*gui, findControl("BTN_TSLRCM")).WillOnce(Return(button));
     EXPECT_CALL(*gui, update(_)).Times(1);
     EXPECT_CALL(*gui, draw()).Times(2);
 
