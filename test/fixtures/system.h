@@ -38,12 +38,20 @@ public:
     };
 };
 
+class MockThreadPool : public IThreadPool, boost::noncopyable {
+public:
+    std::shared_ptr<Task> enqueue(TaskFunc func) override {
+        return nullptr;
+    }
+};
+
 class TestSystemModule : boost::noncopyable {
 public:
     void init() {
         _clock = std::make_unique<MockClock>();
+        _threadPool = std::make_unique<MockThreadPool>();
 
-        _services = std::make_unique<SystemServices>(*_clock);
+        _services = std::make_unique<SystemServices>(*_clock, *_threadPool);
     }
 
     SystemServices &services() {
@@ -52,6 +60,7 @@ public:
 
 private:
     std::unique_ptr<MockClock> _clock;
+    std::unique_ptr<MockThreadPool> _threadPool;
 
     std::unique_ptr<SystemServices> _services;
 };

@@ -42,7 +42,14 @@ private:
     friend class ThreadPool;
 };
 
-class ThreadPool : boost::noncopyable {
+class IThreadPool {
+public:
+    virtual ~IThreadPool() = default;
+
+    virtual std::shared_ptr<Task> enqueue(TaskFunc func) = 0;
+};
+
+class ThreadPool : public IThreadPool, boost::noncopyable {
 public:
     ~ThreadPool() {
         deinit();
@@ -51,7 +58,7 @@ public:
     void init();
     void deinit();
 
-    std::shared_ptr<Task> enqueue(TaskFunc func) {
+    std::shared_ptr<Task> enqueue(TaskFunc func) override {
         std::lock_guard<std::mutex> lock(_mutex);
         auto task = std::make_shared<Task>(std::move(func));
         _tasks.push(task);

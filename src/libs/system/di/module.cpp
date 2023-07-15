@@ -21,7 +21,9 @@ namespace reone {
 
 void SystemModule::init() {
     _clock = std::make_unique<Clock>();
-    _services = std::make_unique<SystemServices>(*_clock);
+    _threadPool = std::make_unique<ThreadPool>();
+
+    _services = std::make_unique<SystemServices>(*_clock, *_threadPool);
 }
 
 } // namespace reone

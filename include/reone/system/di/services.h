@@ -18,14 +18,17 @@
 #pragma once
 
 #include "../clock.h"
+#include "../threadpool.h"
 
 namespace reone {
 
 struct SystemServices {
     IClock &clock;
+    IThreadPool &threadPool;
 
-    SystemServices(IClock &clock) :
-        clock(clock) {
+    SystemServices(IClock &clock, IThreadPool &threadPool) :
+        clock(clock),
+        threadPool(threadPool) {
     }
 };
 

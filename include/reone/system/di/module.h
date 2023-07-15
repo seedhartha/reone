@@ -31,6 +31,7 @@ public:
 
 private:
     std::unique_ptr<Clock> _clock;
+    std::unique_ptr<ThreadPool> _threadPool;
 
     std::unique_ptr<SystemServices> _services;
 };
