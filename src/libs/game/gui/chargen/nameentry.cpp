@@ -17,12 +17,11 @@
 
 #include "reone/game/gui/chargen/nameentry.h"
 
+#include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
 #include "reone/gui/control/button.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
-
-#include "reone/game/game.h"
-#include "reone/game/gui/chargen.h"
 
 using namespace reone::audio;
 
@@ -41,25 +40,18 @@ void NameEntry::onGUILoaded() {
     loadLtrFile("humanf", _femaleLtr);
     loadLtrFile("humanl", _lastNameLtr);
 
-    _binding.nameBoxEdit->setTextMessage("");
+    _controls.NAME_BOX_EDIT->setTextMessage("");
 
-    _binding.btnRandom->setOnClick([this]() {
+    _controls.BTN_RANDOM->setOnClick([this]() {
         loadRandomName();
     });
-    _binding.endBtn->setOnClick([this]() {
+    _controls.END_BTN->setOnClick([this]() {
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openSteps();
     });
-}
-
-void NameEntry::bindControls() {
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnRandom = findControl<Button>("BTN_RANDOM");
-    _binding.endBtn = findControl<Button>("END_BTN");
-    _binding.nameBoxEdit = findControl<Control>("NAME_BOX_EDIT");
 }
 
 void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr) {
@@ -71,14 +63,14 @@ void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader
 
 bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
-        _binding.nameBoxEdit->setTextMessage(_input.text());
+        _controls.NAME_BOX_EDIT->setTextMessage(_input.text());
         return true;
     }
     return _gui->handle(event);
 }
 
 void NameEntry::loadRandomName() {
-    _binding.nameBoxEdit->setTextMessage(getRandomName());
+    _controls.NAME_BOX_EDIT->setTextMessage(getRandomName());
 }
 
 std::string NameEntry::getRandomName() const {

@@ -17,6 +17,13 @@
 
 #include "reone/game/gui/chargen/portraitselect.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
+#include "reone/game/object/factory.h"
+#include "reone/game/portrait.h"
+#include "reone/game/portraits.h"
+#include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/textures.h"
@@ -27,16 +34,7 @@
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
-
 #include "reone/system/randomutil.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/gui/chargen.h"
-#include "reone/game/object/factory.h"
-#include "reone/game/portrait.h"
-#include "reone/game/portraits.h"
-#include "reone/game/types.h"
 
 using namespace reone::audio;
 
@@ -58,10 +56,10 @@ void PortraitSelection::onGUILoaded() {
 
     bindControls();
 
-    setButtonColors(*_binding.btnAccept);
-    setButtonColors(*_binding.btnBack);
+    setButtonColors(*_controls.BTN_ACCEPT);
+    setButtonColors(*_controls.BTN_BACK);
 
-    _binding.btnArrL->setOnClick([this]() {
+    _controls.BTN_ARRL->setOnClick([this]() {
         _currentPortrait--;
         if (_currentPortrait == -1) {
             _currentPortrait = static_cast<int>(_filteredPortraits.size()) - 1;
@@ -69,31 +67,22 @@ void PortraitSelection::onGUILoaded() {
         loadCurrentPortrait();
         loadHeadModel();
     });
-    _binding.btnArrR->setOnClick([this]() {
+    _controls.BTN_ARRR->setOnClick([this]() {
         _currentPortrait = (_currentPortrait + 1) % static_cast<int>(_filteredPortraits.size());
         loadCurrentPortrait();
         loadHeadModel();
     });
-    _binding.btnAccept->setOnClick([this]() {
+    _controls.BTN_ACCEPT->setOnClick([this]() {
         Character character(_charGen.character());
         character.appearance = getAppearanceFromCurrentPortrait();
         _charGen.setCharacter(std::move(character));
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         resetCurrentPortrait();
         _charGen.openSteps();
     });
-}
-
-void PortraitSelection::bindControls() {
-    _binding.lblHead = findControl<Label>("LBL_HEAD");
-    _binding.lblPortrait = findControl<Label>("LBL_PORTRAIT");
-    _binding.btnArrL = findControl<Button>("BTN_ARRL");
-    _binding.btnArrR = findControl<Button>("BTN_ARRR");
-    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
 }
 
 void PortraitSelection::setButtonColors(Control &control) {
@@ -108,7 +97,7 @@ void PortraitSelection::setButtonColors(Control &control) {
 
 void PortraitSelection::loadHeadModel() {
     auto &sceneGraph = _services.scene.graphs.get(kScenePortraitSelect);
-    float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
+    float aspect = _controls.LBL_HEAD->extent().width / static_cast<float>(_controls.LBL_HEAD->extent().height);
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
@@ -118,7 +107,7 @@ void PortraitSelection::loadHeadModel() {
         .cameraFromModelNode(_charGen.character().gender == Gender::Male ? "camerahookm" : "camerahookf")
         .invoke();
 
-    _binding.lblHead->setSceneName(kScenePortraitSelect);
+    _controls.LBL_HEAD->setSceneName(kScenePortraitSelect);
 }
 
 std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sceneGraph) {
@@ -187,7 +176,7 @@ void PortraitSelection::resetCurrentPortrait() {
 void PortraitSelection::loadCurrentPortrait() {
     std::string resRef(_filteredPortraits[_currentPortrait].resRef);
     std::shared_ptr<Texture> portrait(_services.graphics.textures.get(resRef, TextureUsage::GUI));
-    _binding.lblPortrait->setBorderFill(portrait);
+    _controls.LBL_PORTRAIT->setBorderFill(portrait);
 }
 
 } // namespace game

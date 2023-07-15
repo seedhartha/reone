@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
+
 #include "../../gui.h"
 
 namespace reone {
@@ -45,19 +49,29 @@ public:
     }
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Button> btnBack;
-        std::shared_ptr<gui::Button> custCharBtn;
-        std::shared_ptr<gui::Button> quickCharBtn;
-        std::shared_ptr<gui::Label> lblRbg;
-        std::shared_ptr<gui::ListBox> lbDesc;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_BACK;
+        std::shared_ptr<gui::Button> CUST_CHAR_BTN;
+        std::shared_ptr<gui::Label> LBL_DECORATION;
+        std::shared_ptr<gui::Label> LBL_RBG;
+        std::shared_ptr<gui::ListBox> LB_DESC;
+        std::shared_ptr<gui::Button> QUICK_CHAR_BTN;
+    };
+
+    Controls _controls;
 
     CharacterGeneration &_charGen;
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_BACK = findControl<gui::Button>("BTN_BACK");
+        _controls.CUST_CHAR_BTN = findControl<gui::Button>("CUST_CHAR_BTN");
+        _controls.LBL_DECORATION = findControl<gui::Label>("LBL_DECORATION");
+        _controls.LBL_RBG = findControl<gui::Label>("LBL_RBG");
+        _controls.LB_DESC = findControl<gui::ListBox>("LB_DESC");
+        _controls.QUICK_CHAR_BTN = findControl<gui::Button>("QUICK_CHAR_BTN");
+    }
 };
 
 } // namespace game

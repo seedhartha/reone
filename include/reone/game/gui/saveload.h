@@ -20,6 +20,7 @@
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
+#include "reone/gui/control/togglebutton.h"
 
 #include "../gui.h"
 #include "../savedgame.h"
@@ -46,36 +47,55 @@ private:
         std::filesystem::path path;
     };
 
-    struct Binding {
-        std::shared_ptr<gui::Button> btnBack;
-        std::shared_ptr<gui::Button> btnDelete;
-        std::shared_ptr<gui::Button> btnSaveLoad;
-        std::shared_ptr<gui::Label> lblAreaName;
-        std::shared_ptr<gui::Label> lblPanelName;
-        std::shared_ptr<gui::Label> lblPlanetName;
-        std::shared_ptr<gui::Label> lblPm1;
-        std::shared_ptr<gui::Label> lblPm2;
-        std::shared_ptr<gui::Label> lblPm3;
-        std::shared_ptr<gui::Label> lblScreenshot;
-        std::shared_ptr<gui::ListBox> lbGames;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_BACK;
+        std::shared_ptr<gui::Button> BTN_DELETE;
+        std::shared_ptr<gui::Button> BTN_FILTER;
+        std::shared_ptr<gui::Button> BTN_SAVELOAD;
+        std::shared_ptr<gui::ToggleButton> CB_CLOUDSAVE;
+        std::shared_ptr<gui::Label> LBL_AREANAME;
+        std::shared_ptr<gui::Label> LBL_BAR2;
+        std::shared_ptr<gui::Label> LBL_BAR3;
+        std::shared_ptr<gui::Label> LBL_BAR4;
+        std::shared_ptr<gui::Label> LBL_PANELNAME;
+        std::shared_ptr<gui::Label> LBL_PCNAME;
+        std::shared_ptr<gui::Label> LBL_PLANETNAME;
+        std::shared_ptr<gui::Label> LBL_PM1;
+        std::shared_ptr<gui::Label> LBL_PM2;
+        std::shared_ptr<gui::Label> LBL_PM3;
+        std::shared_ptr<gui::Label> LBL_SCREENSHOT;
+        std::shared_ptr<gui::Label> LBL_TIMEPLAYED;
+        std::shared_ptr<gui::ListBox> LB_GAMES;
+    };
 
-        // TSL only
-        std::shared_ptr<gui::Button> btnFilter;
-        std::shared_ptr<gui::Label> lblBar1;
-        std::shared_ptr<gui::Label> lblBar2;
-        std::shared_ptr<gui::Label> lblBar3;
-        std::shared_ptr<gui::Label> lblBar4;
-        std::shared_ptr<gui::Label> lblPcName;
-        std::shared_ptr<gui::Label> lblTimePlayed;
-        // END TSL only
-    } _binding;
+    Controls _controls;
 
     SaveLoadMode _mode {SaveLoadMode::Save};
     std::vector<SavedGameDescriptor> _saves;
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_BACK = findControl<gui::Button>("BTN_BACK");
+        _controls.BTN_DELETE = findControl<gui::Button>("BTN_DELETE");
+        _controls.BTN_FILTER = findControl<gui::Button>("BTN_FILTER");
+        _controls.BTN_SAVELOAD = findControl<gui::Button>("BTN_SAVELOAD");
+        _controls.CB_CLOUDSAVE = findControl<gui::ToggleButton>("CB_CLOUDSAVE");
+        _controls.LBL_AREANAME = findControl<gui::Label>("LBL_AREANAME");
+        _controls.LBL_BAR2 = findControl<gui::Label>("LBL_BAR2");
+        _controls.LBL_BAR3 = findControl<gui::Label>("LBL_BAR3");
+        _controls.LBL_BAR4 = findControl<gui::Label>("LBL_BAR4");
+        _controls.LBL_PANELNAME = findControl<gui::Label>("LBL_PANELNAME");
+        _controls.LBL_PCNAME = findControl<gui::Label>("LBL_PCNAME");
+        _controls.LBL_PLANETNAME = findControl<gui::Label>("LBL_PLANETNAME");
+        _controls.LBL_PM1 = findControl<gui::Label>("LBL_PM1");
+        _controls.LBL_PM2 = findControl<gui::Label>("LBL_PM2");
+        _controls.LBL_PM3 = findControl<gui::Label>("LBL_PM3");
+        _controls.LBL_SCREENSHOT = findControl<gui::Label>("LBL_SCREENSHOT");
+        _controls.LBL_TIMEPLAYED = findControl<gui::Label>("LBL_TIMEPLAYED");
+        _controls.LB_GAMES = findControl<gui::ListBox>("LB_GAMES");
+    }
+
     void refreshSavedGames();
     void indexSavedGame(std::filesystem::path path);
 

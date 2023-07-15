@@ -50,8 +50,10 @@ public:
         _controls.LBL_BAR3 = findControl<gui::Label>("LBL_BAR3");
         _controls.LBL_BAR4 = findControl<gui::Label>("LBL_BAR4");
         _controls.LBL_BAR5 = findControl<gui::Label>("LBL_BAR5");
+        _controls.LBL_AVAILABLE = findControl<gui::Label>("LBL_AVAILABLE");
         _controls.LBL_BEVEL_L = findControl<gui::Label>("LBL_BEVEL_L");
         _controls.LBL_BEVEL_M = findControl<gui::Label>("LBL_BEVEL_M");
+        _controls.LBL_BEVEL_R = findControl<gui::Label>("LBL_BEVEL_R");
         _controls.LBL_CHAR0 = findControl<gui::Label>("LBL_CHAR0");
         _controls.LBL_CHAR1 = findControl<gui::Label>("LBL_CHAR1");
         _controls.LBL_CHAR10 = findControl<gui::Label>("LBL_CHAR10");
@@ -106,8 +108,10 @@ private:
         std::shared_ptr<gui::Label> LBL_BAR3;
         std::shared_ptr<gui::Label> LBL_BAR4;
         std::shared_ptr<gui::Label> LBL_BAR5;
+        std::shared_ptr<gui::Label> LBL_AVAILABLE;
         std::shared_ptr<gui::Label> LBL_BEVEL_L;
         std::shared_ptr<gui::Label> LBL_BEVEL_M;
+        std::shared_ptr<gui::Label> LBL_BEVEL_R;
         std::shared_ptr<gui::Label> LBL_CHAR0;
         std::shared_ptr<gui::Label> LBL_CHAR1;
         std::shared_ptr<gui::Label> LBL_CHAR10;

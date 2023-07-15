@@ -60,38 +60,38 @@ static const std::unordered_map<Ability, int> g_descStrRefByAbility {
 void CharGenAbilities::onGUILoaded() {
     bindControls();
 
-    _binding.lbDesc->setProtoMatchContent(true);
+    _controls.LB_DESC->setProtoMatchContent(true);
 
     std::vector<Label *> labels {
-        _binding.strLbl.get(),
-        _binding.dexLbl.get(),
-        _binding.conLbl.get(),
-        _binding.intLbl.get(),
-        _binding.wisLbl.get(),
-        _binding.chaLbl.get()};
+        _controls.STR_LBL.get(),
+        _controls.DEX_LBL.get(),
+        _controls.CON_LBL.get(),
+        _controls.INT_LBL.get(),
+        _controls.WIS_LBL.get(),
+        _controls.CHA_LBL.get()};
     for (auto &label : labels) {
         label->setFocusable(true);
         label->setHilightColor(_baseColor);
     }
 
-    _binding.strPointsBtn->setDisabled(true);
-    _binding.dexPointsBtn->setDisabled(true);
-    _binding.conPointsBtn->setDisabled(true);
-    _binding.intPointsBtn->setDisabled(true);
-    _binding.wisPointsBtn->setDisabled(true);
-    _binding.chaPointsBtn->setDisabled(true);
+    _controls.STR_POINTS_BTN->setDisabled(true);
+    _controls.DEX_POINTS_BTN->setDisabled(true);
+    _controls.CON_POINTS_BTN->setDisabled(true);
+    _controls.INT_POINTS_BTN->setDisabled(true);
+    _controls.WIS_POINTS_BTN->setDisabled(true);
+    _controls.CHA_POINTS_BTN->setDisabled(true);
 
-    _binding.btnAccept->setOnClick([this]() {
+    _controls.BTN_ACCEPT->setOnClick([this]() {
         if (_points > 0)
             return;
         updateCharacter();
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openSteps();
     });
-    _binding.btnRecommended->setOnClick([this]() {
+    _controls.BTN_RECOMMENDED->setOnClick([this]() {
         ClassType classType = _charGen.character().attributes.getEffectiveClass();
         std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _attributes = clazz->defaultAttributes();
@@ -99,103 +99,62 @@ void CharGenAbilities::onGUILoaded() {
         refreshControls();
     });
 
-    _binding.strLbl->setOnFocusChanged([this](bool focus) {
+    _controls.STR_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Strength, focus);
     });
-    _binding.dexLbl->setOnFocusChanged([this](bool focus) {
+    _controls.DEX_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Dexterity, focus);
     });
-    _binding.conLbl->setOnFocusChanged([this](bool focus) {
+    _controls.CON_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Constitution, focus);
     });
-    _binding.intLbl->setOnFocusChanged([this](bool focus) {
+    _controls.INT_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Intelligence, focus);
     });
-    _binding.wisLbl->setOnFocusChanged([this](bool focus) {
+    _controls.WIS_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Wisdom, focus);
     });
-    _binding.chaLbl->setOnFocusChanged([this](bool focus) {
+    _controls.CHA_LBL->setOnFocusChanged([this](bool focus) {
         onAbilityLabelFocusChanged(Ability::Charisma, focus);
     });
 
-    _binding.strMinusBtn->setOnClick([this]() {
+    _controls.STR_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Strength);
     });
-    _binding.dexMinusBtn->setOnClick([this]() {
+    _controls.DEX_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Dexterity);
     });
-    _binding.conMinusBtn->setOnClick([this]() {
+    _controls.CON_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Constitution);
     });
-    _binding.intMinusBtn->setOnClick([this]() {
+    _controls.INT_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Intelligence);
     });
-    _binding.wisMinusBtn->setOnClick([this]() {
+    _controls.WIS_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Wisdom);
     });
-    _binding.chaMinusBtn->setOnClick([this]() {
+    _controls.CHA_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(Ability::Charisma);
     });
 
-    _binding.strPlusBtn->setOnClick([this]() {
+    _controls.STR_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Strength);
     });
-    _binding.dexPlusBtn->setOnClick([this]() {
+    _controls.DEX_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Dexterity);
     });
-    _binding.conPlusBtn->setOnClick([this]() {
+    _controls.CON_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Constitution);
     });
-    _binding.intPlusBtn->setOnClick([this]() {
+    _controls.INT_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Intelligence);
     });
-    _binding.wisPlusBtn->setOnClick([this]() {
+    _controls.WIS_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Wisdom);
     });
-    _binding.chaPlusBtn->setOnClick([this]() {
+    _controls.CHA_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(Ability::Charisma);
     });
-}
-
-void CharGenAbilities::bindControls() {
-    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnRecommended = findControl<Button>("BTN_RECOMMENDED");
-    _binding.costPointsLbl = findControl<Label>("COST_POINTS_LBL");
-    _binding.lbDesc = findControl<ListBox>("LB_DESC");
-    _binding.remainingSelectionsLbl = findControl<Label>("REMAINING_SELECTIONS_LBL");
-
-    _binding.strLbl = findControl<Label>("STR_LBL");
-    _binding.dexLbl = findControl<Label>("DEX_LBL");
-    _binding.conLbl = findControl<Label>("CON_LBL");
-    _binding.intLbl = findControl<Label>("INT_LBL");
-    _binding.wisLbl = findControl<Label>("WIS_LBL");
-    _binding.chaLbl = findControl<Label>("CHA_LBL");
-
-    _binding.strPointsBtn = findControl<Button>("STR_POINTS_BTN");
-    _binding.dexPointsBtn = findControl<Button>("DEX_POINTS_BTN");
-    _binding.conPointsBtn = findControl<Button>("CON_POINTS_BTN");
-    _binding.intPointsBtn = findControl<Button>("INT_POINTS_BTN");
-    _binding.wisPointsBtn = findControl<Button>("WIS_POINTS_BTN");
-    _binding.chaPointsBtn = findControl<Button>("CHA_POINTS_BTN");
-
-    _binding.strMinusBtn = findControl<Button>("STR_MINUS_BTN");
-    _binding.dexMinusBtn = findControl<Button>("DEX_MINUS_BTN");
-    _binding.conMinusBtn = findControl<Button>("CON_MINUS_BTN");
-    _binding.intMinusBtn = findControl<Button>("INT_MINUS_BTN");
-    _binding.wisMinusBtn = findControl<Button>("WIS_MINUS_BTN");
-    _binding.chaMinusBtn = findControl<Button>("CHA_MINUS_BTN");
-
-    _binding.strPlusBtn = findControl<Button>("STR_PLUS_BTN");
-    _binding.dexPlusBtn = findControl<Button>("DEX_PLUS_BTN");
-    _binding.conPlusBtn = findControl<Button>("CON_PLUS_BTN");
-    _binding.intPlusBtn = findControl<Button>("INT_PLUS_BTN");
-    _binding.wisPlusBtn = findControl<Button>("WIS_PLUS_BTN");
-    _binding.chaPlusBtn = findControl<Button>("CHA_PLUS_BTN");
-
-    if (!_game.isTSL()) {
-        _binding.lblAbilityMod = findControl<Label>("LBL_ABILITY_MOD");
-    }
 }
 
 void CharGenAbilities::reset(bool newGame) {
@@ -215,32 +174,32 @@ void CharGenAbilities::reset(bool newGame) {
 }
 
 void CharGenAbilities::refreshControls() {
-    _binding.remainingSelectionsLbl->setTextMessage(std::to_string(_points));
-    _binding.costPointsLbl->setTextMessage("");
+    _controls.REMAINING_SELECTIONS_LBL->setTextMessage(std::to_string(_points));
+    _controls.COST_POINTS_LBL->setTextMessage("");
     if (!_game.isTSL()) {
-        _binding.lblAbilityMod->setTextMessage("");
+        _controls.LBL_ABILITY_MOD->setTextMessage("");
     }
 
-    _binding.strPointsBtn->setTextMessage(std::to_string(_attributes.strength()));
-    _binding.dexPointsBtn->setTextMessage(std::to_string(_attributes.dexterity()));
-    _binding.conPointsBtn->setTextMessage(std::to_string(_attributes.constitution()));
-    _binding.intPointsBtn->setTextMessage(std::to_string(_attributes.intelligence()));
-    _binding.wisPointsBtn->setTextMessage(std::to_string(_attributes.wisdom()));
-    _binding.chaPointsBtn->setTextMessage(std::to_string(_attributes.charisma()));
+    _controls.STR_POINTS_BTN->setTextMessage(std::to_string(_attributes.strength()));
+    _controls.DEX_POINTS_BTN->setTextMessage(std::to_string(_attributes.dexterity()));
+    _controls.CON_POINTS_BTN->setTextMessage(std::to_string(_attributes.constitution()));
+    _controls.INT_POINTS_BTN->setTextMessage(std::to_string(_attributes.intelligence()));
+    _controls.WIS_POINTS_BTN->setTextMessage(std::to_string(_attributes.wisdom()));
+    _controls.CHA_POINTS_BTN->setTextMessage(std::to_string(_attributes.charisma()));
 
-    _binding.strMinusBtn->setVisible(_attributes.strength() > kMinAbilityScore);
-    _binding.dexMinusBtn->setVisible(_attributes.dexterity() > kMinAbilityScore);
-    _binding.conMinusBtn->setVisible(_attributes.constitution() > kMinAbilityScore);
-    _binding.intMinusBtn->setVisible(_attributes.intelligence() > kMinAbilityScore);
-    _binding.wisMinusBtn->setVisible(_attributes.wisdom() > kMinAbilityScore);
-    _binding.chaMinusBtn->setVisible(_attributes.charisma() > kMinAbilityScore);
+    _controls.STR_MINUS_BTN->setVisible(_attributes.strength() > kMinAbilityScore);
+    _controls.DEX_MINUS_BTN->setVisible(_attributes.dexterity() > kMinAbilityScore);
+    _controls.CON_MINUS_BTN->setVisible(_attributes.constitution() > kMinAbilityScore);
+    _controls.INT_MINUS_BTN->setVisible(_attributes.intelligence() > kMinAbilityScore);
+    _controls.WIS_MINUS_BTN->setVisible(_attributes.wisdom() > kMinAbilityScore);
+    _controls.CHA_MINUS_BTN->setVisible(_attributes.charisma() > kMinAbilityScore);
 
-    _binding.strPlusBtn->setVisible(_points >= getPointCost(Ability::Strength) && _attributes.strength() < kMaxAbilityScore);
-    _binding.dexPlusBtn->setVisible(_points >= getPointCost(Ability::Dexterity) && _attributes.dexterity() < kMaxAbilityScore);
-    _binding.conPlusBtn->setVisible(_points >= getPointCost(Ability::Constitution) && _attributes.constitution() < kMaxAbilityScore);
-    _binding.intPlusBtn->setVisible(_points >= getPointCost(Ability::Intelligence) && _attributes.intelligence() < kMaxAbilityScore);
-    _binding.wisPlusBtn->setVisible(_points >= getPointCost(Ability::Wisdom) && _attributes.wisdom() < kMaxAbilityScore);
-    _binding.chaPlusBtn->setVisible(_points >= getPointCost(Ability::Charisma) && _attributes.charisma() < kMaxAbilityScore);
+    _controls.STR_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Strength) && _attributes.strength() < kMaxAbilityScore);
+    _controls.DEX_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Dexterity) && _attributes.dexterity() < kMaxAbilityScore);
+    _controls.CON_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Constitution) && _attributes.constitution() < kMaxAbilityScore);
+    _controls.INT_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Intelligence) && _attributes.intelligence() < kMaxAbilityScore);
+    _controls.WIS_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Wisdom) && _attributes.wisdom() < kMaxAbilityScore);
+    _controls.CHA_PLUS_BTN->setVisible(_points >= getPointCost(Ability::Charisma) && _attributes.charisma() < kMaxAbilityScore);
 }
 
 int CharGenAbilities::getPointCost(Ability ability) const {
@@ -268,8 +227,8 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
         return;
 
     std::string description(_services.resource.strings.getText(maybeDescription->second));
-    _binding.lbDesc->clearItems();
-    _binding.lbDesc->addTextLinesAsItems(description);
+    _controls.LB_DESC->clearItems();
+    _controls.LB_DESC->addTextLinesAsItems(description);
 }
 
 void CharGenAbilities::onMinusButtonClick(Ability ability) {

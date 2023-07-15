@@ -37,17 +37,24 @@ public:
     void setProgress(int progress);
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::ProgressBar> pbProgress;
-        std::shared_ptr<gui::Label> lblHint;
-        std::shared_ptr<gui::Label> lblLogo;
-        std::shared_ptr<gui::Label> lblLoading;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Label> LBL_HINT;
+        std::shared_ptr<gui::Label> LBL_LOADING;
+        std::shared_ptr<gui::Label> LBL_LOGO;
+        std::shared_ptr<gui::ProgressBar> PB_PROGRESS;
+    };
+
+    Controls _controls;
 
     void preload(gui::IGUI &gui) override;
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.LBL_HINT = findControl<gui::Label>("LBL_HINT");
+        _controls.LBL_LOADING = findControl<gui::Label>("LBL_LOADING");
+        _controls.LBL_LOGO = findControl<gui::Label>("LBL_LOGO");
+        _controls.PB_PROGRESS = findControl<gui::ProgressBar>("PB_PROGRESS");
+    }
 };
 
 } // namespace game

@@ -17,9 +17,6 @@
 
 #include "reone/game/gui/ingame/equip.h"
 
-#include "reone/graphics/textures.h"
-#include "reone/resource/strings.h"
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/gui/ingame.h"
@@ -27,6 +24,8 @@
 #include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
+#include "reone/graphics/textures.h"
+#include "reone/resource/strings.h"
 
 using namespace reone::audio;
 
@@ -70,23 +69,41 @@ void Equipment::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnChange1->setFocusable(false);
-    _binding.btnChange2->setFocusable(false);
-    _binding.btnCharLeft->setVisible(false);
-    _binding.btnCharRight->setVisible(false);
-    _binding.lbDesc->setVisible(false);
-    _binding.lblCantEquip->setVisible(false);
+    if (_controls.LBL_BAR1)
+        _lblBar.push_back(_controls.LBL_BAR1);
+    if (_controls.LBL_BAR2)
+        _lblBar.push_back(_controls.LBL_BAR2);
+    if (_controls.LBL_BAR3)
+        _lblBar.push_back(_controls.LBL_BAR3);
+    if (_controls.LBL_BAR4)
+        _lblBar.push_back(_controls.LBL_BAR4);
+    if (_controls.LBL_BAR5)
+        _lblBar.push_back(_controls.LBL_BAR5);
+
+    for (auto &slotName : g_slotNames) {
+        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !_game.isTSL())
+            continue;
+        _lblInv[slotName.first] = findControl<Label>("LBL_INV_" + slotName.second);
+        _btnInv[slotName.first] = findControl<Button>("BTN_INV_" + slotName.second);
+    }
+
+    _controls.BTN_CHANGE1->setFocusable(false);
+    _controls.BTN_CHANGE2->setFocusable(false);
+    // _controls.btnCharLeft->setVisible(false);
+    // _controls.btnCharRight->setVisible(false);
+    _controls.LB_DESC->setVisible(false);
+    _controls.LBL_CANTEQUIP->setVisible(false);
 
     configureItemsListBox();
 
-    _binding.btnEquip->setOnClick([this]() {
+    _controls.BTN_EQUIP->setOnClick([this]() {
         if (_selectedSlot == Slot::None) {
             _game.openInGame();
         } else {
             selectSlot(Slot::None);
         }
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         if (_selectedSlot == Slot::None) {
             _game.openInGame();
         } else {
@@ -94,7 +111,7 @@ void Equipment::onGUILoaded() {
         }
     });
 
-    for (auto &slotButton : _binding.btnInv) {
+    for (auto &slotButton : _btnInv) {
         slotButton.second->setOnClick([&]() {
             selectSlot(slotButton.first);
         });
@@ -109,71 +126,19 @@ void Equipment::onGUILoaded() {
                 slotDesc = _services.resource.strings.getText(maybeStrRef->second);
             }
 
-            _binding.lblSlotName->setTextMessage(slotDesc);
+            _controls.LBL_SLOTNAME->setTextMessage(slotDesc);
         });
     }
 }
 
-void Equipment::bindControls() {
-    _binding.lblCantEquip = findControl<Label>("LBL_CANTEQUIP");
-    if (!_game.isTSL()) {
-        _binding.lblAttackInfo = findControl<Label>("LBL_ATTACK_INFO");
-        _binding.lblPortBord = findControl<Label>("LBL_PORT_BORD");
-        _binding.lblPortrait = findControl<Label>("LBL_PORTRAIT");
-        _binding.lblDefInfo = findControl<Label>("LBL_DEF_INFO");
-        _binding.lblTxtBar = findControl<Label>("LBL_TXTBAR");
-        _binding.lblVitality = findControl<Label>("LBL_VITALITY");
-        _binding.lblSelectTitle = findControl<Label>("LBL_SELECTTITLE");
-        _binding.btnChange1 = findControl<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = findControl<Button>("BTN_CHANGE2");
-        _binding.btnCharLeft = findControl<Button>("BTN_CHARLEFT");
-        _binding.btnCharRight = findControl<Button>("BTN_CHARRIGHT");
-    } else {
-        _binding.lblBack1 = findControl<Label>("LBL_BACK1");
-        _binding.lblDefBack = findControl<Label>("LBL_DEF_BACK");
-        for (int i = 0; i < kNumControlsBar; ++i) {
-            _binding.lblBar[i] = findControl<Label>("LBL_BAR" + std::to_string(i + 1));
-        }
-        _binding.lblAttackMod = findControl<Label>("LBL_ATTACKMOD");
-        _binding.lblDamText = findControl<Label>("LBL_DAMTEXT");
-        _binding.btnSwapWeapons = findControl<Button>("BTN_SWAPWEAPONS");
-        _binding.btnPrevNpc = findControl<Button>("BTN_PREVNPC");
-        _binding.btnNextNpc = findControl<Button>("BTN_NEXTNPC");
-        _binding.lblDefText = findControl<Label>("LBL_DEF_TEXT");
-        _binding.btnChange1 = _inGameMenu.getBtnChange2();
-        _binding.btnChange2 = _inGameMenu.getBtnChange3();
-        _binding.btnCharLeft = findControl<Button>("BTN_PREVNPC");
-        _binding.btnCharRight = findControl<Button>("BTN_NEXTNPC");
-    }
-    _binding.lblToHitR = findControl<Label>("LBL_TOHITR");
-    _binding.lbItems = findControl<ListBox>("LB_ITEMS");
-    for (auto &slotName : g_slotNames) {
-        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !_game.isTSL())
-            continue;
-        _binding.lblInv[slotName.first] = findControl<Label>("LBL_INV_" + slotName.second);
-        _binding.btnInv[slotName.first] = findControl<Button>("BTN_INV_" + slotName.second);
-    }
-    _binding.lblAtkL = findControl<Label>("LBL_ATKL");
-    _binding.lblAtkR = findControl<Label>("LBL_ATKR");
-    _binding.lblDef = findControl<Label>("LBL_DEF");
-    _binding.lblTitle = findControl<Label>("LBL_TITLE");
-    _binding.lblDamage = findControl<Label>("LBL_DAMAGE");
-    _binding.lblToHitL = findControl<Label>("LBL_TOHITL");
-    _binding.lblToHit = findControl<Label>("LBL_TOHIT");
-    _binding.lblSlotName = findControl<Label>("LBL_SLOTNAME");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnEquip = findControl<Button>("BTN_EQUIP");
-    _binding.lbDesc = findControl<ListBox>("LB_DESC");
-}
-
 void Equipment::configureItemsListBox() {
-    _binding.lbItems->changeProtoItemType(ControlType::ImageButton);
-    _binding.lbItems->setPadding(5);
-    _binding.lbItems->setOnItemClick([this](const std::string &item) {
+    _controls.LB_ITEMS->changeProtoItemType(ControlType::ImageButton);
+    _controls.LB_ITEMS->setPadding(5);
+    _controls.LB_ITEMS->setOnItemClick([this](const std::string &item) {
         onItemsListBoxItemClick(item);
     });
 
-    auto &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
+    auto &protoItem = static_cast<ImageButton &>(_controls.LB_ITEMS->protoItem());
     protoItem.setBorderColor(_baseColor);
     protoItem.setHilightColor(_hilightColor);
 }
@@ -257,9 +222,9 @@ void Equipment::update() {
 
     if (!_game.isTSL()) {
         std::string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
-        _binding.lblVitality->setTextMessage(vitalityString);
+        _controls.LBL_VITALITY->setTextMessage(vitalityString);
     }
-    _binding.lblDef->setTextMessage(std::to_string(partyLeader->getDefense()));
+    _controls.LBL_DEF->setTextMessage(std::to_string(partyLeader->getDefense()));
 }
 
 void Equipment::updatePortraits() {
@@ -271,26 +236,26 @@ void Equipment::updatePortraits() {
     std::shared_ptr<Creature> partyMember1(party.getMember(1));
     std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
-    _binding.lblPortrait->setBorderFill(partyLeader->portrait());
-    _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-    _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _controls.LBL_PORTRAIT->setBorderFill(partyLeader->portrait());
+    _controls.BTN_CHANGE1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _controls.BTN_CHANGE2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void Equipment::selectSlot(Slot slot) {
     bool noneSelected = slot == Slot::None;
 
-    for (auto &lbl : _binding.lblInv) {
+    for (auto &lbl : _lblInv) {
         lbl.second->setVisible(noneSelected);
         lbl.second->setVisible(noneSelected);
     }
 
-    _binding.lbDesc->setVisible(!noneSelected);
-    _binding.lblSlotName->setVisible(noneSelected);
+    _controls.LB_DESC->setVisible(!noneSelected);
+    _controls.LBL_SLOTNAME->setVisible(noneSelected);
 
     if (!_game.isTSL()) {
-        _binding.lblPortBord->setVisible(noneSelected);
-        _binding.lblPortrait->setVisible(noneSelected);
-        _binding.lblTxtBar->setVisible(noneSelected);
+        _controls.LBL_PORT_BORD->setVisible(noneSelected);
+        _controls.LBL_PORTRAIT->setVisible(noneSelected);
+        _controls.LBL_TXTBAR->setVisible(noneSelected);
     }
     _selectedSlot = slot;
 
@@ -301,7 +266,7 @@ void Equipment::updateEquipment() {
     std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     auto &equipment = partyLeader->equipment();
 
-    for (auto &lbl : _binding.lblInv) {
+    for (auto &lbl : _lblInv) {
         int slot = getInventorySlot(lbl.first);
         std::shared_ptr<Texture> fill;
 
@@ -317,18 +282,18 @@ void Equipment::updateEquipment() {
 
     int min, max;
     partyLeader->getMainHandDamage(min, max);
-    _binding.lblAtkR->setTextMessage(str(boost::format("%d-%d") % min % max));
+    _controls.LBL_ATKR->setTextMessage(str(boost::format("%d-%d") % min % max));
 
     partyLeader->getOffhandDamage(min, max);
-    _binding.lblAtkL->setTextMessage(str(boost::format("%d-%d") % min % max));
+    _controls.LBL_ATKL->setTextMessage(str(boost::format("%d-%d") % min % max));
 
     int attackBonus = partyLeader->getAttackBonus();
     std::string attackBonusString(std::to_string(attackBonus));
     if (attackBonus > 0) {
         attackBonusString.insert(0, "+");
     }
-    _binding.lblToHitL->setTextMessage(attackBonusString);
-    _binding.lblToHitR->setTextMessage(attackBonusString);
+    _controls.LBL_TOHITL->setTextMessage(attackBonusString);
+    _controls.LBL_TOHITR->setTextMessage(attackBonusString);
 }
 
 std::shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
@@ -380,7 +345,7 @@ std::shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
 }
 
 void Equipment::updateItems() {
-    _binding.lbItems->clearItems();
+    _controls.LB_ITEMS->clearItems();
 
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
@@ -389,7 +354,7 @@ void Equipment::updateItems() {
         lbItem.iconTexture = _services.graphics.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
-        _binding.lbItems->addItem(std::move(lbItem));
+        _controls.LB_ITEMS->addItem(std::move(lbItem));
     }
     std::shared_ptr<Creature> player(_game.party().player());
 
@@ -411,7 +376,7 @@ void Equipment::updateItems() {
         if (item->stackSize() > 1) {
             lbItem.iconText = std::to_string(item->stackSize());
         }
-        _binding.lbItems->addItem(std::move(lbItem));
+        _controls.LB_ITEMS->addItem(std::move(lbItem));
     }
 }
 

@@ -17,6 +17,10 @@
 
 #include "reone/game/gui/ingame/abilities.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/party.h"
 #include "reone/graphics/textures.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
@@ -25,11 +29,6 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/object/creature.h"
-#include "reone/game/party.h"
 
 using namespace reone::audio;
 
@@ -49,20 +48,20 @@ void AbilitiesMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnSkills->setDisabled(true);
-    _binding.btnPowers->setDisabled(true);
-    _binding.btnFeats->setDisabled(true);
+    _controls.BTN_SKILLS->setDisabled(true);
+    _controls.BTN_POWERS->setDisabled(true);
+    _controls.BTN_FEATS->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_services.resource.strings.getText(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_services.resource.strings.getText(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_services.resource.strings.getText(kStrRefTotalRank));
-    _binding.lblRankVal->setTextMessage("");
-    _binding.lblBonusVal->setTextMessage("");
-    _binding.lblTotalVal->setTextMessage("");
-    _binding.lblName->setTextMessage("");
+    _controls.LBL_SKILLRANK->setTextMessage(_services.resource.strings.getText(kStrRefSkillRank));
+    _controls.LBL_BONUS->setTextMessage(_services.resource.strings.getText(kStrRefBonus));
+    _controls.LBL_TOTAL->setTextMessage(_services.resource.strings.getText(kStrRefTotalRank));
+    _controls.LBL_RANKVAL->setTextMessage("");
+    _controls.LBL_BONUSVAL->setTextMessage("");
+    _controls.LBL_TOTALVAL->setTextMessage("");
+    _controls.LBL_NAME->setTextMessage("");
 
-    _binding.lbDesc->setProtoMatchContent(true);
-    _binding.lbAbility->setOnItemClick([this](const std::string &item) {
+    _controls.LB_DESC->setProtoMatchContent(true);
+    _controls.LB_ABILITY->setOnItemClick([this](const std::string &item) {
         auto skill = static_cast<SkillType>(stoi(item));
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo == _skills.end())
@@ -70,52 +69,19 @@ void AbilitiesMenu::onGUILoaded() {
 
         std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
-        _binding.lblRankVal->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
-        _binding.lblBonusVal->setTextMessage("0");
-        _binding.lblTotalVal->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
-        _binding.lblName->setTextMessage(maybeSkillInfo->second.name);
+        _controls.LBL_RANKVAL->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
+        _controls.LBL_BONUSVAL->setTextMessage("0");
+        _controls.LBL_TOTALVAL->setTextMessage(std::to_string(partyLeader->attributes().getSkillRank(skill)));
+        _controls.LBL_NAME->setTextMessage(maybeSkillInfo->second.name);
 
-        _binding.lbDesc->clearItems();
-        _binding.lbDesc->addTextLinesAsItems(maybeSkillInfo->second.description);
+        _controls.LB_DESC->clearItems();
+        _controls.LB_DESC->addTextLinesAsItems(maybeSkillInfo->second.description);
     });
-    _binding.btnExit->setOnClick([this]() {
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
 
     loadSkills();
-}
-
-void AbilitiesMenu::bindControls() {
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
-    _binding.btnFeats = findControl<Button>("BTN_FEATS");
-    _binding.btnPowers = findControl<Button>("BTN_POWERS");
-    _binding.btnSkills = findControl<Label>("BTN_SKILLS");
-    _binding.lblBonus = findControl<Label>("LBL_BONUS");
-    _binding.lblBonusVal = findControl<Label>("LBL_BONUSVAL");
-    _binding.lblInfoBg = findControl<Label>("LBL_INFOBG");
-    _binding.lblName = findControl<Label>("LBL_NAME");
-    _binding.lblRankVal = findControl<Label>("LBL_RANKVAL");
-    _binding.lblSkillRank = findControl<Label>("LBL_SKILLRANK");
-    _binding.lblTotal = findControl<Label>("LBL_TOTAL");
-    _binding.lblTotalVal = findControl<Label>("LBL_TOTALVAL");
-    _binding.lbAbility = findControl<ListBox>("LB_ABILITY");
-    _binding.lbDesc = findControl<ListBox>("LB_DESC");
-
-    if (!_game.isTSL()) {
-        _binding.btnChange1 = findControl<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = findControl<Button>("BTN_CHANGE2");
-        _binding.lblPortrait = findControl<Label>("LBL_PORTRAIT");
-    } else {
-        _binding.lblAbilities = findControl<Label>("LBL_ABILITIES");
-        _binding.lblBar1 = findControl<Label>("LBL_BAR1");
-        _binding.lblBar2 = findControl<Label>("LBL_BAR2");
-        _binding.lblBar3 = findControl<Label>("LBL_BAR3");
-        _binding.lblBar4 = findControl<Label>("LBL_BAR4");
-        _binding.lblBar5 = findControl<Label>("LBL_BAR5");
-        _binding.lblBar6 = findControl<Label>("LBL_BAR6");
-        _binding.lblFilter = findControl<Label>("LBL_FILTER");
-        _binding.lbDescFeats = findControl<ListBox>("LB_DESC_FEATS");
-    }
 }
 
 void AbilitiesMenu::loadSkills() {
@@ -132,14 +98,14 @@ void AbilitiesMenu::loadSkills() {
         _skills.insert(std::make_pair(skill, std::move(skillInfo)));
     }
 
-    _binding.lbAbility->clearItems();
+    _controls.LB_ABILITY->clearItems();
     for (auto &skill : _skills) {
         ListBox::Item item;
         item.tag = std::to_string(static_cast<int>(skill.second.skill));
         item.text = skill.second.name;
         item.iconFrame = getFrameTexture();
         item.iconTexture = skill.second.icon;
-        _binding.lbAbility->addItem(std::move(item));
+        _controls.LB_ABILITY->addItem(std::move(item));
     }
 }
 
@@ -166,11 +132,11 @@ void AbilitiesMenu::refreshPortraits() {
     std::shared_ptr<Creature> partyMember1(party.getMember(1));
     std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
-    _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-    _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _controls.BTN_CHANGE1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _controls.BTN_CHANGE1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
-    _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _controls.BTN_CHANGE2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _controls.BTN_CHANGE2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 } // namespace game

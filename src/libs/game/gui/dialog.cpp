@@ -94,20 +94,15 @@ void DialogGUI::onGUILoaded() {
     configureReplies();
     loadFrames();
 
-    _binding.lbReplies->setOnItemClick([this](const std::string &item) {
+    _controls.LB_REPLIES->setOnItemClick([this](const std::string &item) {
         int replyIdx = stoi(item);
         pickReply(replyIdx);
     });
 }
 
-void DialogGUI::bindControls() {
-    _binding.lblMessage = findControl<Label>("LBL_MESSAGE");
-    _binding.lbReplies = findControl<ListBox>("LB_REPLIES");
-}
-
 void DialogGUI::loadFrames() {
     int rootTop = _gui->rootControl().extent().top;
-    int messageHeight = _binding.lblMessage->extent().height;
+    int messageHeight = _controls.LBL_MESSAGE->extent().height;
 
     addFrame(kControlTagTopFrame, -rootTop, messageHeight);
     addFrame(kControlTagBottomFrame, 0, _game.options().graphics.height - rootTop);
@@ -129,14 +124,14 @@ void DialogGUI::addFrame(std::string tag, int top, int height) {
 }
 
 void DialogGUI::configureMessage() {
-    _binding.lblMessage->setExtentTop(-_gui->rootControl().extent().top);
-    _binding.lblMessage->setTextColor(_baseColor);
+    _controls.LBL_MESSAGE->setExtentTop(-_gui->rootControl().extent().top);
+    _controls.LBL_MESSAGE->setTextColor(_baseColor);
 }
 
 void DialogGUI::configureReplies() {
-    _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_hilightColor);
-    _binding.lbReplies->protoItem().setTextColor(_baseColor);
+    _controls.LB_REPLIES->setProtoMatchContent(true);
+    _controls.LB_REPLIES->protoItem().setHilightColor(_hilightColor);
+    _controls.LB_REPLIES->protoItem().setTextColor(_baseColor);
 }
 
 void DialogGUI::onStart() {
@@ -187,7 +182,7 @@ void DialogGUI::onLoadEntry() {
     updateParticipantAnimations();
     repositionMessage();
 
-    _binding.lbReplies->setVisible(false);
+    _controls.LB_REPLIES->setVisible(false);
 }
 
 void DialogGUI::loadCurrentSpeaker() {
@@ -320,7 +315,7 @@ AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
 }
 
 void DialogGUI::repositionMessage() {
-    Control::Text text(_binding.lblMessage->text());
+    Control::Text text(_controls.LBL_MESSAGE->text());
     int top;
 
     if (_entryEnded) {
@@ -328,11 +323,11 @@ void DialogGUI::repositionMessage() {
         top = -_gui->rootControl().extent().top;
     } else {
         text.align = Control::TextAlign::CenterTop;
-        top = _binding.lbReplies->extent().top;
+        top = _controls.LB_REPLIES->extent().top;
     }
 
-    _binding.lblMessage->setText(std::move(text));
-    _binding.lblMessage->setExtentTop(top);
+    _controls.LBL_MESSAGE->setText(std::move(text));
+    _controls.LBL_MESSAGE->setExtentTop(top);
 }
 
 void DialogGUI::onFinish() {
@@ -354,24 +349,24 @@ void DialogGUI::releaseStuntParticipants() {
 }
 
 void DialogGUI::onEntryEnded() {
-    _binding.lbReplies->setVisible(true);
+    _controls.LB_REPLIES->setVisible(true);
 
     updateCamera();
     repositionMessage();
 }
 
 void DialogGUI::setMessage(std::string message) {
-    _binding.lblMessage->setTextMessage(message);
+    _controls.LBL_MESSAGE->setTextMessage(message);
 }
 
 void DialogGUI::setReplyLines(std::vector<std::string> lines) {
-    _binding.lbReplies->clearItems();
+    _controls.LB_REPLIES->clearItems();
 
     for (size_t i = 0; i < lines.size(); ++i) {
         ListBox::Item item;
         item.tag = std::to_string(i);
         item.text = lines[i];
-        _binding.lbReplies->addItem(std::move(item));
+        _controls.LB_REPLIES->addItem(std::move(item));
     }
 }
 

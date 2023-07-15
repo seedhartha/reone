@@ -49,50 +49,69 @@ private:
         std::shared_ptr<graphics::Texture> icon;
     };
 
-    struct Binding {
-        std::shared_ptr<gui::Button> btnExit;
-        std::shared_ptr<gui::Button> btnFeats;
-        std::shared_ptr<gui::Button> btnPowers;
-        std::shared_ptr<gui::Label> btnSkills;
-        std::shared_ptr<gui::Label> lblBonus;
-        std::shared_ptr<gui::Label> lblBonusVal;
-        std::shared_ptr<gui::Label> lblInfoBg;
-        std::shared_ptr<gui::Label> lblName;
-        std::shared_ptr<gui::Label> lblRankVal;
-        std::shared_ptr<gui::Label> lblSkillRank;
-        std::shared_ptr<gui::Label> lblTotal;
-        std::shared_ptr<gui::Label> lblTotalVal;
-        std::shared_ptr<gui::ListBox> lbAbility;
-        std::shared_ptr<gui::ListBox> lbDesc;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_CHANGE1;
+        std::shared_ptr<gui::Button> BTN_CHANGE2;
+        std::shared_ptr<gui::Button> BTN_EXIT;
+        std::shared_ptr<gui::Button> BTN_FEATS;
+        std::shared_ptr<gui::Button> BTN_POWERS;
+        std::shared_ptr<gui::Button> BTN_SKILLS;
+        std::shared_ptr<gui::Label> LBL_ABILITIES;
+        std::shared_ptr<gui::Label> LBL_BAR1;
+        std::shared_ptr<gui::Label> LBL_BAR2;
+        std::shared_ptr<gui::Label> LBL_BAR3;
+        std::shared_ptr<gui::Label> LBL_BAR4;
+        std::shared_ptr<gui::Label> LBL_BAR5;
+        std::shared_ptr<gui::Label> LBL_BAR6;
+        std::shared_ptr<gui::Label> LBL_BONUS;
+        std::shared_ptr<gui::Label> LBL_BONUSVAL;
+        std::shared_ptr<gui::Label> LBL_FILTER;
+        std::shared_ptr<gui::Label> LBL_INFOBG;
+        std::shared_ptr<gui::Label> LBL_NAME;
+        std::shared_ptr<gui::Label> LBL_PORTRAIT;
+        std::shared_ptr<gui::Label> LBL_RANKVAL;
+        std::shared_ptr<gui::Label> LBL_SKILLRANK;
+        std::shared_ptr<gui::Label> LBL_TOTAL;
+        std::shared_ptr<gui::Label> LBL_TOTALVAL;
+        std::shared_ptr<gui::ListBox> LB_ABILITY;
+        std::shared_ptr<gui::ListBox> LB_DESC;
+        std::shared_ptr<gui::ListBox> LB_DESC_FEATS;
+    };
 
-        // KotOR only
-
-        std::shared_ptr<gui::Button> btnChange1;
-        std::shared_ptr<gui::Button> btnChange2;
-        std::shared_ptr<gui::Label> lblPortrait;
-
-        // END KotOR only
-
-        // TSL only
-
-        std::shared_ptr<gui::Label> lblAbilities;
-        std::shared_ptr<gui::Label> lblBar1;
-        std::shared_ptr<gui::Label> lblBar2;
-        std::shared_ptr<gui::Label> lblBar3;
-        std::shared_ptr<gui::Label> lblBar4;
-        std::shared_ptr<gui::Label> lblBar5;
-        std::shared_ptr<gui::Label> lblBar6;
-        std::shared_ptr<gui::Label> lblFilter;
-        std::shared_ptr<gui::ListBox> lbDescFeats;
-
-        // END TSL only
-    } _binding;
+    Controls _controls;
 
     std::unordered_map<SkillType, SkillInfo> _skills;
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_CHANGE1 = findControl<gui::Button>("BTN_CHANGE1");
+        _controls.BTN_CHANGE2 = findControl<gui::Button>("BTN_CHANGE2");
+        _controls.BTN_EXIT = findControl<gui::Button>("BTN_EXIT");
+        _controls.BTN_FEATS = findControl<gui::Button>("BTN_FEATS");
+        _controls.BTN_POWERS = findControl<gui::Button>("BTN_POWERS");
+        _controls.BTN_SKILLS = findControl<gui::Button>("BTN_SKILLS");
+        _controls.LBL_ABILITIES = findControl<gui::Label>("LBL_ABILITIES");
+        _controls.LBL_BAR1 = findControl<gui::Label>("LBL_BAR1");
+        _controls.LBL_BAR2 = findControl<gui::Label>("LBL_BAR2");
+        _controls.LBL_BAR3 = findControl<gui::Label>("LBL_BAR3");
+        _controls.LBL_BAR4 = findControl<gui::Label>("LBL_BAR4");
+        _controls.LBL_BAR5 = findControl<gui::Label>("LBL_BAR5");
+        _controls.LBL_BAR6 = findControl<gui::Label>("LBL_BAR6");
+        _controls.LBL_BONUS = findControl<gui::Label>("LBL_BONUS");
+        _controls.LBL_BONUSVAL = findControl<gui::Label>("LBL_BONUSVAL");
+        _controls.LBL_FILTER = findControl<gui::Label>("LBL_FILTER");
+        _controls.LBL_INFOBG = findControl<gui::Label>("LBL_INFOBG");
+        _controls.LBL_NAME = findControl<gui::Label>("LBL_NAME");
+        _controls.LBL_PORTRAIT = findControl<gui::Label>("LBL_PORTRAIT");
+        _controls.LBL_RANKVAL = findControl<gui::Label>("LBL_RANKVAL");
+        _controls.LBL_SKILLRANK = findControl<gui::Label>("LBL_SKILLRANK");
+        _controls.LBL_TOTAL = findControl<gui::Label>("LBL_TOTAL");
+        _controls.LBL_TOTALVAL = findControl<gui::Label>("LBL_TOTALVAL");
+        _controls.LB_ABILITY = findControl<gui::ListBox>("LB_ABILITY");
+        _controls.LB_DESC = findControl<gui::ListBox>("LB_DESC");
+        _controls.LB_DESC_FEATS = findControl<gui::ListBox>("LB_DESC_FEATS");
+    }
 
     void loadSkills();
     void refreshPortraits();

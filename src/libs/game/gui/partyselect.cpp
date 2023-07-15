@@ -17,13 +17,6 @@
 
 #include "reone/game/gui/partyselect.h"
 
-#include "reone/graphics/textures.h"
-#include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/resources.h"
-#include "reone/resource/strings.h"
-#include "reone/script/types.h"
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/factory.h"
@@ -31,6 +24,12 @@
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
+#include "reone/graphics/textures.h"
+#include "reone/resource/di/services.h"
+#include "reone/resource/gffs.h"
+#include "reone/resource/resources.h"
+#include "reone/resource/strings.h"
+#include "reone/script/types.h"
 
 using namespace reone::audio;
 
@@ -75,116 +74,60 @@ void PartySelection::onGUILoaded() {
         button.setUseBorderColorOverride(false);
     }
 
-    _binding.btnAccept->setOnClick([this]() {
+    _controls.BTN_ACCEPT->setOnClick([this]() {
         onAcceptButtonClick();
     });
-    _binding.btnDone->setOnClick([this]() {
+    _controls.BTN_DONE->setOnClick([this]() {
         changeParty();
         _game.openInGame();
         if (!_context.exitScript.empty()) {
             _game.scriptRunner().run(_context.exitScript);
         }
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _game.openInGame();
         if (!_context.exitScript.empty()) {
             _game.scriptRunner().run(_context.exitScript);
         }
     });
-    _binding.btnNpc0->setOnClick([this]() {
+    _controls.BTN_NPC0->setOnClick([this]() {
         onNpcButtonClick(0);
     });
-    _binding.btnNpc1->setOnClick([this]() {
+    _controls.BTN_NPC1->setOnClick([this]() {
         onNpcButtonClick(1);
     });
-    _binding.btnNpc2->setOnClick([this]() {
+    _controls.BTN_NPC2->setOnClick([this]() {
         onNpcButtonClick(2);
     });
-    _binding.btnNpc3->setOnClick([this]() {
+    _controls.BTN_NPC3->setOnClick([this]() {
         onNpcButtonClick(3);
     });
-    _binding.btnNpc4->setOnClick([this]() {
+    _controls.BTN_NPC4->setOnClick([this]() {
         onNpcButtonClick(4);
     });
-    _binding.btnNpc5->setOnClick([this]() {
+    _controls.BTN_NPC5->setOnClick([this]() {
         onNpcButtonClick(5);
     });
-    _binding.btnNpc6->setOnClick([this]() {
+    _controls.BTN_NPC6->setOnClick([this]() {
         onNpcButtonClick(6);
     });
-    _binding.btnNpc7->setOnClick([this]() {
+    _controls.BTN_NPC7->setOnClick([this]() {
         onNpcButtonClick(7);
     });
-    _binding.btnNpc8->setOnClick([this]() {
+    _controls.BTN_NPC8->setOnClick([this]() {
         onNpcButtonClick(8);
     });
 
     if (_game.isTSL()) {
-        _binding.btnNpc9->setOnClick([this]() {
+        _controls.BTN_NPC9->setOnClick([this]() {
             onNpcButtonClick(9);
         });
-        _binding.btnNpc10->setOnClick([this]() {
+        _controls.BTN_NPC10->setOnClick([this]() {
             onNpcButtonClick(10);
         });
-        _binding.btnNpc11->setOnClick([this]() {
+        _controls.BTN_NPC11->setOnClick([this]() {
             onNpcButtonClick(11);
         });
-    }
-}
-
-void PartySelection::bindControls() {
-    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnDone = findControl<Button>("BTN_DONE");
-    _binding.btnNpc0 = findControl<ToggleButton>("BTN_NPC0");
-    _binding.btnNpc1 = findControl<ToggleButton>("BTN_NPC1");
-    _binding.btnNpc2 = findControl<ToggleButton>("BTN_NPC2");
-    _binding.btnNpc3 = findControl<ToggleButton>("BTN_NPC3");
-    _binding.btnNpc4 = findControl<ToggleButton>("BTN_NPC4");
-    _binding.btnNpc5 = findControl<ToggleButton>("BTN_NPC5");
-    _binding.btnNpc6 = findControl<ToggleButton>("BTN_NPC6");
-    _binding.btnNpc7 = findControl<ToggleButton>("BTN_NPC7");
-    _binding.btnNpc8 = findControl<ToggleButton>("BTN_NPC8");
-    _binding.lbl3d = findControl<Label>("LBL_3D");
-    _binding.lblBevelL = findControl<Label>("LBL_BEVEL_L");
-    _binding.lblBevelM = findControl<Label>("LBL_BEVEL_M");
-    _binding.lblChar0 = findControl<Label>("LBL_CHAR0");
-    _binding.lblChar1 = findControl<Label>("LBL_CHAR1");
-    _binding.lblChar2 = findControl<Label>("LBL_CHAR2");
-    _binding.lblChar3 = findControl<Label>("LBL_CHAR3");
-    _binding.lblChar4 = findControl<Label>("LBL_CHAR4");
-    _binding.lblChar5 = findControl<Label>("LBL_CHAR5");
-    _binding.lblChar6 = findControl<Label>("LBL_CHAR6");
-    _binding.lblChar7 = findControl<Label>("LBL_CHAR7");
-    _binding.lblChar8 = findControl<Label>("LBL_CHAR8");
-    _binding.lblCount = findControl<Label>("LBL_COUNT");
-    _binding.lblNa0 = findControl<Label>("LBL_NA0");
-    _binding.lblNa1 = findControl<Label>("LBL_NA1");
-    _binding.lblNa2 = findControl<Label>("LBL_NA2");
-    _binding.lblNa3 = findControl<Label>("LBL_NA3");
-    _binding.lblNa4 = findControl<Label>("LBL_NA4");
-    _binding.lblNa5 = findControl<Label>("LBL_NA5");
-    _binding.lblNa6 = findControl<Label>("LBL_NA6");
-    _binding.lblNa7 = findControl<Label>("LBL_NA7");
-    _binding.lblNa8 = findControl<Label>("LBL_NA8");
-    _binding.lblNpcLevel = findControl<Label>("LBL_NPC_LEVEL");
-    _binding.lblNpcName = findControl<Label>("LBL_NPC_NAME");
-    _binding.lblTitle = findControl<Label>("LBL_TITLE");
-
-    if (_game.isTSL()) {
-        _binding.btnNpc9 = findControl<ToggleButton>("BTN_NPC9");
-        _binding.btnNpc10 = findControl<ToggleButton>("BTN_NPC10");
-        _binding.btnNpc11 = findControl<ToggleButton>("BTN_NPC11");
-        _binding.lblChar9 = findControl<Label>("LBL_CHAR9");
-        _binding.lblChar10 = findControl<Label>("LBL_CHAR10");
-        _binding.lblChar11 = findControl<Label>("LBL_CHAR11");
-        _binding.lblNa9 = findControl<Label>("LBL_NA9");
-        _binding.lblNa10 = findControl<Label>("LBL_NA10");
-        _binding.lblNa11 = findControl<Label>("LBL_NA11");
-        _binding.lblNameBack = findControl<Label>("LBL_NAMEBACK");
-    } else {
-        _binding.lblAvailable = findControl<Label>("LBL_AVAILABLE");
-        _binding.lblBevelR = findControl<Label>("LBL_BEVEL_R");
     }
 }
 
@@ -204,39 +147,39 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
     }
     Party &party = _game.party();
     std::vector<Label *> charLabels {
-        _binding.lblChar0.get(),
-        _binding.lblChar1.get(),
-        _binding.lblChar2.get(),
-        _binding.lblChar3.get(),
-        _binding.lblChar4.get(),
-        _binding.lblChar5.get(),
-        _binding.lblChar6.get(),
-        _binding.lblChar7.get(),
-        _binding.lblChar8.get(),
+        _controls.LBL_CHAR0.get(),
+        _controls.LBL_CHAR1.get(),
+        _controls.LBL_CHAR2.get(),
+        _controls.LBL_CHAR3.get(),
+        _controls.LBL_CHAR4.get(),
+        _controls.LBL_CHAR5.get(),
+        _controls.LBL_CHAR6.get(),
+        _controls.LBL_CHAR7.get(),
+        _controls.LBL_CHAR8.get(),
     };
     std::vector<Label *> naLabels {
-        _binding.lblNa0.get(),
-        _binding.lblNa1.get(),
-        _binding.lblNa2.get(),
-        _binding.lblNa3.get(),
-        _binding.lblNa4.get(),
-        _binding.lblNa5.get(),
-        _binding.lblNa6.get(),
-        _binding.lblNa7.get(),
-        _binding.lblNa8.get()};
+        _controls.LBL_NA0.get(),
+        _controls.LBL_NA1.get(),
+        _controls.LBL_NA2.get(),
+        _controls.LBL_NA3.get(),
+        _controls.LBL_NA4.get(),
+        _controls.LBL_NA5.get(),
+        _controls.LBL_NA6.get(),
+        _controls.LBL_NA7.get(),
+        _controls.LBL_NA8.get()};
     if (_game.isTSL()) {
-        charLabels.push_back(_binding.lblChar9.get());
-        charLabels.push_back(_binding.lblChar10.get());
-        charLabels.push_back(_binding.lblChar11.get());
-        naLabels.push_back(_binding.lblNa9.get());
-        naLabels.push_back(_binding.lblNa10.get());
-        naLabels.push_back(_binding.lblNa11.get());
+        charLabels.push_back(_controls.LBL_CHAR9.get());
+        charLabels.push_back(_controls.LBL_CHAR10.get());
+        charLabels.push_back(_controls.LBL_CHAR11.get());
+        naLabels.push_back(_controls.LBL_NA9.get());
+        naLabels.push_back(_controls.LBL_NA10.get());
+        naLabels.push_back(_controls.LBL_NA11.get());
     }
 
     for (int i = 0; i < kNpcCount; ++i) {
-        ToggleButton &btnNpc = getNpcButton(i);
-        Label &lblChar = *charLabels[i];
-        Label &lblNa = *naLabels[i];
+        ToggleButton &BTN_NPC = getNpcButton(i);
+        Label &LBL_CHAR = *charLabels[i];
+        Label &LBL_NA = *naLabels[i];
 
         if (party.isMemberAvailable(i)) {
             std::string blueprintResRef(party.getAvailableMember(i));
@@ -249,13 +192,13 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
                 int appearance = utc->getInt("Appearance_Type");
                 portrait = _services.game.portraits.getTextureByAppearance(appearance);
             }
-            btnNpc.setDisabled(false);
-            lblChar.setBorderFill(std::move(portrait));
-            lblNa.setVisible(false);
+            BTN_NPC.setDisabled(false);
+            LBL_CHAR.setBorderFill(std::move(portrait));
+            LBL_NA.setVisible(false);
         } else {
-            btnNpc.setDisabled(true);
-            lblChar.setBorderFill(std::shared_ptr<Texture>(nullptr));
-            lblNa.setVisible(true);
+            BTN_NPC.setDisabled(true);
+            LBL_CHAR.setBorderFill(std::shared_ptr<Texture>(nullptr));
+            LBL_NA.setVisible(true);
         }
     }
     refreshAvailableCount();
@@ -270,19 +213,19 @@ void PartySelection::addNpc(int npc) {
 
 ToggleButton &PartySelection::getNpcButton(int npc) {
     std::vector<ToggleButton *> npcButtons {
-        _binding.btnNpc0.get(),
-        _binding.btnNpc1.get(),
-        _binding.btnNpc2.get(),
-        _binding.btnNpc3.get(),
-        _binding.btnNpc4.get(),
-        _binding.btnNpc5.get(),
-        _binding.btnNpc6.get(),
-        _binding.btnNpc7.get(),
-        _binding.btnNpc8.get(),
-        _binding.btnNpc9.get()};
+        _controls.BTN_NPC0.get(),
+        _controls.BTN_NPC1.get(),
+        _controls.BTN_NPC2.get(),
+        _controls.BTN_NPC3.get(),
+        _controls.BTN_NPC4.get(),
+        _controls.BTN_NPC5.get(),
+        _controls.BTN_NPC6.get(),
+        _controls.BTN_NPC7.get(),
+        _controls.BTN_NPC8.get(),
+        _controls.BTN_NPC9.get()};
     if (_game.isTSL()) {
-        npcButtons.push_back(_binding.btnNpc10.get());
-        npcButtons.push_back(_binding.btnNpc11.get());
+        npcButtons.push_back(_controls.BTN_NPC10.get());
+        npcButtons.push_back(_controls.BTN_NPC11.get());
     }
     return *npcButtons[npc];
 }
@@ -303,12 +246,12 @@ void PartySelection::onAcceptButtonClick() {
 }
 
 void PartySelection::refreshAvailableCount() {
-    _binding.lblCount->setTextMessage(std::to_string(_availableCount));
+    _controls.LBL_COUNT->setTextMessage(std::to_string(_availableCount));
 }
 
 void PartySelection::refreshAcceptButton() {
     std::string text(_services.resource.strings.getText(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
-    _binding.btnAccept->setTextMessage(text);
+    _controls.BTN_ACCEPT->setTextMessage(text);
 }
 
 void PartySelection::removeNpc(int npc) {

@@ -17,9 +17,8 @@
 
 #include "reone/game/gui/loadscreen.h"
 
-#include "reone/resource/resources.h"
-
 #include "reone/game/game.h"
+#include "reone/resource/resources.h"
 
 using namespace reone::audio;
 
@@ -44,14 +43,7 @@ void LoadingScreen::onGUILoaded() {
 
     bindControls();
 
-    _binding.lblHint->setTextMessage("");
-}
-
-void LoadingScreen::bindControls() {
-    _binding.pbProgress = findControl<ProgressBar>("PB_PROGRESS");
-    _binding.lblHint = findControl<Label>("LBL_HINT");
-    _binding.lblLogo = findControl<Label>("LBL_LOGO");
-    _binding.lblLoading = findControl<Label>("LBL_LOADING");
+    _controls.LBL_HINT->setTextMessage("");
 }
 
 void LoadingScreen::setImage(const std::string &resRef) {
@@ -59,7 +51,7 @@ void LoadingScreen::setImage(const std::string &resRef) {
 }
 
 void LoadingScreen::setProgress(int progress) {
-    _binding.pbProgress->setValue(progress);
+    _controls.PB_PROGRESS->setValue(progress);
 }
 
 } // namespace game

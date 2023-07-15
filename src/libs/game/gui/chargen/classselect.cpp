@@ -17,16 +17,6 @@
 
 #include "reone/game/gui/chargen/classselect.h"
 
-#include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/gui/control/button.h"
-#include "reone/gui/control/label.h"
-#include "reone/gui/sceneinitializer.h"
-#include "reone/resource/strings.h"
-#include "reone/scene/di/services.h"
-#include "reone/scene/graphs.h"
-#include "reone/system/randomutil.h"
-
 #include "reone/game/d20/classes.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
@@ -36,6 +26,15 @@
 #include "reone/game/party.h"
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
+#include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/sceneinitializer.h"
+#include "reone/resource/strings.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/system/randomutil.h"
 
 using namespace reone::audio;
 using namespace reone::gui;
@@ -69,34 +68,16 @@ void ClassSelection::onGUILoaded() {
     bindControls();
 
     setupClassButtons();
-    setButtonColors(*_binding.btnBack);
+    setButtonColors(*_controls.BTN_BACK);
 
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.cancel();
     });
 }
 
-void ClassSelection::bindControls() {
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnSel1 = findControl<Button>("BTN_SEL1");
-    _binding.btnSel2 = findControl<Button>("BTN_SEL2");
-    _binding.btnSel3 = findControl<Button>("BTN_SEL3");
-    _binding.btnSel4 = findControl<Button>("BTN_SEL4");
-    _binding.btnSel5 = findControl<Button>("BTN_SEL5");
-    _binding.btnSel6 = findControl<Button>("BTN_SEL6");
-    _binding.lblClass = findControl<Label>("LBL_CLASS");
-    _binding.lblDesc = findControl<Label>("LBL_DESC");
-    _binding.threeDModel1 = findControl<Label>("3D_MODEL1");
-    _binding.threeDModel2 = findControl<Label>("3D_MODEL2");
-    _binding.threeDModel3 = findControl<Label>("3D_MODEL3");
-    _binding.threeDModel4 = findControl<Label>("3D_MODEL4");
-    _binding.threeDModel5 = findControl<Label>("3D_MODEL5");
-    _binding.threeDModel6 = findControl<Label>("3D_MODEL6");
-}
-
 void ClassSelection::setupClassButtons() {
-    _enlargedButtonSize = glm::vec2(_binding.btnSel1->extent().width, _binding.btnSel1->extent().height);
-    _defaultButtonSize = glm::vec2(_binding.btnSel2->extent().width, _binding.btnSel2->extent().height);
+    _enlargedButtonSize = glm::vec2(_controls.BTN_SEL1->extent().width, _controls.BTN_SEL1->extent().height);
+    _defaultButtonSize = glm::vec2(_controls.BTN_SEL2->extent().width, _controls.BTN_SEL2->extent().height);
 
     setupClassButton(0, Gender::Male, !_game.isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
     setupClassButton(1, Gender::Male, !_game.isTSL() ? ClassType::Scout : ClassType::JediSentinel);
@@ -119,12 +100,12 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     // Button control
 
     std::vector<Button *> selButtons {
-        _binding.btnSel1.get(),
-        _binding.btnSel2.get(),
-        _binding.btnSel3.get(),
-        _binding.btnSel4.get(),
-        _binding.btnSel5.get(),
-        _binding.btnSel6.get(),
+        _controls.BTN_SEL1.get(),
+        _controls.BTN_SEL2.get(),
+        _controls.BTN_SEL3.get(),
+        _controls.BTN_SEL4.get(),
+        _controls.BTN_SEL5.get(),
+        _controls.BTN_SEL6.get(),
     };
     Button &selButton = *selButtons[index];
     setButtonColors(selButton);
@@ -162,15 +143,15 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         .cameraFromModelNode("camerahook")
         .invoke();
 
-    std::vector<Label *> threeDModels {
-        _binding.threeDModel1.get(),
-        _binding.threeDModel2.get(),
-        _binding.threeDModel3.get(),
-        _binding.threeDModel4.get(),
-        _binding.threeDModel5.get(),
-        _binding.threeDModel6.get(),
+    std::vector<Label *> THREE_D_MODELs {
+        _controls.THREE_D_MODEL1.get(),
+        _controls.THREE_D_MODEL2.get(),
+        _controls.THREE_D_MODEL3.get(),
+        _controls.THREE_D_MODEL4.get(),
+        _controls.THREE_D_MODEL5.get(),
+        _controls.THREE_D_MODEL6.get(),
     };
-    threeDModels[index]->setSceneName(sceneName);
+    THREE_D_MODELs[index]->setSceneName(sceneName);
 
     ClassButton classButton;
     classButton.control = &selButton;
@@ -259,10 +240,10 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
 
     std::string classText(_services.resource.strings.getText(g_genderStrRefs[button.character.gender]));
     classText += " " + _services.game.classes.get(clazz)->name();
-    _binding.lblClass->setTextMessage(classText);
+    _controls.LBL_CLASS->setTextMessage(classText);
 
     std::string descText(_services.resource.strings.getText(g_classDescStrRefs[clazz]));
-    _binding.lblDesc->setTextMessage(descText);
+    _controls.LBL_DESC->setTextMessage(descText);
 }
 
 } // namespace game

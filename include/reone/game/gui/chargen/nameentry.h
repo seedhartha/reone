@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
 #include "reone/gui/textinput.h"
 
 #include "../../format/ltrreader.h"
@@ -51,12 +53,16 @@ public:
     void loadRandomName();
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Button> btnBack;
-        std::shared_ptr<gui::Button> btnRandom;
-        std::shared_ptr<gui::Button> endBtn;
-        std::shared_ptr<gui::Control> nameBoxEdit;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_BACK;
+        std::shared_ptr<gui::Button> BTN_RANDOM;
+        std::shared_ptr<gui::Button> END_BTN;
+        std::shared_ptr<gui::Label> MAIN_TITLE_LBL;
+        std::shared_ptr<gui::Label> NAME_BOX_EDIT;
+        std::shared_ptr<gui::Label> SUB_TITLE_LBL;
+    };
+
+    Controls _controls;
 
     CharacterGeneration &_charGen;
     gui::TextInput _input;
@@ -67,7 +73,14 @@ private:
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_BACK = findControl<gui::Button>("BTN_BACK");
+        _controls.BTN_RANDOM = findControl<gui::Button>("BTN_RANDOM");
+        _controls.END_BTN = findControl<gui::Button>("END_BTN");
+        _controls.MAIN_TITLE_LBL = findControl<gui::Label>("MAIN_TITLE_LBL");
+        _controls.NAME_BOX_EDIT = findControl<gui::Label>("NAME_BOX_EDIT");
+        _controls.SUB_TITLE_LBL = findControl<gui::Label>("SUB_TITLE_LBL");
+    }
 
     void loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr);
 

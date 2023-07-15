@@ -44,26 +44,48 @@ public:
     void refreshControls();
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Button> btnExit;
-        std::shared_ptr<gui::Button> btnUp;
-        std::shared_ptr<gui::Button> btnDown;
-        std::shared_ptr<gui::Button> btnReturn;
-        std::shared_ptr<gui::Label> lblArea;
-        std::shared_ptr<gui::Label> lblMap;
-        std::shared_ptr<gui::Label> lblMapNote;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_DOWN;
+        std::shared_ptr<gui::Button> BTN_EXIT;
+        std::shared_ptr<gui::Button> BTN_PRTYSLCT;
+        std::shared_ptr<gui::Button> BTN_RETURN;
+        std::shared_ptr<gui::Button> BTN_UP;
+        std::shared_ptr<gui::Label> LBL_Area;
+        std::shared_ptr<gui::Label> LBL_BAR1;
+        std::shared_ptr<gui::Label> LBL_BAR2;
+        std::shared_ptr<gui::Label> LBL_BAR3;
+        std::shared_ptr<gui::Label> LBL_BAR4;
+        std::shared_ptr<gui::Label> LBL_BAR5;
+        std::shared_ptr<gui::Label> LBL_COMPASS;
+        std::shared_ptr<gui::Label> LBL_Map;
+        std::shared_ptr<gui::Label> LBL_MapNote;
+        std::shared_ptr<gui::Label> LBL_TITLE;
+    };
 
-        // KotOR only
-        std::shared_ptr<gui::Button> btnPrtySlct;
-        // END KotOR only
-    } _binding;
+    Controls _controls;
 
     std::vector<std::shared_ptr<Waypoint>> _notes;
     int _selectedNoteIdx {0};
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_DOWN = findControl<gui::Button>("BTN_DOWN");
+        _controls.BTN_EXIT = findControl<gui::Button>("BTN_EXIT");
+        _controls.BTN_PRTYSLCT = findControl<gui::Button>("BTN_PRTYSLCT");
+        _controls.BTN_RETURN = findControl<gui::Button>("BTN_RETURN");
+        _controls.BTN_UP = findControl<gui::Button>("BTN_UP");
+        _controls.LBL_Area = findControl<gui::Label>("LBL_Area");
+        _controls.LBL_BAR1 = findControl<gui::Label>("LBL_BAR1");
+        _controls.LBL_BAR2 = findControl<gui::Label>("LBL_BAR2");
+        _controls.LBL_BAR3 = findControl<gui::Label>("LBL_BAR3");
+        _controls.LBL_BAR4 = findControl<gui::Label>("LBL_BAR4");
+        _controls.LBL_BAR5 = findControl<gui::Label>("LBL_BAR5");
+        _controls.LBL_COMPASS = findControl<gui::Label>("LBL_COMPASS");
+        _controls.LBL_Map = findControl<gui::Label>("LBL_Map");
+        _controls.LBL_MapNote = findControl<gui::Label>("LBL_MapNote");
+        _controls.LBL_TITLE = findControl<gui::Label>("LBL_TITLE");
+    }
 
     void refreshSelectedNote();
 };

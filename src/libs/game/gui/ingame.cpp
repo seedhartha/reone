@@ -38,37 +38,37 @@ void InGameMenu::preload(IGUI &gui) {
 void InGameMenu::onGUILoaded() {
     bindControls();
 
-    _binding.btnEqu->setVisible(false);
-    _binding.btnInv->setVisible(false);
-    _binding.btnChar->setVisible(false);
-    _binding.btnAbi->setVisible(false);
-    _binding.btnMsg->setVisible(false);
-    _binding.btnJou->setVisible(false);
-    _binding.btnMap->setVisible(false);
-    _binding.btnOpt->setVisible(false);
+    _controls.BTN_EQU->setVisible(false);
+    _controls.BTN_INV->setVisible(false);
+    _controls.BTN_CHAR->setVisible(false);
+    _controls.BTN_ABI->setVisible(false);
+    _controls.BTN_MSG->setVisible(false);
+    _controls.BTN_JOU->setVisible(false);
+    _controls.BTN_MAP->setVisible(false);
+    _controls.BTN_OPT->setVisible(false);
 
-    _binding.lblhEqu->setOnClick([this]() {
+    _controls.LBLH_EQU->setOnClick([this]() {
         openEquipment();
     });
-    _binding.lblhInv->setOnClick([this]() {
+    _controls.LBLH_INV->setOnClick([this]() {
         openInventory();
     });
-    _binding.lblhCha->setOnClick([this]() {
+    _controls.LBLH_CHA->setOnClick([this]() {
         openCharacter();
     });
-    _binding.lblhAbi->setOnClick([this]() {
+    _controls.LBLH_ABI->setOnClick([this]() {
         openAbilities();
     });
-    _binding.lblhMsg->setOnClick([this]() {
+    _controls.LBLH_MSG->setOnClick([this]() {
         openMessages();
     });
-    _binding.lblhJou->setOnClick([this]() {
+    _controls.LBLH_JOU->setOnClick([this]() {
         openJournal();
     });
-    _binding.lblhMap->setOnClick([this]() {
+    _controls.LBLH_MAP->setOnClick([this]() {
         openMap();
     });
-    _binding.lblhOpt->setOnClick([this]() {
+    _controls.LBLH_OPT->setOnClick([this]() {
         openOptions();
     });
 
@@ -84,35 +84,15 @@ void InGameMenu::onGUILoaded() {
     loadOptions();
 }
 
-void InGameMenu::bindControls() {
-    _binding.lblhEqu = findControl<Label>("LBLH_EQU");
-    _binding.lblhInv = findControl<Label>("LBLH_INV");
-    _binding.lblhCha = findControl<Label>("LBLH_CHA");
-    _binding.lblhAbi = findControl<Label>("LBLH_ABI");
-    _binding.lblhMsg = findControl<Label>("LBLH_MSG");
-    _binding.lblhJou = findControl<Label>("LBLH_JOU");
-    _binding.lblhMap = findControl<Label>("LBLH_MAP");
-    _binding.lblhOpt = findControl<Label>("LBLH_OPT");
-
-    _binding.btnEqu = findControl<Button>("BTN_EQU");
-    _binding.btnInv = findControl<Button>("BTN_INV");
-    _binding.btnChar = findControl<Button>("BTN_CHAR");
-    _binding.btnAbi = findControl<Button>("BTN_ABI");
-    _binding.btnMsg = findControl<Button>("BTN_MSG");
-    _binding.btnJou = findControl<Button>("BTN_JOU");
-    _binding.btnMap = findControl<Button>("BTN_MAP");
-    _binding.btnOpt = findControl<Button>("BTN_OPT");
-}
-
 void InGameMenu::setTabLabelsFocusable(bool focusable) {
-    _binding.lblhEqu->setFocusable(focusable);
-    _binding.lblhInv->setFocusable(focusable);
-    _binding.lblhCha->setFocusable(focusable);
-    _binding.lblhAbi->setFocusable(focusable);
-    _binding.lblhMsg->setFocusable(focusable);
-    _binding.lblhJou->setFocusable(focusable);
-    _binding.lblhMap->setFocusable(focusable);
-    _binding.lblhOpt->setFocusable(focusable);
+    _controls.LBLH_EQU->setFocusable(focusable);
+    _controls.LBLH_INV->setFocusable(focusable);
+    _controls.LBLH_CHA->setFocusable(focusable);
+    _controls.LBLH_ABI->setFocusable(focusable);
+    _controls.LBLH_MSG->setFocusable(focusable);
+    _controls.LBLH_JOU->setFocusable(focusable);
+    _controls.LBLH_MAP->setFocusable(focusable);
+    _controls.LBLH_OPT->setFocusable(focusable);
 }
 
 void InGameMenu::loadEquipment() {
@@ -221,14 +201,14 @@ void InGameMenu::changeTab(InGameMenuTab tab) {
 }
 
 void InGameMenu::updateTabButtons() {
-    _binding.btnEqu->setFocus(_tab == InGameMenuTab::Equipment);
-    _binding.btnInv->setFocus(_tab == InGameMenuTab::Inventory);
-    _binding.btnChar->setFocus(_tab == InGameMenuTab::Character);
-    _binding.btnAbi->setFocus(_tab == InGameMenuTab::Abilities);
-    _binding.btnMsg->setFocus(_tab == InGameMenuTab::Messages);
-    _binding.btnJou->setFocus(_tab == InGameMenuTab::Journal);
-    _binding.btnMap->setFocus(_tab == InGameMenuTab::Map);
-    _binding.btnOpt->setFocus(_tab == InGameMenuTab::Options);
+    _controls.BTN_EQU->setFocus(_tab == InGameMenuTab::Equipment);
+    _controls.BTN_INV->setFocus(_tab == InGameMenuTab::Inventory);
+    _controls.BTN_CHAR->setFocus(_tab == InGameMenuTab::Character);
+    _controls.BTN_ABI->setFocus(_tab == InGameMenuTab::Abilities);
+    _controls.BTN_MSG->setFocus(_tab == InGameMenuTab::Messages);
+    _controls.BTN_JOU->setFocus(_tab == InGameMenuTab::Journal);
+    _controls.BTN_MAP->setFocus(_tab == InGameMenuTab::Map);
+    _controls.BTN_OPT->setFocus(_tab == InGameMenuTab::Options);
 }
 
 void InGameMenu::openInventory() {

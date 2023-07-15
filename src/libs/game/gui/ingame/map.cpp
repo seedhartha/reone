@@ -17,13 +17,11 @@
 
 #include "reone/game/gui/ingame/map.h"
 
+#include "reone/game/game.h"
+#include "reone/game/object/waypoint.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/object/waypoint.h"
-
-#include "reone/game/game.h"
 
 using namespace reone::audio;
 
@@ -41,17 +39,17 @@ void MapMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnReturn->setDisabled(true);
-    _binding.btnExit->setOnClick([this]() {
+    _controls.BTN_RETURN->setDisabled(true);
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
-    _binding.btnUp->setOnClick([this]() {
+    _controls.BTN_UP->setOnClick([this]() {
         if (--_selectedNoteIdx == -1) {
             _selectedNoteIdx = static_cast<int>(_notes.size() - 1);
         }
         refreshSelectedNote();
     });
-    _binding.btnDown->setOnClick([this]() {
+    _controls.BTN_DOWN->setOnClick([this]() {
         if (++_selectedNoteIdx == static_cast<int>(_notes.size())) {
             _selectedNoteIdx = 0;
         }
@@ -59,30 +57,16 @@ void MapMenu::onGUILoaded() {
     });
 
     if (!_game.isTSL()) {
-        _binding.btnPrtySlct->setOnClick([this]() {
+        _controls.BTN_PRTYSLCT->setOnClick([this]() {
             _game.openPartySelection(PartySelectionContext());
         });
-    }
-}
-
-void MapMenu::bindControls() {
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
-    _binding.btnUp = findControl<Button>("BTN_UP");
-    _binding.btnDown = findControl<Button>("BTN_DOWN");
-    _binding.btnReturn = findControl<Button>("BTN_RETURN");
-    _binding.lblArea = findControl<Label>("LBL_Area");
-    _binding.lblMap = findControl<Label>("LBL_Map");
-    _binding.lblMapNote = findControl<Label>("LBL_MapNote");
-
-    if (!_game.isTSL()) {
-        _binding.btnPrtySlct = findControl<Button>("BTN_PRTYSLCT");
     }
 }
 
 void MapMenu::draw() {
     GameGUI::draw();
 
-    const Control::Extent &extent = _binding.lblMap->extent();
+    const Control::Extent &extent = _controls.LBL_Map->extent();
 
     glm::vec4 bounds(
         _gui->controlOffset().x + extent.left,
@@ -94,7 +78,7 @@ void MapMenu::draw() {
 }
 
 void MapMenu::refreshControls() {
-    _binding.lblArea->setTextMessage(_game.module()->area()->localizedName());
+    _controls.LBL_Area->setTextMessage(_game.module()->area()->localizedName());
     _notes.clear();
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
@@ -118,7 +102,7 @@ void MapMenu::refreshSelectedNote() {
         text += ": ";
         text += note->mapNote();
 
-        _binding.lblMapNote->setTextMessage(text);
+        _controls.LBL_MapNote->setTextMessage(text);
     }
 
     _game.map().setSelectedNote(note);

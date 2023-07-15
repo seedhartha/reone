@@ -218,20 +218,17 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/areatransition.h
     ${GAME_INCLUDE_DIR}/gui/generated/barkbubble.h
     ${GAME_INCLUDE_DIR}/gui/generated/character.h
-    ${GAME_INCLUDE_DIR}/gui/generated/charseldemo.h
     ${GAME_INCLUDE_DIR}/gui/generated/chemical.h
     ${GAME_INCLUDE_DIR}/gui/generated/classsel.h
     ${GAME_INCLUDE_DIR}/gui/generated/component.h
     ${GAME_INCLUDE_DIR}/gui/generated/computer.h
     ${GAME_INCLUDE_DIR}/gui/generated/computercam.h
-    ${GAME_INCLUDE_DIR}/gui/generated/computercamera.h
     ${GAME_INCLUDE_DIR}/gui/generated/confirm.h
     ${GAME_INCLUDE_DIR}/gui/generated/container.h
     ${GAME_INCLUDE_DIR}/gui/generated/credits.h
     ${GAME_INCLUDE_DIR}/gui/generated/custpnl.h
     ${GAME_INCLUDE_DIR}/gui/generated/datapad.h
     ${GAME_INCLUDE_DIR}/gui/generated/debug.h
-    ${GAME_INCLUDE_DIR}/gui/generated/demo.h
     ${GAME_INCLUDE_DIR}/gui/generated/dialog.h
     ${GAME_INCLUDE_DIR}/gui/generated/equip.h
     ${GAME_INCLUDE_DIR}/gui/generated/fade.h
@@ -244,7 +241,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/loadscreen.h
     ${GAME_INCLUDE_DIR}/gui/generated/maincg.h
     ${GAME_INCLUDE_DIR}/gui/generated/maininterface.h
-    ${GAME_INCLUDE_DIR}/gui/generated/mainmdemo.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu10x7.h
     ${GAME_INCLUDE_DIR}/gui/generated/mainmenu12x9.h
@@ -278,7 +274,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/generated/optsound.h
     ${GAME_INCLUDE_DIR}/gui/generated/optsoundadv.h
     ${GAME_INCLUDE_DIR}/gui/generated/partyselect.h
-    ${GAME_INCLUDE_DIR}/gui/generated/partyselection.h
     ${GAME_INCLUDE_DIR}/gui/generated/pause.h
     ${GAME_INCLUDE_DIR}/gui/generated/pazaakgame.h
     ${GAME_INCLUDE_DIR}/gui/generated/pazaaksetup.h

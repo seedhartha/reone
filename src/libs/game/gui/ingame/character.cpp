@@ -17,12 +17,6 @@
 
 #include "reone/game/gui/ingame/character.h"
 
-#include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/gui/sceneinitializer.h"
-#include "reone/scene/di/services.h"
-#include "reone/scene/graphs.h"
-
 #include "reone/game/d20/classes.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
@@ -30,6 +24,11 @@
 #include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/types.h"
+#include "reone/graphics/di/services.h"
+#include "reone/graphics/models.h"
+#include "reone/gui/sceneinitializer.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 
 using namespace reone::audio;
 
@@ -46,108 +45,70 @@ void CharacterMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnAuto->setDisabled(true);
-    _binding.btnExit->setOnClick([this]() {
+    if (_controls.LBL_GOOD1)
+        _lblGood.push_back(_controls.LBL_GOOD1);
+    if (_controls.LBL_GOOD2)
+        _lblGood.push_back(_controls.LBL_GOOD2);
+    if (_controls.LBL_GOOD3)
+        _lblGood.push_back(_controls.LBL_GOOD3);
+    if (_controls.LBL_GOOD4)
+        _lblGood.push_back(_controls.LBL_GOOD4);
+    if (_controls.LBL_GOOD5)
+        _lblGood.push_back(_controls.LBL_GOOD5);
+    if (_controls.LBL_GOOD6)
+        _lblGood.push_back(_controls.LBL_GOOD6);
+    if (_controls.LBL_GOOD7)
+        _lblGood.push_back(_controls.LBL_GOOD7);
+    if (_controls.LBL_GOOD8)
+        _lblGood.push_back(_controls.LBL_GOOD8);
+    if (_controls.LBL_GOOD9)
+        _lblGood.push_back(_controls.LBL_GOOD9);
+    if (_controls.LBL_GOOD10)
+        _lblGood.push_back(_controls.LBL_GOOD10);
+
+    if (_controls.LBL_BAR1)
+        _lblBar.push_back(_controls.LBL_BAR1);
+    if (_controls.LBL_BAR2)
+        _lblBar.push_back(_controls.LBL_BAR2);
+    if (_controls.LBL_BAR3)
+        _lblBar.push_back(_controls.LBL_BAR3);
+    if (_controls.LBL_BAR4)
+        _lblBar.push_back(_controls.LBL_BAR4);
+    if (_controls.LBL_BAR5)
+        _lblBar.push_back(_controls.LBL_BAR5);
+    if (_controls.LBL_BAR6)
+        _lblBar.push_back(_controls.LBL_BAR6);
+
+    if (_game.isTSL()) {
+        _controls.BTN_CHANGE1 = _inGameMenu.getBtnChange2();
+        _controls.BTN_CHANGE2 = _inGameMenu.getBtnChange3();
+    }
+
+    _controls.BTN_AUTO->setDisabled(true);
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
-    _binding.btnLevelup->setOnClick([this]() {
+    _controls.BTN_LEVELUP->setOnClick([this]() {
         _game.openLevelUp();
     });
 
     if (!_game.isTSL()) {
-        _binding.btnCharLeft->setVisible(false);
-        _binding.btnCharRight->setVisible(false);
+        // _controls.btnCharLeft->setVisible(false);
+        // _controls.btnCharRight->setVisible(false);
 
-        for (auto &control : _binding.lblGood) {
+        for (auto &control : _lblGood) {
             control->setVisible(false);
         }
 
-        _binding.lblMore->setVisible(false);
-        _binding.btnScripts->setDisabled(true);
-    }
-}
-
-void CharacterMenu::bindControls() {
-    _binding.lbl3dChar = findControl<Label>("LBL_3DCHAR");
-    _binding.btn3dChar = findControl<Button>("BTN_3DCHAR");
-    _binding.sldAlign = findControl<Slider>("SLD_ALIGN");
-    _binding.lblStr = findControl<Label>("LBL_STR");
-    _binding.lblFortitudeStat = findControl<Label>("LBL_FORTITUDE_STAT");
-    _binding.lblReflexStat = findControl<Label>("LBL_REFLEX_STAT");
-    _binding.lblWillStat = findControl<Label>("LBL_WILL_STAT");
-    _binding.lblDefenseStat = findControl<Label>("LBL_DEFENSE_STAT");
-    _binding.lblForceStat = findControl<Label>("LBL_FORCE_STAT");
-    _binding.lblVitalityStat = findControl<Label>("LBL_VITALITY_STAT");
-    _binding.lblDex = findControl<Label>("LBL_DEX");
-    _binding.lblCon = findControl<Label>("LBL_CON");
-    _binding.lblInt = findControl<Label>("LBL_INT");
-    _binding.lblCha = findControl<Label>("LBL_CHA");
-    _binding.lblWis = findControl<Label>("LBL_WIS");
-    _binding.lblStrMod = findControl<Label>("LBL_STR_MOD");
-    _binding.lblDexMod = findControl<Label>("LBL_DEX_MOD");
-    _binding.lblConMod = findControl<Label>("LBL_CON_MOD");
-    _binding.lblIntMod = findControl<Label>("LBL_INT_MOD");
-    _binding.lblWisMod = findControl<Label>("LBL_WIS_MOD");
-    _binding.lblChaMod = findControl<Label>("LBL_CHA_MOD");
-    _binding.lblExperienceStat = findControl<Label>("LBL_EXPERIENCE_STAT");
-    _binding.lblNeededXp = findControl<Label>("LBL_NEEDED_XP");
-    _binding.lblStrength = findControl<Label>("LBL_STRENGTH");
-    _binding.lblDexterity = findControl<Label>("LBL_DEXTERITY");
-    _binding.lblConstitution = findControl<Label>("LBL_CONSTITUTION");
-    _binding.lblIntelligence = findControl<Label>("LBL_INTELLIGENCE");
-    _binding.lblCharisma = findControl<Label>("LBL_CHARISMA");
-    _binding.lblReflex = findControl<Label>("LBL_REFLEX");
-    _binding.lblWill = findControl<Label>("LBL_WILL");
-    _binding.lblExperience = findControl<Label>("LBL_EXPERIENCE");
-    _binding.lblNextLevel = findControl<Label>("LBL_NEXT_LEVEL");
-    _binding.lblForce = findControl<Label>("LBL_FORCE");
-    _binding.lblVitality = findControl<Label>("LBL_VITALITY");
-    _binding.lblDefense = findControl<Label>("LBL_DEFENSE");
-    _binding.lblFortitude = findControl<Label>("LBL_DEFENSE");
-    _binding.lblBevel = findControl<Label>("LBL_BEVEL");
-    _binding.lblWisdom = findControl<Label>("LBL_WISDOM");
-    _binding.lblBevel2 = findControl<Label>("LBL_BEVEL2");
-    _binding.lblLight = findControl<Label>("LBL_LIGHT");
-    _binding.lblDark = findControl<Label>("LBL_DARK");
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
-    _binding.btnAuto = findControl<Button>("BTN_AUTO");
-    _binding.btnLevelup = findControl<Button>("BTN_LEVELUP");
-    if (!_game.isTSL()) {
-        _binding.lblAdorn = findControl<Label>("LBL_ADORN");
-        _binding.btnScripts = findControl<Button>("BTN_SCRIPTS");
-        _binding.lblClass = findControl<Label>("LBL_CLASS");
-        _binding.lblClass1 = findControl<Label>("LBL_CLASS1");
-        _binding.lblClass2 = findControl<Label>("LBL_CLASS2");
-        for (int i = 0; i < kNumControlsGood; ++i) {
-            _binding.lblGood[i] = findControl<Label>("LBL_GOOD" + std::to_string(i + 1));
-        }
-        _binding.lblLevel = findControl<Label>("LBL_LEVEL");
-        _binding.lblLevel1 = findControl<Label>("LBL_LEVEL1");
-        _binding.lblLevel2 = findControl<Label>("LBL_LEVEL2");
-        _binding.lblMore = findControl<Label>("LBL_MORE");
-        _binding.lblName = findControl<Label>("LBL_NAME");
-        _binding.btnChange1 = findControl<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = findControl<Button>("BTN_CHANGE2");
-        _binding.btnCharLeft = findControl<Button>("BTN_CHARLEFT");
-        _binding.btnCharRight = findControl<Button>("BTN_CHARRIGHT");
-    } else {
-        _binding.lblForceMastery = findControl<Label>("LBL_FORCEMASTERY");
-        _binding.lblMoreBack = findControl<Label>("LBL_FORCEMASTERY");
-        _binding.lblStatsBorder = findControl<Label>("LBL_STATSBORDER");
-        _binding.lblTitle = findControl<Label>("LBL_TITLE");
-        _binding.lblXpBack = findControl<Label>("LBL_XP_BACK");
-        for (int i = 0; i < kNumControlsBar; ++i) {
-            _binding.lblBar[i] = findControl<Label>("LBL_BAR" + std::to_string(i + 1));
-        }
-        _binding.btnChange1 = _inGameMenu.getBtnChange2();
-        _binding.btnChange2 = _inGameMenu.getBtnChange3();
+        _controls.LBL_MORE->setVisible(false);
+        _controls.BTN_SCRIPTS->setDisabled(true);
     }
 }
 
 void CharacterMenu::update(float dt) {
     std::shared_ptr<Creature> leader(_game.party().getLeader());
-    _binding.btnLevelup->setVisible(leader->isLevelUpPending());
-    _binding.btnAuto->setVisible(leader->isLevelUpPending());
+    _controls.BTN_LEVELUP->setVisible(leader->isLevelUpPending());
+    _controls.BTN_AUTO->setVisible(leader->isLevelUpPending());
     GameGUI::update(dt);
 }
 
@@ -164,36 +125,36 @@ void CharacterMenu::refreshControls() {
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (!_game.isTSL()) {
-        _binding.lblClass1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
-        _binding.lblClass2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
-        _binding.lblLevel1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
-        _binding.lblLevel2->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(2)));
+        _controls.LBL_CLASS1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
+        _controls.LBL_CLASS2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
+        _controls.LBL_LEVEL1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
+        _controls.LBL_LEVEL2->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(2)));
     }
 
-    _binding.lblVitalityStat->setTextMessage(str(boost::format("%d/%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
-    _binding.lblDefenseStat->setTextMessage(std::to_string(attributes.getDefense()));
-    _binding.lblForceStat->setTextMessage("");
+    _controls.LBL_VITALITY_STAT->setTextMessage(str(boost::format("%d/%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
+    _controls.LBL_DEFENSE_STAT->setTextMessage(std::to_string(attributes.getDefense()));
+    _controls.LBL_FORCE_STAT->setTextMessage("");
 
-    _binding.lblStr->setTextMessage(std::to_string(attributes.strength()));
-    _binding.lblStrMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Strength)));
-    _binding.lblDex->setTextMessage(std::to_string(attributes.dexterity()));
-    _binding.lblDexMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Dexterity)));
-    _binding.lblCon->setTextMessage(std::to_string(attributes.constitution()));
-    _binding.lblConMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Constitution)));
-    _binding.lblInt->setTextMessage(std::to_string(attributes.intelligence()));
-    _binding.lblIntMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Intelligence)));
-    _binding.lblWis->setTextMessage(std::to_string(attributes.wisdom()));
-    _binding.lblWisMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Wisdom)));
-    _binding.lblCha->setTextMessage(std::to_string(attributes.charisma()));
-    _binding.lblChaMod->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Charisma)));
+    _controls.LBL_STR->setTextMessage(std::to_string(attributes.strength()));
+    _controls.LBL_STR_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Strength)));
+    _controls.LBL_DEX->setTextMessage(std::to_string(attributes.dexterity()));
+    _controls.LBL_DEX_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Dexterity)));
+    _controls.LBL_CON->setTextMessage(std::to_string(attributes.constitution()));
+    _controls.LBL_CON_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Constitution)));
+    _controls.LBL_INT->setTextMessage(std::to_string(attributes.intelligence()));
+    _controls.LBL_INT_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Intelligence)));
+    _controls.LBL_WIS->setTextMessage(std::to_string(attributes.wisdom()));
+    _controls.LBL_WIS_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Wisdom)));
+    _controls.LBL_CHA->setTextMessage(std::to_string(attributes.charisma()));
+    _controls.LBL_CHA_MOD->setTextMessage(describeAbilityModifier(attributes.getAbilityModifier(Ability::Charisma)));
 
     SavingThrows savingThrows(attributes.getAggregateSavingThrows());
-    _binding.lblFortitudeStat->setTextMessage(std::to_string(savingThrows.fortitude));
-    _binding.lblReflexStat->setTextMessage(std::to_string(savingThrows.reflex));
-    _binding.lblWillStat->setTextMessage(std::to_string(savingThrows.will));
+    _controls.LBL_FORTITUDE_STAT->setTextMessage(std::to_string(savingThrows.fortitude));
+    _controls.LBL_REFLEX_STAT->setTextMessage(std::to_string(savingThrows.reflex));
+    _controls.LBL_WILL_STAT->setTextMessage(std::to_string(savingThrows.will));
 
-    _binding.lblExperienceStat->setTextMessage(std::to_string(partyLeader->xp()));
-    _binding.lblNeededXp->setTextMessage(std::to_string(partyLeader->getNeededXP()));
+    _controls.LBL_EXPERIENCE_STAT->setTextMessage(std::to_string(partyLeader->xp()));
+    _controls.LBL_NEEDED_XP->setTextMessage(std::to_string(partyLeader->getNeededXP()));
 
     refreshPortraits();
     refresh3D();
@@ -214,16 +175,16 @@ void CharacterMenu::refreshPortraits() {
     std::shared_ptr<Creature> partyMember1(party.getMember(1));
     std::shared_ptr<Creature> partyMember2(party.getMember(2));
 
-    _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-    _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _controls.BTN_CHANGE1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _controls.BTN_CHANGE1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
-    _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _controls.BTN_CHANGE2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _controls.BTN_CHANGE2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void CharacterMenu::refresh3D() {
     auto &sceneGraph = _services.scene.graphs.get(kSceneCharacter);
-    float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
+    float aspect = _controls.LBL_3DCHAR->extent().width / static_cast<float>(_controls.LBL_3DCHAR->extent().height);
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
@@ -233,7 +194,7 @@ void CharacterMenu::refresh3D() {
         .cameraFromModelNode("camerahook")
         .invoke();
 
-    _binding.lbl3dChar->setSceneName(kSceneCharacter);
+    _controls.LBL_3DCHAR->setSceneName(kSceneCharacter);
 }
 
 std::shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneGraph) const {

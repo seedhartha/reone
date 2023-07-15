@@ -17,12 +17,10 @@
 
 #include "reone/game/gui/ingame/options.h"
 
+#include "reone/game/game.h"
 #include "reone/gui/control/button.h"
 
-#include "reone/game/game.h"
-
 using namespace reone::audio;
-
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -35,21 +33,15 @@ void OptionsMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnLoadGame->setOnClick([this]() {
+    _controls.BTN_LOADGAME->setOnClick([this]() {
         _game.openSaveLoad(SaveLoadMode::LoadFromInGame);
     });
-    _binding.btnSaveGame->setOnClick([this]() {
+    _controls.BTN_SAVEGAME->setOnClick([this]() {
         _game.openSaveLoad(SaveLoadMode::Save);
     });
-    _binding.btnExit->setOnClick([this]() {
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
-}
-
-void OptionsMenu::bindControls() {
-    _binding.btnLoadGame = findControl<Button>("BTN_LOADGAME");
-    _binding.btnSaveGame = findControl<Button>("BTN_SAVEGAME");
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
 }
 
 } // namespace game

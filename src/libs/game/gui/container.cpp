@@ -46,32 +46,24 @@ void ContainerGUI::onGUILoaded() {
     bindControls();
 
     std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGiveItemResRef));
-    _binding.btnGiveItems->setTextMessage(btnMessage);
+    _controls.BTN_GIVEITEMS->setTextMessage(btnMessage);
 
-    std::string lblMessage(_services.resource.strings.getText(kInventoryResRef));
-    _binding.lblMessage->setTextMessage(lblMessage);
+    std::string LBL_MESSAGE(_services.resource.strings.getText(kInventoryResRef));
+    _controls.LBL_MESSAGE->setTextMessage(LBL_MESSAGE);
 
-    _binding.btnOk->setOnClick([this]() {
+    _controls.BTN_OK->setOnClick([this]() {
         transferItemsToPlayer();
         _game.openInGame();
     });
-    _binding.btnCancel->setOnClick([this]() {
+    _controls.BTN_CANCEL->setOnClick([this]() {
         _game.openInGame();
     });
 
     configureItemsListBox();
 }
 
-void ContainerGUI::bindControls() {
-    _binding.lblMessage = findControl<Label>("LBL_MESSAGE");
-    _binding.lbItems = findControl<ListBox>("LB_ITEMS");
-    _binding.btnOk = findControl<Button>("BTN_OK");
-    _binding.btnGiveItems = findControl<Button>("BTN_GIVEITEMS");
-    _binding.btnCancel = findControl<Button>("BTN_CANCEL");
-}
-
 void ContainerGUI::configureItemsListBox() {
-    ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
+    ImageButton &protoItem = static_cast<ImageButton &>(_controls.LB_ITEMS->protoItem());
 
     Control::Text text(protoItem.text());
     text.align = Control::TextAlign::LeftTop;
@@ -80,7 +72,7 @@ void ContainerGUI::configureItemsListBox() {
 }
 
 void ContainerGUI::open(std::shared_ptr<Object> container) {
-    _binding.lbItems->clearItems();
+    _controls.LB_ITEMS->clearItems();
 
     for (auto &item : container->items()) {
         if (!item->isDropable())
@@ -95,7 +87,7 @@ void ContainerGUI::open(std::shared_ptr<Object> container) {
         if (item->stackSize() > 1) {
             lbItem.iconText = std::to_string(item->stackSize());
         }
-        _binding.lbItems->addItem(std::move(lbItem));
+        _controls.LB_ITEMS->addItem(std::move(lbItem));
     }
 
     _container = std::move(container);

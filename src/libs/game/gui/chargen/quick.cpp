@@ -17,12 +17,10 @@
 
 #include "reone/game/gui/chargen/quick.h"
 
+#include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
-
-#include "reone/game/game.h"
-
-#include "reone/game/gui/chargen.h"
 
 using namespace reone::audio;
 
@@ -40,44 +38,29 @@ void QuickCharacterGeneration::onGUILoaded() {
     doSetStep(0);
 
     if (!_game.isTSL()) {
-        _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
+        _controls.LBL_DECORATION->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 
-    _binding.btnCancel->setOnClick([this]() {
+    _controls.BTN_CANCEL->setOnClick([this]() {
         setStep(0);
         _charGen.openQuickOrCustom();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         if (_step == 0) {
             _charGen.openQuickOrCustom();
         } else {
             setStep(_step - 1);
         }
     });
-    _binding.btnStepName1->setOnClick([this]() {
+    _controls.BTN_STEPNAME1->setOnClick([this]() {
         _charGen.openPortraitSelection();
     });
-    _binding.btnStepName2->setOnClick([this]() {
+    _controls.BTN_STEPNAME2->setOnClick([this]() {
         _charGen.openNameEntry();
     });
-    _binding.btnStepName3->setOnClick([this]() {
+    _controls.BTN_STEPNAME3->setOnClick([this]() {
         _charGen.finish();
     });
-}
-
-void QuickCharacterGeneration::bindControls() {
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnCancel = findControl<Button>("BTN_CANCEL");
-    _binding.btnStepName1 = findControl<Button>("BTN_STEPNAME1");
-    _binding.btnStepName2 = findControl<Button>("BTN_STEPNAME2");
-    _binding.btnStepName3 = findControl<Button>("BTN_STEPNAME3");
-    _binding.lbl1 = findControl<Label>("LBL_1");
-    _binding.lbl2 = findControl<Label>("LBL_2");
-    _binding.lbl3 = findControl<Label>("LBL_3");
-    _binding.lblDecoration = findControl<Label>("LBL_DECORATION");
-    _binding.lblNum1 = findControl<Label>("LBL_NUM1");
-    _binding.lblNum2 = findControl<Label>("LBL_NUM2");
-    _binding.lblNum3 = findControl<Label>("LBL_NUM3");
 }
 
 void QuickCharacterGeneration::setStep(int step) {
@@ -89,29 +72,29 @@ void QuickCharacterGeneration::setStep(int step) {
 void QuickCharacterGeneration::doSetStep(int step) {
     _step = step;
 
-    _binding.lbl1->setFocusable(false);
-    _binding.lbl2->setFocusable(false);
-    _binding.lbl3->setFocusable(false);
-    _binding.btnStepName1->setFocusable(false);
-    _binding.btnStepName2->setFocusable(false);
-    _binding.btnStepName3->setFocusable(false);
+    _controls.LBL_1->setFocusable(false);
+    _controls.LBL_2->setFocusable(false);
+    _controls.LBL_3->setFocusable(false);
+    _controls.BTN_STEPNAME1->setFocusable(false);
+    _controls.BTN_STEPNAME2->setFocusable(false);
+    _controls.BTN_STEPNAME3->setFocusable(false);
 
-    _binding.lbl1->setDisabled(_step != 0);
-    _binding.lbl2->setDisabled(_step != 1);
-    _binding.lbl3->setDisabled(_step != 2);
-    _binding.btnStepName1->setDisabled(_step != 0);
-    _binding.btnStepName2->setDisabled(_step != 1);
-    _binding.btnStepName3->setDisabled(_step != 2);
+    _controls.LBL_1->setDisabled(_step != 0);
+    _controls.LBL_2->setDisabled(_step != 1);
+    _controls.LBL_3->setDisabled(_step != 2);
+    _controls.BTN_STEPNAME1->setDisabled(_step != 0);
+    _controls.BTN_STEPNAME2->setDisabled(_step != 1);
+    _controls.BTN_STEPNAME3->setDisabled(_step != 2);
 
-    _binding.lbl1->setFocus(_step == 0);
-    _binding.lbl2->setFocus(_step == 1);
-    _binding.lbl3->setFocus(_step == 2);
-    _binding.lblNum1->setFocus(_step == 0);
-    _binding.lblNum2->setFocus(_step == 1);
-    _binding.lblNum3->setFocus(_step == 2);
-    _binding.btnStepName1->setFocus(_step == 0);
-    _binding.btnStepName2->setFocus(_step == 1);
-    _binding.btnStepName3->setFocus(_step == 2);
+    _controls.LBL_1->setFocus(_step == 0);
+    _controls.LBL_2->setFocus(_step == 1);
+    _controls.LBL_3->setFocus(_step == 2);
+    _controls.LBL_NUM1->setFocus(_step == 0);
+    _controls.LBL_NUM2->setFocus(_step == 1);
+    _controls.LBL_NUM3->setFocus(_step == 2);
+    _controls.BTN_STEPNAME1->setFocus(_step == 0);
+    _controls.BTN_STEPNAME2->setFocus(_step == 1);
+    _controls.BTN_STEPNAME3->setFocus(_step == 2);
 }
 
 void QuickCharacterGeneration::goToNextStep() {

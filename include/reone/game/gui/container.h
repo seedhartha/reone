@@ -41,19 +41,28 @@ public:
     Object &container() const { return *_container; }
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Label> lblMessage;
-        std::shared_ptr<gui::ListBox> lbItems;
-        std::shared_ptr<gui::Button> btnOk;
-        std::shared_ptr<gui::Button> btnGiveItems;
-        std::shared_ptr<gui::Button> btnCancel;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_CANCEL;
+        std::shared_ptr<gui::Button> BTN_GIVEITEMS;
+        std::shared_ptr<gui::Button> BTN_OK;
+        std::shared_ptr<gui::Label> LBL_MESSAGE;
+        std::shared_ptr<gui::ListBox> LB_ITEMS;
+    };
+
+    Controls _controls;
 
     std::shared_ptr<Object> _container;
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_CANCEL = findControl<gui::Button>("BTN_CANCEL");
+        _controls.BTN_GIVEITEMS = findControl<gui::Button>("BTN_GIVEITEMS");
+        _controls.BTN_OK = findControl<gui::Button>("BTN_OK");
+        _controls.LBL_MESSAGE = findControl<gui::Label>("LBL_MESSAGE");
+        _controls.LB_ITEMS = findControl<gui::ListBox>("LB_ITEMS");
+    }
+
     void configureItemsListBox();
     void transferItemsToPlayer();
 

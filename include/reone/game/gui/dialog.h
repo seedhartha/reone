@@ -44,10 +44,12 @@ private:
         std::shared_ptr<Creature> creature;
     };
 
-    struct Binding {
-        std::shared_ptr<gui::Label> lblMessage;
-        std::shared_ptr<gui::ListBox> lbReplies;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Label> LBL_MESSAGE;
+        std::shared_ptr<gui::ListBox> LB_REPLIES;
+    };
+
+    Controls _controls;
 
     std::shared_ptr<Object> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
@@ -55,7 +57,11 @@ private:
     void preload(gui::IGUI &gui) override;
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.LBL_MESSAGE = findControl<gui::Label>("LBL_MESSAGE");
+        _controls.LB_REPLIES = findControl<gui::ListBox>("LB_REPLIES");
+    }
+
     void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();

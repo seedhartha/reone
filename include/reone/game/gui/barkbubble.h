@@ -38,9 +38,11 @@ public:
     void setBarkText(const std::string &text, float duration);
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Label> lblBarkText;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Label> LBL_BARKTEXT;
+    };
+
+    Controls _controls;
 
     std::string _barkText;
     Timer _timer;
@@ -48,7 +50,9 @@ private:
     void preload(gui::IGUI &gui) override;
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.LBL_BARKTEXT = findControl<gui::Label>("LBL_BARKTEXT");
+    }
 };
 
 } // namespace game

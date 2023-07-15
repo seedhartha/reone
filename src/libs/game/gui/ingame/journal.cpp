@@ -17,9 +17,8 @@
 
 #include "reone/game/gui/ingame/journal.h"
 
-#include "reone/gui/control/button.h"
-
 #include "reone/game/game.h"
+#include "reone/gui/control/button.h"
 
 using namespace reone::audio;
 
@@ -35,24 +34,14 @@ void JournalMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnExit->setOnClick([this]() {
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
-    _binding.btnSwapText->setDisabled(true);
+    _controls.BTN_SWAPTEXT->setDisabled(true);
 
     if (!_game.isTSL()) {
-        _binding.btnQuestItems->setDisabled(true);
-        _binding.btnSort->setDisabled(true);
-    }
-}
-
-void JournalMenu::bindControls() {
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
-    _binding.btnSwapText = findControl<Button>("BTN_SWAPTEXT");
-
-    if (!_game.isTSL()) {
-        _binding.btnQuestItems = findControl<Button>("BTN_QUESTITEMS");
-        _binding.btnSort = findControl<Button>("BTN_SORT");
+        _controls.BTN_QUESTITEMS->setDisabled(true);
+        _controls.BTN_SORT->setDisabled(true);
     }
 }
 

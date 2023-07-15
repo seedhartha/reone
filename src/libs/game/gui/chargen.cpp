@@ -63,18 +63,18 @@ void CharacterGeneration::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.lblLevelVal->setVisible(false);
-    _binding.lblName->setTextMessage("");
+    _controls.LBL_LEVEL_VAL->setVisible(false);
+    _controls.LBL_NAME->setTextMessage("");
 
     if (!_game.isTSL()) {
-        _binding.lblLevel->setVisible(false);
-        _binding.vitArrowLbl->setVisible(false);
-        _binding.defArrowLbl->setVisible(false);
-        _binding.fortArrowLbl->setVisible(false);
-        _binding.reflArrowLbl->setVisible(false);
-        _binding.willArrowLbl->setVisible(false);
-        _binding.oldLbl->setVisible(false);
-        _binding.newLbl->setVisible(false);
+        _controls.LBL_LEVEL->setVisible(false);
+        _controls.VIT_ARROW_LBL->setVisible(false);
+        _controls.DEF_ARROW_LBL->setVisible(false);
+        _controls.FORT_ARROW_LBL->setVisible(false);
+        _controls.REFL_ARROW_LBL->setVisible(false);
+        _controls.WILL_ARROW_LBL->setVisible(false);
+        _controls.OLD_LBL->setVisible(false);
+        _controls.NEW_LBL->setVisible(false);
     }
 
     loadClassSelection();
@@ -87,41 +87,6 @@ void CharacterGeneration::onGUILoaded() {
     loadSkills();
     loadFeats();
     loadLevelUp();
-}
-
-void CharacterGeneration::bindControls() {
-    _binding.lblClass = findControl<Label>("LBL_CLASS");
-    _binding.lblDef = findControl<Label>("LBL_DEF");
-    _binding.lblLevelVal = findControl<Label>("LBL_LEVEL_VAL");
-    _binding.lblName = findControl<Label>("LBL_NAME");
-    _binding.lblVit = findControl<Label>("LBL_VIT");
-    _binding.modelLbl = findControl<Label>("MODEL_LBL");
-    _binding.portraitLbl = findControl<Label>("PORTRAIT_LBL");
-
-    _binding.strAbLbl = findControl<Label>("STR_AB_LBL");
-    _binding.dexAbLbl = findControl<Label>("DEX_AB_LBL");
-    _binding.conAbLbl = findControl<Label>("CON_AB_LBL");
-    _binding.intAbLbl = findControl<Label>("INT_AB_LBL");
-    _binding.wisAbLbl = findControl<Label>("WIS_AB_LBL");
-    _binding.chaAbLbl = findControl<Label>("CHA_AB_LBL");
-
-    if (!_game.isTSL()) {
-        _binding.newLbl = findControl<Label>("NEW_LBL");
-        _binding.oldLbl = findControl<Label>("OLD_LBL");
-        _binding.lblLevel = findControl<Label>("LBL_LEVEL");
-        _binding.oldFortLbl = findControl<Label>("OLD_FORT_LBL");
-        _binding.oldReflLbl = findControl<Label>("OLD_REFL_LBL");
-        _binding.oldWillLbl = findControl<Label>("OLD_WILL_LBL");
-        _binding.vitArrowLbl = findControl<Label>("VIT_ARROW_LBL");
-        _binding.defArrowLbl = findControl<Label>("DEF_ARROW_LBL");
-        _binding.fortArrowLbl = findControl<Label>("FORT_ARROW_LBL");
-        _binding.reflArrowLbl = findControl<Label>("REFL_ARROW_LBL");
-        _binding.willArrowLbl = findControl<Label>("WILL_ARROW_LBL");
-    } else {
-        _binding.newFortLbl = findControl<Label>("NEW_FORT_LBL");
-        _binding.newReflLbl = findControl<Label>("NEW_REFL_LBL");
-        _binding.newWillLbl = findControl<Label>("NEW_WILL_LBL");
-    }
 }
 
 void CharacterGeneration::loadClassSelection() {
@@ -219,7 +184,7 @@ void CharacterGeneration::draw() {
 }
 
 void CharacterGeneration::openClassSelection() {
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::ClassSelection);
 }
 
@@ -233,28 +198,28 @@ void CharacterGeneration::changeScreen(CharGenScreen screen) {
 
 void CharacterGeneration::openQuickOrCustom() {
     setAttributesVisible(false);
-    _binding.modelLbl->setVisible(true);
+    _controls.MODEL_LBL->setVisible(true);
     changeScreen(CharGenScreen::QuickOrCustom);
 }
 
 void CharacterGeneration::setAttributesVisible(bool visible) {
     std::vector<Label *> attributesLabels {
-        _binding.lblVit.get(),
-        _binding.lblDef.get(),
-        _binding.strAbLbl.get(),
-        _binding.dexAbLbl.get(),
-        _binding.conAbLbl.get(),
-        _binding.intAbLbl.get(),
-        _binding.wisAbLbl.get(),
-        _binding.chaAbLbl.get()};
+        _controls.LBL_VIT.get(),
+        _controls.LBL_DEF.get(),
+        _controls.STR_AB_LBL.get(),
+        _controls.DEX_AB_LBL.get(),
+        _controls.CON_AB_LBL.get(),
+        _controls.INT_AB_LBL.get(),
+        _controls.WIS_AB_LBL.get(),
+        _controls.CHA_AB_LBL.get()};
     if (!_game.isTSL()) {
-        attributesLabels.push_back(_binding.oldFortLbl.get());
-        attributesLabels.push_back(_binding.oldReflLbl.get());
-        attributesLabels.push_back(_binding.oldWillLbl.get());
+        attributesLabels.push_back(_controls.OLD_FORT_LBL.get());
+        attributesLabels.push_back(_controls.OLD_REFL_LBL.get());
+        attributesLabels.push_back(_controls.OLD_WILL_LBL.get());
     } else {
-        attributesLabels.push_back(_binding.newFortLbl.get());
-        attributesLabels.push_back(_binding.newReflLbl.get());
-        attributesLabels.push_back(_binding.newWillLbl.get());
+        attributesLabels.push_back(_controls.NEW_FORT_LBL.get());
+        attributesLabels.push_back(_controls.NEW_REFL_LBL.get());
+        attributesLabels.push_back(_controls.NEW_WILL_LBL.get());
     }
     for (auto &label : attributesLabels) {
         label->setVisible(visible);
@@ -307,46 +272,46 @@ void CharacterGeneration::openSteps() {
 }
 
 void CharacterGeneration::openQuick() {
-    _binding.modelLbl->setVisible(true);
+    _controls.MODEL_LBL->setVisible(true);
     changeScreen(CharGenScreen::Quick);
 }
 
 void CharacterGeneration::openCustom() {
     setAttributesVisible(_custom->step() > 1);
-    _binding.modelLbl->setVisible(true);
+    _controls.MODEL_LBL->setVisible(true);
     changeScreen(CharGenScreen::Custom);
 }
 
 void CharacterGeneration::openPortraitSelection() {
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::PortraitSelection);
 }
 
 void CharacterGeneration::openAbilities() {
     _abilities->reset(_type != Type::LevelUp);
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::Abilities);
 }
 
 void CharacterGeneration::openSkills() {
     _charGenSkills->reset(_type != Type::LevelUp);
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::Skills);
 }
 
 void CharacterGeneration::openFeats() {
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::Feats);
 }
 
 void CharacterGeneration::openNameEntry() {
-    _binding.modelLbl->setVisible(false);
+    _controls.MODEL_LBL->setVisible(false);
     changeScreen(CharGenScreen::Name);
 }
 
 void CharacterGeneration::openLevelUp() {
     _levelUp->reset();
-    _binding.modelLbl->setVisible(true);
+    _controls.MODEL_LBL->setVisible(true);
     changeScreen(CharGenScreen::LevelUp);
 }
 
@@ -403,7 +368,7 @@ void CharacterGeneration::setCharacter(Character character) {
 
 void CharacterGeneration::reloadCharacterModel() {
     auto &sceneGraph = _services.scene.graphs.get(kSceneCharGen);
-    const Control::Extent &extent = _binding.modelLbl->extent();
+    const Control::Extent &extent = _controls.MODEL_LBL->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
     SceneInitializer(sceneGraph)
@@ -414,8 +379,8 @@ void CharacterGeneration::reloadCharacterModel() {
         .cameraFromModelNode("camerahook")
         .invoke();
 
-    _binding.modelLbl->setSceneName(kSceneCharGen);
-    _binding.portraitLbl->setBorderFill(_services.game.portraits.getTextureByAppearance(_character.appearance));
+    _controls.MODEL_LBL->setSceneName(kSceneCharGen);
+    _controls.PORTRAIT_LBL->setBorderFill(_services.game.portraits.getTextureByAppearance(_character.appearance));
 }
 
 std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGraph &sceneGraph) {
@@ -436,31 +401,31 @@ std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGra
 
 void CharacterGeneration::updateAttributes() {
     std::shared_ptr<CreatureClass> clazz(_services.game.classes.get(_character.attributes.getEffectiveClass()));
-    _binding.lblClass->setTextMessage(clazz->name());
+    _controls.LBL_CLASS->setTextMessage(clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);
-    _binding.lblVit->setTextMessage(std::to_string(vitality));
+    _controls.LBL_VIT->setTextMessage(std::to_string(vitality));
 
     int defense = _character.attributes.getDefense();
-    _binding.lblDef->setTextMessage(std::to_string(defense));
+    _controls.LBL_DEF->setTextMessage(std::to_string(defense));
 
-    _binding.strAbLbl->setTextMessage(std::to_string(_character.attributes.strength()));
-    _binding.dexAbLbl->setTextMessage(std::to_string(_character.attributes.dexterity()));
-    _binding.conAbLbl->setTextMessage(std::to_string(_character.attributes.constitution()));
-    _binding.intAbLbl->setTextMessage(std::to_string(_character.attributes.intelligence()));
-    _binding.wisAbLbl->setTextMessage(std::to_string(_character.attributes.wisdom()));
-    _binding.chaAbLbl->setTextMessage(std::to_string(_character.attributes.charisma()));
+    _controls.STR_AB_LBL->setTextMessage(std::to_string(_character.attributes.strength()));
+    _controls.DEX_AB_LBL->setTextMessage(std::to_string(_character.attributes.dexterity()));
+    _controls.CON_AB_LBL->setTextMessage(std::to_string(_character.attributes.constitution()));
+    _controls.INT_AB_LBL->setTextMessage(std::to_string(_character.attributes.intelligence()));
+    _controls.WIS_AB_LBL->setTextMessage(std::to_string(_character.attributes.wisdom()));
+    _controls.CHA_AB_LBL->setTextMessage(std::to_string(_character.attributes.charisma()));
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
     if (_game.isTSL()) {
-        _binding.newFortLbl->setTextMessage(std::to_string(throws.fortitude));
-        _binding.newReflLbl->setTextMessage(std::to_string(throws.reflex));
-        _binding.newWillLbl->setTextMessage(std::to_string(throws.will));
+        _controls.NEW_FORT_LBL->setTextMessage(std::to_string(throws.fortitude));
+        _controls.NEW_REFL_LBL->setTextMessage(std::to_string(throws.reflex));
+        _controls.NEW_WILL_LBL->setTextMessage(std::to_string(throws.will));
     } else {
-        _binding.oldFortLbl->setTextMessage(std::to_string(throws.fortitude));
-        _binding.oldReflLbl->setTextMessage(std::to_string(throws.reflex));
-        _binding.oldWillLbl->setTextMessage(std::to_string(throws.will));
+        _controls.OLD_FORT_LBL->setTextMessage(std::to_string(throws.fortitude));
+        _controls.OLD_REFL_LBL->setTextMessage(std::to_string(throws.reflex));
+        _controls.OLD_WILL_LBL->setTextMessage(std::to_string(throws.will));
     }
 }
 

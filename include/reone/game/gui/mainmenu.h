@@ -40,34 +40,51 @@ public:
     const std::string &musicResRef() const { return _musicResRef; }
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::ListBox> lbModules;
-        std::shared_ptr<gui::Label> lbl3dView;
-        std::shared_ptr<gui::Label> lblGameLogo;
-        std::shared_ptr<gui::Label> lblBw;
-        std::shared_ptr<gui::Label> lblLucas;
-        std::shared_ptr<gui::Button> btnLoadGame;
-        std::shared_ptr<gui::Button> btnNewGame;
-        std::shared_ptr<gui::Button> btnMovies;
-        std::shared_ptr<gui::Button> btnOptions;
-        std::shared_ptr<gui::Label> lblNewContent;
-        std::shared_ptr<gui::Button> btnExit;
-        std::shared_ptr<gui::Button> btnWarp;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_EXIT;
+        std::shared_ptr<gui::Button> BTN_LOADGAME;
+        std::shared_ptr<gui::Button> BTN_MOREGAMES;
+        std::shared_ptr<gui::Button> BTN_MOVIES;
+        std::shared_ptr<gui::Button> BTN_MUSIC;
+        std::shared_ptr<gui::Button> BTN_NEWGAME;
+        std::shared_ptr<gui::Button> BTN_OPTIONS;
+        std::shared_ptr<gui::Button> BTN_TSLRCM;
+        std::shared_ptr<gui::Button> BTN_WARP;
+        std::shared_ptr<gui::Label> LBL_3DVIEW;
+        std::shared_ptr<gui::Label> LBL_BW;
+        std::shared_ptr<gui::Label> LBL_GAMELOGO;
+        std::shared_ptr<gui::Label> LBL_LUCAS;
+        std::shared_ptr<gui::Label> LBL_MENUBG;
+        std::shared_ptr<gui::Label> LBL_NEWCONTENT;
+        std::shared_ptr<gui::ListBox> LB_MODULES;
+    };
 
-        // TSL only
-        std::shared_ptr<gui::Label> lblMenuBg;
-        std::shared_ptr<gui::Button> btnMusic;
-        std::shared_ptr<gui::Button> btnMoreGames;
-        std::shared_ptr<gui::Button> btnTslrcm;
-        // END TSL only
-    } _binding;
+    Controls _controls;
 
     std::string _musicResRef;
 
     void preload(gui::IGUI &gui) override;
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_EXIT = findControl<gui::Button>("BTN_EXIT");
+        _controls.BTN_LOADGAME = findControl<gui::Button>("BTN_LOADGAME");
+        _controls.BTN_MOREGAMES = findControl<gui::Button>("BTN_MOREGAMES");
+        _controls.BTN_MOVIES = findControl<gui::Button>("BTN_MOVIES");
+        _controls.BTN_MUSIC = findControl<gui::Button>("BTN_MUSIC");
+        _controls.BTN_NEWGAME = findControl<gui::Button>("BTN_NEWGAME");
+        _controls.BTN_OPTIONS = findControl<gui::Button>("BTN_OPTIONS");
+        _controls.BTN_TSLRCM = findControl<gui::Button>("BTN_TSLRCM");
+        _controls.BTN_WARP = findControl<gui::Button>("BTN_WARP");
+        _controls.LBL_3DVIEW = findControl<gui::Label>("LBL_3DVIEW");
+        _controls.LBL_BW = findControl<gui::Label>("LBL_BW");
+        _controls.LBL_GAMELOGO = findControl<gui::Label>("LBL_GAMELOGO");
+        _controls.LBL_LUCAS = findControl<gui::Label>("LBL_LUCAS");
+        _controls.LBL_MENUBG = findControl<gui::Label>("LBL_MENUBG");
+        _controls.LBL_NEWCONTENT = findControl<gui::Label>("LBL_NEWCONTENT");
+        _controls.LB_MODULES = findControl<gui::ListBox>("LB_MODULES");
+    }
+
     void configureButtons();
     void setup3DView();
     void setButtonColors(gui::Control &control);

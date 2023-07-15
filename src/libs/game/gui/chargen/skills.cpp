@@ -17,15 +17,14 @@
 
 #include "reone/game/gui/chargen/skills.h"
 
-#include "reone/gui/control/button.h"
-#include "reone/gui/control/label.h"
-#include "reone/gui/control/listbox.h"
-#include "reone/resource/strings.h"
-
 #include "reone/game/d20/classes.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/label.h"
+#include "reone/gui/control/listbox.h"
+#include "reone/resource/strings.h"
 
 using namespace reone::audio;
 
@@ -51,160 +50,118 @@ void CharGenSkills::onGUILoaded() {
     bindControls();
 
     std::vector<Label *> skillLabels {
-        _binding.computerUseLbl.get(),
-        _binding.demolitionsLbl.get(),
-        _binding.stealthLbl.get(),
-        _binding.awarenessLbl.get(),
-        _binding.persuadeLbl.get(),
-        _binding.repairLbl.get(),
-        _binding.securityLbl.get(),
-        _binding.treatInjuryLbl.get()};
+        _controls.COMPUTER_USE_LBL.get(),
+        _controls.DEMOLITIONS_LBL.get(),
+        _controls.STEALTH_LBL.get(),
+        _controls.AWARENESS_LBL.get(),
+        _controls.PERSUADE_LBL.get(),
+        _controls.REPAIR_LBL.get(),
+        _controls.SECURITY_LBL.get(),
+        _controls.TREAT_INJURY_LBL.get()};
     for (auto &label : skillLabels) {
         label->setFocusable(true);
         label->setHilightColor(_baseColor);
     }
 
-    _binding.lbDesc->setProtoMatchContent(true);
+    _controls.LB_DESC->setProtoMatchContent(true);
 
-    _binding.computerUsePointsBtn->setDisabled(true);
-    _binding.demolitionsPointsBtn->setDisabled(true);
-    _binding.stealthPointsBtn->setDisabled(true);
-    _binding.awarenessPointsBtn->setDisabled(true);
-    _binding.persuadePointsBtn->setDisabled(true);
-    _binding.repairPointsBtn->setDisabled(true);
-    _binding.securityPointsBtn->setDisabled(true);
-    _binding.treatInjuryPointsBtn->setDisabled(true);
+    _controls.COMPUTER_USE_POINTS_BTN->setDisabled(true);
+    _controls.DEMOLITIONS_POINTS_BTN->setDisabled(true);
+    _controls.STEALTH_POINTS_BTN->setDisabled(true);
+    _controls.AWARENESS_POINTS_BTN->setDisabled(true);
+    _controls.PERSUADE_POINTS_BTN->setDisabled(true);
+    _controls.REPAIR_POINTS_BTN->setDisabled(true);
+    _controls.SECURITY_POINTS_BTN->setDisabled(true);
+    _controls.TREAT_INJURY_POINTS_BTN->setDisabled(true);
 
-    _binding.btnRecommended->setDisabled(true);
-    _binding.costPointsLbl->setTextMessage("");
+    _controls.BTN_RECOMMENDED->setDisabled(true);
+    _controls.COST_POINTS_LBL->setTextMessage("");
 
-    _binding.btnAccept->setOnClick([this]() {
+    _controls.BTN_ACCEPT->setOnClick([this]() {
         if (_points > 0) {
             updateCharacter();
         }
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openSteps();
     });
 
-    _binding.computerUseLbl->setOnFocusChanged([this](bool focus) {
+    _controls.COMPUTER_USE_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::ComputerUse, focus);
     });
-    _binding.demolitionsLbl->setOnFocusChanged([this](bool focus) {
+    _controls.DEMOLITIONS_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Demolitions, focus);
     });
-    _binding.stealthLbl->setOnFocusChanged([this](bool focus) {
+    _controls.STEALTH_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Stealth, focus);
     });
-    _binding.awarenessLbl->setOnFocusChanged([this](bool focus) {
+    _controls.AWARENESS_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Awareness, focus);
     });
-    _binding.persuadeLbl->setOnFocusChanged([this](bool focus) {
+    _controls.PERSUADE_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Persuade, focus);
     });
-    _binding.repairLbl->setOnFocusChanged([this](bool focus) {
+    _controls.REPAIR_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Repair, focus);
     });
-    _binding.securityLbl->setOnFocusChanged([this](bool focus) {
+    _controls.SECURITY_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::Security, focus);
     });
-    _binding.treatInjuryLbl->setOnFocusChanged([this](bool focus) {
+    _controls.TREAT_INJURY_LBL->setOnFocusChanged([this](bool focus) {
         onSkillLabelFocusChanged(SkillType::TreatInjury, focus);
     });
 
-    _binding.comMinusBtn->setOnClick([this]() {
+    _controls.COM_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::ComputerUse);
     });
-    _binding.demMinusBtn->setOnClick([this]() {
+    _controls.DEM_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Demolitions);
     });
-    _binding.steMinusBtn->setOnClick([this]() {
+    _controls.STE_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Stealth);
     });
-    _binding.awaMinusBtn->setOnClick([this]() {
+    _controls.AWA_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Awareness);
     });
-    _binding.perMinusBtn->setOnClick([this]() {
+    _controls.PER_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Persuade);
     });
-    _binding.repMinusBtn->setOnClick([this]() {
+    _controls.REP_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Repair);
     });
-    _binding.secMinusBtn->setOnClick([this]() {
+    _controls.SEC_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::Security);
     });
-    _binding.treMinusBtn->setOnClick([this]() {
+    _controls.TRE_MINUS_BTN->setOnClick([this]() {
         onMinusButtonClick(SkillType::TreatInjury);
     });
 
-    _binding.comPlusBtn->setOnClick([this]() {
+    _controls.COM_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::ComputerUse);
     });
-    _binding.demPlusBtn->setOnClick([this]() {
+    _controls.DEM_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Demolitions);
     });
-    _binding.stePlusBtn->setOnClick([this]() {
+    _controls.STE_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Stealth);
     });
-    _binding.awaPlusBtn->setOnClick([this]() {
+    _controls.AWA_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Awareness);
     });
-    _binding.perPlusBtn->setOnClick([this]() {
+    _controls.PER_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Persuade);
     });
-    _binding.repPlusBtn->setOnClick([this]() {
+    _controls.REP_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Repair);
     });
-    _binding.secPlusBtn->setOnClick([this]() {
+    _controls.SEC_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::Security);
     });
-    _binding.trePlusBtn->setOnClick([this]() {
+    _controls.TRE_PLUS_BTN->setOnClick([this]() {
         onPlusButtonClick(SkillType::TreatInjury);
     });
-}
-
-void CharGenSkills::bindControls() {
-    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-
-    _binding.awaMinusBtn = findControl<Button>("AWA_MINUS_BTN");
-    _binding.awaPlusBtn = findControl<Button>("AWA_PLUS_BTN");
-    _binding.awarenessPointsBtn = findControl<Button>("AWARENESS_POINTS_BTN");
-    _binding.awarenessLbl = findControl<Label>("AWARENESS_LBL");
-    _binding.btnRecommended = findControl<Button>("BTN_RECOMMENDED");
-    _binding.comMinusBtn = findControl<Button>("COM_MINUS_BTN");
-    _binding.comPlusBtn = findControl<Button>("COM_PLUS_BTN");
-    _binding.computerUsePointsBtn = findControl<Button>("COMPUTER_USE_POINTS_BTN");
-    _binding.computerUseLbl = findControl<Label>("COMPUTER_USE_LBL");
-    _binding.demMinusBtn = findControl<Button>("DEM_MINUS_BTN");
-    _binding.demolitionsPointsBtn = findControl<Button>("DEMOLITIONS_POINTS_BTN");
-    _binding.demolitionsLbl = findControl<Label>("DEMOLITIONS_LBL");
-    _binding.demPlusBtn = findControl<Button>("DEM_PLUS_BTN");
-    _binding.perMinusBtn = findControl<Button>("PER_MINUS_BTN");
-    _binding.perPlusBtn = findControl<Button>("PER_PLUS_BTN");
-    _binding.persuadePointsBtn = findControl<Button>("PERSUADE_POINTS_BTN");
-    _binding.persuadeLbl = findControl<Label>("PERSUADE_LBL");
-    _binding.repairPointsBtn = findControl<Button>("REPAIR_POINTS_BTN");
-    _binding.repairLbl = findControl<Label>("REPAIR_LBL");
-    _binding.repMinusBtn = findControl<Button>("REP_MINUS_BTN");
-    _binding.repPlusBtn = findControl<Button>("REP_PLUS_BTN");
-    _binding.secMinusBtn = findControl<Button>("SEC_MINUS_BTN");
-    _binding.secPlusBtn = findControl<Button>("SEC_PLUS_BTN");
-    _binding.securityPointsBtn = findControl<Button>("SECURITY_POINTS_BTN");
-    _binding.securityLbl = findControl<Label>("SECURITY_LBL");
-    _binding.stealthPointsBtn = findControl<Button>("STEALTH_POINTS_BTN");
-    _binding.stealthLbl = findControl<Label>("STEALTH_LBL");
-    _binding.steMinusBtn = findControl<Button>("STE_MINUS_BTN");
-    _binding.stePlusBtn = findControl<Button>("STE_PLUS_BTN");
-    _binding.treatInjuryPointsBtn = findControl<Button>("TREAT_INJURY_POINTS_BTN");
-    _binding.treatInjuryLbl = findControl<Label>("TREAT_INJURY_LBL");
-    _binding.treMinusBtn = findControl<Button>("TRE_MINUS_BTN");
-    _binding.trePlusBtn = findControl<Button>("TRE_PLUS_BTN");
-    _binding.costPointsLbl = findControl<Label>("COST_POINTS_LBL");
-    _binding.remainingSelectionsLbl = findControl<Label>("REMAINING_SELECTIONS_LBL");
-    _binding.lbDesc = findControl<ListBox>("LB_DESC");
 }
 
 void CharGenSkills::reset(bool newGame) {
@@ -232,34 +189,34 @@ void CharGenSkills::reset(bool newGame) {
 }
 
 void CharGenSkills::refreshControls() {
-    _binding.remainingSelectionsLbl->setTextMessage(std::to_string(_points));
+    _controls.REMAINING_SELECTIONS_LBL->setTextMessage(std::to_string(_points));
 
-    _binding.computerUsePointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::ComputerUse)));
-    _binding.demolitionsPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Demolitions)));
-    _binding.stealthPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Stealth)));
-    _binding.awarenessPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Awareness)));
-    _binding.persuadePointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Persuade)));
-    _binding.repairPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Repair)));
-    _binding.securityPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Security)));
-    _binding.treatInjuryPointsBtn->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::TreatInjury)));
+    _controls.COMPUTER_USE_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::ComputerUse)));
+    _controls.DEMOLITIONS_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Demolitions)));
+    _controls.STEALTH_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Stealth)));
+    _controls.AWARENESS_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Awareness)));
+    _controls.PERSUADE_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Persuade)));
+    _controls.REPAIR_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Repair)));
+    _controls.SECURITY_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::Security)));
+    _controls.TREAT_INJURY_POINTS_BTN->setTextMessage(std::to_string(_attributes.getSkillRank(SkillType::TreatInjury)));
 
-    _binding.comMinusBtn->setVisible(_attributes.getSkillRank(SkillType::ComputerUse) > 0);
-    _binding.demMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Demolitions) > 0);
-    _binding.steMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Stealth) > 0);
-    _binding.awaMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Awareness) > 0);
-    _binding.perMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Persuade) > 0);
-    _binding.repMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Repair) > 0);
-    _binding.secMinusBtn->setVisible(_attributes.getSkillRank(SkillType::Security) > 0);
-    _binding.treMinusBtn->setVisible(_attributes.getSkillRank(SkillType::TreatInjury) > 0);
+    _controls.COM_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::ComputerUse) > 0);
+    _controls.DEM_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Demolitions) > 0);
+    _controls.STE_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Stealth) > 0);
+    _controls.AWA_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Awareness) > 0);
+    _controls.PER_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Persuade) > 0);
+    _controls.REP_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Repair) > 0);
+    _controls.SEC_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::Security) > 0);
+    _controls.TRE_MINUS_BTN->setVisible(_attributes.getSkillRank(SkillType::TreatInjury) > 0);
 
-    _binding.comPlusBtn->setVisible(canIncreaseSkill(SkillType::ComputerUse));
-    _binding.demPlusBtn->setVisible(canIncreaseSkill(SkillType::Demolitions));
-    _binding.stePlusBtn->setVisible(canIncreaseSkill(SkillType::Stealth));
-    _binding.awaPlusBtn->setVisible(canIncreaseSkill(SkillType::Awareness));
-    _binding.perPlusBtn->setVisible(canIncreaseSkill(SkillType::Persuade));
-    _binding.repPlusBtn->setVisible(canIncreaseSkill(SkillType::Repair));
-    _binding.secPlusBtn->setVisible(canIncreaseSkill(SkillType::Security));
-    _binding.trePlusBtn->setVisible(canIncreaseSkill(SkillType::TreatInjury));
+    _controls.COM_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::ComputerUse));
+    _controls.DEM_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Demolitions));
+    _controls.STE_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Stealth));
+    _controls.AWA_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Awareness));
+    _controls.PER_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Persuade));
+    _controls.REP_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Repair));
+    _controls.SEC_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::Security));
+    _controls.TRE_PLUS_BTN->setVisible(canIncreaseSkill(SkillType::TreatInjury));
 }
 
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
@@ -307,8 +264,8 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
         return;
 
     std::string description(_services.resource.strings.getText(maybeDescription->second));
-    _binding.lbDesc->clearItems();
-    _binding.lbDesc->addTextLinesAsItems(description);
+    _controls.LB_DESC->clearItems();
+    _controls.LB_DESC->addTextLinesAsItems(description);
 }
 
 } // namespace game

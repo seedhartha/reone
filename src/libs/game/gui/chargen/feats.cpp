@@ -17,11 +17,9 @@
 
 #include "reone/game/gui/chargen/feats.h"
 
-#include "reone/gui/control/button.h"
-
 #include "reone/game/game.h"
-
 #include "reone/game/gui/chargen.h"
+#include "reone/gui/control/button.h"
 
 using namespace reone::audio;
 
@@ -36,22 +34,15 @@ namespace game {
 void CharGenFeats::onGUILoaded() {
     bindControls();
 
-    _binding.btnAccept->setOnClick([this]() {
+    _controls.BTN_ACCEPT->setOnClick([this]() {
         _charGen.goToNextStep();
         _charGen.openSteps();
     });
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openSteps();
     });
-    _binding.btnSelect->setDisabled(true);
-    _binding.btnRecommended->setDisabled(true);
-}
-
-void CharGenFeats::bindControls() {
-    _binding.btnAccept = findControl<Button>("BTN_ACCEPT");
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.btnSelect = findControl<Button>("BTN_SELECT");
-    _binding.btnRecommended = findControl<Button>("BTN_RECOMMENDED");
+    _controls.BTN_SELECT->setDisabled(true);
+    _controls.BTN_RECOMMENDED->setDisabled(true);
 }
 
 } // namespace game

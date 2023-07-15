@@ -34,44 +34,67 @@ public:
     }
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Label> lblCompSkill;
-        std::shared_ptr<gui::Label> lblCompSkillVal;
-        std::shared_ptr<gui::Label> lblCompSpikes;
-        std::shared_ptr<gui::Label> lblCompSpikesVal;
-        std::shared_ptr<gui::Label> lblRepSkill;
-        std::shared_ptr<gui::Label> lblRepSkillVal;
-        std::shared_ptr<gui::Label> lblRepUnits;
-        std::shared_ptr<gui::Label> lblRepUnitsVal;
-        std::shared_ptr<gui::ListBox> lbMessage;
-        std::shared_ptr<gui::ListBox> lbReplies;
+    struct Controls {
+        std::shared_ptr<gui::Label> LBL_BAR1;
+        std::shared_ptr<gui::Label> LBL_BAR2;
+        std::shared_ptr<gui::Label> LBL_BAR3;
+        std::shared_ptr<gui::Label> LBL_BAR4;
+        std::shared_ptr<gui::Label> LBL_BAR5;
+        std::shared_ptr<gui::Label> LBL_BAR6;
+        std::shared_ptr<gui::Label> LBL_COMP_SKILL;
+        std::shared_ptr<gui::Label> LBL_COMP_SKILL_ICON;
+        std::shared_ptr<gui::Label> LBL_COMP_SKILL_VAL;
+        std::shared_ptr<gui::Label> LBL_COMP_SPIKES;
+        std::shared_ptr<gui::Label> LBL_COMP_SPIKES_ICON;
+        std::shared_ptr<gui::Label> LBL_COMP_SPIKES_VAL;
+        std::shared_ptr<gui::Label> LBL_OBSCURE;
+        std::shared_ptr<gui::Label> LBL_REP_SKILL;
+        std::shared_ptr<gui::Label> LBL_REP_SKILL_ICON;
+        std::shared_ptr<gui::Label> LBL_REP_SKILL_VAL;
+        std::shared_ptr<gui::Label> LBL_REP_UNITS;
+        std::shared_ptr<gui::Label> LBL_REP_UNITS_ICON;
+        std::shared_ptr<gui::Label> LBL_REP_UNITS_VAL;
+        std::shared_ptr<gui::Label> LBL_STATIC1;
+        std::shared_ptr<gui::Label> LBL_STATIC2;
+        std::shared_ptr<gui::Label> LBL_STATIC3;
+        std::shared_ptr<gui::Label> LBL_STATIC4;
+        std::shared_ptr<gui::ListBox> LB_MESSAGE;
+        std::shared_ptr<gui::ListBox> LB_REPLIES;
+    };
 
-        // KotOR only
-        std::shared_ptr<gui::Label> lblCompSkillIcon;
-        std::shared_ptr<gui::Label> lblCompSpikesIcon;
-        std::shared_ptr<gui::Label> lblRepSkillIcon;
-        std::shared_ptr<gui::Label> lblRepUnitsIcon;
-        std::shared_ptr<gui::Label> lblStatic1;
-        std::shared_ptr<gui::Label> lblStatic2;
-        std::shared_ptr<gui::Label> lblStatic3;
-        std::shared_ptr<gui::Label> lblStatic4;
-        std::shared_ptr<gui::Label> lblObscure;
-        // END KotOR only
-
-        // TSL only
-        std::shared_ptr<gui::Label> lblBar1;
-        std::shared_ptr<gui::Label> lblBar2;
-        std::shared_ptr<gui::Label> lblBar3;
-        std::shared_ptr<gui::Label> lblBar4;
-        std::shared_ptr<gui::Label> lblBar5;
-        std::shared_ptr<gui::Label> lblBar6;
-        // END TSL only
-    } _binding;
+    Controls _controls;
 
     void preload(gui::IGUI &gui) override;
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.LBL_BAR1 = findControl<gui::Label>("LBL_BAR1");
+        _controls.LBL_BAR2 = findControl<gui::Label>("LBL_BAR2");
+        _controls.LBL_BAR3 = findControl<gui::Label>("LBL_BAR3");
+        _controls.LBL_BAR4 = findControl<gui::Label>("LBL_BAR4");
+        _controls.LBL_BAR5 = findControl<gui::Label>("LBL_BAR5");
+        _controls.LBL_BAR6 = findControl<gui::Label>("LBL_BAR6");
+        _controls.LBL_COMP_SKILL = findControl<gui::Label>("LBL_COMP_SKILL");
+        _controls.LBL_COMP_SKILL_ICON = findControl<gui::Label>("LBL_COMP_SKILL_ICON");
+        _controls.LBL_COMP_SKILL_VAL = findControl<gui::Label>("LBL_COMP_SKILL_VAL");
+        _controls.LBL_COMP_SPIKES = findControl<gui::Label>("LBL_COMP_SPIKES");
+        _controls.LBL_COMP_SPIKES_ICON = findControl<gui::Label>("LBL_COMP_SPIKES_ICON");
+        _controls.LBL_COMP_SPIKES_VAL = findControl<gui::Label>("LBL_COMP_SPIKES_VAL");
+        _controls.LBL_OBSCURE = findControl<gui::Label>("LBL_OBSCURE");
+        _controls.LBL_REP_SKILL = findControl<gui::Label>("LBL_REP_SKILL");
+        _controls.LBL_REP_SKILL_ICON = findControl<gui::Label>("LBL_REP_SKILL_ICON");
+        _controls.LBL_REP_SKILL_VAL = findControl<gui::Label>("LBL_REP_SKILL_VAL");
+        _controls.LBL_REP_UNITS = findControl<gui::Label>("LBL_REP_UNITS");
+        _controls.LBL_REP_UNITS_ICON = findControl<gui::Label>("LBL_REP_UNITS_ICON");
+        _controls.LBL_REP_UNITS_VAL = findControl<gui::Label>("LBL_REP_UNITS_VAL");
+        _controls.LBL_STATIC1 = findControl<gui::Label>("LBL_STATIC1");
+        _controls.LBL_STATIC2 = findControl<gui::Label>("LBL_STATIC2");
+        _controls.LBL_STATIC3 = findControl<gui::Label>("LBL_STATIC3");
+        _controls.LBL_STATIC4 = findControl<gui::Label>("LBL_STATIC4");
+        _controls.LB_MESSAGE = findControl<gui::ListBox>("LB_MESSAGE");
+        _controls.LB_REPLIES = findControl<gui::ListBox>("LB_REPLIES");
+    }
+
     void configureMessage();
     void configureReplies();
 

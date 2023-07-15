@@ -17,9 +17,8 @@
 
 #include "reone/game/gui/ingame/messages.h"
 
-#include "reone/gui/control/button.h"
-
 #include "reone/game/game.h"
+#include "reone/gui/control/button.h"
 
 using namespace reone::audio;
 
@@ -35,20 +34,12 @@ void MessagesMenu::onGUILoaded() {
     loadBackground(BackgroundType::Menu);
     bindControls();
 
-    _binding.btnExit->setOnClick([this]() {
+    _controls.BTN_EXIT->setOnClick([this]() {
         _game.openInGame();
     });
 
     if (!_game.isTSL()) {
-        _binding.btnShow->setDisabled(true);
-    }
-}
-
-void MessagesMenu::bindControls() {
-    _binding.btnExit = findControl<Button>("BTN_EXIT");
-
-    if (!_game.isTSL()) {
-        _binding.btnShow = findControl<Button>("BTN_SHOW");
+        _controls.BTN_SHOW->setDisabled(true);
     }
 }
 

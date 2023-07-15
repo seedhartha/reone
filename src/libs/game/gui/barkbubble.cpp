@@ -35,11 +35,7 @@ void BarkBubble::preload(IGUI &gui) {
 void BarkBubble::onGUILoaded() {
     bindControls();
     _gui->rootControl().setVisible(false);
-    _binding.lblBarkText->setVisible(false);
-}
-
-void BarkBubble::bindControls() {
-    _binding.lblBarkText = findControl<Label>("LBL_BARKTEXT");
+    _controls.LBL_BARKTEXT->setVisible(false);
 }
 
 void BarkBubble::update(float dt) {
@@ -52,20 +48,20 @@ void BarkBubble::update(float dt) {
 void BarkBubble::setBarkText(const std::string &text, float duration) {
     if (text.empty()) {
         _gui->rootControl().setVisible(false);
-        _binding.lblBarkText->setVisible(false);
+        _controls.LBL_BARKTEXT->setVisible(false);
     } else {
-        float textWidth = _binding.lblBarkText->text().font->measure(text);
-        int lineCount = static_cast<int>(textWidth / static_cast<float>(_binding.lblBarkText->extent().width)) + 1;
-        int padding = _binding.lblBarkText->extent().left;
-        float rootHeight = lineCount * _binding.lblBarkText->text().font->height() + 2 * padding;
-        float labelHeight = lineCount * _binding.lblBarkText->text().font->height();
+        float textWidth = _controls.LBL_BARKTEXT->text().font->measure(text);
+        int lineCount = static_cast<int>(textWidth / static_cast<float>(_controls.LBL_BARKTEXT->extent().width)) + 1;
+        int padding = _controls.LBL_BARKTEXT->extent().left;
+        float rootHeight = lineCount * _controls.LBL_BARKTEXT->text().font->height() + 2 * padding;
+        float labelHeight = lineCount * _controls.LBL_BARKTEXT->text().font->height();
 
         _gui->rootControl().setVisible(true);
         _gui->rootControl().setExtentHeight(static_cast<int>(rootHeight));
 
-        _binding.lblBarkText->setExtentHeight(static_cast<int>(labelHeight));
-        _binding.lblBarkText->setTextMessage(text);
-        _binding.lblBarkText->setVisible(true);
+        _controls.LBL_BARKTEXT->setExtentHeight(static_cast<int>(labelHeight));
+        _controls.LBL_BARKTEXT->setTextMessage(text);
+        _controls.LBL_BARKTEXT->setVisible(true);
     }
 
     if (duration > 0.0f) {

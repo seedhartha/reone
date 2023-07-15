@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "reone/gui/control/button.h"
+#include "reone/gui/control/imagebutton.h"
+#include "reone/gui/control/label.h"
+
 #include "../../gui.h"
 
 namespace reone {
@@ -50,27 +54,42 @@ public:
     void setStep(int step);
 
 private:
-    struct Binding {
-        std::shared_ptr<gui::Button> btnBack;
-        std::shared_ptr<gui::Button> btnCancel;
-        std::shared_ptr<gui::Button> btnStepName1;
-        std::shared_ptr<gui::Button> btnStepName2;
-        std::shared_ptr<gui::Button> btnStepName3;
-        std::shared_ptr<gui::Label> lbl1;
-        std::shared_ptr<gui::Label> lbl2;
-        std::shared_ptr<gui::Label> lbl3;
-        std::shared_ptr<gui::Label> lblDecoration;
-        std::shared_ptr<gui::Label> lblNum1;
-        std::shared_ptr<gui::Label> lblNum2;
-        std::shared_ptr<gui::Label> lblNum3;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Button> BTN_BACK;
+        std::shared_ptr<gui::Button> BTN_CANCEL;
+        std::shared_ptr<gui::Button> BTN_STEPNAME1;
+        std::shared_ptr<gui::Button> BTN_STEPNAME2;
+        std::shared_ptr<gui::Button> BTN_STEPNAME3;
+        std::shared_ptr<gui::ImageButton> LBL_1;
+        std::shared_ptr<gui::ImageButton> LBL_2;
+        std::shared_ptr<gui::ImageButton> LBL_3;
+        std::shared_ptr<gui::Label> LBL_DECORATION;
+        std::shared_ptr<gui::Label> LBL_NUM1;
+        std::shared_ptr<gui::Label> LBL_NUM2;
+        std::shared_ptr<gui::Label> LBL_NUM3;
+    };
+
+    Controls _controls;
 
     CharacterGeneration &_charGen;
     int _step {0};
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.BTN_BACK = findControl<gui::Button>("BTN_BACK");
+        _controls.BTN_CANCEL = findControl<gui::Button>("BTN_CANCEL");
+        _controls.BTN_STEPNAME1 = findControl<gui::Button>("BTN_STEPNAME1");
+        _controls.BTN_STEPNAME2 = findControl<gui::Button>("BTN_STEPNAME2");
+        _controls.BTN_STEPNAME3 = findControl<gui::Button>("BTN_STEPNAME3");
+        _controls.LBL_1 = findControl<gui::ImageButton>("LBL_1");
+        _controls.LBL_2 = findControl<gui::ImageButton>("LBL_2");
+        _controls.LBL_3 = findControl<gui::ImageButton>("LBL_3");
+        _controls.LBL_DECORATION = findControl<gui::Label>("LBL_DECORATION");
+        _controls.LBL_NUM1 = findControl<gui::Label>("LBL_NUM1");
+        _controls.LBL_NUM2 = findControl<gui::Label>("LBL_NUM2");
+        _controls.LBL_NUM3 = findControl<gui::Label>("LBL_NUM3");
+    }
 
     void doSetStep(int step);
 };

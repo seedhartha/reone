@@ -17,14 +17,12 @@
 
 #include "reone/game/gui/chargen/quickorcustom.h"
 
+#include "reone/game/game.h"
+#include "reone/game/gui/chargen.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/strings.h"
-
-#include "reone/game/game.h"
-
-#include "reone/game/gui/chargen.h"
 
 using namespace reone::audio;
 
@@ -43,44 +41,36 @@ void QuickOrCustom::onGUILoaded() {
     bindControls();
 
     if (!_game.isTSL()) {
-        _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
+        _controls.LBL_RBG->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 
-    _binding.lbDesc->setProtoMatchContent(true);
+    _controls.LB_DESC->setProtoMatchContent(true);
 
-    _binding.btnBack->setOnClick([this]() {
+    _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openClassSelection();
     });
 
-    _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
+    _controls.QUICK_CHAR_BTN->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
         std::string text(_services.resource.strings.getText(kStrRefQuickHelpText));
-        _binding.lbDesc->clearItems();
-        _binding.lbDesc->addTextLinesAsItems(text);
+        _controls.LB_DESC->clearItems();
+        _controls.LB_DESC->addTextLinesAsItems(text);
     });
-    _binding.quickCharBtn->setOnClick([this]() {
+    _controls.QUICK_CHAR_BTN->setOnClick([this]() {
         _charGen.startQuick();
     });
 
-    _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
+    _controls.CUST_CHAR_BTN->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
         std::string text(_services.resource.strings.getText(kStrRefCustomHelpText));
-        _binding.lbDesc->clearItems();
-        _binding.lbDesc->addTextLinesAsItems(text);
+        _controls.LB_DESC->clearItems();
+        _controls.LB_DESC->addTextLinesAsItems(text);
     });
-    _binding.custCharBtn->setOnClick([this]() {
+    _controls.CUST_CHAR_BTN->setOnClick([this]() {
         _charGen.startCustom();
     });
-}
-
-void QuickOrCustom::bindControls() {
-    _binding.btnBack = findControl<Button>("BTN_BACK");
-    _binding.custCharBtn = findControl<Button>("CUST_CHAR_BTN");
-    _binding.quickCharBtn = findControl<Button>("QUICK_CHAR_BTN");
-    _binding.lblRbg = findControl<Label>("LBL_RBG");
-    _binding.lbDesc = findControl<ListBox>("LB_DESC");
 }
 
 } // namespace game

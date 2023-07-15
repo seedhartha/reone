@@ -62,23 +62,27 @@ private:
         Character character;
     };
 
-    struct Binding {
-        std::shared_ptr<gui::Button> btnBack;
-        std::shared_ptr<gui::Button> btnSel1;
-        std::shared_ptr<gui::Button> btnSel2;
-        std::shared_ptr<gui::Button> btnSel3;
-        std::shared_ptr<gui::Button> btnSel4;
-        std::shared_ptr<gui::Button> btnSel5;
-        std::shared_ptr<gui::Button> btnSel6;
-        std::shared_ptr<gui::Label> lblClass;
-        std::shared_ptr<gui::Label> lblDesc;
-        std::shared_ptr<gui::Label> threeDModel1;
-        std::shared_ptr<gui::Label> threeDModel2;
-        std::shared_ptr<gui::Label> threeDModel3;
-        std::shared_ptr<gui::Label> threeDModel4;
-        std::shared_ptr<gui::Label> threeDModel5;
-        std::shared_ptr<gui::Label> threeDModel6;
-    } _binding;
+    struct Controls {
+        std::shared_ptr<gui::Label> THREE_D_MODEL1;
+        std::shared_ptr<gui::Label> THREE_D_MODEL2;
+        std::shared_ptr<gui::Label> THREE_D_MODEL3;
+        std::shared_ptr<gui::Label> THREE_D_MODEL4;
+        std::shared_ptr<gui::Label> THREE_D_MODEL5;
+        std::shared_ptr<gui::Label> THREE_D_MODEL6;
+        std::shared_ptr<gui::Button> BTN_BACK;
+        std::shared_ptr<gui::Button> BTN_SEL1;
+        std::shared_ptr<gui::Button> BTN_SEL2;
+        std::shared_ptr<gui::Button> BTN_SEL3;
+        std::shared_ptr<gui::Button> BTN_SEL4;
+        std::shared_ptr<gui::Button> BTN_SEL5;
+        std::shared_ptr<gui::Button> BTN_SEL6;
+        std::shared_ptr<gui::Label> LBL_CHAR_GEN;
+        std::shared_ptr<gui::Label> LBL_CLASS;
+        std::shared_ptr<gui::Label> LBL_DESC;
+        std::shared_ptr<gui::Label> LBL_INSTRUCTION;
+    };
+
+    Controls _controls;
 
     CharacterGeneration &_charGen;
 
@@ -88,7 +92,26 @@ private:
 
     void onGUILoaded() override;
 
-    void bindControls();
+    void bindControls() {
+        _controls.THREE_D_MODEL1 = findControl<gui::Label>("3D_MODEL1");
+        _controls.THREE_D_MODEL2 = findControl<gui::Label>("3D_MODEL2");
+        _controls.THREE_D_MODEL3 = findControl<gui::Label>("3D_MODEL3");
+        _controls.THREE_D_MODEL4 = findControl<gui::Label>("3D_MODEL4");
+        _controls.THREE_D_MODEL5 = findControl<gui::Label>("3D_MODEL5");
+        _controls.THREE_D_MODEL6 = findControl<gui::Label>("3D_MODEL6");
+        _controls.BTN_BACK = findControl<gui::Button>("BTN_BACK");
+        _controls.BTN_SEL1 = findControl<gui::Button>("BTN_SEL1");
+        _controls.BTN_SEL2 = findControl<gui::Button>("BTN_SEL2");
+        _controls.BTN_SEL3 = findControl<gui::Button>("BTN_SEL3");
+        _controls.BTN_SEL4 = findControl<gui::Button>("BTN_SEL4");
+        _controls.BTN_SEL5 = findControl<gui::Button>("BTN_SEL5");
+        _controls.BTN_SEL6 = findControl<gui::Button>("BTN_SEL6");
+        _controls.LBL_CHAR_GEN = findControl<gui::Label>("LBL_CHAR_GEN");
+        _controls.LBL_CLASS = findControl<gui::Label>("LBL_CLASS");
+        _controls.LBL_DESC = findControl<gui::Label>("LBL_DESC");
+        _controls.LBL_INSTRUCTION = findControl<gui::Label>("LBL_INSTRUCTION");
+    }
+
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 
