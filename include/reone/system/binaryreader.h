@@ -35,7 +35,7 @@ public:
         _stream.seek(pos, origin);
     }
 
-    inline void ignore(int count) {
+    inline void skipBytes(int count) {
         _stream.seek(count, SeekOrigin::Current);
     }
 

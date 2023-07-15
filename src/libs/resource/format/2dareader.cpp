@@ -29,7 +29,7 @@ namespace resource {
 void TwoDaReader::load() {
     checkSignature(_reader, std::string("2DA V2.b", 8));
 
-    _reader.ignore(1); // newline
+    _reader.skipBytes(1); // newline
     _columns = readTokens();
     _rowCount = _reader.readUint32();
     readTokens(_rowCount);

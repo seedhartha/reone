@@ -49,7 +49,7 @@ void TlkReader::loadStrings() {
         std::string soundResRef(_tlk.readString(16));
         boost::to_lower(soundResRef);
 
-        _tlk.ignore(8);
+        _tlk.skipBytes(8);
 
         uint32_t stringOffset = _tlk.readUint32();
         uint32_t stringSize = _tlk.readUint32();

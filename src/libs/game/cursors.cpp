@@ -86,12 +86,12 @@ std::vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
     auto stream = MemoryInputStream(res->data);
     auto reader = BinaryReader(stream);
 
-    reader.ignore(4); // Reserved, ResType
+    reader.skipBytes(4); // Reserved, ResType
     uint16_t resCount = reader.readUint16();
 
     std::vector<uint32_t> cursorNames;
     for (uint16_t i = 0; i < resCount; ++i) {
-        reader.ignore(12); // Cursor, Planes, BitCount, BytesInRes
+        reader.skipBytes(12); // Cursor, Planes, BitCount, BytesInRes
         uint16_t cursorId = reader.readUint16();
         cursorNames.push_back(static_cast<uint32_t>(cursorId));
     }

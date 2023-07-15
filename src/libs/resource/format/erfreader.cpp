@@ -25,11 +25,11 @@ namespace resource {
 
 void ErfReader::load() {
     checkSignature();
-    _erf.ignore(8);
+    _erf.skipBytes(8);
 
     _numEntries = _erf.readUint32();
 
-    _erf.ignore(4);
+    _erf.skipBytes(4);
 
     _offKeys = _erf.readUint32();
     _offResources = _erf.readUint32();
@@ -63,7 +63,7 @@ ErfReader::KeyEntry ErfReader::readKeyEntry() {
     auto resRef = boost::to_lower_copy(_erf.readString(16));
     auto resId = _erf.readUint32();
     auto resType = _erf.readUint16();
-    _erf.ignore(2); // unused
+    _erf.skipBytes(2); // unused
 
     auto key = KeyEntry();
     key.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));

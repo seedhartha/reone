@@ -34,7 +34,7 @@ TEST(binary_reader, should_seek_ignore_and_tell_in_little_endian_stream) {
 
     // when
     reader.seek(5);
-    reader.ignore(2);
+    reader.skipBytes(2);
     auto actualPos = reader.position();
 
     // then

@@ -29,7 +29,7 @@ static constexpr int kSiblingMaskDir = 0x80000000;
 
 void PeReader::load() {
     checkSignature(_pe, std::string("MZ", 2));
-    _pe.ignore(58);
+    _pe.skipBytes(58);
 
     uint32_t offPeHeader = _pe.readUint32();
     _pe.seek(offPeHeader);
@@ -51,38 +51,38 @@ void PeReader::load() {
 }
 
 void PeReader::loadHeader() {
-    _pe.ignore(2);
+    _pe.skipBytes(2);
 
     _sectionCount = _pe.readUint16();
     _sections.reserve(_sectionCount);
 
-    _pe.ignore(16);
+    _pe.skipBytes(16);
 }
 
 void PeReader::loadOptionalHeader() {
-    _pe.ignore(92);
+    _pe.skipBytes(92);
 
     uint32_t dirCount = _pe.readUint32();
 
-    _pe.ignore(dirCount * 8);
+    _pe.skipBytes(dirCount * 8);
 }
 
 void PeReader::loadSection() {
     std::string name(_pe.readString(8));
 
-    _pe.ignore(4);
+    _pe.skipBytes(4);
 
     uint32_t virtAddr = _pe.readUint32();
     uint32_t sizeRaw = _pe.readUint32();
     uint32_t offRaw = _pe.readUint32();
 
-    _pe.ignore(16);
+    _pe.skipBytes(16);
 
     _sections.push_back({name, virtAddr, offRaw});
 }
 
 void PeReader::loadResourceDir(const Section &section, int level) {
-    _pe.ignore(12);
+    _pe.skipBytes(12);
 
     uint16_t namedEntryCount = _pe.readUint16();
     uint16_t idEntryCount = _pe.readUint16();
@@ -130,7 +130,7 @@ void PeReader::loadResourceDataEntry(const Section &section) {
     uint32_t offData = _pe.readUint32();
     uint32_t sizeData = _pe.readUint32();
 
-    _pe.ignore(8);
+    _pe.skipBytes(8);
 
     Resource res;
     res.type = _currentType;

@@ -52,7 +52,7 @@ void WavReader::load() {
             loadData(chunk);
             break;
         } else {
-            _wav.ignore(chunk.size);
+            _wav.skipBytes(chunk.size);
         }
     }
 }
@@ -93,7 +93,7 @@ void WavReader::loadFormat(ChunkHeader chunk) {
         throw FormatException("WAV: invalid bits per sample: " + std::to_string(_bitsPerSample));
     }
 
-    _wav.ignore(chunk.size - 16);
+    _wav.skipBytes(chunk.size - 16);
 }
 
 void WavReader::loadData(ChunkHeader chunk) {

@@ -25,7 +25,7 @@ namespace reone {
 namespace resource {
 
 void GffReader::load() {
-    _gff.ignore(8); // signature
+    _gff.skipBytes(8); // signature
 
     _structOffset = _gff.readUint32();
     _structCount = _gff.readUint32();

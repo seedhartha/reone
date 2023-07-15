@@ -31,7 +31,7 @@ namespace graphics {
 void TpcReader::load() {
     uint32_t dataSize = _tpc.readUint32();
 
-    _tpc.ignore(4);
+    _tpc.skipBytes(4);
 
     uint16_t width = _tpc.readUint16();
     uint16_t height = _tpc.readUint16();
@@ -75,7 +75,7 @@ void TpcReader::loadLayers() {
         for (int j = 1; j < _numMipMaps; ++j) {
             int w, h;
             getMipMapSize(j, w, h);
-            _tpc.ignore(getMipMapDataSize(w, h));
+            _tpc.skipBytes(getMipMapDataSize(w, h));
         }
 
         _layers.push_back(Texture::Layer {std::move(pixels)});

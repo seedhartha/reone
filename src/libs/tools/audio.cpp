@@ -45,7 +45,7 @@ void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem:
         suffix = "-unwrap.wav";
     } else if (magic == 0x46464952) { // MP3 in WAV
         // Read subchunks
-        reader.ignore(8); // chunk size + format
+        reader.skipBytes(8); // chunk size + format
         while (true) {
             std::string subchunkId;
             try {
@@ -57,7 +57,7 @@ void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem:
             if (subchunkId == "data") {
                 break;
             } else {
-                reader.ignore(subchunkSize);
+                reader.skipBytes(subchunkSize);
             }
         }
         suffix = ".mp3";

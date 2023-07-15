@@ -55,7 +55,7 @@ void BwmReader::load() {
         _numAabb = _bwm.readUint32();
         _offAabb = _bwm.readUint32();
 
-        _bwm.ignore(4); // unknown
+        _bwm.skipBytes(4); // unknown
 
         _numAdjacencies = _bwm.readUint32();
         _offAdjacencies = _bwm.readUint32();
@@ -147,7 +147,7 @@ void BwmReader::loadAABB() {
     for (uint32_t i = 0; i < _numAabb; ++i) {
         std::vector<float> bounds(_bwm.readFloatArray(6));
         int faceIdx = _bwm.readInt32();
-        _bwm.ignore(4); // unknown
+        _bwm.skipBytes(4); // unknown
         uint32_t mostSignificantPlane = _bwm.readUint32();
         uint32_t childIdx1 = _bwm.readUint32();
         uint32_t childIdx2 = _bwm.readUint32();

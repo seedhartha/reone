@@ -33,7 +33,7 @@ void CurReader::load() {
 }
 
 void CurReader::loadHeader() {
-    _cur.ignore(4);
+    _cur.skipBytes(4);
 
     uint32_t size = _cur.readUint32();
 

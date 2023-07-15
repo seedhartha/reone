@@ -25,7 +25,7 @@ namespace resource {
 
 void RimReader::load() {
     checkSignature(_rim, std::string("RIM V1.0", 8));
-    _rim.ignore(4);
+    _rim.skipBytes(4);
 
     _numResources = _rim.readUint32();
     _offResources = _rim.readUint32();
@@ -45,7 +45,7 @@ void RimReader::loadResources() {
 RimReader::ResourceEntry RimReader::readResource() {
     auto resRef = boost::to_lower_copy(_rim.readString(16));
     auto type = _rim.readUint16();
-    _rim.ignore(4 + 2);
+    _rim.skipBytes(4 + 2);
     auto offset = _rim.readUint32();
     auto size = _rim.readUint32();
 

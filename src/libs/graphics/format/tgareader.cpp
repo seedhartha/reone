@@ -31,7 +31,7 @@ namespace graphics {
 void TgaReader::load() {
     auto idLength = _tga.readByte();
 
-    _tga.ignore(1);
+    _tga.skipBytes(1);
 
     _dataType = static_cast<TGADataType>(_tga.readByte());
     switch (_dataType) {
@@ -44,7 +44,7 @@ void TgaReader::load() {
         return;
     }
 
-    _tga.ignore(9);
+    _tga.skipBytes(9);
 
     auto width = _tga.readUint16();
     auto height = _tga.readUint16();
@@ -72,7 +72,7 @@ void TgaReader::load() {
     }
     _alpha = isRGBA() && bpp == 32;
 
-    _tga.ignore(idLength);
+    _tga.skipBytes(idLength);
     loadTexture();
 }
 

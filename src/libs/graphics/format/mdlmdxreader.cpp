@@ -57,7 +57,7 @@ static bool isTSLFunctionPointer(uint32_t ptr) {
 
 void MdlMdxReader::load() {
     // File Header
-    _mdl.ignore(4); // unknown
+    _mdl.skipBytes(4); // unknown
     uint32_t mdlSize = _mdl.readUint32();
     uint32_t mdxSize = _mdl.readUint32();
 
@@ -67,15 +67,15 @@ void MdlMdxReader::load() {
     std::string name(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offRootNode = _mdl.readUint32();
     uint32_t numNodes = _mdl.readUint32();
-    _mdl.ignore(6 * 4); // unknown
+    _mdl.skipBytes(6 * 4); // unknown
     uint32_t refCount = _mdl.readUint32();
     uint8_t modelType = _mdl.readByte();
-    _mdl.ignore(3); // padding
+    _mdl.skipBytes(3); // padding
 
     // Model Header
     uint8_t classification = _mdl.readByte();
     uint8_t subclassification = _mdl.readByte();
-    _mdl.ignore(1); // unknown
+    _mdl.skipBytes(1); // unknown
     uint8_t affectedByFog = _mdl.readByte();
     uint32_t numChildModels = _mdl.readUint32();
     ArrayDefinition animationArrayDef(readArrayDefinition());
@@ -85,7 +85,7 @@ void MdlMdxReader::load() {
     float animationScale = _mdl.readFloat();
     std::string superModelName(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offAnimRoot = _mdl.readUint32();
-    _mdl.ignore(4); // unknown
+    _mdl.skipBytes(4); // unknown
     uint32_t mdxSize2 = _mdl.readUint32();
     uint32_t mdxOffset = _mdl.readUint32();
     ArrayDefinition nameArrayDef(readArrayDefinition());
@@ -147,7 +147,7 @@ std::shared_ptr<ModelNode> MdlMdxReader::readNodes(uint32_t offset, ModelNode *p
     uint16_t flags = _mdl.readUint16();
     uint16_t nodeNumber = _mdl.readUint16();
     uint16_t nameIndex = _mdl.readUint16();
-    _mdl.ignore(2); // padding
+    _mdl.skipBytes(2); // padding
     uint32_t offRootNode = _mdl.readUint32();
     uint32_t offParentNode = _mdl.readUint32();
     std::vector<float> positionValues(_mdl.readFloatArray(3));
@@ -219,7 +219,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     ArrayDefinition indicesCountArrayDef(readArrayDefinition());
     ArrayDefinition indicesOffsetArrayDef(readArrayDefinition());
     ArrayDefinition invCounterArrayDef(readArrayDefinition());
-    _mdl.ignore(3 * 4 + 8); // unknown
+    _mdl.skipBytes(3 * 4 + 8); // unknown
     uint32_t animateUV = _mdl.readUint32();
     float uvDirectionX = _mdl.readFloat();
     float uvDirectionY = _mdl.readFloat();
@@ -235,7 +235,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     int offMdxTexCoords3 = _mdl.readInt32();
     int offMdxTexCoords4 = _mdl.readInt32();
     int offMdxTanSpace = _mdl.readInt32();
-    _mdl.ignore(3 * 4); // unknown
+    _mdl.skipBytes(3 * 4); // unknown
     uint16_t numVertices = _mdl.readUint16();
     uint16_t numTextures = _mdl.readUint16();
     uint8_t lightmapped = _mdl.readByte();
@@ -244,11 +244,11 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     uint8_t shadow = _mdl.readByte();
     uint8_t beaming = _mdl.readByte();
     uint8_t render = _mdl.readByte();
-    _mdl.ignore(2); // unknown
+    _mdl.skipBytes(2); // unknown
     float totalArea = _mdl.readFloat();
-    _mdl.ignore(4); // unknown
+    _mdl.skipBytes(4); // unknown
     if (_tsl) {
-        _mdl.ignore(8);
+        _mdl.skipBytes(8);
     }
     uint32_t offMdxData = _mdl.readUint32();
     uint32_t offVertices = _mdl.readUint32();
@@ -269,16 +269,16 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
 
     if (flags & MdlNodeFlags::skin) {
         // Skin Mesh Header
-        _mdl.ignore(3 * 4); // unknown
+        _mdl.skipBytes(3 * 4); // unknown
         uint32_t offMdxBoneWeights = _mdl.readUint32();
         uint32_t offMdxBoneIndices = _mdl.readUint32();
         uint32_t offBones = _mdl.readUint32();
         uint32_t numBones = _mdl.readUint32();
         ArrayDefinition qBoneArrayDef(readArrayDefinition());
         ArrayDefinition tBoneArrayDef(readArrayDefinition());
-        _mdl.ignore(3 * 4); // unknown
+        _mdl.skipBytes(3 * 4); // unknown
         std::vector<uint16_t> boneNodeSerial(_mdl.readUint16Array(16));
-        _mdl.ignore(4); // padding
+        _mdl.skipBytes(4); // padding
 
         std::vector<float> boneMap(_mdl.readFloatArrayAt(kMdlDataOffset + offBones, numBones));
         std::vector<float> qBoneValues(_mdl.readFloatArrayAt(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
@@ -344,7 +344,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         uint32_t offSaberVertices = _mdl.readUint32();
         uint32_t offTexCoords = _mdl.readUint32();
         uint32_t offNormals = _mdl.readUint32();
-        _mdl.ignore(2 * 4); // unknown
+        _mdl.skipBytes(2 * 4); // unknown
 
         static int referenceIndices[] {0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95};
 
@@ -499,7 +499,7 @@ std::shared_ptr<ModelNode::AABBTree> MdlMdxReader::readAABBTree(uint32_t offset)
 
 std::shared_ptr<ModelNode::Light> MdlMdxReader::readLight() {
     float flareRadius = _mdl.readFloat();
-    _mdl.ignore(3 * 4); // unknown
+    _mdl.skipBytes(3 * 4); // unknown
     ArrayDefinition flareSizesArrayDef(readArrayDefinition());
     ArrayDefinition flarePositionsArrayDef(readArrayDefinition());
     ArrayDefinition flareColorShiftsArrayDef(readArrayDefinition());
@@ -609,7 +609,7 @@ std::shared_ptr<ModelNode::Emitter> MdlMdxReader::readEmitter() {
     float controlPointSmoothing = _mdl.readFloat();
     uint32_t xGrid = _mdl.readUint32();
     uint32_t yGrid = _mdl.readUint32();
-    _mdl.ignore(4); // unknown
+    _mdl.skipBytes(4); // unknown
     std::string update(boost::to_lower_copy(_mdl.readString(32)));
     std::string render(boost::to_lower_copy(_mdl.readString(32)));
     std::string blend(boost::to_lower_copy(_mdl.readString(32)));
@@ -620,7 +620,7 @@ std::shared_ptr<ModelNode::Emitter> MdlMdxReader::readEmitter() {
     uint32_t renderOrder = _mdl.readUint32();
     uint32_t frameBlending = _mdl.readUint32();
     std::string depthTexture(boost::to_lower_copy(_mdl.readString(32)));
-    _mdl.ignore(1); // padding
+    _mdl.skipBytes(1); // padding
     uint32_t flags = _mdl.readUint32();
 
     auto emitter = std::make_shared<ModelNode::Emitter>();
@@ -664,12 +664,12 @@ void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const 
     _mdl.seek(kMdlDataOffset + keyOffset);
     for (uint32_t i = 0; i < keyCount; ++i) {
         uint32_t type = _mdl.readUint32();
-        _mdl.ignore(2); // unknown
+        _mdl.skipBytes(2); // unknown
         uint16_t numRows = _mdl.readUint16();
         uint16_t timeIndex = _mdl.readUint16();
         uint16_t dataIndex = _mdl.readUint16();
         uint8_t numColumns = _mdl.readByte();
-        _mdl.ignore(3); // padding
+        _mdl.skipBytes(3); // padding
 
         ControllerKey key;
         key.type = type;
@@ -729,17 +729,17 @@ std::unique_ptr<Animation> MdlMdxReader::readAnimation(uint32_t offset) {
     std::string name(boost::to_lower_copy(_mdl.readString(32)));
     uint32_t offRootNode = _mdl.readUint32();
     uint32_t numNodes = _mdl.readUint32();
-    _mdl.ignore(6 * 4); // unknown
+    _mdl.skipBytes(6 * 4); // unknown
     uint32_t refCount = _mdl.readUint32();
     uint8_t modelType = _mdl.readByte();
-    _mdl.ignore(3); // padding
+    _mdl.skipBytes(3); // padding
 
     // Animation Header
     float length = _mdl.readFloat();
     float transitionTime = _mdl.readFloat();
     std::string root(boost::to_lower_copy(_mdl.readString(32)));
     ArrayDefinition eventArrayDef(readArrayDefinition());
-    _mdl.ignore(4); // unknown
+    _mdl.skipBytes(4); // unknown
 
     std::shared_ptr<ModelNode> rootNode(readNodes(offRootNode, nullptr, false, true));
 
