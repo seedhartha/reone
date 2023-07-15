@@ -97,7 +97,7 @@ private:
         int animationVariant {1};
     };
 
-    typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
+    using RoundMap = std::map<uint32_t, std::unique_ptr<Round>>;
 
     Game &_game;
     ServicesView &_services;

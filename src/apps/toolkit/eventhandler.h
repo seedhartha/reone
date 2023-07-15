@@ -22,7 +22,7 @@ namespace reone {
 template <class T>
 class EventHandler : boost::noncopyable {
 public:
-    typedef std::function<void(const T &)> Subscriber;
+    using Subscriber = std::function<void(const T &)>;
 
     void invoke(T data) {
         _data = std::move(data);

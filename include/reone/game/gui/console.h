@@ -50,7 +50,7 @@ public:
     bool isOpen() const { return _open; }
 
 private:
-    typedef std::function<void(std::string, std::vector<std::string>)> CommandHandler;
+    using CommandHandler = std::function<void(std::string, std::vector<std::string>)>;
 
     struct Command {
         std::string name;

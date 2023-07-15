@@ -30,7 +30,7 @@ namespace script {
 
 class MockRoutine : public Routine {
 public:
-    typedef std::tuple<std::vector<Variable>, ExecutionContext> InvokeInvocation;
+    usinsg InvokeInvocation = std::tuple<std::vector<Variable>, ExecutionContext>;
 
     MockRoutine(
         std::string name,
@@ -67,7 +67,7 @@ public:
 
 class MockScripts : public IScripts, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<ScriptProgram>, get, (const std::string &key), (override));
 };
 

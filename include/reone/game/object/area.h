@@ -51,8 +51,8 @@ class Location;
 class Object;
 class Room;
 
-typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
-typedef std::vector<std::shared_ptr<Object>> ObjectList;
+using RoomMap = std::unordered_map<std::string, std::shared_ptr<Room>>;
+using ObjectList = std::vector<std::shared_ptr<Object>>;
 
 class Area : public Object {
 public:
@@ -65,7 +65,7 @@ public:
         glm::vec4 probabilities {0.0f};
     };
 
-    typedef std::vector<std::pair<CreatureType, int>> SearchCriteriaList;
+    using SearchCriteriaList = std::vector<std::pair<CreatureType, int>>;
 
     Area(
         uint32_t id,

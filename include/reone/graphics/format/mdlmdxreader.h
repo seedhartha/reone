@@ -66,8 +66,8 @@ private:
         uint8_t numColumns {0};
     };
 
-    typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
-    typedef std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)> ControllerFn;
+    using MaterialMap = std::unordered_map<uint32_t, std::vector<uint32_t>>;
+    using ControllerFn = std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)>;
 
     BinaryReader _mdl;
     BinaryReader _mdx;

@@ -38,7 +38,7 @@
 
 namespace reone {
 
-typedef void *GameDirectoryItemId;
+using GameDirectoryItemId = void *;
 
 struct GameDirectoryItem {
     GameDirectoryItemId id {nullptr};

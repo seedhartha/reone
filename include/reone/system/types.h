@@ -49,6 +49,6 @@ enum class LogChannel {
     Script3 = 2048
 };
 
-typedef std::vector<char> ByteBuffer;
+using ByteBuffer = std::vector<char>;
 
 } // namespace reone

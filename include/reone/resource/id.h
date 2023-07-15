@@ -67,7 +67,7 @@ struct ResourceIdComparer {
     }
 };
 
-typedef std::unordered_set<ResourceId, ResourceIdHasher> ResourceIdSet;
+using ResourceIdSet = std::unordered_set<ResourceId, ResourceIdHasher>;
 
 } // namespace resource
 

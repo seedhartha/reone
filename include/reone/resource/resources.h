@@ -32,7 +32,7 @@ struct ResourceProviderLocalPair {
     bool local {false};
 };
 
-typedef std::list<ResourceProviderLocalPair> ResourceProviderList;
+using ResourceProviderList = std::list<ResourceProviderLocalPair>;
 
 class IResources {
 public:
