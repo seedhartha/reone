@@ -74,7 +74,7 @@ Dialog::EntryReply Dialogs::getEntryReply(const schema::DLG_EntryReplyList &dlg)
 
     Dialog::EntryReply entry;
     entry.speaker = dlg.Speaker;
-    entry.text = strRef == -1 ? "" : _strings.get(strRef);
+    entry.text = strRef == -1 ? "" : _strings.getText(strRef);
     entry.voResRef = dlg.VO_ResRef;
     entry.script = dlg.Script;
     entry.sound = dlg.Sound;

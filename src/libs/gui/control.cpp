@@ -130,7 +130,7 @@ void Control::loadText(const schema::GUI_TEXT &gui) {
     _text.font = _graphicsSvc.fonts.get(gui.FONT);
 
     int strRef = gui.STRREF;
-    _text.text = strRef == -1 ? gui.TEXT : _strings.get(strRef);
+    _text.text = strRef == -1 ? gui.TEXT : _strings.getText(strRef);
 
     _text.color = gui.COLOR;
     _text.align = static_cast<TextAlign>(gui.ALIGNMENT);

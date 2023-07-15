@@ -35,8 +35,8 @@ void Spells::init() {
         return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
-        std::string name(_strings.get(spells->getInt(row, "name", -1)));
-        std::string description(_strings.get(spells->getInt(row, "spelldesc", -1)));
+        std::string name(_strings.getText(spells->getInt(row, "name", -1)));
+        std::string description(_strings.getText(spells->getInt(row, "spelldesc", -1)));
         std::shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getUint(row, "pips");
 

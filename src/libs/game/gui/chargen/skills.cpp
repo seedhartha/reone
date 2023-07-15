@@ -306,7 +306,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     if (maybeDescription == g_descStrRefBySkill.end())
         return;
 
-    std::string description(_services.resource.strings.get(maybeDescription->second));
+    std::string description(_services.resource.strings.getText(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

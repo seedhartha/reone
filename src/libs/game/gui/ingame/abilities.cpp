@@ -53,9 +53,9 @@ void AbilitiesMenu::onGUILoaded() {
     _binding.btnPowers->setDisabled(true);
     _binding.btnFeats->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_services.resource.strings.get(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_services.resource.strings.get(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_services.resource.strings.get(kStrRefTotalRank));
+    _binding.lblSkillRank->setTextMessage(_services.resource.strings.getText(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_services.resource.strings.getText(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_services.resource.strings.getText(kStrRefTotalRank));
     _binding.lblRankVal->setTextMessage("");
     _binding.lblBonusVal->setTextMessage("");
     _binding.lblTotalVal->setTextMessage("");
@@ -125,8 +125,8 @@ void AbilitiesMenu::loadSkills() {
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _services.resource.strings.get(skills->getInt(row, "name"));
-        skillInfo.description = _services.resource.strings.get(skills->getInt(row, "description"));
+        skillInfo.name = _services.resource.strings.getText(skills->getInt(row, "name"));
+        skillInfo.description = _services.resource.strings.getText(skills->getInt(row, "description"));
         skillInfo.icon = _services.graphics.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(std::make_pair(skill, std::move(skillInfo)));

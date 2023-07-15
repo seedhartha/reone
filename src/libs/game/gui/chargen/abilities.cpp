@@ -267,7 +267,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     if (maybeDescription == g_descStrRefByAbility.end())
         return;
 
-    std::string description(_services.resource.strings.get(maybeDescription->second));
+    std::string description(_services.resource.strings.getText(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

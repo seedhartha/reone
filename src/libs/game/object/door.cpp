@@ -51,7 +51,7 @@ void Door::loadFromGIT(const schema::GIT_Door_List &git) {
     _linkedToModule = boost::to_lower_copy(git.LinkedToModule);
     _linkedTo = boost::to_lower_copy(git.LinkedTo);
     _linkedToFlags = git.LinkedToFlags;
-    _transitionDestin = _services.resource.strings.get(git.TransitionDestin.first);
+    _transitionDestin = _services.resource.strings.getText(git.TransitionDestin.first);
 
     loadTransformFromGIT(git);
 }
@@ -155,7 +155,7 @@ void Door::setLocked(bool locked) {
 
 void Door::loadUTD(const schema::UTD &utd) {
     _tag = boost::to_lower_copy(utd.Tag);
-    _name = _services.resource.strings.get(utd.LocName.first);
+    _name = _services.resource.strings.getText(utd.LocName.first);
     _blueprintResRef = boost::to_lower_copy(utd.TemplateResRef);
     _autoRemoveKey = utd.AutoRemoveKey;
     _conversation = boost::to_lower_copy(utd.Conversation);

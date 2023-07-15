@@ -36,8 +36,8 @@ void Feats::init() {
     }
 
     for (int row = 0; row < feats->getRowCount(); ++row) {
-        std::string name(_strings.get(feats->getInt(row, "name", -1)));
-        std::string description(_strings.get(feats->getInt(row, "description", -1)));
+        std::string name(_strings.getText(feats->getInt(row, "name", -1)));
+        std::string description(_strings.getText(feats->getInt(row, "description", -1)));
         std::shared_ptr<Texture> icon(_textures.get(feats->getString(row, "icon"), TextureUsage::GUI));
         uint32_t minCharLevel = feats->getUint(row, "mincharlevel");
         auto preReqFeat1 = static_cast<FeatType>(feats->getUint(row, "prereqfeat1"));

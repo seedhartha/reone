@@ -55,7 +55,7 @@ void QuickOrCustom::onGUILoaded() {
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        std::string text(_services.resource.strings.get(kStrRefQuickHelpText));
+        std::string text(_services.resource.strings.getText(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });
@@ -66,7 +66,7 @@ void QuickOrCustom::onGUILoaded() {
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus)
             return;
-        std::string text(_services.resource.strings.get(kStrRefCustomHelpText));
+        std::string text(_services.resource.strings.getText(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });

@@ -42,7 +42,7 @@ void Trigger::loadFromGIT(const schema::GIT_TriggerList &git) {
     loadFromBlueprint(templateResRef);
 
     // _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _services.resource.strings.get(git.TransitionDestin.first);
+    _transitionDestin = _services.resource.strings.getText(git.TransitionDestin.first);
     _linkedToModule = boost::to_lower_copy(git.LinkedToModule);
     _linkedTo = boost::to_lower_copy(git.LinkedTo);
     _linkedToFlags = git.LinkedToFlags;
@@ -116,7 +116,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
 void Trigger::loadUTT(const schema::UTT &utt) {
     _tag = boost::to_lower_copy(utt.Tag);
     _blueprintResRef = boost::to_lower_copy(utt.TemplateResRef);
-    _name = _services.resource.strings.get(utt.LocalizedName.first);
+    _name = _services.resource.strings.getText(utt.LocalizedName.first);
     _autoRemoveKey = utt.AutoRemoveKey; // always 0, but could be useful
     _faction = static_cast<Faction>(utt.Faction);
     _keyName = utt.KeyName;

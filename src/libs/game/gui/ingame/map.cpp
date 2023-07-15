@@ -114,7 +114,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        std::string text(_services.resource.strings.get(kStrRefMapNote));
+        std::string text(_services.resource.strings.getText(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

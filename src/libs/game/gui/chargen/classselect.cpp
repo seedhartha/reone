@@ -257,11 +257,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    std::string classText(_services.resource.strings.get(g_genderStrRefs[button.character.gender]));
+    std::string classText(_services.resource.strings.getText(g_genderStrRefs[button.character.gender]));
     classText += " " + _services.game.classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    std::string descText(_services.resource.strings.get(g_classDescStrRefs[clazz]));
+    std::string descText(_services.resource.strings.getText(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

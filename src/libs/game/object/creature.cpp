@@ -488,7 +488,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = _services.resource.strings.get(kStrRefRemains);
+    _name = _services.resource.strings.getText(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag);
 
@@ -1324,8 +1324,8 @@ void Creature::loadUTC(const schema::UTC &utc) {
 }
 
 void Creature::loadNameFromUTC(const schema::UTC &utc) {
-    std::string firstName(_services.resource.strings.get(utc.FirstName.first));
-    std::string lastName(_services.resource.strings.get(utc.LastName.first));
+    std::string firstName(_services.resource.strings.getText(utc.FirstName.first));
+    std::string lastName(_services.resource.strings.getText(utc.LastName.first));
     if (!firstName.empty() && !lastName.empty()) {
         _name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
@@ -1354,7 +1354,7 @@ void Creature::loadBodyBagFromUTC(const schema::UTC &utc) {
         return;
     }
     int bodyBag = utc.BodyBag;
-    _bodyBag.name = _services.resource.strings.get(bodyBags->getInt(bodyBag, "name"));
+    _bodyBag.name = _services.resource.strings.getText(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }

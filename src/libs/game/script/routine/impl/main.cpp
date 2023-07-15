@@ -2088,7 +2088,7 @@ static Variable GetStringByStrRef(const std::vector<Variable> &args, const Routi
     // Transform
 
     // Execute
-    return Variable::ofString(ctx.services.resource.strings.get(nStrRef));
+    return Variable::ofString(ctx.services.resource.strings.getText(nStrRef));
 }
 
 static Variable DestroyObject(const std::vector<Variable> &args, const RoutineContext &ctx) {

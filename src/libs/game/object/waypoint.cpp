@@ -38,7 +38,7 @@ void Waypoint::loadFromGIT(const schema::GIT_WaypointList &git) {
 
     _tag = git.Tag;
     _hasMapNote = git.HasMapNote;
-    _mapNote = _services.resource.strings.get(git.MapNote.first);
+    _mapNote = _services.resource.strings.getText(git.MapNote.first);
     _mapNoteEnabled = git.MapNoteEnabled;
     _tag = boost::to_lower_copy(git.Tag);
 
@@ -69,9 +69,9 @@ void Waypoint::loadUTW(const schema::UTW &utw) {
     _appearance = utw.Appearance;
     _blueprintResRef = boost::to_lower_copy(utw.TemplateResRef);
     _tag = boost::to_lower_copy(utw.Tag);
-    _name = _services.resource.strings.get(utw.LocalizedName.first);
+    _name = _services.resource.strings.getText(utw.LocalizedName.first);
     _hasMapNote = utw.HasMapNote;
-    _mapNote = _services.resource.strings.get(utw.MapNote.first);
+    _mapNote = _services.resource.strings.getText(utw.MapNote.first);
     _mapNoteEnabled = utw.MapNoteEnabled;
 
     // Unused fields:

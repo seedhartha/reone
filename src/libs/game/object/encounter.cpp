@@ -80,7 +80,7 @@ void Encounter::loadSpawnPointsFromGIT(const schema::GIT_Encounter_List &git) {
 
 void Encounter::loadUTE(const schema::UTE &ute) {
     _tag = boost::to_lower_copy(ute.Tag);
-    _name = _services.resource.strings.get(ute.LocalizedName.first);
+    _name = _services.resource.strings.getText(ute.LocalizedName.first);
     _blueprintResRef = boost::to_lower_copy(ute.TemplateResRef);
     _active = ute.Active;
     _difficultyIndex = ute.DifficultyIndex; // index into encdifficulty.2da

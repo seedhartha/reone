@@ -29,7 +29,7 @@ class IStrings {
 public:
     virtual ~IStrings() = default;
 
-    virtual std::string get(int strRef) = 0;
+    virtual std::string getText(int strRef) = 0;
     virtual std::string getSound(int strRef) = 0;
 };
 
@@ -39,7 +39,7 @@ public:
 
     void init(const std::filesystem::path &gameDir);
 
-    std::string get(int strRef) override;
+    std::string getText(int strRef) override;
     std::string getSound(int strRef) override;
 
     void setTalkTable(std::shared_ptr<TalkTable> table) {

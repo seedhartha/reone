@@ -32,8 +32,8 @@ namespace game {
 static const char kSkillsTwoDaResRef[] = "skills";
 
 void CreatureClass::load(const TwoDa &twoDa, int row) {
-    _name = _strings.get(twoDa.getInt(row, "name"));
-    _description = _strings.get(twoDa.getInt(row, "description"));
+    _name = _strings.getText(twoDa.getInt(row, "name"));
+    _description = _strings.getText(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
     _skillPointBase = twoDa.getInt(row, "skillpointbase");
 

@@ -106,7 +106,7 @@ void Equipment::onGUILoaded() {
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
-                slotDesc = _services.resource.strings.get(maybeStrRef->second);
+                slotDesc = _services.resource.strings.getText(maybeStrRef->second);
             }
 
             _binding.lblSlotName->setTextMessage(slotDesc);
@@ -385,7 +385,7 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _services.resource.strings.get(kStrRefNone);
+        lbItem.text = _services.resource.strings.getText(kStrRefNone);
         lbItem.iconTexture = _services.graphics.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 

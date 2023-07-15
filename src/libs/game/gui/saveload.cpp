@@ -150,10 +150,10 @@ void SaveLoad::bindControls() {
 void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != SaveLoadMode::Save);
 
-    std::string panelName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    std::string panelName(_services.resource.strings.getText(_mode == SaveLoadMode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     _binding.lblPanelName->setTextMessage(std::move(panelName));
 
-    std::string actionName(_services.resource.strings.get(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
+    std::string actionName(_services.resource.strings.getText(_mode == SaveLoadMode::Save ? kStrRefSave : kStrRefLoad));
     _binding.btnSaveLoad->setTextMessage(std::move(actionName));
 
     refreshSavedGames();

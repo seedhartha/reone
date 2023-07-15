@@ -127,7 +127,7 @@ void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave)
 }
 
 void Area::loadARE(const schema::ARE &are) {
-    _localizedName = _services.resource.strings.get(are.Name.first);
+    _localizedName = _services.resource.strings.getText(are.Name.first);
 
     loadCameraStyle(are);
     loadAmbientColor(are);

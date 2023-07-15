@@ -56,7 +56,7 @@ void Sound::loadFromBlueprint(const std::string &resRef) {
 
 void Sound::loadUTS(const schema::UTS &uts) {
     _tag = boost::to_lower_copy(uts.Tag);
-    _name = _services.resource.strings.get(uts.LocName.first);
+    _name = _services.resource.strings.getText(uts.LocName.first);
     _blueprintResRef = boost::to_lower_copy(uts.TemplateResRef);
     _active = uts.Active;
     _continuous = uts.Continuous;

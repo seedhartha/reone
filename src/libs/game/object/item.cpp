@@ -101,9 +101,9 @@ void Item::setEquipped(bool equipped) {
 void Item::loadUTI(const schema::UTI &uti) {
     _blueprintResRef = boost::to_lower_copy(uti.TemplateResRef);
     _baseItem = uti.BaseItem; // index into baseitems.2da
-    _localizedName = _services.resource.strings.get(uti.LocalizedName.first);
-    _description = _services.resource.strings.get(uti.Description.first);
-    _descIdentified = _services.resource.strings.get(uti.DescIdentified.first);
+    _localizedName = _services.resource.strings.getText(uti.LocalizedName.first);
+    _description = _services.resource.strings.getText(uti.Description.first);
+    _descIdentified = _services.resource.strings.getText(uti.DescIdentified.first);
     _tag = boost::to_lower_copy(uti.Tag);
     _charges = uti.Charges;
     _cost = uti.Cost;

@@ -60,7 +60,7 @@ TEST(strings, should_init_talktable_and_get_string_and_sound) {
     // when
 
     strings.init(tmpDirPath);
-    auto text = strings.get(0);
+    auto text = strings.getText(0);
     auto sound = strings.getSound(0);
 
     // then

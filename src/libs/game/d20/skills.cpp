@@ -36,8 +36,8 @@ void Skills::init() {
     }
 
     for (int row = 0; row < skills->getRowCount(); ++row) {
-        std::string name(_strings.get(skills->getInt(row, "name", -1)));
-        std::string description(_strings.get(skills->getInt(row, "description", -1)));
+        std::string name(_strings.getText(skills->getInt(row, "name", -1)));
+        std::string description(_strings.getText(skills->getInt(row, "description", -1)));
         std::shared_ptr<Texture> icon(_textures.get(skills->getString(row, "icon"), TextureUsage::GUI));
 
         auto skill = std::make_shared<Skill>();

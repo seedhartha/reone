@@ -45,10 +45,10 @@ static constexpr int kInventoryResRef = 393;
 void ContainerGUI::onGUILoaded() {
     bindControls();
 
-    std::string btnMessage(_services.resource.strings.get(kSwitchToResRef) + " " + _services.resource.strings.get(kGiveItemResRef));
+    std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    std::string lblMessage(_services.resource.strings.get(kInventoryResRef));
+    std::string lblMessage(_services.resource.strings.getText(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {

@@ -37,7 +37,7 @@ void Strings::init(const std::filesystem::path &gameDir) {
     _table = tlkReader.table();
 }
 
-std::string Strings::get(int strRef) {
+std::string Strings::getText(int strRef) {
     if (!_table || strRef < 0 || strRef >= _table->getStringCount())
         return "";
 

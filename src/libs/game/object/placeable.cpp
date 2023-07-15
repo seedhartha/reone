@@ -101,7 +101,7 @@ void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
 
 void Placeable::loadUTP(const schema::UTP &utp) {
     _tag = boost::to_lower_copy(utp.Tag);
-    _name = _services.resource.strings.get(utp.LocName.first);
+    _name = _services.resource.strings.getText(utp.LocName.first);
     _blueprintResRef = boost::to_lower_copy(utp.TemplateResRef);
     _conversation = boost::to_lower_copy(utp.Conversation);
     _interruptable = utp.Interruptable;
