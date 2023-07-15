@@ -23,6 +23,8 @@ void SystemModule::init() {
     _clock = std::make_unique<Clock>();
     _threadPool = std::make_unique<ThreadPool>();
 
+    _threadPool->init();
+
     _services = std::make_unique<SystemServices>(*_clock, *_threadPool);
 }
 
