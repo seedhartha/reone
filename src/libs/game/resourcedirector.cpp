@@ -22,7 +22,7 @@
 #include "reone/game/paths.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/lips.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"

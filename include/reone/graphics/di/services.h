@@ -23,7 +23,7 @@ namespace graphics {
 
 class IFonts;
 class IGraphicsContext;
-class ILipAnimations;
+class ILips;
 class IMeshes;
 class IModels;
 class IPipeline;
@@ -36,7 +36,7 @@ class IWindow;
 struct GraphicsServices {
     IFonts &fonts;
     IGraphicsContext &context;
-    ILipAnimations &lips;
+    ILips &lips;
     IMeshes &meshes;
     IModels &models;
     IPipeline &pipeline;
@@ -49,7 +49,7 @@ struct GraphicsServices {
     GraphicsServices(
         IFonts &fonts,
         IGraphicsContext &context,
-        ILipAnimations &lips,
+        ILips &lips,
         IMeshes &meshes,
         IModels &models,
         IPipeline &pipeline,

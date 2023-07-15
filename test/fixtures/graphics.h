@@ -22,7 +22,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/fonts.h"
-#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/lips.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/pipeline.h"
@@ -39,7 +39,7 @@ namespace graphics {
 
 class MockFonts : public IFonts, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<Font>, get, (const std::string &key), (override));
 };
 
@@ -57,9 +57,9 @@ public:
     MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &block), (override));
 };
 
-class MockLipAnimations : public ILipAnimations, boost::noncopyable {
+class MockLips : public ILips, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<LipAnimation>, get, (const std::string &key), (override));
 };
 
@@ -91,7 +91,7 @@ public:
 
 class MockTextures : public ITextures, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
 
     MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
     MOCK_METHOD(void, bindBuiltIn, (), (override));
@@ -127,7 +127,7 @@ public:
 
 class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
-    MOCK_METHOD(void, clear,(), (override));
+    MOCK_METHOD(void, clear, (), (override));
 
     MOCK_METHOD(std::shared_ptr<Walkmesh>, get, (const std::string &resRef, resource::ResourceType type), (override));
 };
@@ -149,7 +149,7 @@ public:
     void init() {
         _fonts = std::make_unique<MockFonts>();
         _context = std::make_unique<MockGraphicsContext>();
-        _lipAnimations = std::make_unique<MockLipAnimations>();
+        _lips = std::make_unique<MockLips>();
         _meshes = std::make_unique<MockMeshes>();
         _models = std::make_unique<MockModels>();
         _pipeline = std::make_unique<MockPipeline>();
@@ -162,7 +162,7 @@ public:
         _services = std::make_unique<GraphicsServices>(
             *_fonts,
             *_context,
-            *_lipAnimations,
+            *_lips,
             *_meshes,
             *_models,
             *_pipeline,
@@ -192,7 +192,7 @@ public:
 private:
     std::unique_ptr<MockFonts> _fonts;
     std::unique_ptr<MockGraphicsContext> _context;
-    std::unique_ptr<MockLipAnimations> _lipAnimations;
+    std::unique_ptr<MockLips> _lips;
     std::unique_ptr<MockMeshes> _meshes;
     std::unique_ptr<MockModels> _models;
     std::unique_ptr<MockPipeline> _pipeline;

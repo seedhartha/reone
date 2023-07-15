@@ -28,7 +28,7 @@ void GraphicsModule::init() {
     _textures = std::make_unique<Textures>(_options, _resource.resources());
     _models = std::make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = std::make_unique<Walkmeshes>(_resource.resources());
-    _lips = std::make_unique<LipAnimations>(_resource.resources());
+    _lips = std::make_unique<Lips>(_resource.resources());
     _uniforms = std::make_unique<Uniforms>();
     _shaders = std::make_unique<Shaders>(_options);
     _fonts = std::make_unique<Fonts>(*_context, *_meshes, *_shaders, *_textures, *_uniforms);

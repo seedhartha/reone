@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2023 The reone project contributors
  *
@@ -29,18 +30,18 @@ class Resources;
 
 namespace graphics {
 
-class ILipAnimations {
+class ILips {
 public:
-    virtual ~ILipAnimations() = default;
+    virtual ~ILips() = default;
 
     virtual void clear() = 0;
 
     virtual std::shared_ptr<LipAnimation> get(const std::string &key) = 0;
 };
 
-class LipAnimations : public ILipAnimations {
+class Lips : public ILips {
 public:
-    LipAnimations(resource::Resources &resources) :
+    Lips(resource::Resources &resources) :
         _resources(resources) {
     }
 

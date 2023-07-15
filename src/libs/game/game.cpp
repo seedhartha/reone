@@ -36,7 +36,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/format/tgawriter.h"
-#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/lips.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/pipeline.h"

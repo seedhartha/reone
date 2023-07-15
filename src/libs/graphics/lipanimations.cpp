@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/lips.h"
 
 #include "reone/graphics/format/lipreader.h"
 #include "reone/resource/resources.h"
@@ -28,7 +28,7 @@ namespace reone {
 
 namespace graphics {
 
-std::shared_ptr<LipAnimation> LipAnimations::doGet(std::string resRef) {
+std::shared_ptr<LipAnimation> Lips::doGet(std::string resRef) {
     auto res = _resources.find(ResourceId(resRef, ResourceType::Lip));
     if (!res) {
         return nullptr;

@@ -21,7 +21,7 @@
 
 #include "../context.h"
 #include "../fonts.h"
-#include "../lipanimations.h"
+#include "../lips.h"
 #include "../meshes.h"
 #include "../models.h"
 #include "../pipeline.h"
@@ -51,7 +51,7 @@ public:
 
     graphics::Fonts &fonts() { return *_fonts; }
     graphics::GraphicsContext &context() { return *_context; }
-    graphics::LipAnimations &lips() { return *_lips; }
+    graphics::Lips &lips() { return *_lips; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Models &models() { return *_models; }
     graphics::Pipeline &pipeline() { return *_pipeline; }
@@ -69,7 +69,7 @@ protected:
 
     std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::GraphicsContext> _context;
-    std::unique_ptr<graphics::LipAnimations> _lips;
+    std::unique_ptr<graphics::Lips> _lips;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Pipeline> _pipeline;

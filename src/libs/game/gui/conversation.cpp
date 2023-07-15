@@ -22,7 +22,7 @@
 #include "reone/audio/player.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/lipanimations.h"
+#include "reone/graphics/lips.h"
 #include "reone/graphics/models.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/resources.h"
