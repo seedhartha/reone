@@ -19,9 +19,11 @@
 
 namespace reone {
 
+static constexpr int kNumThreadPoolThreads = 2;
+
 void SystemModule::init() {
     _clock = std::make_unique<Clock>();
-    _threadPool = std::make_unique<ThreadPool>();
+    _threadPool = std::make_unique<ThreadPool>(kNumThreadPoolThreads);
 
     _threadPool->init();
 

@@ -51,6 +51,15 @@ public:
 
 class ThreadPool : public IThreadPool, boost::noncopyable {
 public:
+    ThreadPool() = default;
+
+    ThreadPool(int numThreads) :
+        _numThreads(numThreads) {
+        if (_numThreads < -1) {
+            throw std::invalid_argument("numThreads");
+        }
+    }
+
     ~ThreadPool() {
         deinit();
     }
@@ -67,6 +76,8 @@ public:
     }
 
 private:
+    int _numThreads {-1};
+
     std::vector<std::thread> _threads;
     std::atomic_bool _running {false};
 

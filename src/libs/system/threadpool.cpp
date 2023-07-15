@@ -20,7 +20,10 @@
 namespace reone {
 
 void ThreadPool::init() {
-    for (auto i = 0; i < std::thread::hardware_concurrency(); ++i) {
+    if (_numThreads == -1) {
+        _numThreads = static_cast<int>(std::thread::hardware_concurrency());
+    }
+    for (auto i = 0; i < _numThreads; ++i) {
         _threads.emplace_back(std::bind(&ThreadPool::workerThreadFunc, this));
     }
     _running = true;
