@@ -319,6 +319,7 @@ private:
     enum class State {
         Created,
         Running,
+        Paused,
         Quitting
     };
 

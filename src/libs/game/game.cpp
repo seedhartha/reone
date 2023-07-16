@@ -126,9 +126,9 @@ void Game::updateThreadFunc() {
         State state = _state;
         if (state == State::Quitting) {
             return;
-        } else if (state == State::Created) {
+        } else if (state == State::Created || state == State::Paused) {
             std::unique_lock<std::mutex> lock {_updateMutex};
-            _updateCondVar.wait(lock, [this]() { return _state != State::Created; });
+            _updateCondVar.wait(lock, [this]() { return _state == State::Running || _state == State::Quitting; });
             _updateTicks = _services.system.clock.ticks();
             if (_state == State::Quitting) {
                 return;
@@ -191,7 +191,6 @@ void Game::update(float dt) {
         updateMovie(dt);
         return;
     }
-
     updateMusic();
 
     if (!_nextModule.empty()) {
@@ -470,7 +469,9 @@ void Game::updateMusic() {
 }
 
 void Game::loadNextModule() {
+    setState(State::Paused);
     loadModule(_nextModule, _nextEntry);
+    setState(State::Running);
 
     _nextModule.clear();
     _nextEntry.clear();
