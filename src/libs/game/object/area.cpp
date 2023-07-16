@@ -619,20 +619,31 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 void Area::update(float dt) {
+    if (_game.isPaused()) {
+        return;
+    }
+    Object::update(dt);
+
+    for (auto &object : _objects) {
+        object->update(dt);
+    }
+}
+
+void Area::updateScene(float dt) {
     doDestroyObjects();
     updateVisibility();
     updateObjectSelection();
 
-    if (!_game.isPaused()) {
-        Object::update(dt);
-
-        for (auto &object : _objects) {
-            object->update(dt);
-        }
-
-        updatePerception(dt);
-        updateHeartbeat(dt);
+    if (_game.isPaused()) {
+        return;
     }
+    Object::updateScene(dt);
+
+    for (auto &object : _objects) {
+        object->updateScene(dt);
+    }
+    updatePerception(dt);
+    updateHeartbeat(dt);
 }
 
 bool Area::moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {

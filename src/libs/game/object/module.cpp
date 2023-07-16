@@ -277,6 +277,13 @@ void Module::update(float dt) {
     _area->update(dt);
 }
 
+void Module::updateScene(float dt) {
+    if (_game.cameraType() == CameraType::ThirdPerson) {
+        _player->updateScene(dt);
+    }
+    _area->updateScene(dt);
+}
+
 std::vector<ContextAction> Module::getContextActions(const std::shared_ptr<Object> &object) const {
     std::vector<ContextAction> actions;
 

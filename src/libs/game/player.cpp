@@ -126,6 +126,9 @@ bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 }
 
 void Player::update(float dt) {
+}
+
+void Player::updateScene(float dt) {
     std::shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader || partyLeader->isMovementRestricted()) {
         return;

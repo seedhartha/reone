@@ -112,6 +112,10 @@ void Sound::loadTransformFromGIT(const schema::GIT_SoundList &git) {
 
 void Sound::update(float dt) {
     Object::update(dt);
+}
+
+void Sound::updateScene(float dt) {
+    Object::updateScene(dt);
     if (!_active) {
         return;
     }

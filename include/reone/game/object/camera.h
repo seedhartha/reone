@@ -43,8 +43,8 @@ public:
         return false;
     }
 
-    virtual void update(float dt) {
-    }
+    void update(float dt) override {}
+    void updateScene(float dt) override {}
 
     virtual void stopMovement() {
     }

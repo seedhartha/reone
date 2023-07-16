@@ -41,6 +41,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt);
+    void updateScene(float dt);
 
     void stopMovement();
 

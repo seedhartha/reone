@@ -331,7 +331,7 @@ private:
     uint32_t _ticks {0};
     uint32_t _updateTicks {0};
 
-    Screen _screen {Screen::None};
+    std::atomic<Screen> _screen {Screen::None};
 
     std::shared_ptr<movie::IMovie> _movie;
     CursorType _cursorType {CursorType::None};

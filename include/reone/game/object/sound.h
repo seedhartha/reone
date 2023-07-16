@@ -50,6 +50,7 @@ public:
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
+    void updateScene(float dt) override;
 
     bool isActive() const { return _active; }
 

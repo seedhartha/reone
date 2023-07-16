@@ -66,6 +66,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt);
+    void updateScene(float dt);
 
     std::vector<ContextAction> getContextActions(const std::shared_ptr<Object> &object) const;
 

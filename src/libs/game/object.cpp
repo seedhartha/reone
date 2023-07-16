@@ -36,6 +36,9 @@ static constexpr float kMaxConversationDistance = 4.0f;
 static constexpr float kDistanceWalk = 4.0f;
 
 void Object::update(float dt) {
+}
+
+void Object::updateScene(float dt) {
     updateActions(dt);
     updateEffects(dt);
 

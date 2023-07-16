@@ -77,6 +77,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt);
+    void updateScene(float dt);
 
     void destroyObject(const Object &object);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);

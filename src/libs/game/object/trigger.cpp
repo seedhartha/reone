@@ -83,6 +83,9 @@ void Trigger::loadFromBlueprint(const std::string &resRef) {
 }
 
 void Trigger::update(float dt) {
+}
+
+void Trigger::updateScene(float dt) {
     std::set<std::shared_ptr<Object>> tenantsToRemove;
     for (auto &tenant : _tenants) {
         if (tenant) {

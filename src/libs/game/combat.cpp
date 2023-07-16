@@ -91,6 +91,9 @@ void Combat::addAttack(std::shared_ptr<Creature> attacker,
 }
 
 void Combat::update(float dt) {
+}
+
+void Combat::updateScene(float dt) {
     for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end();) {
         Round &round = *it->second;
         updateRound(round, dt);

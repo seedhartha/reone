@@ -139,6 +139,12 @@ void Game::updateThreadFunc() {
         float dt = (ticks - _updateTicks) / 1000.0f;
         _updateTicks = ticks;
 
+        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+        if (updModule) {
+            _module->update(dt);
+            _combat.update(dt);
+        }
+
         std::this_thread::yield();
     }
 }
@@ -183,16 +189,16 @@ void Game::update(float dt) {
 
     updateMusic();
 
-     if (!_nextModule.empty()) {
-         loadNextModule();
-     }
-     updateCamera(dt);
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    updateCamera(dt);
 
-     bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-     if (updModule && !_paused) {
-         _module->update(dt);
-         _combat.update(dt);
-     }
+    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+    if (updModule && !_paused) {
+        _module->updateScene(dt);
+        _combat.updateScene(dt);
+    }
 
     auto gui = getScreenGUI();
     if (gui) {
