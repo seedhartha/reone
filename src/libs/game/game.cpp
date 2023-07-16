@@ -127,7 +127,7 @@ void Game::updateThreadFunc() {
         if (state == State::Quitting) {
             return;
         } else if (state == State::Created) {
-            std::unique_lock<std::mutex> lock(_updateMutex);
+            std::unique_lock<std::mutex> lock {_updateMutex};
             _updateCondVar.wait(lock, [this]() { return _state != State::Created; });
             _updateTicks = _services.system.clock.ticks();
             if (_state == State::Quitting) {
@@ -135,17 +135,22 @@ void Game::updateThreadFunc() {
             }
         }
 
+        if (!_updateFlushed) {
+            std::this_thread::yield();
+            continue;
+        }
+
         uint32_t ticks = _services.system.clock.ticks();
-        float dt = (ticks - _updateTicks) / 1000.0f;
+        float dt = _gameSpeed * (ticks - _updateTicks) / 1000.0f;
         _updateTicks = ticks;
 
+        std::lock_guard<std::mutex> lock {_updateMutex};
         bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
         if (updModule) {
             _module->update(dt);
             _combat.update(dt);
         }
-
-        std::this_thread::yield();
+        _updateFlushed = false;
     }
 }
 
@@ -194,10 +199,14 @@ void Game::update(float dt) {
     }
     updateCamera(dt);
 
-    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-    if (updModule && !_paused) {
-        _module->updateScene(dt);
-        _combat.updateScene(dt);
+    {
+        std::lock_guard<std::mutex> lock {_updateMutex};
+        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+        if (updModule && !_paused) {
+            _module->updateScene(dt);
+            _combat.updateScene(dt);
+        }
+        _updateFlushed = true;
     }
 
     auto gui = getScreenGUI();

@@ -331,12 +331,12 @@ private:
     uint32_t _ticks {0};
     uint32_t _updateTicks {0};
 
-    std::atomic<Screen> _screen {Screen::None};
+    Screen _screen {Screen::None};
 
     std::shared_ptr<movie::IMovie> _movie;
     CursorType _cursorType {CursorType::None};
     std::shared_ptr<graphics::Cursor> _cursor;
-    float _gameSpeed {1.0f};
+    std::atomic<float> _gameSpeed {1.0f};
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
@@ -405,6 +405,7 @@ private:
     std::thread _updateThread;
     std::mutex _updateMutex;
     std::condition_variable _updateCondVar;
+    std::atomic_bool _updateFlushed {false};
 
     // END Update thread
 
