@@ -102,14 +102,26 @@ public:
         _combat(*this, services) {
     }
 
+    ~Game() {
+        deinit();
+    }
+
     void init();
+
+    void deinit() {
+        if (_updateThread.joinable()) {
+            _updateThread.join();
+        }
+    }
 
     /**
      * @return exit code
      */
     int run();
 
-    void quit();
+    void quit() {
+        setState(State::Quitting);
+    }
 
     void playVideo(const std::string &name);
 
@@ -304,15 +316,27 @@ public:
     // END IEventHandler
 
 private:
+    enum class State {
+        Created,
+        Running,
+        Quitting
+    };
+
     GameID _gameId;
     std::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
 
+    std::atomic<State> _state {State::Created};
+    uint32_t _ticks {0};
+    uint32_t _updateTicks {0};
+
+    std::thread _updateThread;
+    std::mutex _updateMutex;
+    std::condition_variable _updateCondVar;
+
     Screen _screen {Screen::None};
 
-    uint32_t _ticks {0};
-    bool _quit {false};
     std::shared_ptr<movie::IMovie> _movie;
     CursorType _cursorType {CursorType::None};
     std::shared_ptr<graphics::Cursor> _cursor;
@@ -384,6 +408,12 @@ private:
 
     // END Global variables
 
+    void setState(State state) {
+        std::lock_guard<std::mutex> lock(_updateMutex);
+        _state = state;
+        _updateCondVar.notify_one();
+    }
+
     void stopMovement();
 
     void mainLoopIteration(float dt);
@@ -411,6 +441,8 @@ private:
     void updateCamera(float dt);
     void updateSceneGraph(float dt);
     void updateCursor();
+
+    void updateThreadFunc();
 
     // END Updates
 

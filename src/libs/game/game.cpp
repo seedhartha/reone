@@ -87,6 +87,8 @@ void Game::init() {
 
     _services.graphics.window.setEventHandler(this);
     _moduleNames = _services.game.resourceDirector.moduleNames();
+
+    _updateThread = std::thread(std::bind(&Game::updateThreadFunc, this));
 }
 
 void Game::initLocalServices() {
@@ -119,13 +121,31 @@ void Game::setSceneSurfaces() {
     }
 }
 
+void Game::updateThreadFunc() {
+    while (true) {
+        State state = _state;
+        if (state == State::Quitting) {
+            return;
+        } else if (state == State::Created) {
+            std::unique_lock<std::mutex> lock(_updateMutex);
+            _updateCondVar.wait(lock, [this]() { return _state != State::Created; });
+            _updateTicks = _services.system.clock.ticks();
+        }
+        uint32_t ticks = _services.system.clock.ticks();
+        float dt = (ticks - _updateTicks) / 1000.0f;
+        _updateTicks = ticks;
+        std::this_thread::yield();
+    }
+}
+
 int Game::run() {
     playVideo("legal");
     openMainMenu();
 
     _ticks = _services.system.clock.ticks();
+    setState(State::Running);
 
-    while (!_quit) {
+    while (_state != State::Quitting) {
         uint32_t ticks = _services.system.clock.ticks();
         float dt = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
@@ -137,8 +157,10 @@ int Game::run() {
 }
 
 void Game::mainLoopIteration(float dt) {
-    _services.graphics.window.processEvents(_quit);
-    if (_quit) {
+    bool quit = false;
+    _services.graphics.window.processEvents(quit);
+    if (quit) {
+        setState(State::Quitting);
         return;
     }
     if (!_services.graphics.window.isInFocus()) {
@@ -434,10 +456,6 @@ void Game::loadNextModule() {
 
     _nextModule.clear();
     _nextEntry.clear();
-}
-
-void Game::quit() {
-    _quit = true;
 }
 
 void Game::stopMovement() {
