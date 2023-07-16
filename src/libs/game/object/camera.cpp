@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/placeablecamera.h"
+#include "reone/game/object/camera.h"
 
 using namespace reone::resource;
 using namespace reone::scene;
@@ -24,14 +24,14 @@ namespace reone {
 
 namespace game {
 
-void PlaceableCamera::loadFromGIT(const schema::GIT_CameraList &git) {
+void CameraObject::loadFromGIT(const schema::GIT_CameraList &git) {
     _cameraId = git.CameraID;
     _fieldOfView = git.FieldOfView;
 
     loadTransformFromGIT(git);
 }
 
-void PlaceableCamera::loadTransformFromGIT(const schema::GIT_CameraList &git) {
+void CameraObject::loadTransformFromGIT(const schema::GIT_CameraList &git) {
     glm::vec3 position(git.Position);
     float height = git.Height;
 

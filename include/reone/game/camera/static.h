@@ -29,13 +29,13 @@ class ISceneGraph;
 
 namespace game {
 
-class PlaceableCamera;
+class CameraObject;
 
 class StaticCamera : public Camera {
 public:
     StaticCamera(float aspect, scene::ISceneGraph &sceneGraph);
 
-    void setObject(const PlaceableCamera &object);
+    void setObject(const CameraObject &object);
 
 private:
     float _aspect {1.0f};

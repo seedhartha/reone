@@ -42,12 +42,12 @@
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
 #include "object/area.h"
+#include "object/camera.h"
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/encounter.h"
 #include "object/module.h"
 #include "object/placeable.h"
-#include "object/placeablecamera.h"
 #include "object/sound.h"
 #include "object/store.h"
 #include "object/trigger.h"
@@ -207,8 +207,8 @@ public:
         return newObject<Sound>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain) {
-        return newObject<PlaceableCamera>(std::move(sceneName), *this, _services);
+    inline std::unique_ptr<CameraObject> newCamera(std::string sceneName = kSceneMain) {
+        return newObject<CameraObject>(std::move(sceneName), *this, _services);
     }
 
     inline std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain) {

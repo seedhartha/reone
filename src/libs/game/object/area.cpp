@@ -287,7 +287,7 @@ void Area::loadSounds(const schema::GIT &git) {
 
 void Area::loadCameras(const schema::GIT &git) {
     for (auto &cameraStruct : git.CameraList) {
-        std::shared_ptr<PlaceableCamera> camera = _game.newCamera(_sceneName);
+        std::shared_ptr<CameraObject> camera = _game.newCamera(_sceneName);
         _game.addObject(camera);
         camera->loadFromGIT(cameraStruct);
         add(camera);
@@ -906,7 +906,7 @@ Camera &Area::getCamera(CameraType type) {
 
 void Area::setStaticCamera(int cameraId) {
     for (auto &object : _objectsByType[ObjectType::Camera]) {
-        PlaceableCamera &camera = static_cast<PlaceableCamera &>(*object);
+        CameraObject &camera = static_cast<CameraObject &>(*object);
         if (camera.cameraId() == cameraId) {
             _staticCamera->setObject(camera);
             break;

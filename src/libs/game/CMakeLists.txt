@@ -304,7 +304,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/item.h
     ${GAME_INCLUDE_DIR}/object/module.h
     ${GAME_INCLUDE_DIR}/object/placeable.h
-    ${GAME_INCLUDE_DIR}/object/placeablecamera.h
+    ${GAME_INCLUDE_DIR}/object/camera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
     ${GAME_INCLUDE_DIR}/object/store.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
@@ -524,7 +524,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/item.cpp
     ${GAME_SOURCE_DIR}/object/module.cpp
     ${GAME_SOURCE_DIR}/object/placeable.cpp
-    ${GAME_SOURCE_DIR}/object/placeablecamera.cpp
+    ${GAME_SOURCE_DIR}/object/camera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp

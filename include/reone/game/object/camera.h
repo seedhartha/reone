@@ -27,9 +27,9 @@ namespace reone {
 
 namespace game {
 
-class PlaceableCamera : public Object, public Camera {
+class CameraObject : public Object, public Camera {
 public:
-    PlaceableCamera(
+    CameraObject(
         uint32_t id,
         std::string sceneName,
         Game &game,

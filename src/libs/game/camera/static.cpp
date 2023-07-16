@@ -19,7 +19,7 @@
 
 #include "reone/scene/graph.h"
 
-#include "reone/game/object/placeablecamera.h"
+#include "reone/game/object/camera.h"
 
 using namespace reone::graphics;
 using namespace reone::scene;
@@ -35,7 +35,7 @@ StaticCamera::StaticCamera(float aspect, ISceneGraph &sceneGraph) :
     _sceneNode->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
-void StaticCamera::setObject(const PlaceableCamera &object) {
+void StaticCamera::setObject(const CameraObject &object) {
     _sceneNode->setLocalTransform(object.transform());
     _sceneNode->setPerspectiveProjection(glm::radians(object.fieldOfView()), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
