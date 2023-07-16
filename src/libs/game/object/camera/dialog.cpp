@@ -15,11 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/camera/dialog.h"
+#include "reone/game/object/camera/dialog.h"
 
+#include "reone/game/di/services.h"
 #include "reone/graphics/types.h"
 #include "reone/scene/collision.h"
-#include "reone/scene/graph.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/camera.h"
 
 using namespace reone::graphics;
@@ -29,11 +31,10 @@ namespace reone {
 
 namespace game {
 
-DialogCamera::DialogCamera(const CameraStyle &style, float aspect, ISceneGraph &sceneGraph) :
-    _sceneGraph(sceneGraph) {
-
-    _sceneNode = sceneGraph.newCamera();
-    _sceneNode->setPerspectiveProjection(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+void DialogCamera::load() {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    _sceneNode = scene.newCamera();
+    cameraSceneNode()->setPerspectiveProjection(glm::radians(_style.viewAngle), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void DialogCamera::setSpeakerPosition(glm::vec3 position) {
@@ -115,7 +116,8 @@ void DialogCamera::updateSceneNode() {
     }
 
     Collision collision;
-    if (_sceneGraph.testLineOfSight(target, eye, collision)) {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    if (scene.testLineOfSight(target, eye, collision)) {
         eye = collision.intersection;
     }
 

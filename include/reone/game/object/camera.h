@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include "reone/resource/format/gffreader.h"
-
-#include "../camera.h"
 #include "../object.h"
 #include "../schema/git.h"
 
@@ -27,9 +24,9 @@ namespace reone {
 
 namespace game {
 
-class CameraObject : public Object, public Camera {
+class Camera : public Object {
 public:
-    CameraObject(
+    Camera(
         uint32_t id,
         std::string sceneName,
         Game &game,
@@ -42,16 +39,32 @@ public:
             services) {
     }
 
-    void loadFromGIT(const schema::GIT_CameraList &git);
+    virtual bool handle(const SDL_Event &event) {
+        return false;
+    }
+
+    virtual void update(float dt) {
+    }
+
+    virtual void stopMovement() {
+    }
+
+    inline std::shared_ptr<scene::CameraSceneNode> cameraSceneNode() const {
+        return std::static_pointer_cast<scene::CameraSceneNode>(_sceneNode);
+    }
 
     int cameraId() const { return _cameraId; }
     float fieldOfView() const { return _fieldOfView; }
 
-private:
-    int _cameraId {0};
+    float facing() const { return _facing; }
+    bool isMouseLookMode() const { return _mouseLookMode; }
+
+protected:
+    int _cameraId {-1};
     float _fieldOfView {0.0f};
 
-    void loadTransformFromGIT(const schema::GIT_CameraList &git);
+    float _facing {0.0f};
+    bool _mouseLookMode {false};
 };
 
 } // namespace game

@@ -17,33 +17,34 @@
 
 #pragma once
 
+#include "../camera.h"
+
 namespace reone {
-
-namespace scene {
-
-class CameraSceneNode;
-
-}
 
 namespace game {
 
-class Camera {
+class StaticCamera : public Camera {
 public:
-    virtual bool handle(const SDL_Event &event);
-    virtual void update(float dt);
+    StaticCamera(
+        uint32_t id,
+        float aspect,
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
+        Camera(
+            id,
+            std::move(sceneName),
+            game,
+            services),
+        _aspect(aspect) {
+    }
 
-    virtual void stopMovement();
+    void loadFromGIT(const schema::GIT_CameraList &git);
 
-    float facing() const { return _facing; }
-    std::shared_ptr<scene::CameraSceneNode> sceneNode() const { return _sceneNode; }
-    bool isMouseLookMode() const { return _mouseLookMode; }
+private:
+    float _aspect;
 
-protected:
-    float _facing {0.0f};
-    std::shared_ptr<scene::CameraSceneNode> _sceneNode;
-    bool _mouseLookMode {false};
-
-    Camera() = default;
+    void loadTransformFromGIT(const schema::GIT_CameraList &git);
 };
 
 } // namespace game

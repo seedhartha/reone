@@ -15,10 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/camera/firstperson.h"
+#include "reone/game/object/camera/firstperson.h"
 
+#include "reone/game/di/services.h"
 #include "reone/graphics/types.h"
-#include "reone/scene/graph.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/camera.h"
 
 using namespace reone::graphics;
@@ -31,9 +33,10 @@ namespace game {
 static constexpr float kMovementSpeed = 4.0f;
 static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
-FirstPersonCamera::FirstPersonCamera(float fovy, float aspect, ISceneGraph &sceneGraph) {
-    _sceneNode = sceneGraph.newCamera();
-    _sceneNode->setPerspectiveProjection(fovy, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+void FirstPersonCamera::load() {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    _sceneNode = scene.newCamera();
+    cameraSceneNode()->setPerspectiveProjection(_fovy, _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

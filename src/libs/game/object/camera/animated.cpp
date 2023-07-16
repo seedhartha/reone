@@ -15,10 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/camera/animated.h"
+#include "reone/game/object/camera/animated.h"
 
+#include "reone/game/di/services.h"
 #include "reone/graphics/types.h"
-#include "reone/scene/graph.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/model.h"
 
@@ -29,16 +31,14 @@ namespace reone {
 
 namespace game {
 
-AnimatedCamera::AnimatedCamera(float aspect, ISceneGraph &sceneGraph) :
-    _aspect(aspect),
-    _sceneGraph(sceneGraph) {
-
-    _sceneNode = _sceneGraph.newCamera();
+void AnimatedCamera::load() {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    _sceneNode = scene.newCamera();
     updateProjection();
 }
 
 void AnimatedCamera::updateProjection() {
-    _sceneNode->setPerspectiveProjection(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    cameraSceneNode()->setPerspectiveProjection(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void AnimatedCamera::update(float dt) {
@@ -61,7 +61,7 @@ static const std::string &getAnimationName(int animNumber) {
 
 void AnimatedCamera::playAnimation(int animNumber) {
     if (_model) {
-        _model->playAnimation(getAnimationName(animNumber));
+        _model->playAnimation(reone::game::getAnimationName(animNumber));
     }
 }
 
@@ -75,7 +75,8 @@ void AnimatedCamera::setModel(std::shared_ptr<Model> model) {
         return;
 
     if (model) {
-        _model = _sceneGraph.newModel(*model, ModelUsage::Camera);
+        auto &scene = _services.scene.graphs.get(_sceneName);
+        _model = scene.newModel(*model, ModelUsage::Camera);
         _model->attach("camerahook", *_sceneNode);
     } else {
         _model.reset();

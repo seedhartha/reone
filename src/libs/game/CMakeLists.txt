@@ -66,12 +66,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/usetalentonobject.h
     ${GAME_INCLUDE_DIR}/action/wait.h
     ${GAME_INCLUDE_DIR}/animationutil.h
-    ${GAME_INCLUDE_DIR}/camera.h
-    ${GAME_INCLUDE_DIR}/camera/animated.h
-    ${GAME_INCLUDE_DIR}/camera/dialog.h
-    ${GAME_INCLUDE_DIR}/camera/firstperson.h
-    ${GAME_INCLUDE_DIR}/camera/static.h
-    ${GAME_INCLUDE_DIR}/camera/thirdperson.h
     ${GAME_INCLUDE_DIR}/camerastyle.h
     ${GAME_INCLUDE_DIR}/camerastyles.h
     ${GAME_INCLUDE_DIR}/character.h
@@ -298,13 +292,18 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/location.h
     ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
+    ${GAME_INCLUDE_DIR}/object/camera.h
+    ${GAME_INCLUDE_DIR}/object/camera/animated.h
+    ${GAME_INCLUDE_DIR}/object/camera/dialog.h
+    ${GAME_INCLUDE_DIR}/object/camera/firstperson.h
+    ${GAME_INCLUDE_DIR}/object/camera/static.h
+    ${GAME_INCLUDE_DIR}/object/camera/thirdperson.h
     ${GAME_INCLUDE_DIR}/object/creature.h
     ${GAME_INCLUDE_DIR}/object/door.h
     ${GAME_INCLUDE_DIR}/object/encounter.h
     ${GAME_INCLUDE_DIR}/object/item.h
     ${GAME_INCLUDE_DIR}/object/module.h
     ${GAME_INCLUDE_DIR}/object/placeable.h
-    ${GAME_INCLUDE_DIR}/object/camera.h
     ${GAME_INCLUDE_DIR}/object/sound.h
     ${GAME_INCLUDE_DIR}/object/store.h
     ${GAME_INCLUDE_DIR}/object/trigger.h
@@ -389,12 +388,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/action/wait.cpp
     ${GAME_SOURCE_DIR}/action.cpp
     ${GAME_SOURCE_DIR}/animationutil.cpp
-    ${GAME_SOURCE_DIR}/camera/animated.cpp
-    ${GAME_SOURCE_DIR}/camera/dialog.cpp
-    ${GAME_SOURCE_DIR}/camera/firstperson.cpp
-    ${GAME_SOURCE_DIR}/camera/static.cpp
-    ${GAME_SOURCE_DIR}/camera/thirdperson.cpp
-    ${GAME_SOURCE_DIR}/camera.cpp
     ${GAME_SOURCE_DIR}/camerastyles.cpp
     ${GAME_SOURCE_DIR}/combat.cpp
     ${GAME_SOURCE_DIR}/cursors.cpp
@@ -518,13 +511,17 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/layouts.cpp
     ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
+    ${GAME_SOURCE_DIR}/object/camera/animated.cpp
+    ${GAME_SOURCE_DIR}/object/camera/dialog.cpp
+    ${GAME_SOURCE_DIR}/object/camera/firstperson.cpp
+    ${GAME_SOURCE_DIR}/object/camera/static.cpp
+    ${GAME_SOURCE_DIR}/object/camera/thirdperson.cpp
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp
     ${GAME_SOURCE_DIR}/object/encounter.cpp
     ${GAME_SOURCE_DIR}/object/item.cpp
     ${GAME_SOURCE_DIR}/object/module.cpp
     ${GAME_SOURCE_DIR}/object/placeable.cpp
-    ${GAME_SOURCE_DIR}/object/camera.cpp
     ${GAME_SOURCE_DIR}/object/sound.cpp
     ${GAME_SOURCE_DIR}/object/trigger.cpp
     ${GAME_SOURCE_DIR}/object/waypoint.cpp

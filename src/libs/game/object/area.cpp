@@ -287,7 +287,7 @@ void Area::loadSounds(const schema::GIT &git) {
 
 void Area::loadCameras(const schema::GIT &git) {
     for (auto &cameraStruct : git.CameraList) {
-        std::shared_ptr<CameraObject> camera = _game.newCamera(_sceneName);
+        std::shared_ptr<StaticCamera> camera = _game.newStaticCamera(_cameraAspect, _sceneName);
         _game.addObject(camera);
         camera->loadFromGIT(cameraStruct);
         add(camera);
@@ -410,17 +410,21 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
 
-    _firstPersonCamera = std::make_unique<FirstPersonCamera>(glm::radians(kDefaultFieldOfView), _cameraAspect, sceneGraph);
+    _firstPersonCamera = _game.newFirstPersonCamera(glm::radians(kDefaultFieldOfView), _cameraAspect, _sceneName);
+    _firstPersonCamera->load();
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = std::make_unique<ThirdPersonCamera>(_camStyleDefault, _cameraAspect, _game, sceneGraph);
+    _thirdPersonCamera = _game.newThirdPersonCamera(_camStyleDefault, _cameraAspect, _sceneName);
+    _thirdPersonCamera->load();
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = std::make_unique<DialogCamera>(_camStyleDefault, _cameraAspect, sceneGraph);
-    _animatedCamera = std::make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
-    _staticCamera = std::make_unique<StaticCamera>(_cameraAspect, sceneGraph);
+    _dialogCamera = _game.newDialogCamera(_camStyleDefault, _cameraAspect, _sceneName);
+    _dialogCamera->load();
+
+    _animatedCamera = _game.newAnimatedCamera(_cameraAspect, _sceneName);
+    _animatedCamera->load();
 }
 
 void Area::add(const std::shared_ptr<Object> &object) {
@@ -906,9 +910,9 @@ Camera &Area::getCamera(CameraType type) {
 
 void Area::setStaticCamera(int cameraId) {
     for (auto &object : _objectsByType[ObjectType::Camera]) {
-        CameraObject &camera = static_cast<CameraObject &>(*object);
-        if (camera.cameraId() == cameraId) {
-            _staticCamera->setObject(camera);
+        auto camera = static_cast<Camera *>(object.get());
+        if (camera->cameraId() == cameraId) {
+            _staticCamera = static_cast<StaticCamera *>(camera);
             break;
         }
     }

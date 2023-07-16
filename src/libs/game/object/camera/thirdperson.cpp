@@ -15,13 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/camera/thirdperson.h"
+#include "reone/game/object/camera/thirdperson.h"
 
-#include "reone/scene/collision.h"
-#include "reone/scene/graph.h"
-#include "reone/scene/node/camera.h"
-
+#include "reone/game/di/services.h"
 #include "reone/game/game.h"
+#include "reone/scene/collision.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+#include "reone/scene/node/camera.h"
 
 using namespace reone::graphics;
 using namespace reone::scene;
@@ -36,14 +37,10 @@ static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 static constexpr float kTargetPadding = 0.05f;
 
-ThirdPersonCamera::ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, ISceneGraph &sceneGraph) :
-    _game(game),
-    _sceneGraph(sceneGraph) {
-
-    _sceneNode = sceneGraph.newCamera();
-    _sceneNode->setPerspectiveProjection(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-
-    _style = style;
+void ThirdPersonCamera::load() {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    _sceneNode = scene.newCamera();
+    cameraSceneNode()->setPerspectiveProjection(glm::radians(_style.viewAngle), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 bool ThirdPersonCamera::handle(const SDL_Event &event) {
@@ -169,7 +166,8 @@ void ThirdPersonCamera::updateSceneNode() {
     cameraPos.z += _style.height;
 
     Collision collision;
-    if (_sceneGraph.testLineOfSight(targetPos, cameraPos, collision)) {
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    if (scene.testLineOfSight(targetPos, cameraPos, collision)) {
         cameraPos = collision.intersection;
     }
 

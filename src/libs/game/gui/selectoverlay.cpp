@@ -187,8 +187,8 @@ void SelectionOverlay::update() {
     std::shared_ptr<Area> area(module->area());
 
     Camera *camera = _game.getActiveCamera();
-    glm::mat4 projection(camera->sceneNode()->camera()->projection());
-    glm::mat4 view(camera->sceneNode()->camera()->view());
+    glm::mat4 projection(camera->cameraSceneNode()->camera()->projection());
+    glm::mat4 view(camera->cameraSceneNode()->camera()->view());
 
     auto hilightedObject = area->hilightedObject();
     if (hilightedObject) {

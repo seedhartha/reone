@@ -17,18 +17,11 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../../camerastyle.h"
 
 #include "../camera.h"
-#include "../camerastyle.h"
 
 namespace reone {
-
-namespace scene {
-
-class ISceneGraph;
-
-}
 
 namespace game {
 
@@ -42,14 +35,31 @@ public:
         ListenerFar
     };
 
-    DialogCamera(const CameraStyle &style, float aspect, scene::ISceneGraph &sceneGraph);
+    DialogCamera(
+        uint32_t id,
+        CameraStyle style,
+        float aspect,
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
+        Camera(
+            id,
+            std::move(sceneName),
+            game,
+            services),
+        _style(std::move(style)),
+        _aspect(aspect) {
+    }
+
+    void load();
 
     void setSpeakerPosition(glm::vec3 position);
     void setListenerPosition(glm::vec3 position);
     void setVariant(Variant variant);
 
 private:
-    scene::ISceneGraph &_sceneGraph;
+    CameraStyle _style;
+    float _aspect;
 
     glm::vec3 _speakerPosition {0.0f};
     glm::vec3 _listenerPosition {0.0f};

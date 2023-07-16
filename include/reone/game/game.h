@@ -24,7 +24,6 @@
 #include "reone/script/routines.h"
 #include "reone/system/logutil.h"
 
-#include "camera.h"
 #include "combat.h"
 #include "di/services.h"
 #include "gui/chargen.h"
@@ -42,7 +41,11 @@
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
 #include "object/area.h"
-#include "object/camera.h"
+#include "object/camera/animated.h"
+#include "object/camera/dialog.h"
+#include "object/camera/firstperson.h"
+#include "object/camera/static.h"
+#include "object/camera/thirdperson.h"
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/encounter.h"
@@ -207,8 +210,24 @@ public:
         return newObject<Sound>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<CameraObject> newCamera(std::string sceneName = kSceneMain) {
-        return newObject<CameraObject>(std::move(sceneName), *this, _services);
+    inline std::unique_ptr<AnimatedCamera> newAnimatedCamera(float aspect, std::string sceneName = kSceneMain) {
+        return newObject<AnimatedCamera>(aspect, std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<DialogCamera> newDialogCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
+        return newObject<DialogCamera>(std::move(style), aspect, std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<FirstPersonCamera> newFirstPersonCamera(float fovy, float aspect, std::string sceneName = kSceneMain) {
+        return newObject<FirstPersonCamera>(fovy, aspect, std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<StaticCamera> newStaticCamera(float aspect, std::string sceneName = kSceneMain) {
+        return newObject<StaticCamera>(aspect, std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<ThirdPersonCamera> newThirdPersonCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
+        return newObject<ThirdPersonCamera>(std::move(style), aspect, std::move(sceneName), *this, _services);
     }
 
     inline std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain) {

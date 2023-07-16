@@ -20,7 +20,7 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 
-#include "../camera/dialog.h"
+#include "../object/camera/dialog.h"
 #include "../object/creature.h"
 
 #include "conversation.h"

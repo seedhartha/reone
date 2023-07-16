@@ -23,12 +23,12 @@
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 
-#include "../camera/animated.h"
-#include "../camera/dialog.h"
-#include "../camera/firstperson.h"
-#include "../camera/static.h"
-#include "../camera/thirdperson.h"
 #include "../object.h"
+#include "../object/camera/animated.h"
+#include "../object/camera/dialog.h"
+#include "../object/camera/firstperson.h"
+#include "../object/camera/static.h"
+#include "../object/camera/thirdperson.h"
 #include "../pathfinder.h"
 #include "../schema/are.h"
 #include "../schema/git.h"
@@ -245,7 +245,7 @@ private:
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<DialogCamera> _dialogCamera;
     std::unique_ptr<AnimatedCamera> _animatedCamera;
-    std::unique_ptr<StaticCamera> _staticCamera;
+    StaticCamera *_staticCamera {nullptr};
 
     // END Cameras
 

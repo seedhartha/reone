@@ -17,28 +17,51 @@
 
 #pragma once
 
+#include "reone/graphics/model.h"
+#include "reone/scene/node/model.h"
+
 #include "../camera.h"
 
 namespace reone {
 
-namespace scene {
-
-class ISceneGraph;
-
-}
-
 namespace game {
 
-class CameraObject;
+const float kDefaultAnimCamFOV = 55.0f;
 
-class StaticCamera : public Camera {
+class AnimatedCamera : public Camera {
 public:
-    StaticCamera(float aspect, scene::ISceneGraph &sceneGraph);
+    AnimatedCamera(
+        uint32_t id,
+        float aspect,
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
+        Camera(
+            id,
+            std::move(sceneName),
+            game,
+            services),
+        _aspect(aspect) {
+    }
 
-    void setObject(const CameraObject &object);
+    void load();
+
+    void update(float dt) override;
+
+    void playAnimation(int animNumber);
+
+    bool isAnimationFinished() const;
+
+    void setModel(std::shared_ptr<graphics::Model> model);
+    void setFieldOfView(float fovy);
 
 private:
-    float _aspect {1.0f};
+    float _aspect;
+
+    std::shared_ptr<scene::ModelSceneNode> _model;
+    float _fovy {kDefaultAnimCamFOV};
+
+    void updateProjection();
 };
 
 } // namespace game

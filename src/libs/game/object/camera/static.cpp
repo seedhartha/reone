@@ -15,23 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/object/camera.h"
+#include "reone/game/object/camera/static.h"
 
-using namespace reone::resource;
+#include "reone/game/di/services.h"
+#include "reone/game/object/camera.h"
+#include "reone/scene/di/services.h"
+#include "reone/scene/graphs.h"
+
+using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-void CameraObject::loadFromGIT(const schema::GIT_CameraList &git) {
+void StaticCamera::loadFromGIT(const schema::GIT_CameraList &git) {
     _cameraId = git.CameraID;
     _fieldOfView = git.FieldOfView;
+
+    auto &scene = _services.scene.graphs.get(_sceneName);
+    _sceneNode = scene.newCamera();
+    cameraSceneNode()->setPerspectiveProjection(glm::radians(_fieldOfView), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
     loadTransformFromGIT(git);
 }
 
-void CameraObject::loadTransformFromGIT(const schema::GIT_CameraList &git) {
+void StaticCamera::loadTransformFromGIT(const schema::GIT_CameraList &git) {
     glm::vec3 position(git.Position);
     float height = git.Height;
 

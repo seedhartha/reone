@@ -17,8 +17,8 @@
 
 #include "reone/game/player.h"
 
-#include "reone/game/camera.h"
 #include "reone/game/object/area.h"
+#include "reone/game/object/camera.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/object/module.h"
 #include "reone/game/party.h"

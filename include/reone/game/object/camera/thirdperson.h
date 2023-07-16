@@ -17,24 +17,33 @@
 
 #pragma once
 
+#include "../../camerastyle.h"
+
 #include "../camera.h"
-#include "../camerastyle.h"
 
 namespace reone {
 
-namespace scene {
-
-class ISceneGraph;
-
-}
-
 namespace game {
-
-class Game;
 
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, scene::ISceneGraph &sceneGraph);
+    ThirdPersonCamera(
+        uint32_t id,
+        CameraStyle style,
+        float aspect,
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
+        Camera(
+            id,
+            std::move(sceneName),
+            game,
+            services),
+        _style(std::move(style)),
+        _aspect(aspect) {
+    }
+
+    void load();
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -45,10 +54,9 @@ public:
     void setStyle(CameraStyle style);
 
 private:
-    Game &_game;
-    scene::ISceneGraph &_sceneGraph;
-
     CameraStyle _style;
+    float _aspect;
+
     glm::vec3 _targetPosition {0.0f};
     bool _rotateCCW {false};
     bool _rotateCW {false};

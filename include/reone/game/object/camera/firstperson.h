@@ -21,17 +21,27 @@
 
 namespace reone {
 
-namespace scene {
-
-class ISceneGraph;
-
-}
-
 namespace game {
 
 class FirstPersonCamera : public Camera {
 public:
-    FirstPersonCamera(float fovy, float aspect, scene::ISceneGraph &sceneGraph);
+    FirstPersonCamera(
+        uint32_t id,
+        float fovy,
+        float aspect,
+        std::string sceneName,
+        Game &game,
+        ServicesView &services) :
+        Camera(
+            id,
+            std::move(sceneName),
+            game,
+            services),
+        _fovy(fovy),
+        _aspect(aspect) {
+    }
+
+    void load();
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -41,6 +51,9 @@ public:
     void setFacing(float facing);
 
 private:
+    float _fovy;
+    float _aspect;
+
     glm::vec3 _position {0.0f};
     float _pitch {0.0f};
     float _multiplier {1.0f};
