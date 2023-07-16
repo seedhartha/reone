@@ -331,10 +331,6 @@ private:
     uint32_t _ticks {0};
     uint32_t _updateTicks {0};
 
-    std::thread _updateThread;
-    std::mutex _updateMutex;
-    std::condition_variable _updateCondVar;
-
     Screen _screen {Screen::None};
 
     std::shared_ptr<movie::IMovie> _movie;
@@ -370,6 +366,11 @@ private:
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
 
+    std::unique_ptr<Map> _map;
+    std::unique_ptr<Console> _console;
+    std::unique_ptr<LoadingScreen> _loadScreen;
+    std::unique_ptr<ProfileOverlay> _profileOverlay;
+
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
 
     // END GUI
@@ -382,15 +383,6 @@ private:
     std::map<std::string, std::shared_ptr<Module>> _loadedModules;
 
     // END Modules
-
-    // GUI
-
-    std::unique_ptr<Map> _map;
-    std::unique_ptr<Console> _console;
-    std::unique_ptr<LoadingScreen> _loadScreen;
-    std::unique_ptr<ProfileOverlay> _profileOverlay;
-
-    // END GUI
 
     // Audio
 
@@ -407,6 +399,14 @@ private:
     std::map<std::string, std::shared_ptr<Location>> _globalLocations;
 
     // END Global variables
+
+    // Update thread
+
+    std::thread _updateThread;
+    std::mutex _updateMutex;
+    std::condition_variable _updateCondVar;
+
+    // END Update thread
 
     void setState(State state) {
         std::lock_guard<std::mutex> lock(_updateMutex);

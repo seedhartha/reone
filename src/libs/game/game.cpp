@@ -130,10 +130,15 @@ void Game::updateThreadFunc() {
             std::unique_lock<std::mutex> lock(_updateMutex);
             _updateCondVar.wait(lock, [this]() { return _state != State::Created; });
             _updateTicks = _services.system.clock.ticks();
+            if (_state == State::Quitting) {
+                return;
+            }
         }
+
         uint32_t ticks = _services.system.clock.ticks();
         float dt = (ticks - _updateTicks) / 1000.0f;
         _updateTicks = ticks;
+
         std::this_thread::yield();
     }
 }
@@ -178,17 +183,16 @@ void Game::update(float dt) {
 
     updateMusic();
 
-    if (!_nextModule.empty()) {
-        loadNextModule();
-    }
+     if (!_nextModule.empty()) {
+         loadNextModule();
+     }
+     updateCamera(dt);
 
-    updateCamera(dt);
-
-    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-    if (updModule && !_paused) {
-        _module->update(dt);
-        _combat.update(dt);
-    }
+     bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+     if (updModule && !_paused) {
+         _module->update(dt);
+         _combat.update(dt);
+     }
 
     auto gui = getScreenGUI();
     if (gui) {
@@ -235,7 +239,6 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
             }
-
             drawAll();
 
             _services.scene.graphs.get(kSceneMain).clear();
