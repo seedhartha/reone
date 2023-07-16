@@ -29,9 +29,9 @@ struct ExecutionContext;
 
 namespace game {
 
-class CommandAction : public Action {
+class DoCommandAction : public Action {
 public:
-    CommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> actionToDo) :
+    DoCommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> actionToDo) :
         Action(game, services, ActionType::DoCommand),
         _actionToDo(std::move(actionToDo)) {
     }

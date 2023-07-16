@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-void CommandAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
+void DoCommandAction::execute(std::shared_ptr<Action> self, Object &actor, float dt) {
     auto executionCtx = std::make_unique<ExecutionContext>(*_actionToDo);
     executionCtx->callerId = actor.id();
 

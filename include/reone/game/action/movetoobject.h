@@ -30,8 +30,8 @@ public:
                        std::shared_ptr<Object> moveTo,
                        bool run,
                        float range,
-                       bool force,
-                       float timeout) :
+                       bool force = false,
+                       float timeout = -1.0f) :
         Action(game, services, ActionType::MoveToObject),
         _moveTo(std::move(moveTo)),
         _run(run),

@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "reone/game/action/docommand.h"
+#include "reone/game/action/jumptolocation.h"
+#include "reone/game/action/jumptoobject.h"
 #include "reone/game/event.h"
 #include "reone/game/game.h"
 #include "reone/game/reputes.h"
@@ -22,6 +25,7 @@
 #include "reone/game/script/routine/context.h"
 #include "reone/game/script/routine/objectutil.h"
 #include "reone/game/script/routines.h"
+#include "reone/game/talent.h"
 #include "reone/resource/strings.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine/exception/argument.h"
@@ -128,7 +132,7 @@ static Variable AssignCommand(const std::vector<Variable> &args, const RoutineCo
     // Transform
 
     // Execute
-    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(aActionToAssign));
+    auto commandAction = ctx.game.actionFactory().newAction<DoCommandAction>(std::move(aActionToAssign));
     oActionSubject->addAction(std::move(commandAction));
     return Variable::ofNull();
 }
@@ -141,7 +145,7 @@ static Variable DelayCommand(const std::vector<Variable> &args, const RoutineCon
     // Transform
 
     // Execute
-    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(aActionToDelay));
+    auto commandAction = ctx.game.actionFactory().newAction<DoCommandAction>(std::move(aActionToDelay));
     getCaller(ctx)->delayAction(std::move(commandAction), fSeconds);
     return Variable::ofNull();
 }
@@ -2673,7 +2677,7 @@ static Variable JumpToLocation(const std::vector<Variable> &args, const RoutineC
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newJumpToLocation(std::move(lDestination));
+    auto action = ctx.game.actionFactory().newAction<JumpToLocationAction>(std::move(lDestination));
     getCaller(ctx)->addActionOnTop(std::move(action));
     return Variable::ofNull();
 }
@@ -3296,7 +3300,7 @@ static Variable JumpToObject(const std::vector<Variable> &args, const RoutineCon
     auto walkStraightLineToPoint = static_cast<bool>(nWalkStraightLineToPoint);
 
     // Execute
-    auto action = ctx.game.actionFactory().newJumpToObject(std::move(oToJumpTo), walkStraightLineToPoint);
+    auto action = ctx.game.actionFactory().newAction<JumpToObjectAction>(std::move(oToJumpTo), walkStraightLineToPoint);
     getCaller(ctx)->addActionOnTop(std::move(action));
     return Variable::ofNull();
 }

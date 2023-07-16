@@ -28,7 +28,7 @@ public:
     AttackObjectAction(Game &game,
                        ServicesView &services,
                        std::shared_ptr<Object> attackee,
-                       bool passive) :
+                       bool passive = false) :
         Action(game, services, ActionType::AttackObject),
         _attackee(std::move(attackee)),
         _passive(passive) {

@@ -15,6 +15,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "reone/game/action/attackobject.h"
+#include "reone/game/action/barkstring.h"
+#include "reone/game/action/castfakespellatlocation.h"
+#include "reone/game/action/castfakespellatobject.h"
+#include "reone/game/action/castspellatlocation.h"
+#include "reone/game/action/castspellatobject.h"
+#include "reone/game/action/closedoor.h"
+#include "reone/game/action/docommand.h"
+#include "reone/game/action/equipitem.h"
+#include "reone/game/action/equipmostdamagingmelee.h"
+#include "reone/game/action/equipmostdamagingranged.h"
+#include "reone/game/action/equipmosteffectivearmor.h"
+#include "reone/game/action/follow.h"
+#include "reone/game/action/followleader.h"
+#include "reone/game/action/followowner.h"
+#include "reone/game/action/giveitem.h"
+#include "reone/game/action/interactobject.h"
+#include "reone/game/action/jumptolocation.h"
+#include "reone/game/action/jumptoobject.h"
+#include "reone/game/action/lockobject.h"
+#include "reone/game/action/moveawayfromlocation.h"
+#include "reone/game/action/moveawayfromobject.h"
+#include "reone/game/action/movetolocation.h"
+#include "reone/game/action/movetoobject.h"
+#include "reone/game/action/movetopoint.h"
+#include "reone/game/action/opencontainer.h"
+#include "reone/game/action/opendoor.h"
+#include "reone/game/action/openlock.h"
+#include "reone/game/action/pauseconversation.h"
+#include "reone/game/action/pickupitem.h"
+#include "reone/game/action/playanimation.h"
+#include "reone/game/action/putdownitem.h"
+#include "reone/game/action/randomwalk.h"
+#include "reone/game/action/resumeconversation.h"
+#include "reone/game/action/speakstring.h"
+#include "reone/game/action/speakstringbystrref.h"
+#include "reone/game/action/startconversation.h"
+#include "reone/game/action/surrendertoenemies.h"
+#include "reone/game/action/switchweapons.h"
+#include "reone/game/action/takeitem.h"
+#include "reone/game/action/unequipitem.h"
+#include "reone/game/action/unlockobject.h"
+#include "reone/game/action/usefeat.h"
+#include "reone/game/action/useskill.h"
+#include "reone/game/action/usetalentatlocation.h"
+#include "reone/game/action/usetalentonobject.h"
+#include "reone/game/action/wait.h"
 #include "reone/game/game.h"
 #include "reone/game/script/routine/argutil.h"
 #include "reone/game/script/routine/context.h"
@@ -42,7 +89,7 @@ namespace game {
 
 static Variable ActionRandomWalk(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newRandomWalk();
+    auto action = ctx.game.actionFactory().newAction<RandomWalkAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -56,7 +103,7 @@ static Variable ActionMoveToLocation(const std::vector<Variable> &args, const Ro
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run);
+    auto action = ctx.game.actionFactory().newAction<MoveToLocationAction>(std::move(lDestination), run);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -71,7 +118,7 @@ static Variable ActionMoveToObject(const std::vector<Variable> &args, const Rout
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange);
+    auto action = ctx.game.actionFactory().newAction<MoveToObjectAction>(std::move(oMoveTo), run, fRange);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -86,7 +133,7 @@ static Variable ActionMoveAwayFromObject(const std::vector<Variable> &args, cons
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveAwayFromObject(std::move(oFleeFrom), run, fMoveAwayRange);
+    auto action = ctx.game.actionFactory().newAction<MoveAwayFromObject>(std::move(oFleeFrom), run, fMoveAwayRange);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -102,7 +149,7 @@ static Variable ActionEquipItem(const std::vector<Variable> &args, const Routine
     auto instant = static_cast<bool>(bInstant);
 
     // Execute
-    auto action = ctx.game.actionFactory().newEquipItem(std::move(item), nInventorySlot, instant);
+    auto action = ctx.game.actionFactory().newAction<EquipItemAction>(std::move(item), nInventorySlot, instant);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -117,7 +164,7 @@ static Variable ActionUnequipItem(const std::vector<Variable> &args, const Routi
     auto instant = static_cast<bool>(bInstant);
 
     // Execute
-    auto action = ctx.game.actionFactory().newUnequipItem(std::move(item), instant);
+    auto action = ctx.game.actionFactory().newAction<UnequipItemAction>(std::move(item), instant);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -130,7 +177,7 @@ static Variable ActionPickUpItem(const std::vector<Variable> &args, const Routin
     auto item = checkItem(oItem);
 
     // Execute
-    auto action = ctx.game.actionFactory().newPickUpItem(std::move(item));
+    auto action = ctx.game.actionFactory().newAction<PickUpItemAction>(std::move(item));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -143,7 +190,7 @@ static Variable ActionPutDownItem(const std::vector<Variable> &args, const Routi
     auto item = checkItem(oItem);
 
     // Execute
-    auto action = ctx.game.actionFactory().newPutDownItem(std::move(item));
+    auto action = ctx.game.actionFactory().newAction<PutDownItemAction>(std::move(item));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -158,7 +205,7 @@ static Variable ActionAttack(const std::vector<Variable> &args, const RoutineCon
 
     // Execute
     auto caller = checkCreature(getCaller(ctx));
-    auto action = ctx.game.actionFactory().newAttackObject(std::move(oAttackee), passive);
+    auto action = ctx.game.actionFactory().newAction<AttackObjectAction>(std::move(oAttackee), passive);
     caller->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -171,7 +218,7 @@ static Variable ActionSpeakString(const std::vector<Variable> &args, const Routi
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newSpeakString(sStringToSpeak, nTalkVolume);
+    auto action = ctx.game.actionFactory().newAction<SpeakStringAction>(sStringToSpeak, nTalkVolume);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -187,7 +234,7 @@ static Variable ActionPlayAnimation(const std::vector<Variable> &args, const Rou
     auto animation = static_cast<AnimationType>(nAnimation);
 
     // Execute
-    auto action = ctx.game.actionFactory().newPlayAnimation(animation, fSpeed, fDurationSeconds);
+    auto action = ctx.game.actionFactory().newAction<PlayAnimationAction>(animation, fSpeed, fDurationSeconds);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -199,7 +246,7 @@ static Variable ActionOpenDoor(const std::vector<Variable> &args, const RoutineC
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newOpenDoor(std::move(oDoor));
+    auto action = ctx.game.actionFactory().newAction<OpenDoorAction>(std::move(oDoor));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -211,7 +258,7 @@ static Variable ActionCloseDoor(const std::vector<Variable> &args, const Routine
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newCloseDoor(std::move(oDoor));
+    auto action = ctx.game.actionFactory().newAction<CloseDoorAction>(std::move(oDoor));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -233,7 +280,7 @@ static Variable ActionCastSpellAtObject(const std::vector<Variable> &args, const
     auto instantSpell = static_cast<bool>(bInstantSpell);
 
     // Execute
-    auto action = ctx.game.actionFactory().newCastSpellAtObject(spell, std::move(oTarget), nMetaMagic, cheat, nDomainLevel, projectilePathType, instantSpell);
+    auto action = ctx.game.actionFactory().newAction<CastSpellAtObjectAction>(spell, std::move(oTarget), nMetaMagic, cheat, nDomainLevel, projectilePathType, instantSpell);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -247,7 +294,7 @@ static Variable ActionGiveItem(const std::vector<Variable> &args, const RoutineC
     auto item = checkItem(oItem);
 
     // Execute
-    auto action = ctx.game.actionFactory().newGiveItem(std::move(item), std::move(oGiveTo));
+    auto action = ctx.game.actionFactory().newAction<GiveItemAction>(std::move(item), std::move(oGiveTo));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -261,7 +308,7 @@ static Variable ActionTakeItem(const std::vector<Variable> &args, const RoutineC
     auto item = checkItem(oItem);
 
     // Execute
-    auto action = ctx.game.actionFactory().newTakeItem(std::move(item), std::move(oTakeFrom));
+    auto action = ctx.game.actionFactory().newAction<TakeItemAction>(std::move(item), std::move(oTakeFrom));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -274,7 +321,7 @@ static Variable ActionForceFollowObject(const std::vector<Variable> &args, const
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newFollow(oFollow, fFollowDistance);
+    auto action = ctx.game.actionFactory().newAction<FollowAction>(oFollow, fFollowDistance);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -289,7 +336,7 @@ static Variable ActionJumpToObject(const std::vector<Variable> &args, const Rout
     auto walkStraightLine = static_cast<bool>(bWalkStraightLineToPoint);
 
     // Execute
-    auto action = ctx.game.actionFactory().newJumpToObject(std::move(oToJumpTo), walkStraightLine);
+    auto action = ctx.game.actionFactory().newAction<JumpToObjectAction>(std::move(oToJumpTo), walkStraightLine);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -301,7 +348,7 @@ static Variable ActionWait(const std::vector<Variable> &args, const RoutineConte
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newWait(fSeconds);
+    auto action = ctx.game.actionFactory().newAction<WaitAction>(fSeconds);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -345,7 +392,7 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
     auto dontClearAllActions = static_cast<bool>(bDontClearAllActions);
 
     // Execute
-    auto action = ctx.game.actionFactory().newStartConversation(
+    auto action = ctx.game.actionFactory().newAction<StartConversationAction>(
         std::move(oObjectToConverse),
         dialogResRef,
         privateConversation,
@@ -362,14 +409,14 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
 
 static Variable ActionPauseConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newPauseConversation();
+    auto action = ctx.game.actionFactory().newAction<PauseConversationAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
 
 static Variable ActionResumeConversation(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newResumeConversation();
+    auto action = ctx.game.actionFactory().newAction<ResumeConversationAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -381,7 +428,7 @@ static Variable ActionJumpToLocation(const std::vector<Variable> &args, const Ro
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newJumpToLocation(std::move(lLocation));
+    auto action = ctx.game.actionFactory().newAction<JumpToLocationAction>(std::move(lLocation));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -402,7 +449,7 @@ static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, con
     auto instantSpell = static_cast<bool>(bInstantSpell);
 
     // Execute
-    auto action = ctx.game.actionFactory().newCastSpellAtLocation(spell, lTargetLocation, nMetaMagic, cheat, projectilePathType, instantSpell);
+    auto action = ctx.game.actionFactory().newAction<CastSpellAtLocationAction>(spell, lTargetLocation, nMetaMagic, cheat, projectilePathType, instantSpell);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -416,7 +463,7 @@ static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, con
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newSpeakStringByStrRef(nStrRef, nTalkVolume);
+    auto action = ctx.game.actionFactory().newAction<SpeakStringByStrRefAction>(nStrRef, nTalkVolume);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -431,7 +478,7 @@ static Variable ActionUseFeat(const std::vector<Variable> &args, const RoutineCo
     auto feat = static_cast<FeatType>(nFeat);
 
     // Execute
-    auto action = ctx.game.actionFactory().newUseFeat(feat, oTarget);
+    auto action = ctx.game.actionFactory().newAction<UseFeatAction>(feat, oTarget);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -449,7 +496,7 @@ static Variable ActionUseSkill(const std::vector<Variable> &args, const RoutineC
     auto itemUsed = checkItem(oItemUsed);
 
     // Execute
-    auto action = ctx.game.actionFactory().newUseSkill(skill, std::move(oTarget), nSubSkill, std::move(itemUsed));
+    auto action = ctx.game.actionFactory().newAction<UseSkillAction>(skill, std::move(oTarget), nSubSkill, std::move(itemUsed));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -461,7 +508,7 @@ static Variable ActionDoCommand(const std::vector<Variable> &args, const Routine
     // Transform
 
     // Execute
-    auto commandAction = ctx.game.actionFactory().newDoCommand(std::move(aActionToDo));
+    auto commandAction = ctx.game.actionFactory().newAction<DoCommandAction>(std::move(aActionToDo));
     getCaller(ctx)->addAction(std::move(commandAction));
     return Variable::ofNull();
 }
@@ -474,7 +521,7 @@ static Variable ActionUseTalentOnObject(const std::vector<Variable> &args, const
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newUseTalentOnObject(tChosenTalent, oTarget);
+    auto action = ctx.game.actionFactory().newAction<UseTalentOnObjectAction>(tChosenTalent, oTarget);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -488,7 +535,7 @@ static Variable ActionUseTalentAtLocation(const std::vector<Variable> &args, con
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newUseTalentAtLocation(tChosenTalent, lTargetLocation);
+    auto action = ctx.game.actionFactory().newAction<UseTalentAtLocationAction>(tChosenTalent, lTargetLocation);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -502,7 +549,7 @@ static Variable ActionInteractObject(const std::vector<Variable> &args, const Ro
     auto placeable = checkPlaceable(oPlaceable);
 
     // Execute
-    auto action = ctx.game.actionFactory().newInteractObject(std::move(placeable));
+    auto action = ctx.game.actionFactory().newAction<InteractObjectAction>(std::move(placeable));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -517,14 +564,14 @@ static Variable ActionMoveAwayFromLocation(const std::vector<Variable> &args, co
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveAwayFromLocation(std::move(lMoveAwayFrom), run, fMoveAwayRange);
+    auto action = ctx.game.actionFactory().newAction<MoveAwayFromLocation>(std::move(lMoveAwayFrom), run, fMoveAwayRange);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
 
 static Variable ActionSurrenderToEnemies(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newSurrenderToEnemies();
+    auto action = ctx.game.actionFactory().newAction<SurrenderToEnemiesAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -539,7 +586,7 @@ static Variable ActionForceMoveToLocation(const std::vector<Variable> &args, con
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToLocation(std::move(lDestination), run, true, fTimeout);
+    auto action = ctx.game.actionFactory().newAction<MoveToLocationAction>(std::move(lDestination), run, true, fTimeout);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -555,7 +602,7 @@ static Variable ActionForceMoveToObject(const std::vector<Variable> &args, const
     auto run = static_cast<bool>(bRun);
 
     // Execute
-    auto action = ctx.game.actionFactory().newMoveToObject(std::move(oMoveTo), run, fRange, true, fTimeout);
+    auto action = ctx.game.actionFactory().newAction<MoveToObjectAction>(std::move(oMoveTo), run, fRange, true, fTimeout);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -569,7 +616,7 @@ static Variable ActionEquipMostDamagingMelee(const std::vector<Variable> &args, 
     auto offHand = static_cast<bool>(bOffHand);
 
     // Execute
-    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee(std::move(oVersus), offHand);
+    auto action = ctx.game.actionFactory().newAction<EquipMostDamagingMeleeAction>(std::move(oVersus), offHand);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -581,14 +628,14 @@ static Variable ActionEquipMostDamagingRanged(const std::vector<Variable> &args,
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged(std::move(oVersus));
+    auto action = ctx.game.actionFactory().newAction<EquipMostDamagingRangedAction>(std::move(oVersus));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
 
 static Variable ActionEquipMostEffectiveArmor(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newEquipMostEffectiveArmor();
+    auto action = ctx.game.actionFactory().newAction<EquipMostEffectiveArmorAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -600,7 +647,7 @@ static Variable ActionUnlockObject(const std::vector<Variable> &args, const Rout
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newUnlockObject(std::move(oTarget));
+    auto action = ctx.game.actionFactory().newAction<UnlockObjectAction>(std::move(oTarget));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -612,7 +659,7 @@ static Variable ActionLockObject(const std::vector<Variable> &args, const Routin
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newLockObject(std::move(oTarget));
+    auto action = ctx.game.actionFactory().newAction<LockObjectAction>(std::move(oTarget));
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -628,7 +675,7 @@ static Variable ActionCastFakeSpellAtObject(const std::vector<Variable> &args, c
     auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
 
     // Execute
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject(spell, std::move(oTarget), projectilePathType);
+    auto action = ctx.game.actionFactory().newAction<CastFakeSpellAtObjectAction>(spell, std::move(oTarget), projectilePathType);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -644,7 +691,7 @@ static Variable ActionCastFakeSpellAtLocation(const std::vector<Variable> &args,
     auto projectilePathType = static_cast<ProjectilePathType>(nProjectilePathType);
 
     // Execute
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation(spell, std::move(lTarget), projectilePathType);
+    auto action = ctx.game.actionFactory().newAction<CastFakeSpellAtLocationAction>(spell, std::move(lTarget), projectilePathType);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -656,14 +703,14 @@ static Variable ActionBarkString(const std::vector<Variable> &args, const Routin
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newBarkString(strRef);
+    auto action = ctx.game.actionFactory().newAction<BarkStringAction>(strRef);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
 
 static Variable ActionFollowLeader(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newFollowLeader();
+    auto action = ctx.game.actionFactory().newAction<FollowLeaderAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
@@ -675,14 +722,14 @@ static Variable ActionFollowOwner(const std::vector<Variable> &args, const Routi
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newFollowOwner(fRange);
+    auto action = ctx.game.actionFactory().newAction<FollowOwnerAction>(fRange);
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }
 
 static Variable ActionSwitchWeapons(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Execute
-    auto action = ctx.game.actionFactory().newSwitchWeapons();
+    auto action = ctx.game.actionFactory().newAction<SwitchWeaponsAction>();
     getCaller(ctx)->addAction(std::move(action));
     return Variable::ofNull();
 }

@@ -231,18 +231,18 @@ void Module::onCreatureClick(const std::shared_ptr<Creature> &creature) {
     if (creature->isDead()) {
         if (!creature->items().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game.actionFactory().newOpenContainer(creature));
+            partyLeader->addAction(_game.actionFactory().newAction<OpenContainerAction>(creature));
         }
     } else {
         bool isEnemy = _services.game.reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            auto action = _game.actionFactory().newAttackObject(creature);
+            auto action = _game.actionFactory().newAction<AttackObjectAction>(creature);
             action->setUserAction(true);
             partyLeader->addAction(std::move(action));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game.actionFactory().newStartConversation(creature, creature->conversation()));
+            partyLeader->addAction(_game.actionFactory().newAction<StartConversationAction>(creature, creature->conversation()));
         }
     }
 }
@@ -255,7 +255,7 @@ void Module::onDoorClick(const std::shared_ptr<Door> &door) {
     if (!door->isOpen()) {
         std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newOpenDoor(door));
+        partyLeader->addAction(_game.actionFactory().newAction<OpenDoorAction>(door));
     }
 }
 
@@ -264,10 +264,10 @@ void Module::onPlaceableClick(const std::shared_ptr<Placeable> &placeable) {
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newOpenContainer(placeable));
+        partyLeader->addAction(_game.actionFactory().newAction<OpenContainerAction>(placeable));
     } else if (!placeable->conversation().empty()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newStartConversation(placeable, placeable->conversation()));
+        partyLeader->addAction(_game.actionFactory().newAction<StartConversationAction>(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(std::move(partyLeader));
     }

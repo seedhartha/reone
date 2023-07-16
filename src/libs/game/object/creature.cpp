@@ -20,6 +20,7 @@
 #include "reone/audio/di/services.h"
 #include "reone/audio/player.h"
 #include "reone/game/action.h"
+#include "reone/game/action/attackobject.h"
 #include "reone/game/animationutil.h"
 #include "reone/game/d20/classes.h"
 #include "reone/game/di/services.h"

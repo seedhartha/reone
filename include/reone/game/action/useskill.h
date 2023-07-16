@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "../object/item.h"
-
 #include "../action.h"
+#include "../object/item.h"
 
 namespace reone {
 
@@ -31,8 +30,8 @@ public:
                    ServicesView &services,
                    SkillType skill,
                    std::shared_ptr<Object> target,
-                   int subSkill,
-                   std::shared_ptr<Item> itemUsed) :
+                   int subSkill = 0,
+                   std::shared_ptr<Item> itemUsed = nullptr) :
         Action(game, services, ActionType::UseSkill),
         _skill(skill),
         _target(std::move(target)),

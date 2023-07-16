@@ -30,8 +30,8 @@ public:
                          ServicesView &services,
                          std::shared_ptr<Location> destination,
                          bool run,
-                         bool force,
-                         float timeout) :
+                         bool force = false,
+                         float timeout = -1.0f) :
         Action(game, services, ActionType::MoveToLocation),
         _destination(std::move(destination)),
         _run(run),

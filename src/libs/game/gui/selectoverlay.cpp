@@ -136,13 +136,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     std::unique_ptr<Action> action;
     switch (ctxAction.type) {
     case ActionType::AttackObject:
-        action = _game.actionFactory().newAttackObject(selectedObject);
+        action = _game.actionFactory().newAction<AttackObjectAction>(selectedObject);
         break;
     case ActionType::UseFeat:
-        action = _game.actionFactory().newUseFeat(ctxAction.feat, selectedObject);
+        action = _game.actionFactory().newAction<UseFeatAction>(ctxAction.feat, selectedObject);
         break;
     case ActionType::UseSkill:
-        action = _game.actionFactory().newUseSkill(ctxAction.skill, selectedObject);
+        action = _game.actionFactory().newAction<UseSkillAction>(ctxAction.skill, selectedObject);
         break;
     default:
         break;
