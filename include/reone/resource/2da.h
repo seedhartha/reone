@@ -59,7 +59,7 @@ public:
     static Row newRow(std::vector<std::string> values) {
         auto row = Row();
         row.values = std::move(values);
-        return std::move(row);
+        return row;
     }
 
 private:

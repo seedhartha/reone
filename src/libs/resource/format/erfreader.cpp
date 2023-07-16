@@ -68,7 +68,7 @@ ErfReader::KeyEntry ErfReader::readKeyEntry() {
     auto key = KeyEntry();
     key.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
 
-    return std::move(key);
+    return key;
 }
 
 void ErfReader::loadResources() {
@@ -88,7 +88,7 @@ ErfReader::ResourceEntry ErfReader::readResourceEntry() {
     resource.offset = offset;
     resource.size = size;
 
-    return std::move(resource);
+    return resource;
 }
 
 } // namespace resource

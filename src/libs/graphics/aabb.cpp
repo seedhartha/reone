@@ -45,7 +45,7 @@ AABB AABB::operator*(const glm::mat4 &m) const {
         aabb = AABB(min, max);
     }
 
-    return std::move(aabb);
+    return aabb;
 }
 
 void AABB::reset() {

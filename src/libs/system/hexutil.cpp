@@ -42,7 +42,7 @@ ByteBuffer unhexify(const std::string &s) {
         sscanf(&s[i], "%02hhx", &byte);
         bytes.push_back(static_cast<char>(byte));
     }
-    return std::move(bytes);
+    return bytes;
 }
 
 } // namespace reone

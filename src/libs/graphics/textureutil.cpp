@@ -159,7 +159,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
     }
 
-    return std::move(properties);
+    return properties;
 }
 
 } // namespace graphics

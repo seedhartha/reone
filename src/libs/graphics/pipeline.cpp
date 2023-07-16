@@ -82,7 +82,7 @@ static std::vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &p
         }
     }
 
-    return std::move(corners);
+    return corners;
 }
 
 static glm::mat4 computeDirectionalLightSpaceMatrix(

@@ -60,7 +60,7 @@ std::unique_ptr<Path> Paths::loadPath(const schema::PTH &pth) const {
         path->points.push_back(std::move(point));
     }
 
-    return std::move(path);
+    return path;
 }
 
 } // namespace game

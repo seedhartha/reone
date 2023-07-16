@@ -118,7 +118,7 @@ std::vector<std::string> Model::getAnimationNames() const {
         result.push_back(anim.first);
     }
 
-    return std::move(result);
+    return result;
 }
 
 std::shared_ptr<Animation> Model::getAnimation(const std::string &name) const {
@@ -131,7 +131,7 @@ std::shared_ptr<Animation> Model::getAnimation(const std::string &name) const {
         anim = _superModel->getAnimation(name);
     }
 
-    return std::move(anim);
+    return anim;
 }
 
 } // namespace graphics

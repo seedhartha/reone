@@ -36,7 +36,7 @@ struct AnimationProperties {
     static AnimationProperties fromFlags(int flags) {
         AnimationProperties properties;
         properties.flags = flags;
-        return std::move(properties);
+        return properties;
     }
 };
 

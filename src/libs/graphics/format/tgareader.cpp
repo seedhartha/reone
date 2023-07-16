@@ -136,7 +136,7 @@ ByteBuffer TgaReader::readPixelsRLE(int w, int h) {
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 bool TgaReader::isGrayscale() const {

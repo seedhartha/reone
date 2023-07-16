@@ -199,7 +199,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
         break;
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {

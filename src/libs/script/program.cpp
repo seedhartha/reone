@@ -46,7 +46,7 @@ Instruction Instruction::newCPDOWNSP(int stackOffset, uint16_t size) {
     val.type = InstructionType::CPDOWNSP;
     val.stackOffset = stackOffset;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCPTOPSP(int stackOffset, uint16_t size) {
@@ -54,7 +54,7 @@ Instruction Instruction::newCPTOPSP(int stackOffset, uint16_t size) {
     val.type = InstructionType::CPTOPSP;
     val.stackOffset = stackOffset;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCPDOWNBP(int stackOffset, uint16_t size) {
@@ -62,7 +62,7 @@ Instruction Instruction::newCPDOWNBP(int stackOffset, uint16_t size) {
     val.type = InstructionType::CPDOWNBP;
     val.stackOffset = stackOffset;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCPTOPBP(int stackOffset, uint16_t size) {
@@ -70,35 +70,35 @@ Instruction Instruction::newCPTOPBP(int stackOffset, uint16_t size) {
     val.type = InstructionType::CPTOPBP;
     val.stackOffset = stackOffset;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCONSTI(int value) {
     Instruction val;
     val.type = InstructionType::CONSTI;
     val.intValue = value;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCONSTF(float value) {
     Instruction val;
     val.type = InstructionType::CONSTF;
     val.floatValue = value;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCONSTS(std::string value) {
     Instruction val;
     val.type = InstructionType::CONSTS;
     val.strValue = std::move(value);
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newCONSTO(int objectId) {
     Instruction val;
     val.type = InstructionType::CONSTO;
     val.objectId = objectId;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newACTION(int routine, int argCount) {
@@ -106,42 +106,42 @@ Instruction Instruction::newACTION(int routine, int argCount) {
     val.type = InstructionType::ACTION;
     val.routine = routine;
     val.argCount = argCount;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newMOVSP(int stackOffset) {
     Instruction val;
     val.type = InstructionType::MOVSP;
     val.stackOffset = stackOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newJMP(int jumpOffset) {
     Instruction val;
     val.type = InstructionType::JMP;
     val.jumpOffset = jumpOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newJSR(int jumpOffset) {
     Instruction val;
     val.type = InstructionType::JSR;
     val.jumpOffset = jumpOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newJZ(int jumpOffset) {
     Instruction val;
     val.type = InstructionType::JZ;
     val.jumpOffset = jumpOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newJNZ(int jumpOffset) {
     Instruction val;
     val.type = InstructionType::JNZ;
     val.jumpOffset = jumpOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newDESTRUCT(uint16_t size, int stackOffset, uint16_t sizeNoDestroy) {
@@ -150,35 +150,35 @@ Instruction Instruction::newDESTRUCT(uint16_t size, int stackOffset, uint16_t si
     val.size = size;
     val.stackOffset = stackOffset;
     val.sizeNoDestroy = sizeNoDestroy;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newDECISP(int stackOffset) {
     Instruction val;
     val.type = InstructionType::DECISP;
     val.stackOffset = stackOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newINCISP(int stackOffset) {
     Instruction val;
     val.type = InstructionType::INCISP;
     val.stackOffset = stackOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newDECIBP(int stackOffset) {
     Instruction val;
     val.type = InstructionType::DECIBP;
     val.stackOffset = stackOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newINCIBP(int stackOffset) {
     Instruction val;
     val.type = InstructionType::INCIBP;
     val.stackOffset = stackOffset;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newSTORE_STATE(uint16_t size, int sizeLocals) {
@@ -186,21 +186,21 @@ Instruction Instruction::newSTORE_STATE(uint16_t size, int sizeLocals) {
     val.type = InstructionType::STORE_STATE;
     val.size = size;
     val.sizeLocals = sizeLocals;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newEQUALTT(uint16_t size) {
     Instruction val;
     val.type = InstructionType::EQUALTT;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 Instruction Instruction::newNEQUALTT(uint16_t size) {
     Instruction val;
     val.type = InstructionType::NEQUALTT;
     val.size = size;
-    return std::move(val);
+    return val;
 }
 
 } // namespace script

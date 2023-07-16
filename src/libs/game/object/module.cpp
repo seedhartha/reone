@@ -349,7 +349,7 @@ std::vector<ContextAction> Module::getContextActions(const std::shared_ptr<Objec
         break;
     }
 
-    return std::move(actions);
+    return actions;
 }
 
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {

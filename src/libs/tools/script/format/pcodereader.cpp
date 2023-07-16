@@ -220,7 +220,7 @@ Instruction PcodeReader::parseInstruction(const std::string &line, uint32_t addr
         break;
     };
 
-    return std::move(ins);
+    return ins;
 }
 
 void PcodeReader::applyArguments(const std::string &line, const std::string &restr, int numArgs, const std::function<void(const std::vector<std::string> &)> &fn) const {

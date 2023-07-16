@@ -35,7 +35,7 @@ std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioBuffer> stre
     auto source = std::make_shared<AudioSource>(std::move(stream), loop, getGain(type, gain), positional, std::move(position));
     source->init();
     source->play();
-    return std::move(source);
+    return source;
 }
 
 float AudioPlayer::getGain(AudioType type, float gain) const {

@@ -168,7 +168,7 @@ std::vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
             result.push_back(portrait);
         }
     }
-    return std::move(result);
+    return result;
 }
 
 int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz) {
@@ -207,7 +207,7 @@ std::shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *character->sceneNode());
 
-    return std::move(model);
+    return model;
 }
 
 void ClassSelection::setButtonColors(Control &control) {

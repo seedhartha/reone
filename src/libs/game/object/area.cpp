@@ -380,7 +380,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
         result.insert(pair);
         result.insert(std::make_pair(pair.second, pair.first));
     }
-    return std::move(result);
+    return result;
 }
 
 void Area::loadPTH() {
@@ -987,7 +987,7 @@ std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &b
         creature->runSpawnScript();
     }
 
-    return std::move(object);
+    return object;
 }
 
 void Area::updateObjectSelection() {

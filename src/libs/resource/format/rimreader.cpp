@@ -54,7 +54,7 @@ RimReader::ResourceEntry RimReader::readResource() {
     resource.offset = offset;
     resource.size = size;
 
-    return std::move(resource);
+    return resource;
 }
 
 } // namespace resource

@@ -243,7 +243,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
 
     auto shader = std::make_unique<Shader>(type, std::move(sources));
     shader->init();
-    return std::move(shader);
+    return shader;
 }
 
 std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders) {
@@ -282,7 +282,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
     program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
 
-    return std::move(program);
+    return program;
 }
 
 ShaderProgram &Shaders::getProgram(ShaderProgramId id) {

@@ -51,7 +51,7 @@ static std::unique_ptr<Combat::Attack> makeAttack(std::shared_ptr<Creature> atta
     attack->action = std::move(action);
     attack->resultType = resultType;
     attack->damage = damage;
-    return std::move(attack);
+    return attack;
 }
 
 static bool isRoundPastFirstAttack(float time) {
@@ -329,7 +329,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Combat::applyAttackResult(const Attack &attack, bool offHand) {

@@ -67,7 +67,7 @@ void GffTool::invokeBatch(
 static std::string sanitizeXmlElementName(const std::string &s) {
     auto sanitized = s;
     boost::replace_all(sanitized, " ", "_");
-    return std::move(sanitized);
+    return sanitized;
 }
 
 static void printStructToXml(const Gff &gff, XMLPrinter &printer, int index = -1) {

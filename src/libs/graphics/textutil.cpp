@@ -90,7 +90,7 @@ std::vector<std::string> breakText(const std::string &text, Font &font, int maxW
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 } // namespace graphics

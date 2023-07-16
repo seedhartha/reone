@@ -56,7 +56,7 @@ std::shared_ptr<Texture> Portraits::getTextureByIndex(int index) const {
     if (index >= 0 && index < static_cast<int>(_portraits.size())) {
         result = getPortraitTexture(_portraits[index]);
     }
-    return std::move(result);
+    return result;
 }
 
 std::shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {

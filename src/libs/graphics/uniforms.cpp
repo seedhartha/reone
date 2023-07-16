@@ -116,7 +116,7 @@ std::unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t 
     auto buf = std::make_unique<UniformBuffer>();
     buf->setData(data, size);
     buf->init();
-    return std::move(buf);
+    return buf;
 }
 
 void Uniforms::refreshBuffer(UniformBuffer &buffer, int bindingPoint, const void *data, ptrdiff_t size) {

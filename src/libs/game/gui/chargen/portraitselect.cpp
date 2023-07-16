@@ -132,7 +132,7 @@ std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", *creatureModel);
 
-    return std::move(model);
+    return model;
 }
 
 int PortraitSelection::getAppearanceFromCurrentPortrait() const {

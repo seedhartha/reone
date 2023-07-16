@@ -335,7 +335,7 @@ private:
     std::shared_ptr<T> newSceneNode(Params... params) {
         auto node = std::make_shared<T>(params..., *this, _graphicsSvc, _audioSvc);
         _nodes.insert(node);
-        return std::move(node);
+        return node;
     }
 };
 

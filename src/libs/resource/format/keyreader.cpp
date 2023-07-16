@@ -55,7 +55,7 @@ KeyReader::FileEntry KeyReader::readFileEntry() {
     entry.filename = boost::replace_all_copy(_key.readStringAt(offFilename, filenameSize), "\\", "/");
     entry.fileSize = fileSize;
 
-    return std::move(entry);
+    return entry;
 }
 
 void KeyReader::loadKeys() {
@@ -77,7 +77,7 @@ KeyReader::KeyEntry KeyReader::readKeyEntry() {
     entry.bifIdx = resId >> 20;
     entry.resIdx = resId & 0xfffff;
 
-    return std::move(entry);
+    return entry;
 }
 
 } // namespace resource

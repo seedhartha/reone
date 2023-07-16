@@ -58,7 +58,7 @@ std::unique_ptr<Dialog> Dialogs::loadDialog(const schema::DLG &dlg) {
         dialog->stunts.push_back(getStunt(stunt));
     }
 
-    return std::move(dialog);
+    return dialog;
 }
 
 Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const schema::DLG_EntryReplyList_EntriesRepliesList &dlg) const {
@@ -66,7 +66,7 @@ Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const schema::DLG_EntryReplyLi
     link.index = dlg.Index;
     link.active = dlg.Active;
 
-    return std::move(link);
+    return link;
 }
 
 Dialog::EntryReply Dialogs::getEntryReply(const schema::DLG_EntryReplyList &dlg) const {
@@ -99,7 +99,7 @@ Dialog::EntryReply Dialogs::getEntryReply(const schema::DLG_EntryReplyList &dlg)
         entry.animations.push_back(getParticipantAnimation(anim));
     }
 
-    return std::move(entry);
+    return entry;
 }
 
 Dialog::Stunt Dialogs::getStunt(const schema::DLG_StuntList &dlg) const {
@@ -113,7 +113,7 @@ Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const schema::DLG_
     Dialog::ParticipantAnimation anim;
     anim.participant = boost::to_lower_copy(dlg.Participant);
     anim.animation = dlg.Animation;
-    return std::move(anim);
+    return anim;
 }
 
 } // namespace game

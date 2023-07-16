@@ -166,7 +166,7 @@ std::vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dat
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 void TgaWriter::writeRLE(uint8_t *pixels, int depth, IOutputStream &out) {

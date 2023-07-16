@@ -396,7 +396,7 @@ std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGra
     auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *creature->sceneNode());
 
-    return std::move(model);
+    return model;
 }
 
 void CharacterGeneration::updateAttributes() {

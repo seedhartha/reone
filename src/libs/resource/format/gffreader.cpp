@@ -145,7 +145,7 @@ Gff::Field GffReader::readField(int idx) {
         throw FormatException("Unsupported field type: " + std::to_string(type));
     }
 
-    return std::move(field);
+    return field;
 }
 
 std::string GffReader::readLabel(int idx) {

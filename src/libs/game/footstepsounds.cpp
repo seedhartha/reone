@@ -53,7 +53,7 @@ std::shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 } // namespace game

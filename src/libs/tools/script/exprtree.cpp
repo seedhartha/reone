@@ -972,7 +972,7 @@ std::unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Ins
         } else if (ins.type == InstructionType::CONSTO) {
             constExpr->value = Variable::ofObject(ins.objectId);
         }
-        return std::move(constExpr);
+        return constExpr;
     }
     default:
         throw std::invalid_argument("Instruction is not of CONSTx type: " + std::to_string(static_cast<int>(ins.type)));
@@ -1008,7 +1008,7 @@ std::unique_ptr<ParameterExpression> ExpressionTree::parameterExpression(const I
         } else if (ins.type == InstructionType::RSADDTAL) {
             paramExpr->variableType = VariableType::Talent;
         }
-        return std::move(paramExpr);
+        return paramExpr;
     }
     default:
         throw std::invalid_argument("Instruction is not of RSADDx type: " + std::to_string(static_cast<int>(ins.type)));

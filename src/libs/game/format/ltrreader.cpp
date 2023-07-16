@@ -111,7 +111,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
     // END First three letters
 
     if (maxLength < 4)
-        return std::move(name);
+        return name;
 
     // Middle letters
 
@@ -142,7 +142,7 @@ std::string LtrReader::getRandomName(int maxLength) const {
 
     // END Final letter
 
-    return std::move(name);
+    return name;
 }
 
 } // namespace game

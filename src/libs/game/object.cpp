@@ -159,7 +159,7 @@ std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, 
         _items.push_back(result);
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Object::addItem(const std::shared_ptr<Item> &item) {

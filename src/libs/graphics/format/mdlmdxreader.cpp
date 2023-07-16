@@ -128,7 +128,7 @@ MdlMdxReader::ArrayDefinition MdlMdxReader::readArrayDefinition() {
     result.offset = _mdl.readUint32();
     result.count = _mdl.readUint32();
     result.count2 = _mdl.readUint32();
-    return std::move(result);
+    return result;
 }
 
 void MdlMdxReader::readNodeNames(const std::vector<uint32_t> &offsets) {
@@ -198,7 +198,7 @@ std::shared_ptr<ModelNode> MdlMdxReader::readNodes(uint32_t offset, ModelNode *p
         node->addChild(readNodes(offset, node.get(), animated, animNode));
     }
 
-    return std::move(node);
+    return node;
 }
 
 std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
@@ -471,7 +471,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     nodeMesh->aabbTree = std::move(aabbTree);
     nodeMesh->saber = flags & MdlNodeFlags::saber;
 
-    return std::move(nodeMesh);
+    return nodeMesh;
 }
 
 std::shared_ptr<ModelNode::AABBTree> MdlMdxReader::readAABBTree(uint32_t offset) {
@@ -494,7 +494,7 @@ std::shared_ptr<ModelNode::AABBTree> MdlMdxReader::readAABBTree(uint32_t offset)
         node->right = readAABBTree(offChildRight);
     }
 
-    return std::move(node);
+    return node;
 }
 
 std::shared_ptr<ModelNode::Light> MdlMdxReader::readLight() {
@@ -552,7 +552,7 @@ std::shared_ptr<ModelNode::Light> MdlMdxReader::readLight() {
         }
     }
 
-    return std::move(light);
+    return light;
 }
 
 static ModelNode::Emitter::UpdateMode parseEmitterUpdate(const std::string &str) {
@@ -635,7 +635,7 @@ std::shared_ptr<ModelNode::Emitter> MdlMdxReader::readEmitter() {
     emitter->p2p = flags & EmitterFlags::p2p;
     emitter->p2pBezier = flags & EmitterFlags::p2pBezier;
 
-    return std::move(emitter);
+    return emitter;
 }
 
 std::shared_ptr<ModelNode::Reference> MdlMdxReader::readReference() {
@@ -646,7 +646,7 @@ std::shared_ptr<ModelNode::Reference> MdlMdxReader::readReference() {
     reference->model = _models.get(modelResRef);
     reference->reattachable = static_cast<bool>(reattachable);
 
-    return std::move(reference);
+    return reference;
 }
 
 void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, ModelNode &node) {
@@ -717,7 +717,7 @@ std::vector<std::shared_ptr<Animation>> MdlMdxReader::readAnimations(const std::
         anims.push_back(readAnimation(offset));
     }
 
-    return std::move(anims);
+    return anims;
 }
 
 std::unique_ptr<Animation> MdlMdxReader::readAnimation(uint32_t offset) {
@@ -846,7 +846,7 @@ MdlMdxReader::ControllerFn MdlMdxReader::getControllerFn(uint32_t type, int node
         auto it = _genericControllers.find(type);
         fn = it != _genericControllers.end() ? it->second : nullptr;
     }
-    return std::move(fn);
+    return fn;
 }
 
 static inline void ensureNumColumnsEquals(int type, int expected, int actual) {

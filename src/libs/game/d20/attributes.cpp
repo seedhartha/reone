@@ -133,7 +133,7 @@ SavingThrows CreatureAttributes::getAggregateSavingThrows() const {
         result.reflex += classThrows.reflex;
         result.will += classThrows.will;
     }
-    return std::move(result);
+    return result;
 }
 
 bool CreatureAttributes::hasSkill(SkillType skill) const {

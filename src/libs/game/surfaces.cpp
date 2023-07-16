@@ -64,7 +64,7 @@ std::set<uint32_t> Surfaces::getSurfaceIndices(const std::function<bool(const Su
             result.insert(static_cast<uint32_t>(i));
         }
     }
-    return std::move(result);
+    return result;
 }
 
 std::set<uint32_t> Surfaces::getGrassSurfaces() const {

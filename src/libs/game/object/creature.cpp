@@ -1061,7 +1061,7 @@ std::shared_ptr<ModelSceneNode> Creature::buildModel() {
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
 
-    return std::move(sceneNode);
+    return sceneNode;
 }
 
 void Creature::finalizeModel(ModelSceneNode &body) {
@@ -1156,7 +1156,7 @@ std::string Creature::getBodyModelName() const {
     std::string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
 
-    return std::move(modelName);
+    return modelName;
 }
 
 std::string Creature::getBodyTextureName() const {
@@ -1200,7 +1200,7 @@ std::string Creature::getBodyTextureName() const {
         }
     }
 
-    return std::move(texName);
+    return texName;
 }
 
 std::string Creature::getHeadModelName() const {
@@ -1223,7 +1223,7 @@ std::string Creature::getHeadModelName() const {
     std::string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
 
-    return std::move(modelName);
+    return modelName;
 }
 
 std::string Creature::getMaskModelName() const {
@@ -1234,7 +1234,7 @@ std::string Creature::getMaskModelName() const {
     std::string modelName(boost::to_lower_copy(headItem->itemClass()));
     modelName += str(boost::format("_%03d") % headItem->modelVariation());
 
-    return std::move(modelName);
+    return modelName;
 }
 
 std::string Creature::getWeaponModelName(int slot) const {
@@ -1247,7 +1247,7 @@ std::string Creature::getWeaponModelName(int slot) const {
 
     modelName += str(boost::format("_%03d") % bodyItem->modelVariation());
 
-    return std::move(modelName);
+    return modelName;
 }
 
 void Creature::loadUTC(const schema::UTC &utc) {

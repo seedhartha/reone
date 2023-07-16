@@ -84,26 +84,26 @@ std::vector<int> TwoDa::getColumnIndices(const std::vector<std::string> &columns
         }
         indices.push_back(index);
     }
-    return std::move(indices);
+    return indices;
 }
 
 std::string TwoDa::getString(int row, const std::string &column, std::string defValue) const {
     if (row < 0 || row >= _rows.size()) {
         warn("2DA: row index out of range: " + std::to_string(row));
-        return std::move(defValue);
+        return defValue;
     }
 
     int columnIdx = getColumnIndex(column);
     if (columnIdx == -1) {
         warn("2DA: column not found: " + column);
-        return std::move(defValue);
+        return defValue;
     }
 
     const std::string &value = _rows[row].values[columnIdx];
 
     if (value == kCellValueDeleted) {
         warn(boost::format("2DA: cell value was deleted: %d %s") % row % column);
-        return std::move(defValue);
+        return defValue;
     }
 
     return value;

@@ -155,7 +155,7 @@ std::vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
         auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         coords[i] = glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]);
     }
-    return std::move(coords);
+    return coords;
 }
 
 glm::vec2 Mesh::getUV1(const Face &face, const glm::vec3 &baryPosition) const {

@@ -44,7 +44,7 @@ std::string Strings::getText(int strRef) {
     std::string text(_table->getString(strRef).text);
     process(text);
 
-    return std::move(text);
+    return text;
 }
 
 std::string Strings::getSound(int strRef) {

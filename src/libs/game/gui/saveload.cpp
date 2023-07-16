@@ -137,7 +137,7 @@ void SaveLoad::refresh() {
 static std::filesystem::path getSavesPath() {
     std::filesystem::path savesPath(std::filesystem::current_path());
     savesPath.append(kSavesDirectoryName);
-    return std::move(savesPath);
+    return savesPath;
 }
 
 void SaveLoad::refreshSavedGames() {
@@ -184,7 +184,7 @@ static SavedGame peekSavedGame(const std::filesystem::path &path) {
     result.screen = std::move(screen);
     result.lastModule = nfo.root()->getString("LastModule");
 
-    return std::move(result);
+    return result;
 }
 
 void SaveLoad::indexSavedGame(std::filesystem::path path) {
@@ -228,7 +228,7 @@ int SaveLoad::getNewSaveNumber() const {
 static std::filesystem::path getSaveGamePath(int number) {
     std::filesystem::path result(getSavesPath());
     result.append(str(boost::format("%06d") % number) + ".sav");
-    return std::move(result);
+    return result;
 }
 
 void SaveLoad::deleteGame(int number) {

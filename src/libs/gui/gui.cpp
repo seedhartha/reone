@@ -313,7 +313,7 @@ std::unique_ptr<Control> GUI::newControl(
 
     control->setTag(tag);
 
-    return std::move(control);
+    return control;
 }
 
 void GUI::addControl(std::shared_ptr<Control> control) {

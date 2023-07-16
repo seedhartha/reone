@@ -543,7 +543,7 @@ std::vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const 
     for (auto &light : distances) {
         lights.push_back(light.first);
     }
-    return std::move(lights);
+    return lights;
 }
 
 bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollision) const {
