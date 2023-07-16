@@ -17,14 +17,14 @@
 
 #include "reone/game/combat.h"
 
+#include "reone/game/di/services.h"
+#include "reone/game/effect/damage.h"
+#include "reone/game/effect/factory.h"
+#include "reone/game/game.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-
-#include "reone/game/di/services.h"
-#include "reone/game/effect/factory.h"
-#include "reone/game/game.h"
 
 using namespace reone::graphics;
 using namespace reone::scene;
@@ -357,7 +357,11 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
+            auto effect = _game.effectFactory().newEffect<DamageEffect>(
+                attack.damage,
+                DamageType::Universal,
+                DamagePower::Normal,
+                attack.attacker);
             attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
@@ -370,7 +374,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
+            std::shared_ptr<DamageEffect> effect(_game.effectFactory().newEffect<DamageEffect>(criticalHitMultiplier * attack.damage, DamageType::Universal, DamagePower::Normal, attack.attacker));
             attack.target->applyEffect(std::move(effect), DurationType::Instant);
         }
         break;
@@ -392,7 +396,7 @@ std::vector<std::shared_ptr<DamageEffect>> Combat::getDamageEffects(std::shared_
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    std::shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, DamagePower::Normal, std::move(damager)));
+    std::shared_ptr<DamageEffect> effect(_game.effectFactory().newEffect<DamageEffect>(multiplier * amount, type, DamagePower::Normal, std::move(damager)));
 
     return std::vector<std::shared_ptr<DamageEffect>> {std::move(effect)};
 }

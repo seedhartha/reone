@@ -27,7 +27,10 @@ class Creature;
 
 class DamageEffect : public Effect {
 public:
-    DamageEffect(int amount, DamageType type, DamagePower power, std::shared_ptr<Creature> damager) :
+    DamageEffect(int amount,
+                 DamageType type,
+                 DamagePower power,
+                 std::shared_ptr<Creature> damager) :
         Effect(EffectType::Damage),
         _amount(amount),
         _type(type),

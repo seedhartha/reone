@@ -17,6 +17,14 @@
 
 #include "reone/game/gui/console.h"
 
+#include "reone/game/debug.h"
+#include "reone/game/di/services.h"
+#include "reone/game/effect/damage.h"
+#include "reone/game/effect/factory.h"
+#include "reone/game/game.h"
+#include "reone/game/location.h"
+#include "reone/game/object/creature.h"
+#include "reone/game/party.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
@@ -33,14 +41,6 @@
 #include "reone/script/routines.h"
 #include "reone/script/variable.h"
 #include "reone/system/logutil.h"
-
-#include "reone/game/debug.h"
-#include "reone/game/di/services.h"
-#include "reone/game/effect/factory.h"
-#include "reone/game/game.h"
-#include "reone/game/location.h"
-#include "reone/game/object/creature.h"
-#include "reone/game/party.h"
 
 using namespace reone::gui;
 using namespace reone::graphics;
@@ -365,7 +365,11 @@ void Console::cmdKill(std::string input, std::vector<std::string> tokens) {
         print("No object is selected");
         return;
     }
-    auto effect = _game.effectFactory().newDamage(100000, DamageType::Universal, DamagePower::Normal, nullptr);
+    auto effect = _game.effectFactory().newEffect<DamageEffect>(
+        100000,
+        DamageType::Universal,
+        DamagePower::Normal,
+        std::shared_ptr<Creature>());
     object->applyEffect(std::move(effect), DurationType::Instant);
 }
 

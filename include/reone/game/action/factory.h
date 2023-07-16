@@ -33,8 +33,8 @@ public:
     }
 
     template <class T, class... Args>
-    std::unique_ptr<T> newAction(Args... args) {
-        return std::make_unique<T>(_game, _services, args...);
+    std::unique_ptr<T> newAction(Args &&...args) {
+        return std::make_unique<T>(_game, _services, std::forward<Args>(args)...);
     }
 
 private:
