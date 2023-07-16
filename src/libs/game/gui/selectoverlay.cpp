@@ -132,7 +132,7 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
         return false;
 
     const ContextAction &ctxAction = slot.actions[slot.indexSelected];
-    std::unique_ptr<Action> action;
+    std::shared_ptr<Action> action;
     switch (ctxAction.type) {
     case ActionType::AttackObject:
         action = _game.newAction<AttackObjectAction>(selectedObject);

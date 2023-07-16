@@ -295,7 +295,6 @@ void PartySelection::changeParty() {
         std::string blueprintResRef(party.getAvailableMember(i));
 
         std::shared_ptr<Creature> creature = _game.newCreature();
-        _game.addObject(creature);
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

@@ -201,7 +201,6 @@ void Equipment::onItemsListBoxItemClick(const std::string &item) {
                     partyLeader->equip(slot, itemObj);
                 } else {
                     std::shared_ptr<Item> clonedItem = _game.newItem();
-                    _game.addObject(clonedItem);
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }

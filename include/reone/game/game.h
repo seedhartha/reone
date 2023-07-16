@@ -24,8 +24,11 @@
 #include "reone/script/routines.h"
 #include "reone/system/logutil.h"
 
+#include "action.h"
 #include "combat.h"
 #include "di/services.h"
+#include "effect.h"
+#include "event.h"
 #include "gui/chargen.h"
 #include "gui/computer.h"
 #include "gui/console.h"
@@ -40,6 +43,7 @@
 #include "gui/partyselect.h"
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
+#include "location.h"
 #include "object/area.h"
 #include "object/camera/animated.h"
 #include "object/camera/dialog.h"
@@ -58,6 +62,7 @@
 #include "options.h"
 #include "party.h"
 #include "script/runner.h"
+#include "talent.h"
 
 namespace reone {
 
@@ -169,72 +174,68 @@ public:
 
     // Objects
 
-    void addObject(std::shared_ptr<Object> object) {
-        _objectById.insert(std::make_pair(object->id(), std::move(object)));
-    }
-
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    inline std::unique_ptr<Module> newModule() {
+    inline std::shared_ptr<Module> newModule() {
         return newObject<Module>(*this, _services);
     }
-    inline std::unique_ptr<Item> newItem() {
+    inline std::shared_ptr<Item> newItem() {
         return newObject<Item>(*this, _services);
     }
 
-    inline std::unique_ptr<Area> newArea(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Area> newArea(std::string sceneName = kSceneMain) {
         return newObject<Area>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Creature> newCreature(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneMain) {
         return newObject<Creature>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain) {
         return newObject<Placeable>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Door> newDoor(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Door> newDoor(std::string sceneName = kSceneMain) {
         return newObject<Door>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain) {
         return newObject<Waypoint>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain) {
         return newObject<Trigger>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Sound> newSound(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Sound> newSound(std::string sceneName = kSceneMain) {
         return newObject<Sound>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<AnimatedCamera> newAnimatedCamera(float aspect, std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<AnimatedCamera> newAnimatedCamera(float aspect, std::string sceneName = kSceneMain) {
         return newObject<AnimatedCamera>(aspect, std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<DialogCamera> newDialogCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<DialogCamera> newDialogCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
         return newObject<DialogCamera>(std::move(style), aspect, std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<FirstPersonCamera> newFirstPersonCamera(float fovy, float aspect, std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<FirstPersonCamera> newFirstPersonCamera(float fovy, float aspect, std::string sceneName = kSceneMain) {
         return newObject<FirstPersonCamera>(fovy, aspect, std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<StaticCamera> newStaticCamera(float aspect, std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<StaticCamera> newStaticCamera(float aspect, std::string sceneName = kSceneMain) {
         return newObject<StaticCamera>(aspect, std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<ThirdPersonCamera> newThirdPersonCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<ThirdPersonCamera> newThirdPersonCamera(CameraStyle style, float aspect, std::string sceneName = kSceneMain) {
         return newObject<ThirdPersonCamera>(std::move(style), aspect, std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain) {
         return newObject<Encounter>(std::move(sceneName), *this, _services);
     }
 
-    inline std::unique_ptr<Store> newStore(std::string sceneName = kSceneMain) {
+    inline std::shared_ptr<Store> newStore(std::string sceneName = kSceneMain) {
         return newObject<Store>(std::move(sceneName), *this, _services);
     }
 
@@ -244,18 +245,35 @@ public:
     }
 
     template <class T, class... Args>
-    inline std::unique_ptr<T> newObject(Args &&...args) {
-        return std::make_unique<T>(_nextObjectId++, std::forward<Args>(args)...);
+    inline std::shared_ptr<T> newObject(Args &&...args) {
+        auto object = std::make_shared<T>(_nextObjectId++, std::forward<Args>(args)...);
+        auto [inserted, _] = _objectById.insert(std::make_pair(object->id(), std::move(object)));
+        return std::static_pointer_cast<T>(inserted->second);
     }
 
     template <class T, class... Args>
-    inline std::unique_ptr<T> newAction(Args &&...args) {
-        return std::make_unique<T>(*this, _services, std::forward<Args>(args)...);
+    inline std::shared_ptr<T> newAction(Args &&...args) {
+        return std::make_shared<T>(*this, _services, std::forward<Args>(args)...);
     }
 
     template <class T, class... Args>
-    inline std::unique_ptr<T> newEffect(Args &&...args) {
-        return std::make_unique<T>(std::forward<Args>(args)...);
+    inline std::shared_ptr<T> newEffect(Args &&...args) {
+        return std::make_shared<T>(std::forward<Args>(args)...);
+    }
+
+    template <class... Args>
+    inline std::shared_ptr<Event> newEvent(Args &&...args) {
+        return std::make_shared<Event>(std::forward<Args>(args)...);
+    }
+
+    template <class... Args>
+    inline std::shared_ptr<Location> newLocation(Args &&...args) {
+        return std::make_shared<Location>(std::forward<Args>(args)...);
+    }
+
+    template <class... Args>
+    inline std::shared_ptr<Talent> newTalent(Args &&...args) {
+        return std::make_shared<Talent>(std::forward<Args>(args)...);
     }
 
     // END Objects
@@ -304,7 +322,7 @@ private:
     std::set<std::string> _moduleNames;
 
     uint32_t _nextObjectId {2}; // ids 0 and 1 are reserved
-    std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
+    std::map<uint32_t, std::shared_ptr<Object>> _objectById;
 
     // Services
 

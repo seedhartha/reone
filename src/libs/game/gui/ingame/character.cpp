@@ -200,7 +200,6 @@ std::shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(ISceneGraph &sceneG
     auto partyLeader = _game.party().getLeader();
 
     std::shared_ptr<Creature> character = _game.newCreature(sceneGraph.name());
-    _game.addObject(character);
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(partyLeader->appearance());
 

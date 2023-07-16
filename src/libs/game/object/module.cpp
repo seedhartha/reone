@@ -77,7 +77,6 @@ void Module::loadArea(const schema::IFO &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _game.newArea();
-    _game.addObject(_area);
 
     std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {

@@ -113,7 +113,6 @@ std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph
     // Create a creature from the current portrait
 
     std::shared_ptr<Creature> creature = _game.newCreature(sceneGraph.name());
-    _game.addObject(creature);
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");

@@ -315,7 +315,6 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
 
 bool Creature::equip(const std::string &resRef) {
     std::shared_ptr<Item> item = _game.newItem();
-    _game.addObject(item);
     item->loadFromBlueprint(resRef);
 
     bool equipped = false;

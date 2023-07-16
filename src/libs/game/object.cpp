@@ -71,15 +71,15 @@ void Object::clearAllActions() {
     }
 }
 
-void Object::addAction(std::unique_ptr<Action> action) {
+void Object::addAction(std::shared_ptr<Action> action) {
     _actions.push_back(std::move(action));
 }
 
-void Object::addActionOnTop(std::unique_ptr<Action> action) {
+void Object::addActionOnTop(std::shared_ptr<Action> action) {
     _actions.push_front(std::move(action));
 }
 
-void Object::delayAction(std::unique_ptr<Action> action, float seconds) {
+void Object::delayAction(std::shared_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = std::move(action);
     delayed.timer = std::make_unique<Timer>(seconds);
@@ -150,7 +150,6 @@ std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, 
 
     } else {
         result = _game.newItem();
-        _game.addObject(result);
         result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);
         result->setDropable(dropable);

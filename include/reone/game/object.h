@@ -164,9 +164,9 @@ public:
 
     virtual void clearAllActions();
 
-    void addAction(std::unique_ptr<Action> action);
-    void addActionOnTop(std::unique_ptr<Action> action);
-    void delayAction(std::unique_ptr<Action> action, float seconds);
+    void addAction(std::shared_ptr<Action> action);
+    void addActionOnTop(std::shared_ptr<Action> action);
+    void delayAction(std::shared_ptr<Action> action, float seconds);
 
     bool hasUserActionsPending() const;
 
@@ -198,7 +198,7 @@ public:
 
 protected:
     struct DelayedAction {
-        std::unique_ptr<Action> action;
+        std::shared_ptr<Action> action;
         std::unique_ptr<Timer> timer;
     };
 

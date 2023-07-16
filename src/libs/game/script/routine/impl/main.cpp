@@ -1218,7 +1218,7 @@ static Variable EventUserDefined(const std::vector<Variable> &args, const Routin
     // Transform
 
     // Execute
-    auto event = std::make_shared<Event>(nUserDefinedEventNumber);
+    auto event = ctx.game.newEvent(nUserDefinedEventNumber);
     return Variable::ofEvent(std::move(event));
 }
 
@@ -1821,8 +1821,7 @@ static Variable GetLocation(const std::vector<Variable> &args, const RoutineCont
     // Transform
 
     // Execute
-    auto location = std::make_shared<game::Location>(oObject->position(), oObject->getFacing());
-    return Variable::ofLocation(std::move(location));
+    return Variable::ofLocation(ctx.game.newLocation(oObject->position(), oObject->getFacing()));
 }
 
 static Variable CreateLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1834,8 +1833,7 @@ static Variable CreateLocation(const std::vector<Variable> &args, const RoutineC
     auto orientation = glm::radians(fOrientation);
 
     // Execute
-    auto location = std::make_shared<game::Location>(std::move(vPosition), orientation);
-    return Variable::ofLocation(location);
+    return Variable::ofLocation(ctx.game.newLocation(std::move(vPosition), orientation));
 }
 
 static Variable ApplyEffectAtLocation(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2566,8 +2564,7 @@ static Variable TalentSpell(const std::vector<Variable> &args, const RoutineCont
     // Transform
 
     // Execute
-    auto talent = std::make_shared<Talent>(TalentType::Spell, nSpell);
-    return Variable::ofTalent(std::move(talent));
+    return Variable::ofTalent(ctx.game.newTalent(TalentType::Spell, nSpell));
 }
 
 static Variable TalentFeat(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -2577,8 +2574,7 @@ static Variable TalentFeat(const std::vector<Variable> &args, const RoutineConte
     // Transform
 
     // Execute
-    auto talent = std::make_shared<Talent>(TalentType::Feat, nFeat);
-    return Variable::ofTalent(std::move(talent));
+    return Variable::ofTalent(ctx.game.newTalent(TalentType::Feat, nFeat));
 }
 
 static Variable TalentSkill(const std::vector<Variable> &args, const RoutineContext &ctx) {

@@ -241,10 +241,10 @@ private:
     // Cameras
 
     float _cameraAspect {0.0f};
-    std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
-    std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
-    std::unique_ptr<DialogCamera> _dialogCamera;
-    std::unique_ptr<AnimatedCamera> _animatedCamera;
+    std::shared_ptr<FirstPersonCamera> _firstPersonCamera;
+    std::shared_ptr<ThirdPersonCamera> _thirdPersonCamera;
+    std::shared_ptr<DialogCamera> _dialogCamera;
+    std::shared_ptr<AnimatedCamera> _animatedCamera;
     StaticCamera *_staticCamera {nullptr};
 
     // END Cameras
