@@ -18,13 +18,11 @@
 #include "reone/game/object/module.h"
 
 #include "reone/game/action/attackobject.h"
-#include "reone/game/action/factory.h"
 #include "reone/game/action/opencontainer.h"
 #include "reone/game/action/opendoor.h"
 #include "reone/game/action/startconversation.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/reputes.h"
 #include "reone/resource/di/services.h"
@@ -78,7 +76,7 @@ void Module::loadInfo(const schema::IFO &ifo) {
 void Module::loadArea(const schema::IFO &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
-    _area = _game.objectFactory().newArea();
+    _area = _game.newArea();
     _game.addObject(_area);
 
     std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
@@ -231,18 +229,18 @@ void Module::onCreatureClick(const std::shared_ptr<Creature> &creature) {
     if (creature->isDead()) {
         if (!creature->items().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game.actionFactory().newAction<OpenContainerAction>(creature));
+            partyLeader->addAction(_game.newAction<OpenContainerAction>(creature));
         }
     } else {
         bool isEnemy = _services.game.reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            auto action = _game.actionFactory().newAction<AttackObjectAction>(creature);
+            auto action = _game.newAction<AttackObjectAction>(creature);
             action->setUserAction(true);
             partyLeader->addAction(std::move(action));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game.actionFactory().newAction<StartConversationAction>(creature, creature->conversation()));
+            partyLeader->addAction(_game.newAction<StartConversationAction>(creature, creature->conversation()));
         }
     }
 }
@@ -255,7 +253,7 @@ void Module::onDoorClick(const std::shared_ptr<Door> &door) {
     if (!door->isOpen()) {
         std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newAction<OpenDoorAction>(door));
+        partyLeader->addAction(_game.newAction<OpenDoorAction>(door));
     }
 }
 
@@ -264,10 +262,10 @@ void Module::onPlaceableClick(const std::shared_ptr<Placeable> &placeable) {
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newAction<OpenContainerAction>(placeable));
+        partyLeader->addAction(_game.newAction<OpenContainerAction>(placeable));
     } else if (!placeable->conversation().empty()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game.actionFactory().newAction<StartConversationAction>(placeable, placeable->conversation()));
+        partyLeader->addAction(_game.newAction<StartConversationAction>(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(std::move(partyLeader));
     }

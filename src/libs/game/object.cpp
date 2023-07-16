@@ -19,7 +19,6 @@
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/room.h"
 #include "reone/system/logutil.h"
@@ -150,7 +149,7 @@ std::shared_ptr<Item> Object::addItem(const std::string &resRef, int stackSize, 
         result->setStackSize(prevStackSize + stackSize);
 
     } else {
-        result = _game.objectFactory().newItem();
+        result = _game.newItem();
         _game.addObject(result);
         result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);

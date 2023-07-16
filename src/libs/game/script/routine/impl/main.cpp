@@ -132,7 +132,7 @@ static Variable AssignCommand(const std::vector<Variable> &args, const RoutineCo
     // Transform
 
     // Execute
-    auto commandAction = ctx.game.actionFactory().newAction<DoCommandAction>(std::move(aActionToAssign));
+    auto commandAction = ctx.game.newAction<DoCommandAction>(std::move(aActionToAssign));
     oActionSubject->addAction(std::move(commandAction));
     return Variable::ofNull();
 }
@@ -145,7 +145,7 @@ static Variable DelayCommand(const std::vector<Variable> &args, const RoutineCon
     // Transform
 
     // Execute
-    auto commandAction = ctx.game.actionFactory().newAction<DoCommandAction>(std::move(aActionToDelay));
+    auto commandAction = ctx.game.newAction<DoCommandAction>(std::move(aActionToDelay));
     getCaller(ctx)->delayAction(std::move(commandAction), fSeconds);
     return Variable::ofNull();
 }
@@ -2677,7 +2677,7 @@ static Variable JumpToLocation(const std::vector<Variable> &args, const RoutineC
     // Transform
 
     // Execute
-    auto action = ctx.game.actionFactory().newAction<JumpToLocationAction>(std::move(lDestination));
+    auto action = ctx.game.newAction<JumpToLocationAction>(std::move(lDestination));
     getCaller(ctx)->addActionOnTop(std::move(action));
     return Variable::ofNull();
 }
@@ -3300,7 +3300,7 @@ static Variable JumpToObject(const std::vector<Variable> &args, const RoutineCon
     auto walkStraightLineToPoint = static_cast<bool>(nWalkStraightLineToPoint);
 
     // Execute
-    auto action = ctx.game.actionFactory().newAction<JumpToObjectAction>(std::move(oToJumpTo), walkStraightLineToPoint);
+    auto action = ctx.game.newAction<JumpToObjectAction>(std::move(oToJumpTo), walkStraightLineToPoint);
     getCaller(ctx)->addActionOnTop(std::move(action));
     return Variable::ofNull();
 }

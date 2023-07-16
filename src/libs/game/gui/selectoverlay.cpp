@@ -31,7 +31,6 @@
 #include "reone/resource/resources.h"
 
 #include "reone/game/action/attackobject.h"
-#include "reone/game/action/factory.h"
 #include "reone/game/action/usefeat.h"
 #include "reone/game/action/useskill.h"
 #include "reone/game/d20/feat.h"
@@ -136,13 +135,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     std::unique_ptr<Action> action;
     switch (ctxAction.type) {
     case ActionType::AttackObject:
-        action = _game.actionFactory().newAction<AttackObjectAction>(selectedObject);
+        action = _game.newAction<AttackObjectAction>(selectedObject);
         break;
     case ActionType::UseFeat:
-        action = _game.actionFactory().newAction<UseFeatAction>(ctxAction.feat, selectedObject);
+        action = _game.newAction<UseFeatAction>(ctxAction.feat, selectedObject);
         break;
     case ActionType::UseSkill:
-        action = _game.actionFactory().newAction<UseSkillAction>(ctxAction.skill, selectedObject);
+        action = _game.newAction<UseSkillAction>(ctxAction.skill, selectedObject);
         break;
     default:
         break;

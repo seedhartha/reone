@@ -24,14 +24,13 @@
 #include "reone/resource/types.h"
 
 #include "../gui.h"
+
 #include "barkbubble.h"
 #include "selectoverlay.h"
 
 namespace reone {
 
 namespace game {
-
-class ActionFactory;
 
 class HUD : public GameGUI {
 public:

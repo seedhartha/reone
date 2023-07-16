@@ -21,7 +21,6 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/ingame.h"
 #include "reone/game/object/creature.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
 #include "reone/graphics/textures.h"
@@ -201,7 +200,7 @@ void Equipment::onItemsListBoxItemClick(const std::string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    std::shared_ptr<Item> clonedItem = _game.objectFactory().newItem();
+                    std::shared_ptr<Item> clonedItem = _game.newItem();
                     _game.addObject(clonedItem);
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);

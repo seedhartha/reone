@@ -30,7 +30,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingmelee.h
     ${GAME_INCLUDE_DIR}/action/equipmostdamagingranged.h
     ${GAME_INCLUDE_DIR}/action/equipmosteffectivearmor.h
-    ${GAME_INCLUDE_DIR}/action/factory.h
     ${GAME_INCLUDE_DIR}/action/follow.h
     ${GAME_INCLUDE_DIR}/action/followleader.h
     ${GAME_INCLUDE_DIR}/action/followowner.h
@@ -135,7 +134,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/droidstun.h
     ${GAME_INCLUDE_DIR}/effect/entangle.h
     ${GAME_INCLUDE_DIR}/effect/factionmodifier.h
-    ${GAME_INCLUDE_DIR}/effect/factory.h
     ${GAME_INCLUDE_DIR}/effect/forcebody.h
     ${GAME_INCLUDE_DIR}/effect/forcedrain.h
     ${GAME_INCLUDE_DIR}/effect/forcefizzle.h
@@ -303,7 +301,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/creature.h
     ${GAME_INCLUDE_DIR}/object/door.h
     ${GAME_INCLUDE_DIR}/object/encounter.h
-    ${GAME_INCLUDE_DIR}/object/factory.h
     ${GAME_INCLUDE_DIR}/object/item.h
     ${GAME_INCLUDE_DIR}/object/module.h
     ${GAME_INCLUDE_DIR}/object/placeable.h
@@ -524,7 +521,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/creature.cpp
     ${GAME_SOURCE_DIR}/object/door.cpp
     ${GAME_SOURCE_DIR}/object/encounter.cpp
-    ${GAME_SOURCE_DIR}/object/factory.cpp
     ${GAME_SOURCE_DIR}/object/item.cpp
     ${GAME_SOURCE_DIR}/object/module.cpp
     ${GAME_SOURCE_DIR}/object/placeable.cpp

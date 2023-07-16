@@ -28,7 +28,6 @@
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/types.h"
 

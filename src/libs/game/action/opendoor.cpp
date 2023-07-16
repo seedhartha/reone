@@ -20,7 +20,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/door.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/script/runner.h"
 
 namespace reone {

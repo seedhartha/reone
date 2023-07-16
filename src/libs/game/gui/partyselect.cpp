@@ -19,7 +19,6 @@
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
@@ -295,7 +294,7 @@ void PartySelection::changeParty() {
 
         std::string blueprintResRef(party.getAvailableMember(i));
 
-        std::shared_ptr<Creature> creature = _game.objectFactory().newCreature();
+        std::shared_ptr<Creature> creature = _game.newCreature();
         _game.addObject(creature);
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);

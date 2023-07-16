@@ -24,11 +24,9 @@
 #include "reone/script/routines.h"
 #include "reone/system/logutil.h"
 
-#include "action/factory.h"
 #include "camera.h"
 #include "combat.h"
 #include "di/services.h"
-#include "effect/factory.h"
 #include "gui/chargen.h"
 #include "gui/computer.h"
 #include "gui/console.h"
@@ -43,8 +41,17 @@
 #include "gui/partyselect.h"
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
-#include "object/factory.h"
+#include "object/area.h"
+#include "object/creature.h"
+#include "object/door.h"
+#include "object/encounter.h"
 #include "object/module.h"
+#include "object/placeable.h"
+#include "object/placeablecamera.h"
+#include "object/sound.h"
+#include "object/store.h"
+#include "object/trigger.h"
+#include "object/waypoint.h"
 #include "options.h"
 #include "party.h"
 #include "script/runner.h"
@@ -84,9 +91,7 @@ public:
         _options(options),
         _services(services),
         _party(*this),
-        _combat(*this, services),
-        _actionFactory(*this, services),
-        _objectFactory(*this, services) {
+        _combat(*this, services) {
     }
 
     void init();
@@ -109,9 +114,6 @@ public:
     const OptionsView &options() const { return _options; }
     Party &party() { return _party; }
     Combat &combat() { return _combat; }
-    ActionFactory &actionFactory() { return _actionFactory; }
-    EffectFactory &effectFactory() { return _effectFactory; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
     Map &map() { return *_map; }
     script::IRoutines &routines() { return *_routines; }
@@ -170,9 +172,71 @@ public:
 
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
+    inline std::unique_ptr<Module> newModule() {
+        return newObject<Module>(*this, _services);
+    }
+    inline std::unique_ptr<Item> newItem() {
+        return newObject<Item>(*this, _services);
+    }
+
+    inline std::unique_ptr<Area> newArea(std::string sceneName = kSceneMain) {
+        return newObject<Area>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Creature> newCreature(std::string sceneName = kSceneMain) {
+        return newObject<Creature>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain) {
+        return newObject<Placeable>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Door> newDoor(std::string sceneName = kSceneMain) {
+        return newObject<Door>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneMain) {
+        return newObject<Waypoint>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Trigger> newTrigger(std::string sceneName = kSceneMain) {
+        return newObject<Trigger>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Sound> newSound(std::string sceneName = kSceneMain) {
+        return newObject<Sound>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneMain) {
+        return newObject<PlaceableCamera>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Encounter> newEncounter(std::string sceneName = kSceneMain) {
+        return newObject<Encounter>(std::move(sceneName), *this, _services);
+    }
+
+    inline std::unique_ptr<Store> newStore(std::string sceneName = kSceneMain) {
+        return newObject<Store>(std::move(sceneName), *this, _services);
+    }
+
     template <class T>
-    std::shared_ptr<T> getObjectById(uint32_t id) const {
+    inline std::shared_ptr<T> getObjectById(uint32_t id) const {
         return std::dynamic_pointer_cast<T>(getObjectById(id));
+    }
+
+    template <class T, class... Args>
+    inline std::unique_ptr<T> newObject(Args &&...args) {
+        return std::make_unique<T>(_nextObjectId++, std::forward<Args>(args)...);
+    }
+
+    template <class T, class... Args>
+    inline std::unique_ptr<T> newAction(Args &&...args) {
+        return std::make_unique<T>(*this, _services, std::forward<Args>(args)...);
+    }
+
+    template <class T, class... Args>
+    inline std::unique_ptr<T> newEffect(Args &&...args) {
+        return std::make_unique<T>(std::forward<Args>(args)...);
     }
 
     // END Objects
@@ -220,15 +284,13 @@ private:
     bool _paused {false};
     std::set<std::string> _moduleNames;
 
+    uint32_t _nextObjectId {2}; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
 
     // Services
 
     Party _party;
     Combat _combat;
-    ActionFactory _actionFactory;
-    EffectFactory _effectFactory;
-    ObjectFactory _objectFactory;
 
     std::unique_ptr<script::IRoutines> _routines;
     std::unique_ptr<ScriptRunner> _scriptRunner;

@@ -22,7 +22,6 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 #include "reone/game/object/creature.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
@@ -195,7 +194,7 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 std::shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, ISceneGraph &sceneGraph) {
-    std::shared_ptr<Creature> character = _game.objectFactory().newCreature(sceneGraph.name());
+    std::shared_ptr<Creature> character = _game.newCreature(sceneGraph.name());
     _game.addObject(character);
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);

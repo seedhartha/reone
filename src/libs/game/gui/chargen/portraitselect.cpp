@@ -20,7 +20,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
@@ -113,7 +112,7 @@ void PortraitSelection::loadHeadModel() {
 std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    std::shared_ptr<Creature> creature = _game.objectFactory().newCreature(sceneGraph.name());
+    std::shared_ptr<Creature> creature = _game.newCreature(sceneGraph.name());
     _game.addObject(creature);
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());

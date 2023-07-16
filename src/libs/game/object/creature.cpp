@@ -26,7 +26,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/footstepsounds.h"
 #include "reone/game/game.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
 #include "reone/game/soundsets.h"
@@ -315,7 +314,7 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
 }
 
 bool Creature::equip(const std::string &resRef) {
-    std::shared_ptr<Item> item = _game.objectFactory().newItem();
+    std::shared_ptr<Item> item = _game.newItem();
     _game.addObject(item);
     item->loadFromBlueprint(resRef);
 

@@ -27,7 +27,6 @@
 #include "reone/game/di/services.h"
 #include "reone/game/dialogs.h"
 #include "reone/game/location.h"
-#include "reone/game/object/factory.h"
 #include "reone/game/party.h"
 #include "reone/game/resourcedirector.h"
 #include "reone/game/script/routines.h"
@@ -203,16 +202,6 @@ void Game::loadModule(const std::string &name, std::string entry) {
     withLoadingScreen("load_" + name, [this, &name, &entry]() {
         loadInGameMenus();
 
-        /*
-        _services.game.soundSets.clear();
-        _services.graphics.textures.clear();
-        _services.graphics.models.clear();
-        _services.graphics.walkmeshes.clear();
-        _services.graphics.lips.clear();
-        _services.audio.files.clear();
-        _services.script.scripts.clear();
-        */
-
         try {
             if (_module) {
                 _module->area()->runOnExitScript();
@@ -233,7 +222,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (maybeModule != _loadedModules.end()) {
                 _module = maybeModule->second;
             } else {
-                _module = _objectFactory.newModule();
+                _module = newModule();
                 _objectById.insert(std::make_pair(_module->id(), _module));
 
                 std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
@@ -274,7 +263,7 @@ void Game::loadDefaultParty() {
     _party.defaultMembers(member1, member2, member3);
 
     if (!member1.empty()) {
-        std::shared_ptr<Creature> player = _objectFactory.newCreature();
+        std::shared_ptr<Creature> player = newCreature();
         _objectById.insert(std::make_pair(player->id(), player));
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
@@ -283,14 +272,14 @@ void Game::loadDefaultParty() {
         _party.setPlayer(player);
     }
     if (!member2.empty()) {
-        std::shared_ptr<Creature> companion = _objectFactory.newCreature();
+        std::shared_ptr<Creature> companion = newCreature();
         _objectById.insert(std::make_pair(companion->id(), companion));
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
         _party.addMember(0, companion);
     }
     if (!member3.empty()) {
-        std::shared_ptr<Creature> companion = _objectFactory.newCreature();
+        std::shared_ptr<Creature> companion = newCreature();
         _objectById.insert(std::make_pair(companion->id(), companion));
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);

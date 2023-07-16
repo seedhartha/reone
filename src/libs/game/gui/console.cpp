@@ -20,7 +20,6 @@
 #include "reone/game/debug.h"
 #include "reone/game/di/services.h"
 #include "reone/game/effect/damage.h"
-#include "reone/game/effect/factory.h"
 #include "reone/game/game.h"
 #include "reone/game/location.h"
 #include "reone/game/object/creature.h"
@@ -365,7 +364,7 @@ void Console::cmdKill(std::string input, std::vector<std::string> tokens) {
         print("No object is selected");
         return;
     }
-    auto effect = _game.effectFactory().newEffect<DamageEffect>(
+    auto effect = _game.newEffect<DamageEffect>(
         100000,
         DamageType::Universal,
         DamagePower::Normal,
