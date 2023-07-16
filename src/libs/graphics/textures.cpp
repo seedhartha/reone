@@ -178,7 +178,6 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         }
         float anisotropy = std::max(1.0f, exp2f(_options.anisotropicFiltering));
         texture->setAnisotropy(anisotropy);
-        texture->init();
     } else {
         warn("Texture not found: " + resRef, LogChannel::Graphics);
     }

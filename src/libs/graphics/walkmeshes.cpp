@@ -17,10 +17,9 @@
 
 #include "reone/graphics/walkmeshes.h"
 
+#include "reone/graphics/format/bwmreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
-
-#include "reone/graphics/format/bwmreader.h"
 
 using namespace reone::resource;
 

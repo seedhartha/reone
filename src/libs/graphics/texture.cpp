@@ -112,10 +112,12 @@ void Texture::init() {
         return;
     }
     checkMainThread();
+
     glGenTextures(1, &_nameGL);
-    bind();
+    glBindTexture(getTargetGL(), _nameGL);
     configure();
     refresh();
+
     _inited = true;
 }
 
@@ -129,13 +131,14 @@ void Texture::deinit() {
 }
 
 void Texture::bind() {
-    auto target = getTargetGL();
-    glBindTexture(target, _nameGL);
+    if (!_inited) {
+        init();
+    }
+    glBindTexture(getTargetGL(), _nameGL);
 }
 
 void Texture::unbind() {
-    auto target = getTargetGL();
-    glBindTexture(target, 0);
+    glBindTexture(getTargetGL(), 0);
 }
 
 void Texture::configure() {

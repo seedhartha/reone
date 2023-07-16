@@ -97,9 +97,6 @@ void Mesh::init() {
 
     // END OpenGL
 
-    computeFaceData();
-    computeAABB();
-
     _inited = true;
 }
 
@@ -115,11 +112,17 @@ void Mesh::deinit() {
 }
 
 void Mesh::draw() {
+    if (!_inited) {
+        init();
+    }
     glBindVertexArray(_vaoId);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr);
 }
 
 void Mesh::drawInstanced(int count) {
+    if (!_inited) {
+        init();
+    }
     glBindVertexArray(_vaoId);
     glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr, count);
 }

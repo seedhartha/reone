@@ -57,6 +57,7 @@ private:
     bool _positional;
     glm::vec3 _position;
 
+    bool _inited {false};
     bool _playing {false};
 
     std::vector<uint32_t> _buffers;

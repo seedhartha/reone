@@ -51,6 +51,9 @@ static void fillBuffer(const AudioBuffer::Frame &frame, uint32_t buffer) {
 }
 
 void AudioSource::init() {
+    if (_inited) {
+        return;
+    }
     checkMainThread();
 
     int frameCount = _stream->getFrameCount();
@@ -80,9 +83,14 @@ void AudioSource::init() {
         alSourcei(_source, AL_BUFFER, _buffers[0]);
         alSourcei(_source, AL_LOOPING, _loop);
     }
+
+    _inited = true;
 }
 
 void AudioSource::deinit() {
+    if (!_inited) {
+        return;
+    }
     checkMainThread();
     if (_source) {
         alSourceStop(_source);
@@ -93,9 +101,13 @@ void AudioSource::deinit() {
         alDeleteBuffers(static_cast<int>(_buffers.size()), &_buffers[0]);
         _buffers.clear();
     }
+    _inited = false;
 }
 
 void AudioSource::update() {
+    if (!_source) {
+        return;
+    }
     if (!_streaming) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);

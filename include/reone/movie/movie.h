@@ -79,6 +79,8 @@ private:
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 
+    bool _inited {false};
+
     int _width {0};
     int _height {0};
 

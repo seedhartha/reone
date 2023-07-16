@@ -17,14 +17,13 @@
 
 #include "reone/graphics/models.h"
 
+#include "reone/graphics/format/mdlmdxreader.h"
+#include "reone/graphics/model.h"
+#include "reone/graphics/textures.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
-
-#include "reone/graphics/format/mdlmdxreader.h"
-#include "reone/graphics/model.h"
-#include "reone/graphics/textures.h"
 
 using namespace reone::resource;
 
@@ -69,9 +68,6 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
         try {
             reader.load();
             model = reader.model();
-            if (model) {
-                model->init();
-            }
         } catch (const FormatException &e) {
             error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannel::Graphics);
         }

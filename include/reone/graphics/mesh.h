@@ -58,6 +58,8 @@ public:
         _vertices(std::move(vertices)),
         _faces(std::move(faces)),
         _spec(std::move(spec)) {
+        computeFaceData();
+        computeAABB();
     }
 
     ~Mesh() { deinit(); }

@@ -17,12 +17,11 @@
 
 #include "reone/audio/files.h"
 
-#include "reone/resource/resources.h"
-#include "reone/system/stream/memoryinput.h"
-
 #include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
+#include "reone/resource/resources.h"
+#include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;
 

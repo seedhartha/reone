@@ -36,19 +36,25 @@ namespace reone {
 namespace movie {
 
 void Movie::init() {
+    if (_inited) {
+        return;
+    }
     if (!_texture && _videoStream) {
         _width = _videoStream->width();
         _height = _videoStream->height();
         _texture = std::make_shared<Texture>("video", getTextureProperties(TextureUsage::Movie));
         _texture->clear(1, 1, PixelFormat::RGB8, 1);
-        _texture->init();
     }
     if (!_audioSource && _audioStream) {
         _audioSource = _audioSvc.player.play(_audioStream, AudioType::Movie);
     }
+    _inited = true;
 }
 
 void Movie::deinit() {
+    if (!_inited) {
+        return;
+    }
     if (_audioSource) {
         _audioSource.reset();
     }
@@ -61,9 +67,13 @@ void Movie::deinit() {
     if (_videoStream) {
         _videoStream.reset();
     }
+    _inited = false;
 }
 
 void Movie::update(float dt) {
+    if (!_inited) {
+        init();
+    }
     if (!_videoStream || _finished) {
         return;
     }
@@ -79,6 +89,9 @@ void Movie::update(float dt) {
 }
 
 void Movie::render() {
+    if (!_inited) {
+        init();
+    }
     if (!_videoStream) {
         return;
     }

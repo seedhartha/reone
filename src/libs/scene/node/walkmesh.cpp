@@ -61,7 +61,6 @@ void WalkmeshSceneNode::init() {
     spec.offMaterial = 6 * sizeof(float);
 
     _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
-    _mesh->init();
 }
 
 void WalkmeshSceneNode::draw() {
