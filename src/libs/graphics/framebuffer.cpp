@@ -19,6 +19,7 @@
 
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/texture.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -28,6 +29,7 @@ void Framebuffer::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
     glGenFramebuffers(1, &_nameGL);
     glBindFramebuffer(GL_FRAMEBUFFER, _nameGL);
     configure();
@@ -39,6 +41,7 @@ void Framebuffer::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteFramebuffers(1, &_nameGL);
     _inited = false;
 }

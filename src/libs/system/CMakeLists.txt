@@ -39,6 +39,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/textreader.h
     ${SYSTEM_INCLUDE_DIR}/textwriter.h
     ${SYSTEM_INCLUDE_DIR}/threadpool.h
+    ${SYSTEM_INCLUDE_DIR}/threadutil.h
     ${SYSTEM_INCLUDE_DIR}/timer.h
     ${SYSTEM_INCLUDE_DIR}/types.h)
 
@@ -54,7 +55,8 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/stream/memoryinput.cpp
     ${SYSTEM_SOURCE_DIR}/textreader.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp
-    ${SYSTEM_SOURCE_DIR}/threadpool.cpp)
+    ${SYSTEM_SOURCE_DIR}/threadpool.cpp
+    ${SYSTEM_SOURCE_DIR}/threadutil.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(system PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

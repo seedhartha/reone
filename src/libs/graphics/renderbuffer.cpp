@@ -18,6 +18,7 @@
 #include "reone/graphics/renderbuffer.h"
 
 #include "reone/graphics/pixelutil.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -27,6 +28,7 @@ void Renderbuffer::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
     glGenRenderbuffers(1, &_nameGL);
     bind();
     refresh();
@@ -37,6 +39,7 @@ void Renderbuffer::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteRenderbuffers(1, &_nameGL);
     _inited = false;
 }

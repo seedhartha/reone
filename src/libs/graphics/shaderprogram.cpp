@@ -18,6 +18,7 @@
 #include "reone/graphics/shaderprogram.h"
 
 #include "reone/graphics/types.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -27,6 +28,8 @@ void ShaderProgram::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
+
     _nameGL = glCreateProgram();
     for (auto &shader : _shaders) {
         glAttachShader(_nameGL, shader->nameGL());
@@ -49,6 +52,7 @@ void ShaderProgram::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteProgram(_nameGL);
     _shaders.clear();
     _inited = false;

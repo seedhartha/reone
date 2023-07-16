@@ -19,6 +19,7 @@
 
 #include "reone/graphics/barycentricutil.h"
 #include "reone/graphics/triangleutil.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -28,6 +29,8 @@ void Mesh::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
+
     std::vector<uint16_t> indices;
     indices.reserve(3 * _faces.size());
     for (auto &face : _faces) {
@@ -104,6 +107,7 @@ void Mesh::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteVertexArrays(1, &_vaoId);
     glDeleteBuffers(1, &_iboId);
     glDeleteBuffers(1, &_vboId);

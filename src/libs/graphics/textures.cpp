@@ -29,6 +29,7 @@
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/stream/memoryinput.h"
+#include "reone/system/threadutil.h"
 
 using namespace reone::resource;
 
@@ -37,6 +38,8 @@ namespace reone {
 namespace graphics {
 
 void Textures::init() {
+    checkMainThread();
+
     _default2DRGB = std::make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
     _default2DRGB->clear(1, 1, PixelFormat::RGB8);
     _default2DRGB->init();

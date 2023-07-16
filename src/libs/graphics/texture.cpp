@@ -20,6 +20,7 @@
 #include "reone/graphics/pixelutil.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/system/exception/notimplemented.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -110,6 +111,7 @@ void Texture::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
     glGenTextures(1, &_nameGL);
     bind();
     configure();
@@ -121,6 +123,7 @@ void Texture::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteTextures(1, &_nameGL);
     _inited = false;
 }

@@ -16,6 +16,7 @@
  */
 
 #include "reone/graphics/context.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -25,6 +26,7 @@ void GraphicsContext::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
     GLenum error = glewInit();
     if (error != GLEW_OK) {
         throw std::runtime_error(str(boost::format("glewInit failed: %s") % glewGetErrorString(error)));
@@ -56,10 +58,12 @@ void GraphicsContext::clearColor(glm::vec4 color) {
 }
 
 void GraphicsContext::clearDepth() {
+    checkMainThread();
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsContext::clearColorDepth(glm::vec4 color) {
+    checkMainThread();
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

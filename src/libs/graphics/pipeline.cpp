@@ -17,9 +17,6 @@
 
 #include "reone/graphics/pipeline.h"
 
-#include "reone/scene/node/light.h"
-#include "reone/system/randomutil.h"
-
 #include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/format/tgawriter.h"
@@ -33,6 +30,9 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/scene/node/light.h"
+#include "reone/system/randomutil.h"
+#include "reone/system/threadutil.h"
 
 #define R_GAUSSIAN_BLUR_HORIZONTAL false
 #define R_GAUSSIAN_BLUR_VERTICAL true
@@ -154,6 +154,8 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 }
 
 void Pipeline::init() {
+    checkMainThread();
+
     // SSAO
     _uniforms.setSSAO([](auto &ssao) {
         for (int i = 0; i < kNumSSAOSamples; ++i) {

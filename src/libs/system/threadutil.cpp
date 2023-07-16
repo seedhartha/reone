@@ -15,28 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
-
 #include "reone/system/threadutil.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#include "frame.h"
 
 namespace reone {
 
-bool LauncherApp::OnInit() {
-#ifdef _WIN32
-    SetProcessDPIAware();
-#endif
-    setMainThread();
-    auto frame = new LauncherFrame(); // managed by the library
-    frame->Show();
-    return true;
-};
+static std::thread::id g_mainThreadId;
+
+void setMainThread() {
+    g_mainThreadId = std::this_thread::get_id();
+}
+
+void checkMainThread() {
+    if (std::this_thread::get_id() != g_mainThreadId) {
+        throw std::logic_error("Operation forbidden outside the main thread");
+    }
+}
 
 } // namespace reone
-
-wxIMPLEMENT_APP(reone::LauncherApp);

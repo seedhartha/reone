@@ -15,28 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
-
-#include "reone/system/threadutil.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#include "frame.h"
+#pragma once
 
 namespace reone {
 
-bool LauncherApp::OnInit() {
-#ifdef _WIN32
-    SetProcessDPIAware();
-#endif
-    setMainThread();
-    auto frame = new LauncherFrame(); // managed by the library
-    frame->Show();
-    return true;
-};
+void setMainThread();
+void checkMainThread();
 
 } // namespace reone
-
-wxIMPLEMENT_APP(reone::LauncherApp);

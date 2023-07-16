@@ -17,6 +17,8 @@
 
 #include "reone/graphics/shader.h"
 
+#include "reone/system/threadutil.h"
+
 namespace reone {
 
 namespace graphics {
@@ -38,6 +40,8 @@ void Shader::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
+
     std::vector<const char *> sourcePtrs;
     for (auto &src : _sources) {
         sourcePtrs.push_back(src.c_str());
@@ -62,6 +66,7 @@ void Shader::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteShader(_nameGL);
     _inited = false;
 }

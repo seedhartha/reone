@@ -17,6 +17,8 @@
 
 #include "reone/graphics/uniformbuffer.h"
 
+#include "reone/system/threadutil.h"
+
 namespace reone {
 
 namespace graphics {
@@ -25,6 +27,7 @@ void UniformBuffer::init() {
     if (_inited) {
         return;
     }
+    checkMainThread();
     glGenBuffers(1, &_nameGL);
     glBindBuffer(GL_UNIFORM_BUFFER, _nameGL);
     glBufferData(GL_UNIFORM_BUFFER, _size, _data, GL_DYNAMIC_DRAW);
@@ -35,6 +38,7 @@ void UniformBuffer::deinit() {
     if (!_inited) {
         return;
     }
+    checkMainThread();
     glDeleteBuffers(1, &_nameGL);
     _inited = false;
 }

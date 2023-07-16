@@ -17,11 +17,14 @@
 
 #include "reone/audio/context.h"
 
+#include "reone/system/threadutil.h"
+
 namespace reone {
 
 namespace audio {
 
 void AudioContext::init() {
+    checkMainThread();
     _device = alcOpenDevice(nullptr);
     if (!_device) {
         throw std::runtime_error("alcOpenDevice failed");
@@ -34,6 +37,7 @@ void AudioContext::init() {
 }
 
 void AudioContext::deinit() {
+    checkMainThread();
     if (_context) {
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(_context);

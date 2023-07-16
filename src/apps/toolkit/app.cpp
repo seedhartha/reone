@@ -22,20 +22,21 @@
 #endif
 
 #include "reone/system/logutil.h"
+#include "reone/system/threadutil.h"
 
 #include "mainframe.h"
 
 namespace reone {
 
 bool ToolkitApp::OnInit() {
+#ifdef _WIN32
+    SetProcessDPIAware();
+#endif
+    setMainThread();
     initLog(
         LogSeverity::Debug,
         std::set<LogChannel> {LogChannel::Global, LogChannel::Resources, LogChannel::Graphics, LogChannel::Audio},
         "toolkit.log");
-
-#ifdef _WIN32
-    SetProcessDPIAware();
-#endif
 
     wxImage::AddHandler(new wxTGAHandler());
 

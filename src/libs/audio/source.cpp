@@ -18,6 +18,7 @@
 #include "reone/audio/source.h"
 
 #include "reone/audio/buffer.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -50,6 +51,8 @@ static void fillBuffer(const AudioBuffer::Frame &frame, uint32_t buffer) {
 }
 
 void AudioSource::init() {
+    checkMainThread();
+
     int frameCount = _stream->getFrameCount();
     int bufferCount = std::min(std::max(frameCount, 1), kMaxBufferCount);
 
@@ -80,6 +83,7 @@ void AudioSource::init() {
 }
 
 void AudioSource::deinit() {
+    checkMainThread();
     if (_source) {
         alSourceStop(_source);
         alDeleteSources(1, &_source);

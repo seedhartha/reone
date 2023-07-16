@@ -21,6 +21,8 @@
 #undef min
 #endif
 
+#include "reone/system/threadutil.h"
+
 #include "engine.h"
 
 using namespace reone;
@@ -29,6 +31,7 @@ int main(int argc, char **argv) {
 #ifdef _WIN32
     SetProcessDPIAware();
 #endif
+    setMainThread();
 
     auto engine = Engine(argc, argv);
     try {
