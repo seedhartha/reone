@@ -92,7 +92,7 @@ void Module::loadArea(const schema::IFO &ifo, bool fromSave) {
 }
 
 void Module::loadPlayer() {
-    _player = std::make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _game.party());
+    _player = std::make_unique<Player>(*this, *_area, *_area->getCamera(CameraType::ThirdPerson), _game.party());
 }
 
 void Module::loadParty(const std::string &entry, bool fromSave) {

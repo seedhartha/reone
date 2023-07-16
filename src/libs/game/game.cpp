@@ -374,10 +374,10 @@ void Game::toggleInGameCameraType() {
     case CameraType::ThirdPerson: {
         _module->player().stopMovement();
         std::shared_ptr<Area> area(_module->area());
-        auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
-        auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
-        firstPerson.setPosition(thirdPerson.sceneNode()->getOrigin());
-        firstPerson.setFacing(thirdPerson.facing());
+        auto thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
+        auto firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
+        firstPerson->setPosition(thirdPerson->sceneNode()->getOrigin());
+        firstPerson->setFacing(thirdPerson->facing());
         _cameraType = CameraType::FirstPerson;
         break;
     }
@@ -398,7 +398,7 @@ Camera *Game::getActiveCamera() const {
     if (!area) {
         return nullptr;
     }
-    return &area->getCamera(_cameraType);
+    return area->getCamera(_cameraType);
 }
 
 std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
@@ -462,7 +462,10 @@ void Game::loadNextModule() {
 }
 
 void Game::stopMovement() {
-    getActiveCamera()->stopMovement();
+    auto camera = getActiveCamera();
+    if (camera) {
+        camera->stopMovement();
+    }
     _module->player().stopMovement();
 }
 
@@ -508,7 +511,7 @@ void Game::updateCamera(float dt) {
 }
 
 void Game::updateSceneGraph(float dt) {
-    const Camera *camera = getActiveCamera();
+    auto camera = getActiveCamera();
     if (!camera) {
         return;
     }
@@ -547,7 +550,7 @@ bool Game::handle(const SDL_Event &event) {
             if (_party.handle(event)) {
                 return true;
             }
-            Camera *camera = getActiveCamera();
+            auto camera = getActiveCamera();
             if (camera && camera->handle(event)) {
                 return true;
             }

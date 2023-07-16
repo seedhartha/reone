@@ -144,14 +144,14 @@ public:
 
     // Cameras
 
-    Camera &getCamera(CameraType type);
+    Camera *getCamera(CameraType type);
 
     void setStaticCamera(int cameraId);
     void setThirdPartyCameraStyle(CameraStyleType type);
 
     template <class T>
-    T &getCamera(CameraType type) {
-        return static_cast<T &>(getCamera(type));
+    T *getCamera(CameraType type) {
+        return static_cast<T *>(getCamera(type));
     };
 
     // END Cameras

@@ -331,7 +331,7 @@ CameraType Conversation::getCamera(int &cameraId) const {
     if (!cameraModel.empty()) {
         return CameraType::Animated;
     }
-    if (_currentEntry->cameraId != -1) {
+    if (_currentEntry->cameraId != 0) {
         cameraId = _currentEntry->cameraId;
         return CameraType::Static;
     }

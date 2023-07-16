@@ -138,8 +138,8 @@ void DialogGUI::onStart() {
     _currentSpeaker = _owner;
     loadStuntParticipants();
 
-    auto &camera = _game.module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
-    camera.setModel(_cameraModel);
+    auto camera = _game.module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
+    camera->setModel(_cameraModel);
 }
 
 void DialogGUI::loadStuntParticipants() {
@@ -225,14 +225,14 @@ void DialogGUI::updateCamera() {
         std::shared_ptr<Creature> player(_game.party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
-        auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
-        camera.setListenerPosition(listenerPosition);
-        camera.setSpeakerPosition(speakerPosition);
-        camera.setVariant(getRandomCameraVariant());
+        auto camera = area->getCamera<DialogCamera>(CameraType::Dialog);
+        camera->setListenerPosition(listenerPosition);
+        camera->setSpeakerPosition(speakerPosition);
+        camera->setVariant(getRandomCameraVariant());
     } else {
-        auto &camera = area->getCamera<AnimatedCamera>(CameraType::Animated);
-        camera.setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
-        camera.playAnimation(_currentEntry->cameraAnimation);
+        auto camera = area->getCamera<AnimatedCamera>(CameraType::Animated);
+        camera->setFieldOfView(_currentEntry->camFieldOfView != 0.0f ? _currentEntry->camFieldOfView : kDefaultAnimCamFOV);
+        camera->playAnimation(_currentEntry->cameraAnimation);
     }
 }
 
@@ -375,8 +375,8 @@ void DialogGUI::update(float dt) {
 
     // Dialog camera follows the current speaker, if any
     if (_currentSpeaker && _game.cameraType() == CameraType::Dialog) {
-        auto &camera = _game.module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
-        camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
+        auto camera = _game.module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
+        camera->setSpeakerPosition(getTalkPosition(*_currentSpeaker));
     }
 }
 

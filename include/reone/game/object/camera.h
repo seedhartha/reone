@@ -60,7 +60,7 @@ public:
     bool isMouseLookMode() const { return _mouseLookMode; }
 
 protected:
-    int _cameraId {-1};
+    int _cameraId {0};
     float _fieldOfView {0.0f};
 
     float _facing {0.0f};

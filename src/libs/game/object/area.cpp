@@ -882,18 +882,18 @@ void Area::updateHeartbeat(float dt) {
     }
 }
 
-Camera &Area::getCamera(CameraType type) {
+Camera *Area::getCamera(CameraType type) {
     switch (type) {
     case CameraType::FirstPerson:
-        return *_firstPersonCamera;
+        return _firstPersonCamera.get();
     case CameraType::ThirdPerson:
-        return *_thirdPersonCamera;
+        return _thirdPersonCamera.get();
     case CameraType::Static:
-        return *_staticCamera;
+        return _staticCamera;
     case CameraType::Animated:
-        return *_animatedCamera;
+        return _animatedCamera.get();
     case CameraType::Dialog:
-        return *_dialogCamera;
+        return _dialogCamera.get();
     default:
         throw std::invalid_argument("Invalid camera type: " + std::to_string(static_cast<int>(type)));
     }
@@ -983,7 +983,11 @@ std::shared_ptr<Object> Area::createObject(ObjectType type, const std::string &b
 
 void Area::updateObjectSelection() {
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
-    auto cameraPos = _game.getActiveCamera()->sceneNode()->getOrigin();
+    auto camera = _game.getActiveCamera();
+    if (!camera) {
+        return;
+    }
+    auto cameraPos = camera->sceneNode()->getOrigin();
 
     if (_hilightedObject) {
         if (!_hilightedObject->isSelectable()) {
