@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/cache.h"
+
 #include "2da.h"
 
 namespace reone {
@@ -41,28 +43,15 @@ public:
     }
 
     void clear() override {
-        _objects.clear();
+        _cache.clear();
     }
 
-    void add(std::string resRef, std::shared_ptr<TwoDa> twoDa) {
-        _objects[resRef] = std::move(twoDa);
-    }
-
-    std::shared_ptr<TwoDa> get(const std::string &key) override {
-        auto maybeObject = _objects.find(key);
-        if (maybeObject != _objects.end()) {
-            return maybeObject->second;
-        }
-        auto object = doGet(key);
-        return _objects.insert(make_pair(key, std::move(object))).first->second;
-    }
+    std::shared_ptr<TwoDa> get(const std::string &key) override;
 
 private:
     Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<TwoDa>> _objects;
-
-    std::shared_ptr<TwoDa> doGet(const std::string &resRef);
+    Cache<std::string, TwoDa> _cache;
 };
 
 } // namespace resource

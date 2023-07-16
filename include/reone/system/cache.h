@@ -22,6 +22,10 @@ namespace reone {
 template <class Key, class Value, class Comparer = std::less<Key>>
 class Cache : boost::noncopyable {
 public:
+    void clear() {
+        _items.clear();
+    }
+
     std::shared_ptr<Value> getOrAdd(Key key, std::function<std::shared_ptr<Value>()> valueFactory) {
         auto it = _items.find(key);
         if (it != _items.end()) {

@@ -17,24 +17,25 @@
 
 #include "reone/resource/2das.h"
 
-#include "reone/system/stream/memoryinput.h"
-
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/memoryinput.h"
 
 namespace reone {
 
 namespace resource {
 
-std::shared_ptr<TwoDa> TwoDas::doGet(const std::string &resRef) {
-    auto res = _resources.find(ResourceId(resRef, ResourceType::TwoDa));
-    if (!res) {
-        return nullptr;
-    }
-    auto stream = MemoryInputStream(res->data);
-    auto reader = TwoDaReader(stream);
-    reader.load();
-    return reader.twoDa();
+std::shared_ptr<TwoDa> TwoDas::get(const std::string &resRef) {
+    return _cache.getOrAdd(resRef, [this, &resRef]() {
+        auto res = _resources.find(ResourceId(resRef, ResourceType::TwoDa));
+        if (!res) {
+            return std::shared_ptr<TwoDa>();
+        }
+        MemoryInputStream stream(res->data);
+        TwoDaReader reader(stream);
+        reader.load();
+        return reader.twoDa();
+    });
 }
 
 } // namespace resource

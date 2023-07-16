@@ -55,7 +55,7 @@ TEST(cache, should_create_and_cache_value_when_get_called_twice_with_the_same_ke
     EXPECT_TRUE(value3 && ((*value3) == 0));
 }
 
-TEST(cache, should_take_optional_comparer) {
+TEST(cache, should_create_and_cache_complex_value_using_custom_comparer) {
     // given
     Cache<CompositeKey, int, CompositeKeyComparer> cache;
     int counter = 0;
@@ -72,4 +72,18 @@ TEST(cache, should_take_optional_comparer) {
     EXPECT_TRUE(value2 && ((*value2) == 1));
     EXPECT_TRUE(value3 && ((*value3) == 2));
     EXPECT_TRUE(value4 && ((*value4) == 0));
+}
+
+TEST(cache, should_clear_cached_items) {
+    // given
+    Cache<int, int> cache;
+
+    // when
+    cache.getOrAdd(0, []() { return std::make_shared<int>(0); });
+    cache.getOrAdd(1, []() { return std::make_shared<int>(1); });
+    cache.clear();
+    auto value = cache.getOrAdd(0, []() { return std::make_shared<int>(2); });
+
+    // then
+    EXPECT_TRUE(value && (*value) == 2);
 }

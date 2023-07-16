@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/system/cache.h"
+
 #include "gff.h"
 #include "id.h"
 #include "types.h"
@@ -46,16 +48,12 @@ public:
         _cache.clear();
     }
 
-    void add(ResourceId resId, std::shared_ptr<Gff> gff) {
-        _cache.insert(std::make_pair(resId, std::move(gff)));
-    }
-
     std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) override;
 
 private:
     Resources &_resources;
 
-    std::unordered_map<ResourceId, std::shared_ptr<Gff>, ResourceIdHasher> _cache;
+    Cache<ResourceId, Gff, ResourceIdComparer> _cache;
 };
 
 } // namespace resource

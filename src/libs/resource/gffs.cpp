@@ -17,31 +17,26 @@
 
 #include "reone/resource/gffs.h"
 
-#include "reone/system/stream/memoryinput.h"
-
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/resources.h"
+#include "reone/system/stream/memoryinput.h"
 
 namespace reone {
 
 namespace resource {
 
 std::shared_ptr<Gff> Gffs::get(const std::string &resRef, ResourceType type) {
-    auto resId = ResourceId(resRef, type);
-    auto cached = _cache.find(resId);
-    if (cached != _cache.end()) {
-        return cached->second;
-    }
-    std::shared_ptr<Gff> gff;
-    auto res = _resources.find(resId);
-    if (res) {
-        auto stream = MemoryInputStream(res->data);
-        auto reader = GffReader(stream);
+    ResourceId resId(resRef, type);
+    return _cache.getOrAdd(resId, [this, &resId]() {
+        auto res = _resources.find(resId);
+        if (!res) {
+            return std::shared_ptr<Gff>();
+        }
+        MemoryInputStream stream(res->data);
+        GffReader reader(stream);
         reader.load();
-        gff = reader.root();
-    }
-    auto inserted = _cache.insert(std::make_pair(resId, std::move(gff)));
-    return inserted.first->second;
+        return reader.root();
+    });
 }
 
 } // namespace resource
