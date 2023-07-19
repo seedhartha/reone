@@ -21,15 +21,38 @@ namespace reone {
 
 namespace game {
 
-void ObjectSceneBridge::flush() {
+void ObjectSceneBridge::applyAll() {
     while (!_events.empty()) {
         auto &event = _events.front();
-        applyEvent(event);
+        apply(event);
         _events.pop();
     }
 }
 
-void ObjectSceneBridge::applyEvent(const ObjectEvent &event) {
+void ObjectSceneBridge::apply(const ObjectEvent &event) {
+    switch (event.type) {
+    case ObjectEventType::ObjectCreated:
+        applyObjectCreated(event);
+        break;
+    case ObjectEventType::ObjectDestroyed:
+        applyObjectDestroyed(event);
+        break;
+    case ObjectEventType::ObjectTransformChanged:
+        applyObjectTransformChanged(event);
+        break;
+    default:
+        // do nothing
+        break;
+    }
+}
+
+void ObjectSceneBridge::applyObjectCreated(const ObjectEvent &event) {
+}
+
+void ObjectSceneBridge::applyObjectDestroyed(const ObjectEvent &event) {
+}
+
+void ObjectSceneBridge::applyObjectTransformChanged(const ObjectEvent &event) {
 }
 
 } // namespace game

@@ -104,7 +104,6 @@ public:
     void loadAppearance();
 
     void update(float dt) override;
-    void updateScene(float dt) override;
 
     void clearAllActions() override;
     void die() override;

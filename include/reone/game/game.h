@@ -55,6 +55,7 @@
 #include "object/encounter.h"
 #include "object/module.h"
 #include "object/placeable.h"
+#include "object/scenebridge.h"
 #include "object/sound.h"
 #include "object/store.h"
 #include "object/trigger.h"
@@ -135,6 +136,7 @@ public:
     Party &party() { return _party; }
     Combat &combat() { return _combat; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
+    ObjectSceneBridge &objectSceneBridge() { return *_objectSceneBridge; }
     Map &map() { return *_map; }
     script::IRoutines &routines() { return *_routines; }
 
@@ -319,7 +321,7 @@ private:
     enum class State {
         Created,
         Running,
-        Paused,
+        ModuleLoad,
         Quitting
     };
 
@@ -350,6 +352,7 @@ private:
     Party _party;
     Combat _combat;
 
+    std::unique_ptr<ObjectSceneBridge> _objectSceneBridge;
     std::unique_ptr<script::IRoutines> _routines;
     std::unique_ptr<ScriptRunner> _scriptRunner;
 

@@ -44,7 +44,6 @@ public:
     }
 
     void update(float dt) override {}
-    void updateScene(float dt) override {}
 
     virtual void stopMovement() {
     }

@@ -49,9 +49,6 @@ void Item::loadFromBlueprint(const std::string &resRef) {
 }
 
 void Item::update(float dt) {
-}
-
-void Item::updateScene(float dt) {
     if (_audioSource) {
         _audioSource->update();
     }

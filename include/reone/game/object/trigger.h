@@ -46,7 +46,6 @@ public:
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
-    void updateScene(float dt) override;
 
     void addTenant(const std::shared_ptr<Object> &object);
 

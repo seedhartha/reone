@@ -92,6 +92,9 @@ void Game::init() {
 }
 
 void Game::initLocalServices() {
+    auto &scene = _services.scene.graphs.get(kSceneMain);
+    _objectSceneBridge = std::make_unique<ObjectSceneBridge>(scene);
+
     auto console = std::make_unique<Console>(*this, _services);
     console->init();
     _console = std::move(console);
@@ -126,7 +129,7 @@ void Game::updateThreadFunc() {
         State state = _state;
         if (state == State::Quitting) {
             return;
-        } else if (state == State::Created || state == State::Paused) {
+        } else if (state == State::Created || state == State::ModuleLoad) {
             std::unique_lock<std::mutex> lock {_updateMutex};
             _updateCondVar.wait(lock, [this]() { return _state == State::Running || _state == State::Quitting; });
             _updateTicks = _services.system.clock.ticks();
@@ -145,11 +148,7 @@ void Game::updateThreadFunc() {
         _updateTicks = ticks;
 
         std::lock_guard<std::mutex> lock {_updateMutex};
-        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-        if (updModule) {
-            _module->update(dt);
-            _combat.update(dt);
-        }
+        // update game objects
         _updateFlushed = false;
     }
 }
@@ -202,8 +201,9 @@ void Game::update(float dt) {
         std::lock_guard<std::mutex> lock {_updateMutex};
         bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
         if (updModule && !_paused) {
-            _module->updateScene(dt);
-            _combat.updateScene(dt);
+            _module->update(dt);
+            _combat.update(dt);
+            _objectSceneBridge->applyAll();
         }
         _updateFlushed = true;
     }
@@ -469,7 +469,7 @@ void Game::updateMusic() {
 }
 
 void Game::loadNextModule() {
-    setState(State::Paused);
+    setState(State::ModuleLoad);
     loadModule(_nextModule, _nextEntry);
     setState(State::Running);
 

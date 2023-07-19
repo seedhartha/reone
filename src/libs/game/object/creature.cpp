@@ -179,11 +179,6 @@ bool Creature::isSelectable() const {
 
 void Creature::update(float dt) {
     Object::update(dt);
-}
-
-void Creature::updateScene(float dt) {
-    Object::updateScene(dt);
-
     updateModelAnimation();
     updateHealth();
     updateCombat(dt);

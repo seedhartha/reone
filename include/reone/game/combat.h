@@ -65,7 +65,6 @@ public:
         int damage = -1);
 
     void update(float dt);
-    void updateScene(float dt);
 
 private:
     enum class RoundState {

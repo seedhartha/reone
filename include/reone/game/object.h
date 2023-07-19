@@ -44,8 +44,6 @@ public:
     virtual ~Object() = default;
 
     virtual void update(float dt);
-    virtual void updateScene(float dt);
-
     virtual void die();
 
     void face(const Object &other);

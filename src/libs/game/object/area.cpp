@@ -619,17 +619,6 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 void Area::update(float dt) {
-    if (_game.isPaused()) {
-        return;
-    }
-    Object::update(dt);
-
-    for (auto &object : _objects) {
-        object->update(dt);
-    }
-}
-
-void Area::updateScene(float dt) {
     doDestroyObjects();
     updateVisibility();
     updateObjectSelection();
@@ -637,10 +626,10 @@ void Area::updateScene(float dt) {
     if (_game.isPaused()) {
         return;
     }
-    Object::updateScene(dt);
+    Object::update(dt);
 
     for (auto &object : _objects) {
-        object->updateScene(dt);
+        object->update(dt);
     }
     updatePerception(dt);
     updateHeartbeat(dt);

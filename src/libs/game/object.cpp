@@ -38,9 +38,6 @@ static constexpr float kDistanceWalk = 4.0f;
 void Object::update(float dt) {
     updateActions(dt);
     updateEffects(dt);
-}
-
-void Object::updateScene(float dt) {
     if (!_dead) {
         executeActions(dt);
     }

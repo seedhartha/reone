@@ -56,7 +56,6 @@ public:
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
-    void updateScene(float dt) override;
 
     void playShotSound(int variant, glm::vec3 position);
     void playImpactSound(int variant, glm::vec3 position);

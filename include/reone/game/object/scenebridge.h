@@ -23,7 +23,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraph;
+class ISceneGraph;
 
 }
 
@@ -34,30 +34,38 @@ namespace game {
  */
 class IObjectSceneBridge {
 public:
-    virtual ~IObjectSceneBridge() = 0;
+    virtual ~IObjectSceneBridge() = default;
 
     virtual void enqueue(ObjectEvent event) = 0;
-    virtual void flush() = 0;
+    virtual void applyAll() = 0;
 };
 
 class ObjectSceneBridge : public IObjectSceneBridge, boost::noncopyable {
 public:
-    ObjectSceneBridge(scene::SceneGraph &sceneGraph) :
+    ObjectSceneBridge(scene::ISceneGraph &sceneGraph) :
         _sceneGraph(sceneGraph) {
+    }
+
+    void clear() {
+        std::queue<ObjectEvent>().swap(_events);
     }
 
     void enqueue(ObjectEvent event) override {
         _events.push(std::move(event));
     }
 
-    void flush() override;
+    void applyAll() override;
 
 private:
-    scene::SceneGraph &_sceneGraph;
+    scene::ISceneGraph &_sceneGraph;
 
     std::queue<ObjectEvent> _events;
 
-    void applyEvent(const ObjectEvent &event);
+    void apply(const ObjectEvent &event);
+
+    void applyObjectCreated(const ObjectEvent &event);
+    void applyObjectDestroyed(const ObjectEvent &event);
+    void applyObjectTransformChanged(const ObjectEvent &event);
 };
 
 } // namespace game

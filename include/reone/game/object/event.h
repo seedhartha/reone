@@ -21,7 +21,21 @@ namespace reone {
 
 namespace game {
 
+enum class ObjectEventType {
+    Invalid = -1,
+
+    ObjectCreated = 0,
+    ObjectDestroyed = 1,
+
+    ObjectTransformChanged = 2
+};
+
 struct ObjectEvent {
+    ObjectEventType type {ObjectEventType::Invalid};
+    uint32_t objectId {0};
+    std::string modelResRef;
+    std::string texResRef;
+    glm::mat4 transform {1.0f};
 };
 
 } // namespace game
