@@ -92,9 +92,6 @@ void Game::init() {
 }
 
 void Game::initLocalServices() {
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    _objectSceneBridge = std::make_unique<ObjectSceneBridge>(scene);
-
     auto console = std::make_unique<Console>(*this, _services);
     console->init();
     _console = std::move(console);
@@ -203,7 +200,6 @@ void Game::update(float dt) {
         if (updModule && !_paused) {
             _module->update(dt);
             _combat.update(dt);
-            _objectSceneBridge->applyAll();
         }
         _updateFlushed = true;
     }
