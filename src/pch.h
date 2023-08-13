@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <atomic>
 #include <climits>
+#include <condition_variable>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdlib>
