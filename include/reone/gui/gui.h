@@ -22,7 +22,7 @@
 #include "reone/resource/di/services.h"
 
 #include "control.h"
-#include "schema/gui.h"
+#include "gffschema/gui.h"
 
 namespace reone {
 
@@ -186,7 +186,7 @@ private:
 
     // END GUI Colors
 
-    void loadControl(const schema::GUI_CONTROLS &gui);
+    void loadControl(const gffschema::GUI_CONTROLS &gui);
 
     void onClick(const std::string &control) {
         if (_eventListener) {

@@ -40,7 +40,7 @@ public:
         _clickable = true;
     }
 
-    void load(const schema::GUI_BASECONTROL &gui, bool protoItem) override;
+    void load(const gffschema::GUI_BASECONTROL &gui, bool protoItem) override;
 
     void draw(
         const glm::ivec2 &offset,

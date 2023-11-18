@@ -39,12 +39,12 @@ public:
         _aspect(aspect) {
     }
 
-    void loadFromGIT(const schema::GIT_CameraList &git);
+    void loadFromGIT(const gffschema::GIT_CameraList &git);
 
 private:
     float _aspect;
 
-    void loadTransformFromGIT(const schema::GIT_CameraList &git);
+    void loadTransformFromGIT(const gffschema::GIT_CameraList &git);
 };
 
 } // namespace game

@@ -20,9 +20,9 @@
 #include "reone/resource/format/gffreader.h"
 #include "reone/scene/node/walkmesh.h"
 
+#include "../gffschema/git.h"
+#include "../gffschema/utd.h"
 #include "../object.h"
-#include "../schema/git.h"
-#include "../schema/utd.h"
 
 namespace reone {
 
@@ -43,7 +43,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const schema::GIT_Door_List &git);
+    void loadFromGIT(const gffschema::GIT_Door_List &git);
     void loadFromBlueprint(const std::string &resRef);
 
     bool isSelectable() const override;
@@ -111,8 +111,8 @@ private:
 
     // END Scripts
 
-    void loadUTD(const schema::UTD &utd);
-    void loadTransformFromGIT(const schema::GIT_Door_List &git);
+    void loadUTD(const gffschema::UTD &utd);
+    void loadTransformFromGIT(const gffschema::GIT_Door_List &git);
 
     void updateTransform() override;
 };

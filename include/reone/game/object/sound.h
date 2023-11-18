@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include "../gffschema/git.h"
+#include "../gffschema/uts.h"
 #include "../object.h"
-#include "../schema/git.h"
-#include "../schema/uts.h"
 
 namespace reone {
 
@@ -46,7 +46,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const schema::GIT_SoundList &git);
+    void loadFromGIT(const gffschema::GIT_SoundList &git);
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
@@ -88,14 +88,14 @@ private:
 
     std::vector<std::string> _sounds;
 
-    void loadTransformFromGIT(const schema::GIT_SoundList &git);
+    void loadTransformFromGIT(const gffschema::GIT_SoundList &git);
 
     void updateTransform() override;
 
     // Blueprint
 
-    void loadUTS(const schema::UTS &uts);
-    void loadPriorityFromUTS(const schema::UTS &uts);
+    void loadUTS(const gffschema::UTS &uts);
+    void loadPriorityFromUTS(const gffschema::UTS &uts);
 
     // END Blueprint
 };

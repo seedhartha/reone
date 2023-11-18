@@ -38,10 +38,10 @@ namespace reone {
 
 namespace gui {
 
-void ScrollBar::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+void ScrollBar::load(const gffschema::GUI_BASECONTROL &gui, bool protoItem) {
     Control::load(gui, protoItem);
 
-    auto &scrollbarStruct = *static_cast<const schema::GUI_CONTROLS_SCROLLBAR *>(&gui);
+    auto &scrollbarStruct = *static_cast<const gffschema::GUI_CONTROLS_SCROLLBAR *>(&gui);
     if (scrollbarStruct.DIR) {
         auto &dirImage = scrollbarStruct.DIR->IMAGE;
         _dir.image = _graphicsSvc.textures.get(dirImage, TextureUsage::GUI);

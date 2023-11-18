@@ -37,7 +37,7 @@ namespace reone {
 
 namespace game {
 
-void Trigger::loadFromGIT(const schema::GIT_TriggerList &git) {
+void Trigger::loadFromGIT(const gffschema::GIT_TriggerList &git) {
     std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
 
@@ -55,7 +55,7 @@ void Trigger::loadFromGIT(const schema::GIT_TriggerList &git) {
     _sceneNode->setLocalTransform(glm::translate(_position));
 }
 
-void Trigger::loadTransformFromGIT(const schema::GIT_TriggerList &git) {
+void Trigger::loadTransformFromGIT(const gffschema::GIT_TriggerList &git) {
     _position.x = git.XPosition;
     _position.y = git.YPosition;
     _position.z = git.ZPosition;
@@ -65,7 +65,7 @@ void Trigger::loadTransformFromGIT(const schema::GIT_TriggerList &git) {
     updateTransform();
 }
 
-void Trigger::loadGeometryFromGIT(const schema::GIT_TriggerList &git) {
+void Trigger::loadGeometryFromGIT(const gffschema::GIT_TriggerList &git) {
     for (auto &pointStruct : git.Geometry) {
         float x = pointStruct.PointX;
         float y = pointStruct.PointY;
@@ -77,7 +77,7 @@ void Trigger::loadGeometryFromGIT(const schema::GIT_TriggerList &git) {
 void Trigger::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
-        auto uttParsed = schema::parseUTT(*utt);
+        auto uttParsed = gffschema::parseUTT(*utt);
         loadUTT(uttParsed);
     }
 }
@@ -113,7 +113,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
     return maybeTenant != _tenants.end();
 }
 
-void Trigger::loadUTT(const schema::UTT &utt) {
+void Trigger::loadUTT(const gffschema::UTT &utt) {
     _tag = boost::to_lower_copy(utt.Tag);
     _blueprintResRef = boost::to_lower_copy(utt.TemplateResRef);
     _name = _services.resource.strings.getText(utt.LocalizedName.first);

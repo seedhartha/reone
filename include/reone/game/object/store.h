@@ -17,8 +17,9 @@
 
 #pragma once
 
+#include "../gffschema/utm.h"
 #include "../object.h"
-#include "../schema/utm.h"
+
 
 namespace reone {
 

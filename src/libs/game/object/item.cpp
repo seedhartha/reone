@@ -43,7 +43,7 @@ namespace game {
 void Item::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
     if (uti) {
-        auto utiParsed = schema::parseUTI(*uti);
+        auto utiParsed = gffschema::parseUTI(*uti);
         loadUTI(utiParsed);
     }
 }
@@ -98,7 +98,7 @@ void Item::setEquipped(bool equipped) {
     _equipped = equipped;
 }
 
-void Item::loadUTI(const schema::UTI &uti) {
+void Item::loadUTI(const gffschema::UTI &uti) {
     _blueprintResRef = boost::to_lower_copy(uti.TemplateResRef);
     _baseItem = uti.BaseItem; // index into baseitems.2da
     _localizedName = _services.resource.strings.getText(uti.LocalizedName.first);

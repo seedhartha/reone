@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void Encounter::loadFromGIT(const schema::GIT_Encounter_List &git) {
+void Encounter::loadFromGIT(const gffschema::GIT_Encounter_List &git) {
     std::string blueprintResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(blueprintResRef);
 
@@ -42,12 +42,12 @@ void Encounter::loadFromGIT(const schema::GIT_Encounter_List &git) {
 void Encounter::loadFromBlueprint(const std::string &blueprintResRef) {
     std::shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
-        auto uteParsed = schema::parseUTE(*ute);
+        auto uteParsed = gffschema::parseUTE(*ute);
         loadUTE(uteParsed);
     }
 }
 
-void Encounter::loadPositionFromGIT(const schema::GIT_Encounter_List &git) {
+void Encounter::loadPositionFromGIT(const gffschema::GIT_Encounter_List &git) {
     float x = git.XPosition;
     float y = git.YPosition;
     float z = git.ZPosition;
@@ -55,7 +55,7 @@ void Encounter::loadPositionFromGIT(const schema::GIT_Encounter_List &git) {
     updateTransform();
 }
 
-void Encounter::loadGeometryFromGIT(const schema::GIT_Encounter_List &git) {
+void Encounter::loadGeometryFromGIT(const gffschema::GIT_Encounter_List &git) {
     for (auto &pointStruct : git.Geometry) {
         float x = pointStruct.X;
         float y = pointStruct.Y;
@@ -64,7 +64,7 @@ void Encounter::loadGeometryFromGIT(const schema::GIT_Encounter_List &git) {
     }
 }
 
-void Encounter::loadSpawnPointsFromGIT(const schema::GIT_Encounter_List &git) {
+void Encounter::loadSpawnPointsFromGIT(const gffschema::GIT_Encounter_List &git) {
     for (auto &pointStruct : git.SpawnPointList) {
         float x = pointStruct.X;
         float y = pointStruct.Y;
@@ -78,7 +78,7 @@ void Encounter::loadSpawnPointsFromGIT(const schema::GIT_Encounter_List &git) {
     }
 }
 
-void Encounter::loadUTE(const schema::UTE &ute) {
+void Encounter::loadUTE(const gffschema::UTE &ute) {
     _tag = boost::to_lower_copy(ute.Tag);
     _name = _services.resource.strings.getText(ute.LocalizedName.first);
     _blueprintResRef = boost::to_lower_copy(ute.TemplateResRef);
@@ -107,7 +107,7 @@ void Encounter::loadUTE(const schema::UTE &ute) {
     // - Comment (toolset only)
 }
 
-void Encounter::loadCreaturesFromUTE(const schema::UTE &ute) {
+void Encounter::loadCreaturesFromUTE(const gffschema::UTE &ute) {
     for (auto &creatureStruct : ute.CreatureList) {
         EncounterCreature creature;
         creature._appearance = creatureStruct.Appearance;

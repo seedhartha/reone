@@ -23,8 +23,8 @@
 #include "reone/graphics/texture.h"
 #include "reone/resource/format/gffreader.h"
 
+#include "../gffschema/uti.h"
 #include "../object.h"
-#include "../schema/uti.h"
 #include "../types.h"
 
 namespace reone {
@@ -126,7 +126,7 @@ private:
 
     // Blueprint
 
-    void loadUTI(const schema::UTI &uti);
+    void loadUTI(const gffschema::UTI &uti);
 
     void loadAmmunitionType();
 

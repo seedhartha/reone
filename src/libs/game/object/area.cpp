@@ -115,8 +115,8 @@ void Area::init() {
 void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave) {
     _name = std::move(name);
 
-    auto areParsed = schema::parseARE(are);
-    auto gitParsed = schema::parseGIT(git);
+    auto areParsed = gffschema::parseARE(are);
+    auto gitParsed = gffschema::parseGIT(git);
 
     loadARE(areParsed);
     loadGIT(gitParsed);
@@ -125,7 +125,7 @@ void Area::load(std::string name, const Gff &are, const Gff &git, bool fromSave)
     loadPTH();
 }
 
-void Area::loadARE(const schema::ARE &are) {
+void Area::loadARE(const gffschema::ARE &are) {
     _localizedName = _services.resource.strings.getText(are.Name.first);
 
     loadCameraStyle(are);
@@ -137,7 +137,7 @@ void Area::loadARE(const schema::ARE &are) {
     loadFog(are);
 }
 
-void Area::loadCameraStyle(const schema::ARE &are) {
+void Area::loadCameraStyle(const gffschema::ARE &are) {
     // Area
     int areaStyleIdx = are.CameraStyle;
     std::shared_ptr<CameraStyle> areaStyle(_services.game.cameraStyles.get(areaStyleIdx));
@@ -156,31 +156,31 @@ void Area::loadCameraStyle(const schema::ARE &are) {
     }
 }
 
-void Area::loadAmbientColor(const schema::ARE &are) {
+void Area::loadAmbientColor(const gffschema::ARE &are) {
     _ambientColor = are.DynAmbientColor > 0 ? Gff::colorFromUint32(are.DynAmbientColor) : g_defaultAmbientColor;
 
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     sceneGraph.setAmbientLightColor(_ambientColor);
 }
 
-void Area::loadScripts(const schema::ARE &are) {
+void Area::loadScripts(const gffschema::ARE &are) {
     _onEnter = are.OnEnter;
     _onExit = are.OnExit;
     _onHeartbeat = are.OnHeartbeat;
     _onUserDefined = are.OnUserDefined;
 }
 
-void Area::loadMap(const schema::ARE &are) {
+void Area::loadMap(const gffschema::ARE &are) {
     _game.map().load(_name, are.Map);
 }
 
-void Area::loadStealthXP(const schema::ARE &are) {
+void Area::loadStealthXP(const gffschema::ARE &are) {
     _stealthXPEnabled = are.StealthXPEnabled;
     _stealthXPDecrement = are.StealthXPLoss; // TODO: loss = decrement?
     _maxStealthXP = are.StealthXPMax;
 }
 
-void Area::loadGrass(const schema::ARE &are) {
+void Area::loadGrass(const gffschema::ARE &are) {
     std::string texName(boost::to_lower_copy(are.Grass_TexName));
     if (!texName.empty()) {
         _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
@@ -195,7 +195,7 @@ void Area::loadGrass(const schema::ARE &are) {
     _grass.probabilities[3] = are.Grass_Prob_LR;
 }
 
-void Area::loadFog(const schema::ARE &are) {
+void Area::loadFog(const gffschema::ARE &are) {
     _fogEnabled = are.SunFogOn;
     _fogNear = are.SunFogNear;
     _fogFar = are.SunFogFar;
@@ -210,7 +210,7 @@ void Area::loadFog(const schema::ARE &are) {
     sceneGraph.setFog(fogProperties);
 }
 
-void Area::loadGIT(const schema::GIT &git) {
+void Area::loadGIT(const gffschema::GIT &git) {
     loadProperties(git);
     loadCreatures(git);
     loadDoors(git);
@@ -222,7 +222,7 @@ void Area::loadGIT(const schema::GIT &git) {
     loadEncounters(git);
 }
 
-void Area::loadProperties(const schema::GIT &git) {
+void Area::loadProperties(const gffschema::GIT &git) {
     int musicIdx = git.AreaProperties.MusicDay;
     if (musicIdx) {
         std::shared_ptr<TwoDa> musicTable(_services.resource.twoDas.get("ambientmusic"));
@@ -230,7 +230,7 @@ void Area::loadProperties(const schema::GIT &git) {
     }
 }
 
-void Area::loadCreatures(const schema::GIT &git) {
+void Area::loadCreatures(const gffschema::GIT &git) {
     for (auto &creatureStruct : git.Creature_List) {
         std::shared_ptr<Creature> creature = _game.newCreature(_sceneName);
         creature->loadFromGIT(creatureStruct);
@@ -239,7 +239,7 @@ void Area::loadCreatures(const schema::GIT &git) {
     }
 }
 
-void Area::loadDoors(const schema::GIT &git) {
+void Area::loadDoors(const gffschema::GIT &git) {
     for (auto &doorStruct : git.Door_List) {
         std::shared_ptr<Door> door = _game.newDoor(_sceneName);
         door->loadFromGIT(doorStruct);
@@ -247,7 +247,7 @@ void Area::loadDoors(const schema::GIT &git) {
     }
 }
 
-void Area::loadPlaceables(const schema::GIT &git) {
+void Area::loadPlaceables(const gffschema::GIT &git) {
     for (auto &placeableStruct : git.Placeable_List) {
         std::shared_ptr<Placeable> placeable = _game.newPlaceable(_sceneName);
         placeable->loadFromGIT(placeableStruct);
@@ -255,7 +255,7 @@ void Area::loadPlaceables(const schema::GIT &git) {
     }
 }
 
-void Area::loadWaypoints(const schema::GIT &git) {
+void Area::loadWaypoints(const gffschema::GIT &git) {
     for (auto &waypointStruct : git.WaypointList) {
         std::shared_ptr<Waypoint> waypoint = _game.newWaypoint(_sceneName);
         waypoint->loadFromGIT(waypointStruct);
@@ -263,7 +263,7 @@ void Area::loadWaypoints(const schema::GIT &git) {
     }
 }
 
-void Area::loadTriggers(const schema::GIT &git) {
+void Area::loadTriggers(const gffschema::GIT &git) {
     for (auto &gffs : git.TriggerList) {
         std::shared_ptr<Trigger> trigger = _game.newTrigger(_sceneName);
         trigger->loadFromGIT(gffs);
@@ -271,7 +271,7 @@ void Area::loadTriggers(const schema::GIT &git) {
     }
 }
 
-void Area::loadSounds(const schema::GIT &git) {
+void Area::loadSounds(const gffschema::GIT &git) {
     for (auto &soundStruct : git.SoundList) {
         std::shared_ptr<Sound> sound = _game.newSound(_sceneName);
         sound->loadFromGIT(soundStruct);
@@ -279,7 +279,7 @@ void Area::loadSounds(const schema::GIT &git) {
     }
 }
 
-void Area::loadCameras(const schema::GIT &git) {
+void Area::loadCameras(const gffschema::GIT &git) {
     for (auto &cameraStruct : git.CameraList) {
         std::shared_ptr<StaticCamera> camera = _game.newStaticCamera(_cameraAspect, _sceneName);
         camera->loadFromGIT(cameraStruct);
@@ -287,7 +287,7 @@ void Area::loadCameras(const schema::GIT &git) {
     }
 }
 
-void Area::loadEncounters(const schema::GIT &git) {
+void Area::loadEncounters(const gffschema::GIT &git) {
     for (auto &encounterStruct : git.Encounter_List) {
         std::shared_ptr<Encounter> encounter = _game.newEncounter(_sceneName);
         encounter->loadFromGIT(encounterStruct);
@@ -295,7 +295,7 @@ void Area::loadEncounters(const schema::GIT &git) {
     }
 }
 
-void Area::loadStores(const schema::GIT &git) {
+void Area::loadStores(const gffschema::GIT &git) {
     for (auto &storeStruct : git.StoreList) {
         std::shared_ptr<Store> store = _game.newStore(_sceneName);
         add(store);

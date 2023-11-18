@@ -38,7 +38,7 @@ namespace gui {
 
 static const char kIconFontResRef[] = "dialogfont10x10a";
 
-void ImageButton::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+void ImageButton::load(const gffschema::GUI_BASECONTROL &gui, bool protoItem) {
     Control::load(gui, protoItem);
     _iconFont = _graphicsSvc.fonts.get(kIconFontResRef);
 }

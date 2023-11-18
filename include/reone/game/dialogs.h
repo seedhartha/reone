@@ -18,7 +18,7 @@
 #pragma once
 
 #include "dialog.h"
-#include "schema/dlg.h"
+#include "gffschema/dlg.h"
 
 namespace reone {
 
@@ -69,12 +69,12 @@ private:
 
     std::shared_ptr<Dialog> doGet(std::string resRef);
 
-    std::unique_ptr<Dialog> loadDialog(const schema::DLG &dlg);
+    std::unique_ptr<Dialog> loadDialog(const gffschema::DLG &dlg);
 
-    Dialog::EntryReplyLink getEntryReplyLink(const schema::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
-    Dialog::EntryReply getEntryReply(const schema::DLG_EntryReplyList &dlg) const;
-    Dialog::Stunt getStunt(const schema::DLG_StuntList &dlg) const;
-    Dialog::ParticipantAnimation getParticipantAnimation(const schema::DLG_EntryReplyList_AnimList &dlg) const;
+    Dialog::EntryReplyLink getEntryReplyLink(const gffschema::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
+    Dialog::EntryReply getEntryReply(const gffschema::DLG_EntryReplyList &dlg) const;
+    Dialog::Stunt getStunt(const gffschema::DLG_StuntList &dlg) const;
+    Dialog::ParticipantAnimation getParticipantAnimation(const gffschema::DLG_EntryReplyList_AnimList &dlg) const;
 };
 
 } // namespace game

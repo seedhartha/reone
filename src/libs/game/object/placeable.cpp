@@ -43,7 +43,7 @@ namespace reone {
 
 namespace game {
 
-void Placeable::loadFromGIT(const schema::GIT_Placeable_List &git) {
+void Placeable::loadFromGIT(const gffschema::GIT_Placeable_List &git) {
     std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(git);
@@ -54,7 +54,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     if (!utp) {
         return;
     }
-    auto utpParsed = schema::parseUTP(*utp);
+    auto utpParsed = gffschema::parseUTP(*utp);
     loadUTP(utpParsed);
     std::shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
     std::string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
@@ -77,7 +77,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     }
 }
 
-void Placeable::loadTransformFromGIT(const schema::GIT_Placeable_List &git) {
+void Placeable::loadTransformFromGIT(const gffschema::GIT_Placeable_List &git) {
     _position[0] = git.X;
     _position[1] = git.Y;
     _position[2] = git.Z;
@@ -99,7 +99,7 @@ void Placeable::runOnInvDisturbed(std::shared_ptr<Object> triggerrer) {
     }
 }
 
-void Placeable::loadUTP(const schema::UTP &utp) {
+void Placeable::loadUTP(const gffschema::UTP &utp) {
     _tag = boost::to_lower_copy(utp.Tag);
     _name = _services.resource.strings.getText(utp.LocName.first);
     _blueprintResRef = boost::to_lower_copy(utp.TemplateResRef);

@@ -23,6 +23,8 @@
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 
+#include "../gffschema/are.h"
+#include "../gffschema/git.h"
 #include "../object.h"
 #include "../object/camera/animated.h"
 #include "../object/camera/dialog.h"
@@ -30,8 +32,6 @@
 #include "../object/camera/static.h"
 #include "../object/camera/thirdperson.h"
 #include "../pathfinder.h"
-#include "../schema/are.h"
-#include "../schema/git.h"
 #include "../types.h"
 
 namespace reone {
@@ -305,32 +305,32 @@ private:
 
     // Loading ARE
 
-    void loadARE(const schema::ARE &are);
+    void loadARE(const gffschema::ARE &are);
 
-    void loadCameraStyle(const schema::ARE &are);
-    void loadAmbientColor(const schema::ARE &are);
-    void loadScripts(const schema::ARE &are);
-    void loadMap(const schema::ARE &are);
-    void loadStealthXP(const schema::ARE &are);
-    void loadGrass(const schema::ARE &are);
-    void loadFog(const schema::ARE &are);
+    void loadCameraStyle(const gffschema::ARE &are);
+    void loadAmbientColor(const gffschema::ARE &are);
+    void loadScripts(const gffschema::ARE &are);
+    void loadMap(const gffschema::ARE &are);
+    void loadStealthXP(const gffschema::ARE &are);
+    void loadGrass(const gffschema::ARE &are);
+    void loadFog(const gffschema::ARE &are);
 
     // END Loading ARE
 
     // Loading GIT
 
-    void loadGIT(const schema::GIT &git);
+    void loadGIT(const gffschema::GIT &git);
 
-    void loadProperties(const schema::GIT &git);
-    void loadCreatures(const schema::GIT &git);
-    void loadDoors(const schema::GIT &git);
-    void loadPlaceables(const schema::GIT &git);
-    void loadWaypoints(const schema::GIT &git);
-    void loadTriggers(const schema::GIT &git);
-    void loadSounds(const schema::GIT &git);
-    void loadCameras(const schema::GIT &git);
-    void loadEncounters(const schema::GIT &git);
-    void loadStores(const schema::GIT &git);
+    void loadProperties(const gffschema::GIT &git);
+    void loadCreatures(const gffschema::GIT &git);
+    void loadDoors(const gffschema::GIT &git);
+    void loadPlaceables(const gffschema::GIT &git);
+    void loadWaypoints(const gffschema::GIT &git);
+    void loadTriggers(const gffschema::GIT &git);
+    void loadSounds(const gffschema::GIT &git);
+    void loadCameras(const gffschema::GIT &git);
+    void loadEncounters(const gffschema::GIT &git);
+    void loadStores(const gffschema::GIT &git);
 
     // END Loading GIT
 

@@ -42,15 +42,15 @@ namespace reone {
 
 namespace gui {
 
-ControlType Control::getType(const schema::GUI_BASECONTROL &gui) {
+ControlType Control::getType(const gffschema::GUI_BASECONTROL &gui) {
     return static_cast<ControlType>(gui.CONTROLTYPE);
 }
 
-std::string Control::getTag(const schema::GUI_BASECONTROL &gui) {
+std::string Control::getTag(const gffschema::GUI_BASECONTROL &gui) {
     return gui.TAG;
 }
 
-std::string Control::getParent(const schema::GUI_BASECONTROL &gui) {
+std::string Control::getParent(const gffschema::GUI_BASECONTROL &gui) {
     return gui.Obj_Parent;
 }
 
@@ -67,7 +67,7 @@ void Control::Extent::getCenter(int &x, int &y) const {
     y = top + height / 2;
 }
 
-void Control::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
+void Control::load(const gffschema::GUI_BASECONTROL &gui, bool protoItem) {
     loadExtent(gui.EXTENT);
     loadBorder(gui.BORDER);
 
@@ -76,7 +76,7 @@ void Control::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
     } else if (static_cast<ControlType>(gui.CONTROLTYPE) == ControlType::ScrollBar) {
         // do nothing
     } else if (protoItem) {
-        auto &protoItem = *static_cast<const schema::GUI_CONTROLS_PROTOITEM *>(&gui);
+        auto &protoItem = *static_cast<const gffschema::GUI_CONTROLS_PROTOITEM *>(&gui);
         if (protoItem.TEXT) {
             loadText(*protoItem.TEXT);
         }
@@ -84,7 +84,7 @@ void Control::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
             loadHilight(*protoItem.HILIGHT);
         }
     } else {
-        auto &controlStruct = *static_cast<const schema::GUI_CONTROLS *>(&gui);
+        auto &controlStruct = *static_cast<const gffschema::GUI_CONTROLS *>(&gui);
         _id = controlStruct.ID;
         _padding = controlStruct.PADDING;
         if (controlStruct.TEXT) {
@@ -98,14 +98,14 @@ void Control::load(const schema::GUI_BASECONTROL &gui, bool protoItem) {
     updateTransform();
 }
 
-void Control::loadExtent(const schema::GUI_EXTENT &gui) {
+void Control::loadExtent(const gffschema::GUI_EXTENT &gui) {
     _extent.left = gui.LEFT;
     _extent.top = gui.TOP;
     _extent.width = gui.WIDTH;
     _extent.height = gui.HEIGHT;
 }
 
-void Control::loadBorder(const schema::GUI_BORDER &gui) {
+void Control::loadBorder(const gffschema::GUI_BORDER &gui) {
     std::string corner(gui.CORNER);
     std::string edge(gui.EDGE);
     std::string fill(gui.FILL);
@@ -126,7 +126,7 @@ void Control::loadBorder(const schema::GUI_BORDER &gui) {
     _border->color = gui.COLOR;
 }
 
-void Control::loadText(const schema::GUI_TEXT &gui) {
+void Control::loadText(const gffschema::GUI_TEXT &gui) {
     _text.font = _graphicsSvc.fonts.get(gui.FONT);
 
     int strRef = gui.STRREF;
@@ -145,7 +145,7 @@ void Control::updateTextLines() {
     }
 }
 
-void Control::loadHilight(const schema::GUI_BORDER &gui) {
+void Control::loadHilight(const gffschema::GUI_BORDER &gui) {
     std::string corner(gui.CORNER);
     std::string edge(gui.EDGE);
     std::string fill(gui.FILL);

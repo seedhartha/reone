@@ -22,9 +22,9 @@
 #include "reone/resource/types.h"
 
 #include "../contextaction.h"
+#include "../gffschema/ifo.h"
 #include "../object.h"
 #include "../player.h"
-#include "../schema/ifo.h"
 
 #include "area.h"
 
@@ -89,8 +89,8 @@ private:
 
     // Loading
 
-    void loadInfo(const schema::IFO &ifo);
-    void loadArea(const schema::IFO &ifo, bool fromSave = false);
+    void loadInfo(const gffschema::IFO &ifo);
+    void loadArea(const gffschema::IFO &ifo, bool fromSave = false);
     void loadPlayer();
 
     // END Loading

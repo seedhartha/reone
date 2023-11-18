@@ -29,9 +29,9 @@
 #include "reone/system/timer.h"
 
 #include "../d20/attributes.h"
+#include "../gffschema/git.h"
+#include "../gffschema/utc.h"
 #include "../object.h"
-#include "../schema/git.h"
-#include "../schema/utc.h"
 
 #include "item.h"
 
@@ -99,7 +99,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const schema::GIT_Creature_List &git);
+    void loadFromGIT(const gffschema::GIT_Creature_List &git);
     void loadFromBlueprint(const std::string &resRef);
     void loadAppearance();
 
@@ -315,7 +315,7 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const schema::GIT_Creature_List &git);
+    void loadTransformFromGIT(const gffschema::GIT_Creature_List &git);
 
     void updateModel();
     void updateHealth();
@@ -368,13 +368,13 @@ private:
 
     // Blueprint
 
-    void loadUTC(const schema::UTC &utc);
+    void loadUTC(const gffschema::UTC &utc);
 
-    void loadNameFromUTC(const schema::UTC &utc);
-    void loadSoundSetFromUTC(const schema::UTC &utc);
-    void loadBodyBagFromUTC(const schema::UTC &utc);
-    void loadAttributesFromUTC(const schema::UTC &utc);
-    void loadPerceptionRangeFromUTC(const schema::UTC &utc);
+    void loadNameFromUTC(const gffschema::UTC &utc);
+    void loadSoundSetFromUTC(const gffschema::UTC &utc);
+    void loadBodyBagFromUTC(const gffschema::UTC &utc);
+    void loadAttributesFromUTC(const gffschema::UTC &utc);
+    void loadPerceptionRangeFromUTC(const gffschema::UTC &utc);
 
     // END Blueprint
 };
