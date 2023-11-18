@@ -53,6 +53,8 @@
 #include "reone/tools/tlk.h"
 #include "reone/tools/tpc.h"
 
+#include "composelipdialog.h"
+
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -74,22 +76,23 @@ struct EventHandlerID {
     static constexpr int openGameDir = wxID_HIGHEST + 1;
     static constexpr int extractAllBifs = wxID_HIGHEST + 2;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
-    static constexpr int extractTool = wxID_HIGHEST + 4;
-    static constexpr int unwrapTool = wxID_HIGHEST + 5;
-    static constexpr int toRimTool = wxID_HIGHEST + 6;
-    static constexpr int toErfTool = wxID_HIGHEST + 7;
-    static constexpr int toModTool = wxID_HIGHEST + 8;
-    static constexpr int toXmlTool = wxID_HIGHEST + 9;
-    static constexpr int toTwoDaTool = wxID_HIGHEST + 10;
-    static constexpr int toGffTool = wxID_HIGHEST + 11;
-    static constexpr int toTlkTool = wxID_HIGHEST + 12;
-    static constexpr int toLipTool = wxID_HIGHEST + 13;
-    static constexpr int toSsfTool = wxID_HIGHEST + 14;
-    static constexpr int toTgaTool = wxID_HIGHEST + 15;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 16;
-    static constexpr int toNcsTool = wxID_HIGHEST + 17;
-    static constexpr int toNssTool = wxID_HIGHEST + 18;
-    static constexpr int saveFile = wxID_HIGHEST + 19;
+    static constexpr int composeLip = wxID_HIGHEST + 4;
+    static constexpr int extractTool = wxID_HIGHEST + 5;
+    static constexpr int unwrapTool = wxID_HIGHEST + 6;
+    static constexpr int toRimTool = wxID_HIGHEST + 7;
+    static constexpr int toErfTool = wxID_HIGHEST + 8;
+    static constexpr int toModTool = wxID_HIGHEST + 9;
+    static constexpr int toXmlTool = wxID_HIGHEST + 10;
+    static constexpr int toTwoDaTool = wxID_HIGHEST + 11;
+    static constexpr int toGffTool = wxID_HIGHEST + 12;
+    static constexpr int toTlkTool = wxID_HIGHEST + 13;
+    static constexpr int toLipTool = wxID_HIGHEST + 14;
+    static constexpr int toSsfTool = wxID_HIGHEST + 15;
+    static constexpr int toTgaTool = wxID_HIGHEST + 16;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 17;
+    static constexpr int toNcsTool = wxID_HIGHEST + 18;
+    static constexpr int toNssTool = wxID_HIGHEST + 19;
+    static constexpr int saveFile = wxID_HIGHEST + 20;
 };
 
 struct CommandID {
@@ -121,6 +124,7 @@ MainFrame::MainFrame() :
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
+    toolsMenu->Append(EventHandlerID::composeLip, "Compose LIP...");
     toolsMenu->AppendSeparator();
     toolsMenu->Append(EventHandlerID::extractTool, "Extract BIF/RIM/ERF archive...");
     toolsMenu->Append(EventHandlerID::unwrapTool, "Unwrap WAV to WAV/MP3...");
@@ -714,6 +718,12 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     wxMessageBox("Operation completed successfully", "Success");
 }
 
+void MainFrame::OnComposeLipCommand(wxCommandEvent &event) {
+    auto dialog = ComposeLipDialog(this, -1, "LIP Composer");
+    if (dialog.ShowModal() != wxID_OK) {
+    }
+}
+
 void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::Extract);
 }
@@ -823,6 +833,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
     EVT_MENU(EventHandlerID::saveFile, MainFrame::OnSaveFileCommand)                  //
     EVT_MENU(EventHandlerID::extractAllBifs, MainFrame::OnExtractAllBifsCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, MainFrame::OnBatchConvertTpcToTgaCommand) //
+    EVT_MENU(EventHandlerID::composeLip, MainFrame::OnComposeLipCommand)              //
     EVT_MENU(EventHandlerID::extractTool, MainFrame::OnExtractToolCommand)            //
     EVT_MENU(EventHandlerID::unwrapTool, MainFrame::OnUnwrapToolCommand)              //
     EVT_MENU(EventHandlerID::toRimTool, MainFrame::OnToRimToolCommand)                //

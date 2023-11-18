@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <climits>
 #include <condition_variable>
 #include <cstdarg>

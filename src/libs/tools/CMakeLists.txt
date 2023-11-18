@@ -25,6 +25,7 @@ set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/gff.h
     ${TOOLS_INCLUDE_DIR}/keybif.h
     ${TOOLS_INCLUDE_DIR}/lip.h
+    ${TOOLS_INCLUDE_DIR}/lipcomposer.h
     ${TOOLS_INCLUDE_DIR}/ncs.h
     ${TOOLS_INCLUDE_DIR}/rim.h
     ${TOOLS_INCLUDE_DIR}/script/exprtree.h
@@ -50,6 +51,7 @@ set(TOOLS_SOURCES
     ${TOOLS_SOURCE_DIR}/gff.cpp
     ${TOOLS_SOURCE_DIR}/keybif.cpp
     ${TOOLS_SOURCE_DIR}/lip.cpp
+    ${TOOLS_SOURCE_DIR}/lipcomposer.cpp
     ${TOOLS_SOURCE_DIR}/ncs.cpp
     ${TOOLS_SOURCE_DIR}/rim.cpp
     ${TOOLS_SOURCE_DIR}/ssf.cpp

@@ -108,6 +108,7 @@ private:
     void OnSaveFileCommand(wxCommandEvent &event);
     void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
+    void OnComposeLipCommand(wxCommandEvent &event);
 
     void OnExtractToolCommand(wxCommandEvent &event);
     void OnUnwrapToolCommand(wxCommandEvent &event);

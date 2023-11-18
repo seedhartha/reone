@@ -25,7 +25,7 @@ namespace graphics {
 
 class LipWriter {
 public:
-    LipWriter(LipAnimation &&animation);
+    LipWriter(LipAnimation &animation);
 
     void save(const std::filesystem::path &path);
 

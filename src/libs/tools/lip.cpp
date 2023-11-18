@@ -119,7 +119,7 @@ void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::pa
     auto lipPath = std::filesystem::path(destPath);
     lipPath.append(tokens[0] + ".lip");
 
-    auto writer = LipWriter(std::move(animation));
+    auto writer = LipWriter(animation);
     writer.save(lipPath);
 }
 

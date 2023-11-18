@@ -17,6 +17,7 @@ set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 
 set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/app.h
+    ${TOOLKIT_SOURCE_DIR}/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/eventhandler.h
     ${TOOLKIT_SOURCE_DIR}/mainframe.h
     ${TOOLKIT_SOURCE_DIR}/mainviewmodel.h)
@@ -24,6 +25,7 @@ set(TOOLKIT_HEADERS
 set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
+    ${TOOLKIT_SOURCE_DIR}/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/mainframe.cpp
     ${TOOLKIT_SOURCE_DIR}/mainviewmodel.cpp)
 
@@ -39,3 +41,5 @@ target_precompile_headers(toolkit PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(toolkit PRIVATE tools ${wxWidgets_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets toolkit)
+
+add_custom_target(copy_cmudict ALL ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/extern/cmudict/cmudict.dict ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
