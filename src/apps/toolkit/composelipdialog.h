@@ -44,7 +44,7 @@ private:
     wxTextCtrl *_pronounciationCtrl;
 
     void OnSoundLoadCommand(wxCommandEvent &evt);
-    void OnPronounciationHelpCommand(wxCommandEvent &evt);
+    void OnHelpCommmand(wxCommandEvent &evt);
     void OnPronounciationSaveCommand(wxCommandEvent &evt);
     void OnComposeCommand(wxCommandEvent &evt);
 
