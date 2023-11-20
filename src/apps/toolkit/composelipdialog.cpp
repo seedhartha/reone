@@ -107,11 +107,11 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
     soundSizer->Add(soundLoadBtn, wxSizerFlags(0).Border(wxALL, 3));
 
     _pronounciationCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _pronounciationCtrl->SetMinSize(wxSize(400, 200));
+    _pronounciationCtrl->SetMinSize(wxSize(400, 0));
     auto pronounciationSaveBtn = new wxButton(this, wxID_ANY, "Save");
     pronounciationSaveBtn->Bind(wxEVT_BUTTON, &ComposeLipDialog::OnPronounciationSaveCommand, this);
     auto pronounciationSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Pronounciation");
-    pronounciationSizer->Add(_pronounciationCtrl, wxSizerFlags(0).Border(wxALL, 3));
+    pronounciationSizer->Add(_pronounciationCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
     pronounciationSizer->Add(pronounciationSaveBtn, wxSizerFlags(0).Border(wxALL, 3));
 
     auto helpBtn = new wxButton(this, wxID_ANY, "Help");
@@ -131,7 +131,7 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
 
     auto topSizer = new wxBoxSizer(wxHORIZONTAL);
     topSizer->Add(composeSizer, wxSizerFlags(0).Border(wxALL, 3));
-    topSizer->Add(pronounciationSizer, wxSizerFlags(0).Border(wxALL, 3));
+    topSizer->Add(pronounciationSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     SetSizerAndFit(topSizer);
 
     auto pronouncingDictPath = std::filesystem::current_path();
