@@ -17,11 +17,14 @@
 
 #include "composelipdialog.h"
 
+#include <wx/dcbuffer.h>
+
 #include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/graphics/format/lipwriter.h"
 #include "reone/graphics/lipanimation.h"
+#include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
@@ -93,10 +96,14 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
     auto soundLengthSizer = new wxBoxSizer(wxHORIZONTAL);
     soundLengthSizer->Add(soundLengthLabel, wxSizerFlags(0).Border(wxALL, 3));
     soundLengthSizer->Add(_soundLengthCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    _soundWavePanel = new wxPanel(this, -1);
+    _soundWavePanel->SetMinSize(wxSize(400, 100));
+    _soundWavePanel->Bind(wxEVT_PAINT, &ComposeLipDialog::OnSoundWavePanelPaint, this);
     auto soundLoadBtn = new wxButton(this, wxID_ANY, "Load...");
     soundLoadBtn->Bind(wxEVT_BUTTON, &ComposeLipDialog::OnSoundLoadCommand, this);
     auto soundSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Sound");
     soundSizer->Add(soundLengthSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    soundSizer->Add(_soundWavePanel, wxSizerFlags(0).Border(wxALL, 3));
     soundSizer->Add(soundLoadBtn, wxSizerFlags(0).Border(wxALL, 3));
 
     _pronounciationCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
@@ -138,6 +145,65 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
     }
 }
 
+void ComposeLipDialog::OnSoundWavePanelPaint(wxPaintEvent &evt) {
+    int w, h;
+    _soundWavePanel->GetClientSize(&w, &h);
+
+    wxBufferedPaintDC dc(_soundWavePanel);
+    dc.SetBackground(*wxLIGHT_GREY_BRUSH);
+    dc.Clear();
+    if (!_sound || _sound->getFrameCount() == 0) {
+        return;
+    }
+    dc.SetPen(*wxGREY_PEN);
+
+    float prevSample = 0.0f;
+    for (int i = 0; i < w; ++i) {
+        float graphTime = (i / static_cast<float>(w)) * _sound->duration();
+
+        const AudioBuffer::Frame *graphFrame = nullptr;
+        float frameTime = 0.0f;
+        for (int frameIdx = 0; frameIdx < _sound->getFrameCount(); ++frameIdx) {
+            const auto &frame = _sound->getFrame(frameIdx);
+            float frameDuration = frame.samples.size() / static_cast<float>(frame.sampleRate);
+            if (graphTime >= frameTime && graphTime < frameTime + frameDuration) {
+                graphFrame = &frame;
+                break;
+            }
+            frameTime += frameDuration;
+        }
+        if (!graphFrame || graphFrame->samples.empty()) {
+            break;
+        }
+        int sampleIdx = static_cast<int>((graphTime - frameTime) / static_cast<float>(graphFrame->sampleRate));
+        float newSample;
+        switch (graphFrame->format) {
+        case AudioFormat::Mono8:
+            newSample = (reinterpret_cast<const uint8_t *>(&graphFrame->samples[0])[sampleIdx] - 128) / 255.0f;
+            break;
+        case AudioFormat::Mono16:
+            newSample = reinterpret_cast<const int16_t *>(&graphFrame->samples[0])[sampleIdx] / 65535.0f;
+            break;
+        case AudioFormat::Stereo8:
+            newSample = (reinterpret_cast<const uint8_t *>(&graphFrame->samples[0])[2 * sampleIdx] - 128) / 255.0f;
+            break;
+        case AudioFormat::Stereo16:
+            newSample = reinterpret_cast<const int16_t *>(&graphFrame->samples[0])[2 * sampleIdx] / 65535.0f;
+            break;
+        default:
+            throw std::logic_error("Unsupported audio format: " + std::to_string(static_cast<int>(graphFrame->format)));
+        }
+        if (i > 0) {
+            dc.DrawLine(
+                i - 1,
+                h / 2 + static_cast<int>(prevSample * h),
+                i,
+                h / 2 + static_cast<int>(newSample * h));
+        }
+        prevSample = newSample;
+    }
+}
+
 void ComposeLipDialog::OnSoundLoadCommand(wxCommandEvent &evt) {
     auto dialog = wxFileDialog(
         this,
@@ -170,6 +236,8 @@ void ComposeLipDialog::OnSoundLoadCommand(wxCommandEvent &evt) {
     _soundLength = audio->duration();
     auto lengthStr = str(boost::format("%.04f") % audio->duration());
     _soundLengthCtrl->SetValue(lengthStr);
+    _sound = std::move(audio);
+    _soundWavePanel->Refresh();
 }
 
 void ComposeLipDialog::OnHelpCommmand(wxCommandEvent &evt) {

@@ -27,6 +27,12 @@
 
 namespace reone {
 
+namespace audio {
+
+class AudioBuffer;
+
+}
+
 class ComposeLipDialog : public wxDialog {
 public:
     ComposeLipDialog(wxWindow *parent,
@@ -41,8 +47,12 @@ private:
     float _soundLength {1.0f};
     wxTextCtrl *_textCtrl;
     wxTextCtrl *_soundLengthCtrl;
+    wxPanel *_soundWavePanel;
     wxTextCtrl *_pronounciationCtrl;
 
+    std::shared_ptr<audio::AudioBuffer> _sound;
+
+    void OnSoundWavePanelPaint(wxPaintEvent &evt);
     void OnSoundLoadCommand(wxCommandEvent &evt);
     void OnHelpCommmand(wxCommandEvent &evt);
     void OnPronounciationSaveCommand(wxCommandEvent &evt);
