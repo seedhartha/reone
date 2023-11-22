@@ -27,6 +27,7 @@ set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/keybif.h
     ${TOOLS_INCLUDE_DIR}/lip.h
     ${TOOLS_INCLUDE_DIR}/lipcomposer.h
+    ${TOOLS_INCLUDE_DIR}/liputil.h
     ${TOOLS_INCLUDE_DIR}/ncs.h
     ${TOOLS_INCLUDE_DIR}/rim.h
     ${TOOLS_INCLUDE_DIR}/script/exprtree.h

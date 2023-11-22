@@ -39,4 +39,23 @@ enum class Operation {
     ToNSS
 };
 
+enum class LipShape {
+    Rest = 0,
+    IH = 1,
+    EH_ER_IY = 2,
+    AA_AH_AW_AY = 3,
+    AO_OW_R = 4,
+    OY_UH_UW_W = 5,
+    Y = 6,
+    S = 7,
+    F_V = 8,
+    G_HH_K = 9,
+    D_DH_T_TH = 10,
+    B_M_P = 11,
+    N_NG = 12,
+    CH_JH_SH_ZH = 13,
+    AE_EY = 14,
+    L_Z = 15
+};
+
 } // namespace reone

@@ -40,6 +40,7 @@
 #include "reone/tools/gff.h"
 #include "reone/tools/keybif.h"
 #include "reone/tools/lip.h"
+#include "reone/tools/liputil.h"
 #include "reone/tools/ncs.h"
 #include "reone/tools/rim.h"
 #include "reone/tools/ssf.h"
@@ -206,7 +207,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         for (auto &kf : animation->keyframes()) {
             auto values = std::vector<std::string>();
             values.push_back(std::to_string(kf.time));
-            values.push_back(std::to_string(kf.shape));
+            values.push_back(str(boost::format("%s [%d]") % describeLipShape(static_cast<LipShape>(kf.shape)) % static_cast<int>(kf.shape)));
             rows.push_back(std::move(values));
         }
 
