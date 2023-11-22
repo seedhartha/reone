@@ -44,7 +44,7 @@ TEST(pronouncing_dictionary, should_load_phonemes_from_stream) {
     EXPECT_EQ(phonemes, (std::vector<std::string> {"HH", "AH0", "L", "OW1"}));
 }
 
-TEST(lip_composer, should_compose_lip_file_from_text) {
+TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_and_empty_silent_spans) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
         {"hello", {"HH", "AH0", "L", "OW1"}}, //
@@ -61,27 +61,94 @@ TEST(lip_composer, should_compose_lip_file_from_text) {
     EXPECT_EQ(anim->name(), "name");
     EXPECT_EQ(anim->length(), 1.0f);
     auto &keyframes = anim->keyframes();
-    EXPECT_EQ(keyframes.size(), 11);
+    EXPECT_EQ(keyframes.size(), 9);
     EXPECT_FLOAT_EQ(keyframes[0].time, 0.0f);
-    EXPECT_FLOAT_EQ(keyframes[1].time, 0.1f);
-    EXPECT_FLOAT_EQ(keyframes[2].time, 0.2f);
-    EXPECT_FLOAT_EQ(keyframes[3].time, 0.3f);
-    EXPECT_FLOAT_EQ(keyframes[4].time, 0.4f);
-    EXPECT_FLOAT_EQ(keyframes[5].time, 0.5f);
-    EXPECT_FLOAT_EQ(keyframes[6].time, 0.6f);
-    EXPECT_FLOAT_EQ(keyframes[7].time, 0.7f);
-    EXPECT_FLOAT_EQ(keyframes[8].time, 0.8f);
-    EXPECT_FLOAT_EQ(keyframes[9].time, 0.9f);
-    EXPECT_FLOAT_EQ(keyframes[10].time, 1.0f);
+    EXPECT_FLOAT_EQ(keyframes[1].time, 0.125f);
+    EXPECT_FLOAT_EQ(keyframes[2].time, 0.25f);
+    EXPECT_FLOAT_EQ(keyframes[3].time, 0.375f);
+    EXPECT_FLOAT_EQ(keyframes[4].time, 0.5f);
+    EXPECT_FLOAT_EQ(keyframes[5].time, 0.625f);
+    EXPECT_FLOAT_EQ(keyframes[6].time, 0.75f);
+    EXPECT_FLOAT_EQ(keyframes[7].time, 0.875f);
+    EXPECT_FLOAT_EQ(keyframes[8].time, 1.0f);
+    EXPECT_EQ(keyframes[0].shape, 9);
+    EXPECT_EQ(keyframes[1].shape, 3);
+    EXPECT_EQ(keyframes[2].shape, 15);
+    EXPECT_EQ(keyframes[3].shape, 4);
+    EXPECT_EQ(keyframes[4].shape, 5);
+    EXPECT_EQ(keyframes[5].shape, 2);
+    EXPECT_EQ(keyframes[6].shape, 15);
+    EXPECT_EQ(keyframes[7].shape, 10);
+    EXPECT_EQ(keyframes[8].shape, 0);
+}
+
+TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_and_silent_spans) {
+    // given
+    auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
+        {"hello", {"HH", "AH0", "L", "OW1"}},   //
+        {"world", {"W", "ER1", "L", "D"}},      //
+        {"lorem", {"L", "AO", "R", "EH", "M"}}, //
+        {"ipsum", {"IH", "P", "S", "AH0", "M"}} //
+    };
+    auto dict = PronouncingDictionary(wordToPhonemes);
+    auto composer = LipComposer(dict);
+    auto silentSpans = std::vector<TimeSpan> {
+        {0.0f, 0.1f},   //
+        {0.45f, 0.55f}, //
+        {0.9, 1.0f}     //
+    };
+
+    // when
+    auto anim = composer.compose("name", "(Hello, world!) (Lorem ipsum)", 1.0f, silentSpans);
+
+    // then
+    EXPECT_TRUE(anim);
+    EXPECT_EQ(anim->name(), "name");
+    EXPECT_EQ(anim->length(), 1.0f);
+    auto &keyframes = anim->keyframes();
+    EXPECT_EQ(keyframes.size(), 22);
+    EXPECT_FLOAT_EQ(keyframes[0].time, 0.0f);
+    EXPECT_NEAR(keyframes[1].time, 0.1f, 0.001f);
+    EXPECT_NEAR(keyframes[2].time, 0.1437f, 0.001f);
+    EXPECT_NEAR(keyframes[3].time, 0.1875f, 0.001f);
+    EXPECT_NEAR(keyframes[4].time, 0.2312f, 0.001f);
+    EXPECT_NEAR(keyframes[5].time, 0.275f, 0.001f);
+    EXPECT_NEAR(keyframes[6].time, 0.3187f, 0.001f);
+    EXPECT_NEAR(keyframes[7].time, 0.3624f, 0.001f);
+    EXPECT_NEAR(keyframes[8].time, 0.4062f, 0.001f);
+    EXPECT_NEAR(keyframes[9].time, 0.4499f, 0.001f);
+    EXPECT_NEAR(keyframes[10].time, 0.55f, 0.001f);
+    EXPECT_NEAR(keyframes[11].time, 0.585f, 0.001f);
+    EXPECT_NEAR(keyframes[12].time, 0.62f, 0.001f);
+    EXPECT_NEAR(keyframes[13].time, 0.6549f, 0.001f);
+    EXPECT_NEAR(keyframes[14].time, 0.6899f, 0.001f);
+    EXPECT_NEAR(keyframes[15].time, 0.7249f, 0.001f);
+    EXPECT_NEAR(keyframes[16].time, 0.7599f, 0.001f);
+    EXPECT_NEAR(keyframes[17].time, 0.7949f, 0.001f);
+    EXPECT_NEAR(keyframes[18].time, 0.8299f, 0.001f);
+    EXPECT_NEAR(keyframes[19].time, 0.86499f, 0.001f);
+    EXPECT_NEAR(keyframes[20].time, 0.8999f, 0.001f);
+    EXPECT_NEAR(keyframes[21].time, 1.0f, 0.001f);
     EXPECT_EQ(keyframes[0].shape, 0);
     EXPECT_EQ(keyframes[1].shape, 9);
     EXPECT_EQ(keyframes[2].shape, 3);
     EXPECT_EQ(keyframes[3].shape, 15);
     EXPECT_EQ(keyframes[4].shape, 4);
-    EXPECT_EQ(keyframes[5].shape, 0);
-    EXPECT_EQ(keyframes[6].shape, 5);
-    EXPECT_EQ(keyframes[7].shape, 2);
-    EXPECT_EQ(keyframes[8].shape, 15);
-    EXPECT_EQ(keyframes[9].shape, 10);
-    EXPECT_EQ(keyframes[10].shape, 0);
+    EXPECT_EQ(keyframes[5].shape, 5);
+    EXPECT_EQ(keyframes[6].shape, 2);
+    EXPECT_EQ(keyframes[7].shape, 15);
+    EXPECT_EQ(keyframes[8].shape, 10);
+    EXPECT_EQ(keyframes[9].shape, 0);
+    EXPECT_EQ(keyframes[10].shape, 15);
+    EXPECT_EQ(keyframes[11].shape, 4);
+    EXPECT_EQ(keyframes[12].shape, 4);
+    EXPECT_EQ(keyframes[13].shape, 2);
+    EXPECT_EQ(keyframes[14].shape, 11);
+    EXPECT_EQ(keyframes[15].shape, 1);
+    EXPECT_EQ(keyframes[16].shape, 11);
+    EXPECT_EQ(keyframes[17].shape, 7);
+    EXPECT_EQ(keyframes[18].shape, 3);
+    EXPECT_EQ(keyframes[19].shape, 11);
+    EXPECT_EQ(keyframes[20].shape, 0);
+    EXPECT_EQ(keyframes[21].shape, 0);
 }

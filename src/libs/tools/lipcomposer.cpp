@@ -132,6 +132,11 @@ struct WordDurationTuple {
     float end {0.0f};
 };
 
+struct TimeSpanPhonemesPair {
+    TimeSpan span;
+    std::vector<std::string> phonemes;
+};
+
 void PronouncingDictionary::load(IInputStream &stream) {
     auto reader = TextReader(stream);
     while (auto line = reader.readLine()) {
@@ -151,50 +156,102 @@ void PronouncingDictionary::load(IInputStream &stream) {
 
 std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
                                                    const std::string &text,
-                                                   float length) {
-    auto words = split(text);
+                                                   float duration,
+                                                   std::vector<TimeSpan> silentSpans) {
+    auto wordGroups = split(text);
 
-    std::vector<WordDurationTuple> wordDurations;
-    float timePerWord = length / static_cast<float>(words.size());
-    float wordTime = 0.0f;
-    for (const auto &word : words) {
-        float start = wordTime;
-        float end = (wordTime += timePerWord);
-        wordDurations.push_back(WordDurationTuple {word, start, end});
+    auto spans = std::vector<TimeSpan>();
+    if (silentSpans.empty()) {
+        spans.push_back(TimeSpan {0.0f, duration});
+    } else {
+        if (silentSpans.front().startInclusive > 0.0f) {
+            spans.push_back(TimeSpan {0.0f, silentSpans.front().startInclusive});
+        }
+        for (size_t i = 0; i < silentSpans.size() - 1; ++i) {
+            spans.push_back(TimeSpan {silentSpans[i].endExclusive, silentSpans[i + 1].startInclusive});
+        }
+        if (silentSpans.back().endExclusive < duration) {
+            spans.push_back(TimeSpan {silentSpans.back().endExclusive, duration});
+        }
+    }
+    if (spans.size() != wordGroups.size()) {
+        throw WordGroupsSoundSpansMismatchedException(wordGroups, spans);
     }
 
     std::vector<LipAnimation::Keyframe> frames;
-    for (const auto &wordDuration : wordDurations) {
-        auto phonemes = _dict.phonemes(wordDuration.word);
-        float timePerPhoneme = (wordDuration.end - wordDuration.start) / static_cast<float>(phonemes.size() + 1);
-        float phonemeTime = wordDuration.start;
-        frames.push_back(LipAnimation::Keyframe {phonemeTime, static_cast<uint8_t>(Shape::Rest)});
-        phonemeTime += timePerPhoneme;
-        for (auto &phoneme : phonemes) {
-            auto lowerPhoneme = boost::to_lower_copy(phoneme);
-            if (std::isdigit((*lowerPhoneme.rbegin()))) {
-                lowerPhoneme.pop_back();
+    for (size_t i = 0; i < wordGroups.size(); ++i) {
+        std::vector<Shape> groupPhonemeShapes;
+        for (const auto &word : wordGroups[i]) {
+            auto wordPhonemes = _dict.phonemes(word);
+            for (const auto &phoneme : wordPhonemes) {
+                auto lowerPhoneme = boost::to_lower_copy(phoneme);
+                if (std::isdigit((*lowerPhoneme.rbegin()))) {
+                    lowerPhoneme.pop_back();
+                }
+                if (g_phonemeToShape.count(lowerPhoneme) == 0) {
+                    throw IllegalPhonemeException(lowerPhoneme);
+                }
+                auto shape = g_phonemeToShape.at(lowerPhoneme);
+                groupPhonemeShapes.push_back(shape);
             }
-            if (g_phonemeToShape.count(lowerPhoneme) == 0) {
-                throw IllegalPhonemeException(lowerPhoneme);
-            }
-            auto shape = g_phonemeToShape.at(lowerPhoneme);
-            frames.push_back(LipAnimation::Keyframe {phonemeTime, static_cast<uint8_t>(shape)});
-            phonemeTime += timePerPhoneme;
+        }
+        float timePerPhoneme = spans[i].duration() / static_cast<float>(groupPhonemeShapes.size());
+        float time = spans[i].startInclusive;
+        for (const auto &shape : groupPhonemeShapes) {
+            frames.push_back(LipAnimation::Keyframe {time, static_cast<uint8_t>(shape)});
+            time += timePerPhoneme;
         }
     }
-    frames.push_back(LipAnimation::Keyframe {length, static_cast<uint8_t>(Shape::Rest)});
+    for (const auto &span : silentSpans) {
+        frames.push_back(LipAnimation::Keyframe {span.startInclusive, static_cast<uint8_t>(Shape::Rest)});
+    }
+    std::sort(frames.begin(), frames.end(), [](const auto &lhs, const auto &rhs) { return lhs.time < rhs.time; });
+    frames.push_back(LipAnimation::Keyframe {duration, static_cast<uint8_t>(Shape::Rest)});
 
     return std::make_unique<LipAnimation>(
         name,
-        length,
+        duration,
         std::move(frames));
 }
 
-std::vector<std::string> LipComposer::split(const std::string &text) {
+std::vector<std::vector<std::string>> LipComposer::split(const std::string &text) {
+    std::vector<std::vector<std::string>> wordGroups;
     std::vector<std::string> words;
-    auto word = StringBuilder();
-    for (const auto &ch : text) {
+    StringBuilder word;
+
+    int groupStart = -1;
+    for (size_t i = 0; i < text.length(); ++i) {
+        const auto &ch = text[i];
+        if (ch == '(') {
+            if (groupStart != -1) {
+                throw TextSyntaxException(str(boost::format("Unexpected '(' character at %d") % i));
+            }
+            if (!word.empty()) {
+                words.push_back(word.string());
+                word.clear();
+            }
+            if (!words.empty()) {
+                wordGroups.push_back(words);
+                words.clear();
+            }
+            groupStart = i;
+            continue;
+        }
+        if (ch == ')') {
+            if (groupStart == -1) {
+                throw TextSyntaxException(str(boost::format("Unexpected ')' character at %d") % i));
+            }
+            if (!word.empty()) {
+                words.push_back(word.string());
+                word.clear();
+            }
+            if (!words.empty()) {
+                wordGroups.push_back(words);
+                words.clear();
+            }
+            groupStart = -1;
+            continue;
+        }
         if (std::isspace(ch)) {
             if (!word.empty()) {
                 words.push_back(word.string());
@@ -204,12 +261,24 @@ std::vector<std::string> LipComposer::split(const std::string &text) {
         }
         if (std::isalpha(ch) || ((ch == '\'' || ch == '-') && !word.empty())) {
             word.append(std::tolower(ch));
+            continue;
         }
+        if (std::ispunct(ch)) {
+            continue;
+        }
+        throw TextSyntaxException(str(boost::format("Unexpected character %d at %d") % static_cast<int>(ch) % i));
+    }
+    if (groupStart != -1) {
+        throw TextSyntaxException(str(boost::format("Expected matching ')' character for '(' at %d") % groupStart));
     }
     if (!word.empty()) {
         words.push_back(word.string());
     }
-    return words;
+    if (!words.empty()) {
+        wordGroups.push_back(words);
+    }
+
+    return wordGroups;
 }
 
 } // namespace reone

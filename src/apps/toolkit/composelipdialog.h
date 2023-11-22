@@ -25,6 +25,8 @@
 
 #include <wx/valnum.h>
 
+#include "reone/tools/audioanalyzer.h"
+
 namespace reone {
 
 namespace audio {
@@ -43,17 +45,29 @@ public:
                      long style = wxDEFAULT_DIALOG_STYLE);
 
 private:
-    wxFloatingPointValidator<float> _soundLengthValidator;
-    float _soundLength {1.0f};
     wxTextCtrl *_textCtrl;
-    wxTextCtrl *_soundLengthCtrl;
-    wxPanel *_soundWavePanel;
+    wxPanel *_soundWaveformPanel;
+    wxTextCtrl *_soundDurationCtrl;
+    wxSlider *_minSilenceDurationSlider;
+    wxSlider *_maxSilenceAmplitudeSlider;
     wxTextCtrl *_pronounciationCtrl;
 
+    wxFloatingPointValidator<float> _soundDurationValidator;
+    float _soundDuration {1.0f};
+
     std::shared_ptr<audio::AudioBuffer> _sound;
+    std::vector<TimeSpan> _silentSpans;
+    std::vector<float> _soundWaveform;
+
+    ByteBuffer _cmudictBytes;
+
+    void analyzeAudio();
 
     void OnSoundWavePanelPaint(wxPaintEvent &evt);
     void OnSoundLoadCommand(wxCommandEvent &evt);
+    void OnSoundResetCommand(wxCommandEvent &evt);
+    void OnMinSilenceDurationCommand(wxCommandEvent &evt);
+    void OnMaxSilenceAmplitudeCommand(wxCommandEvent &evt);
     void OnHelpCommmand(wxCommandEvent &evt);
     void OnPronounciationSaveCommand(wxCommandEvent &evt);
     void OnComposeCommand(wxCommandEvent &evt);

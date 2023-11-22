@@ -76,8 +76,13 @@ endif()
 
 # Compile options
 
-if(ENABLE_ASAN AND MSVC)
-    add_compile_options("/fsanitize=address")
+if(ENABLE_ASAN)
+    if (MSVC)
+        add_compile_options("/fsanitize=address")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address)
+    endif()
 endif()
 
 # END Compile options

@@ -64,6 +64,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/script/execution.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
     ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
+    ${TESTS_SOURCE_DIR}/tools/audioanalyzer.cpp
     ${TESTS_SOURCE_DIR}/tools/exprtree.cpp
     ${TESTS_SOURCE_DIR}/tools/exprtreeoptimizer.cpp
     ${TESTS_SOURCE_DIR}/tools/lipcomposer.cpp

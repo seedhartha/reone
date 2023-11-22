@@ -42,6 +42,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/threadpool.h
     ${SYSTEM_INCLUDE_DIR}/threadutil.h
     ${SYSTEM_INCLUDE_DIR}/timer.h
+    ${SYSTEM_INCLUDE_DIR}/timespan.h
     ${SYSTEM_INCLUDE_DIR}/types.h)
 
 set(SYSTEM_SOURCES

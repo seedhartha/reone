@@ -15,25 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "reone/audio/buffer.h"
+#include "reone/system/timespan.h"
 
 namespace reone {
 
-namespace audio {
+class AudioAnalyzer : boost::noncopyable {
+public:
+    std::vector<TimeSpan> silentSpans(const audio::AudioBuffer &buffer,
+                                      float minSilenceDuration = 0.05f,
+                                      float maxSilenceAmplitude = 0.01f);
 
-void AudioBuffer::add(Frame &&frame) {
-    _duration += frame.samples.size() / frame.stride() / static_cast<float>(frame.sampleRate);
-    _frames.push_back(frame);
-}
+    std::vector<float> waveform(const audio::AudioBuffer &buffer, int resolution);
 
-int AudioBuffer::getFrameCount() const {
-    return static_cast<int>(_frames.size());
-}
-
-const AudioBuffer::Frame &AudioBuffer::getFrame(int index) const {
-    return _frames[index];
-}
-
-} // namespace audio
+private:
+    std::vector<TimeSpan> computeFrameSpans(const audio::AudioBuffer &buffer);
+    float sampleNormalized(const audio::AudioBuffer::Frame &frame, float time);
+};
 
 } // namespace reone

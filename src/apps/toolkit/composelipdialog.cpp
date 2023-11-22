@@ -19,7 +19,6 @@
 
 #include <wx/dcbuffer.h>
 
-#include "reone/audio/buffer.h"
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/graphics/format/lipwriter.h"
@@ -28,6 +27,7 @@
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
+#include "reone/system/stringbuilder.h"
 #include "reone/tools/lipcomposer.h"
 
 using namespace reone::audio;
@@ -84,30 +84,49 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
                                    const wxSize &size,
                                    long style) :
     wxDialog(parent, id, title, pos, size, style),
-    _soundLengthValidator(4, &_soundLength) {
+    _soundDurationValidator(4, &_soundDuration) {
 
     _textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _textCtrl->SetMinSize(wxSize(400, 100));
+    _textCtrl->SetMinSize(wxSize(500, 100));
     auto textSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Text");
     textSizer->Add(_textCtrl, wxSizerFlags(0).Border(wxALL, 3));
 
-    auto soundLengthLabel = new wxStaticText(this, wxID_ANY, "Length (seconds)");
-    _soundLengthCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _soundLengthValidator);
-    auto soundLengthSizer = new wxBoxSizer(wxHORIZONTAL);
-    soundLengthSizer->Add(soundLengthLabel, wxSizerFlags(0).Border(wxALL, 3));
-    soundLengthSizer->Add(_soundLengthCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    _soundWavePanel = new wxPanel(this, -1);
-    _soundWavePanel->SetMinSize(wxSize(400, 100));
-    _soundWavePanel->Bind(wxEVT_PAINT, &ComposeLipDialog::OnSoundWavePanelPaint, this);
+    _soundWaveformPanel = new wxPanel(this, -1);
+    _soundWaveformPanel->SetMinSize(wxSize(500, 100));
+    _soundWaveformPanel->Bind(wxEVT_PAINT, &ComposeLipDialog::OnSoundWavePanelPaint, this);
+    auto soundDurationLabel = new wxStaticText(this, wxID_ANY, "Duration (seconds)");
+    _soundDurationCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _soundDurationValidator);
+    auto soundDurationSizer = new wxBoxSizer(wxHORIZONTAL);
+    soundDurationSizer->Add(soundDurationLabel, wxSizerFlags(0).Center().Border(wxALL, 3));
+    soundDurationSizer->Add(_soundDurationCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    auto minSilenceDurationLabel = new wxStaticText(this, wxID_ANY, "Min silence duration (millis)");
+    _minSilenceDurationSlider = new wxSlider(this, wxID_ANY, 125, 25, 250, wxDefaultPosition, wxDefaultSize, wxSL_LABELS);
+    _minSilenceDurationSlider->Bind(wxEVT_SLIDER, &ComposeLipDialog::OnMinSilenceDurationCommand, this);
+    auto minSilenceDurationSizer = new wxBoxSizer(wxHORIZONTAL);
+    minSilenceDurationSizer->Add(minSilenceDurationLabel, wxSizerFlags(0).Center().Border(wxALL, 3));
+    minSilenceDurationSizer->Add(_minSilenceDurationSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    auto maxSilenceAmplitudeLabel = new wxStaticText(this, wxID_ANY, "Max silence amplitude (1/1000)");
+    _maxSilenceAmplitudeSlider = new wxSlider(this, wxID_ANY, 25, 5, 50, wxDefaultPosition, wxDefaultSize, wxSL_LABELS);
+    _maxSilenceAmplitudeSlider->Bind(wxEVT_SLIDER, &ComposeLipDialog::OnMaxSilenceAmplitudeCommand, this);
+    auto maxSilenceAmplitudeSizer = new wxBoxSizer(wxHORIZONTAL);
+    maxSilenceAmplitudeSizer->Add(maxSilenceAmplitudeLabel, wxSizerFlags(0).Center().Border(wxALL, 3));
+    maxSilenceAmplitudeSizer->Add(_maxSilenceAmplitudeSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
     auto soundLoadBtn = new wxButton(this, wxID_ANY, "Load...");
     soundLoadBtn->Bind(wxEVT_BUTTON, &ComposeLipDialog::OnSoundLoadCommand, this);
+    auto soundResetBtn = new wxButton(this, wxID_ANY, "Reset");
+    soundResetBtn->Bind(wxEVT_BUTTON, &ComposeLipDialog::OnSoundResetCommand, this);
+    auto soundBtnSizer = new wxBoxSizer(wxHORIZONTAL);
+    soundBtnSizer->Add(soundLoadBtn, wxSizerFlags(0).Border(wxALL, 3));
+    soundBtnSizer->Add(soundResetBtn, wxSizerFlags(0).Border(wxALL, 3));
     auto soundSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Sound");
-    soundSizer->Add(soundLengthSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    soundSizer->Add(_soundWavePanel, wxSizerFlags(0).Border(wxALL, 3));
-    soundSizer->Add(soundLoadBtn, wxSizerFlags(0).Border(wxALL, 3));
+    soundSizer->Add(_soundWaveformPanel, wxSizerFlags(0).Border(wxALL, 3));
+    soundSizer->Add(soundDurationSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    soundSizer->Add(minSilenceDurationSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    soundSizer->Add(maxSilenceAmplitudeSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    soundSizer->Add(soundBtnSizer, wxSizerFlags(0).Border(wxALL, 3));
 
     _pronounciationCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _pronounciationCtrl->SetMinSize(wxSize(400, 0));
+    _pronounciationCtrl->SetMinSize(wxSize(500, 0));
     auto pronounciationSaveBtn = new wxButton(this, wxID_ANY, "Save");
     pronounciationSaveBtn->Bind(wxEVT_BUTTON, &ComposeLipDialog::OnPronounciationSaveCommand, this);
     auto pronounciationSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Pronounciation");
@@ -145,63 +164,62 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
     }
 }
 
-void ComposeLipDialog::OnSoundWavePanelPaint(wxPaintEvent &evt) {
-    int w, h;
-    _soundWavePanel->GetClientSize(&w, &h);
-
-    wxBufferedPaintDC dc(_soundWavePanel);
-    dc.SetBackground(*wxLIGHT_GREY_BRUSH);
-    dc.Clear();
-    if (!_sound || _sound->getFrameCount() == 0) {
+void ComposeLipDialog::analyzeAudio() {
+    if (!_sound) {
         return;
     }
-    dc.SetPen(*wxGREY_PEN);
+    float minSilenceDuration = _minSilenceDurationSlider->GetValue() / 1000.0f;
+    float maxSilenceAmplitude = _maxSilenceAmplitudeSlider->GetValue() / 1000.0f;
+    AudioAnalyzer audioAnalyzer;
+    _silentSpans = audioAnalyzer.silentSpans(*_sound, minSilenceDuration, maxSilenceAmplitude);
+    int w, h;
+    _soundWaveformPanel->GetClientSize(&w, &h);
+    _soundWaveform = audioAnalyzer.waveform(*_sound, w);
+    _soundWaveformPanel->Refresh();
+}
 
-    float prevSample = 0.0f;
-    for (int i = 0; i < w; ++i) {
-        float graphTime = (i / static_cast<float>(w)) * _sound->duration();
+void ComposeLipDialog::OnSoundWavePanelPaint(wxPaintEvent &evt) {
+    wxBufferedPaintDC dc(_soundWaveformPanel);
+    dc.SetBackground(*wxGREY_BRUSH);
+    dc.SetPen(*wxWHITE_PEN);
+    dc.Clear();
 
-        const AudioBuffer::Frame *graphFrame = nullptr;
-        float frameTime = 0.0f;
-        for (int frameIdx = 0; frameIdx < _sound->getFrameCount(); ++frameIdx) {
-            const auto &frame = _sound->getFrame(frameIdx);
-            float frameDuration = frame.samples.size() / static_cast<float>(frame.sampleRate);
-            if (graphTime >= frameTime && graphTime < frameTime + frameDuration) {
-                graphFrame = &frame;
-                break;
-            }
-            frameTime += frameDuration;
-        }
-        if (!graphFrame || graphFrame->samples.empty()) {
-            break;
-        }
-        int sampleIdx = static_cast<int>((graphTime - frameTime) / static_cast<float>(graphFrame->sampleRate));
-        float newSample;
-        switch (graphFrame->format) {
-        case AudioFormat::Mono8:
-            newSample = (reinterpret_cast<const uint8_t *>(&graphFrame->samples[0])[sampleIdx] - 128) / 255.0f;
-            break;
-        case AudioFormat::Mono16:
-            newSample = reinterpret_cast<const int16_t *>(&graphFrame->samples[0])[sampleIdx] / 65535.0f;
-            break;
-        case AudioFormat::Stereo8:
-            newSample = (reinterpret_cast<const uint8_t *>(&graphFrame->samples[0])[2 * sampleIdx] - 128) / 255.0f;
-            break;
-        case AudioFormat::Stereo16:
-            newSample = reinterpret_cast<const int16_t *>(&graphFrame->samples[0])[2 * sampleIdx] / 65535.0f;
-            break;
-        default:
-            throw std::logic_error("Unsupported audio format: " + std::to_string(static_cast<int>(graphFrame->format)));
-        }
-        if (i > 0) {
-            dc.DrawLine(
-                i - 1,
-                h / 2 + static_cast<int>(prevSample * h),
-                i,
-                h / 2 + static_cast<int>(newSample * h));
-        }
-        prevSample = newSample;
+    if (_soundWaveform.empty()) {
+        return;
     }
+    int w, h;
+    _soundWaveformPanel->GetSize(&w, &h);
+    float prevSample = 0.0f;
+    bool prevSilent = false;
+    for (int x = 0; x < w; ++x) {
+        float waveformTime = (x / static_cast<float>(w)) * _sound->duration();
+        float sample = _soundWaveform[x];
+        bool silent = std::any_of(_silentSpans.begin(),
+                                  _silentSpans.end(),
+                                  [&waveformTime](const auto &span) { return span.contains(waveformTime); });
+        if (silent && prevSilent) {
+            dc.SetPen(*wxBLACK_PEN);
+        } else {
+            dc.SetPen(*wxWHITE_PEN);
+        }
+        if (x > 0) {
+            dc.DrawLine(
+                x - 1,
+                h / 2 + static_cast<int>(prevSample * h),
+                x,
+                h / 2 + static_cast<int>(sample * h));
+        }
+        prevSample = sample;
+        prevSilent = silent;
+    }
+}
+
+void ComposeLipDialog::OnMinSilenceDurationCommand(wxCommandEvent &evt) {
+    analyzeAudio();
+}
+
+void ComposeLipDialog::OnMaxSilenceAmplitudeCommand(wxCommandEvent &evt) {
+    analyzeAudio();
 }
 
 void ComposeLipDialog::OnSoundLoadCommand(wxCommandEvent &evt) {
@@ -216,28 +234,41 @@ void ComposeLipDialog::OnSoundLoadCommand(wxCommandEvent &evt) {
         return;
     }
     auto path = std::filesystem::path(dialog.GetPath().ToStdString());
+
     auto lowerExt = boost::to_lower_copy(path.extension().string());
-    std::shared_ptr<AudioBuffer> audio;
     if (lowerExt == ".wav") {
         auto wav = FileInputStream(path);
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(wav, mp3ReaderFactory);
         reader.load();
-        audio = reader.stream();
+        _sound = reader.stream();
     } else if (lowerExt == ".mp3") {
         auto mp3 = FileInputStream(path);
         auto reader = Mp3Reader();
         reader.load(mp3);
-        audio = reader.stream();
-    }
-    if (!audio) {
+        _sound = reader.stream();
+    } else {
+        _sound.reset();
         return;
     }
-    _soundLength = audio->duration();
-    auto lengthStr = str(boost::format("%.04f") % audio->duration());
-    _soundLengthCtrl->SetValue(lengthStr);
-    _sound = std::move(audio);
-    _soundWavePanel->Refresh();
+
+    analyzeAudio();
+
+    _soundDuration = _sound->duration();
+    _soundDurationCtrl->SetValue(str(boost::format("%.04f") % _soundDuration));
+    _soundDurationCtrl->SetEditable(false);
+}
+
+void ComposeLipDialog::OnSoundResetCommand(wxCommandEvent &evt) {
+    _sound.reset();
+    _silentSpans.clear();
+    _soundWaveform.clear();
+    _soundWaveformPanel->Refresh();
+    _soundDuration = 1.0f;
+    _soundDurationCtrl->SetValue(str(boost::format("%.04f") % _soundDuration));
+    _soundDurationCtrl->SetEditable(true);
+    _minSilenceDurationSlider->SetValue(125);
+    _maxSilenceAmplitudeSlider->SetValue(25);
 }
 
 void ComposeLipDialog::OnHelpCommmand(wxCommandEvent &evt) {
@@ -257,9 +288,18 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
     if (text.empty()) {
         return;
     }
-    auto cmudictPath = std::filesystem::current_path();
-    cmudictPath.append("cmudict.dict");
-    auto cmudict = FileInputStream(cmudictPath);
+
+    if (_cmudictBytes.empty()) {
+        auto cmudictPath = std::filesystem::current_path();
+        cmudictPath.append("cmudict.dict");
+        if (std::filesystem::exists(cmudictPath)) {
+            auto cmudict = FileInputStream(cmudictPath);
+            int length = cmudict.length();
+            _cmudictBytes.resize(length);
+            cmudict.read(&_cmudictBytes[0], length);
+        }
+    }
+    auto cmudict = MemoryInputStream(_cmudictBytes);
 
     auto pronounciationValue = _pronounciationCtrl->GetValue();
     auto pronouncingBuffer = ByteBuffer(pronounciationValue.begin(), pronounciationValue.end());
@@ -272,7 +312,19 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
     std::unique_ptr<LipAnimation> anim;
     auto composer = LipComposer(dict);
     try {
-        anim = composer.compose("composed", text, _soundLength);
+        anim = composer.compose("composed", text, _soundDuration, _silentSpans);
+    } catch (const WordGroupsSoundSpansMismatchedException &ex) {
+        std::vector<std::string> spans;
+        for (const auto &span : ex.soundSpans()) {
+            spans.push_back(span.string());
+        }
+        auto spansStr = boost::join(spans, ", ");
+        StringBuilder message;
+        message.append("Mismatch between word groups and sound spans.\n");
+        message.append(str(boost::format("Expected %llu word groups at the following time spans: %s\n") % spans.size() % spansStr));
+        message.append("Wrap words into word groups with parentheses.");
+        wxMessageBox(message.string());
+        return;
     } catch (const WordPhonemesNotFoundException &ex) {
         wxMessageBox(ex.what());
         auto pronounciationText = _pronounciationCtrl->GetValue();

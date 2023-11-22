@@ -21,6 +21,7 @@ set(TOOLS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
 set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/2da.h
     ${TOOLS_INCLUDE_DIR}/audio.h
+    ${TOOLS_INCLUDE_DIR}/audioanalyzer.h
     ${TOOLS_INCLUDE_DIR}/erf.h
     ${TOOLS_INCLUDE_DIR}/gff.h
     ${TOOLS_INCLUDE_DIR}/keybif.h
@@ -47,6 +48,7 @@ set(TOOLS_SOURCES
     ${TOOLS_SOURCE_DIR}/script/format/pcodewriter.cpp
     ${TOOLS_SOURCE_DIR}/2da.cpp
     ${TOOLS_SOURCE_DIR}/audio.cpp
+    ${TOOLS_SOURCE_DIR}/audioanalyzer.cpp
     ${TOOLS_SOURCE_DIR}/erf.cpp
     ${TOOLS_SOURCE_DIR}/gff.cpp
     ${TOOLS_SOURCE_DIR}/keybif.cpp

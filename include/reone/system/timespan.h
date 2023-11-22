@@ -15,25 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/buffer.h"
+#pragma once
 
 namespace reone {
 
-namespace audio {
+struct TimeSpan {
+    float startInclusive {0.0f};
+    float endExclusive {0.0f};
 
-void AudioBuffer::add(Frame &&frame) {
-    _duration += frame.samples.size() / frame.stride() / static_cast<float>(frame.sampleRate);
-    _frames.push_back(frame);
-}
+    float duration() const {
+        return endExclusive - startInclusive;
+    }
 
-int AudioBuffer::getFrameCount() const {
-    return static_cast<int>(_frames.size());
-}
+    bool contains(float time) const {
+        return startInclusive <= time && time < endExclusive;
+    }
 
-const AudioBuffer::Frame &AudioBuffer::getFrame(int index) const {
-    return _frames[index];
-}
-
-} // namespace audio
+    std::string string() const {
+        return str(boost::format("[%.04f, %.04f)") % startInclusive % endExclusive);
+    }
+};
 
 } // namespace reone

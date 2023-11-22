@@ -31,13 +31,27 @@ public:
         AudioFormat format {AudioFormat::Mono8};
         int sampleRate {0};
         ByteBuffer samples;
+
+        int stride() const {
+            switch (format) {
+            case AudioFormat::Mono8:
+                return 1;
+            case AudioFormat::Mono16:
+                return 2;
+            case AudioFormat::Stereo8:
+                return 2;
+            case AudioFormat::Stereo16:
+                return 4;
+            default:
+                throw std::logic_error("Unsupported audio format" + std::to_string(static_cast<int>(format)));
+            }
+        }
     };
 
     void add(Frame &&frame);
 
     int getFrameCount() const;
     const Frame &getFrame(int index) const;
-
     float duration() const { return _duration; }
 
 private:

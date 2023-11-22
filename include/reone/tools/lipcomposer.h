@@ -19,6 +19,8 @@
 
 #include "reone/system/stream/input.h"
 
+#include "audioanalyzer.h"
+
 namespace reone {
 
 namespace graphics {
@@ -69,6 +71,35 @@ private:
     WordPhonemesMap _wordToPhonemes;
 };
 
+class TextSyntaxException : public std::runtime_error {
+public:
+    TextSyntaxException(std::string message) :
+        std::runtime_error(message) {
+    }
+};
+
+class WordGroupsSoundSpansMismatchedException : public std::runtime_error {
+public:
+    WordGroupsSoundSpansMismatchedException(std::vector<std::vector<std::string>> wordGroups,
+                                            std::vector<TimeSpan> soundSpans) :
+        std::runtime_error("Mismatch between word groups and sound spans"),
+        _wordGroups(std::move(wordGroups)),
+        _soundSpans(std::move(soundSpans)) {
+    }
+
+    const std::vector<std::vector<std::string>> &wordGroups() const {
+        return _wordGroups;
+    }
+
+    const std::vector<TimeSpan> &soundSpans() const {
+        return _soundSpans;
+    }
+
+private:
+    std::vector<std::vector<std::string>> _wordGroups;
+    std::vector<TimeSpan> _soundSpans;
+};
+
 class IllegalPhonemeException : public std::runtime_error {
 public:
     IllegalPhonemeException(std::string phoneme) :
@@ -87,17 +118,20 @@ public:
     }
 
     /**
+     * @throws TextSyntaxException
+     * @throws WordGroupsSoundSpansMismatchedException
      * @throws WordPhonemesNotFoundException
      * @throws IllegalPhonemeException
      */
     std::unique_ptr<graphics::LipAnimation> compose(const std::string &name,
                                                     const std::string &text,
-                                                    float length = 1.0f);
+                                                    float duration,
+                                                    std::vector<TimeSpan> silentSpans = std::vector<TimeSpan>());
 
 private:
     PronouncingDictionary _dict;
 
-    std::vector<std::string> split(const std::string &text);
+    std::vector<std::vector<std::string>> split(const std::string &text);
 };
 
 } // namespace reone
