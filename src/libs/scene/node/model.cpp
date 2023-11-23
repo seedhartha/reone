@@ -564,6 +564,39 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
     }
 }
 
+void ModelSceneNode::pauseAnimation() {
+    if (_animChannels.empty()) {
+        return;
+    }
+    _animChannels.front().freeze = true;
+}
+
+void ModelSceneNode::resumeAnimation() {
+    if (_animChannels.empty()) {
+        return;
+    }
+    _animChannels.front().freeze = false;
+}
+
+void ModelSceneNode::setAnimationTime(float time) {
+    if (_animChannels.empty()) {
+        return;
+    }
+    auto &channel = _animChannels.front();
+    channel.time = time;
+    bool looped = (channel.properties.flags & AnimationFlags::loop) != 0;
+    bool frozen = channel.freeze;
+    if (looped) {
+        channel.properties.flags ^= AnimationFlags::loop;
+    }
+    channel.freeze = false;
+    updateAnimations(0.0f);
+    channel.freeze = frozen;
+    if (looped) {
+        channel.properties.flags |= AnimationFlags::loop;
+    }
+}
+
 bool ModelSceneNode::isAnimationFinished() const {
     return _animChannels.empty() || _animChannels.front().finished;
 }

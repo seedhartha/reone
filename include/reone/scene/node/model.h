@@ -120,6 +120,10 @@ public:
     void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
     void playAnimation(graphics::Animation &anim, graphics::LipAnimation *lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
 
+    void pauseAnimation();
+    void resumeAnimation();
+    void setAnimationTime(float time);
+
     bool isAnimationFinished() const;
 
     std::string activeAnimationName() const;

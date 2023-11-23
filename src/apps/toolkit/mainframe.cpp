@@ -232,7 +232,7 @@ MainFrame::MainFrame() :
                 _animationsListBox->Append(animation);
             }
             _animationsListBox->Thaw();
-            _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, std::numeric_limits<int>::max());
+            _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
         } else {
             _renderSplitter->Unsplit();
         }
@@ -278,9 +278,38 @@ MainFrame::MainFrame() :
 #endif
         glContext->SetCurrent(*_glCanvas);
 
-        _animationsListBox = new wxListBox(_renderSplitter, wxID_ANY);
+        _animationPanel = new wxPanel(_renderSplitter);
+        _animPauseResumeBtn = new wxButton(_animationPanel, wxID_ANY, "Pause");
+        _animPauseResumeBtn->Bind(wxEVT_BUTTON, &MainFrame::OnAnimPauseResumeCommand, this);
+        _animTimeSlider = new wxSlider(_animationPanel, wxID_ANY, 0, 0, 100, wxDefaultPosition, wxDefaultSize);
+        _animTimeSlider->Bind(wxEVT_SLIDER, &MainFrame::OnAnimTimeSliderCommand, this);
+        _animTimeCtrl = new wxTextCtrl(_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+        auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
+        animPlaybackSizer->Add(_animPauseResumeBtn, wxSizerFlags(0).Center().Border(wxALL, 3));
+        animPlaybackSizer->Add(_animTimeSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
+        animPlaybackSizer->Add(_animTimeCtrl, wxSizerFlags(0).Center().Border(wxALL, 3));
+        _animationsListBox = new wxListBox(_animationPanel, wxID_ANY);
+        _animationsListBox->SetMinSize(wxSize(400, 100));
         _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::OnAnimationsListBoxDoubleClick, this);
-        _renderSplitter->SplitHorizontally(_glCanvas, _animationsListBox, std::numeric_limits<int>::max());
+        auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Animations");
+        animationsSizer->Add(_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
+        auto lipLoadBtn = new wxButton(_animationPanel, wxID_ANY, "Load LIP...");
+        auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Lip Sync");
+        lipSyncSizer->Add(lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
+        auto animationHSizer = new wxBoxSizer(wxHORIZONTAL);
+        animationHSizer->Add(animationsSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+        animationHSizer->Add(lipSyncSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+        auto animationVSizer = new wxBoxSizer(wxVERTICAL);
+        animationVSizer->Add(animPlaybackSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+        animationVSizer->Add(animationHSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+        _animationPanel->SetSizer(animationVSizer);
+
+        _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
+    });
+    _viewModel->animationProgress().subscribe([this](const auto &progress) {
+        _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
+        int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
+        _animTimeSlider->SetValue(value);
     });
     _viewModel->onViewCreated();
 
@@ -673,13 +702,33 @@ void MainFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
     _viewModel->onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
+void MainFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
+    if (_viewModel->isAnimationPlaying()) {
+        _viewModel->pauseAnimation();
+        _animPauseResumeBtn->SetLabelText("Resume");
+    } else {
+        _viewModel->resumeAnimation();
+        _animPauseResumeBtn->SetLabelText("Pause");
+    }
+}
+
+void MainFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
+    float duration = _viewModel->animationProgress().data().duration;
+    if (duration == 0.0f) {
+        return;
+    }
+    float time = duration * _animTimeSlider->GetValue() / static_cast<float>(_animTimeSlider->GetMax());
+    _viewModel->setAnimationTime(time);
+}
+
 void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     int selection = event.GetSelection();
     if (selection == -1) {
         return;
     }
     auto animation = _animationsListBox->GetString(selection);
-    _viewModel->playAnimation((std::string)animation);
+    _viewModel->playAnimation(animation.ToStdString());
+    _animPauseResumeBtn->SetLabelText("Pause");
 }
 
 void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {

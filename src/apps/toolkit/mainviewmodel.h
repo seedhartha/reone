@@ -119,6 +119,11 @@ struct ImageContent {
     }
 };
 
+struct AnimationProgress {
+    float time {0.0f};
+    float duration {0.0f};
+};
+
 struct Progress {
     bool visible {false};
     std::string title;
@@ -139,7 +144,10 @@ public:
                     const std::filesystem::path &srcPath,
                     const std::filesystem::path &destPath);
 
-    void playAnimation(const std::string &anim);
+    void playAnimation(std::string anim);
+    void pauseAnimation();
+    void resumeAnimation();
+    void setAnimationTime(float time);
 
     void update3D();
     void render3D(int w, int h);
@@ -161,6 +169,7 @@ public:
     std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
     bool isRenderEnabled() const { return _renderEnabled; }
+    bool isAnimationPlaying() const { return _animationPlaying; }
 
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
     EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
@@ -170,6 +179,7 @@ public:
     EventHandler<std::shared_ptr<audio::AudioBuffer>> &audioStream() { return _audioStream; }
     EventHandler<Progress> &progress() { return _progress; }
     EventHandler<bool> &engineLoadRequested() { return _engineLoadRequested; }
+    EventHandler<AnimationProgress> &animationProgress() { return _animationProgress; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -221,6 +231,7 @@ private:
     EventHandler<std::shared_ptr<audio::AudioBuffer>> _audioStream;
     EventHandler<Progress> _progress;
     EventHandler<bool> _engineLoadRequested;
+    EventHandler<AnimationProgress> _animationProgress;
 
     // END Event handlers
 
@@ -237,6 +248,7 @@ private:
 
     bool _engineLoaded {false};
     bool _renderEnabled {false};
+    bool _animationPlaying {false};
 
     // END Embedded engine
 

@@ -100,13 +100,13 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
     soundDurationSizer->Add(soundDurationLabel, wxSizerFlags(0).Center().Border(wxALL, 3));
     soundDurationSizer->Add(_soundDurationCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
     auto minSilenceDurationLabel = new wxStaticText(this, wxID_ANY, "Min silence duration (millis)");
-    _minSilenceDurationSlider = new wxSlider(this, wxID_ANY, 125, 25, 250, wxDefaultPosition, wxDefaultSize, wxSL_LABELS);
+    _minSilenceDurationSlider = new wxSlider(this, wxID_ANY, 125, 25, 250, wxDefaultPosition, wxDefaultSize, wxSL_VALUE_LABEL);
     _minSilenceDurationSlider->Bind(wxEVT_SLIDER, &ComposeLipDialog::OnMinSilenceDurationCommand, this);
     auto minSilenceDurationSizer = new wxBoxSizer(wxHORIZONTAL);
     minSilenceDurationSizer->Add(minSilenceDurationLabel, wxSizerFlags(0).Center().Border(wxALL, 3));
     minSilenceDurationSizer->Add(_minSilenceDurationSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
     auto maxSilenceAmplitudeLabel = new wxStaticText(this, wxID_ANY, "Max silence amplitude (1/1000)");
-    _maxSilenceAmplitudeSlider = new wxSlider(this, wxID_ANY, 25, 5, 50, wxDefaultPosition, wxDefaultSize, wxSL_LABELS);
+    _maxSilenceAmplitudeSlider = new wxSlider(this, wxID_ANY, 25, 5, 50, wxDefaultPosition, wxDefaultSize, wxSL_VALUE_LABEL);
     _maxSilenceAmplitudeSlider->Bind(wxEVT_SLIDER, &ComposeLipDialog::OnMaxSilenceAmplitudeCommand, this);
     auto maxSilenceAmplitudeSizer = new wxBoxSizer(wxHORIZONTAL);
     maxSilenceAmplitudeSizer->Add(maxSilenceAmplitudeLabel, wxSizerFlags(0).Center().Border(wxALL, 3));

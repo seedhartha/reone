@@ -79,10 +79,14 @@ private:
 
     wxSplitterWindow *_imageSplitter {nullptr};
     wxSplitterWindow *_renderSplitter {nullptr};
+    wxPanel *_animationPanel {nullptr};
     wxPanel *_audioPanel {nullptr};
 
     wxPanel *_imageCanvas {nullptr};
     wxTextCtrl *_imageInfoCtrl {nullptr};
+    wxButton *_animPauseResumeBtn {nullptr};
+    wxSlider *_animTimeSlider {nullptr};
+    wxTextCtrl *_animTimeCtrl {nullptr};
     wxListBox *_animationsListBox {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
 
@@ -144,6 +148,8 @@ private:
     void OnGLCanvasMouseWheel(wxMouseEvent &event);
     void OnGLCanvasMouseMotion(wxMouseEvent &event);
 
+    void OnAnimPauseResumeCommand(wxCommandEvent &event);
+    void OnAnimTimeSliderCommand(wxCommandEvent &event);
     void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
 
     void OnStopAudioCommand(wxCommandEvent &event);

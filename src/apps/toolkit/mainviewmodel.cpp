@@ -20,6 +20,7 @@
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/game/format/ssfreader.h"
+#include "reone/graphics/animation.h"
 #include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/lipanimation.h"
@@ -616,11 +617,35 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
-void MainViewModel::playAnimation(const std::string &anim) {
+void MainViewModel::playAnimation(std::string anim) {
     if (!_modelNode) {
         return;
     }
     _modelNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+    _animationPlaying = true;
+}
+
+void MainViewModel::pauseAnimation() {
+    if (!_modelNode) {
+        return;
+    }
+    _modelNode->pauseAnimation();
+    _animationPlaying = false;
+}
+
+void MainViewModel::resumeAnimation() {
+    if (!_modelNode) {
+        return;
+    }
+    _modelNode->resumeAnimation();
+    _animationPlaying = true;
+}
+
+void MainViewModel::setAnimationTime(float time) {
+    if (!_modelNode) {
+        return;
+    }
+    _modelNode->setAnimationTime(time);
 }
 
 void MainViewModel::update3D() {
@@ -633,6 +658,15 @@ void MainViewModel::update3D() {
 
     auto &scene = _sceneModule->graphs().get(kSceneMain);
     scene.update(delta);
+
+    if (_modelNode && !_modelNode->animationChannels().empty()) {
+        const auto &animChannel = _modelNode->animationChannels().front();
+        if (animChannel.anim) {
+            float time = animChannel.time;
+            float duration = animChannel.anim->length();
+            _animationProgress.invoke(AnimationProgress {time, duration});
+        }
+    }
 }
 
 void MainViewModel::render3D(int w, int h) {
