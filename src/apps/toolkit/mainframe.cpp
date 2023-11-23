@@ -242,6 +242,7 @@ MainFrame::MainFrame() :
             _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             _audioSource->init();
             _audioSource->play();
+            wxWakeUpIdle();
         } else {
             _audioSource.reset();
         }
@@ -311,6 +312,11 @@ MainFrame::MainFrame() :
         _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
         int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
         _animTimeSlider->SetValue(value);
+    });
+    _viewModel->renderEnabled().subscribe([this](const auto &enabled) {
+        if (enabled) {
+            wxWakeUpIdle();
+        }
     });
     _viewModel->onViewCreated();
 
@@ -430,14 +436,17 @@ void MainFrame::OnClose(wxCloseEvent &event) {
 }
 
 void MainFrame::OnIdle(wxIdleEvent &event) {
-    if (_viewModel->isRenderEnabled()) {
+    bool renderEnabled = _viewModel->renderEnabled().data();
+    if (renderEnabled) {
         _viewModel->update3D();
         _glCanvas->Refresh();
     }
     if (_audioSource) {
         _audioSource->update();
     }
-    event.RequestMore();
+    if (renderEnabled || _audioSource) {
+        event.RequestMore();
+    }
 }
 
 void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {

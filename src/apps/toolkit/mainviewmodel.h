@@ -168,7 +168,6 @@ public:
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
     std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
-    bool isRenderEnabled() const { return _renderEnabled; }
     bool isAnimationPlaying() const { return _animationPlaying; }
 
     EventHandler<Page *> &pageAdded() { return _pageAdded; }
@@ -180,6 +179,7 @@ public:
     EventHandler<Progress> &progress() { return _progress; }
     EventHandler<bool> &engineLoadRequested() { return _engineLoadRequested; }
     EventHandler<AnimationProgress> &animationProgress() { return _animationProgress; }
+    EventHandler<bool> &renderEnabled() { return _renderEnabled; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -232,6 +232,7 @@ private:
     EventHandler<Progress> _progress;
     EventHandler<bool> _engineLoadRequested;
     EventHandler<AnimationProgress> _animationProgress;
+    EventHandler<bool> _renderEnabled;
 
     // END Event handlers
 
@@ -247,7 +248,6 @@ private:
     std::unique_ptr<scene::SceneModule> _sceneModule;
 
     bool _engineLoaded {false};
-    bool _renderEnabled {false};
     bool _animationPlaying {false};
 
     // END Embedded engine

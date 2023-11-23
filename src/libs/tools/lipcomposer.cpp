@@ -136,7 +136,7 @@ std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
     for (const auto &span : silentSpans) {
         frames.push_back(LipAnimation::Keyframe {span.startInclusive, static_cast<uint8_t>(LipShape::Rest)});
         if (span.endExclusive != duration) {
-            frames.push_back(LipAnimation::Keyframe {span.endExclusive - 0.000001f, static_cast<uint8_t>(LipShape::Rest)});
+            frames.push_back(LipAnimation::Keyframe {span.endExclusive - 0.00001f, static_cast<uint8_t>(LipShape::Rest)});
         }
     }
     std::sort(frames.begin(), frames.end(), [](const auto &lhs, const auto &rhs) { return lhs.time < rhs.time; });
