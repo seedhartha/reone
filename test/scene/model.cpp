@@ -127,7 +127,7 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
 
     // when
     modelSceneNode->init();
-    modelSceneNode->playAnimation("some_animation", AnimationProperties::fromFlags(AnimationFlags::fireForget));
+    modelSceneNode->playAnimation("some_animation", nullptr, AnimationProperties::fromFlags(AnimationFlags::fireForget));
     modelSceneNode->update(1.25f);
 
     // then
@@ -174,7 +174,7 @@ TEST(model_scene_node, should_play_single_looping_animation) {
 
     // when
     modelSceneNode->init();
-    modelSceneNode->playAnimation("some_animation", AnimationProperties::fromFlags(AnimationFlags::loop));
+    modelSceneNode->playAnimation("some_animation", nullptr, AnimationProperties::fromFlags(AnimationFlags::loop));
     modelSceneNode->update(1.25f);
 
     // then
@@ -230,8 +230,8 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
 
     // when
     modelSceneNode->init();
-    modelSceneNode->playAnimation("animation1", AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
-    modelSceneNode->playAnimation("animation2", AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+    modelSceneNode->playAnimation("animation1", nullptr, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+    modelSceneNode->playAnimation("animation2", nullptr, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
     modelSceneNode->update(1.25f);
 
     // then
@@ -291,8 +291,8 @@ TEST(model_scene_node, hould_transition_between_two_animations) {
 
     // when
     modelSceneNode->init();
-    modelSceneNode->playAnimation("animation1", AnimationProperties::fromFlags(AnimationFlags::loopBlend));
-    modelSceneNode->playAnimation("animation2", AnimationProperties::fromFlags(AnimationFlags::loopBlend));
+    modelSceneNode->playAnimation("animation1", nullptr, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
+    modelSceneNode->playAnimation("animation2", nullptr, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
     modelSceneNode->update(1.25f);
 
     // then

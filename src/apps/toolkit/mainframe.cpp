@@ -294,6 +294,7 @@ MainFrame::MainFrame() :
         auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Animations");
         animationsSizer->Add(_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
         auto lipLoadBtn = new wxButton(_animationPanel, wxID_ANY, "Load LIP...");
+        lipLoadBtn->Bind(wxEVT_BUTTON, &MainFrame::OnLipLoadCommand, this);
         auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Lip Sync");
         lipSyncSizer->Add(lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
         auto animationHSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -729,6 +730,25 @@ void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     auto animation = _animationsListBox->GetString(selection);
     _viewModel->playAnimation(animation.ToStdString());
     _animPauseResumeBtn->SetLabelText("Pause");
+}
+
+void MainFrame::OnLipLoadCommand(wxCommandEvent &event) {
+    auto dialog = wxFileDialog(
+        this,
+        "Choose LIP file",
+        wxEmptyString,
+        wxEmptyString,
+        "*.lip",
+        wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (dialog.ShowModal() != wxID_OK) {
+        return;
+    }
+    auto path = std::filesystem::path(dialog.GetPath().ToStdString());
+    auto lip = FileInputStream(path);
+    auto reader = LipReader(lip, "");
+    reader.load();
+    _lipAnim = reader.animation();
+    _viewModel->playAnimation("talk", _lipAnim.get());
 }
 
 void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {

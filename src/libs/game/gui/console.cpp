@@ -355,7 +355,7 @@ void Console::cmdPlayAnim(std::string input, std::vector<std::string> tokens) {
         }
     }
     auto model = std::static_pointer_cast<ModelSceneNode>(object->sceneNode());
-    model->playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
+    model->playAnimation(tokens[1], nullptr, AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
 void Console::cmdKill(std::string input, std::vector<std::string> tokens) {

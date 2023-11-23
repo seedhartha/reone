@@ -41,6 +41,7 @@
 #include "reone/audio/context.h"
 #include "reone/audio/source.h"
 #include "reone/game/types.h"
+#include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/id.h"
@@ -90,6 +91,7 @@ private:
     wxListBox *_animationsListBox {nullptr};
     wxGLCanvas *_glCanvas {nullptr};
 
+    std::shared_ptr<graphics::LipAnimation> _lipAnim;
     std::unique_ptr<wxBitmap> _image;
 
     // END Widgets
@@ -151,6 +153,7 @@ private:
     void OnAnimPauseResumeCommand(wxCommandEvent &event);
     void OnAnimTimeSliderCommand(wxCommandEvent &event);
     void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
+    void OnLipLoadCommand(wxCommandEvent &event);
 
     void OnStopAudioCommand(wxCommandEvent &event);
 

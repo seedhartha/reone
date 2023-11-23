@@ -278,7 +278,7 @@ void Creature::playAnimation(const std::string &name, AnimationProperties proper
     doPlayAnimation(fireForget, [&]() {
         auto model = std::static_pointer_cast<ModelSceneNode>(_sceneNode);
         if (model) {
-            model->playAnimation(name, properties);
+            model->playAnimation(name, nullptr, properties);
         }
     });
 }

@@ -144,7 +144,7 @@ public:
                     const std::filesystem::path &srcPath,
                     const std::filesystem::path &destPath);
 
-    void playAnimation(std::string anim);
+    void playAnimation(std::string anim, graphics::LipAnimation *lipAnim = nullptr);
     void pauseAnimation();
     void resumeAnimation();
     void setAnimationTime(float time);

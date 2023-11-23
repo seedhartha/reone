@@ -617,11 +617,11 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
-void MainViewModel::playAnimation(std::string anim) {
+void MainViewModel::playAnimation(std::string anim, graphics::LipAnimation *lipAnim) {
     if (!_modelNode) {
         return;
     }
-    _modelNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
+    _modelNode->playAnimation(anim, lipAnim, AnimationProperties::fromFlags(AnimationFlags::loop));
     _animationPlaying = true;
 }
 
@@ -663,7 +663,7 @@ void MainViewModel::update3D() {
         const auto &animChannel = _modelNode->animationChannels().front();
         if (animChannel.anim) {
             float time = animChannel.time;
-            float duration = animChannel.anim->length();
+            float duration = animChannel.lipAnim ? animChannel.lipAnim->length() : animChannel.anim->length();
             _animationProgress.invoke(AnimationProgress {time, duration});
         }
     }

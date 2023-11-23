@@ -117,7 +117,7 @@ public:
 
     // Animation
 
-    void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
+    void playAnimation(const std::string &name, graphics::LipAnimation *lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
     void playAnimation(graphics::Animation &anim, graphics::LipAnimation *lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
 
     void pauseAnimation();

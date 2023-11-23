@@ -218,10 +218,10 @@ void ModelSceneNode::setEnvironmentMap(Texture *texture) {
     }
 }
 
-void ModelSceneNode::playAnimation(const std::string &name, AnimationProperties properties) {
+void ModelSceneNode::playAnimation(const std::string &name, graphics::LipAnimation *lipAnim, AnimationProperties properties) {
     auto anim = _model->getAnimation(name);
     if (anim) {
-        playAnimation(*anim, nullptr, std::move(properties));
+        playAnimation(*anim, lipAnim, std::move(properties));
     }
 }
 
@@ -316,7 +316,7 @@ void ModelSceneNode::updateAnimations(float dt) {
     }
 
     if (_animChannels.empty()) {
-        playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
+        playAnimation("default", nullptr, AnimationProperties::fromFlags(AnimationFlags::loop));
         return;
     }
 
