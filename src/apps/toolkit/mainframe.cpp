@@ -282,7 +282,7 @@ MainFrame::MainFrame() :
         _animationPanel = new wxPanel(_renderSplitter);
         _animPauseResumeBtn = new wxButton(_animationPanel, wxID_ANY, "Pause");
         _animPauseResumeBtn->Bind(wxEVT_BUTTON, &MainFrame::OnAnimPauseResumeCommand, this);
-        _animTimeSlider = new wxSlider(_animationPanel, wxID_ANY, 0, 0, 100, wxDefaultPosition, wxDefaultSize);
+        _animTimeSlider = new wxSlider(_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
         _animTimeSlider->Bind(wxEVT_SLIDER, &MainFrame::OnAnimTimeSliderCommand, this);
         _animTimeCtrl = new wxTextCtrl(_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
         auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
