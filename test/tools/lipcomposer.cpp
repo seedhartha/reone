@@ -258,3 +258,43 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
     EXPECT_EQ(keyframes[38].shape, 7);
     EXPECT_EQ(keyframes[39].shape, 0);
 }
+
+TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_pauses) {
+    // given
+    auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
+        {"hello", {"HH", "AH0", "L", "OW1"}}, //
+        {"world", {"W", "ER1", "L", "D"}}     //
+    };
+    auto dict = PronouncingDictionary(wordToPhonemes);
+    auto composer = LipComposer(dict);
+
+    // when
+    auto anim = composer.compose("name", "Hello, | world!", 1.0f);
+
+    // then
+    EXPECT_TRUE(anim);
+    EXPECT_EQ(anim->name(), "name");
+    EXPECT_EQ(anim->length(), 1.0f);
+    auto &keyframes = anim->keyframes();
+    EXPECT_EQ(keyframes.size(), 10);
+    EXPECT_FLOAT_EQ(keyframes[0].time, 0.0f);
+    EXPECT_NEAR(keyframes[1].time, 0.111f, 0.001f);
+    EXPECT_NEAR(keyframes[2].time, 0.222f, 0.001f);
+    EXPECT_NEAR(keyframes[3].time, 0.333f, 0.001f);
+    EXPECT_NEAR(keyframes[4].time, 0.444f, 0.001f);
+    EXPECT_NEAR(keyframes[5].time, 0.555f, 0.001f);
+    EXPECT_NEAR(keyframes[6].time, 0.666f, 0.001f);
+    EXPECT_NEAR(keyframes[7].time, 0.777f, 0.001f);
+    EXPECT_NEAR(keyframes[8].time, 0.888f, 0.001f);
+    EXPECT_FLOAT_EQ(keyframes[9].time, 1.0f);
+    EXPECT_EQ(keyframes[0].shape, 9);
+    EXPECT_EQ(keyframes[1].shape, 3);
+    EXPECT_EQ(keyframes[2].shape, 12);
+    EXPECT_EQ(keyframes[3].shape, 4);
+    EXPECT_EQ(keyframes[4].shape, 0);
+    EXPECT_EQ(keyframes[5].shape, 5);
+    EXPECT_EQ(keyframes[6].shape, 2);
+    EXPECT_EQ(keyframes[7].shape, 12);
+    EXPECT_EQ(keyframes[8].shape, 6);
+    EXPECT_EQ(keyframes[9].shape, 0);
+}

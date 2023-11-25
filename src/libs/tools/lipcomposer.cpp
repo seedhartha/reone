@@ -113,6 +113,10 @@ std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
     for (size_t i = 0; i < wordGroups.size(); ++i) {
         std::vector<LipShape> groupPhonemeShapes;
         for (const auto &word : wordGroups[i]) {
+            if (word.empty()) {
+                groupPhonemeShapes.push_back(LipShape::Neutral);
+                continue;
+            }
             auto wordPhonemes = _dict.phonemes(word);
             for (const auto &phoneme : wordPhonemes) {
                 auto lowerPhoneme = boost::to_lower_copy(phoneme);
@@ -184,6 +188,14 @@ std::vector<std::vector<std::string>> LipComposer::split(const std::string &text
                 words.clear();
             }
             groupStart = -1;
+            continue;
+        }
+        if (ch == '|') {
+            if (!word.empty()) {
+                words.push_back(word.string());
+                word.clear();
+            }
+            words.push_back("");
             continue;
         }
         if (std::isspace(ch)) {
