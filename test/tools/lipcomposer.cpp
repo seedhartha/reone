@@ -73,12 +73,12 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_a
     EXPECT_FLOAT_EQ(keyframes[8].time, 1.0f);
     EXPECT_EQ(keyframes[0].shape, 9);
     EXPECT_EQ(keyframes[1].shape, 3);
-    EXPECT_EQ(keyframes[2].shape, 15);
+    EXPECT_EQ(keyframes[2].shape, 12);
     EXPECT_EQ(keyframes[3].shape, 4);
     EXPECT_EQ(keyframes[4].shape, 5);
     EXPECT_EQ(keyframes[5].shape, 2);
-    EXPECT_EQ(keyframes[6].shape, 15);
-    EXPECT_EQ(keyframes[7].shape, 10);
+    EXPECT_EQ(keyframes[6].shape, 12);
+    EXPECT_EQ(keyframes[7].shape, 6);
     EXPECT_EQ(keyframes[8].shape, 0);
 }
 
@@ -135,24 +135,126 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_a
     EXPECT_EQ(keyframes[1].shape, 0);
     EXPECT_EQ(keyframes[2].shape, 9);
     EXPECT_EQ(keyframes[3].shape, 3);
-    EXPECT_EQ(keyframes[4].shape, 15);
+    EXPECT_EQ(keyframes[4].shape, 12);
     EXPECT_EQ(keyframes[5].shape, 4);
     EXPECT_EQ(keyframes[6].shape, 5);
     EXPECT_EQ(keyframes[7].shape, 2);
-    EXPECT_EQ(keyframes[8].shape, 15);
-    EXPECT_EQ(keyframes[9].shape, 10);
+    EXPECT_EQ(keyframes[8].shape, 12);
+    EXPECT_EQ(keyframes[9].shape, 6);
     EXPECT_EQ(keyframes[10].shape, 0);
     EXPECT_EQ(keyframes[11].shape, 0);
-    EXPECT_EQ(keyframes[12].shape, 15);
-    EXPECT_EQ(keyframes[13].shape, 4);
-    EXPECT_EQ(keyframes[14].shape, 4);
+    EXPECT_EQ(keyframes[12].shape, 12);
+    EXPECT_EQ(keyframes[13].shape, 15);
+    EXPECT_EQ(keyframes[14].shape, 13);
     EXPECT_EQ(keyframes[15].shape, 2);
     EXPECT_EQ(keyframes[16].shape, 11);
     EXPECT_EQ(keyframes[17].shape, 1);
     EXPECT_EQ(keyframes[18].shape, 11);
-    EXPECT_EQ(keyframes[19].shape, 7);
+    EXPECT_EQ(keyframes[19].shape, 6);
     EXPECT_EQ(keyframes[20].shape, 3);
     EXPECT_EQ(keyframes[21].shape, 11);
     EXPECT_EQ(keyframes[22].shape, 0);
     EXPECT_EQ(keyframes[23].shape, 0);
+}
+
+TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
+    // given
+    auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {{
+        "all", {"AA", "AE", "AH", "AO", "AW", "AY", "B", "CH", "D", "DH", //
+                "EH", "ER", "EY", "F", "G", "HH", "IH", "IY", "JH", "K",  //
+                "L", "M", "N", "NG", "OW", "OY", "P", "R", "S", "SH",     //
+                "T", "TH", "UH", "UW", "V", "W", "Y", "Z", "ZH"}          //
+    }};
+    auto dict = PronouncingDictionary(wordToPhonemes);
+    auto composer = LipComposer(dict);
+
+    // when
+    auto anim = composer.compose("name", "all", 39.0f);
+
+    // then
+    EXPECT_TRUE(anim);
+    EXPECT_EQ(anim->name(), "name");
+    EXPECT_EQ(anim->length(), 39.0f);
+    auto &keyframes = anim->keyframes();
+    EXPECT_EQ(keyframes.size(), 40);
+    EXPECT_FLOAT_EQ(keyframes[0].time, 0.0f);
+    EXPECT_FLOAT_EQ(keyframes[1].time, 1.0f);
+    EXPECT_FLOAT_EQ(keyframes[2].time, 2.0f);
+    EXPECT_FLOAT_EQ(keyframes[3].time, 3.0f);
+    EXPECT_FLOAT_EQ(keyframes[4].time, 4.0f);
+    EXPECT_FLOAT_EQ(keyframes[5].time, 5.0f);
+    EXPECT_FLOAT_EQ(keyframes[6].time, 6.0f);
+    EXPECT_FLOAT_EQ(keyframes[7].time, 7.0f);
+    EXPECT_FLOAT_EQ(keyframes[8].time, 8.0f);
+    EXPECT_FLOAT_EQ(keyframes[9].time, 9.0f);
+    EXPECT_FLOAT_EQ(keyframes[10].time, 10.0f);
+    EXPECT_FLOAT_EQ(keyframes[11].time, 11.0f);
+    EXPECT_FLOAT_EQ(keyframes[12].time, 12.0f);
+    EXPECT_FLOAT_EQ(keyframes[13].time, 13.0f);
+    EXPECT_FLOAT_EQ(keyframes[14].time, 14.0f);
+    EXPECT_FLOAT_EQ(keyframes[15].time, 15.0f);
+    EXPECT_FLOAT_EQ(keyframes[16].time, 16.0f);
+    EXPECT_FLOAT_EQ(keyframes[17].time, 17.0f);
+    EXPECT_FLOAT_EQ(keyframes[18].time, 18.0f);
+    EXPECT_FLOAT_EQ(keyframes[19].time, 19.0f);
+    EXPECT_FLOAT_EQ(keyframes[20].time, 20.0f);
+    EXPECT_FLOAT_EQ(keyframes[21].time, 21.0f);
+    EXPECT_FLOAT_EQ(keyframes[22].time, 22.0f);
+    EXPECT_FLOAT_EQ(keyframes[23].time, 23.0f);
+    EXPECT_FLOAT_EQ(keyframes[24].time, 24.0f);
+    EXPECT_FLOAT_EQ(keyframes[25].time, 25.0f);
+    EXPECT_FLOAT_EQ(keyframes[26].time, 26.0f);
+    EXPECT_FLOAT_EQ(keyframes[27].time, 27.0f);
+    EXPECT_FLOAT_EQ(keyframes[28].time, 28.0f);
+    EXPECT_FLOAT_EQ(keyframes[29].time, 29.0f);
+    EXPECT_FLOAT_EQ(keyframes[30].time, 30.0f);
+    EXPECT_FLOAT_EQ(keyframes[31].time, 31.0f);
+    EXPECT_FLOAT_EQ(keyframes[32].time, 32.0f);
+    EXPECT_FLOAT_EQ(keyframes[33].time, 33.0f);
+    EXPECT_FLOAT_EQ(keyframes[34].time, 34.0f);
+    EXPECT_FLOAT_EQ(keyframes[35].time, 35.0f);
+    EXPECT_FLOAT_EQ(keyframes[36].time, 36.0f);
+    EXPECT_FLOAT_EQ(keyframes[37].time, 37.0f);
+    EXPECT_FLOAT_EQ(keyframes[38].time, 38.0f);
+    EXPECT_FLOAT_EQ(keyframes[39].time, 39.0f);
+    EXPECT_EQ(keyframes[0].shape, 3);
+    EXPECT_EQ(keyframes[1].shape, 3);
+    EXPECT_EQ(keyframes[2].shape, 3);
+    EXPECT_EQ(keyframes[3].shape, 15);
+    EXPECT_EQ(keyframes[4].shape, 14);
+    EXPECT_EQ(keyframes[5].shape, 14);
+    EXPECT_EQ(keyframes[6].shape, 11);
+    EXPECT_EQ(keyframes[7].shape, 7);
+    EXPECT_EQ(keyframes[8].shape, 6);
+    EXPECT_EQ(keyframes[9].shape, 6);
+    EXPECT_EQ(keyframes[10].shape, 2);
+    EXPECT_EQ(keyframes[11].shape, 2);
+    EXPECT_EQ(keyframes[12].shape, 2);
+    EXPECT_EQ(keyframes[13].shape, 8);
+    EXPECT_EQ(keyframes[14].shape, 9);
+    EXPECT_EQ(keyframes[15].shape, 9);
+    EXPECT_EQ(keyframes[16].shape, 1);
+    EXPECT_EQ(keyframes[17].shape, 1);
+    EXPECT_EQ(keyframes[18].shape, 7);
+    EXPECT_EQ(keyframes[19].shape, 9);
+    EXPECT_EQ(keyframes[20].shape, 12);
+    EXPECT_EQ(keyframes[21].shape, 11);
+    EXPECT_EQ(keyframes[22].shape, 12);
+    EXPECT_EQ(keyframes[23].shape, 9);
+    EXPECT_EQ(keyframes[24].shape, 4);
+    EXPECT_EQ(keyframes[25].shape, 4);
+    EXPECT_EQ(keyframes[26].shape, 11);
+    EXPECT_EQ(keyframes[27].shape, 13);
+    EXPECT_EQ(keyframes[28].shape, 6);
+    EXPECT_EQ(keyframes[29].shape, 7);
+    EXPECT_EQ(keyframes[30].shape, 10);
+    EXPECT_EQ(keyframes[31].shape, 10);
+    EXPECT_EQ(keyframes[32].shape, 5);
+    EXPECT_EQ(keyframes[33].shape, 5);
+    EXPECT_EQ(keyframes[34].shape, 8);
+    EXPECT_EQ(keyframes[35].shape, 5);
+    EXPECT_EQ(keyframes[36].shape, 6);
+    EXPECT_EQ(keyframes[37].shape, 6);
+    EXPECT_EQ(keyframes[38].shape, 7);
+    EXPECT_EQ(keyframes[39].shape, 0);
 }

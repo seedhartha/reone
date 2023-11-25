@@ -27,44 +27,44 @@ using namespace reone::graphics;
 namespace reone {
 
 static const std::unordered_map<std::string, LipShape> g_phonemeToShape {
-    {"aa", LipShape::AA_AH_AW_AY}, //
-    {"ae", LipShape::AE_EY},       //
-    {"ah", LipShape::AA_AH_AW_AY}, //
-    {"ao", LipShape::AO_OW_R},     //
-    {"aw", LipShape::AA_AH_AW_AY}, //
-    {"ay", LipShape::AA_AH_AW_AY}, //
+    {"aa", LipShape::AA_AE_AH},    //
+    {"ae", LipShape::AA_AE_AH},    //
+    {"ah", LipShape::AA_AE_AH},    //
+    {"ao", LipShape::AO},          //
+    {"aw", LipShape::AW_AY},       //
+    {"ay", LipShape::AW_AY},       //
     {"b", LipShape::B_M_P},        //
     {"ch", LipShape::CH_JH_SH_ZH}, //
-    {"d", LipShape::D_DH_T_TH},    //
-    {"dh", LipShape::D_DH_T_TH},   //
-    {"eh", LipShape::EH_ER_IY},    //
-    {"er", LipShape::EH_ER_IY},    //
-    {"ey", LipShape::AE_EY},       //
+    {"d", LipShape::D_DH_S_Y_Z},   //
+    {"dh", LipShape::D_DH_S_Y_Z},  //
+    {"eh", LipShape::EH_ER_EY},    //
+    {"er", LipShape::EH_ER_EY},    //
+    {"ey", LipShape::EH_ER_EY},    //
     {"f", LipShape::F_V},          //
-    {"g", LipShape::G_HH_K},       //
-    {"hh", LipShape::G_HH_K},      //
-    {"ih", LipShape::IH},          //
-    {"iy", LipShape::EH_ER_IY},    //
+    {"g", LipShape::G_HH_K_NG},    //
+    {"hh", LipShape::G_HH_K_NG},   //
+    {"ih", LipShape::IH_IY},       //
+    {"iy", LipShape::IH_IY},       //
     {"jh", LipShape::CH_JH_SH_ZH}, //
-    {"k", LipShape::G_HH_K},       //
-    {"l", LipShape::L_Z},          //
+    {"k", LipShape::G_HH_K_NG},    //
+    {"l", LipShape::L_N},          //
     {"m", LipShape::B_M_P},        //
-    {"n", LipShape::N_NG},         //
-    {"ng", LipShape::N_NG},        //
-    {"ow", LipShape::AO_OW_R},     //
-    {"oy", LipShape::OY_UH_UW_W},  //
+    {"n", LipShape::L_N},          //
+    {"ng", LipShape::G_HH_K_NG},   //
+    {"ow", LipShape::OW_OY},       //
+    {"oy", LipShape::OW_OY},       //
     {"p", LipShape::B_M_P},        //
-    {"r", LipShape::AO_OW_R},      //
-    {"s", LipShape::S},            //
+    {"r", LipShape::R},            //
+    {"s", LipShape::D_DH_S_Y_Z},   //
     {"sh", LipShape::CH_JH_SH_ZH}, //
-    {"t", LipShape::D_DH_T_TH},    //
-    {"th", LipShape::D_DH_T_TH},   //
-    {"uh", LipShape::OY_UH_UW_W},  //
-    {"uw", LipShape::OY_UH_UW_W},  //
+    {"t", LipShape::T_TH},         //
+    {"th", LipShape::T_TH},        //
+    {"uh", LipShape::UH_UW_W},     //
+    {"uw", LipShape::UH_UW_W},     //
     {"v", LipShape::F_V},          //
-    {"w", LipShape::OY_UH_UW_W},   //
-    {"y", LipShape::Y},            //
-    {"z", LipShape::L_Z},          //
+    {"w", LipShape::UH_UW_W},      //
+    {"y", LipShape::D_DH_S_Y_Z},   //
+    {"z", LipShape::D_DH_S_Y_Z},   //
     {"zh", LipShape::CH_JH_SH_ZH}, //
 };
 
@@ -134,13 +134,13 @@ std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
         }
     }
     for (const auto &span : silentSpans) {
-        frames.push_back(LipAnimation::Keyframe {span.startInclusive, static_cast<uint8_t>(LipShape::Rest)});
+        frames.push_back(LipAnimation::Keyframe {span.startInclusive, static_cast<uint8_t>(LipShape::Neutral)});
         if (span.endExclusive != duration) {
-            frames.push_back(LipAnimation::Keyframe {span.endExclusive - 0.00001f, static_cast<uint8_t>(LipShape::Rest)});
+            frames.push_back(LipAnimation::Keyframe {span.endExclusive - 0.00001f, static_cast<uint8_t>(LipShape::Neutral)});
         }
     }
     std::sort(frames.begin(), frames.end(), [](const auto &lhs, const auto &rhs) { return lhs.time < rhs.time; });
-    frames.push_back(LipAnimation::Keyframe {duration, static_cast<uint8_t>(LipShape::Rest)});
+    frames.push_back(LipAnimation::Keyframe {duration, static_cast<uint8_t>(LipShape::Neutral)});
 
     return std::make_unique<LipAnimation>(
         name,

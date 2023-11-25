@@ -23,38 +23,38 @@ namespace reone {
 
 std::string describeLipShape(LipShape shape) {
     switch (shape) {
-    case LipShape::Rest:
-        return "Rest";
-    case LipShape::IH:
-        return "IH";
-    case LipShape::EH_ER_IY:
-        return "EH_ER_IY";
-    case LipShape::AA_AH_AW_AY:
-        return "AA_AH_AW_AY";
-    case LipShape::AO_OW_R:
-        return "AO_OW_R";
-    case LipShape::OY_UH_UW_W:
-        return "OY_UH_UW_W";
-    case LipShape::Y:
-        return "Y";
-    case LipShape::S:
-        return "S";
-    case LipShape::F_V:
-        return "F_V";
-    case LipShape::G_HH_K:
-        return "G_HH_K";
-    case LipShape::D_DH_T_TH:
-        return "D_DH_T_TH";
-    case LipShape::B_M_P:
-        return "B_M_P";
-    case LipShape::N_NG:
-        return "N_NG";
+    case LipShape::Neutral:
+        return "Neutral";
+    case LipShape::IH_IY:
+        return "IH_IY";
+    case LipShape::EH_ER_EY:
+        return "EH_ER_EY";
+    case LipShape::AA_AE_AH:
+        return "AA_AE_AH";
+    case LipShape::OW_OY:
+        return "OW_OY";
+    case LipShape::UH_UW_W:
+        return "UH_UW_W";
+    case LipShape::D_DH_S_Y_Z:
+        return "D_DH_S_Y_Z";
     case LipShape::CH_JH_SH_ZH:
         return "CH_JH_SH_ZH";
-    case LipShape::AE_EY:
-        return "AE_EY";
-    case LipShape::L_Z:
-        return "L_Z";
+    case LipShape::F_V:
+        return "F_V";
+    case LipShape::G_HH_K_NG:
+        return "G_HH_K_NG";
+    case LipShape::T_TH:
+        return "T_TH";
+    case LipShape::B_M_P:
+        return "B_M_P";
+    case LipShape::L_N:
+        return "L_N";
+    case LipShape::R:
+        return "R";
+    case LipShape::AW_AY:
+        return "AW_AY";
+    case LipShape::AO:
+        return "AO";
     default:
         throw std::logic_error("Unsupported LIP shape: " + std::to_string(static_cast<int>(shape)));
     }
