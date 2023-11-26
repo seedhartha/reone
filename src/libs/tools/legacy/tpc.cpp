@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/tpc.h"
+#include "reone/tools/legacy/tpc.h"
 
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/format/tpcreader.h"

@@ -28,7 +28,7 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
-#include "reone/tools/lipcomposer.h"
+#include "reone/tools/lip/composer.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;

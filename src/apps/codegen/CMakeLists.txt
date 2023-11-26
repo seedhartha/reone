@@ -30,4 +30,4 @@ set(CODEGEN_HEADERS
 add_executable(codegen ${CODEGEN_SOURCES} ${CODEGEN_HEADERS} ${CLANG_FORMAT_PATH})
 set_target_properties(codegen PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(codegen PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(codegen PRIVATE resource system ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(codegen PRIVATE tools resource system ${Boost_PROGRAM_OPTIONS_LIBRARY})

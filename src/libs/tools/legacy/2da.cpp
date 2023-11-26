@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/2da.h"
+#include "reone/tools/legacy/2da.h"
 
 #include "reone/resource/2da.h"
 #include "reone/resource/exception/format.h"

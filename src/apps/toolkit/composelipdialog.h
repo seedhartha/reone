@@ -25,7 +25,7 @@
 
 #include <wx/valnum.h>
 
-#include "reone/tools/audioanalyzer.h"
+#include "reone/tools/lip/audioanalyzer.h"
 
 namespace reone {
 

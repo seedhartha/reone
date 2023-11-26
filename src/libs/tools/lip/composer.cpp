@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/lipcomposer.h"
+#include "reone/tools/lip/composer.h"
 
 #include "reone/graphics/lipanimation.h"
 #include "reone/system/stringbuilder.h"

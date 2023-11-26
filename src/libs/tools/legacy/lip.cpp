@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/ssf.h"
+#include "reone/tools/legacy/lip.h"
 
-#include "reone/game/format/ssfreader.h"
-#include "reone/game/format/ssfwriter.h"
+#include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/format/lipwriter.h"
 #include "reone/resource/exception/format.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
@@ -28,11 +28,11 @@
 
 using namespace tinyxml2;
 
-using namespace reone::game;
+using namespace reone::graphics;
 
 namespace reone {
 
-void SsfTool::invoke(
+void LipTool::invoke(
     Operation operation,
     const std::filesystem::path &input,
     const std::filesystem::path &outputDir,
@@ -41,7 +41,7 @@ void SsfTool::invoke(
     return invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
-void SsfTool::invokeBatch(
+void LipTool::invokeBatch(
     Operation operation,
     const std::vector<std::filesystem::path> &input,
     const std::filesystem::path &outputDir,
@@ -50,35 +50,36 @@ void SsfTool::invokeBatch(
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
             toXML(path, outDir);
-        } else if (operation == Operation::ToSSF) {
-            toSSF(path, outDir);
+        } else if (operation == Operation::ToLIP) {
+            toLIP(path, outDir);
         }
     });
 }
 
-void SsfTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
-    auto ssf = FileInputStream(path);
+void LipTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
+    auto lip = FileInputStream(path);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
     auto xml = FileOutputStream(xmlPath);
 
-    toXML(ssf, xml);
+    toXML(lip, xml);
 }
 
-void SsfTool::toXML(IInputStream &ssf, IOutputStream &xml) {
-    auto reader = SsfReader(ssf);
+void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
+    auto reader = LipReader(lip, "");
     reader.load();
 
-    auto soundSet = reader.soundSet();
+    auto animation = reader.animation();
 
     auto printer = XMLPrinter();
     printer.PushHeader(false, true);
-    printer.OpenElement("soundset");
-    for (size_t i = 0; i < soundSet.size(); ++i) {
-        printer.OpenElement("sound");
-        printer.PushAttribute("index", static_cast<int>(i));
-        printer.PushAttribute("strref", soundSet[i]);
+    printer.OpenElement("animation");
+    printer.PushAttribute("length", animation->length());
+    for (auto &keyframe : animation->keyframes()) {
+        printer.OpenElement("keyframe");
+        printer.PushAttribute("time", keyframe.time);
+        printer.PushAttribute("shape", keyframe.shape);
         printer.CloseElement();
     }
     printer.CloseElement();
@@ -86,7 +87,7 @@ void SsfTool::toXML(IInputStream &ssf, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-void SsfTool::toSSF(const std::filesystem::path &path, const std::filesystem::path &destPath) {
+void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -99,11 +100,14 @@ void SsfTool::toSSF(const std::filesystem::path &path, const std::filesystem::pa
         return;
     }
 
-    auto soundSet = std::vector<uint32_t>();
+    auto length = rootElement->FloatAttribute("length");
+    auto keyframes = std::vector<LipAnimation::Keyframe>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
-        auto strref = element->UnsignedAttribute("strref");
-        soundSet.push_back(strref);
+        keyframes.push_back(LipAnimation::Keyframe {
+            element->FloatAttribute("time"),
+            static_cast<uint8_t>(element->UnsignedAttribute("shape"))});
     }
+    auto animation = LipAnimation("", length, std::move(keyframes));
 
     std::vector<std::string> tokens;
     boost::split(
@@ -112,16 +116,17 @@ void SsfTool::toSSF(const std::filesystem::path &path, const std::filesystem::pa
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto ssfPath = std::filesystem::path(destPath);
-    ssfPath.append(tokens[0] + ".ssf");
+    auto lipPath = std::filesystem::path(destPath);
+    lipPath.append(tokens[0] + ".lip");
 
-    auto writer = SsfWriter(std::move(soundSet));
-    writer.save(ssfPath);
+    auto writer = LipWriter(animation);
+    writer.save(lipPath);
 }
 
-bool SsfTool::supports(Operation operation, const std::filesystem::path &input) const {
-    return (operation == Operation::ToXML && input.extension() == ".ssf") ||
-           (operation == Operation::ToSSF && input.extension() == ".xml");
+bool LipTool::supports(Operation operation, const std::filesystem::path &input) const {
+    return !std::filesystem::is_directory(input) &&
+           ((input.extension() == ".lip" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::ToLIP));
 }
 
 } // namespace reone

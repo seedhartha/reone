@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/audio.h"
+#include "reone/tools/legacy/audio.h"
 
 #include "reone/resource/exception/format.h"
 #include "reone/system/binaryreader.h"

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/gff.h"
+#include "reone/tools/legacy/gff.h"
 
 #include "tinyxml2.h"
 

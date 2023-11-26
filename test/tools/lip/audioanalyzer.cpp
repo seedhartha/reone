@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "reone/system/binarywriter.h"
-#include "reone/tools/audioanalyzer.h"
+#include "reone/tools/lip/audioanalyzer.h"
 
 using namespace reone;
 using namespace reone::audio;

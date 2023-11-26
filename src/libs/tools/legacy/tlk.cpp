@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/lip.h"
+#include "reone/tools/legacy/tlk.h"
 
-#include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/format/lipwriter.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/tlkreader.h"
+#include "reone/resource/format/tlkwriter.h"
+#include "reone/resource/talktable.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
@@ -28,11 +29,11 @@
 
 using namespace tinyxml2;
 
-using namespace reone::graphics;
+using namespace reone::resource;
 
 namespace reone {
 
-void LipTool::invoke(
+void TlkTool::invoke(
     Operation operation,
     const std::filesystem::path &input,
     const std::filesystem::path &outputDir,
@@ -41,7 +42,7 @@ void LipTool::invoke(
     return invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
 }
 
-void LipTool::invokeBatch(
+void TlkTool::invokeBatch(
     Operation operation,
     const std::vector<std::filesystem::path> &input,
     const std::filesystem::path &outputDir,
@@ -50,36 +51,35 @@ void LipTool::invokeBatch(
     return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
         if (operation == Operation::ToXML) {
             toXML(path, outDir);
-        } else if (operation == Operation::ToLIP) {
-            toLIP(path, outDir);
+        } else if (operation == Operation::ToTLK) {
+            toTLK(path, outDir);
         }
     });
 }
 
-void LipTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
-    auto lip = FileInputStream(path);
+void TlkTool::toXML(const std::filesystem::path &path, const std::filesystem::path &destPath) {
+    auto tlk = FileInputStream(path);
 
     auto xmlPath = destPath;
     xmlPath.append(path.filename().string() + ".xml");
     auto xml = FileOutputStream(xmlPath);
 
-    toXML(lip, xml);
+    toXML(tlk, xml);
 }
 
-void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
-    auto reader = LipReader(lip, "");
+void TlkTool::toXML(IInputStream &tlk, IOutputStream &xml) {
+    auto reader = TlkReader(tlk);
     reader.load();
 
-    auto animation = reader.animation();
-
+    auto table = reader.table();
     auto printer = XMLPrinter();
     printer.PushHeader(false, true);
-    printer.OpenElement("animation");
-    printer.PushAttribute("length", animation->length());
-    for (auto &keyframe : animation->keyframes()) {
-        printer.OpenElement("keyframe");
-        printer.PushAttribute("time", keyframe.time);
-        printer.PushAttribute("shape", keyframe.shape);
+    printer.OpenElement("strings");
+    for (int i = 0; i < table->getStringCount(); ++i) {
+        printer.OpenElement("string");
+        printer.PushAttribute("index", i);
+        printer.PushAttribute("text", table->getString(i).text.c_str());
+        printer.PushAttribute("soundResRef", table->getString(i).soundResRef.c_str());
         printer.CloseElement();
     }
     printer.CloseElement();
@@ -87,7 +87,7 @@ void LipTool::toXML(IInputStream &lip, IOutputStream &xml) {
     xml.write(printer.CStr(), printer.CStrSize() - 1);
 }
 
-void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::path &destPath) {
+void TlkTool::toTLK(const std::filesystem::path &path, const std::filesystem::path &destPath) {
     auto fp = fopen(path.string().c_str(), "rb");
 
     auto document = XMLDocument();
@@ -100,14 +100,13 @@ void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::pa
         return;
     }
 
-    auto length = rootElement->FloatAttribute("length");
-    auto keyframes = std::vector<LipAnimation::Keyframe>();
+    auto strings = std::vector<TalkTable::String>();
     for (auto element = rootElement->FirstChildElement(); element; element = element->NextSiblingElement()) {
-        keyframes.push_back(LipAnimation::Keyframe {
-            element->FloatAttribute("time"),
-            static_cast<uint8_t>(element->UnsignedAttribute("shape"))});
+        strings.push_back(TalkTable::String {
+            element->Attribute("text"),
+            element->Attribute("soundResRef")});
     }
-    auto animation = LipAnimation("", length, std::move(keyframes));
+    auto table = TalkTable(std::move(strings));
 
     std::vector<std::string> tokens;
     boost::split(
@@ -116,17 +115,17 @@ void LipTool::toLIP(const std::filesystem::path &path, const std::filesystem::pa
         boost::is_any_of("."),
         boost::token_compress_on);
 
-    auto lipPath = std::filesystem::path(destPath);
-    lipPath.append(tokens[0] + ".lip");
+    auto tlkPath = std::filesystem::path(destPath);
+    tlkPath.append(tokens[0] + ".tlk");
 
-    auto writer = LipWriter(animation);
-    writer.save(lipPath);
+    auto writer = TlkWriter(table);
+    writer.save(tlkPath);
 }
 
-bool LipTool::supports(Operation operation, const std::filesystem::path &input) const {
+bool TlkTool::supports(Operation operation, const std::filesystem::path &input) const {
     return !std::filesystem::is_directory(input) &&
-           ((input.extension() == ".lip" && operation == Operation::ToXML) ||
-            (input.extension() == ".xml" && operation == Operation::ToLIP));
+           ((input.extension() == ".tlk" && operation == Operation::ToXML) ||
+            (input.extension() == ".xml" && operation == Operation::ToTLK));
 }
 
 } // namespace reone

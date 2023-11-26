@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/keybif.h"
+#include "reone/tools/legacy/keybif.h"
 
 #include "reone/resource/typeutil.h"
 #include "reone/system/fileutil.h"

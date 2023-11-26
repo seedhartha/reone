@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/audioanalyzer.h"
+#include "reone/tools/lip/audioanalyzer.h"
 
 #include "reone/system/logutil.h"
 

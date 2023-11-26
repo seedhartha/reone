@@ -21,7 +21,7 @@
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stream/memoryoutput.h"
 #include "reone/system/textwriter.h"
-#include "reone/tools/lipcomposer.h"
+#include "reone/tools/lip/composer.h"
 
 using namespace reone;
 

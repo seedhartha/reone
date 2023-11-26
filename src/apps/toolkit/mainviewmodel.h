@@ -31,7 +31,7 @@
 #include "reone/scene/di/module.h"
 #include "reone/system/di/module.h"
 #include "reone/system/stream/input.h"
-#include "reone/tools/tool.h"
+#include "reone/tools/legacy/tool.h"
 #include "reone/tools/types.h"
 
 #include "eventhandler.h"

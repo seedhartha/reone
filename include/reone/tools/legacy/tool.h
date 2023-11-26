@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "types.h"
-
 #include "reone/resource/exception/format.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/logutil.h"
+
+#include "../types.h"
 
 namespace reone {
 

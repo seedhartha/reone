@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/tools/ncs.h"
+#include "reone/tools/legacy/ncs.h"
 
 #include "reone/game/script/routines.h"
 #include "reone/resource/exception/format.h"
