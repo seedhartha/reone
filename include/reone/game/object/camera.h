@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "../gffschema/git.h"
+#include "../generated/git.h"
 #include "../object.h"
-
 
 namespace reone {
 

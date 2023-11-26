@@ -23,8 +23,8 @@
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 
-#include "../gffschema/are.h"
-#include "../gffschema/git.h"
+#include "../generated/are.h"
+#include "../generated/git.h"
 #include "../object.h"
 #include "../object/camera/animated.h"
 #include "../object/camera/dialog.h"
@@ -305,32 +305,32 @@ private:
 
     // Loading ARE
 
-    void loadARE(const gffschema::ARE &are);
+    void loadARE(const generated::ARE &are);
 
-    void loadCameraStyle(const gffschema::ARE &are);
-    void loadAmbientColor(const gffschema::ARE &are);
-    void loadScripts(const gffschema::ARE &are);
-    void loadMap(const gffschema::ARE &are);
-    void loadStealthXP(const gffschema::ARE &are);
-    void loadGrass(const gffschema::ARE &are);
-    void loadFog(const gffschema::ARE &are);
+    void loadCameraStyle(const generated::ARE &are);
+    void loadAmbientColor(const generated::ARE &are);
+    void loadScripts(const generated::ARE &are);
+    void loadMap(const generated::ARE &are);
+    void loadStealthXP(const generated::ARE &are);
+    void loadGrass(const generated::ARE &are);
+    void loadFog(const generated::ARE &are);
 
     // END Loading ARE
 
     // Loading GIT
 
-    void loadGIT(const gffschema::GIT &git);
+    void loadGIT(const generated::GIT &git);
 
-    void loadProperties(const gffschema::GIT &git);
-    void loadCreatures(const gffschema::GIT &git);
-    void loadDoors(const gffschema::GIT &git);
-    void loadPlaceables(const gffschema::GIT &git);
-    void loadWaypoints(const gffschema::GIT &git);
-    void loadTriggers(const gffschema::GIT &git);
-    void loadSounds(const gffschema::GIT &git);
-    void loadCameras(const gffschema::GIT &git);
-    void loadEncounters(const gffschema::GIT &git);
-    void loadStores(const gffschema::GIT &git);
+    void loadProperties(const generated::GIT &git);
+    void loadCreatures(const generated::GIT &git);
+    void loadDoors(const generated::GIT &git);
+    void loadPlaceables(const generated::GIT &git);
+    void loadWaypoints(const generated::GIT &git);
+    void loadTriggers(const generated::GIT &git);
+    void loadSounds(const generated::GIT &git);
+    void loadCameras(const generated::GIT &git);
+    void loadEncounters(const generated::GIT &git);
+    void loadStores(const generated::GIT &git);
 
     // END Loading GIT
 

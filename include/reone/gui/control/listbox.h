@@ -63,7 +63,7 @@ public:
 
     void clearSelection();
 
-    void load(const gffschema::GUI_BASECONTROL &gui, bool protoItem) override;
+    void load(const generated::GUI_BASECONTROL &gui, bool protoItem) override;
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;

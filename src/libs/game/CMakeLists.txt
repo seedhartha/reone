@@ -320,20 +320,20 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/resourcedirector.h
     ${GAME_INCLUDE_DIR}/room.h
     ${GAME_INCLUDE_DIR}/savedgame.h
-    ${GAME_INCLUDE_DIR}/gffschema/are.h
-    ${GAME_INCLUDE_DIR}/gffschema/dlg.h
-    ${GAME_INCLUDE_DIR}/gffschema/git.h
-    ${GAME_INCLUDE_DIR}/gffschema/ifo.h
-    ${GAME_INCLUDE_DIR}/gffschema/pth.h
-    ${GAME_INCLUDE_DIR}/gffschema/utc.h
-    ${GAME_INCLUDE_DIR}/gffschema/utd.h
-    ${GAME_INCLUDE_DIR}/gffschema/ute.h
-    ${GAME_INCLUDE_DIR}/gffschema/uti.h
-    ${GAME_INCLUDE_DIR}/gffschema/utm.h
-    ${GAME_INCLUDE_DIR}/gffschema/utp.h
-    ${GAME_INCLUDE_DIR}/gffschema/uts.h
-    ${GAME_INCLUDE_DIR}/gffschema/utt.h
-    ${GAME_INCLUDE_DIR}/gffschema/utw.h
+    ${GAME_INCLUDE_DIR}/generated/are.h
+    ${GAME_INCLUDE_DIR}/generated/dlg.h
+    ${GAME_INCLUDE_DIR}/generated/git.h
+    ${GAME_INCLUDE_DIR}/generated/ifo.h
+    ${GAME_INCLUDE_DIR}/generated/pth.h
+    ${GAME_INCLUDE_DIR}/generated/utc.h
+    ${GAME_INCLUDE_DIR}/generated/utd.h
+    ${GAME_INCLUDE_DIR}/generated/ute.h
+    ${GAME_INCLUDE_DIR}/generated/uti.h
+    ${GAME_INCLUDE_DIR}/generated/utm.h
+    ${GAME_INCLUDE_DIR}/generated/utp.h
+    ${GAME_INCLUDE_DIR}/generated/uts.h
+    ${GAME_INCLUDE_DIR}/generated/utt.h
+    ${GAME_INCLUDE_DIR}/generated/utw.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
     ${GAME_INCLUDE_DIR}/script/routine/context.h
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
@@ -533,20 +533,20 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/reputes.cpp
     ${GAME_SOURCE_DIR}/resourcedirector.cpp
     ${GAME_SOURCE_DIR}/room.cpp
-    ${GAME_SOURCE_DIR}/gffschema/are.cpp
-    ${GAME_SOURCE_DIR}/gffschema/dlg.cpp
-    ${GAME_SOURCE_DIR}/gffschema/git.cpp
-    ${GAME_SOURCE_DIR}/gffschema/ifo.cpp
-    ${GAME_SOURCE_DIR}/gffschema/pth.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utc.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utd.cpp
-    ${GAME_SOURCE_DIR}/gffschema/ute.cpp
-    ${GAME_SOURCE_DIR}/gffschema/uti.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utm.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utp.cpp
-    ${GAME_SOURCE_DIR}/gffschema/uts.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utt.cpp
-    ${GAME_SOURCE_DIR}/gffschema/utw.cpp
+    ${GAME_SOURCE_DIR}/generated/are.cpp
+    ${GAME_SOURCE_DIR}/generated/dlg.cpp
+    ${GAME_SOURCE_DIR}/generated/git.cpp
+    ${GAME_SOURCE_DIR}/generated/ifo.cpp
+    ${GAME_SOURCE_DIR}/generated/pth.cpp
+    ${GAME_SOURCE_DIR}/generated/utc.cpp
+    ${GAME_SOURCE_DIR}/generated/utd.cpp
+    ${GAME_SOURCE_DIR}/generated/ute.cpp
+    ${GAME_SOURCE_DIR}/generated/uti.cpp
+    ${GAME_SOURCE_DIR}/generated/utm.cpp
+    ${GAME_SOURCE_DIR}/generated/utp.cpp
+    ${GAME_SOURCE_DIR}/generated/uts.cpp
+    ${GAME_SOURCE_DIR}/generated/utt.cpp
+    ${GAME_SOURCE_DIR}/generated/utw.cpp
     ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/effect.cpp

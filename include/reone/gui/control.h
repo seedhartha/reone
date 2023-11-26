@@ -20,7 +20,7 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
 
-#include "gffschema/gui.h"
+#include "generated/gui.h"
 #include "types.h"
 
 namespace reone {
@@ -101,13 +101,13 @@ public:
         TextAlign align {TextAlign::CenterCenter};
     };
 
-    static ControlType getType(const gffschema::GUI_BASECONTROL &gui);
-    static std::string getTag(const gffschema::GUI_BASECONTROL &gui);
-    static std::string getParent(const gffschema::GUI_BASECONTROL &gui);
+    static ControlType getType(const generated::GUI_BASECONTROL &gui);
+    static std::string getTag(const generated::GUI_BASECONTROL &gui);
+    static std::string getParent(const generated::GUI_BASECONTROL &gui);
 
     virtual ~Control() = default;
 
-    virtual void load(const gffschema::GUI_BASECONTROL &gui, bool protoItem = false);
+    virtual void load(const generated::GUI_BASECONTROL &gui, bool protoItem = false);
     virtual void update(float dt);
 
     void updateTransform();
@@ -242,10 +242,10 @@ protected:
     virtual const glm::vec3 &getBorderColor() const;
 
 private:
-    void loadExtent(const gffschema::GUI_EXTENT &gui);
-    void loadBorder(const gffschema::GUI_BORDER &gui);
-    void loadText(const gffschema::GUI_TEXT &gui);
-    void loadHilight(const gffschema::GUI_BORDER &gui);
+    void loadExtent(const generated::GUI_EXTENT &gui);
+    void loadBorder(const generated::GUI_BORDER &gui);
+    void loadText(const generated::GUI_TEXT &gui);
+    void loadHilight(const generated::GUI_BORDER &gui);
 
     void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, graphics::TextGravity &gravity) const;
 };

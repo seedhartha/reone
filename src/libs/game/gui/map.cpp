@@ -50,12 +50,12 @@ Map::Map(Game &game, ServicesView &services) :
     }
 }
 
-void Map::load(const std::string &area, const gffschema::ARE_Map &map) {
+void Map::load(const std::string &area, const generated::ARE_Map &map) {
     loadProperties(map);
     loadTextures(area);
 }
 
-void Map::loadProperties(const gffschema::ARE_Map &map) {
+void Map::loadProperties(const generated::ARE_Map &map) {
     _northAxis = map.NorthAxis;
     _worldPoint1 = glm::vec2(map.WorldPt1X, map.WorldPt1Y);
     _worldPoint2 = glm::vec2(map.WorldPt2X, map.WorldPt2Y);

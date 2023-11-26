@@ -31,11 +31,11 @@ std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
     if (!dlg) {
         return nullptr;
     }
-    auto dlgParsed = gffschema::parseDLG(*dlg);
+    auto dlgParsed = generated::parseDLG(*dlg);
     return loadDialog(dlgParsed);
 }
 
-std::unique_ptr<Dialog> Dialogs::loadDialog(const gffschema::DLG &dlg) {
+std::unique_ptr<Dialog> Dialogs::loadDialog(const generated::DLG &dlg) {
     auto dialog = std::make_unique<Dialog>();
 
     dialog->skippable = dlg.Skippable;
@@ -61,7 +61,7 @@ std::unique_ptr<Dialog> Dialogs::loadDialog(const gffschema::DLG &dlg) {
     return dialog;
 }
 
-Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const gffschema::DLG_EntryReplyList_EntriesRepliesList &dlg) const {
+Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const generated::DLG_EntryReplyList_EntriesRepliesList &dlg) const {
     Dialog::EntryReplyLink link;
     link.index = dlg.Index;
     link.active = dlg.Active;
@@ -69,7 +69,7 @@ Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const gffschema::DLG_EntryRepl
     return link;
 }
 
-Dialog::EntryReply Dialogs::getEntryReply(const gffschema::DLG_EntryReplyList &dlg) const {
+Dialog::EntryReply Dialogs::getEntryReply(const generated::DLG_EntryReplyList &dlg) const {
     int strRef = dlg.Text.first;
 
     Dialog::EntryReply entry;
@@ -102,14 +102,14 @@ Dialog::EntryReply Dialogs::getEntryReply(const gffschema::DLG_EntryReplyList &d
     return entry;
 }
 
-Dialog::Stunt Dialogs::getStunt(const gffschema::DLG_StuntList &dlg) const {
+Dialog::Stunt Dialogs::getStunt(const generated::DLG_StuntList &dlg) const {
     Dialog::Stunt stunt;
     stunt.participant = boost::to_lower_copy(dlg.Participant);
     stunt.stuntModel = boost::to_lower_copy(dlg.StuntModel);
     return stunt;
 }
 
-Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const gffschema::DLG_EntryReplyList_AnimList &dlg) const {
+Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const generated::DLG_EntryReplyList_AnimList &dlg) const {
     Dialog::ParticipantAnimation anim;
     anim.participant = boost::to_lower_copy(dlg.Participant);
     anim.animation = dlg.Animation;

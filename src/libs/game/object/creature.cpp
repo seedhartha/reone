@@ -77,7 +77,7 @@ void Creature::Path::selectNextPoint() {
     }
 }
 
-void Creature::loadFromGIT(const gffschema::GIT_Creature_List &git) {
+void Creature::loadFromGIT(const generated::GIT_Creature_List &git) {
     std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(git);
@@ -88,7 +88,7 @@ void Creature::loadFromBlueprint(const std::string &resRef) {
     if (!utc) {
         return;
     }
-    loadUTC(gffschema::parseUTC(*utc));
+    loadUTC(generated::parseUTC(*utc));
     loadAppearance();
 }
 
@@ -154,7 +154,7 @@ void Creature::updateModel() {
     _animDirty = true;
 }
 
-void Creature::loadTransformFromGIT(const gffschema::GIT_Creature_List &git) {
+void Creature::loadTransformFromGIT(const generated::GIT_Creature_List &git) {
     _position[0] = git.XPosition;
     _position[1] = git.YPosition;
     _position[2] = git.ZPosition;
@@ -1248,7 +1248,7 @@ std::string Creature::getWeaponModelName(int slot) const {
     return modelName;
 }
 
-void Creature::loadUTC(const gffschema::UTC &utc) {
+void Creature::loadUTC(const generated::UTC &utc) {
     _blueprintResRef = boost::to_lower_copy(utc.TemplateResRef);
     _race = static_cast<RacialType>(utc.Race);         // index into racialtypes.2da
     _subrace = static_cast<Subrace>(utc.SubraceIndex); // index into subrace.2da
@@ -1322,7 +1322,7 @@ void Creature::loadUTC(const gffschema::UTC &utc) {
     // - Comment (toolset only)
 }
 
-void Creature::loadNameFromUTC(const gffschema::UTC &utc) {
+void Creature::loadNameFromUTC(const generated::UTC &utc) {
     std::string firstName(_services.resource.strings.getText(utc.FirstName.first));
     std::string lastName(_services.resource.strings.getText(utc.LastName.first));
     if (!firstName.empty() && !lastName.empty()) {
@@ -1332,7 +1332,7 @@ void Creature::loadNameFromUTC(const gffschema::UTC &utc) {
     }
 }
 
-void Creature::loadSoundSetFromUTC(const gffschema::UTC &utc) {
+void Creature::loadSoundSetFromUTC(const generated::UTC &utc) {
     uint32_t soundSetIdx = utc.SoundSetFile;
     if (soundSetIdx == 0xffff) {
         return;
@@ -1347,7 +1347,7 @@ void Creature::loadSoundSetFromUTC(const gffschema::UTC &utc) {
     }
 }
 
-void Creature::loadBodyBagFromUTC(const gffschema::UTC &utc) {
+void Creature::loadBodyBagFromUTC(const generated::UTC &utc) {
     std::shared_ptr<TwoDa> bodyBags(_services.resource.twoDas.get("bodybag"));
     if (!bodyBags) {
         return;
@@ -1358,7 +1358,7 @@ void Creature::loadBodyBagFromUTC(const gffschema::UTC &utc) {
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
 
-void Creature::loadAttributesFromUTC(const gffschema::UTC &utc) {
+void Creature::loadAttributesFromUTC(const generated::UTC &utc) {
     CreatureAttributes &attributes = _attributes;
     attributes.setAbilityScore(Ability::Strength, utc.Str);
     attributes.setAbilityScore(Ability::Dexterity, utc.Dex);
@@ -1388,7 +1388,7 @@ void Creature::loadAttributesFromUTC(const gffschema::UTC &utc) {
     }
 }
 
-void Creature::loadPerceptionRangeFromUTC(const gffschema::UTC &utc) {
+void Creature::loadPerceptionRangeFromUTC(const generated::UTC &utc) {
     std::shared_ptr<TwoDa> ranges(_services.resource.twoDas.get("ranges"));
     if (!ranges) {
         return;

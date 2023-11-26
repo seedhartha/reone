@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "gffschema/pth.h"
+#include "generated/pth.h"
 #include "path.h"
 
 namespace reone {
@@ -66,7 +66,7 @@ private:
 
     std::shared_ptr<Path> doGet(std::string resRef);
 
-    std::unique_ptr<Path> loadPath(const gffschema::PTH &pth) const;
+    std::unique_ptr<Path> loadPath(const generated::PTH &pth) const;
 };
 
 } // namespace game
