@@ -47,7 +47,7 @@
 #include "reone/resource/id.h"
 #include "reone/system/stream/input.h"
 
-#include "mainviewmodel.h"
+#include "../viewmodel/main.h"
 
 namespace reone {
 

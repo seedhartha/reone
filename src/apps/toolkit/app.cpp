@@ -24,7 +24,7 @@
 #include "reone/system/logutil.h"
 #include "reone/system/threadutil.h"
 
-#include "mainframe.h"
+#include "ui/mainframe.h"
 
 namespace reone {
 

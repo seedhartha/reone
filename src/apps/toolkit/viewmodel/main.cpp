@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mainviewmodel.h"
+#include "main.h"
 
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
@@ -48,7 +48,7 @@
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 
-#include "di/graphicsmodule.h"
+#include "../di/graphicsmodule.h"
 
 using namespace reone::audio;
 using namespace reone::game;
