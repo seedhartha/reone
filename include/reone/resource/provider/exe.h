@@ -37,7 +37,7 @@ public:
 
     std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
 
-    const ResourceIdSet &resourceIds() const override { return _resourceIds; }
+    const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
     // END IResourceProvider
 
@@ -50,8 +50,8 @@ private:
     std::filesystem::path _path;
     std::unique_ptr<FileInputStream> _exe;
 
-    ResourceIdSet _resourceIds;
-    std::unordered_map<ResourceId, Resource, ResourceIdHasher> _idToResource;
+    std::unordered_set<ResourceId> _resourceIds;
+    std::unordered_map<ResourceId, Resource> _idToResource;
 };
 
 } // namespace resource

@@ -22,6 +22,16 @@
 #include "renderbuffer.h"
 #include "types.h"
 
+template <>
+struct std::hash<glm::ivec2> {
+    size_t operator()(const glm::ivec2 &dim) const {
+        size_t hash = 0;
+        boost::hash_combine(hash, dim.x);
+        boost::hash_combine(hash, dim.y);
+        return hash;
+    }
+};
+
 namespace reone {
 
 namespace graphics {
@@ -67,15 +77,6 @@ private:
         static constexpr int depth = 2;
 
         static constexpr int colorDepth = color | depth;
-    };
-
-    struct Vec2Hasher {
-        size_t operator()(const glm::ivec2 &dim) const {
-            size_t seed = 0;
-            boost::hash_combine(seed, dim.x);
-            boost::hash_combine(seed, dim.y);
-            return seed;
-        }
     };
 
     struct Attachments {
@@ -124,7 +125,7 @@ private:
     glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
 
-    std::unordered_map<glm::ivec2, Attachments, Vec2Hasher> _attachments;
+    std::unordered_map<glm::ivec2, Attachments> _attachments;
 
     // Services
 

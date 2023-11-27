@@ -45,6 +45,13 @@ struct ResourceId {
         return resRef.value() + "." + getExtByResType(type);
     }
 
+    size_t hash() const {
+        size_t hash = 0;
+        boost::hash_combine(hash, resRef.value());
+        boost::hash_combine(hash, type);
+        return hash;
+    }
+
     bool operator==(const ResourceId &rhs) const {
         return resRef == rhs.resRef && type == rhs.type;
     }
@@ -52,31 +59,43 @@ struct ResourceId {
     bool operator!=(const ResourceId &rhs) const {
         return resRef != rhs.resRef || type != rhs.type;
     }
-};
 
-struct ResourceIdHasher {
-    size_t operator()(const ResourceId &id) const {
-        size_t seed = 0;
-        boost::hash_combine(seed, id.resRef.value());
-        boost::hash_combine(seed, id.type);
-        return seed;
-    }
-};
-
-struct ResourceIdComparer {
-    bool operator()(const ResourceId &lhs, const ResourceId &rhs) const {
-        if (lhs.resRef < rhs.resRef) {
+    bool operator<(const ResourceId &rhs) const {
+        if (resRef < rhs.resRef) {
             return true;
         }
-        if (lhs.resRef > rhs.resRef) {
+        if (resRef > rhs.resRef) {
             return false;
         }
-        return lhs.type < rhs.type;
+        return type < rhs.type;
+    }
+
+    bool operator>(const ResourceId &rhs) const {
+        if (resRef > rhs.resRef) {
+            return true;
+        }
+        if (resRef < rhs.resRef) {
+            return false;
+        }
+        return type > rhs.type;
     }
 };
-
-using ResourceIdSet = std::unordered_set<ResourceId, ResourceIdHasher>;
 
 } // namespace resource
 
 } // namespace reone
+
+template <>
+struct std::hash<reone::resource::ResourceId> {
+    size_t operator()(const reone::resource::ResourceId &id) const {
+        return id.hash();
+    }
+};
+
+template <>
+struct std::less<reone::resource::ResourceId> {
+    bool operator()(const reone::resource::ResourceId &lhs,
+                    const reone::resource::ResourceId &rhs) const {
+        return lhs < rhs;
+    }
+};

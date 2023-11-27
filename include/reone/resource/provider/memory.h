@@ -45,13 +45,13 @@ public:
         return it->second;
     }
 
-    const ResourceIdSet &resourceIds() const override { return _resourceIds; }
+    const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
     // END IResourceProvider
 
 private:
-    ResourceIdSet _resourceIds;
-    std::unordered_map<ResourceId, ByteBuffer, ResourceIdHasher> _idToResource;
+    std::unordered_set<ResourceId> _resourceIds;
+    std::unordered_map<ResourceId, ByteBuffer> _idToResource;
 };
 
 } // namespace resource

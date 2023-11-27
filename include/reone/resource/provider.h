@@ -32,7 +32,7 @@ public:
 
     virtual std::optional<ByteBuffer> findResourceData(const ResourceId &id) = 0;
 
-    virtual const ResourceIdSet &resourceIds() const = 0;
+    virtual const std::unordered_set<ResourceId> &resourceIds() const = 0;
 };
 
 } // namespace resource

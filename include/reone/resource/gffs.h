@@ -53,7 +53,7 @@ public:
 private:
     Resources &_resources;
 
-    Cache<ResourceId, Gff, ResourceIdComparer> _cache;
+    Cache<ResourceId, Gff> _cache;
 };
 
 } // namespace resource
