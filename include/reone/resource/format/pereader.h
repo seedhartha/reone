@@ -27,7 +27,7 @@ namespace reone {
 
 namespace resource {
 
-enum class PEResourceType {
+enum class PEResType {
     Cursor = 1,
     Icon = 3,
     CursorGroup = 12,
@@ -39,7 +39,7 @@ enum class PEResourceType {
 class PeReader : boost::noncopyable {
 public:
     struct Resource {
-        PEResourceType type {PEResourceType::Cursor};
+        PEResType type {PEResType::Cursor};
         uint32_t name {0};
         uint32_t langId {0};
         uint32_t offset {0};
@@ -64,7 +64,7 @@ private:
     BinaryReader _pe;
 
     int _sectionCount {0};
-    PEResourceType _currentType {PEResourceType::Cursor};
+    PEResType _currentType {PEResType::Cursor};
     uint32_t _currentName {0};
     uint32_t _currentLangId {0};
     std::vector<Section> _sections;

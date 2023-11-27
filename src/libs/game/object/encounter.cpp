@@ -40,7 +40,7 @@ void Encounter::loadFromGIT(const generated::GIT_Encounter_List &git) {
 }
 
 void Encounter::loadFromBlueprint(const std::string &blueprintResRef) {
-    std::shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResourceType::Ute));
+    std::shared_ptr<Gff> ute(_services.resource.gffs.get(blueprintResRef, ResType::Ute));
     if (ute) {
         auto uteParsed = generated::parseUTE(*ute);
         loadUTE(uteParsed);

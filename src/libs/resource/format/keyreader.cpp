@@ -73,7 +73,7 @@ KeyReader::KeyEntry KeyReader::readKeyEntry() {
     auto resId = _key.readUint32();
 
     auto entry = KeyEntry();
-    entry.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
+    entry.resId = ResourceId(std::move(resRef), static_cast<ResType>(resType));
     entry.bifIdx = resId >> 20;
     entry.resIdx = resId & 0xfffff;
 

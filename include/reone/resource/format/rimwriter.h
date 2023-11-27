@@ -31,7 +31,7 @@ class RimWriter {
 public:
     struct Resource {
         std::string resRef;
-        ResourceType resType {ResourceType::Invalid};
+        ResType resType {ResType::Invalid};
         ByteBuffer data;
     };
 

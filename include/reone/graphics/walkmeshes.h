@@ -39,7 +39,7 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) = 0;
+    virtual std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResType type) = 0;
 };
 
 class Walkmeshes : public IWalkmeshes, boost::noncopyable {
@@ -48,14 +48,14 @@ public:
 
     void clear() override;
 
-    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type) override;
+    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResType type) override;
 
 private:
     resource::Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
 
-    std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResourceType type);
+    std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResType type);
 };
 
 } // namespace graphics

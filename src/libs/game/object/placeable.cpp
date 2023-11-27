@@ -50,7 +50,7 @@ void Placeable::loadFromGIT(const generated::GIT_Placeable_List &git) {
 }
 
 void Placeable::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
+    std::shared_ptr<Gff> utp(_services.resource.gffs.get(resRef, ResType::Utp));
     if (!utp) {
         return;
     }
@@ -71,7 +71,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = std::move(sceneNode);
 
-    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
+    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResType::Pwk);
     if (walkmesh) {
         _walkmesh = sceneGraph.newWalkmesh(*walkmesh);
     }

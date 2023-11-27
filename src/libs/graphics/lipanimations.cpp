@@ -29,7 +29,7 @@ namespace reone {
 namespace graphics {
 
 std::shared_ptr<LipAnimation> Lips::doGet(std::string resRef) {
-    auto res = _resources.find(ResourceId(resRef, ResourceType::Lip));
+    auto res = _resources.find(ResourceId(resRef, ResType::Lip));
     if (!res) {
         return nullptr;
     }

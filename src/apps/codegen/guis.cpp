@@ -218,7 +218,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     auto k1KeyBifProvider = KeyBifResourceProvider(k1KeyPath);
     k1KeyBifProvider.init();
     for (auto &resId : k1KeyBifProvider.resourceIds()) {
-        if (resId.type == ResourceType::Gui) {
+        if (resId.type == ResType::Gui) {
             guiResRefs.insert(resId.resRef);
         }
     }
@@ -227,7 +227,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     auto k2KeyBifProvider = KeyBifResourceProvider(k2KeyPath);
     k2KeyBifProvider.init();
     for (auto &resId : k2KeyBifProvider.resourceIds()) {
-        if (resId.type != ResourceType::Gui) {
+        if (resId.type != ResType::Gui) {
             continue;
         }
         if (!boost::ends_with(resId.resRef, "_x") && !boost::ends_with(resId.resRef, "_p")) {
@@ -241,7 +241,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     auto k2OverrideFolder = FolderResourceProvider(k2OverridePath);
     k2OverrideFolder.init();
     for (auto &resId : k2OverrideFolder.resourceIds()) {
-        if (resId.type != ResourceType::Gui) {
+        if (resId.type != ResType::Gui) {
             continue;
         }
         if (!boost::ends_with(resId.resRef, "_x") && !boost::ends_with(resId.resRef, "_p")) {
@@ -256,7 +256,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     for (auto &resRef : guiResRefs) {
         std::unique_ptr<ParsedGUI> k1Gui;
         for (auto &provider : k1Providers) {
-            auto bytes = provider->findResourceData(ResourceId(resRef, ResourceType::Gui));
+            auto bytes = provider->findResourceData(ResourceId(resRef, ResType::Gui));
             if (bytes) {
                 k1Gui = std::make_unique<ParsedGUI>(parseGui(*bytes));
                 break;
@@ -265,7 +265,7 @@ void generateGuis(const std::filesystem::path &k1dir,
 
         std::unique_ptr<ParsedGUI> k2Gui;
         for (auto &provider : k2Providers) {
-            auto bytes = provider->findResourceData(ResourceId(resRef + "_p", ResourceType::Gui));
+            auto bytes = provider->findResourceData(ResourceId(resRef + "_p", ResType::Gui));
             if (bytes) {
                 k2Gui = std::make_unique<ParsedGUI>(parseGui(*bytes));
                 break;

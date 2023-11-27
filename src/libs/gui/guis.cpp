@@ -26,7 +26,7 @@ namespace reone {
 namespace gui {
 
 std::shared_ptr<IGUI> GUIs::doGet(std::string resRef, std::function<void(IGUI &)> preload) {
-    auto gff = _resourceSvc.gffs.get(resRef, ResourceType::Gui);
+    auto gff = _resourceSvc.gffs.get(resRef, ResType::Gui);
     if (!gff) {
         return nullptr;
     }

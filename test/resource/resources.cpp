@@ -95,9 +95,9 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     resources.addRIM(rimPath);
 
     auto numProviders = resources.providers().size();
-    auto actualRes1 = resources.find(ResourceId("sample", ResourceType::Txt));
+    auto actualRes1 = resources.find(ResourceId("sample", ResType::Txt));
     resources.clear();
-    auto actualRes2 = resources.find(ResourceId("sample", ResourceType::Txt));
+    auto actualRes2 = resources.find(ResourceId("sample", ResType::Txt));
 
     // then
 

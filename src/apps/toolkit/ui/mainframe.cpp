@@ -585,7 +585,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     if (item.resId) {
         auto menu = wxMenu();
         menu.Append(CommandID::exportFile, "Export...");
-        if (item.resId->type == ResourceType::Ncs) {
+        if (item.resId->type == ResType::Ncs) {
             menu.Append(CommandID::decompile, "Decompile");
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
         }

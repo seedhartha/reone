@@ -55,7 +55,7 @@ void NameEntry::onGUILoaded() {
 }
 
 void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr) {
-    auto [data, _] = _services.resource.resources.get(ResourceId(resRef, ResourceType::Ltr));
+    auto [data, _] = _services.resource.resources.get(ResourceId(resRef, ResType::Ltr));
     auto stream = MemoryInputStream(data);
     ltr = std::make_unique<LtrReader>(stream);
     ltr->load();

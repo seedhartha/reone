@@ -24,9 +24,9 @@ namespace reone {
 
 namespace resource {
 
-static std::unordered_map<PEResourceType, ResourceType> kPEResTypeToResType {
-    {PEResourceType::Cursor, ResourceType::Cursor}, //
-    {PEResourceType::CursorGroup, ResourceType::CursorGroup}};
+static std::unordered_map<PEResType, ResType> kPEResTypeToResType {
+    {PEResType::Cursor, ResType::Cursor}, //
+    {PEResType::CursorGroup, ResType::CursorGroup}};
 
 void ExeResourceProvider::init() {
     _exe = std::make_unique<FileInputStream>(_path);

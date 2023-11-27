@@ -32,7 +32,7 @@ namespace resource {
 class MockGffs : public IGffs, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<Gff>, get, (const std::string &resRef, ResourceType type), (override));
+    MOCK_METHOD(std::shared_ptr<Gff>, get, (const std::string &resRef, ResType type), (override));
 };
 
 class MockResources : public IResources, boost::noncopyable {

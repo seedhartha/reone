@@ -21,7 +21,7 @@
 
 namespace reone {
 
-void generateGffSchema(resource::ResourceType resType,
+void generateGffSchema(resource::ResType resType,
                        const std::filesystem::path &k1dir,
                        const std::filesystem::path &k2dir,
                        const std::filesystem::path &destDir);

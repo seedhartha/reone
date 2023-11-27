@@ -30,7 +30,7 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
-    auto res = _resources.find(ResourceId(resRef, ResourceType::Vis));
+    auto res = _resources.find(ResourceId(resRef, ResType::Vis));
     if (!res) {
         return nullptr;
     }

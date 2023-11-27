@@ -46,7 +46,7 @@ void Sound::loadFromGIT(const generated::GIT_SoundList &git) {
 }
 
 void Sound::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
+    std::shared_ptr<Gff> uts(_services.resource.gffs.get(resRef, ResType::Uts));
     if (!uts) {
         return;
     }

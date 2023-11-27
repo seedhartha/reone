@@ -23,7 +23,7 @@ namespace reone {
 
 namespace resource {
 
-enum class ResourceType : uint16_t {
+enum class ResType : uint16_t {
     Res = 0,
     Bmp = 1,
     Tga = 3,

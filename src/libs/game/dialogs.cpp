@@ -27,7 +27,7 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
-    auto dlg = _gffs.get(resRef, ResourceType::Dlg);
+    auto dlg = _gffs.get(resRef, ResType::Dlg);
     if (!dlg) {
         return nullptr;
     }

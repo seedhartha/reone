@@ -75,7 +75,7 @@ void Trigger::loadGeometryFromGIT(const generated::GIT_TriggerList &git) {
 }
 
 void Trigger::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
+    std::shared_ptr<Gff> utt(_services.resource.gffs.get(resRef, ResType::Utt));
     if (utt) {
         auto uttParsed = generated::parseUTT(*utt);
         loadUTT(uttParsed);

@@ -27,7 +27,7 @@ namespace resource {
 
 std::shared_ptr<TwoDa> TwoDas::get(const std::string &resRef) {
     return _cache.getOrAdd(resRef, [this, &resRef]() {
-        auto res = _resources.find(ResourceId(resRef, ResourceType::TwoDa));
+        auto res = _resources.find(ResourceId(resRef, ResType::TwoDa));
         if (!res) {
             return std::shared_ptr<TwoDa>();
         }

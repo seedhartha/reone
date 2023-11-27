@@ -26,7 +26,7 @@ namespace reone {
 namespace game {
 
 std::shared_ptr<Path> Paths::doGet(std::string resRef) {
-    auto pth = _gffs.get(resRef, ResourceType::Pth);
+    auto pth = _gffs.get(resRef, ResType::Pth);
     if (!pth) {
         return nullptr;
     }

@@ -33,24 +33,24 @@ enum class FieldClassification {
     List
 };
 
-static const std::unordered_map<ResourceType, std::string> g_signatures {
-    {ResourceType::Res, "RES"},
-    {ResourceType::Are, "ARE"},
-    {ResourceType::Dlg, "DLG"},
-    {ResourceType::Git, "GIT"},
-    {ResourceType::Gui, "GUI"},
-    {ResourceType::Ifo, "IFO"},
-    {ResourceType::Jrl, "JRL"},
-    {ResourceType::Utc, "UTC"},
-    {ResourceType::Utd, "UTD"},
-    {ResourceType::Ute, "UTE"},
-    {ResourceType::Uti, "UTI"},
-    {ResourceType::Utm, "UTM"},
-    {ResourceType::Utp, "UTP"},
-    {ResourceType::Uts, "UTS"},
-    {ResourceType::Utt, "UTT"},
-    {ResourceType::Utw, "UTW"},
-    {ResourceType::Pth, "PTH"}};
+static const std::unordered_map<ResType, std::string> g_signatures {
+    {ResType::Res, "RES"},
+    {ResType::Are, "ARE"},
+    {ResType::Dlg, "DLG"},
+    {ResType::Git, "GIT"},
+    {ResType::Gui, "GUI"},
+    {ResType::Ifo, "IFO"},
+    {ResType::Jrl, "JRL"},
+    {ResType::Utc, "UTC"},
+    {ResType::Utd, "UTD"},
+    {ResType::Ute, "UTE"},
+    {ResType::Uti, "UTI"},
+    {ResType::Utm, "UTM"},
+    {ResType::Utp, "UTP"},
+    {ResType::Uts, "UTS"},
+    {ResType::Utt, "UTT"},
+    {ResType::Utw, "UTW"},
+    {ResType::Pth, "PTH"}};
 
 void GffWriter::save(const std::filesystem::path &path) {
     auto out = FileOutputStream(path);

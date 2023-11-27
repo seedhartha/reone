@@ -166,13 +166,13 @@ void SaveLoad::refreshSavedGames() {
 static SavedGame peekSavedGame(const std::filesystem::path &path) {
     auto erfResourceProvider = ErfResourceProvider(path);
 
-    auto nfoData = erfResourceProvider.findResourceData(ResourceId("savenfo", ResourceType::Res));
+    auto nfoData = erfResourceProvider.findResourceData(ResourceId("savenfo", ResType::Res));
     auto nfoStream = MemoryInputStream(*nfoData);
     GffReader nfo(nfoStream);
     nfo.load();
 
     std::shared_ptr<Texture> screen;
-    auto screenData = erfResourceProvider.findResourceData(ResourceId("screen", ResourceType::Tga));
+    auto screenData = erfResourceProvider.findResourceData(ResourceId("screen", ResType::Tga));
     if (screenData) {
         auto tga = MemoryInputStream(*screenData);
         TgaReader tgaReader(tga, "screen", TextureUsage::GUI);

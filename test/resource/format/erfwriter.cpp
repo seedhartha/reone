@@ -58,7 +58,7 @@ TEST(erf_writer, should_write_erf) {
     auto stream = MemoryOutputStream(bytes);
 
     auto writer = ErfWriter();
-    writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteBuffer {'B', 'b'}});
+    writer.add(ErfWriter::Resource {"Aa", ResType::Txi, ByteBuffer {'B', 'b'}});
 
     // when
 

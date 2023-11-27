@@ -293,7 +293,7 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
     writer.write("} // namespace reone\n");
 }
 
-void generateGffSchema(resource::ResourceType resType,
+void generateGffSchema(resource::ResType resType,
                        const std::filesystem::path &k1dir,
                        const std::filesystem::path &k2dir,
                        const std::filesystem::path &destDir) {

@@ -129,7 +129,7 @@ class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
 
-    MOCK_METHOD(std::shared_ptr<Walkmesh>, get, (const std::string &resRef, resource::ResourceType type), (override));
+    MOCK_METHOD(std::shared_ptr<Walkmesh>, get, (const std::string &resRef, resource::ResType type), (override));
 };
 
 class MockWindow : public IWindow, boost::noncopyable {

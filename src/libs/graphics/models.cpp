@@ -57,8 +57,8 @@ std::shared_ptr<Model> Models::get(const std::string &resRef) {
 std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     debug("Load model " + resRef, LogChannel::Graphics);
 
-    auto mdlRes = _resources.find(ResourceId(resRef, ResourceType::Mdl));
-    auto mdxRes = _resources.find(ResourceId(resRef, ResourceType::Mdx));
+    auto mdlRes = _resources.find(ResourceId(resRef, ResType::Mdl));
+    auto mdxRes = _resources.find(ResourceId(resRef, ResType::Mdx));
     std::shared_ptr<Model> model;
 
     if (mdlRes && mdxRes) {

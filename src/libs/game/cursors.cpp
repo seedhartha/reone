@@ -79,7 +79,7 @@ const std::pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType typ
 }
 
 std::vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
-    auto res = _resources.find(ResourceId(std::to_string(name), ResourceType::CursorGroup));
+    auto res = _resources.find(ResourceId(std::to_string(name), ResType::CursorGroup));
     if (!res) {
         return std::vector<uint32_t>();
     }
@@ -100,7 +100,7 @@ std::vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
 }
 
 std::shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
-    auto [data, _] = _resources.get(ResourceId(std::to_string(name), ResourceType::Cursor));
+    auto [data, _] = _resources.get(ResourceId(std::to_string(name), ResType::Cursor));
     auto stream = MemoryInputStream(data);
 
     CurReader cur(stream);

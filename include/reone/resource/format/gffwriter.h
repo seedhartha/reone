@@ -33,7 +33,7 @@ class Gff;
 class GffWriter {
 public:
     GffWriter(
-        ResourceType resType,
+        ResType resType,
         std::shared_ptr<Gff> root) :
         _resType(resType),
         _root(std::move(root)) {
@@ -64,7 +64,7 @@ private:
         std::vector<uint32_t> listIndices;
     };
 
-    ResourceType _resType;
+    ResType _resType;
     std::shared_ptr<Gff> _root;
     WriteContext _context;
     std::unique_ptr<BinaryWriter> _writer;

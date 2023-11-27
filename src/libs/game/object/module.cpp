@@ -78,12 +78,12 @@ void Module::loadArea(const generated::IFO &ifo, bool fromSave) {
 
     _area = _game.newArea();
 
-    std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
+    std::shared_ptr<Gff> are(_services.resource.gffs.get(_info.entryArea, ResType::Are));
     if (!are) {
         throw ResourceNotFoundException("Area ARE not found: " + _info.entryArea);
     }
 
-    std::shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
+    std::shared_ptr<Gff> git(_services.resource.gffs.get(_info.entryArea, ResType::Git));
     if (!git) {
         throw ResourceNotFoundException("Area GIT not found: " + _info.entryArea);
     }

@@ -327,7 +327,7 @@ void Area::loadLYT() {
 
         // Walkmesh
         std::shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResourceType::Wok);
+        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(*walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);

@@ -35,7 +35,7 @@ void Walkmeshes::clear() {
     _cache.clear();
 }
 
-std::shared_ptr<Walkmesh> Walkmeshes::get(const std::string &resRef, ResourceType type) {
+std::shared_ptr<Walkmesh> Walkmeshes::get(const std::string &resRef, ResType type) {
     auto lcResRef = boost::to_lower_copy(resRef);
 
     auto maybeWalkmesh = _cache.find(lcResRef);
@@ -47,7 +47,7 @@ std::shared_ptr<Walkmesh> Walkmeshes::get(const std::string &resRef, ResourceTyp
     return inserted.first->second;
 }
 
-std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResourceType type) {
+std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResType type) {
     auto res = _resources.find(ResourceId(resRef, type));
     if (!res) {
         return nullptr;

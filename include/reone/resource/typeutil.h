@@ -23,9 +23,9 @@ namespace reone {
 
 namespace resource {
 
-const std::string &getExtByResType(ResourceType type);
-ResourceType getResTypeByExt(const std::string &ext, bool logNotFound = true);
-bool isGFFCompatibleResType(ResourceType type);
+const std::string &getExtByResType(ResType type);
+ResType getResTypeByExt(const std::string &ext, bool logNotFound = true);
+bool isGFFCompatibleResType(ResType type);
 
 } // namespace resource
 

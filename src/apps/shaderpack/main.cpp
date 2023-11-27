@@ -25,7 +25,7 @@ using namespace reone::resource;
 int main(int argc, char **argv) {
     try {
         boost::program_options::options_description description;
-        description.add_options()                                                              //
+        description.add_options()                                                            //
             ("srcdir", boost::program_options::value<std::filesystem::path>()->required())   //
             ("destdir", boost::program_options::value<std::filesystem::path>()->required()); //
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 
             ErfWriter::Resource resource;
             resource.resRef = resRef.string();
-            resource.resType = ResourceType::Glsl;
+            resource.resType = ResType::Glsl;
             resource.data = std::move(glslBytes);
             writer.add(std::move(resource));
         }

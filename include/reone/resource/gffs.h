@@ -35,7 +35,7 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) = 0;
+    virtual std::shared_ptr<Gff> get(const std::string &resRef, ResType type) = 0;
 };
 
 class Gffs : public IGffs, boost::noncopyable {
@@ -48,7 +48,7 @@ public:
         _cache.clear();
     }
 
-    std::shared_ptr<Gff> get(const std::string &resRef, ResourceType type) override;
+    std::shared_ptr<Gff> get(const std::string &resRef, ResType type) override;
 
 private:
     Resources &_resources;

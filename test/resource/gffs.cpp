@@ -46,18 +46,18 @@ TEST(gffs, should_get_gff_with_caching) {
 
     auto resources = Resources();
     auto provider = std::make_unique<MemoryResourceProvider>();
-    provider->add(ResourceId("sample", ResourceType::Gff), std::move(resBytes));
+    provider->add(ResourceId("sample", ResType::Gff), std::move(resBytes));
     resources.add(std::move(provider));
 
     auto gffs = Gffs(resources);
 
     // when
 
-    auto gff1 = gffs.get("sample", ResourceType::Gff);
+    auto gff1 = gffs.get("sample", ResType::Gff);
 
     resources.clear();
 
-    auto gff2 = gffs.get("sample", ResourceType::Gff);
+    auto gff2 = gffs.get("sample", ResType::Gff);
 
     // then
 

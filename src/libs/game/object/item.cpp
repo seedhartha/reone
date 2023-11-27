@@ -41,7 +41,7 @@ namespace reone {
 namespace game {
 
 void Item::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResourceType::Uti));
+    std::shared_ptr<Gff> uti(_services.resource.gffs.get(resRef, ResType::Uti));
     if (uti) {
         auto utiParsed = generated::parseUTI(*uti);
         loadUTI(utiParsed);

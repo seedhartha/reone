@@ -50,7 +50,7 @@ RimReader::ResourceEntry RimReader::readResource() {
     auto size = _rim.readUint32();
 
     ResourceEntry resource;
-    resource.resId = ResourceId(resRef, static_cast<ResourceType>(type));
+    resource.resId = ResourceId(resRef, static_cast<ResType>(type));
     resource.offset = offset;
     resource.size = size;
 

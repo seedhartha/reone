@@ -260,7 +260,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
                 _module = newModule();
                 _objectById.insert(std::make_pair(_module->id(), _module));
 
-                std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
+                std::shared_ptr<Gff> ifo(_services.resource.gffs.get("module", ResType::Ifo));
                 if (!ifo) {
                     throw ResourceNotFoundException("Module IFO not found");
                 }
@@ -791,7 +791,7 @@ void Game::startCharacterGeneration() {
 }
 
 void Game::startDialog(const std::shared_ptr<Object> &owner, const std::string &resRef) {
-    std::shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
+    std::shared_ptr<Gff> dlg(_services.resource.gffs.get(resRef, ResType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;

@@ -32,7 +32,7 @@ namespace audio {
 std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
     std::shared_ptr<AudioBuffer> buffer;
 
-    auto m3pRes = _resources.find(ResourceId(resRef, ResourceType::Mp3));
+    auto m3pRes = _resources.find(ResourceId(resRef, ResType::Mp3));
     if (m3pRes) {
         auto stream = MemoryInputStream(m3pRes->data);
         auto reader = Mp3Reader();
@@ -40,7 +40,7 @@ std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
         buffer = reader.stream();
     }
     if (!buffer) {
-        auto wavRes = _resources.find(ResourceId(resRef, ResourceType::Wav));
+        auto wavRes = _resources.find(ResourceId(resRef, ResType::Wav));
         if (wavRes) {
             auto stream = MemoryInputStream(wavRes->data);
             auto mp3ReaderFactory = Mp3ReaderFactory();

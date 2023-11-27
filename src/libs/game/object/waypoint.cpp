@@ -46,7 +46,7 @@ void Waypoint::loadFromGIT(const generated::GIT_WaypointList &git) {
 }
 
 void Waypoint::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
+    std::shared_ptr<Gff> utw(_services.resource.gffs.get(resRef, ResType::Utw));
     if (utw) {
         auto utwParsed = generated::parseUTW(*utw);
         loadUTW(utwParsed);

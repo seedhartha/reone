@@ -66,7 +66,7 @@ ErfReader::KeyEntry ErfReader::readKeyEntry() {
     _erf.skipBytes(2); // unused
 
     auto key = KeyEntry();
-    key.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
+    key.resId = ResourceId(std::move(resRef), static_cast<ResType>(resType));
 
     return key;
 }

@@ -70,11 +70,11 @@ static const std::set<std::string> kFilesExtensionBlacklist {
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
 
-static const std::set<ResourceType> kFilesPlaintextResourceTypes {
-    ResourceType::Txt,
-    ResourceType::Txi,
-    ResourceType::Lyt,
-    ResourceType::Vis};
+static const std::set<ResType> kFilesPlaintextResTypes {
+    ResType::Txt,
+    ResType::Txi,
+    ResType::Lyt,
+    ResType::Vis};
 
 void MainViewModel::openFile(const GameDirectoryItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
@@ -101,7 +101,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         return;
     }
 
-    if (kFilesPlaintextResourceTypes.count(id.type) > 0) {
+    if (kFilesPlaintextResTypes.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
@@ -113,7 +113,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::TwoDa) {
+    } else if (id.type == ResType::TwoDa) {
         auto reader = TwoDaReader(data);
         reader.load();
         auto twoDa = reader.twoDa();
@@ -148,7 +148,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Tlk) {
+    } else if (id.type == ResType::Tlk) {
         auto reader = TlkReader(data);
         reader.load();
         auto tlk = reader.table();
@@ -174,7 +174,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Ncs) {
+    } else if (id.type == ResType::Ncs) {
         auto pcodeBytes = ByteBuffer();
         auto pcode = MemoryOutputStream(pcodeBytes);
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
@@ -184,7 +184,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Nss) {
+    } else if (id.type == ResType::Nss) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
@@ -196,7 +196,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Lip) {
+    } else if (id.type == ResType::Lip) {
         auto reader = LipReader(data, "");
         reader.load();
         auto animation = reader.animation();
@@ -217,7 +217,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Ssf) {
+    } else if (id.type == ResType::Ssf) {
         auto reader = SsfReader(data);
         reader.load();
         auto &soundSet = reader.soundSet();
@@ -248,10 +248,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Tpc || id.type == ResourceType::Tga) {
+    } else if (id.type == ResType::Tpc || id.type == ResType::Tga) {
         auto tgaBytes = std::make_shared<ByteBuffer>();
         auto txiBytes = std::make_shared<ByteBuffer>();
-        if (id.type == ResourceType::Tpc) {
+        if (id.type == ResType::Tpc) {
             auto tga = MemoryOutputStream(*tgaBytes);
             auto txi = MemoryOutputStream(*txiBytes);
             TpcTool().toTGA(data, tga, txi, false);
@@ -276,12 +276,12 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Mdl) {
+    } else if (id.type == ResType::Mdl) {
         loadEngine();
 
         _renderEnabled.invoke(false);
 
-        auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResourceType::Mdx));
+        auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResType::Mdx));
         if (!mdxRes) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
         }
@@ -319,7 +319,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
 
-    } else if (id.type == ResourceType::Wav) {
+    } else if (id.type == ResType::Wav) {
         loadEngine();
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(data, mp3ReaderFactory);
@@ -342,34 +342,34 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         return;
     }
 
-    if (id.type == ResourceType::Mdl) {
+    if (id.type == ResType::Mdl) {
         _renderEnabled.invoke(true);
     }
 }
 
-PageType MainViewModel::getPageType(ResourceType type) const {
-    if (kFilesPlaintextResourceTypes.count(type) > 0) {
+PageType MainViewModel::getPageType(ResType type) const {
+    if (kFilesPlaintextResTypes.count(type) > 0) {
         return PageType::Text;
     }
     if (isGFFCompatibleResType(type)) {
         return PageType::GFF;
     }
     switch (type) {
-    case ResourceType::TwoDa:
-    case ResourceType::Tlk:
-    case ResourceType::Lip:
-    case ResourceType::Ssf:
+    case ResType::TwoDa:
+    case ResType::Tlk:
+    case ResType::Lip:
+    case ResType::Ssf:
         return PageType::Table;
-    case ResourceType::Ncs:
+    case ResType::Ncs:
         return PageType::NCS;
-    case ResourceType::Nss:
+    case ResType::Nss:
         return PageType::NSS;
-    case ResourceType::Tga:
-    case ResourceType::Tpc:
+    case ResType::Tga:
+    case ResType::Tpc:
         return PageType::Image;
-    case ResourceType::Mdl:
+    case ResType::Mdl:
         return PageType::Model;
-    case ResourceType::Wav:
+    case ResType::Wav:
         return PageType::Audio;
     default:
         throw std::invalid_argument("Invalid resource type: " + std::to_string(static_cast<int>(type)));
@@ -414,7 +414,7 @@ void MainViewModel::loadGameDirectory() {
         item->container = container;
         if (extension == ".tlk") {
             auto resRef = filename.substr(0, filename.size() - 4);
-            item->resId = std::make_unique<ResourceId>(resRef, ResourceType::Tlk);
+            item->resId = std::make_unique<ResourceId>(resRef, ResType::Tlk);
         }
         _gameDirItems.push_back(std::move(item));
     }
@@ -790,10 +790,10 @@ void MainViewModel::onNotebookPageClose(int page) {
     auto pageResId = (*pageIterator)->resourceId;
     _pages.erase(pageIterator);
 
-    if (pageResId.type == ResourceType::Mdl) {
+    if (pageResId.type == ResType::Mdl) {
         _renderEnabled.invoke(false);
     }
-    if (pageResId.type == ResourceType::Wav) {
+    if (pageResId.type == ResType::Wav) {
         _audioStream.invoke(nullptr);
     }
 }
@@ -836,7 +836,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             item->path = file.path();
             if (!extension.empty()) {
                 auto resType = getResTypeByExt(extension.substr(1), false);
-                if (resType != ResourceType::Invalid) {
+                if (resType != ResType::Invalid) {
                     auto resRef = filename.substr(0, filename.size() - 4);
                     item->resId = std::make_shared<ResourceId>(resRef, resType);
                 }

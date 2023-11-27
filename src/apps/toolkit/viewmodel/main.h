@@ -262,7 +262,7 @@ private:
     void updateModelTransform();
     void updateCameraTransform();
 
-    PageType getPageType(resource::ResourceType type) const;
+    PageType getPageType(resource::ResType type) const;
 
     void withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block);
 };

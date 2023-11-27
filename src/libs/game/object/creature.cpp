@@ -84,7 +84,7 @@ void Creature::loadFromGIT(const generated::GIT_Creature_List &git) {
 }
 
 void Creature::loadFromBlueprint(const std::string &resRef) {
-    auto utc = _services.resource.gffs.get(resRef, ResourceType::Utc);
+    auto utc = _services.resource.gffs.get(resRef, ResType::Utc);
     if (!utc) {
         return;
     }

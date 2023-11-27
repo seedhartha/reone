@@ -57,7 +57,7 @@ void Door::loadFromGIT(const generated::GIT_Door_List &git) {
 }
 
 void Door::loadFromBlueprint(const std::string &resRef) {
-    std::shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
+    std::shared_ptr<Gff> utd(_services.resource.gffs.get(resRef, ResType::Utd));
     if (!utd) {
         return;
     }
@@ -78,20 +78,20 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = std::move(modelSceneNode);
 
-    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResType::Dwk);
     if (walkmeshClosed) {
         _walkmeshClosed = sceneGraph.newWalkmesh(*walkmeshClosed);
         _walkmeshClosed->setUser(*this);
     }
 
-    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResType::Dwk);
     if (walkmeshOpen1) {
         _walkmeshOpen1 = sceneGraph.newWalkmesh(*walkmeshOpen1);
         _walkmeshOpen1->setUser(*this);
         _walkmeshOpen1->setEnabled(false);
     }
 
-    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResType::Dwk);
     if (walkmeshOpen2) {
         _walkmeshOpen2 = sceneGraph.newWalkmesh(*walkmeshOpen2);
         _walkmeshOpen2->setUser(*this);

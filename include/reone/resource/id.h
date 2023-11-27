@@ -26,11 +26,11 @@ namespace resource {
 
 struct ResourceId {
     std::string resRef;
-    ResourceType type {ResourceType::Invalid};
+    ResType type {ResType::Invalid};
 
     ResourceId() = default;
 
-    ResourceId(std::string resRef, ResourceType type) :
+    ResourceId(std::string resRef, ResType type) :
         resRef(std::move(resRef)),
         type(type) {
     }

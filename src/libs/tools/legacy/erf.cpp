@@ -91,8 +91,8 @@ void ErfTool::toERF(Operation operation, const std::filesystem::path &target, co
         std::string ext(path.extension().string());
         ext.erase(0, 1);
 
-        ResourceType resType = getResTypeByExt(ext, false);
-        if (resType == ResourceType::Invalid)
+        ResType resType = getResTypeByExt(ext, false);
+        if (resType == ResType::Invalid)
             continue;
 
         std::ifstream in(path, std::ios::binary);

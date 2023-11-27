@@ -45,7 +45,7 @@ public:
 private:
     struct Resource {
         std::filesystem::path path;
-        ResourceType type;
+        ResType type;
     };
 
     std::filesystem::path _path;

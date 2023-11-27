@@ -144,7 +144,7 @@ std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage u
 std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage usage) {
     std::shared_ptr<Texture> texture;
 
-    auto tgaRes = _resources.find(ResourceId(resRef, ResourceType::Tga));
+    auto tgaRes = _resources.find(ResourceId(resRef, ResType::Tga));
     if (tgaRes) {
         auto tga = MemoryInputStream(tgaRes->data);
         auto tgaReader = TgaReader(tga, resRef, usage);
@@ -152,7 +152,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         texture = tgaReader.texture();
 
         if (texture) {
-            auto txiRes = _resources.find(ResourceId(resRef, ResourceType::Txi));
+            auto txiRes = _resources.find(ResourceId(resRef, ResType::Txi));
             if (txiRes) {
                 auto txi = MemoryInputStream(txiRes->data);
                 auto txiReader = TxiReader();
@@ -163,7 +163,7 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
     }
 
     if (!texture) {
-        auto tpcRes = _resources.find(ResourceId(resRef, ResourceType::Tpc));
+        auto tpcRes = _resources.find(ResourceId(resRef, ResType::Tpc));
         if (tpcRes) {
             auto tpc = MemoryInputStream(tpcRes->data);
             auto tpcReader = TpcReader(tpc, resRef, usage);

@@ -98,7 +98,7 @@ void PeReader::loadResourceDirEntry(const Section &section, int level) {
 
     switch (level) {
     case 0:
-        _currentType = static_cast<PEResourceType>(name);
+        _currentType = static_cast<PEResType>(name);
         break;
     case 1:
         _currentName = name;
