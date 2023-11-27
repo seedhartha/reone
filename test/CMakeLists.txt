@@ -59,6 +59,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/format/tlkwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/gffs.cpp
     ${TESTS_SOURCE_DIR}/resource/resources.cpp
+    ${TESTS_SOURCE_DIR}/resource/resref.cpp
     ${TESTS_SOURCE_DIR}/resource/strings.cpp
     ${TESTS_SOURCE_DIR}/scene/model.cpp
     ${TESTS_SOURCE_DIR}/script/execution.cpp

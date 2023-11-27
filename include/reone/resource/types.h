@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/system/types.h"
-
 namespace reone {
 
 namespace resource {
