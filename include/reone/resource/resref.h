@@ -27,6 +27,8 @@ static constexpr int kMaxResRefLength = 16;
 
 class ResRef {
 public:
+    ResRef() = default;
+
     ResRef(std::string value) :
         _value(std::move(value)) {
         if (_value.size() > kMaxResRefLength) {
@@ -45,6 +47,14 @@ public:
 
     inline bool operator!=(const ResRef &rhs) const {
         return _value != rhs._value;
+    }
+
+    inline bool operator<(const ResRef &rhs) const {
+        return _value < rhs._value;
+    }
+
+    inline bool operator>(const ResRef &rhs) const {
+        return _value > rhs._value;
     }
 
 private:

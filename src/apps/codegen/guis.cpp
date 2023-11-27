@@ -219,7 +219,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     k1KeyBifProvider.init();
     for (auto &resId : k1KeyBifProvider.resourceIds()) {
         if (resId.type == ResType::Gui) {
-            guiResRefs.insert(resId.resRef);
+            guiResRefs.insert(resId.resRef.value());
         }
     }
 
@@ -230,10 +230,10 @@ void generateGuis(const std::filesystem::path &k1dir,
         if (resId.type != ResType::Gui) {
             continue;
         }
-        if (!boost::ends_with(resId.resRef, "_x") && !boost::ends_with(resId.resRef, "_p")) {
+        if (!boost::ends_with(resId.resRef.value(), "_x") && !boost::ends_with(resId.resRef.value(), "_p")) {
             throw std::runtime_error("Invalid TSL GUI ResRef");
         }
-        auto strippedResRef = resId.resRef.substr(0, resId.resRef.length() - 2);
+        auto strippedResRef = resId.resRef.value().substr(0, resId.resRef.value().length() - 2);
         guiResRefs.insert(std::move(strippedResRef));
     }
 
@@ -244,10 +244,10 @@ void generateGuis(const std::filesystem::path &k1dir,
         if (resId.type != ResType::Gui) {
             continue;
         }
-        if (!boost::ends_with(resId.resRef, "_x") && !boost::ends_with(resId.resRef, "_p")) {
+        if (!boost::ends_with(resId.resRef.value(), "_x") && !boost::ends_with(resId.resRef.value(), "_p")) {
             throw std::runtime_error("Invalid TSL GUI ResRef");
         }
-        auto strippedResRef = resId.resRef.substr(0, resId.resRef.length() - 2);
+        auto strippedResRef = resId.resRef.value().substr(0, resId.resRef.value().length() - 2);
         guiResRefs.insert(std::move(strippedResRef));
     }
 

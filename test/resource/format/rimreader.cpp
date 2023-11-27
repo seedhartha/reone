@@ -55,7 +55,7 @@ TEST(rim_reader, should_read_rim) {
 
     auto resources = reader.resources();
     EXPECT_EQ(1ll, resources.size());
-    EXPECT_EQ("aa", resources.front().resId.resRef);
+    EXPECT_EQ("aa", resources.front().resId.resRef.value());
     EXPECT_EQ(static_cast<int>(ResType::Txi), static_cast<int>(resources.front().resId.type));
     EXPECT_EQ(152, resources.front().offset);
     EXPECT_EQ(2, resources.front().size);

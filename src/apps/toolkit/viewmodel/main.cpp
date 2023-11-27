@@ -283,7 +283,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 
         auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResType::Mdx));
         if (!mdxRes) {
-            throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef);
+            throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
         }
         auto mdx = MemoryInputStream(mdxRes->data);
         auto reader = MdlMdxReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
@@ -490,7 +490,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
         auto nss = MemoryOutputStream(nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
-        auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef), *item.resId);
+        auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef.value()), *item.resId);
         page->nssContent = std::string(nssBytes.begin(), nssBytes.end());
         _pages.push_back(std::move(page));
         _pageAdded.invoke(_pages.back().get());
@@ -859,7 +859,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
                     }
                     auto item = std::make_shared<GameDirectoryItem>();
                     item->parentId = expandingItem.id;
-                    item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                    item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                     item->path = expandingItem.path;
                     item->resId = std::make_shared<ResourceId>(key.resId);
                     item->archived = true;
@@ -874,7 +874,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             for (auto &key : keys) {
                 auto item = std::make_shared<GameDirectoryItem>();
                 item->parentId = expandingItem.id;
-                item->displayName = str(boost::format("%s.%s") % key.resId.resRef % getExtByResType(key.resId.type));
+                item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                 item->path = expandingItem.path;
                 item->resId = std::make_shared<ResourceId>(key.resId);
                 item->archived = true;
@@ -888,7 +888,7 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             for (auto &resource : resources) {
                 auto item = std::make_shared<GameDirectoryItem>();
                 item->parentId = expandingItem.id;
-                item->displayName = str(boost::format("%s.%s") % resource.resId.resRef % getExtByResType(resource.resId.type));
+                item->displayName = str(boost::format("%s.%s") % resource.resId.resRef.value() % getExtByResType(resource.resId.type));
                 item->path = expandingItem.path;
                 item->resId = std::make_shared<ResourceId>(resource.resId);
                 item->archived = true;

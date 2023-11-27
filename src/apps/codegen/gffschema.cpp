@@ -310,7 +310,7 @@ void generateGffSchema(resource::ResType resType,
         auto stream = MemoryInputStream(*bytes);
         auto reader = GffReader(stream);
         reader.load();
-        trees[resId.resRef] = reader.root();
+        trees[resId.resRef.value()] = reader.root();
     }
 
     auto modulesPath = getFileIgnoreCase(k2dir, "modules");
@@ -330,7 +330,7 @@ void generateGffSchema(resource::ResType resType,
                 auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader(stream);
                 reader.load();
-                trees[res.resRef] = reader.root();
+                trees[res.resRef.value()] = reader.root();
             }
         } else if (extension == ".erf") {
             auto erf = ErfResourceProvider(entry.path());
@@ -343,7 +343,7 @@ void generateGffSchema(resource::ResType resType,
                 auto stream = MemoryInputStream(*bytes);
                 auto reader = GffReader(stream);
                 reader.load();
-                trees[res.resRef] = reader.root();
+                trees[res.resRef.value()] = reader.root();
             }
         }
     }

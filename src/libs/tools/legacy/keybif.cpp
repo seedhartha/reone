@@ -104,7 +104,7 @@ void KeyBifTool::extractBIF(const KeyReader &key, int bifIdx, const std::filesys
 
         auto resPath = std::filesystem::path(destPath);
         auto &ext = getExtByResType(keyEntry.resId.type);
-        resPath.append(keyEntry.resId.resRef + "." + ext);
+        resPath.append(keyEntry.resId.resRef.value() + "." + ext);
 
         auto out = std::ofstream(resPath, std::ios::binary);
         out.write(&buffer[0], buffer.size());

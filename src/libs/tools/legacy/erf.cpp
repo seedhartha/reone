@@ -73,7 +73,7 @@ void ErfTool::extract(ErfReader &erf, const std::filesystem::path &erfPath, cons
 
         auto resPath = destPath;
         auto &ext = getExtByResType(key.resId.type);
-        resPath.append(key.resId.resRef + "." + ext);
+        resPath.append(key.resId.resRef.value() + "." + ext);
 
         auto res = std::ofstream(resPath, std::ios::binary);
         res.write(&buffer[0], buffer.size());

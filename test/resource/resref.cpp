@@ -37,3 +37,16 @@ TEST(res_ref, should_be_equatable) {
     EXPECT_NE(resRef1, resRef3);
     EXPECT_NE(resRef2, resRef3);
 }
+
+TEST(res_ref, should_be_comparable) {
+    // given
+    ResRef resRef1("a");
+    ResRef resRef2("ab");
+    ResRef resRef3("baa");
+
+    // expect
+    EXPECT_LT(resRef1, resRef2);
+    EXPECT_LT(resRef2, resRef3);
+    EXPECT_GT(resRef3, resRef1);
+    EXPECT_GT(resRef3, resRef2);
+}

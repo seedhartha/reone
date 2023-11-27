@@ -73,7 +73,7 @@ void RimTool::extract(RimReader &rim, const std::filesystem::path &rimPath, cons
 
         auto resPath = destPath;
         auto &ext = getExtByResType(rimResource.resId.type);
-        resPath.append(rimResource.resId.resRef + "." + ext);
+        resPath.append(rimResource.resId.resRef.value() + "." + ext);
 
         auto res = std::ofstream(resPath, std::ios::binary);
         res.write(&buffer[0], buffer.size());

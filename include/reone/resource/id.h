@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "resref.h"
 #include "types.h"
 #include "typeutil.h"
 
@@ -25,33 +26,38 @@ namespace reone {
 namespace resource {
 
 struct ResourceId {
-    std::string resRef;
+    ResRef resRef;
     ResType type {ResType::Invalid};
 
     ResourceId() = default;
 
     ResourceId(std::string resRef, ResType type) :
+        resRef(ResRef(std::move(resRef))),
+        type(type) {
+    }
+
+    ResourceId(ResRef resRef, ResType type) :
         resRef(std::move(resRef)),
         type(type) {
     }
 
     std::string string() const {
-        return resRef + "." + getExtByResType(type);
+        return resRef.value() + "." + getExtByResType(type);
     }
 
-    bool operator==(const ResourceId &other) const {
-        return resRef == other.resRef && type == other.type;
+    bool operator==(const ResourceId &rhs) const {
+        return resRef == rhs.resRef && type == rhs.type;
     }
 
-    bool operator!=(const ResourceId &other) const {
-        return !operator==(other);
+    bool operator!=(const ResourceId &rhs) const {
+        return resRef != rhs.resRef || type != rhs.type;
     }
 };
 
 struct ResourceIdHasher {
     size_t operator()(const ResourceId &id) const {
         size_t seed = 0;
-        boost::hash_combine(seed, id.resRef);
+        boost::hash_combine(seed, id.resRef.value());
         boost::hash_combine(seed, id.type);
         return seed;
     }
@@ -59,10 +65,12 @@ struct ResourceIdHasher {
 
 struct ResourceIdComparer {
     bool operator()(const ResourceId &lhs, const ResourceId &rhs) const {
-        if (lhs.resRef < rhs.resRef)
+        if (lhs.resRef < rhs.resRef) {
             return true;
-        if (lhs.resRef > rhs.resRef)
+        }
+        if (lhs.resRef > rhs.resRef) {
             return false;
+        }
         return lhs.type < rhs.type;
     }
 };
