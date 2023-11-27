@@ -29,11 +29,23 @@ class ResRef {
 public:
     ResRef(std::string value) :
         _value(std::move(value)) {
-        _value.erase(kMaxResRefLength);
+        if (_value.size() > kMaxResRefLength) {
+            _value.erase(kMaxResRefLength);
+        }
         boost::to_lower(_value);
     }
 
-    operator std::string() const { return _value; }
+    inline const std::string &value() const {
+        return _value;
+    }
+
+    inline bool operator==(const ResRef &rhs) const {
+        return _value == rhs._value;
+    }
+
+    inline bool operator!=(const ResRef &rhs) const {
+        return _value != rhs._value;
+    }
 
 private:
     std::string _value;
