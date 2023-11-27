@@ -238,7 +238,7 @@ void generateGuis(const std::filesystem::path &k1dir,
     }
 
     auto k2OverridePath = getFileIgnoreCase(k2dir, "override");
-    auto k2OverrideFolder = Folder(k2OverridePath);
+    auto k2OverrideFolder = FolderResourceProvider(k2OverridePath);
     k2OverrideFolder.init();
     for (auto &resId : k2OverrideFolder.resourceIds()) {
         if (resId.type != ResourceType::Gui) {

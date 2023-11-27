@@ -26,9 +26,9 @@ namespace reone {
 
 namespace resource {
 
-class Folder : public IResourceProvider, boost::noncopyable {
+class FolderResourceProvider : public IResourceProvider, boost::noncopyable {
 public:
-    Folder(std::filesystem::path path) :
+    FolderResourceProvider(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 

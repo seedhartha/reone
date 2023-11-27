@@ -53,7 +53,7 @@ void Resources::addEXE(const std::filesystem::path &path) {
 }
 
 void Resources::addFolder(const std::filesystem::path &path) {
-    auto provider = std::make_unique<Folder>(path);
+    auto provider = std::make_unique<FolderResourceProvider>(path);
     provider->init();
     _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
 }

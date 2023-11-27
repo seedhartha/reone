@@ -24,11 +24,11 @@ namespace reone {
 
 namespace resource {
 
-void Folder::init() {
+void FolderResourceProvider::init() {
     loadDirectory(_path);
 }
 
-void Folder::loadDirectory(const std::filesystem::path &path) {
+void FolderResourceProvider::loadDirectory(const std::filesystem::path &path) {
     for (auto &entry : std::filesystem::directory_iterator(path)) {
         if (std::filesystem::is_directory(entry.path())) {
             loadDirectory(entry.path());
@@ -48,7 +48,7 @@ void Folder::loadDirectory(const std::filesystem::path &path) {
     }
 }
 
-std::optional<ByteBuffer> Folder::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> FolderResourceProvider::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return std::nullopt;
