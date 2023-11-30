@@ -17,22 +17,38 @@
 
 #pragma once
 
+#include "reone/system/stream/input.h"
+
+#include "../layout.h"
+
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class SsfWriter {
+class LytReader : boost::noncopyable {
 public:
-    SsfWriter(std::vector<uint32_t> soundSet) :
-        _soundSet(std::move(soundSet)) {
-    }
+    void load(IInputStream &in);
 
-    void save(const std::filesystem::path &path);
+    const Layout &layout() const { return _layout; }
 
 private:
-    std::vector<uint32_t> _soundSet;
+    enum class State {
+        None,
+        Layout,
+        Rooms
+    };
+
+    std::filesystem::path _path;
+    State _state {State::None};
+    int _roomCount {0};
+
+    Layout _layout;
+
+    void processLine(const std::string &line);
+
+    void appendRoom(const std::vector<std::string> &tokens);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

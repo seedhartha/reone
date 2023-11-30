@@ -15,17 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/format/ltrreader.h"
+#include "reone/resource/format/ltrreader.h"
 
 #include "reone/resource/exception/format.h"
 #include "reone/resource/format/signutil.h"
 #include "reone/system/randomutil.h"
 
-using namespace reone::resource;
-
 namespace reone {
 
-namespace game {
+namespace resource {
 
 static const std::vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -145,6 +143,6 @@ std::string LtrReader::getRandomName(int maxLength) const {
     return name;
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

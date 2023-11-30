@@ -15,24 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/format/ssfreader.h"
+#pragma once
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/stream/input.h"
 
-using namespace reone::resource;
+#include "../types.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-void SsfReader::load() {
-    checkSignature(_ssf, std::string("SSF V1.1", 8));
-    uint32_t tableOffset = _ssf.readUint32();
-    int entryCount = static_cast<int>((_ssf.length() - tableOffset) / 4);
-    _ssf.seek(tableOffset);
-    _soundSet = _ssf.readInt32Array(entryCount);
-}
+class VisReader : boost::noncopyable {
+public:
+    void load(IInputStream &in);
 
-} // namespace game
+    const Visibility &visibility() const { return _visibility; }
+
+private:
+    Visibility _visibility;
+    std::string _roomFrom;
+
+    void processLine(const std::string &line);
+};
+
+} // namespace resource
 
 } // namespace reone

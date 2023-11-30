@@ -17,10 +17,8 @@
 
 #include "reone/game/visibilities.h"
 
+#include "reone/resource/format/visreader.h"
 #include "reone/resource/resources.h"
-
-#include "reone/game/format/visreader.h"
-
 #include "reone/system/stream/memoryinput.h"
 
 using namespace reone::resource;

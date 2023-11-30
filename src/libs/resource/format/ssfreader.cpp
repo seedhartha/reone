@@ -15,27 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/format/ssfwriter.h"
+#include "reone/resource/format/ssfreader.h"
 
-#include "reone/system/binarywriter.h"
-#include "reone/system/stream/fileoutput.h"
+#include "reone/resource/format/signutil.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-void SsfWriter::save(const std::filesystem::path &path) {
-    auto stream = FileOutputStream(path);
-    auto writer = BinaryWriter(stream);
-
-    writer.writeString("SSF V1.1");
-    writer.writeUint32(12); // offset to entries
-
-    for (auto val : _soundSet) {
-        writer.writeUint32(val);
-    }
+void SsfReader::load() {
+    checkSignature(_ssf, std::string("SSF V1.1", 8));
+    uint32_t tableOffset = _ssf.readUint32();
+    int entryCount = static_cast<int>((_ssf.length() - tableOffset) / 4);
+    _ssf.seek(tableOffset);
+    _soundSet = _ssf.readInt32Array(entryCount);
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

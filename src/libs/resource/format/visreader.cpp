@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/format/visreader.h"
+#include "reone/resource/format/visreader.h"
 
 #include "reone/system/stream/input.h"
 #include "reone/system/textreader.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 void VisReader::load(IInputStream &in) {
     auto reader = TextReader(in);
@@ -50,6 +50,6 @@ void VisReader::processLine(const std::string &line) {
     }
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

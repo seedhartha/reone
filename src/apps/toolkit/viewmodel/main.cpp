@@ -19,7 +19,6 @@
 
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
-#include "reone/game/format/ssfreader.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/format/mdlmdxreader.h"
@@ -28,6 +27,7 @@
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/format/ssfreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/talktable.h"
 #include "reone/system/fileutil.h"

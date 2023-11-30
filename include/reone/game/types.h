@@ -1347,7 +1347,6 @@ struct PartySelectionContext {
     int forceNpc2 {-2};
 };
 
-using Visibility = std::multimap<std::string, std::string>;
 using SoundSet = std::unordered_map<SoundSetEntry, std::shared_ptr<reone::audio::AudioBuffer>>;
 
 } // namespace game

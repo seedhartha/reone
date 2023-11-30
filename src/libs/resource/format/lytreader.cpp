@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/format/lytreader.h"
+#include "reone/resource/format/lytreader.h"
 
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/textreader.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 void LytReader::load(IInputStream &in) {
     auto reader = TextReader(in);
@@ -76,6 +76,6 @@ void LytReader::appendRoom(const std::vector<std::string> &tokens) {
     _layout.rooms.push_back(std::move(room));
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

@@ -90,7 +90,7 @@ public:
 class MockLayouts : public ILayouts, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<Layout>, get, (const std::string &key), (override));
+    MOCK_METHOD(std::shared_ptr<resource::Layout>, get, (const std::string &key), (override));
 };
 
 class MockPaths : public IPaths, boost::noncopyable {

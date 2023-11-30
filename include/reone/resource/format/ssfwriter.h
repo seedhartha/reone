@@ -19,26 +19,20 @@
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-struct Layout {
-    struct Room {
-        std::string name;
-        glm::vec3 position {0.0f};
-    };
-
-    std::vector<Room> rooms;
-
-    const Room *findByName(const std::string &name) const {
-        for (auto &room : rooms) {
-            if (room.name == name) {
-                return &room;
-            }
-        }
-        return nullptr;
+class SsfWriter {
+public:
+    SsfWriter(std::vector<uint32_t> soundSet) :
+        _soundSet(std::move(soundSet)) {
     }
+
+    void save(const std::filesystem::path &path);
+
+private:
+    std::vector<uint32_t> _soundSet;
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

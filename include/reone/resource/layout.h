@@ -17,43 +17,28 @@
 
 #pragma once
 
-#include "reone/system/binaryreader.h"
-#include "reone/system/stream/input.h"
-
 namespace reone {
 
-namespace game {
+namespace resource {
 
-/**
- * LTR contains rules for random name generation.
- */
-class LtrReader : boost::noncopyable {
-public:
-    LtrReader(IInputStream &ltr) :
-        _ltr(BinaryReader(ltr)) {
-    }
-
-    void load();
-
-    std::string getRandomName(int maxLength) const;
-
-private:
-    struct LetterSet {
-        std::vector<float> start;
-        std::vector<float> mid;
-        std::vector<float> end;
+struct Layout {
+    struct Room {
+        std::string name;
+        glm::vec3 position {0.0f};
     };
 
-    BinaryReader _ltr;
+    std::vector<Room> rooms;
 
-    int _letterCount {0};
-    LetterSet _singleLetters;
-    std::vector<LetterSet> _doubleLetters;
-    std::vector<std::vector<LetterSet>> _trippleLetters;
-
-    void readLetterSet(LetterSet &set);
+    const Room *findByName(const std::string &name) const {
+        for (auto &room : rooms) {
+            if (room.name == name) {
+                return &room;
+            }
+        }
+        return nullptr;
+    }
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

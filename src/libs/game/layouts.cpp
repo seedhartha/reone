@@ -17,10 +17,9 @@
 
 #include "reone/game/layouts.h"
 
+#include "reone/resource/format/lytreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
-
-#include "reone/game/format/lytreader.h"
 
 using namespace reone::resource;
 

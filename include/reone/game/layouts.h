@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "layout.h"
+#include "reone/resource/layout.h"
 
 namespace reone {
 
@@ -35,7 +35,7 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Layout> get(const std::string &key) = 0;
+    virtual std::shared_ptr<resource::Layout> get(const std::string &key) = 0;
 };
 
 class Layouts : public ILayouts {
@@ -48,7 +48,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<Layout> get(const std::string &key) override {
+    std::shared_ptr<resource::Layout> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -60,9 +60,9 @@ public:
 private:
     resource::Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<Layout>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<resource::Layout>> _objects;
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
+    std::shared_ptr<resource::Layout> doGet(std::string resRef);
 };
 
 } // namespace game

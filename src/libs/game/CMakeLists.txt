@@ -180,11 +180,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/effect/whirlwind.h
     ${GAME_INCLUDE_DIR}/event.h
     ${GAME_INCLUDE_DIR}/footstepsounds.h
-    ${GAME_INCLUDE_DIR}/format/ltrreader.h
-    ${GAME_INCLUDE_DIR}/format/lytreader.h
-    ${GAME_INCLUDE_DIR}/format/ssfreader.h
-    ${GAME_INCLUDE_DIR}/format/ssfwriter.h
-    ${GAME_INCLUDE_DIR}/format/visreader.h
     ${GAME_INCLUDE_DIR}/game.h
     ${GAME_INCLUDE_DIR}/gui.h
     ${GAME_INCLUDE_DIR}/gui/barkbubble.h
@@ -287,7 +282,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/saveload.h
     ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
     ${GAME_INCLUDE_DIR}/gui/sounds.h
-    ${GAME_INCLUDE_DIR}/layout.h
     ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
     ${GAME_INCLUDE_DIR}/object.h
@@ -466,11 +460,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/effect/whirlwind.cpp
     ${GAME_SOURCE_DIR}/effect.cpp
     ${GAME_SOURCE_DIR}/footstepsounds.cpp
-    ${GAME_SOURCE_DIR}/format/ltrreader.cpp
-    ${GAME_SOURCE_DIR}/format/lytreader.cpp
-    ${GAME_SOURCE_DIR}/format/ssfreader.cpp
-    ${GAME_SOURCE_DIR}/format/ssfwriter.cpp
-    ${GAME_SOURCE_DIR}/format/visreader.cpp
     ${GAME_SOURCE_DIR}/game.cpp
     ${GAME_SOURCE_DIR}/gui/barkbubble.cpp
     ${GAME_SOURCE_DIR}/gui/chargen/abilities.cpp

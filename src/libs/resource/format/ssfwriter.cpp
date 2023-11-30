@@ -15,28 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/format/ssfwriter.h"
 
-#include "reone/system/stream/input.h"
-#include "../types.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/stream/fileoutput.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class VisReader : boost::noncopyable {
-public:
-    void load(IInputStream &in);
+void SsfWriter::save(const std::filesystem::path &path) {
+    auto stream = FileOutputStream(path);
+    auto writer = BinaryWriter(stream);
 
-    const game::Visibility &visibility() const { return _visibility; }
+    writer.writeString("SSF V1.1");
+    writer.writeUint32(12); // offset to entries
 
-private:
-    game::Visibility _visibility;
-    std::string _roomFrom;
+    for (auto val : _soundSet) {
+        writer.writeUint32(val);
+    }
+}
 
-    void processLine(const std::string &line);
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

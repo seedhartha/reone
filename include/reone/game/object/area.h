@@ -218,7 +218,7 @@ private:
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;
-    Visibility _visibility;
+    resource::Visibility _visibility;
     CameraStyle _camStyleDefault;
     CameraStyle _camStyleCombat;
     std::string _music;
@@ -298,7 +298,7 @@ private:
      * room B, but room B is not visible from room A. This function makes room
      * relations symmetric.
      */
-    Visibility fixVisibility(const Visibility &visiblity);
+    resource::Visibility fixVisibility(const resource::Visibility &visiblity);
 
     void determineObjectRoom(Object &object);
     void checkTriggersIntersection(const std::shared_ptr<Object> &triggerrer);

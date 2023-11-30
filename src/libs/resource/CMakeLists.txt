@@ -31,21 +31,27 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/gffreader.h
     ${RESOURCE_INCLUDE_DIR}/format/gffwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/signutil.h
+    ${RESOURCE_INCLUDE_DIR}/format/ssfreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/ssfwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
+    ${RESOURCE_INCLUDE_DIR}/format/visreader.h
     ${RESOURCE_INCLUDE_DIR}/gff.h
     ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
+    ${RESOURCE_INCLUDE_DIR}/layout.h
     ${RESOURCE_INCLUDE_DIR}/provider.h
     ${RESOURCE_INCLUDE_DIR}/provider/erf.h
     ${RESOURCE_INCLUDE_DIR}/provider/exe.h
     ${RESOURCE_INCLUDE_DIR}/provider/folder.h
-    ${RESOURCE_INCLUDE_DIR}/provider/memory.h
     ${RESOURCE_INCLUDE_DIR}/provider/keybif.h
+    ${RESOURCE_INCLUDE_DIR}/provider/memory.h
     ${RESOURCE_INCLUDE_DIR}/provider/rim.h
     ${RESOURCE_INCLUDE_DIR}/resource.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
@@ -67,12 +73,17 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/gffreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/gffwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/ltrreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/lytreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/signutil.cpp
+    ${RESOURCE_SOURCE_DIR}/format/ssfreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/ssfwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
+    ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/gffs.cpp
     ${RESOURCE_SOURCE_DIR}/provider/erf.cpp

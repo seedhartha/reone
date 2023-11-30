@@ -22,24 +22,38 @@
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class SsfReader : boost::noncopyable {
+/**
+ * LTR contains rules for random name generation.
+ */
+class LtrReader : boost::noncopyable {
 public:
-    SsfReader(IInputStream &ssf) :
-        _ssf(BinaryReader(ssf)) {
+    LtrReader(IInputStream &ltr) :
+        _ltr(BinaryReader(ltr)) {
     }
 
     void load();
 
-    const std::vector<int> &soundSet() const { return _soundSet; }
+    std::string getRandomName(int maxLength) const;
 
 private:
-    BinaryReader _ssf;
+    struct LetterSet {
+        std::vector<float> start;
+        std::vector<float> mid;
+        std::vector<float> end;
+    };
 
-    std::vector<int> _soundSet;
+    BinaryReader _ltr;
+
+    int _letterCount {0};
+    LetterSet _singleLetters;
+    std::vector<LetterSet> _doubleLetters;
+    std::vector<std::vector<LetterSet>> _trippleLetters;
+
+    void readLetterSet(LetterSet &set);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

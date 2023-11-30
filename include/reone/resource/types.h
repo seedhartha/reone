@@ -87,6 +87,8 @@ enum class ResType : uint16_t {
     Invalid = 0xffff
 };
 
+using Visibility = std::multimap<std::string, std::string>;
+
 } // namespace resource
 
 } // namespace reone

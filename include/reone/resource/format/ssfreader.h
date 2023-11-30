@@ -17,37 +17,29 @@
 
 #pragma once
 
+#include "reone/system/binaryreader.h"
 #include "reone/system/stream/input.h"
-#include "../layout.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class LytReader : boost::noncopyable {
+class SsfReader : boost::noncopyable {
 public:
-    void load(IInputStream &in);
+    SsfReader(IInputStream &ssf) :
+        _ssf(BinaryReader(ssf)) {
+    }
 
-    const Layout &layout() const { return _layout; }
+    void load();
+
+    const std::vector<int> &soundSet() const { return _soundSet; }
 
 private:
-    enum class State {
-        None,
-        Layout,
-        Rooms
-    };
+    BinaryReader _ssf;
 
-    std::filesystem::path _path;
-    State _state {State::None};
-    int _roomCount {0};
-
-    Layout _layout;
-
-    void processLine(const std::string &line);
-
-    void appendRoom(const std::vector<std::string> &tokens);
+    std::vector<int> _soundSet;
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone
