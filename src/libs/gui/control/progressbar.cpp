@@ -36,10 +36,10 @@ namespace reone {
 
 namespace gui {
 
-void ProgressBar::load(const generated::GUI_BASECONTROL &gui, bool protoItem) {
+void ProgressBar::load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) {
     Control::load(gui, protoItem);
 
-    auto &controlStruct = *static_cast<const generated::GUI_CONTROLS *>(&gui);
+    auto &controlStruct = *static_cast<const resource::generated::GUI_CONTROLS *>(&gui);
     if (controlStruct.PROGRESS) {
         _progress.fill = _graphicsSvc.textures.get(controlStruct.PROGRESS->FILL, TextureUsage::GUI);
     }

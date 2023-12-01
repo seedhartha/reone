@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../generated/git.h"
 #include "../object.h"
+#include "reone/resource/template/generated/git.h"
 
 namespace reone {
 

@@ -22,9 +22,9 @@
 #include "reone/resource/types.h"
 
 #include "../contextaction.h"
-#include "../generated/ifo.h"
 #include "../object.h"
 #include "../player.h"
+#include "reone/resource/template/generated/ifo.h"
 
 #include "area.h"
 
@@ -89,8 +89,8 @@ private:
 
     // Loading
 
-    void loadInfo(const generated::IFO &ifo);
-    void loadArea(const generated::IFO &ifo, bool fromSave = false);
+    void loadInfo(const resource::generated::IFO &ifo);
+    void loadArea(const resource::generated::IFO &ifo, bool fromSave = false);
     void loadPlayer();
 
     // END Loading

@@ -76,10 +76,10 @@ void ListBox::clearSelection() {
     _selectedItemIndex = -1;
 }
 
-void ListBox::load(const generated::GUI_BASECONTROL &gui, bool protoItem) {
+void ListBox::load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) {
     Control::load(gui, protoItem);
 
-    auto &controlStruct = *static_cast<const generated::GUI_CONTROLS *>(&gui);
+    auto &controlStruct = *static_cast<const resource::generated::GUI_CONTROLS *>(&gui);
     if (controlStruct.PROTOITEM) {
         _protoItem = _gui.newControl(getType(*controlStruct.PROTOITEM), getTag(*controlStruct.PROTOITEM));
         _protoItem->load(*controlStruct.PROTOITEM, true);

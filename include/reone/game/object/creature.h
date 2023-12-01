@@ -29,9 +29,9 @@
 #include "reone/system/timer.h"
 
 #include "../d20/attributes.h"
-#include "../generated/git.h"
-#include "../generated/utc.h"
 #include "../object.h"
+#include "reone/resource/template/generated/git.h"
+#include "reone/resource/template/generated/utc.h"
 
 #include "item.h"
 
@@ -99,7 +99,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const generated::GIT_Creature_List &git);
+    void loadFromGIT(const resource::generated::GIT_Creature_List &git);
     void loadFromBlueprint(const std::string &resRef);
     void loadAppearance();
 
@@ -315,7 +315,7 @@ private:
 
     // END Scripts
 
-    void loadTransformFromGIT(const generated::GIT_Creature_List &git);
+    void loadTransformFromGIT(const resource::generated::GIT_Creature_List &git);
 
     void updateModel();
     void updateHealth();
@@ -368,13 +368,13 @@ private:
 
     // Blueprint
 
-    void loadUTC(const generated::UTC &utc);
+    void loadUTC(const resource::generated::UTC &utc);
 
-    void loadNameFromUTC(const generated::UTC &utc);
-    void loadSoundSetFromUTC(const generated::UTC &utc);
-    void loadBodyBagFromUTC(const generated::UTC &utc);
-    void loadAttributesFromUTC(const generated::UTC &utc);
-    void loadPerceptionRangeFromUTC(const generated::UTC &utc);
+    void loadNameFromUTC(const resource::generated::UTC &utc);
+    void loadSoundSetFromUTC(const resource::generated::UTC &utc);
+    void loadBodyBagFromUTC(const resource::generated::UTC &utc);
+    void loadAttributesFromUTC(const resource::generated::UTC &utc);
+    void loadPerceptionRangeFromUTC(const resource::generated::UTC &utc);
 
     // END Blueprint
 };

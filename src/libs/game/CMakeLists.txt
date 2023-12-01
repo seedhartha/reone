@@ -314,20 +314,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/resourcedirector.h
     ${GAME_INCLUDE_DIR}/room.h
     ${GAME_INCLUDE_DIR}/savedgame.h
-    ${GAME_INCLUDE_DIR}/generated/are.h
-    ${GAME_INCLUDE_DIR}/generated/dlg.h
-    ${GAME_INCLUDE_DIR}/generated/git.h
-    ${GAME_INCLUDE_DIR}/generated/ifo.h
-    ${GAME_INCLUDE_DIR}/generated/pth.h
-    ${GAME_INCLUDE_DIR}/generated/utc.h
-    ${GAME_INCLUDE_DIR}/generated/utd.h
-    ${GAME_INCLUDE_DIR}/generated/ute.h
-    ${GAME_INCLUDE_DIR}/generated/uti.h
-    ${GAME_INCLUDE_DIR}/generated/utm.h
-    ${GAME_INCLUDE_DIR}/generated/utp.h
-    ${GAME_INCLUDE_DIR}/generated/uts.h
-    ${GAME_INCLUDE_DIR}/generated/utt.h
-    ${GAME_INCLUDE_DIR}/generated/utw.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
     ${GAME_INCLUDE_DIR}/script/routine/context.h
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
@@ -522,20 +508,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/reputes.cpp
     ${GAME_SOURCE_DIR}/resourcedirector.cpp
     ${GAME_SOURCE_DIR}/room.cpp
-    ${GAME_SOURCE_DIR}/generated/are.cpp
-    ${GAME_SOURCE_DIR}/generated/dlg.cpp
-    ${GAME_SOURCE_DIR}/generated/git.cpp
-    ${GAME_SOURCE_DIR}/generated/ifo.cpp
-    ${GAME_SOURCE_DIR}/generated/pth.cpp
-    ${GAME_SOURCE_DIR}/generated/utc.cpp
-    ${GAME_SOURCE_DIR}/generated/utd.cpp
-    ${GAME_SOURCE_DIR}/generated/ute.cpp
-    ${GAME_SOURCE_DIR}/generated/uti.cpp
-    ${GAME_SOURCE_DIR}/generated/utm.cpp
-    ${GAME_SOURCE_DIR}/generated/utp.cpp
-    ${GAME_SOURCE_DIR}/generated/uts.cpp
-    ${GAME_SOURCE_DIR}/generated/utt.cpp
-    ${GAME_SOURCE_DIR}/generated/utw.cpp
     ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/effect.cpp
@@ -551,4 +523,4 @@ add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(game PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(game PRIVATE gui scene movie audio graphics resource script system)
+target_link_libraries(game PRIVATE gui scene resource movie graphics audio script system)

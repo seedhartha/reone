@@ -22,7 +22,7 @@
 #include "reone/resource/di/services.h"
 
 #include "control.h"
-#include "generated/gui.h"
+#include "reone/resource/template/generated/gui.h"
 
 namespace reone {
 
@@ -186,7 +186,7 @@ private:
 
     // END GUI Colors
 
-    void loadControl(const generated::GUI_CONTROLS &gui);
+    void loadControl(const resource::generated::GUI_CONTROLS &gui);
 
     void onClick(const std::string &control) {
         if (_eventListener) {

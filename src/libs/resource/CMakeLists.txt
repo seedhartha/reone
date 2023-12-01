@@ -52,6 +52,21 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/visreader.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/are.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/dlg.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/git.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/gui.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/ifo.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/pth.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utc.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utd.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/ute.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/uti.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utm.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utp.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/uts.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utt.h
+    ${RESOURCE_INCLUDE_DIR}/template/generated/utw.h
     ${RESOURCE_INCLUDE_DIR}/gff.h
     ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
@@ -97,6 +112,21 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/are.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/dlg.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/git.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/gui.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/ifo.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/pth.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utc.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utd.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/ute.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/uti.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utm.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utp.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/uts.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utt.cpp
+    ${RESOURCE_SOURCE_DIR}/template/generated/utw.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/gffs.cpp
     ${RESOURCE_SOURCE_DIR}/movies.cpp

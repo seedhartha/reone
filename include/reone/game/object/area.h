@@ -23,8 +23,6 @@
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 
-#include "../generated/are.h"
-#include "../generated/git.h"
 #include "../object.h"
 #include "../object/camera/animated.h"
 #include "../object/camera/dialog.h"
@@ -33,6 +31,8 @@
 #include "../object/camera/thirdperson.h"
 #include "../pathfinder.h"
 #include "../types.h"
+#include "reone/resource/template/generated/are.h"
+#include "reone/resource/template/generated/git.h"
 
 namespace reone {
 
@@ -305,32 +305,32 @@ private:
 
     // Loading ARE
 
-    void loadARE(const generated::ARE &are);
+    void loadARE(const resource::generated::ARE &are);
 
-    void loadCameraStyle(const generated::ARE &are);
-    void loadAmbientColor(const generated::ARE &are);
-    void loadScripts(const generated::ARE &are);
-    void loadMap(const generated::ARE &are);
-    void loadStealthXP(const generated::ARE &are);
-    void loadGrass(const generated::ARE &are);
-    void loadFog(const generated::ARE &are);
+    void loadCameraStyle(const resource::generated::ARE &are);
+    void loadAmbientColor(const resource::generated::ARE &are);
+    void loadScripts(const resource::generated::ARE &are);
+    void loadMap(const resource::generated::ARE &are);
+    void loadStealthXP(const resource::generated::ARE &are);
+    void loadGrass(const resource::generated::ARE &are);
+    void loadFog(const resource::generated::ARE &are);
 
     // END Loading ARE
 
     // Loading GIT
 
-    void loadGIT(const generated::GIT &git);
+    void loadGIT(const resource::generated::GIT &git);
 
-    void loadProperties(const generated::GIT &git);
-    void loadCreatures(const generated::GIT &git);
-    void loadDoors(const generated::GIT &git);
-    void loadPlaceables(const generated::GIT &git);
-    void loadWaypoints(const generated::GIT &git);
-    void loadTriggers(const generated::GIT &git);
-    void loadSounds(const generated::GIT &git);
-    void loadCameras(const generated::GIT &git);
-    void loadEncounters(const generated::GIT &git);
-    void loadStores(const generated::GIT &git);
+    void loadProperties(const resource::generated::GIT &git);
+    void loadCreatures(const resource::generated::GIT &git);
+    void loadDoors(const resource::generated::GIT &git);
+    void loadPlaceables(const resource::generated::GIT &git);
+    void loadWaypoints(const resource::generated::GIT &git);
+    void loadTriggers(const resource::generated::GIT &git);
+    void loadSounds(const resource::generated::GIT &git);
+    void loadCameras(const resource::generated::GIT &git);
+    void loadEncounters(const resource::generated::GIT &git);
+    void loadStores(const resource::generated::GIT &git);
 
     // END Loading GIT
 

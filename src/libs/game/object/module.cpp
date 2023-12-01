@@ -43,7 +43,7 @@ namespace game {
 void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     _name = std::move(name);
 
-    auto ifoParsed = generated::parseIFO(ifo);
+    auto ifoParsed = resource::generated::parseIFO(ifo);
     loadInfo(ifoParsed);
     loadArea(ifoParsed);
 
@@ -56,7 +56,7 @@ void Module::load(std::string name, const Gff &ifo, bool fromSave) {
     }
 }
 
-void Module::loadInfo(const generated::IFO &ifo) {
+void Module::loadInfo(const resource::generated::IFO &ifo) {
     // Entry location
 
     _info.entryArea = ifo.Mod_Entry_Area;
@@ -73,7 +73,7 @@ void Module::loadInfo(const generated::IFO &ifo) {
     _info.entryFacing = -glm::atan(dirX, dirY);
 }
 
-void Module::loadArea(const generated::IFO &ifo, bool fromSave) {
+void Module::loadArea(const resource::generated::IFO &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _game.newArea();

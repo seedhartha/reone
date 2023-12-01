@@ -19,6 +19,6 @@ set(SHADERPACK_SOURCES ${SHADERPACK_SOURCE_DIR}/main.cpp)
 add_executable(shaderpack ${SHADERPACK_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(shaderpack PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(shaderpack PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(shaderpack PRIVATE resource script system ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(shaderpack PRIVATE resource movie graphics audio script system ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_custom_target(create_shaderpack ALL shaderpack ${CMAKE_SOURCE_DIR}/glsl ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)

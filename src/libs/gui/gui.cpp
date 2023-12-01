@@ -34,13 +34,14 @@
 #include "reone/gui/control/scrollbar.h"
 #include "reone/gui/control/slider.h"
 #include "reone/gui/control/togglebutton.h"
-#include "reone/gui/generated/gui.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/template/generated/gui.h"
 #include "reone/system/logutil.h"
+
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -52,7 +53,7 @@ namespace gui {
 
 void GUI::load(const Gff &gui) {
     debug("Load " + _resRef, LogChannel::GUI);
-    auto guiParsed = generated::parseGUI(gui);
+    auto guiParsed = resource::generated::parseGUI(gui);
 
     ControlType type = Control::getType(guiParsed);
     std::string tag(Control::getTag(guiParsed));
@@ -87,7 +88,7 @@ void GUI::stretchControl(Control &control) {
     control.stretch(aspectX, aspectY);
 }
 
-void GUI::loadControl(const generated::GUI_CONTROLS &gui) {
+void GUI::loadControl(const resource::generated::GUI_CONTROLS &gui) {
     ControlType type = Control::getType(gui);
     std::string tag(Control::getTag(gui));
     std::string parent(Control::getParent(gui));

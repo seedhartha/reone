@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-void StaticCamera::loadFromGIT(const generated::GIT_CameraList &git) {
+void StaticCamera::loadFromGIT(const resource::generated::GIT_CameraList &git) {
     _cameraId = git.CameraID;
     _fieldOfView = git.FieldOfView;
 
@@ -40,7 +40,7 @@ void StaticCamera::loadFromGIT(const generated::GIT_CameraList &git) {
     loadTransformFromGIT(git);
 }
 
-void StaticCamera::loadTransformFromGIT(const generated::GIT_CameraList &git) {
+void StaticCamera::loadTransformFromGIT(const resource::generated::GIT_CameraList &git) {
     glm::vec3 position(git.Position);
     float height = git.Height;
 

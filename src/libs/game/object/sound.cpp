@@ -39,7 +39,7 @@ namespace reone {
 
 namespace game {
 
-void Sound::loadFromGIT(const generated::GIT_SoundList &git) {
+void Sound::loadFromGIT(const resource::generated::GIT_SoundList &git) {
     std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
     loadTransformFromGIT(git);
@@ -50,11 +50,11 @@ void Sound::loadFromBlueprint(const std::string &resRef) {
     if (!uts) {
         return;
     }
-    auto utsParsed = generated::parseUTS(*uts);
+    auto utsParsed = resource::generated::parseUTS(*uts);
     loadUTS(utsParsed);
 }
 
-void Sound::loadUTS(const generated::UTS &uts) {
+void Sound::loadUTS(const resource::generated::UTS &uts) {
     _tag = boost::to_lower_copy(uts.Tag);
     _name = _services.resource.strings.getText(uts.LocName.first);
     _blueprintResRef = boost::to_lower_copy(uts.TemplateResRef);
@@ -89,13 +89,13 @@ void Sound::loadUTS(const generated::UTS &uts) {
     // - Comment (toolset only)
 }
 
-void Sound::loadPriorityFromUTS(const generated::UTS &uts) {
+void Sound::loadPriorityFromUTS(const resource::generated::UTS &uts) {
     std::shared_ptr<TwoDa> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
     int priorityIdx = uts.Priority;
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }
 
-void Sound::loadTransformFromGIT(const generated::GIT_SoundList &git) {
+void Sound::loadTransformFromGIT(const resource::generated::GIT_SoundList &git) {
     _position[0] = git.XPosition;
     _position[1] = git.YPosition;
     _position[2] = git.ZPosition;

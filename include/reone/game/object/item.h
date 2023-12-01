@@ -23,9 +23,9 @@
 #include "reone/graphics/texture.h"
 #include "reone/resource/format/gffreader.h"
 
-#include "../generated/uti.h"
 #include "../object.h"
 #include "../types.h"
+#include "reone/resource/template/generated/uti.h"
 
 namespace reone {
 
@@ -126,7 +126,7 @@ private:
 
     // Blueprint
 
-    void loadUTI(const generated::UTI &uti);
+    void loadUTI(const resource::generated::UTI &uti);
 
     void loadAmmunitionType();
 

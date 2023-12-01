@@ -32,7 +32,6 @@ set(GUI_HEADERS
     ${GUI_INCLUDE_DIR}/gui.h
     ${GUI_INCLUDE_DIR}/guis.h
     ${GUI_INCLUDE_DIR}/sceneinitializer.h
-    ${GUI_INCLUDE_DIR}/generated/gui.h
     ${GUI_INCLUDE_DIR}/textinput.h
     ${GUI_INCLUDE_DIR}/types.h)
 
@@ -47,7 +46,6 @@ set(GUI_SOURCES
     ${GUI_SOURCE_DIR}/gui.cpp
     ${GUI_SOURCE_DIR}/guis.cpp
     ${GUI_SOURCE_DIR}/sceneinitializer.cpp
-    ${GUI_SOURCE_DIR}/generated/gui.cpp
     ${GUI_SOURCE_DIR}/textinput.cpp)
 
 add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES} ${CLANG_FORMAT_PATH})

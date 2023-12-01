@@ -32,7 +32,6 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/types.h"
 
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 
@@ -45,7 +44,7 @@ namespace reone {
 
 namespace game {
 
-void Door::loadFromGIT(const generated::GIT_Door_List &git) {
+void Door::loadFromGIT(const resource::generated::GIT_Door_List &git) {
     std::string templateResRef(boost::to_lower_copy(git.TemplateResRef));
     loadFromBlueprint(templateResRef);
 
@@ -62,7 +61,7 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     if (!utd) {
         return;
     }
-    auto utdParsed = generated::parseUTD(*utd);
+    auto utdParsed = resource::generated::parseUTD(*utd);
     loadUTD(utdParsed);
     std::shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
     std::string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
@@ -100,7 +99,7 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     }
 }
 
-void Door::loadTransformFromGIT(const generated::GIT_Door_List &git) {
+void Door::loadTransformFromGIT(const resource::generated::GIT_Door_List &git) {
     _position[0] = git.X;
     _position[1] = git.Y;
     _position[2] = git.Z;
@@ -154,7 +153,7 @@ void Door::setLocked(bool locked) {
     _locked = locked;
 }
 
-void Door::loadUTD(const generated::UTD &utd) {
+void Door::loadUTD(const resource::generated::UTD &utd) {
     _tag = boost::to_lower_copy(utd.Tag);
     _name = _services.resource.strings.getText(utd.LocName.first);
     _blueprintResRef = boost::to_lower_copy(utd.TemplateResRef);

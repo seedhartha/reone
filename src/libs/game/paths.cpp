@@ -30,11 +30,11 @@ std::shared_ptr<Path> Paths::doGet(std::string resRef) {
     if (!pth) {
         return nullptr;
     }
-    auto pthParsed = generated::parsePTH(*pth);
+    auto pthParsed = resource::generated::parsePTH(*pth);
     return loadPath(pthParsed);
 }
 
-std::unique_ptr<Path> Paths::loadPath(const generated::PTH &pth) const {
+std::unique_ptr<Path> Paths::loadPath(const resource::generated::PTH &pth) const {
     auto path = std::make_unique<Path>();
 
     std::vector<int> connections;

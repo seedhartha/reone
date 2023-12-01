@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../generated/git.h"
-#include "../generated/uts.h"
 #include "../object.h"
+#include "reone/resource/template/generated/git.h"
+#include "reone/resource/template/generated/uts.h"
 
 namespace reone {
 
@@ -46,7 +46,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const generated::GIT_SoundList &git);
+    void loadFromGIT(const resource::generated::GIT_SoundList &git);
     void loadFromBlueprint(const std::string &resRef);
 
     void update(float dt) override;
@@ -88,14 +88,14 @@ private:
 
     std::vector<std::string> _sounds;
 
-    void loadTransformFromGIT(const generated::GIT_SoundList &git);
+    void loadTransformFromGIT(const resource::generated::GIT_SoundList &git);
 
     void updateTransform() override;
 
     // Blueprint
 
-    void loadUTS(const generated::UTS &uts);
-    void loadPriorityFromUTS(const generated::UTS &uts);
+    void loadUTS(const resource::generated::UTS &uts);
+    void loadPriorityFromUTS(const resource::generated::UTS &uts);
 
     // END Blueprint
 };

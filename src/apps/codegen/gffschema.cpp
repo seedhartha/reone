@@ -28,7 +28,6 @@
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
-
 #include "templates.h"
 
 using namespace reone::resource;
@@ -186,20 +185,18 @@ static void writeSchemaHeaderFile(const std::string &topStructName,
     writer.write("namespace reone {\n\n");
     writer.write("namespace resource {\n\n");
     writer.write("class Gff;\n\n");
-    writer.write("}\n\n");
-    writer.write("namespace game {\n\n");
     writer.write("namespace generated {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeStruct(*schemaStruct, writer);
     }
     for (auto &[_, schemaStruct] : structs) {
         if (schemaStruct->top) {
-            writer.write(str(boost::format("%1% parse%1%(const resource::Gff &gff);\n") % topStructName));
+            writer.write(str(boost::format("%1% parse%1%(const Gff &gff);\n") % topStructName));
         }
     }
     writer.write("\n");
     writer.write("} // namespace generated\n\n");
-    writer.write("} // namespace game\n\n");
+    writer.write("} // namespace resource\n\n");
     writer.write("} // namespace reone\n");
 }
 
@@ -282,15 +279,14 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
     writer.write("\n\n");
     writer.write(str(boost::format(kIncludeFormat + "\n\n") % schemaHeaderFilename));
     writer.write(str(boost::format(kIncludeFormat + "\n\n") % "reone/resource/gff.h"));
-    writer.write("using namespace reone::resource;\n\n");
     writer.write("namespace reone {\n\n");
-    writer.write("namespace game {\n\n");
+    writer.write("namespace resource {\n\n");
     writer.write("namespace generated {\n\n");
     for (auto &[_, schemaStruct] : structs) {
         writeParseFunction(*schemaStruct, writer);
     }
     writer.write("} // namespace generated\n\n");
-    writer.write("} // namespace game\n\n");
+    writer.write("} // namespace resource\n\n");
     writer.write("} // namespace reone\n");
 }
 

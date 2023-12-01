@@ -18,7 +18,7 @@
 #pragma once
 
 #include "dialog.h"
-#include "generated/dlg.h"
+#include "reone/resource/template/generated/dlg.h"
 
 namespace reone {
 
@@ -69,12 +69,12 @@ private:
 
     std::shared_ptr<Dialog> doGet(std::string resRef);
 
-    std::unique_ptr<Dialog> loadDialog(const generated::DLG &dlg);
+    std::unique_ptr<Dialog> loadDialog(const resource::generated::DLG &dlg);
 
-    Dialog::EntryReplyLink getEntryReplyLink(const generated::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
-    Dialog::EntryReply getEntryReply(const generated::DLG_EntryReplyList &dlg) const;
-    Dialog::Stunt getStunt(const generated::DLG_StuntList &dlg) const;
-    Dialog::ParticipantAnimation getParticipantAnimation(const generated::DLG_EntryReplyList_AnimList &dlg) const;
+    Dialog::EntryReplyLink getEntryReplyLink(const resource::generated::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
+    Dialog::EntryReply getEntryReply(const resource::generated::DLG_EntryReplyList &dlg) const;
+    Dialog::Stunt getStunt(const resource::generated::DLG_StuntList &dlg) const;
+    Dialog::ParticipantAnimation getParticipantAnimation(const resource::generated::DLG_EntryReplyList_AnimList &dlg) const;
 };
 
 } // namespace game

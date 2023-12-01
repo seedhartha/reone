@@ -19,9 +19,9 @@
 
 #include "reone/resource/format/gffreader.h"
 
-#include "../generated/git.h"
-#include "../generated/utw.h"
 #include "../object.h"
+#include "reone/resource/template/generated/git.h"
+#include "reone/resource/template/generated/utw.h"
 
 namespace reone {
 
@@ -42,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const generated::GIT_WaypointList &git);
+    void loadFromGIT(const resource::generated::GIT_WaypointList &git);
     void loadFromBlueprint(const std::string &resRef);
 
     bool isMapNoteEnabled() const { return _mapNoteEnabled; }
@@ -55,9 +55,9 @@ private:
     std::string _mapNote;
     bool _mapNoteEnabled {false};
 
-    void loadTransformFromGIT(const generated::GIT_WaypointList &git);
+    void loadTransformFromGIT(const resource::generated::GIT_WaypointList &git);
 
-    void loadUTW(const generated::UTW &utw);
+    void loadUTW(const resource::generated::UTW &utw);
 };
 
 } // namespace game

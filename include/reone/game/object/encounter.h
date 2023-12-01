@@ -19,9 +19,9 @@
 
 #include "reone/resource/gff.h"
 
-#include "../generated/git.h"
-#include "../generated/ute.h"
 #include "../object.h"
+#include "reone/resource/template/generated/git.h"
+#include "reone/resource/template/generated/ute.h"
 
 namespace reone {
 
@@ -42,7 +42,7 @@ public:
             services) {
     }
 
-    void loadFromGIT(const generated::GIT_Encounter_List &git);
+    void loadFromGIT(const resource::generated::GIT_Encounter_List &git);
 
 private:
     struct SpawnPoint {
@@ -79,12 +79,12 @@ private:
     // END Scripts
 
     void loadFromBlueprint(const std::string &blueprintResRef);
-    void loadPositionFromGIT(const generated::GIT_Encounter_List &gffs);
-    void loadGeometryFromGIT(const generated::GIT_Encounter_List &gffs);
-    void loadSpawnPointsFromGIT(const generated::GIT_Encounter_List &gffs);
+    void loadPositionFromGIT(const resource::generated::GIT_Encounter_List &gffs);
+    void loadGeometryFromGIT(const resource::generated::GIT_Encounter_List &gffs);
+    void loadSpawnPointsFromGIT(const resource::generated::GIT_Encounter_List &gffs);
 
-    void loadUTE(const generated::UTE &ute);
-    void loadCreaturesFromUTE(const generated::UTE &ute);
+    void loadUTE(const resource::generated::UTE &ute);
+    void loadCreaturesFromUTE(const resource::generated::UTE &ute);
 };
 
 } // namespace game
