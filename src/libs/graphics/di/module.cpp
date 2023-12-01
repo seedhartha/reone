@@ -25,8 +25,8 @@ void GraphicsModule::init() {
     _window = newWindow();
     _context = std::make_unique<GraphicsContext>(_options);
     _meshes = std::make_unique<Meshes>();
-    _uniforms = std::make_unique<Uniforms>();
     _shaderManager = std::make_unique<ShaderManager>();
+    _uniforms = std::make_unique<Uniforms>();
     _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaderManager, *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(

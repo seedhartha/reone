@@ -30,9 +30,7 @@ void ResourceModule::init() {
     _strings = std::make_unique<Strings>();
     _twoDas = std::make_unique<TwoDas>(*_resources);
     _gffs = std::make_unique<Gffs>(*_resources);
-    _scripts = std::make_unique<Scripts>(*_resources);
-    _audioFiles = std::make_unique<AudioFiles>(*_resources);
-    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), _audio.player());
+    _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderManager());
     _textures = std::make_unique<Textures>(_graphicsOpt, *_resources);
     _models = std::make_unique<Models>(*_textures, *_resources);
     _walkmeshes = std::make_unique<Walkmeshes>(*_resources);
@@ -51,13 +49,15 @@ void ResourceModule::init() {
         _graphics.uniforms(),
         _graphics.window(),
         *_resources);
+    _audioFiles = std::make_unique<AudioFiles>(*_resources);
+    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), _audio.player());
+    _scripts = std::make_unique<Scripts>(*_resources);
     _dialogs = std::make_unique<Dialogs>(*_gffs, *_strings);
     _layouts = std::make_unique<Layouts>(*_resources);
     _paths = std::make_unique<Paths>(*_gffs);
     _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
     _ltrs = std::make_unique<Ltrs>(*_resources);
-    _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderManager());
     _director = std::make_unique<ResourceDirector>(
         _gameId,
         _gamePath,
@@ -71,9 +71,10 @@ void ResourceModule::init() {
         *_resources,
         *_scripts);
 
+    _director->init();
     _strings->init(_gamePath);
-    _textures->init();
     _shaders->init();
+    _textures->init();
 
     _services = std::make_unique<ResourceServices>(
         *_gffs,
@@ -102,21 +103,27 @@ void ResourceModule::init() {
 void ResourceModule::deinit() {
     _services.reset();
 
+    _director.reset();
+    _ltrs.reset();
     _visibilities.reset();
     _soundSets.reset();
     _paths.reset();
     _layouts.reset();
-    _cursors.reset();
-    _shaders.reset();
-    _textures.reset();
-    _audioFiles.reset();
-    _movies.reset();
+    _dialogs.reset();
     _scripts.reset();
+    _movies.reset();
+    _audioFiles.reset();
+    _cursors.reset();
+    _fonts.reset();
+    _lips.reset();
+    _walkmeshes.reset();
+    _models.reset();
+    _textures.reset();
+    _shaders.reset();
     _gffs.reset();
     _twoDas.reset();
     _strings.reset();
     _resources.reset();
-    _director.reset();
 }
 
 } // namespace resource

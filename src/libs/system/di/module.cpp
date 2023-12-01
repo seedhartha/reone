@@ -30,4 +30,11 @@ void SystemModule::init() {
     _services = std::make_unique<SystemServices>(*_clock, *_threadPool);
 }
 
+void SystemModule::deinit() {
+    _services.reset();
+
+    _threadPool.reset();
+    _clock.reset();
+}
+
 } // namespace reone

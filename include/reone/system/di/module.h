@@ -27,6 +27,7 @@ namespace reone {
 class SystemModule : boost::noncopyable {
 public:
     void init();
+    void deinit();
 
     SystemServices &services() {
         return *_services;

@@ -55,9 +55,14 @@ void GameModule::deinit() {
     _services.reset();
 
     _surfaces.reset();
+    _spells.reset();
+    _skills.reset();
+    _reputes.reset();
     _portraits.reset();
     _guiSounds.reset();
     _footstepSounds.reset();
+    _feats.reset();
+    _classes.reset();
     _cameraStyles.reset();
 }
 
