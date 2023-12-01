@@ -22,12 +22,10 @@
 #include "reone/game/combat.h"
 #include "reone/game/debug.h"
 #include "reone/game/di/services.h"
-#include "reone/game/dialogs.h"
 #include "reone/game/location.h"
 #include "reone/game/party.h"
 #include "reone/game/resourcedirector.h"
 #include "reone/game/script/routines.h"
-#include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
@@ -44,6 +42,7 @@
 #include "reone/resource/audio/player.h"
 #include "reone/resource/cursors.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/dialogs.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/format/bikreader.h"
@@ -57,6 +56,7 @@
 #include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
+#include "reone/resource/soundsets.h"
 #include "reone/resource/textures.h"
 #include "reone/resource/walkmeshes.h"
 #include "reone/scene/di/services.h"
@@ -802,7 +802,7 @@ void Game::startDialog(const std::shared_ptr<Object> &owner, const std::string &
     setCursorType(CursorType::Default);
     changeScreen(Screen::Conversation);
 
-    auto dialog = _services.game.dialogs.get(resRef);
+    auto dialog = _services.resource.dialogs.get(resRef);
     bool computerConversation = dialog->conversationType == ConversationType::Computer;
     _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
     _conversation->start(dialog, owner);

@@ -15,16 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/dialogs.h"
+#include "reone/resource/dialogs.h"
 
 #include "reone/resource/gffs.h"
 #include "reone/resource/strings.h"
 
-using namespace reone::resource;
-
 namespace reone {
 
-namespace game {
+namespace resource {
 
 std::shared_ptr<Dialog> Dialogs::doGet(std::string resRef) {
     auto dlg = _gffs.get(resRef, ResType::Dlg);
@@ -116,6 +114,6 @@ Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const resource::ge
     return anim;
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

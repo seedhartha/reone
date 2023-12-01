@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/paths.h"
+#include "reone/resource/paths.h"
 
 #include "reone/resource/gffs.h"
 
@@ -23,7 +23,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 std::shared_ptr<Path> Paths::doGet(std::string resRef) {
     auto pth = _gffs.get(resRef, ResType::Pth);
@@ -63,6 +63,6 @@ std::unique_ptr<Path> Paths::loadPath(const resource::generated::PTH &pth) const
     return path;
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

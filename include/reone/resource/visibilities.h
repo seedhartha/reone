@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/resource/types.h"
-
 #include "types.h"
 
 namespace reone {
@@ -27,22 +25,18 @@ namespace resource {
 
 class Resources;
 
-}
-
-namespace game {
-
 class IVisibilities {
 public:
     virtual ~IVisibilities() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<resource::Visibility> get(const std::string &key) = 0;
+    virtual std::shared_ptr<Visibility> get(const std::string &key) = 0;
 };
 
 class Visibilities : public IVisibilities, boost::noncopyable {
 public:
-    Visibilities(resource::Resources &resources) :
+    Visibilities(Resources &resources) :
         _resources(resources) {
     }
 
@@ -50,7 +44,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<resource::Visibility> get(const std::string &key) override {
+    std::shared_ptr<Visibility> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -60,13 +54,13 @@ public:
     }
 
 private:
-    resource::Resources &_resources;
+    Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<resource::Visibility>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<Visibility>> _objects;
 
-    std::shared_ptr<resource::Visibility> doGet(std::string resRef);
+    std::shared_ptr<Visibility> doGet(std::string resRef);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

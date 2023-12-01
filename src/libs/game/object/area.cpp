@@ -20,16 +20,13 @@
 #include "reone/game/camerastyles.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
-#include "reone/game/layouts.h"
 #include "reone/game/location.h"
 #include "reone/game/party.h"
-#include "reone/game/paths.h"
 #include "reone/game/reputes.h"
 #include "reone/game/room.h"
 #include "reone/game/script/runner.h"
 #include "reone/game/surfaces.h"
 #include "reone/game/types.h"
-#include "reone/game/visibilities.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
@@ -39,10 +36,13 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/layouts.h"
 #include "reone/resource/models.h"
+#include "reone/resource/paths.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
 #include "reone/resource/textures.h"
+#include "reone/resource/visibilities.h"
 #include "reone/resource/walkmeshes.h"
 #include "reone/scene/collision.h"
 #include "reone/scene/di/services.h"
@@ -303,7 +303,7 @@ void Area::loadStores(const resource::generated::GIT &git) {
 }
 
 void Area::loadLYT() {
-    auto layout = _services.game.layouts.get(_name);
+    auto layout = _services.resource.layouts.get(_name);
     if (!layout) {
         throw ResourceNotFoundException("Area LYT not found: " + _name);
     }
@@ -357,7 +357,7 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visibility = _services.game.visibilities.get(_name);
+    auto visibility = _services.resource.visibilities.get(_name);
     if (!visibility) {
         return;
     }
@@ -374,7 +374,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    std::shared_ptr<Path> path(_services.game.paths.get(_name));
+    std::shared_ptr<Path> path(_services.resource.paths.get(_name));
     if (!path) {
         return;
     }

@@ -21,15 +21,20 @@
 #include "../audio/files.h"
 #include "../audio/player.h"
 #include "../cursors.h"
+#include "../dialogs.h"
 #include "../fonts.h"
 #include "../gffs.h"
+#include "../layouts.h"
 #include "../lips.h"
 #include "../models.h"
 #include "../movies.h"
+#include "../paths.h"
 #include "../resources.h"
 #include "../scripts.h"
+#include "../soundsets.h"
 #include "../strings.h"
 #include "../textures.h"
+#include "../visibilities.h"
 #include "../walkmeshes.h"
 
 #include "services.h"
@@ -98,6 +103,11 @@ private:
     std::unique_ptr<Models> _models;
     std::unique_ptr<Textures> _textures;
     std::unique_ptr<Walkmeshes> _walkmeshes;
+    std::unique_ptr<Dialogs> _dialogs;
+    std::unique_ptr<Layouts> _layouts;
+    std::unique_ptr<Paths> _paths;
+    std::unique_ptr<SoundSets> _soundSets;
+    std::unique_ptr<Visibilities> _visibilities;
 
     std::unique_ptr<ResourceServices> _services;
 };

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "dialog.h"
-#include "reone/resource/template/generated/dlg.h"
+#include "path.h"
+#include "template/generated/pth.h"
 
 namespace reone {
 
@@ -26,33 +26,27 @@ namespace resource {
 
 class Gffs;
 class Gff;
-class Strings;
 
-} // namespace resource
-
-namespace game {
-
-class IDialogs {
+class IPaths {
 public:
-    virtual ~IDialogs() = default;
+    virtual ~IPaths() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Dialog> get(const std::string &key) = 0;
+    virtual std::shared_ptr<Path> get(const std::string &key) = 0;
 };
 
-class Dialogs : public IDialogs {
+class Paths : public IPaths {
 public:
-    Dialogs(resource::Gffs &gffs, resource::Strings &strings) :
-        _gffs(gffs),
-        _strings(strings) {
+    Paths(Gffs &gffs) :
+        _gffs(gffs) {
     }
 
     void clear() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Dialog> get(const std::string &key) override {
+    std::shared_ptr<Path> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -62,21 +56,15 @@ public:
     }
 
 private:
-    resource::Gffs &_gffs;
-    resource::Strings &_strings;
+    Gffs &_gffs;
 
-    std::unordered_map<std::string, std::shared_ptr<Dialog>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<Path>> _objects;
 
-    std::shared_ptr<Dialog> doGet(std::string resRef);
+    std::shared_ptr<Path> doGet(std::string resRef);
 
-    std::unique_ptr<Dialog> loadDialog(const resource::generated::DLG &dlg);
-
-    Dialog::EntryReplyLink getEntryReplyLink(const resource::generated::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
-    Dialog::EntryReply getEntryReply(const resource::generated::DLG_EntryReplyList &dlg) const;
-    Dialog::Stunt getStunt(const resource::generated::DLG_StuntList &dlg) const;
-    Dialog::ParticipantAnimation getParticipantAnimation(const resource::generated::DLG_EntryReplyList_AnimList &dlg) const;
+    std::unique_ptr<Path> loadPath(const generated::PTH &pth) const;
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

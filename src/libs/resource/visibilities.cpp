@@ -15,17 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/visibilities.h"
+#include "reone/resource/visibilities.h"
 
 #include "reone/resource/format/visreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
-
 namespace reone {
 
-namespace game {
+namespace resource {
 
 std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
     auto res = _resources.find(ResourceId(resRef, ResType::Vis));
@@ -40,6 +38,6 @@ std::shared_ptr<Visibility> Visibilities::doGet(std::string resRef) {
     return std::make_shared<Visibility>(vis.visibility());
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

@@ -28,19 +28,14 @@
 #include "../d20/feats.h"
 #include "../d20/skills.h"
 #include "../d20/spells.h"
-#include "../dialogs.h"
 #include "../footstepsounds.h"
 #include "../gui/sounds.h"
-#include "../layouts.h"
 #include "../options.h"
-#include "../paths.h"
 #include "../portraits.h"
 #include "../reputes.h"
 #include "../resourcedirector.h"
-#include "../soundsets.h"
 #include "../surfaces.h"
 #include "../types.h"
-#include "../visibilities.h"
 
 #include "services.h"
 
@@ -86,20 +81,15 @@ private:
 
     std::unique_ptr<CameraStyles> _cameraStyles;
     std::unique_ptr<Classes> _classes;
-    std::unique_ptr<Dialogs> _dialogs;
     std::unique_ptr<Feats> _feats;
     std::unique_ptr<FootstepSounds> _footstepSounds;
     std::unique_ptr<GUISounds> _guiSounds;
-    std::unique_ptr<Layouts> _layouts;
-    std::unique_ptr<Paths> _paths;
     std::unique_ptr<Portraits> _portraits;
     std::unique_ptr<Reputes> _reputes;
     std::unique_ptr<ResourceDirector> _resourceDirector;
     std::unique_ptr<Skills> _skills;
-    std::unique_ptr<SoundSets> _soundSets;
     std::unique_ptr<Spells> _spells;
     std::unique_ptr<Surfaces> _surfaces;
-    std::unique_ptr<Visibilities> _visibilities;
 
     std::unique_ptr<GameServices> _services;
 };

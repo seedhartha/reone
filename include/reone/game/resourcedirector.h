@@ -43,9 +43,6 @@ namespace game {
 
 struct OptionsView;
 
-class IDialogs;
-class IPaths;
-
 class IResourceDirector {
 public:
     virtual ~IResourceDirector() = default;
@@ -60,15 +57,11 @@ class ResourceDirector : public IResourceDirector, boost::noncopyable {
 public:
     ResourceDirector(GameID gameId,
                      OptionsView &options,
-                     IDialogs &dialogs,
-                     IPaths &paths,
                      script::ScriptServices &scriptSvc,
                      graphics::GraphicsServices &graphicsSvc,
                      resource::ResourceServices &resourceSvc) :
         _gameId(gameId),
         _options(options),
-        _dialogs(dialogs),
-        _paths(paths),
         _scriptSvc(scriptSvc),
         _graphicsSvc(graphicsSvc),
         _resourceSvc(resourceSvc) {
@@ -82,8 +75,6 @@ public:
 private:
     GameID _gameId;
     OptionsView &_options;
-    IDialogs &_dialogs;
-    IPaths &_paths;
     script::ScriptServices &_scriptSvc;
     graphics::GraphicsServices &_graphicsSvc;
     resource::ResourceServices &_resourceSvc;

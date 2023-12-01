@@ -50,6 +50,11 @@ void ResourceModule::init() {
         _graphics.uniforms(),
         _graphics.window(),
         *_resources);
+    _dialogs = std::make_unique<Dialogs>(*_gffs, *_strings);
+    _layouts = std::make_unique<Layouts>(*_resources);
+    _paths = std::make_unique<Paths>(*_gffs);
+    _soundSets = std::make_unique<SoundSets>(*_files, *_resources, *_strings);
+    _visibilities = std::make_unique<Visibilities>(*_resources);
 
     _strings->init(_gamePath);
     _textures->init();
@@ -68,12 +73,21 @@ void ResourceModule::init() {
         *_lips,
         *_models,
         *_textures,
-        *_walkmeshes);
+        *_walkmeshes,
+        *_dialogs,
+        *_layouts,
+        *_paths,
+        *_soundSets,
+        *_visibilities);
 }
 
 void ResourceModule::deinit() {
     _services.reset();
 
+    _visibilities.reset();
+    _soundSets.reset();
+    _paths.reset();
+    _layouts.reset();
     _cursors.reset();
     _textures.reset();
     _player.reset();

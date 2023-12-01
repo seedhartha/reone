@@ -20,9 +20,9 @@
 #include "reone/audio/source.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/graphics/model.h"
+#include "reone/resource/dialog.h"
 #include "reone/system/timer.h"
 
-#include "../dialog.h"
 #include "../gui.h"
 #include "../object.h"
 #include "../types.h"
@@ -40,7 +40,7 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
 
-    void start(const std::shared_ptr<Dialog> &dialog, const std::shared_ptr<Object> &owner);
+    void start(const std::shared_ptr<resource::Dialog> &dialog, const std::shared_ptr<Object> &owner);
 
     CameraType getCamera(int &cameraId) const;
 
@@ -49,11 +49,11 @@ public:
     void resume();
 
 protected:
-    std::shared_ptr<Dialog> _dialog;
+    std::shared_ptr<resource::Dialog> _dialog;
     std::shared_ptr<Object> _owner;
     std::shared_ptr<graphics::Model> _cameraModel;
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
-    const Dialog::EntryReply *_currentEntry {nullptr};
+    const resource::Dialog::EntryReply *_currentEntry {nullptr};
     bool _entryEnded {false};
     bool _paused {false};
 
@@ -72,7 +72,7 @@ private:
     std::shared_ptr<audio::AudioSource> _currentVoice;
     Timer _endEntryTimer;
     float _entryDuration {0.0f};
-    std::vector<const Dialog::EntryReply *> _replies;
+    std::vector<const resource::Dialog::EntryReply *> _replies;
     bool _autoPickFirstReply {false};
 
     void loadConversationBackground();
@@ -89,7 +89,7 @@ private:
     void finish();
     void endCurrentEntry();
 
-    int indexOfFirstActive(const std::vector<Dialog::EntryReplyLink> &links);
+    int indexOfFirstActive(const std::vector<resource::Dialog::EntryReplyLink> &links);
 
     bool evaluateCondition(const std::string &scriptResRef);
 

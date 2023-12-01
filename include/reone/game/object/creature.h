@@ -22,6 +22,8 @@
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
+#include "reone/resource/template/generated/git.h"
+#include "reone/resource/template/generated/utc.h"
 #include "reone/resource/types.h"
 #include "reone/scene/animeventlistener.h"
 #include "reone/scene/node/model.h"
@@ -30,8 +32,6 @@
 
 #include "../d20/attributes.h"
 #include "../object.h"
-#include "reone/resource/template/generated/git.h"
-#include "reone/resource/template/generated/utc.h"
 
 #include "item.h"
 
@@ -110,7 +110,7 @@ public:
 
     void giveXP(int amount);
 
-    void playSound(SoundSetEntry entry, bool positional = true);
+    void playSound(resource::SoundSetEntry entry, bool positional = true);
 
     void startTalking(const std::shared_ptr<graphics::LipAnimation> &animation);
     void stopTalking();
@@ -260,7 +260,7 @@ private:
     int _portraitId {0};
     bool _immortal {false};
     int _xp {0};
-    std::shared_ptr<SoundSet> _soundSet;
+    std::shared_ptr<resource::SoundSet> _soundSet;
     BodyBag _bodyBag;
     Perception _perception;
     RacialType _race {RacialType::Unknown};

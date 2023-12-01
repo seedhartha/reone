@@ -27,7 +27,6 @@
 #include "reone/game/game.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
-#include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
@@ -39,6 +38,7 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/models.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/soundsets.h"
 #include "reone/resource/strings.h"
 #include "reone/resource/textures.h"
 #include "reone/scene/di/services.h"
@@ -1344,7 +1344,7 @@ void Creature::loadSoundSetFromUTC(const resource::generated::UTC &utc) {
     }
     std::string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
     if (!soundSetResRef.empty()) {
-        _soundSet = _services.game.soundSets.get(soundSetResRef);
+        _soundSet = _services.resource.soundSets.get(soundSetResRef);
     }
 }
 

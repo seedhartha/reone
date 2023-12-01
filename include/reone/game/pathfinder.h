@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "path.h"
+#include "reone/resource/path.h"
 
 namespace reone {
 
@@ -28,7 +28,7 @@ namespace game {
  */
 class Pathfinder : boost::noncopyable {
 public:
-    void load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ);
+    void load(const std::vector<resource::Path::Point> &points, const std::unordered_map<int, float> &pointZ);
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 

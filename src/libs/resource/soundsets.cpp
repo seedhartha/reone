@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/soundsets.h"
+#include "reone/resource/soundsets.h"
 
 #include "reone/resource/audio/files.h"
 #include "reone/resource/format/ssfreader.h"
@@ -24,11 +24,10 @@
 #include "reone/system/stream/memoryinput.h"
 
 using namespace reone::audio;
-using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     auto res = _resources.find(ResourceId(resRef, ResType::Ssf));
@@ -53,6 +52,6 @@ std::shared_ptr<SoundSet> SoundSets::doGet(std::string resRef) {
     return result;
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

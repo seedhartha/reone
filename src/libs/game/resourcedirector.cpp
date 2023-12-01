@@ -17,17 +17,17 @@
 
 #include "reone/game/resourcedirector.h"
 
-#include "reone/game/dialogs.h"
 #include "reone/game/options.h"
-#include "reone/game/paths.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/dialogs.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/lips.h"
+#include "reone/resource/paths.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
 #include "reone/script/di/services.h"
@@ -72,8 +72,8 @@ void ResourceDirector::init() {
 }
 
 void ResourceDirector::onModuleLoad(const std::string &name) {
-    _dialogs.clear();
-    _paths.clear();
+    _resourceSvc.dialogs.clear();
+    _resourceSvc.paths.clear();
     _resourceSvc.scripts.clear();
     _resourceSvc.lips.clear();
     _resourceSvc.gffs.clear();

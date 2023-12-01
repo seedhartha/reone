@@ -84,8 +84,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/debug.h
     ${GAME_INCLUDE_DIR}/di/module.h
     ${GAME_INCLUDE_DIR}/di/services.h
-    ${GAME_INCLUDE_DIR}/dialog.h
-    ${GAME_INCLUDE_DIR}/dialogs.h
     ${GAME_INCLUDE_DIR}/effect.h
     ${GAME_INCLUDE_DIR}/effect/abilitydecrease.h
     ${GAME_INCLUDE_DIR}/effect/abilityincrease.h
@@ -281,7 +279,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/gui/saveload.h
     ${GAME_INCLUDE_DIR}/gui/selectoverlay.h
     ${GAME_INCLUDE_DIR}/gui/sounds.h
-    ${GAME_INCLUDE_DIR}/layouts.h
     ${GAME_INCLUDE_DIR}/location.h
     ${GAME_INCLUDE_DIR}/object.h
     ${GAME_INCLUDE_DIR}/object/area.h
@@ -303,9 +300,7 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/object/waypoint.h
     ${GAME_INCLUDE_DIR}/options.h
     ${GAME_INCLUDE_DIR}/party.h
-    ${GAME_INCLUDE_DIR}/path.h
     ${GAME_INCLUDE_DIR}/pathfinder.h
-    ${GAME_INCLUDE_DIR}/paths.h
     ${GAME_INCLUDE_DIR}/player.h
     ${GAME_INCLUDE_DIR}/portrait.h
     ${GAME_INCLUDE_DIR}/portraits.h
@@ -318,12 +313,10 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/script/routine/objectutil.h
     ${GAME_INCLUDE_DIR}/script/routines.h
     ${GAME_INCLUDE_DIR}/script/runner.h
-    ${GAME_INCLUDE_DIR}/soundsets.h
     ${GAME_INCLUDE_DIR}/surface.h
     ${GAME_INCLUDE_DIR}/surfaces.h
     ${GAME_INCLUDE_DIR}/talent.h
-    ${GAME_INCLUDE_DIR}/types.h
-    ${GAME_INCLUDE_DIR}/visibilities.h)
+    ${GAME_INCLUDE_DIR}/types.h)
 
 set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/action/attackobject.cpp
@@ -377,7 +370,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/d20/spells.cpp
     ${GAME_SOURCE_DIR}/debug.cpp
     ${GAME_SOURCE_DIR}/di/module.cpp
-    ${GAME_SOURCE_DIR}/dialogs.cpp
     ${GAME_SOURCE_DIR}/effect/abilitydecrease.cpp
     ${GAME_SOURCE_DIR}/effect/abilityincrease.cpp
     ${GAME_SOURCE_DIR}/effect/acdecrease.cpp
@@ -481,7 +473,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/gui/saveload.cpp
     ${GAME_SOURCE_DIR}/gui/selectoverlay.cpp
     ${GAME_SOURCE_DIR}/gui/sounds.cpp
-    ${GAME_SOURCE_DIR}/layouts.cpp
     ${GAME_SOURCE_DIR}/object.cpp
     ${GAME_SOURCE_DIR}/object/area.cpp
     ${GAME_SOURCE_DIR}/object/camera/animated.cpp
@@ -500,7 +491,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/object/waypoint.cpp
     ${GAME_SOURCE_DIR}/party.cpp
     ${GAME_SOURCE_DIR}/pathfinder.cpp
-    ${GAME_SOURCE_DIR}/paths.cpp
     ${GAME_SOURCE_DIR}/player.cpp
     ${GAME_SOURCE_DIR}/portraits.cpp
     ${GAME_SOURCE_DIR}/reputes.cpp
@@ -513,9 +503,7 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/script/routine/impl/minigame.cpp
     ${GAME_SOURCE_DIR}/script/routines.cpp
     ${GAME_SOURCE_DIR}/script/runner.cpp
-    ${GAME_SOURCE_DIR}/soundsets.cpp
-    ${GAME_SOURCE_DIR}/surfaces.cpp
-    ${GAME_SOURCE_DIR}/visibilities.cpp)
+    ${GAME_SOURCE_DIR}/surfaces.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

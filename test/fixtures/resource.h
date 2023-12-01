@@ -24,16 +24,21 @@
 #include "reone/resource/audio/player.h"
 #include "reone/resource/cursors.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/dialogs.h"
 #include "reone/resource/fonts.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/layouts.h"
 #include "reone/resource/lips.h"
 #include "reone/resource/models.h"
 #include "reone/resource/movies.h"
+#include "reone/resource/paths.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
+#include "reone/resource/soundsets.h"
 #include "reone/resource/strings.h"
 #include "reone/resource/textures.h"
+#include "reone/resource/visibilities.h"
 #include "reone/resource/walkmeshes.h"
 
 namespace reone {
@@ -141,6 +146,36 @@ public:
     MOCK_METHOD(std::shared_ptr<graphics::Walkmesh>, get, (const std::string &resRef, ResType type), (override));
 };
 
+class MockDialogs : public IDialogs, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<Dialog>, get, (const std::string &key), (override));
+};
+
+class MockLayouts : public ILayouts, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<Layout>, get, (const std::string &key), (override));
+};
+
+class MockPaths : public IPaths, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<Path>, get, (const std::string &key), (override));
+};
+
+class MockSoundSets : public ISoundSets, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<SoundSet>, get, (const std::string &key), (override));
+};
+
+class MockVisiblities : public IVisibilities, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -158,6 +193,11 @@ public:
         _models = std::make_unique<MockModels>();
         _textures = std::make_unique<MockTextures>();
         _walkmeshes = std::make_unique<MockWalkmeshes>();
+        _dialogs = std::make_unique<MockDialogs>();
+        _layouts = std::make_unique<MockLayouts>();
+        _paths = std::make_unique<MockPaths>();
+        _soundSets = std::make_unique<MockSoundSets>();
+        _visibilities = std::make_unique<MockVisiblities>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
@@ -173,7 +213,12 @@ public:
             *_lips,
             *_models,
             *_textures,
-            *_walkmeshes);
+            *_walkmeshes,
+            *_dialogs,
+            *_layouts,
+            *_paths,
+            *_soundSets,
+            *_visibilities);
     }
 
     MockGffs &gffs() {
@@ -219,6 +264,11 @@ private:
     std::unique_ptr<MockModels> _models;
     std::unique_ptr<MockTextures> _textures;
     std::unique_ptr<MockWalkmeshes> _walkmeshes;
+    std::unique_ptr<MockDialogs> _dialogs;
+    std::unique_ptr<MockLayouts> _layouts;
+    std::unique_ptr<MockPaths> _paths;
+    std::unique_ptr<MockSoundSets> _soundSets;
+    std::unique_ptr<MockVisiblities> _visibilities;
 
     std::unique_ptr<ResourceServices> _services;
 };

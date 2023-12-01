@@ -17,38 +17,41 @@
 
 #pragma once
 
-#include "reone/resource/layout.h"
+#include "types.h"
 
 namespace reone {
 
 namespace resource {
 
 class Resources;
+class Strings;
+class AudioFiles;
 
-}
-
-namespace game {
-
-class ILayouts {
+class ISoundSets {
 public:
-    virtual ~ILayouts() = default;
+    virtual ~ISoundSets() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<resource::Layout> get(const std::string &key) = 0;
+    virtual std::shared_ptr<SoundSet> get(const std::string &key) = 0;
 };
 
-class Layouts : public ILayouts {
+class SoundSets : public ISoundSets {
 public:
-    Layouts(resource::Resources &resources) :
-        _resources(resources) {
+    SoundSets(
+        AudioFiles &audioFiles,
+        Resources &resources,
+        Strings &strings) :
+        _audioFiles(audioFiles),
+        _resources(resources),
+        _strings(strings) {
     }
 
     void clear() override {
         _objects.clear();
     }
 
-    std::shared_ptr<resource::Layout> get(const std::string &key) override {
+    std::shared_ptr<SoundSet> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -58,13 +61,15 @@ public:
     }
 
 private:
-    resource::Resources &_resources;
+    AudioFiles &_audioFiles;
+    Resources &_resources;
+    Strings &_strings;
 
-    std::unordered_map<std::string, std::shared_ptr<resource::Layout>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<SoundSet>> _objects;
 
-    std::shared_ptr<resource::Layout> doGet(std::string resRef);
+    std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

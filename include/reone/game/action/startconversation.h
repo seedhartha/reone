@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/resource/types.h"
+
 #include "../action.h"
 
 namespace reone {
@@ -30,7 +32,7 @@ public:
                             std::shared_ptr<Object> objectToConverse,
                             std::string dialogResRef,
                             bool privateConversation = false,
-                            ConversationType conversationType = ConversationType::Cinematic,
+                            resource::ConversationType conversationType = resource::ConversationType::Cinematic,
                             bool ignoreStartRange = false,
                             std::vector<std::string> namesToIgnore = {},
                             bool useLeader = false,
@@ -53,7 +55,7 @@ private:
     std::shared_ptr<Object> _objectToConverse;
     std::string _dialogResRef;
     bool _privateConversation;
-    ConversationType _conversationType;
+    resource::ConversationType _conversationType;
     bool _ignoreStartRange;
     std::vector<std::string> _namesToIgnore;
     bool _useLeader;

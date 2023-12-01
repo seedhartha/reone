@@ -380,7 +380,7 @@ static Variable ActionStartConversation(const std::vector<Variable> &args, const
         dialogResRef = caller->conversation();
     }
     auto privateConversation = static_cast<bool>(bPrivateConversation);
-    auto conversationType = static_cast<ConversationType>(nConversationType);
+    auto conversationType = static_cast<resource::ConversationType>(nConversationType);
     auto ignoreStartRange = static_cast<bool>(bIgnoreStartRange);
     auto namesToIgnore = std::vector<std::string> {sNameObjectToIgnore1,
                                                    sNameObjectToIgnore2,

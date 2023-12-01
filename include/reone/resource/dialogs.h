@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "path.h"
-#include "reone/resource/template/generated/pth.h"
+#include "dialog.h"
+#include "template/generated/dlg.h"
 
 namespace reone {
 
@@ -26,31 +26,29 @@ namespace resource {
 
 class Gffs;
 class Gff;
+class Strings;
 
-} // namespace resource
-
-namespace game {
-
-class IPaths {
+class IDialogs {
 public:
-    virtual ~IPaths() = default;
+    virtual ~IDialogs() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Path> get(const std::string &key) = 0;
+    virtual std::shared_ptr<Dialog> get(const std::string &key) = 0;
 };
 
-class Paths : public IPaths {
+class Dialogs : public IDialogs {
 public:
-    Paths(resource::Gffs &gffs) :
-        _gffs(gffs) {
+    Dialogs(Gffs &gffs, Strings &strings) :
+        _gffs(gffs),
+        _strings(strings) {
     }
 
     void clear() override {
         _objects.clear();
     }
 
-    std::shared_ptr<Path> get(const std::string &key) override {
+    std::shared_ptr<Dialog> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -60,15 +58,21 @@ public:
     }
 
 private:
-    resource::Gffs &_gffs;
+    Gffs &_gffs;
+    Strings &_strings;
 
-    std::unordered_map<std::string, std::shared_ptr<Path>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<Dialog>> _objects;
 
-    std::shared_ptr<Path> doGet(std::string resRef);
+    std::shared_ptr<Dialog> doGet(std::string resRef);
 
-    std::unique_ptr<Path> loadPath(const resource::generated::PTH &pth) const;
+    std::unique_ptr<Dialog> loadDialog(const generated::DLG &dlg);
+
+    Dialog::EntryReplyLink getEntryReplyLink(const generated::DLG_EntryReplyList_EntriesRepliesList &dlg) const;
+    Dialog::EntryReply getEntryReply(const generated::DLG_EntryReplyList &dlg) const;
+    Dialog::Stunt getStunt(const generated::DLG_StuntList &dlg) const;
+    Dialog::ParticipantAnimation getParticipantAnimation(const generated::DLG_EntryReplyList_AnimList &dlg) const;
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

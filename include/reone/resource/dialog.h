@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 struct Dialog {
     struct WaitFlags {
@@ -81,6 +81,6 @@ struct Dialog {
     const EntryReply &getReply(int index) const { return replies[index]; }
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

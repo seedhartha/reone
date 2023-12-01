@@ -32,72 +32,52 @@ namespace game {
 
 class ICameraStyles;
 class IClasses;
-class IDialogs;
 class IFeats;
 class IFootstepSounds;
 class IGUISounds;
-class ILayouts;
-class IPaths;
 class IPortraits;
 class IReputes;
 class IResourceDirector;
 class ISkills;
-class ISoundSets;
 class ISpells;
 class ISurfaces;
-class IVisibilities;
 
 struct GameServices {
     ICameraStyles &cameraStyles;
     IClasses &classes;
-    IDialogs &dialogs;
     IFeats &feats;
     IFootstepSounds &footstepSounds;
     IGUISounds &guiSounds;
-    ILayouts &layouts;
-    IPaths &paths;
     IPortraits &portraits;
     IReputes &reputes;
     IResourceDirector &resourceDirector;
     ISkills &skills;
-    ISoundSets &soundSets;
     ISpells &spells;
     ISurfaces &surfaces;
-    IVisibilities &visibilities;
 
     GameServices(
         ICameraStyles &cameraStyles,
         IClasses &classes,
-        IDialogs &dialogs,
         IFeats &feats,
         IFootstepSounds &footstepSounds,
         IGUISounds &guiSounds,
-        ILayouts &layouts,
-        IPaths &paths,
         IPortraits &portraits,
         IReputes &reputes,
         IResourceDirector &resourceDirector,
         ISkills &skills,
-        ISoundSets &soundSets,
         ISpells &spells,
-        ISurfaces &surfaces,
-        IVisibilities &visibilities) :
+        ISurfaces &surfaces) :
         cameraStyles(cameraStyles),
         classes(classes),
-        dialogs(dialogs),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
-        layouts(layouts),
-        paths(paths),
         portraits(portraits),
         reputes(reputes),
         resourceDirector(resourceDirector),
         skills(skills),
-        soundSets(soundSets),
         spells(spells),
-        surfaces(surfaces),
-        visibilities(visibilities) {
+        surfaces(surfaces) {
     }
 };
 

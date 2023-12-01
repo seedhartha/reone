@@ -17,6 +17,8 @@
 
 #include "reone/game/pathfinder.h"
 
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
@@ -42,7 +44,7 @@ void Pathfinder::load(const std::vector<Path::Point> &points, const std::unorder
             continue;
         }
 
-        const Path::Point &point = points[i];
+        const auto &point = points[i];
         glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
         _vertices.push_back(pointVec);
 

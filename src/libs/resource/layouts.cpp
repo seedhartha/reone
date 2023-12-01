@@ -15,22 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/layouts.h"
+
+#include "reone/resource/format/lytreader.h"
+#include "reone/resource/resources.h"
+#include "reone/system/stream/memoryinput.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-struct Path {
-    struct Point {
-        float x {0.0f};
-        float y {0.0f};
-        std::vector<int> adjPoints;
-    };
+std::shared_ptr<Layout> Layouts::doGet(std::string resRef) {
+    auto res = _resources.find(ResourceId(resRef, ResType::Lyt));
+    if (!res) {
+        return nullptr;
+    }
+    auto stream = MemoryInputStream(res->data);
+    LytReader lyt;
+    lyt.load(stream);
+    return std::make_shared<Layout>(lyt.layout());
+}
 
-    std::vector<Point> points;
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone
