@@ -56,10 +56,11 @@ void ResourceModule::init() {
     _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
     _ltrs = std::make_unique<Ltrs>(*_resources);
-    _shaders = std::make_unique<Shaders>();
+    _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderManager());
 
     _strings->init(_gamePath);
     _textures->init();
+    _shaders->init();
 
     _services = std::make_unique<ResourceServices>(
         *_gffs,
@@ -93,6 +94,7 @@ void ResourceModule::deinit() {
     _paths.reset();
     _layouts.reset();
     _cursors.reset();
+    _shaders.reset();
     _textures.reset();
     _audioPlayer.reset();
     _audioFiles.reset();

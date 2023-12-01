@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/resource/container/erf.h"
-
 #include "shader.h"
 #include "shaderprogram.h"
 
@@ -69,63 +67,28 @@ public:
 
 class ShaderManager : public IShaderManager, boost::noncopyable {
 public:
-    ShaderManager(GraphicsOptions &options) :
-        _options(options) {
+    void associate(ShaderProgramId programId, std::shared_ptr<ShaderProgram> program) {
+        _idToProgram[programId] = std::move(program);
     }
 
-    ~ShaderManager() { deinit(); }
-
-    void init();
-    void deinit();
-
-    void use(ShaderProgramId programId) override;
+    void use(ShaderProgramId programId) override {
+        if (_usedProgram == programId) {
+            return;
+        }
+        if (programId != ShaderProgramId::None) {
+            auto programIter = _idToProgram.find(programId);
+            if (programIter == _idToProgram.end()) {
+                throw std::runtime_error("Shader program not found by id: " + std::to_string(static_cast<int>(programId)));
+            }
+            programIter->second->use();
+        }
+        _usedProgram = programId;
+    }
 
 private:
-    GraphicsOptions &_options;
-
-    bool _inited {false};
+    std::map<ShaderProgramId, std::shared_ptr<ShaderProgram>> _idToProgram;
 
     ShaderProgramId _usedProgram {ShaderProgramId::None};
-
-    std::unique_ptr<resource::ErfResourceContainer> _sourceProvider;
-    std::map<std::string, std::string> _resRefToSource;
-
-    // Shader Programs
-
-    std::shared_ptr<ShaderProgram> _spSimpleColor;
-    std::shared_ptr<ShaderProgram> _spSimpleTexture;
-    std::shared_ptr<ShaderProgram> _spGUI;
-    std::shared_ptr<ShaderProgram> _spText;
-    std::shared_ptr<ShaderProgram> _spPoints;
-
-    std::shared_ptr<ShaderProgram> _spPointLightShadows;
-    std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
-    std::shared_ptr<ShaderProgram> _spModelOpaque;
-    std::shared_ptr<ShaderProgram> _spModelTransparent;
-    std::shared_ptr<ShaderProgram> _spAABB;
-    std::shared_ptr<ShaderProgram> _spWalkmesh;
-    std::shared_ptr<ShaderProgram> _spParticle;
-    std::shared_ptr<ShaderProgram> _spGrass;
-    std::shared_ptr<ShaderProgram> _spBillboard;
-    std::shared_ptr<ShaderProgram> _spSSAO;
-    std::shared_ptr<ShaderProgram> _spSSR;
-    std::shared_ptr<ShaderProgram> _spCombineOpaque;
-    std::shared_ptr<ShaderProgram> _spCombineGeometry;
-
-    std::shared_ptr<ShaderProgram> _spBoxBlur4;
-    std::shared_ptr<ShaderProgram> _spGaussianBlur9;
-    std::shared_ptr<ShaderProgram> _spGaussianBlur13;
-    std::shared_ptr<ShaderProgram> _spMedianFilter3;
-    std::shared_ptr<ShaderProgram> _spMedianFilter5;
-    std::shared_ptr<ShaderProgram> _spFXAA;
-    std::shared_ptr<ShaderProgram> _spSharpen;
-
-    // END Shader Programs
-
-    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sourceResRefs);
-    std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
-
-    ShaderProgram &getProgram(ShaderProgramId id);
 };
 
 } // namespace graphics

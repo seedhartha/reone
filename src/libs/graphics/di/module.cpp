@@ -26,7 +26,7 @@ void GraphicsModule::init() {
     _context = std::make_unique<GraphicsContext>(_options);
     _meshes = std::make_unique<Meshes>();
     _uniforms = std::make_unique<Uniforms>();
-    _shaderManager = std::make_unique<ShaderManager>(_options);
+    _shaderManager = std::make_unique<ShaderManager>();
     _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaderManager, *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(
@@ -40,7 +40,6 @@ void GraphicsModule::init() {
     _context->init();
     _meshes->init();
     _uniforms->init();
-    _shaderManager->init();
     _pipeline->init();
 }
 
@@ -48,7 +47,6 @@ void GraphicsModule::deinit() {
     _services.reset();
 
     _pipeline.reset();
-    _shaderManager.reset();
     _uniforms.reset();
     _meshes.reset();
     _context.reset();

@@ -17,7 +17,21 @@
 
 #pragma once
 
+#include "reone/resource/container/erf.h"
+
+#include "reone/graphics/shader.h"
+#include "reone/graphics/shaderprogram.h"
+#include "reone/graphics/types.h"
+
 namespace reone {
+
+namespace graphics {
+
+class ShaderManager;
+
+struct GraphicsOptions;
+
+} // namespace graphics
 
 namespace resource {
 
@@ -27,6 +41,31 @@ public:
 };
 
 class Shaders : public IShaders, boost::noncopyable {
+public:
+    Shaders(graphics::GraphicsOptions &graphicsOpt,
+            graphics::ShaderManager &shaderManager) :
+        _graphicsOpt(graphicsOpt),
+        _shaderManager(shaderManager) {
+    }
+
+    ~Shaders() {
+        deinit();
+    }
+
+    void init();
+    void deinit();
+
+private:
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::ShaderManager &_shaderManager;
+
+    bool _inited {false};
+
+    std::unique_ptr<ErfResourceContainer> _sourceProvider;
+    std::map<std::string, std::string> _resRefToSource;
+
+    std::shared_ptr<graphics::Shader> initShader(graphics::ShaderType type, std::vector<std::string> sourceResRefs);
+    std::shared_ptr<graphics::ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<graphics::Shader>> shaders);
 };
 
 } // namespace resource

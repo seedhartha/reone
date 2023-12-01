@@ -166,6 +166,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/provider/movies.cpp
     ${RESOURCE_SOURCE_DIR}/provider/paths.cpp
     ${RESOURCE_SOURCE_DIR}/provider/scripts.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/shaders.cpp
     ${RESOURCE_SOURCE_DIR}/provider/soundsets.cpp
     ${RESOURCE_SOURCE_DIR}/provider/textures.cpp
     ${RESOURCE_SOURCE_DIR}/provider/visibilities.cpp
