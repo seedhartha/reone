@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../director.h"
 #include "../provider/2das.h"
 #include "../provider/audiofiles.h"
 #include "../provider/cursors.h"
@@ -56,20 +57,30 @@ class GraphicsModule;
 
 }
 
+namespace script {
+
+class ScriptModule;
+
+}
+
 namespace resource {
 
 class ResourceModule : boost::noncopyable {
 public:
-    ResourceModule(std::filesystem::path gamePath,
+    ResourceModule(GameID gameId,
+                   std::filesystem::path gamePath,
                    graphics::GraphicsOptions &graphicsOpt,
                    audio::AudioOptions &audioOpt,
                    graphics::GraphicsModule &graphics,
-                   audio::AudioModule &audio) :
+                   audio::AudioModule &audio,
+                   script::ScriptModule &script) :
+        _gameId(gameId),
         _gamePath(std::move(gamePath)),
         _graphicsOpt(graphicsOpt),
         _audioOpt(audioOpt),
         _graphics(graphics),
-        _audio(audio) {
+        _audio(audio),
+        _script(script) {
     }
 
     ~ResourceModule() { deinit(); }
@@ -92,15 +103,18 @@ public:
     Walkmeshes &walkmeshes() { return *_walkmeshes; }
     Ltrs &ltrs() { return *_ltrs; }
     Shaders &shaders() { return *_shaders; }
+    ResourceDirector &director() { return *_director; }
 
     ResourceServices &services() { return *_services; }
 
 private:
+    GameID _gameId;
     std::filesystem::path _gamePath;
     graphics::GraphicsOptions &_graphicsOpt;
     audio::AudioOptions &_audioOpt;
     graphics::GraphicsModule &_graphics;
     audio::AudioModule &_audio;
+    script::ScriptModule &_script;
 
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;
@@ -122,6 +136,7 @@ private:
     std::unique_ptr<Visibilities> _visibilities;
     std::unique_ptr<Ltrs> _ltrs;
     std::unique_ptr<Shaders> _shaders;
+    std::unique_ptr<ResourceDirector> _director;
 
     std::unique_ptr<ResourceServices> _services;
 };

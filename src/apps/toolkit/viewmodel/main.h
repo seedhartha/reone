@@ -29,6 +29,7 @@
 #include "reone/resource/id.h"
 #include "reone/resource/talktable.h"
 #include "reone/scene/di/module.h"
+#include "reone/script/di/module.h"
 #include "reone/system/di/module.h"
 #include "reone/system/stream/input.h"
 #include "reone/tools/legacy/tool.h"
@@ -152,7 +153,7 @@ public:
     void update3D();
     void render3D(int w, int h);
 
-    game::GameID gameId() const { return _gameId; }
+    resource::GameID gameId() const { return _gameId; }
     const std::filesystem::path &gamePath() const { return _gamePath; }
 
     int getGameDirItemCount() const { return static_cast<int>(_gameDirItems.size()); }
@@ -196,7 +197,7 @@ public:
 
 private:
     std::filesystem::path _gamePath;
-    game::GameID _gameId {game::GameID::KotOR};
+    resource::GameID _gameId {resource::GameID::KotOR};
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
@@ -246,6 +247,7 @@ private:
     std::unique_ptr<graphics::GraphicsModule> _graphicsModule;
     std::unique_ptr<audio::AudioModule> _audioModule;
     std::unique_ptr<scene::SceneModule> _sceneModule;
+    std::unique_ptr<script::ScriptModule> _scriptModule;
 
     bool _engineLoaded {false};
     bool _animationPlaying {false};

@@ -29,12 +29,6 @@ void GameModule::init() {
     _guiSounds = std::make_unique<GUISounds>(_resource.audioFiles(), _resource.twoDas());
     _portraits = std::make_unique<Portraits>(_resource.textures(), _resource.twoDas());
     _reputes = std::make_unique<Reputes>(_resource.twoDas());
-    _resourceDirector = std::make_unique<ResourceDirector>(
-        _gameId,
-        _options,
-        _script.services(),
-        _graphics.services(),
-        _resource.services());
     _skills = std::make_unique<Skills>(_resource.textures(), _resource.strings(), _resource.twoDas());
     _spells = std::make_unique<Spells>(_resource.textures(), _resource.strings(), _resource.twoDas());
     _surfaces = std::make_unique<Surfaces>(_resource.twoDas());
@@ -47,12 +41,10 @@ void GameModule::init() {
         *_guiSounds,
         *_portraits,
         *_reputes,
-        *_resourceDirector,
         *_skills,
         *_spells,
         *_surfaces);
 
-    _resourceDirector->init();
     _cameraStyles->init();
     _guiSounds->init();
     _portraits->init();
@@ -63,7 +55,6 @@ void GameModule::deinit() {
     _services.reset();
 
     _surfaces.reset();
-    _resourceDirector.reset();
     _portraits.reset();
     _guiSounds.reset();
     _footstepSounds.reset();

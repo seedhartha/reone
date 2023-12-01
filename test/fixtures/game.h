@@ -32,7 +32,6 @@
 #include "reone/game/options.h"
 #include "reone/game/portraits.h"
 #include "reone/game/reputes.h"
-#include "reone/game/resourcedirector.h"
 #include "reone/game/surfaces.h"
 #include "reone/game/types.h"
 
@@ -84,13 +83,6 @@ public:
     MOCK_METHOD(bool, getIsNeutral, (const Creature &left, const Creature &right), (const override));
 };
 
-class MockResourceDirector : public IResourceDirector, boost::noncopyable {
-public:
-    MOCK_METHOD(void, init, (), (override));
-    MOCK_METHOD(void, onModuleLoad, (const std::string &name), (override));
-    MOCK_METHOD(std::set<std::string>, moduleNames, (), (override));
-};
-
 class MockSkills : public ISkills, boost::noncopyable {
 public:
     MOCK_METHOD(std::shared_ptr<Skill>, get, (SkillType type), (const override));
@@ -122,7 +114,6 @@ public:
         _guiSounds = std::make_unique<MockGUISounds>();
         _portraits = std::make_unique<MockPortraits>();
         _reputes = std::make_unique<MockReputes>();
-        _resourceDirector = std::make_unique<MockResourceDirector>();
         _skills = std::make_unique<MockSkills>();
         _spells = std::make_unique<MockSpells>();
         _surfaces = std::make_unique<MockSurfaces>();
@@ -135,14 +126,9 @@ public:
             *_guiSounds,
             *_portraits,
             *_reputes,
-            *_resourceDirector,
             *_skills,
             *_spells,
             *_surfaces);
-    }
-
-    MockResourceDirector &resourceDirector() {
-        return *_resourceDirector;
     }
 
     GameServices &services() {
@@ -157,7 +143,6 @@ private:
     std::unique_ptr<MockGUISounds> _guiSounds;
     std::unique_ptr<MockPortraits> _portraits;
     std::unique_ptr<MockReputes> _reputes;
-    std::unique_ptr<MockResourceDirector> _resourceDirector;
     std::unique_ptr<MockSkills> _skills;
     std::unique_ptr<MockSpells> _spells;
     std::unique_ptr<MockSurfaces> _surfaces;

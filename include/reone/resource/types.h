@@ -93,6 +93,11 @@ enum class ResType : uint16_t {
     Invalid = 0xffff
 };
 
+enum class GameID {
+    KotOR,
+    TSL
+};
+
 enum class ConversationType {
     Cinematic = 0,
     Computer = 1

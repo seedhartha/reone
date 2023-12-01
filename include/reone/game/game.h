@@ -90,7 +90,7 @@ public:
     };
 
     Game(
-        GameID gameId,
+        resource::GameID gameId,
         std::filesystem::path path,
         OptionsView &options,
         ServicesView &services) :
@@ -126,7 +126,7 @@ public:
     void playVideo(const std::string &name);
 
     bool isPaused() const { return _paused; }
-    bool isTSL() const { return _gameId == GameID::TSL; }
+    bool isTSL() const { return _gameId == resource::GameID::TSL; }
 
     Camera *getActiveCamera() const;
 
@@ -323,7 +323,7 @@ private:
         Quitting
     };
 
-    GameID _gameId;
+    resource::GameID _gameId;
     std::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;

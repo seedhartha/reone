@@ -21,17 +21,12 @@
 
 namespace reone {
 
-namespace resource {
-
-struct ResourceServices;
-
-}
-
 namespace graphics {
 
+struct GraphicsOptions;
 struct GraphicsServices;
 
-}
+} // namespace graphics
 
 namespace script {
 
@@ -39,9 +34,14 @@ struct ScriptServices;
 
 }
 
-namespace game {
+namespace resource {
 
-struct OptionsView;
+class IDialogs;
+class IGffs;
+class ILips;
+class IPaths;
+class IResources;
+class IScripts;
 
 class IResourceDirector {
 public:
@@ -56,15 +56,27 @@ public:
 class ResourceDirector : public IResourceDirector, boost::noncopyable {
 public:
     ResourceDirector(GameID gameId,
-                     OptionsView &options,
-                     script::ScriptServices &scriptSvc,
+                     const std::filesystem::path &gamePath,
+                     const graphics::GraphicsOptions &graphicsOpt,
                      graphics::GraphicsServices &graphicsSvc,
-                     resource::ResourceServices &resourceSvc) :
+                     script::ScriptServices &scriptSvc,
+                     IDialogs &dialogs,
+                     IGffs &gffs,
+                     ILips &lips,
+                     IPaths &paths,
+                     IResources &resources,
+                     IScripts &scripts) :
         _gameId(gameId),
-        _options(options),
-        _scriptSvc(scriptSvc),
+        _gamePath(gamePath),
+        _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
-        _resourceSvc(resourceSvc) {
+        _scriptSvc(scriptSvc),
+        _dialogs(dialogs),
+        _gffs(gffs),
+        _lips(lips),
+        _paths(paths),
+        _resources(resources),
+        _scripts(scripts) {
     }
 
     void init() override;
@@ -74,15 +86,21 @@ public:
 
 private:
     GameID _gameId;
-    OptionsView &_options;
-    script::ScriptServices &_scriptSvc;
+    const std::filesystem::path &_gamePath;
+    const graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
-    resource::ResourceServices &_resourceSvc;
+    script::ScriptServices &_scriptSvc;
+    IDialogs &_dialogs;
+    IGffs &_gffs;
+    ILips &_lips;
+    IPaths &_paths;
+    IResources &_resources;
+    IScripts &_scripts;
 
     void loadGlobalResources();
     void loadModuleResources(const std::string &name);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

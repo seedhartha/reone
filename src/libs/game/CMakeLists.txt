@@ -305,7 +305,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/portrait.h
     ${GAME_INCLUDE_DIR}/portraits.h
     ${GAME_INCLUDE_DIR}/reputes.h
-    ${GAME_INCLUDE_DIR}/resourcedirector.h
     ${GAME_INCLUDE_DIR}/room.h
     ${GAME_INCLUDE_DIR}/savedgame.h
     ${GAME_INCLUDE_DIR}/script/routine/argutil.h
@@ -494,7 +493,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/player.cpp
     ${GAME_SOURCE_DIR}/portraits.cpp
     ${GAME_SOURCE_DIR}/reputes.cpp
-    ${GAME_SOURCE_DIR}/resourcedirector.cpp
     ${GAME_SOURCE_DIR}/room.cpp
     ${GAME_SOURCE_DIR}/script/routine/argutil.cpp
     ${GAME_SOURCE_DIR}/script/routine/impl/action.cpp

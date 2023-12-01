@@ -19,6 +19,7 @@
 
 #include "reone/audio/di/module.h"
 #include "reone/graphics/di/module.h"
+#include "reone/script/di/module.h"
 
 namespace reone {
 
@@ -57,6 +58,18 @@ void ResourceModule::init() {
     _visibilities = std::make_unique<Visibilities>(*_resources);
     _ltrs = std::make_unique<Ltrs>(*_resources);
     _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderManager());
+    _director = std::make_unique<ResourceDirector>(
+        _gameId,
+        _gamePath,
+        _graphicsOpt,
+        _graphics.services(),
+        _script.services(),
+        *_dialogs,
+        *_gffs,
+        *_lips,
+        *_paths,
+        *_resources,
+        *_scripts);
 
     _strings->init(_gamePath);
     _textures->init();
@@ -82,7 +95,8 @@ void ResourceModule::init() {
         *_soundSets,
         *_visibilities,
         *_ltrs,
-        *_shaders);
+        *_shaders,
+        *_director);
 }
 
 void ResourceModule::deinit() {
@@ -102,6 +116,7 @@ void ResourceModule::deinit() {
     _twoDas.reset();
     _strings.reset();
     _resources.reset();
+    _director.reset();
 }
 
 } // namespace resource

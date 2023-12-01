@@ -22,6 +22,7 @@
 #include "reone/game/types.h"
 #include "reone/script/variable.h"
 
+using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {

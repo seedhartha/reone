@@ -21,6 +21,7 @@
 
 #include "reone/audio/player.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/director.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/audiofiles.h"
@@ -180,6 +181,13 @@ public:
 class MockShaders : public IShaders, boost::noncopyable {
 };
 
+class MockResourceDirector : public IResourceDirector, boost::noncopyable {
+public:
+    MOCK_METHOD(void, init, (), (override));
+    MOCK_METHOD(void, onModuleLoad, (const std::string &name), (override));
+    MOCK_METHOD(std::set<std::string>, moduleNames, (), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -203,6 +211,7 @@ public:
         _visibilities = std::make_unique<MockVisiblities>();
         _ltrs = std::make_unique<MockLtrs>();
         _shaders = std::make_unique<MockShaders>();
+        _director = std::make_unique<MockResourceDirector>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
@@ -224,7 +233,8 @@ public:
             *_soundSets,
             *_visibilities,
             *_ltrs,
-            *_shaders);
+            *_shaders,
+            *_director);
     }
 
     MockGffs &gffs() {
@@ -245,6 +255,10 @@ public:
 
     MockAudioFiles &audioFiles() {
         return *_audioFiles;
+    }
+
+    MockResourceDirector &director() {
+        return *_director;
     }
 
     ResourceServices &services() {
@@ -272,6 +286,7 @@ private:
     std::unique_ptr<MockVisiblities> _visibilities;
     std::unique_ptr<MockLtrs> _ltrs;
     std::unique_ptr<MockShaders> _shaders;
+    std::unique_ptr<MockResourceDirector> _director;
 
     std::unique_ptr<ResourceServices> _services;
 };

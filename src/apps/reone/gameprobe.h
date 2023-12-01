@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/game/types.h"
+#include "reone/resource/types.h"
 
 namespace reone {
 
@@ -27,7 +27,7 @@ public:
         _gamePath(std::move(gamePath)) {
     }
 
-    game::GameID probe();
+    resource::GameID probe();
 
 private:
     std::filesystem::path _gamePath;

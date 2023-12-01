@@ -72,7 +72,7 @@ private:
     std::unique_ptr<game::Game> _game;
 
     void loadOptions();
-    void initServices(game::GameID gameId);
+    void initServices(resource::GameID gameId);
 };
 
 } // namespace reone

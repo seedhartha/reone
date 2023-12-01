@@ -56,6 +56,7 @@ using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
@@ -451,7 +452,8 @@ void MainViewModel::loadEngine() {
     _systemModule = std::make_unique<SystemModule>();
     _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>(_audioOpt);
-    _resourceModule = std::make_unique<ResourceModule>(_gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule);
+    _scriptModule = std::make_unique<ScriptModule>();
+    _resourceModule = std::make_unique<ResourceModule>(GameID::KotOR, _gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
     _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
 
     _systemModule->init();

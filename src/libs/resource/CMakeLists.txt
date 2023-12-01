@@ -28,6 +28,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/di/module.h
     ${RESOURCE_INCLUDE_DIR}/di/services.h
     ${RESOURCE_INCLUDE_DIR}/dialog.h
+    ${RESOURCE_INCLUDE_DIR}/director.h
     ${RESOURCE_INCLUDE_DIR}/exception/format.h
     ${RESOURCE_INCLUDE_DIR}/exception/notfound.h
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
@@ -117,6 +118,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/container/keybif.cpp
     ${RESOURCE_SOURCE_DIR}/container/rim.cpp
     ${RESOURCE_SOURCE_DIR}/di/module.cpp
+    ${RESOURCE_SOURCE_DIR}/director.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp

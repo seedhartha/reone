@@ -20,7 +20,7 @@
 #include "reone/resource/exception/format.h"
 #include "reone/system/fileutil.h"
 
-using namespace reone::game;
+using namespace reone::resource;
 
 namespace reone {
 

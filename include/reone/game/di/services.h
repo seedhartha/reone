@@ -37,7 +37,6 @@ class IFootstepSounds;
 class IGUISounds;
 class IPortraits;
 class IReputes;
-class IResourceDirector;
 class ISkills;
 class ISpells;
 class ISurfaces;
@@ -50,7 +49,6 @@ struct GameServices {
     IGUISounds &guiSounds;
     IPortraits &portraits;
     IReputes &reputes;
-    IResourceDirector &resourceDirector;
     ISkills &skills;
     ISpells &spells;
     ISurfaces &surfaces;
@@ -63,7 +61,6 @@ struct GameServices {
         IGUISounds &guiSounds,
         IPortraits &portraits,
         IReputes &reputes,
-        IResourceDirector &resourceDirector,
         ISkills &skills,
         ISpells &spells,
         ISurfaces &surfaces) :
@@ -74,7 +71,6 @@ struct GameServices {
         guiSounds(guiSounds),
         portraits(portraits),
         reputes(reputes),
-        resourceDirector(resourceDirector),
         skills(skills),
         spells(spells),
         surfaces(surfaces) {

@@ -33,7 +33,6 @@
 #include "../options.h"
 #include "../portraits.h"
 #include "../reputes.h"
-#include "../resourcedirector.h"
 #include "../surfaces.h"
 #include "../types.h"
 
@@ -46,7 +45,7 @@ namespace game {
 class GameModule : boost::noncopyable {
 public:
     GameModule(
-        GameID gameId,
+        resource::GameID gameId,
         OptionsView &options,
         resource::ResourceModule &resource,
         graphics::GraphicsModule &graphics,
@@ -70,7 +69,7 @@ public:
     GameServices &services() { return *_services; }
 
 private:
-    GameID _gameId;
+    resource::GameID _gameId;
     OptionsView &_options;
 
     resource::ResourceModule &_resource;
@@ -86,7 +85,6 @@ private:
     std::unique_ptr<GUISounds> _guiSounds;
     std::unique_ptr<Portraits> _portraits;
     std::unique_ptr<Reputes> _reputes;
-    std::unique_ptr<ResourceDirector> _resourceDirector;
     std::unique_ptr<Skills> _skills;
     std::unique_ptr<Spells> _spells;
     std::unique_ptr<Surfaces> _surfaces;

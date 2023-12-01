@@ -57,7 +57,7 @@ void Engine::initServices(GameID gameId) {
     _graphicsModule = std::make_unique<GraphicsModule>(_options->graphics);
     _audioModule = std::make_unique<AudioModule>(_options->audio);
     _movieModule = std::make_unique<MovieModule>();
-    _resourceModule = std::make_unique<ResourceModule>(_options->game.path, _options->graphics, _options->audio, *_graphicsModule, *_audioModule);
+    _resourceModule = std::make_unique<ResourceModule>(gameId, _options->game.path, _options->graphics, _options->audio, *_graphicsModule, *_audioModule, *_scriptModule);
     _sceneModule = std::make_unique<SceneModule>(_options->graphics, *_resourceModule, *_graphicsModule, *_audioModule);
     _guiModule = std::make_unique<GUIModule>(_options->graphics, *_sceneModule, *_graphicsModule, *_resourceModule);
     _scriptModule = std::make_unique<ScriptModule>();

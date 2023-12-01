@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/resourcedirector.h"
+#include "reone/resource/director.h"
 
-#include "reone/game/options.h"
-#include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/options.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
@@ -38,7 +37,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 static constexpr char kKeyFilename[] = "chitin.key";
 static constexpr char kPatchFilename[] = "patch.erf";
@@ -72,19 +71,19 @@ void ResourceDirector::init() {
 }
 
 void ResourceDirector::onModuleLoad(const std::string &name) {
-    _resourceSvc.dialogs.clear();
-    _resourceSvc.paths.clear();
-    _resourceSvc.scripts.clear();
-    _resourceSvc.lips.clear();
-    _resourceSvc.gffs.clear();
-    _resourceSvc.resources.clearLocal();
+    _dialogs.clear();
+    _paths.clear();
+    _scripts.clear();
+    _lips.clear();
+    _gffs.clear();
+    _resources.clearLocal();
 
     loadModuleResources(name);
 }
 
 std::set<std::string> ResourceDirector::moduleNames() {
     auto moduleNames = std::set<std::string>();
-    auto modulesPath = findFileIgnoreCase(_options.game.path, kModulesDirectoryName);
+    auto modulesPath = findFileIgnoreCase(_gamePath, kModulesDirectoryName);
     if (!modulesPath) {
         throw ResourceNotFoundException("Modules directory not found");
     }
@@ -99,52 +98,52 @@ std::set<std::string> ResourceDirector::moduleNames() {
 }
 
 void ResourceDirector::loadGlobalResources() {
-    auto &resources = _resourceSvc.resources;
-    resources.addKEY(getFileIgnoreCase(_options.game.path, kKeyFilename));
+    auto &resources = _resources;
+    resources.addKEY(getFileIgnoreCase(_gamePath, kKeyFilename));
 
-    auto texPacksPath = getFileIgnoreCase(_options.game.path, kTexturePackDirectoryName);
-    auto &texPack = kTexQualityToTexPack.at(_options.graphics.textureQuality);
+    auto texPacksPath = getFileIgnoreCase(_gamePath, kTexturePackDirectoryName);
+    auto &texPack = kTexQualityToTexPack.at(_graphicsOpt.textureQuality);
 
     if (_gameId == GameID::TSL) {
         resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
         resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kMusicDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kSoundsDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kVoiceDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kVoiceDirectoryName));
 
-        auto lipsPath = getFileIgnoreCase(_options.game.path, kLipsDirectoryName);
+        auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
         resources.addERF(getFileIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kOverrideDirectoryName));
-        resources.addEXE(getFileIgnoreCase(_options.game.path, kExeFilenameTsl));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
+        resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameTsl));
 
     } else {
-        resources.addERF(getFileIgnoreCase(_options.game.path, kPatchFilename));
+        resources.addERF(getFileIgnoreCase(_gamePath, kPatchFilename));
         resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
         resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kMusicDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kSoundsDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kWavesDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kWavesDirectoryName));
 
-        auto lipsPath = getFileIgnoreCase(_options.game.path, kLipsDirectoryName);
+        auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
         for (auto &filename : g_globalLipFiles) {
             resources.addERF(getFileIgnoreCase(lipsPath, filename));
         }
 
-        resources.addFolder(getFileIgnoreCase(_options.game.path, kOverrideDirectoryName));
-        resources.addEXE(getFileIgnoreCase(_options.game.path, kExeFilenameKotor));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
+        resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameKotor));
     }
 }
 
 void ResourceDirector::loadModuleResources(const std::string &name) {
-    auto modulesPath = findFileIgnoreCase(_options.game.path, kModulesDirectoryName);
+    auto modulesPath = findFileIgnoreCase(_gamePath, kModulesDirectoryName);
     if (!modulesPath) {
         throw ResourceNotFoundException("Modules directory not found");
     }
 
-    auto &resources = _resourceSvc.resources;
+    auto &resources = _resources;
     resources.addRIM(getFileIgnoreCase(*modulesPath, name + ".rim"), true);
     resources.addRIM(getFileIgnoreCase(*modulesPath, name + "_s.rim"), true);
     auto modPath = findFileIgnoreCase(*modulesPath, name + ".mod");
@@ -152,7 +151,7 @@ void ResourceDirector::loadModuleResources(const std::string &name) {
         resources.addERF(*modPath, true);
     }
 
-    auto lipsPath = findFileIgnoreCase(_options.game.path, kLipsDirectoryName);
+    auto lipsPath = findFileIgnoreCase(_gamePath, kLipsDirectoryName);
     if (lipsPath) {
         resources.addERF(getFileIgnoreCase(*lipsPath, name + "_loc.mod"), true);
     }
@@ -162,6 +161,6 @@ void ResourceDirector::loadModuleResources(const std::string &name) {
     }
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

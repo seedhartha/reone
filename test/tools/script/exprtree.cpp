@@ -23,6 +23,7 @@
 
 using namespace reone;
 using namespace reone::game;
+using namespace reone::resource;
 using namespace reone::script;
 
 class StubExpressionTreeOptimizer : public IExpressionTreeOptimizer, boost::noncopyable {

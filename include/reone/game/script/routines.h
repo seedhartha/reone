@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/resource/types.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 
@@ -33,7 +34,7 @@ class Game;
 
 class Routines : public script::IRoutines, boost::noncopyable {
 public:
-    Routines(GameID gameId, Game *game, ServicesView *services) :
+    Routines(resource::GameID gameId, Game *game, ServicesView *services) :
         _gameId(gameId),
         _game(game),
         _services(services) {
@@ -54,7 +55,7 @@ public:
     int getIndexByName(const std::string &name) const override;
 
 private:
-    GameID _gameId;
+    resource::GameID _gameId;
     Game *_game;
     ServicesView *_services;
 

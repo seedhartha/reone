@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/game/types.h"
+#include "reone/resource/types.h"
 #include "reone/system/stream/input.h"
 #include "reone/system/stream/output.h"
 
@@ -33,7 +34,7 @@ class Routines;
 
 class NcsTool : public Tool {
 public:
-    NcsTool(game::GameID gameId) :
+    NcsTool(resource::GameID gameId) :
         _gameId(gameId) {
     }
 
@@ -55,7 +56,7 @@ public:
     void toNSS(IInputStream &ncs, IOutputStream &nss, game::Routines &routines, bool optimize = true);
 
 private:
-    game::GameID _gameId;
+    resource::GameID _gameId;
 
     void toPCODE(const std::filesystem::path &input, const std::filesystem::path &outputDir, game::Routines &routines);
     void toNCS(const std::filesystem::path &input, const std::filesystem::path &outputDir, game::Routines &routines);

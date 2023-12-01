@@ -47,11 +47,6 @@ constexpr glm::vec3 kTSLGUIColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f
 constexpr glm::vec3 kTSLGUIColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
 constexpr glm::vec3 kTSLGUIColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
 
-enum class GameID {
-    KotOR,
-    TSL
-};
-
 enum class BackgroundType {
     None,
     Menu,
