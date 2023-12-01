@@ -23,8 +23,8 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 
 using namespace reone::audio;
 
@@ -336,7 +336,7 @@ std::shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
         return nullptr;
     }
 
-    std::shared_ptr<Texture> texture(_services.graphics.textures.get(resRef, TextureUsage::GUI));
+    std::shared_ptr<Texture> texture(_services.resource.textures.get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(std::make_pair(slot, texture));
 
     return pair.first->second;
@@ -349,7 +349,7 @@ void Equipment::updateItems() {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
         lbItem.text = _services.resource.strings.getText(kStrRefNone);
-        lbItem.iconTexture = _services.graphics.textures.get("inone", TextureUsage::GUI);
+        lbItem.iconTexture = _services.resource.textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         _controls.LB_ITEMS->addItem(std::move(lbItem));
@@ -385,7 +385,7 @@ std::shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
+    return _services.resource.textures.get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

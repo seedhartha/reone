@@ -27,7 +27,6 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
-class Textures;
 class Uniforms;
 
 class Cursor : boost::noncopyable {
@@ -38,7 +37,6 @@ public:
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
-        Textures &textures,
         Uniforms &uniforms,
         IWindow &window) :
         _up(std::move(up)),
@@ -46,7 +44,6 @@ public:
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures),
         _uniforms(uniforms),
         _window(window) {
     }
@@ -68,7 +65,6 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
-    Textures &_textures;
     Uniforms &_uniforms;
     IWindow &_window;
 

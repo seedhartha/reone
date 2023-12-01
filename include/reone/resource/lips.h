@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "lipanimation.h"
+#include "reone/graphics/lipanimation.h"
 
 namespace reone {
 
@@ -26,22 +26,18 @@ namespace resource {
 
 class Resources;
 
-}
-
-namespace graphics {
-
 class ILips {
 public:
     virtual ~ILips() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<LipAnimation> get(const std::string &key) = 0;
+    virtual std::shared_ptr<graphics::LipAnimation> get(const std::string &key) = 0;
 };
 
 class Lips : public ILips {
 public:
-    Lips(resource::Resources &resources) :
+    Lips(Resources &resources) :
         _resources(resources) {
     }
 
@@ -49,7 +45,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<LipAnimation> get(const std::string &key) override {
+    std::shared_ptr<graphics::LipAnimation> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -59,13 +55,13 @@ public:
     }
 
 private:
-    resource::Resources &_resources;
+    Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<LipAnimation>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<graphics::LipAnimation>> _objects;
 
-    std::shared_ptr<LipAnimation> doGet(std::string resRef);
+    std::shared_ptr<graphics::LipAnimation> doGet(std::string resRef);
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

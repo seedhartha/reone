@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/game/cursors.h"
+#include "reone/resource/cursors.h"
 
 #include "reone/graphics/cursor.h"
 #include "reone/graphics/texture.h"
@@ -24,14 +24,11 @@
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 
-
-using namespace reone::game;
 using namespace reone::graphics;
-using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
 static std::unordered_map<CursorType, std::pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::Default, {1, 2}},
@@ -65,7 +62,7 @@ std::shared_ptr<Cursor> Cursors::get(CursorType type) {
     std::shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
     textureDown->init();
 
-    auto cursor = std::make_shared<Cursor>(textureUp, textureDown, _graphicsContext, _meshes, _shaders, _textures, _uniforms, _window);
+    auto cursor = std::make_shared<Cursor>(textureUp, textureDown, _graphicsContext, _meshes, _shaders, _uniforms, _window);
     _cache.insert(std::make_pair(type, cursor));
 
     return cursor;
@@ -110,6 +107,6 @@ std::shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     return cur.texture();
 }
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

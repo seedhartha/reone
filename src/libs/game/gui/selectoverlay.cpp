@@ -20,15 +20,15 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
-#include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/fonts.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/textures.h"
 
 #include "reone/game/action/attackobject.h"
 #include "reone/game/action/usefeat.h"
@@ -70,14 +70,14 @@ SelectionOverlay::SelectionOverlay(
 }
 
 void SelectionOverlay::init() {
-    _font = _services.graphics.fonts.get("dialogfont16x16");
-    _friendlyReticle = _services.graphics.textures.get("friendlyreticle", TextureUsage::GUI);
-    _friendlyReticle2 = _services.graphics.textures.get("friendlyreticle2", TextureUsage::GUI);
-    _hostileReticle = _services.graphics.textures.get("hostilereticle", TextureUsage::GUI);
-    _hostileReticle2 = _services.graphics.textures.get("hostilereticle2", TextureUsage::GUI);
-    _friendlyScroll = _services.graphics.textures.get("lbl_miscroll_f", TextureUsage::GUI);
-    _hostileScroll = _services.graphics.textures.get("lbl_miscroll_h", TextureUsage::GUI);
-    _hilightedScroll = _services.graphics.textures.get("lbl_miscroll_hi", TextureUsage::GUI);
+    _font = _services.resource.fonts.get("dialogfont16x16");
+    _friendlyReticle = _services.resource.textures.get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = _services.resource.textures.get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = _services.resource.textures.get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = _services.resource.textures.get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = _services.resource.textures.get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = _services.resource.textures.get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = _services.resource.textures.get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 }
 
@@ -260,7 +260,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
-    _services.graphics.textures.bind(*texture);
+    _services.graphics.context.bind(*texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
     int width = texture->width();
@@ -359,7 +359,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _services.graphics.textures.bind(*frameTexture);
+    _services.graphics.context.bind(*frameTexture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -397,7 +397,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
     case ActionType::AttackObject:
-        texture = _services.graphics.textures.get(g_attackIcon, TextureUsage::GUI);
+        texture = _services.resource.textures.get(g_attackIcon, TextureUsage::GUI);
         break;
     case ActionType::UseFeat: {
         std::shared_ptr<Feat> feat(_services.game.feats.get(action.feat));
@@ -419,7 +419,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _services.graphics.textures.bind(*texture);
+    _services.graphics.context.bind(*texture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);

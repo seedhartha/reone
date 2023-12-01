@@ -23,12 +23,18 @@ namespace resource {
 
 class IAudioFiles;
 class IAudioPlayer;
+class ICursors;
+class IFonts;
 class IGffs;
+class ILips;
+class IModels;
 class IMovies;
 class IResources;
 class IScripts;
 class IStrings;
+class ITextures;
 class ITwoDas;
+class IWalkmeshes;
 
 struct ResourceServices {
     IGffs &gffs;
@@ -39,6 +45,12 @@ struct ResourceServices {
     IMovies &movies;
     IAudioFiles &files;
     IAudioPlayer &player;
+    ICursors &cursors;
+    IFonts &fonts;
+    ILips &lips;
+    IModels &models;
+    ITextures &textures;
+    IWalkmeshes &walkmeshes;
 
     ResourceServices(
         IGffs &gffs,
@@ -48,7 +60,13 @@ struct ResourceServices {
         IScripts &scripts,
         IMovies &movies,
         IAudioFiles &files,
-        IAudioPlayer &player) :
+        IAudioPlayer &player,
+        ICursors &cursors,
+        IFonts &fonts,
+        ILips &lips,
+        IModels &models,
+        ITextures &textures,
+        IWalkmeshes &walkmeshes) :
         gffs(gffs),
         resources(resources),
         strings(strings),
@@ -56,7 +74,13 @@ struct ResourceServices {
         scripts(scripts),
         movies(movies),
         files(files),
-        player(player) {
+        player(player),
+        cursors(cursors),
+        fonts(fonts),
+        lips(lips),
+        models(models),
+        textures(textures),
+        walkmeshes(walkmeshes) {
     }
 };
 

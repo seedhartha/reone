@@ -29,17 +29,18 @@
 #include "reone/game/script/runner.h"
 #include "reone/game/soundsets.h"
 #include "reone/game/surfaces.h"
+#include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/types.h"
@@ -141,7 +142,7 @@ void Creature::updateModel() {
     if (bodyModelName.empty()) {
         return;
     }
-    auto replacement = _services.graphics.models.get(bodyModelName);
+    auto replacement = _services.resource.models.get(bodyModelName);
     if (!replacement) {
         return;
     }
@@ -1050,7 +1051,7 @@ std::shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (modelName.empty()) {
         return nullptr;
     }
-    std::shared_ptr<Model> model(_services.graphics.models.get(modelName));
+    std::shared_ptr<Model> model(_services.resource.models.get(modelName));
     if (!model) {
         return nullptr;
     }
@@ -1069,14 +1070,14 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(_services.graphics.textures.defaultCubemapRGB().get());
+            body.setEnvironmentMap(_services.graphics.context.defaultCubemapRGB().get());
         } else {
-            body.setEnvironmentMap(_services.graphics.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
+            body.setEnvironmentMap(_services.resource.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
         }
     }
     std::string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        std::shared_ptr<Texture> texture(_services.graphics.textures.get(bodyTextureName, TextureUsage::Diffuse));
+        std::shared_ptr<Texture> texture(_services.resource.textures.get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             body.setDiffuseMap(texture.get());
         }
@@ -1087,14 +1088,14 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     std::shared_ptr<Model> maskModel;
     std::string maskModelName(getMaskModelName());
     if (!maskModelName.empty()) {
-        maskModel = _services.graphics.models.get(maskModelName);
+        maskModel = _services.resource.models.get(maskModelName);
     }
 
     // Head
 
     std::string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
-        std::shared_ptr<Model> headModel(_services.graphics.models.get(headModelName));
+        std::shared_ptr<Model> headModel(_services.resource.models.get(headModelName));
         if (headModel) {
             std::shared_ptr<ModelSceneNode> headSceneNode(sceneGraph.newModel(*headModel, ModelUsage::Creature));
             body.attach(g_headHookNode, *headSceneNode);
@@ -1109,7 +1110,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     std::string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
-        std::shared_ptr<Model> weaponModel(_services.graphics.models.get(rightWeaponModelName));
+        std::shared_ptr<Model> weaponModel(_services.resource.models.get(rightWeaponModelName));
         if (weaponModel) {
             std::shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(*weaponModel, ModelUsage::Equipment));
             body.attach(g_rightHandNode, *weaponSceneNode);
@@ -1120,7 +1121,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     std::string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
-        std::shared_ptr<Model> weaponModel(_services.graphics.models.get(leftWeaponModelName));
+        std::shared_ptr<Model> weaponModel(_services.resource.models.get(leftWeaponModelName));
         if (weaponModel) {
             std::shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(*weaponModel, ModelUsage::Equipment));
             body.attach(g_leftHandNode, *weaponSceneNode);
@@ -1187,7 +1188,7 @@ std::string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             std::string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            std::shared_ptr<Texture> texture(_services.graphics.textures.get(tmp, TextureUsage::Diffuse));
+            std::shared_ptr<Texture> texture(_services.resource.textures.get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = std::move(tmp);
                 texFound = true;

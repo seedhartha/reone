@@ -33,17 +33,17 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/walkmesh.h"
-#include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
+#include "reone/resource/walkmeshes.h"
 #include "reone/scene/collision.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
@@ -183,7 +183,7 @@ void Area::loadStealthXP(const resource::generated::ARE &are) {
 void Area::loadGrass(const resource::generated::ARE &are) {
     std::string texName(boost::to_lower_copy(are.Grass_TexName));
     if (!texName.empty()) {
-        _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.resource.textures.get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.Grass_Density;
     _grass.quadSize = are.Grass_QuadSize;
@@ -309,7 +309,7 @@ void Area::loadLYT() {
     }
     auto &sceneGraph = _services.scene.graphs.get(_sceneName);
     for (auto &lytRoom : layout->rooms) {
-        auto model = _services.graphics.models.get(lytRoom.name);
+        auto model = _services.resource.models.get(lytRoom.name);
         if (!model) {
             continue;
         }
@@ -327,7 +327,7 @@ void Area::loadLYT() {
 
         // Walkmesh
         std::shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResType::Wok);
+        auto walkmesh = _services.resource.walkmeshes.get(lytRoom.name, ResType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(*walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);

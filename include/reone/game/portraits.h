@@ -24,15 +24,15 @@ namespace reone {
 namespace resource {
 
 class TwoDas;
+class Textures;
 
 } // namespace resource
 
 namespace graphics {
 
 class Texture;
-class Textures;
 
-} // namespace graphics
+}
 
 namespace game {
 
@@ -40,7 +40,8 @@ class IPortraits {
 public:
     virtual ~IPortraits() = default;
 
-    virtual std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const = 0;;
+    virtual std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const = 0;
+    ;
     virtual std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const = 0;
 
     virtual const std::vector<Portrait> &portraits() const = 0;
@@ -48,7 +49,7 @@ public:
 
 class Portraits : public IPortraits, boost::noncopyable {
 public:
-    Portraits(graphics::Textures &textures, resource::TwoDas &twoDas) :
+    Portraits(resource::Textures &textures, resource::TwoDas &twoDas) :
         _textures(textures), _twoDas(twoDas) {
     }
 
@@ -60,7 +61,7 @@ public:
     const std::vector<Portrait> &portraits() const override { return _portraits; }
 
 private:
-    graphics::Textures &_textures;
+    resource::Textures &_textures;
     resource::TwoDas &_twoDas;
 
     std::vector<Portrait> _portraits;

@@ -87,6 +87,17 @@ enum class ResType : uint16_t {
     Invalid = 0xffff
 };
 
+enum class CursorType {
+    None,
+    Default,
+    Attack,
+    Door,
+    Talk,
+    Pickup,
+    DisableMine,
+    RecoverMine
+};
+
 using Visibility = std::multimap<std::string, std::string>;
 
 } // namespace resource

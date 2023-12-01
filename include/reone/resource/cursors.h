@@ -21,12 +21,6 @@
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace graphics {
 
 class IWindow;
@@ -36,18 +30,20 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
-class Textures;
 class Uniforms;
 
 } // namespace graphics
 
-namespace game {
+namespace resource {
+
+class Resources;
+class Textures;
 
 class ICursors {
 public:
     virtual ~ICursors() = default;
 
-    virtual std::shared_ptr<graphics::Cursor> get(game::CursorType type) = 0;
+    virtual std::shared_ptr<graphics::Cursor> get(CursorType type) = 0;
 };
 
 class Cursors : public ICursors, boost::noncopyable {
@@ -56,10 +52,10 @@ public:
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Textures &textures,
+        resource::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::IWindow &window,
-        resource::Resources &resources) :
+        Resources &resources) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
@@ -73,29 +69,29 @@ public:
 
     void deinit();
 
-    std::shared_ptr<graphics::Cursor> get(game::CursorType type) override;
+    std::shared_ptr<graphics::Cursor> get(CursorType type) override;
 
 private:
-    std::unordered_map<game::CursorType, std::shared_ptr<graphics::Cursor>> _cache;
+    std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
     // Services
 
     graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
+    resource::Textures &_textures;
     graphics::Uniforms &_uniforms;
     graphics::IWindow &_window;
-    resource::Resources &_resources;
+    Resources &_resources;
 
     // END Services
 
     std::shared_ptr<graphics::Texture> newTextureFromCursor(uint32_t name);
 
-    const std::pair<uint32_t, uint32_t> &getCursorGroupNames(game::CursorType type);
+    const std::pair<uint32_t, uint32_t> &getCursorGroupNames(CursorType type);
     std::vector<uint32_t> getCursorNamesFromCursorGroup(uint32_t name);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

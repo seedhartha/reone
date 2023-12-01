@@ -35,13 +35,13 @@ public:
         IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         Control(
             gui,
             ControlType::ScrollBar,
             sceneGraphs,
             graphicsSvc,
-            strings) {
+            resourceSvc) {
     }
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;

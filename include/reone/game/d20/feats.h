@@ -27,14 +27,9 @@ namespace resource {
 
 class Strings;
 class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
 class Textures;
 
-}
+} // namespace resource
 
 namespace game {
 
@@ -50,7 +45,7 @@ public:
 class Feats : public IFeats, boost::noncopyable {
 public:
     Feats(
-        graphics::Textures &textures,
+        resource::Textures &textures,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
         _textures(textures),
@@ -67,7 +62,7 @@ private:
 
     // Services
 
-    graphics::Textures &_textures;
+    resource::Textures &_textures;
     resource::Strings &_strings;
     resource::TwoDas &_twoDas;
 

@@ -26,10 +26,10 @@
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
+#include "reone/resource/models.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
@@ -202,7 +202,7 @@ std::shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.resource.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *character->sceneNode());
 
     return model;

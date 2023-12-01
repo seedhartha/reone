@@ -23,7 +23,6 @@
 #include "reone/system/exception/notimplemented.h"
 
 #include "reone/game/camerastyles.h"
-#include "reone/game/cursors.h"
 #include "reone/game/d20/classes.h"
 #include "reone/game/d20/feats.h"
 #include "reone/game/d20/skills.h"
@@ -41,6 +40,7 @@
 #include "reone/game/surfaces.h"
 #include "reone/game/types.h"
 #include "reone/game/visibilities.h"
+#include "reone/resource/cursors.h"
 
 namespace reone {
 
@@ -56,11 +56,6 @@ class MockClasses : public IClasses, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<CreatureClass>, get, (ClassType key), (override));
-};
-
-class MockCursors : public ICursors, boost::noncopyable {
-public:
-    MOCK_METHOD(std::shared_ptr<graphics::Cursor>, get, (game::CursorType type), (override));
 };
 
 class MockDialogs : public IDialogs, boost::noncopyable {
@@ -150,7 +145,7 @@ public:
 class MockVisiblities : public IVisibilities, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
+    MOCK_METHOD(std::shared_ptr<resource::Visibility>, get, (const std::string &key), (override));
 };
 
 class TestGameModule : boost::noncopyable {
@@ -158,7 +153,6 @@ public:
     void init() {
         _cameraStyles = std::make_unique<MockCameraStyles>();
         _classes = std::make_unique<MockClasses>();
-        _cursors = std::make_unique<MockCursors>();
         _dialogs = std::make_unique<MockDialogs>();
         _feats = std::make_unique<MockFeats>();
         _footstepSounds = std::make_unique<MockFootstepSounds>();
@@ -177,7 +171,6 @@ public:
         _services = std::make_unique<GameServices>(
             *_cameraStyles,
             *_classes,
-            *_cursors,
             *_dialogs,
             *_feats,
             *_footstepSounds,
@@ -205,7 +198,6 @@ public:
 private:
     std::unique_ptr<MockCameraStyles> _cameraStyles;
     std::unique_ptr<MockClasses> _classes;
-    std::unique_ptr<MockCursors> _cursors;
     std::unique_ptr<MockDialogs> _dialogs;
     std::unique_ptr<MockFeats> _feats;
     std::unique_ptr<MockFootstepSounds> _footstepSounds;

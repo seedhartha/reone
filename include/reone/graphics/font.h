@@ -27,7 +27,6 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
-class Textures;
 class Uniforms;
 
 class Font {
@@ -36,12 +35,10 @@ public:
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
-        Textures &textures,
         Uniforms &uniforms) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures),
         _uniforms(uniforms) {
     }
 
@@ -73,7 +70,6 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
-    Textures &_textures;
     Uniforms &_uniforms;
 
     // END Services

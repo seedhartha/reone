@@ -20,11 +20,11 @@
 #include "reone/audio/di/services.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/lips.h"
-#include "reone/graphics/models.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/audio/files.h"
 #include "reone/resource/audio/player.h"
+#include "reone/resource/lips.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 
@@ -77,7 +77,7 @@ void Conversation::loadConversationBackground() {
 
 void Conversation::loadCameraModel() {
     std::string modelResRef(_dialog->cameraModel);
-    _cameraModel = modelResRef.empty() ? nullptr : _services.graphics.models.get(modelResRef);
+    _cameraModel = modelResRef.empty() ? nullptr : _services.resource.models.get(modelResRef);
 }
 
 void Conversation::onStart() {
@@ -164,14 +164,14 @@ void Conversation::loadVoiceOver() {
     std::string voiceResRef;
     if (!_currentEntry->sound.empty()) {
         voiceResRef = _currentEntry->sound;
-        _lipAnimation = _services.graphics.lips.get(_currentEntry->sound);
+        _lipAnimation = _services.resource.lips.get(_currentEntry->sound);
     }
     if (!_currentEntry->voResRef.empty()) {
         if (voiceResRef.empty()) {
             voiceResRef = _currentEntry->voResRef;
         }
         if (!_lipAnimation) {
-            _lipAnimation = _services.graphics.lips.get(_currentEntry->voResRef);
+            _lipAnimation = _services.resource.lips.get(_currentEntry->voResRef);
         }
     }
     if (!voiceResRef.empty()) {

@@ -19,13 +19,13 @@
 
 #include "reone/audio/source.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
 #include "reone/gui/control/panel.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/audio/files.h"
 #include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/models.h"
 #include "reone/scene/types.h"
 #include "reone/script/execution.h"
 #include "reone/system/logutil.h"
@@ -163,7 +163,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            std::shared_ptr<Model> model(_services.graphics.models.get(stunt.stuntModel));
+            std::shared_ptr<Model> model(_services.resource.models.get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;

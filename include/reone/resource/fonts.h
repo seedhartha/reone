@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "font.h"
+#include "reone/graphics/font.h"
 
 namespace reone {
 
@@ -26,8 +26,13 @@ namespace graphics {
 class GraphicsContext;
 class Meshes;
 class Shaders;
-class Textures;
 class Uniforms;
+
+} // namespace graphics
+
+namespace resource {
+
+class Textures;
 
 class IFonts {
 public:
@@ -35,17 +40,17 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Font> get(const std::string &key) = 0;
+    virtual std::shared_ptr<graphics::Font> get(const std::string &key) = 0;
 };
 
 class Fonts : public IFonts {
 public:
     Fonts(
-        GraphicsContext &graphicsContext,
-        Meshes &meshes,
-        Shaders &shaders,
+        graphics::GraphicsContext &graphicsContext,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
         Textures &textures,
-        Uniforms &uniforms) :
+        graphics::Uniforms &uniforms) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
@@ -57,7 +62,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<Font> get(const std::string &key) override {
+    std::shared_ptr<graphics::Font> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -67,21 +72,21 @@ public:
     }
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<Font>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<graphics::Font>> _objects;
 
     // Services
 
-    GraphicsContext &_graphicsContext;
-    Meshes &_meshes;
-    Shaders &_shaders;
+    graphics::GraphicsContext &_graphicsContext;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
     Textures &_textures;
-    Uniforms &_uniforms;
+    graphics::Uniforms &_uniforms;
 
     // END Services
 
-    std::shared_ptr<Font> doGet(std::string resRef);
+    std::shared_ptr<graphics::Font> doGet(std::string resRef);
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

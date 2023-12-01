@@ -25,31 +25,20 @@ void GraphicsModule::init() {
     _window = newWindow();
     _context = std::make_unique<GraphicsContext>(_options);
     _meshes = std::make_unique<Meshes>();
-    _textures = std::make_unique<Textures>(_options, _resource.resources());
-    _models = std::make_unique<Models>(*_textures, _resource.resources());
-    _walkmeshes = std::make_unique<Walkmeshes>(_resource.resources());
-    _lips = std::make_unique<Lips>(_resource.resources());
     _uniforms = std::make_unique<Uniforms>();
     _shaders = std::make_unique<Shaders>(_options);
-    _fonts = std::make_unique<Fonts>(*_context, *_meshes, *_shaders, *_textures, *_uniforms);
-    _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaders, *_textures, *_uniforms);
+    _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaders, *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(
-        *_fonts,
         *_context,
-        *_lips,
         *_meshes,
-        *_models,
         *_pipeline,
         *_shaders,
-        *_textures,
         *_uniforms,
-        *_walkmeshes,
         *_window);
 
     _context->init();
     _meshes->init();
-    _textures->init();
     _uniforms->init();
     _shaders->init();
     _pipeline->init();
@@ -61,7 +50,6 @@ void GraphicsModule::deinit() {
     _pipeline.reset();
     _shaders.reset();
     _uniforms.reset();
-    _textures.reset();
     _meshes.reset();
     _context.reset();
     _window.reset();

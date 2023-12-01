@@ -20,9 +20,9 @@
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/models.h"
+#include "reone/resource/textures.h"
 #include "reone/system/logutil.h"
 
 using namespace reone::graphics;

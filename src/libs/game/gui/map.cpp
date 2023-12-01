@@ -23,10 +23,10 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
+#include "reone/resource/textures.h"
 #include "reone/system/logutil.h"
 
 using namespace reone::graphics;
@@ -65,13 +65,13 @@ void Map::loadProperties(const resource::generated::ARE_Map &map) {
 
 void Map::loadTextures(const std::string &area) {
     std::string resRef("lbl_map" + area);
-    _areaTexture = _services.graphics.textures.get(resRef, TextureUsage::GUI);
+    _areaTexture = _services.resource.textures.get(resRef, TextureUsage::GUI);
 
     if (!_arrowTexture) {
-        _arrowTexture = _services.graphics.textures.get(_arrowResRef, TextureUsage::GUI);
+        _arrowTexture = _services.resource.textures.get(_arrowResRef, TextureUsage::GUI);
     }
     if (!_noteTexture) {
-        _noteTexture = _services.graphics.textures.get("whitetarget", TextureUsage::GUI);
+        _noteTexture = _services.resource.textures.get("whitetarget", TextureUsage::GUI);
     }
 }
 
@@ -92,7 +92,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         if (!partyLeader) {
             return;
         }
-        _services.graphics.textures.bind(*_areaTexture);
+        _services.graphics.context.bind(*_areaTexture);
 
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
@@ -119,7 +119,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         });
 
     } else {
-        _services.graphics.textures.bind(*_areaTexture);
+        _services.graphics.context.bind(*_areaTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
@@ -139,7 +139,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) {
         return;
     }
-    _services.graphics.textures.bind(*_noteTexture);
+    _services.graphics.context.bind(*_noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = std::static_pointer_cast<Waypoint>(object);
@@ -207,7 +207,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     if (!partyLeader) {
         return;
     }
-    _services.graphics.textures.bind(*_arrowTexture);
+    _services.graphics.context.bind(*_arrowTexture);
 
     glm::vec3 arrowPos(0.0f);
 

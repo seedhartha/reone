@@ -30,6 +30,7 @@
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/format/wavreader.h"
 #include "reone/resource/talktable.h"
+#include "reone/resource/textures.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
@@ -47,7 +48,6 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
-
 
 #include "../di/graphicsmodule.h"
 
@@ -287,7 +287,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
         }
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlMdxReader(data, mdx, _graphicsModule->models(), _graphicsModule->textures());
+        auto reader = MdlMdxReader(data, mdx, _resourceModule->models(), _resourceModule->textures());
         reader.load();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);
@@ -449,9 +449,9 @@ void MainViewModel::loadEngine() {
     _graphicsOpt.sharpen = false;
 
     _systemModule = std::make_unique<SystemModule>();
-    _resourceModule = std::make_unique<ResourceModule>(_gamePath, _audioOpt);
-    _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
+    _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>();
+    _resourceModule = std::make_unique<ResourceModule>(_gamePath, _graphicsOpt, _audioOpt, *_graphicsModule);
     _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule);
 
     _systemModule->init();
@@ -687,7 +687,7 @@ void MainViewModel::render3D(int w, int h) {
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
         _graphicsModule->shaders().use(ShaderProgramId::SimpleTexture);
-        _graphicsModule->textures().bind(*output);
+        _graphicsModule->context().bind(*output);
         _graphicsModule->meshes().quadNDC().draw();
     });
 }

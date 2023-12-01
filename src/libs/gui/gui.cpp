@@ -22,7 +22,6 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/control/button.h"
@@ -40,8 +39,8 @@
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/template/generated/gui.h"
+#include "reone/resource/textures.h"
 #include "reone/system/logutil.h"
-
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -241,7 +240,7 @@ void GUI::draw() {
 }
 
 void GUI::drawBackground() {
-    _graphicsSvc.textures.bind(*_background);
+    _graphicsSvc.context.bind(*_background);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
@@ -281,31 +280,31 @@ std::unique_ptr<Control> GUI::newControl(
     std::unique_ptr<Control> control;
     switch (type) {
     case ControlType::Panel:
-        control = std::make_unique<Panel>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Panel>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::Label:
-        control = std::make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Label>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::ImageButton:
-        control = std::make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ImageButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::Button:
-        control = std::make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Button>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::ToggleButton:
-        control = std::make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ToggleButton>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::Slider:
-        control = std::make_unique<Slider>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<Slider>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::ScrollBar:
-        control = std::make_unique<ScrollBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ScrollBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::ProgressBar:
-        control = std::make_unique<ProgressBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ProgressBar>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     case ControlType::ListBox:
-        control = std::make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc.strings);
+        control = std::make_unique<ListBox>(*this, _sceneGraphs, _graphicsSvc, _resourceSvc);
         break;
     default:
         debug("Unsupported control type: " + std::to_string(static_cast<int>(type)), LogChannel::GUI);

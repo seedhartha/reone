@@ -24,6 +24,7 @@
 #include "reone/system/stringbuilder.h"
 
 #include "../../fixtures/graphics.h"
+#include "../../fixtures/resource.h"
 
 using namespace reone;
 using namespace reone::graphics;

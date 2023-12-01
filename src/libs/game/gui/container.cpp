@@ -17,9 +17,9 @@
 
 #include "reone/game/gui/container.h"
 
-#include "reone/graphics/textures.h"
 #include "reone/gui/control/imagebutton.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
@@ -100,7 +100,7 @@ std::shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const 
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
+    return _services.resource.textures.get(resRef, TextureUsage::GUI);
 }
 
 void ContainerGUI::transferItemsToPlayer() {

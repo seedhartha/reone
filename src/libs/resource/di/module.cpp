@@ -17,6 +17,8 @@
 
 #include "reone/resource/di/module.h"
 
+#include "reone/graphics/di/module.h"
+
 namespace reone {
 
 namespace resource {
@@ -28,10 +30,29 @@ void ResourceModule::init() {
     _gffs = std::make_unique<Gffs>(*_resources);
     _scripts = std::make_unique<Scripts>(*_resources);
     _files = std::make_unique<AudioFiles>(*_resources);
-    _player = std::make_unique<AudioPlayer>(_audioOpts, *_files);
-    _movies = std::make_unique<Movies>(_gamePath, *_player);
+    _player = std::make_unique<AudioPlayer>(_audioOpt, *_files);
+    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), *_player);
+    _textures = std::make_unique<Textures>(_graphicsOpt, *_resources);
+    _models = std::make_unique<Models>(*_textures, *_resources);
+    _walkmeshes = std::make_unique<Walkmeshes>(*_resources);
+    _lips = std::make_unique<Lips>(*_resources);
+    _fonts = std::make_unique<Fonts>(
+        _graphics.context(),
+        _graphics.meshes(),
+        _graphics.shaders(),
+        *_textures,
+        _graphics.uniforms());
+    _cursors = std::make_unique<Cursors>(
+        _graphics.context(),
+        _graphics.meshes(),
+        _graphics.shaders(),
+        *_textures,
+        _graphics.uniforms(),
+        _graphics.window(),
+        *_resources);
 
     _strings->init(_gamePath);
+    _textures->init();
 
     _services = std::make_unique<ResourceServices>(
         *_gffs,
@@ -41,12 +62,20 @@ void ResourceModule::init() {
         *_scripts,
         *_movies,
         *_files,
-        *_player);
+        *_player,
+        *_cursors,
+        *_fonts,
+        *_lips,
+        *_models,
+        *_textures,
+        *_walkmeshes);
 }
 
 void ResourceModule::deinit() {
     _services.reset();
 
+    _cursors.reset();
+    _textures.reset();
     _player.reset();
     _files.reset();
     _movies.reset();

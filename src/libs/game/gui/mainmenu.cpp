@@ -18,14 +18,13 @@
 #include "reone/game/gui/mainmenu.h"
 
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/resource/audio/player.h"
+#include "reone/resource/models.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
-
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
@@ -146,7 +145,7 @@ void MainMenu::setup3DView() {
 }
 
 std::shared_ptr<ModelSceneNode> MainMenu::getKotorModel(ISceneGraph &sceneGraph) {
-    auto model = _services.graphics.models.get("mainmenu");
+    auto model = _services.resource.models.get("mainmenu");
     if (!model) {
         return nullptr;
     }

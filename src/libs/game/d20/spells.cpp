@@ -17,10 +17,11 @@
 
 #include "reone/game/d20/spells.h"
 
-#include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
+
 
 using namespace reone::graphics;
 using namespace reone::resource;

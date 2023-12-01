@@ -17,15 +17,17 @@
 
 #include "reone/gui/control/imagebutton.h"
 
-#include "reone/graphics/fonts.h"
+#include "reone/graphics/context.h"
+#include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/fonts.h"
+#include "reone/resource/textures.h"
 
 #include "reone/gui/gui.h"
 
@@ -40,7 +42,7 @@ static const char kIconFontResRef[] = "dialogfont10x10a";
 
 void ImageButton::load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) {
     Control::load(gui, protoItem);
-    _iconFont = _graphicsSvc.fonts.get(kIconFontResRef);
+    _iconFont = _resourceSvc.fonts.get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -88,7 +90,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _graphicsSvc.textures.bind(*iconFrame);
+        _graphicsSvc.context.bind(*iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
@@ -109,7 +111,7 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _graphicsSvc.textures.bind(*iconTexture);
+        _graphicsSvc.context.bind(*iconTexture);
 
         _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2023 The reone project contributors
  *
@@ -15,48 +16,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/lips.h"
 
-#include "types.h"
+#include "reone/resource/format/lipreader.h"
+#include "reone/resource/resources.h"
+#include "reone/system/stream/memoryinput.h"
+
+using namespace reone::graphics;
 
 namespace reone {
 
 namespace resource {
 
-class Resources;
-
+std::shared_ptr<LipAnimation> Lips::doGet(std::string resRef) {
+    auto res = _resources.find(ResourceId(resRef, ResType::Lip));
+    if (!res) {
+        return nullptr;
+    }
+    auto stream = MemoryInputStream(res->data);
+    auto reader = LipReader(stream, resRef);
+    reader.load();
+    return reader.animation();
 }
 
-namespace graphics {
-
-class Model;
-class Textures;
-
-class IModels {
-public:
-    virtual ~IModels() {
-    }
-
-    virtual std::shared_ptr<Model> get(const std::string &resRef) = 0;
-};
-
-class Models : public IModels, boost::noncopyable {
-public:
-    Models(Textures &textures, resource::Resources &resources);
-
-    void clear();
-
-    std::shared_ptr<Model> get(const std::string &resRef) override;
-
-private:
-    Textures &_textures;
-    resource::Resources &_resources;
-
-    std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
-
-    std::shared_ptr<Model> doGet(const std::string &resRef);
-};
-
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

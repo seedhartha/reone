@@ -24,7 +24,6 @@
 #include "reone/script/di/module.h"
 
 #include "../camerastyles.h"
-#include "../cursors.h"
 #include "../d20/classes.h"
 #include "../d20/feats.h"
 #include "../d20/skills.h"
@@ -87,7 +86,6 @@ private:
 
     std::unique_ptr<CameraStyles> _cameraStyles;
     std::unique_ptr<Classes> _classes;
-    std::unique_ptr<Cursors> _cursors;
     std::unique_ptr<Dialogs> _dialogs;
     std::unique_ptr<Feats> _feats;
     std::unique_ptr<FootstepSounds> _footstepSounds;

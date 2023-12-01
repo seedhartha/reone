@@ -71,7 +71,6 @@ set(GAME_HEADERS
     ${GAME_INCLUDE_DIR}/character.h
     ${GAME_INCLUDE_DIR}/combat.h
     ${GAME_INCLUDE_DIR}/contextaction.h
-    ${GAME_INCLUDE_DIR}/cursors.h
     ${GAME_INCLUDE_DIR}/d20/attributes.h
     ${GAME_INCLUDE_DIR}/d20/class.h
     ${GAME_INCLUDE_DIR}/d20/classes.h
@@ -370,7 +369,6 @@ set(GAME_SOURCES
     ${GAME_SOURCE_DIR}/animationutil.cpp
     ${GAME_SOURCE_DIR}/camerastyles.cpp
     ${GAME_SOURCE_DIR}/combat.cpp
-    ${GAME_SOURCE_DIR}/cursors.cpp
     ${GAME_SOURCE_DIR}/d20/attributes.cpp
     ${GAME_SOURCE_DIR}/d20/class.cpp
     ${GAME_SOURCE_DIR}/d20/classes.cpp

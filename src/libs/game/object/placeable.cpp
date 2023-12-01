@@ -21,14 +21,14 @@
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/walkmeshes.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
@@ -59,7 +59,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<TwoDa> placeables(_services.resource.twoDas.get("placeables"));
     std::string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = _services.graphics.models.get(modelName);
+    auto model = _services.resource.models.get(modelName);
     if (!model) {
         return;
     }
@@ -71,7 +71,7 @@ void Placeable::loadFromBlueprint(const std::string &resRef) {
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = std::move(sceneNode);
 
-    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResType::Pwk);
+    auto walkmesh = _services.resource.walkmeshes.get(modelName, ResType::Pwk);
     if (walkmesh) {
         _walkmesh = sceneGraph.newWalkmesh(*walkmesh);
     }

@@ -60,17 +60,6 @@ enum class BackgroundType {
     Computer1
 };
 
-enum class CursorType {
-    None,
-    Default,
-    Attack,
-    Door,
-    Talk,
-    Pickup,
-    DisableMine,
-    RecoverMine
-};
-
 enum class WeaponType {
     None = 0,
     Melee = 1,

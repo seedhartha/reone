@@ -20,7 +20,6 @@
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
 #include "reone/game/combat.h"
-#include "reone/game/cursors.h"
 #include "reone/game/debug.h"
 #include "reone/game/di/services.h"
 #include "reone/game/dialogs.h"
@@ -32,21 +31,18 @@
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/lips.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/models.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/audio/files.h"
 #include "reone/resource/audio/player.h"
+#include "reone/resource/cursors.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
@@ -56,9 +52,13 @@
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/format/tgawriter.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/lips.h"
+#include "reone/resource/models.h"
 #include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
+#include "reone/resource/textures.h"
+#include "reone/resource/walkmeshes.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/script/di/services.h"
@@ -67,7 +67,6 @@
 #include "reone/system/di/services.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
-
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -331,7 +330,7 @@ void Game::setCursorType(CursorType type) {
         _cursor.reset();
         _services.graphics.window.showCursor(true);
     } else {
-        _cursor = _services.game.cursors.get(type);
+        _cursor = _services.resource.cursors.get(type);
         _services.graphics.window.showCursor(false);
     }
     _cursorType = type;
@@ -371,7 +370,7 @@ void Game::drawWorld() {
         general.resetLocals();
     });
     _services.graphics.shaders.use(ShaderProgramId::SimpleTexture);
-    _services.graphics.textures.bind(*output);
+    _services.graphics.context.bind(*output);
     _services.graphics.meshes.quadNDC().draw();
 }
 

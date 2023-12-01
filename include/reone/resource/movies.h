@@ -37,8 +37,11 @@ public:
 
 class Movies : public IMovies, boost::noncopyable {
 public:
-    Movies(std::filesystem::path gamePath, IAudioPlayer &audioPlayer) :
+    Movies(std::filesystem::path gamePath,
+           graphics::GraphicsServices &graphicsSvc,
+           IAudioPlayer &audioPlayer) :
         _gamePath(gamePath),
+        _graphicsSvc(graphicsSvc),
         _audioPlayer(audioPlayer) {
     }
 
@@ -55,19 +58,10 @@ public:
         return _objects.insert(make_pair(name, std::move(object))).first->second;
     }
 
-    // TODO: remove once graphics and audio libs migrated
-
-    void setGraphicsServices(graphics::GraphicsServices &graphics) {
-        _graphicsSvc = &graphics;
-    }
-
-    // END TODO
-
 private:
     std::filesystem::path _gamePath;
+    graphics::GraphicsServices &_graphicsSvc;
     IAudioPlayer &_audioPlayer;
-
-    graphics::GraphicsServices *_graphicsSvc {nullptr};
 
     std::unordered_map<std::string, std::shared_ptr<movie::IMovie>> _objects;
 

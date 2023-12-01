@@ -18,15 +18,15 @@
 #include "reone/game/object/door.h"
 
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/walkmeshes.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/walkmeshes.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
@@ -66,7 +66,7 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     std::shared_ptr<TwoDa> doors(_services.resource.twoDas.get("genericdoors"));
     std::string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _services.graphics.models.get(modelName);
+    auto model = _services.resource.models.get(modelName);
     if (!model) {
         return;
     }
@@ -78,20 +78,20 @@ void Door::loadFromBlueprint(const std::string &resRef) {
     // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = std::move(modelSceneNode);
 
-    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResType::Dwk);
+    auto walkmeshClosed = _services.resource.walkmeshes.get(modelName + "0", ResType::Dwk);
     if (walkmeshClosed) {
         _walkmeshClosed = sceneGraph.newWalkmesh(*walkmeshClosed);
         _walkmeshClosed->setUser(*this);
     }
 
-    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResType::Dwk);
+    auto walkmeshOpen1 = _services.resource.walkmeshes.get(modelName + "1", ResType::Dwk);
     if (walkmeshOpen1) {
         _walkmeshOpen1 = sceneGraph.newWalkmesh(*walkmeshOpen1);
         _walkmeshOpen1->setUser(*this);
         _walkmeshOpen1->setEnabled(false);
     }
 
-    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResType::Dwk);
+    auto walkmeshOpen2 = _services.resource.walkmeshes.get(modelName + "2", ResType::Dwk);
     if (walkmeshOpen2) {
         _walkmeshOpen2 = sceneGraph.newWalkmesh(*walkmeshOpen2);
         _walkmeshOpen2->setUser(*this);

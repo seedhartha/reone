@@ -22,11 +22,11 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/sounds.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/textures.h"
 #include "reone/gui/guis.h"
 #include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/di/services.h"
 
 using namespace reone::audio;
@@ -139,7 +139,7 @@ void GameGUI::loadBackground(BackgroundType type) {
     }
 
     if (_gui) {
-        _gui->setBackground(_services.graphics.textures.get(resRef, TextureUsage::Diffuse));
+        _gui->setBackground(_services.resource.textures.get(resRef, TextureUsage::Diffuse));
     }
 }
 

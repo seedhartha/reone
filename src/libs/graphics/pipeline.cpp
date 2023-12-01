@@ -25,7 +25,6 @@
 #include "reone/graphics/scene.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -33,7 +32,6 @@
 #include "reone/scene/node/light.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"
-
 
 #define R_GAUSSIAN_BLUR_HORIZONTAL false
 #define R_GAUSSIAN_BLUR_VERTICAL true
@@ -508,8 +506,8 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _shaders.use(ShaderProgramId::SSAO);
-    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
-    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -538,11 +536,11 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _shaders.use(ShaderProgramId::SSR);
-    _textures.bind(*attachments.cbGBufferDiffuse);
-    _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
-    _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
-    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _graphicsContext.bind(*attachments.cbGBufferDiffuse);
+    _graphicsContext.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
+    _graphicsContext.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -577,20 +575,20 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);
     _shaders.use(ShaderProgramId::CombineOpaque);
-    _textures.bind(*attachments.cbGBufferDiffuse);
-    _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
-    _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _textures.bind(*attachments.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
-    _textures.bind(*attachments.cbGBufferFeatures, TextureUnits::features);
-    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
-    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _textures.bind(_options.ssao ? *attachments.cbSSAO : *_textures.ssaoRGB(), TextureUnits::ssao);
-    _textures.bind(_options.ssr ? *attachments.cbSSR : *_textures.ssrRGBA(), TextureUnits::ssr);
+    _graphicsContext.bind(*attachments.cbGBufferDiffuse);
+    _graphicsContext.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
+    _graphicsContext.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _graphicsContext.bind(*attachments.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
+    _graphicsContext.bind(*attachments.cbGBufferFeatures, TextureUnits::features);
+    _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _graphicsContext.bind(_options.ssao ? *attachments.cbSSAO : *_graphicsContext.ssaoRGB(), TextureUnits::ssao);
+    _graphicsContext.bind(_options.ssr ? *attachments.cbSSR : *_graphicsContext.ssrRGBA(), TextureUnits::ssr);
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {
-            _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
+            _graphicsContext.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
         } else {
-            _textures.bind(*attachments.dbPointLightShadows, TextureUnits::shadowMapCube);
+            _graphicsContext.bind(*attachments.dbPointLightShadows, TextureUnits::shadowMapCube);
         }
     }
     _graphicsContext.clearColorDepth();
@@ -605,10 +603,10 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(ShaderProgramId::CombineGeometry);
-    _textures.bind(*attachments.cbOpaqueGeometry1);
-    _textures.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
-    _textures.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
-    _textures.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
+    _graphicsContext.bind(*attachments.cbOpaqueGeometry1);
+    _graphicsContext.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
+    _graphicsContext.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
+    _graphicsContext.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -621,7 +619,7 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(ShaderProgramId::BoxBlur4);
-    _textures.bind(srcTexture);
+    _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -636,7 +634,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(strong ? ShaderProgramId::GaussianBlur13 : ShaderProgramId::GaussianBlur9);
-    _textures.bind(srcTexture);
+    _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -649,7 +647,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(strong ? ShaderProgramId::MedianFilter5 : ShaderProgramId::MedianFilter3);
-    _textures.bind(srcTexture);
+    _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -663,7 +661,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(ShaderProgramId::FXAA);
-    _textures.bind(srcTexture);
+    _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -678,7 +676,7 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(ShaderProgramId::Sharpen);
-    _textures.bind(srcTexture);
+    _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }

@@ -23,11 +23,11 @@
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/textures.h"
 
 #include "reone/gui/gui.h"
 
@@ -44,11 +44,11 @@ void ScrollBar::load(const resource::generated::GUI_BASECONTROL &gui, bool proto
     auto &scrollbarStruct = *static_cast<const resource::generated::GUI_CONTROLS_SCROLLBAR *>(&gui);
     if (scrollbarStruct.DIR) {
         auto &dirImage = scrollbarStruct.DIR->IMAGE;
-        _dir.image = _graphicsSvc.textures.get(dirImage, TextureUsage::GUI);
+        _dir.image = _resourceSvc.textures.get(dirImage, TextureUsage::GUI);
     }
     if (scrollbarStruct.THUMB) {
         auto &thumbImage = scrollbarStruct.THUMB->IMAGE;
-        _thumb.image = _graphicsSvc.textures.get(thumbImage, TextureUsage::GUI);
+        _thumb.image = _resourceSvc.textures.get(thumbImage, TextureUsage::GUI);
     }
 }
 
@@ -63,7 +63,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     }
 
     _graphicsSvc.shaders.use(ShaderProgramId::GUI);
-    _graphicsSvc.textures.bind(*_thumb.image);
+    _graphicsSvc.context.bind(*_thumb.image);
 
     // Top edge
     _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
@@ -115,7 +115,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _graphicsSvc.textures.bind(*_dir.image);
+    _graphicsSvc.context.bind(*_dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);

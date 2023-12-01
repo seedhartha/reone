@@ -22,13 +22,19 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/audio/files.h"
 #include "reone/resource/audio/player.h"
+#include "reone/resource/cursors.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/fonts.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/lips.h"
+#include "reone/resource/models.h"
 #include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
+#include "reone/resource/walkmeshes.h"
 
 namespace reone {
 
@@ -100,6 +106,41 @@ public:
     MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
 };
 
+class MockCursors : public ICursors, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<graphics::Cursor>, get, (resource::CursorType type), (override));
+};
+
+class MockFonts : public IFonts, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<graphics::Font>, get, (const std::string &key), (override));
+};
+
+class MockLips : public ILips, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<graphics::LipAnimation>, get, (const std::string &key), (override));
+};
+
+class MockModels : public IModels, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<graphics::Model>, get, (const std::string &resRef), (override));
+};
+
+class MockTextures : public ITextures, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+
+    MOCK_METHOD(std::shared_ptr<graphics::Texture>, get, (const std::string &resRef, graphics::TextureUsage usage), (override));
+};
+
+class MockWalkmeshes : public IWalkmeshes, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<graphics::Walkmesh>, get, (const std::string &resRef, ResType type), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -111,6 +152,12 @@ public:
         _movies = std::make_unique<MockMovies>();
         _files = std::make_unique<MockAudioFiles>();
         _player = std::make_unique<MockAudioPlayer>();
+        _cursors = std::make_unique<MockCursors>();
+        _fonts = std::make_unique<MockFonts>();
+        _lips = std::make_unique<MockLips>();
+        _models = std::make_unique<MockModels>();
+        _textures = std::make_unique<MockTextures>();
+        _walkmeshes = std::make_unique<MockWalkmeshes>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
@@ -120,7 +167,13 @@ public:
             *_scripts,
             *_movies,
             *_files,
-            *_player);
+            *_player,
+            *_cursors,
+            *_fonts,
+            *_lips,
+            *_models,
+            *_textures,
+            *_walkmeshes);
     }
 
     MockGffs &gffs() {
@@ -160,6 +213,12 @@ private:
     std::unique_ptr<MockMovies> _movies;
     std::unique_ptr<MockAudioFiles> _files;
     std::unique_ptr<MockAudioPlayer> _player;
+    std::unique_ptr<MockCursors> _cursors;
+    std::unique_ptr<MockFonts> _fonts;
+    std::unique_ptr<MockLips> _lips;
+    std::unique_ptr<MockModels> _models;
+    std::unique_ptr<MockTextures> _textures;
+    std::unique_ptr<MockWalkmeshes> _walkmeshes;
 
     std::unique_ptr<ResourceServices> _services;
 };

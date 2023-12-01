@@ -23,17 +23,16 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/system/logutil.h"
-#include "reone/system/randomutil.h"
-
+#include "reone/resource/di/services.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/graph.h"
-
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/model.h"
+#include "reone/system/logutil.h"
+#include "reone/system/randomutil.h"
 
 using namespace reone::graphics;
 
@@ -70,12 +69,12 @@ void MeshSceneNode::refreshAdditionalTextures() {
     }
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.envmapTexture, TextureUsage::EnvironmentMap).get();
+        _nodeTextures.envmap = _resourceSvc.textures.get(features.envmapTexture, TextureUsage::EnvironmentMap).get();
     } else if (!features.bumpyShinyTexture.empty()) {
-        _nodeTextures.envmap = _graphicsSvc.textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap).get();
+        _nodeTextures.envmap = _resourceSvc.textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap).get();
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _graphicsSvc.textures.get(features.bumpmapTexture, TextureUsage::BumpMap).get();
+        _nodeTextures.bumpmap = _resourceSvc.textures.get(features.bumpmapTexture, TextureUsage::BumpMap).get();
     }
 }
 
@@ -185,7 +184,7 @@ void MeshSceneNode::draw() {
         general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
         general.alpha = _alpha;
 
-        _graphicsSvc.textures.bind(*_nodeTextures.diffuse);
+        _graphicsSvc.context.bind(*_nodeTextures.diffuse);
         switch (_nodeTextures.diffuse->features().blending) {
         case Texture::Blending::PunchThrough:
             general.featureMask |= UniformsFeatureFlags::hashedalphatest;
@@ -206,15 +205,15 @@ void MeshSceneNode::draw() {
 
         if (_nodeTextures.lightmap) {
             general.featureMask |= UniformsFeatureFlags::lightmap;
-            _graphicsSvc.textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
+            _graphicsSvc.context.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
         }
         if (_nodeTextures.envmap) {
             general.featureMask |= UniformsFeatureFlags::envmap;
             if (_nodeTextures.envmap->isCubemap()) {
                 general.featureMask |= UniformsFeatureFlags::envmapcube;
-                _graphicsSvc.textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
+                _graphicsSvc.context.bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
             } else {
-                _graphicsSvc.textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
+                _graphicsSvc.context.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
             }
         }
         if (_nodeTextures.bumpmap) {
@@ -243,7 +242,7 @@ void MeshSceneNode::draw() {
             } else {
                 general.featureMask |= UniformsFeatureFlags::normalmap;
             }
-            _graphicsSvc.textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
+            _graphicsSvc.context.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
         }
         if (mesh->skin) {
             general.featureMask |= UniformsFeatureFlags::skeletal;

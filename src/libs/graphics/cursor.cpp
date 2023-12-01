@@ -22,7 +22,6 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 
@@ -32,7 +31,7 @@ namespace graphics {
 
 void Cursor::draw() {
     std::shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _textures.bind(*texture);
+    _graphicsContext.bind(*texture);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));

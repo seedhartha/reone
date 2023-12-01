@@ -40,7 +40,6 @@ class GraphicsContext;
 class IScene;
 class Meshes;
 class Shaders;
-class Textures;
 class Uniforms;
 
 class IPipeline {
@@ -57,13 +56,11 @@ public:
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
-        Textures &textures,
         Uniforms &uniforms) :
         _options(options),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures),
         _uniforms(uniforms) {
     }
 
@@ -132,7 +129,6 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
-    Textures &_textures;
     Uniforms &_uniforms;
 
     // END Services

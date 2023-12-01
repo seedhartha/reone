@@ -32,7 +32,7 @@ std::shared_ptr<IMovie> Movies::doGet(std::string name) {
         return nullptr;
     }
 
-    BikReader bik(*path, *_graphicsSvc, _audioPlayer);
+    BikReader bik(*path, _graphicsSvc, _audioPlayer);
     bik.load();
 
     return bik.movie();

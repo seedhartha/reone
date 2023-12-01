@@ -17,9 +17,10 @@
 
 #include "reone/game/portraits.h"
 
-#include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/textures.h"
+
 
 #include "reone/game/portrait.h"
 

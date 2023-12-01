@@ -22,7 +22,6 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 
 namespace reone {
@@ -58,7 +57,7 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
     }
 
     _shaders.use(ShaderProgramId::Text);
-    _textures.bind(*_texture);
+    _graphicsContext.bind(*_texture);
 
     _uniforms.setGeneral([this, &color](auto &general) {
         general.resetLocals();

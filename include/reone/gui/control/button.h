@@ -29,13 +29,13 @@ public:
         IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         Button(
             gui,
             ControlType::Button,
             sceneGraphs,
             graphicsSvc,
-            strings) {
+            resourceSvc) {
     }
 
 protected:
@@ -44,13 +44,13 @@ protected:
         ControlType type,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         Control(
             gui,
             type,
             sceneGraphs,
             graphicsSvc,
-            strings) {
+            resourceSvc) {
 
         _clickable = true;
     }

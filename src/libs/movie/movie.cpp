@@ -23,10 +23,10 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/audio/player.h"
+#include "reone/resource/textures.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -97,7 +97,7 @@ void Movie::render() {
     }
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
-        _graphicsSvc.textures.bind(*_texture);
+        _graphicsSvc.context.bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
     _graphicsSvc.uniforms.setGeneral([](auto &general) {

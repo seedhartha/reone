@@ -23,11 +23,11 @@
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/resource/gff.h"
+#include "reone/resource/textures.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -41,7 +41,7 @@ void ProgressBar::load(const resource::generated::GUI_BASECONTROL &gui, bool pro
 
     auto &controlStruct = *static_cast<const resource::generated::GUI_CONTROLS *>(&gui);
     if (controlStruct.PROGRESS) {
-        _progress.fill = _graphicsSvc.textures.get(controlStruct.PROGRESS->FILL, TextureUsage::GUI);
+        _progress.fill = _resourceSvc.textures.get(controlStruct.PROGRESS->FILL, TextureUsage::GUI);
     }
 }
 
@@ -49,7 +49,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
     if (_value == 0 || !_progress.fill) {
         return;
     }
-    _graphicsSvc.textures.bind(*_progress.fill);
+    _graphicsSvc.context.bind(*_progress.fill);
 
     float w = _extent.width * _value / 100.0f;
 

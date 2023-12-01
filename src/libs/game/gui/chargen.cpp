@@ -18,9 +18,9 @@
 #include "reone/game/gui/chargen.h"
 
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
@@ -390,7 +390,7 @@ std::shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(ISceneGra
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(*_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.resource.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", *creature->sceneNode());
 
     return model;

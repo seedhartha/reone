@@ -145,7 +145,7 @@ public:
     void initLocalServices();
     void setSceneSurfaces();
 
-    void setCursorType(CursorType type);
+    void setCursorType(resource::CursorType type);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
 
@@ -335,7 +335,7 @@ private:
     Screen _screen {Screen::None};
 
     std::shared_ptr<movie::IMovie> _movie;
-    CursorType _cursorType {CursorType::None};
+    resource::CursorType _cursorType {resource::CursorType::None};
     std::shared_ptr<graphics::Cursor> _cursor;
     std::atomic<float> _gameSpeed {1.0f};
     CameraType _cameraType {CameraType::ThirdPerson};

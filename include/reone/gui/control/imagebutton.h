@@ -29,13 +29,13 @@ public:
         IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         Control(
             gui,
             ControlType::ImageButton,
             sceneGraphs,
             graphicsSvc,
-            strings) {
+            resourceSvc) {
 
         _clickable = true;
     }

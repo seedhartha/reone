@@ -20,24 +20,40 @@
 #include "../2das.h"
 #include "../audio/files.h"
 #include "../audio/player.h"
+#include "../cursors.h"
+#include "../fonts.h"
 #include "../gffs.h"
+#include "../lips.h"
+#include "../models.h"
 #include "../movies.h"
 #include "../resources.h"
 #include "../scripts.h"
 #include "../strings.h"
+#include "../textures.h"
+#include "../walkmeshes.h"
 
 #include "services.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsModule;
+
+}
 
 namespace resource {
 
 class ResourceModule : boost::noncopyable {
 public:
     ResourceModule(std::filesystem::path gamePath,
-                   audio::AudioOptions &audioOpts) :
+                   graphics::GraphicsOptions &graphicsOpt,
+                   audio::AudioOptions &audioOpt,
+                   graphics::GraphicsModule &graphics) :
         _gamePath(std::move(gamePath)),
-        _audioOpts(audioOpts) {
+        _graphicsOpt(graphicsOpt),
+        _audioOpt(audioOpt),
+        _graphics(graphics) {
     }
 
     ~ResourceModule() { deinit(); }
@@ -53,12 +69,20 @@ public:
     Movies &movies() { return *_movies; }
     AudioFiles &files() { return *_files; }
     AudioPlayer &player() { return *_player; }
+    Cursors &cursors() { return *_cursors; }
+    Fonts &fonts() { return *_fonts; }
+    Lips &lips() { return *_lips; }
+    Models &models() { return *_models; }
+    Textures &textures() { return *_textures; }
+    Walkmeshes &walkmeshes() { return *_walkmeshes; }
 
     ResourceServices &services() { return *_services; }
 
 private:
     std::filesystem::path _gamePath;
-    audio::AudioOptions &_audioOpts;
+    graphics::GraphicsOptions &_graphicsOpt;
+    audio::AudioOptions &_audioOpt;
+    graphics::GraphicsModule &_graphics;
 
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;
@@ -68,6 +92,12 @@ private:
     std::unique_ptr<Movies> _movies;
     std::unique_ptr<AudioFiles> _files;
     std::unique_ptr<AudioPlayer> _player;
+    std::unique_ptr<Cursors> _cursors;
+    std::unique_ptr<Fonts> _fonts;
+    std::unique_ptr<Lips> _lips;
+    std::unique_ptr<Models> _models;
+    std::unique_ptr<Textures> _textures;
+    std::unique_ptr<Walkmeshes> _walkmeshes;
 
     std::unique_ptr<ResourceServices> _services;
 };

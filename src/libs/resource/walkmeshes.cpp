@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/walkmeshes.h"
+#include "reone/resource/walkmeshes.h"
 
 #include "reone/resource/format/bwmreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 Walkmeshes::Walkmeshes(Resources &resources) :
     _resources(resources) {
@@ -58,6 +58,6 @@ std::shared_ptr<Walkmesh> Walkmeshes::doGet(const std::string &resRef, ResType t
     return reader.walkmesh();
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

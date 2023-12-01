@@ -23,15 +23,14 @@
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace graphics {
 
 class Walkmesh;
+}
+
+namespace resource {
+
+class Resources;
 
 class IWalkmeshes {
 public:
@@ -39,7 +38,7 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResType type) = 0;
+    virtual std::shared_ptr<graphics::Walkmesh> get(const std::string &resRef, ResType type) = 0;
 };
 
 class Walkmeshes : public IWalkmeshes, boost::noncopyable {
@@ -48,16 +47,16 @@ public:
 
     void clear() override;
 
-    std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResType type) override;
+    std::shared_ptr<graphics::Walkmesh> get(const std::string &resRef, ResType type) override;
 
 private:
     resource::Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;
+    std::unordered_map<std::string, std::shared_ptr<graphics::Walkmesh>> _cache;
 
-    std::shared_ptr<Walkmesh> doGet(const std::string &resRef, resource::ResType type);
+    std::shared_ptr<graphics::Walkmesh> doGet(const std::string &resRef, ResType type);
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

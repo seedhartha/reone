@@ -27,12 +27,12 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
-#include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/fonts.h"
 #include "reone/resource/resources.h"
 #include "reone/scene/types.h"
 #include "reone/script/executioncontext.h"
@@ -56,7 +56,7 @@ static constexpr int kVisibleLineCount = 15;
 static constexpr float kTextOffset = 3.0f;
 
 void Console::init() {
-    _font = _services.graphics.fonts.get("fnt_console");
+    _font = _services.resource.fonts.get("fnt_console");
 
     addCommand("clear", "c", "clear console", std::bind(&Console::cmdClear, this, std::placeholders::_1, std::placeholders::_2));
     addCommand("info", "i", "information on selected object", std::bind(&Console::cmdInfo, this, std::placeholders::_1, std::placeholders::_2));

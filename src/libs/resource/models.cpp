@@ -15,22 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/models.h"
+#include "reone/resource/models.h"
 
 #include "reone/graphics/model.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/format/mdlmdxreader.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/textures.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
 
-
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 Models::Models(Textures &textures, Resources &resources) :
     _textures(textures), _resources(resources) {
@@ -77,6 +76,6 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     return model;
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

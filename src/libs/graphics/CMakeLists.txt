@@ -32,16 +32,13 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/dxtutil.h
     ${GRAPHICS_INCLUDE_DIR}/eventhandler.h
     ${GRAPHICS_INCLUDE_DIR}/font.h
-    ${GRAPHICS_INCLUDE_DIR}/fonts.h
     ${GRAPHICS_INCLUDE_DIR}/framebuffer.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
-    ${GRAPHICS_INCLUDE_DIR}/lips.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h
     ${GRAPHICS_INCLUDE_DIR}/mesh.h
     ${GRAPHICS_INCLUDE_DIR}/meshes.h
     ${GRAPHICS_INCLUDE_DIR}/model.h
     ${GRAPHICS_INCLUDE_DIR}/modelnode.h
-    ${GRAPHICS_INCLUDE_DIR}/models.h
     ${GRAPHICS_INCLUDE_DIR}/options.h
     ${GRAPHICS_INCLUDE_DIR}/pipeline.h
     ${GRAPHICS_INCLUDE_DIR}/pixelutil.h
@@ -51,7 +48,6 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/shaderprogram.h
     ${GRAPHICS_INCLUDE_DIR}/shaders.h
     ${GRAPHICS_INCLUDE_DIR}/texture.h
-    ${GRAPHICS_INCLUDE_DIR}/textures.h
     ${GRAPHICS_INCLUDE_DIR}/textureutil.h
     ${GRAPHICS_INCLUDE_DIR}/textutil.h
     ${GRAPHICS_INCLUDE_DIR}/triangleutil.h
@@ -59,7 +55,6 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/uniformbuffer.h
     ${GRAPHICS_INCLUDE_DIR}/uniforms.h
     ${GRAPHICS_INCLUDE_DIR}/walkmesh.h
-    ${GRAPHICS_INCLUDE_DIR}/walkmeshes.h
     ${GRAPHICS_INCLUDE_DIR}/window.h)
 
 set(GRAPHICS_SOURCES
@@ -70,15 +65,12 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/di/module.cpp
     ${GRAPHICS_SOURCE_DIR}/dxtutil.cpp
     ${GRAPHICS_SOURCE_DIR}/font.cpp
-    ${GRAPHICS_SOURCE_DIR}/fonts.cpp
     ${GRAPHICS_SOURCE_DIR}/framebuffer.cpp
     ${GRAPHICS_SOURCE_DIR}/lipanimation.cpp
-    ${GRAPHICS_SOURCE_DIR}/lipanimations.cpp
     ${GRAPHICS_SOURCE_DIR}/mesh.cpp
     ${GRAPHICS_SOURCE_DIR}/meshes.cpp
     ${GRAPHICS_SOURCE_DIR}/model.cpp
     ${GRAPHICS_SOURCE_DIR}/modelnode.cpp
-    ${GRAPHICS_SOURCE_DIR}/models.cpp
     ${GRAPHICS_SOURCE_DIR}/pipeline.cpp
     ${GRAPHICS_SOURCE_DIR}/pixelutil.cpp
     ${GRAPHICS_SOURCE_DIR}/renderbuffer.cpp
@@ -86,13 +78,11 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/shaderprogram.cpp
     ${GRAPHICS_SOURCE_DIR}/shaders.cpp
     ${GRAPHICS_SOURCE_DIR}/texture.cpp
-    ${GRAPHICS_SOURCE_DIR}/textures.cpp
     ${GRAPHICS_SOURCE_DIR}/textureutil.cpp
     ${GRAPHICS_SOURCE_DIR}/textutil.cpp
     ${GRAPHICS_SOURCE_DIR}/uniformbuffer.cpp
     ${GRAPHICS_SOURCE_DIR}/uniforms.cpp
     ${GRAPHICS_SOURCE_DIR}/walkmesh.cpp
-    ${GRAPHICS_SOURCE_DIR}/walkmeshes.cpp
     ${GRAPHICS_SOURCE_DIR}/window.cpp)
 
 add_library(graphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES} ${CLANG_FORMAT_PATH})

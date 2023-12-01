@@ -23,12 +23,13 @@
 #include "reone/game/portrait.h"
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 #include "reone/script/types.h"
+
 
 using namespace reone::audio;
 

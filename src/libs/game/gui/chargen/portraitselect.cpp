@@ -24,12 +24,12 @@
 #include "reone/game/portraits.h"
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
@@ -127,7 +127,7 @@ std::shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(ISceneGraph
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->getOrigin().z));
     }
-    auto model = sceneGraph.newModel(*_services.graphics.models.get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.resource.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", *creatureModel);
 
     return model;
@@ -173,7 +173,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     std::string resRef(_filteredPortraits[_currentPortrait].resRef);
-    std::shared_ptr<Texture> portrait(_services.graphics.textures.get(resRef, TextureUsage::GUI));
+    std::shared_ptr<Texture> portrait(_services.resource.textures.get(resRef, TextureUsage::GUI));
     _controls.LBL_PORTRAIT->setBorderFill(portrait);
 }
 

@@ -36,29 +36,29 @@ set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/fixtures/system.h)
 
 set(TESTS_SOURCES
-    ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
-    ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
-    ${TESTS_SOURCE_DIR}/graphics/format/mdlmdxreader.cpp
-    ${TESTS_SOURCE_DIR}/graphics/format/tgareader.cpp
-    ${TESTS_SOURCE_DIR}/graphics/format/tpcreader.cpp
-    ${TESTS_SOURCE_DIR}/graphics/format/txireader.cpp
     ${TESTS_SOURCE_DIR}/graphics/walkmesh.cpp
     ${TESTS_SOURCE_DIR}/resource/2das.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dareader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dawriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/bifreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/bwmreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/erfreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/erfwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/keyreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/mdlmdxreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/ncsreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/tgareader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkwriter.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/tpcreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/txireader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/resource/gffs.cpp
     ${TESTS_SOURCE_DIR}/resource/resources.cpp
     ${TESTS_SOURCE_DIR}/resource/resref.cpp

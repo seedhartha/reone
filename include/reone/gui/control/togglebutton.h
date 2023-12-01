@@ -29,13 +29,13 @@ public:
         IGUI &gui,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         Button(
             gui,
             ControlType::ToggleButton,
             sceneGraphs,
             graphicsSvc,
-            strings) {
+            resourceSvc) {
     }
 
     const glm::vec3 &getBorderColor() const override;

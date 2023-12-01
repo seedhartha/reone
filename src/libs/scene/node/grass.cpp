@@ -24,12 +24,11 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/triangleutil.h"
 #include "reone/graphics/uniforms.h"
-
+#include "reone/resource/di/services.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/graph.h"
-
 #include "reone/scene/node/grasscluster.h"
 
 using namespace reone::graphics;
@@ -143,12 +142,12 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.textures.bind(*_properties.texture);
+    _graphicsSvc.context.bind(*_properties.texture);
     _graphicsSvc.uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (_aabbNode.mesh()->lightmap) {
-            _graphicsSvc.textures.bind(*_aabbNode.mesh()->lightmap, TextureUnits::lightmap);
+            _graphicsSvc.context.bind(*_aabbNode.mesh()->lightmap, TextureUnits::lightmap);
             general.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });

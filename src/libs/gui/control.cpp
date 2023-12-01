@@ -18,18 +18,18 @@
 #include "reone/gui/control.h"
 
 #include "reone/graphics/context.h"
-#include "reone/graphics/fonts.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/fonts.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/graphs.h"
 
 #include "reone/gui/gui.h"
@@ -113,13 +113,13 @@ void Control::loadBorder(const resource::generated::GUI_BORDER &gui) {
     _border = std::make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _border->corner = _graphicsSvc.textures.get(corner, TextureUsage::GUI);
+        _border->corner = _resourceSvc.textures.get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _border->edge = _graphicsSvc.textures.get(edge, TextureUsage::GUI);
+        _border->edge = _resourceSvc.textures.get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _border->fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
+        _border->fill = _resourceSvc.textures.get(fill, TextureUsage::GUI);
     }
 
     _border->dimension = gui.DIMENSION;
@@ -127,10 +127,10 @@ void Control::loadBorder(const resource::generated::GUI_BORDER &gui) {
 }
 
 void Control::loadText(const resource::generated::GUI_TEXT &gui) {
-    _text.font = _graphicsSvc.fonts.get(gui.FONT);
+    _text.font = _resourceSvc.fonts.get(gui.FONT);
 
     int strRef = gui.STRREF;
-    _text.text = strRef == -1 ? gui.TEXT : _strings.getText(strRef);
+    _text.text = strRef == -1 ? gui.TEXT : _resourceSvc.strings.getText(strRef);
 
     _text.color = gui.COLOR;
     _text.align = static_cast<TextAlign>(gui.ALIGNMENT);
@@ -153,13 +153,13 @@ void Control::loadHilight(const resource::generated::GUI_BORDER &gui) {
     _hilight = std::make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _hilight->corner = _graphicsSvc.textures.get(corner, TextureUsage::GUI);
+        _hilight->corner = _resourceSvc.textures.get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _hilight->edge = _graphicsSvc.textures.get(edge, TextureUsage::GUI);
+        _hilight->edge = _resourceSvc.textures.get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _hilight->fill = _graphicsSvc.textures.get(fill, TextureUsage::GUI);
+        _hilight->fill = _resourceSvc.textures.get(fill, TextureUsage::GUI);
     }
 
     _hilight->dimension = gui.DIMENSION;
@@ -229,7 +229,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         general.model = std::move(transform);
     });
     _graphicsSvc.shaders.use(ShaderProgramId::GUI);
-    _graphicsSvc.textures.bind(*output);
+    _graphicsSvc.context.bind(*output);
     _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
         _graphicsSvc.meshes.quad().draw();
     });
@@ -242,7 +242,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     glm::mat4 transform(1.0f);
 
     if (border.fill) {
-        _graphicsSvc.textures.bind(*border.fill);
+        _graphicsSvc.context.bind(*border.fill);
 
         int x = _extent.left + border.dimension + offset.x;
         int y = _extent.top + border.dimension + offset.y;
@@ -270,7 +270,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        _graphicsSvc.textures.bind(*border.edge);
+        _graphicsSvc.context.bind(*border.edge);
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -351,7 +351,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        _graphicsSvc.textures.bind(*border.corner);
+        _graphicsSvc.context.bind(*border.corner);
 
         // Top left corner
         transform = glm::translate(glm::vec3(x, y, 0.0f));
@@ -570,7 +570,7 @@ void Control::setBorder(Border border) {
 void Control::setBorderFill(std::string resRef) {
     std::shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
+        texture = _resourceSvc.textures.get(resRef, TextureUsage::GUI);
     }
     setBorderFill(std::move(texture));
 }
@@ -614,7 +614,7 @@ void Control::setHilightColor(glm::vec3 color) {
 void Control::setHilightFill(std::string resRef) {
     std::shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = _graphicsSvc.textures.get(resRef, TextureUsage::GUI);
+        texture = _resourceSvc.textures.get(resRef, TextureUsage::GUI);
     }
     setHilightFill(texture);
 }

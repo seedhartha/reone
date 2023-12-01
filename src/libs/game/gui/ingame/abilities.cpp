@@ -21,7 +21,6 @@
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
 #include "reone/game/party.h"
-#include "reone/graphics/textures.h"
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
@@ -29,6 +28,7 @@
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 
 using namespace reone::audio;
 
@@ -93,7 +93,7 @@ void AbilitiesMenu::loadSkills() {
         skillInfo.skill = skill;
         skillInfo.name = _services.resource.strings.getText(skills->getInt(row, "name"));
         skillInfo.description = _services.resource.strings.getText(skills->getInt(row, "description"));
-        skillInfo.icon = _services.graphics.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.icon = _services.resource.textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(std::make_pair(skill, std::move(skillInfo)));
     }
@@ -116,7 +116,7 @@ std::shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _services.graphics.textures.get(resRef, TextureUsage::GUI);
+    return _services.resource.textures.get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {

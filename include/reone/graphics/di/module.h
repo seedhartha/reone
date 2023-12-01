@@ -20,15 +20,10 @@
 #include "reone/resource/di/module.h"
 
 #include "../context.h"
-#include "../fonts.h"
-#include "../lips.h"
 #include "../meshes.h"
-#include "../models.h"
 #include "../pipeline.h"
 #include "../shaders.h"
-#include "../textures.h"
 #include "../uniforms.h"
-#include "../walkmeshes.h"
 #include "../window.h"
 
 #include "services.h"
@@ -39,9 +34,8 @@ namespace graphics {
 
 class GraphicsModule : boost::noncopyable {
 public:
-    GraphicsModule(graphics::GraphicsOptions &options, resource::ResourceModule &resource) :
-        _options(options),
-        _resource(resource) {
+    GraphicsModule(graphics::GraphicsOptions &options) :
+        _options(options) {
     }
 
     virtual ~GraphicsModule() { deinit(); }
@@ -49,34 +43,23 @@ public:
     void init();
     void deinit();
 
-    graphics::Fonts &fonts() { return *_fonts; }
     graphics::GraphicsContext &context() { return *_context; }
-    graphics::Lips &lips() { return *_lips; }
     graphics::Meshes &meshes() { return *_meshes; }
-    graphics::Models &models() { return *_models; }
     graphics::Pipeline &pipeline() { return *_pipeline; }
     graphics::Shaders &shaders() { return *_shaders; }
-    graphics::Textures &textures() { return *_textures; }
     graphics::Uniforms &uniforms() { return *_uniforms; }
-    graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
     graphics::IWindow &window() { return *_window; }
 
     graphics::GraphicsServices &services() { return *_services; }
 
 protected:
     graphics::GraphicsOptions &_options;
-    resource::ResourceModule &_resource;
 
-    std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::GraphicsContext> _context;
-    std::unique_ptr<graphics::Lips> _lips;
     std::unique_ptr<graphics::Meshes> _meshes;
-    std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Pipeline> _pipeline;
     std::unique_ptr<graphics::Shaders> _shaders;
-    std::unique_ptr<graphics::Textures> _textures;
     std::unique_ptr<graphics::Uniforms> _uniforms;
-    std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
     std::unique_ptr<graphics::IWindow> _window;
 
     std::unique_ptr<graphics::GraphicsServices> _services;

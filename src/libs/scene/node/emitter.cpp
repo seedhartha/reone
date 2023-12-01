@@ -23,14 +23,13 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/system/randomutil.h"
-
+#include "reone/resource/di/services.h"
+#include "reone/resource/textures.h"
 #include "reone/scene/graph.h"
-
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/particle.h"
+#include "reone/system/randomutil.h"
 
 using namespace reone::graphics;
 
@@ -310,7 +309,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
         }
     });
     _graphicsSvc.shaders.use(ShaderProgramId::Particle);
-    _graphicsSvc.textures.bind(*texture);
+    _graphicsSvc.context.bind(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
     _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {

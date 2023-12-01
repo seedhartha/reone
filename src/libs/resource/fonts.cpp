@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/fonts.h"
+#include "reone/resource/fonts.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
-#include "reone/graphics/textures.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/textures.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 static std::unordered_map<std::string, std::string> g_fontOverride = {
     {"fnt_d16x16", "fnt_d16x16b"}};
@@ -41,12 +41,12 @@ std::shared_ptr<Font> Fonts::doGet(std::string resRef) {
     if (!texture)
         return nullptr;
 
-    auto font = std::make_shared<Font>(_graphicsContext, _meshes, _shaders, _textures, _uniforms);
+    auto font = std::make_shared<Font>(_graphicsContext, _meshes, _shaders, _uniforms);
     font->load(texture);
 
     return font;
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

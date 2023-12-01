@@ -28,20 +28,21 @@ class IInputStream;
 namespace graphics {
 
 class Animation;
-class IModels;
-class ITextures;
 class Model;
 
 } // namespace graphics
 
 namespace resource {
 
+class IModels;
+class ITextures;
+
 class MdlMdxReader : boost::noncopyable {
 public:
     MdlMdxReader(IInputStream &mdl,
                  IInputStream &mdx,
-                 graphics::IModels &models,
-                 graphics::ITextures &textures) :
+                 IModels &models,
+                 ITextures &textures) :
         _mdl(BinaryReader(mdl)),
         _mdx(BinaryReader(mdx)),
         _models(models),
@@ -74,8 +75,8 @@ private:
 
     BinaryReader _mdl;
     BinaryReader _mdx;
-    graphics::IModels &_models;
-    graphics::ITextures &_textures;
+    IModels &_models;
+    ITextures &_textures;
 
     std::unordered_map<uint32_t, ControllerFn> _genericControllers;
     std::unordered_map<uint32_t, ControllerFn> _meshControllers;

@@ -28,7 +28,8 @@ namespace reone {
 namespace resource {
 
 class Gff;
-class IStrings;
+
+struct ResourceServices;
 
 } // namespace resource
 
@@ -211,7 +212,7 @@ protected:
     // Services
 
     graphics::GraphicsServices &_graphicsSvc;
-    resource::IStrings &_strings;
+    resource::ResourceServices &_resourceSvc;
     scene::ISceneGraphs &_sceneGraphs;
 
     // END Services
@@ -228,12 +229,12 @@ protected:
         ControlType type,
         scene::ISceneGraphs &sceneGraphs,
         graphics::GraphicsServices &graphicsSvc,
-        resource::IStrings &strings) :
+        resource::ResourceServices &resourceSvc) :
         _gui(gui),
         _type(type),
         _sceneGraphs(sceneGraphs),
         _graphicsSvc(graphicsSvc),
-        _strings(strings) {
+        _resourceSvc(resourceSvc) {
     }
 
     void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);

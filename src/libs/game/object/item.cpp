@@ -21,16 +21,16 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/models.h"
-#include "reone/graphics/textures.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/audio/files.h"
 #include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/models.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
+#include "reone/resource/textures.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -137,7 +137,7 @@ void Item::loadUTI(const resource::generated::UTI &uti) {
     } else {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
-    _icon = _services.graphics.textures.get(iconResRef, TextureUsage::GUI);
+    _icon = _services.resource.textures.get(iconResRef, TextureUsage::GUI);
 
     loadAmmunitionType();
 
@@ -156,7 +156,7 @@ void Item::loadAmmunitionType() {
     if (ammunitionIdx != -1) {
         std::shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = std::make_shared<Item::AmmunitionType>();
-        _ammunitionType->model = _services.graphics.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
+        _ammunitionType->model = _services.resource.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
         _ammunitionType->shotSound1 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
         _ammunitionType->shotSound2 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
         _ammunitionType->impactSound1 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));

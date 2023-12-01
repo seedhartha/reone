@@ -25,8 +25,8 @@ namespace graphics {
 
 class ToolkitGraphicsModule : public GraphicsModule {
 public:
-    ToolkitGraphicsModule(graphics::GraphicsOptions &options, resource::ResourceModule &resource) :
-        GraphicsModule(options, resource) {
+    ToolkitGraphicsModule(graphics::GraphicsOptions &options) :
+        GraphicsModule(options) {
     }
 
 private:

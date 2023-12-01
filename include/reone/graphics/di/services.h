@@ -21,53 +21,33 @@ namespace reone {
 
 namespace graphics {
 
-class IFonts;
 class IGraphicsContext;
-class ILips;
 class IMeshes;
-class IModels;
 class IPipeline;
 class IShaders;
-class ITextures;
 class IUniforms;
-class IWalkmeshes;
 class IWindow;
 
 struct GraphicsServices {
-    IFonts &fonts;
     IGraphicsContext &context;
-    ILips &lips;
     IMeshes &meshes;
-    IModels &models;
     IPipeline &pipeline;
     IShaders &shaders;
-    ITextures &textures;
     IUniforms &uniforms;
-    IWalkmeshes &walkmeshes;
     IWindow &window;
 
     GraphicsServices(
-        IFonts &fonts,
         IGraphicsContext &context,
-        ILips &lips,
         IMeshes &meshes,
-        IModels &models,
         IPipeline &pipeline,
         IShaders &shaders,
-        ITextures &textures,
         IUniforms &uniforms,
-        IWalkmeshes &walkmeshes,
         IWindow &window) :
-        fonts(fonts),
         context(context),
-        lips(lips),
         meshes(meshes),
-        models(models),
         pipeline(pipeline),
         shaders(shaders),
-        textures(textures),
         uniforms(uniforms),
-        walkmeshes(walkmeshes),
         window(window) {
     }
 };
