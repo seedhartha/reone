@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../audioplayer.h"
 #include "../provider/2das.h"
 #include "../provider/audiofiles.h"
 #include "../provider/cursors.h"
@@ -43,6 +42,14 @@
 
 namespace reone {
 
+namespace audio {
+
+class AudioModule;
+
+struct AudioOptions;
+
+} // namespace audio
+
 namespace graphics {
 
 class GraphicsModule;
@@ -56,11 +63,13 @@ public:
     ResourceModule(std::filesystem::path gamePath,
                    graphics::GraphicsOptions &graphicsOpt,
                    audio::AudioOptions &audioOpt,
-                   graphics::GraphicsModule &graphics) :
+                   graphics::GraphicsModule &graphics,
+                   audio::AudioModule &audio) :
         _gamePath(std::move(gamePath)),
         _graphicsOpt(graphicsOpt),
         _audioOpt(audioOpt),
-        _graphics(graphics) {
+        _graphics(graphics),
+        _audio(audio) {
     }
 
     ~ResourceModule() { deinit(); }
@@ -75,7 +84,6 @@ public:
     Scripts &scripts() { return *_scripts; }
     Movies &movies() { return *_movies; }
     AudioFiles &audioFiles() { return *_audioFiles; }
-    AudioPlayer &audioPlayer() { return *_audioPlayer; }
     Cursors &cursors() { return *_cursors; }
     Fonts &fonts() { return *_fonts; }
     Lips &lips() { return *_lips; }
@@ -92,6 +100,7 @@ private:
     graphics::GraphicsOptions &_graphicsOpt;
     audio::AudioOptions &_audioOpt;
     graphics::GraphicsModule &_graphics;
+    audio::AudioModule &_audio;
 
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;
@@ -100,7 +109,6 @@ private:
     std::unique_ptr<Scripts> _scripts;
     std::unique_ptr<Movies> _movies;
     std::unique_ptr<AudioFiles> _audioFiles;
-    std::unique_ptr<AudioPlayer> _audioPlayer;
     std::unique_ptr<Cursors> _cursors;
     std::unique_ptr<Fonts> _fonts;
     std::unique_ptr<Lips> _lips;

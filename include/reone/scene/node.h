@@ -29,6 +29,12 @@ struct GraphicsServices;
 
 }
 
+namespace audio {
+
+struct AudioServices;
+
+}
+
 namespace resource {
 
 struct ResourceServices;
@@ -99,6 +105,7 @@ protected:
     SceneNodeType _type;
     SceneGraph &_sceneGraph;
     graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
     resource::ResourceServices &_resourceSvc;
 
     SceneNode *_parent {nullptr};
@@ -129,10 +136,12 @@ protected:
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         _type(type),
         _sceneGraph(sceneGraph),
         _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc),
         _resourceSvc(resourceSvc) {
     }
 

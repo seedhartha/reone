@@ -28,6 +28,12 @@ struct GraphicsServices;
 
 } // namespace graphics
 
+namespace audio {
+
+struct AudioServices;
+
+}
+
 namespace resource {
 
 struct ResourceServices;
@@ -52,9 +58,11 @@ public:
     SceneGraphs(
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
+        _audioSvc(audioSvc),
         _resourceSvc(resourceSvc) {
     }
 
@@ -73,6 +81,7 @@ public:
 protected:
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
+    audio::AudioServices &_audioSvc;
     resource::ResourceServices &_resourceSvc;
 
     std::unordered_map<std::string, std::shared_ptr<ISceneGraph>> _scenes;

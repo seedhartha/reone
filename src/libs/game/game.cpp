@@ -19,6 +19,7 @@
 
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/game/combat.h"
 #include "reone/game/debug.h"
 #include "reone/game/di/services.h"
@@ -37,7 +38,6 @@
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
@@ -460,7 +460,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.resource.audioPlayer.play(_musicResRef, AudioType::Music);
+        _music = _services.audio.player.play(_services.resource.audioFiles.get(_musicResRef), AudioType::Music);
     }
 }
 

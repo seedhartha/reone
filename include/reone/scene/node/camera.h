@@ -30,11 +30,13 @@ public:
     CameraSceneNode(
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Camera,
             sceneGraph,
             graphicsSvc,
+            audioSvc,
             resourceSvc) {
     }
 

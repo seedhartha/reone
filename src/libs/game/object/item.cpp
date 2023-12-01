@@ -18,11 +18,11 @@
 #include "reone/game/object/item.h"
 
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/graphics/di/services.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/audiofiles.h"
@@ -60,7 +60,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     }
     std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
     if (sound) {
-        _audioSource = _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+        _audioSource = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }
 }
 
@@ -70,7 +70,7 @@ void Item::playImpactSound(int variant, glm::vec3 position) {
     }
     std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
     if (sound) {
-        _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+        _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }
 }
 

@@ -17,11 +17,11 @@
 
 #include "reone/game/gui/dialog.h"
 
+#include "reone/audio/player.h"
 #include "reone/audio/source.h"
 #include "reone/graphics/di/services.h"
 #include "reone/gui/control/panel.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/audiofiles.h"
@@ -30,7 +30,6 @@
 #include "reone/script/execution.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
-
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"

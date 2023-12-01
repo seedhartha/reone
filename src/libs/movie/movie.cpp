@@ -18,6 +18,7 @@
 #include "reone/movie/movie.h"
 
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
@@ -25,8 +26,6 @@
 #include "reone/graphics/shadermanager.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/resource/audioplayer.h"
-#include "reone/resource/provider/textures.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;

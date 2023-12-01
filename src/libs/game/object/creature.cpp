@@ -18,6 +18,7 @@
 #include "reone/game/object/creature.h"
 
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 #include "reone/game/action.h"
 #include "reone/game/action/attackobject.h"
 #include "reone/game/animationutil.h"
@@ -31,7 +32,6 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/provider/2das.h"
@@ -482,7 +482,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
         return;
     }
     glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.resource.audioPlayer.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    _audioSourceVoice = _services.audio.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
@@ -699,7 +699,7 @@ void Creature::onEventSignalled(const std::string &name) {
     }
     std::shared_ptr<AudioBuffer> sound(materialSounds[index]);
     if (sound) {
-        _audioSourceFootstep = _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, _position);
+        _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 

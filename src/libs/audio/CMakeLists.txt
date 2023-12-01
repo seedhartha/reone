@@ -22,6 +22,7 @@ set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/di/module.h
     ${AUDIO_INCLUDE_DIR}/di/services.h
     ${AUDIO_INCLUDE_DIR}/options.h
+    ${AUDIO_INCLUDE_DIR}/player.h
     ${AUDIO_INCLUDE_DIR}/source.h
     ${AUDIO_INCLUDE_DIR}/types.h)
 
@@ -29,6 +30,7 @@ set(AUDIO_SOURCES
     ${AUDIO_SOURCE_DIR}/buffer.cpp
     ${AUDIO_SOURCE_DIR}/context.cpp
     ${AUDIO_SOURCE_DIR}/di/module.cpp
+    ${AUDIO_SOURCE_DIR}/player.cpp
     ${AUDIO_SOURCE_DIR}/source.cpp)
 
 add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES} ${CLANG_FORMAT_PATH})

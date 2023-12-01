@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/audio/di/module.h"
 #include "reone/graphics/di/module.h"
 #include "reone/graphics/options.h"
 #include "reone/resource/di/module.h"
@@ -34,10 +35,12 @@ public:
     SceneModule(
         graphics::GraphicsOptions &graphicsOpt,
         resource::ResourceModule &resource,
-        graphics::GraphicsModule &graphics) :
+        graphics::GraphicsModule &graphics,
+        audio::AudioModule &audio) :
         _graphicsOpt(graphicsOpt),
         _resource(resource),
-        _graphics(graphics) {
+        _graphics(graphics),
+        _audio(audio) {
     }
 
     ~SceneModule() { deinit(); }
@@ -52,6 +55,7 @@ public:
 private:
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsModule &_graphics;
+    audio::AudioModule &_audio;
     resource::ResourceModule &_resource;
 
     std::unique_ptr<SceneGraphs> _graphs;

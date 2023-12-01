@@ -29,13 +29,15 @@ public:
         graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        resource::ResourceServices &audioSvc) :
+        audio::AudioServices &audioSvc,
+        resource::ResourceServices &resourceSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Dummy,
             sceneGraph,
             graphicsSvc,
-            audioSvc) {
+            audioSvc,
+            resourceSvc) {
     }
 };
 

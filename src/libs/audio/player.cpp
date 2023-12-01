@@ -15,26 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/audioplayer.h"
-
-#include "reone/resource/provider/audiofiles.h"
-
-using namespace reone::audio;
+#include "reone/audio/player.h"
 
 namespace reone {
 
-namespace resource {
+namespace audio {
 
-std::shared_ptr<AudioSource> AudioPlayer::play(const std::string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    std::shared_ptr<AudioBuffer> stream(_audioFiles.get(resRef));
-    if (!stream) {
-        return nullptr;
-    }
-    return play(std::move(stream), type, loop, gain, positional, std::move(position));
-}
-
-std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioBuffer> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    auto source = std::make_shared<AudioSource>(std::move(stream), loop, getGain(type, gain), positional, std::move(position));
+std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
+    auto source = std::make_shared<AudioSource>(std::move(buffer), loop, getGain(type, gain), positional, std::move(position));
     source->init();
     source->play();
     return source;
@@ -62,6 +50,6 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     return gain * (volume / 100.0f);
 }
 
-} // namespace resource
+} // namespace audio
 
 } // namespace reone

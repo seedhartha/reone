@@ -23,15 +23,17 @@ namespace audio {
 
 void AudioModule::init() {
     _context = std::make_unique<AudioContext>();
+    _player = std::make_unique<AudioPlayer>(_options);
 
     _context->init();
 
-    _services = std::make_unique<AudioServices>(*_context);
+    _services = std::make_unique<AudioServices>(*_context, *_player);
 }
 
 void AudioModule::deinit() {
     _services.reset();
 
+    _player.reset();
     _context.reset();
 }
 

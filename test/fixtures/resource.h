@@ -19,7 +19,7 @@
 
 #include <gmock/gmock.h>
 
-#include "reone/resource/audioplayer.h"
+#include "reone/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/provider/2das.h"
@@ -95,12 +95,6 @@ class MockAudioFiles : public IAudioFiles, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<audio::AudioBuffer>, get, (const std::string &key), (override));
-};
-
-class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
-public:
-    MOCK_METHOD(std::shared_ptr<audio::AudioSource>, play, (const std::string &resRef, audio::AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
-    MOCK_METHOD(std::shared_ptr<audio::AudioSource>, play, (std::shared_ptr<audio::AudioBuffer> stream, audio::AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
 };
 
 class MockMp3Reader : public Mp3Reader {
@@ -195,8 +189,7 @@ public:
         _twoDas = std::make_unique<MockTwoDas>();
         _scripts = std::make_unique<MockScripts>();
         _movies = std::make_unique<MockMovies>();
-        _files = std::make_unique<MockAudioFiles>();
-        _player = std::make_unique<MockAudioPlayer>();
+        _audioFiles = std::make_unique<MockAudioFiles>();
         _cursors = std::make_unique<MockCursors>();
         _fonts = std::make_unique<MockFonts>();
         _lips = std::make_unique<MockLips>();
@@ -218,8 +211,7 @@ public:
             *_twoDas,
             *_scripts,
             *_movies,
-            *_files,
-            *_player,
+            *_audioFiles,
             *_cursors,
             *_fonts,
             *_lips,
@@ -252,11 +244,7 @@ public:
     }
 
     MockAudioFiles &audioFiles() {
-        return *_files;
-    }
-
-    MockAudioPlayer &audioPlayer() {
-        return *_player;
+        return *_audioFiles;
     }
 
     ResourceServices &services() {
@@ -270,8 +258,7 @@ private:
     std::unique_ptr<MockTwoDas> _twoDas;
     std::unique_ptr<MockScripts> _scripts;
     std::unique_ptr<MockMovies> _movies;
-    std::unique_ptr<MockAudioFiles> _files;
-    std::unique_ptr<MockAudioPlayer> _player;
+    std::unique_ptr<MockAudioFiles> _audioFiles;
     std::unique_ptr<MockCursors> _cursors;
     std::unique_ptr<MockFonts> _fonts;
     std::unique_ptr<MockLips> _lips;

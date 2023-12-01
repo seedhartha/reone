@@ -37,11 +37,13 @@ public:
         std::vector<glm::vec3> geometry,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Trigger,
             sceneGraph,
             graphicsSvc,
+            audioSvc,
             resourceSvc),
         _geometry(std::move(geometry)) {
 

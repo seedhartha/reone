@@ -31,6 +31,7 @@
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
 
+using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -45,11 +46,13 @@ ModelSceneNode::ModelSceneNode(
     ModelUsage usage,
     SceneGraph &sceneGraph,
     GraphicsServices &graphicsSvc,
+    AudioServices &audioSvc,
     ResourceServices &resourceSvc) :
     SceneNode(
         SceneNodeType::Model,
         sceneGraph,
         graphicsSvc,
+        audioSvc,
         resourceSvc),
     _model(&model),
     _usage(usage) {

@@ -28,11 +28,13 @@ public:
     GrassClusterSceneNode(
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::GrassCluster,
             sceneGraph,
             graphicsSvc,
+            audioSvc,
             resourceSvc) {
         _point = false;
     }

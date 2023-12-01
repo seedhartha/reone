@@ -26,7 +26,7 @@ namespace reone {
 namespace scene {
 
 void SceneModule::init() {
-    _graphs = std::make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _resource.services());
+    _graphs = std::make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services(), _resource.services());
     _services = std::make_unique<SceneServices>(*_graphs);
 
     // Init scenes

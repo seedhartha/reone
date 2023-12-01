@@ -31,7 +31,7 @@ struct GraphicsServices;
 
 }
 
-namespace resource {
+namespace audio {
 
 class IAudioPlayer;
 
@@ -57,7 +57,7 @@ class Movie : public IMovie, boost::noncopyable {
 public:
     Movie(
         graphics::GraphicsServices &graphicsSvc,
-        resource::IAudioPlayer &audioPlayer) :
+        audio::IAudioPlayer &audioPlayer) :
         _graphicsSvc(graphicsSvc),
         _audioPlayer(audioPlayer) {
     }
@@ -77,7 +77,7 @@ public:
 
 private:
     graphics::GraphicsServices &_graphicsSvc;
-    resource::IAudioPlayer &_audioPlayer;
+    audio::IAudioPlayer &_audioPlayer;
 
     bool _inited {false};
 

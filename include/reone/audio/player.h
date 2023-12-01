@@ -17,39 +17,35 @@
 
 #pragma once
 
-#include "../context.h"
-#include "../options.h"
-#include "../player.h"
-
-#include "services.h"
+#include "options.h"
+#include "source.h"
+#include "types.h"
 
 namespace reone {
 
 namespace audio {
 
-class AudioModule : boost::noncopyable {
+class AudioBuffer;
+
+class IAudioPlayer {
 public:
-    AudioModule(AudioOptions &options) :
+    virtual ~IAudioPlayer() = default;
+
+    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
+};
+
+class AudioPlayer : public IAudioPlayer, boost::noncopyable {
+public:
+    AudioPlayer(AudioOptions &options) :
         _options(options) {
     }
 
-    ~AudioModule() { deinit(); }
-
-    void init();
-    void deinit();
-
-    AudioContext &context() { return *_context; }
-    AudioPlayer &player() { return *_player; }
-
-    AudioServices &services() { return *_services; }
+    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
 
 private:
     AudioOptions &_options;
 
-    std::unique_ptr<AudioContext> _context;
-    std::unique_ptr<AudioPlayer> _player;
-
-    std::unique_ptr<AudioServices> _services;
+    float getGain(AudioType type, float gain) const;
 };
 
 } // namespace audio

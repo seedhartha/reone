@@ -87,6 +87,7 @@ public:
         ModelUsage usage,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc);
 
     void init();

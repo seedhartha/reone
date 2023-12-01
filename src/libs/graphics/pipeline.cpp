@@ -28,7 +28,6 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/format/tgawriter.h"
 #include "reone/scene/node/light.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"

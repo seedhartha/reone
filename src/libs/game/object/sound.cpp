@@ -17,10 +17,10 @@
 
 #include "reone/game/object/sound.h"
 
+#include "reone/audio/player.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/audiofiles.h"
@@ -30,7 +30,6 @@
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/sound.h"
-
 
 using namespace reone::audio;
 using namespace reone::resource;

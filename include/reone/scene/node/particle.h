@@ -31,11 +31,13 @@ public:
         const EmitterSceneNode &emitter,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
+        audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Particle,
             sceneGraph,
             graphicsSvc,
+            audioSvc,
             resourceSvc),
         _emitter(emitter) {
 

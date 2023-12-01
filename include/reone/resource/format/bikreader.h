@@ -25,6 +25,12 @@ struct GraphicsServices;
 
 }
 
+namespace audio {
+
+class IAudioPlayer;
+
+}
+
 namespace movie {
 
 class Movie;
@@ -33,14 +39,12 @@ class Movie;
 
 namespace resource {
 
-class IAudioPlayer;
-
 class BikReader {
 public:
     BikReader(
         std::filesystem::path path,
         graphics::GraphicsServices &graphicsSvc,
-        IAudioPlayer &audioPlayer) :
+        audio::IAudioPlayer &audioPlayer) :
         _path(std::move(path)),
         _graphicsSvc(graphicsSvc),
         _audioPlayer(audioPlayer) {
@@ -53,7 +57,7 @@ public:
 private:
     std::filesystem::path _path;
     graphics::GraphicsServices &_graphicsSvc;
-    IAudioPlayer &_audioPlayer;
+    audio::IAudioPlayer &_audioPlayer;
 
     std::shared_ptr<movie::Movie> _movie;
 };

@@ -21,6 +21,7 @@
 
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/player.h"
 
 namespace reone {
 
@@ -31,12 +32,18 @@ public:
     MOCK_METHOD(void, setListenerPosition, (glm::vec3 position), (override));
 };
 
+class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+};
+
 class TestAudioModule : boost::noncopyable {
 public:
     void init() {
         _context = std::make_unique<MockAudioContext>();
+        _player = std::make_unique<MockAudioPlayer>();
 
-        _services = std::make_unique<AudioServices>(*_context);
+        _services = std::make_unique<AudioServices>(*_context, *_player);
     }
 
     AudioServices &services() {
@@ -45,6 +52,7 @@ public:
 
 private:
     std::unique_ptr<MockAudioContext> _context;
+    std::unique_ptr<MockAudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;
 };

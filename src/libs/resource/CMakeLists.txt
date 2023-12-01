@@ -18,7 +18,6 @@ set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
-    ${RESOURCE_INCLUDE_DIR}/audioplayer.h
     ${RESOURCE_INCLUDE_DIR}/container.h
     ${RESOURCE_INCLUDE_DIR}/container/erf.h
     ${RESOURCE_INCLUDE_DIR}/container/exe.h
@@ -112,7 +111,6 @@ set(RESOURCE_HEADERS
 
 set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/2da.cpp
-    ${RESOURCE_SOURCE_DIR}/audioplayer.cpp
     ${RESOURCE_SOURCE_DIR}/container/erf.cpp
     ${RESOURCE_SOURCE_DIR}/container/exe.cpp
     ${RESOURCE_SOURCE_DIR}/container/folder.cpp

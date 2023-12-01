@@ -22,7 +22,6 @@ namespace reone {
 namespace resource {
 
 class IAudioFiles;
-class IAudioPlayer;
 class ICursors;
 class IDialogs;
 class IFonts;
@@ -51,7 +50,6 @@ struct ResourceServices {
     IScripts &scripts;
     IMovies &movies;
     IAudioFiles &audioFiles;
-    IAudioPlayer &audioPlayer;
     ICursors &cursors;
     IFonts &fonts;
     ILips &lips;
@@ -74,7 +72,6 @@ struct ResourceServices {
         IScripts &scripts,
         IMovies &movies,
         IAudioFiles &audioFiles,
-        IAudioPlayer &audioPlayer,
         ICursors &cursors,
         IFonts &fonts,
         ILips &lips,
@@ -95,7 +92,6 @@ struct ResourceServices {
         scripts(scripts),
         movies(movies),
         audioFiles(audioFiles),
-        audioPlayer(audioPlayer),
         cursors(cursors),
         fonts(fonts),
         lips(lips),
