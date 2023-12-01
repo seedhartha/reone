@@ -72,10 +72,10 @@ void Engine::initServices(GameID gameId) {
         *_scriptModule);
 
     _systemModule->init();
-    _resourceModule->init();
     _graphicsModule->init();
     _audioModule->init();
     _movieModule->init();
+    _resourceModule->init();
     _sceneModule->init();
     _guiModule->init();
     _scriptModule->init();
