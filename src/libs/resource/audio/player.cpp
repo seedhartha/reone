@@ -15,13 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/player.h"
+#include "reone/resource/audio/player.h"
 
-#include "reone/audio/files.h"
+#include "reone/resource/audio/files.h"
+
+using namespace reone::audio;
 
 namespace reone {
 
-namespace audio {
+namespace resource {
 
 std::shared_ptr<AudioSource> AudioPlayer::play(const std::string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
     std::shared_ptr<AudioBuffer> stream(_audioFiles.get(resRef));
@@ -60,6 +62,6 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     return gain * (volume / 100.0f);
 }
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

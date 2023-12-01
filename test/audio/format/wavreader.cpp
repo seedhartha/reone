@@ -18,16 +18,16 @@
 #include <gtest/gtest.h>
 
 #include "reone/audio/buffer.h"
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/format/wavreader.h"
+#include "reone/resource/format/mp3reader.h"
+#include "reone/resource/format/wavreader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
-
-#include "../../fixtures/audio.h"
+#include "../../fixtures/resource.h"
 
 using namespace reone;
 using namespace reone::audio;
+using namespace reone::resource;
 
 using testing::_;
 using testing::Return;

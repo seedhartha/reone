@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/files.h"
+#include "reone/resource/audio/files.h"
 
 #include "reone/audio/buffer.h"
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/format/wavreader.h"
+#include "reone/resource/format/mp3reader.h"
+#include "reone/resource/format/wavreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
+using namespace reone::audio;
 
 namespace reone {
 
-namespace audio {
+namespace resource {
 
 std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
     std::shared_ptr<AudioBuffer> buffer;
@@ -53,6 +53,6 @@ std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
     return buffer;
 }
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

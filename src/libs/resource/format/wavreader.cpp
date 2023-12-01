@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/format/wavreader.h"
+#include "reone/resource/format/wavreader.h"
 
 #include "reone/audio/buffer.h"
-#include "reone/audio/format/mp3reader.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/mp3reader.h"
 #include "reone/system/exception/endofstream.h"
 #include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
+using namespace reone::audio;
 
 namespace reone {
 
-namespace audio {
+namespace resource {
 
 void WavReader::load() {
     _wavLength = _wav.length();
@@ -226,6 +226,6 @@ int16_t WavReader::getIMASample(int channel, uint8_t nibble) {
     return sample;
 }
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

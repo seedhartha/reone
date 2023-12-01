@@ -20,8 +20,12 @@
 #include <gmock/gmock.h>
 
 #include "reone/resource/2das.h"
+#include "reone/resource/audio/files.h"
+#include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/format/mp3reader.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
 #include "reone/resource/strings.h"
@@ -74,6 +78,28 @@ public:
     MOCK_METHOD(std::shared_ptr<movie::IMovie>, get, (const std::string &name), (override));
 };
 
+class MockAudioFiles : public IAudioFiles, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<audio::AudioBuffer>, get, (const std::string &key), (override));
+};
+
+class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<audio::AudioSource>, play, (const std::string &resRef, audio::AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+    MOCK_METHOD(std::shared_ptr<audio::AudioSource>, play, (std::shared_ptr<audio::AudioBuffer> stream, audio::AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+};
+
+class MockMp3Reader : public Mp3Reader {
+public:
+    MOCK_METHOD(void, load, (IInputStream & stream), (override));
+};
+
+class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -83,6 +109,8 @@ public:
         _twoDas = std::make_unique<MockTwoDas>();
         _scripts = std::make_unique<MockScripts>();
         _movies = std::make_unique<MockMovies>();
+        _files = std::make_unique<MockAudioFiles>();
+        _player = std::make_unique<MockAudioPlayer>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
@@ -90,7 +118,9 @@ public:
             *_strings,
             *_twoDas,
             *_scripts,
-            *_movies);
+            *_movies,
+            *_files,
+            *_player);
     }
 
     MockGffs &gffs() {
@@ -109,6 +139,14 @@ public:
         return *_movies;
     }
 
+    MockAudioFiles &audioFiles() {
+        return *_files;
+    }
+
+    MockAudioPlayer &audioPlayer() {
+        return *_player;
+    }
+
     ResourceServices &services() {
         return *_services;
     }
@@ -120,6 +158,8 @@ private:
     std::unique_ptr<MockTwoDas> _twoDas;
     std::unique_ptr<MockScripts> _scripts;
     std::unique_ptr<MockMovies> _movies;
+    std::unique_ptr<MockAudioFiles> _files;
+    std::unique_ptr<MockAudioPlayer> _player;
 
     std::unique_ptr<ResourceServices> _services;
 };

@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "reone/audio/di/services.h"
 #include "reone/graphics/di/services.h"
 #include "reone/movie/movie.h"
 
 namespace reone {
 
 namespace resource {
+
+class IAudioPlayer;
 
 class IMovies {
 public:
@@ -36,8 +37,9 @@ public:
 
 class Movies : public IMovies, boost::noncopyable {
 public:
-    Movies(std::filesystem::path gamePath) :
-        _gamePath(gamePath) {
+    Movies(std::filesystem::path gamePath, IAudioPlayer &audioPlayer) :
+        _gamePath(gamePath),
+        _audioPlayer(audioPlayer) {
     }
 
     void clear() override {
@@ -59,17 +61,13 @@ public:
         _graphicsSvc = &graphics;
     }
 
-    void setAudioServices(audio::AudioServices &audio) {
-        _audioSvc = &audio;
-    }
-
     // END TODO
 
 private:
     std::filesystem::path _gamePath;
+    IAudioPlayer &_audioPlayer;
 
     graphics::GraphicsServices *_graphicsSvc {nullptr};
-    audio::AudioServices *_audioSvc {nullptr};
 
     std::unordered_map<std::string, std::shared_ptr<movie::IMovie>> _objects;
 

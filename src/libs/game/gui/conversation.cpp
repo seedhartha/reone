@@ -18,13 +18,13 @@
 #include "reone/game/gui/conversation.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/files.h"
-#include "reone/audio/player.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/lips.h"
 #include "reone/graphics/models.h"
 #include "reone/gui/control/listbox.h"
+#include "reone/resource/audio/files.h"
+#include "reone/resource/audio/player.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 
@@ -175,7 +175,7 @@ void Conversation::loadVoiceOver() {
         }
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _services.audio.player.play(voiceResRef, AudioType::Voice);
+        _currentVoice = _services.resource.player.play(voiceResRef, AudioType::Voice);
     }
 }
 

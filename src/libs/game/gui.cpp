@@ -18,13 +18,13 @@
 #include "reone/game/gui.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/gui/sounds.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/textures.h"
 #include "reone/gui/guis.h"
+#include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/scene/di/services.h"
@@ -148,12 +148,12 @@ std::string GameGUI::guiResRef(const std::string &base) const {
 }
 
 void GameGUI::onClick(const std::string &control) {
-    _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
+    _audioSource = _services.resource.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const std::string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
+        _audioSource = _services.resource.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

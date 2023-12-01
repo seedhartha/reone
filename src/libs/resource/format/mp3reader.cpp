@@ -15,15 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/format/mp3reader.h"
-
-#include "reone/system/stream/input.h"
+#include "reone/resource/format/mp3reader.h"
 
 #include "reone/audio/buffer.h"
+#include "reone/system/stream/input.h"
+
+using namespace reone::audio;
 
 namespace reone {
 
-namespace audio {
+namespace resource {
 
 static inline int scale(mad_fixed_t sample) {
     // round
@@ -109,6 +110,6 @@ mad_flow Mp3Reader::outputFunc(void *playbuf, mad_header const *header, mad_pcm 
     return MAD_FLOW_CONTINUE;
 }
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

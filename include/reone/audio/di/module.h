@@ -20,9 +20,7 @@
 #include "reone/resource/di/module.h"
 
 #include "../context.h"
-#include "../files.h"
 #include "../options.h"
-#include "../player.h"
 
 #include "services.h"
 
@@ -32,29 +30,17 @@ namespace audio {
 
 class AudioModule : boost::noncopyable {
 public:
-    AudioModule(AudioOptions &options, resource::ResourceModule &resource) :
-        _options(options),
-        _resource(resource) {
-    }
-
     ~AudioModule() { deinit(); }
 
     void init();
     void deinit();
 
     AudioContext &context() { return *_context; }
-    AudioFiles &files() { return *_files; }
-    AudioPlayer &player() { return *_player; }
 
     AudioServices &services() { return *_services; }
 
 private:
-    AudioOptions &_options;
-    resource::ResourceModule &_resource;
-
     std::unique_ptr<AudioContext> _context;
-    std::unique_ptr<AudioFiles> _files;
-    std::unique_ptr<AudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;
 };

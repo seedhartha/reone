@@ -24,17 +24,15 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/system/logutil.h"
-
 #include "reone/scene/graph.h"
-#include "reone/scene/types.h"
-
 #include "reone/scene/node/emitter.h"
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/mesh.h"
+#include "reone/scene/types.h"
+#include "reone/system/logutil.h"
 
-using namespace reone::audio;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 namespace reone {
 
@@ -47,12 +45,12 @@ ModelSceneNode::ModelSceneNode(
     ModelUsage usage,
     SceneGraph &sceneGraph,
     GraphicsServices &graphicsSvc,
-    AudioServices &audioSvc) :
+    ResourceServices &resourceSvc) :
     SceneNode(
         SceneNodeType::Model,
         sceneGraph,
         graphicsSvc,
-        audioSvc),
+        resourceSvc),
     _model(&model),
     _usage(usage) {
 

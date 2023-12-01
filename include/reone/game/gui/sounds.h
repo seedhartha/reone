@@ -21,6 +21,7 @@ namespace reone {
 
 namespace resource {
 
+class AudioFiles;
 class TwoDa;
 class TwoDas;
 
@@ -28,10 +29,9 @@ class TwoDas;
 
 namespace audio {
 
-class AudioFiles;
 class AudioBuffer;
 
-} // namespace audio
+}
 
 namespace game {
 
@@ -45,7 +45,7 @@ public:
 
 class GUISounds : public IGUISounds, boost::noncopyable {
 public:
-    GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
+    GUISounds(resource::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
         _audioFiles(audioFiles),
         _twoDas(twoDas) {
     }
@@ -59,7 +59,7 @@ public:
     std::shared_ptr<audio::AudioBuffer> getOnEnter() const override { return _onEnter; }
 
 private:
-    audio::AudioFiles &_audioFiles;
+    resource::AudioFiles &_audioFiles;
     resource::TwoDas &_twoDas;
 
     std::shared_ptr<audio::AudioBuffer> _onClick;

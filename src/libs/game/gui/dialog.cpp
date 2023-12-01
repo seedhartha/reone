@@ -17,14 +17,14 @@
 
 #include "reone/game/gui/dialog.h"
 
-#include "reone/audio/files.h"
-#include "reone/audio/player.h"
 #include "reone/audio/source.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/models.h"
 #include "reone/gui/control/panel.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/audio/files.h"
+#include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/scene/types.h"
 #include "reone/script/execution.h"

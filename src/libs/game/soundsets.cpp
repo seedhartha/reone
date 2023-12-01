@@ -17,7 +17,7 @@
 
 #include "reone/game/soundsets.h"
 
-#include "reone/audio/files.h"
+#include "reone/resource/audio/files.h"
 #include "reone/resource/format/ssfreader.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"

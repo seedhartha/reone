@@ -42,12 +42,12 @@ public:
         graphics::ModelNode &aabbNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Grass,
             sceneGraph,
             graphicsSvc,
-            audioSvc),
+            resourceSvc),
         _properties(std::move(properties)),
         _aabbNode(aabbNode) {
 

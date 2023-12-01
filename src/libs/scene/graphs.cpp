@@ -29,7 +29,7 @@ void SceneGraphs::reserve(std::string name) {
         name,
         _graphicsOpt,
         _graphicsSvc,
-        _audioSvc);
+        _resourceSvc);
 
     _scenes.insert(std::make_pair(name, std::move(scene)));
 }

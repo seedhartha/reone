@@ -21,12 +21,14 @@ namespace reone {
 
 namespace resource {
 
+class IAudioFiles;
+class IAudioPlayer;
 class IGffs;
+class IMovies;
 class IResources;
 class IScripts;
 class IStrings;
 class ITwoDas;
-class IMovies;
 
 struct ResourceServices {
     IGffs &gffs;
@@ -35,6 +37,8 @@ struct ResourceServices {
     ITwoDas &twoDas;
     IScripts &scripts;
     IMovies &movies;
+    IAudioFiles &files;
+    IAudioPlayer &player;
 
     ResourceServices(
         IGffs &gffs,
@@ -42,13 +46,17 @@ struct ResourceServices {
         IStrings &strings,
         ITwoDas &twoDas,
         IScripts &scripts,
-        IMovies &movies) :
+        IMovies &movies,
+        IAudioFiles &files,
+        IAudioPlayer &player) :
         gffs(gffs),
         resources(resources),
         strings(strings),
         twoDas(twoDas),
         scripts(scripts),
-        movies(movies) {
+        movies(movies),
+        files(files),
+        player(player) {
     }
 };
 

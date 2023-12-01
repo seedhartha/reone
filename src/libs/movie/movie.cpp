@@ -18,7 +18,6 @@
 #include "reone/movie/movie.h"
 
 #include "reone/audio/di/services.h"
-#include "reone/audio/player.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
@@ -27,6 +26,7 @@
 #include "reone/graphics/textures.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/resource/audio/player.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -46,7 +46,7 @@ void Movie::init() {
         _texture->clear(1, 1, PixelFormat::RGB8, 1);
     }
     if (!_audioSource && _audioStream) {
-        _audioSource = _audioSvc.player.play(_audioStream, AudioType::Movie);
+        _audioSource = _audioPlayer.play(_audioStream, AudioType::Movie);
     }
     _inited = true;
 }

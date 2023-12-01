@@ -32,13 +32,13 @@ public:
         graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Mesh,
             sceneGraph,
             graphicsSvc,
-            audioSvc),
+            resourceSvc),
         _model(model) {
 
         init();

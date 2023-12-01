@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../2das.h"
+#include "../audio/files.h"
+#include "../audio/player.h"
 #include "../gffs.h"
 #include "../movies.h"
 #include "../resources.h"
@@ -32,8 +34,10 @@ namespace resource {
 
 class ResourceModule : boost::noncopyable {
 public:
-    ResourceModule(std::filesystem::path gamePath) :
-        _gamePath(std::move(gamePath)) {
+    ResourceModule(std::filesystem::path gamePath,
+                   audio::AudioOptions &audioOpts) :
+        _gamePath(std::move(gamePath)),
+        _audioOpts(audioOpts) {
     }
 
     ~ResourceModule() { deinit(); }
@@ -47,11 +51,14 @@ public:
     TwoDas &twoDas() { return *_twoDas; }
     Scripts &scripts() { return *_scripts; }
     Movies &movies() { return *_movies; }
+    AudioFiles &files() { return *_files; }
+    AudioPlayer &player() { return *_player; }
 
     ResourceServices &services() { return *_services; }
 
 private:
     std::filesystem::path _gamePath;
+    audio::AudioOptions &_audioOpts;
 
     std::unique_ptr<Gffs> _gffs;
     std::unique_ptr<Resources> _resources;
@@ -59,6 +66,8 @@ private:
     std::unique_ptr<TwoDas> _twoDas;
     std::unique_ptr<Scripts> _scripts;
     std::unique_ptr<Movies> _movies;
+    std::unique_ptr<AudioFiles> _files;
+    std::unique_ptr<AudioPlayer> _player;
 
     std::unique_ptr<ResourceServices> _services;
 };

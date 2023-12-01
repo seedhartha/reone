@@ -41,12 +41,12 @@ protected:
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         SceneNode(
             type,
             sceneGraph,
             graphicsSvc,
-            audioSvc),
+            resourceSvc),
         _modelNode(modelNode) {
     }
 };

@@ -23,15 +23,10 @@ namespace reone {
 
 namespace resource {
 
+class AudioFiles;
 class TwoDas;
 
-}
-
-namespace audio {
-
-class AudioFiles;
-
-}
+} // namespace resource
 
 namespace game {
 
@@ -58,7 +53,7 @@ public:
 class FootstepSounds : public IFootstepSounds {
 public:
     FootstepSounds(
-        audio::AudioFiles &audioFiles,
+        resource::AudioFiles &audioFiles,
         resource::TwoDas &twoDas) :
         _audioFiles(audioFiles),
         _twoDas(twoDas) {
@@ -78,7 +73,7 @@ public:
     }
 
 private:
-    audio::AudioFiles &_audioFiles;
+    resource::AudioFiles &_audioFiles;
     resource::TwoDas &_twoDas;
 
     std::unordered_map<uint32_t, std::shared_ptr<FootstepTypeSounds>> _objects;

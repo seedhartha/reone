@@ -38,12 +38,12 @@ public:
         graphics::Walkmesh &walkmesh,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Walkmesh,
             sceneGraph,
             graphicsSvc,
-            audioSvc),
+            resourceSvc),
         _walkmesh(walkmesh) {
 
         _point = false;

@@ -17,12 +17,12 @@
 
 #include "reone/game/object/sound.h"
 
-#include "reone/audio/files.h"
-#include "reone/audio/player.h"
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
+#include "reone/resource/audio/files.h"
+#include "reone/resource/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"

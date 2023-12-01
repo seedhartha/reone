@@ -25,7 +25,6 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmesh.h"
-
 #include "reone/scene/collision.h"
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/emitter.h"

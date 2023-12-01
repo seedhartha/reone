@@ -19,6 +19,8 @@ set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
     ${RESOURCE_INCLUDE_DIR}/2das.h
+    ${RESOURCE_INCLUDE_DIR}/audio/files.h
+    ${RESOURCE_INCLUDE_DIR}/audio/player.h
     ${RESOURCE_INCLUDE_DIR}/container.h
     ${RESOURCE_INCLUDE_DIR}/container/erf.h
     ${RESOURCE_INCLUDE_DIR}/container/exe.h
@@ -41,6 +43,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
     ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/mp3reader.h
     ${RESOURCE_INCLUDE_DIR}/format/ncsreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ncswriter.h
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
@@ -52,6 +55,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/visreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/wavreader.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/are.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/dlg.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/git.h
@@ -84,6 +88,8 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/2da.cpp
     ${RESOURCE_SOURCE_DIR}/2das.cpp
+    ${RESOURCE_SOURCE_DIR}/audio/files.cpp
+    ${RESOURCE_SOURCE_DIR}/audio/player.cpp
     ${RESOURCE_SOURCE_DIR}/container/erf.cpp
     ${RESOURCE_SOURCE_DIR}/container/exe.cpp
     ${RESOURCE_SOURCE_DIR}/container/folder.cpp
@@ -101,6 +107,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ltrreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/lytreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/mp3reader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ncsreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ncswriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
@@ -112,6 +119,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/wavreader.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/are.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/dlg.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/git.cpp

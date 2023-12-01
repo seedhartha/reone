@@ -25,14 +25,9 @@ namespace resource {
 
 class Resources;
 class Strings;
-
-} // namespace resource
-
-namespace audio {
-
 class AudioFiles;
 
-}
+} // namespace resource
 
 namespace game {
 
@@ -48,7 +43,7 @@ public:
 class SoundSets : public ISoundSets {
 public:
     SoundSets(
-        audio::AudioFiles &audioFiles,
+        resource::AudioFiles &audioFiles,
         resource::Resources &resources,
         resource::Strings &strings) :
         _audioFiles(audioFiles),
@@ -70,7 +65,7 @@ public:
     }
 
 private:
-    audio::AudioFiles &_audioFiles;
+    resource::AudioFiles &_audioFiles;
     resource::Resources &_resources;
     resource::Strings &_strings;
 

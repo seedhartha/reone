@@ -43,9 +43,9 @@ class Walkmesh;
 
 } // namespace graphics
 
-namespace audio {
+namespace resource {
 
-struct AudioServices;
+struct ResourceServices;
 
 }
 
@@ -115,11 +115,11 @@ public:
         std::string name,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         _name(std::move(name)),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
-        _audioSvc(audioSvc) {
+        _resourceSvc(resourceSvc) {
     }
 
     void update(float dt) override;
@@ -249,7 +249,7 @@ private:
     std::string _name;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
-    audio::AudioServices &_audioSvc;
+    resource::ResourceServices &_resourceSvc;
 
     bool _updateRoots {true};
 
@@ -333,7 +333,7 @@ private:
 
     template <class T, class... Params>
     std::shared_ptr<T> newSceneNode(Params... params) {
-        auto node = std::make_shared<T>(params..., *this, _graphicsSvc, _audioSvc);
+        auto node = std::make_shared<T>(params..., *this, _graphicsSvc, _resourceSvc);
         _nodes.insert(node);
         return node;
     }

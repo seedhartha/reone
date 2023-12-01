@@ -27,7 +27,9 @@ void ResourceModule::init() {
     _twoDas = std::make_unique<TwoDas>(*_resources);
     _gffs = std::make_unique<Gffs>(*_resources);
     _scripts = std::make_unique<Scripts>(*_resources);
-    _movies = std::make_unique<Movies>(_gamePath);
+    _files = std::make_unique<AudioFiles>(*_resources);
+    _player = std::make_unique<AudioPlayer>(_audioOpts, *_files);
+    _movies = std::make_unique<Movies>(_gamePath, *_player);
 
     _strings->init(_gamePath);
 
@@ -37,12 +39,16 @@ void ResourceModule::init() {
         *_strings,
         *_twoDas,
         *_scripts,
-        *_movies);
+        *_movies,
+        *_files,
+        *_player);
 }
 
 void ResourceModule::deinit() {
     _services.reset();
 
+    _player.reset();
+    _files.reset();
     _movies.reset();
     _scripts.reset();
     _gffs.reset();

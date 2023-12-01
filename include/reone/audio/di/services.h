@@ -22,21 +22,12 @@ namespace reone {
 namespace audio {
 
 class IAudioContext;
-class IAudioFiles;
-class IAudioPlayer;
 
 struct AudioServices {
     IAudioContext &context;
-    IAudioFiles &files;
-    IAudioPlayer &player;
 
-    AudioServices(
-        IAudioContext &context,
-        IAudioFiles &files,
-        IAudioPlayer &player) :
-        context(context),
-        files(files),
-        player(player) {
+    AudioServices(IAudioContext &context) :
+        context(context) {
     }
 };
 

@@ -21,52 +21,22 @@
 
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
-#include "reone/audio/files.h"
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/player.h"
 
 namespace reone {
 
 namespace audio {
-
-class MockMp3Reader : public Mp3Reader {
-public:
-    MOCK_METHOD(void, load, (IInputStream & stream), (override));
-};
-
-class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
-public:
-    MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
-};
 
 class MockAudioContext : public IAudioContext, boost::noncopyable {
 public:
     MOCK_METHOD(void, setListenerPosition, (glm::vec3 position), (override));
 };
 
-class MockAudioFiles : public IAudioFiles, boost::noncopyable {
-public:
-    MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<AudioBuffer>, get, (const std::string &key), (override));
-};
-
-class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
-public:
-    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (const std::string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
-    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioBuffer> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
-};
-
 class TestAudioModule : boost::noncopyable {
 public:
     void init() {
         _context = std::make_unique<MockAudioContext>();
-        _files = std::make_unique<MockAudioFiles>();
-        _player = std::make_unique<MockAudioPlayer>();
 
-        _services = std::make_unique<AudioServices>(
-            *_context,
-            *_files,
-            *_player);
+        _services = std::make_unique<AudioServices>(*_context);
     }
 
     AudioServices &services() {
@@ -75,8 +45,6 @@ public:
 
 private:
     std::unique_ptr<MockAudioContext> _context;
-    std::unique_ptr<MockAudioFiles> _files;
-    std::unique_ptr<MockAudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;
 };

@@ -29,9 +29,9 @@ struct GraphicsServices;
 
 }
 
-namespace audio {
+namespace resource {
 
-struct AudioServices;
+struct ResourceServices;
 
 }
 
@@ -99,7 +99,7 @@ protected:
     SceneNodeType _type;
     SceneGraph &_sceneGraph;
     graphics::GraphicsServices &_graphicsSvc;
-    audio::AudioServices &_audioSvc;
+    resource::ResourceServices &_resourceSvc;
 
     SceneNode *_parent {nullptr};
     std::unordered_set<SceneNode *> _children;
@@ -129,11 +129,11 @@ protected:
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         _type(type),
         _sceneGraph(sceneGraph),
         _graphicsSvc(graphicsSvc),
-        _audioSvc(audioSvc) {
+        _resourceSvc(resourceSvc) {
     }
 
     void computeAbsoluteTransforms();

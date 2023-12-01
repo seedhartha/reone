@@ -19,10 +19,10 @@
 
 #include <wx/dcbuffer.h>
 
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/format/wavreader.h"
 #include "reone/graphics/format/lipwriter.h"
 #include "reone/graphics/lipanimation.h"
+#include "reone/resource/format/mp3reader.h"
+#include "reone/resource/format/wavreader.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
@@ -32,6 +32,7 @@
 
 using namespace reone::audio;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 namespace reone {
 

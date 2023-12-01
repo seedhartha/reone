@@ -17,8 +17,6 @@
 
 #include "main.h"
 
-#include "reone/audio/format/mp3reader.h"
-#include "reone/audio/format/wavreader.h"
 #include "reone/graphics/animation.h"
 #include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/format/mdlmdxreader.h"
@@ -27,8 +25,10 @@
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/ssfreader.h"
 #include "reone/resource/format/tlkreader.h"
+#include "reone/resource/format/wavreader.h"
 #include "reone/resource/talktable.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
@@ -448,10 +448,10 @@ void MainViewModel::loadEngine() {
     _graphicsOpt.sharpen = false;
 
     _systemModule = std::make_unique<SystemModule>();
-    _resourceModule = std::make_unique<ResourceModule>(_gamePath);
+    _resourceModule = std::make_unique<ResourceModule>(_gamePath, _audioOpt);
     _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt, *_resourceModule);
-    _audioModule = std::make_unique<AudioModule>(_audioOpt, *_resourceModule);
-    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_audioModule, *_graphicsModule);
+    _audioModule = std::make_unique<AudioModule>();
+    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule);
 
     _systemModule->init();
     _resourceModule->init();

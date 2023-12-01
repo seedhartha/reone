@@ -25,12 +25,12 @@
 #include "reone/scene/node/model.h"
 #include "reone/scene/node/modelnode.h"
 
-#include "../fixtures/audio.h"
 #include "../fixtures/graphics.h"
+#include "../fixtures/resource.h"
 
 using namespace reone;
-using namespace reone::audio;
 using namespace reone::graphics;
+using namespace reone::resource;
 using namespace reone::scene;
 
 TEST(model_scene_node, should_build_from_model) {
@@ -40,10 +40,10 @@ TEST(model_scene_node, should_build_from_model) {
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = TestAudioModule();
-    audioModule.init();
+    auto resourceModule = TestResourceModule();
+    resourceModule.init();
 
-    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), resourceModule.services());
 
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -68,7 +68,7 @@ TEST(model_scene_node, should_build_from_model) {
         ModelUsage::Creature,
         *scene,
         graphicsModule.services(),
-        audioModule.services());
+        resourceModule.services());
 
     // when
     modelSceneNode->init();
@@ -102,10 +102,10 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = TestAudioModule();
-    audioModule.init();
+    auto resourceModule = TestResourceModule();
+    resourceModule.init();
 
-    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), resourceModule.services());
 
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -123,7 +123,7 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
         ModelUsage::Creature,
         *scene,
         graphicsModule.services(),
-        audioModule.services());
+        resourceModule.services());
 
     // when
     modelSceneNode->init();
@@ -150,10 +150,10 @@ TEST(model_scene_node, should_play_single_looping_animation) {
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = TestAudioModule();
-    audioModule.init();
+    auto resourceModule = TestResourceModule();
+    resourceModule.init();
 
-    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), resourceModule.services());
 
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -170,7 +170,7 @@ TEST(model_scene_node, should_play_single_looping_animation) {
         ModelUsage::Creature,
         *scene,
         graphicsModule.services(),
-        audioModule.services());
+        resourceModule.services());
 
     // when
     modelSceneNode->init();
@@ -197,10 +197,10 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = TestAudioModule();
-    audioModule.init();
+    auto resourceModule = TestResourceModule();
+    resourceModule.init();
 
-    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), resourceModule.services());
 
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
     auto dummyNode = std::make_shared<ModelNode>(1, "dummy_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, rootNode.get());
@@ -226,7 +226,7 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
         ModelUsage::Creature,
         *scene,
         graphicsModule.services(),
-        audioModule.services());
+        resourceModule.services());
 
     // when
     modelSceneNode->init();
@@ -262,10 +262,10 @@ TEST(model_scene_node, hould_transition_between_two_animations) {
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
 
-    auto audioModule = TestAudioModule();
-    audioModule.init();
+    auto resourceModule = TestResourceModule();
+    resourceModule.init();
 
-    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), audioModule.services());
+    auto scene = std::make_unique<SceneGraph>("test", graphicsOpt, graphicsModule.services(), resourceModule.services());
 
     auto rootNode = std::make_shared<ModelNode>(0, "root_node", glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), true, nullptr);
 
@@ -287,7 +287,7 @@ TEST(model_scene_node, hould_transition_between_two_animations) {
         ModelUsage::Creature,
         *scene,
         graphicsModule.services(),
-        audioModule.services());
+        resourceModule.services());
 
     // when
     modelSceneNode->init();

@@ -30,12 +30,12 @@ public:
     SoundSceneNode(
         SceneGraph &sceneGraph,
         graphics::GraphicsServices &graphicsSvc,
-        audio::AudioServices &audioSvc) :
+        resource::ResourceServices &resourceSvc) :
         SceneNode(
             SceneNodeType::Sound,
             sceneGraph,
             graphicsSvc,
-            audioSvc) {
+            resourceSvc) {
     }
 
     void update(float dt) override;
