@@ -482,7 +482,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
         return;
     }
     glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.resource.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    _audioSourceVoice = _services.resource.audioPlayer.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
@@ -699,7 +699,7 @@ void Creature::onEventSignalled(const std::string &name) {
     }
     std::shared_ptr<AudioBuffer> sound(materialSounds[index]);
     if (sound) {
-        _audioSourceFootstep = _services.resource.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
+        _audioSourceFootstep = _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 

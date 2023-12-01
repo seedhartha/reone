@@ -34,7 +34,7 @@ void SoundSceneNode::update(float dt) {
 }
 
 void SoundSceneNode::playSound(const std::string &resRef, float gain, bool positional, bool loop) {
-    _source = _resourceSvc.player.play(resRef, AudioType::Sound, loop, gain, positional, getOrigin());
+    _source = _resourceSvc.audioPlayer.play(resRef, AudioType::Sound, loop, gain, positional, getOrigin());
 }
 
 bool SoundSceneNode::isSoundPlaying() const {

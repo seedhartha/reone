@@ -32,7 +32,6 @@
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
 
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -61,7 +60,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     }
     std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
     if (sound) {
-        _audioSource = _services.resource.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+        _audioSource = _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }
 }
 
@@ -71,7 +70,7 @@ void Item::playImpactSound(int variant, glm::vec3 position) {
     }
     std::shared_ptr<AudioBuffer> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
     if (sound) {
-        _services.resource.player.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
+        _services.resource.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, std::move(position));
     }
 }
 
@@ -158,10 +157,10 @@ void Item::loadAmmunitionType() {
         std::shared_ptr<TwoDa> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = std::make_shared<Item::AmmunitionType>();
         _ammunitionType->model = _services.resource.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
-        _ammunitionType->shotSound1 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
-        _ammunitionType->shotSound2 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
-        _ammunitionType->impactSound1 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
-        _ammunitionType->impactSound2 = _services.resource.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
+        _ammunitionType->shotSound1 = _services.resource.audioFiles.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
+        _ammunitionType->shotSound2 = _services.resource.audioFiles.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
+        _ammunitionType->impactSound1 = _services.resource.audioFiles.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
+        _ammunitionType->impactSound2 = _services.resource.audioFiles.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
     }
 }
 

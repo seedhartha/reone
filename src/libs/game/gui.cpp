@@ -148,12 +148,12 @@ std::string GameGUI::guiResRef(const std::string &base) const {
 }
 
 void GameGUI::onClick(const std::string &control) {
-    _audioSource = _services.resource.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
+    _audioSource = _services.resource.audioPlayer.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const std::string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.resource.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
+        _audioSource = _services.resource.audioPlayer.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

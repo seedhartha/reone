@@ -460,7 +460,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.resource.player.play(_musicResRef, AudioType::Music);
+        _music = _services.resource.audioPlayer.play(_musicResRef, AudioType::Music);
     }
 }
 

@@ -72,8 +72,8 @@ public:
     TwoDas &twoDas() { return *_twoDas; }
     Scripts &scripts() { return *_scripts; }
     Movies &movies() { return *_movies; }
-    AudioFiles &files() { return *_files; }
-    AudioPlayer &player() { return *_player; }
+    AudioFiles &audioFiles() { return *_audioFiles; }
+    AudioPlayer &audioPlayer() { return *_audioPlayer; }
     Cursors &cursors() { return *_cursors; }
     Fonts &fonts() { return *_fonts; }
     Lips &lips() { return *_lips; }
@@ -95,8 +95,8 @@ private:
     std::unique_ptr<TwoDas> _twoDas;
     std::unique_ptr<Scripts> _scripts;
     std::unique_ptr<Movies> _movies;
-    std::unique_ptr<AudioFiles> _files;
-    std::unique_ptr<AudioPlayer> _player;
+    std::unique_ptr<AudioFiles> _audioFiles;
+    std::unique_ptr<AudioPlayer> _audioPlayer;
     std::unique_ptr<Cursors> _cursors;
     std::unique_ptr<Fonts> _fonts;
     std::unique_ptr<Lips> _lips;

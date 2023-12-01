@@ -29,9 +29,9 @@ void ResourceModule::init() {
     _twoDas = std::make_unique<TwoDas>(*_resources);
     _gffs = std::make_unique<Gffs>(*_resources);
     _scripts = std::make_unique<Scripts>(*_resources);
-    _files = std::make_unique<AudioFiles>(*_resources);
-    _player = std::make_unique<AudioPlayer>(_audioOpt, *_files);
-    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), *_player);
+    _audioFiles = std::make_unique<AudioFiles>(*_resources);
+    _audioPlayer = std::make_unique<AudioPlayer>(_audioOpt, *_audioFiles);
+    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), *_audioPlayer);
     _textures = std::make_unique<Textures>(_graphicsOpt, *_resources);
     _models = std::make_unique<Models>(*_textures, *_resources);
     _walkmeshes = std::make_unique<Walkmeshes>(*_resources);
@@ -53,7 +53,7 @@ void ResourceModule::init() {
     _dialogs = std::make_unique<Dialogs>(*_gffs, *_strings);
     _layouts = std::make_unique<Layouts>(*_resources);
     _paths = std::make_unique<Paths>(*_gffs);
-    _soundSets = std::make_unique<SoundSets>(*_files, *_resources, *_strings);
+    _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
 
     _strings->init(_gamePath);
@@ -66,8 +66,8 @@ void ResourceModule::init() {
         *_twoDas,
         *_scripts,
         *_movies,
-        *_files,
-        *_player,
+        *_audioFiles,
+        *_audioPlayer,
         *_cursors,
         *_fonts,
         *_lips,
@@ -90,8 +90,8 @@ void ResourceModule::deinit() {
     _layouts.reset();
     _cursors.reset();
     _textures.reset();
-    _player.reset();
-    _files.reset();
+    _audioPlayer.reset();
+    _audioFiles.reset();
     _movies.reset();
     _scripts.reset();
     _gffs.reset();

@@ -48,8 +48,8 @@ struct ResourceServices {
     ITwoDas &twoDas;
     IScripts &scripts;
     IMovies &movies;
-    IAudioFiles &files;
-    IAudioPlayer &player;
+    IAudioFiles &audioFiles;
+    IAudioPlayer &audioPlayer;
     ICursors &cursors;
     IFonts &fonts;
     ILips &lips;
@@ -69,8 +69,8 @@ struct ResourceServices {
         ITwoDas &twoDas,
         IScripts &scripts,
         IMovies &movies,
-        IAudioFiles &files,
-        IAudioPlayer &player,
+        IAudioFiles &audioFiles,
+        IAudioPlayer &audioPlayer,
         ICursors &cursors,
         IFonts &fonts,
         ILips &lips,
@@ -88,8 +88,8 @@ struct ResourceServices {
         twoDas(twoDas),
         scripts(scripts),
         movies(movies),
-        files(files),
-        player(player),
+        audioFiles(audioFiles),
+        audioPlayer(audioPlayer),
         cursors(cursors),
         fonts(fonts),
         lips(lips),

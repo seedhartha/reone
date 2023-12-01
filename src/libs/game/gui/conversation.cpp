@@ -175,7 +175,7 @@ void Conversation::loadVoiceOver() {
         }
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _services.resource.player.play(voiceResRef, AudioType::Voice);
+        _currentVoice = _services.resource.audioPlayer.play(voiceResRef, AudioType::Voice);
     }
 }
 
