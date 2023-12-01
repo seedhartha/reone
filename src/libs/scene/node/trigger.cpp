@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/uniforms.h"
 
 using namespace reone::graphics;
@@ -99,7 +99,7 @@ void TriggerSceneNode::draw() {
         general.resetLocals();
         general.model = _absTransform;
     });
-    _graphicsSvc.shaders.use(ShaderProgramId::Walkmesh);
+    _graphicsSvc.shaderManager.use(ShaderProgramId::Walkmesh);
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {
         _mesh->draw();
     });

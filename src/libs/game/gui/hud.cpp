@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/control/label.h"
@@ -320,7 +320,7 @@ void HUD::drawHealth(int memberIndex) {
         general.model = std::move(transform);
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
-    _services.graphics.shaders.use(ShaderProgramId::SimpleColor);
+    _services.graphics.shaderManager.use(ShaderProgramId::SimpleColor);
     _services.graphics.meshes.quad().draw();
 }
 

@@ -21,14 +21,13 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
-
 
 #include "reone/gui/gui.h"
 
@@ -63,7 +62,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         return;
     }
 
-    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
+    _graphicsSvc.shaderManager.use(ShaderProgramId::GUI);
     _graphicsSvc.context.bind(*_thumb.image);
 
     // Top edge
@@ -136,7 +135,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
+    _graphicsSvc.shaderManager.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 
@@ -151,7 +150,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
+    _graphicsSvc.shaderManager.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 

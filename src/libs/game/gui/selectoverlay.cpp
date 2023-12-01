@@ -22,14 +22,13 @@
 #include "reone/graphics/font.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/provider/fonts.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
-
 
 #include "reone/game/action/attackobject.h"
 #include "reone/game/action/usefeat.h"
@@ -276,7 +275,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.shaders.use(ShaderProgramId::GUI);
+    _services.graphics.shaderManager.use(ShaderProgramId::GUI);
     _services.graphics.meshes.quad().draw();
 }
 
@@ -304,7 +303,7 @@ void SelectionOverlay::drawTitleBar() {
             general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             general.alpha = 0.5f;
         });
-        _services.graphics.shaders.use(ShaderProgramId::SimpleColor);
+        _services.graphics.shaderManager.use(ShaderProgramId::SimpleColor);
         _services.graphics.meshes.quad().draw();
     }
     {
@@ -337,7 +336,7 @@ void SelectionOverlay::drawHealthBar() {
         general.model = std::move(transform);
         general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
-    _services.graphics.shaders.use(ShaderProgramId::SimpleColor);
+    _services.graphics.shaderManager.use(ShaderProgramId::SimpleColor);
     _services.graphics.meshes.quad().draw();
 }
 
@@ -374,7 +373,7 @@ void SelectionOverlay::drawActionFrame(int index) {
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.shaders.use(ShaderProgramId::GUI);
+    _services.graphics.shaderManager.use(ShaderProgramId::GUI);
     _services.graphics.meshes.quad().draw();
 }
 
@@ -437,7 +436,7 @@ void SelectionOverlay::drawActionIcon(int index) {
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.shaders.use(ShaderProgramId::GUI);
+    _services.graphics.shaderManager.use(ShaderProgramId::GUI);
     _services.graphics.meshes.quad().draw();
 }
 

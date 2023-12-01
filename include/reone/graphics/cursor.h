@@ -25,7 +25,7 @@ class IWindow;
 
 class GraphicsContext;
 class Meshes;
-class Shaders;
+class ShaderManager;
 class Texture;
 class Uniforms;
 
@@ -36,14 +36,14 @@ public:
         std::shared_ptr<Texture> down,
         GraphicsContext &graphicsContext,
         Meshes &meshes,
-        Shaders &shaders,
+        ShaderManager &shaderManager,
         Uniforms &uniforms,
         IWindow &window) :
         _up(std::move(up)),
         _down(std::move(down)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaders(shaders),
+        _shaderManager(shaderManager),
         _uniforms(uniforms),
         _window(window) {
     }
@@ -64,7 +64,7 @@ private:
 
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
-    Shaders &_shaders;
+    ShaderManager &_shaderManager;
     Uniforms &_uniforms;
     IWindow &_window;
 

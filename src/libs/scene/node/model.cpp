@@ -22,7 +22,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node/emitter.h"
@@ -128,7 +128,7 @@ void ModelSceneNode::drawAABB() {
             u.model *= glm::scale(0.5f * _aabb.size());
             u.modelInv = glm::inverse(u.model);
         });
-        _graphicsSvc.shaders.use(ShaderProgramId::AABB);
+        _graphicsSvc.shaderManager.use(ShaderProgramId::AABB);
         _graphicsSvc.meshes.box().draw();
     });
 }

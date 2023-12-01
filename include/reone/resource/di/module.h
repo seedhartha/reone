@@ -31,6 +31,7 @@
 #include "../provider/movies.h"
 #include "../provider/paths.h"
 #include "../provider/scripts.h"
+#include "../provider/shaders.h"
 #include "../provider/soundsets.h"
 #include "../provider/textures.h"
 #include "../provider/visibilities.h"
@@ -82,6 +83,7 @@ public:
     Textures &textures() { return *_textures; }
     Walkmeshes &walkmeshes() { return *_walkmeshes; }
     Ltrs &ltrs() { return *_ltrs; }
+    Shaders &shaders() { return *_shaders; }
 
     ResourceServices &services() { return *_services; }
 
@@ -111,6 +113,7 @@ private:
     std::unique_ptr<SoundSets> _soundSets;
     std::unique_ptr<Visibilities> _visibilities;
     std::unique_ptr<Ltrs> _ltrs;
+    std::unique_ptr<Shaders> _shaders;
 
     std::unique_ptr<ResourceServices> _services;
 };

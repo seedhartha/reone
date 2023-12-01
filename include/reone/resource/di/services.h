@@ -35,6 +35,7 @@ class IMovies;
 class IPaths;
 class IResources;
 class IScripts;
+class IShaders;
 class ISoundSets;
 class IStrings;
 class ITextures;
@@ -63,6 +64,7 @@ struct ResourceServices {
     ISoundSets &soundSets;
     IVisibilities &visibilities;
     ILtrs &ltrs;
+    IShaders &shaders;
 
     ResourceServices(
         IGffs &gffs,
@@ -84,7 +86,8 @@ struct ResourceServices {
         IPaths &paths,
         ISoundSets &soundSets,
         IVisibilities &visibilities,
-        ILtrs &ltrs) :
+        ILtrs &ltrs,
+        IShaders &shaders) :
         gffs(gffs),
         resources(resources),
         strings(strings),
@@ -104,7 +107,8 @@ struct ResourceServices {
         paths(paths),
         soundSets(soundSets),
         visibilities(visibilities),
-        ltrs(ltrs) {
+        ltrs(ltrs),
+        shaders(shaders) {
     }
 };
 

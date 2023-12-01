@@ -69,6 +69,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/layout.h
     ${RESOURCE_INCLUDE_DIR}/ltr.h
     ${RESOURCE_INCLUDE_DIR}/path.h
+    ${RESOURCE_INCLUDE_DIR}/provider/shaders.h
     ${RESOURCE_INCLUDE_DIR}/provider/2das.h
     ${RESOURCE_INCLUDE_DIR}/provider/audiofiles.h
     ${RESOURCE_INCLUDE_DIR}/provider/cursors.h

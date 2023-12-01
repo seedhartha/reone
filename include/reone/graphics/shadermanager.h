@@ -60,20 +60,20 @@ enum class ShaderProgramId {
     Sharpen
 };
 
-class IShaders {
+class IShaderManager {
 public:
-    virtual ~IShaders() = default;
+    virtual ~IShaderManager() = default;
 
     virtual void use(ShaderProgramId programId) = 0;
 };
 
-class Shaders : public IShaders, boost::noncopyable {
+class ShaderManager : public IShaderManager, boost::noncopyable {
 public:
-    Shaders(GraphicsOptions &options) :
+    ShaderManager(GraphicsOptions &options) :
         _options(options) {
     }
 
-    ~Shaders() { deinit(); }
+    ~ShaderManager() { deinit(); }
 
     void init();
     void deinit();

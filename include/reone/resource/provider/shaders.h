@@ -19,39 +19,16 @@
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
-class IGraphicsContext;
-class IMeshes;
-class IPipeline;
-class IShaderManager;
-class IUniforms;
-class IWindow;
-
-struct GraphicsServices {
-    IGraphicsContext &context;
-    IMeshes &meshes;
-    IPipeline &pipeline;
-    IShaderManager &shaderManager;
-    IUniforms &uniforms;
-    IWindow &window;
-
-    GraphicsServices(
-        IGraphicsContext &context,
-        IMeshes &meshes,
-        IPipeline &pipeline,
-        IShaderManager &shaderManager,
-        IUniforms &uniforms,
-        IWindow &window) :
-        context(context),
-        meshes(meshes),
-        pipeline(pipeline),
-        shaderManager(shaderManager),
-        uniforms(uniforms),
-        window(window) {
-    }
+class IShaders {
+public:
+    virtual ~IShaders() = default;
 };
 
-} // namespace graphics
+class Shaders : public IShaders, boost::noncopyable {
+};
+
+} // namespace resource
 
 } // namespace reone

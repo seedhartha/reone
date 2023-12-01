@@ -39,13 +39,13 @@ void ResourceModule::init() {
     _fonts = std::make_unique<Fonts>(
         _graphics.context(),
         _graphics.meshes(),
-        _graphics.shaders(),
+        _graphics.shaderManager(),
         *_textures,
         _graphics.uniforms());
     _cursors = std::make_unique<Cursors>(
         _graphics.context(),
         _graphics.meshes(),
-        _graphics.shaders(),
+        _graphics.shaderManager(),
         *_textures,
         _graphics.uniforms(),
         _graphics.window(),
@@ -56,6 +56,7 @@ void ResourceModule::init() {
     _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
     _ltrs = std::make_unique<Ltrs>(*_resources);
+    _shaders = std::make_unique<Shaders>();
 
     _strings->init(_gamePath);
     _textures->init();
@@ -80,7 +81,8 @@ void ResourceModule::init() {
         *_paths,
         *_soundSets,
         *_visibilities,
-        *_ltrs);
+        *_ltrs,
+        *_shaders);
 }
 
 void ResourceModule::deinit() {

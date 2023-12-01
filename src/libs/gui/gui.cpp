@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -41,7 +41,6 @@
 #include "reone/resource/resources.h"
 #include "reone/resource/template/generated/gui.h"
 #include "reone/system/logutil.h"
-
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -252,7 +251,7 @@ void GUI::drawBackground() {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaders.use(ShaderProgramId::GUI);
+    _graphicsSvc.shaderManager.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 

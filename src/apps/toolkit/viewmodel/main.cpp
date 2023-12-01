@@ -49,7 +49,6 @@
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 
-
 #include "../di/graphicsmodule.h"
 
 using namespace reone::audio;
@@ -687,7 +686,7 @@ void MainViewModel::render3D(int w, int h) {
     });
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
-        _graphicsModule->shaders().use(ShaderProgramId::SimpleTexture);
+        _graphicsModule->shaderManager().use(ShaderProgramId::SimpleTexture);
         _graphicsModule->context().bind(*output);
         _graphicsModule->meshes().quadNDC().draw();
     });

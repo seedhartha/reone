@@ -32,7 +32,7 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
@@ -369,7 +369,7 @@ void Game::drawWorld() {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.graphics.shaders.use(ShaderProgramId::SimpleTexture);
+    _services.graphics.shaderManager.use(ShaderProgramId::SimpleTexture);
     _services.graphics.context.bind(*output);
     _services.graphics.meshes.quadNDC().draw();
 }

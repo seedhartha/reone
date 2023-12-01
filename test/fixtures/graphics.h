@@ -23,7 +23,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/pipeline.h"
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/system/exception/notimplemented.h"
@@ -78,7 +78,7 @@ public:
     MOCK_METHOD(std::shared_ptr<Texture>, draw, (IScene & scene, const glm::ivec2 &dim), (override));
 };
 
-class MockShaders : public IShaders, boost::noncopyable {
+class MockShaders : public IShaderManager, boost::noncopyable {
 public:
     MOCK_METHOD(void, use, (ShaderProgramId programId), (override));
 };

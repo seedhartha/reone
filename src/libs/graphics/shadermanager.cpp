@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/shaders.h"
+#include "reone/graphics/shadermanager.h"
 
 #include "reone/graphics/options.h"
 #include "reone/system/stringbuilder.h"
@@ -87,7 +87,7 @@ static const std::string kResRefFragmentText = "f_text";
 static const std::string kResRefFragmentTexture = "f_texture";
 static const std::string kResRefFragmentWalkmesh = "f_walkmesh";
 
-void Shaders::init() {
+void ShaderManager::init() {
     if (_inited) {
         return;
     }
@@ -168,7 +168,7 @@ void Shaders::init() {
     _inited = true;
 }
 
-void Shaders::deinit() {
+void ShaderManager::deinit() {
     if (!_inited) {
         return;
     }
@@ -202,7 +202,7 @@ void Shaders::deinit() {
     _inited = false;
 }
 
-void Shaders::use(ShaderProgramId programId) {
+void ShaderManager::use(ShaderProgramId programId) {
     if (_usedProgram == programId) {
         return;
     }
@@ -212,7 +212,7 @@ void Shaders::use(ShaderProgramId programId) {
     _usedProgram = programId;
 }
 
-std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::string> sourceResRefs) {
+std::shared_ptr<Shader> ShaderManager::initShader(ShaderType type, std::vector<std::string> sourceResRefs) {
     std::list<std::string> sources;
     sources.push_back("#version 330 core\n\n");
     auto defines = StringBuilder();
@@ -246,7 +246,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
     return shader;
 }
 
-std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders) {
+std::shared_ptr<ShaderProgram> ShaderManager::initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders) {
     auto program = std::make_unique<ShaderProgram>(std::move(shaders));
     program->init();
     program->use();
@@ -285,7 +285,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     return program;
 }
 
-ShaderProgram &Shaders::getProgram(ShaderProgramId id) {
+ShaderProgram &ShaderManager::getProgram(ShaderProgramId id) {
     switch (id) {
     case ShaderProgramId::SimpleColor:
         return *_spSimpleColor;
