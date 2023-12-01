@@ -19,8 +19,8 @@
 
 #include <wx/dcbuffer.h>
 
-#include "reone/graphics/format/lipwriter.h"
 #include "reone/graphics/lipanimation.h"
+#include "reone/resource/format/lipwriter.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/wavreader.h"
 #include "reone/system/logutil.h"
@@ -29,6 +29,7 @@
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 #include "reone/tools/lip/composer.h"
+
 
 using namespace reone::audio;
 using namespace reone::graphics;

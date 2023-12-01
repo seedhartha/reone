@@ -20,49 +20,38 @@
 #include "reone/system/binaryreader.h"
 #include "reone/system/stream/input.h"
 
-#include "../types.h"
-
 namespace reone {
 
 namespace graphics {
 
 class Texture;
 
-class TgaReader : boost::noncopyable {
+}
+
+namespace resource {
+
+class CurReader : boost::noncopyable {
 public:
-    TgaReader(IInputStream &tga, std::string resRef, TextureUsage usage) :
-        _tga(BinaryReader(tga)),
-        _resRef(std::move(resRef)),
-        _usage(usage) {
+    CurReader(IInputStream &cur) :
+        _cur(BinaryReader(cur)) {
     }
 
     void load();
 
-    std::shared_ptr<graphics::Texture> texture() const { return _texture; }
+    std::shared_ptr<graphics::Texture> texture() { return _texture; }
 
 private:
-    BinaryReader _tga;
-    std::string _resRef;
-    TextureUsage _usage;
+    BinaryReader _cur;
 
-    TGADataType _dataType {TGADataType::RGBA};
+    uint16_t _bitCount {0};
     int _width {0};
     int _height {0};
-    int _numLayers {0};
-    bool _alpha {false};
+    std::shared_ptr<graphics::Texture> _texture;
 
-    std::shared_ptr<Texture> _texture;
-
-    void loadTexture();
-
-    ByteBuffer readPixels(int w, int h);
-    ByteBuffer readPixelsRLE(int w, int h);
-
-    bool isRGBA() const;
-    bool isGrayscale() const;
-    bool isRLE() const;
+    void loadHeader();
+    void loadData();
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

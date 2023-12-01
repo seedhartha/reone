@@ -15,15 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/txireader.h"
+#include "reone/resource/format/txireader.h"
 
 #include "reone/system/logutil.h"
 #include "reone/system/stream/input.h"
 #include "reone/system/textreader.h"
 
+using namespace reone::graphics;
+
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 void TxiReader::load(IInputStream &in) {
     auto reader = TextReader(in);
@@ -136,6 +138,6 @@ Texture::Blending TxiReader::parseBlending(const std::string &s) const {
     }
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

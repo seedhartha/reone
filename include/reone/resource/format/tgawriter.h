@@ -17,36 +17,33 @@
 
 #pragma once
 
-#include "../texture.h"
+#include "reone/graphics/types.h"
+#include "reone/system/stream/output.h"
 
 namespace reone {
 
-class IInputStream;
-
 namespace graphics {
 
-class TxiReader {
-public:
-    void load(IInputStream &in);
+class Texture;
 
-    const Texture::Features &features() const { return _features; }
+}
+
+namespace resource {
+
+class TgaWriter {
+public:
+    TgaWriter(std::shared_ptr<graphics::Texture> texture);
+
+    void save(IOutputStream &out, bool compress = false);
 
 private:
-    enum class State {
-        None,
-        UpperLeftCoords,
-        LowerRightCoords
-    };
+    std::shared_ptr<graphics::Texture> _texture;
 
-    Texture::Features _features;
-    State _state {State::None};
-    int _upperLeftCoordCount {0};
-    int _lowerRightCoordCount {0};
+    void writeRLE(uint8_t *pixels, int depth, IOutputStream &out);
 
-    void processLine(const std::vector<std::string> &tokens);
-    Texture::Blending parseBlending(const std::string &s) const;
+    std::vector<uint8_t> getTexturePixels(bool compress, graphics::TGADataType &dataType, int &depth) const;
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

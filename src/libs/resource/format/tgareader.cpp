@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/tgareader.h"
+#include "reone/resource/format/tgareader.h"
 
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/resource/exception/format.h"
 #include "reone/system/logutil.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 void TgaReader::load() {
     auto idLength = _tga.readByte();
@@ -151,6 +151,6 @@ bool TgaReader::isRLE() const {
     return _dataType == TGADataType::RGBA_RLE;
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

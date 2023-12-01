@@ -17,12 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/graphics/format/tpcreader.h"
+#include "reone/resource/format/tpcreader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 TEST(tpc_reader, should_load_tpc) {
     // given

@@ -17,12 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/graphics/format/txireader.h"
+#include "reone/resource/format/txireader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 TEST(txi_reader, should_load_txi) {
     // given

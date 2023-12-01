@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "reone/graphics/types.h"
 #include "reone/system/binaryreader.h"
 #include "reone/system/stream/input.h"
 
@@ -26,28 +27,45 @@ namespace graphics {
 
 class Texture;
 
-class CurReader : boost::noncopyable {
+}
+
+namespace resource {
+
+class TgaReader : boost::noncopyable {
 public:
-    CurReader(IInputStream &cur) :
-        _cur(BinaryReader(cur)) {
+    TgaReader(IInputStream &tga, std::string resRef, graphics::TextureUsage usage) :
+        _tga(BinaryReader(tga)),
+        _resRef(std::move(resRef)),
+        _usage(usage) {
     }
 
     void load();
 
-    std::shared_ptr<Texture> texture() { return _texture; }
+    std::shared_ptr<graphics::Texture> texture() const { return _texture; }
 
 private:
-    BinaryReader _cur;
+    BinaryReader _tga;
+    std::string _resRef;
+    graphics::TextureUsage _usage;
 
-    uint16_t _bitCount {0};
+    graphics::TGADataType _dataType {graphics::TGADataType::RGBA};
     int _width {0};
     int _height {0};
-    std::shared_ptr<Texture> _texture;
+    int _numLayers {0};
+    bool _alpha {false};
 
-    void loadHeader();
-    void loadData();
+    std::shared_ptr<graphics::Texture> _texture;
+
+    void loadTexture();
+
+    ByteBuffer readPixels(int w, int h);
+    ByteBuffer readPixelsRLE(int w, int h);
+
+    bool isRGBA() const;
+    bool isGrayscale() const;
+    bool isRLE() const;
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

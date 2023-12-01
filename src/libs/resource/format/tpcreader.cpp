@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/tpcreader.h"
+#include "reone/resource/format/tpcreader.h"
 
-#include "reone/graphics/format/txireader.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/txireader.h"
 #include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 void TpcReader::load() {
     uint32_t dataSize = _tpc.readUint32();
@@ -155,6 +155,6 @@ PixelFormat TpcReader::getPixelFormat() const {
         }
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

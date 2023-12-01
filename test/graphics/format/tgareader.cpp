@@ -17,13 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/graphics/format/tgareader.h"
 #include "reone/graphics/texture.h"
+#include "reone/resource/format/tgareader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 TEST(tga_reader, should_load_tga) {
     // given

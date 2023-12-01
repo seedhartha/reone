@@ -26,6 +26,10 @@ namespace graphics {
 
 class Walkmesh;
 
+}
+
+namespace resource {
+
 class BwmReader : boost::noncopyable {
 public:
     BwmReader(IInputStream &bwm) :
@@ -34,7 +38,7 @@ public:
 
     void load();
 
-    std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
+    std::shared_ptr<graphics::Walkmesh> walkmesh() const { return _walkmesh; }
 
 private:
     enum class WalkmeshType {
@@ -68,7 +72,7 @@ private:
     std::vector<uint32_t> _materials;
     std::vector<float> _normals;
 
-    std::shared_ptr<Walkmesh> _walkmesh;
+    std::shared_ptr<graphics::Walkmesh> _walkmesh;
 
     void loadVertices();
     void loadIndices();
@@ -77,6 +81,6 @@ private:
     void loadAABB();
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

@@ -18,14 +18,13 @@
 #include "reone/game/gui/saveload.h"
 
 #include "reone/game/game.h"
-#include "reone/graphics/format/tgareader.h"
 #include "reone/resource/container/erf.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
+#include "reone/resource/format/tgareader.h"
 #include "reone/resource/strings.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
-
 
 using namespace reone::audio;
 

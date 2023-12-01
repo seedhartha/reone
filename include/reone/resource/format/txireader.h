@@ -17,22 +17,36 @@
 
 #pragma once
 
-#include "../lipanimation.h"
+#include "reone/graphics/texture.h"
 
 namespace reone {
 
-namespace graphics {
+class IInputStream;
 
-class LipWriter {
+namespace resource {
+
+class TxiReader {
 public:
-    LipWriter(LipAnimation &animation);
+    void load(IInputStream &in);
 
-    void save(const std::filesystem::path &path);
+    const graphics::Texture::Features &features() const { return _features; }
 
 private:
-    LipAnimation _animation;
+    enum class State {
+        None,
+        UpperLeftCoords,
+        LowerRightCoords
+    };
+
+    graphics::Texture::Features _features;
+    State _state {State::None};
+    int _upperLeftCoordCount {0};
+    int _lowerRightCoordCount {0};
+
+    void processLine(const std::vector<std::string> &tokens);
+    graphics::Texture::Blending parseBlending(const std::string &s) const;
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

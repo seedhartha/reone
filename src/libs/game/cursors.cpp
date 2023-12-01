@@ -18,11 +18,12 @@
 #include "reone/game/cursors.h"
 
 #include "reone/graphics/cursor.h"
-#include "reone/graphics/format/curreader.h"
 #include "reone/graphics/texture.h"
 #include "reone/resource/exception/notfound.h"
+#include "reone/resource/format/curreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
+
 
 using namespace reone::game;
 using namespace reone::graphics;

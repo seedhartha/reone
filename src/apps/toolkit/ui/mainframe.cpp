@@ -22,13 +22,13 @@
 
 #include "reone/audio/buffer.h"
 #include "reone/game/script/routines.h"
-#include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
+#include "reone/resource/format/lipreader.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/format/ssfreader.h"
@@ -52,6 +52,7 @@
 #include "reone/tools/legacy/ssf.h"
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
+
 
 #include "composelipdialog.h"
 

@@ -17,9 +17,9 @@
 
 #include "reone/tools/legacy/lip.h"
 
-#include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/format/lipwriter.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/lipreader.h"
+#include "reone/resource/format/lipwriter.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
@@ -29,6 +29,7 @@
 using namespace tinyxml2;
 
 using namespace reone::graphics;
+using namespace reone::resource;
 
 namespace reone {
 

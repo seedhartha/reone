@@ -17,13 +17,14 @@
 
 #include "reone/graphics/models.h"
 
-#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/textures.h"
 #include "reone/resource/exception/format.h"
+#include "reone/resource/format/mdlmdxreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
+
 
 using namespace reone::resource;
 

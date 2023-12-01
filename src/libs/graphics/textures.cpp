@@ -17,19 +17,20 @@
 
 #include "reone/graphics/textures.h"
 
-#include "reone/graphics/format/curreader.h"
-#include "reone/graphics/format/tgareader.h"
-#include "reone/graphics/format/tpcreader.h"
-#include "reone/graphics/format/txireader.h"
 #include "reone/graphics/options.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/types.h"
+#include "reone/resource/format/curreader.h"
+#include "reone/resource/format/tgareader.h"
+#include "reone/resource/format/tpcreader.h"
+#include "reone/resource/format/txireader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/threadutil.h"
+
 
 using namespace reone::resource;
 

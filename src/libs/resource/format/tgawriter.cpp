@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/tgawriter.h"
+#include "reone/resource/format/tgawriter.h"
 
 #include "reone/graphics/dxtutil.h"
 #include "reone/graphics/texture.h"
 #include "reone/resource/exception/format.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 static constexpr int kHeaderSize = 18;
 
@@ -221,6 +221,6 @@ void TgaWriter::writeRLE(uint8_t *pixels, int depth, IOutputStream &out) {
     }
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

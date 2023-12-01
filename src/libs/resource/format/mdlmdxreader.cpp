@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/mdlmdxreader.h"
-
-#include "reone/resource/exception/format.h"
-
-#include "reone/system/logutil.h"
+#include "reone/resource/format/mdlmdxreader.h"
 
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/models.h"
 #include "reone/graphics/textures.h"
+#include "reone/resource/exception/format.h"
+#include "reone/system/logutil.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 static constexpr int kFlagBezier = 16;
 
@@ -1167,6 +1165,6 @@ void MdlMdxReader::readDetonateController(const ControllerKey &key, const std::v
     readFloatController(key, data, node.detonate());
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

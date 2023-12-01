@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2023 The reone project contributors
  *
@@ -16,29 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/lips.h"
-
 #include "reone/resource/format/lipreader.h"
-#include "reone/resource/resources.h"
-#include "reone/system/stream/memoryinput.h"
 
-using namespace reone::resource;
+#include "reone/graphics/lipanimation.h"
+#include "reone/resource/format/signutil.h"
+
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
-std::shared_ptr<LipAnimation> Lips::doGet(std::string resRef) {
-    auto res = _resources.find(ResourceId(resRef, ResType::Lip));
-    if (!res) {
-        return nullptr;
+void LipReader::load() {
+    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
+
+    checkSignature(_lip, std::string("LIP V1.0", 8));
+
+    float length = _lip.readFloat();
+    uint32_t entryCount = _lip.readUint32();
+
+    std::vector<LipAnimation::Keyframe> keyframes;
+    for (uint32_t i = 0; i < entryCount; ++i) {
+        LipAnimation::Keyframe keyframe;
+        keyframe.time = _lip.readFloat();
+        keyframe.shape = _lip.readByte();
+        keyframes.push_back(std::move(keyframe));
     }
-    auto stream = MemoryInputStream(res->data);
-    auto reader = LipReader(stream, resRef);
-    reader.load();
-    return reader.animation();
+
+    _animation = std::make_shared<LipAnimation>(_name, length, std::move(keyframes));
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/curreader.h"
+#include "reone/resource/format/curreader.h"
 
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/resource/format/signutil.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 void CurReader::load() {
     loadHeader();
@@ -76,6 +76,6 @@ void CurReader::loadData() {
     _texture->setPixels(_width, _width, PixelFormat::BGRA8, Texture::Layer {std::move(pixels)});
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

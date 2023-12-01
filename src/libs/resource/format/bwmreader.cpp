@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/bwmreader.h"
+#include "reone/resource/format/bwmreader.h"
 
 #include "reone/graphics/walkmesh.h"
 #include "reone/resource/format/signutil.h"
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 void BwmReader::load() {
     checkSignature(_bwm, std::string("BWM V1.0", 8));
@@ -172,6 +172,6 @@ void BwmReader::loadAABB() {
     _walkmesh->_rootAabb = aabbs[0];
 }
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

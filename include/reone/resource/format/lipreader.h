@@ -15,32 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/lipwriter.h"
+#pragma once
 
-#include "reone/system/binarywriter.h"
-#include "reone/system/stream/fileoutput.h"
+#include "reone/system/binaryreader.h"
+#include "reone/system/stream/input.h"
 
 namespace reone {
 
 namespace graphics {
 
-LipWriter::LipWriter(LipAnimation &animation) :
-    _animation(animation) {
+class LipAnimation;
+
 }
 
-void LipWriter::save(const std::filesystem::path &path) {
-    auto lip = std::make_shared<FileOutputStream>(path);
+namespace resource {
 
-    BinaryWriter writer(*lip);
-    writer.writeString("LIP V1.0");
-    writer.writeFloat(_animation.length());
-    writer.writeUint32(static_cast<uint32_t>(_animation.keyframes().size()));
-    for (auto &keyframe : _animation.keyframes()) {
-        writer.writeFloat(keyframe.time);
-        writer.writeByte(keyframe.shape);
+class LipReader : boost::noncopyable {
+public:
+    LipReader(IInputStream &lip, std::string name) :
+        _lip(BinaryReader(lip)),
+        _name(std::move(name)) {
     }
-}
 
-} // namespace graphics
+    void load();
+
+    std::shared_ptr<graphics::LipAnimation> animation() const { return _animation; }
+
+private:
+    BinaryReader _lip;
+
+    std::string _name;
+
+    std::shared_ptr<graphics::LipAnimation> _animation;
+};
+
+} // namespace resource
 
 } // namespace reone

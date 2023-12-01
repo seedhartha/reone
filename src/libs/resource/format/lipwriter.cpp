@@ -15,32 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/format/lipwriter.h"
 
-#include "reone/system/stream/output.h"
+#include "reone/system/binarywriter.h"
+#include "reone/system/stream/fileoutput.h"
 
-#include "../types.h"
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
-class Texture;
+LipWriter::LipWriter(LipAnimation &animation) :
+    _animation(animation) {
+}
 
-class TgaWriter {
-public:
-    TgaWriter(std::shared_ptr<Texture> texture);
+void LipWriter::save(const std::filesystem::path &path) {
+    auto lip = std::make_shared<FileOutputStream>(path);
 
-    void save(IOutputStream &out, bool compress = false);
+    BinaryWriter writer(*lip);
+    writer.writeString("LIP V1.0");
+    writer.writeFloat(_animation.length());
+    writer.writeUint32(static_cast<uint32_t>(_animation.keyframes().size()));
+    for (auto &keyframe : _animation.keyframes()) {
+        writer.writeFloat(keyframe.time);
+        writer.writeByte(keyframe.shape);
+    }
+}
 
-private:
-    std::shared_ptr<Texture> _texture;
-
-    void writeRLE(uint8_t *pixels, int depth, IOutputStream &out);
-
-    std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
-};
-
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

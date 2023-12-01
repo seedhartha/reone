@@ -15,36 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/format/lipreader.h"
+#pragma once
 
 #include "reone/graphics/lipanimation.h"
-#include "reone/resource/format/signutil.h"
-
-using namespace reone::resource;
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
-void LipReader::load() {
-    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
+class LipWriter {
+public:
+    LipWriter(graphics::LipAnimation &animation);
 
-    checkSignature(_lip, std::string("LIP V1.0", 8));
+    void save(const std::filesystem::path &path);
 
-    float length = _lip.readFloat();
-    uint32_t entryCount = _lip.readUint32();
+private:
+    graphics::LipAnimation &_animation;
+};
 
-    std::vector<LipAnimation::Keyframe> keyframes;
-    for (uint32_t i = 0; i < entryCount; ++i) {
-        LipAnimation::Keyframe keyframe;
-        keyframe.time = _lip.readFloat();
-        keyframe.shape = _lip.readByte();
-        keyframes.push_back(std::move(keyframe));
-    }
-
-    _animation = std::make_shared<LipAnimation>(_name, length, std::move(keyframes));
-}
-
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

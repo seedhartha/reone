@@ -32,7 +32,6 @@
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/lips.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/models.h"
@@ -55,6 +54,7 @@
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/format/gffwriter.h"
+#include "reone/resource/format/tgawriter.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
@@ -67,6 +67,7 @@
 #include "reone/system/di/services.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
+
 
 using namespace reone::audio;
 using namespace reone::graphics;

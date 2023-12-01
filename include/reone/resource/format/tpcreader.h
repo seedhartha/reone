@@ -17,18 +17,17 @@
 
 #pragma once
 
+#include "reone/graphics/texture.h"
 #include "reone/system/binaryreader.h"
 #include "reone/system/stream/input.h"
 
-#include "../texture.h"
-
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
 class TpcReader : boost::noncopyable {
 public:
-    TpcReader(IInputStream &tpc, std::string resRef, TextureUsage usage) :
+    TpcReader(IInputStream &tpc, std::string resRef, graphics::TextureUsage usage) :
         _tpc(BinaryReader(tpc)),
         _resRef(std::move(resRef)),
         _usage(usage) {
@@ -36,7 +35,7 @@ public:
 
     void load();
 
-    std::shared_ptr<Texture> texture() const { return _texture; }
+    std::shared_ptr<graphics::Texture> texture() const { return _texture; }
     const ByteBuffer &txiData() const { return _txiData; }
 
 private:
@@ -48,7 +47,7 @@ private:
 
     BinaryReader _tpc;
     std::string _resRef;
-    TextureUsage _usage;
+    graphics::TextureUsage _usage;
 
     uint32_t _dataSize {0};
     uint16_t _width {0};
@@ -58,10 +57,10 @@ private:
     int _numLayers {0};
     uint8_t _numMipMaps {0};
 
-    std::vector<Texture::Layer> _layers;
-    Texture::Features _features;
+    std::vector<graphics::Texture::Layer> _layers;
+    graphics::Texture::Features _features;
 
-    std::shared_ptr<Texture> _texture;
+    std::shared_ptr<graphics::Texture> _texture;
     ByteBuffer _txiData;
 
     void loadLayers();
@@ -72,9 +71,9 @@ private:
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
 
-    PixelFormat getPixelFormat() const;
+    graphics::PixelFormat getPixelFormat() const;
 };
 
-} // namespace graphics
+} // namespace resource
 
 } // namespace reone

@@ -17,12 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/graphics/format/bwmreader.h"
+#include "reone/resource/format/bwmreader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
 using namespace reone::graphics;
+using namespace reone::resource;
 
 TEST(bwm_reader, should_load_pwk_dwk) {
     // given

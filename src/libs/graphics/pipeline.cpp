@@ -19,7 +19,6 @@
 
 #include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
-#include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
@@ -30,9 +29,11 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/format/tgawriter.h"
 #include "reone/scene/node/light.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"
+
 
 #define R_GAUSSIAN_BLUR_HORIZONTAL false
 #define R_GAUSSIAN_BLUR_VERTICAL true
