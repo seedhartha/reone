@@ -18,9 +18,9 @@
 #include "reone/game/d20/skills.h"
 
 #include "reone/resource/2da.h"
-#include "reone/resource/2das.h"
+#include "reone/resource/provider/2das.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
 
 
 using namespace reone::graphics;

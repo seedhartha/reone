@@ -17,9 +17,9 @@
 
 #include "reone/game/gui/sounds.h"
 
-#include "reone/resource/2das.h"
-#include "reone/resource/audio/files.h"
 #include "reone/resource/format/2dareader.h"
+#include "reone/resource/provider/2das.h"
+#include "reone/resource/provider/audiofiles.h"
 
 
 using namespace reone::audio;

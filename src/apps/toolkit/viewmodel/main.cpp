@@ -29,8 +29,8 @@
 #include "reone/resource/format/ssfreader.h"
 #include "reone/resource/format/tlkreader.h"
 #include "reone/resource/format/wavreader.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/talktable.h"
-#include "reone/resource/textures.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
@@ -48,6 +48,7 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
+
 
 #include "../di/graphicsmodule.h"
 

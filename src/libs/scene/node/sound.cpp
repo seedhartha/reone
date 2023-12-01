@@ -17,7 +17,7 @@
 
 #include "reone/scene/node/sound.h"
 
-#include "reone/resource/audio/player.h"
+#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
 
 using namespace reone::audio;

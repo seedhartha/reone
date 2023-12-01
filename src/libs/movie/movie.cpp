@@ -25,8 +25,8 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/resource/audio/player.h"
-#include "reone/resource/textures.h"
+#include "reone/resource/audioplayer.h"
+#include "reone/resource/provider/textures.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;

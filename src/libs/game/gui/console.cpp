@@ -32,7 +32,7 @@
 #include "reone/graphics/shaders.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/fonts.h"
+#include "reone/resource/provider/fonts.h"
 #include "reone/resource/resources.h"
 #include "reone/scene/types.h"
 #include "reone/script/executioncontext.h"

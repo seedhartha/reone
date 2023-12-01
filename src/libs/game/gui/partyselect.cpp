@@ -24,10 +24,10 @@
 #include "reone/game/portraits.h"
 #include "reone/game/script/runner.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
 #include "reone/script/types.h"
 
 

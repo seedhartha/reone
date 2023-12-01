@@ -21,8 +21,8 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
 #include "reone/resource/exception/format.h"
-#include "reone/resource/models.h"
-#include "reone/resource/textures.h"
+#include "reone/resource/provider/models.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/system/logutil.h"
 
 using namespace reone::graphics;

@@ -28,7 +28,7 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/system/logutil.h"
 

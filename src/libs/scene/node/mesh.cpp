@@ -26,7 +26,7 @@
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/textures.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/light.h"

@@ -36,11 +36,12 @@
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gff.h"
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/template/generated/gui.h"
-#include "reone/resource/textures.h"
 #include "reone/system/logutil.h"
+
 
 using namespace reone::graphics;
 using namespace reone::resource;

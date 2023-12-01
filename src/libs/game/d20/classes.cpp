@@ -17,7 +17,7 @@
 
 #include "reone/game/d20/classes.h"
 
-#include "reone/resource/2das.h"
+#include "reone/resource/provider/2das.h"
 
 using namespace reone::resource;
 

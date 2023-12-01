@@ -18,11 +18,10 @@
 #include "reone/game/script/runner.h"
 
 #include "reone/game/game.h"
-#include "reone/resource/scripts.h"
+#include "reone/resource/provider/scripts.h"
 #include "reone/script/execution.h"
 #include "reone/script/executioncontext.h"
 #include "reone/script/routines.h"
-
 
 using namespace reone::script;
 

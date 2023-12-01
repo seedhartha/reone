@@ -19,8 +19,8 @@
 
 #include "reone/graphics/di/services.h"
 #include "reone/gui/sceneinitializer.h"
-#include "reone/resource/audio/player.h"
-#include "reone/resource/models.h"
+#include "reone/resource/audioplayer.h"
+#include "reone/resource/provider/models.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/types.h"

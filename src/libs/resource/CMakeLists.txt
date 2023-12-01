@@ -18,9 +18,7 @@ set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
-    ${RESOURCE_INCLUDE_DIR}/2das.h
-    ${RESOURCE_INCLUDE_DIR}/audio/files.h
-    ${RESOURCE_INCLUDE_DIR}/audio/player.h
+    ${RESOURCE_INCLUDE_DIR}/audioplayer.h
     ${RESOURCE_INCLUDE_DIR}/container.h
     ${RESOURCE_INCLUDE_DIR}/container/erf.h
     ${RESOURCE_INCLUDE_DIR}/container/exe.h
@@ -28,14 +26,11 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/container/keybif.h
     ${RESOURCE_INCLUDE_DIR}/container/memory.h
     ${RESOURCE_INCLUDE_DIR}/container/rim.h
-    ${RESOURCE_INCLUDE_DIR}/cursors.h
     ${RESOURCE_INCLUDE_DIR}/di/module.h
     ${RESOURCE_INCLUDE_DIR}/di/services.h
     ${RESOURCE_INCLUDE_DIR}/dialog.h
-    ${RESOURCE_INCLUDE_DIR}/dialogs.h
     ${RESOURCE_INCLUDE_DIR}/exception/format.h
     ${RESOURCE_INCLUDE_DIR}/exception/notfound.h
-    ${RESOURCE_INCLUDE_DIR}/fonts.h
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
@@ -50,7 +45,6 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/lipreader.h
     ${RESOURCE_INCLUDE_DIR}/format/lipwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
-    ${RESOURCE_INCLUDE_DIR}/path.h
     ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
     ${RESOURCE_INCLUDE_DIR}/format/mdlmdxreader.h
     ${RESOURCE_INCLUDE_DIR}/format/mp3reader.h
@@ -71,19 +65,28 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/visreader.h
     ${RESOURCE_INCLUDE_DIR}/format/wavreader.h
     ${RESOURCE_INCLUDE_DIR}/gff.h
-    ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/layout.h
-    ${RESOURCE_INCLUDE_DIR}/layouts.h
-    ${RESOURCE_INCLUDE_DIR}/lips.h
-    ${RESOURCE_INCLUDE_DIR}/models.h
-    ${RESOURCE_INCLUDE_DIR}/movies.h
-    ${RESOURCE_INCLUDE_DIR}/paths.h
+    ${RESOURCE_INCLUDE_DIR}/path.h
+    ${RESOURCE_INCLUDE_DIR}/provider/2das.h
+    ${RESOURCE_INCLUDE_DIR}/provider/audiofiles.h
+    ${RESOURCE_INCLUDE_DIR}/provider/cursors.h
+    ${RESOURCE_INCLUDE_DIR}/provider/dialogs.h
+    ${RESOURCE_INCLUDE_DIR}/provider/fonts.h
+    ${RESOURCE_INCLUDE_DIR}/provider/gffs.h
+    ${RESOURCE_INCLUDE_DIR}/provider/layouts.h
+    ${RESOURCE_INCLUDE_DIR}/provider/lips.h
+    ${RESOURCE_INCLUDE_DIR}/provider/models.h
+    ${RESOURCE_INCLUDE_DIR}/provider/movies.h
+    ${RESOURCE_INCLUDE_DIR}/provider/paths.h
+    ${RESOURCE_INCLUDE_DIR}/provider/scripts.h
+    ${RESOURCE_INCLUDE_DIR}/provider/soundsets.h
+    ${RESOURCE_INCLUDE_DIR}/provider/textures.h
+    ${RESOURCE_INCLUDE_DIR}/provider/visibilities.h
+    ${RESOURCE_INCLUDE_DIR}/provider/walkmeshes.h
     ${RESOURCE_INCLUDE_DIR}/resource.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
     ${RESOURCE_INCLUDE_DIR}/resref.h
-    ${RESOURCE_INCLUDE_DIR}/scripts.h
-    ${RESOURCE_INCLUDE_DIR}/soundsets.h
     ${RESOURCE_INCLUDE_DIR}/strings.h
     ${RESOURCE_INCLUDE_DIR}/talktable.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/are.h
@@ -101,26 +104,18 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/template/generated/uts.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/utt.h
     ${RESOURCE_INCLUDE_DIR}/template/generated/utw.h
-    ${RESOURCE_INCLUDE_DIR}/textures.h
     ${RESOURCE_INCLUDE_DIR}/types.h
-    ${RESOURCE_INCLUDE_DIR}/typeutil.h
-    ${RESOURCE_INCLUDE_DIR}/visibilities.h
-    ${RESOURCE_INCLUDE_DIR}/walkmeshes.h)
+    ${RESOURCE_INCLUDE_DIR}/typeutil.h)
 
 set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/2da.cpp
-    ${RESOURCE_SOURCE_DIR}/2das.cpp
-    ${RESOURCE_SOURCE_DIR}/audio/files.cpp
-    ${RESOURCE_SOURCE_DIR}/audio/player.cpp
+    ${RESOURCE_SOURCE_DIR}/audioplayer.cpp
     ${RESOURCE_SOURCE_DIR}/container/erf.cpp
     ${RESOURCE_SOURCE_DIR}/container/exe.cpp
     ${RESOURCE_SOURCE_DIR}/container/folder.cpp
     ${RESOURCE_SOURCE_DIR}/container/keybif.cpp
     ${RESOURCE_SOURCE_DIR}/container/rim.cpp
-    ${RESOURCE_SOURCE_DIR}/cursors.cpp
     ${RESOURCE_SOURCE_DIR}/di/module.cpp
-    ${RESOURCE_SOURCE_DIR}/dialogs.cpp
-    ${RESOURCE_SOURCE_DIR}/fonts.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
@@ -155,15 +150,23 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/wavreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
-    ${RESOURCE_SOURCE_DIR}/gffs.cpp
-    ${RESOURCE_SOURCE_DIR}/layouts.cpp
-    ${RESOURCE_SOURCE_DIR}/lips.cpp
-    ${RESOURCE_SOURCE_DIR}/models.cpp
-    ${RESOURCE_SOURCE_DIR}/movies.cpp
-    ${RESOURCE_SOURCE_DIR}/paths.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/2das.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/audiofiles.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/cursors.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/dialogs.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/fonts.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/gffs.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/layouts.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/lips.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/models.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/movies.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/paths.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/scripts.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/soundsets.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/textures.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/visibilities.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/walkmeshes.cpp
     ${RESOURCE_SOURCE_DIR}/resources.cpp
-    ${RESOURCE_SOURCE_DIR}/scripts.cpp
-    ${RESOURCE_SOURCE_DIR}/soundsets.cpp
     ${RESOURCE_SOURCE_DIR}/strings.cpp
     ${RESOURCE_SOURCE_DIR}/talktable.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/are.cpp
@@ -181,10 +184,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/template/generated/uts.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/utt.cpp
     ${RESOURCE_SOURCE_DIR}/template/generated/utw.cpp
-    ${RESOURCE_SOURCE_DIR}/textures.cpp
-    ${RESOURCE_SOURCE_DIR}/typeutil.cpp
-    ${RESOURCE_SOURCE_DIR}/visibilities.cpp
-    ${RESOURCE_SOURCE_DIR}/walkmeshes.cpp)
+    ${RESOURCE_SOURCE_DIR}/typeutil.cpp)
 
 add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

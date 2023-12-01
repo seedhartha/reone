@@ -26,9 +26,10 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
-#include "reone/resource/fonts.h"
+#include "reone/resource/provider/fonts.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/textures.h"
+
 
 #include "reone/game/action/attackobject.h"
 #include "reone/game/action/usefeat.h"

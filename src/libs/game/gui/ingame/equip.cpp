@@ -23,8 +23,9 @@
 #include "reone/game/object/creature.h"
 #include "reone/game/object/item.h"
 #include "reone/game/party.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
+
 
 using namespace reone::audio;
 

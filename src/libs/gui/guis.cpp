@@ -17,7 +17,7 @@
 
 #include "reone/gui/guis.h"
 
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
 
 using namespace reone::resource;
 

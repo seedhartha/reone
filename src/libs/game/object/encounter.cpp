@@ -20,7 +20,7 @@
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
 

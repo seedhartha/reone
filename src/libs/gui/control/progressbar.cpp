@@ -27,7 +27,7 @@
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/resource/gff.h"
-#include "reone/resource/textures.h"
+#include "reone/resource/provider/textures.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;

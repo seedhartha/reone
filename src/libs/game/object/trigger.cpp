@@ -21,7 +21,7 @@
 #include "reone/game/game.h"
 #include "reone/game/script/runner.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
+#include "reone/resource/provider/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/di/services.h"

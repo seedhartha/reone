@@ -38,7 +38,7 @@ set(TESTS_HEADERS
 set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/walkmesh.cpp
-    ${TESTS_SOURCE_DIR}/resource/2das.cpp
+    ${TESTS_SOURCE_DIR}/resource/provider/2das.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dareader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dawriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/bifreader.cpp
@@ -59,7 +59,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/format/tpcreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/txireader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/wavreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/gffs.cpp
+    ${TESTS_SOURCE_DIR}/resource/provider/gffs.cpp
     ${TESTS_SOURCE_DIR}/resource/resources.cpp
     ${TESTS_SOURCE_DIR}/resource/resref.cpp
     ${TESTS_SOURCE_DIR}/resource/strings.cpp

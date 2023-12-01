@@ -22,15 +22,16 @@
 #include "reone/game/game.h"
 #include "reone/graphics/di/services.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/2das.h"
-#include "reone/resource/audio/files.h"
-#include "reone/resource/audio/player.h"
+#include "reone/resource/audioplayer.h"
 #include "reone/resource/di/services.h"
-#include "reone/resource/gffs.h"
-#include "reone/resource/models.h"
+#include "reone/resource/provider/2das.h"
+#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/gffs.h"
+#include "reone/resource/provider/models.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
+
 
 using namespace reone::audio;
 using namespace reone::graphics;

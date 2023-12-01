@@ -27,13 +27,14 @@
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/sceneinitializer.h"
-#include "reone/resource/models.h"
+#include "reone/resource/provider/models.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
-#include "reone/resource/textures.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
 #include "reone/system/randomutil.h"
+
 
 using namespace reone::audio;
 

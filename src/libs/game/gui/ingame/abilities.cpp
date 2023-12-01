@@ -25,10 +25,10 @@
 #include "reone/gui/control/label.h"
 #include "reone/gui/control/listbox.h"
 #include "reone/resource/2da.h"
-#include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/provider/2das.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
 
 using namespace reone::audio;
 

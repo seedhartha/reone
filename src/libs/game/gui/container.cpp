@@ -18,8 +18,9 @@
 #include "reone/game/gui/container.h"
 
 #include "reone/gui/control/imagebutton.h"
+#include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
-#include "reone/resource/textures.h"
+
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
