@@ -24,15 +24,20 @@ namespace reone {
 namespace script {
 
 class IRoutines;
+
+}
+
+namespace resource {
+
 class IScripts;
 
-} // namespace script
+}
 
 namespace game {
 
 class ScriptRunner {
 public:
-    ScriptRunner(script::IRoutines &routines, script::IScripts &scripts) :
+    ScriptRunner(script::IRoutines &routines, resource::IScripts &scripts) :
         _routines(routines),
         _scripts(scripts) {
     }
@@ -46,7 +51,7 @@ public:
 
 private:
     script::IRoutines &_routines;
-    script::IScripts &_scripts;
+    resource::IScripts &_scripts;
 };
 
 } // namespace game

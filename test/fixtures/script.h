@@ -23,7 +23,6 @@
 #include "reone/script/executioncontext.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
-#include "reone/script/scripts.h"
 
 namespace reone {
 
@@ -66,18 +65,10 @@ public:
     MOCK_METHOD(int, getIndexByName, (const std::string &name), (const override));
 };
 
-class MockScripts : public IScripts, boost::noncopyable {
-public:
-    MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<ScriptProgram>, get, (const std::string &key), (override));
-};
-
 class TestScriptModule : boost::noncopyable {
 public:
     void init() {
-        _scripts = std::make_unique<MockScripts>();
-
-        _services = std::make_unique<ScriptServices>(*_scripts);
+        _services = std::make_unique<ScriptServices>();
     }
 
     ScriptServices &services() {
@@ -85,8 +76,6 @@ public:
     }
 
 private:
-    std::unique_ptr<MockScripts> _scripts;
-
     std::unique_ptr<ScriptServices> _services;
 };
 

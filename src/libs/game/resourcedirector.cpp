@@ -29,8 +29,8 @@
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/scripts.h"
 #include "reone/script/di/services.h"
-#include "reone/script/scripts.h"
 #include "reone/system/fileutil.h"
 
 using namespace reone::graphics;
@@ -74,7 +74,7 @@ void ResourceDirector::init() {
 void ResourceDirector::onModuleLoad(const std::string &name) {
     _dialogs.clear();
     _paths.clear();
-    _scriptSvc.scripts.clear();
+    _resourceSvc.scripts.clear();
     _graphicsSvc.lips.clear();
     _resourceSvc.gffs.clear();
     _resourceSvc.resources.clearLocal();

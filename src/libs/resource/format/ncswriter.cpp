@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/script/format/ncswriter.h"
+#include "reone/resource/format/ncswriter.h"
 
 #include "reone/resource/exception/format.h"
 #include "reone/script/program.h"
@@ -24,11 +24,11 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryoutput.h"
 
-using namespace reone::resource;
+using namespace reone::script;
 
 namespace reone {
 
-namespace script {
+namespace resource {
 
 void NcsWriter::save(const std::filesystem::path &path) {
     auto ncs = std::make_shared<FileOutputStream>(path);
@@ -116,6 +116,6 @@ void NcsWriter::save(std::shared_ptr<IOutputStream> out) {
     ncsWriter.writeString(std::string(&bytes[0], bytes.size()));
 }
 
-} // namespace script
+} // namespace resource
 
 } // namespace reone

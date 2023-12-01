@@ -26,6 +26,10 @@ namespace script {
 
 class ScriptProgram;
 
+}
+
+namespace resource {
+
 class NcsReader : boost::noncopyable {
 public:
     NcsReader(IInputStream &ncs, std::string resRef) :
@@ -35,17 +39,17 @@ public:
 
     void load();
 
-    std::shared_ptr<ScriptProgram> program() const { return _program; }
+    std::shared_ptr<script::ScriptProgram> program() const { return _program; }
 
 private:
     BinaryReader _ncs;
 
     std::string _resRef;
-    std::shared_ptr<ScriptProgram> _program;
+    std::shared_ptr<script::ScriptProgram> _program;
 
     void readInstruction(size_t &offset);
 };
 
-} // namespace script
+} // namespace resource
 
 } // namespace reone

@@ -21,14 +21,7 @@ namespace reone {
 
 namespace script {
 
-class IScripts;
-
 struct ScriptServices {
-    IScripts &scripts;
-
-    ScriptServices(IScripts &scripts) :
-        scripts(scripts) {
-    }
 };
 
 } // namespace script

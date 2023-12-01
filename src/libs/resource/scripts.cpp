@@ -15,29 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "reone/resource/scripts.h"
 
-#include "reone/system/stream/output.h"
+#include "reone/resource/format/ncsreader.h"
+#include "reone/system/stream/memoryinput.h"
+
+using namespace reone::script;
 
 namespace reone {
 
-namespace script {
+namespace resource {
 
-class ScriptProgram;
-
-class NcsWriter {
-public:
-    NcsWriter(ScriptProgram &program) :
-        _program(program) {
+std::shared_ptr<ScriptProgram> Scripts::doGet(std::string resRef) {
+    auto res = _resources.find(ResourceId(resRef, ResType::Ncs));
+    if (!res) {
+        return nullptr;
     }
+    auto stream = MemoryInputStream(res->data);
+    auto reader = NcsReader(stream, resRef);
+    reader.load();
+    return reader.program();
+}
 
-    void save(const std::filesystem::path &path);
-    void save(std::shared_ptr<IOutputStream> out);
-
-private:
-    ScriptProgram &_program;
-};
-
-} // namespace script
+} // namespace resource
 
 } // namespace reone

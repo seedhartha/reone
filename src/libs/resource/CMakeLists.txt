@@ -19,6 +19,13 @@ set(RESOURCE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/resource)
 set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/2da.h
     ${RESOURCE_INCLUDE_DIR}/2das.h
+    ${RESOURCE_INCLUDE_DIR}/container.h
+    ${RESOURCE_INCLUDE_DIR}/container/erf.h
+    ${RESOURCE_INCLUDE_DIR}/container/exe.h
+    ${RESOURCE_INCLUDE_DIR}/container/folder.h
+    ${RESOURCE_INCLUDE_DIR}/container/keybif.h
+    ${RESOURCE_INCLUDE_DIR}/container/memory.h
+    ${RESOURCE_INCLUDE_DIR}/container/rim.h
     ${RESOURCE_INCLUDE_DIR}/di/module.h
     ${RESOURCE_INCLUDE_DIR}/di/services.h
     ${RESOURCE_INCLUDE_DIR}/exception/format.h
@@ -33,6 +40,8 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
     ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/ncsreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/ncswriter.h
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
@@ -46,16 +55,10 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/layout.h
-    ${RESOURCE_INCLUDE_DIR}/container.h
-    ${RESOURCE_INCLUDE_DIR}/container/erf.h
-    ${RESOURCE_INCLUDE_DIR}/container/exe.h
-    ${RESOURCE_INCLUDE_DIR}/container/folder.h
-    ${RESOURCE_INCLUDE_DIR}/container/keybif.h
-    ${RESOURCE_INCLUDE_DIR}/container/memory.h
-    ${RESOURCE_INCLUDE_DIR}/container/rim.h
     ${RESOURCE_INCLUDE_DIR}/resource.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
     ${RESOURCE_INCLUDE_DIR}/resref.h
+    ${RESOURCE_INCLUDE_DIR}/scripts.h
     ${RESOURCE_INCLUDE_DIR}/strings.h
     ${RESOURCE_INCLUDE_DIR}/talktable.h
     ${RESOURCE_INCLUDE_DIR}/types.h
@@ -64,6 +67,11 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/2da.cpp
     ${RESOURCE_SOURCE_DIR}/2das.cpp
+    ${RESOURCE_SOURCE_DIR}/container/erf.cpp
+    ${RESOURCE_SOURCE_DIR}/container/exe.cpp
+    ${RESOURCE_SOURCE_DIR}/container/folder.cpp
+    ${RESOURCE_SOURCE_DIR}/container/keybif.cpp
+    ${RESOURCE_SOURCE_DIR}/container/rim.cpp
     ${RESOURCE_SOURCE_DIR}/di/module.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
@@ -75,6 +83,8 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ltrreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/lytreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/ncsreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/ncswriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
@@ -86,12 +96,8 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/gffs.cpp
-    ${RESOURCE_SOURCE_DIR}/container/erf.cpp
-    ${RESOURCE_SOURCE_DIR}/container/exe.cpp
-    ${RESOURCE_SOURCE_DIR}/container/folder.cpp
-    ${RESOURCE_SOURCE_DIR}/container/keybif.cpp
-    ${RESOURCE_SOURCE_DIR}/container/rim.cpp
     ${RESOURCE_SOURCE_DIR}/resources.cpp
+    ${RESOURCE_SOURCE_DIR}/scripts.cpp
     ${RESOURCE_SOURCE_DIR}/strings.cpp
     ${RESOURCE_SOURCE_DIR}/talktable.cpp
     ${RESOURCE_SOURCE_DIR}/typeutil.cpp)

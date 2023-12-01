@@ -18,12 +18,11 @@
 #pragma once
 
 #include "reone/resource/resources.h"
-
-#include "program.h"
+#include "reone/script/program.h"
 
 namespace reone {
 
-namespace script {
+namespace resource {
 
 class IScripts {
 public:
@@ -31,12 +30,12 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<ScriptProgram> get(const std::string &key) = 0;
+    virtual std::shared_ptr<script::ScriptProgram> get(const std::string &key) = 0;
 };
 
 class Scripts : public IScripts {
 public:
-    Scripts(resource::Resources &resources) :
+    Scripts(Resources &resources) :
         _resources(resources) {
     }
 
@@ -44,7 +43,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<ScriptProgram> get(const std::string &key) override {
+    std::shared_ptr<script::ScriptProgram> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -54,13 +53,13 @@ public:
     }
 
 private:
-    resource::Resources &_resources;
+    Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<ScriptProgram>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<script::ScriptProgram>> _objects;
 
-    std::shared_ptr<ScriptProgram> doGet(std::string resRef);
+    std::shared_ptr<script::ScriptProgram> doGet(std::string resRef);
 };
 
-} // namespace script
+} // namespace resource
 
 } // namespace reone

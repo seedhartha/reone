@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/script/format/ncswriter.h"
+#include "reone/resource/format/ncswriter.h"
 #include "reone/script/program.h"
 #include "reone/system/stream/memoryoutput.h"
 #include "reone/system/stringbuilder.h"
@@ -25,6 +25,7 @@
 #include "../../checkutil.h"
 
 using namespace reone;
+using namespace reone::resource;
 using namespace reone::script;
 
 TEST(ncs_writer, should_write_ncs) {

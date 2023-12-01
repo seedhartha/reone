@@ -53,6 +53,8 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/format/gffreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/keyreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/ncsreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkreader.cpp
@@ -63,8 +65,6 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/strings.cpp
     ${TESTS_SOURCE_DIR}/scene/model.cpp
     ${TESTS_SOURCE_DIR}/script/execution.cpp
-    ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
-    ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/audioanalyzer.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/composer.cpp
     ${TESTS_SOURCE_DIR}/tools/script/exprtree.cpp

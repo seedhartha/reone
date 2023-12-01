@@ -25,12 +25,13 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/scripts.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/scene/node/model.h"
 #include "reone/scene/types.h"
-#include "reone/script/scripts.h"
+
 
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"

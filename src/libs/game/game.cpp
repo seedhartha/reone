@@ -58,10 +58,10 @@
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/scripts.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
 #include "reone/script/di/services.h"
-#include "reone/script/scripts.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/clock.h"
 #include "reone/system/di/services.h"
@@ -104,7 +104,7 @@ void Game::initLocalServices() {
     routines->init();
     _routines = std::move(routines);
 
-    _scriptRunner = std::make_unique<ScriptRunner>(*_routines, _services.script.scripts);
+    _scriptRunner = std::make_unique<ScriptRunner>(*_routines, _services.resource.scripts);
 
     _map = std::make_unique<Map>(*this, _services);
 }

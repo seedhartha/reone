@@ -22,13 +22,11 @@ namespace reone {
 namespace script {
 
 void ScriptModule::init() {
-    _scripts = std::make_unique<Scripts>(_resource.resources());
-    _services = std::make_unique<ScriptServices>(*_scripts);
+    _services = std::make_unique<ScriptServices>();
 }
 
 void ScriptModule::deinit() {
     _services.reset();
-    _scripts.reset();
 }
 
 } // namespace script

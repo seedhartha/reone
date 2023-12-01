@@ -23,6 +23,7 @@
 #include "reone/resource/di/services.h"
 #include "reone/resource/gffs.h"
 #include "reone/resource/resources.h"
+#include "reone/resource/scripts.h"
 #include "reone/resource/strings.h"
 
 namespace reone {
@@ -61,6 +62,12 @@ public:
     MOCK_METHOD(std::shared_ptr<TwoDa>, get, (const std::string &key), (override));
 };
 
+class MockScripts : public IScripts, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<script::ScriptProgram>, get, (const std::string &key), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -68,12 +75,14 @@ public:
         _resources = std::make_unique<MockResources>();
         _strings = std::make_unique<MockStrings>();
         _twoDas = std::make_unique<MockTwoDas>();
+        _scripts = std::make_unique<MockScripts>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
             *_resources,
             *_strings,
-            *_twoDas);
+            *_twoDas,
+            *_scripts);
     }
 
     MockGffs &gffs() {
@@ -82,6 +91,10 @@ public:
 
     MockStrings &strings() {
         return *_strings;
+    }
+
+    MockScripts &scripts() {
+        return *_scripts;
     }
 
     ResourceServices &services() {
@@ -93,6 +106,7 @@ private:
     std::unique_ptr<MockResources> _resources;
     std::unique_ptr<MockStrings> _strings;
     std::unique_ptr<MockTwoDas> _twoDas;
+    std::unique_ptr<MockScripts> _scripts;
 
     std::unique_ptr<ResourceServices> _services;
 };

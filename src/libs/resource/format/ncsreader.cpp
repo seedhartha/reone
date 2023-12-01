@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/script/format/ncsreader.h"
+#include "reone/resource/format/ncsreader.h"
 
 #include "reone/resource/format/signutil.h"
 #include "reone/script/program.h"
 #include "reone/system/logutil.h"
 
-using namespace reone::resource;
+using namespace reone::script;
 
 namespace reone {
 
-namespace script {
+namespace resource {
 
 void NcsReader::load() {
     checkSignature(_ncs, std::string("NCS V1.0", 8));
@@ -191,6 +191,6 @@ void NcsReader::readInstruction(size_t &offset) {
     offset = pos;
 }
 
-} // namespace script
+} // namespace resource
 
 } // namespace reone

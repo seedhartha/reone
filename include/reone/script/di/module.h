@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include "reone/resource/di/module.h"
-
-#include "../scripts.h"
-
 #include "services.h"
 
 namespace reone {
@@ -29,24 +25,14 @@ namespace script {
 
 class ScriptModule : boost::noncopyable {
 public:
-    ScriptModule(resource::ResourceModule &resource) :
-        _resource(resource) {
-    }
-
     ~ScriptModule() { deinit(); }
 
     void init();
     void deinit();
 
-    Scripts &scripts() { return *_scripts; }
-
     ScriptServices &services() { return *_services; }
 
 private:
-    resource::ResourceModule &_resource;
-
-    std::unique_ptr<Scripts> _scripts;
-
     std::unique_ptr<ScriptServices> _services;
 };
 

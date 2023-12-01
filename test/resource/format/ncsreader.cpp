@@ -17,12 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/script/format/ncsreader.h"
+#include "reone/resource/format/ncsreader.h"
 #include "reone/script/program.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone;
+using namespace reone::resource;
 using namespace reone::script;
 
 TEST(ncs_reader, should_read_ncs) {

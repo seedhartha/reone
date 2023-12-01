@@ -23,6 +23,7 @@ namespace resource {
 
 class IGffs;
 class IResources;
+class IScripts;
 class IStrings;
 class ITwoDas;
 
@@ -31,16 +32,19 @@ struct ResourceServices {
     IResources &resources;
     IStrings &strings;
     ITwoDas &twoDas;
+    IScripts &scripts;
 
     ResourceServices(
         IGffs &gffs,
         IResources &resources,
         IStrings &strings,
-        ITwoDas &twoDas) :
+        ITwoDas &twoDas,
+        IScripts &scripts) :
         gffs(gffs),
         resources(resources),
         strings(strings),
-        twoDas(twoDas) {
+        twoDas(twoDas),
+        scripts(scripts) {
     }
 };
 
