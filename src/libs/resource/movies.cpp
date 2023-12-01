@@ -15,14 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/movie/movies.h"
+#include "reone/resource/movies.h"
 
-#include "reone/movie/format/bikreader.h"
+#include "reone/resource/format/bikreader.h"
 #include "reone/system/fileutil.h"
+
+using namespace reone::movie;
 
 namespace reone {
 
-namespace movie {
+namespace resource {
 
 std::shared_ptr<IMovie> Movies::doGet(std::string name) {
     auto path = findFileIgnoreCase(_gamePath, "movies/" + name + ".bik");
@@ -30,12 +32,12 @@ std::shared_ptr<IMovie> Movies::doGet(std::string name) {
         return nullptr;
     }
 
-    BikReader bik(*path, _graphicsSvc, _audioSvc);
+    BikReader bik(*path, *_graphicsSvc, *_audioSvc);
     bik.load();
 
     return bik.movie();
 }
 
-} // namespace movie
+} // namespace resource
 
 } // namespace reone

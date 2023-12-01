@@ -21,13 +21,8 @@ namespace reone {
 
 namespace movie {
 
-class IMovies;
-
 struct MovieServices {
-    IMovies &movies;
-
-    MovieServices(IMovies &movies) :
-        movies(movies) {
+    MovieServices() {
     }
 };
 

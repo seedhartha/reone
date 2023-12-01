@@ -68,6 +68,12 @@ public:
     MOCK_METHOD(std::shared_ptr<script::ScriptProgram>, get, (const std::string &key), (override));
 };
 
+class MockMovies : public IMovies, boost::noncopyable {
+public:
+    MOCK_METHOD(void, clear, (), (override));
+    MOCK_METHOD(std::shared_ptr<movie::IMovie>, get, (const std::string &name), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -76,13 +82,15 @@ public:
         _strings = std::make_unique<MockStrings>();
         _twoDas = std::make_unique<MockTwoDas>();
         _scripts = std::make_unique<MockScripts>();
+        _movies = std::make_unique<MockMovies>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
             *_resources,
             *_strings,
             *_twoDas,
-            *_scripts);
+            *_scripts,
+            *_movies);
     }
 
     MockGffs &gffs() {
@@ -97,6 +105,10 @@ public:
         return *_scripts;
     }
 
+    MockMovies &movies() {
+        return *_movies;
+    }
+
     ResourceServices &services() {
         return *_services;
     }
@@ -107,6 +119,7 @@ private:
     std::unique_ptr<MockStrings> _strings;
     std::unique_ptr<MockTwoDas> _twoDas;
     std::unique_ptr<MockScripts> _scripts;
+    std::unique_ptr<MockMovies> _movies;
 
     std::unique_ptr<ResourceServices> _services;
 };

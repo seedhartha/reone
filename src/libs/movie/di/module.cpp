@@ -22,13 +22,11 @@ namespace reone {
 namespace movie {
 
 void MovieModule::init() {
-    _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), _audio.services());
-    _services = std::make_unique<MovieServices>(*_movies);
+    _services = std::make_unique<MovieServices>();
 }
 
 void MovieModule::deinit() {
     _services.reset();
-    _movies.reset();
 }
 
 } // namespace movie

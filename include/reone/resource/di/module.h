@@ -19,6 +19,7 @@
 
 #include "../2das.h"
 #include "../gffs.h"
+#include "../movies.h"
 #include "../resources.h"
 #include "../scripts.h"
 #include "../strings.h"
@@ -45,6 +46,7 @@ public:
     Strings &strings() { return *_strings; }
     TwoDas &twoDas() { return *_twoDas; }
     Scripts &scripts() { return *_scripts; }
+    Movies &movies() { return *_movies; }
 
     ResourceServices &services() { return *_services; }
 
@@ -56,6 +58,7 @@ private:
     std::unique_ptr<Strings> _strings;
     std::unique_ptr<TwoDas> _twoDas;
     std::unique_ptr<Scripts> _scripts;
+    std::unique_ptr<Movies> _movies;
 
     std::unique_ptr<ResourceServices> _services;
 };

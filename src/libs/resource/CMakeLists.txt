@@ -33,6 +33,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
+    ${RESOURCE_INCLUDE_DIR}/format/bikreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/gffreader.h
@@ -55,6 +56,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/gffs.h
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/layout.h
+    ${RESOURCE_INCLUDE_DIR}/movies.h
     ${RESOURCE_INCLUDE_DIR}/resource.h
     ${RESOURCE_INCLUDE_DIR}/resources.h
     ${RESOURCE_INCLUDE_DIR}/resref.h
@@ -76,6 +78,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
+    ${RESOURCE_SOURCE_DIR}/format/bikreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/gffreader.cpp
@@ -96,6 +99,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/gffs.cpp
+    ${RESOURCE_SOURCE_DIR}/movies.cpp
     ${RESOURCE_SOURCE_DIR}/resources.cpp
     ${RESOURCE_SOURCE_DIR}/scripts.cpp
     ${RESOURCE_SOURCE_DIR}/strings.cpp

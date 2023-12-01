@@ -19,12 +19,11 @@
 
 #include "reone/audio/di/services.h"
 #include "reone/graphics/di/services.h"
-
-#include "movie.h"
+#include "reone/movie/movie.h"
 
 namespace reone {
 
-namespace movie {
+namespace resource {
 
 class IMovies {
 public:
@@ -32,24 +31,20 @@ public:
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<IMovie> get(const std::string &name) = 0;
+    virtual std::shared_ptr<movie::IMovie> get(const std::string &name) = 0;
 };
 
 class Movies : public IMovies, boost::noncopyable {
 public:
-    Movies(std::filesystem::path gamePath,
-           graphics::GraphicsServices &graphicsSvc,
-           audio::AudioServices &audioSvc) :
-        _gamePath(gamePath),
-        _graphicsSvc(graphicsSvc),
-        _audioSvc(audioSvc) {
+    Movies(std::filesystem::path gamePath) :
+        _gamePath(gamePath) {
     }
 
     void clear() override {
         _objects.clear();
     }
 
-    std::shared_ptr<IMovie> get(const std::string &name) override {
+    std::shared_ptr<movie::IMovie> get(const std::string &name) override {
         auto maybeObject = _objects.find(name);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -58,16 +53,29 @@ public:
         return _objects.insert(make_pair(name, std::move(object))).first->second;
     }
 
+    // TODO: remove once graphics and audio libs migrated
+
+    void setGraphicsServices(graphics::GraphicsServices &graphics) {
+        _graphicsSvc = &graphics;
+    }
+
+    void setAudioServices(audio::AudioServices &audio) {
+        _audioSvc = &audio;
+    }
+
+    // END TODO
+
 private:
     std::filesystem::path _gamePath;
-    graphics::GraphicsServices &_graphicsSvc;
-    audio::AudioServices &_audioSvc;
 
-    std::unordered_map<std::string, std::shared_ptr<IMovie>> _objects;
+    graphics::GraphicsServices *_graphicsSvc {nullptr};
+    audio::AudioServices *_audioSvc {nullptr};
 
-    std::shared_ptr<IMovie> doGet(std::string name);
+    std::unordered_map<std::string, std::shared_ptr<movie::IMovie>> _objects;
+
+    std::shared_ptr<movie::IMovie> doGet(std::string name);
 };
 
-} // namespace movie
+} // namespace resource
 
 } // namespace reone

@@ -46,17 +46,17 @@
 #include "reone/graphics/walkmeshes.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
-#include "reone/movie/format/bikreader.h"
-#include "reone/movie/movies.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
+#include "reone/resource/format/bikreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/erfwriter.h"
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/gffs.h"
+#include "reone/resource/movies.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/scripts.h"
 #include "reone/scene/di/services.h"
@@ -337,7 +337,7 @@ void Game::setCursorType(CursorType type) {
 }
 
 void Game::playVideo(const std::string &name) {
-    _movie = _services.movie.movies.get(name);
+    _movie = _services.resource.movies.get(name);
     if (!_movie) {
         return;
     }

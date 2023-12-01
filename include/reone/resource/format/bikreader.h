@@ -35,6 +35,10 @@ namespace movie {
 
 class Movie;
 
+}
+
+namespace resource {
+
 class BikReader {
 public:
     BikReader(
@@ -48,16 +52,16 @@ public:
 
     void load();
 
-    std::shared_ptr<Movie> movie() const { return _movie; }
+    std::shared_ptr<movie::Movie> movie() const { return _movie; }
 
 private:
     std::filesystem::path _path;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
 
-    std::shared_ptr<Movie> _movie;
+    std::shared_ptr<movie::Movie> _movie;
 };
 
-} // namespace movie
+} // namespace resource
 
 } // namespace reone

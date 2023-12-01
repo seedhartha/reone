@@ -26,6 +26,7 @@ class IResources;
 class IScripts;
 class IStrings;
 class ITwoDas;
+class IMovies;
 
 struct ResourceServices {
     IGffs &gffs;
@@ -33,18 +34,21 @@ struct ResourceServices {
     IStrings &strings;
     ITwoDas &twoDas;
     IScripts &scripts;
+    IMovies &movies;
 
     ResourceServices(
         IGffs &gffs,
         IResources &resources,
         IStrings &strings,
         ITwoDas &twoDas,
-        IScripts &scripts) :
+        IScripts &scripts,
+        IMovies &movies) :
         gffs(gffs),
         resources(resources),
         strings(strings),
         twoDas(twoDas),
-        scripts(scripts) {
+        scripts(scripts),
+        movies(movies) {
     }
 };
 

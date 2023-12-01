@@ -20,7 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "reone/movie/di/services.h"
-#include "reone/movie/movies.h"
+#include "reone/movie/movie.h"
 
 namespace reone {
 
@@ -34,21 +34,10 @@ public:
     MOCK_METHOD(bool, isFinished, (), (const override));
 };
 
-class MockMovies : public IMovies, boost::noncopyable {
-public:
-    MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<IMovie>, get, (const std::string &name), (override));
-};
-
 class TestMovieModule : boost::noncopyable {
 public:
     void init() {
-        _movies = std::make_unique<MockMovies>();
-        _services = std::make_unique<MovieServices>(*_movies);
-    }
-
-    MockMovies &movies() {
-        return *_movies;
+        _services = std::make_unique<MovieServices>();
     }
 
     MovieServices &services() {
@@ -56,8 +45,6 @@ public:
     }
 
 private:
-    std::unique_ptr<MockMovies> _movies;
-
     std::unique_ptr<MovieServices> _services;
 };
 

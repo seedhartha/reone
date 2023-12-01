@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/movie/format/bikreader.h"
+#include "reone/resource/format/bikreader.h"
 
 #include "reone/audio/buffer.h"
 #include "reone/movie/movie.h"
@@ -38,15 +38,15 @@ extern "C" {
 #endif
 
 using namespace reone::audio;
-using namespace reone::resource;
+using namespace reone::movie;
 
 namespace reone {
 
-namespace movie {
+namespace resource {
 
 #ifdef R_ENABLE_MOVIE
 
-class BinkVideoDecoder : public VideoStream {
+class BinkVideoDecoder : public movie::VideoStream {
 public:
     BinkVideoDecoder(std::filesystem::path path) :
         _path(std::move(path)) {
@@ -325,13 +325,13 @@ void BikReader::load() {
     auto decoder = std::make_shared<BinkVideoDecoder>(_path);
     decoder->load();
 
-    _movie = std::make_shared<Movie>(_graphicsSvc, _audioSvc);
+    _movie = std::make_shared<movie::Movie>(_graphicsSvc, _audioSvc);
     _movie->setVideoStream(decoder);
     _movie->setAudioBuffer(decoder->audioStream());
     _movie->init();
 #endif
 }
 
-} // namespace movie
+} // namespace resource
 
 } // namespace reone
