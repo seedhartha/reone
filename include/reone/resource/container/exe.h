@@ -17,22 +17,41 @@
 
 #pragma once
 
-#include "reone/system/types.h"
+#include "reone/system/stream/fileinput.h"
 
-#include "id.h"
+#include "../container.h"
 
 namespace reone {
 
 namespace resource {
 
-class IResourceProvider {
+class ExeResourceContainer : public IResourceContainer, boost::noncopyable {
 public:
-    virtual ~IResourceProvider() {
+    ExeResourceContainer(std::filesystem::path path) :
+        _path(std::move(path)) {
     }
 
-    virtual std::optional<ByteBuffer> findResourceData(const ResourceId &id) = 0;
+    void init();
 
-    virtual const std::unordered_set<ResourceId> &resourceIds() const = 0;
+    // IResourceContainer
+
+    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
+
+    const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
+
+    // END IResourceContainer
+
+private:
+    struct Resource {
+        uint32_t offset {0};
+        uint32_t size {0};
+    };
+
+    std::filesystem::path _path;
+    std::unique_ptr<FileInputStream> _exe;
+
+    std::unordered_set<ResourceId> _resourceIds;
+    std::unordered_map<ResourceId, Resource> _idToResource;
 };
 
 } // namespace resource

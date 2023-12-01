@@ -17,7 +17,7 @@
 
 #include "routines.h"
 
-#include "reone/resource/provider/keybif.h"
+#include "reone/resource/container/keybif.h"
 #include "reone/system/exception/notimplemented.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileoutput.h"
@@ -358,7 +358,7 @@ void generateRoutines(const std::filesystem::path &k1Dir,
     if (!k1KeyPath) {
         throw std::runtime_error("KotOR chitin.key file not found");
     }
-    auto k1KeyBif = KeyBifResourceProvider(*k1KeyPath);
+    auto k1KeyBif = KeyBifResourceContainer(*k1KeyPath);
     k1KeyBif.init();
     auto k1NssBytes = k1KeyBif.findResourceData(ResourceId("nwscript", ResType::Nss));
     if (!k1NssBytes) {
@@ -387,7 +387,7 @@ void generateRoutines(const std::filesystem::path &k1Dir,
     if (!k2KeyPath) {
         throw std::runtime_error("TSL chitin.key file not found");
     }
-    auto k2KeyBif = KeyBifResourceProvider(*k1KeyPath);
+    auto k2KeyBif = KeyBifResourceContainer(*k1KeyPath);
     k2KeyBif.init();
     auto k2NssBytes = k2KeyBif.findResourceData(ResourceId("nwscript", ResType::Nss));
     if (!k2NssBytes) {

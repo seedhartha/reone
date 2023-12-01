@@ -19,41 +19,20 @@
 
 #include "reone/system/types.h"
 
-#include "../provider.h"
-#include "../types.h"
+#include "id.h"
 
 namespace reone {
 
 namespace resource {
 
-class FolderResourceProvider : public IResourceProvider, boost::noncopyable {
+class IResourceContainer {
 public:
-    FolderResourceProvider(std::filesystem::path path) :
-        _path(std::move(path)) {
+    virtual ~IResourceContainer() {
     }
 
-    void init();
+    virtual std::optional<ByteBuffer> findResourceData(const ResourceId &id) = 0;
 
-    // IResourceProvider
-
-    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
-
-    const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
-
-    // END IResourceProvider
-
-private:
-    struct Resource {
-        std::filesystem::path path;
-        ResType type;
-    };
-
-    std::filesystem::path _path;
-
-    std::unordered_set<ResourceId> _resourceIds;
-    std::unordered_map<ResourceId, Resource> _idToResource;
-
-    void loadDirectory(const std::filesystem::path &path);
+    virtual const std::unordered_set<ResourceId> &resourceIds() const = 0;
 };
 
 } // namespace resource

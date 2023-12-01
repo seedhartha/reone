@@ -19,12 +19,13 @@
 
 #include "reone/game/game.h"
 #include "reone/graphics/format/tgareader.h"
+#include "reone/resource/container/erf.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
-#include "reone/resource/provider/erf.h"
 #include "reone/resource/strings.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
+
 
 using namespace reone::audio;
 
@@ -164,15 +165,15 @@ void SaveLoad::refreshSavedGames() {
 }
 
 static SavedGame peekSavedGame(const std::filesystem::path &path) {
-    auto erfResourceProvider = ErfResourceProvider(path);
+    auto erfResourceContainer = ErfResourceContainer(path);
 
-    auto nfoData = erfResourceProvider.findResourceData(ResourceId("savenfo", ResType::Res));
+    auto nfoData = erfResourceContainer.findResourceData(ResourceId("savenfo", ResType::Res));
     auto nfoStream = MemoryInputStream(*nfoData);
     GffReader nfo(nfoStream);
     nfo.load();
 
     std::shared_ptr<Texture> screen;
-    auto screenData = erfResourceProvider.findResourceData(ResourceId("screen", ResType::Tga));
+    auto screenData = erfResourceContainer.findResourceData(ResourceId("screen", ResType::Tga));
     if (screenData) {
         auto tga = MemoryInputStream(*screenData);
         TgaReader tgaReader(tga, "screen", TextureUsage::GUI);

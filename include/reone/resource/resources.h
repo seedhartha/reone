@@ -19,20 +19,20 @@
 
 #include "reone/system/types.h"
 
+#include "container.h"
 #include "id.h"
-#include "provider.h"
 #include "resource.h"
 
 namespace reone {
 
 namespace resource {
 
-struct ResourceProviderLocalPair {
-    std::unique_ptr<IResourceProvider> provider;
+struct ResourceContainerLocalPair {
+    std::unique_ptr<IResourceContainer> provider;
     bool local {false};
 };
 
-using ResourceProviderList = std::list<ResourceProviderLocalPair>;
+using ResourceContainerList = std::list<ResourceContainerLocalPair>;
 
 class IResources {
 public:
@@ -54,18 +54,18 @@ public:
 class Resources : public IResources, boost::noncopyable {
 public:
     void clear() override {
-        _providers.clear();
+        _containers.clear();
     }
 
     void clearLocal() override {
-        auto toErase = std::remove_if(_providers.begin(), _providers.end(), [](auto &pair) {
+        auto toErase = std::remove_if(_containers.begin(), _containers.end(), [](auto &pair) {
             return pair.local;
         });
-        _providers.erase(toErase, _providers.end());
+        _containers.erase(toErase, _containers.end());
     }
 
-    void add(std::unique_ptr<IResourceProvider> provider, bool local = false) {
-        _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
+    void add(std::unique_ptr<IResourceContainer> provider, bool local = false) {
+        _containers.push_front(ResourceContainerLocalPair {std::move(provider), local});
     }
 
     void addKEY(const std::filesystem::path &path) override;
@@ -77,10 +77,10 @@ public:
     Resource get(const ResourceId &id) override;
     std::optional<Resource> find(const ResourceId &id) override;
 
-    const ResourceProviderList &providers() const { return _providers; }
+    const ResourceContainerList &containers() const { return _containers; }
 
 private:
-    ResourceProviderList _providers;
+    ResourceContainerList _containers;
 };
 
 } // namespace resource

@@ -17,45 +17,45 @@
 
 #include "reone/resource/resources.h"
 
+#include "reone/resource/container/erf.h"
+#include "reone/resource/container/exe.h"
+#include "reone/resource/container/folder.h"
+#include "reone/resource/container/keybif.h"
+#include "reone/resource/container/rim.h"
 #include "reone/resource/exception/notfound.h"
-#include "reone/resource/provider/erf.h"
-#include "reone/resource/provider/exe.h"
-#include "reone/resource/provider/folder.h"
-#include "reone/resource/provider/keybif.h"
-#include "reone/resource/provider/rim.h"
 
 namespace reone {
 
 namespace resource {
 
 void Resources::addKEY(const std::filesystem::path &path) {
-    auto provider = std::make_unique<KeyBifResourceProvider>(path);
+    auto provider = std::make_unique<KeyBifResourceContainer>(path);
     provider->init();
-    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
+    _containers.push_front(ResourceContainerLocalPair {std::move(provider), false});
 }
 
 void Resources::addERF(const std::filesystem::path &path, bool local) {
-    auto provider = std::make_unique<ErfResourceProvider>(path);
+    auto provider = std::make_unique<ErfResourceContainer>(path);
     provider->init();
-    _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
+    _containers.push_front(ResourceContainerLocalPair {std::move(provider), local});
 }
 
 void Resources::addRIM(const std::filesystem::path &path, bool local) {
-    auto provider = std::make_unique<RimResourceProvider>(path);
+    auto provider = std::make_unique<RimResourceContainer>(path);
     provider->init();
-    _providers.push_front(ResourceProviderLocalPair {std::move(provider), local});
+    _containers.push_front(ResourceContainerLocalPair {std::move(provider), local});
 }
 
 void Resources::addEXE(const std::filesystem::path &path) {
-    auto provider = std::make_unique<ExeResourceProvider>(path);
+    auto provider = std::make_unique<ExeResourceContainer>(path);
     provider->init();
-    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
+    _containers.push_front(ResourceContainerLocalPair {std::move(provider), false});
 }
 
 void Resources::addFolder(const std::filesystem::path &path) {
-    auto provider = std::make_unique<FolderResourceProvider>(path);
+    auto provider = std::make_unique<FolderResourceContainer>(path);
     provider->init();
-    _providers.push_front(ResourceProviderLocalPair {std::move(provider), false});
+    _containers.push_front(ResourceContainerLocalPair {std::move(provider), false});
 }
 
 Resource Resources::get(const ResourceId &id) {
@@ -67,7 +67,7 @@ Resource Resources::get(const ResourceId &id) {
 }
 
 std::optional<Resource> Resources::find(const ResourceId &id) {
-    for (auto &[provider, local] : _providers) {
+    for (auto &[provider, local] : _containers) {
         auto data = provider->findResourceData(id);
         if (data) {
             return Resource {*data, local};

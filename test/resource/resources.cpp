@@ -94,7 +94,7 @@ TEST(resources, should_index_providers_and_get_resources_without_caching) {
     resources.addFolder(overridePath);
     resources.addRIM(rimPath);
 
-    auto numProviders = resources.providers().size();
+    auto numProviders = resources.containers().size();
     auto actualRes1 = resources.find(ResourceId("sample", ResType::Txt));
     resources.clear();
     auto actualRes2 = resources.find(ResourceId("sample", ResType::Txt));

@@ -17,10 +17,11 @@
 
 #include <gtest/gtest.h>
 
+#include "reone/resource/container/memory.h"
 #include "reone/resource/gffs.h"
-#include "reone/resource/provider/memory.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryoutput.h"
+
 
 using namespace reone;
 using namespace reone::resource;
@@ -45,7 +46,7 @@ TEST(gffs, should_get_gff_with_caching) {
     res.write("\x00\x00\x00\x00", 4);
 
     auto resources = Resources();
-    auto provider = std::make_unique<MemoryResourceProvider>();
+    auto provider = std::make_unique<MemoryResourceContainer>();
     provider->add(ResourceId("sample", ResType::Gff), std::move(resBytes));
     resources.add(std::move(provider));
 

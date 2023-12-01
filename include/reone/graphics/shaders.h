@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/resource/provider/erf.h"
+#include "reone/resource/container/erf.h"
 
 #include "shader.h"
 #include "shaderprogram.h"
@@ -87,7 +87,7 @@ private:
 
     ShaderProgramId _usedProgram {ShaderProgramId::None};
 
-    std::unique_ptr<resource::ErfResourceProvider> _sourceProvider;
+    std::unique_ptr<resource::ErfResourceContainer> _sourceProvider;
     std::map<std::string, std::string> _resRefToSource;
 
     // Shader Programs

@@ -17,41 +17,42 @@
 
 #pragma once
 
-#include "../provider.h"
+#include "reone/system/stream/fileinput.h"
+
+#include "../container.h"
 
 namespace reone {
 
 namespace resource {
 
-class MemoryResourceProvider : public IResourceProvider, boost::noncopyable {
+class RimResourceContainer : public IResourceContainer, boost::noncopyable {
 public:
-    void clear() {
-        _resourceIds.clear();
-        _idToResource.clear();
+    RimResourceContainer(std::filesystem::path path) :
+        _path(std::move(path)) {
     }
 
-    void add(const ResourceId &id, ByteBuffer data) {
-        _resourceIds.insert(id);
-        _idToResource.insert(std::make_pair(id, std::move(data)));
-    }
+    void init();
 
-    // IResourceProvider
+    // IResourceContainer
 
-    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override {
-        auto it = _idToResource.find(id);
-        if (it == _idToResource.end()) {
-            return std::nullopt;
-        }
-        return it->second;
-    }
+    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
 
     const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
-    // END IResourceProvider
+    // END IResourceContainer
 
 private:
+    struct Resource {
+        ResourceId id;
+        uint32_t offset {0};
+        uint32_t fileSize {0};
+    };
+
+    std::filesystem::path _path;
+    std::unique_ptr<FileInputStream> _rim;
+
     std::unordered_set<ResourceId> _resourceIds;
-    std::unordered_map<ResourceId, ByteBuffer> _idToResource;
+    std::unordered_map<ResourceId, Resource> _idToResource;
 };
 
 } // namespace resource

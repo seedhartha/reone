@@ -17,16 +17,17 @@
 
 #include "gffschema.h"
 
+#include "reone/resource/container/erf.h"
+#include "reone/resource/container/keybif.h"
+#include "reone/resource/container/rim.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/gff.h"
-#include "reone/resource/provider/erf.h"
-#include "reone/resource/provider/keybif.h"
-#include "reone/resource/provider/rim.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
+
 
 #include "templates.h"
 
@@ -300,7 +301,7 @@ void generateGffSchema(resource::ResType resType,
     std::map<std::string, std::shared_ptr<Gff>> trees;
 
     auto keyPath = getFileIgnoreCase(k2dir, "chitin.key");
-    auto keyBif = KeyBifResourceProvider(keyPath);
+    auto keyBif = KeyBifResourceContainer(keyPath);
     keyBif.init();
     for (auto &resId : keyBif.resourceIds()) {
         if (resId.type != resType) {
@@ -320,7 +321,7 @@ void generateGffSchema(resource::ResType resType,
         }
         auto extension = boost::to_lower_copy(entry.path().extension().string());
         if (extension == ".rim") {
-            auto rim = RimResourceProvider(entry.path());
+            auto rim = RimResourceContainer(entry.path());
             rim.init();
             for (auto &res : rim.resourceIds()) {
                 if (res.type != resType) {
@@ -333,7 +334,7 @@ void generateGffSchema(resource::ResType resType,
                 trees[res.resRef.value()] = reader.root();
             }
         } else if (extension == ".erf") {
-            auto erf = ErfResourceProvider(entry.path());
+            auto erf = ErfResourceContainer(entry.path());
             erf.init();
             for (auto &res : erf.resourceIds()) {
                 if (res.type != resType) {

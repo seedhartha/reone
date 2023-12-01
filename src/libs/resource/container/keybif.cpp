@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/keybif.h"
+#include "reone/resource/container/keybif.h"
 
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/keyreader.h"
@@ -26,7 +26,7 @@ namespace reone {
 
 namespace resource {
 
-void KeyBifResourceProvider::init() {
+void KeyBifResourceContainer::init() {
     auto key = FileInputStream(_keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
@@ -65,7 +65,7 @@ void KeyBifResourceProvider::init() {
     }
 }
 
-std::optional<ByteBuffer> KeyBifResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> KeyBifResourceContainer::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return std::nullopt;

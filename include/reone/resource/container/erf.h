@@ -19,27 +19,27 @@
 
 #include "reone/system/stream/fileinput.h"
 
-#include "../provider.h"
+#include "../container.h"
 
 namespace reone {
 
 namespace resource {
 
-class ErfResourceProvider : public IResourceProvider, boost::noncopyable {
+class ErfResourceContainer : public IResourceContainer, boost::noncopyable {
 public:
-    ErfResourceProvider(std::filesystem::path path) :
+    ErfResourceContainer(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
     void init();
 
-    // IResourceProvider
+    // IResourceContainer
 
     std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
 
     const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
-    // END IResourceProvider
+    // END IResourceContainer
 
 private:
     struct Resource {

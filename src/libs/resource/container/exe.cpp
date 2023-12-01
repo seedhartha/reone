@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/exe.h"
+#include "reone/resource/container/exe.h"
 
 #include "reone/resource/format/pereader.h"
 #include "reone/system/stream/fileinput.h"
@@ -28,7 +28,7 @@ static std::unordered_map<PEResType, ResType> kPEResTypeToResType {
     {PEResType::Cursor, ResType::Cursor}, //
     {PEResType::CursorGroup, ResType::CursorGroup}};
 
-void ExeResourceProvider::init() {
+void ExeResourceContainer::init() {
     _exe = std::make_unique<FileInputStream>(_path);
 
     auto reader = PeReader(*_exe);
@@ -48,7 +48,7 @@ void ExeResourceProvider::init() {
     }
 }
 
-std::optional<ByteBuffer> ExeResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> ExeResourceContainer::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return std::nullopt;

@@ -97,7 +97,7 @@ void Shaders::init() {
     if (!std::filesystem::exists(shaderpackPath)) {
         throw std::runtime_error("File not found: " + shaderpackPath.string());
     }
-    _sourceProvider = std::make_unique<ErfResourceProvider>(shaderpackPath);
+    _sourceProvider = std::make_unique<ErfResourceContainer>(shaderpackPath);
     _sourceProvider->init();
 
     // Shaders

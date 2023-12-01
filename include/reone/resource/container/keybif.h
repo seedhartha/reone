@@ -19,36 +19,40 @@
 
 #include "reone/system/stream/fileinput.h"
 
-#include "../provider.h"
+#include "../container.h"
 
 namespace reone {
 
 namespace resource {
 
-class ExeResourceProvider : public IResourceProvider, boost::noncopyable {
+class BifReader;
+
+class KeyBifResourceContainer : public IResourceContainer, boost::noncopyable {
 public:
-    ExeResourceProvider(std::filesystem::path path) :
-        _path(std::move(path)) {
+    KeyBifResourceContainer(std::filesystem::path keyPath) :
+        _keyPath(std::move(keyPath)) {
     }
 
     void init();
 
-    // IResourceProvider
+    // IResourceContainer
 
     std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
 
     const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
-    // END IResourceProvider
+    // END IResourceContainer
 
 private:
     struct Resource {
-        uint32_t offset {0};
-        uint32_t size {0};
+        int bifIdx {0};
+        uint32_t bifOffset {0};
+        uint32_t fileSize {0};
     };
 
-    std::filesystem::path _path;
-    std::unique_ptr<FileInputStream> _exe;
+    std::filesystem::path _keyPath;
+
+    std::vector<std::unique_ptr<FileInputStream>> _bifs;
 
     std::unordered_set<ResourceId> _resourceIds;
     std::unordered_map<ResourceId, Resource> _idToResource;

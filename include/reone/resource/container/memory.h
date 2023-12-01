@@ -17,45 +17,41 @@
 
 #pragma once
 
-#include "reone/system/stream/fileinput.h"
-
-#include "../provider.h"
+#include "../container.h"
 
 namespace reone {
 
 namespace resource {
 
-class BifReader;
-
-class KeyBifResourceProvider : public IResourceProvider, boost::noncopyable {
+class MemoryResourceContainer : public IResourceContainer, boost::noncopyable {
 public:
-    KeyBifResourceProvider(std::filesystem::path keyPath) :
-        _keyPath(std::move(keyPath)) {
+    void clear() {
+        _resourceIds.clear();
+        _idToResource.clear();
     }
 
-    void init();
+    void add(const ResourceId &id, ByteBuffer data) {
+        _resourceIds.insert(id);
+        _idToResource.insert(std::make_pair(id, std::move(data)));
+    }
 
-    // IResourceProvider
+    // IResourceContainer
 
-    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override;
+    std::optional<ByteBuffer> findResourceData(const ResourceId &id) override {
+        auto it = _idToResource.find(id);
+        if (it == _idToResource.end()) {
+            return std::nullopt;
+        }
+        return it->second;
+    }
 
     const std::unordered_set<ResourceId> &resourceIds() const override { return _resourceIds; }
 
-    // END IResourceProvider
+    // END IResourceContainer
 
 private:
-    struct Resource {
-        int bifIdx {0};
-        uint32_t bifOffset {0};
-        uint32_t fileSize {0};
-    };
-
-    std::filesystem::path _keyPath;
-
-    std::vector<std::unique_ptr<FileInputStream>> _bifs;
-
     std::unordered_set<ResourceId> _resourceIds;
-    std::unordered_map<ResourceId, Resource> _idToResource;
+    std::unordered_map<ResourceId, ByteBuffer> _idToResource;
 };
 
 } // namespace resource

@@ -19,7 +19,7 @@
 
 #include "reone/resource/2da.h"
 #include "reone/resource/2das.h"
-#include "reone/resource/provider/memory.h"
+#include "reone/resource/container/memory.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryoutput.h"
 
@@ -37,7 +37,7 @@ TEST(two_das, should_get_2da_with_caching) {
     res.write("\x00\x00\x00\x00", 4);
 
     auto resources = Resources();
-    auto provider = std::make_unique<MemoryResourceProvider>();
+    auto provider = std::make_unique<MemoryResourceContainer>();
     provider->add(ResourceId("sample", ResType::TwoDa), std::move(resBytes));
     resources.add(std::move(provider));
 

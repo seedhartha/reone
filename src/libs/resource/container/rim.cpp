@@ -15,34 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/erf.h"
+#include "reone/resource/container/rim.h"
 
-#include "reone/resource/format/erfreader.h"
+#include "reone/resource/format/rimreader.h"
+#include "reone/system/stream/fileinput.h"
 
 namespace reone {
 
 namespace resource {
 
-void ErfResourceProvider::init() {
-    _erf = std::make_unique<FileInputStream>(_path);
+void RimResourceContainer::init() {
+    _rim = std::make_unique<FileInputStream>(_path);
 
-    auto reader = ErfReader(*_erf);
+    auto reader = RimReader(*_rim);
     reader.load();
 
-    auto &keys = reader.keys();
-    auto &erfResources = reader.resources();
-
-    for (auto i = 0; i < keys.size(); ++i) {
+    for (auto &rimResource : reader.resources()) {
         auto resource = Resource();
-        resource.id = keys[i].resId;
-        resource.offset = erfResources[i].offset;
-        resource.fileSize = erfResources[i].size;
+        resource.id = rimResource.resId;
+        resource.offset = rimResource.offset;
+        resource.fileSize = rimResource.size;
         _resourceIds.insert(resource.id);
-        _idToResource.insert(std::make_pair(keys[i].resId, std::move(resource)));
+        _idToResource.insert(std::make_pair(resource.id, std::move(resource)));
     }
 }
 
-std::optional<ByteBuffer> ErfResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> RimResourceContainer::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return std::nullopt;
@@ -54,8 +52,8 @@ std::optional<ByteBuffer> ErfResourceProvider::findResourceData(const ResourceId
     ByteBuffer buf;
     buf.resize(resource.fileSize);
 
-    _erf->seek(resource.offset, SeekOrigin::Begin);
-    _erf->read(&buf[0], buf.size());
+    _rim->seek(resource.offset, SeekOrigin::Begin);
+    _rim->read(&buf[0], buf.size());
 
     return buf;
 }

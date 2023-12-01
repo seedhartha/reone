@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/folder.h"
+#include "reone/resource/container/folder.h"
 
 #include "reone/resource/typeutil.h"
 #include "reone/system/stream/fileinput.h"
@@ -24,11 +24,11 @@ namespace reone {
 
 namespace resource {
 
-void FolderResourceProvider::init() {
+void FolderResourceContainer::init() {
     loadDirectory(_path);
 }
 
-void FolderResourceProvider::loadDirectory(const std::filesystem::path &path) {
+void FolderResourceContainer::loadDirectory(const std::filesystem::path &path) {
     for (auto &entry : std::filesystem::directory_iterator(path)) {
         if (std::filesystem::is_directory(entry.path())) {
             loadDirectory(entry.path());
@@ -48,7 +48,7 @@ void FolderResourceProvider::loadDirectory(const std::filesystem::path &path) {
     }
 }
 
-std::optional<ByteBuffer> FolderResourceProvider::findResourceData(const ResourceId &id) {
+std::optional<ByteBuffer> FolderResourceContainer::findResourceData(const ResourceId &id) {
     auto it = _idToResource.find(id);
     if (it == _idToResource.end()) {
         return std::nullopt;
