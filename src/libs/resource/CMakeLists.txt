@@ -67,6 +67,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/gff.h
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/layout.h
+    ${RESOURCE_INCLUDE_DIR}/ltr.h
     ${RESOURCE_INCLUDE_DIR}/path.h
     ${RESOURCE_INCLUDE_DIR}/provider/2das.h
     ${RESOURCE_INCLUDE_DIR}/provider/audiofiles.h
@@ -76,6 +77,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/provider/gffs.h
     ${RESOURCE_INCLUDE_DIR}/provider/layouts.h
     ${RESOURCE_INCLUDE_DIR}/provider/lips.h
+    ${RESOURCE_INCLUDE_DIR}/provider/ltrs.h
     ${RESOURCE_INCLUDE_DIR}/provider/models.h
     ${RESOURCE_INCLUDE_DIR}/provider/movies.h
     ${RESOURCE_INCLUDE_DIR}/provider/paths.h
@@ -150,6 +152,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/wavreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
+    ${RESOURCE_SOURCE_DIR}/ltr.cpp
     ${RESOURCE_SOURCE_DIR}/provider/2das.cpp
     ${RESOURCE_SOURCE_DIR}/provider/audiofiles.cpp
     ${RESOURCE_SOURCE_DIR}/provider/cursors.cpp

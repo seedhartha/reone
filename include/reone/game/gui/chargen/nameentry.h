@@ -20,7 +20,7 @@
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/textinput.h"
-#include "reone/resource/format/ltrreader.h"
+#include "reone/resource/ltr.h"
 
 #include "../../gui.h"
 
@@ -67,10 +67,6 @@ private:
     CharacterGeneration &_charGen;
     gui::TextInput _input;
 
-    std::unique_ptr<resource::LtrReader> _maleLtr;
-    std::unique_ptr<resource::LtrReader> _femaleLtr;
-    std::unique_ptr<resource::LtrReader> _lastNameLtr;
-
     void onGUILoaded() override;
 
     void bindControls() {
@@ -81,10 +77,6 @@ private:
         _controls.NAME_BOX_EDIT = findControl<gui::Label>("NAME_BOX_EDIT");
         _controls.SUB_TITLE_LBL = findControl<gui::Label>("SUB_TITLE_LBL");
     }
-
-    void loadLtrFile(const std::string &resRef, std::unique_ptr<resource::LtrReader> &ltr);
-
-    std::string getRandomName() const;
 };
 
 } // namespace game

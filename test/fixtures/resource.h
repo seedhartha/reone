@@ -30,6 +30,7 @@
 #include "reone/resource/provider/gffs.h"
 #include "reone/resource/provider/layouts.h"
 #include "reone/resource/provider/lips.h"
+#include "reone/resource/provider/ltrs.h"
 #include "reone/resource/provider/models.h"
 #include "reone/resource/provider/movies.h"
 #include "reone/resource/provider/paths.h"
@@ -176,6 +177,11 @@ public:
     MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
 };
 
+class MockLtrs : public ILtrs, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<Ltr>, get, (const ResRef &resRef), (override));
+};
+
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
@@ -198,6 +204,7 @@ public:
         _paths = std::make_unique<MockPaths>();
         _soundSets = std::make_unique<MockSoundSets>();
         _visibilities = std::make_unique<MockVisiblities>();
+        _ltrs = std::make_unique<MockLtrs>();
 
         _services = std::make_unique<ResourceServices>(
             *_gffs,
@@ -218,7 +225,8 @@ public:
             *_layouts,
             *_paths,
             *_soundSets,
-            *_visibilities);
+            *_visibilities,
+            *_ltrs);
     }
 
     MockGffs &gffs() {
@@ -269,6 +277,7 @@ private:
     std::unique_ptr<MockPaths> _paths;
     std::unique_ptr<MockSoundSets> _soundSets;
     std::unique_ptr<MockVisiblities> _visibilities;
+    std::unique_ptr<MockLtrs> _ltrs;
 
     std::unique_ptr<ResourceServices> _services;
 };

@@ -26,6 +26,7 @@
 #include "../provider/gffs.h"
 #include "../provider/layouts.h"
 #include "../provider/lips.h"
+#include "../provider/ltrs.h"
 #include "../provider/models.h"
 #include "../provider/movies.h"
 #include "../provider/paths.h"
@@ -80,6 +81,7 @@ public:
     Models &models() { return *_models; }
     Textures &textures() { return *_textures; }
     Walkmeshes &walkmeshes() { return *_walkmeshes; }
+    Ltrs &ltrs() { return *_ltrs; }
 
     ResourceServices &services() { return *_services; }
 
@@ -108,6 +110,7 @@ private:
     std::unique_ptr<Paths> _paths;
     std::unique_ptr<SoundSets> _soundSets;
     std::unique_ptr<Visibilities> _visibilities;
+    std::unique_ptr<Ltrs> _ltrs;
 
     std::unique_ptr<ResourceServices> _services;
 };

@@ -55,6 +55,7 @@ void ResourceModule::init() {
     _paths = std::make_unique<Paths>(*_gffs);
     _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
+    _ltrs = std::make_unique<Ltrs>(*_resources);
 
     _strings->init(_gamePath);
     _textures->init();
@@ -78,7 +79,8 @@ void ResourceModule::init() {
         *_layouts,
         *_paths,
         *_soundSets,
-        *_visibilities);
+        *_visibilities,
+        *_ltrs);
 }
 
 void ResourceModule::deinit() {

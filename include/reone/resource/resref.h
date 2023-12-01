@@ -41,6 +41,10 @@ public:
         return _value;
     }
 
+    inline size_t hash() const {
+        return std::hash<std::string>()(_value);
+    }
+
     inline bool operator==(const ResRef &rhs) const {
         return _value == rhs._value;
     }
@@ -64,3 +68,18 @@ private:
 } // namespace resource
 
 } // namespace reone
+
+template <>
+struct std::hash<reone::resource::ResRef> {
+    size_t operator()(const reone::resource::ResRef &resRef) const {
+        return resRef.hash();
+    }
+};
+
+template <>
+struct std::less<reone::resource::ResRef> {
+    bool operator()(const reone::resource::ResRef &lhs,
+                    const reone::resource::ResRef &rhs) const {
+        return lhs < rhs;
+    }
+};

@@ -29,6 +29,7 @@ class IFonts;
 class IGffs;
 class ILayouts;
 class ILips;
+class ILtrs;
 class IModels;
 class IMovies;
 class IPaths;
@@ -61,6 +62,7 @@ struct ResourceServices {
     IPaths &paths;
     ISoundSets &soundSets;
     IVisibilities &visibilities;
+    ILtrs &ltrs;
 
     ResourceServices(
         IGffs &gffs,
@@ -81,7 +83,8 @@ struct ResourceServices {
         ILayouts &layouts,
         IPaths &paths,
         ISoundSets &soundSets,
-        IVisibilities &visibilities) :
+        IVisibilities &visibilities,
+        ILtrs &ltrs) :
         gffs(gffs),
         resources(resources),
         strings(strings),
@@ -100,7 +103,8 @@ struct ResourceServices {
         layouts(layouts),
         paths(paths),
         soundSets(soundSets),
-        visibilities(visibilities) {
+        visibilities(visibilities),
+        ltrs(ltrs) {
     }
 };
 

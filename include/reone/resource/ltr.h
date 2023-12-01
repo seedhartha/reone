@@ -17,28 +17,35 @@
 
 #pragma once
 
-#include "reone/system/binaryreader.h"
-
-#include "../ltr.h"
-
 namespace reone {
-
-class IInputStream;
 
 namespace resource {
 
-class LtrReader : boost::noncopyable {
+class Ltr : boost::noncopyable {
 public:
-    LtrReader(IInputStream &ltr) :
-        _ltr(BinaryReader(ltr)) {
+    struct LetterSet {
+        std::vector<float> start;
+        std::vector<float> mid;
+        std::vector<float> end;
+    };
+
+    Ltr(int letterCount,
+        LetterSet singleLetters,
+        std::vector<LetterSet> doubleLetters,
+        std::vector<std::vector<LetterSet>> tripleLetters) :
+        _letterCount(letterCount),
+        _singleLetters(std::move(singleLetters)),
+        _doubleLetters(std::move(doubleLetters)),
+        _tripleLetters(std::move(tripleLetters)) {
     }
 
-    std::unique_ptr<Ltr> load();
+    std::string randomName(int maxLength) const;
 
 private:
-    BinaryReader _ltr;
-
-    void readLetterSet(int count, Ltr::LetterSet &set);
+    int _letterCount;
+    LetterSet _singleLetters;
+    std::vector<LetterSet> _doubleLetters;
+    std::vector<std::vector<LetterSet>> _tripleLetters;
 };
 
 } // namespace resource

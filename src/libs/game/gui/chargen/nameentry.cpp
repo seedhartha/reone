@@ -20,8 +20,7 @@
 #include "reone/game/game.h"
 #include "reone/game/gui/chargen.h"
 #include "reone/gui/control/button.h"
-#include "reone/resource/resources.h"
-#include "reone/system/stream/memoryinput.h"
+#include "reone/resource/provider/ltrs.h"
 
 using namespace reone::audio;
 
@@ -33,12 +32,12 @@ namespace reone {
 
 namespace game {
 
+static const ResRef kMaleNameLtrResRef("humanm");
+static const ResRef kFemaleNameLtrResRef("humanf");
+static const ResRef kLastNameLtrResRef("humanl");
+
 void NameEntry::onGUILoaded() {
     bindControls();
-
-    loadLtrFile("humanm", _maleLtr);
-    loadLtrFile("humanf", _femaleLtr);
-    loadLtrFile("humanl", _lastNameLtr);
 
     _controls.NAME_BOX_EDIT->setTextMessage("");
 
@@ -54,13 +53,6 @@ void NameEntry::onGUILoaded() {
     });
 }
 
-void NameEntry::loadLtrFile(const std::string &resRef, std::unique_ptr<LtrReader> &ltr) {
-    auto [data, _] = _services.resource.resources.get(ResourceId(resRef, ResType::Ltr));
-    auto stream = MemoryInputStream(data);
-    ltr = std::make_unique<LtrReader>(stream);
-    ltr->load();
-}
-
 bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
         _controls.NAME_BOX_EDIT->setTextMessage(_input.text());
@@ -70,13 +62,12 @@ bool NameEntry::handle(const SDL_Event &event) {
 }
 
 void NameEntry::loadRandomName() {
-    _controls.NAME_BOX_EDIT->setTextMessage(getRandomName());
-}
-
-std::string NameEntry::getRandomName() const {
-    Gender gender = _charGen.character().gender;
-    auto &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
-    return nameLtr->getRandomName(8) + " " + _lastNameLtr->getRandomName(8);
+    auto gender = _charGen.character().gender;
+    const auto &nameLtrResRef = (gender == Gender::Female) ? kFemaleNameLtrResRef : kMaleNameLtrResRef;
+    auto nameLtr = _services.resource.ltrs.get(nameLtrResRef);
+    auto lastNameLtr = _services.resource.ltrs.get(kLastNameLtrResRef);
+    auto generated = nameLtr->randomName(8) + " " + lastNameLtr->randomName(8);
+    _controls.NAME_BOX_EDIT->setTextMessage(generated);
 }
 
 } // namespace game
