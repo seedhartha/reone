@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/resource/di/module.h"
-
 #include "../context.h"
 #include "../options.h"
 
