@@ -16,10 +16,8 @@
  */
 
 #include "reone/tools/script/exprtreeoptimizer.h"
-#include "reone/resource/exception/format.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
-
-using namespace reone::resource;
 
 namespace reone {
 
@@ -114,7 +112,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
         } else if (ExpressionTree::isUnaryExpression(expr->type)) {
             auto unaryExpr = static_cast<UnaryExpression *>(expr);
             if (unaryExpr->operand->type != ExpressionType::Parameter) {
-                throw FormatException("Unary expression operand must be parameter");
+                throw ValidationException("Unary expression operand must be parameter");
             }
             auto paramOperand = static_cast<ParameterExpression *>(unaryExpr->operand);
             ctx.parameters[paramOperand].reads.push_back(ParameterReadEvent(unaryExpr));
@@ -125,7 +123,7 @@ void ExpressionTreeOptimizer::analyzeFunction(Function &func, OptimizationContex
             auto binaryExpr = static_cast<BinaryExpression *>(expr);
             if (binaryExpr->type == ExpressionType::Assign) {
                 if (binaryExpr->left->type != ExpressionType::Parameter) {
-                    throw FormatException("Left of assign expression must be parameter");
+                    throw ValidationException("Left of assign expression must be parameter");
                 }
                 auto leftParam = static_cast<ParameterExpression *>(binaryExpr->left);
                 ctx.parameters[leftParam].writes.push_back(ParameterWriteEvent(binaryExpr, binaryExpr->right));

@@ -17,18 +17,18 @@
 
 #include "main.h"
 
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
 #include "reone/graphics/animation.h"
+#include "reone/graphics/format/lipreader.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/keyreader.h"
-#include "reone/resource/format/lipreader.h"
 #include "reone/resource/format/mdlmdxreader.h"
-#include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/ssfreader.h"
 #include "reone/resource/format/tlkreader.h"
-#include "reone/resource/format/wavreader.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/talktable.h"
 #include "reone/system/fileutil.h"
@@ -48,6 +48,7 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
+
 
 #include "../di/graphicsmodule.h"
 

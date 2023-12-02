@@ -22,12 +22,6 @@
 
 namespace reone {
 
-namespace resource {
-
-class BwmReader;
-
-}
-
 namespace graphics {
 
 class Walkmesh : boost::noncopyable {
@@ -91,7 +85,7 @@ private:
         float maxDistance,
         float &outDistance) const;
 
-    friend class resource::BwmReader;
+    friend class BwmReader;
 };
 
 } // namespace graphics

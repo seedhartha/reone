@@ -19,11 +19,11 @@
 
 #include "tinyxml2.h"
 
-#include "reone/resource/exception/format.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/binarywriter.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/hexutil.h"
 #include "reone/system/logutil.h"
@@ -150,7 +150,7 @@ void GffTool::toXML(IInputStream &gff, IOutputStream &xml) {
 
 static std::unique_ptr<Gff> elementToGff(const XMLElement &element) {
     if (strncmp(element.Name(), "struct", 6) != 0) {
-        throw FormatException("XML element must have name 'struct'");
+        throw ValidationException("XML element must have name 'struct'");
     }
 
     auto structType = element.UnsignedAttribute("type");
@@ -218,7 +218,7 @@ static std::unique_ptr<Gff> elementToGff(const XMLElement &element) {
                 fieldElement->FloatAttribute("z"));
             break;
         default:
-            throw FormatException("Unsupported field type: " + std::to_string(static_cast<int>(fieldType)));
+            throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(fieldType)));
         }
 
         fields.push_back(std::move(field));

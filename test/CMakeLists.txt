@@ -36,51 +36,51 @@ set(TESTS_HEADERS
     ${TESTS_SOURCE_DIR}/fixtures/system.h)
 
 set(TESTS_SOURCES
+    ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/tgareader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/tpcreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/txireader.cpp
     ${TESTS_SOURCE_DIR}/graphics/walkmesh.cpp
-    ${TESTS_SOURCE_DIR}/resource/provider/2das.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dareader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/2dawriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/bifreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/bwmreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/erfreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/erfwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/keyreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/mdlmdxreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/ncsreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimwriter.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/tgareader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkwriter.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/tpcreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/txireader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/wavreader.cpp
+    ${TESTS_SOURCE_DIR}/resource/provider/2das.cpp
     ${TESTS_SOURCE_DIR}/resource/provider/gffs.cpp
     ${TESTS_SOURCE_DIR}/resource/resources.cpp
     ${TESTS_SOURCE_DIR}/resource/resref.cpp
     ${TESTS_SOURCE_DIR}/resource/strings.cpp
     ${TESTS_SOURCE_DIR}/scene/model.cpp
     ${TESTS_SOURCE_DIR}/script/execution.cpp
-    ${TESTS_SOURCE_DIR}/tools/lip/audioanalyzer.cpp
-    ${TESTS_SOURCE_DIR}/tools/lip/composer.cpp
-    ${TESTS_SOURCE_DIR}/tools/script/exprtree.cpp
-    ${TESTS_SOURCE_DIR}/tools/script/exprtreeoptimizer.cpp
+    ${TESTS_SOURCE_DIR}/script/format/ncsreader.cpp
+    ${TESTS_SOURCE_DIR}/script/format/ncswriter.cpp
     ${TESTS_SOURCE_DIR}/system/binaryreader.cpp
     ${TESTS_SOURCE_DIR}/system/binarywriter.cpp
     ${TESTS_SOURCE_DIR}/system/cache.cpp
     ${TESTS_SOURCE_DIR}/system/fileutil.cpp
     ${TESTS_SOURCE_DIR}/system/hexutil.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp
-    ${TESTS_SOURCE_DIR}/system/stream/memoryoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stream/fileinput.cpp
     ${TESTS_SOURCE_DIR}/system/stream/fileoutput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryinput.cpp
+    ${TESTS_SOURCE_DIR}/system/stream/memoryoutput.cpp
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
     ${TESTS_SOURCE_DIR}/system/textreader.cpp
     ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/tools/lip/audioanalyzer.cpp
+    ${TESTS_SOURCE_DIR}/tools/lip/composer.cpp
+    ${TESTS_SOURCE_DIR}/tools/script/exprtree.cpp
+    ${TESTS_SOURCE_DIR}/tools/script/exprtreeoptimizer.cpp
     ${TESTS_SOURCE_DIR}/system/threadpool.cpp
     ${TESTS_SOURCE_DIR}/system/timer.cpp)
 

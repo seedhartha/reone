@@ -32,6 +32,14 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/dxtutil.h
     ${GRAPHICS_INCLUDE_DIR}/eventhandler.h
     ${GRAPHICS_INCLUDE_DIR}/font.h
+    ${GRAPHICS_INCLUDE_DIR}/format/bwmreader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/curreader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/lipreader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/lipwriter.h
+    ${GRAPHICS_INCLUDE_DIR}/format/tgareader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/tgawriter.h
+    ${GRAPHICS_INCLUDE_DIR}/format/tpcreader.h
+    ${GRAPHICS_INCLUDE_DIR}/format/txireader.h
     ${GRAPHICS_INCLUDE_DIR}/framebuffer.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h
@@ -66,6 +74,14 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/di/module.cpp
     ${GRAPHICS_SOURCE_DIR}/dxtutil.cpp
     ${GRAPHICS_SOURCE_DIR}/font.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/bwmreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/curreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/lipreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/lipwriter.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tgareader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tgawriter.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/tpcreader.cpp
+    ${GRAPHICS_SOURCE_DIR}/format/txireader.cpp
     ${GRAPHICS_SOURCE_DIR}/framebuffer.cpp
     ${GRAPHICS_SOURCE_DIR}/lipanimation.cpp
     ${GRAPHICS_SOURCE_DIR}/mesh.cpp

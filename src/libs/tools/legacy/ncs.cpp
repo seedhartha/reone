@@ -18,9 +18,9 @@
 #include "reone/tools/legacy/ncs.h"
 
 #include "reone/game/script/routines.h"
-#include "reone/resource/exception/format.h"
-#include "reone/resource/format/ncsreader.h"
-#include "reone/resource/format/ncswriter.h"
+#include "reone/script/format/ncsreader.h"
+#include "reone/script/format/ncswriter.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"

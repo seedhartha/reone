@@ -19,10 +19,8 @@
 
 #include <gmock/gmock.h>
 
-#include "reone/audio/player.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/director.h"
-#include "reone/resource/format/mp3reader.h"
 #include "reone/resource/provider/2das.h"
 #include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/cursors.h"
@@ -96,16 +94,6 @@ class MockAudioClips : public IAudioClips, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<audio::AudioClip>, get, (const std::string &key), (override));
-};
-
-class MockMp3Reader : public Mp3Reader {
-public:
-    MOCK_METHOD(void, load, (IInputStream & stream), (override));
-};
-
-class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
-public:
-    MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
 };
 
 class MockCursors : public ICursors, boost::noncopyable {

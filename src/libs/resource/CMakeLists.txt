@@ -29,41 +29,27 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/di/services.h
     ${RESOURCE_INCLUDE_DIR}/dialog.h
     ${RESOURCE_INCLUDE_DIR}/director.h
-    ${RESOURCE_INCLUDE_DIR}/exception/format.h
     ${RESOURCE_INCLUDE_DIR}/exception/notfound.h
     ${RESOURCE_INCLUDE_DIR}/format/2dareader.h
     ${RESOURCE_INCLUDE_DIR}/format/2dawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/bifreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/bikreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/bwmreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/curreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfreader.h
     ${RESOURCE_INCLUDE_DIR}/format/erfwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/gffreader.h
     ${RESOURCE_INCLUDE_DIR}/format/gffwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/lipreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/lipwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
     ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
     ${RESOURCE_INCLUDE_DIR}/format/mdlmdxreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/mp3reader.h
-    ${RESOURCE_INCLUDE_DIR}/format/ncsreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/ncswriter.h
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/signutil.h
     ${RESOURCE_INCLUDE_DIR}/format/ssfreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ssfwriter.h
-    ${RESOURCE_INCLUDE_DIR}/format/tgareader.h
-    ${RESOURCE_INCLUDE_DIR}/format/tgawriter.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkwriter.h
-    ${RESOURCE_INCLUDE_DIR}/format/tpcreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/txireader.h
     ${RESOURCE_INCLUDE_DIR}/format/visreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/wavreader.h
     ${RESOURCE_INCLUDE_DIR}/gff.h
     ${RESOURCE_INCLUDE_DIR}/id.h
     ${RESOURCE_INCLUDE_DIR}/layout.h
@@ -122,36 +108,23 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/2dareader.cpp
     ${RESOURCE_SOURCE_DIR}/format/2dawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/bifreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/bikreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/bwmreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/curreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/erfwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/gffreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/gffwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/lipreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/lipwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/ltrreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/lytreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/mdlmdxreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/mp3reader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/ncsreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/ncswriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/signutil.cpp
     ${RESOURCE_SOURCE_DIR}/format/ssfreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ssfwriter.cpp
-    ${RESOURCE_SOURCE_DIR}/format/tgareader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/tgawriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkwriter.cpp
-    ${RESOURCE_SOURCE_DIR}/format/tpcreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/txireader.cpp
     ${RESOURCE_SOURCE_DIR}/format/visreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/wavreader.cpp
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/ltr.cpp
     ${RESOURCE_SOURCE_DIR}/provider/2das.cpp
@@ -195,8 +168,3 @@ add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES} ${CLANG_FORM
 set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(resource PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(resource PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-
-if(ENABLE_MOVIE)
-    target_compile_definitions(resource PRIVATE R_ENABLE_MOVIE)
-    target_link_libraries(resource PRIVATE ${FFMPEG_LIBRARIES})
-endif()

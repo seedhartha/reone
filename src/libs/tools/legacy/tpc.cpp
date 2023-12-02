@@ -17,16 +17,15 @@
 
 #include "reone/tools/legacy/tpc.h"
 
-#include "reone/resource/exception/format.h"
-#include "reone/resource/format/tgawriter.h"
-#include "reone/resource/format/tpcreader.h"
+#include "reone/graphics/format/tgawriter.h"
+#include "reone/graphics/format/tpcreader.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/fileinput.h"
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryoutput.h"
 
 using namespace reone::graphics;
-using namespace reone::resource;
 
 namespace reone {
 

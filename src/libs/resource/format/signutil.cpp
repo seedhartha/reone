@@ -24,11 +24,11 @@ namespace resource {
 void checkSignature(BinaryReader &reader, const std::string &expected) {
     auto len = reader.length();
     if (len < expected.size()) {
-        throw FormatException("Invalid binary resource size");
+        throw ValidationException("Invalid binary resource size");
     }
     auto actual = reader.readString(expected.size());
     if (expected != actual) {
-        throw FormatException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
+        throw ValidationException(str(boost::format("Invalid binary resource signature: expected '%s', got '%s'") % expected % actual));
     }
 }
 

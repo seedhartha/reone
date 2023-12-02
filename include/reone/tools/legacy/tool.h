@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/exception/format.h"
 #include "reone/system/exception/notimplemented.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
 #include "../types.h"
@@ -57,7 +57,7 @@ protected:
             }
             try {
                 block(path, outDir);
-            } catch (const resource::FormatException &e) {
+            } catch (const ValidationException &e) {
                 error(boost::format("Error while processing '%s': %s") % path % std::string(e.what()));
             }
         }

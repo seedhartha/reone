@@ -17,11 +17,11 @@
 
 #include "reone/tools/script/format/nsswriter.h"
 
-#include "reone/resource/exception/format.h"
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variableutil.h"
 #include "reone/system/exception/notimplemented.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryoutput.h"
 #include "reone/system/textwriter.h"

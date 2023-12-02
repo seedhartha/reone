@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/exception/format.h"
 #include "reone/system/binaryreader.h"
+#include "reone/system/exception/validation.h"
 
 namespace reone {
 

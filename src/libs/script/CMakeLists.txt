@@ -23,6 +23,8 @@ set(SCRIPT_HEADERS
     ${SCRIPT_INCLUDE_DIR}/execution.h
     ${SCRIPT_INCLUDE_DIR}/executioncontext.h
     ${SCRIPT_INCLUDE_DIR}/executionstate.h
+    ${SCRIPT_INCLUDE_DIR}/format/ncsreader.h
+    ${SCRIPT_INCLUDE_DIR}/format/ncswriter.h
     ${SCRIPT_INCLUDE_DIR}/instrutil.h
     ${SCRIPT_INCLUDE_DIR}/program.h
     ${SCRIPT_INCLUDE_DIR}/routine.h
@@ -37,6 +39,8 @@ set(SCRIPT_HEADERS
 set(SCRIPT_SOURCES
     ${SCRIPT_SOURCE_DIR}/di/module.cpp
     ${SCRIPT_SOURCE_DIR}/execution.cpp
+    ${SCRIPT_SOURCE_DIR}/format/ncsreader.cpp
+    ${SCRIPT_SOURCE_DIR}/format/ncswriter.cpp
     ${SCRIPT_SOURCE_DIR}/instrutil.cpp
     ${SCRIPT_SOURCE_DIR}/program.cpp
     ${SCRIPT_SOURCE_DIR}/routine.cpp

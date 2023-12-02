@@ -21,11 +21,22 @@
 
 #include "reone/audio/context.h"
 #include "reone/audio/di/services.h"
+#include "reone/audio/format/mp3reader.h"
 #include "reone/audio/player.h"
 
 namespace reone {
 
 namespace audio {
+
+class MockMp3Reader : public Mp3Reader {
+public:
+    MOCK_METHOD(void, load, (IInputStream & stream), (override));
+};
+
+class MockMp3ReaderFactory : public IMp3ReaderFactory, boost::noncopyable {
+public:
+    MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
+};
 
 class MockAudioContext : public IAudioContext, boost::noncopyable {
 public:

@@ -20,21 +20,23 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/binaryreader.h
     ${SYSTEM_INCLUDE_DIR}/binarywriter.h
     ${SYSTEM_INCLUDE_DIR}/cache.h
+    ${SYSTEM_INCLUDE_DIR}/checkutil.h
     ${SYSTEM_INCLUDE_DIR}/clock.h
     ${SYSTEM_INCLUDE_DIR}/di/module.h
     ${SYSTEM_INCLUDE_DIR}/di/services.h
     ${SYSTEM_INCLUDE_DIR}/exception/endofstream.h
     ${SYSTEM_INCLUDE_DIR}/exception/filenotfound.h
+    ${SYSTEM_INCLUDE_DIR}/exception/validation.h
     ${SYSTEM_INCLUDE_DIR}/exception/notimplemented.h
     ${SYSTEM_INCLUDE_DIR}/fileutil.h
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
     ${SYSTEM_INCLUDE_DIR}/logutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
-    ${SYSTEM_INCLUDE_DIR}/stream/memoryinput.h
-    ${SYSTEM_INCLUDE_DIR}/stream/memoryoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileinput.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/input.h
+    ${SYSTEM_INCLUDE_DIR}/stream/memoryinput.h
+    ${SYSTEM_INCLUDE_DIR}/stream/memoryoutput.h
     ${SYSTEM_INCLUDE_DIR}/stream/output.h
     ${SYSTEM_INCLUDE_DIR}/stringbuilder.h
     ${SYSTEM_INCLUDE_DIR}/textreader.h

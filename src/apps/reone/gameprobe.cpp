@@ -17,7 +17,7 @@
 
 #include "gameprobe.h"
 
-#include "reone/resource/exception/format.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/fileutil.h"
 
 using namespace reone::resource;

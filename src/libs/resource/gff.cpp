@@ -17,7 +17,7 @@
 
 #include "reone/resource/gff.h"
 
-#include "reone/resource/exception/format.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -167,7 +167,7 @@ std::string Gff::Field::toString() const {
     case FieldType::ResRef:
         return strValue;
     default:
-        throw FormatException("Unsupported field type: " + std::to_string(static_cast<int>(type)));
+        throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(type)));
     }
 }
 

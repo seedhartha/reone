@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/gffwriter.h"
 
-#include "reone/resource/exception/format.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/stream/fileoutput.h"
 
 #include "reone/resource/gff.h"
@@ -168,7 +168,7 @@ static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simpl
         return FieldClassification::Complex;
     }
     default:
-        throw FormatException("Unsupported field type: " + std::to_string(static_cast<int>(field.type)));
+        throw ValidationException("Unsupported field type: " + std::to_string(static_cast<int>(field.type)));
     }
 }
 

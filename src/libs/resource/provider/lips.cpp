@@ -18,7 +18,7 @@
 
 #include "reone/resource/provider/lips.h"
 
-#include "reone/resource/format/lipreader.h"
+#include "reone/graphics/format/lipreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 

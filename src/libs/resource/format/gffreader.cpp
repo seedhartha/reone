@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/gffreader.h"
 
-#include "reone/resource/exception/format.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -142,7 +142,7 @@ Gff::Field GffReader::readField(int idx) {
         field.intValue = readStrRefFieldData(dataOrDataOffset);
         break;
     default:
-        throw FormatException("Unsupported field type: " + std::to_string(type));
+        throw ValidationException("Unsupported field type: " + std::to_string(type));
     }
 
     return field;

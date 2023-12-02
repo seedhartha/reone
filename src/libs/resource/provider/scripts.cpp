@@ -17,7 +17,7 @@
 
 #include "reone/resource/provider/scripts.h"
 
-#include "reone/resource/format/ncsreader.h"
+#include "reone/script/format/ncsreader.h"
 #include "reone/system/stream/memoryinput.h"
 
 using namespace reone::script;

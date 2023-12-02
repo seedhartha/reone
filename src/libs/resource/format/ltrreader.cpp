@@ -17,8 +17,8 @@
 
 #include "reone/resource/format/ltrreader.h"
 
-#include "reone/resource/exception/format.h"
 #include "reone/resource/format/signutil.h"
+#include "reone/system/exception/validation.h"
 
 namespace reone {
 
@@ -29,7 +29,7 @@ std::unique_ptr<Ltr> LtrReader::load() {
 
     int letterCount = _ltr.readByte();
     if (letterCount != 28) {
-        throw FormatException("Invalid letter count: " + std::to_string(letterCount));
+        throw ValidationException("Invalid letter count: " + std::to_string(letterCount));
     }
     Ltr::LetterSet singleLetters;
     readLetterSet(letterCount, singleLetters);

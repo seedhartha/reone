@@ -18,8 +18,8 @@
 #include "reone/resource/format/2dareader.h"
 
 #include "reone/resource/2da.h"
-#include "reone/resource/exception/format.h"
 #include "reone/resource/format/signutil.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/stringbuilder.h"
 
 namespace reone {

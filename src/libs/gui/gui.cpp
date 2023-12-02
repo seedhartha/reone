@@ -33,13 +33,13 @@
 #include "reone/gui/control/scrollbar.h"
 #include "reone/gui/control/slider.h"
 #include "reone/gui/control/togglebutton.h"
-#include "reone/resource/exception/format.h"
 #include "reone/resource/exception/notfound.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/provider/gffs.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/template/generated/gui.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
 using namespace reone::graphics;

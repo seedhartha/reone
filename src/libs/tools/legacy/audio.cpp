@@ -17,12 +17,10 @@
 
 #include "reone/tools/legacy/audio.h"
 
-#include "reone/resource/exception/format.h"
 #include "reone/system/binaryreader.h"
 #include "reone/system/exception/endofstream.h"
+#include "reone/system/exception/validation.h"
 #include "reone/system/stream/fileinput.h"
-
-using namespace reone::resource;
 
 namespace reone {
 
@@ -62,7 +60,7 @@ void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem:
         }
         suffix = ".mp3";
     } else {
-        throw FormatException("Unsupported audio format");
+        throw ValidationException("Unsupported audio format");
     }
 
     int dataSize = static_cast<int>(filesize - reader.position());

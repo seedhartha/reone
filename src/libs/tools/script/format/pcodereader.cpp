@@ -17,11 +17,9 @@
 
 #include "reone/tools/script/format/pcodereader.h"
 
-#include "reone/resource/exception/format.h"
 #include "reone/script/instrutil.h"
 #include "reone/script/routines.h"
-
-using namespace reone::resource;
+#include "reone/system/exception/validation.h"
 
 namespace reone {
 
@@ -184,7 +182,7 @@ Instruction PcodeReader::parseInstruction(const std::string &line, uint32_t addr
             const std::string &label = args[0];
             auto maybeAddr = _addrByLabel.find(label);
             if (maybeAddr == _addrByLabel.end()) {
-                throw FormatException("Instruction address not found by label '" + label + "'");
+                throw ValidationException("Instruction address not found by label '" + label + "'");
             }
             ins.jumpOffset = maybeAddr->second - ins.offset;
         });
@@ -227,7 +225,7 @@ void PcodeReader::applyArguments(const std::string &line, const std::string &res
     std::smatch what;
     std::regex re(restr);
     if (!std::regex_match(line, what, re)) {
-        throw FormatException(str(boost::format("Arguments line '%s' must match regular expression '%s'") % line % restr));
+        throw ValidationException(str(boost::format("Arguments line '%s' must match regular expression '%s'") % line % restr));
     }
     std::vector<std::string> args;
     for (int i = 0; i < numArgs; ++i) {

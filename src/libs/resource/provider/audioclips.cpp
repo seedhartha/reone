@@ -18,8 +18,8 @@
 #include "reone/resource/provider/audioclips.h"
 
 #include "reone/audio/clip.h"
-#include "reone/resource/format/mp3reader.h"
-#include "reone/resource/format/wavreader.h"
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
 

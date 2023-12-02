@@ -17,7 +17,7 @@
 
 #include "reone/resource/provider/movies.h"
 
-#include "reone/resource/format/bikreader.h"
+#include "reone/movie/format/bikreader.h"
 #include "reone/system/fileutil.h"
 
 using namespace reone::movie;
