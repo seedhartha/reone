@@ -25,7 +25,7 @@ namespace graphics {
 
 class GraphicsContext;
 class Meshes;
-class ShaderManager;
+class ShaderRegistry;
 class Uniforms;
 
 } // namespace graphics
@@ -48,12 +48,12 @@ public:
     Fonts(
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::ShaderManager &shaderManager,
+        graphics::ShaderRegistry &shaderRegistry,
         Textures &textures,
         graphics::Uniforms &uniforms) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaderManager(shaderManager),
+        _shaderRegistry(shaderRegistry),
         _textures(textures),
         _uniforms(uniforms) {
     }
@@ -78,7 +78,7 @@ private:
 
     graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
-    graphics::ShaderManager &_shaderManager;
+    graphics::ShaderRegistry &_shaderRegistry;
     Textures &_textures;
     graphics::Uniforms &_uniforms;
 

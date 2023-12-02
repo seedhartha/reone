@@ -27,7 +27,7 @@ namespace reone {
 
 namespace graphics {
 
-class ShaderManager;
+class ShaderRegistry;
 
 struct GraphicsOptions;
 
@@ -43,9 +43,9 @@ public:
 class Shaders : public IShaders, boost::noncopyable {
 public:
     Shaders(graphics::GraphicsOptions &graphicsOpt,
-            graphics::ShaderManager &shaderManager) :
+            graphics::ShaderRegistry &shaderRegistry) :
         _graphicsOpt(graphicsOpt),
-        _shaderManager(shaderManager) {
+        _shaderRegistry(shaderRegistry) {
     }
 
     ~Shaders() {
@@ -57,7 +57,7 @@ public:
 
 private:
     graphics::GraphicsOptions &_graphicsOpt;
-    graphics::ShaderManager &_shaderManager;
+    graphics::ShaderRegistry &_shaderRegistry;
 
     bool _inited {false};
 

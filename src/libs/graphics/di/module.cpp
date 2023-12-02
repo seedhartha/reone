@@ -25,15 +25,15 @@ void GraphicsModule::init() {
     _window = newWindow();
     _context = std::make_unique<GraphicsContext>(_options);
     _meshes = std::make_unique<Meshes>();
-    _shaderManager = std::make_unique<ShaderManager>();
+    _shaderRegistry = std::make_unique<ShaderRegistry>();
     _uniforms = std::make_unique<Uniforms>();
-    _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaderManager, *_uniforms);
+    _pipeline = std::make_unique<Pipeline>(_options, *_context, *_meshes, *_shaderRegistry, *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(
         *_context,
         *_meshes,
         *_pipeline,
-        *_shaderManager,
+        *_shaderRegistry,
         *_uniforms,
         *_window);
 

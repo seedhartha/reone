@@ -29,7 +29,7 @@
 #include "reone/graphics/font.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/provider/fonts.h"
@@ -202,7 +202,7 @@ void Console::drawBackground() {
         general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         general.alpha = 0.5f;
     });
-    _services.graphics.shaderManager.use(ShaderProgramId::SimpleColor);
+    _services.graphics.shaderRegistry.use(ShaderProgramId::SimpleColor);
     _services.graphics.meshes.quad().draw();
 }
 

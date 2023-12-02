@@ -22,7 +22,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
@@ -110,7 +110,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
             general.projection = _services.graphics.window.getOrthoProjection();
             general.model = std::move(transform);
         });
-        _services.graphics.shaderManager.use(ShaderProgramId::GUI);
+        _services.graphics.shaderRegistry.use(ShaderProgramId::GUI);
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
@@ -130,7 +130,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
             general.projection = _services.graphics.window.getOrthoProjection();
             general.model = std::move(transform);
         });
-        _services.graphics.shaderManager.use(ShaderProgramId::GUI);
+        _services.graphics.shaderRegistry.use(ShaderProgramId::GUI);
         _services.graphics.meshes.quad().draw();
     }
 }
@@ -170,7 +170,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
             general.model = std::move(transform);
             general.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
-        _services.graphics.shaderManager.use(ShaderProgramId::GUI);
+        _services.graphics.shaderRegistry.use(ShaderProgramId::GUI);
         _services.graphics.meshes.quad().draw();
     }
 }
@@ -252,7 +252,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.shaderManager.use(ShaderProgramId::GUI);
+    _services.graphics.shaderRegistry.use(ShaderProgramId::GUI);
     _services.graphics.meshes.quad().draw();
 }
 

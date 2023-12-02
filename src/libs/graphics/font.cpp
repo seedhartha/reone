@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 
@@ -56,7 +56,7 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
         return;
     }
 
-    _shaderManager.use(ShaderProgramId::Text);
+    _shaderRegistry.use(ShaderProgramId::Text);
     _graphicsContext.bind(*_texture);
 
     _uniforms.setGeneral([this, &color](auto &general) {

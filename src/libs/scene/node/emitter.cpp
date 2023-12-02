@@ -21,7 +21,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
@@ -308,7 +308,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
             }
         }
     });
-    _graphicsSvc.shaderManager.use(ShaderProgramId::Particle);
+    _graphicsSvc.shaderRegistry.use(ShaderProgramId::Particle);
     _graphicsSvc.context.bind(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;

@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 
 #include "reone/scene/graph.h"
@@ -68,7 +68,7 @@ void WalkmeshSceneNode::draw() {
         general.resetLocals();
         general.model = _absTransform;
     });
-    _graphicsSvc.shaderManager.use(ShaderProgramId::Walkmesh);
+    _graphicsSvc.shaderRegistry.use(ShaderProgramId::Walkmesh);
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {
         _mesh->draw();
     });

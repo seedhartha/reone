@@ -21,7 +21,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/lumautil.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
@@ -279,7 +279,7 @@ void MeshSceneNode::draw() {
         });
     }
 
-    _graphicsSvc.shaderManager.use(transparent ? ShaderProgramId::ModelTransparent : ShaderProgramId::ModelOpaque);
+    _graphicsSvc.shaderRegistry.use(transparent ? ShaderProgramId::ModelTransparent : ShaderProgramId::ModelOpaque);
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [&mesh]() {
         mesh->mesh->draw();
     });
@@ -296,7 +296,7 @@ void MeshSceneNode::drawShadow() {
         general.modelInv = _absTransformInv;
         general.alpha = _alpha;
     });
-    _graphicsSvc.shaderManager.use(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::DirectionalLightShadows : ShaderProgramId::PointLightShadows);
+    _graphicsSvc.shaderRegistry.use(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::DirectionalLightShadows : ShaderProgramId::PointLightShadows);
     mesh->mesh->draw();
 }
 

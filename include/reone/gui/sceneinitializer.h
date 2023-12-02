@@ -25,7 +25,7 @@ namespace graphics {
 
 class GraphicsContext;
 class Meshes;
-class ShaderManager;
+class ShaderRegistry;
 class Textures;
 
 } // namespace graphics

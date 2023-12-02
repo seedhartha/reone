@@ -18,7 +18,7 @@
 #include "reone/resource/provider/shaders.h"
 
 #include "reone/graphics/options.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone::graphics;
@@ -139,31 +139,31 @@ void Shaders::init() {
     auto fsSharpen = initShader(ShaderType::Fragment, {kResRefUniformsGeneral, kResRefFragmentSharpen});
 
     // Shader Programs
-    _shaderManager.associate(ShaderProgramId::SimpleColor, initShaderProgram({vsClipSpace, fsColor}));
-    _shaderManager.associate(ShaderProgramId::SimpleTexture, initShaderProgram({vsClipSpace, fsTexture}));
-    _shaderManager.associate(ShaderProgramId::GUI, initShaderProgram({vsClipSpace, fsGUI}));
-    _shaderManager.associate(ShaderProgramId::Text, initShaderProgram({vsText, fsText}));
-    _shaderManager.associate(ShaderProgramId::Points, initShaderProgram({vsPoints, fsColor}));
-    _shaderManager.associate(ShaderProgramId::PointLightShadows, initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows}));
-    _shaderManager.associate(ShaderProgramId::DirectionalLightShadows, initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows}));
-    _shaderManager.associate(ShaderProgramId::ModelOpaque, initShaderProgram({vsModel, fsModelOpaque}));
-    _shaderManager.associate(ShaderProgramId::ModelTransparent, initShaderProgram({vsModel, fsModelTransparent}));
-    _shaderManager.associate(ShaderProgramId::AABB, initShaderProgram({vsClipSpace, fsAABB}));
-    _shaderManager.associate(ShaderProgramId::Walkmesh, initShaderProgram({vsWalkmesh, fsWalkmesh}));
-    _shaderManager.associate(ShaderProgramId::Billboard, initShaderProgram({vsBillboard, fsBillboard}));
-    _shaderManager.associate(ShaderProgramId::Particle, initShaderProgram({vsParticle, fsParticle}));
-    _shaderManager.associate(ShaderProgramId::Grass, initShaderProgram({vsGrass, fsGrass}));
-    _shaderManager.associate(ShaderProgramId::SSAO, initShaderProgram({vsObjectSpace, fsSSAO}));
-    _shaderManager.associate(ShaderProgramId::SSR, initShaderProgram({vsObjectSpace, fsSSR}));
-    _shaderManager.associate(ShaderProgramId::CombineOpaque, initShaderProgram({vsObjectSpace, fsCombineOpaque}));
-    _shaderManager.associate(ShaderProgramId::CombineGeometry, initShaderProgram({vsObjectSpace, fsCombineGeometry}));
-    _shaderManager.associate(ShaderProgramId::BoxBlur4, initShaderProgram({vsObjectSpace, fsBoxBlur4}));
-    _shaderManager.associate(ShaderProgramId::GaussianBlur9, initShaderProgram({vsObjectSpace, fsGaussianBlur9}));
-    _shaderManager.associate(ShaderProgramId::GaussianBlur13, initShaderProgram({vsObjectSpace, fsGaussianBlur13}));
-    _shaderManager.associate(ShaderProgramId::MedianFilter3, initShaderProgram({vsObjectSpace, fsMedianFilter3}));
-    _shaderManager.associate(ShaderProgramId::MedianFilter5, initShaderProgram({vsObjectSpace, fsMedianFilter5}));
-    _shaderManager.associate(ShaderProgramId::FXAA, initShaderProgram({vsObjectSpace, fsFXAA}));
-    _shaderManager.associate(ShaderProgramId::Sharpen, initShaderProgram({vsObjectSpace, fsSharpen}));
+    _shaderRegistry.add(ShaderProgramId::SimpleColor, initShaderProgram({vsClipSpace, fsColor}));
+    _shaderRegistry.add(ShaderProgramId::SimpleTexture, initShaderProgram({vsClipSpace, fsTexture}));
+    _shaderRegistry.add(ShaderProgramId::GUI, initShaderProgram({vsClipSpace, fsGUI}));
+    _shaderRegistry.add(ShaderProgramId::Text, initShaderProgram({vsText, fsText}));
+    _shaderRegistry.add(ShaderProgramId::Points, initShaderProgram({vsPoints, fsColor}));
+    _shaderRegistry.add(ShaderProgramId::PointLightShadows, initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows}));
+    _shaderRegistry.add(ShaderProgramId::DirectionalLightShadows, initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows}));
+    _shaderRegistry.add(ShaderProgramId::ModelOpaque, initShaderProgram({vsModel, fsModelOpaque}));
+    _shaderRegistry.add(ShaderProgramId::ModelTransparent, initShaderProgram({vsModel, fsModelTransparent}));
+    _shaderRegistry.add(ShaderProgramId::AABB, initShaderProgram({vsClipSpace, fsAABB}));
+    _shaderRegistry.add(ShaderProgramId::Walkmesh, initShaderProgram({vsWalkmesh, fsWalkmesh}));
+    _shaderRegistry.add(ShaderProgramId::Billboard, initShaderProgram({vsBillboard, fsBillboard}));
+    _shaderRegistry.add(ShaderProgramId::Particle, initShaderProgram({vsParticle, fsParticle}));
+    _shaderRegistry.add(ShaderProgramId::Grass, initShaderProgram({vsGrass, fsGrass}));
+    _shaderRegistry.add(ShaderProgramId::SSAO, initShaderProgram({vsObjectSpace, fsSSAO}));
+    _shaderRegistry.add(ShaderProgramId::SSR, initShaderProgram({vsObjectSpace, fsSSR}));
+    _shaderRegistry.add(ShaderProgramId::CombineOpaque, initShaderProgram({vsObjectSpace, fsCombineOpaque}));
+    _shaderRegistry.add(ShaderProgramId::CombineGeometry, initShaderProgram({vsObjectSpace, fsCombineGeometry}));
+    _shaderRegistry.add(ShaderProgramId::BoxBlur4, initShaderProgram({vsObjectSpace, fsBoxBlur4}));
+    _shaderRegistry.add(ShaderProgramId::GaussianBlur9, initShaderProgram({vsObjectSpace, fsGaussianBlur9}));
+    _shaderRegistry.add(ShaderProgramId::GaussianBlur13, initShaderProgram({vsObjectSpace, fsGaussianBlur13}));
+    _shaderRegistry.add(ShaderProgramId::MedianFilter3, initShaderProgram({vsObjectSpace, fsMedianFilter3}));
+    _shaderRegistry.add(ShaderProgramId::MedianFilter5, initShaderProgram({vsObjectSpace, fsMedianFilter5}));
+    _shaderRegistry.add(ShaderProgramId::FXAA, initShaderProgram({vsObjectSpace, fsFXAA}));
+    _shaderRegistry.add(ShaderProgramId::Sharpen, initShaderProgram({vsObjectSpace, fsSharpen}));
 
     _inited = true;
 }

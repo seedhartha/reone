@@ -21,7 +21,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -79,7 +79,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         general.alpha = 0.5f;
         general.color = glm::vec4(_color, 1.0f);
     });
-    _graphicsSvc.shaderManager.use(ShaderProgramId::Billboard);
+    _graphicsSvc.shaderRegistry.use(ShaderProgramId::Billboard);
     _graphicsSvc.context.bind(*flare.texture);
     _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
         _graphicsSvc.meshes.billboard().draw();

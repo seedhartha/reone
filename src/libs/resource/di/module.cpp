@@ -30,7 +30,7 @@ void ResourceModule::init() {
     _strings = std::make_unique<Strings>();
     _twoDas = std::make_unique<TwoDas>(*_resources);
     _gffs = std::make_unique<Gffs>(*_resources);
-    _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderManager());
+    _shaders = std::make_unique<Shaders>(_graphicsOpt, _graphics.shaderRegistry());
     _textures = std::make_unique<Textures>(_graphicsOpt, *_resources);
     _models = std::make_unique<Models>(*_textures, *_resources);
     _walkmeshes = std::make_unique<Walkmeshes>(*_resources);
@@ -38,13 +38,13 @@ void ResourceModule::init() {
     _fonts = std::make_unique<Fonts>(
         _graphics.context(),
         _graphics.meshes(),
-        _graphics.shaderManager(),
+        _graphics.shaderRegistry(),
         *_textures,
         _graphics.uniforms());
     _cursors = std::make_unique<Cursors>(
         _graphics.context(),
         _graphics.meshes(),
-        _graphics.shaderManager(),
+        _graphics.shaderRegistry(),
         *_textures,
         _graphics.uniforms(),
         _graphics.window(),

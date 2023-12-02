@@ -23,7 +23,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/pipeline.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/system/exception/notimplemented.h"
@@ -78,7 +78,7 @@ public:
     MOCK_METHOD(std::shared_ptr<Texture>, draw, (IScene & scene, const glm::ivec2 &dim), (override));
 };
 
-class MockShaders : public IShaderManager, boost::noncopyable {
+class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
     MOCK_METHOD(void, use, (ShaderProgramId programId), (override));
 };
@@ -114,7 +114,7 @@ public:
         _context = std::make_unique<MockGraphicsContext>();
         _meshes = std::make_unique<MockMeshes>();
         _pipeline = std::make_unique<MockPipeline>();
-        _shaders = std::make_unique<MockShaders>();
+        _shaderRegistry = std::make_unique<MockShaderRegistry>();
         _uniforms = std::make_unique<MockUniforms>();
         _window = std::make_unique<MockWindow>();
 
@@ -122,7 +122,7 @@ public:
             *_context,
             *_meshes,
             *_pipeline,
-            *_shaders,
+            *_shaderRegistry,
             *_uniforms,
             *_window);
     }
@@ -147,7 +147,7 @@ private:
     std::unique_ptr<MockGraphicsContext> _context;
     std::unique_ptr<MockMeshes> _meshes;
     std::unique_ptr<MockPipeline> _pipeline;
-    std::unique_ptr<MockShaders> _shaders;
+    std::unique_ptr<MockShaderRegistry> _shaderRegistry;
     std::unique_ptr<MockUniforms> _uniforms;
     std::unique_ptr<MockWindow> _window;
 

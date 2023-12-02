@@ -58,16 +58,16 @@ enum class ShaderProgramId {
     Sharpen
 };
 
-class IShaderManager {
+class IShaderRegistry {
 public:
-    virtual ~IShaderManager() = default;
+    virtual ~IShaderRegistry() = default;
 
     virtual void use(ShaderProgramId programId) = 0;
 };
 
-class ShaderManager : public IShaderManager, boost::noncopyable {
+class ShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
-    void associate(ShaderProgramId programId, std::shared_ptr<ShaderProgram> program) {
+    void add(ShaderProgramId programId, std::shared_ptr<ShaderProgram> program) {
         _idToProgram[programId] = std::move(program);
     }
 

@@ -21,7 +21,7 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -62,7 +62,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaderManager.use(ShaderProgramId::GUI);
+    _graphicsSvc.shaderRegistry.use(ShaderProgramId::GUI);
     _graphicsSvc.meshes.quad().draw();
 }
 

@@ -20,7 +20,7 @@
 #include "../context.h"
 #include "../meshes.h"
 #include "../pipeline.h"
-#include "../shadermanager.h"
+#include "../shaderregistry.h"
 #include "../uniforms.h"
 #include "../window.h"
 
@@ -44,7 +44,7 @@ public:
     graphics::GraphicsContext &context() { return *_context; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Pipeline &pipeline() { return *_pipeline; }
-    graphics::ShaderManager &shaderManager() { return *_shaderManager; }
+    graphics::ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
     graphics::Uniforms &uniforms() { return *_uniforms; }
     graphics::IWindow &window() { return *_window; }
 
@@ -56,7 +56,7 @@ protected:
     std::unique_ptr<graphics::GraphicsContext> _context;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Pipeline> _pipeline;
-    std::unique_ptr<graphics::ShaderManager> _shaderManager;
+    std::unique_ptr<graphics::ShaderRegistry> _shaderRegistry;
     std::unique_ptr<graphics::Uniforms> _uniforms;
     std::unique_ptr<graphics::IWindow> _window;
 

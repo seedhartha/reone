@@ -22,7 +22,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/triangleutil.h"
 #include "reone/graphics/uniforms.h"
@@ -160,7 +160,7 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
             grass.clusters[i].lightmapUV = cluster->lightmapUV();
         }
     });
-    _graphicsSvc.shaderManager.use(ShaderProgramId::Grass);
+    _graphicsSvc.shaderRegistry.use(ShaderProgramId::Grass);
     _graphicsSvc.meshes.grass().drawInstanced(leafs.size());
 }
 

@@ -20,7 +20,7 @@
 #include "reone/graphics/font.h"
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/resources.h"

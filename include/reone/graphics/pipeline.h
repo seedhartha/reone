@@ -39,7 +39,7 @@ namespace graphics {
 class GraphicsContext;
 class IScene;
 class Meshes;
-class ShaderManager;
+class ShaderRegistry;
 class Uniforms;
 
 class IPipeline {
@@ -55,12 +55,12 @@ public:
         GraphicsOptions &options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,
-        ShaderManager &shaderManager,
+        ShaderRegistry &shaderRegistry,
         Uniforms &uniforms) :
         _options(options),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaderManager(shaderManager),
+        _shaderRegistry(shaderRegistry),
         _uniforms(uniforms) {
     }
 
@@ -128,7 +128,7 @@ private:
 
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
-    ShaderManager &_shaderManager;
+    ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;
 
     // END Services

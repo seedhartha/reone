@@ -28,7 +28,7 @@ class IWindow;
 class Cursor;
 class GraphicsContext;
 class Meshes;
-class ShaderManager;
+class ShaderRegistry;
 class Texture;
 class Uniforms;
 
@@ -51,14 +51,14 @@ public:
     Cursors(
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::ShaderManager &shaderManager,
+        graphics::ShaderRegistry &shaderRegistry,
         resource::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::IWindow &window,
         Resources &resources) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaderManager(shaderManager),
+        _shaderRegistry(shaderRegistry),
         _textures(textures),
         _uniforms(uniforms),
         _window(window),
@@ -78,7 +78,7 @@ private:
 
     graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
-    graphics::ShaderManager &_shaderManager;
+    graphics::ShaderRegistry &_shaderRegistry;
     resource::Textures &_textures;
     graphics::Uniforms &_uniforms;
     graphics::IWindow &_window;

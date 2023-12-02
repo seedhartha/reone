@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshes.h"
-#include "reone/graphics/shadermanager.h"
+#include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -42,7 +42,7 @@ void Cursor::draw() {
         general.projection = _window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _shaderManager.use(ShaderProgramId::GUI);
+    _shaderRegistry.use(ShaderProgramId::GUI);
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {
         _meshes.quad().draw();
     });
