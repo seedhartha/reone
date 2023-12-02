@@ -30,8 +30,3 @@ add_library(movie STATIC ${MOVIE_HEADERS} ${MOVIE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(movie PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(movie PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(movie PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-
-if(ENABLE_MOVIE)
-    target_compile_definitions(movie PRIVATE R_ENABLE_MOVIE)
-    target_link_libraries(movie PRIVATE ${FFMPEG_LIBRARIES})
-endif()
