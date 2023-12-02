@@ -18,7 +18,7 @@
 #include "reone/resource/format/2dareader.h"
 
 #include "reone/resource/2da.h"
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/stringbuilder.h"
 
@@ -27,7 +27,7 @@ namespace reone {
 namespace resource {
 
 void TwoDaReader::load() {
-    checkSignature(_reader, std::string("2DA V2.b", 8));
+    checkEqual(_reader.readString(8), std::string("2DA V2.b", 8), "Invalid 2DA signature");
 
     _reader.skipBytes(1); // newline
     _columns = readTokens();

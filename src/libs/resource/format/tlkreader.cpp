@@ -17,8 +17,8 @@
 
 #include "reone/resource/format/tlkreader.h"
 
-#include "reone/resource/format/signutil.h"
 #include "reone/resource/talktable.h"
+#include "reone/system/checkutil.h"
 
 namespace reone {
 
@@ -31,7 +31,7 @@ struct StringFlags {
 };
 
 void TlkReader::load() {
-    checkSignature(_tlk, std::string("TLK V3.0", 8));
+    checkEqual(_tlk.readString(8), std::string("TLK V3.0", 8), "Invalid TLK signature");
 
     uint32_t languageId = _tlk.readUint32();
     _stringCount = _tlk.readUint32();

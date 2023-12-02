@@ -44,7 +44,6 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
-    ${RESOURCE_INCLUDE_DIR}/format/signutil.h
     ${RESOURCE_INCLUDE_DIR}/format/ssfreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ssfwriter.h
     ${RESOURCE_INCLUDE_DIR}/format/tlkreader.h
@@ -119,7 +118,6 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp
-    ${RESOURCE_SOURCE_DIR}/format/signutil.cpp
     ${RESOURCE_SOURCE_DIR}/format/ssfreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ssfwriter.cpp
     ${RESOURCE_SOURCE_DIR}/format/tlkreader.cpp

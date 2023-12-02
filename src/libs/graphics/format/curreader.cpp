@@ -19,7 +19,6 @@
 
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
-#include "reone/resource/format/signutil.h"
 
 namespace reone {
 

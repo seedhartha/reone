@@ -17,14 +17,15 @@
 
 #include "reone/resource/format/rimreader.h"
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 
 namespace reone {
 
 namespace resource {
 
 void RimReader::load() {
-    checkSignature(_rim, std::string("RIM V1.0", 8));
+    checkEqual(_rim.readString(8), std::string("RIM V1.0", 8), "Invalid RIM signature");
+
     _rim.skipBytes(4);
 
     _numResources = _rim.readUint32();

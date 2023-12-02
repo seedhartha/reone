@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/ltrreader.h"
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 #include "reone/system/exception/validation.h"
 
 namespace reone {
@@ -25,7 +25,7 @@ namespace reone {
 namespace resource {
 
 std::unique_ptr<Ltr> LtrReader::load() {
-    checkSignature(_ltr, std::string("LTR V1.0", 8));
+    checkEqual(_ltr.readString(8), std::string("LTR V1.0", 8), "Invalid LTR signature");
 
     int letterCount = _ltr.readByte();
     if (letterCount != 28) {

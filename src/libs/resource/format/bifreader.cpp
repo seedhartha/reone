@@ -17,14 +17,14 @@
 
 #include "reone/resource/format/bifreader.h"
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 
 namespace reone {
 
 namespace resource {
 
 void BifReader::load() {
-    checkSignature(_bif, std::string("BIFFV1  ", 8));
+    checkEqual(_bif.readString(8), std::string("BIFFV1  ", 8), "Invalid BIF signature");
     loadHeader();
     loadResources();
 }

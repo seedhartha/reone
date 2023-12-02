@@ -17,14 +17,14 @@
 
 #include "reone/resource/format/ssfreader.h"
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 
 namespace reone {
 
 namespace resource {
 
 void SsfReader::load() {
-    checkSignature(_ssf, std::string("SSF V1.1", 8));
+    checkEqual(_ssf.readString(8), std::string("SSF V1.1", 8), "Invalid SSF signature");
     uint32_t tableOffset = _ssf.readUint32();
     int entryCount = static_cast<int>((_ssf.length() - tableOffset) / 4);
     _ssf.seek(tableOffset);

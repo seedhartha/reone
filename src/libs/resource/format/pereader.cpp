@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/pereader.h"
 
-#include "reone/resource/format/signutil.h"
+#include "reone/system/checkutil.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -28,7 +28,8 @@ static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
 void PeReader::load() {
-    checkSignature(_pe, std::string("MZ", 2));
+    checkEqual(_pe.readString(2), std::string("MZ", 2), "Invalid PE signature");
+
     _pe.skipBytes(58);
 
     uint32_t offPeHeader = _pe.readUint32();
