@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 
 #include "reone/graphics/mesh.h"
 
@@ -149,35 +149,24 @@ static std::unique_ptr<Mesh> getMesh(std::vector<float> vertices, std::vector<Me
     return std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
 }
 
-void Meshes::init() {
+void MeshRegistry::init() {
     if (_inited) {
         return;
     }
-
-    _quad = getMesh(g_quadVertices, g_quadFaces, g_quadSpec);
-    _quadNDC = getMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec);
-    _billboard = getMesh(g_billboardVertices, g_quadFaces, g_quadSpec);
-    _grass = getMesh(g_grassVertices, g_quadFaces, g_quadSpec);
-
-    _box = getMesh(g_boxVertices, g_boxFaces, g_boxSpec);
-    _cubemap = getMesh(g_cubemapVertices, g_boxFaces, g_cubemapSpec);
-
+    add(MeshName::quad, getMesh(g_quadVertices, g_quadFaces, g_quadSpec));
+    add(MeshName::quadNDC, getMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec));
+    add(MeshName::billboard, getMesh(g_billboardVertices, g_quadFaces, g_quadSpec));
+    add(MeshName::grass, getMesh(g_grassVertices, g_quadFaces, g_quadSpec));
+    add(MeshName::box, getMesh(g_boxVertices, g_boxFaces, g_boxSpec));
+    add(MeshName::cubemap, getMesh(g_cubemapVertices, g_boxFaces, g_cubemapSpec));
     _inited = true;
 }
 
-void Meshes::deinit() {
+void MeshRegistry::deinit() {
     if (!_inited) {
         return;
     }
-
-    _quad.reset();
-    _quadNDC.reset();
-    _billboard.reset();
-    _grass.reset();
-
-    _box.reset();
-    _cubemap.reset();
-
+    _nameToMesh.clear();
     _inited = false;
 }
 

@@ -18,7 +18,7 @@
 #include "reone/resource/provider/fonts.h"
 
 #include "reone/graphics/context.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/window.h"
 #include "reone/resource/provider/textures.h"
@@ -41,7 +41,7 @@ std::shared_ptr<Font> Fonts::doGet(std::string resRef) {
     if (!texture)
         return nullptr;
 
-    auto font = std::make_shared<Font>(_graphicsContext, _meshes, _shaderRegistry, _uniforms);
+    auto font = std::make_shared<Font>(_graphicsContext, _meshRegistry, _shaderRegistry, _uniforms);
     font->load(texture);
 
     return font;

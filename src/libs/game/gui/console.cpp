@@ -28,7 +28,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -203,7 +203,7 @@ void Console::drawBackground() {
         general.alpha = 0.5f;
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 void Console::drawLines() {

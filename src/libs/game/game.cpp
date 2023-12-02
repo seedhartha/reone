@@ -29,7 +29,7 @@
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
@@ -371,7 +371,7 @@ void Game::drawWorld() {
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleTexture));
     _services.graphics.context.bind(*output);
-    _services.graphics.meshes.quadNDC().draw();
+    _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Game::toggleInGameCameraType() {

@@ -36,7 +36,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h
     ${GRAPHICS_INCLUDE_DIR}/mesh.h
-    ${GRAPHICS_INCLUDE_DIR}/meshes.h
+    ${GRAPHICS_INCLUDE_DIR}/meshregistry.h
     ${GRAPHICS_INCLUDE_DIR}/model.h
     ${GRAPHICS_INCLUDE_DIR}/modelnode.h
     ${GRAPHICS_INCLUDE_DIR}/options.h
@@ -69,7 +69,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/framebuffer.cpp
     ${GRAPHICS_SOURCE_DIR}/lipanimation.cpp
     ${GRAPHICS_SOURCE_DIR}/mesh.cpp
-    ${GRAPHICS_SOURCE_DIR}/meshes.cpp
+    ${GRAPHICS_SOURCE_DIR}/meshregistry.cpp
     ${GRAPHICS_SOURCE_DIR}/model.cpp
     ${GRAPHICS_SOURCE_DIR}/modelnode.cpp
     ${GRAPHICS_SOURCE_DIR}/pipeline.cpp

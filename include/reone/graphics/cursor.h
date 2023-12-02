@@ -24,7 +24,7 @@ namespace graphics {
 class IWindow;
 
 class GraphicsContext;
-class Meshes;
+class MeshRegistry;
 class ShaderRegistry;
 class Texture;
 class Uniforms;
@@ -35,14 +35,14 @@ public:
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
         GraphicsContext &graphicsContext,
-        Meshes &meshes,
+        MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
         Uniforms &uniforms,
         IWindow &window) :
         _up(std::move(up)),
         _down(std::move(down)),
         _graphicsContext(graphicsContext),
-        _meshes(meshes),
+        _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _uniforms(uniforms),
         _window(window) {
@@ -63,7 +63,7 @@ private:
     // Services
 
     GraphicsContext &_graphicsContext;
-    Meshes &_meshes;
+    MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;
     IWindow &_window;

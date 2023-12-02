@@ -38,7 +38,7 @@ namespace graphics {
 
 class GraphicsContext;
 class IScene;
-class Meshes;
+class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
@@ -55,13 +55,13 @@ public:
     Pipeline(
         GraphicsOptions &options,
         GraphicsContext &graphicsContext,
-        Meshes &meshes,
+        MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
         TextureRegistry &textureRegistry,
         Uniforms &uniforms) :
         _options(options),
         _graphicsContext(graphicsContext),
-        _meshes(meshes),
+        _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
@@ -130,7 +130,7 @@ private:
     // Services
 
     GraphicsContext &_graphicsContext;
-    Meshes &_meshes;
+    MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;

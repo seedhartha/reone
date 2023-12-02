@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
@@ -72,28 +72,28 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width, 1.0f, 1.0f));
     });
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
     // Left edge
     _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
     // Right edge
     _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
     // Bottom edge
     _graphicsSvc.uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width, 1.0f, 1.0f));
     });
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
     // Thumb
     float frameHeight = _extent.height - 2.0f * _extent.width - 4.0f;
@@ -103,7 +103,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         general.model = glm::translate(glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
     });
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void ScrollBar::drawArrows(const glm::ivec2 &offset) {
@@ -136,7 +136,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
         general.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
@@ -151,7 +151,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
         general.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void ScrollBar::setScrollState(ScrollState state) {

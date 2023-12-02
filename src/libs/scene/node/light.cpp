@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -82,7 +82,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
     _graphicsSvc.context.bind(*flare.texture);
     _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
-        _graphicsSvc.meshes.billboard().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::billboard).draw();
     });
 }
 

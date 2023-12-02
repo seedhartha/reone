@@ -21,7 +21,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -276,7 +276,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
         general.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -304,7 +304,7 @@ void SelectionOverlay::drawTitleBar() {
             general.alpha = 0.5f;
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
-        _services.graphics.meshes.quad().draw();
+        _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -337,7 +337,7 @@ void SelectionOverlay::drawHealthBar() {
         general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -374,7 +374,7 @@ void SelectionOverlay::drawActionFrame(int index) {
         general.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -437,7 +437,7 @@ void SelectionOverlay::drawActionIcon(int index) {
         general.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

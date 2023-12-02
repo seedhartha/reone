@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -87,7 +87,7 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
                 textOffset.x += glyph.size.x;
             }
         });
-        _meshes.quad().drawInstanced(numChars);
+        _meshRegistry.get(MeshName::quad).drawInstanced(numChars);
     }
 }
 

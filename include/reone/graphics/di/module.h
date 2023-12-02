@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../context.h"
-#include "../meshes.h"
+#include "../meshregistry.h"
 #include "../pipeline.h"
 #include "../shaderregistry.h"
 #include "../textureregistry.h"
@@ -43,7 +43,7 @@ public:
     void deinit();
 
     GraphicsContext &context() { return *_context; }
-    Meshes &meshes() { return *_meshes; }
+    MeshRegistry &meshRegistry() { return *_meshRegistry; }
     Pipeline &pipeline() { return *_pipeline; }
     ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
     TextureRegistry &textureRegistry() { return *_textureRegistry; }
@@ -56,7 +56,7 @@ protected:
     GraphicsOptions &_options;
 
     std::unique_ptr<GraphicsContext> _context;
-    std::unique_ptr<Meshes> _meshes;
+    std::unique_ptr<MeshRegistry> _meshRegistry;
     std::unique_ptr<Pipeline> _pipeline;
     std::unique_ptr<ShaderRegistry> _shaderRegistry;
     std::unique_ptr<TextureRegistry> _textureRegistry;

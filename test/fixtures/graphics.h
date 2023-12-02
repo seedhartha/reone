@@ -21,7 +21,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureregistry.h"
@@ -52,15 +52,9 @@ public:
     MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &block), (override));
 };
 
-class MockMeshes : public IMeshes, boost::noncopyable {
+class MockMeshRegistry : public IMeshRegistry, boost::noncopyable {
 public:
-    MOCK_METHOD(Mesh &, quad, (), (const override));
-    MOCK_METHOD(Mesh &, quadNDC, (), (const override));
-    MOCK_METHOD(Mesh &, billboard, (), (const override));
-    MOCK_METHOD(Mesh &, grass, (), (const override));
-
-    MOCK_METHOD(Mesh &, box, (), (const override));
-    MOCK_METHOD(Mesh &, cubemap, (), (const override));
+    MOCK_METHOD(Mesh &, get, (const std::string &), (override));
 };
 
 class MockPipeline : public IPipeline, boost::noncopyable {
@@ -107,7 +101,7 @@ class TestGraphicsModule : boost::noncopyable {
 public:
     void init() {
         _context = std::make_unique<MockGraphicsContext>();
-        _meshes = std::make_unique<MockMeshes>();
+        _meshRegistry = std::make_unique<MockMeshRegistry>();
         _pipeline = std::make_unique<MockPipeline>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
         _textureRegistry = std::make_unique<MockTextureRegistry>();
@@ -116,7 +110,7 @@ public:
 
         _services = std::make_unique<GraphicsServices>(
             *_context,
-            *_meshes,
+            *_meshRegistry,
             *_pipeline,
             *_shaderRegistry,
             *_textureRegistry,
@@ -142,7 +136,7 @@ public:
 
 private:
     std::unique_ptr<MockGraphicsContext> _context;
-    std::unique_ptr<MockMeshes> _meshes;
+    std::unique_ptr<MockMeshRegistry> _meshRegistry;
     std::unique_ptr<MockPipeline> _pipeline;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;
     std::unique_ptr<MockTextureRegistry> _textureRegistry;

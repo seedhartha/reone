@@ -24,7 +24,7 @@ namespace reone {
 namespace graphics {
 
 class GraphicsContext;
-class Meshes;
+class MeshRegistry;
 class ShaderRegistry;
 class Texture;
 class Uniforms;
@@ -33,11 +33,11 @@ class Font {
 public:
     Font(
         GraphicsContext &graphicsContext,
-        Meshes &meshes,
+        MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
         Uniforms &uniforms) :
         _graphicsContext(graphicsContext),
-        _meshes(meshes),
+        _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _uniforms(uniforms) {
     }
@@ -68,7 +68,7 @@ private:
     // Services
 
     GraphicsContext &_graphicsContext;
-    Meshes &_meshes;
+    MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;
 

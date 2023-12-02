@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
@@ -231,7 +231,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
     _graphicsSvc.context.bind(*output);
     _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     });
 }
 
@@ -262,7 +262,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
         auto blendMode = border.fill->features().blending == Texture::Blending::Additive ? BlendMode::Additive : BlendMode::Normal;
         _graphicsSvc.context.withBlending(blendMode, [this, &border]() {
-            _graphicsSvc.meshes.quad().draw();
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
         });
     }
 
@@ -291,7 +291,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 general.color = glm::vec4(color, 1.0f);
             });
 
-            _graphicsSvc.meshes.quad().draw();
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
             // Right edge
             transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
@@ -308,7 +308,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 general.color = glm::vec4(color, 1.0f);
             });
 
-            _graphicsSvc.meshes.quad().draw();
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
         }
 
         if (width > 0.0f) {
@@ -326,7 +326,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 general.color = glm::vec4(color, 1.0f);
             });
 
-            _graphicsSvc.meshes.quad().draw();
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
             // Bottom edge
             transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
@@ -343,7 +343,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 general.color = glm::vec4(color, 1.0f);
             });
 
-            _graphicsSvc.meshes.quad().draw();
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
         }
     }
 
@@ -364,7 +364,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             general.color = glm::vec4(color, 1.0f);
         });
 
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
         // Bottom left corner
         transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
@@ -381,7 +381,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             general.color = glm::vec4(color, 1.0f);
         });
 
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
         // Top right corner
         transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
@@ -398,7 +398,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             general.color = glm::vec4(color, 1.0f);
         });
 
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 
         // Bottom right corner
         transform = glm::translate(glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
@@ -415,7 +415,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             general.color = glm::vec4(color, 1.0f);
         });
 
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     }
 }
 

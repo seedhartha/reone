@@ -21,7 +21,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/triangleutil.h"
@@ -161,7 +161,7 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
         }
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::grass));
-    _graphicsSvc.meshes.grass().drawInstanced(leafs.size());
+    _graphicsSvc.meshRegistry.get(MeshName::grass).drawInstanced(leafs.size());
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {

@@ -21,7 +21,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/graph.h"
@@ -132,7 +132,7 @@ void ModelSceneNode::drawAABB() {
             u.modelInv = glm::inverse(u.model);
         });
         _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::aabb));
-        _graphicsSvc.meshes.box().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::box).draw();
     });
 }
 

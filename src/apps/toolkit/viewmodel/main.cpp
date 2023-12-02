@@ -690,7 +690,7 @@ void MainViewModel::render3D(int w, int h) {
         _graphicsModule->context().clearColorDepth();
         _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::simpleTexture));
         _graphicsModule->context().bind(*output);
-        _graphicsModule->meshes().quadNDC().draw();
+        _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
     });
 }
 

@@ -22,7 +22,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
@@ -108,7 +108,7 @@ void Movie::render() {
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.meshes.quadNDC().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 } // namespace movie

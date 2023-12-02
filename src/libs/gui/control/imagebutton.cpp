@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
@@ -103,7 +103,7 @@ void ImageButton::drawIcon(
             general.color = glm::vec4(color, 1.0f);
         });
         _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     }
 
     if (iconTexture) {
@@ -119,7 +119,7 @@ void ImageButton::drawIcon(
             general.model = std::move(transform);
         });
         _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-        _graphicsSvc.meshes.quad().draw();
+        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     }
 
     if (!iconText.empty()) {

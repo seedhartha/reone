@@ -24,21 +24,21 @@ namespace graphics {
 void GraphicsModule::init() {
     _window = newWindow();
     _context = std::make_unique<GraphicsContext>(_options);
-    _meshes = std::make_unique<Meshes>();
+    _meshRegistry = std::make_unique<MeshRegistry>();
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();
     _uniforms = std::make_unique<Uniforms>();
     _pipeline = std::make_unique<Pipeline>(
         _options,
         *_context,
-        *_meshes,
+        *_meshRegistry,
         *_shaderRegistry,
         *_textureRegistry,
         *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(
         *_context,
-        *_meshes,
+        *_meshRegistry,
         *_pipeline,
         *_shaderRegistry,
         *_textureRegistry,
@@ -46,7 +46,7 @@ void GraphicsModule::init() {
         *_window);
 
     _context->init();
-    _meshes->init();
+    _meshRegistry->init();
     _textureRegistry->init();
     _uniforms->init();
     _pipeline->init();
@@ -57,7 +57,7 @@ void GraphicsModule::deinit() {
 
     _pipeline.reset();
     _uniforms.reset();
-    _meshes.reset();
+    _meshRegistry.reset();
     _textureRegistry.reset();
     _context.reset();
     _window.reset();

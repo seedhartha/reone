@@ -21,7 +21,7 @@
 #include "reone/game/game.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -115,7 +115,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
         _services.graphics.context.withScissorTest(scissorBounds, [&]() {
-            _services.graphics.meshes.quad().draw();
+            _services.graphics.meshRegistry.get(MeshName::quad).draw();
         });
 
     } else {
@@ -131,7 +131,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
             general.model = std::move(transform);
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-        _services.graphics.meshes.quad().draw();
+        _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
 }
 
@@ -171,7 +171,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
             general.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-        _services.graphics.meshes.quad().draw();
+        _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
 }
 
@@ -253,7 +253,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
         general.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 } // namespace game

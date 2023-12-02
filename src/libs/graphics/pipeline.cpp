@@ -20,7 +20,7 @@
 #include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/scene.h"
 #include "reone/graphics/shaderregistry.h"
@@ -509,7 +509,7 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
     _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float bias, float pixelStride, float maxSteps) {
@@ -542,7 +542,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst) {
@@ -592,7 +592,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
         }
     }
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
@@ -608,7 +608,7 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
     _graphicsContext.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
     _graphicsContext.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
@@ -621,7 +621,7 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::boxBlur4));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
@@ -636,7 +636,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::gaussianBlur13 : ShaderProgramId::gaussianBlur9));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
@@ -649,7 +649,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
     _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::medianFilter5 : ShaderProgramId::medianFilter3));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
@@ -663,7 +663,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::fxaa));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
@@ -678,7 +678,7 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::sharpen));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
 void Pipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags) {

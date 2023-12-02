@@ -29,7 +29,7 @@
 #include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/walkmesh.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/di/services.h"

@@ -37,13 +37,13 @@ void ResourceModule::init() {
     _lips = std::make_unique<Lips>(*_resources);
     _fonts = std::make_unique<Fonts>(
         _graphics.context(),
-        _graphics.meshes(),
+        _graphics.meshRegistry(),
         _graphics.shaderRegistry(),
         *_textures,
         _graphics.uniforms());
     _cursors = std::make_unique<Cursors>(
         _graphics.context(),
-        _graphics.meshes(),
+        _graphics.meshRegistry(),
         _graphics.shaderRegistry(),
         *_textures,
         _graphics.uniforms(),

@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -321,7 +321,7 @@ void HUD::drawHealth(int memberIndex) {
         general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
-    _services.graphics.meshes.quad().draw();
+    _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 void HUD::toggleCombat(bool enabled) {

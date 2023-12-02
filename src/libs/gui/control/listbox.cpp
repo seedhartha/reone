@@ -18,7 +18,7 @@
 #include "reone/gui/control/listbox.h"
 
 #include "reone/graphics/font.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"

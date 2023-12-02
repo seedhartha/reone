@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -44,7 +44,7 @@ void Cursor::draw() {
     });
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::gui));
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {
-        _meshes.quad().draw();
+        _meshRegistry.get(MeshName::quad).draw();
     });
 }
 

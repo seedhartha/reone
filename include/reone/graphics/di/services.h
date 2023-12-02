@@ -22,7 +22,7 @@ namespace reone {
 namespace graphics {
 
 class IGraphicsContext;
-class IMeshes;
+class IMeshRegistry;
 class IPipeline;
 class IShaderRegistry;
 class ITextureRegistry;
@@ -31,7 +31,7 @@ class IWindow;
 
 struct GraphicsServices {
     IGraphicsContext &context;
-    IMeshes &meshes;
+    IMeshRegistry &meshRegistry;
     IPipeline &pipeline;
     IShaderRegistry &shaderRegistry;
     ITextureRegistry &textureRegistry;
@@ -40,14 +40,14 @@ struct GraphicsServices {
 
     GraphicsServices(
         IGraphicsContext &context,
-        IMeshes &meshes,
+        IMeshRegistry &meshRegistry,
         IPipeline &pipeline,
         IShaderRegistry &shaderRegistry,
         ITextureRegistry &textureRegistry,
         IUniforms &uniforms,
         IWindow &window) :
         context(context),
-        meshes(meshes),
+        meshRegistry(meshRegistry),
         pipeline(pipeline),
         shaderRegistry(shaderRegistry),
         textureRegistry(textureRegistry),

@@ -20,7 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -313,7 +313,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
     _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
-        _graphicsSvc.meshes.billboard().drawInstanced(leafs.size());
+        _graphicsSvc.meshRegistry.get(MeshName::billboard).drawInstanced(leafs.size());
     });
 }
 

@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -252,7 +252,7 @@ void GUI::drawBackground() {
         general.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void GUI::resetFocus() {

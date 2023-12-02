@@ -19,7 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/meshes.h"
+#include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
@@ -63,7 +63,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
         general.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.meshes.quad().draw();
+    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
 void ProgressBar::setValue(int value) {

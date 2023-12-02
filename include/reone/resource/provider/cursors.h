@@ -27,7 +27,7 @@ class IWindow;
 
 class Cursor;
 class GraphicsContext;
-class Meshes;
+class MeshRegistry;
 class ShaderRegistry;
 class Texture;
 class Uniforms;
@@ -50,14 +50,14 @@ class Cursors : public ICursors, boost::noncopyable {
 public:
     Cursors(
         graphics::GraphicsContext &graphicsContext,
-        graphics::Meshes &meshes,
+        graphics::MeshRegistry &meshRegistry,
         graphics::ShaderRegistry &shaderRegistry,
         resource::Textures &textures,
         graphics::Uniforms &uniforms,
         graphics::IWindow &window,
         Resources &resources) :
         _graphicsContext(graphicsContext),
-        _meshes(meshes),
+        _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _textures(textures),
         _uniforms(uniforms),
@@ -77,7 +77,7 @@ private:
     // Services
 
     graphics::GraphicsContext &_graphicsContext;
-    graphics::Meshes &_meshes;
+    graphics::MeshRegistry &_meshRegistry;
     graphics::ShaderRegistry &_shaderRegistry;
     resource::Textures &_textures;
     graphics::Uniforms &_uniforms;
