@@ -21,6 +21,7 @@
 #include "../meshes.h"
 #include "../pipeline.h"
 #include "../shaderregistry.h"
+#include "../textureregistry.h"
 #include "../uniforms.h"
 #include "../window.h"
 
@@ -32,7 +33,7 @@ namespace graphics {
 
 class GraphicsModule : boost::noncopyable {
 public:
-    GraphicsModule(graphics::GraphicsOptions &options) :
+    GraphicsModule(GraphicsOptions &options) :
         _options(options) {
     }
 
@@ -41,28 +42,30 @@ public:
     void init();
     void deinit();
 
-    graphics::GraphicsContext &context() { return *_context; }
-    graphics::Meshes &meshes() { return *_meshes; }
-    graphics::Pipeline &pipeline() { return *_pipeline; }
-    graphics::ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
-    graphics::Uniforms &uniforms() { return *_uniforms; }
-    graphics::IWindow &window() { return *_window; }
+    GraphicsContext &context() { return *_context; }
+    Meshes &meshes() { return *_meshes; }
+    Pipeline &pipeline() { return *_pipeline; }
+    ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
+    TextureRegistry &textureRegistry() { return *_textureRegistry; }
+    Uniforms &uniforms() { return *_uniforms; }
+    IWindow &window() { return *_window; }
 
-    graphics::GraphicsServices &services() { return *_services; }
+    GraphicsServices &services() { return *_services; }
 
 protected:
-    graphics::GraphicsOptions &_options;
+    GraphicsOptions &_options;
 
-    std::unique_ptr<graphics::GraphicsContext> _context;
-    std::unique_ptr<graphics::Meshes> _meshes;
-    std::unique_ptr<graphics::Pipeline> _pipeline;
-    std::unique_ptr<graphics::ShaderRegistry> _shaderRegistry;
-    std::unique_ptr<graphics::Uniforms> _uniforms;
-    std::unique_ptr<graphics::IWindow> _window;
+    std::unique_ptr<GraphicsContext> _context;
+    std::unique_ptr<Meshes> _meshes;
+    std::unique_ptr<Pipeline> _pipeline;
+    std::unique_ptr<ShaderRegistry> _shaderRegistry;
+    std::unique_ptr<TextureRegistry> _textureRegistry;
+    std::unique_ptr<Uniforms> _uniforms;
+    std::unique_ptr<IWindow> _window;
 
-    std::unique_ptr<graphics::GraphicsServices> _services;
+    std::unique_ptr<GraphicsServices> _services;
 
-    virtual std::unique_ptr<graphics::IWindow> newWindow();
+    virtual std::unique_ptr<IWindow> newWindow();
 };
 
 } // namespace graphics

@@ -24,6 +24,7 @@
 #include "reone/graphics/meshes.h"
 #include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/textureregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
 #include "reone/system/exception/notimplemented.h"
@@ -39,7 +40,6 @@ public:
     MOCK_METHOD(void, clearColorDepth, (glm::vec4 color), (override));
 
     MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
-    MOCK_METHOD(void, bindBuiltInTextures, (), (override));
 
     MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
     MOCK_METHOD(void, resetProgram, (), (override));
@@ -50,19 +50,6 @@ public:
     MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &block), (override));
-
-    // Built-in
-
-    MOCK_METHOD(std::shared_ptr<Texture>, default2DRGB, (), (const override));
-    MOCK_METHOD(std::shared_ptr<Texture>, defaultArrayDepth, (), (const override));
-    MOCK_METHOD(std::shared_ptr<Texture>, defaultCubemapRGB, (), (const override));
-    MOCK_METHOD(std::shared_ptr<Texture>, defaultCubemapDepth, (), (const override));
-
-    MOCK_METHOD(std::shared_ptr<Texture>, noiseRG, (), (const override));
-    MOCK_METHOD(std::shared_ptr<Texture>, ssaoRGB, (), (const override));
-    MOCK_METHOD(std::shared_ptr<Texture>, ssrRGBA, (), (const override));
-
-    // END Built-in
 };
 
 class MockMeshes : public IMeshes, boost::noncopyable {
@@ -84,6 +71,11 @@ public:
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
     MOCK_METHOD(ShaderProgram &, get, (ShaderProgramId), (override));
+};
+
+class MockTextureRegistry : public ITextureRegistry, boost::noncopyable {
+public:
+    MOCK_METHOD(Texture &, get, (TextureName), (override));
 };
 
 class MockUniforms : public IUniforms, boost::noncopyable {
@@ -118,6 +110,7 @@ public:
         _meshes = std::make_unique<MockMeshes>();
         _pipeline = std::make_unique<MockPipeline>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
+        _textureRegistry = std::make_unique<MockTextureRegistry>();
         _uniforms = std::make_unique<MockUniforms>();
         _window = std::make_unique<MockWindow>();
 
@@ -126,6 +119,7 @@ public:
             *_meshes,
             *_pipeline,
             *_shaderRegistry,
+            *_textureRegistry,
             *_uniforms,
             *_window);
     }
@@ -151,6 +145,7 @@ private:
     std::unique_ptr<MockMeshes> _meshes;
     std::unique_ptr<MockPipeline> _pipeline;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;
+    std::unique_ptr<MockTextureRegistry> _textureRegistry;
     std::unique_ptr<MockUniforms> _uniforms;
     std::unique_ptr<MockWindow> _window;
 

@@ -48,6 +48,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/shaderprogram.h
     ${GRAPHICS_INCLUDE_DIR}/shaderregistry.h
     ${GRAPHICS_INCLUDE_DIR}/texture.h
+    ${GRAPHICS_INCLUDE_DIR}/textureregistry.h
     ${GRAPHICS_INCLUDE_DIR}/textureutil.h
     ${GRAPHICS_INCLUDE_DIR}/textutil.h
     ${GRAPHICS_INCLUDE_DIR}/triangleutil.h
@@ -77,6 +78,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/shader.cpp
     ${GRAPHICS_SOURCE_DIR}/shaderprogram.cpp
     ${GRAPHICS_SOURCE_DIR}/texture.cpp
+    ${GRAPHICS_SOURCE_DIR}/textureregistry.cpp
     ${GRAPHICS_SOURCE_DIR}/textureutil.cpp
     ${GRAPHICS_SOURCE_DIR}/textutil.cpp
     ${GRAPHICS_SOURCE_DIR}/uniformbuffer.cpp

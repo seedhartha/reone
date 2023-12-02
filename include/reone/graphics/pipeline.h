@@ -40,6 +40,7 @@ class GraphicsContext;
 class IScene;
 class Meshes;
 class ShaderRegistry;
+class TextureRegistry;
 class Uniforms;
 
 class IPipeline {
@@ -56,11 +57,13 @@ public:
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         ShaderRegistry &shaderRegistry,
+        TextureRegistry &textureRegistry,
         Uniforms &uniforms) :
         _options(options),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaderRegistry(shaderRegistry),
+        _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
     }
 
@@ -129,6 +132,7 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     ShaderRegistry &_shaderRegistry;
+    TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;
 
     // END Services

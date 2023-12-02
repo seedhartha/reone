@@ -18,8 +18,6 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/texture.h"
-#include "reone/graphics/textureutil.h"
-#include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"
 
 namespace reone {
@@ -53,56 +51,6 @@ void GraphicsContext::init() {
     glGetIntegerv(GL_VIEWPORT, &viewport[0]);
     _viewports.push(std::move(viewport));
 
-    _default2DRGB = std::make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
-    _default2DRGB->clear(1, 1, PixelFormat::RGB8);
-    _default2DRGB->init();
-
-    _defaultCubemapRGB = std::make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
-    _defaultCubemapRGB->setCubemap(true);
-    _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
-    _defaultCubemapRGB->init();
-
-    _defaultCubemapDepth = std::make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
-    _defaultCubemapDepth->setCubemap(true);
-    _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
-    _defaultCubemapDepth->init();
-
-    _defaultArrayDepth = std::make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
-    _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
-    _defaultArrayDepth->init();
-
-    auto noisePixels = std::make_shared<ByteBuffer>();
-    noisePixels->resize(4 * 4 * 2 * sizeof(float));
-    for (int i = 0; i < 4 * 4 * 2; ++i) {
-        float *pixel = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
-        *pixel = randomFloat(-1.0f, 1.0f);
-    }
-    auto noiseLayer = Texture::Layer {std::move(noisePixels)};
-    _noiseRG = std::make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
-    _noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
-    _noiseRG->init();
-
-    auto ssaoPixels = std::make_shared<ByteBuffer>();
-    ssaoPixels->resize(3);
-    (*ssaoPixels)[0] = 0xff;
-    (*ssaoPixels)[1] = 0xff;
-    (*ssaoPixels)[2] = 0xff;
-    auto ssaoLayer = Texture::Layer {std::move(ssaoPixels)};
-    _ssaoRGB = std::make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
-    _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
-    _ssaoRGB->init();
-
-    auto ssrPixels = std::make_shared<ByteBuffer>();
-    ssrPixels->resize(4);
-    (*ssrPixels)[0] = 0;
-    (*ssrPixels)[1] = 0;
-    (*ssrPixels)[2] = 0;
-    (*ssrPixels)[3] = 0;
-    auto ssrLayer = Texture::Layer {std::move(ssrPixels)};
-    _ssrRGBA = std::make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
-    _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, std::move(ssrLayer));
-    _ssrRGBA->init();
-
     _inited = true;
 }
 
@@ -128,28 +76,6 @@ void GraphicsContext::bind(Texture &texture, int unit) {
         _activeTexUnit = unit;
     }
     texture.bind();
-}
-
-void GraphicsContext::bindBuiltInTextures() {
-    bind(*_default2DRGB, TextureUnits::mainTex);
-    bind(*_default2DRGB, TextureUnits::lightmap);
-    bind(*_default2DRGB, TextureUnits::environmentMap);
-    bind(*_default2DRGB, TextureUnits::bumpMap);
-    bind(*_default2DRGB, TextureUnits::envmapColor);
-    bind(*_default2DRGB, TextureUnits::selfIllumColor);
-    bind(*_default2DRGB, TextureUnits::features);
-    bind(*_default2DRGB, TextureUnits::eyePos);
-    bind(*_default2DRGB, TextureUnits::eyeNormal);
-    bind(*_default2DRGB, TextureUnits::hilights);
-    bind(*_default2DRGB, TextureUnits::oitAccum);
-    bind(*_default2DRGB, TextureUnits::oitRevealage);
-    bind(*_defaultCubemapRGB, TextureUnits::environmentMapCube);
-    bind(*_defaultCubemapDepth, TextureUnits::shadowMapCube);
-    bind(*_defaultArrayDepth, TextureUnits::shadowMapArray);
-
-    bind(*_noiseRG, TextureUnits::noise);
-    bind(*_ssaoRGB, TextureUnits::ssao);
-    bind(*_ssrRGBA, TextureUnits::ssr);
 }
 
 void GraphicsContext::useProgram(ShaderProgram &program) {

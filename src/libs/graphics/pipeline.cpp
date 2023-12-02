@@ -25,6 +25,7 @@
 #include "reone/graphics/scene.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
+#include "reone/graphics/textureregistry.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
@@ -581,8 +582,8 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     _graphicsContext.bind(*attachments.cbGBufferFeatures, TextureUnits::features);
     _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _graphicsContext.bind(_options.ssao ? *attachments.cbSSAO : *_graphicsContext.ssaoRGB(), TextureUnits::ssao);
-    _graphicsContext.bind(_options.ssr ? *attachments.cbSSR : *_graphicsContext.ssrRGBA(), TextureUnits::ssr);
+    _graphicsContext.bind(_options.ssao ? *attachments.cbSSAO : _textureRegistry.get(TextureName::SsaoRgb), TextureUnits::ssao);
+    _graphicsContext.bind(_options.ssr ? *attachments.cbSSR : _textureRegistry.get(TextureName::SsrRgba), TextureUnits::ssr);
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {
             _graphicsContext.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMapArray);

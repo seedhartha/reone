@@ -25,6 +25,7 @@ class IGraphicsContext;
 class IMeshes;
 class IPipeline;
 class IShaderRegistry;
+class ITextureRegistry;
 class IUniforms;
 class IWindow;
 
@@ -33,6 +34,7 @@ struct GraphicsServices {
     IMeshes &meshes;
     IPipeline &pipeline;
     IShaderRegistry &shaderRegistry;
+    ITextureRegistry &textureRegistry;
     IUniforms &uniforms;
     IWindow &window;
 
@@ -41,12 +43,14 @@ struct GraphicsServices {
         IMeshes &meshes,
         IPipeline &pipeline,
         IShaderRegistry &shaderRegistry,
+        ITextureRegistry &textureRegistry,
         IUniforms &uniforms,
         IWindow &window) :
         context(context),
         meshes(meshes),
         pipeline(pipeline),
         shaderRegistry(shaderRegistry),
+        textureRegistry(textureRegistry),
         uniforms(uniforms),
         window(window) {
     }

@@ -31,6 +31,7 @@
 #include "reone/game/surfaces.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/textureregistry.h"
 #include "reone/resource/2da.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/exception/notfound.h"
@@ -1070,7 +1071,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(_services.graphics.context.defaultCubemapRGB().get());
+            body.setEnvironmentMap(&_services.graphics.textureRegistry.get(TextureName::DefaultCubemapRgb));
         } else {
             body.setEnvironmentMap(_services.resource.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
         }
