@@ -23,21 +23,21 @@ namespace reone {
 
 namespace graphics {
 
-enum class TextureName {
-    Default2dRgb,
-    DefaultArrayDepth,
-    DefaultCubemapRgb,
-    DefaultCubemapDepth,
-    NoiseRg,
-    SsaoRgb,
-    SsrRgba
+struct TextureName {
+    static constexpr char default2dRgb[] = "default_2d_rgb";
+    static constexpr char defaultArrayDepth[] = "default_array_depth";
+    static constexpr char defaultCubemapRgb[] = "default_cubemap_rgb";
+    static constexpr char defaultCubemapDepth[] = "default_cubemap_depth";
+    static constexpr char noiseRg[] = "noise_rg";
+    static constexpr char ssaoRgb[] = "ssao_rgb";
+    static constexpr char ssrRgb[] = "ssr_rgb";
 };
 
 class ITextureRegistry {
 public:
     virtual ~ITextureRegistry() = default;
 
-    virtual Texture &get(TextureName name) = 0;
+    virtual Texture &get(const std::string &name) = 0;
 };
 
 class TextureRegistry : public ITextureRegistry, boost::noncopyable {
@@ -49,21 +49,21 @@ public:
     void init();
     void deinit();
 
-    Texture &get(TextureName name) override {
+    void add(std::string name, std::shared_ptr<Texture> texture) {
+        _nameToTexture[name] = std::move(texture);
+    }
+
+    Texture &get(const std::string &name) override {
         auto texture = _nameToTexture.find(name);
         if (texture == _nameToTexture.end()) {
-            throw std::runtime_error("Texture not found by name: " + std::to_string(static_cast<int>(name)));
+            throw std::runtime_error("Texture not found by name: " + name);
         }
         return *texture->second;
     }
 
 private:
     bool _inited {false};
-    std::map<TextureName, std::shared_ptr<Texture>> _nameToTexture;
-
-    void add(TextureName name, std::shared_ptr<Texture> texture) {
-        _nameToTexture[name] = std::move(texture);
-    }
+    std::map<std::string, std::shared_ptr<Texture>> _nameToTexture;
 };
 
 } // namespace graphics

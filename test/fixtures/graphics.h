@@ -75,7 +75,7 @@ public:
 
 class MockTextureRegistry : public ITextureRegistry, boost::noncopyable {
 public:
-    MOCK_METHOD(Texture &, get, (TextureName), (override));
+    MOCK_METHOD(Texture &, get, (const std::string &), (override));
 };
 
 class MockUniforms : public IUniforms, boost::noncopyable {

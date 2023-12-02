@@ -32,24 +32,24 @@ void TextureRegistry::init() {
     auto default2DRGB = std::make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
     default2DRGB->clear(1, 1, PixelFormat::RGB8);
     default2DRGB->init();
-    add(TextureName::Default2dRgb, std::move(default2DRGB));
+    add(TextureName::default2dRgb, std::move(default2DRGB));
 
     auto defaultCubemapRGB = std::make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
     defaultCubemapRGB->setCubemap(true);
     defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
     defaultCubemapRGB->init();
-    add(TextureName::DefaultCubemapRgb, std::move(defaultCubemapRGB));
+    add(TextureName::defaultCubemapRgb, std::move(defaultCubemapRGB));
 
     auto defaultCubemapDepth = std::make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
     defaultCubemapDepth->setCubemap(true);
     defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
     defaultCubemapDepth->init();
-    add(TextureName::DefaultCubemapDepth, std::move(defaultCubemapDepth));
+    add(TextureName::defaultCubemapDepth, std::move(defaultCubemapDepth));
 
     auto defaultArrayDepth = std::make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
     defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     defaultArrayDepth->init();
-    add(TextureName::DefaultArrayDepth, std::move(defaultArrayDepth));
+    add(TextureName::defaultArrayDepth, std::move(defaultArrayDepth));
 
     auto noisePixels = std::make_shared<ByteBuffer>();
     noisePixels->resize(4 * 4 * 2 * sizeof(float));
@@ -61,7 +61,7 @@ void TextureRegistry::init() {
     auto noiseRG = std::make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
     noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
     noiseRG->init();
-    add(TextureName::NoiseRg, std::move(noiseRG));
+    add(TextureName::noiseRg, std::move(noiseRG));
 
     auto ssaoPixels = std::make_shared<ByteBuffer>();
     ssaoPixels->resize(3);
@@ -72,7 +72,7 @@ void TextureRegistry::init() {
     auto ssaoRGB = std::make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
     ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
     ssaoRGB->init();
-    add(TextureName::SsaoRgb, std::move(ssaoRGB));
+    add(TextureName::ssaoRgb, std::move(ssaoRGB));
 
     auto ssrPixels = std::make_shared<ByteBuffer>();
     ssrPixels->resize(4);
@@ -84,7 +84,7 @@ void TextureRegistry::init() {
     auto ssrRGBA = std::make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
     ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, std::move(ssrLayer));
     ssrRGBA->init();
-    add(TextureName::SsrRgba, std::move(ssrRGBA));
+    add(TextureName::ssrRgb, std::move(ssrRGBA));
 
     _inited = true;
 }

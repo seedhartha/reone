@@ -1071,7 +1071,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(&_services.graphics.textureRegistry.get(TextureName::DefaultCubemapRgb));
+            body.setEnvironmentMap(&_services.graphics.textureRegistry.get(TextureName::defaultCubemapRgb));
         } else {
             body.setEnvironmentMap(_services.resource.textures.get(_envmap, TextureUsage::EnvironmentMap).get());
         }
