@@ -228,7 +228,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         general.projection = std::move(projection);
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaderRegistry.use(ShaderProgramId::GUI);
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::GUI));
     _graphicsSvc.context.bind(*output);
     _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
         _graphicsSvc.meshes.quad().draw();
@@ -236,7 +236,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
 }
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
-    _graphicsSvc.shaderRegistry.use(ShaderProgramId::GUI);
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::GUI));
 
     glm::vec3 color(getBorderColor());
     glm::mat4 transform(1.0f);

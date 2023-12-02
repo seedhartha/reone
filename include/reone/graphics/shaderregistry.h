@@ -62,7 +62,7 @@ class IShaderRegistry {
 public:
     virtual ~IShaderRegistry() = default;
 
-    virtual void use(ShaderProgramId programId) = 0;
+    virtual ShaderProgram &get(ShaderProgramId programId) = 0;
 };
 
 class ShaderRegistry : public IShaderRegistry, boost::noncopyable {
@@ -71,24 +71,16 @@ public:
         _idToProgram[programId] = std::move(program);
     }
 
-    void use(ShaderProgramId programId) override {
-        if (_usedProgram == programId) {
-            return;
+    ShaderProgram &get(ShaderProgramId programId) {
+        auto program = _idToProgram.find(programId);
+        if (program == _idToProgram.end()) {
+            throw std::runtime_error("Shader program not found by id: " + std::to_string(static_cast<int>(programId)));
         }
-        if (programId != ShaderProgramId::None) {
-            auto programIter = _idToProgram.find(programId);
-            if (programIter == _idToProgram.end()) {
-                throw std::runtime_error("Shader program not found by id: " + std::to_string(static_cast<int>(programId)));
-            }
-            programIter->second->use();
-        }
-        _usedProgram = programId;
+        return *program->second;
     }
 
 private:
     std::map<ShaderProgramId, std::shared_ptr<ShaderProgram>> _idToProgram;
-
-    ShaderProgramId _usedProgram {ShaderProgramId::None};
 };
 
 } // namespace graphics

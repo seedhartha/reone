@@ -369,7 +369,7 @@ void Game::drawWorld() {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.graphics.shaderRegistry.use(ShaderProgramId::SimpleTexture);
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::SimpleTexture));
     _services.graphics.context.bind(*output);
     _services.graphics.meshes.quadNDC().draw();
 }

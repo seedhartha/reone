@@ -251,7 +251,7 @@ void GUI::drawBackground() {
         general.projection = _graphicsSvc.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _graphicsSvc.shaderRegistry.use(ShaderProgramId::GUI);
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::GUI));
     _graphicsSvc.meshes.quad().draw();
 }
 

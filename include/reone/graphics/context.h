@@ -24,6 +24,7 @@ namespace reone {
 
 namespace graphics {
 
+class ShaderProgram;
 class Texture;
 
 class IGraphicsContext {
@@ -36,6 +37,9 @@ public:
 
     virtual void bind(Texture &texture, int unit = TextureUnits::mainTex) = 0;
     virtual void bindBuiltInTextures() = 0;
+
+    virtual void useProgram(ShaderProgram &program) = 0;
+    virtual void resetProgram() = 0;
 
     virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
     virtual void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) = 0;
@@ -73,6 +77,9 @@ public:
     void bind(Texture &texture, int unit = TextureUnits::mainTex) override;
     void bindBuiltInTextures() override;
 
+    void useProgram(ShaderProgram &program) override;
+    void resetProgram() override;
+
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override;
     void withBlending(BlendMode mode, const std::function<void()> &block) override;
@@ -98,6 +105,7 @@ private:
 
     bool _inited {false};
     int _activeTexUnit {0};
+    ShaderProgram *_usedProgram {nullptr};
 
     // States
 

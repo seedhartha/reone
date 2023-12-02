@@ -41,6 +41,9 @@ public:
     MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
     MOCK_METHOD(void, bindBuiltInTextures, (), (override));
 
+    MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
+    MOCK_METHOD(void, resetProgram, (), (override));
+
     MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withFaceCulling, (CullFaceMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &block), (override));
@@ -80,7 +83,7 @@ public:
 
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
-    MOCK_METHOD(void, use, (ShaderProgramId programId), (override));
+    MOCK_METHOD(ShaderProgram &, get, (ShaderProgramId), (override));
 };
 
 class MockUniforms : public IUniforms, boost::noncopyable {

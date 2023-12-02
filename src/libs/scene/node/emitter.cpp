@@ -308,7 +308,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
             }
         }
     });
-    _graphicsSvc.shaderRegistry.use(ShaderProgramId::Particle);
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::Particle));
     _graphicsSvc.context.bind(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;

@@ -56,7 +56,7 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
         return;
     }
 
-    _shaderRegistry.use(ShaderProgramId::Text);
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::Text));
     _graphicsContext.bind(*_texture);
 
     _uniforms.setGeneral([this, &color](auto &general) {

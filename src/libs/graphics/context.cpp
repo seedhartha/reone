@@ -16,6 +16,7 @@
  */
 
 #include "reone/graphics/context.h"
+#include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/system/randomutil.h"
@@ -149,6 +150,22 @@ void GraphicsContext::bindBuiltInTextures() {
     bind(*_noiseRG, TextureUnits::noise);
     bind(*_ssaoRGB, TextureUnits::ssao);
     bind(*_ssrRGBA, TextureUnits::ssr);
+}
+
+void GraphicsContext::useProgram(ShaderProgram &program) {
+    if (_usedProgram == &program) {
+        return;
+    }
+    program.use();
+    _usedProgram = &program;
+}
+
+void GraphicsContext::resetProgram() {
+    if (!_usedProgram) {
+        return;
+    }
+    glUseProgram(0);
+    _usedProgram = nullptr;
 }
 
 void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {
