@@ -63,6 +63,10 @@ public:
     std::vector<std::string> getAnimationNames() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
 
+    const std::unordered_map<std::string, std::shared_ptr<Animation>> &animations() const {
+        return _animations;
+    }
+
     // END Animations
 
 private:

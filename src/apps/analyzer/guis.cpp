@@ -26,8 +26,7 @@
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
-
-#include "templates.h"
+#include "code.h"
 
 using namespace reone::gui;
 using namespace reone::resource;

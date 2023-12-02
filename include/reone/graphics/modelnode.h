@@ -22,9 +22,13 @@
 #include "mesh.h"
 #include "texture.h"
 
-#define R_ANIMPROP(a, b, c)                             \
-    const AnimatedProperty<a> &b() const { return c; }; \
-    AnimatedProperty<a> &b() { return c; };
+#define R_ANIMPROP(a, b, c)                \
+    const AnimatedProperty<a> &b() const { \
+        return c;                          \
+    };                                     \
+    AnimatedProperty<a> &b() {             \
+        return c;                          \
+    };
 
 namespace reone {
 
@@ -167,6 +171,9 @@ public:
         bool reattachable {false};
     };
 
+    using ControllerFrame = std::pair<float, std::vector<float>>;
+    using Controllers = std::map<int, std::vector<ControllerFrame>>;
+
     ModelNode(
         uint16_t number,
         std::string name,
@@ -186,6 +193,7 @@ public:
     uint16_t flags() const { return _flags; }
     const ModelNode *parent() const { return _parent; }
     const std::vector<std::shared_ptr<ModelNode>> &children() const { return _children; }
+    Controllers &controllers() { return _controllers; }
 
     void setFlags(uint16_t flags) { _flags = flags; }
 
@@ -302,6 +310,7 @@ private:
 
     uint16_t _flags {0};
     std::vector<std::shared_ptr<ModelNode>> _children;
+    Controllers _controllers;
 
     // Transformations
 

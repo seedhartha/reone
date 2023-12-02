@@ -17,13 +17,8 @@
 
 #pragma once
 
-#include "reone/resource/types.h"
-
 namespace reone {
 
-void generateGffSchema(resource::ResType resType,
-                       const std::filesystem::path &k1dir,
-                       const std::filesystem::path &k2dir,
-                       const std::filesystem::path &destDir);
+void analyzeModels(const std::filesystem::path &k1Dir, const std::filesystem::path &k2Dir);
 
-} // namespace reone
+}

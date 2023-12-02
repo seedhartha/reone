@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gffschema.h"
+#include "templates.h"
 
 #include "reone/resource/container/erf.h"
 #include "reone/resource/container/keybif.h"
@@ -28,7 +28,7 @@
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/textwriter.h"
 
-#include "templates.h"
+#include "code.h"
 
 using namespace reone::resource;
 
@@ -290,7 +290,7 @@ static void writeSchemaImplFile(const std::vector<std::pair<int, SchemaStruct *>
     writer.write("} // namespace reone\n");
 }
 
-void generateGffSchema(resource::ResType resType,
+void generateTemplates(resource::ResType resType,
                        const std::filesystem::path &k1dir,
                        const std::filesystem::path &k2dir,
                        const std::filesystem::path &destDir) {

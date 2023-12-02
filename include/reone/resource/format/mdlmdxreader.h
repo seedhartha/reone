@@ -172,8 +172,15 @@ private:
     static void readColorStartController(const ControllerKey &key, const std::vector<float> &data, graphics::ModelNode &node);
     static void readDetonateController(const ControllerKey &key, const std::vector<float> &data, graphics::ModelNode &node);
 
-    static void readFloatController(const ControllerKey &key, const std::vector<float> &data, graphics::AnimatedProperty<float> &prop);
-    static void readVectorController(const ControllerKey &key, const std::vector<float> &data, graphics::AnimatedProperty<glm::vec3> &prop);
+    static void readFloatController(const ControllerKey &key,
+                                    const std::vector<float> &data,
+                                    graphics::ModelNode &node,
+                                    graphics::AnimatedProperty<float> &prop);
+
+    static void readVectorController(const ControllerKey &key,
+                                     const std::vector<float> &data,
+                                     graphics::ModelNode &node,
+                                     graphics::AnimatedProperty<glm::vec3> &prop);
 
     // END Controllers
 };

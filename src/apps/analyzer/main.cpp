@@ -18,9 +18,10 @@
 #include "reone/resource/types.h"
 #include "reone/resource/typeutil.h"
 
-#include "gffschema.h"
 #include "guis.h"
+#include "models.h"
 #include "routines.h"
+#include "templates.h"
 
 using namespace reone;
 using namespace reone::resource;
@@ -28,18 +29,18 @@ using namespace reone::resource;
 int main(int argc, char **argv) {
     try {
         boost::program_options::options_description description;
-        description.add_options()                                                   //
-            ("generator", boost::program_options::value<std::string>()->required()) //
-            ("destdir", boost::program_options::value<std::string>()->required())   //
-            ("k1dir", boost::program_options::value<std::string>()->required())     //
-            ("k2dir", boost::program_options::value<std::string>()->required())     //
-            ("restype", boost::program_options::value<std::string>());              //
+        description.add_options()                                                 //
+            ("tool", boost::program_options::value<std::string>()->required())    //
+            ("destdir", boost::program_options::value<std::string>()->required()) //
+            ("k1dir", boost::program_options::value<std::string>()->required())   //
+            ("k2dir", boost::program_options::value<std::string>()->required())   //
+            ("restype", boost::program_options::value<std::string>());            //
 
         boost::program_options::variables_map vars;
         boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vars);
         boost::program_options::notify(vars);
 
-        auto &generator = vars["generator"].as<std::string>();
+        auto &tool = vars["tool"].as<std::string>();
 
         auto &destDirValue = vars["destdir"].as<std::string>();
         auto destDir = std::filesystem::path(destDirValue);
@@ -59,10 +60,10 @@ int main(int argc, char **argv) {
             throw std::runtime_error("Directory not found: " + k2Dir.string());
         }
 
-        if (generator == "routines") {
+        if (tool == "routines") {
             generateRoutines(k1Dir, k2Dir, destDir);
 
-        } else if (generator == "gffschema") {
+        } else if (tool == "templates") {
             if (vars.count("restype") == 0) {
                 throw std::runtime_error("Required restype argument not specified");
             }
@@ -71,13 +72,16 @@ int main(int argc, char **argv) {
             if (!isGFFCompatibleResType(restype)) {
                 throw std::runtime_error("Resource type not GFF compatible: " + restypeValue);
             }
-            generateGffSchema(restype, k1Dir, k2Dir, destDir);
+            generateTemplates(restype, k1Dir, k2Dir, destDir);
 
-        } else if (generator == "guis") {
+        } else if (tool == "guis") {
             generateGuis(k1Dir, k2Dir, destDir);
 
+        } else if (tool == "models") {
+            analyzeModels(k1Dir, k2Dir);
+
         } else {
-            throw std::runtime_error("Invalid generator argument: " + generator);
+            throw std::runtime_error("Invalid tool argument: " + tool);
         }
 
         return 0;

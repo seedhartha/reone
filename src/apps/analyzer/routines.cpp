@@ -25,7 +25,7 @@
 #include "reone/system/textreader.h"
 #include "reone/system/textwriter.h"
 
-#include "templates.h"
+#include "code.h"
 
 using namespace reone::resource;
 
