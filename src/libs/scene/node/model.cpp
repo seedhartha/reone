@@ -131,7 +131,7 @@ void ModelSceneNode::drawAABB() {
             u.model *= glm::scale(0.5f * _aabb.size());
             u.modelInv = glm::inverse(u.model);
         });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::AABB));
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::aabb));
         _graphicsSvc.meshes.box().draw();
     });
 }

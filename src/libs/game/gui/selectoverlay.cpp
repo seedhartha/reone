@@ -275,7 +275,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::GUI));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshes.quad().draw();
 }
 
@@ -303,7 +303,7 @@ void SelectionOverlay::drawTitleBar() {
             general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             general.alpha = 0.5f;
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::SimpleColor));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
         _services.graphics.meshes.quad().draw();
     }
     {
@@ -336,7 +336,7 @@ void SelectionOverlay::drawHealthBar() {
         general.model = std::move(transform);
         general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::SimpleColor));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
     _services.graphics.meshes.quad().draw();
 }
 
@@ -373,7 +373,7 @@ void SelectionOverlay::drawActionFrame(int index) {
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::GUI));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshes.quad().draw();
 }
 
@@ -436,7 +436,7 @@ void SelectionOverlay::drawActionIcon(int index) {
         general.projection = _services.graphics.window.getOrthoProjection();
         general.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::GUI));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshes.quad().draw();
 }
 

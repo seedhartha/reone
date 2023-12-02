@@ -70,7 +70,7 @@ public:
 
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
-    MOCK_METHOD(ShaderProgram &, get, (ShaderProgramId), (override));
+    MOCK_METHOD(ShaderProgram &, get, (const std::string &), (override));
 };
 
 class MockTextureRegistry : public ITextureRegistry, boost::noncopyable {

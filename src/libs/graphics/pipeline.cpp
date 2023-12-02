@@ -505,7 +505,7 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::SSAO));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::ssao));
     _graphicsContext.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _graphicsContext.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
@@ -535,7 +535,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::SSR));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::ssr));
     _graphicsContext.bind(*attachments.cbGBufferDiffuse);
     _graphicsContext.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _graphicsContext.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
@@ -574,7 +574,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::CombineOpaque));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::combineOpaque));
     _graphicsContext.bind(*attachments.cbGBufferDiffuse);
     _graphicsContext.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _graphicsContext.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
@@ -602,7 +602,7 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::CombineGeometry));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::combineGeometry));
     _graphicsContext.bind(*attachments.cbOpaqueGeometry1);
     _graphicsContext.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
     _graphicsContext.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
@@ -618,7 +618,7 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::BoxBlur4));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::boxBlur4));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
@@ -633,7 +633,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::GaussianBlur13 : ShaderProgramId::GaussianBlur9));
+    _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::gaussianBlur13 : ShaderProgramId::gaussianBlur9));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
@@ -646,7 +646,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::MedianFilter5 : ShaderProgramId::MedianFilter3));
+    _graphicsContext.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::medianFilter5 : ShaderProgramId::medianFilter3));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
@@ -660,7 +660,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::FXAA));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::fxaa));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
@@ -675,7 +675,7 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::Sharpen));
+    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::sharpen));
     _graphicsContext.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
