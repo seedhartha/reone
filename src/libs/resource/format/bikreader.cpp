@@ -17,7 +17,7 @@
 
 #include "reone/resource/format/bikreader.h"
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/movie/movie.h"
 #include "reone/movie/videostream.h"
 #include "reone/resource/exception/format.h"
@@ -103,7 +103,7 @@ public:
         if (hasAudio()) {
             openCodec(_audioStreamIdx, &_audioCodecCtx);
             initResamplingContext();
-            loadAudioBuffer();
+            loadAudioClip();
             seekBeginning();
         }
     }
@@ -113,7 +113,7 @@ public:
         loadVideoFrame(timestamp);
     }
 
-    std::shared_ptr<audio::AudioBuffer> audioStream() const { return _audioStream; }
+    std::shared_ptr<audio::AudioClip> audioStream() const { return _audioStream; }
 
 private:
     std::filesystem::path _path;
@@ -131,7 +131,7 @@ private:
     AVFrame *_avFrameScaled {nullptr};
     uint8_t *_frameBuffer {nullptr};
 
-    std::shared_ptr<audio::AudioBuffer> _audioStream;
+    std::shared_ptr<audio::AudioClip> _audioStream;
 
     void findStreams() {
         if (avformat_find_stream_info(_formatCtx, nullptr) != 0) {
@@ -256,8 +256,8 @@ private:
         av_packet_unref(&packet);
     }
 
-    void loadAudioBuffer() {
-        _audioStream = std::make_shared<AudioBuffer>();
+    void loadAudioClip() {
+        _audioStream = std::make_shared<AudioClip>();
 
         AVPacket packet;
         int ret;
@@ -278,7 +278,7 @@ private:
                     const_cast<const uint8_t **>(&_avFrame->extended_data[0]), _avFrame->nb_samples);
 
                 // Save frame
-                AudioBuffer::Frame frame;
+                AudioClip::Frame frame;
                 frame.format = AudioFormat::Mono16;
                 frame.sampleRate = _audioCodecCtx->sample_rate;
                 frame.samples = std::move(samples);
@@ -327,7 +327,7 @@ void BikReader::load() {
 
     _movie = std::make_shared<Movie>(_graphicsSvc, _audioPlayer);
     _movie->setVideoStream(decoder);
-    _movie->setAudioBuffer(decoder->audioStream());
+    _movie->setAudioClip(decoder->audioStream());
     _movie->init();
 #endif
 }

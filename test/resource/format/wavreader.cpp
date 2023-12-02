@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/wavreader.h"
 #include "reone/system/stream/memoryinput.h"

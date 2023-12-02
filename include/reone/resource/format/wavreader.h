@@ -25,7 +25,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioBuffer;
+class AudioClip;
 
 }
 
@@ -47,7 +47,7 @@ public:
 
     void load();
 
-    std::shared_ptr<audio::AudioBuffer> stream() const { return _stream; }
+    std::shared_ptr<audio::AudioClip> stream() const { return _stream; }
 
 private:
     struct ChunkHeader {
@@ -72,7 +72,7 @@ private:
     uint16_t _bitsPerSample {0};
     IMA _ima[2];
 
-    std::shared_ptr<audio::AudioBuffer> _stream;
+    std::shared_ptr<audio::AudioClip> _stream;
 
     int16_t getIMASample(int channel, uint8_t nibble);
     void getIMASamples(int channel, uint8_t nibbles, int16_t &sample1, int16_t &sample2);

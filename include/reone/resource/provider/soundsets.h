@@ -25,7 +25,7 @@ namespace resource {
 
 class Resources;
 class Strings;
-class AudioFiles;
+class AudioClips;
 
 class ISoundSets {
 public:
@@ -39,10 +39,10 @@ public:
 class SoundSets : public ISoundSets {
 public:
     SoundSets(
-        AudioFiles &audioFiles,
+        AudioClips &audioClips,
         Resources &resources,
         Strings &strings) :
-        _audioFiles(audioFiles),
+        _audioClips(audioClips),
         _resources(resources),
         _strings(strings) {
     }
@@ -61,7 +61,7 @@ public:
     }
 
 private:
-    AudioFiles &_audioFiles;
+    AudioClips &_audioClips;
     Resources &_resources;
     Strings &_strings;
 

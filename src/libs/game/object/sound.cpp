@@ -23,7 +23,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/gffs.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/strings.h"

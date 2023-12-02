@@ -20,7 +20,7 @@
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
@@ -52,7 +52,6 @@
 #include "reone/tools/legacy/ssf.h"
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
-
 
 #include "composelipdialog.h"
 

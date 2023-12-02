@@ -21,7 +21,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioBuffer;
+class AudioClip;
 
 }
 
@@ -29,18 +29,18 @@ namespace resource {
 
 class Resources;
 
-class IAudioFiles {
+class IAudioClips {
 public:
-    virtual ~IAudioFiles() = default;
+    virtual ~IAudioClips() = default;
 
     virtual void clear() = 0;
 
-    virtual std::shared_ptr<audio::AudioBuffer> get(const std::string &key) = 0;
+    virtual std::shared_ptr<audio::AudioClip> get(const std::string &key) = 0;
 };
 
-class AudioFiles : public IAudioFiles {
+class AudioClips : public IAudioClips {
 public:
-    AudioFiles(Resources &resources) :
+    AudioClips(Resources &resources) :
         _resources(resources) {
     }
 
@@ -48,7 +48,7 @@ public:
         _objects.clear();
     }
 
-    std::shared_ptr<audio::AudioBuffer> get(const std::string &key) override {
+    std::shared_ptr<audio::AudioClip> get(const std::string &key) override {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) {
             return maybeObject->second;
@@ -60,9 +60,9 @@ public:
 private:
     Resources &_resources;
 
-    std::unordered_map<std::string, std::shared_ptr<audio::AudioBuffer>> _objects;
+    std::unordered_map<std::string, std::shared_ptr<audio::AudioClip>> _objects;
 
-    std::shared_ptr<audio::AudioBuffer> doGet(std::string resRef);
+    std::shared_ptr<audio::AudioClip> doGet(std::string resRef);
 };
 
 } // namespace resource

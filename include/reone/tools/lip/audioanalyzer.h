@@ -17,22 +17,22 @@
 
 #pragma once
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/system/timespan.h"
 
 namespace reone {
 
 class AudioAnalyzer : boost::noncopyable {
 public:
-    std::vector<TimeSpan> silentSpans(const audio::AudioBuffer &buffer,
+    std::vector<TimeSpan> silentSpans(const audio::AudioClip &clip,
                                       float minSilenceDuration = 0.05f,
                                       float maxSilenceAmplitude = 0.01f);
 
-    std::vector<float> waveform(const audio::AudioBuffer &buffer, int resolution);
+    std::vector<float> waveform(const audio::AudioClip &clip, int resolution);
 
 private:
-    std::vector<TimeSpan> computeFrameSpans(const audio::AudioBuffer &buffer);
-    float sampleNormalized(const audio::AudioBuffer::Frame &frame, float time);
+    std::vector<TimeSpan> computeFrameSpans(const audio::AudioClip &clip);
+    float sampleNormalized(const audio::AudioClip::Frame &frame, float time);
 };
 
 } // namespace reone

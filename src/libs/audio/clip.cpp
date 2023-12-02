@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 
 namespace reone {
 
 namespace audio {
 
-void AudioBuffer::add(Frame &&frame) {
+void AudioClip::add(Frame &&frame) {
     _duration += frame.samples.size() / frame.stride() / static_cast<float>(frame.sampleRate);
     _frames.push_back(frame);
 }
 
-int AudioBuffer::getFrameCount() const {
+int AudioClip::getFrameCount() const {
     return static_cast<int>(_frames.size());
 }
 
-const AudioBuffer::Frame &AudioBuffer::getFrame(int index) const {
+const AudioClip::Frame &AudioClip::getFrame(int index) const {
     return _frames[index];
 }
 

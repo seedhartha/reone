@@ -21,8 +21,8 @@ namespace reone {
 
 namespace audio {
 
-std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    auto source = std::make_shared<AudioSource>(std::move(buffer), loop, getGain(type, gain), positional, std::move(position));
+std::shared_ptr<AudioSource> AudioPlayer::play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
+    auto source = std::make_shared<AudioSource>(std::move(clip), loop, getGain(type, gain), positional, std::move(position));
     source->init();
     source->play();
     return source;

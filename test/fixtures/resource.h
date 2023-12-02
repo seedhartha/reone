@@ -24,7 +24,7 @@
 #include "reone/resource/director.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/cursors.h"
 #include "reone/resource/provider/dialogs.h"
 #include "reone/resource/provider/fonts.h"
@@ -92,10 +92,10 @@ public:
     MOCK_METHOD(std::shared_ptr<movie::IMovie>, get, (const std::string &name), (override));
 };
 
-class MockAudioFiles : public IAudioFiles, boost::noncopyable {
+class MockAudioClips : public IAudioClips, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
-    MOCK_METHOD(std::shared_ptr<audio::AudioBuffer>, get, (const std::string &key), (override));
+    MOCK_METHOD(std::shared_ptr<audio::AudioClip>, get, (const std::string &key), (override));
 };
 
 class MockMp3Reader : public Mp3Reader {
@@ -197,7 +197,7 @@ public:
         _twoDas = std::make_unique<MockTwoDas>();
         _scripts = std::make_unique<MockScripts>();
         _movies = std::make_unique<MockMovies>();
-        _audioFiles = std::make_unique<MockAudioFiles>();
+        _audioClips = std::make_unique<MockAudioClips>();
         _cursors = std::make_unique<MockCursors>();
         _fonts = std::make_unique<MockFonts>();
         _lips = std::make_unique<MockLips>();
@@ -220,7 +220,7 @@ public:
             *_twoDas,
             *_scripts,
             *_movies,
-            *_audioFiles,
+            *_audioClips,
             *_cursors,
             *_fonts,
             *_lips,
@@ -253,8 +253,8 @@ public:
         return *_movies;
     }
 
-    MockAudioFiles &audioFiles() {
-        return *_audioFiles;
+    MockAudioClips &audioClips() {
+        return *_audioClips;
     }
 
     MockResourceDirector &director() {
@@ -272,7 +272,7 @@ private:
     std::unique_ptr<MockTwoDas> _twoDas;
     std::unique_ptr<MockScripts> _scripts;
     std::unique_ptr<MockMovies> _movies;
-    std::unique_ptr<MockAudioFiles> _audioFiles;
+    std::unique_ptr<MockAudioClips> _audioClips;
     std::unique_ptr<MockCursors> _cursors;
     std::unique_ptr<MockFonts> _fonts;
     std::unique_ptr<MockLips> _lips;

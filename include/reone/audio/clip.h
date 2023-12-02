@@ -25,7 +25,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioBuffer : boost::noncopyable {
+class AudioClip : boost::noncopyable {
 public:
     struct Frame {
         AudioFormat format {AudioFormat::Mono8};

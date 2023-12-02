@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/audio/source.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"

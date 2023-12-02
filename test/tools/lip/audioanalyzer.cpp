@@ -32,12 +32,12 @@ TEST(audio_analyzer, should_return_silent_spans_given_mono8_audio_with_sound_and
     };
     ByteBuffer samplesBuffer(sizeof(samples));
     std::memcpy(&samplesBuffer[0], samples, sizeof(samples));
-    AudioBuffer buffer;
-    buffer.add(AudioBuffer::Frame {AudioFormat::Mono8, 24, samplesBuffer});
+    AudioClip clip;
+    clip.add(AudioClip::Frame {AudioFormat::Mono8, 24, samplesBuffer});
     AudioAnalyzer analyzer;
 
     // when
-    auto spans = analyzer.silentSpans(buffer, 0.05f);
+    auto spans = analyzer.silentSpans(clip, 0.05f);
 
     // then
     EXPECT_EQ(spans.size(), 1ll);
@@ -54,12 +54,12 @@ TEST(audio_analyzer, should_return_waveform_given_mono8_audio_with_sound_and_sil
     };
     ByteBuffer samplesBuffer(sizeof(samples));
     std::memcpy(&samplesBuffer[0], samples, sizeof(samples));
-    AudioBuffer buffer;
-    buffer.add(AudioBuffer::Frame {AudioFormat::Mono8, 24, samplesBuffer});
+    AudioClip clip;
+    clip.add(AudioClip::Frame {AudioFormat::Mono8, 24, samplesBuffer});
     AudioAnalyzer analyzer;
 
     // when
-    auto waveform = analyzer.waveform(buffer, 12);
+    auto waveform = analyzer.waveform(clip, 12);
 
     // then
     EXPECT_EQ(waveform.size(), 12ll);

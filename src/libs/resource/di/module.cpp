@@ -49,13 +49,13 @@ void ResourceModule::init() {
         _graphics.uniforms(),
         _graphics.window(),
         *_resources);
-    _audioFiles = std::make_unique<AudioFiles>(*_resources);
+    _audioClips = std::make_unique<AudioClips>(*_resources);
     _movies = std::make_unique<Movies>(_gamePath, _graphics.services(), _audio.player());
     _scripts = std::make_unique<Scripts>(*_resources);
     _dialogs = std::make_unique<Dialogs>(*_gffs, *_strings);
     _layouts = std::make_unique<Layouts>(*_resources);
     _paths = std::make_unique<Paths>(*_gffs);
-    _soundSets = std::make_unique<SoundSets>(*_audioFiles, *_resources, *_strings);
+    _soundSets = std::make_unique<SoundSets>(*_audioClips, *_resources, *_strings);
     _visibilities = std::make_unique<Visibilities>(*_resources);
     _ltrs = std::make_unique<Ltrs>(*_resources);
     _director = std::make_unique<ResourceDirector>(
@@ -83,7 +83,7 @@ void ResourceModule::init() {
         *_twoDas,
         *_scripts,
         *_movies,
-        *_audioFiles,
+        *_audioClips,
         *_cursors,
         *_fonts,
         *_lips,
@@ -112,7 +112,7 @@ void ResourceModule::deinit() {
     _dialogs.reset();
     _scripts.reset();
     _movies.reset();
-    _audioFiles.reset();
+    _audioClips.reset();
     _cursors.reset();
     _fonts.reset();
     _lips.reset();

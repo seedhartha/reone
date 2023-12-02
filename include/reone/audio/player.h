@@ -25,13 +25,13 @@ namespace reone {
 
 namespace audio {
 
-class AudioBuffer;
+class AudioClip;
 
 class IAudioPlayer {
 public:
     virtual ~IAudioPlayer() = default;
 
-    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
+    virtual std::shared_ptr<AudioSource> play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) = 0;
 };
 
 class AudioPlayer : public IAudioPlayer, boost::noncopyable {
@@ -40,7 +40,7 @@ public:
         _options(options) {
     }
 
-    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
+    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioClip> clip, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f)) override;
 
 private:
     AudioOptions &_options;

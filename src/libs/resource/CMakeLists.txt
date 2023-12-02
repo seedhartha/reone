@@ -71,7 +71,7 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/path.h
     ${RESOURCE_INCLUDE_DIR}/provider/shaders.h
     ${RESOURCE_INCLUDE_DIR}/provider/2das.h
-    ${RESOURCE_INCLUDE_DIR}/provider/audiofiles.h
+    ${RESOURCE_INCLUDE_DIR}/provider/audioclips.h
     ${RESOURCE_INCLUDE_DIR}/provider/cursors.h
     ${RESOURCE_INCLUDE_DIR}/provider/dialogs.h
     ${RESOURCE_INCLUDE_DIR}/provider/fonts.h
@@ -155,7 +155,7 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/gff.cpp
     ${RESOURCE_SOURCE_DIR}/ltr.cpp
     ${RESOURCE_SOURCE_DIR}/provider/2das.cpp
-    ${RESOURCE_SOURCE_DIR}/provider/audiofiles.cpp
+    ${RESOURCE_SOURCE_DIR}/provider/audioclips.cpp
     ${RESOURCE_SOURCE_DIR}/provider/cursors.cpp
     ${RESOURCE_SOURCE_DIR}/provider/dialogs.cpp
     ${RESOURCE_SOURCE_DIR}/provider/fonts.cpp

@@ -17,7 +17,7 @@ set(AUDIO_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/audio)
 set(AUDIO_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/audio)
 
 set(AUDIO_HEADERS
-    ${AUDIO_INCLUDE_DIR}/buffer.h
+    ${AUDIO_INCLUDE_DIR}/clip.h
     ${AUDIO_INCLUDE_DIR}/context.h
     ${AUDIO_INCLUDE_DIR}/di/module.h
     ${AUDIO_INCLUDE_DIR}/di/services.h
@@ -27,7 +27,7 @@ set(AUDIO_HEADERS
     ${AUDIO_INCLUDE_DIR}/types.h)
 
 set(AUDIO_SOURCES
-    ${AUDIO_SOURCE_DIR}/buffer.cpp
+    ${AUDIO_SOURCE_DIR}/clip.cpp
     ${AUDIO_SOURCE_DIR}/context.cpp
     ${AUDIO_SOURCE_DIR}/di/module.cpp
     ${AUDIO_SOURCE_DIR}/player.cpp

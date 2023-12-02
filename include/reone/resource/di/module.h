@@ -19,7 +19,7 @@
 
 #include "../director.h"
 #include "../provider/2das.h"
-#include "../provider/audiofiles.h"
+#include "../provider/audioclips.h"
 #include "../provider/cursors.h"
 #include "../provider/dialogs.h"
 #include "../provider/fonts.h"
@@ -94,7 +94,7 @@ public:
     TwoDas &twoDas() { return *_twoDas; }
     Scripts &scripts() { return *_scripts; }
     Movies &movies() { return *_movies; }
-    AudioFiles &audioFiles() { return *_audioFiles; }
+    AudioClips &audioClips() { return *_audioClips; }
     Cursors &cursors() { return *_cursors; }
     Fonts &fonts() { return *_fonts; }
     Lips &lips() { return *_lips; }
@@ -122,7 +122,7 @@ private:
     std::unique_ptr<TwoDas> _twoDas;
     std::unique_ptr<Scripts> _scripts;
     std::unique_ptr<Movies> _movies;
-    std::unique_ptr<AudioFiles> _audioFiles;
+    std::unique_ptr<AudioClips> _audioClips;
     std::unique_ptr<Cursors> _cursors;
     std::unique_ptr<Fonts> _fonts;
     std::unique_ptr<Lips> _lips;

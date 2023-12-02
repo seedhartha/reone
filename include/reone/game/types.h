@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 
 namespace reone {
 

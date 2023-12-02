@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 
 namespace reone {
 
 namespace resource {
 
-class AudioFiles;
+class AudioClips;
 class TwoDas;
 
 } // namespace resource
@@ -31,14 +31,14 @@ class TwoDas;
 namespace game {
 
 struct FootstepTypeSounds {
-    std::vector<std::shared_ptr<audio::AudioBuffer>> dirt;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> grass;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> stone;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> wood;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> water;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> carpet;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> metal;
-    std::vector<std::shared_ptr<audio::AudioBuffer>> leaves;
+    std::vector<std::shared_ptr<audio::AudioClip>> dirt;
+    std::vector<std::shared_ptr<audio::AudioClip>> grass;
+    std::vector<std::shared_ptr<audio::AudioClip>> stone;
+    std::vector<std::shared_ptr<audio::AudioClip>> wood;
+    std::vector<std::shared_ptr<audio::AudioClip>> water;
+    std::vector<std::shared_ptr<audio::AudioClip>> carpet;
+    std::vector<std::shared_ptr<audio::AudioClip>> metal;
+    std::vector<std::shared_ptr<audio::AudioClip>> leaves;
 };
 
 class IFootstepSounds {
@@ -53,9 +53,9 @@ public:
 class FootstepSounds : public IFootstepSounds {
 public:
     FootstepSounds(
-        resource::AudioFiles &audioFiles,
+        resource::AudioClips &audioClips,
         resource::TwoDas &twoDas) :
-        _audioFiles(audioFiles),
+        _audioClips(audioClips),
         _twoDas(twoDas) {
     }
 
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    resource::AudioFiles &_audioFiles;
+    resource::AudioClips &_audioClips;
     resource::TwoDas &_twoDas;
 
     std::unordered_map<uint32_t, std::shared_ptr<FootstepTypeSounds>> _objects;

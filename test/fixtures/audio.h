@@ -34,7 +34,7 @@ public:
 
 class MockAudioPlayer : public IAudioPlayer, boost::noncopyable {
 public:
-    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioBuffer> buffer, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
+    MOCK_METHOD(std::shared_ptr<AudioSource>, play, (std::shared_ptr<AudioClip> clip, AudioType type, bool loop, float gain, bool positional, glm::vec3 position), (override));
 };
 
 class TestAudioModule : boost::noncopyable {

@@ -23,20 +23,20 @@ using namespace reone::audio;
 
 namespace reone {
 
-std::vector<TimeSpan> AudioAnalyzer::silentSpans(const AudioBuffer &buffer,
+std::vector<TimeSpan> AudioAnalyzer::silentSpans(const AudioClip &clip,
                                                  float minSilenceDuration,
                                                  float maxSilenceAmplitude) {
     std::vector<TimeSpan> silentSpans;
-    auto frameSpans = computeFrameSpans(buffer);
+    auto frameSpans = computeFrameSpans(clip);
     float silenceStart = 0.0f;
     bool silentSpan = false;
-    for (float t = 0.0f; t < buffer.duration(); t += 0.001f) {
-        for (int i = 0; i < buffer.getFrameCount(); ++i) {
+    for (float t = 0.0f; t < clip.duration(); t += 0.001f) {
+        for (int i = 0; i < clip.getFrameCount(); ++i) {
             if (!frameSpans[i].contains(t)) {
                 continue;
             }
             float sampleTime = t - frameSpans[i].startInclusive;
-            float sample = sampleNormalized(buffer.getFrame(i), sampleTime);
+            float sample = sampleNormalized(clip.getFrame(i), sampleTime);
             bool silent = std::fabs(sample) <= maxSilenceAmplitude;
             if (silent && !silentSpan) {
                 silenceStart = t;
@@ -50,34 +50,34 @@ std::vector<TimeSpan> AudioAnalyzer::silentSpans(const AudioBuffer &buffer,
             break;
         }
     }
-    if (silentSpan && buffer.duration() - silenceStart >= minSilenceDuration) {
-        silentSpans.push_back(TimeSpan {silenceStart, buffer.duration()});
+    if (silentSpan && clip.duration() - silenceStart >= minSilenceDuration) {
+        silentSpans.push_back(TimeSpan {silenceStart, clip.duration()});
     }
     return silentSpans;
 }
 
-std::vector<float> AudioAnalyzer::waveform(const AudioBuffer &buffer, int resolution) {
-    auto frameSpans = computeFrameSpans(buffer);
+std::vector<float> AudioAnalyzer::waveform(const AudioClip &clip, int resolution) {
+    auto frameSpans = computeFrameSpans(clip);
     std::vector<float> waveform;
     for (int x = 0; x < resolution; ++x) {
-        float waveformTime = (x / static_cast<float>(resolution)) * buffer.duration();
-        for (int i = 0; i < buffer.getFrameCount(); ++i) {
+        float waveformTime = (x / static_cast<float>(resolution)) * clip.duration();
+        for (int i = 0; i < clip.getFrameCount(); ++i) {
             if (!frameSpans[i].contains(waveformTime)) {
                 continue;
             }
             float sampleTime = waveformTime - frameSpans[i].startInclusive;
-            waveform.push_back(sampleNormalized(buffer.getFrame(i), sampleTime));
+            waveform.push_back(sampleNormalized(clip.getFrame(i), sampleTime));
             break;
         }
     }
     return waveform;
 }
 
-std::vector<TimeSpan> AudioAnalyzer::computeFrameSpans(const AudioBuffer &buffer) {
+std::vector<TimeSpan> AudioAnalyzer::computeFrameSpans(const AudioClip &clip) {
     std::vector<TimeSpan> spans;
     float time = 0.0f;
-    for (int i = 0; i < buffer.getFrameCount(); ++i) {
-        const auto &frame = buffer.getFrame(i);
+    for (int i = 0; i < clip.getFrameCount(); ++i) {
+        const auto &frame = clip.getFrame(i);
         float duration = frame.samples.size() / frame.stride() / static_cast<float>(frame.sampleRate);
         spans.push_back(TimeSpan {time, time + duration});
         time += duration;
@@ -85,7 +85,7 @@ std::vector<TimeSpan> AudioAnalyzer::computeFrameSpans(const AudioBuffer &buffer
     return spans;
 }
 
-float AudioAnalyzer::sampleNormalized(const AudioBuffer::Frame &frame, float time) {
+float AudioAnalyzer::sampleNormalized(const AudioClip::Frame &frame, float time) {
     int sampleIdx = static_cast<int>(time * frame.sampleRate);
     if (sampleIdx >= frame.samples.size() / frame.stride()) {
         sampleIdx = frame.samples.size() / frame.stride() - 1;

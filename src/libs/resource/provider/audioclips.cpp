@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 
-#include "reone/audio/buffer.h"
+#include "reone/audio/clip.h"
 #include "reone/resource/format/mp3reader.h"
 #include "reone/resource/format/wavreader.h"
 #include "reone/resource/resources.h"
@@ -29,28 +29,28 @@ namespace reone {
 
 namespace resource {
 
-std::shared_ptr<AudioBuffer> AudioFiles::doGet(std::string resRef) {
-    std::shared_ptr<AudioBuffer> buffer;
+std::shared_ptr<AudioClip> AudioClips::doGet(std::string resRef) {
+    std::shared_ptr<AudioClip> clip;
 
     auto m3pRes = _resources.find(ResourceId(resRef, ResType::Mp3));
     if (m3pRes) {
         auto stream = MemoryInputStream(m3pRes->data);
         auto reader = Mp3Reader();
         reader.load(stream);
-        buffer = reader.stream();
+        clip = reader.stream();
     }
-    if (!buffer) {
+    if (!clip) {
         auto wavRes = _resources.find(ResourceId(resRef, ResType::Wav));
         if (wavRes) {
             auto stream = MemoryInputStream(wavRes->data);
             auto mp3ReaderFactory = Mp3ReaderFactory();
             auto reader = WavReader(stream, mp3ReaderFactory);
             reader.load();
-            buffer = reader.stream();
+            clip = reader.stream();
         }
     }
 
-    return buffer;
+    return clip;
 }
 
 } // namespace resource

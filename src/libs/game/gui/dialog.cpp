@@ -24,7 +24,7 @@
 #include "reone/resource/2da.h"
 #include "reone/resource/di/services.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/models.h"
 #include "reone/scene/types.h"
 #include "reone/script/execution.h"

@@ -19,8 +19,7 @@
 
 #include "reone/resource/2da.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
-
+#include "reone/resource/provider/audioclips.h"
 
 using namespace reone::audio;
 using namespace reone::resource;
@@ -35,7 +34,7 @@ std::shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     std::shared_ptr<TwoDa> twoDa(_twoDas.get("footstepsounds"));
     if (twoDa) {
         result = std::make_shared<FootstepTypeSounds>();
-        std::map<std::string, std::vector<std::shared_ptr<AudioBuffer>> &> dict {
+        std::map<std::string, std::vector<std::shared_ptr<AudioClip>> &> dict {
             {"dirt", result->dirt},
             {"grass", result->grass},
             {"stone", result->stone},
@@ -48,7 +47,7 @@ std::shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
             for (int i = 0; i < 3; ++i) {
                 std::string key(str(boost::format("%s%d") % pair.first % i));
                 std::string resRef(twoDa->getString(static_cast<int>(type), key));
-                std::shared_ptr<AudioBuffer> audio(_audioFiles.get(resRef));
+                std::shared_ptr<AudioClip> audio(_audioClips.get(resRef));
                 pair.second.push_back(std::move(audio));
             }
         }

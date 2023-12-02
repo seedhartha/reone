@@ -22,7 +22,7 @@
 #include "reone/graphics/animation.h"
 #include "reone/graphics/di/services.h"
 #include "reone/gui/control/listbox.h"
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/lips.h"
 #include "reone/resource/provider/models.h"
 #include "reone/resource/resources.h"
@@ -175,7 +175,7 @@ void Conversation::loadVoiceOver() {
         }
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _services.audio.player.play(_services.resource.audioFiles.get(voiceResRef), AudioType::Voice);
+        _currentVoice = _services.audio.player.play(_services.resource.audioClips.get(voiceResRef), AudioType::Voice);
     }
 }
 

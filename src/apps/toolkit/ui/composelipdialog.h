@@ -31,7 +31,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioBuffer;
+class AudioClip;
 
 }
 
@@ -55,7 +55,7 @@ private:
     wxFloatingPointValidator<float> _soundDurationValidator;
     float _soundDuration {1.0f};
 
-    std::shared_ptr<audio::AudioBuffer> _sound;
+    std::shared_ptr<audio::AudioClip> _sound;
     std::vector<TimeSpan> _silentSpans;
     std::vector<float> _soundWaveform;
 

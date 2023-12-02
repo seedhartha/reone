@@ -47,7 +47,7 @@
 #include "reone/resource/format/gffwriter.h"
 #include "reone/resource/format/tgawriter.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
+#include "reone/resource/provider/audioclips.h"
 #include "reone/resource/provider/cursors.h"
 #include "reone/resource/provider/dialogs.h"
 #include "reone/resource/provider/gffs.h"
@@ -460,7 +460,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.audio.player.play(_services.resource.audioFiles.get(_musicResRef), AudioType::Music);
+        _music = _services.audio.player.play(_services.resource.audioClips.get(_musicResRef), AudioType::Music);
     }
 }
 

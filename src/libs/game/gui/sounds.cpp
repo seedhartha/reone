@@ -19,8 +19,7 @@
 
 #include "reone/resource/format/2dareader.h"
 #include "reone/resource/provider/2das.h"
-#include "reone/resource/provider/audiofiles.h"
-
+#include "reone/resource/provider/audioclips.h"
 
 using namespace reone::audio;
 using namespace reone::resource;
@@ -38,10 +37,10 @@ void GUISounds::init() {
     loadSound(*sounds, "Entered_Default", _onEnter);
 }
 
-void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioBuffer> &sound) {
+void GUISounds::loadSound(const TwoDa &twoDa, const std::string &label, std::shared_ptr<AudioClip> &sound) {
     int row = twoDa.indexByCellValue("label", label);
     if (row != -1) {
-        sound = _audioFiles.get(twoDa.getString(row, "soundresref"));
+        sound = _audioClips.get(twoDa.getString(row, "soundresref"));
     }
 }
 
