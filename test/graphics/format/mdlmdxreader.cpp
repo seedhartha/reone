@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/scene.h"
-#include "reone/resource/format/mdlmdxreader.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 
@@ -27,7 +27,6 @@
 
 using namespace reone;
 using namespace reone::graphics;
-using namespace reone::resource;
 
 TEST(mdl_reader, should_load_mdl) {
     // given

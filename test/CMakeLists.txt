@@ -39,6 +39,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
+    ${TESTS_SOURCE_DIR}/graphics/format/mdlmdxreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/tgareader.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/tpcreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/txireader.cpp
@@ -51,7 +52,6 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/resource/format/gffreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/gffwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/keyreader.cpp
-    ${TESTS_SOURCE_DIR}/resource/format/mdlmdxreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimreader.cpp
     ${TESTS_SOURCE_DIR}/resource/format/rimwriter.cpp
     ${TESTS_SOURCE_DIR}/resource/format/tlkreader.cpp

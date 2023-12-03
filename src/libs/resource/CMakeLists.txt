@@ -40,7 +40,6 @@ set(RESOURCE_HEADERS
     ${RESOURCE_INCLUDE_DIR}/format/keyreader.h
     ${RESOURCE_INCLUDE_DIR}/format/ltrreader.h
     ${RESOURCE_INCLUDE_DIR}/format/lytreader.h
-    ${RESOURCE_INCLUDE_DIR}/format/mdlmdxreader.h
     ${RESOURCE_INCLUDE_DIR}/format/pereader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimreader.h
     ${RESOURCE_INCLUDE_DIR}/format/rimwriter.h
@@ -114,7 +113,6 @@ set(RESOURCE_SOURCES
     ${RESOURCE_SOURCE_DIR}/format/keyreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/ltrreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/lytreader.cpp
-    ${RESOURCE_SOURCE_DIR}/format/mdlmdxreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/pereader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimreader.cpp
     ${RESOURCE_SOURCE_DIR}/format/rimwriter.cpp

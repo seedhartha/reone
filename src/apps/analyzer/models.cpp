@@ -18,13 +18,14 @@
 #include "models.h"
 
 #include "reone/graphics/animation.h"
+#include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
 #include "reone/graphics/options.h"
-#include "reone/resource/format/mdlmdxreader.h"
 #include "reone/resource/provider/models.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stream/memoryinput.h"
+
 
 using namespace reone;
 using namespace reone::graphics;
