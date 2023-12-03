@@ -93,9 +93,9 @@ public:
 
         // Textures
 
-        std::shared_ptr<Texture> diffuseMap;
-        std::shared_ptr<Texture> lightmap;
-        std::shared_ptr<Texture> bumpmap;
+        std::string diffuseMap;
+        std::string lightmap;
+        std::string bumpmap;
 
         // END Textures
 
@@ -110,7 +110,7 @@ public:
     };
 
     struct LensFlare {
-        std::shared_ptr<Texture> texture;
+        std::string textureName;
         glm::vec3 colorShift {0.0f};
         float position {0.0f};
         float size {0.0f};
@@ -157,7 +157,7 @@ public:
         UpdateMode updateMode {UpdateMode::Invalid};
         RenderMode renderMode {RenderMode::Invalid};
         BlendMode blendMode {BlendMode::Invalid};
-        std::shared_ptr<Texture> texture;
+        std::string textureName;
         glm::ivec2 gridSize {0};
         int renderOrder {0};
         bool twosided {false};
@@ -167,7 +167,7 @@ public:
     };
 
     struct Reference {
-        std::shared_ptr<Model> model;
+        std::string modelName;
         bool reattachable {false};
     };
 

@@ -55,10 +55,18 @@ void MeshSceneNode::initTextures() {
     if (!mesh) {
         return;
     }
-    _nodeTextures.diffuse = mesh->diffuseMap.get();
-    _nodeTextures.lightmap = mesh->lightmap.get();
-    _nodeTextures.bumpmap = mesh->bumpmap.get();
-
+    if (!mesh->diffuseMap.empty()) {
+        auto diffuseMap = _resourceSvc.textures.get(mesh->diffuseMap, TextureUsage::Diffuse);
+        _nodeTextures.diffuse = diffuseMap.get();
+    }
+    if (!mesh->lightmap.empty()) {
+        auto lightmap = _resourceSvc.textures.get(mesh->lightmap, TextureUsage::Lightmap);
+        _nodeTextures.lightmap = lightmap.get();
+    }
+    if (!mesh->bumpmap.empty()) {
+        auto bumpmap = _resourceSvc.textures.get(mesh->bumpmap, TextureUsage::BumpMap);
+        _nodeTextures.bumpmap = bumpmap.get();
+    }
     refreshAdditionalTextures();
 }
 
@@ -116,7 +124,7 @@ bool MeshSceneNode::shouldRender() const {
     if (!mesh || !mesh->render || _modelNode.alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
         return false;
     }
-    return !_modelNode.isAABBMesh() && mesh->diffuseMap;
+    return !_modelNode.isAABBMesh() && !mesh->diffuseMap.empty();
 }
 
 bool MeshSceneNode::shouldCastShadows() const {

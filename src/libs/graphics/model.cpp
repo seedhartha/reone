@@ -17,12 +17,11 @@
 
 #include "reone/graphics/model.h"
 
-#include "reone/system/logutil.h"
-
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/modelnode.h"
 #include "reone/graphics/types.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -33,12 +32,12 @@ Model::Model(
     int classification,
     std::shared_ptr<ModelNode> rootNode,
     std::vector<std::shared_ptr<Animation>> animations,
-    std::shared_ptr<Model> superModel,
+    std::string superModelName,
     float animationScale) :
     _name(std::move(name)),
     _classification(classification),
     _rootNode(rootNode),
-    _superModel(std::move(superModel)),
+    _superModelName(std::move(superModelName)),
     _animationScale(animationScale) {
 
     if (_rootNode) {

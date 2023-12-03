@@ -67,7 +67,7 @@ TEST(model_scene_node, should_build_from_model) {
     emitterNode->setEmitter(emitter);
     rootNode->addChild(emitterNode);
 
-    auto model = Model("some_model", 0, rootNode, std::vector<std::shared_ptr<Animation>>(), nullptr, 1.0f);
+    auto model = Model("some_model", 0, rootNode, std::vector<std::shared_ptr<Animation>>(), "", 1.0f);
     auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
@@ -125,7 +125,7 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
     auto animations = std::vector<std::shared_ptr<Animation>> {
         std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
 
-    auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
+    auto model = Model("some_model", 0, rootNode, animations, "", 1.0f);
 
     auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
@@ -177,7 +177,7 @@ TEST(model_scene_node, should_play_single_looping_animation) {
     auto animations = std::vector<std::shared_ptr<Animation>> {
         std::make_shared<Animation>("some_animation", 1.0f, 0.5f, "root_node", animRootNode, std::vector<Animation::Event>())};
 
-    auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
+    auto model = Model("some_model", 0, rootNode, animations, "", 1.0f);
     auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
@@ -237,7 +237,7 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
         std::make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, std::vector<Animation::Event>()),
         std::make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, std::vector<Animation::Event>())};
 
-    auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
+    auto model = Model("some_model", 0, rootNode, animations, "", 1.0f);
     auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,
@@ -302,7 +302,7 @@ TEST(model_scene_node, hould_transition_between_two_animations) {
         std::make_shared<Animation>("animation1", 1.0f, 0.5f, "root_node", anim1RootNode, std::vector<Animation::Event>()),
         std::make_shared<Animation>("animation2", 2.0f, 0.5f, "root_node", anim2RootNode, std::vector<Animation::Event>())};
 
-    auto model = Model("some_model", 0, rootNode, animations, nullptr, 1.0f);
+    auto model = Model("some_model", 0, rootNode, animations, "", 1.0f);
     auto modelSceneNode = std::make_shared<ModelSceneNode>(
         model,
         ModelUsage::Creature,

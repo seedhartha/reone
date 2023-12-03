@@ -118,9 +118,6 @@ static ModelStats analyzeModels(const std::filesystem::path &gameDir) {
     ModelStats stats;
     Resources resources;
     resources.addKEY(gameDir / std::string("chitin.key"));
-    GraphicsOptions graphicsOpt;
-    Textures textures(graphicsOpt, resources);
-    Models models(textures, resources);
     for (const auto &[container, local] : resources.containers()) {
         const auto &resIds = container->resourceIds();
         for (const auto &resId : resIds) {
@@ -135,7 +132,7 @@ static ModelStats analyzeModels(const std::filesystem::path &gameDir) {
                 }
                 auto mdl = MemoryInputStream(*mdlData);
                 auto mdx = MemoryInputStream(*mdxData);
-                auto reader = MdlMdxReader(mdl, mdx, models, textures);
+                auto reader = MdlMdxReader(mdl, mdx);
                 reader.load();
                 auto model = reader.model();
                 stats.extend(analyzeModel(*model));

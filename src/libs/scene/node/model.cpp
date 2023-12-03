@@ -24,6 +24,8 @@
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/resource/di/services.h"
+#include "reone/resource/provider/models.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node/emitter.h"
 #include "reone/scene/node/light.h"
@@ -96,10 +98,13 @@ void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {
 
     if (node.isReference()) {
         auto reference = node.reference();
-        if (reference->model) {
-            auto model = _sceneGraph.newModel(*reference->model, _usage);
-            model->init();
-            attach(node.name(), *model);
+        if (!reference->modelName.empty()) {
+            auto model = _resourceSvc.models.get(reference->modelName);
+            if (model) {
+                auto refModelNode = _sceneGraph.newModel(*model, _usage);
+                refModelNode->init();
+                attach(node.name(), *refModelNode);
+            }
         }
     }
     for (auto &child : node.children()) {

@@ -33,7 +33,7 @@ public:
         int classification,
         std::shared_ptr<ModelNode> rootNode,
         std::vector<std::shared_ptr<Animation>> animations,
-        std::shared_ptr<Model> superModel,
+        std::string superModelName,
         float animationScale);
 
     void init();
@@ -44,10 +44,15 @@ public:
     int classification() const { return _classification; }
     std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
+    const std::string &superModelName() const { return _superModelName; }
     float animationScale() const { return _animationScale; }
     const AABB &aabb() const { return _aabb; }
 
     void setAffectedByFog(bool affected) { _affectedByFog = affected; }
+
+    void setSuperModel(std::shared_ptr<Model> superModel) {
+        _superModel = std::move(superModel);
+    }
 
     // Nodes
 
@@ -74,11 +79,12 @@ private:
     int _classification;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
-    std::shared_ptr<Model> _superModel;
+    std::string _superModelName;
     float _animationScale;
 
     AABB _aabb;
     bool _affectedByFog;
+    std::shared_ptr<Model> _superModel;
 
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;

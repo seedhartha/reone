@@ -25,10 +25,9 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/resource/di/services.h"
 #include "reone/resource/provider/textures.h"
-
 #include "reone/scene/graph.h"
-
 #include "reone/scene/node/camera.h"
 
 using namespace reone::graphics;
@@ -71,6 +70,10 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
+    auto texture = _resourceSvc.textures.get(flare.textureName);
+    if (!texture) {
+        return;
+    }
     _graphicsSvc.uniforms.setGeneral([this, &flare](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::fixedsize;
@@ -80,7 +83,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         general.color = glm::vec4(_color, 1.0f);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
-    _graphicsSvc.context.bind(*flare.texture);
+    _graphicsSvc.context.bind(*texture);
     _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
         _graphicsSvc.meshRegistry.get(MeshName::billboard).draw();
     });

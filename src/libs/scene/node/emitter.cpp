@@ -243,7 +243,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
         return;
     }
     auto emitter = _modelNode.emitter();
-    auto texture = emitter->texture;
+    auto texture = _resourceSvc.textures.get(emitter->textureName, TextureUsage::Diffuse);
     if (!texture) {
         return;
     }

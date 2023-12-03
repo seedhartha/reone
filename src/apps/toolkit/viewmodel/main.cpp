@@ -49,7 +49,6 @@
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 
-
 #include "../di/graphicsmodule.h"
 
 using namespace reone::audio;
@@ -289,7 +288,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
             throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
         }
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlMdxReader(data, mdx, _resourceModule->models(), _resourceModule->textures());
+        auto reader = MdlMdxReader(data, mdx);
         reader.load();
 
         auto &scene = _sceneModule->graphs().get(kSceneMain);
@@ -298,6 +297,10 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         _modelNode.reset();
 
         _model = reader.model();
+        if (!_model->superModelName().empty()) {
+            auto superModel = _resourceModule->models().get(_model->superModelName());
+            _model->setSuperModel(std::move(superModel));
+        }
         _model->init();
         _animations.invoke(_model->getAnimationNames());
 

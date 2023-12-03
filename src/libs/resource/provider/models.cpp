@@ -64,10 +64,14 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
     if (mdlRes && mdxRes) {
         auto mdl = MemoryInputStream(mdlRes->data);
         auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlMdxReader(mdl, mdx, *this, _textures);
+        auto reader = MdlMdxReader(mdl, mdx);
         try {
             reader.load();
             model = reader.model();
+            if (!model->superModelName().empty()) {
+                auto superModel = get(model->superModelName());
+                model->setSuperModel(std::move(superModel));
+            }
         } catch (const ValidationException &e) {
             error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannel::Graphics);
         }

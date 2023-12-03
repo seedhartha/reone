@@ -34,19 +34,12 @@ class Model;
 
 namespace resource {
 
-class IModels;
-class ITextures;
-
 class MdlMdxReader : boost::noncopyable {
 public:
     MdlMdxReader(IInputStream &mdl,
-                 IInputStream &mdx,
-                 IModels &models,
-                 ITextures &textures) :
+                 IInputStream &mdx) :
         _mdl(BinaryReader(mdl)),
-        _mdx(BinaryReader(mdx)),
-        _models(models),
-        _textures(textures) {
+        _mdx(BinaryReader(mdx)) {
 
         initControllerFn();
     }
@@ -75,8 +68,6 @@ private:
 
     BinaryReader _mdl;
     BinaryReader _mdx;
-    IModels &_models;
-    ITextures &_textures;
 
     std::unordered_map<uint32_t, ControllerFn> _genericControllers;
     std::unordered_map<uint32_t, ControllerFn> _meshControllers;

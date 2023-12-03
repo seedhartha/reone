@@ -20,8 +20,6 @@
 #include "reone/graphics/animation.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/model.h"
-#include "reone/resource/provider/models.h"
-#include "reone/resource/provider/textures.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
@@ -89,6 +87,9 @@ void MdlMdxReader::load() {
     ArrayDefinition nameArrayDef(readArrayDefinition());
 
     _tsl = isTSLFunctionPointer(funcPtr1);
+    if (superModelName == "null") {
+        superModelName.clear();
+    }
     _modelName = name;
     _offAnimRoot = offAnimRoot;
 
@@ -100,12 +101,6 @@ void MdlMdxReader::load() {
     std::shared_ptr<ModelNode> rootNode(readNodes(offRootNode, nullptr, false));
     prepareSkinMeshes();
 
-    // Load supermodel
-    std::shared_ptr<Model> superModel;
-    if (!superModelName.empty() && superModelName != "null") {
-        superModel = _models.get(superModelName);
-    }
-
     // Read animations
     std::vector<uint32_t> animOffsets(_mdl.readUint32ArrayAt(kMdlDataOffset + animationArrayDef.offset, animationArrayDef.count));
     std::vector<std::shared_ptr<Animation>> animations(readAnimations(animOffsets));
@@ -115,7 +110,7 @@ void MdlMdxReader::load() {
         classification,
         std::move(rootNode),
         std::move(animations),
-        std::move(superModel),
+        std::move(superModelName),
         animationScale);
 
     _model->setAffectedByFog(affectedByFog != 0);
@@ -444,13 +439,13 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
     if (animateUV) {
         uvAnimation.dir = glm::vec2(uvDirectionX, uvDirectionY);
     }
-    std::shared_ptr<Texture> diffuseMap;
+    std::string diffuseMap;
     if (!texture1.empty() && texture1 != "null") {
-        diffuseMap = _textures.get(texture1, TextureUsage::Diffuse);
+        diffuseMap = texture1;
     }
-    std::shared_ptr<Texture> lightmap;
+    std::string lightmap;
     if (!texture2.empty()) {
-        lightmap = _textures.get(texture2, TextureUsage::Lightmap);
+        lightmap = texture2;
     }
 
     auto nodeMesh = std::make_unique<ModelNode::TriangleMesh>();
@@ -532,17 +527,16 @@ std::shared_ptr<ModelNode::Light> MdlMdxReader::readLight() {
             colorShifts.push_back(std::move(colorShift));
         }
 
-        std::vector<std::shared_ptr<Texture>> flareTextures;
+        std::vector<std::string> flareTextures;
         for (int i = 0; i < numFlares; ++i) {
             _mdl.seek(kMdlDataOffset + texNameOffsets[i]);
             std::string textureName(boost::to_lower_copy(_mdl.readString(12)));
-            std::shared_ptr<Texture> texture(_textures.get(textureName));
-            flareTextures.push_back(std::move(texture));
+            flareTextures.push_back(std::move(textureName));
         }
 
         for (int i = 0; i < numFlares; ++i) {
             ModelNode::LensFlare lensFlare;
-            lensFlare.texture = flareTextures[i];
+            lensFlare.textureName = flareTextures[i];
             lensFlare.colorShift = colorShifts[i];
             lensFlare.position = flarePositions[i];
             lensFlare.size = flareSizes[i];
@@ -625,7 +619,7 @@ std::shared_ptr<ModelNode::Emitter> MdlMdxReader::readEmitter() {
     emitter->updateMode = parseEmitterUpdate(update);
     emitter->renderMode = parseEmitterRender(render);
     emitter->blendMode = parseEmitterBlend(blend);
-    emitter->texture = _textures.get(texture, TextureUsage::Diffuse);
+    emitter->textureName = std::move(texture);
     emitter->gridSize = glm::ivec2(glm::max(xGrid, 1u), glm::max(yGrid, 1u));
     emitter->renderOrder = renderOrder;
     emitter->twosided = static_cast<bool>(twosided);
@@ -641,7 +635,7 @@ std::shared_ptr<ModelNode::Reference> MdlMdxReader::readReference() {
     uint32_t reattachable = _mdl.readUint32();
 
     auto reference = std::make_shared<ModelNode::Reference>();
-    reference->model = _models.get(modelResRef);
+    reference->modelName = std::move(modelResRef);
     reference->reattachable = static_cast<bool>(reattachable);
 
     return reference;

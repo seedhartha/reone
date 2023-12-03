@@ -24,7 +24,6 @@
 #include "reone/system/stringbuilder.h"
 
 #include "../../fixtures/graphics.h"
-#include "../../fixtures/resource.h"
 
 using namespace reone;
 using namespace reone::graphics;
@@ -103,9 +102,7 @@ TEST(mdl_reader, should_load_mdl) {
     auto mdl = MemoryInputStream(mdlBytes);
     auto mdxBytes = StringBuilder().string();
     auto mdx = MemoryInputStream(mdxBytes);
-    auto models = std::make_unique<MockModels>();
-    auto textures = std::make_unique<MockTextures>();
-    auto reader = MdlMdxReader(mdl, mdx, *models, *textures);
+    auto reader = MdlMdxReader(mdl, mdx);
 
     // when
     reader.load();
