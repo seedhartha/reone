@@ -246,10 +246,12 @@ void GUI::drawBackground() {
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
-    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _graphicsSvc.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _graphicsSvc.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _graphicsSvc.window.getOrthoProjection();
+    });
+    _graphicsSvc.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();

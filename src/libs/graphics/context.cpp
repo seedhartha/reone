@@ -18,6 +18,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/texture.h"
+#include "reone/graphics/uniformbuffer.h"
 #include "reone/system/threadutil.h"
 
 namespace reone {
@@ -92,6 +93,11 @@ void GraphicsContext::resetProgram() {
     }
     glUseProgram(0);
     _usedProgram = nullptr;
+}
+
+void GraphicsContext::bind(UniformBuffer &buffer, int index) {
+    _uniformBuffers[index] = &buffer;
+    buffer.bind(index);
 }
 
 void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {

@@ -256,12 +256,12 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    _graphicsSvc.uniforms.setGeneral([&emitter](auto &general) {
-        general.resetLocals();
-        general.gridSize = emitter->gridSize;
+    _graphicsSvc.uniforms.setLocals([&emitter](auto &locals) {
+        locals.reset();
+        locals.gridSize = emitter->gridSize;
         switch (emitter->blendMode) {
         case ModelNode::Emitter::BlendMode::Lighten:
-            general.featureMask |= UniformsFeatureFlags::premulalpha;
+            locals.featureMask |= UniformsFeatureFlags::premulalpha;
             break;
         case ModelNode::Emitter::BlendMode::Normal:
         case ModelNode::Emitter::BlendMode::PunchThrough:

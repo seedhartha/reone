@@ -40,48 +40,25 @@ struct UniformsFeatureFlags {
     static constexpr int envmapcube = 0x1000;
 };
 
-struct GeneralUniforms {
+struct GlobalsUniforms {
     glm::mat4 projection {1.0f};
-    glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
-    glm::mat4 model {1.0f};
-    glm::mat4 modelInv {1.0f};
-    glm::mat3x4 uv {1.0f};
     glm::vec4 cameraPosition {0.0f};
-    glm::vec4 color {1.0f};
     glm::vec4 worldAmbientColor {1.0f};
-    glm::vec4 selfIllumColor {1.0f};
-    glm::vec4 discardColor {0.0f};
     glm::vec4 fogColor {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
-    glm::vec4 heightMapFrameBounds {0.0f};
-    glm::vec2 screenResolution {0.0f};
-    glm::vec2 screenResolutionRcp {0.0f};
-    glm::vec2 blurDirection {0.0f};
-    glm::ivec2 gridSize {0};
     float clipNear {kDefaultClipPlaneNear};
     float clipFar {kDefaultClipPlaneFar};
-    float alpha {1.0f};
-    float waterAlpha {1.0f};
     float fogNear {0.0f};
     float fogFar {0.0f};
-    float heightMapScaling {1.0f};
     float shadowStrength {0.0f};
     float shadowRadius {0.0f};
-    float billboardSize {1.0f};
-    float ssaoSampleRadius {0.5f};
-    float ssaoBias {0.1f};
-    float ssrBias {0.5f};
-    float ssrPixelStride {4.0f};
-    float ssrMaxSteps {32.0f};
-    float sharpenAmount {0.25f};
-    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    float padding[3];
+    float padding[2];
     glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
-    void resetGlobals() {
+    void reset() {
         projection = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         viewInv = glm::mat4(1.0f);
@@ -89,6 +66,8 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
+        clipNear = kDefaultClipPlaneNear;
+        clipFar = kDefaultClipPlaneFar;
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
@@ -98,8 +77,35 @@ struct GeneralUniforms {
             shadowLightSpace[i] = glm::mat4(1.0f);
         }
     }
+};
 
-    void resetLocals() {
+struct LocalsUniforms {
+    glm::mat4 screenProjection {1.0f};
+    glm::mat4 model {1.0f};
+    glm::mat4 modelInv {1.0f};
+    glm::mat3x4 uv {1.0f};
+    glm::vec4 color {1.0f};
+    glm::vec4 selfIllumColor {1.0f};
+    glm::vec4 discardColor {0.0f};
+    glm::vec4 heightMapFrameBounds {0.0f};
+    glm::vec2 screenResolution {0.0f};
+    glm::vec2 screenResolutionRcp {0.0f};
+    glm::vec2 blurDirection {0.0f};
+    glm::ivec2 gridSize {0};
+    float alpha {1.0f};
+    float waterAlpha {1.0f};
+    float heightMapScaling {1.0f};
+    float billboardSize {1.0f};
+    float ssaoSampleRadius {0.5f};
+    float ssaoBias {0.1f};
+    float ssrBias {0.5f};
+    float ssrPixelStride {4.0f};
+    float ssrMaxSteps {32.0f};
+    float sharpenAmount {0.25f};
+    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
+    float padding;
+
+    void reset() {
         screenProjection = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
         modelInv = glm::mat4(1.0f);
@@ -192,11 +198,14 @@ struct PointsUniforms {
     glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
 };
 
+class GraphicsContext;
+
 class IUniforms {
 public:
     virtual ~IUniforms() = default;
 
-    virtual void setGeneral(const std::function<void(GeneralUniforms &)> &block) = 0;
+    virtual void setGlobals(const std::function<void(GlobalsUniforms &)> &block) = 0;
+    virtual void setLocals(const std::function<void(LocalsUniforms &)> &block) = 0;
     virtual void setText(const std::function<void(TextUniforms &)> &block) = 0;
     virtual void setLighting(const std::function<void(LightingUniforms &)> &block) = 0;
     virtual void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) = 0;
@@ -209,12 +218,17 @@ public:
 
 class Uniforms : public IUniforms, boost::noncopyable {
 public:
+    Uniforms(GraphicsContext &context) :
+        _context(context) {
+    }
+
     ~Uniforms() { deinit(); }
 
     void init();
     void deinit();
 
-    void setGeneral(const std::function<void(GeneralUniforms &)> &block) override;
+    void setGlobals(const std::function<void(GlobalsUniforms &)> &block) override;
+    void setLocals(const std::function<void(LocalsUniforms &)> &block) override;
     void setText(const std::function<void(TextUniforms &)> &block) override;
     void setLighting(const std::function<void(LightingUniforms &)> &block) override;
     void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override;
@@ -227,9 +241,12 @@ public:
 private:
     bool _inited {false};
 
+    GraphicsContext &_context;
+
     // Uniforms
 
-    GeneralUniforms _general;
+    GlobalsUniforms _globals;
+    LocalsUniforms _locals;
     TextUniforms _text;
     LightingUniforms _lighting;
     SkeletalUniforms _skeletal;
@@ -243,7 +260,8 @@ private:
 
     // Uniform Buffers
 
-    std::shared_ptr<UniformBuffer> _ubGeneral;
+    std::shared_ptr<UniformBuffer> _ubGlobals;
+    std::shared_ptr<UniformBuffer> _ubLocals;
     std::shared_ptr<UniformBuffer> _ubText;
     std::shared_ptr<UniformBuffer> _ubLighting;
     std::shared_ptr<UniformBuffer> _ubSkeletal;
@@ -256,8 +274,6 @@ private:
     // END Uniform Buffers
 
     std::unique_ptr<UniformBuffer> initBuffer(const void *data, ptrdiff_t size);
-
-    void refreshBuffer(UniformBuffer &buffer, int bindingPoint, const void *data, ptrdiff_t size);
 };
 
 } // namespace graphics

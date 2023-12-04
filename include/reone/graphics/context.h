@@ -26,6 +26,7 @@ namespace graphics {
 
 class ShaderProgram;
 class Texture;
+class UniformBuffer;
 
 class IGraphicsContext {
 public:
@@ -39,6 +40,9 @@ public:
 
     virtual void useProgram(ShaderProgram &program) = 0;
     virtual void resetProgram() = 0;
+
+    virtual void bind(UniformBuffer &buffer, int index) = 0;
+    virtual UniformBuffer &uniformBufferAt(int index) = 0;
 
     virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
     virtual void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) = 0;
@@ -65,6 +69,15 @@ public:
     void useProgram(ShaderProgram &program) override;
     void resetProgram() override;
 
+    void bind(UniformBuffer &buffer, int index) override;
+
+    UniformBuffer &uniformBufferAt(int index) override {
+        if (_uniformBuffers.empty()) {
+            throw std::out_of_range("Uniform buffer index out of range: " + std::to_string(index));
+        }
+        return *_uniformBuffers.at(index);
+    }
+
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override;
     void withBlending(BlendMode mode, const std::function<void()> &block) override;
@@ -76,8 +89,10 @@ private:
     GraphicsOptions &_options;
 
     bool _inited {false};
-    int _activeTexUnit {0};
+
     ShaderProgram *_usedProgram {nullptr};
+    int _activeTexUnit {0};
+    std::map<int, UniformBuffer *> _uniformBuffers;
 
     // States
 

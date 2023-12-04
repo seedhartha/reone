@@ -169,15 +169,16 @@ struct TextureUnits {
 };
 
 struct UniformBlockBindingPoints {
-    static constexpr int general = 0;
-    static constexpr int text = 1;
-    static constexpr int lighting = 2;
-    static constexpr int skeletal = 3;
-    static constexpr int particles = 4;
-    static constexpr int grass = 5;
-    static constexpr int ssao = 6;
-    static constexpr int walkmesh = 7;
-    static constexpr int points = 8;
+    static constexpr int globals = 0;
+    static constexpr int locals = 1;
+    static constexpr int text = 2;
+    static constexpr int lighting = 3;
+    static constexpr int skeletal = 4;
+    static constexpr int particles = 5;
+    static constexpr int grass = 6;
+    static constexpr int ssao = 7;
+    static constexpr int walkmesh = 8;
+    static constexpr int points = 9;
 };
 
 // MDL

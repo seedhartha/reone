@@ -365,9 +365,11 @@ void Game::drawWorld() {
     if (!output) {
         return;
     }
-    _services.graphics.uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
+    _services.graphics.uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _services.graphics.uniforms.setLocals([](auto &locals) {
+        locals.reset();
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleTexture));
     _services.graphics.context.bind(*output);

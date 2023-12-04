@@ -64,9 +64,9 @@ void WalkmeshSceneNode::init() {
 }
 
 void WalkmeshSceneNode::draw() {
-    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
-        general.resetLocals();
-        general.model = _absTransform;
+    _graphicsSvc.uniforms.setLocals([this](auto &locals) {
+        locals.reset();
+        locals.model = _absTransform;
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::walkmesh));
     _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {

@@ -74,13 +74,13 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!texture) {
         return;
     }
-    _graphicsSvc.uniforms.setGeneral([this, &flare](auto &general) {
-        general.resetLocals();
-        general.featureMask = UniformsFeatureFlags::fixedsize;
-        general.model = glm::translate(getOrigin());
-        general.billboardSize = 0.2f * flare.size;
-        general.alpha = 0.5f;
-        general.color = glm::vec4(_color, 1.0f);
+    _graphicsSvc.uniforms.setLocals([this, &flare](auto &locals) {
+        locals.reset();
+        locals.featureMask = UniformsFeatureFlags::fixedsize;
+        locals.model = glm::translate(getOrigin());
+        locals.billboardSize = 0.2f * flare.size;
+        locals.alpha = 0.5f;
+        locals.color = glm::vec4(_color, 1.0f);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
     _graphicsSvc.context.bind(*texture);

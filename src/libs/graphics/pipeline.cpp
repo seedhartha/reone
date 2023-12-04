@@ -421,11 +421,11 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
         return;
     }
 
-    _uniforms.setGeneral([this, &scene](auto &general) {
-        general.resetGlobals();
-        general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
+    _uniforms.setGlobals([this, &scene](auto &globals) {
+        globals.reset();
+        globals.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
-            general.shadowLightSpace[i] = _shadowLightSpace[i];
+            globals.shadowLightSpace[i] = _shadowLightSpace[i];
         }
     });
 
@@ -441,12 +441,12 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
 void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
 
-    _uniforms.setGeneral([&camera](auto &general) {
-        general.resetGlobals();
-        general.projection = camera->projection();
-        general.view = camera->view();
-        general.viewInv = glm::inverse(camera->view());
-        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+    _uniforms.setGlobals([&camera](auto &globals) {
+        globals.reset();
+        globals.projection = camera->projection();
+        globals.view = camera->view();
+        globals.viewInv = glm::inverse(camera->view());
+        globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGBuffer->nameGL());
@@ -458,14 +458,14 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
 void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
 
-    _uniforms.setGeneral([&camera](auto &general) {
-        general.resetGlobals();
-        general.projection = camera->projection();
-        general.view = camera->view();
-        general.viewInv = glm::inverse(camera->view());
-        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
-        general.clipNear = camera->zNear();
-        general.clipFar = camera->zFar();
+    _uniforms.setGlobals([&camera](auto &globals) {
+        globals.reset();
+        globals.projection = camera->projection();
+        globals.view = camera->view();
+        globals.viewInv = glm::inverse(camera->view());
+        globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
+        globals.clipNear = camera->zNear();
+        globals.clipFar = camera->zFar();
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbTransparentGeometry->nameGL());
@@ -481,10 +481,10 @@ void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) 
 void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
     auto camera = scene.camera();
 
-    _uniforms.setGeneral([&camera](auto &general) {
-        general.resetGlobals();
-        general.projection = camera->projection();
-        general.view = camera->view();
+    _uniforms.setGlobals([&camera](auto &globals) {
+        globals.reset();
+        globals.projection = camera->projection();
+        globals.view = camera->view();
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -494,13 +494,15 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
 void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias) {
     auto camera = scene.camera();
 
-    _uniforms.setGeneral([&dim, &sampleRadius, &bias, &camera](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.projection = camera->projection();
-        general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-        general.ssaoSampleRadius = sampleRadius;
-        general.ssaoBias = bias;
+    _uniforms.setGlobals([&dim, &sampleRadius, &bias, &camera](auto &globals) {
+        globals.reset();
+        globals.projection = camera->projection();
+    });
+    _uniforms.setLocals([&dim, &sampleRadius, &bias, &camera](auto &locals) {
+        locals.reset();
+        locals.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+        locals.ssaoSampleRadius = sampleRadius;
+        locals.ssaoBias = bias;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
@@ -520,17 +522,19 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
     screenProjection *= camera->projection();
 
-    _uniforms.setGeneral([&dim, &bias, &pixelStride, &maxSteps, &camera, screenProjection](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.screenProjection = std::move(screenProjection);
-        general.screenResolution = glm::vec2(dim.x, dim.y);
-        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        general.clipNear = camera->zNear();
-        general.clipFar = camera->zFar();
-        general.ssrBias = bias;
-        general.ssrPixelStride = pixelStride;
-        general.ssrMaxSteps = maxSteps;
+    _uniforms.setGlobals([&camera](auto &globals) {
+        globals.reset();
+        globals.clipNear = camera->zNear();
+        globals.clipFar = camera->zFar();
+    });
+    _uniforms.setLocals([&dim, &bias, &pixelStride, &maxSteps, screenProjection](auto &locals) {
+        locals.reset();
+        locals.screenProjection = std::move(screenProjection);
+        locals.screenResolution = glm::vec2(dim.x, dim.y);
+        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        locals.ssrBias = bias;
+        locals.ssrPixelStride = pixelStride;
+        locals.ssrMaxSteps = maxSteps;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
@@ -547,28 +551,28 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
 
 void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst) {
     auto camera = scene.camera();
-    _uniforms.setGeneral([this, &scene, &camera](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.viewInv = glm::inverse(camera->view());
-        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
-        general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
+    _uniforms.setGlobals([this, &scene, &camera](auto &globals) {
+        globals.reset();
+        globals.viewInv = glm::inverse(camera->view());
+        globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
+        globals.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
         if (scene.hasShadowLight()) {
-            general.featureMask |= UniformsFeatureFlags::shadows;
-            general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
-            general.shadowStrength = scene.shadowStrength();
-            general.shadowRadius = scene.shadowRadius();
-            general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
+            globals.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
+            globals.shadowStrength = scene.shadowStrength();
+            globals.shadowRadius = scene.shadowRadius();
+            globals.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
             for (int i = 0; i < kNumShadowLightSpace; ++i) {
-                general.shadowLightSpace[i] = _shadowLightSpace[i];
+                globals.shadowLightSpace[i] = _shadowLightSpace[i];
             }
         }
         if (scene.isFogEnabled()) {
-            general.featureMask |= UniformsFeatureFlags::fog;
-            general.fogNear = scene.fogNear();
-            general.fogFar = scene.fogFar();
-            general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
+            globals.fogNear = scene.fogNear();
+            globals.fogFar = scene.fogFar();
+            globals.fogColor = glm::vec4(scene.fogColor(), 1.0f);
         }
+    });
+    _uniforms.setLocals([](auto &locals) {
+        locals.reset();
     });
     scene.fillLightingUniforms();
 
@@ -596,9 +600,11 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
 }
 
 void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
-    _uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([](auto &locals) {
+        locals.reset();
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -612,9 +618,11 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
 }
 
 void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([](auto &locals) {
+        locals.reset();
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -625,11 +633,13 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 }
 
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
-    _uniforms.setGeneral([&dim, &vertical](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([&dim, &vertical](auto &locals) {
+        locals.reset();
+        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        locals.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -640,9 +650,11 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
 }
 
 void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
-    _uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([](auto &locals) {
+        locals.reset();
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -653,10 +665,12 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 }
 
 void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniforms.setGeneral([&dim](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([&dim](auto &locals) {
+        locals.reset();
+        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -667,11 +681,13 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 }
 
 void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
-    _uniforms.setGeneral([&dim, &amount](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        general.sharpenAmount = amount;
+    _uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _uniforms.setLocals([&dim, &amount](auto &locals) {
+        locals.reset();
+        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        locals.sharpenAmount = amount;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());

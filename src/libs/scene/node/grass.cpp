@@ -143,13 +143,13 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
         return;
     }
     _graphicsSvc.context.bind(*_properties.texture);
-    _graphicsSvc.uniforms.setGeneral([this](auto &general) {
-        general.resetLocals();
-        general.featureMask = UniformsFeatureFlags::hashedalphatest;
+    _graphicsSvc.uniforms.setLocals([this](auto &locals) {
+        locals.reset();
+        locals.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (!_aabbNode.mesh()->lightmap.empty()) {
             auto lightmap = _resourceSvc.textures.get(_aabbNode.mesh()->lightmap, TextureUsage::Lightmap);
             _graphicsSvc.context.bind(*lightmap, TextureUnits::lightmap);
-            general.featureMask |= UniformsFeatureFlags::lightmap;
+            locals.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });
     _graphicsSvc.uniforms.setGrass([this, &leafs](auto &grass) {

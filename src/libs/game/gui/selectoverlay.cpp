@@ -270,10 +270,12 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -296,12 +298,14 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-            general.resetLocals();
-            general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = std::move(transform);
-            general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-            general.alpha = 0.5f;
+        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+            globals.projection = _services.graphics.window.getOrthoProjection();
+        });
+        _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+            locals.reset();
+            locals.model = std::move(transform);
+            locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+            locals.alpha = 0.5f;
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -330,11 +334,13 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
-        general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
+        locals.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -368,10 +374,12 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -431,10 +439,12 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();

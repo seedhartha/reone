@@ -129,8 +129,8 @@ void ModelSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
 
 void ModelSceneNode::drawAABB() {
     _graphicsSvc.context.withPolygonMode(PolygonMode::Line, [this]() {
-        _graphicsSvc.uniforms.setGeneral([this](auto &u) {
-            u.resetLocals();
+        _graphicsSvc.uniforms.setLocals([this](auto &u) {
+            u.reset();
             u.model = _absTransform;
             u.model *= glm::translate(_aabb.center());
             u.model *= glm::scale(0.5f * _aabb.size());

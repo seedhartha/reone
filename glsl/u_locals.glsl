@@ -1,5 +1,3 @@
-const int NUM_SHADOW_LIGHT_SPACE = 6;
-
 const int FEATURE_LIGHTMAP = 1;
 const int FEATURE_ENVMAP = 2;
 const int FEATURE_NORMALMAP = 4;
@@ -14,35 +12,22 @@ const int FEATURE_HASHEDALPHATEST = 0x400;
 const int FEATURE_PREMULALPHA = 0x800;
 const int FEATURE_ENVMAPCUBE = 0x1000;
 
-layout(std140) uniform General {
-    mat4 uProjection;
+layout(std140) uniform Locals {
     mat4 uScreenProjection;
-    mat4 uView;
-    mat4 uViewInv;
     mat4 uModel;
     mat4 uModelInv;
     mat3 uUV;
-    vec4 uCameraPosition;
     vec4 uColor;
-    vec4 uWorldAmbientColor;
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
-    vec4 uFogColor;
-    vec4 uShadowLightPosition;
     vec4 uHeightMapFrameBounds;
     vec2 uScreenResolution;
     vec2 uScreenResolutionRcp;
     vec2 uBlurDirection;
     ivec2 uGridSize;
-    float uClipNear;
-    float uClipFar;
     float uAlpha;
     float uWaterAlpha;
-    float uFogNear;
-    float uFogFar;
     float uHeightMapScaling;
-    float uShadowStrength;
-    float uShadowRadius;
     float uBillboardSize;
     float uSSAOSampleRadius;
     float uSSAOBias;
@@ -51,8 +36,6 @@ layout(std140) uniform General {
     float uSSRMaxSteps;
     float uSharpenAmount;
     int uFeatureMask;
-    vec4 uShadowCascadeFarPlanes;
-    mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
 };
 
 bool isFeatureEnabled(int flag) {

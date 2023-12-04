@@ -35,12 +35,18 @@ using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 
+using testing::_;
+using testing::ReturnRef;
+
 TEST(model_scene_node, should_build_from_model) {
     // given
     auto graphicsOpt = GraphicsOptions();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
+    auto program = std::make_unique<ShaderProgram>(std::vector<std::shared_ptr<Shader>>());
+    auto &shaderRegistry = graphicsModule.shaderRegistry();
+    EXPECT_CALL(shaderRegistry, get(_)).WillOnce(ReturnRef(*program));
 
     auto audioModule = TestAudioModule();
     audioModule.init();

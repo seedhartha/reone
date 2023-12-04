@@ -314,11 +314,13 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::translate(transform, glm::vec3(_gui->controlOffset().x + extent.left + extent.width - 14.0f, _gui->controlOffset().y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
-        general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
+        locals.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();

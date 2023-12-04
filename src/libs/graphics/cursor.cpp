@@ -37,10 +37,12 @@ void Cursor::draw() {
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    _uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _window.getOrthoProjection();
-        general.model = std::move(transform);
+    _uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _window.getOrthoProjection();
+    });
+    _uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::gui));
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {

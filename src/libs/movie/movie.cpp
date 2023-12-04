@@ -99,10 +99,12 @@ void Movie::render() {
         _graphicsSvc.context.bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    _graphicsSvc.uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-        general.uv = glm::mat3x4(
+    _graphicsSvc.uniforms.setGlobals([](auto &globals) {
+        globals.reset();
+    });
+    _graphicsSvc.uniforms.setLocals([](auto &locals) {
+        locals.reset();
+        locals.uv = glm::mat3x4(
             glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));

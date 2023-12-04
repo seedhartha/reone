@@ -44,6 +44,9 @@ public:
     MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
     MOCK_METHOD(void, resetProgram, (), (override));
 
+    MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
+    MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
+
     MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withFaceCulling, (CullFaceMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &block), (override));
@@ -74,7 +77,8 @@ public:
 
 class MockUniforms : public IUniforms, boost::noncopyable {
 public:
-    MOCK_METHOD(void, setGeneral, (const std::function<void(GeneralUniforms &)> &block), (override));
+    MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalsUniforms &)> &block), (override));
+    MOCK_METHOD(void, setLocals, (const std::function<void(LocalsUniforms &)> &block), (override));
     MOCK_METHOD(void, setText, (const std::function<void(TextUniforms &)> &block), (override));
     MOCK_METHOD(void, setLighting, (const std::function<void(LightingUniforms &)> &block), (override));
     MOCK_METHOD(void, setSkeletal, (const std::function<void(SkeletalUniforms &)> &block), (override));
@@ -128,6 +132,10 @@ public:
 
     MockWindow &window() {
         return *_window;
+    }
+
+    MockShaderRegistry &shaderRegistry() {
+        return *_shaderRegistry;
     }
 
     GraphicsServices &services() {

@@ -59,9 +59,9 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
     _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::text));
     _graphicsContext.bind(*_texture);
 
-    _uniforms.setGeneral([this, &color](auto &general) {
-        general.resetLocals();
-        general.color = glm::vec4(color, 1.0f);
+    _uniforms.setLocals([this, &color](auto &locals) {
+        locals.reset();
+        locals.color = glm::vec4(color, 1.0f);
     });
 
     int numBlocks = static_cast<int>(text.size()) / kMaxTextChars;

@@ -57,10 +57,12 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
-    _graphicsSvc.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _graphicsSvc.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
+        globals.projection = _graphicsSvc.window.getOrthoProjection();
+    });
+    _graphicsSvc.uniforms.setLocals([transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();

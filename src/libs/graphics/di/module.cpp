@@ -27,7 +27,7 @@ void GraphicsModule::init() {
     _meshRegistry = std::make_unique<MeshRegistry>();
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();
-    _uniforms = std::make_unique<Uniforms>();
+    _uniforms = std::make_unique<Uniforms>(*_context);
     _pipeline = std::make_unique<Pipeline>(
         _options,
         *_context,

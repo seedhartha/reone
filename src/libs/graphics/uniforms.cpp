@@ -17,6 +17,8 @@
 
 #include "reone/graphics/uniforms.h"
 
+#include "reone/graphics/context.h"
+
 namespace reone {
 
 namespace graphics {
@@ -26,7 +28,8 @@ void Uniforms::init() {
         return;
     }
 
-    static GeneralUniforms defaultsGeneral;
+    static GlobalsUniforms defaultsGlobals;
+    static LocalsUniforms defaultsLocals;
     static TextUniforms defaultsText;
     static LightingUniforms defaultsLighting;
     static SkeletalUniforms defaultsSkeletal;
@@ -36,7 +39,8 @@ void Uniforms::init() {
     static WalkmeshUniforms defaultsWalkmesh;
     static PointsUniforms defaultsPoints;
 
-    _ubGeneral = initBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
+    _ubGlobals = initBuffer(&defaultsGlobals, sizeof(GlobalsUniforms));
+    _ubLocals = initBuffer(&defaultsLocals, sizeof(LocalsUniforms));
     _ubText = initBuffer(&defaultsText, sizeof(TextUniforms));
     _ubLighting = initBuffer(&defaultsLighting, sizeof(LightingUniforms));
     _ubSkeletal = initBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
@@ -46,6 +50,17 @@ void Uniforms::init() {
     _ubWalkmesh = initBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
     _ubPoints = initBuffer(&defaultsPoints, sizeof(PointsUniforms));
 
+    _context.bind(*_ubGlobals, UniformBlockBindingPoints::globals);
+    _context.bind(*_ubLocals, UniformBlockBindingPoints::locals);
+    _context.bind(*_ubText, UniformBlockBindingPoints::text);
+    _context.bind(*_ubLighting, UniformBlockBindingPoints::lighting);
+    _context.bind(*_ubSkeletal, UniformBlockBindingPoints::skeletal);
+    _context.bind(*_ubParticles, UniformBlockBindingPoints::particles);
+    _context.bind(*_ubGrass, UniformBlockBindingPoints::grass);
+    _context.bind(*_ubSSAO, UniformBlockBindingPoints::ssao);
+    _context.bind(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
+    _context.bind(*_ubPoints, UniformBlockBindingPoints::points);
+
     _inited = true;
 }
 
@@ -54,7 +69,8 @@ void Uniforms::deinit() {
         return;
     }
 
-    _ubGeneral.reset();
+    _ubGlobals.reset();
+    _ubLocals.reset();
     _ubText.reset();
     _ubLighting.reset();
     _ubSkeletal.reset();
@@ -67,61 +83,71 @@ void Uniforms::deinit() {
     _inited = false;
 }
 
-void Uniforms::setGeneral(const std::function<void(GeneralUniforms &)> &block) {
-    block(_general);
-    refreshBuffer(*_ubGeneral, UniformBlockBindingPoints::general, &_general, sizeof(GeneralUniforms));
+void Uniforms::setGlobals(const std::function<void(GlobalsUniforms &)> &block) {
+    block(_globals);
+    _context.bind(*_ubGlobals, UniformBlockBindingPoints::globals);
+    _ubGlobals->setData(&_globals, sizeof(GlobalsUniforms));
+}
+
+void Uniforms::setLocals(const std::function<void(LocalsUniforms &)> &block) {
+    block(_locals);
+    _context.bind(*_ubLocals, UniformBlockBindingPoints::locals);
+    _ubLocals->setData(&_locals, sizeof(LocalsUniforms));
 }
 
 void Uniforms::setText(const std::function<void(TextUniforms &)> &block) {
     block(_text);
-    refreshBuffer(*_ubText, UniformBlockBindingPoints::text, &_text, sizeof(TextUniforms));
+    _context.bind(*_ubText, UniformBlockBindingPoints::text);
+    _ubText->setData(&_text, sizeof(TextUniforms));
 }
 
 void Uniforms::setLighting(const std::function<void(LightingUniforms &)> &block) {
     block(_lighting);
-    refreshBuffer(*_ubLighting, UniformBlockBindingPoints::lighting, &_lighting, sizeof(LightingUniforms));
+    _context.bind(*_ubLighting, UniformBlockBindingPoints::lighting);
+    _ubLighting->setData(&_lighting, sizeof(LightingUniforms));
 }
 
 void Uniforms::setSkeletal(const std::function<void(SkeletalUniforms &)> &block) {
     block(_skeletal);
-    refreshBuffer(*_ubSkeletal, UniformBlockBindingPoints::skeletal, &_skeletal, sizeof(SkeletalUniforms));
+    _context.bind(*_ubSkeletal, UniformBlockBindingPoints::skeletal);
+    _ubSkeletal->setData(&_skeletal, sizeof(SkeletalUniforms));
 }
 
 void Uniforms::setParticles(const std::function<void(ParticlesUniforms &)> &block) {
     block(_particles);
-    refreshBuffer(*_ubParticles, UniformBlockBindingPoints::particles, &_particles, sizeof(ParticlesUniforms));
+    _context.bind(*_ubParticles, UniformBlockBindingPoints::particles);
+    _ubParticles->setData(&_particles, sizeof(ParticlesUniforms));
 }
 
 void Uniforms::setGrass(const std::function<void(GrassUniforms &)> &block) {
     block(_grass);
-    refreshBuffer(*_ubGrass, UniformBlockBindingPoints::grass, &_grass, sizeof(GrassUniforms));
+    _context.bind(*_ubGrass, UniformBlockBindingPoints::grass);
+    _ubGrass->setData(&_grass, sizeof(GrassUniforms));
 }
 
 void Uniforms::setSSAO(const std::function<void(SSAOUniforms &)> &block) {
     block(_ssao);
-    refreshBuffer(*_ubSSAO, UniformBlockBindingPoints::ssao, &_ssao, sizeof(SSAOUniforms));
+    _context.bind(*_ubSSAO, UniformBlockBindingPoints::ssao);
+    _ubSSAO->setData(&_ssao, sizeof(SSAOUniforms));
 }
 
 void Uniforms::setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) {
     block(_walkmesh);
-    refreshBuffer(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh, &_walkmesh, sizeof(WalkmeshUniforms));
+    _context.bind(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
+    _ubWalkmesh->setData(&_walkmesh, sizeof(WalkmeshUniforms));
 }
 
 void Uniforms::setPoints(const std::function<void(PointsUniforms &)> &block) {
     block(_points);
-    refreshBuffer(*_ubPoints, UniformBlockBindingPoints::points, &_points, sizeof(PointsUniforms));
+    _context.bind(*_ubPoints, UniformBlockBindingPoints::points);
+    _ubPoints->setData(&_points, sizeof(PointsUniforms));
 }
 
 std::unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {
     auto buf = std::make_unique<UniformBuffer>();
-    buf->setData(data, size);
+    buf->setData(data, size, false);
     buf->init();
     return buf;
-}
-
-void Uniforms::refreshBuffer(UniformBuffer &buffer, int bindingPoint, const void *data, ptrdiff_t size) {
-    buffer.bind(bindingPoint);
-    buffer.setData(data, size, true);
 }
 
 } // namespace graphics

@@ -105,10 +105,12 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-            general.resetLocals();
-            general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = std::move(transform);
+        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+            globals.projection = _services.graphics.window.getOrthoProjection();
+        });
+        _services.graphics.uniforms.setLocals([transform](auto &locals) {
+            locals.reset();
+            locals.model = std::move(transform);
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
 
@@ -125,10 +127,12 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-            general.resetLocals();
-            general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = std::move(transform);
+        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+            globals.projection = _services.graphics.window.getOrthoProjection();
+        });
+        _services.graphics.uniforms.setLocals([transform](auto &locals) {
+            locals.reset();
+            locals.model = std::move(transform);
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -164,11 +168,13 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         auto guiColorHilight = _game.isTSL() ? kTSLGUIColorHilight : kGUIColorHilight;
         auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
 
-        _services.graphics.uniforms.setGeneral([&](auto &general) {
-            general.resetLocals();
-            general.projection = _services.graphics.window.getOrthoProjection();
-            general.model = std::move(transform);
-            general.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
+        _services.graphics.uniforms.setGlobals([&](auto &globals) {
+            globals.projection = _services.graphics.window.getOrthoProjection();
+        });
+        _services.graphics.uniforms.setLocals([&](auto &locals) {
+            locals.reset();
+            locals.model = std::move(transform);
+            locals.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
@@ -247,10 +253,12 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
-        general.resetLocals();
-        general.projection = _services.graphics.window.getOrthoProjection();
-        general.model = std::move(transform);
+    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
+    _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
+        locals.reset();
+        locals.model = std::move(transform);
     });
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();

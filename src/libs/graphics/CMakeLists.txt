@@ -44,6 +44,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/framebuffer.h
     ${GRAPHICS_INCLUDE_DIR}/lipanimation.h
     ${GRAPHICS_INCLUDE_DIR}/lumautil.h
+    ${GRAPHICS_INCLUDE_DIR}/material.h
     ${GRAPHICS_INCLUDE_DIR}/mesh.h
     ${GRAPHICS_INCLUDE_DIR}/meshregistry.h
     ${GRAPHICS_INCLUDE_DIR}/model.h
@@ -86,6 +87,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/format/txireader.cpp
     ${GRAPHICS_SOURCE_DIR}/framebuffer.cpp
     ${GRAPHICS_SOURCE_DIR}/lipanimation.cpp
+    ${GRAPHICS_SOURCE_DIR}/material.cpp
     ${GRAPHICS_SOURCE_DIR}/mesh.cpp
     ${GRAPHICS_SOURCE_DIR}/meshregistry.cpp
     ${GRAPHICS_SOURCE_DIR}/model.cpp
