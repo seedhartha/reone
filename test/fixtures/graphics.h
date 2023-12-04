@@ -84,9 +84,9 @@ public:
     MOCK_METHOD(void, setSkeletal, (const std::function<void(SkeletalUniforms &)> &block), (override));
     MOCK_METHOD(void, setParticles, (const std::function<void(ParticlesUniforms &)> &block), (override));
     MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &block), (override));
-    MOCK_METHOD(void, setSSAO, (const std::function<void(SSAOUniforms &)> &block), (override));
     MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &block), (override));
     MOCK_METHOD(void, setPoints, (const std::function<void(PointsUniforms &)> &block), (override));
+    MOCK_METHOD(void, setScreenSpace, (const std::function<void(ScreenSpaceUniforms &)> &block), (override));
 };
 
 class MockWindow : public IWindow, boost::noncopyable {

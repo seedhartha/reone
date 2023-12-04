@@ -35,9 +35,9 @@ void Uniforms::init() {
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
-    static SSAOUniforms defaultsSSAO;
     static WalkmeshUniforms defaultsWalkmesh;
     static PointsUniforms defaultsPoints;
+    static ScreenSpaceUniforms defaultsScreenSpace;
 
     _ubGlobals = initBuffer(&defaultsGlobals, sizeof(GlobalsUniforms));
     _ubLocals = initBuffer(&defaultsLocals, sizeof(LocalsUniforms));
@@ -46,9 +46,9 @@ void Uniforms::init() {
     _ubSkeletal = initBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
     _ubParticles = initBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
     _ubGrass = initBuffer(&defaultsGrass, sizeof(GrassUniforms));
-    _ubSSAO = initBuffer(&defaultsSSAO, sizeof(SSAOUniforms));
     _ubWalkmesh = initBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
     _ubPoints = initBuffer(&defaultsPoints, sizeof(PointsUniforms));
+    _ubScreenSpace = initBuffer(&defaultsScreenSpace, sizeof(ScreenSpaceUniforms));
 
     _context.bind(*_ubGlobals, UniformBlockBindingPoints::globals);
     _context.bind(*_ubLocals, UniformBlockBindingPoints::locals);
@@ -57,9 +57,9 @@ void Uniforms::init() {
     _context.bind(*_ubSkeletal, UniformBlockBindingPoints::skeletal);
     _context.bind(*_ubParticles, UniformBlockBindingPoints::particles);
     _context.bind(*_ubGrass, UniformBlockBindingPoints::grass);
-    _context.bind(*_ubSSAO, UniformBlockBindingPoints::ssao);
     _context.bind(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
     _context.bind(*_ubPoints, UniformBlockBindingPoints::points);
+    _context.bind(*_ubScreenSpace, UniformBlockBindingPoints::screenSpace);
 
     _inited = true;
 }
@@ -76,9 +76,9 @@ void Uniforms::deinit() {
     _ubSkeletal.reset();
     _ubParticles.reset();
     _ubGrass.reset();
-    _ubSSAO.reset();
     _ubWalkmesh.reset();
     _ubPoints.reset();
+    _ubScreenSpace.reset();
 
     _inited = false;
 }
@@ -125,12 +125,6 @@ void Uniforms::setGrass(const std::function<void(GrassUniforms &)> &block) {
     _ubGrass->setData(&_grass, sizeof(GrassUniforms));
 }
 
-void Uniforms::setSSAO(const std::function<void(SSAOUniforms &)> &block) {
-    block(_ssao);
-    _context.bind(*_ubSSAO, UniformBlockBindingPoints::ssao);
-    _ubSSAO->setData(&_ssao, sizeof(SSAOUniforms));
-}
-
 void Uniforms::setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) {
     block(_walkmesh);
     _context.bind(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
@@ -141,6 +135,12 @@ void Uniforms::setPoints(const std::function<void(PointsUniforms &)> &block) {
     block(_points);
     _context.bind(*_ubPoints, UniformBlockBindingPoints::points);
     _ubPoints->setData(&_points, sizeof(PointsUniforms));
+}
+
+void Uniforms::setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) {
+    block(_screenSpace);
+    _context.bind(*_ubScreenSpace, UniformBlockBindingPoints::screenSpace);
+    _ubScreenSpace->setData(&_screenSpace, sizeof(ScreenSpaceUniforms));
 }
 
 std::unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {

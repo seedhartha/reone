@@ -42,7 +42,6 @@ struct UniformsFeatureFlags {
 
 struct GlobalsUniforms {
     glm::mat4 projection {1.0f};
-    glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
@@ -51,26 +50,16 @@ struct GlobalsUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
     glm::vec4 shadowCascadeFarPlanes {0.0f};
-    glm::vec2 screenResolution {0.0f};
-    glm::vec2 screenResolutionRcp {0.0f};
-    glm::vec2 blurDirection {0.0f};
     float clipNear {kDefaultClipPlaneNear};
     float clipFar {kDefaultClipPlaneFar};
     float fogNear {0.0f};
     float fogFar {0.0f};
     float shadowStrength {0.0f};
     float shadowRadius {0.0f};
-    float ssaoSampleRadius {0.5f};
-    float ssaoBias {0.1f};
-    float ssrBias {0.5f};
-    float ssrPixelStride {4.0f};
-    float ssrMaxSteps {32.0f};
-    float sharpenAmount {0.25f};
     float padding[2];
 
     void reset() {
         projection = glm::mat4(1.0f);
-        screenProjection = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         viewInv = glm::mat4(1.0f);
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
@@ -81,19 +70,10 @@ struct GlobalsUniforms {
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
         shadowCascadeFarPlanes = glm::vec4(0.0f);
-        screenResolution = glm::vec2(0.0f);
-        screenResolutionRcp = glm::vec2(0.0f);
-        blurDirection = glm::vec2(0.0f);
         clipNear = kDefaultClipPlaneNear;
         clipFar = kDefaultClipPlaneFar;
         fogNear = 0.0f;
         fogFar = 0.0f;
-        ssaoSampleRadius = 0.5f;
-        ssaoBias = 0.1f;
-        ssrBias = 0.5f;
-        ssrPixelStride = 4.0f;
-        ssrMaxSteps = 32.0f;
-        sharpenAmount = 0.25f;
         shadowStrength = 1.0f;
         shadowRadius = 0.0f;
     }
@@ -186,16 +166,26 @@ struct TextUniforms {
     TextCharacterUniforms chars[kMaxTextChars];
 };
 
-struct SSAOUniforms {
-    glm::vec4 samples[kNumSSAOSamples] {glm::vec4(0.0f)};
-};
-
 struct WalkmeshUniforms {
     glm::vec4 materials[kMaxWalkmeshMaterials] {glm::vec4(1.0f)};
 };
 
 struct PointsUniforms {
     glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
+};
+
+struct ScreenSpaceUniforms {
+    glm::mat4 screenProjection {1.0f};
+    glm::vec4 ssaoSamples[kNumSSAOSamples] {glm::vec4(0.0f)};
+    glm::vec2 screenResolution {0.0f};
+    glm::vec2 screenResolutionRcp {0.0f};
+    glm::vec2 blurDirection {0.0f};
+    float ssaoSampleRadius {0.5f};
+    float ssaoBias {0.1f};
+    float ssrBias {0.5f};
+    float ssrPixelStride {4.0f};
+    float ssrMaxSteps {32.0f};
+    float sharpenAmount {0.25f};
 };
 
 class GraphicsContext;
@@ -211,9 +201,9 @@ public:
     virtual void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) = 0;
     virtual void setParticles(const std::function<void(ParticlesUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
-    virtual void setSSAO(const std::function<void(SSAOUniforms &)> &block) = 0;
     virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
     virtual void setPoints(const std::function<void(PointsUniforms &)> &block) = 0;
+    virtual void setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) = 0;
 };
 
 class Uniforms : public IUniforms, boost::noncopyable {
@@ -234,9 +224,9 @@ public:
     void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override;
     void setParticles(const std::function<void(ParticlesUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
-    void setSSAO(const std::function<void(SSAOUniforms &)> &block) override;
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
     void setPoints(const std::function<void(PointsUniforms &)> &block) override;
+    void setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) override;
 
 private:
     bool _inited {false};
@@ -252,9 +242,9 @@ private:
     SkeletalUniforms _skeletal;
     ParticlesUniforms _particles;
     GrassUniforms _grass;
-    SSAOUniforms _ssao;
     WalkmeshUniforms _walkmesh;
     PointsUniforms _points;
+    ScreenSpaceUniforms _screenSpace;
 
     // END Uniforms
 
@@ -267,9 +257,9 @@ private:
     std::shared_ptr<UniformBuffer> _ubSkeletal;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
-    std::shared_ptr<UniformBuffer> _ubSSAO;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;
     std::shared_ptr<UniformBuffer> _ubPoints;
+    std::shared_ptr<UniformBuffer> _ubScreenSpace;
 
     // END Uniform Buffers
 

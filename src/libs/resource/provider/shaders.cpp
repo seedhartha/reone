@@ -46,9 +46,9 @@ static const std::string kResRefUniformsLighting = "u_lighting";
 static const std::string kResRefUniformsParticle = "u_particle";
 static const std::string kResRefUniformsPoints = "u_points";
 static const std::string kResRefUniformsSkeletal = "u_skeletal";
-static const std::string kResRefUniformsSSAO = "u_ssao";
 static const std::string kResRefUniformsText = "u_text";
 static const std::string kResRefUniformsWalkmesh = "u_walkmesh";
+static const std::string kResRefUniformsScreenSpace = "u_screenspace";
 
 static const std::string kResRefVertexBillboard = "v_billboard";
 static const std::string kResRefVertexClipSpace = "v_clipspace";
@@ -127,17 +127,17 @@ void Shaders::init() {
     auto fsBillboard = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsParticle, kResRefOIT, kResRefLuma, kResRefFragmentParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsGrass, kResRefHash, kResRefHashedAlphaTest, kResRefFragmentGrass});
-    auto fsSSAO = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsSSAO, kResRefFragmentSSAO});
-    auto fsSSR = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentSSR});
+    auto fsSSAO = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentSSAO});
+    auto fsSSR = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentSSR});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsLighting, kResRefMath, kResRefBRDF, kResRefLighting, kResRefLuma, kResRefShadowMap, kResRefFog, kResRefFragmentCombineOpaque});
     auto fsCombineGeometry = initShader(ShaderType::Fragment, {kResRefFragmentCombineGeometry});
-    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentBoxBlur4});
-    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentGaussianBlur9});
-    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentGaussianBlur13});
-    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentMedianFilter3});
-    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentMedianFilter5});
-    auto fsFXAA = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefLuma, kResRefFragmentFXAA});
-    auto fsSharpen = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefFragmentSharpen});
+    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentBoxBlur4});
+    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentGaussianBlur9});
+    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentGaussianBlur13});
+    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentMedianFilter3});
+    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentMedianFilter5});
+    auto fsFXAA = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefLuma, kResRefFragmentFXAA});
+    auto fsSharpen = initShader(ShaderType::Fragment, {kResRefUniformsGlobals, kResRefUniformsLocals, kResRefUniformsScreenSpace, kResRefFragmentSharpen});
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::simpleColor, initShaderProgram({vsClipSpace, fsColor}));
@@ -243,9 +243,9 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
-    program->bindUniformBlock("SSAO", UniformBlockBindingPoints::ssao);
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
     program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
+    program->bindUniformBlock("ScreenSpace", UniformBlockBindingPoints::screenSpace);
 
     return program;
 }

@@ -129,12 +129,12 @@ void ModelSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
 
 void ModelSceneNode::drawAABB() {
     _graphicsSvc.context.withPolygonMode(PolygonMode::Line, [this]() {
-        _graphicsSvc.uniforms.setLocals([this](auto &u) {
-            u.reset();
-            u.model = _absTransform;
-            u.model *= glm::translate(_aabb.center());
-            u.model *= glm::scale(0.5f * _aabb.size());
-            u.modelInv = glm::inverse(u.model);
+        _graphicsSvc.uniforms.setLocals([this](auto &locals) {
+            locals.reset();
+            locals.model = _absTransform;
+            locals.model *= glm::translate(_aabb.center());
+            locals.model *= glm::scale(0.5f * _aabb.size());
+            locals.modelInv = glm::inverse(locals.model);
         });
         _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::aabb));
         _graphicsSvc.meshRegistry.get(MeshName::box).draw();

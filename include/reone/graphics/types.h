@@ -176,9 +176,9 @@ struct UniformBlockBindingPoints {
     static constexpr int skeletal = 4;
     static constexpr int particles = 5;
     static constexpr int grass = 6;
-    static constexpr int ssao = 7;
-    static constexpr int walkmesh = 8;
-    static constexpr int points = 9;
+    static constexpr int walkmesh = 7;
+    static constexpr int points = 8;
+    static constexpr int screenSpace = 9;
 };
 
 // MDL
