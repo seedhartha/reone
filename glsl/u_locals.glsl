@@ -13,7 +13,6 @@ const int FEATURE_PREMULALPHA = 0x800;
 const int FEATURE_ENVMAPCUBE = 0x1000;
 
 layout(std140) uniform Locals {
-    mat4 uScreenProjection;
     mat4 uModel;
     mat4 uModelInv;
     mat3 uUV;
@@ -21,21 +20,12 @@ layout(std140) uniform Locals {
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
     vec4 uHeightMapFrameBounds;
-    vec2 uScreenResolution;
-    vec2 uScreenResolutionRcp;
-    vec2 uBlurDirection;
     ivec2 uGridSize;
+    int uFeatureMask;
     float uAlpha;
     float uWaterAlpha;
     float uHeightMapScaling;
     float uBillboardSize;
-    float uSSAOSampleRadius;
-    float uSSAOBias;
-    float uSSRBias;
-    float uSSRPixelStride;
-    float uSSRMaxSteps;
-    float uSharpenAmount;
-    int uFeatureMask;
 };
 
 bool isFeatureEnabled(int flag) {

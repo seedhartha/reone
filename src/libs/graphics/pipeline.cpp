@@ -494,15 +494,15 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
 void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias) {
     auto camera = scene.camera();
 
-    _uniforms.setGlobals([&dim, &sampleRadius, &bias, &camera](auto &globals) {
+    _uniforms.setGlobals([&](auto &globals) {
         globals.reset();
         globals.projection = camera->projection();
+        globals.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+        globals.ssaoSampleRadius = sampleRadius;
+        globals.ssaoBias = bias;
     });
-    _uniforms.setLocals([&dim, &sampleRadius, &bias, &camera](auto &locals) {
+    _uniforms.setLocals([](auto &locals) {
         locals.reset();
-        locals.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-        locals.ssaoSampleRadius = sampleRadius;
-        locals.ssaoBias = bias;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
@@ -522,19 +522,19 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
     screenProjection *= camera->projection();
 
-    _uniforms.setGlobals([&camera](auto &globals) {
+    _uniforms.setGlobals([&](auto &globals) {
         globals.reset();
+        globals.screenProjection = std::move(screenProjection);
+        globals.screenResolution = glm::vec2(dim.x, dim.y);
+        globals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
         globals.clipNear = camera->zNear();
         globals.clipFar = camera->zFar();
+        globals.ssrBias = bias;
+        globals.ssrPixelStride = pixelStride;
+        globals.ssrMaxSteps = maxSteps;
     });
-    _uniforms.setLocals([&dim, &bias, &pixelStride, &maxSteps, screenProjection](auto &locals) {
+    _uniforms.setLocals([](auto &locals) {
         locals.reset();
-        locals.screenProjection = std::move(screenProjection);
-        locals.screenResolution = glm::vec2(dim.x, dim.y);
-        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        locals.ssrBias = bias;
-        locals.ssrPixelStride = pixelStride;
-        locals.ssrMaxSteps = maxSteps;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
@@ -633,13 +633,13 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 }
 
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
-    _uniforms.setGlobals([](auto &globals) {
+    _uniforms.setGlobals([&dim, &vertical](auto &globals) {
         globals.reset();
+        globals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        globals.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
     });
-    _uniforms.setLocals([&dim, &vertical](auto &locals) {
+    _uniforms.setLocals([](auto &locals) {
         locals.reset();
-        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        locals.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -665,12 +665,12 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 }
 
 void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniforms.setGlobals([](auto &globals) {
+    _uniforms.setGlobals([&dim](auto &globals) {
         globals.reset();
+        globals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     });
-    _uniforms.setLocals([&dim](auto &locals) {
+    _uniforms.setLocals([](auto &locals) {
         locals.reset();
-        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -681,13 +681,13 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 }
 
 void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
-    _uniforms.setGlobals([](auto &globals) {
+    _uniforms.setGlobals([&dim, &amount](auto &globals) {
         globals.reset();
+        globals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        globals.sharpenAmount = amount;
     });
-    _uniforms.setLocals([&dim, &amount](auto &locals) {
+    _uniforms.setLocals([](auto &locals) {
         locals.reset();
-        locals.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        locals.sharpenAmount = amount;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());

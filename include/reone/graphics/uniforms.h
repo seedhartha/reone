@@ -42,45 +42,64 @@ struct UniformsFeatureFlags {
 
 struct GlobalsUniforms {
     glm::mat4 projection {1.0f};
+    glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
+    glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 worldAmbientColor {1.0f};
     glm::vec4 fogColor {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 shadowCascadeFarPlanes {0.0f};
+    glm::vec2 screenResolution {0.0f};
+    glm::vec2 screenResolutionRcp {0.0f};
+    glm::vec2 blurDirection {0.0f};
     float clipNear {kDefaultClipPlaneNear};
     float clipFar {kDefaultClipPlaneFar};
     float fogNear {0.0f};
     float fogFar {0.0f};
     float shadowStrength {0.0f};
     float shadowRadius {0.0f};
+    float ssaoSampleRadius {0.5f};
+    float ssaoBias {0.1f};
+    float ssrBias {0.5f};
+    float ssrPixelStride {4.0f};
+    float ssrMaxSteps {32.0f};
+    float sharpenAmount {0.25f};
     float padding[2];
-    glm::vec4 shadowCascadeFarPlanes {0.0f};
-    glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
     void reset() {
         projection = glm::mat4(1.0f);
+        screenProjection = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         viewInv = glm::mat4(1.0f);
+        for (int i = 0; i < kNumShadowLightSpace; ++i) {
+            shadowLightSpace[i] = glm::mat4(1.0f);
+        }
         cameraPosition = glm::vec4(0.0f);
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
+        shadowCascadeFarPlanes = glm::vec4(0.0f);
+        screenResolution = glm::vec2(0.0f);
+        screenResolutionRcp = glm::vec2(0.0f);
+        blurDirection = glm::vec2(0.0f);
         clipNear = kDefaultClipPlaneNear;
         clipFar = kDefaultClipPlaneFar;
         fogNear = 0.0f;
         fogFar = 0.0f;
+        ssaoSampleRadius = 0.5f;
+        ssaoBias = 0.1f;
+        ssrBias = 0.5f;
+        ssrPixelStride = 4.0f;
+        ssrMaxSteps = 32.0f;
+        sharpenAmount = 0.25f;
         shadowStrength = 1.0f;
         shadowRadius = 0.0f;
-        shadowCascadeFarPlanes = glm::vec4(0.0f);
-        for (int i = 0; i < kNumShadowLightSpace; ++i) {
-            shadowLightSpace[i] = glm::mat4(1.0f);
-        }
     }
 };
 
 struct LocalsUniforms {
-    glm::mat4 screenProjection {1.0f};
     glm::mat4 model {1.0f};
     glm::mat4 modelInv {1.0f};
     glm::mat3x4 uv {1.0f};
@@ -88,25 +107,15 @@ struct LocalsUniforms {
     glm::vec4 selfIllumColor {1.0f};
     glm::vec4 discardColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
-    glm::vec2 screenResolution {0.0f};
-    glm::vec2 screenResolutionRcp {0.0f};
-    glm::vec2 blurDirection {0.0f};
     glm::ivec2 gridSize {0};
+    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     float alpha {1.0f};
     float waterAlpha {1.0f};
     float heightMapScaling {1.0f};
     float billboardSize {1.0f};
-    float ssaoSampleRadius {0.5f};
-    float ssaoBias {0.1f};
-    float ssrBias {0.5f};
-    float ssrPixelStride {4.0f};
-    float ssrMaxSteps {32.0f};
-    float sharpenAmount {0.25f};
-    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     float padding;
 
     void reset() {
-        screenProjection = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
         modelInv = glm::mat4(1.0f);
         uv = glm::mat3x4(1.0f);
@@ -114,21 +123,12 @@ struct LocalsUniforms {
         selfIllumColor = glm::vec4(1.0f);
         discardColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);
-        screenResolution = glm::vec2(0.0f);
-        screenResolutionRcp = glm::vec2(0.0f);
-        blurDirection = glm::vec2(0.0f);
         gridSize = glm::ivec2(0);
+        featureMask = 0;
         alpha = 1.0f;
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;
-        ssaoSampleRadius = 0.5f;
-        ssaoBias = 0.1f;
-        ssrBias = 0.5f;
-        ssrPixelStride = 4.0f;
-        ssrMaxSteps = 32.0f;
-        sharpenAmount = 0.25f;
-        featureMask = 0;
     }
 };
 
