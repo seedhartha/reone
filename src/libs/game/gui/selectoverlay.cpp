@@ -277,7 +277,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2d));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -381,7 +381,7 @@ void SelectionOverlay::drawActionFrame(int index) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2d));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -446,7 +446,7 @@ void SelectionOverlay::drawActionIcon(int index) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::gui));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2d));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 

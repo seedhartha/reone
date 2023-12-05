@@ -64,7 +64,7 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture2d));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 

@@ -109,7 +109,7 @@ void Movie::render() {
             glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture2d));
     _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
 }
 

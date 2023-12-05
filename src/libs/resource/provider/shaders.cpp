@@ -66,7 +66,6 @@ static const std::string kGeometryDirLightShadows = "g_dirlightshadow";
 static const std::string kGeometryPointLightShadows = "g_ptlightshadow";
 
 static const std::string kFragmentAABB = "f_aabb";
-static const std::string kFragmentBillboard = "f_billboard";
 static const std::string kFragmentBoxBlur4 = "f_boxblur4";
 static const std::string kFragmentColor = "f_color";
 static const std::string kFragmentCombineGeometry = "f_combinegeom";
@@ -76,7 +75,6 @@ static const std::string kFragmentFXAA = "f_fxaa";
 static const std::string kFragmentGaussianBlur13 = "f_gaussianblur13";
 static const std::string kFragmentGaussianBlur9 = "f_gaussianblur9";
 static const std::string kFragmentGrass = "f_grass";
-static const std::string kFragmentGUI = "f_gui";
 static const std::string kFragmentMedianFilter3 = "f_medianfilter3";
 static const std::string kFragmentMedianFilter5 = "f_medianfilter5";
 static const std::string kFragmentModelOpaque = "f_modelopaque";
@@ -118,7 +116,6 @@ void Shaders::init() {
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {kUniformsGlobals, kUniformsLocals, kGeometryDirLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentColor});
     auto fsTexture = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentTexture});
-    auto fsGUI = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentGUI});
     auto fsText = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsText, kFragmentText});
     auto fsPointLightShadows = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {kFragmentDirLightShadows});
@@ -126,7 +123,6 @@ void Shaders::init() {
     auto fsModelTransparent = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kIncludeMath, kIncludeEnvMap, kIncludeNormalMap, kIncludeOIT, kIncludeLuma, kFragmentModelTransparent});
     auto fsAABB = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentAABB});
     auto fsWalkmesh = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsWalkmesh, kFragmentWalkmesh});
-    auto fsBillboard = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragmentBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsParticle, kIncludeOIT, kIncludeLuma, kFragmentParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsGrass, kIncludeHash, kIncludeHashedAlpha, kFragmentGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsScreenEffect, kFragmentSSAO});
@@ -144,7 +140,6 @@ void Shaders::init() {
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::color2d, initShaderProgram({vsMVP2D, fsColor}));
     _shaderRegistry.add(ShaderProgramId::texture2d, initShaderProgram({vsMVP2D, fsTexture}));
-    _shaderRegistry.add(ShaderProgramId::gui, initShaderProgram({vsMVP2D, fsGUI}));
     _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vsText, fsText}));
     _shaderRegistry.add(ShaderProgramId::points, initShaderProgram({vsPoints, fsColor}));
     _shaderRegistry.add(ShaderProgramId::pointLightShadows, initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows}));
@@ -153,7 +148,7 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::modelTransparent, initShaderProgram({vsModel, fsModelTransparent}));
     _shaderRegistry.add(ShaderProgramId::aabb, initShaderProgram({vsMVP3D, fsAABB}));
     _shaderRegistry.add(ShaderProgramId::walkmesh, initShaderProgram({vsWalkmesh, fsWalkmesh}));
-    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vsBillboard, fsBillboard}));
+    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vsBillboard, fsTexture}));
     _shaderRegistry.add(ShaderProgramId::particle, initShaderProgram({vsParticle, fsParticle}));
     _shaderRegistry.add(ShaderProgramId::grass, initShaderProgram({vsGrass, fsGrass}));
     _shaderRegistry.add(ShaderProgramId::ssao, initShaderProgram({vsPassthrough, fsSSAO}));
