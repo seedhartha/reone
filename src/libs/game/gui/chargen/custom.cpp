@@ -65,10 +65,6 @@ void CustomCharacterGeneration::onGUILoaded() {
     _controls.BTN_STEPNAME6->setOnClick([this]() {
         _charGen.finish();
     });
-
-    if (!_game.isTSL()) {
-        _controls.LBL_BG->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
-    }
 }
 
 void CustomCharacterGeneration::setStep(int step) {
@@ -79,19 +75,6 @@ void CustomCharacterGeneration::setStep(int step) {
 
 void CustomCharacterGeneration::doSetStep(int step) {
     _step = step;
-
-    _controls.LBL_1->setFocusable(false);
-    _controls.LBL_2->setFocusable(false);
-    _controls.LBL_3->setFocusable(false);
-    _controls.LBL_4->setFocusable(false);
-    _controls.LBL_5->setFocusable(false);
-    _controls.LBL_6->setFocusable(false);
-    _controls.BTN_STEPNAME1->setFocusable(false);
-    _controls.BTN_STEPNAME2->setFocusable(false);
-    _controls.BTN_STEPNAME3->setFocusable(false);
-    _controls.BTN_STEPNAME4->setFocusable(false);
-    _controls.BTN_STEPNAME5->setFocusable(false);
-    _controls.BTN_STEPNAME6->setFocusable(false);
 
     _controls.LBL_1->setDisabled(_step != 0);
     _controls.LBL_2->setDisabled(_step != 1);
@@ -106,24 +89,24 @@ void CustomCharacterGeneration::doSetStep(int step) {
     _controls.BTN_STEPNAME5->setDisabled(_step != 4);
     _controls.BTN_STEPNAME6->setDisabled(_step != 5);
 
-    _controls.LBL_1->setFocus(_step == 0);
-    _controls.LBL_2->setFocus(_step == 1);
-    _controls.LBL_3->setFocus(_step == 2);
-    _controls.LBL_4->setFocus(_step == 3);
-    _controls.LBL_5->setFocus(_step == 4);
-    _controls.LBL_6->setFocus(_step == 5);
-    _controls.LBL_NUM1->setFocus(_step == 0);
-    _controls.LBL_NUM2->setFocus(_step == 1);
-    _controls.LBL_NUM3->setFocus(_step == 2);
-    _controls.LBL_NUM4->setFocus(_step == 3);
-    _controls.LBL_NUM5->setFocus(_step == 4);
-    _controls.LBL_NUM6->setFocus(_step == 5);
-    _controls.BTN_STEPNAME1->setFocus(_step == 0);
-    _controls.BTN_STEPNAME2->setFocus(_step == 1);
-    _controls.BTN_STEPNAME3->setFocus(_step == 2);
-    _controls.BTN_STEPNAME4->setFocus(_step == 3);
-    _controls.BTN_STEPNAME5->setFocus(_step == 4);
-    _controls.BTN_STEPNAME6->setFocus(_step == 5);
+    _controls.LBL_1->setSelected(_step == 0);
+    _controls.LBL_2->setSelected(_step == 1);
+    _controls.LBL_3->setSelected(_step == 2);
+    _controls.LBL_4->setSelected(_step == 3);
+    _controls.LBL_5->setSelected(_step == 4);
+    _controls.LBL_6->setSelected(_step == 5);
+    _controls.LBL_NUM1->setSelected(_step == 0);
+    _controls.LBL_NUM2->setSelected(_step == 1);
+    _controls.LBL_NUM3->setSelected(_step == 2);
+    _controls.LBL_NUM4->setSelected(_step == 3);
+    _controls.LBL_NUM5->setSelected(_step == 4);
+    _controls.LBL_NUM6->setSelected(_step == 5);
+    _controls.BTN_STEPNAME1->setSelected(_step == 0);
+    _controls.BTN_STEPNAME2->setSelected(_step == 1);
+    _controls.BTN_STEPNAME3->setSelected(_step == 2);
+    _controls.BTN_STEPNAME4->setSelected(_step == 3);
+    _controls.BTN_STEPNAME5->setSelected(_step == 4);
+    _controls.BTN_STEPNAME6->setSelected(_step == 5);
 }
 
 void CustomCharacterGeneration::goToNextStep() {

@@ -37,8 +37,8 @@ public:
     virtual void update(float dt);
     virtual void draw();
 
-    void resetFocus() {
-        _gui->resetFocus();
+    void clearSelection() {
+        _gui->clearSelection();
     }
 
 protected:
@@ -62,7 +62,7 @@ protected:
 
     virtual void configureControls() {}
     void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
+    void onSelectionChanged(const std::string &control, bool selected) override;
 
     std::string guiResRef(const std::string &base) const;
 

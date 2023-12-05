@@ -151,8 +151,8 @@ void GameGUI::onClick(const std::string &control) {
     _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
-void GameGUI::onFocusChanged(const std::string &control, bool focus) {
-    if (focus) {
+void GameGUI::onSelectionChanged(const std::string &control, bool selected) {
+    if (selected) {
         _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }

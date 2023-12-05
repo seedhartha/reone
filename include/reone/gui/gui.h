@@ -42,7 +42,7 @@ public:
     virtual ~IGUIEventListener() = default;
 
     virtual void onClick(const std::string &control) = 0;
-    virtual void onFocusChanged(const std::string &control, bool focus) = 0;
+    virtual void onSelectionChanged(const std::string &control, bool selected) = 0;
 };
 
 class IGUI {
@@ -61,7 +61,7 @@ public:
     virtual void update(float dt) = 0;
     virtual void draw() = 0;
 
-    virtual void resetFocus() = 0;
+    virtual void clearSelection() = 0;
 
     virtual Control &rootControl() = 0;
 
@@ -104,7 +104,7 @@ public:
     void update(float dt) override;
     void draw() override;
 
-    void resetFocus() override;
+    void clearSelection() override;
 
     Control &rootControl() override {
         return *_rootControl;
@@ -155,7 +155,6 @@ private:
 
     IGUIEventListener *_eventListener {nullptr};
 
-    std::string _resRef;
     int _resolutionX {kDefaultResolutionX};
     int _resolutionY {kDefaultResolutionY};
     ScalingMode _scaling {ScalingMode::Center};
@@ -164,12 +163,19 @@ private:
     glm::ivec2 _rootOffset {0};
     glm::ivec2 _controlOffset {0};
     std::shared_ptr<graphics::Texture> _background;
-    std::unique_ptr<Control> _rootControl;
-    std::vector<std::shared_ptr<Control>> _controls;
-    std::unordered_map<std::string, Control *> _controlByTag;
-    Control *_focus {nullptr};
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
     bool _leftMouseDown {false};
+
+    // Controls
+
+    std::vector<std::shared_ptr<Control>> _controls;
+    std::unordered_map<std::string, std::reference_wrapper<Control>> _tagToControl;
+    std::unordered_map<std::string, std::vector<std::reference_wrapper<Control>>> _controlTagToChildren;
+
+    std::optional<std::reference_wrapper<Control>> _rootControl;
+    std::optional<std::reference_wrapper<Control>> _selection;
+
+    // END Controls
 
     // Services
 
@@ -194,19 +200,20 @@ private:
         }
     }
 
-    void onFocusChanged(const std::string &control, bool focus) {
+    void onSelectionChanged(const std::string &control, bool selected) {
         if (_eventListener) {
-            _eventListener->onFocusChanged(control, focus);
+            _eventListener->onSelectionChanged(control, selected);
         }
     }
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);
-    void updateFocus(int x, int y);
+    void updateSelection(int x, int y);
 
     void drawBackground();
 
-    Control *getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const;
+    std::optional<std::reference_wrapper<Control>> findControlAt(int x, int y,
+                                                                 const std::function<bool(const Control &)> &test) const;
 
     // User input
 

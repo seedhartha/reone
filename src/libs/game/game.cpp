@@ -842,7 +842,7 @@ void Game::loadInGameMenus() {
 void Game::changeScreen(Screen screen) {
     auto gui = getScreenGUI();
     if (gui) {
-        gui->resetFocus();
+        gui->clearSelection();
     }
     _screen = screen;
 }

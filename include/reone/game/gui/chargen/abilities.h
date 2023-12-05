@@ -158,7 +158,7 @@ private:
 
     int getPointCost(Ability ability) const;
 
-    void onAbilityLabelFocusChanged(Ability ability, bool focus);
+    void onAbilityLabelSelectionChanged(Ability ability, bool selected);
     void onMinusButtonClick(Ability ability);
     void onPlusButtonClick(Ability ability);
 };

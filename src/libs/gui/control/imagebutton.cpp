@@ -60,7 +60,7 @@ void ImageButton::draw(
 
     glm::ivec2 size(_extent.width - _extent.height, _extent.height);
 
-    if (_focus && _hilight) {
+    if (_selected && _hilight) {
         drawBorder(*_hilight, borderOffset, size);
     } else if (_border) {
         drawBorder(*_border, borderOffset, size);
@@ -83,7 +83,7 @@ void ImageButton::drawIcon(
         return;
 
     glm::vec3 color(1.0f);
-    if (_focus && _hilight) {
+    if (_selected && _hilight) {
         color = _hilight->color;
     } else if (_border) {
         color = _border->color;

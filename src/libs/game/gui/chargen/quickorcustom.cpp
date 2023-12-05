@@ -40,18 +40,14 @@ static constexpr int kStrRefCustomHelpText = 242;
 void QuickOrCustom::onGUILoaded() {
     bindControls();
 
-    if (!_game.isTSL()) {
-        _controls.LBL_RBG->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
-    }
-
     _controls.LB_DESC->setProtoMatchContent(true);
 
     _controls.BTN_BACK->setOnClick([this]() {
         _charGen.openClassSelection();
     });
 
-    _controls.QUICK_CHAR_BTN->setOnFocusChanged([this](bool focus) {
-        if (!focus)
+    _controls.QUICK_CHAR_BTN->setOnSelectionChanged([this](bool selected) {
+        if (!selected)
             return;
         std::string text(_services.resource.strings.getText(kStrRefQuickHelpText));
         _controls.LB_DESC->clearItems();
@@ -61,8 +57,8 @@ void QuickOrCustom::onGUILoaded() {
         _charGen.startQuick();
     });
 
-    _controls.CUST_CHAR_BTN->setOnFocusChanged([this](bool focus) {
-        if (!focus)
+    _controls.CUST_CHAR_BTN->setOnSelectionChanged([this](bool selected) {
+        if (!selected)
             return;
         std::string text(_services.resource.strings.getText(kStrRefCustomHelpText));
         _controls.LB_DESC->clearItems();

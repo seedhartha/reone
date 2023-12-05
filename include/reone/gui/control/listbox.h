@@ -54,7 +54,7 @@ public:
             graphicsSvc,
             resourceSvc) {
 
-        _clickable = true;
+        _selectable = true;
     }
 
     void clearItems();
@@ -67,12 +67,12 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
     void stretch(float x, float y, int mask) override;
 
     void changeProtoItemType(ControlType type);
 
-    void setFocus(bool focus) override;
+    void setSelected(bool selected) override;
     void setExtent(Extent extent) override;
     void setExtentHeight(int height) override;
     void setSelectionMode(SelectionMode mode);

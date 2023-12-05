@@ -37,7 +37,7 @@ public:
             graphicsSvc,
             resourceSvc) {
 
-        _clickable = true;
+        _selectable = true;
     }
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;

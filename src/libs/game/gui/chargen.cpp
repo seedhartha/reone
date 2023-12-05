@@ -190,7 +190,7 @@ void CharacterGeneration::openClassSelection() {
 void CharacterGeneration::changeScreen(CharGenScreen screen) {
     auto gui = getSubGUI();
     if (gui) {
-        gui->resetFocus();
+        gui->clearSelection();
     }
     _screen = screen;
 }

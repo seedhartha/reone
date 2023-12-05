@@ -26,7 +26,6 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
 
-
 using namespace reone::audio;
 
 using namespace reone::graphics;
@@ -87,8 +86,8 @@ void Equipment::onGUILoaded() {
         _btnInv[slotName.first] = findControl<Button>("BTN_INV_" + slotName.second);
     }
 
-    _controls.BTN_CHANGE1->setFocusable(false);
-    _controls.BTN_CHANGE2->setFocusable(false);
+    _controls.BTN_CHANGE1->setSelectable(false);
+    _controls.BTN_CHANGE2->setSelectable(false);
     // _controls.btnCharLeft->setVisible(false);
     // _controls.btnCharRight->setVisible(false);
     _controls.LB_DESC->setVisible(false);
@@ -115,8 +114,8 @@ void Equipment::onGUILoaded() {
         slotButton.second->setOnClick([&]() {
             selectSlot(slotButton.first);
         });
-        slotButton.second->setOnFocusChanged([&](bool focus) {
-            if (!focus)
+        slotButton.second->setOnSelectionChanged([&](bool selected) {
+            if (!selected)
                 return;
 
             std::string slotDesc;

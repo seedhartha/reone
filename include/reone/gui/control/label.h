@@ -36,8 +36,6 @@ public:
             sceneGraphs,
             graphicsSvc,
             resourceSvc) {
-
-        _focusable = false;
     }
 };
 

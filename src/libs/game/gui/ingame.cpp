@@ -38,41 +38,39 @@ void InGameMenu::preload(IGUI &gui) {
 void InGameMenu::onGUILoaded() {
     bindControls();
 
-    _controls.BTN_EQU->setVisible(false);
-    _controls.BTN_INV->setVisible(false);
-    _controls.BTN_CHAR->setVisible(false);
-    _controls.BTN_ABI->setVisible(false);
-    _controls.BTN_MSG->setVisible(false);
-    _controls.BTN_JOU->setVisible(false);
-    _controls.BTN_MAP->setVisible(false);
-    _controls.BTN_OPT->setVisible(false);
+    // _controls.BTN_EQU->setVisible(false);
+    // _controls.BTN_INV->setVisible(false);
+    // _controls.BTN_CHAR->setVisible(false);
+    // _controls.BTN_ABI->setVisible(false);
+    // _controls.BTN_MSG->setVisible(false);
+    // _controls.BTN_JOU->setVisible(false);
+    // _controls.BTN_MAP->setVisible(false);
+    // _controls.BTN_OPT->setVisible(false);
 
-    _controls.LBLH_EQU->setOnClick([this]() {
+    _controls.BTN_EQU->setOnClick([this]() {
         openEquipment();
     });
-    _controls.LBLH_INV->setOnClick([this]() {
+    _controls.BTN_INV->setOnClick([this]() {
         openInventory();
     });
-    _controls.LBLH_CHA->setOnClick([this]() {
+    _controls.BTN_CHAR->setOnClick([this]() {
         openCharacter();
     });
-    _controls.LBLH_ABI->setOnClick([this]() {
+    _controls.BTN_ABI->setOnClick([this]() {
         openAbilities();
     });
-    _controls.LBLH_MSG->setOnClick([this]() {
+    _controls.BTN_MSG->setOnClick([this]() {
         openMessages();
     });
-    _controls.LBLH_JOU->setOnClick([this]() {
+    _controls.BTN_JOU->setOnClick([this]() {
         openJournal();
     });
-    _controls.LBLH_MAP->setOnClick([this]() {
+    _controls.BTN_MAP->setOnClick([this]() {
         openMap();
     });
-    _controls.LBLH_OPT->setOnClick([this]() {
+    _controls.BTN_OPT->setOnClick([this]() {
         openOptions();
     });
-
-    setTabLabelsFocusable(false);
 
     loadEquipment();
     loadInventory();
@@ -82,17 +80,6 @@ void InGameMenu::onGUILoaded() {
     loadJournal();
     loadMap();
     loadOptions();
-}
-
-void InGameMenu::setTabLabelsFocusable(bool focusable) {
-    _controls.LBLH_EQU->setFocusable(focusable);
-    _controls.LBLH_INV->setFocusable(focusable);
-    _controls.LBLH_CHA->setFocusable(focusable);
-    _controls.LBLH_ABI->setFocusable(focusable);
-    _controls.LBLH_MSG->setFocusable(focusable);
-    _controls.LBLH_JOU->setFocusable(focusable);
-    _controls.LBLH_MAP->setFocusable(focusable);
-    _controls.LBLH_OPT->setFocusable(focusable);
 }
 
 void InGameMenu::loadEquipment() {
@@ -194,21 +181,21 @@ void InGameMenu::openEquipment() {
 void InGameMenu::changeTab(InGameMenuTab tab) {
     auto gui = getActiveTabGUI();
     if (gui) {
-        gui->resetFocus();
+        gui->clearSelection();
     }
     _tab = tab;
     updateTabButtons();
 }
 
 void InGameMenu::updateTabButtons() {
-    _controls.BTN_EQU->setFocus(_tab == InGameMenuTab::Equipment);
-    _controls.BTN_INV->setFocus(_tab == InGameMenuTab::Inventory);
-    _controls.BTN_CHAR->setFocus(_tab == InGameMenuTab::Character);
-    _controls.BTN_ABI->setFocus(_tab == InGameMenuTab::Abilities);
-    _controls.BTN_MSG->setFocus(_tab == InGameMenuTab::Messages);
-    _controls.BTN_JOU->setFocus(_tab == InGameMenuTab::Journal);
-    _controls.BTN_MAP->setFocus(_tab == InGameMenuTab::Map);
-    _controls.BTN_OPT->setFocus(_tab == InGameMenuTab::Options);
+    _controls.BTN_EQU->setSelected(_tab == InGameMenuTab::Equipment);
+    _controls.BTN_INV->setSelected(_tab == InGameMenuTab::Inventory);
+    _controls.BTN_CHAR->setSelected(_tab == InGameMenuTab::Character);
+    _controls.BTN_ABI->setSelected(_tab == InGameMenuTab::Abilities);
+    _controls.BTN_MSG->setSelected(_tab == InGameMenuTab::Messages);
+    _controls.BTN_JOU->setSelected(_tab == InGameMenuTab::Journal);
+    _controls.BTN_MAP->setSelected(_tab == InGameMenuTab::Map);
+    _controls.BTN_OPT->setSelected(_tab == InGameMenuTab::Options);
 }
 
 void InGameMenu::openInventory() {

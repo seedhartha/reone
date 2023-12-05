@@ -181,11 +181,11 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
+void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (!_visible)
         return;
 
-    Control::draw(screenSize, offset, text);
+    Control::draw(screenSize, offset);
 
     if (!_protoItem)
         return;
@@ -201,13 +201,14 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         if (_protoMatchContent) {
             _protoItem->setHeight(static_cast<int>(item._textLines.size() * (_protoItem->text().font->height() + _padding)));
         }
-        _protoItem->setFocus(_selectedItemIndex == itemIdx);
+        _protoItem->setSelected(_selectedItemIndex == itemIdx);
 
         auto imageButton = std::dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
             imageButton->draw(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
         } else {
-            _protoItem->draw(screenSize, itemOffset, item._textLines);
+            _protoItem->setTextLines(item._textLines);
+            _protoItem->draw(screenSize, itemOffset);
         }
 
         if (_protoMatchContent) {
@@ -224,7 +225,7 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setScrollState(std::move(state));
-        scrollBar.draw(screenSize, offset, std::vector<std::string>());
+        scrollBar.draw(screenSize, offset);
     }
 }
 
@@ -241,9 +242,9 @@ void ListBox::stretch(float x, float y, int mask) {
     }
 }
 
-void ListBox::setFocus(bool focus) {
-    Control::setFocus(focus);
-    if (!focus && _selectionMode == SelectionMode::OnHover) {
+void ListBox::setSelected(bool selected) {
+    Control::setSelected(selected);
+    if (!selected && _selectionMode == SelectionMode::OnHover) {
         _selectedItemIndex = -1;
     }
 }

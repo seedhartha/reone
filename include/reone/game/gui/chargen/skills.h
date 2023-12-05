@@ -167,7 +167,7 @@ private:
 
     void onMinusButtonClick(SkillType skill);
     void onPlusButtonClick(SkillType skill);
-    void onSkillLabelFocusChanged(SkillType skill, bool focus);
+    void onSkillLabelSelectionChanged(SkillType skill, bool selected);
 };
 
 } // namespace game

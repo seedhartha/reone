@@ -70,7 +70,7 @@ void CharGenAbilities::onGUILoaded() {
         _controls.WIS_LBL.get(),
         _controls.CHA_LBL.get()};
     for (auto &label : labels) {
-        label->setFocusable(true);
+        label->setSelectable(true);
         label->setHilightColor(_baseColor);
     }
 
@@ -99,23 +99,23 @@ void CharGenAbilities::onGUILoaded() {
         refreshControls();
     });
 
-    _controls.STR_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Strength, focus);
+    _controls.STR_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Strength, selected);
     });
-    _controls.DEX_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Dexterity, focus);
+    _controls.DEX_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Dexterity, selected);
     });
-    _controls.CON_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Constitution, focus);
+    _controls.CON_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Constitution, selected);
     });
-    _controls.INT_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Intelligence, focus);
+    _controls.INT_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Intelligence, selected);
     });
-    _controls.WIS_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Wisdom, focus);
+    _controls.WIS_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Wisdom, selected);
     });
-    _controls.CHA_LBL->setOnFocusChanged([this](bool focus) {
-        onAbilityLabelFocusChanged(Ability::Charisma, focus);
+    _controls.CHA_LBL->setOnSelectionChanged([this](bool selected) {
+        onAbilityLabelSelectionChanged(Ability::Charisma, selected);
     });
 
     _controls.STR_MINUS_BTN->setOnClick([this]() {
@@ -218,8 +218,8 @@ void CharGenAbilities::updateCharacter() {
     _charGen.setCharacter(std::move(character));
 }
 
-void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
-    if (!focus)
+void CharGenAbilities::onAbilityLabelSelectionChanged(Ability ability, bool selected) {
+    if (!selected)
         return;
 
     auto maybeDescription = g_descStrRefByAbility.find(ability);

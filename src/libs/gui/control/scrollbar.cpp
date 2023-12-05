@@ -52,7 +52,7 @@ void ScrollBar::load(const resource::generated::GUI_BASECONTROL &gui, bool proto
     }
 }
 
-void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
+void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     drawThumb(offset);
     drawArrows(offset);
 }

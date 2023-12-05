@@ -59,7 +59,7 @@ void CharGenSkills::onGUILoaded() {
         _controls.SECURITY_LBL.get(),
         _controls.TREAT_INJURY_LBL.get()};
     for (auto &label : skillLabels) {
-        label->setFocusable(true);
+        label->setSelectable(true);
         label->setHilightColor(_baseColor);
     }
 
@@ -88,29 +88,29 @@ void CharGenSkills::onGUILoaded() {
         _charGen.openSteps();
     });
 
-    _controls.COMPUTER_USE_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::ComputerUse, focus);
+    _controls.COMPUTER_USE_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::ComputerUse, selected);
     });
-    _controls.DEMOLITIONS_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Demolitions, focus);
+    _controls.DEMOLITIONS_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Demolitions, selected);
     });
-    _controls.STEALTH_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Stealth, focus);
+    _controls.STEALTH_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Stealth, selected);
     });
-    _controls.AWARENESS_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Awareness, focus);
+    _controls.AWARENESS_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Awareness, selected);
     });
-    _controls.PERSUADE_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Persuade, focus);
+    _controls.PERSUADE_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Persuade, selected);
     });
-    _controls.REPAIR_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Repair, focus);
+    _controls.REPAIR_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Repair, selected);
     });
-    _controls.SECURITY_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::Security, focus);
+    _controls.SECURITY_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::Security, selected);
     });
-    _controls.TREAT_INJURY_LBL->setOnFocusChanged([this](bool focus) {
-        onSkillLabelFocusChanged(SkillType::TreatInjury, focus);
+    _controls.TREAT_INJURY_LBL->setOnSelectionChanged([this](bool selected) {
+        onSkillLabelSelectionChanged(SkillType::TreatInjury, selected);
     });
 
     _controls.COM_MINUS_BTN->setOnClick([this]() {
@@ -255,8 +255,8 @@ void CharGenSkills::onPlusButtonClick(SkillType skill) {
     refreshControls();
 }
 
-void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
-    if (!focus)
+void CharGenSkills::onSkillLabelSelectionChanged(SkillType skill, bool selected) {
+    if (!selected)
         return;
 
     auto maybeDescription = g_descStrRefBySkill.find(skill);

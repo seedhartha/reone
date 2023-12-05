@@ -52,7 +52,7 @@ protected:
             graphicsSvc,
             resourceSvc) {
 
-        _clickable = true;
+        _selectable = true;
     }
 };
 

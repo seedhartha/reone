@@ -187,54 +187,58 @@ bool Control::handleClick(int x, int y) {
 }
 
 void Control::update(float dt) {
-    if (_sceneName.empty() || !_visible) {
+    if (!_visible) {
         return;
     }
-    _sceneGraphs.get(_sceneName).update(dt);
+    for (auto &child : _children) {
+        child.get().update(dt);
+    }
+    if (!_sceneName.empty()) {
+        _sceneGraphs.get(_sceneName).update(dt);
+    }
 }
 
-void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) {
+void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (!_visible) {
         return;
     }
     glm::ivec2 size(_extent.width, _extent.height);
-    if (_focus && _hilight) {
+    if (_selected && _hilight) {
         drawBorder(*_hilight, offset, size);
     } else if (_border) {
         drawBorder(*_border, offset, size);
     }
-    if (!text.empty()) {
-        drawText(text, offset, size);
+    if (!_textLines.empty()) {
+        drawText(_textLines, offset, size);
     }
-    if (_sceneName.empty()) {
-        return;
-    }
-    std::shared_ptr<Texture> output;
-    _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
-        output = _graphicsSvc.pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
-    });
-    glm::mat4 projection(glm::ortho(
-        0.0f,
-        static_cast<float>(screenSize.x),
-        static_cast<float>(screenSize.y),
-        0.0f));
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
+    if (!_sceneName.empty()) {
+        std::shared_ptr<Texture> output;
+        _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
+            output = _graphicsSvc.pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
+        });
+        glm::mat4 projection(glm::ortho(
+            0.0f,
+            static_cast<float>(screenSize.x),
+            static_cast<float>(screenSize.y),
+            0.0f));
+        glm::mat4 transform(1.0f);
+        transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+        transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
 
-    _graphicsSvc.uniforms.setGlobals([projection](auto &globals) {
-        globals.reset();
-        globals.projection = std::move(projection);
-    });
-    _graphicsSvc.uniforms.setLocals([transform](auto &locals) {
-        locals.reset();
-        locals.model = std::move(transform);
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
-    _graphicsSvc.context.bind(*output);
-    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
-        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
-    });
+        _graphicsSvc.uniforms.setGlobals([projection](auto &globals) {
+            globals.reset();
+            globals.projection = std::move(projection);
+        });
+        _graphicsSvc.uniforms.setLocals([transform](auto &locals) {
+            locals.reset();
+            locals.model = std::move(transform);
+        });
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::gui));
+        _graphicsSvc.context.bind(*output);
+        _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
+            _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+        });
+    }
 }
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
@@ -259,9 +263,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         });
         _graphicsSvc.uniforms.setLocals([this, &transform](auto &locals) {
             locals.reset();
-            locals.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
             locals.model = transform;
-            locals.discardColor = glm::vec4(_discardColor, 1.0f);
         });
 
         auto blendMode = border.fill->features().blending == Texture::Blending::Additive ? BlendMode::Additive : BlendMode::Normal;
@@ -443,7 +445,7 @@ const glm::vec3 &Control::getBorderColor() const {
     if (_useBorderColorOverride) {
         return _borderColorOverride;
     }
-    return (_focus && _hilight) ? _hilight->color : _border->color;
+    return (_selected && _hilight) ? _hilight->color : _border->color;
 }
 
 void Control::drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
@@ -452,7 +454,7 @@ void Control::drawText(const std::vector<std::string> &lines, const glm::ivec2 &
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
 
     glm::vec3 linePosition(0.0f);
-    glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
+    glm::vec3 color((_selected && _hilight) ? _hilight->color : _text.color);
 
     for (auto &line : lines) {
         linePosition.x = static_cast<float>(position.x + offset.x);
@@ -538,8 +540,8 @@ void Control::stretch(float x, float y, int mask) {
     updateTransform();
 }
 
-void Control::setFocusable(bool focusable) {
-    _focusable = focusable;
+void Control::setSelectable(bool selectable) {
+    _selectable = selectable;
 }
 
 void Control::setHeight(int height) {
@@ -556,14 +558,14 @@ void Control::setDisabled(bool disabled) {
     _disabled = disabled;
 }
 
-void Control::setFocus(bool focus) {
-    if (_focus == focus)
+void Control::setSelected(bool setSelected) {
+    if (_selected == setSelected)
         return;
 
-    _focus = focus;
+    _selected = setSelected;
 
-    if (_onFocusChanged) {
-        _onFocusChanged(focus);
+    if (_onSelectedChanged) {
+        _onSelectedChanged(setSelected);
     }
 }
 
@@ -677,11 +679,6 @@ void Control::setSceneName(std::string name) {
 
 void Control::setPadding(int padding) {
     _padding = padding;
-}
-
-void Control::setDiscardColor(glm::vec3 color) {
-    _discardEnabled = true;
-    _discardColor = color;
 }
 
 } // namespace gui

@@ -37,10 +37,6 @@ void QuickCharacterGeneration::onGUILoaded() {
 
     doSetStep(0);
 
-    if (!_game.isTSL()) {
-        _controls.LBL_DECORATION->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
-    }
-
     _controls.BTN_CANCEL->setOnClick([this]() {
         setStep(0);
         _charGen.openQuickOrCustom();
@@ -72,13 +68,6 @@ void QuickCharacterGeneration::setStep(int step) {
 void QuickCharacterGeneration::doSetStep(int step) {
     _step = step;
 
-    _controls.LBL_1->setFocusable(false);
-    _controls.LBL_2->setFocusable(false);
-    _controls.LBL_3->setFocusable(false);
-    _controls.BTN_STEPNAME1->setFocusable(false);
-    _controls.BTN_STEPNAME2->setFocusable(false);
-    _controls.BTN_STEPNAME3->setFocusable(false);
-
     _controls.LBL_1->setDisabled(_step != 0);
     _controls.LBL_2->setDisabled(_step != 1);
     _controls.LBL_3->setDisabled(_step != 2);
@@ -86,15 +75,15 @@ void QuickCharacterGeneration::doSetStep(int step) {
     _controls.BTN_STEPNAME2->setDisabled(_step != 1);
     _controls.BTN_STEPNAME3->setDisabled(_step != 2);
 
-    _controls.LBL_1->setFocus(_step == 0);
-    _controls.LBL_2->setFocus(_step == 1);
-    _controls.LBL_3->setFocus(_step == 2);
-    _controls.LBL_NUM1->setFocus(_step == 0);
-    _controls.LBL_NUM2->setFocus(_step == 1);
-    _controls.LBL_NUM3->setFocus(_step == 2);
-    _controls.BTN_STEPNAME1->setFocus(_step == 0);
-    _controls.BTN_STEPNAME2->setFocus(_step == 1);
-    _controls.BTN_STEPNAME3->setFocus(_step == 2);
+    _controls.LBL_1->setSelected(_step == 0);
+    _controls.LBL_2->setSelected(_step == 1);
+    _controls.LBL_3->setSelected(_step == 2);
+    _controls.LBL_NUM1->setSelected(_step == 0);
+    _controls.LBL_NUM2->setSelected(_step == 1);
+    _controls.LBL_NUM3->setSelected(_step == 2);
+    _controls.BTN_STEPNAME1->setSelected(_step == 0);
+    _controls.BTN_STEPNAME2->setSelected(_step == 1);
+    _controls.BTN_STEPNAME3->setSelected(_step == 2);
 }
 
 void QuickCharacterGeneration::goToNextStep() {

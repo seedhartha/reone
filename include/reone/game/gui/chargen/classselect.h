@@ -123,7 +123,7 @@ private:
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);
 
-    void onClassButtonFocusChanged(int index, bool focus);
+    void onClassButtonSelectionChanged(int index, bool selected);
 };
 
 } // namespace game

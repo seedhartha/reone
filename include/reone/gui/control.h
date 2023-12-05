@@ -52,9 +52,6 @@ namespace gui {
 
 class IGUI;
 
-/**
- * GUI control. Can render itself and handle events.
- */
 class Control : boost::noncopyable {
 public:
     static constexpr int kStretchLeft = 1;
@@ -121,10 +118,9 @@ public:
      */
     virtual void stretch(float x, float y, int mask = kStretchAll);
 
-    bool isClickable() const { return _clickable; }
-    bool isDisabled() const { return _disabled; }
-    bool isFocusable() const { return _focusable; }
     bool isVisible() const { return _visible; }
+    bool isSelectable() const { return _selectable; }
+    bool isDisabled() const { return _disabled; }
 
     int id() const { return _id; }
     int padding() const { return _padding; }
@@ -144,12 +140,11 @@ public:
     void setBorderColor(glm::vec3 color);
     void setBorderColorOverride(glm::vec3 color);
     void setDisabled(bool disabled);
-    void setDiscardColor(glm::vec3 color);
     virtual void setExtent(Extent extent);
     virtual void setExtentHeight(int height);
     void setExtentTop(int top);
-    virtual void setFocus(bool focus);
-    void setFocusable(bool focusable);
+    virtual void setSelected(bool selected);
+    void setSelectable(bool selectable);
     void setHeight(int height);
     void setHilight(Border hilight);
     void setHilightColor(glm::vec3 color);
@@ -164,6 +159,22 @@ public:
     void setUseBorderColorOverride(bool use);
     void setVisible(bool visible);
 
+    void setTextLines(std::vector<std::string> lines) {
+        _textLines = std::move(lines);
+    }
+
+    // Childen
+
+    void addChild(Control &child) {
+        _children.push_back(child);
+    }
+
+    std::vector<std::reference_wrapper<Control>> &children() {
+        return _children;
+    }
+
+    // END Children
+
     // User input
 
     virtual bool handleMouseMotion(int x, int y);
@@ -174,14 +185,14 @@ public:
 
     // Rendering
 
-    virtual void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text);
+    virtual void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset);
 
     // END Rendering
 
     // Event listeners
 
     void setOnClick(std::function<void()> fn) { _onClick = std::move(fn); }
-    void setOnFocusChanged(std::function<void(bool)> fn) { _onFocusChanged = std::move(fn); }
+    void setOnSelectionChanged(std::function<void(bool)> fn) { _onSelectedChanged = std::move(fn); }
 
     // END Event listeners
 
@@ -200,14 +211,13 @@ protected:
     glm::mat4 _transform {1.0f};
     bool _visible {true};
     bool _disabled {false};
-    bool _focus {false};
-    bool _focusable {true};
-    bool _clickable {false};
-    bool _discardEnabled {false};
-    glm::vec3 _discardColor {false};
+    bool _selected {false};
+    bool _selectable {false};
     glm::vec3 _borderColorOverride {1.0f};
     bool _useBorderColorOverride {false};
     std::vector<std::string> _textLines;
+
+    std::vector<std::reference_wrapper<Control>> _children;
 
     // Services
 
@@ -220,7 +230,7 @@ protected:
     // Event listeners
 
     std::function<void()> _onClick;
-    std::function<void(bool)> _onFocusChanged;
+    std::function<void(bool)> _onSelectedChanged;
 
     // END Event listeners
 

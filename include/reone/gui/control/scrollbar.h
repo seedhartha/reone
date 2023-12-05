@@ -45,7 +45,7 @@ public:
     }
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;
-    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
 
     void setScrollState(ScrollState state);
 

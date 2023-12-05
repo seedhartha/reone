@@ -122,8 +122,8 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         _charGen.setCharacter(character);
         _charGen.openQuickOrCustom();
     });
-    selButton.setOnFocusChanged([this, index](bool focus) {
-        onClassButtonFocusChanged(index, focus);
+    selButton.setOnSelectionChanged([this, index](bool selected) {
+        onClassButtonSelectionChanged(index, selected);
     });
 
     // 3D control
@@ -226,8 +226,8 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
     control.setExtent(std::move(extent));
 }
 
-void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
-    if (focus) {
+void ClassSelection::onClassButtonSelectionChanged(int index, bool selected) {
+    if (selected) {
         setClassButtonEnlarged(index, true);
     } else {
         setClassButtonEnlarged(index, false);

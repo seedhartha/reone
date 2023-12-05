@@ -29,15 +29,14 @@ struct UniformsFeatureFlags {
     static constexpr int envmap = 2;
     static constexpr int normalmap = 4;
     static constexpr int heightmap = 8;
-    static constexpr int skeletal = 0x10;
-    static constexpr int discard = 0x20;
-    static constexpr int shadows = 0x40;
-    static constexpr int water = 0x80;
-    static constexpr int fog = 0x100;
-    static constexpr int fixedsize = 0x200;
-    static constexpr int hashedalphatest = 0x400;
-    static constexpr int premulalpha = 0x800;
-    static constexpr int envmapcube = 0x1000;
+    static constexpr int skeletal = 16;
+    static constexpr int shadows = 32;
+    static constexpr int water = 64;
+    static constexpr int fog = 128;
+    static constexpr int fixedsize = 256;
+    static constexpr int hashedalphatest = 512;
+    static constexpr int premulalpha = 1024;
+    static constexpr int envmapcube = 2048;
 };
 
 struct GlobalsUniforms {
@@ -85,7 +84,6 @@ struct LocalsUniforms {
     glm::mat3x4 uv {1.0f};
     glm::vec4 color {1.0f};
     glm::vec4 selfIllumColor {1.0f};
-    glm::vec4 discardColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::ivec2 gridSize {0};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
@@ -101,7 +99,6 @@ struct LocalsUniforms {
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
         selfIllumColor = glm::vec4(1.0f);
-        discardColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);
         gridSize = glm::ivec2(0);
         featureMask = 0;

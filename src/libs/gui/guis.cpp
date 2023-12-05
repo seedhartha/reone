@@ -18,6 +18,7 @@
 #include "reone/gui/guis.h"
 
 #include "reone/resource/provider/gffs.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::resource;
 
@@ -34,6 +35,7 @@ std::shared_ptr<IGUI> GUIs::doGet(std::string resRef, std::function<void(IGUI &)
     if (preload) {
         preload(*gui);
     }
+    info("Loading GUI: " + resRef, LogChannel::GUI);
     gui->load(*gff);
     return gui;
 }

@@ -174,8 +174,6 @@ private:
     void loadOptions();
 
     GameGUI *getActiveTabGUI() const;
-
-    void setTabLabelsFocusable(bool focusable);
 };
 
 } // namespace game

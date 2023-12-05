@@ -49,8 +49,8 @@ void InventoryMenu::onGUILoaded() {
     if (!_game.isTSL()) {
         _controls.LBL_VIT->setVisible(false);
         _controls.LBL_DEF->setVisible(false);
-        _controls.BTN_CHANGE1->setFocusable(false);
-        _controls.BTN_CHANGE2->setFocusable(false);
+        _controls.BTN_CHANGE1->setSelectable(false);
+        _controls.BTN_CHANGE2->setSelectable(false);
         _controls.BTN_QUESTITEMS->setDisabled(true);
     }
 }

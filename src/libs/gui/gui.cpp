@@ -51,15 +51,15 @@ namespace reone {
 namespace gui {
 
 void GUI::load(const Gff &gui) {
-    debug("Load " + _resRef, LogChannel::GUI);
     auto guiParsed = resource::generated::parseGUI(gui);
+    auto type = Control::getType(guiParsed);
+    auto tag = Control::getTag(guiParsed);
+    auto rootControl = newControl(type, tag);
+    rootControl->load(guiParsed);
 
-    ControlType type = Control::getType(guiParsed);
-    std::string tag(Control::getTag(guiParsed));
-
-    _rootControl = newControl(type, tag);
-    _rootControl->load(guiParsed);
-    _controlByTag[tag] = _rootControl.get();
+    _tagToControl.insert({tag, *rootControl});
+    _rootControl = *rootControl;
+    _controls.push_back(std::move(rootControl));
 
     switch (_scaling) {
     case ScalingMode::Center:
@@ -73,11 +73,21 @@ void GUI::load(const Gff &gui) {
         break;
     }
 
-    const Control::Extent &rootExtent = _rootControl->extent();
+    const Control::Extent &rootExtent = _rootControl->get().extent();
     _controlOffset = _rootOffset + glm::ivec2(rootExtent.left, rootExtent.top);
 
     for (auto &controlStruct : guiParsed.CONTROLS) {
         loadControl(controlStruct);
+    }
+    for (auto &[tag, children] : _controlTagToChildren) {
+        auto maybeParent = _tagToControl.find(tag);
+        if (maybeParent == _tagToControl.end()) {
+            throw ValidationException("Parent control not found: " + tag);
+        }
+        auto &parent = maybeParent->second.get();
+        for (auto &child : children) {
+            parent.addChild(child);
+        }
     }
 }
 
@@ -88,20 +98,22 @@ void GUI::stretchControl(Control &control) {
 }
 
 void GUI::loadControl(const resource::generated::GUI_CONTROLS &gui) {
-    ControlType type = Control::getType(gui);
-    std::string tag(Control::getTag(gui));
-    std::string parent(Control::getParent(gui));
+    auto type = Control::getType(gui);
+    auto tag = Control::getTag(gui);
+    auto parentTag = Control::getParent(gui);
+    debug(boost::format("Loading control: type=%s, tag='%s', parent='%s'") % static_cast<int>(type) % tag % parentTag,
+          LogChannel::GUI);
 
-    std::shared_ptr<Control> control(newControl(type, tag));
-    if (!control)
+    auto control = newControl(type, tag);
+    if (!control) {
         return;
-
+    }
     control->load(gui);
     if (_hasDefaultHilightColor) {
         control->setHilightColor(_defaultHilightColor);
     }
 
-    ScalingMode scaling = _scaling;
+    auto scaling = _scaling;
     auto maybeScaling = _scalingByControlTag.find(tag);
     if (maybeScaling != _scalingByControlTag.end()) {
         scaling = maybeScaling->second;
@@ -117,7 +129,8 @@ void GUI::loadControl(const resource::generated::GUI_CONTROLS &gui) {
         break;
     }
 
-    _controlByTag[tag] = control.get();
+    _tagToControl.insert({tag, *control});
+    _controlTagToChildren[parentTag].push_back(*control);
     _controls.push_back(std::move(control));
 }
 
@@ -142,9 +155,9 @@ bool GUI::handle(const SDL_Event &event) {
 
     case SDL_MOUSEMOTION: {
         glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
-        updateFocus(ctrlCoords.x, ctrlCoords.y);
-        if (_focus) {
-            _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
+        updateSelection(ctrlCoords.x, ctrlCoords.y);
+        if (_selection) {
+            _selection->get().handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
         }
         break;
     }
@@ -157,17 +170,19 @@ bool GUI::handle(const SDL_Event &event) {
         if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
             _leftMouseDown = false;
             glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
-            Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
+            auto control = findControlAt(
+                ctrlCoords.x, ctrlCoords.y,
+                [](const auto &control) { return control.isSelectable(); });
             if (control) {
-                debug("Click " + control->tag(), LogChannel::GUI);
-                onClick(control->tag());
-                return control->handleClick(ctrlCoords.x, ctrlCoords.y);
+                debug("Control clicked: " + control->get().tag(), LogChannel::GUI);
+                onClick(control->get().tag());
+                return control->get().handleClick(ctrlCoords.x, ctrlCoords.y);
             }
         }
         break;
 
     case SDL_MOUSEWHEEL:
-        if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y))
+        if (_selection && _selection->get().handleMouseWheel(event.wheel.x, event.wheel.y))
             return true;
         break;
     }
@@ -183,43 +198,52 @@ bool GUI::handleKeyUp(SDL_Scancode key) {
     return false;
 }
 
-void GUI::updateFocus(int x, int y) {
-    Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
-    if (control == _focus)
+void GUI::updateSelection(int x, int y) {
+    auto control = findControlAt(
+        x, y,
+        [](const auto &control) { return control.isSelectable(); });
+    if ((!_selection && !control) ||
+        (_selection && control && _selection->get().id() == control->get().id())) {
         return;
-
-    if (_focus) {
-        if (_focus->isFocusable()) {
-            _focus->setFocus(false);
-            onFocusChanged(_focus->tag(), false);
-        }
     }
-    _focus = control;
-
+    if (_selection) {
+        _selection->get().setSelected(false);
+        onSelectionChanged(_selection->get().tag(), false);
+    }
+    _selection = control;
     if (control) {
-        control->setFocus(true);
-        onFocusChanged(control->tag(), true);
+        control->get().setSelected(true);
+        onSelectionChanged(control->get().tag(), true);
     }
 }
 
-Control *GUI::getControlAt(int x, int y, const std::function<bool(const Control &)> &test) const {
-    for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
-        Control *ctrl = (*it).get();
-        if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl))
-            continue;
-
-        if (ctrl->extent().contains(x, y)) {
-            return ctrl;
+std::optional<std::reference_wrapper<Control>> GUI::findControlAt(int x, int y,
+                                                                  const std::function<bool(const Control &)> &test) const {
+    if (!_rootControl) {
+        return std::nullopt;
+    }
+    std::stack<std::reference_wrapper<Control>> controls;
+    controls.push(*_rootControl);
+    while (!controls.empty()) {
+        auto &control = controls.top().get();
+        controls.pop();
+        if (control.isVisible() && !control.isDisabled() &&
+            control.extent().contains(x, y) &&
+            test(control)) {
+            return control;
+        }
+        for (auto &child : control.children()) {
+            controls.push(child);
         }
     }
-
-    return nullptr;
+    return std::nullopt;
 }
 
 void GUI::update(float dt) {
-    for (auto &control : _controls) {
-        control->update(dt);
+    if (!_rootControl) {
+        return;
     }
+    _rootControl->get().update(dt);
 }
 
 void GUI::draw() {
@@ -227,14 +251,19 @@ void GUI::draw() {
         if (_background) {
             drawBackground();
         }
-        if (_rootControl) {
-            _rootControl->draw({_options.width, _options.height}, _rootOffset, _rootControl->textLines());
+        if (!_rootControl) {
+            return;
         }
-        for (auto &control : _controls) {
-            if (!control->isVisible()) {
-                continue;
+        std::queue<std::pair<std::reference_wrapper<Control>, glm::ivec2>> controls;
+        controls.push({*_rootControl, _rootOffset});
+        while (!controls.empty()) {
+            auto &[controlWrapper, offset] = controls.front();
+            auto &control = controlWrapper.get();
+            controls.pop();
+            control.draw({_options.width, _options.height}, offset);
+            for (auto &child : control.children()) {
+                controls.push({child, _controlOffset});
             }
-            control->draw({_options.width, _options.height}, _controlOffset, control->textLines());
         }
     });
 }
@@ -257,13 +286,11 @@ void GUI::drawBackground() {
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
-void GUI::resetFocus() {
-    if (_focus) {
-        if (_focus->isFocusable()) {
-            _focus->setFocus(false);
-        }
-        onFocusChanged(_focus->tag(), false);
-        _focus = nullptr;
+void GUI::clearSelection() {
+    if (_selection) {
+        _selection->get().setSelected(false);
+        onSelectionChanged(_selection->get().tag(), false);
+        _selection.reset();
     }
 }
 
@@ -319,8 +346,9 @@ std::unique_ptr<Control> GUI::newControl(
 }
 
 void GUI::addControl(std::shared_ptr<Control> control) {
-    _controls.insert(_controls.begin(), control);
-    _controlByTag.insert(std::make_pair(control->tag(), control.get()));
+    _rootControl->get().addChild(*control);
+    _tagToControl.insert({control->tag(), *control});
+    _controls.push_back(std::move(control));
 }
 
 } // namespace gui
