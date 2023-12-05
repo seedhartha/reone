@@ -42,7 +42,7 @@ public:
 
 class MockThreadPool : public IThreadPool, boost::noncopyable {
 public:
-    std::shared_ptr<Task> enqueue(TaskFunc func) override {
+    std::shared_ptr<Task> enqueue(TaskFragmentunc func) override {
         return nullptr;
     }
 };

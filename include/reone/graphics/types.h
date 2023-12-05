@@ -178,7 +178,7 @@ struct UniformBlockBindingPoints {
     static constexpr int grass = 6;
     static constexpr int walkmesh = 7;
     static constexpr int points = 8;
-    static constexpr int screenSpace = 9;
+    static constexpr int screenEffect = 9;
 };
 
 // MDL

@@ -307,7 +307,7 @@ void SelectionOverlay::drawTitleBar() {
             locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             locals.alpha = 0.5f;
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2d));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
     {
@@ -342,7 +342,7 @@ void SelectionOverlay::drawHealthBar() {
         locals.model = std::move(transform);
         locals.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2d));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -453,7 +453,7 @@ void SelectionOverlay::drawActionIcon(int index) {
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
+    auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGeometryUIColorBase;
 
     return (_selectedObject && _selectedHostile) ? red : guiColorBase;
 }

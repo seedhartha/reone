@@ -165,8 +165,8 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        auto guiColorHilight = _game.isTSL() ? kTSLGUIColorHilight : kGUIColorHilight;
-        auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
+        auto guiColorHilight = _game.isTSL() ? kTSLGUIColorHilight : kGeometryUIColorHilight;
+        auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGeometryUIColorBase;
 
         _services.graphics.uniforms.setGlobals([&](auto &globals) {
             globals.projection = _services.graphics.window.getOrthoProjection();

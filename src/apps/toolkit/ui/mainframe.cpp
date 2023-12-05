@@ -53,7 +53,6 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 
-
 #include "composelipdialog.h"
 
 using namespace reone::audio;
@@ -66,7 +65,7 @@ namespace reone {
 
 static constexpr char kIconName[] = "toolkit";
 
-static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
+static const std::set<std::string> kFragmentilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
 static const std::set<PageType> kStaticPageTypes {
     PageType::Image,
@@ -598,7 +597,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             return;
         }
         auto extension = item.path.extension().string();
-        if (kFilesArchiveExtensions.count(extension) == 0) {
+        if (kFragmentilesArchiveExtensions.count(extension) == 0) {
             return;
         }
         auto menu = wxMenu();

@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 static const ResRef kMaleNameLtrResRef("humanm");
-static const ResRef kFemaleNameLtrResRef("humanf");
+static const ResRef kFragmentemaleNameLtrResRef("humanf");
 static const ResRef kLastNameLtrResRef("humanl");
 
 void NameEntry::onGUILoaded() {
@@ -63,7 +63,7 @@ bool NameEntry::handle(const SDL_Event &event) {
 
 void NameEntry::loadRandomName() {
     auto gender = _charGen.character().gender;
-    const auto &nameLtrResRef = (gender == Gender::Female) ? kFemaleNameLtrResRef : kMaleNameLtrResRef;
+    const auto &nameLtrResRef = (gender == Gender::Female) ? kFragmentemaleNameLtrResRef : kMaleNameLtrResRef;
     auto nameLtr = _services.resource.ltrs.get(nameLtrResRef);
     auto lastNameLtr = _services.resource.ltrs.get(kLastNameLtrResRef);
     auto generated = nameLtr->randomName(8) + " " + lastNameLtr->randomName(8);

@@ -60,19 +60,19 @@ using namespace reone::script;
 
 namespace reone {
 
-static const std::set<std::string> kFilesSubdirectoryWhitelist {
+static const std::set<std::string> kFragmentilesSubdirectoryWhitelist {
     "data", "lips", "localvault", "modules", "movies", "override", "rims", "saves", "texturepacks", //
     "streammusic", "streamsounds", "streamwaves", "streamvoice"};
 
-static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
+static const std::set<std::string> kFragmentilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
-static const std::set<std::string> kFilesExtensionBlacklist {
+static const std::set<std::string> kFragmentilesExtensionBlacklist {
     ".key",                                         //
     ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
     ".zip", ".pdf",                                 //
     ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
 
-static const std::set<ResType> kFilesPlaintextResTypes {
+static const std::set<ResType> kFragmentilesPlaintextResTypes {
     ResType::Txt,
     ResType::Txi,
     ResType::Lyt,
@@ -103,7 +103,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
         return;
     }
 
-    if (kFilesPlaintextResTypes.count(id.type) > 0) {
+    if (kFragmentilesPlaintextResTypes.count(id.type) > 0) {
         data.seek(0, SeekOrigin::End);
         auto length = data.position();
         data.seek(0, SeekOrigin::Begin);
@@ -354,7 +354,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
 }
 
 PageType MainViewModel::getPageType(ResType type) const {
-    if (kFilesPlaintextResTypes.count(type) > 0) {
+    if (kFragmentilesPlaintextResTypes.count(type) > 0) {
         return PageType::Text;
     }
     if (isGFFCompatibleResType(type)) {
@@ -406,10 +406,10 @@ void MainViewModel::loadGameDirectory() {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         bool container;
-        if ((file.is_directory() && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
-            (file.is_regular_file() && kFilesArchiveExtensions.count(extension) > 0)) {
+        if ((file.is_directory() && kFragmentilesSubdirectoryWhitelist.count(filename) > 0) ||
+            (file.is_regular_file() && kFragmentilesArchiveExtensions.count(extension) > 0)) {
             container = true;
-        } else if (file.is_regular_file() && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
+        } else if (file.is_regular_file() && (kFragmentilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
             container = false;
         } else {
             continue;
@@ -694,7 +694,7 @@ void MainViewModel::render3D(int w, int h) {
     });
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
-        _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::simpleTexture));
+        _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::texture2d));
         _graphicsModule->context().bind(*output);
         _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
     });
@@ -832,9 +832,9 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
             auto extension = boost::to_lower_copy(file.path().extension().string());
             bool container;
-            if (file.is_directory() || kFilesArchiveExtensions.count(extension) > 0) {
+            if (file.is_directory() || kFragmentilesArchiveExtensions.count(extension) > 0) {
                 container = true;
-            } else if (file.is_regular_file() && kFilesExtensionBlacklist.count(extension) == 0) {
+            } else if (file.is_regular_file() && kFragmentilesExtensionBlacklist.count(extension) == 0) {
                 container = false;
             } else {
                 continue;

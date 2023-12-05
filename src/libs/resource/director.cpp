@@ -45,16 +45,16 @@ static constexpr char kTexturePackDirectoryName[] = "texturepacks";
 static constexpr char kMusicDirectoryName[] = "streammusic";
 static constexpr char kSoundsDirectoryName[] = "streamsounds";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
-static constexpr char kVoiceDirectoryName[] = "streamvoice";
+static constexpr char kVertexoiceDirectoryName[] = "streamvoice";
 static constexpr char kModulesDirectoryName[] = "modules";
 static constexpr char kLipsDirectoryName[] = "lips";
 static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kOverrideDirectoryName[] = "override";
 
-static constexpr char kTexturePackFilenameGUI[] = "swpc_tex_gui.erf";
-static constexpr char kTexturePackFilenameHigh[] = "swpc_tex_tpa.erf";
-static constexpr char kTexturePackFilenameMedium[] = "swpc_tex_tpb.erf";
-static constexpr char kTexturePackFilenameLow[] = "swpc_tex_tpc.erf";
+static constexpr char kTexturePackFragmentilenameGUI[] = "swpc_tex_gui.erf";
+static constexpr char kTexturePackFragmentilenameHigh[] = "swpc_tex_tpa.erf";
+static constexpr char kTexturePackFragmentilenameMedium[] = "swpc_tex_tpb.erf";
+static constexpr char kTexturePackFragmentilenameLow[] = "swpc_tex_tpc.erf";
 
 static constexpr char kExeFilenameKotor[] = "swkotor.exe";
 static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
@@ -62,9 +62,9 @@ static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
 static const std::vector<std::string> g_globalLipFiles {"global.mod", "localization.mod"};
 
 static const std::unordered_map<TextureQuality, std::string> kTexQualityToTexPack {
-    {TextureQuality::High, kTexturePackFilenameHigh},
-    {TextureQuality::Medium, kTexturePackFilenameMedium},
-    {TextureQuality::Low, kTexturePackFilenameLow}};
+    {TextureQuality::High, kTexturePackFragmentilenameHigh},
+    {TextureQuality::Medium, kTexturePackFragmentilenameMedium},
+    {TextureQuality::Low, kTexturePackFragmentilenameLow}};
 
 void ResourceDirector::init() {
     loadGlobalResources();
@@ -105,12 +105,12 @@ void ResourceDirector::loadGlobalResources() {
     auto &texPack = kTexQualityToTexPack.at(_graphicsOpt.textureQuality);
 
     if (_gameId == GameID::TSL) {
-        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
         resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
         resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
         resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_gamePath, kVoiceDirectoryName));
+        resources.addFolder(getFileIgnoreCase(_gamePath, kVertexoiceDirectoryName));
 
         auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
         resources.addERF(getFileIgnoreCase(lipsPath, kLocalizationLipFilename));
@@ -120,7 +120,7 @@ void ResourceDirector::loadGlobalResources() {
 
     } else {
         resources.addERF(getFileIgnoreCase(_gamePath, kPatchFilename));
-        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
         resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
         resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));

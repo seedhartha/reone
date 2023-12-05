@@ -171,7 +171,7 @@ struct PointsUniforms {
     glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
 };
 
-struct ScreenSpaceUniforms {
+struct ScreenEffectUniforms {
     glm::mat4 screenProjection {1.0f};
     glm::vec4 ssaoSamples[kNumSSAOSamples] {glm::vec4(0.0f)};
     glm::vec2 screenResolution {0.0f};
@@ -200,7 +200,7 @@ public:
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
     virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
     virtual void setPoints(const std::function<void(PointsUniforms &)> &block) = 0;
-    virtual void setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) = 0;
+    virtual void setScreenEffect(const std::function<void(ScreenEffectUniforms &)> &block) = 0;
 };
 
 class Uniforms : public IUniforms, boost::noncopyable {
@@ -223,7 +223,7 @@ public:
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
     void setPoints(const std::function<void(PointsUniforms &)> &block) override;
-    void setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) override;
+    void setScreenEffect(const std::function<void(ScreenEffectUniforms &)> &block) override;
 
 private:
     bool _inited {false};
@@ -241,7 +241,7 @@ private:
     GrassUniforms _grass;
     WalkmeshUniforms _walkmesh;
     PointsUniforms _points;
-    ScreenSpaceUniforms _screenSpace;
+    ScreenEffectUniforms _screenEffect;
 
     // END Uniforms
 
@@ -256,7 +256,7 @@ private:
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;
     std::shared_ptr<UniformBuffer> _ubPoints;
-    std::shared_ptr<UniformBuffer> _ubScreenSpace;
+    std::shared_ptr<UniformBuffer> _ubScreenEffect;
 
     // END Uniform Buffers
 

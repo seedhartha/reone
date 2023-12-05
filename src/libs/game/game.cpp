@@ -371,7 +371,7 @@ void Game::drawWorld() {
     _services.graphics.uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleTexture));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2d));
     _services.graphics.context.bind(*output);
     _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
 }

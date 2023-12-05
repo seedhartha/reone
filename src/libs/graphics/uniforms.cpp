@@ -37,7 +37,7 @@ void Uniforms::init() {
     static GrassUniforms defaultsGrass;
     static WalkmeshUniforms defaultsWalkmesh;
     static PointsUniforms defaultsPoints;
-    static ScreenSpaceUniforms defaultsScreenSpace;
+    static ScreenEffectUniforms defaultsScreenEffect;
 
     _ubGlobals = initBuffer(&defaultsGlobals, sizeof(GlobalsUniforms));
     _ubLocals = initBuffer(&defaultsLocals, sizeof(LocalsUniforms));
@@ -48,7 +48,7 @@ void Uniforms::init() {
     _ubGrass = initBuffer(&defaultsGrass, sizeof(GrassUniforms));
     _ubWalkmesh = initBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
     _ubPoints = initBuffer(&defaultsPoints, sizeof(PointsUniforms));
-    _ubScreenSpace = initBuffer(&defaultsScreenSpace, sizeof(ScreenSpaceUniforms));
+    _ubScreenEffect = initBuffer(&defaultsScreenEffect, sizeof(ScreenEffectUniforms));
 
     _context.bind(*_ubGlobals, UniformBlockBindingPoints::globals);
     _context.bind(*_ubLocals, UniformBlockBindingPoints::locals);
@@ -59,7 +59,7 @@ void Uniforms::init() {
     _context.bind(*_ubGrass, UniformBlockBindingPoints::grass);
     _context.bind(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
     _context.bind(*_ubPoints, UniformBlockBindingPoints::points);
-    _context.bind(*_ubScreenSpace, UniformBlockBindingPoints::screenSpace);
+    _context.bind(*_ubScreenEffect, UniformBlockBindingPoints::screenEffect);
 
     _inited = true;
 }
@@ -78,7 +78,7 @@ void Uniforms::deinit() {
     _ubGrass.reset();
     _ubWalkmesh.reset();
     _ubPoints.reset();
-    _ubScreenSpace.reset();
+    _ubScreenEffect.reset();
 
     _inited = false;
 }
@@ -137,10 +137,10 @@ void Uniforms::setPoints(const std::function<void(PointsUniforms &)> &block) {
     _ubPoints->setData(&_points, sizeof(PointsUniforms));
 }
 
-void Uniforms::setScreenSpace(const std::function<void(ScreenSpaceUniforms &)> &block) {
-    block(_screenSpace);
-    _context.bind(*_ubScreenSpace, UniformBlockBindingPoints::screenSpace);
-    _ubScreenSpace->setData(&_screenSpace, sizeof(ScreenSpaceUniforms));
+void Uniforms::setScreenEffect(const std::function<void(ScreenEffectUniforms &)> &block) {
+    block(_screenEffect);
+    _context.bind(*_ubScreenEffect, UniformBlockBindingPoints::screenEffect);
+    _ubScreenEffect->setData(&_screenEffect, sizeof(ScreenEffectUniforms));
 }
 
 std::unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {

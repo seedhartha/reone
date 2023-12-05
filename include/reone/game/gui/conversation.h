@@ -73,7 +73,7 @@ private:
     Timer _endEntryTimer;
     float _entryDuration {0.0f};
     std::vector<const resource::Dialog::EntryReply *> _replies;
-    bool _autoPickFirstReply {false};
+    bool _autoPickFragmentirstReply {false};
 
     void loadConversationBackground();
     void loadCameraModel();

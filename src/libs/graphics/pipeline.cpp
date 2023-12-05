@@ -156,14 +156,14 @@ void Pipeline::init() {
     checkMainThread();
 
     // SSAO
-    _uniforms.setScreenSpace([](auto &screenSpace) {
+    _uniforms.setScreenEffect([](auto &screenEffect) {
         for (int i = 0; i < kNumSSAOSamples; ++i) {
             float scale = i / static_cast<float>(kNumSSAOSamples);
             scale = glm::mix(0.1f, 1.0f, scale * scale);
             auto sample = glm::vec3(randomFloat(-1.0f, 1.0f), randomFloat(-1.0f, 1.0f), randomFloat(0.0f, 1.0f));
             sample = glm::normalize(sample);
             sample *= scale;
-            screenSpace.ssaoSamples[i] = glm::vec4(std::move(sample), 0.0f);
+            screenEffect.ssaoSamples[i] = glm::vec4(std::move(sample), 0.0f);
         }
     });
 }
@@ -501,10 +501,10 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _uniforms.setScreenSpace([&dim, &sampleRadius, &bias](auto &screenSpace) {
-        screenSpace.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-        screenSpace.ssaoSampleRadius = sampleRadius;
-        screenSpace.ssaoBias = bias;
+    _uniforms.setScreenEffect([&dim, &sampleRadius, &bias](auto &screenEffect) {
+        screenEffect.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+        screenEffect.ssaoSampleRadius = sampleRadius;
+        screenEffect.ssaoBias = bias;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
@@ -532,13 +532,13 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _uniforms.setScreenSpace([&](auto &screenSpace) {
-        screenSpace.screenProjection = screenProjection;
-        screenSpace.screenResolution = glm::vec2(dim.x, dim.y);
-        screenSpace.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenSpace.ssrBias = bias;
-        screenSpace.ssrPixelStride = pixelStride;
-        screenSpace.ssrMaxSteps = maxSteps;
+    _uniforms.setScreenEffect([&](auto &screenEffect) {
+        screenEffect.screenProjection = screenProjection;
+        screenEffect.screenResolution = glm::vec2(dim.x, dim.y);
+        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        screenEffect.ssrBias = bias;
+        screenEffect.ssrPixelStride = pixelStride;
+        screenEffect.ssrMaxSteps = maxSteps;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
@@ -643,9 +643,9 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _uniforms.setScreenSpace([&dim, &vertical](auto &screenSpace) {
-        screenSpace.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenSpace.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+    _uniforms.setScreenEffect([&dim, &vertical](auto &screenEffect) {
+        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        screenEffect.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -677,8 +677,8 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _uniforms.setScreenSpace([&dim](auto &screenSpace) {
-        screenSpace.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+    _uniforms.setScreenEffect([&dim](auto &screenEffect) {
+        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -695,9 +695,9 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    _uniforms.setScreenSpace([&dim, &amount](auto &screenSpace) {
-        screenSpace.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenSpace.sharpenAmount = amount;
+    _uniforms.setScreenEffect([&dim, &amount](auto &screenEffect) {
+        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        screenEffect.sharpenAmount = amount;
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());

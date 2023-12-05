@@ -797,7 +797,7 @@ std::string Creature::getAnimationName(AnimationType anim) const {
         return "tlknorm";
     case AnimationType::LoopingTalkPleading:
         return "tlkplead";
-    case AnimationType::LoopingTalkForceful:
+    case AnimationType::LoopingTalkFragmentorceful:
         return "tlkforce";
     case AnimationType::LoopingTalkLaughing:
         return getFirstIfCreatureModel("", "tlklaugh");

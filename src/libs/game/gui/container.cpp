@@ -21,7 +21,6 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
 
-
 #include "reone/game/di/services.h"
 #include "reone/game/game.h"
 #include "reone/game/object/creature.h"
@@ -40,13 +39,13 @@ namespace reone {
 namespace game {
 
 static constexpr int kSwitchToResRef = 47884;
-static constexpr int kGiveItemResRef = 47885;
+static constexpr int kGeometryiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
 void ContainerGUI::onGUILoaded() {
     bindControls();
 
-    std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGiveItemResRef));
+    std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGeometryiveItemResRef));
     _controls.BTN_GIVEITEMS->setTextMessage(btnMessage);
 
     std::string LBL_MESSAGE(_services.resource.strings.getText(kInventoryResRef));

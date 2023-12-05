@@ -38,7 +38,7 @@ namespace reone {
 namespace scene {
 
 static constexpr int kNumClustersInPool = 2048;
-static constexpr float kGrassDensityFactor = 0.25f;
+static constexpr float kGeometryrassDensityFactor = 0.25f;
 
 static constexpr float kMaxClusterDistance = 32.0f;
 static constexpr float kMaxClusterDistance2 = kMaxClusterDistance * kMaxClusterDistance;
@@ -166,7 +166,7 @@ void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {
-    return static_cast<int>(glm::round(kGrassDensityFactor * _properties.density * area));
+    return static_cast<int>(glm::round(kGeometryrassDensityFactor * _properties.density * area));
 }
 
 int GrassSceneNode::getRandomGrassVariant() const {

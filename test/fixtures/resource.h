@@ -46,7 +46,7 @@ namespace reone {
 
 namespace resource {
 
-class MockGffs : public IGffs, boost::noncopyable {
+class MockGeometryffs : public IGffs, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<Gff>, get, (const std::string &resRef, ResType type), (override));
@@ -101,7 +101,7 @@ public:
     MOCK_METHOD(std::shared_ptr<graphics::Cursor>, get, (resource::CursorType type), (override));
 };
 
-class MockFonts : public IFonts, boost::noncopyable {
+class MockFragmentonts : public IFonts, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<graphics::Font>, get, (const std::string &key), (override));
@@ -155,7 +155,7 @@ public:
     MOCK_METHOD(std::shared_ptr<SoundSet>, get, (const std::string &key), (override));
 };
 
-class MockVisiblities : public IVisibilities, boost::noncopyable {
+class MockVertexisiblities : public IVisibilities, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<Visibility>, get, (const std::string &key), (override));
@@ -179,7 +179,7 @@ public:
 class TestResourceModule : boost::noncopyable {
 public:
     void init() {
-        _gffs = std::make_unique<MockGffs>();
+        _gffs = std::make_unique<MockGeometryffs>();
         _resources = std::make_unique<MockResources>();
         _strings = std::make_unique<MockStrings>();
         _twoDas = std::make_unique<MockTwoDas>();
@@ -187,7 +187,7 @@ public:
         _movies = std::make_unique<MockMovies>();
         _audioClips = std::make_unique<MockAudioClips>();
         _cursors = std::make_unique<MockCursors>();
-        _fonts = std::make_unique<MockFonts>();
+        _fonts = std::make_unique<MockFragmentonts>();
         _lips = std::make_unique<MockLips>();
         _models = std::make_unique<MockModels>();
         _textures = std::make_unique<MockTextures>();
@@ -196,7 +196,7 @@ public:
         _layouts = std::make_unique<MockLayouts>();
         _paths = std::make_unique<MockPaths>();
         _soundSets = std::make_unique<MockSoundSets>();
-        _visibilities = std::make_unique<MockVisiblities>();
+        _visibilities = std::make_unique<MockVertexisiblities>();
         _ltrs = std::make_unique<MockLtrs>();
         _shaders = std::make_unique<MockShaders>();
         _director = std::make_unique<MockResourceDirector>();
@@ -225,7 +225,7 @@ public:
             *_director);
     }
 
-    MockGffs &gffs() {
+    MockGeometryffs &gffs() {
         return *_gffs;
     }
 
@@ -254,7 +254,7 @@ public:
     }
 
 private:
-    std::unique_ptr<MockGffs> _gffs;
+    std::unique_ptr<MockGeometryffs> _gffs;
     std::unique_ptr<MockResources> _resources;
     std::unique_ptr<MockStrings> _strings;
     std::unique_ptr<MockTwoDas> _twoDas;
@@ -262,7 +262,7 @@ private:
     std::unique_ptr<MockMovies> _movies;
     std::unique_ptr<MockAudioClips> _audioClips;
     std::unique_ptr<MockCursors> _cursors;
-    std::unique_ptr<MockFonts> _fonts;
+    std::unique_ptr<MockFragmentonts> _fonts;
     std::unique_ptr<MockLips> _lips;
     std::unique_ptr<MockModels> _models;
     std::unique_ptr<MockTextures> _textures;
@@ -271,7 +271,7 @@ private:
     std::unique_ptr<MockLayouts> _layouts;
     std::unique_ptr<MockPaths> _paths;
     std::unique_ptr<MockSoundSets> _soundSets;
-    std::unique_ptr<MockVisiblities> _visibilities;
+    std::unique_ptr<MockVertexisiblities> _visibilities;
     std::unique_ptr<MockLtrs> _ltrs;
     std::unique_ptr<MockShaders> _shaders;
     std::unique_ptr<MockResourceDirector> _director;

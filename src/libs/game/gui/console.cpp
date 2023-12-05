@@ -51,7 +51,7 @@ namespace reone {
 namespace game {
 
 static constexpr int kMaxOutputLineCount = 100;
-static constexpr int kVisibleLineCount = 15;
+static constexpr int kVertexisibleLineCount = 15;
 
 static constexpr float kTextOffset = 3.0f;
 
@@ -111,7 +111,7 @@ bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
             --_outputOffset;
         }
     } else {
-        if (_outputOffset < static_cast<int>(_output.size()) - kVisibleLineCount + 1) {
+        if (_outputOffset < static_cast<int>(_output.size()) - kVertexisibleLineCount + 1) {
             ++_outputOffset;
         }
     }
@@ -190,7 +190,7 @@ void Console::draw() {
 }
 
 void Console::drawBackground() {
-    float height = kVisibleLineCount * _font->height();
+    float height = kVertexisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
@@ -204,12 +204,12 @@ void Console::drawBackground() {
         locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.alpha = 0.5f;
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::simpleColor));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2d));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
 void Console::drawLines() {
-    float height = kVisibleLineCount * _font->height();
+    float height = kVertexisibleLineCount * _font->height();
 
     glm::vec3 position(kTextOffset, height - 0.5f * _font->height(), 0.0f);
 
@@ -220,7 +220,7 @@ void Console::drawLines() {
 
     // Output
 
-    for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
+    for (int i = 0; i < kVertexisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
         const std::string &line = _output[static_cast<size_t>(i) + _outputOffset];
         position.y -= _font->height();
         _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);

@@ -33,7 +33,7 @@ namespace reone {
 
 namespace graphics {
 
-class MockGraphicsContext : public IGraphicsContext, boost::noncopyable {
+class MockGeometryraphicsContext : public IGraphicsContext, boost::noncopyable {
 public:
     MOCK_METHOD(void, clearColor, (glm::vec4 color), (override));
     MOCK_METHOD(void, clearDepth, (), (override));
@@ -86,7 +86,7 @@ public:
     MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &block), (override));
     MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &block), (override));
     MOCK_METHOD(void, setPoints, (const std::function<void(PointsUniforms &)> &block), (override));
-    MOCK_METHOD(void, setScreenSpace, (const std::function<void(ScreenSpaceUniforms &)> &block), (override));
+    MOCK_METHOD(void, setScreenEffect, (const std::function<void(ScreenEffectUniforms &)> &block), (override));
 };
 
 class MockWindow : public IWindow, boost::noncopyable {
@@ -104,7 +104,7 @@ public:
 class TestGraphicsModule : boost::noncopyable {
 public:
     void init() {
-        _context = std::make_unique<MockGraphicsContext>();
+        _context = std::make_unique<MockGeometryraphicsContext>();
         _meshRegistry = std::make_unique<MockMeshRegistry>();
         _pipeline = std::make_unique<MockPipeline>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
@@ -122,7 +122,7 @@ public:
             *_window);
     }
 
-    MockGraphicsContext &context() {
+    MockGeometryraphicsContext &context() {
         return *_context;
     }
 
@@ -143,7 +143,7 @@ public:
     }
 
 private:
-    std::unique_ptr<MockGraphicsContext> _context;
+    std::unique_ptr<MockGeometryraphicsContext> _context;
     std::unique_ptr<MockMeshRegistry> _meshRegistry;
     std::unique_ptr<MockPipeline> _pipeline;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;

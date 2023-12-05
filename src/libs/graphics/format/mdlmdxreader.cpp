@@ -27,7 +27,7 @@ namespace reone {
 
 namespace graphics {
 
-static constexpr int kFlagBezier = 16;
+static constexpr int kFragmentlagBezier = 16;
 
 struct EmitterFlags {
     static constexpr int p2p = 1;
@@ -849,8 +849,8 @@ void MdlMdxReader::readFloatController(const ControllerKey &key,
                                        const std::vector<float> &data,
                                        ModelNode &node,
                                        AnimatedProperty<float> &prop) {
-    bool bezier = key.numColumns & kFlagBezier;
-    int numColumns = key.numColumns & ~kFlagBezier;
+    bool bezier = key.numColumns & kFragmentlagBezier;
+    int numColumns = key.numColumns & ~kFragmentlagBezier;
     ensureNumColumnsEquals(key.type, 1, numColumns);
 
     for (uint16_t i = 0; i < key.numRows; ++i) {
@@ -866,8 +866,8 @@ void MdlMdxReader::readVectorController(const ControllerKey &key,
                                         const std::vector<float> &data,
                                         ModelNode &node,
                                         AnimatedProperty<glm::vec3> &prop) {
-    bool bezier = key.numColumns & kFlagBezier;
-    int numColumns = key.numColumns & ~kFlagBezier;
+    bool bezier = key.numColumns & kFragmentlagBezier;
+    int numColumns = key.numColumns & ~kFragmentlagBezier;
 
     // HACK: workaround for s_male02 from TSLRCM
     if (numColumns == 9) {

@@ -342,7 +342,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
     switch (attack.resultType) {
     case AttackResultType::Miss:
     case AttackResultType::AttackResisted:
-    case AttackResultType::AttackFailed:
+    case AttackResultType::AttackFragmentailed:
     case AttackResultType::Parried:
     case AttackResultType::Deflected:
         debug(boost::format("Attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannel::Combat);

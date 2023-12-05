@@ -45,13 +45,13 @@ namespace movie {
 
 #ifdef R_ENABLE_MOVIE
 
-class BinkVideoDecoder : public movie::VideoStream {
+class BinkVertexideoDecoder : public movie::VideoStream {
 public:
-    BinkVideoDecoder(std::filesystem::path path) :
+    BinkVertexideoDecoder(std::filesystem::path path) :
         _path(std::move(path)) {
     }
 
-    ~BinkVideoDecoder() { deinit(); }
+    ~BinkVertexideoDecoder() { deinit(); }
 
     void deinit() {
         if (_avFrameScaled) {
@@ -321,7 +321,7 @@ void BikReader::load() {
         throw FileNotFoundException("BIK: file not found: " + _path.string());
     }
 
-    auto decoder = std::make_shared<BinkVideoDecoder>(_path);
+    auto decoder = std::make_shared<BinkVertexideoDecoder>(_path);
     decoder->load();
 
     _movie = std::make_shared<Movie>(_graphicsSvc, _audioPlayer);

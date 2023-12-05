@@ -26,7 +26,7 @@ namespace reone {
 
 namespace gui {
 
-class MockGUI : public IGUI, boost::noncopyable {
+class MockGeometryUI : public IGUI, boost::noncopyable {
 public:
     MOCK_METHOD(void, load, (const resource::Gff &), (override));
 
@@ -54,7 +54,7 @@ public:
     MOCK_METHOD(std::shared_ptr<Control>, findControl, (const std::string &), (const override));
 };
 
-class MockGUIs : public IGUIs, boost::noncopyable {
+class MockGeometryUIs : public IGUIs, boost::noncopyable {
 public:
     MOCK_METHOD(void, clear, (), (override));
     MOCK_METHOD(std::shared_ptr<IGUI>, get, (const std::string &, std::function<void(IGUI &)>), (override));
@@ -63,11 +63,11 @@ public:
 class TestGUIModule : boost::noncopyable {
 public:
     void init() {
-        _guis = std::make_unique<MockGUIs>();
+        _guis = std::make_unique<MockGeometryUIs>();
         _services = std::make_unique<GUIServices>(*_guis);
     }
 
-    MockGUIs &guis() {
+    MockGeometryUIs &guis() {
         return *_guis;
     }
 
@@ -76,7 +76,7 @@ public:
     }
 
 private:
-    std::unique_ptr<MockGUIs> _guis;
+    std::unique_ptr<MockGeometryUIs> _guis;
 
     std::unique_ptr<GUIServices> _services;
 };

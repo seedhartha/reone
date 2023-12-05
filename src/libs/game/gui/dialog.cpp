@@ -61,7 +61,7 @@ static const std::unordered_map<std::string, AnimationType> g_animTypeByName {
     {"bow", AnimationType::FireForgetBow},
     {"talk_normal", AnimationType::LoopingTalkNormal},
     {"talk_pleading", AnimationType::LoopingTalkPleading},
-    {"talk_forceful", AnimationType::LoopingTalkForceful},
+    {"talk_forceful", AnimationType::LoopingTalkFragmentorceful},
     {"talk_laughing", AnimationType::LoopingTalkLaughing},
     {"talk_sad", AnimationType::LoopingTalkSad},
     {"victory", AnimationType::FireForgetVictory1},

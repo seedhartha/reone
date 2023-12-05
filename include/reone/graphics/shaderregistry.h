@@ -25,8 +25,8 @@ namespace reone {
 namespace graphics {
 
 struct ShaderProgramId {
-    static constexpr char simpleColor[] = "simple_color";
-    static constexpr char simpleTexture[] = "simple_texture";
+    static constexpr char color2d[] = "simple_color";
+    static constexpr char texture2d[] = "simple_texture";
     static constexpr char gui[] = "gui";
     static constexpr char text[] = "text";
     static constexpr char points[] = "points";

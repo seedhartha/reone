@@ -1,6 +1,6 @@
 const int NUM_SSAO_SAMPLES = 64;
 
-layout(std140) uniform ScreenSpace {
+layout(std140) uniform ScreenEffect {
     mat4 uScreenProjection;
     vec4 uSSAOSamples[NUM_SSAO_SAMPLES];
     vec2 uScreenResolution;

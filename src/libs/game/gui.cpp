@@ -48,9 +48,9 @@ GameGUI::GameGUI(Game &game,
         _hilightColor = kTSLGUIColorHilight;
         _disabledColor = kTSLGUIColorDisabled;
     } else {
-        _baseColor = kGUIColorBase;
-        _hilightColor = kGUIColorHilight;
-        _disabledColor = kGUIColorDisabled;
+        _baseColor = kGeometryUIColorBase;
+        _hilightColor = kGeometryUIColorHilight;
+        _disabledColor = kGeometryUIColorDisabled;
     }
 }
 
@@ -71,7 +71,7 @@ void GameGUI::preload(IGUI &gui) {
     if (_game.isTSL()) {
         gui.setResolution(800, 600);
     } else {
-        gui.setDefaultHilightColor(kGUIColorHilight);
+        gui.setDefaultHilightColor(kGeometryUIColorHilight);
     }
 }
 

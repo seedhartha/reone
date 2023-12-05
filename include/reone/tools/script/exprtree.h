@@ -294,21 +294,21 @@ public:
     static bool isBinaryExpression(ExpressionType type);
 
 private:
-    struct CallStackFrame {
+    struct CallStackFragmentrame {
         Function *function;
         int stackSizeOnEnter;
 
-        CallStackFrame(Function *function, int stackSizeOnEnter) :
+        CallStackFragmentrame(Function *function, int stackSizeOnEnter) :
             function(function),
             stackSizeOnEnter(stackSizeOnEnter) {
         }
     };
 
-    struct StackFrame {
+    struct StackFragmentrame {
         ParameterExpression *param;
         Function *allocatedBy;
 
-        StackFrame(
+        StackFragmentrame(
             ParameterExpression *param,
             Function *allocatedBy) :
             param(param),
@@ -323,8 +323,8 @@ private:
         std::map<uint32_t, std::shared_ptr<Function>> &functions;
         std::vector<std::shared_ptr<Expression>> &expressions;
 
-        std::vector<CallStackFrame> callStack;
-        std::vector<StackFrame> stack;
+        std::vector<CallStackFragmentrame> callStack;
+        std::vector<StackFragmentrame> stack;
         int numGlobals {0};
         int prevNumGlobals {0};
         BlockExpression *savedAction {nullptr};
@@ -359,14 +359,14 @@ private:
         }
 
         void pushCallStack(Function *function) {
-            callStack.push_back(CallStackFrame(function, static_cast<int>(stack.size())));
+            callStack.push_back(CallStackFragmentrame(function, static_cast<int>(stack.size())));
         }
 
         void pushStack(ParameterExpression *param) {
-            stack.push_back(StackFrame(param, topCall().function));
+            stack.push_back(StackFragmentrame(param, topCall().function));
         }
 
-        CallStackFrame &topCall() {
+        CallStackFragmentrame &topCall() {
             return callStack.back();
         }
 
