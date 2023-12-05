@@ -20,7 +20,6 @@ layout(std140) uniform Locals {
     vec4 uHeightMapFrameBounds;
     ivec2 uGridSize;
     int uFeatureMask;
-    float uAlpha;
     float uWaterAlpha;
     float uHeightMapScaling;
     float uBillboardSize;

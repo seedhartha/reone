@@ -8,5 +8,5 @@ void main() {
     vec4 mainTexSample = texture(sMainTex, fragUV1);
     vec3 objectColor = uColor.rgb * mainTexSample.rgb;
 
-    fragColor1 = vec4(objectColor, uAlpha * mainTexSample.a);
+    fragColor1 = vec4(objectColor, uColor.a * mainTexSample.a);
 }

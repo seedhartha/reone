@@ -305,7 +305,7 @@ void SelectionOverlay::drawTitleBar() {
             locals.reset();
             locals.model = std::move(transform);
             locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-            locals.alpha = 0.5f;
+            locals.color.a = 0.5f;
         });
         _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2d));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();

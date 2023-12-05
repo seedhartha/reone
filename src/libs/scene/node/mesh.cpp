@@ -199,7 +199,7 @@ void MeshSceneNode::draw() {
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
     locals.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
-    locals.alpha = _alpha;
+    locals.color.a = _alpha;
 
     //_graphicsSvc.context.bind(*_nodeTextures.diffuse);
     _material->setTexture(*_nodeTextures.diffuse, TextureUnits::mainTex);
@@ -318,7 +318,7 @@ void MeshSceneNode::drawShadow() {
         locals.reset();
         locals.model = _absTransform;
         locals.modelInv = _absTransformInv;
-        locals.alpha = _alpha;
+        locals.color.a = _alpha;
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::directionalLightShadows : ShaderProgramId::pointLightShadows));
     mesh->mesh->draw();

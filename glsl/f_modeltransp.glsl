@@ -36,7 +36,7 @@ void main() {
 
     vec3 normal = getNormal(uv);
 
-    float objectAlpha = uAlpha;
+    float objectAlpha = uColor.a;
     if (!isFeatureEnabled(FEATURE_ENVMAP)) {
         objectAlpha *= diffuseAlpha;
     }

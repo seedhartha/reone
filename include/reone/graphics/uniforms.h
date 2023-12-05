@@ -87,11 +87,10 @@ struct LocalsUniforms {
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::ivec2 gridSize {0};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    float alpha {1.0f};
     float waterAlpha {1.0f};
     float heightMapScaling {1.0f};
     float billboardSize {1.0f};
-    float padding;
+    float padding[2];
 
     void reset() {
         model = glm::mat4(1.0f);
@@ -102,7 +101,6 @@ struct LocalsUniforms {
         heightMapFrameBounds = glm::vec4(0.0f);
         gridSize = glm::ivec2(0);
         featureMask = 0;
-        alpha = 1.0f;
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;

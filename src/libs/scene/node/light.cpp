@@ -79,7 +79,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         locals.featureMask = UniformsFeatureFlags::fixedsize;
         locals.model = glm::translate(getOrigin());
         locals.billboardSize = 0.2f * flare.size;
-        locals.alpha = 0.5f;
+        locals.color.a = 0.5f;
         locals.color = glm::vec4(_color, 1.0f);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
