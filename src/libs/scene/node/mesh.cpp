@@ -50,8 +50,8 @@ void MeshSceneNode::init() {
     initTextures();
 
     bool transparent = isTransparent();
-    auto &program = _graphicsSvc.shaderRegistry.get(transparent ? ShaderProgramId::modelTransparent
-                                                                : ShaderProgramId::modelOpaque);
+    auto &program = _graphicsSvc.shaderRegistry.get(transparent ? ShaderProgramId::oitModel
+                                                                : ShaderProgramId::deferredOpaqueModel);
     if (_modelNode.isSkinMesh()) {
         _material = std::make_unique<SkinnedModelMaterial>(program);
     } else {
@@ -320,7 +320,7 @@ void MeshSceneNode::drawShadow() {
         locals.modelInv = _absTransformInv;
         locals.color.a = _alpha;
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::directionalLightShadows : ShaderProgramId::pointLightShadows));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::dirLightShadows : ShaderProgramId::pointLightShadows));
     mesh->mesh->draw();
 }
 

@@ -25,31 +25,30 @@ namespace reone {
 namespace graphics {
 
 struct ShaderProgramId {
-    static constexpr char color2d[] = "simple_color";
-    static constexpr char texture2d[] = "simple_texture";
-    static constexpr char gui[] = "gui";
-    static constexpr char text[] = "text";
-    static constexpr char points[] = "points";
-    static constexpr char pointLightShadows[] = "point_light_shadows";
-    static constexpr char directionalLightShadows[] = "directional_light_shadows";
-    static constexpr char modelOpaque[] = "model_opaque";
-    static constexpr char modelTransparent[] = "model_transparent";
-    static constexpr char aabb[] = "aabb";
-    static constexpr char walkmesh[] = "walkmesh";
-    static constexpr char particle[] = "particle";
-    static constexpr char grass[] = "grass";
     static constexpr char billboard[] = "billboard";
-    static constexpr char ssao[] = "ssao";
-    static constexpr char ssr[] = "ssr";
-    static constexpr char combineOpaque[] = "combine_opaque";
-    static constexpr char combineGeometry[] = "combine_geometry";
-    static constexpr char boxBlur4[] = "box_blur4";
-    static constexpr char gaussianBlur9[] = "gaussian_blur9";
-    static constexpr char gaussianBlur13[] = "gaussian_blur13";
-    static constexpr char medianFilter3[] = "median_filter3";
-    static constexpr char medianFilter5[] = "median_filter5";
-    static constexpr char fxaa[] = "fxaa";
-    static constexpr char sharpen[] = "sharpen";
+    static constexpr char color2D[] = "color_2d";
+    static constexpr char deferredAABB[] = "deferred_aabb";
+    static constexpr char deferredCombine[] = "deferred_combine";
+    static constexpr char deferredGrass[] = "deferred_grass";
+    static constexpr char deferredOpaqueModel[] = "deferred_opaque_model";
+    static constexpr char deferredSSAO[] = "deferred_ssao";
+    static constexpr char deferredSSR[] = "deferred_ssr";
+    static constexpr char deferredWalkmesh[] = "deferred_walkmesh";
+    static constexpr char dirLightShadows[] = "dir_light_shadows";
+    static constexpr char oitBlend[] = "oit_blend";
+    static constexpr char oitModel[] = "oit_model";
+    static constexpr char oitParticle[] = "oit_particle";
+    static constexpr char pointLightShadows[] = "point_light_shadows";
+    static constexpr char points[] = "points";
+    static constexpr char postBoxBlur4[] = "post_box_blur4";
+    static constexpr char postFXAA[] = "post_fxaa";
+    static constexpr char postGaussianBlur13[] = "post_gaussian_blur13";
+    static constexpr char postGaussianBlur9[] = "post_gaussian_blur9";
+    static constexpr char postMedianFilter3[] = "post_median_filter3";
+    static constexpr char postMedianFilter5[] = "post_median_filter5";
+    static constexpr char postSharpen[] = "post_sharpen";
+    static constexpr char text[] = "text";
+    static constexpr char texture2D[] = "texture_2d";
 };
 
 struct GraphicsOptions;

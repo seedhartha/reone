@@ -66,7 +66,7 @@ void main() {
         objectColor *= uWaterAlpha;
     }
 
-    float w = OIT_getWeight(gl_FragCoord.z, objectAlpha);
+    float w = OIT_weight(gl_FragCoord.z, objectAlpha);
     fragColor1 = vec4(objectColor * w, objectAlpha);
     fragColor2 = vec4(w);
 }

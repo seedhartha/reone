@@ -78,10 +78,10 @@ void main() {
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.01, 0.99);
 
     vec3 ambientD, ambientS;
-    getIrradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness, ambientD, ambientS);
+    PBR_irradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness, ambientD, ambientS);
 
     vec3 directD, directS, directAreaD, directAreaS;
-    getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
+    PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
     vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
     colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
