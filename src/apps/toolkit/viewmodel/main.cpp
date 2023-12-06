@@ -682,10 +682,7 @@ void MainViewModel::render3D(int w, int h) {
     float aspect = w / static_cast<float>(h);
     _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
-    auto output = _graphicsModule->pipeline().draw(scene, glm::ivec2(w, h));
-    if (!output) {
-        return;
-    }
+    auto &output = scene.draw(glm::ivec2(w, h));
     _graphicsModule->uniforms().setGlobals([](auto &globals) {
         globals.reset();
     });
@@ -695,7 +692,7 @@ void MainViewModel::render3D(int w, int h) {
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
         _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::texture2D));
-        _graphicsModule->context().bind(*output);
+        _graphicsModule->context().bind(output);
         _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
     });
 }

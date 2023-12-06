@@ -21,9 +21,22 @@
 
 namespace reone {
 
+inline void checkThat(bool condition, const std::string &message) {
+    if (!condition) {
+        throw ValidationException(message);
+    }
+}
+
 template <class T>
-void checkEqual(const T &actual, const T &expected, const std::string &message) {
+inline void checkEqual(const T &actual, const T &expected, const std::string &message) {
     if (actual != expected) {
+        throw ValidationException(message);
+    }
+}
+
+template <class T>
+inline void checkNotEqual(const T &actual, const T &expected, const std::string &message) {
+    if (actual == expected) {
         throw ValidationException(message);
     }
 }

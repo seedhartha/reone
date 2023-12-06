@@ -212,9 +212,12 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
         drawText(_textLines, offset, size);
     }
     if (!_sceneName.empty()) {
-        std::shared_ptr<Texture> output;
+        std::optional<std::reference_wrapper<Texture>> output;
         _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
-            output = _graphicsSvc.pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
+            _graphicsSvc.context.withViewport({0, 0, _extent.width, _extent.height}, [this, &output]() {
+                auto &scene = _sceneGraphs.get(_sceneName);
+                output = scene.draw({_extent.width, _extent.height});
+            });
         });
         glm::mat4 projection(glm::ortho(
             0.0f,

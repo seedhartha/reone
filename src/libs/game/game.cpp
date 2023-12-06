@@ -360,19 +360,13 @@ void Game::playMusic(const std::string &resRef) {
 }
 
 void Game::drawWorld() {
-    auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
-    if (!output) {
+    if (!_module) {
         return;
     }
-    _services.graphics.uniforms.setGlobals([](auto &globals) {
-        globals.reset();
-    });
-    _services.graphics.uniforms.setLocals([](auto &locals) {
-        locals.reset();
-    });
+    auto &scene = _services.scene.graphs.get(kSceneMain);
+    auto &output = scene.draw(glm::ivec2(_options.graphics.width, _options.graphics.height));
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2D));
-    _services.graphics.context.bind(*output);
+    _services.graphics.context.bind(output);
     _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
 }
 

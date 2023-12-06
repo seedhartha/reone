@@ -19,7 +19,6 @@
 
 #include "reone/graphics/format/mdlmdxreader.h"
 #include "reone/graphics/model.h"
-#include "reone/graphics/scene.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
 

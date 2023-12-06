@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "reone/scene/di/services.h"
+#include "reone/scene/graph.h"
 #include "reone/scene/graphs.h"
 
 namespace reone {
@@ -29,6 +30,7 @@ namespace scene {
 class MockSceneGraph : public ISceneGraph, boost::noncopyable {
 public:
     MOCK_METHOD(void, update, (float dt), (override));
+    MOCK_METHOD(graphics::Texture &, draw, (const glm::ivec2 &dim), (override));
 
     MOCK_METHOD(void, clear, (), (override));
 

@@ -53,7 +53,6 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/pipeline.h
     ${GRAPHICS_INCLUDE_DIR}/pixelutil.h
     ${GRAPHICS_INCLUDE_DIR}/renderbuffer.h
-    ${GRAPHICS_INCLUDE_DIR}/scene.h
     ${GRAPHICS_INCLUDE_DIR}/shader.h
     ${GRAPHICS_INCLUDE_DIR}/shaderprogram.h
     ${GRAPHICS_INCLUDE_DIR}/shaderregistry.h

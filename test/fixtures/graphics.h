@@ -33,7 +33,7 @@ namespace reone {
 
 namespace graphics {
 
-class MockGeometryraphicsContext : public IGraphicsContext, boost::noncopyable {
+class MockGraphicsContext : public IGraphicsContext, boost::noncopyable {
 public:
     MOCK_METHOD(void, clearColor, (glm::vec4 color), (override));
     MOCK_METHOD(void, clearDepth, (), (override));
@@ -46,6 +46,12 @@ public:
 
     MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
     MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
+
+    MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
+    MOCK_METHOD(void, pushBlending, (BlendMode), (override));
+
+    MOCK_METHOD(void, popBlending, (), (override));
+    MOCK_METHOD(void, popViewport, (), (override));
 
     MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withFaceCulling, (CullFaceMode mode, const std::function<void()> &block), (override));
@@ -62,7 +68,12 @@ public:
 
 class MockPipeline : public IPipeline, boost::noncopyable {
 public:
-    MOCK_METHOD(std::shared_ptr<Texture>, draw, (IScene & scene, const glm::ivec2 &dim), (override));
+    MOCK_METHOD(void, setTargetSize, (glm::ivec2), (override));
+
+    MOCK_METHOD(void, beginPass, (RenderPass), (override));
+    MOCK_METHOD(void, endPass, (), (override));
+
+    MOCK_METHOD(Texture &, output, (), (override));
 };
 
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
@@ -104,7 +115,7 @@ public:
 class TestGraphicsModule : boost::noncopyable {
 public:
     void init() {
-        _context = std::make_unique<MockGeometryraphicsContext>();
+        _context = std::make_unique<MockGraphicsContext>();
         _meshRegistry = std::make_unique<MockMeshRegistry>();
         _pipeline = std::make_unique<MockPipeline>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
@@ -122,7 +133,7 @@ public:
             *_window);
     }
 
-    MockGeometryraphicsContext &context() {
+    MockGraphicsContext &context() {
         return *_context;
     }
 
@@ -143,7 +154,7 @@ public:
     }
 
 private:
-    std::unique_ptr<MockGeometryraphicsContext> _context;
+    std::unique_ptr<MockGraphicsContext> _context;
     std::unique_ptr<MockMeshRegistry> _meshRegistry;
     std::unique_ptr<MockPipeline> _pipeline;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;

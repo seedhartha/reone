@@ -170,17 +170,21 @@ struct PointsUniforms {
 };
 
 struct ScreenEffectUniforms {
+    glm::mat4 projection {1.0f};
     glm::mat4 screenProjection {1.0f};
     glm::vec4 ssaoSamples[kNumSSAOSamples] {glm::vec4(0.0f)};
     glm::vec2 screenResolution {0.0f};
     glm::vec2 screenResolutionRcp {0.0f};
     glm::vec2 blurDirection {0.0f};
+    float clipNear {kDefaultClipPlaneNear};
+    float clipFar {kDefaultClipPlaneFar};
     float ssaoSampleRadius {0.5f};
     float ssaoBias {0.1f};
     float ssrBias {0.5f};
     float ssrPixelStride {4.0f};
     float ssrMaxSteps {32.0f};
     float sharpenAmount {0.25f};
+    float padding[2];
 };
 
 class GraphicsContext;

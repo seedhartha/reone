@@ -44,6 +44,12 @@ public:
     virtual void bind(UniformBuffer &buffer, int index) = 0;
     virtual UniformBuffer &uniformBufferAt(int index) = 0;
 
+    virtual void pushBlending(BlendMode mode) = 0;
+    virtual void pushViewport(glm::ivec4 viewport) = 0;
+
+    virtual void popBlending() = 0;
+    virtual void popViewport() = 0;
+
     virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
     virtual void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) = 0;
     virtual void withBlending(BlendMode mode, const std::function<void()> &block) = 0;
@@ -77,6 +83,12 @@ public:
         }
         return *_uniformBuffers.at(index);
     }
+
+    void pushBlending(BlendMode mode) override;
+    void pushViewport(glm::ivec4 viewport) override;
+
+    void popBlending() override;
+    void popViewport() override;
 
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override;

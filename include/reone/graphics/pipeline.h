@@ -36,8 +36,16 @@ namespace reone {
 
 namespace graphics {
 
+enum class RenderPass {
+    None,
+    DirLightShadowsPass,
+    PointLightShadows,
+    OpaqueGeometry,
+    TransparentGeometry,
+    PostProcessing
+};
+
 class GraphicsContext;
-class IScene;
 class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
@@ -47,7 +55,12 @@ class IPipeline {
 public:
     virtual ~IPipeline() = default;
 
-    virtual std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) = 0;
+    virtual void setTargetSize(glm::ivec2 size) = 0;
+
+    virtual void beginPass(RenderPass pass) = 0;
+    virtual void endPass() = 0;
+
+    virtual Texture &output() = 0;
 };
 
 class Pipeline : public IPipeline, boost::noncopyable {
@@ -60,7 +73,7 @@ public:
         TextureRegistry &textureRegistry,
         Uniforms &uniforms) :
         _options(options),
-        _graphicsContext(graphicsContext),
+        _context(graphicsContext),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
@@ -69,7 +82,12 @@ public:
 
     void init();
 
-    std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim) override;
+    void setTargetSize(glm::ivec2 size) override;
+
+    void beginPass(RenderPass pass) override;
+    void endPass() override;
+
+    Texture &output() override;
 
 private:
     struct BlitFlags {
@@ -79,7 +97,7 @@ private:
         static constexpr int colorDepth = color | depth;
     };
 
-    struct Attachments {
+    struct RenderTargets {
         std::shared_ptr<Texture> cbGBufferDiffuse;
         std::shared_ptr<Texture> cbGBufferLightmap;
         std::shared_ptr<Texture> cbGBufferEnvMap;
@@ -87,8 +105,8 @@ private:
         std::shared_ptr<Texture> cbGBufferFeatures;
         std::shared_ptr<Texture> cbGBufferEyePos;
         std::shared_ptr<Texture> cbGBufferEyeNormal;
-        std::shared_ptr<Texture> cbOpaqueGeometry1;
-        std::shared_ptr<Texture> cbOpaqueGeometry2;
+        std::shared_ptr<Texture> cbDeferredOpaque1;
+        std::shared_ptr<Texture> cbDeferredOpaque2;
         std::shared_ptr<Texture> cbTransparentGeometry1;
         std::shared_ptr<Texture> cbTransparentGeometry2;
         std::shared_ptr<Texture> cbSSAO;
@@ -107,9 +125,9 @@ private:
         std::shared_ptr<Texture> dbOutput;
 
         std::shared_ptr<Framebuffer> fbPointLightShadows;
-        std::shared_ptr<Framebuffer> fbDirectionalLightShadows;
-        std::shared_ptr<Framebuffer> fbGBuffer;
+        std::shared_ptr<Framebuffer> fbDirLightShadows;
         std::shared_ptr<Framebuffer> fbOpaqueGeometry;
+        std::shared_ptr<Framebuffer> fbDeferredCombine;
         std::shared_ptr<Framebuffer> fbTransparentGeometry;
         std::shared_ptr<Framebuffer> fbSSAO;
         std::shared_ptr<Framebuffer> fbSSR;
@@ -125,11 +143,13 @@ private:
     glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
 
-    std::unordered_map<glm::ivec2, Attachments> _attachments;
+    glm::ivec2 _targetSize {0};
+    std::unordered_map<glm::ivec2, RenderTargets> _sizeToTargets;
+    RenderPass _pass {RenderPass::None};
 
     // Services
 
-    GraphicsContext &_graphicsContext;
+    GraphicsContext &_context;
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     TextureRegistry &_textureRegistry;
@@ -137,18 +157,9 @@ private:
 
     // END Services
 
-    void initAttachments(glm::ivec2 extent);
-
-    void computeLightSpaceMatrices(IScene &scene);
-
-    void drawShadows(IScene &scene, Attachments &attachments);
-    void drawOpaqueGeometry(IScene &scene, Attachments &attachments);
-    void drawTransparentGeometry(IScene &scene, Attachments &attachments);
-    void drawLensFlares(IScene &scene, Framebuffer &dst);
-    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias);
-    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float bias, float pixelStride, float maxSteps);
-    void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
-    void drawCombineGeometry(Attachments &attachments, Framebuffer &dst);
+    void drawSSAO(const glm::ivec2 &dim, RenderTargets &targets, float sampleRadius, float bias);
+    void drawSSR(const glm::ivec2 &dim, RenderTargets &targets, float bias, float pixelStride, float maxSteps);
+    void drawOITBlend(RenderTargets &targets, Framebuffer &dst);
 
     void drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
@@ -157,6 +168,30 @@ private:
     void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
+
+    // Render Targets
+
+    void initTargets(glm::ivec2 size);
+
+    RenderTargets &targetsForSize(const glm::ivec2 &size);
+
+    // END Render Targets
+
+    // Render Passes
+
+    void beginDirLightShadowsPass();
+    void beginPointLightShadowsPass();
+    void beginOpaqueGeometryPass();
+    void beginTransparentGeometryPass();
+    void beginPostProcessingPass();
+
+    void endDirLightShadowsPass();
+    void endPointLightShadowsPass();
+    void endOpaqueGeometryPass();
+    void endTransparentGeometryPass();
+    void endPostProcessingPass();
+
+    // END Render Passes
 };
 
 } // namespace graphics

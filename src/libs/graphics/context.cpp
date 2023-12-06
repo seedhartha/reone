@@ -100,19 +100,34 @@ void GraphicsContext::bind(UniformBuffer &buffer, int index) {
     buffer.bind(index);
 }
 
+void GraphicsContext::pushBlending(BlendMode mode) {
+    setBlendMode(mode);
+    _blendModes.push(mode);
+}
+
+void GraphicsContext::pushViewport(glm::ivec4 viewport) {
+    setViewport(viewport);
+    _viewports.push(std::move(viewport));
+}
+
+void GraphicsContext::popBlending() {
+    _blendModes.pop();
+    setBlendMode(_blendModes.top());
+}
+
+void GraphicsContext::popViewport() {
+    _viewports.pop();
+    setViewport(_viewports.top());
+}
+
 void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {
     if (_blendModes.top() == mode) {
         block();
         return;
     }
-
-    setBlendMode(mode);
-    _blendModes.push(mode);
-
+    pushBlending(mode);
     block();
-
-    _blendModes.pop();
-    setBlendMode(_blendModes.top());
+    popBlending();
 }
 
 void GraphicsContext::withDepthTest(DepthTestMode mode, const std::function<void()> &block) {
@@ -162,13 +177,9 @@ void GraphicsContext::withViewport(glm::ivec4 viewport, const std::function<void
         block();
         return;
     }
-    setViewport(viewport);
-    _viewports.push(viewport);
-
+    pushViewport(std::move(viewport));
     block();
-
-    _viewports.pop();
-    setViewport(_viewports.top());
+    popViewport();
 }
 
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) {

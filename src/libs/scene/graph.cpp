@@ -18,10 +18,12 @@
 #include "reone/scene/graph.h"
 
 #include "reone/audio/di/services.h"
+#include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmesh.h"
@@ -58,6 +60,16 @@ static constexpr float kMaxCollisionDistanceWalk2 = kMaxCollisionDistanceWalk * 
 
 static constexpr float kMaxCollisionDistanceLineOfSight = 16.0f;
 static constexpr float kMaxCollisionDistanceLineOfSight2 = kMaxCollisionDistanceLineOfSight * kMaxCollisionDistanceLineOfSight;
+
+static constexpr float kPointLightShadowsFOV = glm::radians(90.0f);
+static constexpr float kPointLightShadowsNearPlane = 0.25f;
+static constexpr float kPointLightShadowsFarPlane = 2500.0f;
+
+static const std::vector<float> g_shadowCascadeDivisors {
+    0.005f,
+    0.015f,
+    0.045f,
+    0.135f};
 
 void SceneGraph::clear() {
     _modelRoots.clear();
@@ -429,6 +441,80 @@ void SceneGraph::prepareTransparentLeafs() {
     }
 }
 
+Texture &SceneGraph::draw(const glm::ivec2 &dim) {
+    auto &pipeline = _graphicsSvc.pipeline;
+    pipeline.setTargetSize(dim);
+
+    auto camera = this->camera();
+    if (camera) {
+        _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
+            globals.projection = camera->projection();
+            globals.view = camera->view();
+            globals.viewInv = glm::inverse(camera->view());
+            globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
+            globals.worldAmbientColor = glm::vec4(ambientLightColor(), 1.0f);
+            globals.clipNear = camera->zNear();
+            globals.clipFar = camera->zFar();
+            if (hasShadowLight()) {
+                computeLightSpaceMatrices();
+                for (int i = 0; i < kNumShadowLightSpace; ++i) {
+                    globals.shadowLightSpace[i] = _shadowLightSpace[i];
+                }
+                globals.shadowLightPosition = glm::vec4(shadowLightPosition(), isShadowLightDirectional() ? 0.0 : 1.0);
+                globals.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
+                globals.shadowStrength = shadowStrength();
+                globals.shadowRadius = shadowRadius();
+            }
+            if (isFogEnabled()) {
+                globals.fogNear = fogNear();
+                globals.fogFar = fogFar();
+                globals.fogColor = glm::vec4(fogColor(), 1.0f);
+            }
+        });
+        auto halfDim = dim / 2;
+        auto screenProjection = glm::mat4(1.0f);
+        screenProjection *= glm::scale(glm::vec3(halfDim.x, halfDim.y, 1.0f));
+        screenProjection *= glm::translate(glm::vec3(0.5f, 0.5f, 0.0f));
+        screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
+        screenProjection *= camera->projection();
+        _graphicsSvc.uniforms.setScreenEffect([&camera, &screenProjection](auto &screenEffect) {
+            screenEffect.projection = camera->projection();
+            screenEffect.screenProjection = screenProjection;
+            screenEffect.clipNear = camera->zNear();
+            screenEffect.clipFar = camera->zFar();
+        });
+
+        if (hasShadowLight()) {
+            auto pass = isShadowLightDirectional() ? RenderPass::DirLightShadowsPass : RenderPass::PointLightShadows;
+            pipeline.beginPass(pass);
+            drawShadows();
+            pipeline.endPass();
+        }
+
+        pipeline.beginPass(RenderPass::OpaqueGeometry);
+        fillLightsUniforms();
+        drawOpaque();
+        pipeline.endPass();
+
+        pipeline.beginPass(RenderPass::TransparentGeometry);
+        drawTransparent();
+        pipeline.endPass();
+
+        pipeline.beginPass(RenderPass::PostProcessing);
+        if (!_flareLights.empty()) {
+            _graphicsSvc.uniforms.setGlobals([&camera](auto &globals) {
+                globals.reset();
+                globals.projection = camera->projection();
+                globals.view = camera->view();
+            });
+            drawLensFlares();
+        }
+        pipeline.endPass();
+    }
+
+    return pipeline.output();
+}
+
 void SceneGraph::drawShadows() {
     if (!_activeCamera) {
         return;
@@ -505,6 +591,120 @@ void SceneGraph::drawLensFlares() {
             light->drawLensFlare(light->modelNode().light()->flares.front());
         }
     });
+}
+
+static std::vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
+    auto inv = glm::inverse(projection * view);
+
+    std::vector<glm::vec4> corners;
+    for (auto x = 0; x < 2; ++x) {
+        for (auto y = 0; y < 2; ++y) {
+            for (auto z = 0; z < 2; ++z) {
+                auto pt = inv * glm::vec4(
+                                    2.0f * x - 1.0f,
+                                    2.0f * y - 1.0f,
+                                    2.0f * z - 1.0f,
+                                    1.0f);
+                corners.push_back(pt / pt.w);
+            }
+        }
+    }
+
+    return corners;
+}
+
+static glm::mat4 computeDirectionalLightSpaceMatrix(
+    float fov,
+    float aspect,
+    float near, float far,
+    const glm::vec3 &lightDir,
+    const glm::mat4 &cameraView) {
+
+    auto projection = glm::perspective(fov, aspect, near, far);
+
+    glm::vec3 center(0.0f);
+    auto corners = computeFrustumCornersWorldSpace(projection, cameraView);
+    for (auto &v : corners) {
+        center += glm::vec3(v);
+    }
+    center /= corners.size();
+
+    auto lightView = glm::lookAt(center - lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::min();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::min();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::min();
+    for (auto &v : corners) {
+        auto trf = lightView * v;
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
+    }
+    float zMult = 10.0f;
+    if (minZ < 0.0f) {
+        minZ *= zMult;
+    } else {
+        minZ /= zMult;
+    }
+    if (maxZ < 0.0f) {
+        maxZ /= zMult;
+    } else {
+        maxZ *= zMult;
+    }
+
+    auto lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+    return lightProjection * lightView;
+}
+
+static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) {
+    switch (face) {
+    case CubeMapFace::PositiveX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::PositiveY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+    case CubeMapFace::NegativeY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+    case CubeMapFace::PositiveZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+    default:
+        throw std::invalid_argument("Invalid cube map face: " + std::to_string(static_cast<int>(face)));
+    }
+}
+
+void SceneGraph::computeLightSpaceMatrices() {
+    if (isShadowLightDirectional()) {
+        auto camera = std::static_pointer_cast<PerspectiveCamera>(this->camera());
+        auto lightDir = glm::normalize(camera->position() - shadowLightPosition());
+        float fovy = camera->fovy();
+        float aspect = camera->aspect();
+        float cameraNear = camera->zNear();
+        float cameraFar = camera->zFar();
+        for (int i = 0; i < kNumShadowCascades; ++i) {
+            float far = cameraFar * g_shadowCascadeDivisors[i];
+            float near = cameraNear;
+            if (i > 0) {
+                near = cameraFar * g_shadowCascadeDivisors[i - 1];
+            }
+            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fovy, aspect, near, far, lightDir, camera->view());
+            _shadowCascadeFarPlanes[i] = far;
+        }
+    } else {
+        glm::mat4 projection(glm::perspective(kPointLightShadowsFOV, 1.0f, kPointLightShadowsNearPlane, kPointLightShadowsFarPlane));
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            glm::mat4 lightView(getPointLightView(shadowLightPosition(), static_cast<CubeMapFace>(i)));
+            _shadowLightSpace[i] = projection * lightView;
+        }
+    }
 }
 
 std::vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const {

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/graphics/scene.h"
-
 #include "fogproperties.h"
 #include "node/camera.h"
 #include "node/dummy.h"
@@ -61,9 +59,10 @@ struct Collision;
 
 class IAnimationEventListener;
 
-class ISceneGraph : public graphics::IScene {
+class ISceneGraph {
 public:
     virtual void update(float dt) = 0;
+    virtual graphics::Texture &draw(const glm::ivec2 &dim) = 0;
 
     virtual void clear() = 0;
 
@@ -131,11 +130,12 @@ public:
     }
 
     void update(float dt) override;
+    graphics::Texture &draw(const glm::ivec2 &dim) override;
 
-    void drawShadows() override;
-    void drawOpaque() override;
-    void drawTransparent() override;
-    void drawLensFlares() override;
+    void drawShadows();
+    void drawOpaque();
+    void drawTransparent();
+    void drawLensFlares();
 
     const std::string &name() const override {
         return _name;
@@ -145,7 +145,7 @@ public:
         return _activeCamera;
     }
 
-    std::shared_ptr<graphics::Camera> camera() const override {
+    std::shared_ptr<graphics::Camera> camera() const {
         return _activeCamera ? _activeCamera->camera() : nullptr;
     }
 
@@ -176,9 +176,9 @@ public:
 
     // Lighting
 
-    void fillLightsUniforms() override;
+    void fillLightsUniforms();
 
-    const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
+    const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
 
     void setAmbientLightColor(glm::vec3 color) override { _ambientLightColor = std::move(color); }
 
@@ -186,19 +186,19 @@ public:
 
     // Fog
 
-    bool isFogEnabled() const override {
+    bool isFogEnabled() const {
         return _fog.enabled;
     }
 
-    float fogNear() const override {
+    float fogNear() const {
         return _fog.nearPlane;
     }
 
-    float fogFar() const override {
+    float fogFar() const {
         return _fog.farPlane;
     }
 
-    const glm::vec3 &fogColor() const override {
+    const glm::vec3 &fogColor() const {
         return _fog.color;
     }
 
@@ -210,12 +210,12 @@ public:
 
     // Shadows
 
-    bool hasShadowLight() const override { return _shadowLight; }
-    bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
+    bool hasShadowLight() const { return _shadowLight; }
+    bool isShadowLightDirectional() const { return _shadowLight->isDirectional(); }
 
-    glm::vec3 shadowLightPosition() const override { return _shadowLight->getOrigin(); }
-    float shadowStrength() const override { return _shadowStrength; }
-    float shadowRadius() const override { return _shadowLight->radius(); }
+    glm::vec3 shadowLightPosition() const { return _shadowLight->getOrigin(); }
+    float shadowStrength() const { return _shadowStrength; }
+    float shadowRadius() const { return _shadowLight->radius(); }
 
     // END Shadows
 
@@ -309,6 +309,9 @@ private:
 
     LightSceneNode *_shadowLight {nullptr};
 
+    glm::mat4 _shadowLightSpace[graphics::kNumShadowLightSpace] {glm::mat4(1.0f)};
+    glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
+
     // END Shadows
 
     // Fog
@@ -337,6 +340,8 @@ private:
 
     void prepareOpaqueLeafs();
     void prepareTransparentLeafs();
+
+    void computeLightSpaceMatrices();
 
     std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const;
 
