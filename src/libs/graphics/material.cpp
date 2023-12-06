@@ -17,35 +17,9 @@
 
 #include "reone/graphics/material.h"
 
-#include "reone/graphics/context.h"
-#include "reone/graphics/types.h"
-#include "reone/graphics/uniformbuffer.h"
-#include "reone/graphics/uniforms.h"
-
 namespace reone {
 
 namespace graphics {
-
-void Material::apply(IGraphicsContext &context) {
-    context.useProgram(_program);
-    for (auto &[unit, texture] : _textures) {
-        context.bind(*texture, unit);
-    }
-}
-
-void ModelMaterial::apply(IGraphicsContext &context) {
-    Material::apply(context);
-    auto &uboLocals = context.uniformBufferAt(UniformBlockBindingPoints::locals);
-    uboLocals.bind(UniformBlockBindingPoints::locals);
-    uboLocals.setData(&_localsUniforms, sizeof(LocalsUniforms));
-}
-
-void SkinnedModelMaterial::apply(IGraphicsContext &context) {
-    ModelMaterial::apply(context);
-    auto &uboSkeletal = context.uniformBufferAt(UniformBlockBindingPoints::skeletal);
-    uboSkeletal.bind(UniformBlockBindingPoints::skeletal);
-    uboSkeletal.setData(&_skeletalUniforms, sizeof(SkeletalUniforms));
-}
 
 } // namespace graphics
 

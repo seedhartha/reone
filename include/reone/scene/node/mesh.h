@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "reone/graphics/material.h"
-
 #include "modelnode.h"
 
 namespace reone {
@@ -77,8 +75,6 @@ private:
     } _nodeTextures;
 
     ModelSceneNode &_model;
-
-    std::unique_ptr<graphics::ModelMaterial> _material;
 
     glm::vec2 _uvOffset {0.0f};
     float _bumpmapCycleTime {0.0f};

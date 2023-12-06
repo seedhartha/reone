@@ -17,69 +17,27 @@
 
 #pragma once
 
-#include "uniforms.h"
-
 namespace reone {
 
 namespace graphics {
 
-class IGraphicsContext;
-class ShaderProgram;
 class Texture;
 
 class Material {
 public:
     using TextureUnit = int;
 
-    virtual ~Material() = default;
-
-    void setTexture(Texture &texture, TextureUnit unit) {
-        _textures[unit] = &texture;
+    bool transparent() const {
+        return _transparent;
     }
 
-    virtual void apply(IGraphicsContext &context);
-
-protected:
-    using TextureMap = std::map<TextureUnit, Texture *>;
-
-    Material(ShaderProgram &program) :
-        _program(program) {
-    }
-
-    ShaderProgram &_program;
-    TextureMap _textures;
-};
-
-class ModelMaterial : public Material {
-public:
-    ModelMaterial(ShaderProgram &program) :
-        Material(program) {
-    }
-
-    void apply(IGraphicsContext &context) override;
-
-    LocalsUniforms &localsUniforms() {
-        return _localsUniforms;
+    void setTransparent(bool transparent) {
+        _transparent = transparent;
     }
 
 private:
-    LocalsUniforms _localsUniforms;
-};
-
-class SkinnedModelMaterial : public ModelMaterial {
-public:
-    SkinnedModelMaterial(ShaderProgram &program) :
-        ModelMaterial(program) {
-    }
-
-    void apply(IGraphicsContext &context) override;
-
-    SkeletalUniforms &skeletalUniforms() {
-        return _skeletalUniforms;
-    }
-
-private:
-    SkeletalUniforms _skeletalUniforms;
+    bool _transparent {false};
+    std::unordered_map<TextureUnit, std::reference_wrapper<Texture>> _textures;
 };
 
 } // namespace graphics
