@@ -61,6 +61,8 @@ class IAnimationEventListener;
 
 class ISceneGraph {
 public:
+    virtual ~ISceneGraph() = default;
+
     virtual void update(float dt) = 0;
     virtual graphics::Texture &draw(const glm::ivec2 &dim) = 0;
 

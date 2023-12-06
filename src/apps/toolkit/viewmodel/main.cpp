@@ -461,18 +461,20 @@ void MainViewModel::loadEngine() {
     _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
 
     _systemModule->init();
-    _resourceModule->init();
     _graphicsModule->init();
     _audioModule->init();
+    _resourceModule->init();
     _sceneModule->init();
 
     auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto shaderPackPath = getFileIgnoreCase(std::filesystem::current_path(), "shaderpack.erf");
     auto guiTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf");
     auto tpaTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf");
     auto overridePath = getFileIgnoreCase(_gamePath, "override");
 
     auto &resources = _resourceModule->resources();
     resources.addKEY(keyPath);
+    resources.addERF(shaderPackPath);
     resources.addERF(guiTexPackPath);
     resources.addERF(tpaTexPackPath);
     resources.addFolder(overridePath);
@@ -677,12 +679,15 @@ void MainViewModel::update3D() {
 }
 
 void MainViewModel::render3D(int w, int h) {
-    auto &scene = _sceneModule->graphs().get(kSceneMain);
-
     float aspect = w / static_cast<float>(h);
     _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
-    auto &output = scene.draw(glm::ivec2(w, h));
+    auto &scene = _sceneModule->graphs().get(kSceneMain);
+    std::optional<std::reference_wrapper<Texture>> output;
+    _graphicsModule->context().withViewport({0, 0, w, h}, [&scene, &output, &w, &h]() {
+        output = scene.draw(glm::ivec2(w, h));
+    });
+
     _graphicsModule->uniforms().setGlobals([](auto &globals) {
         globals.reset();
     });
@@ -692,7 +697,7 @@ void MainViewModel::render3D(int w, int h) {
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
         _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::texture2D));
-        _graphicsModule->context().bind(output);
+        _graphicsModule->context().bind(output->get());
         _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
     });
 }
