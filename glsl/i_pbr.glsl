@@ -25,13 +25,13 @@ void PBR_irradianceAmbient(
     vec3 irradiance = uWorldAmbientColor.rgb;
 
     for (int i = 0; i < uNumLights; ++i) {
-        if (!uLights[i].ambientOnly)
+        if (!uLights[i].ambientOnly) {
             continue;
-
+        }
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius * uLights[i].radius)
+        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) {
             continue;
-
+        }
         float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
         irradiance += attenuation * uLights[i].multiplier * uLights[i].color.rgb;
     }
@@ -68,13 +68,13 @@ void PBR_irradianceDirect(
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     for (int i = 0; i < uNumLights; ++i) {
-        if (uLights[i].ambientOnly)
+        if (uLights[i].ambientOnly) {
             continue;
-
+        }
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius * uLights[i].radius)
+        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) {
             continue;
-
+        }
         float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
         vec3 radiance = attenuation * uLights[i].multiplier * uLights[i].color.rgb;
 

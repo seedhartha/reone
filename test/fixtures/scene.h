@@ -84,7 +84,7 @@ public:
     MOCK_METHOD(void, drawTransparent, (), (override));
     MOCK_METHOD(void, drawLensFlares, (), (override));
 
-    MOCK_METHOD(void, fillLightingUniforms, (), (override));
+    MOCK_METHOD(void, fillLightsUniforms, (), (override));
 
     MOCK_METHOD(std::shared_ptr<graphics::Camera>, camera, (), (const override));
     MOCK_METHOD(const glm::vec3 &, ambientLightColor, (), (const override));

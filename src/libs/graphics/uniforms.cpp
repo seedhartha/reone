@@ -31,7 +31,7 @@ void Uniforms::init() {
     static GlobalsUniforms defaultsGlobals;
     static LocalsUniforms defaultsLocals;
     static TextUniforms defaultsText;
-    static LightingUniforms defaultsLighting;
+    static LightsUniforms defaultsLights;
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
@@ -42,7 +42,7 @@ void Uniforms::init() {
     _ubGlobals = initBuffer(&defaultsGlobals, sizeof(GlobalsUniforms));
     _ubLocals = initBuffer(&defaultsLocals, sizeof(LocalsUniforms));
     _ubText = initBuffer(&defaultsText, sizeof(TextUniforms));
-    _ubLighting = initBuffer(&defaultsLighting, sizeof(LightingUniforms));
+    _ubLights = initBuffer(&defaultsLights, sizeof(LightsUniforms));
     _ubSkeletal = initBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
     _ubParticles = initBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
     _ubGrass = initBuffer(&defaultsGrass, sizeof(GrassUniforms));
@@ -53,7 +53,7 @@ void Uniforms::init() {
     _context.bind(*_ubGlobals, UniformBlockBindingPoints::globals);
     _context.bind(*_ubLocals, UniformBlockBindingPoints::locals);
     _context.bind(*_ubText, UniformBlockBindingPoints::text);
-    _context.bind(*_ubLighting, UniformBlockBindingPoints::lighting);
+    _context.bind(*_ubLights, UniformBlockBindingPoints::lights);
     _context.bind(*_ubSkeletal, UniformBlockBindingPoints::skeletal);
     _context.bind(*_ubParticles, UniformBlockBindingPoints::particles);
     _context.bind(*_ubGrass, UniformBlockBindingPoints::grass);
@@ -72,7 +72,7 @@ void Uniforms::deinit() {
     _ubGlobals.reset();
     _ubLocals.reset();
     _ubText.reset();
-    _ubLighting.reset();
+    _ubLights.reset();
     _ubSkeletal.reset();
     _ubParticles.reset();
     _ubGrass.reset();
@@ -101,10 +101,10 @@ void Uniforms::setText(const std::function<void(TextUniforms &)> &block) {
     _ubText->setData(&_text, sizeof(TextUniforms));
 }
 
-void Uniforms::setLighting(const std::function<void(LightingUniforms &)> &block) {
-    block(_lighting);
-    _context.bind(*_ubLighting, UniformBlockBindingPoints::lighting);
-    _ubLighting->setData(&_lighting, sizeof(LightingUniforms));
+void Uniforms::setLights(const std::function<void(LightsUniforms &)> &block) {
+    block(_lights);
+    _context.bind(*_ubLights, UniformBlockBindingPoints::lights);
+    _ubLights->setData(&_lights, sizeof(LightsUniforms));
 }
 
 void Uniforms::setSkeletal(const std::function<void(SkeletalUniforms &)> &block) {

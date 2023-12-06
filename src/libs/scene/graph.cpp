@@ -683,8 +683,8 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
     return distances[0].first;
 }
 
-void SceneGraph::fillLightingUniforms() {
-    _graphicsSvc.uniforms.setLighting([this](auto &lighting) {
+void SceneGraph::fillLightsUniforms() {
+    _graphicsSvc.uniforms.setLights([this](auto &lighting) {
         lighting.numLights = static_cast<int>(_activeLights.size());
         for (size_t i = 0; i < _activeLights.size(); ++i) {
             LightUniforms &shaderLight = lighting.lights[i];

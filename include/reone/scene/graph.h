@@ -176,7 +176,7 @@ public:
 
     // Lighting
 
-    void fillLightingUniforms() override;
+    void fillLightsUniforms() override;
 
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
 

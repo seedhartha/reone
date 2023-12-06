@@ -1,4 +1,3 @@
-const float LIGHTMAP_STRENGTH = 0.5;
 const float SELFILLUM_THRESHOLD = 0.8;
 
 uniform sampler2D sMainTex;
@@ -37,6 +36,8 @@ void main() {
     vec4 envmapSample = texture(sEnvmapColor, uv);
     vec4 selfIllumSample = texture(sSelfIllumColor, uv);
     vec4 featuresSample = texture(sFeatures, uv);
+    vec3 eyePos = texture(sEyePos, uv).rgb;
+    vec3 eyeNormal = normalize(2.0 * texture(sEyeNormal, uv).rgb - 1.0);
 #ifdef R_SSAO
     vec4 ssaoSample = texture(sSSAO, uv);
 #endif
@@ -44,22 +45,12 @@ void main() {
     vec4 ssrSample = texture(sSSR, uv);
 #endif
 
-    vec3 eyePos = texture(sEyePos, uv).rgb;
     vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).rgb;
-
-    vec3 eyeNormal = texture(sEyeNormal, uv).rgb;
-    eyeNormal = normalize(2.0 * eyeNormal - 1.0);
-
     vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).rgb;
-
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
-
     float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
     float fog = mix(0.0, getFog(worldPos), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
-
-    float shadowLM = smoothstep(0.0, 1.0, 1.0 - rgbToLuma(lightmapSample.rgb));
-    shadowLM = max(shadow, mix(0.0, shadowLM, lightmapped));
 
     vec3 albedo = mainTexSample.rgb;
 #ifdef R_SSR
@@ -74,24 +65,27 @@ void main() {
     float ao = 1.0;
 #endif
 
+#ifdef R_PBR
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.01, 0.99);
-
-    vec3 ambientD, ambientS;
+    vec3 ambientD, ambientS, directD, directS, directAreaD, directAreaS;
     PBR_irradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness, ambientD, ambientS);
-
-    vec3 directD, directS, directAreaD, directAreaS;
     PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
-
-    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
-    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
-
+    vec3 colorDynamic = clamp(ambientD * ao + directD + emission, 0.0, 1.0) * albedo;
+    colorDynamic += ambientS * ao + directS;
     vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
+    vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
+#else
+    vec3 ambient, diffuse, specular;
+    BP_lighting(worldPos, worldNormal, ambient, diffuse, specular);
+    vec3 colorDynamic = clamp(emission + ao * ambient + (diffuse + specular) * (1.0 - shadow), 0.0, 1.0) * albedo;
+    vec3 colorLightmapped = clamp(emission + lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow), 0.0, 1.0) * albedo;
+    vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
+    color = mix(color, color + ao * (1.0 - mainTexSample.a) * environment, envmapped);
+#endif
 
-    vec3 color = mix(colorDynamic, colorLightmapped, LIGHTMAP_STRENGTH * lightmapped);
     color = mix(color, uFogColor.rgb, fog);
-
     float alpha = step(0.0001, mainTexSample.a);
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, emission * albedo * mainTexSample.a);
 

@@ -9,7 +9,7 @@ struct Light {
     int dynamicType;
 };
 
-layout(std140) uniform Lighting {
+layout(std140) uniform Lights {
     int uNumLights;
     Light uLights[MAX_LIGHTS];
 };

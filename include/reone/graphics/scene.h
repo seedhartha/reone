@@ -32,7 +32,7 @@ public:
     virtual void drawTransparent() = 0;
     virtual void drawLensFlares() = 0;
 
-    virtual void fillLightingUniforms() = 0;
+    virtual void fillLightsUniforms() = 0;
 
     virtual std::shared_ptr<Camera> camera() const = 0;
     virtual const glm::vec3 &ambientLightColor() const = 0;

@@ -29,7 +29,7 @@ namespace resource {
 
 static const std::string kUniformsGlobals = "u_globals";
 static const std::string kUniformsGrass = "u_grass";
-static const std::string kUniformsLighting = "u_lighting";
+static const std::string kUniformsLights = "u_lights";
 static const std::string kUniformsLocals = "u_locals";
 static const std::string kUniformsParticle = "u_particle";
 static const std::string kUniformsPoints = "u_points";
@@ -38,6 +38,7 @@ static const std::string kUniformsSkeletal = "u_skeletal";
 static const std::string kUniformsText = "u_text";
 static const std::string kUniformsWalkmesh = "u_walkmesh";
 
+static const std::string kIncludeBlinnPhong = "i_blinnphong";
 static const std::string kIncludeEnvMap = "i_envmap";
 static const std::string kIncludeFog = "i_fog";
 static const std::string kIncludeHash = "i_hash";
@@ -118,7 +119,7 @@ void Shaders::init() {
 
     auto fragColor = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragColor});
     auto fragDeferredAABB = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragDeferredAABB});
-    auto fragDeferredCombine = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsLighting, kIncludeMath, kIncludeLighting, kIncludePBR, kIncludeLuma, kIncludeShadowMap, kIncludeFog, kFragDeferredCombine});
+    auto fragDeferredCombine = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsLights, kIncludeMath, kIncludeLighting, kIncludeBlinnPhong, kIncludePBR, kIncludeLuma, kIncludeShadowMap, kIncludeFog, kFragDeferredCombine});
     auto fragDeferredGrass = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsGrass, kIncludeHash, kIncludeHashedAlpha, kFragDeferredGrass});
     auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kIncludeMath, kIncludeHash, kIncludeHashedAlpha, kIncludeEnvMap, kIncludeNormalMap, kFragDeferredOpaqueModel});
     auto fragDeferredSSAO = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsScreenEffect, kFragDeferredSSAO});
@@ -179,6 +180,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
     std::list<std::string> sources;
     sources.push_back("#version 330 core\n\n");
     auto defines = StringBuilder();
+    defines.append("#define R_PBR\n");
     if (_graphicsOpt.ssr) {
         defines.append("#define R_SSR\n");
     }
@@ -238,7 +240,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);
     program->bindUniformBlock("Locals", UniformBlockBindingPoints::locals);
     program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
-    program->bindUniformBlock("Lighting", UniformBlockBindingPoints::lighting);
+    program->bindUniformBlock("Lights", UniformBlockBindingPoints::lights);
     program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);

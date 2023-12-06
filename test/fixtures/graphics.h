@@ -80,7 +80,7 @@ public:
     MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalsUniforms &)> &block), (override));
     MOCK_METHOD(void, setLocals, (const std::function<void(LocalsUniforms &)> &block), (override));
     MOCK_METHOD(void, setText, (const std::function<void(TextUniforms &)> &block), (override));
-    MOCK_METHOD(void, setLighting, (const std::function<void(LightingUniforms &)> &block), (override));
+    MOCK_METHOD(void, setLights, (const std::function<void(LightsUniforms &)> &block), (override));
     MOCK_METHOD(void, setSkeletal, (const std::function<void(SkeletalUniforms &)> &block), (override));
     MOCK_METHOD(void, setParticles, (const std::function<void(ParticlesUniforms &)> &block), (override));
     MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &block), (override));

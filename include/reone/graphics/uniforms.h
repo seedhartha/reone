@@ -116,7 +116,7 @@ struct LightUniforms {
     int dynamicType {0};
 };
 
-struct LightingUniforms {
+struct LightsUniforms {
     int numLights {0};
     float padding[3];
     LightUniforms lights[kMaxLights];
@@ -192,7 +192,7 @@ public:
     virtual void setGlobals(const std::function<void(GlobalsUniforms &)> &block) = 0;
     virtual void setLocals(const std::function<void(LocalsUniforms &)> &block) = 0;
     virtual void setText(const std::function<void(TextUniforms &)> &block) = 0;
-    virtual void setLighting(const std::function<void(LightingUniforms &)> &block) = 0;
+    virtual void setLights(const std::function<void(LightsUniforms &)> &block) = 0;
     virtual void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) = 0;
     virtual void setParticles(const std::function<void(ParticlesUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
@@ -215,7 +215,7 @@ public:
     void setGlobals(const std::function<void(GlobalsUniforms &)> &block) override;
     void setLocals(const std::function<void(LocalsUniforms &)> &block) override;
     void setText(const std::function<void(TextUniforms &)> &block) override;
-    void setLighting(const std::function<void(LightingUniforms &)> &block) override;
+    void setLights(const std::function<void(LightsUniforms &)> &block) override;
     void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override;
     void setParticles(const std::function<void(ParticlesUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
@@ -233,7 +233,7 @@ private:
     GlobalsUniforms _globals;
     LocalsUniforms _locals;
     TextUniforms _text;
-    LightingUniforms _lighting;
+    LightsUniforms _lights;
     SkeletalUniforms _skeletal;
     ParticlesUniforms _particles;
     GrassUniforms _grass;
@@ -248,7 +248,7 @@ private:
     std::shared_ptr<UniformBuffer> _ubGlobals;
     std::shared_ptr<UniformBuffer> _ubLocals;
     std::shared_ptr<UniformBuffer> _ubText;
-    std::shared_ptr<UniformBuffer> _ubLighting;
+    std::shared_ptr<UniformBuffer> _ubLights;
     std::shared_ptr<UniformBuffer> _ubSkeletal;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;

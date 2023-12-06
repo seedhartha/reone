@@ -172,7 +172,7 @@ struct UniformBlockBindingPoints {
     static constexpr int globals = 0;
     static constexpr int locals = 1;
     static constexpr int text = 2;
-    static constexpr int lighting = 3;
+    static constexpr int lights = 3;
     static constexpr int skeletal = 4;
     static constexpr int particles = 5;
     static constexpr int grass = 6;

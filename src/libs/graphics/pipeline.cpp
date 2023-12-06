@@ -578,7 +578,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    scene.fillLightingUniforms();
+    scene.fillLightsUniforms();
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);
