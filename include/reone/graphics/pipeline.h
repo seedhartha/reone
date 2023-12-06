@@ -56,9 +56,7 @@ public:
     virtual ~IPipeline() = default;
 
     virtual void setTargetSize(glm::ivec2 size) = 0;
-
-    virtual void beginPass(RenderPass pass) = 0;
-    virtual void endPass() = 0;
+    virtual void inPass(RenderPass pass, std::function<void()> block) = 0;
 
     virtual Texture &output() = 0;
 };
@@ -83,9 +81,7 @@ public:
     void init();
 
     void setTargetSize(glm::ivec2 size) override;
-
-    void beginPass(RenderPass pass) override;
-    void endPass() override;
+    void inPass(RenderPass pass, std::function<void()> block) override;
 
     Texture &output() override;
 

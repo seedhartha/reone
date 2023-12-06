@@ -486,30 +486,30 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
 
         if (hasShadowLight()) {
             auto pass = isShadowLightDirectional() ? RenderPass::DirLightShadowsPass : RenderPass::PointLightShadows;
-            pipeline.beginPass(pass);
-            drawShadows();
-            pipeline.endPass();
-        }
-
-        pipeline.beginPass(RenderPass::OpaqueGeometry);
-        fillLightsUniforms();
-        drawOpaque();
-        pipeline.endPass();
-
-        pipeline.beginPass(RenderPass::TransparentGeometry);
-        drawTransparent();
-        pipeline.endPass();
-
-        pipeline.beginPass(RenderPass::PostProcessing);
-        if (!_flareLights.empty()) {
-            _graphicsSvc.uniforms.setGlobals([&camera](auto &globals) {
-                globals.reset();
-                globals.projection = camera->projection();
-                globals.view = camera->view();
+            pipeline.inPass(pass, [this]() {
+                drawShadows();
             });
-            drawLensFlares();
         }
-        pipeline.endPass();
+
+        fillLightsUniforms();
+        pipeline.inPass(RenderPass::OpaqueGeometry, [this]() {
+            drawOpaque();
+        });
+
+        pipeline.inPass(RenderPass::TransparentGeometry, [this]() {
+            drawTransparent();
+        });
+
+        pipeline.inPass(RenderPass::PostProcessing, [this, &camera]() {
+            if (!_flareLights.empty()) {
+                _graphicsSvc.uniforms.setGlobals([&camera](auto &globals) {
+                    globals.reset();
+                    globals.projection = camera->projection();
+                    globals.view = camera->view();
+                });
+                drawLensFlares();
+            }
+        });
     }
 
     return pipeline.output();

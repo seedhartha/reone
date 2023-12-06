@@ -398,28 +398,38 @@ void Pipeline::setTargetSize(glm::ivec2 size) {
     _targetSize = std::move(size);
 }
 
-void Pipeline::beginPass(RenderPass pass) {
-    checkEqual(_pass, RenderPass::None, "Must end previous render pass");
+void Pipeline::inPass(RenderPass pass, std::function<void()> block) {
+    checkEqual(_pass, RenderPass::None, "Current render pass must be None");
+    checkNotEqual(pass, RenderPass::None, "New render pass must not be None");
     switch (pass) {
     case RenderPass::DirLightShadowsPass:
         beginDirLightShadowsPass();
+        block();
+        endDirLightShadowsPass();
         break;
     case RenderPass::PointLightShadows:
         beginPointLightShadowsPass();
+        block();
+        endPointLightShadowsPass();
         break;
     case RenderPass::OpaqueGeometry:
         beginOpaqueGeometryPass();
+        block();
+        endOpaqueGeometryPass();
         break;
     case RenderPass::TransparentGeometry:
         beginTransparentGeometryPass();
+        block();
+        endTransparentGeometryPass();
         break;
     case RenderPass::PostProcessing:
         beginPostProcessingPass();
+        block();
+        endPostProcessingPass();
         break;
     default:
-        throw std::invalid_argument("Unexpected new pass: " + std::to_string(static_cast<int>(pass)));
+        throw std::invalid_argument("Unexpected new render pass");
     }
-    _pass = pass;
 }
 
 void Pipeline::beginDirLightShadowsPass() {
@@ -458,31 +468,6 @@ void Pipeline::beginTransparentGeometryPass() {
 void Pipeline::beginPostProcessingPass() {
     auto &targets = targetsForSize(_targetSize);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targets.fbOutput->nameGL());
-}
-
-void Pipeline::endPass() {
-    switch (_pass) {
-    case RenderPass::None:
-        return;
-    case RenderPass::DirLightShadowsPass:
-        endDirLightShadowsPass();
-        break;
-    case RenderPass::PointLightShadows:
-        endPointLightShadowsPass();
-        break;
-    case RenderPass::OpaqueGeometry:
-        endOpaqueGeometryPass();
-        break;
-    case RenderPass::TransparentGeometry:
-        endTransparentGeometryPass();
-        break;
-    case RenderPass::PostProcessing:
-        endPostProcessingPass();
-        break;
-    default:
-        throw std::logic_error("Unexpected current pass: " + std::to_string(static_cast<int>(_pass)));
-    }
-    _pass = RenderPass::None;
 }
 
 void Pipeline::endDirLightShadowsPass() {

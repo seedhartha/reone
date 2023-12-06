@@ -69,9 +69,7 @@ public:
 class MockPipeline : public IPipeline, boost::noncopyable {
 public:
     MOCK_METHOD(void, setTargetSize, (glm::ivec2), (override));
-
-    MOCK_METHOD(void, beginPass, (RenderPass), (override));
-    MOCK_METHOD(void, endPass, (), (override));
+    MOCK_METHOD(void, inPass, (RenderPass, std::function<void()>), (override));
 
     MOCK_METHOD(Texture &, output, (), (override));
 };
