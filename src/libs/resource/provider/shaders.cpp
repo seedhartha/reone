@@ -180,7 +180,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
     std::list<std::string> sources;
     sources.push_back("#version 330 core\n\n");
     auto defines = StringBuilder();
-    defines.append("#define R_PBR\n");
+    // defines.append("#define R_PBR\n");
     if (_graphicsOpt.ssr) {
         defines.append("#define R_SSR\n");
     }

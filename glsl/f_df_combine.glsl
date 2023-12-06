@@ -1,4 +1,5 @@
 const float SELFILLUM_THRESHOLD = 0.8;
+const float LIGHTMAP_AMBIENT_FACTOR = 0.5;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
@@ -77,12 +78,15 @@ void main() {
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
 #else
-    vec3 ambient, diffuse, specular;
-    BP_lighting(worldPos, worldNormal, ambient, diffuse, specular);
-    vec3 colorDynamic = clamp(emission + ao * ambient + (diffuse + specular) * (1.0 - shadow), 0.0, 1.0) * albedo;
-    vec3 colorLightmapped = clamp(emission + lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow), 0.0, 1.0) * albedo;
+    vec3 ambient, directDiff, directSpec;
+    BP_lighting(worldPos, worldNormal, 1.0 - lightmapped,
+                ambient, directDiff, directSpec);
+    vec3 indirectDiff = ao * (ambient + uWorldAmbientColor.rgb);
+    vec3 indirectSpec = environment * (1.0 - mainTexSample.a);
+    vec3 colorDynamic = clamp(indirectDiff + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo + indirectSpec + directSpec;
+    vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
+                            indirectSpec + directSpec;
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
-    color = mix(color, color + ao * (1.0 - mainTexSample.a) * environment, envmapped);
 #endif
 
     color = mix(color, uFogColor.rgb, fog);

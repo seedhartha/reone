@@ -96,7 +96,7 @@ void PBR_irradianceDirect(
         diffuse += kD * radiance * NdotL;
         specular += spec * radiance * NdotL;
 
-        if (uLights[i].dynamicType == 1) {
+        if (uLights[i].dynamicType == LIGHT_DYNAMIC_TYPE_ALL) {
             areaDiffuse += kD * radiance * NdotL;
             areaSpecular += spec * radiance * NdotL;
         }

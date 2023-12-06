@@ -1,3 +1,6 @@
+const int LIGHT_DYNAMIC_TYPE_ALL = 1;
+const int LIGHT_DYNAMIC_TYPE_DYNAMIC_ONLY = 2;
+
 float lightAttenuationQuadratic(Light light, vec3 fragPos) {
     if (light.position.w == 0.0) {
         return 1.0;
