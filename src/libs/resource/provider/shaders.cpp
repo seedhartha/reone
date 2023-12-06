@@ -19,6 +19,7 @@
 
 #include "reone/graphics/options.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/resource/resources.h"
 #include "reone/system/stringbuilder.h"
 
 using namespace reone::graphics;
@@ -93,13 +94,6 @@ void Shaders::init() {
     if (_inited) {
         return;
     }
-    auto shaderpackPath = std::filesystem::current_path();
-    shaderpackPath.append("shaderpack.erf");
-    if (!std::filesystem::exists(shaderpackPath)) {
-        throw std::runtime_error("File not found: " + shaderpackPath.string());
-    }
-    _sourceProvider = std::make_unique<ErfResourceContainer>(shaderpackPath);
-    _sourceProvider->init();
 
     // Shaders
     auto vertBillboard = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertBillboard});
@@ -196,11 +190,11 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
         if (_resRefToSource.count(resRef) > 0) {
             source = _resRefToSource.at(resRef);
         } else {
-            auto bytes = _sourceProvider->findResourceData(ResourceId(resRef, ResType::Glsl));
-            if (!bytes) {
+            auto res = _resources.find(ResourceId(resRef, ResType::Glsl));
+            if (!res) {
                 throw std::runtime_error("Shader source not found: " + resRef);
             }
-            source = std::string(bytes->begin(), bytes->end());
+            source = std::string(res->data.begin(), res->data.end());
             _resRefToSource[resRef] = source;
         }
         sources.push_back(std::move(source));

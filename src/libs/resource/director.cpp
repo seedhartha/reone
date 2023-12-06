@@ -59,6 +59,8 @@ static constexpr char kTexturePackFragmentilenameLow[] = "swpc_tex_tpc.erf";
 static constexpr char kExeFilenameKotor[] = "swkotor.exe";
 static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
 
+static constexpr char kShaderPackFilename[] = "shaderpack.erf";
+
 static const std::vector<std::string> g_globalLipFiles {"global.mod", "localization.mod"};
 
 static const std::unordered_map<TextureQuality, std::string> kTexQualityToTexPack {
@@ -98,42 +100,42 @@ std::set<std::string> ResourceDirector::moduleNames() {
 }
 
 void ResourceDirector::loadGlobalResources() {
-    auto &resources = _resources;
-    resources.addKEY(getFileIgnoreCase(_gamePath, kKeyFilename));
+    _resources.addKEY(getFileIgnoreCase(_gamePath, kKeyFilename));
+    _resources.addERF(getFileIgnoreCase(std::filesystem::current_path(), kShaderPackFilename));
 
     auto texPacksPath = getFileIgnoreCase(_gamePath, kTexturePackDirectoryName);
     auto &texPack = kTexQualityToTexPack.at(_graphicsOpt.textureQuality);
 
     if (_gameId == GameID::TSL) {
-        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
-        resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
+        _resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
+        _resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
-        resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_gamePath, kVertexoiceDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kVertexoiceDirectoryName));
 
         auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
-        resources.addERF(getFileIgnoreCase(lipsPath, kLocalizationLipFilename));
+        _resources.addERF(getFileIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-        resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
-        resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameTsl));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
+        _resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameTsl));
 
     } else {
-        resources.addERF(getFileIgnoreCase(_gamePath, kPatchFilename));
-        resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
-        resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
+        _resources.addERF(getFileIgnoreCase(_gamePath, kPatchFilename));
+        _resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFragmentilenameGUI));
+        _resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
 
-        resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
-        resources.addFolder(getFileIgnoreCase(_gamePath, kWavesDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kWavesDirectoryName));
 
         auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
         for (auto &filename : g_globalLipFiles) {
-            resources.addERF(getFileIgnoreCase(lipsPath, filename));
+            _resources.addERF(getFileIgnoreCase(lipsPath, filename));
         }
 
-        resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
-        resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameKotor));
+        _resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
+        _resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameKotor));
     }
 }
 
