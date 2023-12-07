@@ -19,6 +19,7 @@
 
 #include "reone/graphics/camera/perspective.h"
 #include "reone/graphics/context.h"
+#include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
@@ -266,9 +267,9 @@ void Pipeline::drawSSAO(const glm::ivec2 &dim, RenderTargets &targets, float sam
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targets.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSAO));
-    _context.bind(*targets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bind(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _context.bind(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
+    _context.bindTexture(*targets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -285,11 +286,11 @@ void Pipeline::drawSSR(const glm::ivec2 &dim, RenderTargets &targets, float bias
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targets.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSR));
-    _context.bind(*targets.cbGBufferDiffuse);
-    _context.bind(*targets.cbGBufferLightmap, TextureUnits::lightmap);
-    _context.bind(*targets.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _context.bind(*targets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bind(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.bindTexture(*targets.cbGBufferDiffuse);
+    _context.bindTexture(*targets.cbGBufferLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*targets.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _context.bindTexture(*targets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -304,10 +305,10 @@ void Pipeline::drawOITBlend(RenderTargets &attachments, Framebuffer &dst) {
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
-    _context.bind(*attachments.cbDeferredOpaque1);
-    _context.bind(*attachments.cbDeferredOpaque2, TextureUnits::hilights);
-    _context.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
-    _context.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
+    _context.bindTexture(*attachments.cbDeferredOpaque1);
+    _context.bindTexture(*attachments.cbDeferredOpaque2, TextureUnits::hilights);
+    _context.bindTexture(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
+    _context.bindTexture(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -315,7 +316,7 @@ void Pipeline::drawOITBlend(RenderTargets &attachments, Framebuffer &dst) {
 void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postBoxBlur4));
-    _context.bind(srcTexture);
+    _context.bindTexture(srcTexture);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -328,7 +329,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::postGaussianBlur13 : ShaderProgramId::postGaussianBlur9));
-    _context.bind(srcTexture);
+    _context.bindTexture(srcTexture);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -336,7 +337,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
 void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::postMedianFilter5 : ShaderProgramId::postMedianFilter3));
-    _context.bind(srcTexture);
+    _context.bindTexture(srcTexture);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -354,7 +355,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postFXAA));
-    _context.bind(srcTexture);
+    _context.bindTexture(srcTexture);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -367,7 +368,7 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postSharpen));
-    _context.bind(srcTexture);
+    _context.bindTexture(srcTexture);
     _context.clearColorDepth();
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -398,33 +399,38 @@ void Pipeline::setTargetSize(glm::ivec2 size) {
     _targetSize = std::move(size);
 }
 
-void Pipeline::inPass(RenderPass pass, std::function<void()> block) {
-    checkEqual(_pass, RenderPass::None, "Current render pass must be None");
-    checkNotEqual(pass, RenderPass::None, "New render pass must not be None");
-    switch (pass) {
-    case RenderPass::DirLightShadowsPass:
+void Pipeline::inPass(RenderPassName name, std::function<void(IRenderPass &)> block) {
+    checkEqual(_passName, RenderPassName::None, "Current render pass must be None");
+    checkNotEqual(name, RenderPassName::None, "New render pass must not be None");
+    auto pass = RenderPass(
+        _context,
+        _shaderRegistry,
+        _textureRegistry,
+        _uniforms);
+    switch (name) {
+    case RenderPassName::DirLightShadowsPass:
         beginDirLightShadowsPass();
-        block();
+        block(pass);
         endDirLightShadowsPass();
         break;
-    case RenderPass::PointLightShadows:
+    case RenderPassName::PointLightShadows:
         beginPointLightShadowsPass();
-        block();
+        block(pass);
         endPointLightShadowsPass();
         break;
-    case RenderPass::OpaqueGeometry:
+    case RenderPassName::OpaqueGeometry:
         beginOpaqueGeometryPass();
-        block();
+        block(pass);
         endOpaqueGeometryPass();
         break;
-    case RenderPass::TransparentGeometry:
+    case RenderPassName::TransparentGeometry:
         beginTransparentGeometryPass();
-        block();
+        block(pass);
         endTransparentGeometryPass();
         break;
-    case RenderPass::PostProcessing:
+    case RenderPassName::PostProcessing:
         beginPostProcessingPass();
-        block();
+        block(pass);
         endPostProcessingPass();
         break;
     default:
@@ -497,17 +503,17 @@ void Pipeline::endOpaqueGeometryPass() {
         }
     });
 
-    _context.bind(*targets.cbGBufferDiffuse);
-    _context.bind(*targets.cbGBufferLightmap, TextureUnits::lightmap);
-    _context.bind(*targets.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _context.bind(*targets.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
-    _context.bind(*targets.cbGBufferFeatures, TextureUnits::features);
-    _context.bind(*targets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bind(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _context.bind(_options.ssao ? *targets.cbSSAO : _textureRegistry.get(TextureName::ssaoRgb), TextureUnits::ssao);
-    _context.bind(_options.ssr ? *targets.cbSSR : _textureRegistry.get(TextureName::ssrRgb), TextureUnits::ssr);
-    _context.bind(*targets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
-    _context.bind(*targets.dbPointLightShadows, TextureUnits::shadowMapCube);
+    _context.bindTexture(*targets.cbGBufferDiffuse);
+    _context.bindTexture(*targets.cbGBufferLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*targets.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _context.bindTexture(*targets.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
+    _context.bindTexture(*targets.cbGBufferFeatures, TextureUnits::features);
+    _context.bindTexture(*targets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*targets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.bindTexture(_options.ssao ? *targets.cbSSAO : _textureRegistry.get(TextureName::ssaoRgb), TextureUnits::ssao);
+    _context.bindTexture(_options.ssr ? *targets.cbSSR : _textureRegistry.get(TextureName::ssrRgb), TextureUnits::ssr);
+    _context.bindTexture(*targets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
+    _context.bindTexture(*targets.dbPointLightShadows, TextureUnits::shadowMapCube);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targets.fbDeferredCombine->nameGL());
     glDrawBuffers(2, kColorAttachments);
     _context.clearColorDepth();
@@ -546,6 +552,142 @@ void Pipeline::endPostProcessingPass() {
 
 Texture &Pipeline::output() {
     return *targetsForSize(_targetSize).cbOutput;
+}
+
+void RenderPass::draw(Mesh &mesh,
+                      Material &material,
+                      const glm::mat4 &transform,
+                      const glm::mat4 &transformInv) {
+    applyToContext(material);
+    _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+        locals.reset();
+        locals.model = transform;
+        locals.modelInv = transformInv;
+        applyToLocals(material, locals);
+    });
+    mesh.draw();
+    unapplyToContext(material);
+}
+
+void RenderPass::drawSkinned(Mesh &mesh,
+                             Material &material,
+                             const glm::mat4 &transform,
+                             const glm::mat4 &transformInv,
+                             const std::vector<glm::mat4> &bones) {
+    applyToContext(material);
+    _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+        locals.reset();
+        locals.featureMask |= UniformsFeatureFlags::skeletal;
+        locals.model = transform;
+        locals.modelInv = transformInv;
+        applyToLocals(material, locals);
+    });
+    _uniforms.setSkeletal([&bones](auto &skeletal) {
+        std::memcpy(skeletal.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
+    });
+    mesh.draw();
+    unapplyToContext(material);
+}
+
+void RenderPass::applyToContext(const Material &material) {
+    _context.useProgram(_shaderRegistry.get(material.programId()));
+    for (const auto &[unit, texture] : material.textures()) {
+        _context.bindTexture(texture, unit);
+    }
+    if (material.cullFaceMode()) {
+        _context.pushFaceCulling(*material.cullFaceMode());
+    }
+}
+
+void RenderPass::applyToLocals(const Material &material,
+                               LocalsUniforms &locals) {
+    locals.featureMask |= materialFeatureMask(material);
+    locals.uv = material.uv();
+    locals.color.a = material.alpha();
+    locals.selfIllumColor = glm::vec4(material.selfIllumColor(), 1.0f);
+    if (material.textures().count(TextureUnits::mainTex) > 0) {
+        const auto &mainTex = material.textures().at(TextureUnits::mainTex).get();
+        if (mainTex.features().waterAlpha != -1.0f) {
+            locals.waterAlpha = mainTex.features().waterAlpha;
+        }
+    }
+    if (material.textures().count(TextureUnits::bumpMap) > 0) {
+        const auto &bumpmap = material.textures().at(TextureUnits::bumpMap).get();
+        locals.heightMapScaling = bumpmap.features().bumpMapScaling;
+        int bumpmapW = bumpmap.width();
+        int bumpmapH = bumpmap.height();
+        int gridX = bumpmap.features().numX;
+        int gridY = bumpmap.features().numY;
+        int frameW = bumpmapW / gridX;
+        int frameH = bumpmapH / gridY;
+        switch (bumpmap.features().procedureType) {
+        case Texture::ProcedureType::Cycle:
+            locals.heightMapFrameBounds = glm::vec4(
+                static_cast<float>(frameW * (material.heightMapFrame() % gridX)),
+                static_cast<float>(frameH * (material.heightMapFrame() / gridX)),
+                static_cast<float>(frameW),
+                static_cast<float>(frameH));
+            break;
+        default:
+            locals.heightMapFrameBounds = glm::vec4(
+                0.0f,
+                0.0f,
+                static_cast<float>(frameW),
+                static_cast<float>(frameH));
+            break;
+        }
+    }
+}
+
+void RenderPass::unapplyToContext(const Material &material) {
+    if (material.cullFaceMode()) {
+        _context.popFaceCulling();
+    }
+}
+
+int RenderPass::materialFeatureMask(const Material &material) const {
+    int mask = 0;
+    const auto &textures = material.textures();
+    if (textures.count(TextureUnits::mainTex) > 0) {
+        const auto &mainTex = textures.at(TextureUnits::mainTex).get();
+        switch (mainTex.features().blending) {
+        case Texture::Blending::PunchThrough:
+            mask |= UniformsFeatureFlags::hashedalphatest;
+            break;
+        case Texture::Blending::Additive:
+            if (textures.count(TextureUnits::environmentMap) == 0 &&
+                textures.count(TextureUnits::environmentMapCube) == 0) {
+                mask |= UniformsFeatureFlags::premulalpha;
+            }
+            break;
+        default:
+            break;
+        }
+        if (mainTex.features().waterAlpha != -1.0f) {
+            mask |= UniformsFeatureFlags::water;
+        }
+    }
+    if (textures.count(TextureUnits::lightmap) > 0) {
+        mask |= UniformsFeatureFlags::lightmap;
+    }
+    if (textures.count(TextureUnits::environmentMap) > 0) {
+        mask |= UniformsFeatureFlags::envmap;
+    }
+    if (textures.count(TextureUnits::environmentMapCube) > 0) {
+        mask |= UniformsFeatureFlags::envmap | UniformsFeatureFlags::envmapcube;
+    }
+    if (textures.count(TextureUnits::bumpMap) > 0) {
+        mask |= textures.at(TextureUnits::bumpMap).get().isGrayscale()
+                    ? UniformsFeatureFlags::heightmap
+                    : UniformsFeatureFlags::normalmap;
+    }
+    if (material.affectedByShadows()) {
+        mask |= UniformsFeatureFlags::shadows;
+    }
+    if (material.affectedByFog()) {
+        mask |= UniformsFeatureFlags::fog;
+    }
+    return mask;
 }
 
 } // namespace graphics

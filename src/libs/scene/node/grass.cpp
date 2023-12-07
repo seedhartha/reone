@@ -138,17 +138,17 @@ void GrassSceneNode::update(float dt) {
     }
 }
 
-void GrassSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
+void GrassSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.context.bind(*_properties.texture);
+    _graphicsSvc.context.bindTexture(*_properties.texture);
     _graphicsSvc.uniforms.setLocals([this](auto &locals) {
         locals.reset();
         locals.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (!_aabbNode.mesh()->lightmap.empty()) {
             auto lightmap = _resourceSvc.textures.get(_aabbNode.mesh()->lightmap, TextureUsage::Lightmap);
-            _graphicsSvc.context.bind(*lightmap, TextureUnits::lightmap);
+            _graphicsSvc.context.bindTexture(*lightmap, TextureUnits::lightmap);
             locals.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });

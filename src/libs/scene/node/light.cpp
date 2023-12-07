@@ -83,7 +83,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
         locals.color = glm::vec4(_color, 1.0f);
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
-    _graphicsSvc.context.bind(*texture);
+    _graphicsSvc.context.bindTexture(*texture);
     _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
         _graphicsSvc.meshRegistry.get(MeshName::billboard).draw();
     });

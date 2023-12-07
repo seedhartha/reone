@@ -20,7 +20,9 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/lumautil.h"
+#include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
+#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
@@ -174,126 +176,73 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
     return model.usage() == ModelUsage::Room;
 }
 
-void MeshSceneNode::draw() {
+void MeshSceneNode::draw(IRenderPass &pass) {
     auto mesh = _modelNode.mesh();
     if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
-    bool transparent = isTransparent();
-
-    _graphicsSvc.uniforms.setLocals([this, &mesh](auto &locals) {
-        locals.reset();
-        locals.model = _absTransform;
-        locals.modelInv = _absTransformInv;
-        locals.uv = glm::mat3x4(
-            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-            glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
-        locals.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
-        locals.color.a = _alpha;
-
-        _graphicsSvc.context.bind(*_nodeTextures.diffuse);
-        switch (_nodeTextures.diffuse->features().blending) {
-        case Texture::Blending::PunchThrough:
-            locals.featureMask |= UniformsFeatureFlags::hashedalphatest;
-            break;
-        case Texture::Blending::Additive:
-            if (!_nodeTextures.envmap) {
-                locals.featureMask |= UniformsFeatureFlags::premulalpha;
-            }
-            break;
-        default:
-            break;
-        }
-        float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
-        if (waterAlpha != -1.0f) {
-            locals.featureMask |= UniformsFeatureFlags::water;
-            locals.waterAlpha = waterAlpha;
-        }
-
-        if (_nodeTextures.lightmap) {
-            locals.featureMask |= UniformsFeatureFlags::lightmap;
-            _graphicsSvc.context.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
-        }
-        if (_nodeTextures.envmap) {
-            locals.featureMask |= UniformsFeatureFlags::envmap;
-            if (_nodeTextures.envmap->isCubemap()) {
-                locals.featureMask |= UniformsFeatureFlags::envmapcube;
-                _graphicsSvc.context.bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
-            } else {
-                _graphicsSvc.context.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
-            }
-        }
-        if (_nodeTextures.bumpmap) {
-            if (_nodeTextures.bumpmap->isGrayscale()) {
-                locals.featureMask |= UniformsFeatureFlags::heightmap;
-                locals.heightMapScaling = _nodeTextures.bumpmap->features().bumpMapScaling;
-                int bumpmapW = _nodeTextures.bumpmap->width();
-                int bumpmapH = _nodeTextures.bumpmap->height();
-                if (_nodeTextures.bumpmap->features().procedureType == Texture::ProcedureType::Cycle) {
-                    int gridX = _nodeTextures.bumpmap->features().numX;
-                    int gridY = _nodeTextures.bumpmap->features().numY;
-                    int frameW = bumpmapW / gridX;
-                    int frameH = bumpmapH / gridY;
-                    locals.heightMapFrameBounds = glm::vec4(
-                        static_cast<float>(frameW * (_bumpmapCycleFrame % gridX)),
-                        static_cast<float>(frameH * (_bumpmapCycleFrame / gridX)),
-                        static_cast<float>(frameW),
-                        static_cast<float>(frameH));
-                } else {
-                    locals.heightMapFrameBounds = glm::ivec4(
-                        0.0f,
-                        0.0f,
-                        static_cast<float>(bumpmapW),
-                        static_cast<float>(bumpmapH));
-                }
-            } else {
-                locals.featureMask |= UniformsFeatureFlags::normalmap;
-            }
-            _graphicsSvc.context.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
-        }
-        if (mesh->skin) {
-            locals.featureMask |= UniformsFeatureFlags::skeletal;
-        }
-        bool receivesShadows = isReceivingShadows(_model, *this);
-        if (receivesShadows && _sceneGraph.hasShadowLight()) {
-            locals.featureMask |= UniformsFeatureFlags::shadows;
-        }
-        if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
-            locals.featureMask |= UniformsFeatureFlags::fog;
-        }
-    });
-
-    auto &skin = mesh->skin;
-    if (skin) {
-        _graphicsSvc.uniforms.setSkeletal([this, &skin](auto &skeletal) {
-            for (size_t i = 0; i < kMaxBones; ++i) {
-                if (i >= skin->boneNodeNumber.size()) {
-                    break;
-                }
-                auto nodeNumber = skin->boneNodeNumber[i];
-                if (nodeNumber == 0xffff) {
-                    continue;
-                }
-                auto bone = _model.getNodeByNumber(nodeNumber);
-                if (!bone) {
-                    continue;
-                }
-                skeletal.bones[i] = _modelNode.absoluteTransformInverse() *
-                                    _model.absoluteTransformInverse() *
-                                    bone->absoluteTransform() *
-                                    skin->boneMatrices[skin->boneSerial[i]];
-            }
-        });
+    auto material = Material(isTransparent()
+                                 ? ShaderProgramId::oitModel
+                                 : ShaderProgramId::deferredOpaqueModel);
+    material.setTexture(TextureUnits::mainTex, *_nodeTextures.diffuse);
+    if (_nodeTextures.lightmap) {
+        material.setTexture(TextureUnits::lightmap, *_nodeTextures.lightmap);
     }
-
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(transparent ? ShaderProgramId::oitModel : ShaderProgramId::deferredOpaqueModel));
-    _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [&mesh]() {
-        mesh->mesh->draw();
-    });
+    if (_nodeTextures.envmap) {
+        if (_nodeTextures.envmap->isCubemap()) {
+            material.setTexture(TextureUnits::environmentMapCube, *_nodeTextures.envmap);
+        } else {
+            material.setTexture(TextureUnits::environmentMap, *_nodeTextures.envmap);
+        }
+    }
+    if (_nodeTextures.bumpmap) {
+        material.setTexture(TextureUnits::bumpMap, *_nodeTextures.bumpmap);
+        if (_nodeTextures.bumpmap->isGrayscale()) {
+            material.setHeightMapFrame(_bumpmapCycleFrame);
+        }
+    }
+    material.setUV(glm::mat3x4(
+        glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+        glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f)));
+    material.setAmbient(mesh->ambient);
+    material.setDiffuse(mesh->diffuse);
+    material.setSelfIllumColor(_selfIllumColor);
+    material.setAlpha(_alpha);
+    if (_sceneGraph.hasShadowLight() && isReceivingShadows(_model, *this)) {
+        material.setAffectedByShadows(true);
+    }
+    if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
+        material.setAffectedByFog(true);
+    }
+    material.setCullFaceMode(CullFaceMode::Back);
+    if (_modelNode.isSkinMesh()) {
+        const auto &skin = *mesh->skin;
+        auto bones = std::vector<glm::mat4>(kMaxBones, glm::mat4(1.0f));
+        for (size_t i = 0; i < kMaxBones; ++i) {
+            if (i >= skin.boneNodeNumber.size()) {
+                break;
+            }
+            auto nodeNumber = skin.boneNodeNumber[i];
+            if (nodeNumber == 0xffff) {
+                continue;
+            }
+            auto bone = _model.getNodeByNumber(nodeNumber);
+            if (!bone) {
+                continue;
+            }
+            bones[i] = _modelNode.absoluteTransformInverse(); // convert bone transform in model space to bone transform in this model node space
+            bones[i] *= _model.absoluteTransformInverse();    // convert bone transform in world space to bone transform in model space
+            bones[i] *= bone->absoluteTransform();
+            bones[i] *= skin.boneMatrices[skin.boneSerial[i]]; // extract changes to the bone transform in this model node space
+        }
+        pass.drawSkinned(*mesh->mesh, material, _absTransform, _absTransformInv, std::move(bones));
+    } else {
+        pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
+    }
 }
 
-void MeshSceneNode::drawShadow() {
+void MeshSceneNode::drawShadow(IRenderPass &pass) {
     std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;

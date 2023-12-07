@@ -63,7 +63,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     }
 
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture2D));
-    _graphicsSvc.context.bind(*_thumb.image);
+    _graphicsSvc.context.bindTexture(*_thumb.image);
 
     // Top edge
     _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
@@ -117,7 +117,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _graphicsSvc.context.bind(*_dir.image);
+    _graphicsSvc.context.bindTexture(*_dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);

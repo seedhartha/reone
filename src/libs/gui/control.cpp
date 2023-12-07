@@ -237,7 +237,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
             locals.model = std::move(transform);
         });
         _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture2D));
-        _graphicsSvc.context.bind(*output);
+        _graphicsSvc.context.bindTexture(*output);
         _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
             _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
         });
@@ -251,7 +251,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
     glm::mat4 transform(1.0f);
 
     if (border.fill) {
-        _graphicsSvc.context.bind(*border.fill);
+        _graphicsSvc.context.bindTexture(*border.fill);
 
         int x = _extent.left + border.dimension + offset.x;
         int y = _extent.top + border.dimension + offset.y;
@@ -279,7 +279,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        _graphicsSvc.context.bind(*border.edge);
+        _graphicsSvc.context.bindTexture(*border.edge);
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -368,7 +368,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        _graphicsSvc.context.bind(*border.corner);
+        _graphicsSvc.context.bindTexture(*border.corner);
 
         // Top left corner
         transform = glm::translate(glm::vec3(x, y, 0.0f));

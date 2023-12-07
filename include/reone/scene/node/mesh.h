@@ -50,8 +50,8 @@ public:
 
     void update(float dt) override;
 
-    void draw();
-    void drawShadow();
+    void draw(graphics::IRenderPass &pass);
+    void drawShadow(graphics::IRenderPass &pass);
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

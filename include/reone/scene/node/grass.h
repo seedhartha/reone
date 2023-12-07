@@ -60,7 +60,7 @@ public:
 
     void update(float dt) override;
 
-    void drawLeafs(const std::vector<SceneNode *> &leafs) override;
+    void drawLeafs(graphics::IRenderPass &pass, const std::vector<SceneNode *> &leafs) override;
 
     int getNumClustersInFace(float area) const;
     int getRandomGrassVariant() const;

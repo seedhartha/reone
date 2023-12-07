@@ -83,11 +83,11 @@ struct LocalsUniforms {
     glm::mat4 modelInv {1.0f};
     glm::mat3x4 uv {1.0f};
     glm::vec4 color {1.0f};
-    glm::vec4 selfIllumColor {1.0f};
+    glm::vec4 selfIllumColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::ivec2 gridSize {0};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    float waterAlpha {1.0f};
+    float waterAlpha {0.0f};
     float heightMapScaling {1.0f};
     float billboardSize {1.0f};
     float padding[2];
@@ -97,11 +97,11 @@ struct LocalsUniforms {
         modelInv = glm::mat4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
-        selfIllumColor = glm::vec4(1.0f);
+        selfIllumColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);
         gridSize = glm::ivec2(0);
         featureMask = 0;
-        waterAlpha = 1.0f;
+        waterAlpha = 0.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;
     }

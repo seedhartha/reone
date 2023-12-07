@@ -36,7 +36,7 @@ namespace reone {
 
 namespace graphics {
 
-enum class RenderPass {
+enum class RenderPassName {
     None,
     DirLightShadowsPass,
     PointLightShadows,
@@ -46,32 +46,86 @@ enum class RenderPass {
 };
 
 class GraphicsContext;
+class LocalsUniforms;
+class Material;
+class Mesh;
 class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
+
+class IRenderPass {
+public:
+    virtual ~IRenderPass() = default;
+
+    virtual void draw(Mesh &mesh,
+                      Material &material,
+                      const glm::mat4 &transform,
+                      const glm::mat4 &transformInv) = 0;
+
+    virtual void drawSkinned(Mesh &mesh,
+                             Material &material,
+                             const glm::mat4 &transform,
+                             const glm::mat4 &transformInv,
+                             const std::vector<glm::mat4> &bones) = 0;
+};
 
 class IPipeline {
 public:
     virtual ~IPipeline() = default;
 
     virtual void setTargetSize(glm::ivec2 size) = 0;
-    virtual void inPass(RenderPass pass, std::function<void()> block) = 0;
+    virtual void inPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
 
     virtual Texture &output() = 0;
 };
 
+class RenderPass : public IRenderPass, boost::noncopyable {
+public:
+    RenderPass(GraphicsContext &context,
+               ShaderRegistry &shaderRegistry,
+               TextureRegistry &textureRegistry,
+               Uniforms &uniforms) :
+        _context(context),
+        _shaderRegistry(shaderRegistry),
+        _textureRegistry(textureRegistry),
+        _uniforms(uniforms) {
+    }
+
+    void draw(Mesh &mesh,
+              Material &material,
+              const glm::mat4 &transform,
+              const glm::mat4 &transformInv) override;
+
+    void drawSkinned(Mesh &mesh,
+                     Material &material,
+                     const glm::mat4 &transform,
+                     const glm::mat4 &transformInv,
+                     const std::vector<glm::mat4> &bones) override;
+
+private:
+    GraphicsContext &_context;
+    ShaderRegistry &_shaderRegistry;
+    TextureRegistry &_textureRegistry;
+    Uniforms &_uniforms;
+
+    void applyToContext(const Material &material);
+    void applyToLocals(const Material &material, LocalsUniforms &locals);
+    void unapplyToContext(const Material &material);
+
+    int materialFeatureMask(const Material &material) const;
+};
+
 class Pipeline : public IPipeline, boost::noncopyable {
 public:
-    Pipeline(
-        GraphicsOptions &options,
-        GraphicsContext &graphicsContext,
-        MeshRegistry &meshRegistry,
-        ShaderRegistry &shaderRegistry,
-        TextureRegistry &textureRegistry,
-        Uniforms &uniforms) :
+    Pipeline(GraphicsOptions &options,
+             GraphicsContext &context,
+             MeshRegistry &meshRegistry,
+             ShaderRegistry &shaderRegistry,
+             TextureRegistry &textureRegistry,
+             Uniforms &uniforms) :
         _options(options),
-        _context(graphicsContext),
+        _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
@@ -81,7 +135,7 @@ public:
     void init();
 
     void setTargetSize(glm::ivec2 size) override;
-    void inPass(RenderPass pass, std::function<void()> block) override;
+    void inPass(RenderPassName name, std::function<void(IRenderPass &)> block) override;
 
     Texture &output() override;
 
@@ -141,7 +195,7 @@ private:
 
     glm::ivec2 _targetSize {0};
     std::unordered_map<glm::ivec2, RenderTargets> _sizeToTargets;
-    RenderPass _pass {RenderPass::None};
+    RenderPassName _passName {RenderPassName::None};
 
     // Services
 

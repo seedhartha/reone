@@ -39,7 +39,7 @@ public:
     MOCK_METHOD(void, clearDepth, (), (override));
     MOCK_METHOD(void, clearColorDepth, (glm::vec4 color), (override));
 
-    MOCK_METHOD(void, bind, (Texture & texture, int unit), (override));
+    MOCK_METHOD(void, bindTexture, (Texture &, int), (override));
 
     MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
     MOCK_METHOD(void, resetProgram, (), (override));
@@ -47,9 +47,11 @@ public:
     MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
     MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
 
-    MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
+    MOCK_METHOD(void, pushFaceCulling, (CullFaceMode), (override));
     MOCK_METHOD(void, pushBlending, (BlendMode), (override));
+    MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
 
+    MOCK_METHOD(void, popFaceCulling, (), (override));
     MOCK_METHOD(void, popBlending, (), (override));
     MOCK_METHOD(void, popViewport, (), (override));
 
@@ -69,7 +71,7 @@ public:
 class MockPipeline : public IPipeline, boost::noncopyable {
 public:
     MOCK_METHOD(void, setTargetSize, (glm::ivec2), (override));
-    MOCK_METHOD(void, inPass, (RenderPass, std::function<void()>), (override));
+    MOCK_METHOD(void, inPass, (RenderPassName, std::function<void(IRenderPass &)>), (override));
 
     MOCK_METHOD(Texture &, output, (), (override));
 };

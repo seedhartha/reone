@@ -31,7 +31,7 @@ namespace graphics {
 
 void Cursor::draw() {
     std::shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _graphicsContext.bind(*texture);
+    _graphicsContext.bindTexture(*texture);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));

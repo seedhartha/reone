@@ -36,7 +36,7 @@ public:
     virtual void clearDepth() = 0;
     virtual void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) = 0;
 
-    virtual void bind(Texture &texture, int unit = TextureUnits::mainTex) = 0;
+    virtual void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) = 0;
 
     virtual void useProgram(ShaderProgram &program) = 0;
     virtual void resetProgram() = 0;
@@ -44,9 +44,11 @@ public:
     virtual void bind(UniformBuffer &buffer, int index) = 0;
     virtual UniformBuffer &uniformBufferAt(int index) = 0;
 
+    virtual void pushFaceCulling(CullFaceMode mode) = 0;
     virtual void pushBlending(BlendMode mode) = 0;
     virtual void pushViewport(glm::ivec4 viewport) = 0;
 
+    virtual void popFaceCulling() = 0;
     virtual void popBlending() = 0;
     virtual void popViewport() = 0;
 
@@ -70,7 +72,7 @@ public:
     void clearDepth() override;
     void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override;
 
-    void bind(Texture &texture, int unit = TextureUnits::mainTex) override;
+    void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) override;
 
     void useProgram(ShaderProgram &program) override;
     void resetProgram() override;
@@ -84,9 +86,11 @@ public:
         return *_uniformBuffers.at(index);
     }
 
+    void pushFaceCulling(CullFaceMode mode) override;
     void pushBlending(BlendMode mode) override;
     void pushViewport(glm::ivec4 viewport) override;
 
+    void popFaceCulling() override;
     void popBlending() override;
     void popViewport() override;
 

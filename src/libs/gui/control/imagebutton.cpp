@@ -90,7 +90,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _graphicsSvc.context.bind(*iconFrame);
+        _graphicsSvc.context.bindTexture(*iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
@@ -113,7 +113,7 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _graphicsSvc.context.bind(*iconTexture);
+        _graphicsSvc.context.bindTexture(*iconTexture);
 
         _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
             globals.projection = _graphicsSvc.window.getOrthoProjection();

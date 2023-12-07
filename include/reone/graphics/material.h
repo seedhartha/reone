@@ -17,27 +17,123 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
 
 class Texture;
 
-class Material {
+class Material : boost::noncopyable {
 public:
     using TextureUnit = int;
+    using TextureUnitToTexture = std::unordered_map<TextureUnit, std::reference_wrapper<Texture>>;
 
-    bool transparent() const {
-        return _transparent;
+    Material(std::string programId) :
+        _programId(std::move(programId)) {
     }
 
-    void setTransparent(bool transparent) {
-        _transparent = transparent;
+    const std::string &programId() const {
+        return _programId;
+    }
+
+    const TextureUnitToTexture &textures() const {
+        return _textures;
+    }
+
+    const glm::mat3x4 &uv() const {
+        return _uv;
+    }
+
+    int heightMapFrame() const {
+        return _heightMapFrame;
+    }
+
+    const glm::vec3 &ambient() const {
+        return _ambient;
+    }
+
+    const glm::vec3 &diffuse() const {
+        return _diffuse;
+    }
+
+    const glm::vec3 &selfIllumColor() const {
+        return _selfIllumColor;
+    }
+
+    float alpha() const {
+        return _alpha;
+    }
+
+    bool affectedByShadows() const {
+        return _affectedByShadows;
+    }
+
+    bool affectedByFog() const {
+        return _affectedByFog;
+    }
+
+    const std::optional<CullFaceMode> &cullFaceMode() const {
+        return _cullFaceMode;
+    }
+
+    void setTexture(TextureUnit unit, Texture &texture) {
+        _textures.insert_or_assign(unit, texture);
+    }
+
+    void setUV(glm::mat3x4 uv) {
+        _uv = std::move(uv);
+    }
+
+    void setHeightMapFrame(int frame) {
+        _heightMapFrame = frame;
+    }
+
+    void setAmbient(glm::vec3 ambient) {
+        _ambient = std::move(ambient);
+    }
+
+    void setDiffuse(glm::vec3 diffuse) {
+        _diffuse = std::move(diffuse);
+    }
+
+    void setSelfIllumColor(glm::vec3 emission) {
+        _selfIllumColor = std::move(emission);
+    }
+
+    void setAlpha(float alpha) {
+        _alpha = alpha;
+    }
+
+    void setAffectedByShadows(bool affected) {
+        _affectedByShadows = affected;
+    }
+
+    void setAffectedByFog(bool affected) {
+        _affectedByFog = affected;
+    }
+
+    void setCullFaceMode(CullFaceMode mode) {
+        _cullFaceMode = mode;
     }
 
 private:
-    bool _transparent {false};
-    std::unordered_map<TextureUnit, std::reference_wrapper<Texture>> _textures;
+    std::string _programId;
+
+    TextureUnitToTexture _textures;
+    glm::mat3x4 _uv {1.0f};
+    int _heightMapFrame {0};
+
+    glm::vec3 _ambient {0.2f};
+    glm::vec3 _diffuse {0.8f};
+    glm::vec3 _selfIllumColor {0.0f};
+    float _alpha {1.0f};
+
+    bool _affectedByShadows {false};
+    bool _affectedByFog {false};
+
+    std::optional<CullFaceMode> _cullFaceMode;
 };
 
 } // namespace graphics

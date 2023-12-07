@@ -92,8 +92,8 @@ public:
         // Animation
 
         ProcedureType procedureType {ProcedureType::Invalid};
-        int numX {0};
-        int numY {0};
+        int numX {1};
+        int numY {1};
         int fps {0};
 
         // END Animation

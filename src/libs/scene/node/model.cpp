@@ -121,9 +121,9 @@ void ModelSceneNode::update(float dt) {
     updateAnimations(dt);
 }
 
-void ModelSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
+void ModelSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     for (auto &leaf : leafs) {
-        static_cast<MeshSceneNode *>(leaf)->draw();
+        static_cast<MeshSceneNode *>(leaf)->draw(pass);
     }
 }
 

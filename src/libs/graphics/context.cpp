@@ -71,7 +71,7 @@ void GraphicsContext::clearColorDepth(glm::vec4 color) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GraphicsContext::bind(Texture &texture, int unit) {
+void GraphicsContext::bindTexture(Texture &texture, int unit) {
     if (_activeTexUnit != unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         _activeTexUnit = unit;
@@ -100,6 +100,11 @@ void GraphicsContext::bind(UniformBuffer &buffer, int index) {
     buffer.bind(index);
 }
 
+void GraphicsContext::pushFaceCulling(CullFaceMode mode) {
+    setCullFaceMode(mode);
+    _cullFaceModes.push(mode);
+}
+
 void GraphicsContext::pushBlending(BlendMode mode) {
     setBlendMode(mode);
     _blendModes.push(mode);
@@ -108,6 +113,11 @@ void GraphicsContext::pushBlending(BlendMode mode) {
 void GraphicsContext::pushViewport(glm::ivec4 viewport) {
     setViewport(viewport);
     _viewports.push(std::move(viewport));
+}
+
+void GraphicsContext::popFaceCulling() {
+    _cullFaceModes.pop();
+    setCullFaceMode(_cullFaceModes.top());
 }
 
 void GraphicsContext::popBlending() {
@@ -149,13 +159,9 @@ void GraphicsContext::withFaceCulling(CullFaceMode mode, const std::function<voi
         block();
         return;
     }
-    setCullFaceMode(mode);
-    _cullFaceModes.push(mode);
-
+    pushFaceCulling(mode);
     block();
-
-    _cullFaceModes.pop();
-    setCullFaceMode(_cullFaceModes.top());
+    popFaceCulling();
 }
 
 void GraphicsContext::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {

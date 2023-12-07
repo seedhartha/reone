@@ -37,6 +37,7 @@ namespace graphics {
 struct GraphicsOptions;
 struct GraphicsServices;
 
+class IRenderPass;
 class Walkmesh;
 
 } // namespace graphics
@@ -134,10 +135,10 @@ public:
     void update(float dt) override;
     graphics::Texture &draw(const glm::ivec2 &dim) override;
 
-    void drawShadows();
-    void drawOpaque();
-    void drawTransparent();
-    void drawLensFlares();
+    void drawShadows(graphics::IRenderPass &pass);
+    void drawOpaque(graphics::IRenderPass &pass);
+    void drawTransparent(graphics::IRenderPass &pass);
+    void drawLensFlares(graphics::IRenderPass &pass);
 
     const std::string &name() const override {
         return _name;

@@ -366,7 +366,7 @@ void Game::drawWorld() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
     auto &output = scene.draw(glm::ivec2(_options.graphics.width, _options.graphics.height));
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2D));
-    _services.graphics.context.bind(output);
+    _services.graphics.context.bindTexture(output);
     _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
 }
 

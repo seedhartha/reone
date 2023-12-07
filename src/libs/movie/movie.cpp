@@ -96,7 +96,7 @@ void Movie::render() {
     }
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
-        _graphicsSvc.context.bind(*_texture);
+        _graphicsSvc.context.bindTexture(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
     _graphicsSvc.uniforms.setGlobals([](auto &globals) {

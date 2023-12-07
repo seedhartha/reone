@@ -485,29 +485,31 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
         });
 
         if (hasShadowLight()) {
-            auto pass = isShadowLightDirectional() ? RenderPass::DirLightShadowsPass : RenderPass::PointLightShadows;
-            pipeline.inPass(pass, [this]() {
-                drawShadows();
+            auto passName = isShadowLightDirectional()
+                                ? RenderPassName::DirLightShadowsPass
+                                : RenderPassName::PointLightShadows;
+            pipeline.inPass(passName, [this](auto &pass) {
+                drawShadows(pass);
             });
         }
 
         fillLightsUniforms();
-        pipeline.inPass(RenderPass::OpaqueGeometry, [this]() {
-            drawOpaque();
+        pipeline.inPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
+            drawOpaque(pass);
         });
 
-        pipeline.inPass(RenderPass::TransparentGeometry, [this]() {
-            drawTransparent();
+        pipeline.inPass(RenderPassName::TransparentGeometry, [this](auto &pass) {
+            drawTransparent(pass);
         });
 
-        pipeline.inPass(RenderPass::PostProcessing, [this, &camera]() {
+        pipeline.inPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
             if (!_flareLights.empty()) {
                 _graphicsSvc.uniforms.setGlobals([&camera](auto &globals) {
                     globals.reset();
                     globals.projection = camera->projection();
                     globals.view = camera->view();
                 });
-                drawLensFlares();
+                drawLensFlares(pass);
             }
         });
     }
@@ -515,18 +517,18 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
     return pipeline.output();
 }
 
-void SceneGraph::drawShadows() {
+void SceneGraph::drawShadows(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
-    _graphicsSvc.context.withFaceCulling(CullFaceMode::Front, [this]() {
+    _graphicsSvc.context.withFaceCulling(CullFaceMode::Front, [this, &pass]() {
         for (auto &mesh : _shadowMeshes) {
-            mesh->drawShadow();
+            mesh->drawShadow(pass);
         }
     });
 }
 
-void SceneGraph::drawOpaque() {
+void SceneGraph::drawOpaque(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
@@ -541,11 +543,11 @@ void SceneGraph::drawOpaque() {
 
     // Draw opaque meshes
     for (auto &mesh : _opaqueMeshes) {
-        mesh->draw();
+        mesh->draw(pass);
     }
     // Draw opaque leafs
     for (auto &[node, leafs] : _opaqueLeafs) {
-        node->drawLeafs(leafs);
+        node->drawLeafs(pass, leafs);
     }
 
     if (_drawAABB) {
@@ -567,17 +569,17 @@ void SceneGraph::drawOpaque() {
     }
 }
 
-void SceneGraph::drawTransparent() {
+void SceneGraph::drawTransparent(IRenderPass &pass) {
     if (!_activeCamera || _drawWalkmeshes) {
         return;
     }
     // Draw transparent leafs (incl. meshes)
     for (auto &[node, leafs] : _transparentLeafs) {
-        node->drawLeafs(leafs);
+        node->drawLeafs(pass, leafs);
     }
 }
 
-void SceneGraph::drawLensFlares() {
+void SceneGraph::drawLensFlares(IRenderPass &pass) {
     // Draw lens flares
     if (_flareLights.empty() || _drawWalkmeshes) {
         return;

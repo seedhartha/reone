@@ -238,7 +238,7 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
+void EmitterSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
@@ -309,7 +309,7 @@ void EmitterSceneNode::drawLeafs(const std::vector<SceneNode *> &leafs) {
         }
     });
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::oitParticle));
-    _graphicsSvc.context.bind(*texture);
+    _graphicsSvc.context.bindTexture(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
     _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
