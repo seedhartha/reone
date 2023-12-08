@@ -584,13 +584,13 @@ void SceneGraph::drawLensFlares(IRenderPass &pass) {
     if (_flareLights.empty() || _drawWalkmeshes) {
         return;
     }
-    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
+    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this, &pass]() {
         for (auto &light : _flareLights) {
             Collision collision;
             if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
                 continue;
             }
-            light->drawLensFlare(light->modelNode().light()->flares.front());
+            light->drawLensFlare(pass, light->modelNode().light()->flares.front());
         }
     });
 }

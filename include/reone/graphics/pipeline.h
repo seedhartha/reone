@@ -68,6 +68,12 @@ public:
                              const glm::mat4 &transform,
                              const glm::mat4 &transformInv,
                              const std::vector<glm::mat4> &bones) = 0;
+
+    virtual void drawBillboard(Texture &texture,
+                               const glm::vec4 &color,
+                               const glm::mat4 &transform,
+                               const glm::mat4 &transformInv,
+                               std::optional<float> size) = 0;
 };
 
 class IPipeline {
@@ -84,10 +90,12 @@ class RenderPass : public IRenderPass, boost::noncopyable {
 public:
     RenderPass(GraphicsContext &context,
                ShaderRegistry &shaderRegistry,
+               MeshRegistry &meshRegistry,
                TextureRegistry &textureRegistry,
                Uniforms &uniforms) :
         _context(context),
         _shaderRegistry(shaderRegistry),
+        _meshRegistry(meshRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
     }
@@ -103,9 +111,16 @@ public:
                      const glm::mat4 &transformInv,
                      const std::vector<glm::mat4> &bones) override;
 
+    void drawBillboard(Texture &texture,
+                       const glm::vec4 &color,
+                       const glm::mat4 &transform,
+                       const glm::mat4 &transformInv,
+                       std::optional<float> size) override;
+
 private:
     GraphicsContext &_context;
     ShaderRegistry &_shaderRegistry;
+    MeshRegistry &_meshRegistry;
     TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;
 

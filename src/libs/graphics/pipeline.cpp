@@ -405,6 +405,7 @@ void Pipeline::inPass(RenderPassName name, std::function<void(IRenderPass &)> bl
     auto pass = RenderPass(
         _context,
         _shaderRegistry,
+        _meshRegistry,
         _textureRegistry,
         _uniforms);
     switch (name) {
@@ -589,6 +590,28 @@ void RenderPass::drawSkinned(Mesh &mesh,
     unapplyToContext(material);
 }
 
+void RenderPass::drawBillboard(Texture &texture,
+                               const glm::vec4 &color,
+                               const glm::mat4 &transform,
+                               const glm::mat4 &transformInv,
+                               std::optional<float> size) {
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::billboard));
+    _context.bindTexture(texture, TextureUnits::mainTex);
+    _uniforms.setLocals([&transform, &transformInv, &size, &color](auto &locals) {
+        locals.reset();
+        locals.model = transform;
+        locals.modelInv = transformInv;
+        locals.color = color;
+        if (size) {
+            locals.featureMask |= UniformsFeatureFlags::fixedsize;
+            locals.billboardSize = *size;
+        }
+    });
+    _context.pushBlending(BlendMode::Additive);
+    _meshRegistry.get(MeshName::billboard).draw();
+    _context.popBlending();
+}
+
 void RenderPass::applyToContext(const Material &material) {
     _context.useProgram(_shaderRegistry.get(material.programId()));
     for (const auto &[unit, texture] : material.textures()) {
@@ -603,7 +626,7 @@ void RenderPass::applyToLocals(const Material &material,
                                LocalsUniforms &locals) {
     locals.featureMask |= materialFeatureMask(material);
     locals.uv = material.uv();
-    locals.color.a = material.alpha();
+    locals.color = material.color();
     locals.selfIllumColor = glm::vec4(material.selfIllumColor(), 1.0f);
     if (material.textures().count(TextureUnits::mainTex) > 0) {
         const auto &mainTex = material.textures().at(TextureUnits::mainTex).get();

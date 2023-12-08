@@ -205,10 +205,10 @@ void MeshSceneNode::draw(IRenderPass &pass) {
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f)));
+    material.setColor(glm::vec4(1.0f, 1.0f, 1.0f, _alpha));
     material.setAmbient(mesh->ambient);
     material.setDiffuse(mesh->diffuse);
     material.setSelfIllumColor(_selfIllumColor);
-    material.setAlpha(_alpha);
     if (_sceneGraph.hasShadowLight() && isReceivingShadows(_model, *this)) {
         material.setAffectedByShadows(true);
     }
@@ -251,7 +251,7 @@ void MeshSceneNode::drawShadow(IRenderPass &pass) {
                                 ? ShaderProgramId::dirLightShadows
                                 : ShaderProgramId::pointLightShadows;
     auto material = Material(programId);
-    material.setAlpha(_alpha);
+    material.setColor(glm::vec4(1.0f, 1.0f, 1.0f, _alpha));
     pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
 }
 

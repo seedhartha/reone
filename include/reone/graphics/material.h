@@ -50,6 +50,10 @@ public:
         return _heightMapFrame;
     }
 
+    const glm::vec4 &color() const {
+        return _color;
+    }
+
     const glm::vec3 &ambient() const {
         return _ambient;
     }
@@ -60,10 +64,6 @@ public:
 
     const glm::vec3 &selfIllumColor() const {
         return _selfIllumColor;
-    }
-
-    float alpha() const {
-        return _alpha;
     }
 
     bool affectedByShadows() const {
@@ -90,6 +90,10 @@ public:
         _heightMapFrame = frame;
     }
 
+    void setColor(glm::vec4 color) {
+        _color = std::move(color);
+    }
+
     void setAmbient(glm::vec3 ambient) {
         _ambient = std::move(ambient);
     }
@@ -100,10 +104,6 @@ public:
 
     void setSelfIllumColor(glm::vec3 emission) {
         _selfIllumColor = std::move(emission);
-    }
-
-    void setAlpha(float alpha) {
-        _alpha = alpha;
     }
 
     void setAffectedByShadows(bool affected) {
@@ -125,10 +125,10 @@ private:
     glm::mat3x4 _uv {1.0f};
     int _heightMapFrame {0};
 
+    glm::vec4 _color {0.0f};
     glm::vec3 _ambient {0.2f};
     glm::vec3 _diffuse {0.8f};
     glm::vec3 _selfIllumColor {0.0f};
-    float _alpha {1.0f};
 
     bool _affectedByShadows {false};
     bool _affectedByFog {false};

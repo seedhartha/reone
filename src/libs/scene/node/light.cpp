@@ -19,8 +19,10 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -65,7 +67,7 @@ void LightSceneNode::update(float dt) {
     }
 }
 
-void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
+void LightSceneNode::drawLensFlare(IRenderPass &pass, const ModelNode::LensFlare &flare) {
     std::shared_ptr<Camera> camera(_sceneGraph.camera());
     if (!camera) {
         return;
@@ -74,19 +76,9 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!texture) {
         return;
     }
-    _graphicsSvc.uniforms.setLocals([this, &flare](auto &locals) {
-        locals.reset();
-        locals.featureMask = UniformsFeatureFlags::fixedsize;
-        locals.model = glm::translate(getOrigin());
-        locals.billboardSize = 0.2f * flare.size;
-        locals.color.a = 0.5f;
-        locals.color = glm::vec4(_color, 1.0f);
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::billboard));
-    _graphicsSvc.context.bindTexture(*texture);
-    _graphicsSvc.context.withBlending(BlendMode::Additive, [this]() {
-        _graphicsSvc.meshRegistry.get(MeshName::billboard).draw();
-    });
+    auto color = glm::vec4(_color, 0.5f);
+    auto transform = glm::translate(getOrigin());
+    pass.drawBillboard(*texture, color, transform, glm::inverse(transform), 0.2f * flare.size);
 }
 
 bool LightSceneNode::isDirectional() const {

@@ -50,7 +50,7 @@ public:
 
     void update(float dt) override;
 
-    void drawLensFlare(const graphics::ModelNode::LensFlare &flare);
+    void drawLensFlare(graphics::IRenderPass &pass, const graphics::ModelNode::LensFlare &flare);
 
     bool isDirectional() const;
 
