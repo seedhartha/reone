@@ -46,14 +46,17 @@ public:
 
     virtual FaceCullMode faceCulling() const = 0;
     virtual BlendMode blending() const = 0;
+    virtual PolygonMode polygonMode() const = 0;
 
     virtual void pushFaceCulling(FaceCullMode mode) = 0;
     virtual void pushBlending(BlendMode mode) = 0;
     virtual void pushViewport(glm::ivec4 viewport) = 0;
+    virtual void pushPolygonMode(PolygonMode mode) = 0;
 
     virtual void popFaceCulling() = 0;
     virtual void popBlending() = 0;
     virtual void popViewport() = 0;
+    virtual void popPolygonMode() = 0;
 
     virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
     virtual void withFaceCulling(FaceCullMode mode, const std::function<void()> &block) = 0;
@@ -97,13 +100,19 @@ public:
         return _blendModes.top();
     }
 
+    PolygonMode polygonMode() const override {
+        return _polygonModes.top();
+    }
+
     void pushFaceCulling(FaceCullMode mode) override;
     void pushBlending(BlendMode mode) override;
     void pushViewport(glm::ivec4 viewport) override;
+    void pushPolygonMode(PolygonMode mode) override;
 
     void popFaceCulling() override;
     void popBlending() override;
     void popViewport() override;
+    void popPolygonMode() override;
 
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
     void withFaceCulling(FaceCullMode mode, const std::function<void()> &block) override;

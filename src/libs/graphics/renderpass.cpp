@@ -50,12 +50,16 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
         _context.bindTexture(texture, unit);
     }
     auto prevBlending = _context.blending();
-    auto prevFaceCulling = _context.faceCulling();
     if (material.blending && *material.blending != prevBlending) {
         _context.pushBlending(*material.blending);
     }
+    auto prevFaceCulling = _context.faceCulling();
     if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
         _context.pushFaceCulling(*material.faceCulling);
+    }
+    auto prevPolygonMode = _context.polygonMode();
+    if (material.polygonMode && *material.polygonMode != prevPolygonMode) {
+        _context.pushPolygonMode(*material.polygonMode);
     }
     block();
     if (material.blending && *material.blending != prevBlending) {
@@ -63,6 +67,9 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     }
     if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
         _context.popFaceCulling();
+    }
+    if (material.polygonMode && *material.polygonMode != prevPolygonMode) {
+        _context.popPolygonMode();
     }
 }
 

@@ -49,14 +49,17 @@ public:
 
     MOCK_METHOD(FaceCullMode, faceCulling, (), (const override));
     MOCK_METHOD(BlendMode, blending, (), (const override));
+    MOCK_METHOD(PolygonMode, polygonMode, (), (const override));
 
     MOCK_METHOD(void, pushFaceCulling, (FaceCullMode), (override));
     MOCK_METHOD(void, pushBlending, (BlendMode), (override));
     MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
+    MOCK_METHOD(void, pushPolygonMode, (PolygonMode), (override));
 
     MOCK_METHOD(void, popFaceCulling, (), (override));
     MOCK_METHOD(void, popBlending, (), (override));
     MOCK_METHOD(void, popViewport, (), (override));
+    MOCK_METHOD(void, popPolygonMode, (), (override));
 
     MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withFaceCulling, (FaceCullMode mode, const std::function<void()> &block), (override));

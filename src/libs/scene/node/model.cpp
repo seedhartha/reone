@@ -20,8 +20,10 @@
 #include "reone/graphics/animation.h"
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
@@ -127,18 +129,15 @@ void ModelSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *>
     }
 }
 
-void ModelSceneNode::drawAABB() {
-    _graphicsSvc.context.withPolygonMode(PolygonMode::Line, [this]() {
-        _graphicsSvc.uniforms.setLocals([this](auto &locals) {
-            locals.reset();
-            locals.model = _absTransform;
-            locals.model *= glm::translate(_aabb.center());
-            locals.model *= glm::scale(0.5f * _aabb.size());
-            locals.modelInv = glm::inverse(locals.model);
-        });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::deferredAABB));
-        _graphicsSvc.meshRegistry.get(MeshName::box).draw();
-    });
+void ModelSceneNode::drawAABB(IRenderPass &pass) {
+    auto &mesh = _graphicsSvc.meshRegistry.get(MeshName::box);
+    Material material;
+    material.programId = ShaderProgramId::deferredAABB;
+    material.polygonMode = PolygonMode::Line;
+    auto transform = _absTransform;
+    transform *= glm::translate(_aabb.center());
+    transform *= glm::scale(0.5f * _aabb.size());
+    pass.draw(mesh, material, transform, glm::inverse(transform));
 }
 
 void ModelSceneNode::computeAABB() {

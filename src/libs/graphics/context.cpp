@@ -115,6 +115,11 @@ void GraphicsContext::pushViewport(glm::ivec4 viewport) {
     _viewports.push(std::move(viewport));
 }
 
+void GraphicsContext::pushPolygonMode(PolygonMode mode) {
+    setPolygonMode(mode);
+    _polygonModes.push(mode);
+}
+
 void GraphicsContext::popFaceCulling() {
     _faceCullModes.pop();
     setFaceCullMode(_faceCullModes.top());
@@ -128,6 +133,11 @@ void GraphicsContext::popBlending() {
 void GraphicsContext::popViewport() {
     _viewports.pop();
     setViewport(_viewports.top());
+}
+
+void GraphicsContext::popPolygonMode() {
+    _polygonModes.pop();
+    setPolygonMode(_polygonModes.top());
 }
 
 void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {
@@ -169,13 +179,9 @@ void GraphicsContext::withPolygonMode(PolygonMode mode, const std::function<void
         block();
         return;
     }
-    setPolygonMode(mode);
-    _polygonModes.push(mode);
-
+    pushPolygonMode(mode);
     block();
-
-    _polygonModes.pop();
-    setPolygonMode(_polygonModes.top());
+    popPolygonMode();
 }
 
 void GraphicsContext::withViewport(glm::ivec4 viewport, const std::function<void()> &block) {

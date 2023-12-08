@@ -45,6 +45,7 @@ public:
 
     std::optional<BlendMode> blending;
     std::optional<FaceCullMode> faceCulling;
+    std::optional<PolygonMode> polygonMode;
 };
 
 } // namespace graphics

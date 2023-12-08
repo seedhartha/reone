@@ -552,7 +552,7 @@ void SceneGraph::drawOpaque(IRenderPass &pass) {
 
     if (_drawAABB) {
         for (auto &model : _modelRoots) {
-            model->drawAABB();
+            model->drawAABB(pass);
         }
     }
     if (_drawWalkmeshes) {
