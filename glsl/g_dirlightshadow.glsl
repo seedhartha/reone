@@ -1,3 +1,5 @@
+#include "u_sceneglobals.glsl"
+
 const int NUM_SHADOW_CASCADES = 4;
 
 layout(triangles) in;

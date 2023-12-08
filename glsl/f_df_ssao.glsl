@@ -1,3 +1,5 @@
+#include "u_screeneffect.glsl"
+
 const float NOISE_SCALE = 1.0 / 4.0;
 const float MAX_DISTANCE = 500.0;
 

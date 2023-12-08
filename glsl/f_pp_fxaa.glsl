@@ -1,3 +1,7 @@
+#include "u_screeneffect.glsl"
+
+#include "i_luma.glsl"
+
 #define FXAA_PS 5
 #define FXAA_P0 1.0
 #define FXAA_P1 1.5

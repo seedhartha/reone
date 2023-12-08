@@ -1,3 +1,7 @@
+#include "u_sceneglobals.glsl"
+#include "u_scenelocals.glsl"
+#include "u_walkmesh.glsl"
+
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 9) in float aMaterial;

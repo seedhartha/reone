@@ -20,6 +20,7 @@
 #include "reone/graphics/shader.h"
 #include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/types.h"
+#include "reone/system/types.h"
 
 namespace reone {
 
@@ -64,9 +65,9 @@ private:
 
     bool _inited {false};
 
-    std::map<std::string, std::string> _resRefToSource;
+    std::map<std::string, ByteBuffer> _sourceResRefToData;
 
-    std::shared_ptr<graphics::Shader> initShader(graphics::ShaderType type, std::vector<std::string> sourceResRefs);
+    std::shared_ptr<graphics::Shader> initShader(graphics::ShaderType type, std::string resRef);
     std::shared_ptr<graphics::ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<graphics::Shader>> shaders);
 };
 

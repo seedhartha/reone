@@ -1,3 +1,5 @@
+#include "u_sceneglobals.glsl"
+
 const int NUM_CUBE_FACES = 6;
 
 layout(triangles) in;

@@ -1,3 +1,5 @@
+#include "u_scenelocals.glsl"
+
 layout(location = 0) in vec3 aPosition;
 
 void main() {

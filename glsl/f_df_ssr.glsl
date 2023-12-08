@@ -1,3 +1,5 @@
+#include "u_screeneffect.glsl"
+
 const float MAX_DISTANCE = 100.0;
 
 const float EDGE_FADE_START = 0.8;

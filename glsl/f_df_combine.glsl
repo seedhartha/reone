@@ -1,3 +1,14 @@
+#include "u_sceneglobals.glsl"
+#include "u_scenelocals.glsl"
+
+#include "i_fog.glsl"
+#include "i_lighting.glsl"
+#include "i_math.glsl"
+#include "i_shadowmap.glsl"
+
+#include "i_blinnphong.glsl"
+#include "i_pbr.glsl"
+
 const float SELFILLUM_THRESHOLD = 0.8;
 const float LIGHTMAP_AMBIENT_FACTOR = 0.5;
 

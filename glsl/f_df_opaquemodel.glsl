@@ -1,3 +1,13 @@
+#include "u_sceneglobals.glsl"
+#include "u_scenelocals.glsl"
+
+#include "i_hash.glsl"
+#include "i_hashedalpha.glsl"
+#include "i_math.glsl"
+#include "i_normalmap.glsl"
+
+#include "i_envmap.glsl"
+
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sEnvironmentMap;

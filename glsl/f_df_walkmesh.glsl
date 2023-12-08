@@ -1,3 +1,6 @@
+#include "u_sceneglobals.glsl"
+#include "u_walkmesh.glsl"
+
 in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 flat in int fragMaterial;

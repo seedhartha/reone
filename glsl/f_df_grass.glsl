@@ -1,3 +1,10 @@
+#include "u_grass.glsl"
+#include "u_sceneglobals.glsl"
+#include "u_scenelocals.glsl"
+
+#include "i_hash.glsl"
+#include "i_hashedalpha.glsl"
+
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 
@@ -24,12 +31,10 @@ void main() {
     hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
 
     vec3 eyePos = (uView * fragPosWorldSpace).xyz;
-
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
     eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = mainTexSample;
-
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, uGrassClusters[fragInstanceID].lightmapUV).rgb, 1.0) : vec4(0.0);
 
     fragEnvmapColor = vec4(0.0);

@@ -1,4 +1,4 @@
-#include "u_locals.glsl"
+#include "u_scenelocals.glsl"
 
 uniform sampler2D sMainTex;
 

@@ -1,3 +1,5 @@
+#include "u_screeneffect.glsl"
+
 uniform sampler2D sMainTex;
 
 noperspective in vec2 fragUV1;

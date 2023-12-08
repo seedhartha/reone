@@ -21,7 +21,10 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
+#include "reone/system/stream/memoryinput.h"
 #include "reone/system/stringbuilder.h"
+#include "reone/system/textreader.h"
 
 using namespace reone::graphics;
 
@@ -67,6 +70,7 @@ static const std::string kVertWalkmesh = "v_walkmesh";
 static const std::string kGeometryDirLightShadows = "g_dirlightshadow";
 static const std::string kGeometryPointLightShadows = "g_ptlightshadow";
 
+static const std::string kFragBillboard = "f_billboard";
 static const std::string kFragColor = "f_color";
 static const std::string kFragDeferredAABB = "f_df_aabb";
 static const std::string kFragDeferredCombine = "f_df_combine";
@@ -96,45 +100,45 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vertBillboard = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kVertBillboard});
-    auto vertGrass = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsGrass, kVertGrass});
-    auto vertModel = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsBones, kVertModel});
-    auto vertMVP3D = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kVertMVP3D});
-    auto vertParticles = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsParticles, kVertParticles});
-    auto vertPassthrough = initShader(ShaderType::Vertex, {kVertPassthrough});
-    auto vertShadows = initShader(ShaderType::Vertex, {kUniformsSceneLocals, kVertShadows});
-    auto vertWalkmesh = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsWalkmesh, kVertWalkmesh});
+    auto vertBillboard = initShader(ShaderType::Vertex, kVertBillboard);
+    auto vertGrass = initShader(ShaderType::Vertex, kVertGrass);
+    auto vertModel = initShader(ShaderType::Vertex, kVertModel);
+    auto vertMVP3D = initShader(ShaderType::Vertex, kVertMVP3D);
+    auto vertParticles = initShader(ShaderType::Vertex, kVertParticles);
+    auto vertPassthrough = initShader(ShaderType::Vertex, kVertPassthrough);
+    auto vertShadows = initShader(ShaderType::Vertex, kVertShadows);
+    auto vertWalkmesh = initShader(ShaderType::Vertex, kVertWalkmesh);
 
-    auto vertMVP2D = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertMVP2D});
-    auto vertText = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsText, kVertText});
+    auto vertMVP2D = initShader(ShaderType::Vertex, kVertMVP2D);
+    auto vertText = initShader(ShaderType::Vertex, kVertText);
 
-    auto geomDirLightShadows = initShader(ShaderType::Geometry, {kUniformsSceneGlobals, kGeometryDirLightShadows});
-    auto geomPointLightShadows = initShader(ShaderType::Geometry, {kUniformsSceneGlobals, kGeometryPointLightShadows});
+    auto geomDirLightShadows = initShader(ShaderType::Geometry, kGeometryDirLightShadows);
+    auto geomPointLightShadows = initShader(ShaderType::Geometry, kGeometryPointLightShadows);
 
-    auto fragBillboard = initShader(ShaderType::Fragment, {kUniformsSceneLocals, kFragTexture});
-    auto fragDeferredAABB = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kFragDeferredAABB});
-    auto fragDeferredCombine = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeLighting, kIncludeBlinnPhong, kIncludePBR, kIncludeLuma, kIncludeShadowMap, kIncludeFog, kFragDeferredCombine});
-    auto fragDeferredGrass = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsGrass, kIncludeHash, kIncludeHashedAlpha, kFragDeferredGrass});
-    auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeHash, kIncludeHashedAlpha, kIncludeEnvMap, kIncludeNormalMap, kFragDeferredOpaqueModel});
-    auto fragDeferredSSAO = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragDeferredSSAO});
-    auto fragDeferredSSR = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragDeferredSSR});
-    auto fragDeferredWalkmesh = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsWalkmesh, kFragDeferredWalkmesh});
-    auto fragNull = initShader(ShaderType::Fragment, {kFragNull});
-    auto fragOITBlend = initShader(ShaderType::Fragment, {kFragOITBlend});
-    auto fragOITModel = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeEnvMap, kIncludeNormalMap, kIncludeOIT, kIncludeLuma, kFragOITModel});
-    auto fragOITParticles = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsParticles, kIncludeOIT, kIncludeLuma, kFragOITParticles});
-    auto fragPointLightShadows = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kFragPointLightShadows});
-    auto fragPostBoxBlur4 = initShader(ShaderType::Fragment, {kFragPostBoxBlur4});
-    auto fragPostFXAA = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kIncludeLuma, kFragPostFXAA});
-    auto fragPostGaussianBlur13 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostGaussianBlur13});
-    auto fragPostGaussianBlur9 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostGaussianBlur9});
-    auto fragPostMedianFilter3 = initShader(ShaderType::Fragment, {kFragPostMedianFilter3});
-    auto fragPostMedianFilter5 = initShader(ShaderType::Fragment, {kFragPostMedianFilter5});
-    auto fragPostSharpen = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostSharpen});
+    auto fragBillboard = initShader(ShaderType::Fragment, kFragBillboard);
+    auto fragDeferredAABB = initShader(ShaderType::Fragment, kFragDeferredAABB);
+    auto fragDeferredCombine = initShader(ShaderType::Fragment, kFragDeferredCombine);
+    auto fragDeferredGrass = initShader(ShaderType::Fragment, kFragDeferredGrass);
+    auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, kFragDeferredOpaqueModel);
+    auto fragDeferredSSAO = initShader(ShaderType::Fragment, kFragDeferredSSAO);
+    auto fragDeferredSSR = initShader(ShaderType::Fragment, kFragDeferredSSR);
+    auto fragDeferredWalkmesh = initShader(ShaderType::Fragment, kFragDeferredWalkmesh);
+    auto fragNull = initShader(ShaderType::Fragment, kFragNull);
+    auto fragOITBlend = initShader(ShaderType::Fragment, kFragOITBlend);
+    auto fragOITModel = initShader(ShaderType::Fragment, kFragOITModel);
+    auto fragOITParticles = initShader(ShaderType::Fragment, kFragOITParticles);
+    auto fragPointLightShadows = initShader(ShaderType::Fragment, kFragPointLightShadows);
+    auto fragPostBoxBlur4 = initShader(ShaderType::Fragment, kFragPostBoxBlur4);
+    auto fragPostFXAA = initShader(ShaderType::Fragment, kFragPostFXAA);
+    auto fragPostGaussianBlur13 = initShader(ShaderType::Fragment, kFragPostGaussianBlur13);
+    auto fragPostGaussianBlur9 = initShader(ShaderType::Fragment, kFragPostGaussianBlur9);
+    auto fragPostMedianFilter3 = initShader(ShaderType::Fragment, kFragPostMedianFilter3);
+    auto fragPostMedianFilter5 = initShader(ShaderType::Fragment, kFragPostMedianFilter5);
+    auto fragPostSharpen = initShader(ShaderType::Fragment, kFragPostSharpen);
 
-    auto fragText = initShader(ShaderType::Fragment, {kUniformsLocals, kUniformsText, kFragText});
-    auto fragColor = initShader(ShaderType::Fragment, {kUniformsLocals, kFragColor});
-    auto fragTexture = initShader(ShaderType::Fragment, {kUniformsLocals, kFragTexture});
+    auto fragText = initShader(ShaderType::Fragment, kFragText);
+    auto fragColor = initShader(ShaderType::Fragment, kFragColor);
+    auto fragTexture = initShader(ShaderType::Fragment, kFragTexture);
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragBillboard}));
@@ -172,11 +176,38 @@ void Shaders::deinit() {
     _inited = false;
 }
 
-std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::string> sourceResRefs) {
+std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::string resRef) {
     std::list<std::string> sources;
-    sources.push_back("#version 330 core\n\n");
+
+    std::list<std::string> resRefs;
+    resRefs.push_back(resRef);
+    while (!resRefs.empty()) {
+        const auto &rr = resRefs.back();
+        resRefs.pop_back();
+        if (_sourceResRefToData.count(rr) == 0) {
+            auto res = _resources.get(ResourceId(rr, ResType::Glsl));
+            _sourceResRefToData[rr] = std::move(res.data);
+        }
+        auto source = StringBuilder();
+        auto stream = MemoryInputStream(_sourceResRefToData.at(rr));
+        auto reader = TextReader(stream);
+        while (auto line = reader.readLine()) {
+            std::smatch match;
+            if (std::regex_search(*line, match, std::regex("^#include \"([\\d\\w_]+)\\.glsl\"$"))) {
+                resRefs.push_back(match[1].str());
+                continue;
+            }
+            source.append(*line);
+            source.append("\n");
+        }
+        sources.push_front(source.string());
+    }
+
+    // Prepend preprocessor directives
     auto defines = StringBuilder();
-    // defines.append("#define R_PBR\n");
+    if (true) {
+        defines.append("#define R_PBR\n");
+    }
     if (_graphicsOpt.ssr) {
         defines.append("#define R_SSR\n");
     }
@@ -185,22 +216,9 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::vector<std::st
     }
     if (!defines.empty()) {
         defines.append("\n");
-        sources.push_back(defines.string());
+        sources.push_front(defines.string());
     }
-    for (auto &resRef : sourceResRefs) {
-        std::string source;
-        if (_resRefToSource.count(resRef) > 0) {
-            source = _resRefToSource.at(resRef);
-        } else {
-            auto res = _resources.find(ResourceId(resRef, ResType::Glsl));
-            if (!res) {
-                throw std::runtime_error("Shader source not found: " + resRef);
-            }
-            source = std::string(res->data.begin(), res->data.end());
-            _resRefToSource[resRef] = source;
-        }
-        sources.push_back(std::move(source));
-    }
+    sources.push_front("#version 330 core\n\n");
 
     auto shader = std::make_unique<Shader>(type, std::move(sources));
     shader->init();

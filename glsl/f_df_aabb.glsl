@@ -1,3 +1,5 @@
+#include "u_sceneglobals.glsl"
+
 in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 

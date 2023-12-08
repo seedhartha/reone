@@ -1,3 +1,6 @@
+#include "u_locals.glsl"
+#include "u_text.glsl"
+
 uniform sampler2D sMainTex;
 
 in vec2 fragUV1;

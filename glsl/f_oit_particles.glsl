@@ -1,3 +1,10 @@
+#include "u_particles.glsl"
+#include "u_sceneglobals.glsl"
+#include "u_scenelocals.glsl"
+
+#include "i_luma.glsl"
+#include "i_oit.glsl"
+
 uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
