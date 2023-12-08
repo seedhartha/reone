@@ -47,7 +47,7 @@ public:
     MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
     MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
 
-    MOCK_METHOD(void, pushFaceCulling, (CullFaceMode), (override));
+    MOCK_METHOD(void, pushFaceCulling, (FaceCullMode), (override));
     MOCK_METHOD(void, pushBlending, (BlendMode), (override));
     MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
 
@@ -56,7 +56,7 @@ public:
     MOCK_METHOD(void, popViewport, (), (override));
 
     MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withFaceCulling, (CullFaceMode mode, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withFaceCulling, (FaceCullMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &block), (override));
     MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &block), (override));

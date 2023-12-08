@@ -22,6 +22,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/triangleutil.h"
@@ -142,27 +143,22 @@ void GrassSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *>
     if (leafs.empty()) {
         return;
     }
-    _graphicsSvc.context.bindTexture(*_properties.texture);
-    _graphicsSvc.uniforms.setLocals([this](auto &locals) {
-        locals.reset();
-        locals.featureMask = UniformsFeatureFlags::hashedalphatest;
-        if (!_aabbNode.mesh()->lightmap.empty()) {
-            auto lightmap = _resourceSvc.textures.get(_aabbNode.mesh()->lightmap, TextureUsage::Lightmap);
-            _graphicsSvc.context.bindTexture(*lightmap, TextureUnits::lightmap);
-            locals.featureMask |= UniformsFeatureFlags::lightmap;
-        }
-    });
-    _graphicsSvc.uniforms.setGrass([this, &leafs](auto &grass) {
-        for (size_t i = 0; i < leafs.size(); ++i) {
-            auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
-            grass.quadSize = glm::vec2(_properties.quadSize);
-            grass.radius = kMaxClusterDistance;
-            grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
-            grass.clusters[i].lightmapUV = cluster->lightmapUV();
-        }
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::deferredGrass));
-    _graphicsSvc.meshRegistry.get(MeshName::grass).drawInstanced(leafs.size());
+    std::optional<std::reference_wrapper<Texture>> lightmap;
+    if (!_aabbNode.mesh()->lightmap.empty()) {
+        lightmap = *_resourceSvc.textures.get(_aabbNode.mesh()->lightmap, TextureUsage::Lightmap);
+    }
+    auto instances = std::vector<GrassInstance>(leafs.size());
+    for (size_t i = 0; i < leafs.size(); ++i) {
+        const auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
+        instances[i].position = cluster->getOrigin();
+        instances[i].variant = cluster->variant();
+        instances[i].lightmapUV = cluster->lightmapUV();
+    }
+    pass.drawGrass(kMaxClusterDistance,
+                   _properties.quadSize,
+                   *_properties.texture,
+                   lightmap,
+                   instances);
 }
 
 int GrassSceneNode::getNumClustersInFace(float area) const {

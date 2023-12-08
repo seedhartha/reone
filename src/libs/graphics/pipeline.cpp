@@ -612,13 +612,42 @@ void RenderPass::drawBillboard(Texture &texture,
     _context.popBlending();
 }
 
+void RenderPass::drawGrass(float radius,
+                           float quadSize,
+                           Texture &texture,
+                           std::optional<std::reference_wrapper<Texture>> &lightmap,
+                           const std::vector<GrassInstance> &instances) {
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredGrass));
+    _context.bindTexture(texture, TextureUnits::mainTex);
+    if (lightmap) {
+        _context.bindTexture(lightmap->get(), TextureUnits::lightmap);
+    }
+    _uniforms.setLocals([&lightmap](auto &locals) {
+        locals.reset();
+        locals.featureMask |= UniformsFeatureFlags::hashedalphatest;
+        if (lightmap) {
+            locals.featureMask |= UniformsFeatureFlags::lightmap;
+        }
+    });
+    _uniforms.setGrass([&radius, &quadSize, &instances](auto &grass) {
+        grass.radius = radius;
+        grass.quadSize = glm::vec2(quadSize);
+        for (size_t i = 0; i < instances.size(); ++i) {
+            const auto &instance = instances[i];
+            grass.clusters[i].positionVariant = glm::vec4(instance.position, static_cast<float>(instance.variant));
+            grass.clusters[i].lightmapUV = instance.lightmapUV;
+        }
+    });
+    _meshRegistry.get(MeshName::grass).drawInstanced(instances.size());
+}
+
 void RenderPass::applyToContext(const Material &material) {
     _context.useProgram(_shaderRegistry.get(material.programId));
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
     }
-    if (material.cullFaceMode) {
-        _context.pushFaceCulling(*material.cullFaceMode);
+    if (material.faceCullMode) {
+        _context.pushFaceCulling(*material.faceCullMode);
     }
 }
 
@@ -663,7 +692,7 @@ void RenderPass::applyToLocals(const Material &material,
 }
 
 void RenderPass::unapplyToContext(const Material &material) {
-    if (material.cullFaceMode) {
+    if (material.faceCullMode) {
         _context.popFaceCulling();
     }
 }

@@ -39,8 +39,8 @@ void GraphicsContext::init() {
     setDepthTestMode(DepthTestMode::LessOrEqual);
     _depthTestModes.push(DepthTestMode::LessOrEqual);
 
-    setCullFaceMode(CullFaceMode::None);
-    _cullFaceModes.push(CullFaceMode::None);
+    setFaceCullMode(FaceCullMode::None);
+    _faceCullModes.push(FaceCullMode::None);
 
     setBlendMode(BlendMode::None);
     _blendModes.push(BlendMode::None);
@@ -100,9 +100,9 @@ void GraphicsContext::bind(UniformBuffer &buffer, int index) {
     buffer.bind(index);
 }
 
-void GraphicsContext::pushFaceCulling(CullFaceMode mode) {
-    setCullFaceMode(mode);
-    _cullFaceModes.push(mode);
+void GraphicsContext::pushFaceCulling(FaceCullMode mode) {
+    setFaceCullMode(mode);
+    _faceCullModes.push(mode);
 }
 
 void GraphicsContext::pushBlending(BlendMode mode) {
@@ -116,8 +116,8 @@ void GraphicsContext::pushViewport(glm::ivec4 viewport) {
 }
 
 void GraphicsContext::popFaceCulling() {
-    _cullFaceModes.pop();
-    setCullFaceMode(_cullFaceModes.top());
+    _faceCullModes.pop();
+    setFaceCullMode(_faceCullModes.top());
 }
 
 void GraphicsContext::popBlending() {
@@ -154,8 +154,8 @@ void GraphicsContext::withDepthTest(DepthTestMode mode, const std::function<void
     setDepthTestMode(_depthTestModes.top());
 }
 
-void GraphicsContext::withFaceCulling(CullFaceMode mode, const std::function<void()> &block) {
-    if (_cullFaceModes.top() == mode) {
+void GraphicsContext::withFaceCulling(FaceCullMode mode, const std::function<void()> &block) {
+    if (_faceCullModes.top() == mode) {
         block();
         return;
     }
@@ -222,12 +222,12 @@ void GraphicsContext::setDepthTestMode(DepthTestMode mode) {
     }
 }
 
-void GraphicsContext::setCullFaceMode(CullFaceMode mode) {
-    if (mode == CullFaceMode::None) {
+void GraphicsContext::setFaceCullMode(FaceCullMode mode) {
+    if (mode == FaceCullMode::None) {
         glDisable(GL_CULL_FACE);
     } else {
         glEnable(GL_CULL_FACE);
-        if (mode == CullFaceMode::Front) {
+        if (mode == FaceCullMode::Front) {
             glCullFace(GL_FRONT);
         } else {
             glCullFace(GL_BACK);

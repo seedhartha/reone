@@ -33,9 +33,9 @@ public:
     std::string programId;
     TextureUnitToTexture textures;
     glm::mat3x4 uv {1.0f};
+    glm::vec4 color {1.0f};
     int heightMapFrame {0};
 
-    glm::vec4 color {0.0f};
     glm::vec3 ambient {0.2f};
     glm::vec3 diffuse {0.8f};
     glm::vec3 selfIllumColor {0.0f};
@@ -43,7 +43,8 @@ public:
     bool affectedByShadows {false};
     bool affectedByFog {false};
 
-    std::optional<CullFaceMode> cullFaceMode;
+    std::optional<BlendMode> blendMode;
+    std::optional<FaceCullMode> faceCullMode;
 };
 
 } // namespace graphics

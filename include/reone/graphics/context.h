@@ -44,7 +44,7 @@ public:
     virtual void bind(UniformBuffer &buffer, int index) = 0;
     virtual UniformBuffer &uniformBufferAt(int index) = 0;
 
-    virtual void pushFaceCulling(CullFaceMode mode) = 0;
+    virtual void pushFaceCulling(FaceCullMode mode) = 0;
     virtual void pushBlending(BlendMode mode) = 0;
     virtual void pushViewport(glm::ivec4 viewport) = 0;
 
@@ -53,7 +53,7 @@ public:
     virtual void popViewport() = 0;
 
     virtual void withDepthTest(DepthTestMode mode, const std::function<void()> &block) = 0;
-    virtual void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) = 0;
+    virtual void withFaceCulling(FaceCullMode mode, const std::function<void()> &block) = 0;
     virtual void withBlending(BlendMode mode, const std::function<void()> &block) = 0;
     virtual void withPolygonMode(PolygonMode mode, const std::function<void()> &block) = 0;
     virtual void withViewport(glm::ivec4 viewport, const std::function<void()> &block) = 0;
@@ -86,7 +86,7 @@ public:
         return *_uniformBuffers.at(index);
     }
 
-    void pushFaceCulling(CullFaceMode mode) override;
+    void pushFaceCulling(FaceCullMode mode) override;
     void pushBlending(BlendMode mode) override;
     void pushViewport(glm::ivec4 viewport) override;
 
@@ -95,7 +95,7 @@ public:
     void popViewport() override;
 
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block) override;
-    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block) override;
+    void withFaceCulling(FaceCullMode mode, const std::function<void()> &block) override;
     void withBlending(BlendMode mode, const std::function<void()> &block) override;
     void withPolygonMode(PolygonMode mode, const std::function<void()> &block) override;
     void withViewport(glm::ivec4 viewport, const std::function<void()> &block) override;
@@ -113,7 +113,7 @@ private:
     // States
 
     std::stack<DepthTestMode> _depthTestModes;
-    std::stack<CullFaceMode> _cullFaceModes;
+    std::stack<FaceCullMode> _faceCullModes;
     std::stack<BlendMode> _blendModes;
     std::stack<PolygonMode> _polygonModes;
     std::stack<glm::ivec4> _viewports;
@@ -121,7 +121,7 @@ private:
     // END States
 
     void setDepthTestMode(DepthTestMode mode);
-    void setCullFaceMode(CullFaceMode mode);
+    void setFaceCullMode(FaceCullMode mode);
     void setBlendMode(BlendMode mode);
     void setPolygonMode(PolygonMode mode);
     void setViewport(glm::ivec4 viewport);

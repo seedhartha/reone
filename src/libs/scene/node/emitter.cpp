@@ -312,7 +312,7 @@ void EmitterSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode 
     _graphicsSvc.context.bindTexture(*texture);
 
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
-    _graphicsSvc.context.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
+    _graphicsSvc.context.withFaceCulling(twosided ? FaceCullMode::None : FaceCullMode::Back, [this, &leafs] {
         _graphicsSvc.meshRegistry.get(MeshName::billboard).drawInstanced(leafs.size());
     });
 }

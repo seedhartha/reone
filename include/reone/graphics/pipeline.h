@@ -54,6 +54,12 @@ class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
 
+struct GrassInstance {
+    int variant {0};
+    glm::vec3 position {0.0f};
+    glm::vec2 lightmapUV {0.0f};
+};
+
 class IRenderPass {
 public:
     virtual ~IRenderPass() = default;
@@ -74,6 +80,12 @@ public:
                                const glm::mat4 &transform,
                                const glm::mat4 &transformInv,
                                std::optional<float> size) = 0;
+
+    virtual void drawGrass(float radius,
+                           float quadSize,
+                           Texture &texture,
+                           std::optional<std::reference_wrapper<Texture>> &lightmap,
+                           const std::vector<GrassInstance> &instances) = 0;
 };
 
 class IPipeline {
@@ -116,6 +128,12 @@ public:
                        const glm::mat4 &transform,
                        const glm::mat4 &transformInv,
                        std::optional<float> size) override;
+
+    void drawGrass(float radius,
+                   float quadSize,
+                   Texture &texture,
+                   std::optional<std::reference_wrapper<Texture>> &lightmap,
+                   const std::vector<GrassInstance> &instances) override;
 
 private:
     GraphicsContext &_context;

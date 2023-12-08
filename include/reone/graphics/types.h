@@ -98,7 +98,7 @@ enum class DepthTestMode {
     Always
 };
 
-enum class CullFaceMode {
+enum class FaceCullMode {
     None,
     Front,
     Back

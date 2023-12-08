@@ -521,7 +521,7 @@ void SceneGraph::drawShadows(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
-    _graphicsSvc.context.withFaceCulling(CullFaceMode::Front, [this, &pass]() {
+    _graphicsSvc.context.withFaceCulling(FaceCullMode::Front, [this, &pass]() {
         for (auto &mesh : _shadowMeshes) {
             mesh->drawShadow(pass);
         }

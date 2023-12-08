@@ -216,7 +216,7 @@ void MeshSceneNode::draw(IRenderPass &pass) {
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         material.affectedByFog = true;
     }
-    material.cullFaceMode = CullFaceMode::Back;
+    material.faceCullMode = FaceCullMode::Back;
     if (_modelNode.isSkinMesh()) {
         const auto &skin = *mesh->skin;
         auto bones = std::vector<glm::mat4>(kMaxBones, glm::mat4(1.0f));
