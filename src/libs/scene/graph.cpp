@@ -558,7 +558,7 @@ void SceneGraph::drawOpaque(IRenderPass &pass) {
     if (_drawWalkmeshes) {
         for (auto &walkmesh : _walkmeshRoots) {
             if (walkmesh->isEnabled()) {
-                walkmesh->draw();
+                walkmesh->draw(pass);
             }
         }
     }

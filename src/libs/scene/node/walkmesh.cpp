@@ -19,9 +19,10 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/material.h"
+#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
-
 #include "reone/scene/graph.h"
 
 using namespace reone::graphics;
@@ -63,15 +64,10 @@ void WalkmeshSceneNode::init() {
     _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
 }
 
-void WalkmeshSceneNode::draw() {
-    _graphicsSvc.uniforms.setLocals([this](auto &locals) {
-        locals.reset();
-        locals.model = _absTransform;
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::deferredWalkmesh));
-    _graphicsSvc.context.withFaceCulling(CullFaceMode::Back, [this]() {
-        _mesh->draw();
-    });
+void WalkmeshSceneNode::draw(IRenderPass &pass) {
+    auto material = Material(ShaderProgramId::deferredWalkmesh);
+    material.setCullFaceMode(CullFaceMode::Back);
+    pass.draw(*_mesh, material, _absTransform, _absTransformInv);
 }
 
 } // namespace scene
