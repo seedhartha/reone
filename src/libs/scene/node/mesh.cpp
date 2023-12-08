@@ -247,14 +247,12 @@ void MeshSceneNode::drawShadow(IRenderPass &pass) {
     if (!mesh) {
         return;
     }
-    _graphicsSvc.uniforms.setLocals([this](auto &locals) {
-        locals.reset();
-        locals.model = _absTransform;
-        locals.modelInv = _absTransformInv;
-        locals.color.a = _alpha;
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(_sceneGraph.isShadowLightDirectional() ? ShaderProgramId::dirLightShadows : ShaderProgramId::pointLightShadows));
-    mesh->mesh->draw();
+    const auto &programId = _sceneGraph.isShadowLightDirectional()
+                                ? ShaderProgramId::dirLightShadows
+                                : ShaderProgramId::pointLightShadows;
+    auto material = Material(programId);
+    material.setAlpha(_alpha);
+    pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
