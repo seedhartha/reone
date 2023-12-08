@@ -66,6 +66,51 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     }
 }
 
+int RenderPass::materialFeatureMask(const Material &material) const {
+    int mask = 0;
+    const auto &textures = material.textures;
+    if (textures.count(TextureUnits::mainTex) > 0) {
+        const auto &mainTex = textures.at(TextureUnits::mainTex).get();
+        switch (mainTex.features().blending) {
+        case Texture::Blending::PunchThrough:
+            mask |= UniformsFeatureFlags::hashedalphatest;
+            break;
+        case Texture::Blending::Additive:
+            if (textures.count(TextureUnits::environmentMap) == 0 &&
+                textures.count(TextureUnits::environmentMapCube) == 0) {
+                mask |= UniformsFeatureFlags::premulalpha;
+            }
+            break;
+        default:
+            break;
+        }
+        if (mainTex.features().waterAlpha != -1.0f) {
+            mask |= UniformsFeatureFlags::water;
+        }
+    }
+    if (textures.count(TextureUnits::lightmap) > 0) {
+        mask |= UniformsFeatureFlags::lightmap;
+    }
+    if (textures.count(TextureUnits::environmentMap) > 0) {
+        mask |= UniformsFeatureFlags::envmap;
+    }
+    if (textures.count(TextureUnits::environmentMapCube) > 0) {
+        mask |= UniformsFeatureFlags::envmap | UniformsFeatureFlags::envmapcube;
+    }
+    if (textures.count(TextureUnits::bumpMap) > 0) {
+        mask |= textures.at(TextureUnits::bumpMap).get().isGrayscale()
+                    ? UniformsFeatureFlags::heightmap
+                    : UniformsFeatureFlags::normalmap;
+    }
+    if (material.affectedByShadows) {
+        mask |= UniformsFeatureFlags::shadows;
+    }
+    if (material.affectedByFog) {
+        mask |= UniformsFeatureFlags::fog;
+    }
+    return mask;
+}
+
 void RenderPass::drawSkinned(Mesh &mesh,
                              Material &material,
                              const glm::mat4 &transform,
@@ -106,6 +151,40 @@ void RenderPass::drawBillboard(Texture &texture,
     _context.pushBlending(BlendMode::Additive);
     _meshRegistry.get(MeshName::billboard).draw();
     _context.popBlending();
+}
+
+void RenderPass::drawParticles(Texture &texture,
+                               FaceCullMode faceCulling,
+                               bool premultipliedAlpha,
+                               const glm::ivec2 &gridSize,
+                               const std::vector<ParticleInstance> &particles) {
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitParticles));
+    _context.bindTexture(texture, TextureUnits::mainTex);
+    _uniforms.setLocals([&premultipliedAlpha](auto &locals) {
+        locals.reset();
+        if (premultipliedAlpha) {
+            locals.featureMask |= UniformsFeatureFlags::premulalpha;
+        }
+    });
+    _uniforms.setParticles([&gridSize, &premultipliedAlpha, &particles](auto &p) {
+        p.gridSize = gridSize;
+        for (size_t i = 0; i < particles.size(); ++i) {
+            const auto &particle = particles[i];
+            p.particles[i].positionFrame = glm::vec4(particle.position, static_cast<float>(particle.frame));
+            p.particles[i].size = particle.size;
+            p.particles[i].color = particle.color;
+            p.particles[i].right = glm::vec4(particle.right, 0.0f);
+            p.particles[i].up = glm::vec4(particle.up, 0.0f);
+        }
+    });
+    auto prevFaceCulling = _context.faceCulling();
+    if (faceCulling != prevFaceCulling) {
+        _context.pushFaceCulling(faceCulling);
+    }
+    _meshRegistry.get(MeshName::billboard).drawInstanced(particles.size());
+    if (faceCulling != prevFaceCulling) {
+        _context.popFaceCulling();
+    }
 }
 
 void RenderPass::drawGrass(float radius,
@@ -175,51 +254,6 @@ void RenderPass::applyMaterialToLocals(const Material &material,
             break;
         }
     }
-}
-
-int RenderPass::materialFeatureMask(const Material &material) const {
-    int mask = 0;
-    const auto &textures = material.textures;
-    if (textures.count(TextureUnits::mainTex) > 0) {
-        const auto &mainTex = textures.at(TextureUnits::mainTex).get();
-        switch (mainTex.features().blending) {
-        case Texture::Blending::PunchThrough:
-            mask |= UniformsFeatureFlags::hashedalphatest;
-            break;
-        case Texture::Blending::Additive:
-            if (textures.count(TextureUnits::environmentMap) == 0 &&
-                textures.count(TextureUnits::environmentMapCube) == 0) {
-                mask |= UniformsFeatureFlags::premulalpha;
-            }
-            break;
-        default:
-            break;
-        }
-        if (mainTex.features().waterAlpha != -1.0f) {
-            mask |= UniformsFeatureFlags::water;
-        }
-    }
-    if (textures.count(TextureUnits::lightmap) > 0) {
-        mask |= UniformsFeatureFlags::lightmap;
-    }
-    if (textures.count(TextureUnits::environmentMap) > 0) {
-        mask |= UniformsFeatureFlags::envmap;
-    }
-    if (textures.count(TextureUnits::environmentMapCube) > 0) {
-        mask |= UniformsFeatureFlags::envmap | UniformsFeatureFlags::envmapcube;
-    }
-    if (textures.count(TextureUnits::bumpMap) > 0) {
-        mask |= textures.at(TextureUnits::bumpMap).get().isGrayscale()
-                    ? UniformsFeatureFlags::heightmap
-                    : UniformsFeatureFlags::normalmap;
-    }
-    if (material.affectedByShadows) {
-        mask |= UniformsFeatureFlags::shadows;
-    }
-    if (material.affectedByFog) {
-        mask |= UniformsFeatureFlags::fog;
-    }
-    return mask;
 }
 
 } // namespace graphics

@@ -9,5 +9,6 @@ struct Particle {
 };
 
 layout(std140) uniform Particles {
+    ivec2 uGridSize;
     Particle uParticles[MAX_PARTICLES];
 };

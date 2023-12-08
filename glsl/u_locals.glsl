@@ -18,7 +18,6 @@ layout(std140) uniform Locals {
     vec4 uColor;
     vec4 uSelfIllumColor;
     vec4 uHeightMapFrameBounds;
-    ivec2 uGridSize;
     int uFeatureMask;
     float uWaterAlpha;
     float uHeightMapScaling;

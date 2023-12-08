@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
@@ -39,6 +41,15 @@ enum class RenderPassName {
     OpaqueGeometry,
     TransparentGeometry,
     PostProcessing
+};
+
+struct ParticleInstance {
+    int frame {0};
+    glm::vec3 position {0.0f};
+    glm::vec2 size {0.0f};
+    glm::vec4 color {1.0f};
+    glm::vec3 right {0.0f};
+    glm::vec3 up {0.0f};
 };
 
 struct GrassInstance {
@@ -67,6 +78,12 @@ public:
                                const glm::mat4 &transform,
                                const glm::mat4 &transformInv,
                                std::optional<float> size) = 0;
+
+    virtual void drawParticles(Texture &texture,
+                               FaceCullMode faceCulling,
+                               bool premultipliedAlpha,
+                               const glm::ivec2 &gridSize,
+                               const std::vector<ParticleInstance> &particles) = 0;
 
     virtual void drawGrass(float radius,
                            float quadSize,
@@ -105,6 +122,12 @@ public:
                        const glm::mat4 &transform,
                        const glm::mat4 &transformInv,
                        std::optional<float> size) override;
+
+    void drawParticles(Texture &texture,
+                       FaceCullMode faceCulling,
+                       bool premultipliedAlpha,
+                       const glm::ivec2 &gridSize,
+                       const std::vector<ParticleInstance> &particles) override;
 
     void drawGrass(float radius,
                    float quadSize,

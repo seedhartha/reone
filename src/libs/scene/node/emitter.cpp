@@ -21,6 +21,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -256,65 +257,49 @@ void EmitterSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode 
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    _graphicsSvc.uniforms.setLocals([&emitter](auto &locals) {
-        locals.reset();
-        locals.gridSize = emitter->gridSize;
-        switch (emitter->blendMode) {
-        case ModelNode::Emitter::BlendMode::Lighten:
-            locals.featureMask |= UniformsFeatureFlags::premulalpha;
+    auto particles = std::vector<ParticleInstance>(leafs.size());
+    for (size_t i = 0; i < leafs.size(); ++i) {
+        const auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
+        particles[i].frame = particle->frame();
+        particles[i].position = particle->getOrigin();
+        particles[i].size = glm::vec2(particle->size());
+        particles[i].color = glm::vec4(particle->color(), particle->alpha());
+        switch (emitter->renderMode) {
+        case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
+        case ModelNode::Emitter::RenderMode::MotionBlur:
+            if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
+                particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
+            }
+            particles[i].right = glm::vec4(emitterUp, 0.0f);
+            particles[i].up = glm::vec4(emitterRight, 0.0f);
             break;
-        case ModelNode::Emitter::BlendMode::Normal:
-        case ModelNode::Emitter::BlendMode::PunchThrough:
+        case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
+            particles[i].right = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
+            particles[i].up = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            break;
+        case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
+            particles[i].right = glm::vec4(emitterRight, 0.0f);
+            particles[i].up = glm::vec4(emitterForward, 0.0f);
+            break;
+        case ModelNode::Emitter::RenderMode::Linked: {
+            auto particleUp = particle->dir();
+            auto particleForward = glm::cross(particleUp, cameraRight);
+            auto particleRight = glm::cross(particleForward, particleUp);
+            particles[i].right = glm::vec4(particleRight, 0.0f);
+            particles[i].up = glm::vec4(particleUp, 0.0f);
+            break;
+        }
+        case ModelNode::Emitter::RenderMode::Normal:
         default:
+            particles[i].right = glm::vec4(cameraRight, 0.0f);
+            particles[i].up = glm::vec4(cameraUp, 0.0f);
             break;
         }
-    });
-    _graphicsSvc.uniforms.setParticles([&](auto &particles) {
-        for (size_t i = 0; i < leafs.size(); ++i) {
-            auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
-            particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
-            particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
-            particles.particles[i].size = glm::vec2(particle->size());
-            switch (emitter->renderMode) {
-            case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
-            case ModelNode::Emitter::RenderMode::MotionBlur:
-                particles.particles[i].right = glm::vec4(emitterUp, 0.0f);
-                particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
-                if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-                    particles.particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
-                }
-                break;
-            case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
-                particles.particles[i].right = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
-                particles.particles[i].up = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-                break;
-            case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
-                particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
-                particles.particles[i].up = glm::vec4(emitterForward, 0.0f);
-                break;
-            case ModelNode::Emitter::RenderMode::Linked: {
-                auto particleUp = particle->dir();
-                auto particleForward = glm::cross(particleUp, cameraRight);
-                auto particleRight = glm::cross(particleForward, particleUp);
-                particles.particles[i].right = glm::vec4(particleRight, 0.0f);
-                particles.particles[i].up = glm::vec4(particleUp, 0.0f);
-                break;
-            }
-            case ModelNode::Emitter::RenderMode::Normal:
-            default:
-                particles.particles[i].right = glm::vec4(cameraRight, 0.0f);
-                particles.particles[i].up = glm::vec4(cameraUp, 0.0f);
-                break;
-            }
-        }
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::oitParticle));
-    _graphicsSvc.context.bindTexture(*texture);
-
+    }
     bool twosided = _modelNode.emitter()->twosided || _modelNode.emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
-    _graphicsSvc.context.withFaceCulling(twosided ? FaceCullMode::None : FaceCullMode::Back, [this, &leafs] {
-        _graphicsSvc.meshRegistry.get(MeshName::billboard).drawInstanced(leafs.size());
-    });
+    auto faceCulling = twosided ? FaceCullMode::None : FaceCullMode::Back;
+    bool premultipliedAlpha = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
+    pass.drawParticles(*texture, faceCulling, premultipliedAlpha, emitter->gridSize, particles);
 }
 
 } // namespace scene
