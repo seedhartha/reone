@@ -51,7 +51,7 @@ public:
     }
 
     void init();
-    void draw();
+    void draw(graphics::IRenderPass &pass);
 
     bool isIn(const glm::vec2 &pt) const;
 

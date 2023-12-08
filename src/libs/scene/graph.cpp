@@ -564,7 +564,7 @@ void SceneGraph::drawOpaque(IRenderPass &pass) {
     }
     if (_drawTriggers) {
         for (auto &trigger : _triggerRoots) {
-            trigger->draw();
+            trigger->draw(pass);
         }
     }
 }
