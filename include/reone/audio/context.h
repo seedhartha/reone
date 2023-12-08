@@ -21,16 +21,16 @@ namespace reone {
 
 namespace audio {
 
-class IAudioContext {
+class IContext {
 public:
-    virtual ~IAudioContext() = default;
+    virtual ~IContext() = default;
 
     virtual void setListenerPosition(glm::vec3 position) = 0;
 };
 
-class AudioContext : public IAudioContext, boost::noncopyable {
+class Context : public IContext, boost::noncopyable {
 public:
-    ~AudioContext() { deinit(); }
+    ~Context() { deinit(); }
 
     void init();
     void deinit();

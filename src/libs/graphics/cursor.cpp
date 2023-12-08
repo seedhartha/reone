@@ -31,7 +31,7 @@ namespace graphics {
 
 void Cursor::draw() {
     std::shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _graphicsContext.bindTexture(*texture);
+    _context.bindTexture(*texture);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
@@ -44,8 +44,8 @@ void Cursor::draw() {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::texture2D));
-    _graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::texture2D));
+    _context.withBlending(BlendMode::Normal, [this]() {
         _meshRegistry.get(MeshName::quad).draw();
     });
 }

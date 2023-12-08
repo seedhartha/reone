@@ -23,7 +23,7 @@ namespace graphics {
 
 void GraphicsModule::init() {
     _window = newWindow();
-    _context = std::make_unique<GraphicsContext>(_options);
+    _context = std::make_unique<Context>(_options);
     _meshRegistry = std::make_unique<MeshRegistry>();
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();

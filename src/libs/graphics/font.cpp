@@ -56,8 +56,8 @@ void Font::draw(const std::string &text, const glm::vec3 &position, const glm::v
         return;
     }
 
-    _graphicsContext.useProgram(_shaderRegistry.get(ShaderProgramId::text));
-    _graphicsContext.bindTexture(*_texture);
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::text));
+    _context.bindTexture(*_texture);
 
     _uniforms.setLocals([this, &color](auto &locals) {
         locals.reset();

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace audio {
 
-void AudioContext::init() {
+void Context::init() {
     checkMainThread();
     _device = alcOpenDevice(nullptr);
     if (!_device) {
@@ -36,7 +36,7 @@ void AudioContext::init() {
     alcMakeContextCurrent(_context);
 }
 
-void AudioContext::deinit() {
+void Context::deinit() {
     checkMainThread();
     if (_context) {
         alcMakeContextCurrent(nullptr);
@@ -49,7 +49,7 @@ void AudioContext::deinit() {
     }
 }
 
-void AudioContext::setListenerPosition(glm::vec3 position) {
+void Context::setListenerPosition(glm::vec3 position) {
     if (_listenerPosition == position) {
         return;
     }

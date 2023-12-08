@@ -186,7 +186,7 @@ struct ScreenEffectUniforms {
     float padding[2];
 };
 
-class GraphicsContext;
+class Context;
 
 class IUniforms {
 public:
@@ -206,7 +206,7 @@ public:
 
 class Uniforms : public IUniforms, boost::noncopyable {
 public:
-    Uniforms(GraphicsContext &context) :
+    Uniforms(Context &context) :
         _context(context) {
     }
 
@@ -229,7 +229,7 @@ public:
 private:
     bool _inited {false};
 
-    GraphicsContext &_context;
+    Context &_context;
 
     // Uniforms
 

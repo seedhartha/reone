@@ -21,14 +21,14 @@ namespace reone {
 
 namespace audio {
 
-class IAudioContext;
+class IContext;
 class IAudioPlayer;
 
 struct AudioServices {
-    IAudioContext &context;
+    IContext &context;
     IAudioPlayer &player;
 
-    AudioServices(IAudioContext &context,
+    AudioServices(IContext &context,
                   IAudioPlayer &player) :
         context(context),
         player(player) {

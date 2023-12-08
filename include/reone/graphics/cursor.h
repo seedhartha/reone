@@ -23,7 +23,7 @@ namespace graphics {
 
 class IWindow;
 
-class GraphicsContext;
+class Context;
 class MeshRegistry;
 class ShaderRegistry;
 class Texture;
@@ -34,14 +34,14 @@ public:
     Cursor(
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
-        GraphicsContext &graphicsContext,
+        Context &context,
         MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
         Uniforms &uniforms,
         IWindow &window) :
         _up(std::move(up)),
         _down(std::move(down)),
-        _graphicsContext(graphicsContext),
+        _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
         _uniforms(uniforms),
@@ -62,7 +62,7 @@ private:
 
     // Services
 
-    GraphicsContext &_graphicsContext;
+    Context &_context;
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;

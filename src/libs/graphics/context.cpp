@@ -25,7 +25,7 @@ namespace reone {
 
 namespace graphics {
 
-void GraphicsContext::init() {
+void Context::init() {
     if (_inited) {
         return;
     }
@@ -55,23 +55,23 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
-void GraphicsContext::clearColor(glm::vec4 color) {
+void Context::clearColor(glm::vec4 color) {
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void GraphicsContext::clearDepth() {
+void Context::clearDepth() {
     checkMainThread();
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void GraphicsContext::clearColorDepth(glm::vec4 color) {
+void Context::clearColorDepth(glm::vec4 color) {
     checkMainThread();
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GraphicsContext::bindTexture(Texture &texture, int unit) {
+void Context::bindTexture(Texture &texture, int unit) {
     if (_activeTexUnit != unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         _activeTexUnit = unit;
@@ -79,7 +79,7 @@ void GraphicsContext::bindTexture(Texture &texture, int unit) {
     texture.bind();
 }
 
-void GraphicsContext::useProgram(ShaderProgram &program) {
+void Context::useProgram(ShaderProgram &program) {
     if (_usedProgram == &program) {
         return;
     }
@@ -87,7 +87,7 @@ void GraphicsContext::useProgram(ShaderProgram &program) {
     _usedProgram = &program;
 }
 
-void GraphicsContext::resetProgram() {
+void Context::resetProgram() {
     if (!_usedProgram) {
         return;
     }
@@ -95,52 +95,52 @@ void GraphicsContext::resetProgram() {
     _usedProgram = nullptr;
 }
 
-void GraphicsContext::bind(UniformBuffer &buffer, int index) {
+void Context::bind(UniformBuffer &buffer, int index) {
     _uniformBuffers[index] = &buffer;
     buffer.bind(index);
 }
 
-void GraphicsContext::pushFaceCulling(FaceCullMode mode) {
+void Context::pushFaceCulling(FaceCullMode mode) {
     setFaceCullMode(mode);
     _faceCullModes.push(mode);
 }
 
-void GraphicsContext::pushBlending(BlendMode mode) {
+void Context::pushBlending(BlendMode mode) {
     setBlendMode(mode);
     _blendModes.push(mode);
 }
 
-void GraphicsContext::pushViewport(glm::ivec4 viewport) {
+void Context::pushViewport(glm::ivec4 viewport) {
     setViewport(viewport);
     _viewports.push(std::move(viewport));
 }
 
-void GraphicsContext::pushPolygonMode(PolygonMode mode) {
+void Context::pushPolygonMode(PolygonMode mode) {
     setPolygonMode(mode);
     _polygonModes.push(mode);
 }
 
-void GraphicsContext::popFaceCulling() {
+void Context::popFaceCulling() {
     _faceCullModes.pop();
     setFaceCullMode(_faceCullModes.top());
 }
 
-void GraphicsContext::popBlending() {
+void Context::popBlending() {
     _blendModes.pop();
     setBlendMode(_blendModes.top());
 }
 
-void GraphicsContext::popViewport() {
+void Context::popViewport() {
     _viewports.pop();
     setViewport(_viewports.top());
 }
 
-void GraphicsContext::popPolygonMode() {
+void Context::popPolygonMode() {
     _polygonModes.pop();
     setPolygonMode(_polygonModes.top());
 }
 
-void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &block) {
+void Context::withBlending(BlendMode mode, const std::function<void()> &block) {
     if (_blendModes.top() == mode) {
         block();
         return;
@@ -150,7 +150,7 @@ void GraphicsContext::withBlending(BlendMode mode, const std::function<void()> &
     popBlending();
 }
 
-void GraphicsContext::withDepthTest(DepthTestMode mode, const std::function<void()> &block) {
+void Context::withDepthTest(DepthTestMode mode, const std::function<void()> &block) {
     if (_depthTestModes.top() == mode) {
         block();
         return;
@@ -164,7 +164,7 @@ void GraphicsContext::withDepthTest(DepthTestMode mode, const std::function<void
     setDepthTestMode(_depthTestModes.top());
 }
 
-void GraphicsContext::withFaceCulling(FaceCullMode mode, const std::function<void()> &block) {
+void Context::withFaceCulling(FaceCullMode mode, const std::function<void()> &block) {
     if (_faceCullModes.top() == mode) {
         block();
         return;
@@ -174,7 +174,7 @@ void GraphicsContext::withFaceCulling(FaceCullMode mode, const std::function<voi
     popFaceCulling();
 }
 
-void GraphicsContext::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {
+void Context::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {
     if (_polygonModes.top() == mode) {
         block();
         return;
@@ -184,7 +184,7 @@ void GraphicsContext::withPolygonMode(PolygonMode mode, const std::function<void
     popPolygonMode();
 }
 
-void GraphicsContext::withViewport(glm::ivec4 viewport, const std::function<void()> &block) {
+void Context::withViewport(glm::ivec4 viewport, const std::function<void()> &block) {
     if (_viewports.top() == viewport) {
         block();
         return;
@@ -194,7 +194,7 @@ void GraphicsContext::withViewport(glm::ivec4 viewport, const std::function<void
     popViewport();
 }
 
-void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) {
+void Context::withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -204,7 +204,7 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const std::funct
     glDisable(GL_SCISSOR_TEST);
 }
 
-void GraphicsContext::setDepthTestMode(DepthTestMode mode) {
+void Context::setDepthTestMode(DepthTestMode mode) {
     if (mode == DepthTestMode::None) {
         glDisable(GL_DEPTH_TEST);
     } else {
@@ -228,7 +228,7 @@ void GraphicsContext::setDepthTestMode(DepthTestMode mode) {
     }
 }
 
-void GraphicsContext::setFaceCullMode(FaceCullMode mode) {
+void Context::setFaceCullMode(FaceCullMode mode) {
     if (mode == FaceCullMode::None) {
         glDisable(GL_CULL_FACE);
     } else {
@@ -241,7 +241,7 @@ void GraphicsContext::setFaceCullMode(FaceCullMode mode) {
     }
 }
 
-void GraphicsContext::setBlendMode(BlendMode mode) {
+void Context::setBlendMode(BlendMode mode) {
     if (mode == BlendMode::None) {
         glDisable(GL_BLEND);
     } else {
@@ -268,7 +268,7 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
     }
 }
 
-void GraphicsContext::setPolygonMode(PolygonMode mode) {
+void Context::setPolygonMode(PolygonMode mode) {
     if (mode == PolygonMode::Line) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     } else {
@@ -276,7 +276,7 @@ void GraphicsContext::setPolygonMode(PolygonMode mode) {
     }
 }
 
-void GraphicsContext::setViewport(glm::ivec4 viewport) {
+void Context::setViewport(glm::ivec4 viewport) {
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 

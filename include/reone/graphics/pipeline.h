@@ -38,7 +38,7 @@ namespace graphics {
 
 struct GraphicsOptions;
 
-class GraphicsContext;
+class Context;
 class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
@@ -57,7 +57,7 @@ public:
 class Pipeline : public IPipeline, boost::noncopyable {
 public:
     Pipeline(GraphicsOptions &options,
-             GraphicsContext &context,
+             Context &context,
              MeshRegistry &meshRegistry,
              ShaderRegistry &shaderRegistry,
              TextureRegistry &textureRegistry,
@@ -137,7 +137,7 @@ private:
 
     // Services
 
-    GraphicsContext &_context;
+    Context &_context;
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     TextureRegistry &_textureRegistry;

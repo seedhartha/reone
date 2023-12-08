@@ -22,7 +22,7 @@ namespace reone {
 namespace audio {
 
 void AudioModule::init() {
-    _context = std::make_unique<AudioContext>();
+    _context = std::make_unique<Context>();
     _player = std::make_unique<AudioPlayer>(_options);
 
     _context->init();

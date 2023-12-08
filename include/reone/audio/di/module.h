@@ -38,7 +38,7 @@ public:
     void init();
     void deinit();
 
-    AudioContext &context() { return *_context; }
+    Context &context() { return *_context; }
     AudioPlayer &player() { return *_player; }
 
     AudioServices &services() { return *_services; }
@@ -46,7 +46,7 @@ public:
 private:
     AudioOptions &_options;
 
-    std::unique_ptr<AudioContext> _context;
+    std::unique_ptr<Context> _context;
     std::unique_ptr<AudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;

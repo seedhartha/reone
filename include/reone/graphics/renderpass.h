@@ -25,7 +25,7 @@ namespace graphics {
 
 struct LocalsUniforms;
 
-class GraphicsContext;
+class Context;
 class Material;
 class Mesh;
 class MeshRegistry;
@@ -94,7 +94,7 @@ public:
 
 class RenderPass : public IRenderPass, boost::noncopyable {
 public:
-    RenderPass(GraphicsContext &context,
+    RenderPass(Context &context,
                ShaderRegistry &shaderRegistry,
                MeshRegistry &meshRegistry,
                TextureRegistry &textureRegistry,
@@ -136,7 +136,7 @@ public:
                    const std::vector<GrassInstance> &instances) override;
 
 private:
-    GraphicsContext &_context;
+    Context &_context;
     ShaderRegistry &_shaderRegistry;
     MeshRegistry &_meshRegistry;
     TextureRegistry &_textureRegistry;

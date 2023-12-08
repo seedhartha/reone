@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
+class Context;
 class MeshRegistry;
 class ShaderRegistry;
 class Textures;

@@ -38,7 +38,7 @@ public:
     MOCK_METHOD(std::shared_ptr<Mp3Reader>, create, (), (override));
 };
 
-class MockAudioContext : public IAudioContext, boost::noncopyable {
+class MockContext : public IContext, boost::noncopyable {
 public:
     MOCK_METHOD(void, setListenerPosition, (glm::vec3 position), (override));
 };
@@ -51,7 +51,7 @@ public:
 class TestAudioModule : boost::noncopyable {
 public:
     void init() {
-        _context = std::make_unique<MockAudioContext>();
+        _context = std::make_unique<MockContext>();
         _player = std::make_unique<MockAudioPlayer>();
 
         _services = std::make_unique<AudioServices>(*_context, *_player);
@@ -62,7 +62,7 @@ public:
     }
 
 private:
-    std::unique_ptr<MockAudioContext> _context;
+    std::unique_ptr<MockContext> _context;
     std::unique_ptr<MockAudioPlayer> _player;
 
     std::unique_ptr<AudioServices> _services;

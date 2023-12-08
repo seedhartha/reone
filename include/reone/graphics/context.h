@@ -28,9 +28,9 @@ class ShaderProgram;
 class Texture;
 class UniformBuffer;
 
-class IGraphicsContext {
+class IContext {
 public:
-    virtual ~IGraphicsContext() = default;
+    virtual ~IContext() = default;
 
     virtual void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) = 0;
     virtual void clearDepth() = 0;
@@ -66,9 +66,9 @@ public:
     virtual void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block) = 0;
 };
 
-class GraphicsContext : public IGraphicsContext, boost::noncopyable {
+class Context : public IContext, boost::noncopyable {
 public:
-    GraphicsContext(GraphicsOptions &options) :
+    Context(GraphicsOptions &options) :
         _options(options) {
     }
 

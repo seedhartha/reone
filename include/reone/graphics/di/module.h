@@ -42,7 +42,7 @@ public:
     void init();
     void deinit();
 
-    GraphicsContext &context() { return *_context; }
+    Context &context() { return *_context; }
     MeshRegistry &meshRegistry() { return *_meshRegistry; }
     Pipeline &pipeline() { return *_pipeline; }
     ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
@@ -55,7 +55,7 @@ public:
 protected:
     GraphicsOptions &_options;
 
-    std::unique_ptr<GraphicsContext> _context;
+    std::unique_ptr<Context> _context;
     std::unique_ptr<MeshRegistry> _meshRegistry;
     std::unique_ptr<Pipeline> _pipeline;
     std::unique_ptr<ShaderRegistry> _shaderRegistry;
