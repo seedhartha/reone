@@ -24,7 +24,7 @@ namespace reone {
 namespace resource {
 
 void BifReader::load() {
-    checkEqual(_bif.readString(8), std::string("BIFFV1  ", 8), "Invalid BIF signature");
+    checkEqual("BIF signature", _bif.readString(8), std::string("BIFFV1  ", 8));
     loadHeader();
     loadResources();
 }

@@ -25,7 +25,7 @@ namespace reone {
 namespace graphics {
 
 void BwmReader::load() {
-    checkEqual(_bwm.readString(8), std::string("BWM V1.0", 8), "Invalid BWM signature");
+    checkEqual("BWM signature", _bwm.readString(8), std::string("BWM V1.0", 8));
 
     _type = static_cast<WalkmeshType>(_bwm.readUint32());
 

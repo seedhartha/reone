@@ -25,7 +25,7 @@ namespace reone {
 namespace graphics {
 
 void LipReader::load() {
-    checkEqual(_lip.readString(8), std::string("LIP V1.0", 8), "Invalid LIP signature");
+    checkEqual("LIP signature", _lip.readString(8), std::string("LIP V1.0", 8));
 
     float length = _lip.readFloat();
     uint32_t entryCount = _lip.readUint32();

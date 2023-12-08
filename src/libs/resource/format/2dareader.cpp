@@ -27,7 +27,7 @@ namespace reone {
 namespace resource {
 
 void TwoDaReader::load() {
-    checkEqual(_reader.readString(8), std::string("2DA V2.b", 8), "Invalid 2DA signature");
+    checkEqual("2DA signature", _reader.readString(8), std::string("2DA V2.b", 8));
 
     _reader.skipBytes(1); // newline
     _columns = readTokens();

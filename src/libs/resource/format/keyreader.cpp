@@ -24,7 +24,7 @@ namespace reone {
 namespace resource {
 
 void KeyReader::load() {
-    checkEqual(_key.readString(8), std::string("KEY V1  ", 8), "Invalid KEY signature");
+    checkEqual("KEY signature", _key.readString(8), std::string("KEY V1  ", 8));
 
     _numBifs = _key.readUint32();
     _numKeys = _key.readUint32();

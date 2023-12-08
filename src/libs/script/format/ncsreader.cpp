@@ -26,7 +26,7 @@ namespace reone {
 namespace script {
 
 void NcsReader::load() {
-    checkEqual(_ncs.readString(8), std::string("NCS V1.0", 8), "Invalid NCS signature");
+    checkEqual("NCS signature", _ncs.readString(8), std::string("NCS V1.0", 8));
 
     uint8_t byteCode = _ncs.readByte();
     uint32_t length = _ncs.readUint32();

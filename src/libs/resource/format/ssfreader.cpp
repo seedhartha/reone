@@ -24,7 +24,7 @@ namespace reone {
 namespace resource {
 
 void SsfReader::load() {
-    checkEqual(_ssf.readString(8), std::string("SSF V1.1", 8), "Invalid SSF signature");
+    checkEqual("SSF signature", _ssf.readString(8), std::string("SSF V1.1", 8));
     uint32_t tableOffset = _ssf.readUint32();
     int entryCount = static_cast<int>((_ssf.length() - tableOffset) / 4);
     _ssf.seek(tableOffset);

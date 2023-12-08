@@ -400,8 +400,8 @@ void Pipeline::setTargetSize(glm::ivec2 size) {
 }
 
 void Pipeline::inPass(RenderPassName name, std::function<void(IRenderPass &)> block) {
-    checkEqual(_passName, RenderPassName::None, "Current render pass must be None");
-    checkNotEqual(name, RenderPassName::None, "New render pass must not be None");
+    checkEqual("Current pass", _passName, RenderPassName::None);
+    checkNotEqual("New pass", name, RenderPassName::None);
     auto pass = RenderPass(
         _context,
         _shaderRegistry,

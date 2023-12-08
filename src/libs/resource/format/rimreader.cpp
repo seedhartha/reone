@@ -24,7 +24,7 @@ namespace reone {
 namespace resource {
 
 void RimReader::load() {
-    checkEqual(_rim.readString(8), std::string("RIM V1.0", 8), "Invalid RIM signature");
+    checkEqual("RIM signature", _rim.readString(8), std::string("RIM V1.0", 8));
 
     _rim.skipBytes(4);
 

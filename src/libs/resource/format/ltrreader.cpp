@@ -25,7 +25,7 @@ namespace reone {
 namespace resource {
 
 std::unique_ptr<Ltr> LtrReader::load() {
-    checkEqual(_ltr.readString(8), std::string("LTR V1.0", 8), "Invalid LTR signature");
+    checkEqual("LTR signature", _ltr.readString(8), std::string("LTR V1.0", 8));
 
     int letterCount = _ltr.readByte();
     if (letterCount != 28) {

@@ -31,7 +31,7 @@ struct StringFlags {
 };
 
 void TlkReader::load() {
-    checkEqual(_tlk.readString(8), std::string("TLK V3.0", 8), "Invalid TLK signature");
+    checkEqual("TLK signature", _tlk.readString(8), std::string("TLK V3.0", 8));
 
     uint32_t languageId = _tlk.readUint32();
     _stringCount = _tlk.readUint32();

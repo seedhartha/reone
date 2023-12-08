@@ -28,7 +28,7 @@ static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
 void PeReader::load() {
-    checkEqual(_pe.readString(2), std::string("MZ", 2), "Invalid PE signature");
+    checkEqual("PE signature", _pe.readString(2), std::string("MZ", 2));
 
     _pe.skipBytes(58);
 

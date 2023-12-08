@@ -27,17 +27,76 @@ inline void checkThat(bool condition, const std::string &message) {
     }
 }
 
-template <class T>
-inline void checkEqual(const T &actual, const T &expected, const std::string &message) {
+template <class T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+inline void checkEqual(const std::string &param, const T &actual, const T &expected) {
     if (actual != expected) {
-        throw ValidationException(message);
+        throw ValidationException(str(boost::format("%s expected to be equal to %d, was %d") % param % expected % actual));
     }
 }
 
-template <class T>
-inline void checkNotEqual(const T &actual, const T &expected, const std::string &message) {
+template <class T, std::enable_if_t<std::is_enum_v<T>, bool> = true>
+inline void checkEqual(const std::string &param, const T &actual, const T &expected) {
+    if (actual != expected) {
+        throw ValidationException(str(boost::format("%s expected to be equal to %d, was %d") %
+                                      param %
+                                      static_cast<int>(expected) %
+                                      static_cast<int>(actual)));
+    }
+}
+
+inline void checkEqual(const std::string &param, const std::string &actual, const std::string &expected) {
+    if (actual != expected) {
+        throw ValidationException(str(boost::format("%s expected to be equal to '%s', was '%s'") % param % expected % actual));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+inline void checkNotEqual(const std::string &param, const T &actual, const T &expected) {
     if (actual == expected) {
-        throw ValidationException(message);
+        throw ValidationException(str(boost::format("%s expected not to be equal to %d, but was") % param % expected));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_enum_v<T>, bool> = true>
+inline void checkNotEqual(const std::string &param, const T &actual, const T &expected) {
+    if (actual == expected) {
+        throw ValidationException(str(boost::format("%s expected not to be equal to %d, but was") %
+                                      param %
+                                      static_cast<int>(expected)));
+    }
+}
+
+inline void checkNotEqual(const std::string &param, const std::string &actual, const std::string &expected) {
+    if (actual == expected) {
+        throw ValidationException(str(boost::format("%s expected not to be equal to '%s', but was") % param % expected));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
+inline void checkLess(const std::string &param, const T &lhs, const T &rhs) {
+    if (lhs >= rhs) {
+        throw ValidationException(str(boost::format("%1% expected to be less than %2%, was %3%") % param % rhs % lhs));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
+inline void checkLessOrEqual(const std::string &param, const T &lhs, const T &rhs) {
+    if (lhs > rhs) {
+        throw ValidationException(str(boost::format("%1% expected to be less or equal to %2%, was %3%") % param % rhs % lhs));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
+inline void checkGreater(const std::string &param, const T &lhs, const T &rhs) {
+    if (lhs <= rhs) {
+        throw ValidationException(str(boost::format("%1% expected to be greater than %2%, was %3%") % param % rhs % lhs));
+    }
+}
+
+template <class T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
+inline void checkGreaterOrEqual(const std::string &param, const T &lhs, const T &rhs) {
+    if (lhs < rhs) {
+        throw ValidationException(str(boost::format("%1% expected to be greater or equal to %2%, was %3%") % param % rhs % lhs));
     }
 }
 
