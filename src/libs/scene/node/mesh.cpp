@@ -181,41 +181,42 @@ void MeshSceneNode::draw(IRenderPass &pass) {
     if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
-    auto material = Material(isTransparent()
-                                 ? ShaderProgramId::oitModel
-                                 : ShaderProgramId::deferredOpaqueModel);
-    material.setTexture(TextureUnits::mainTex, *_nodeTextures.diffuse);
+    Material material;
+    material.programId = isTransparent()
+                             ? ShaderProgramId::oitModel
+                             : ShaderProgramId::deferredOpaqueModel;
+    material.textures.insert({TextureUnits::mainTex, *_nodeTextures.diffuse});
     if (_nodeTextures.lightmap) {
-        material.setTexture(TextureUnits::lightmap, *_nodeTextures.lightmap);
+        material.textures.insert({TextureUnits::lightmap, *_nodeTextures.lightmap});
     }
     if (_nodeTextures.envmap) {
         if (_nodeTextures.envmap->isCubemap()) {
-            material.setTexture(TextureUnits::environmentMapCube, *_nodeTextures.envmap);
+            material.textures.insert({TextureUnits::environmentMapCube, *_nodeTextures.envmap});
         } else {
-            material.setTexture(TextureUnits::environmentMap, *_nodeTextures.envmap);
+            material.textures.insert({TextureUnits::environmentMap, *_nodeTextures.envmap});
         }
     }
     if (_nodeTextures.bumpmap) {
-        material.setTexture(TextureUnits::bumpMap, *_nodeTextures.bumpmap);
+        material.textures.insert({TextureUnits::bumpMap, *_nodeTextures.bumpmap});
         if (_nodeTextures.bumpmap->isGrayscale()) {
-            material.setHeightMapFrame(_bumpmapCycleFrame);
+            material.heightMapFrame = _bumpmapCycleFrame;
         }
     }
-    material.setUV(glm::mat3x4(
+    material.uv = glm::mat3x4(
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-        glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f)));
-    material.setColor(glm::vec4(1.0f, 1.0f, 1.0f, _alpha));
-    material.setAmbient(mesh->ambient);
-    material.setDiffuse(mesh->diffuse);
-    material.setSelfIllumColor(_selfIllumColor);
+        glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
+    material.color = glm::vec4(1.0f, 1.0f, 1.0f, _alpha);
+    material.ambient = mesh->ambient;
+    material.diffuse = mesh->diffuse;
+    material.selfIllumColor = _selfIllumColor;
     if (_sceneGraph.hasShadowLight() && isReceivingShadows(_model, *this)) {
-        material.setAffectedByShadows(true);
+        material.affectedByShadows = true;
     }
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
-        material.setAffectedByFog(true);
+        material.affectedByFog = true;
     }
-    material.setCullFaceMode(CullFaceMode::Back);
+    material.cullFaceMode = CullFaceMode::Back;
     if (_modelNode.isSkinMesh()) {
         const auto &skin = *mesh->skin;
         auto bones = std::vector<glm::mat4>(kMaxBones, glm::mat4(1.0f));
@@ -247,11 +248,11 @@ void MeshSceneNode::drawShadow(IRenderPass &pass) {
     if (!mesh) {
         return;
     }
-    const auto &programId = _sceneGraph.isShadowLightDirectional()
-                                ? ShaderProgramId::dirLightShadows
-                                : ShaderProgramId::pointLightShadows;
-    auto material = Material(programId);
-    material.setColor(glm::vec4(1.0f, 1.0f, 1.0f, _alpha));
+    Material material;
+    material.programId = _sceneGraph.isShadowLightDirectional()
+                             ? ShaderProgramId::dirLightShadows
+                             : ShaderProgramId::pointLightShadows;
+    material.color = glm::vec4(1.0f, 1.0f, 1.0f, _alpha);
     pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
 }
 

@@ -613,29 +613,29 @@ void RenderPass::drawBillboard(Texture &texture,
 }
 
 void RenderPass::applyToContext(const Material &material) {
-    _context.useProgram(_shaderRegistry.get(material.programId()));
-    for (const auto &[unit, texture] : material.textures()) {
+    _context.useProgram(_shaderRegistry.get(material.programId));
+    for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
     }
-    if (material.cullFaceMode()) {
-        _context.pushFaceCulling(*material.cullFaceMode());
+    if (material.cullFaceMode) {
+        _context.pushFaceCulling(*material.cullFaceMode);
     }
 }
 
 void RenderPass::applyToLocals(const Material &material,
                                LocalsUniforms &locals) {
     locals.featureMask |= materialFeatureMask(material);
-    locals.uv = material.uv();
-    locals.color = material.color();
-    locals.selfIllumColor = glm::vec4(material.selfIllumColor(), 1.0f);
-    if (material.textures().count(TextureUnits::mainTex) > 0) {
-        const auto &mainTex = material.textures().at(TextureUnits::mainTex).get();
+    locals.uv = material.uv;
+    locals.color = material.color;
+    locals.selfIllumColor = glm::vec4(material.selfIllumColor, 1.0f);
+    if (material.textures.count(TextureUnits::mainTex) > 0) {
+        const auto &mainTex = material.textures.at(TextureUnits::mainTex).get();
         if (mainTex.features().waterAlpha != -1.0f) {
             locals.waterAlpha = mainTex.features().waterAlpha;
         }
     }
-    if (material.textures().count(TextureUnits::bumpMap) > 0) {
-        const auto &bumpmap = material.textures().at(TextureUnits::bumpMap).get();
+    if (material.textures.count(TextureUnits::bumpMap) > 0) {
+        const auto &bumpmap = material.textures.at(TextureUnits::bumpMap).get();
         locals.heightMapScaling = bumpmap.features().bumpMapScaling;
         int bumpmapW = bumpmap.width();
         int bumpmapH = bumpmap.height();
@@ -646,8 +646,8 @@ void RenderPass::applyToLocals(const Material &material,
         switch (bumpmap.features().procedureType) {
         case Texture::ProcedureType::Cycle:
             locals.heightMapFrameBounds = glm::vec4(
-                static_cast<float>(frameW * (material.heightMapFrame() % gridX)),
-                static_cast<float>(frameH * (material.heightMapFrame() / gridX)),
+                static_cast<float>(frameW * (material.heightMapFrame % gridX)),
+                static_cast<float>(frameH * (material.heightMapFrame / gridX)),
                 static_cast<float>(frameW),
                 static_cast<float>(frameH));
             break;
@@ -663,14 +663,14 @@ void RenderPass::applyToLocals(const Material &material,
 }
 
 void RenderPass::unapplyToContext(const Material &material) {
-    if (material.cullFaceMode()) {
+    if (material.cullFaceMode) {
         _context.popFaceCulling();
     }
 }
 
 int RenderPass::materialFeatureMask(const Material &material) const {
     int mask = 0;
-    const auto &textures = material.textures();
+    const auto &textures = material.textures;
     if (textures.count(TextureUnits::mainTex) > 0) {
         const auto &mainTex = textures.at(TextureUnits::mainTex).get();
         switch (mainTex.features().blending) {
@@ -704,10 +704,10 @@ int RenderPass::materialFeatureMask(const Material &material) const {
                     ? UniformsFeatureFlags::heightmap
                     : UniformsFeatureFlags::normalmap;
     }
-    if (material.affectedByShadows()) {
+    if (material.affectedByShadows) {
         mask |= UniformsFeatureFlags::shadows;
     }
-    if (material.affectedByFog()) {
+    if (material.affectedByFog) {
         mask |= UniformsFeatureFlags::fog;
     }
     return mask;

@@ -97,8 +97,9 @@ void TriggerSceneNode::init() {
 }
 
 void TriggerSceneNode::draw(IRenderPass &pass) {
-    auto material = Material(ShaderProgramId::deferredWalkmesh);
-    material.setCullFaceMode(CullFaceMode::Back);
+    Material material;
+    material.programId = ShaderProgramId::deferredWalkmesh;
+    material.cullFaceMode = CullFaceMode::Back;
     pass.draw(*_mesh, material, _absTransform, _absTransformInv);
 }
 
