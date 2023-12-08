@@ -28,7 +28,7 @@ void GraphicsModule::init() {
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();
     _uniforms = std::make_unique<Uniforms>(*_context);
-    _pipeline = std::make_unique<Pipeline>(
+    _pipelineFactory = std::make_unique<PipelineFactory>(
         _options,
         *_context,
         *_meshRegistry,
@@ -39,7 +39,7 @@ void GraphicsModule::init() {
     _services = std::make_unique<GraphicsServices>(
         *_context,
         *_meshRegistry,
-        *_pipeline,
+        *_pipelineFactory,
         *_shaderRegistry,
         *_textureRegistry,
         *_uniforms,
@@ -49,13 +49,12 @@ void GraphicsModule::init() {
     _meshRegistry->init();
     _textureRegistry->init();
     _uniforms->init();
-    _pipeline->init();
 }
 
 void GraphicsModule::deinit() {
     _services.reset();
 
-    _pipeline.reset();
+    _pipelineFactory.reset();
     _uniforms.reset();
     _meshRegistry.reset();
     _textureRegistry.reset();

@@ -442,8 +442,11 @@ void SceneGraph::prepareTransparentLeafs() {
 }
 
 Texture &SceneGraph::draw(const glm::ivec2 &dim) {
-    auto &pipeline = _graphicsSvc.pipeline;
-    pipeline.setTargetSize(dim);
+    if (!_pipeline) {
+        _pipeline = _graphicsSvc.pipelineFactory.create(dim);
+        _pipeline->init();
+    }
+    auto &pipeline = *_pipeline;
 
     auto camera = this->camera();
     if (camera) {

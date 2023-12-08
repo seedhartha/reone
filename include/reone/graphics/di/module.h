@@ -44,7 +44,7 @@ public:
 
     Context &context() { return *_context; }
     MeshRegistry &meshRegistry() { return *_meshRegistry; }
-    Pipeline &pipeline() { return *_pipeline; }
+    PipelineFactory &pipelineFactory() { return *_pipelineFactory; }
     ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
     TextureRegistry &textureRegistry() { return *_textureRegistry; }
     Uniforms &uniforms() { return *_uniforms; }
@@ -57,7 +57,7 @@ protected:
 
     std::unique_ptr<Context> _context;
     std::unique_ptr<MeshRegistry> _meshRegistry;
-    std::unique_ptr<Pipeline> _pipeline;
+    std::unique_ptr<PipelineFactory> _pipelineFactory;
     std::unique_ptr<ShaderRegistry> _shaderRegistry;
     std::unique_ptr<TextureRegistry> _textureRegistry;
     std::unique_ptr<Uniforms> _uniforms;

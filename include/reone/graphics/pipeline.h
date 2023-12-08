@@ -48,20 +48,30 @@ class IPipeline {
 public:
     virtual ~IPipeline() = default;
 
-    virtual void setTargetSize(glm::ivec2 size) = 0;
+    virtual void init() = 0;
+
     virtual void inPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
 
     virtual Texture &output() = 0;
 };
 
+class IPipelineFactory {
+public:
+    virtual ~IPipelineFactory() = default;
+
+    virtual std::unique_ptr<IPipeline> create(glm::ivec2 targetSize) = 0;
+};
+
 class Pipeline : public IPipeline, boost::noncopyable {
 public:
-    Pipeline(GraphicsOptions &options,
+    Pipeline(glm::ivec2 targetSize,
+             GraphicsOptions &options,
              Context &context,
              MeshRegistry &meshRegistry,
              ShaderRegistry &shaderRegistry,
              TextureRegistry &textureRegistry,
              Uniforms &uniforms) :
+        _targetSize(std::move(targetSize)),
         _options(options),
         _context(context),
         _meshRegistry(meshRegistry),
@@ -70,9 +80,8 @@ public:
         _uniforms(uniforms) {
     }
 
-    void init();
+    void init() override;
 
-    void setTargetSize(glm::ivec2 size) override;
     void inPass(RenderPassName name, std::function<void(IRenderPass &)> block) override;
 
     Texture &output() override;
@@ -126,28 +135,28 @@ private:
         std::shared_ptr<Framebuffer> fbOutput;
     };
 
+    glm::ivec2 _targetSize;
     GraphicsOptions &_options;
-
-    glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
-    glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
-
-    glm::ivec2 _targetSize {0};
-    std::unordered_map<glm::ivec2, RenderTargets> _sizeToTargets;
-    RenderPassName _passName {RenderPassName::None};
-
-    // Services
-
     Context &_context;
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;
 
-    // END Services
+    bool _inited {false};
 
-    void drawSSAO(const glm::ivec2 &dim, RenderTargets &targets, float sampleRadius, float bias);
-    void drawSSR(const glm::ivec2 &dim, RenderTargets &targets, float bias, float pixelStride, float maxSteps);
-    void drawOITBlend(RenderTargets &targets, Framebuffer &dst);
+    RenderTargets _renderTargets;
+    glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
+    glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
+
+    RenderPassName _passName {RenderPassName::None};
+
+    void initRenderTargets();
+    void initSSAOSamples();
+
+    void drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias);
+    void drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, float maxSteps);
+    void drawOITBlend(Framebuffer &dst);
 
     void drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
@@ -156,14 +165,6 @@ private:
     void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
-
-    // Render Targets
-
-    void initTargets(glm::ivec2 size);
-
-    RenderTargets &targetsForSize(const glm::ivec2 &size);
-
-    // END Render Targets
 
     // Render Passes
 
@@ -180,6 +181,42 @@ private:
     void endPostProcessingPass();
 
     // END Render Passes
+};
+
+class PipelineFactory : public IPipelineFactory, boost::noncopyable {
+public:
+    PipelineFactory(GraphicsOptions &options,
+                    Context &context,
+                    MeshRegistry &meshRegistry,
+                    ShaderRegistry &shaderRegistry,
+                    TextureRegistry &textureRegistry,
+                    Uniforms &uniforms) :
+        _options(options),
+        _context(context),
+        _meshRegistry(meshRegistry),
+        _shaderRegistry(shaderRegistry),
+        _textureRegistry(textureRegistry),
+        _uniforms(uniforms) {
+    }
+
+    std::unique_ptr<IPipeline> create(glm::ivec2 targetSize) override {
+        return std::make_unique<Pipeline>(
+            targetSize,
+            _options,
+            _context,
+            _meshRegistry,
+            _shaderRegistry,
+            _textureRegistry,
+            _uniforms);
+    }
+
+private:
+    GraphicsOptions &_options;
+    Context &_context;
+    MeshRegistry &_meshRegistry;
+    ShaderRegistry &_shaderRegistry;
+    TextureRegistry &_textureRegistry;
+    Uniforms &_uniforms;
 };
 
 } // namespace graphics

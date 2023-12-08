@@ -23,7 +23,7 @@ namespace graphics {
 
 class IContext;
 class IMeshRegistry;
-class IPipeline;
+class IPipelineFactory;
 class IShaderRegistry;
 class ITextureRegistry;
 class IUniforms;
@@ -32,7 +32,7 @@ class IWindow;
 struct GraphicsServices {
     IContext &context;
     IMeshRegistry &meshRegistry;
-    IPipeline &pipeline;
+    IPipelineFactory &pipelineFactory;
     IShaderRegistry &shaderRegistry;
     ITextureRegistry &textureRegistry;
     IUniforms &uniforms;
@@ -41,14 +41,14 @@ struct GraphicsServices {
     GraphicsServices(
         IContext &context,
         IMeshRegistry &meshRegistry,
-        IPipeline &pipeline,
+        IPipelineFactory &pipelineFactory,
         IShaderRegistry &shaderRegistry,
         ITextureRegistry &textureRegistry,
         IUniforms &uniforms,
         IWindow &window) :
         context(context),
         meshRegistry(meshRegistry),
-        pipeline(pipeline),
+        pipelineFactory(pipelineFactory),
         shaderRegistry(shaderRegistry),
         textureRegistry(textureRegistry),
         uniforms(uniforms),

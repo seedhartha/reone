@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/graphics/pipeline.h"
+
 #include "fogproperties.h"
 #include "node/camera.h"
 #include "node/dummy.h"
@@ -262,6 +264,8 @@ private:
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
     resource::ResourceServices &_resourceSvc;
+
+    std::unique_ptr<graphics::IPipeline> _pipeline;
 
     bool _updateRoots {true};
 

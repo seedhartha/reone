@@ -76,10 +76,16 @@ public:
 
 class MockPipeline : public IPipeline, boost::noncopyable {
 public:
-    MOCK_METHOD(void, setTargetSize, (glm::ivec2), (override));
+    MOCK_METHOD(void, init, (), (override));
+
     MOCK_METHOD(void, inPass, (RenderPassName, std::function<void(IRenderPass &)>), (override));
 
     MOCK_METHOD(Texture &, output, (), (override));
+};
+
+class MockPipelineFactory : public IPipelineFactory, boost::noncopyable {
+public:
+    MOCK_METHOD(std::unique_ptr<IPipeline>, create, (glm::ivec2), (override));
 };
 
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
@@ -123,7 +129,7 @@ public:
     void init() {
         _context = std::make_unique<MockContext>();
         _meshRegistry = std::make_unique<MockMeshRegistry>();
-        _pipeline = std::make_unique<MockPipeline>();
+        _pipelineFactory = std::make_unique<MockPipelineFactory>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
         _textureRegistry = std::make_unique<MockTextureRegistry>();
         _uniforms = std::make_unique<MockUniforms>();
@@ -132,7 +138,7 @@ public:
         _services = std::make_unique<GraphicsServices>(
             *_context,
             *_meshRegistry,
-            *_pipeline,
+            *_pipelineFactory,
             *_shaderRegistry,
             *_textureRegistry,
             *_uniforms,
@@ -143,8 +149,8 @@ public:
         return *_context;
     }
 
-    MockPipeline &pipeline() {
-        return *_pipeline;
+    MockPipelineFactory &pipelineFactory() {
+        return *_pipelineFactory;
     }
 
     MockWindow &window() {
@@ -162,7 +168,7 @@ public:
 private:
     std::unique_ptr<MockContext> _context;
     std::unique_ptr<MockMeshRegistry> _meshRegistry;
-    std::unique_ptr<MockPipeline> _pipeline;
+    std::unique_ptr<MockPipelineFactory> _pipelineFactory;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;
     std::unique_ptr<MockTextureRegistry> _textureRegistry;
     std::unique_ptr<MockUniforms> _uniforms;
