@@ -559,15 +559,37 @@ void RenderPass::draw(Mesh &mesh,
                       Material &material,
                       const glm::mat4 &transform,
                       const glm::mat4 &transformInv) {
-    applyToContext(material);
-    _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
-        locals.reset();
-        locals.model = transform;
-        locals.modelInv = transformInv;
-        applyToLocals(material, locals);
+    withMaterialAppliedToContext(material, [&]() {
+        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+            locals.reset();
+            locals.model = transform;
+            locals.modelInv = transformInv;
+            applyMaterialToLocals(material, locals);
+        });
+        mesh.draw();
     });
-    mesh.draw();
-    unapplyToContext(material);
+}
+
+void RenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
+    _context.useProgram(_shaderRegistry.get(material.programId));
+    for (const auto &[unit, texture] : material.textures) {
+        _context.bindTexture(texture, unit);
+    }
+    auto prevBlending = _context.blending();
+    auto prevFaceCulling = _context.faceCulling();
+    if (material.blending && *material.blending != prevBlending) {
+        _context.pushBlending(*material.blending);
+    }
+    if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
+        _context.pushFaceCulling(*material.faceCulling);
+    }
+    block();
+    if (material.blending && *material.blending != prevBlending) {
+        _context.popBlending();
+    }
+    if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
+        _context.popFaceCulling();
+    }
 }
 
 void RenderPass::drawSkinned(Mesh &mesh,
@@ -575,19 +597,19 @@ void RenderPass::drawSkinned(Mesh &mesh,
                              const glm::mat4 &transform,
                              const glm::mat4 &transformInv,
                              const std::vector<glm::mat4> &bones) {
-    applyToContext(material);
-    _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
-        locals.reset();
-        locals.featureMask |= UniformsFeatureFlags::skeletal;
-        locals.model = transform;
-        locals.modelInv = transformInv;
-        applyToLocals(material, locals);
+    withMaterialAppliedToContext(material, [&]() {
+        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+            locals.reset();
+            locals.featureMask |= UniformsFeatureFlags::skeletal;
+            locals.model = transform;
+            locals.modelInv = transformInv;
+            applyMaterialToLocals(material, locals);
+        });
+        _uniforms.setSkeletal([&bones](auto &skeletal) {
+            std::memcpy(skeletal.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
+        });
+        mesh.draw();
     });
-    _uniforms.setSkeletal([&bones](auto &skeletal) {
-        std::memcpy(skeletal.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
-    });
-    mesh.draw();
-    unapplyToContext(material);
 }
 
 void RenderPass::drawBillboard(Texture &texture,
@@ -641,18 +663,8 @@ void RenderPass::drawGrass(float radius,
     _meshRegistry.get(MeshName::grass).drawInstanced(instances.size());
 }
 
-void RenderPass::applyToContext(const Material &material) {
-    _context.useProgram(_shaderRegistry.get(material.programId));
-    for (const auto &[unit, texture] : material.textures) {
-        _context.bindTexture(texture, unit);
-    }
-    if (material.faceCullMode) {
-        _context.pushFaceCulling(*material.faceCullMode);
-    }
-}
-
-void RenderPass::applyToLocals(const Material &material,
-                               LocalsUniforms &locals) {
+void RenderPass::applyMaterialToLocals(const Material &material,
+                                       LocalsUniforms &locals) {
     locals.featureMask |= materialFeatureMask(material);
     locals.uv = material.uv;
     locals.color = material.color;
@@ -688,12 +700,6 @@ void RenderPass::applyToLocals(const Material &material,
                 static_cast<float>(frameH));
             break;
         }
-    }
-}
-
-void RenderPass::unapplyToContext(const Material &material) {
-    if (material.faceCullMode) {
-        _context.popFaceCulling();
     }
 }
 

@@ -67,7 +67,7 @@ void WalkmeshSceneNode::init() {
 void WalkmeshSceneNode::draw(IRenderPass &pass) {
     Material material;
     material.programId = ShaderProgramId::deferredWalkmesh;
-    material.faceCullMode = FaceCullMode::Back;
+    material.faceCulling = FaceCullMode::Back;
     pass.draw(*_mesh, material, _absTransform, _absTransformInv);
 }
 

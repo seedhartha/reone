@@ -47,6 +47,9 @@ public:
     MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
     MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
 
+    MOCK_METHOD(FaceCullMode, faceCulling, (), (const override));
+    MOCK_METHOD(BlendMode, blending, (), (const override));
+
     MOCK_METHOD(void, pushFaceCulling, (FaceCullMode), (override));
     MOCK_METHOD(void, pushBlending, (BlendMode), (override));
     MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));

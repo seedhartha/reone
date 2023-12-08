@@ -43,8 +43,8 @@ public:
     bool affectedByShadows {false};
     bool affectedByFog {false};
 
-    std::optional<BlendMode> blendMode;
-    std::optional<FaceCullMode> faceCullMode;
+    std::optional<BlendMode> blending;
+    std::optional<FaceCullMode> faceCulling;
 };
 
 } // namespace graphics

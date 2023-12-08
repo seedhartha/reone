@@ -44,6 +44,9 @@ public:
     virtual void bind(UniformBuffer &buffer, int index) = 0;
     virtual UniformBuffer &uniformBufferAt(int index) = 0;
 
+    virtual FaceCullMode faceCulling() const = 0;
+    virtual BlendMode blending() const = 0;
+
     virtual void pushFaceCulling(FaceCullMode mode) = 0;
     virtual void pushBlending(BlendMode mode) = 0;
     virtual void pushViewport(glm::ivec4 viewport) = 0;
@@ -84,6 +87,14 @@ public:
             throw std::out_of_range("Uniform buffer index out of range: " + std::to_string(index));
         }
         return *_uniformBuffers.at(index);
+    }
+
+    FaceCullMode faceCulling() const override {
+        return _faceCullModes.top();
+    }
+
+    BlendMode blending() const override {
+        return _blendModes.top();
     }
 
     void pushFaceCulling(FaceCullMode mode) override;

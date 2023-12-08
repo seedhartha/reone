@@ -142,11 +142,11 @@ private:
     TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;
 
-    void applyToContext(const Material &material);
-    void applyToLocals(const Material &material, LocalsUniforms &locals);
-    void unapplyToContext(const Material &material);
+    void applyMaterialToLocals(const Material &material, LocalsUniforms &locals);
 
     int materialFeatureMask(const Material &material) const;
+
+    void withMaterialAppliedToContext(const Material &material, std::function<void()> block);
 };
 
 class Pipeline : public IPipeline, boost::noncopyable {
