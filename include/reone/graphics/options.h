@@ -29,6 +29,7 @@ struct GraphicsOptions {
     bool fullscreen {false};
     bool vsync {true};
     bool grass {true};
+    bool pbr {true};
     bool ssao {true};
     bool ssr {true};
     bool fxaa {true};

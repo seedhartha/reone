@@ -47,13 +47,11 @@ void PBR_irradianceAmbient(
 }
 
 void PBR_irradianceDirect(
-    vec3 worldPos, vec3 normal, vec3 albedo, float metallic, float roughness,
-    out vec3 diffuse, out vec3 specular, out vec3 areaDiffuse, out vec3 areaSpecular) {
+    vec3 worldPos, vec3 normal, vec3 albedo, float metallic, float roughness, float dynamic,
+    out vec3 diffuse, out vec3 specular) {
 
     diffuse = vec3(0.0);
     specular = vec3(0.0);
-    areaDiffuse = vec3(0.0);
-    areaSpecular = vec3(0.0);
 
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
     float NdotV = max(0.0, dot(normal, V));
@@ -93,12 +91,10 @@ void PBR_irradianceDirect(
         vec3 kD = vec3(1.0) - F;
         kD *= 1.0 - metallic;
 
+        if (dynamic == 0.0 && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
+            continue;
+        }
         diffuse += kD * radiance * NdotL;
         specular += spec * radiance * NdotL;
-
-        if (uLights[i].dynamicType == LIGHT_DYNAMIC_TYPE_ALL) {
-            areaDiffuse += kD * radiance * NdotL;
-            areaSpecular += spec * radiance * NdotL;
-        }
     }
 }

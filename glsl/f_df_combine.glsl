@@ -80,13 +80,15 @@ void main() {
 #ifdef R_PBR
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.01, 0.99);
-    vec3 ambientD, ambientS, directD, directS, directAreaD, directAreaS;
-    PBR_irradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness, ambientD, ambientS);
-    PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
-    vec3 colorDynamic = clamp(ambientD * ao + directD + emission, 0.0, 1.0) * albedo;
-    colorDynamic += ambientS * ao + directS;
-    vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
-    colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
+    vec3 ambientD, ambientS, directD, directS;
+    PBR_irradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness,
+                          ambientD, ambientS);
+    PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, 1.0 - lightmapped,
+                         directD, directS);
+    vec3 colorDynamic = clamp(ambientD * ao + directD + emission, 0.0, 1.0) * albedo +
+                        ambientS + directS;
+    vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
+                            ambientS + directS;
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
 #else
     vec3 ambient, directDiff, directSpec;
@@ -94,7 +96,8 @@ void main() {
                 ambient, directDiff, directSpec);
     vec3 indirectDiff = ao * (ambient + uWorldAmbientColor.rgb);
     vec3 indirectSpec = environment * (1.0 - mainTexSample.a);
-    vec3 colorDynamic = clamp(indirectDiff + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo + indirectSpec + directSpec;
+    vec3 colorDynamic = clamp(indirectDiff + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
+                        indirectSpec + directSpec;
     vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
                             indirectSpec + directSpec;
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);

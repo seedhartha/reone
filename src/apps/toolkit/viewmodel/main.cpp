@@ -448,6 +448,7 @@ void MainViewModel::loadEngine() {
     _engineLoadRequested.invoke(true);
 
     _graphicsOpt.grass = false;
+    _graphicsOpt.pbr = false;
     _graphicsOpt.ssao = false;
     _graphicsOpt.ssr = false;
     _graphicsOpt.fxaa = false;

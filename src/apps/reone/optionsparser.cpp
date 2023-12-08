@@ -47,6 +47,7 @@ std::unique_ptr<Options> OptionsParser::parse() {
         ("fullscreen", value<bool>()->default_value(options->graphics.fullscreen), "enable fullscreen")                         //
         ("vsync", value<bool>()->default_value(options->graphics.vsync), "enable v-sync")                                       //
         ("grass", value<bool>()->default_value(options->graphics.grass), "enable grass")                                        //
+        ("pbr", value<bool>()->default_value(options->graphics.pbr), "enable physically-based rendering")                       //
         ("ssao", value<bool>()->default_value(options->graphics.ssao), "enable screen-space ambient occlusion")                 //
         ("ssr", value<bool>()->default_value(options->graphics.ssr), "enable screen-space reflections")                         //
         ("fxaa", value<bool>()->default_value(options->graphics.fxaa), "enable anti-aliasing")                                  //
@@ -83,6 +84,7 @@ std::unique_ptr<Options> OptionsParser::parse() {
     options->graphics.fullscreen = vars["fullscreen"].as<bool>();
     options->graphics.vsync = vars["vsync"].as<bool>();
     options->graphics.grass = vars["grass"].as<bool>();
+    options->graphics.pbr = vars["pbr"].as<bool>();
     options->graphics.ssao = vars["ssao"].as<bool>();
     options->graphics.ssr = vars["ssr"].as<bool>();
     options->graphics.fxaa = vars["fxaa"].as<bool>();

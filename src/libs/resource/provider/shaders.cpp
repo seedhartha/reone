@@ -205,7 +205,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::string resRef)
 
     // Prepend preprocessor directives
     auto defines = StringBuilder();
-    if (true) {
+    if (_graphicsOpt.pbr) {
         defines.append("#define R_PBR\n");
     }
     if (_graphicsOpt.ssr) {

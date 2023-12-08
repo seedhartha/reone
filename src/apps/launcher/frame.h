@@ -46,6 +46,7 @@ private:
         bool fullscreen {false};
         bool vsync {false};
         bool grass {true};
+        bool pbr {true};
         bool ssao {true};
         bool ssr {true};
         bool fxaa {true};
@@ -72,6 +73,7 @@ private:
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxGrass;
+    wxCheckBox *_checkBoxPBR;
     wxCheckBox *_checkBoxSSAO;
     wxCheckBox *_checkBoxSSR;
     wxCheckBox *_checkBoxFXAA;
