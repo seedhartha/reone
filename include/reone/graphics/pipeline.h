@@ -18,9 +18,9 @@
 #pragma once
 
 #include "framebuffer.h"
-#include "options.h"
 #include "renderbuffer.h"
-#include "types.h"
+#include "renderpass.h"
+#include "texture.h"
 
 template <>
 struct std::hash<glm::ivec2> {
@@ -36,57 +36,13 @@ namespace reone {
 
 namespace graphics {
 
-enum class RenderPassName {
-    None,
-    DirLightShadowsPass,
-    PointLightShadows,
-    OpaqueGeometry,
-    TransparentGeometry,
-    PostProcessing
-};
+struct GraphicsOptions;
 
 class GraphicsContext;
-class LocalsUniforms;
-class Material;
-class Mesh;
 class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
-
-struct GrassInstance {
-    int variant {0};
-    glm::vec3 position {0.0f};
-    glm::vec2 lightmapUV {0.0f};
-};
-
-class IRenderPass {
-public:
-    virtual ~IRenderPass() = default;
-
-    virtual void draw(Mesh &mesh,
-                      Material &material,
-                      const glm::mat4 &transform,
-                      const glm::mat4 &transformInv) = 0;
-
-    virtual void drawSkinned(Mesh &mesh,
-                             Material &material,
-                             const glm::mat4 &transform,
-                             const glm::mat4 &transformInv,
-                             const std::vector<glm::mat4> &bones) = 0;
-
-    virtual void drawBillboard(Texture &texture,
-                               const glm::vec4 &color,
-                               const glm::mat4 &transform,
-                               const glm::mat4 &transformInv,
-                               std::optional<float> size) = 0;
-
-    virtual void drawGrass(float radius,
-                           float quadSize,
-                           Texture &texture,
-                           std::optional<std::reference_wrapper<Texture>> &lightmap,
-                           const std::vector<GrassInstance> &instances) = 0;
-};
 
 class IPipeline {
 public:
@@ -96,57 +52,6 @@ public:
     virtual void inPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
 
     virtual Texture &output() = 0;
-};
-
-class RenderPass : public IRenderPass, boost::noncopyable {
-public:
-    RenderPass(GraphicsContext &context,
-               ShaderRegistry &shaderRegistry,
-               MeshRegistry &meshRegistry,
-               TextureRegistry &textureRegistry,
-               Uniforms &uniforms) :
-        _context(context),
-        _shaderRegistry(shaderRegistry),
-        _meshRegistry(meshRegistry),
-        _textureRegistry(textureRegistry),
-        _uniforms(uniforms) {
-    }
-
-    void draw(Mesh &mesh,
-              Material &material,
-              const glm::mat4 &transform,
-              const glm::mat4 &transformInv) override;
-
-    void drawSkinned(Mesh &mesh,
-                     Material &material,
-                     const glm::mat4 &transform,
-                     const glm::mat4 &transformInv,
-                     const std::vector<glm::mat4> &bones) override;
-
-    void drawBillboard(Texture &texture,
-                       const glm::vec4 &color,
-                       const glm::mat4 &transform,
-                       const glm::mat4 &transformInv,
-                       std::optional<float> size) override;
-
-    void drawGrass(float radius,
-                   float quadSize,
-                   Texture &texture,
-                   std::optional<std::reference_wrapper<Texture>> &lightmap,
-                   const std::vector<GrassInstance> &instances) override;
-
-private:
-    GraphicsContext &_context;
-    ShaderRegistry &_shaderRegistry;
-    MeshRegistry &_meshRegistry;
-    TextureRegistry &_textureRegistry;
-    Uniforms &_uniforms;
-
-    void applyMaterialToLocals(const Material &material, LocalsUniforms &locals);
-
-    int materialFeatureMask(const Material &material) const;
-
-    void withMaterialAppliedToContext(const Material &material, std::function<void()> block);
 };
 
 class Pipeline : public IPipeline, boost::noncopyable {

@@ -53,6 +53,7 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/pipeline.h
     ${GRAPHICS_INCLUDE_DIR}/pixelutil.h
     ${GRAPHICS_INCLUDE_DIR}/renderbuffer.h
+    ${GRAPHICS_INCLUDE_DIR}/renderpass.h
     ${GRAPHICS_INCLUDE_DIR}/shader.h
     ${GRAPHICS_INCLUDE_DIR}/shaderprogram.h
     ${GRAPHICS_INCLUDE_DIR}/shaderregistry.h
@@ -94,6 +95,7 @@ set(GRAPHICS_SOURCES
     ${GRAPHICS_SOURCE_DIR}/pipeline.cpp
     ${GRAPHICS_SOURCE_DIR}/pixelutil.cpp
     ${GRAPHICS_SOURCE_DIR}/renderbuffer.cpp
+    ${GRAPHICS_SOURCE_DIR}/renderpass.cpp
     ${GRAPHICS_SOURCE_DIR}/shader.cpp
     ${GRAPHICS_SOURCE_DIR}/shaderprogram.cpp
     ${GRAPHICS_SOURCE_DIR}/texture.cpp
