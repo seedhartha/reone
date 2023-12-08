@@ -34,11 +34,11 @@ void RenderPass::draw(Mesh &mesh,
                       const glm::mat4 &transform,
                       const glm::mat4 &transformInv) {
     withMaterialAppliedToContext(material, [&]() {
-        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+        _uniforms.setSceneLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
             locals.model = transform;
             locals.modelInv = transformInv;
-            applyMaterialToLocals(material, locals);
+            applyMaterialToSceneLocals(material, locals);
         });
         mesh.draw();
     });
@@ -124,15 +124,15 @@ void RenderPass::drawSkinned(Mesh &mesh,
                              const glm::mat4 &transformInv,
                              const std::vector<glm::mat4> &bones) {
     withMaterialAppliedToContext(material, [&]() {
-        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+        _uniforms.setSceneLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
-            locals.featureMask |= UniformsFeatureFlags::skeletal;
+            locals.featureMask |= UniformsFeatureFlags::skin;
             locals.model = transform;
             locals.modelInv = transformInv;
-            applyMaterialToLocals(material, locals);
+            applyMaterialToSceneLocals(material, locals);
         });
-        _uniforms.setSkeletal([&bones](auto &skeletal) {
-            std::memcpy(skeletal.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
+        _uniforms.setBones([&bones](auto &b) {
+            std::memcpy(b.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
         });
         mesh.draw();
     });
@@ -145,7 +145,7 @@ void RenderPass::drawBillboard(Texture &texture,
                                std::optional<float> size) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::billboard));
     _context.bindTexture(texture, TextureUnits::mainTex);
-    _uniforms.setLocals([&transform, &transformInv, &size, &color](auto &locals) {
+    _uniforms.setSceneLocals([&transform, &transformInv, &size, &color](auto &locals) {
         locals.reset();
         locals.model = transform;
         locals.modelInv = transformInv;
@@ -167,7 +167,7 @@ void RenderPass::drawParticles(Texture &texture,
                                const std::vector<ParticleInstance> &particles) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitParticles));
     _context.bindTexture(texture, TextureUnits::mainTex);
-    _uniforms.setLocals([&premultipliedAlpha](auto &locals) {
+    _uniforms.setSceneLocals([&premultipliedAlpha](auto &locals) {
         locals.reset();
         if (premultipliedAlpha) {
             locals.featureMask |= UniformsFeatureFlags::premulalpha;
@@ -204,7 +204,7 @@ void RenderPass::drawGrass(float radius,
     if (lightmap) {
         _context.bindTexture(lightmap->get(), TextureUnits::lightmap);
     }
-    _uniforms.setLocals([&lightmap](auto &locals) {
+    _uniforms.setSceneLocals([&lightmap](auto &locals) {
         locals.reset();
         locals.featureMask |= UniformsFeatureFlags::hashedalphatest;
         if (lightmap) {
@@ -223,8 +223,8 @@ void RenderPass::drawGrass(float radius,
     _meshRegistry.get(MeshName::grass).drawInstanced(instances.size());
 }
 
-void RenderPass::applyMaterialToLocals(const Material &material,
-                                       LocalsUniforms &locals) {
+void RenderPass::applyMaterialToSceneLocals(const Material &material,
+                                            SceneLocalUniforms &locals) {
     locals.featureMask |= materialFeatureMask(material);
     locals.uv = material.uv;
     locals.color = material.color;

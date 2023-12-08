@@ -19,6 +19,7 @@
 
 #include "reone/graphics/options.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/uniforms.h"
 #include "reone/resource/resources.h"
 #include "reone/system/stringbuilder.h"
 
@@ -29,15 +30,15 @@ namespace reone {
 namespace resource {
 
 static const std::string kUniformsGlobals = "u_globals";
-static const std::string kUniformsGrass = "u_grass";
-static const std::string kUniformsLights = "u_lights";
 static const std::string kUniformsLocals = "u_locals";
-static const std::string kUniformsParticle = "u_particle";
-static const std::string kUniformsPoints = "u_points";
-static const std::string kUniformsScreenEffect = "u_screeneffect";
-static const std::string kUniformsSkeletal = "u_skeletal";
-static const std::string kUniformsText = "u_text";
+static const std::string kUniformsSceneGlobals = "u_sceneglobals";
+static const std::string kUniformsSceneLocals = "u_scenelocals";
+static const std::string kUniformsBones = "u_bones";
+static const std::string kUniformsParticles = "u_particles";
+static const std::string kUniformsGrass = "u_grass";
 static const std::string kUniformsWalkmesh = "u_walkmesh";
+static const std::string kUniformsScreenEffect = "u_screeneffect";
+static const std::string kUniformsText = "u_text";
 
 static const std::string kIncludeBlinnPhong = "i_blinnphong";
 static const std::string kIncludeEnvMap = "i_envmap";
@@ -59,7 +60,6 @@ static const std::string kVertMVP2D = "v_mvp2d";
 static const std::string kVertMVP3D = "v_mvp3d";
 static const std::string kVertParticles = "v_particles";
 static const std::string kVertPassthrough = "v_passthrough";
-static const std::string kVertPoints = "v_points";
 static const std::string kVertShadows = "v_shadows";
 static const std::string kVertText = "v_text";
 static const std::string kVertWalkmesh = "v_walkmesh";
@@ -96,47 +96,48 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vertBillboard = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertBillboard});
-    auto vertGrass = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsGrass, kVertGrass});
-    auto vertModel = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsSkeletal, kVertModel});
-    auto vertMVP2D = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertMVP2D});
-    auto vertMVP3D = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertMVP3D});
-    auto vertParticles = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsParticle, kVertParticles});
+    auto vertBillboard = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kVertBillboard});
+    auto vertGrass = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsGrass, kVertGrass});
+    auto vertModel = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsBones, kVertModel});
+    auto vertMVP3D = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kVertMVP3D});
+    auto vertParticles = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsParticles, kVertParticles});
     auto vertPassthrough = initShader(ShaderType::Vertex, {kVertPassthrough});
-    auto vertPoints = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsPoints, kVertPoints});
-    auto vertShadows = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertShadows});
-    auto vertText = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsText, kVertText});
-    auto vertWalkmesh = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kUniformsWalkmesh, kVertWalkmesh});
+    auto vertShadows = initShader(ShaderType::Vertex, {kUniformsSceneLocals, kVertShadows});
+    auto vertWalkmesh = initShader(ShaderType::Vertex, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsWalkmesh, kVertWalkmesh});
 
-    auto geomDirLightShadows = initShader(ShaderType::Geometry, {kUniformsGlobals, kUniformsLocals, kGeometryDirLightShadows});
-    auto geomPointLightShadows = initShader(ShaderType::Geometry, {kUniformsGlobals, kUniformsLocals, kGeometryPointLightShadows});
+    auto vertMVP2D = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsLocals, kVertMVP2D});
+    auto vertText = initShader(ShaderType::Vertex, {kUniformsGlobals, kUniformsText, kVertText});
 
-    auto fragColor = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragColor});
-    auto fragDeferredAABB = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragDeferredAABB});
-    auto fragDeferredCombine = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsLights, kIncludeMath, kIncludeLighting, kIncludeBlinnPhong, kIncludePBR, kIncludeLuma, kIncludeShadowMap, kIncludeFog, kFragDeferredCombine});
-    auto fragDeferredGrass = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsGrass, kIncludeHash, kIncludeHashedAlpha, kFragDeferredGrass});
-    auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kIncludeMath, kIncludeHash, kIncludeHashedAlpha, kIncludeEnvMap, kIncludeNormalMap, kFragDeferredOpaqueModel});
+    auto geomDirLightShadows = initShader(ShaderType::Geometry, {kUniformsSceneGlobals, kGeometryDirLightShadows});
+    auto geomPointLightShadows = initShader(ShaderType::Geometry, {kUniformsSceneGlobals, kGeometryPointLightShadows});
+
+    auto fragBillboard = initShader(ShaderType::Fragment, {kUniformsSceneLocals, kFragTexture});
+    auto fragDeferredAABB = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kFragDeferredAABB});
+    auto fragDeferredCombine = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeLighting, kIncludeBlinnPhong, kIncludePBR, kIncludeLuma, kIncludeShadowMap, kIncludeFog, kFragDeferredCombine});
+    auto fragDeferredGrass = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsGrass, kIncludeHash, kIncludeHashedAlpha, kFragDeferredGrass});
+    auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeHash, kIncludeHashedAlpha, kIncludeEnvMap, kIncludeNormalMap, kFragDeferredOpaqueModel});
     auto fragDeferredSSAO = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragDeferredSSAO});
     auto fragDeferredSSR = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragDeferredSSR});
-    auto fragDeferredWalkmesh = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsWalkmesh, kFragDeferredWalkmesh});
+    auto fragDeferredWalkmesh = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsWalkmesh, kFragDeferredWalkmesh});
     auto fragNull = initShader(ShaderType::Fragment, {kFragNull});
     auto fragOITBlend = initShader(ShaderType::Fragment, {kFragOITBlend});
-    auto fragOITModel = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kIncludeMath, kIncludeEnvMap, kIncludeNormalMap, kIncludeOIT, kIncludeLuma, kFragOITModel});
-    auto fragOITParticles = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsParticle, kIncludeOIT, kIncludeLuma, kFragOITParticles});
-    auto fragPointLightShadows = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragPointLightShadows});
-    auto fragPostBoxBlur4 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostBoxBlur4});
+    auto fragOITModel = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kIncludeMath, kIncludeEnvMap, kIncludeNormalMap, kIncludeOIT, kIncludeLuma, kFragOITModel});
+    auto fragOITParticles = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kUniformsSceneLocals, kUniformsParticles, kIncludeOIT, kIncludeLuma, kFragOITParticles});
+    auto fragPointLightShadows = initShader(ShaderType::Fragment, {kUniformsSceneGlobals, kFragPointLightShadows});
+    auto fragPostBoxBlur4 = initShader(ShaderType::Fragment, {kFragPostBoxBlur4});
     auto fragPostFXAA = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kIncludeLuma, kFragPostFXAA});
     auto fragPostGaussianBlur13 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostGaussianBlur13});
     auto fragPostGaussianBlur9 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostGaussianBlur9});
-    auto fragPostMedianFilter3 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostMedianFilter3});
-    auto fragPostMedianFilter5 = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostMedianFilter5});
+    auto fragPostMedianFilter3 = initShader(ShaderType::Fragment, {kFragPostMedianFilter3});
+    auto fragPostMedianFilter5 = initShader(ShaderType::Fragment, {kFragPostMedianFilter5});
     auto fragPostSharpen = initShader(ShaderType::Fragment, {kUniformsScreenEffect, kFragPostSharpen});
-    auto fragText = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kUniformsText, kFragText});
-    auto fragTexture = initShader(ShaderType::Fragment, {kUniformsGlobals, kUniformsLocals, kFragTexture});
+
+    auto fragText = initShader(ShaderType::Fragment, {kUniformsLocals, kUniformsText, kFragText});
+    auto fragColor = initShader(ShaderType::Fragment, {kUniformsLocals, kFragColor});
+    auto fragTexture = initShader(ShaderType::Fragment, {kUniformsLocals, kFragTexture});
 
     // Shader Programs
-    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
-    _shaderRegistry.add(ShaderProgramId::color2D, initShaderProgram({vertMVP2D, fragColor}));
+    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragBillboard}));
     _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVP3D, fragDeferredAABB}));
     _shaderRegistry.add(ShaderProgramId::deferredCombine, initShaderProgram({vertPassthrough, fragDeferredCombine}));
     _shaderRegistry.add(ShaderProgramId::deferredGrass, initShaderProgram({vertGrass, fragDeferredGrass}));
@@ -149,7 +150,6 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::oitModel, initShaderProgram({vertModel, fragOITModel}));
     _shaderRegistry.add(ShaderProgramId::oitParticles, initShaderProgram({vertParticles, fragOITParticles}));
     _shaderRegistry.add(ShaderProgramId::pointLightShadows, initShaderProgram({vertShadows, geomPointLightShadows, fragPointLightShadows}));
-    _shaderRegistry.add(ShaderProgramId::points, initShaderProgram({vertPoints, fragColor}));
     _shaderRegistry.add(ShaderProgramId::postBoxBlur4, initShaderProgram({vertPassthrough, fragPostBoxBlur4}));
     _shaderRegistry.add(ShaderProgramId::postFXAA, initShaderProgram({vertPassthrough, fragPostFXAA}));
     _shaderRegistry.add(ShaderProgramId::postGaussianBlur13, initShaderProgram({vertPassthrough, fragPostGaussianBlur13}));
@@ -157,8 +157,10 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::postMedianFilter3, initShaderProgram({vertPassthrough, fragPostMedianFilter3}));
     _shaderRegistry.add(ShaderProgramId::postMedianFilter5, initShaderProgram({vertPassthrough, fragPostMedianFilter5}));
     _shaderRegistry.add(ShaderProgramId::postSharpen, initShaderProgram({vertPassthrough, fragPostSharpen}));
-    _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
+
+    _shaderRegistry.add(ShaderProgramId::color2D, initShaderProgram({vertMVP2D, fragColor}));
     _shaderRegistry.add(ShaderProgramId::texture2D, initShaderProgram({vertMVP2D, fragTexture}));
+    _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
 
     _inited = true;
 }
@@ -233,13 +235,13 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     // Uniform Blocks
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);
     program->bindUniformBlock("Locals", UniformBlockBindingPoints::locals);
-    program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
-    program->bindUniformBlock("Lights", UniformBlockBindingPoints::lights);
-    program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
+    program->bindUniformBlock("SceneGlobals", UniformBlockBindingPoints::sceneGlobals);
+    program->bindUniformBlock("SceneLocals", UniformBlockBindingPoints::sceneLocals);
+    program->bindUniformBlock("Bones", UniformBlockBindingPoints::bones);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
-    program->bindUniformBlock("Points", UniformBlockBindingPoints::points);
+    program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
     program->bindUniformBlock("ScreenEffect", UniformBlockBindingPoints::screenEffect);
 
     return program;

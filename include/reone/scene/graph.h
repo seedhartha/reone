@@ -181,8 +181,6 @@ public:
 
     // Lighting
 
-    void fillLightsUniforms();
-
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
 
     void setAmbientLightColor(glm::vec3 color) override { _ambientLightColor = std::move(color); }

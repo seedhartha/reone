@@ -61,12 +61,12 @@ public:
     MOCK_METHOD(void, popViewport, (), (override));
     MOCK_METHOD(void, popPolygonMode, (), (override));
 
-    MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withFaceCulling, (FaceCullMode mode, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &block), (override));
-    MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &block), (override));
+    MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withFaceCulling, (FaceCullMode mode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &), (override));
 };
 
 class MockMeshRegistry : public IMeshRegistry, boost::noncopyable {
@@ -100,16 +100,16 @@ public:
 
 class MockUniforms : public IUniforms, boost::noncopyable {
 public:
-    MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalsUniforms &)> &block), (override));
-    MOCK_METHOD(void, setLocals, (const std::function<void(LocalsUniforms &)> &block), (override));
-    MOCK_METHOD(void, setText, (const std::function<void(TextUniforms &)> &block), (override));
-    MOCK_METHOD(void, setLights, (const std::function<void(LightsUniforms &)> &block), (override));
-    MOCK_METHOD(void, setSkeletal, (const std::function<void(SkeletalUniforms &)> &block), (override));
-    MOCK_METHOD(void, setParticles, (const std::function<void(ParticlesUniforms &)> &block), (override));
-    MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &block), (override));
-    MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &block), (override));
-    MOCK_METHOD(void, setPoints, (const std::function<void(PointsUniforms &)> &block), (override));
-    MOCK_METHOD(void, setScreenEffect, (const std::function<void(ScreenEffectUniforms &)> &block), (override));
+    MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalUniforms &)> &), (override));
+    MOCK_METHOD(void, setLocals, (const std::function<void(LocalUniforms &)> &), (override));
+    MOCK_METHOD(void, setSceneGlobals, (const std::function<void(SceneGlobalUniforms &)> &), (override));
+    MOCK_METHOD(void, setSceneLocals, (const std::function<void(SceneLocalUniforms &)> &), (override));
+    MOCK_METHOD(void, setBones, (const std::function<void(BoneUniforms &)> &), (override));
+    MOCK_METHOD(void, setParticles, (const std::function<void(ParticleUniforms &)> &), (override));
+    MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &), (override));
+    MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &), (override));
+    MOCK_METHOD(void, setText, (const std::function<void(TextUniforms &)> &), (override));
+    MOCK_METHOD(void, setScreenEffect, (const std::function<void(ScreenEffectUniforms &)> &), (override));
 };
 
 class MockWindow : public IWindow, boost::noncopyable {

@@ -31,12 +31,11 @@ constexpr int kNumShadowLightSpace = 6;
 constexpr int kNumSSAOSamples = 64;
 
 constexpr int kMaxBones = 24;
-constexpr int kMaxLights = 64;
+constexpr int kMaxLights = 16;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
-constexpr int kMaxWalkmeshMaterials = 64;
-constexpr int kMaxPoints = 128;
+constexpr int kMaxWalkmeshMaterials = 32;
 
 enum class TextureUsage {
     Default,
@@ -166,19 +165,6 @@ struct TextureUnits {
     // Arrays
 
     static constexpr int shadowMapArray = 17;
-};
-
-struct UniformBlockBindingPoints {
-    static constexpr int globals = 0;
-    static constexpr int locals = 1;
-    static constexpr int text = 2;
-    static constexpr int lights = 3;
-    static constexpr int skeletal = 4;
-    static constexpr int particles = 5;
-    static constexpr int grass = 6;
-    static constexpr int walkmesh = 7;
-    static constexpr int points = 8;
-    static constexpr int screenEffect = 9;
 };
 
 // MDL

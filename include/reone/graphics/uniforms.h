@@ -24,12 +24,25 @@ namespace reone {
 
 namespace graphics {
 
+struct UniformBlockBindingPoints {
+    static constexpr int globals = 0;
+    static constexpr int locals = 1;
+    static constexpr int sceneGlobals = 2;
+    static constexpr int sceneLocals = 3;
+    static constexpr int bones = 4;
+    static constexpr int particles = 5;
+    static constexpr int grass = 6;
+    static constexpr int walkmesh = 7;
+    static constexpr int text = 8;
+    static constexpr int screenEffect = 9;
+};
+
 struct UniformsFeatureFlags {
     static constexpr int lightmap = 1;
     static constexpr int envmap = 2;
     static constexpr int normalmap = 4;
     static constexpr int heightmap = 8;
-    static constexpr int skeletal = 16;
+    static constexpr int skin = 16;
     static constexpr int shadows = 32;
     static constexpr int water = 64;
     static constexpr int fog = 128;
@@ -39,46 +52,84 @@ struct UniformsFeatureFlags {
     static constexpr int envmapcube = 2048;
 };
 
-struct GlobalsUniforms {
+struct GlobalUniforms {
     glm::mat4 projection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
-    glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
-    glm::vec4 cameraPosition {0.0f};
-    glm::vec4 worldAmbientColor {1.0f};
-    glm::vec4 fogColor {0.0f};
-    glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
-    glm::vec4 shadowCascadeFarPlanes {0.0f};
     float clipNear {kDefaultClipPlaneNear};
     float clipFar {kDefaultClipPlaneFar};
-    float fogNear {0.0f};
-    float fogFar {0.0f};
-    float shadowStrength {0.0f};
-    float shadowRadius {0.0f};
-    float padding[2];
 
     void reset() {
         projection = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         viewInv = glm::mat4(1.0f);
-        for (int i = 0; i < kNumShadowLightSpace; ++i) {
-            shadowLightSpace[i] = glm::mat4(1.0f);
-        }
-        cameraPosition = glm::vec4(0.0f);
-        worldAmbientColor = glm::vec4(1.0f);
-        fogColor = glm::vec4(0.0f);
-        shadowLightPosition = glm::vec4(0.0f);
-        shadowCascadeFarPlanes = glm::vec4(0.0f);
         clipNear = kDefaultClipPlaneNear;
         clipFar = kDefaultClipPlaneFar;
-        fogNear = 0.0f;
-        fogFar = 0.0f;
-        shadowStrength = 1.0f;
-        shadowRadius = 0.0f;
     }
 };
 
-struct LocalsUniforms {
+struct LocalUniforms {
+    glm::mat4 model {1.0f};
+    glm::mat4 modelInv {1.0f};
+    glm::mat3x4 uv {1.0f};
+    glm::vec4 color {1.0f};
+
+    void reset() {
+        model = glm::mat4(1.0f);
+        modelInv = glm::mat4(1.0f);
+        uv = glm::mat3x4(1.0f);
+        color = glm::vec4(1.0f);
+    }
+};
+
+struct alignas(16) SceneGlobalUniformsLight {
+    glm::vec4 position {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 color {1.0f};
+    float multiplier {1.0f};
+    float radius {1.0f};
+    int ambientOnly {0};
+    int dynamicType {0};
+};
+
+struct SceneGlobalUniforms {
+    glm::mat4 projection {1.0f};
+    glm::mat4 view {1.0f};
+    glm::mat4 viewInv {1.0f};
+    glm::vec4 cameraPosition {0.0f};
+    glm::vec4 worldAmbientColor {1.0f};
+    SceneGlobalUniformsLight lights[kMaxLights];
+    glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 shadowCascadeFarPlanes {0.0f};
+    glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
+    glm::vec4 fogColor {0.0f};
+    float clipNear {kDefaultClipPlaneNear};
+    float clipFar {kDefaultClipPlaneFar};
+    int numLights {0};
+    float shadowStrength {0.0f};
+    float shadowRadius {0.0f};
+    float fogNear {0.0f};
+    float fogFar {0.0f};
+
+    void reset() {
+        projection = glm::mat4(1.0f);
+        view = glm::mat4(1.0f);
+        viewInv = glm::mat4(1.0f);
+        cameraPosition = glm::vec4(0.0f);
+        worldAmbientColor = glm::vec4(1.0f);
+        shadowLightPosition = glm::vec4(0.0f);
+        shadowCascadeFarPlanes = glm::vec4(0.0f);
+        fogColor = glm::vec4(0.0f);
+        clipNear = kDefaultClipPlaneNear;
+        clipFar = kDefaultClipPlaneFar;
+        numLights = 0;
+        shadowStrength = 1.0f;
+        shadowRadius = 0.0f;
+        fogNear = 0.0f;
+        fogFar = 0.0f;
+    }
+};
+
+struct SceneLocalUniforms {
     glm::mat4 model {1.0f};
     glm::mat4 modelInv {1.0f};
     glm::mat3x4 uv {1.0f};
@@ -104,68 +155,45 @@ struct LocalsUniforms {
     }
 };
 
-struct LightUniforms {
-    glm::vec4 position {0.0f}; /**< W = 0 if light is directional */
-    glm::vec4 color {1.0f};
-    float multiplier {1.0f};
-    float radius {1.0f};
-    int ambientOnly {0};
-    int dynamicType {0};
-};
-
-struct LightsUniforms {
-    int numLights {0};
-    float padding[3];
-    LightUniforms lights[kMaxLights];
-};
-
-struct SkeletalUniforms {
+struct BoneUniforms {
     glm::mat4 bones[kMaxBones] {glm::mat4(1.0f)};
 };
 
-struct ParticleUniforms {
+struct alignas(16) ParticleUniformsParticle {
     glm::vec4 positionFrame {0.0f};
     glm::vec4 right {1.0f, 0.0f, 0.0f, 0.0f};
     glm::vec4 up {0.0f, 0.0f, 1.0f, 0.0f};
     glm::vec4 color {1.0f};
     glm::vec2 size {1.0f};
-    float padding[2];
 };
 
-struct ParticlesUniforms {
+struct ParticleUniforms {
     glm::ivec2 gridSize {0};
-    float padding[2];
-    ParticleUniforms particles[kMaxParticles];
+    ParticleUniformsParticle particles[kMaxParticles];
 };
 
-struct GrassClusterUniforms {
+struct alignas(16) GrassUniformsCluster {
     glm::vec4 positionVariant {0.0f}; /**< fourth component is a variant (0-3) */
     glm::vec2 lightmapUV {0.0f};
-    float padding[2];
 };
 
 struct GrassUniforms {
     glm::vec2 quadSize {0.0f};
     float radius {0.0f};
-    float padding;
-    GrassClusterUniforms clusters[kMaxGrassClusters];
+    GrassUniformsCluster clusters[kMaxGrassClusters];
 };
 
-struct TextCharacterUniforms {
+struct alignas(16) TextUniformsCharacter {
     glm::vec4 posScale {0.0f};
     glm::vec4 uv {0.0f};
 };
 
 struct TextUniforms {
-    TextCharacterUniforms chars[kMaxTextChars];
+    TextUniformsCharacter chars[kMaxTextChars];
 };
 
 struct WalkmeshUniforms {
     glm::vec4 materials[kMaxWalkmeshMaterials] {glm::vec4(1.0f)};
-};
-
-struct PointsUniforms {
-    glm::vec4 points[kMaxPoints] {glm::vec4(0.0f)};
 };
 
 struct ScreenEffectUniforms {
@@ -183,7 +211,6 @@ struct ScreenEffectUniforms {
     float ssrPixelStride {4.0f};
     float ssrMaxSteps {32.0f};
     float sharpenAmount {0.25f};
-    float padding[2];
 };
 
 class Context;
@@ -192,15 +219,15 @@ class IUniforms {
 public:
     virtual ~IUniforms() = default;
 
-    virtual void setGlobals(const std::function<void(GlobalsUniforms &)> &block) = 0;
-    virtual void setLocals(const std::function<void(LocalsUniforms &)> &block) = 0;
-    virtual void setText(const std::function<void(TextUniforms &)> &block) = 0;
-    virtual void setLights(const std::function<void(LightsUniforms &)> &block) = 0;
-    virtual void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) = 0;
-    virtual void setParticles(const std::function<void(ParticlesUniforms &)> &block) = 0;
+    virtual void setGlobals(const std::function<void(GlobalUniforms &)> &block) = 0;
+    virtual void setLocals(const std::function<void(LocalUniforms &)> &block) = 0;
+    virtual void setSceneGlobals(const std::function<void(SceneGlobalUniforms &)> &block) = 0;
+    virtual void setSceneLocals(const std::function<void(SceneLocalUniforms &)> &block) = 0;
+    virtual void setBones(const std::function<void(BoneUniforms &)> &block) = 0;
+    virtual void setParticles(const std::function<void(ParticleUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
     virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
-    virtual void setPoints(const std::function<void(PointsUniforms &)> &block) = 0;
+    virtual void setText(const std::function<void(TextUniforms &)> &block) = 0;
     virtual void setScreenEffect(const std::function<void(ScreenEffectUniforms &)> &block) = 0;
 };
 
@@ -215,15 +242,15 @@ public:
     void init();
     void deinit();
 
-    void setGlobals(const std::function<void(GlobalsUniforms &)> &block) override;
-    void setLocals(const std::function<void(LocalsUniforms &)> &block) override;
-    void setText(const std::function<void(TextUniforms &)> &block) override;
-    void setLights(const std::function<void(LightsUniforms &)> &block) override;
-    void setSkeletal(const std::function<void(SkeletalUniforms &)> &block) override;
-    void setParticles(const std::function<void(ParticlesUniforms &)> &block) override;
+    void setGlobals(const std::function<void(GlobalUniforms &)> &block) override;
+    void setLocals(const std::function<void(LocalUniforms &)> &block) override;
+    void setSceneGlobals(const std::function<void(SceneGlobalUniforms &)> &block) override;
+    void setSceneLocals(const std::function<void(SceneLocalUniforms &)> &block) override;
+    void setBones(const std::function<void(BoneUniforms &)> &block) override;
+    void setParticles(const std::function<void(ParticleUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
-    void setPoints(const std::function<void(PointsUniforms &)> &block) override;
+    void setText(const std::function<void(TextUniforms &)> &block) override;
     void setScreenEffect(const std::function<void(ScreenEffectUniforms &)> &block) override;
 
 private:
@@ -233,15 +260,15 @@ private:
 
     // Uniforms
 
-    GlobalsUniforms _globals;
-    LocalsUniforms _locals;
-    TextUniforms _text;
-    LightsUniforms _lights;
-    SkeletalUniforms _skeletal;
-    ParticlesUniforms _particles;
+    GlobalUniforms _globals;
+    LocalUniforms _locals;
+    SceneGlobalUniforms _sceneGlobals;
+    SceneLocalUniforms _sceneLocals;
+    BoneUniforms _bones;
+    ParticleUniforms _particles;
     GrassUniforms _grass;
     WalkmeshUniforms _walkmesh;
-    PointsUniforms _points;
+    TextUniforms _text;
     ScreenEffectUniforms _screenEffect;
 
     // END Uniforms
@@ -250,13 +277,13 @@ private:
 
     std::shared_ptr<UniformBuffer> _ubGlobals;
     std::shared_ptr<UniformBuffer> _ubLocals;
-    std::shared_ptr<UniformBuffer> _ubText;
-    std::shared_ptr<UniformBuffer> _ubLights;
-    std::shared_ptr<UniformBuffer> _ubSkeletal;
+    std::shared_ptr<UniformBuffer> _ubSceneGlobals;
+    std::shared_ptr<UniformBuffer> _ubSceneLocals;
+    std::shared_ptr<UniformBuffer> _ubBones;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;
-    std::shared_ptr<UniformBuffer> _ubPoints;
+    std::shared_ptr<UniformBuffer> _ubText;
     std::shared_ptr<UniformBuffer> _ubScreenEffect;
 
     // END Uniform Buffers

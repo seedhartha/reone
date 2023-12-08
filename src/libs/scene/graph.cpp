@@ -450,7 +450,7 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
 
     auto camera = this->camera();
     if (camera) {
-        _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
+        _graphicsSvc.uniforms.setSceneGlobals([this, &camera](auto &globals) {
             globals.projection = camera->projection();
             globals.view = camera->view();
             globals.viewInv = glm::inverse(camera->view());
@@ -458,6 +458,16 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
             globals.worldAmbientColor = glm::vec4(ambientLightColor(), 1.0f);
             globals.clipNear = camera->zNear();
             globals.clipFar = camera->zFar();
+            globals.numLights = static_cast<int>(_activeLights.size());
+            for (size_t i = 0; i < _activeLights.size(); ++i) {
+                auto &light = globals.lights[i];
+                light.position = glm::vec4(_activeLights[i]->getOrigin(), _activeLights[i]->isDirectional() ? 0.0f : 1.0f);
+                light.color = glm::vec4(_activeLights[i]->color(), 1.0f);
+                light.multiplier = _activeLights[i]->multiplier() * _activeLights[i]->strength();
+                light.radius = _activeLights[i]->radius();
+                light.ambientOnly = static_cast<int>(_activeLights[i]->modelNode().light()->ambientOnly);
+                light.dynamicType = _activeLights[i]->modelNode().light()->dynamicType;
+            }
             if (hasShadowLight()) {
                 computeLightSpaceMatrices();
                 for (int i = 0; i < kNumShadowLightSpace; ++i) {
@@ -496,7 +506,6 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
             });
         }
 
-        fillLightsUniforms();
         pipeline.inPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
             drawOpaque(pass);
         });
@@ -886,21 +895,6 @@ ModelSceneNode *SceneGraph::pickModelAt(int x, int y, IUser *except) const {
     sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
-}
-
-void SceneGraph::fillLightsUniforms() {
-    _graphicsSvc.uniforms.setLights([this](auto &lighting) {
-        lighting.numLights = static_cast<int>(_activeLights.size());
-        for (size_t i = 0; i < _activeLights.size(); ++i) {
-            LightUniforms &shaderLight = lighting.lights[i];
-            shaderLight.position = glm::vec4(_activeLights[i]->getOrigin(), _activeLights[i]->isDirectional() ? 0.0f : 1.0f);
-            shaderLight.color = glm::vec4(_activeLights[i]->color(), 1.0f);
-            shaderLight.multiplier = _activeLights[i]->multiplier() * _activeLights[i]->strength();
-            shaderLight.radius = _activeLights[i]->radius();
-            shaderLight.ambientOnly = static_cast<int>(_activeLights[i]->modelNode().light()->ambientOnly);
-            shaderLight.dynamicType = _activeLights[i]->modelNode().light()->dynamicType;
-        }
-    });
 }
 
 std::shared_ptr<CameraSceneNode> SceneGraph::newCamera() {

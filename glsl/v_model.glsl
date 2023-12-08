@@ -19,7 +19,7 @@ void main() {
     vec4 P = vec4(aPosition, 1.0);
     vec4 N = vec4(aNormal, 0.0);
 
-    if (isFeatureEnabled(FEATURE_SKELETAL)) {
+    if (isFeatureEnabled(FEATURE_SKIN)) {
         int i1 = max(0, int(aBoneIndices[0]));
         int i2 = max(0, int(aBoneIndices[1]));
         int i3 = max(0, int(aBoneIndices[2]));

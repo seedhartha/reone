@@ -18,6 +18,10 @@
 #include "reone/game/gui/mainmenu.h"
 
 #include "reone/audio/player.h"
+#include "reone/game/di/services.h"
+#include "reone/game/game.h"
+#include "reone/game/party.h"
+#include "reone/game/types.h"
 #include "reone/graphics/di/services.h"
 #include "reone/gui/sceneinitializer.h"
 #include "reone/resource/provider/models.h"
@@ -25,12 +29,6 @@
 #include "reone/scene/graphs.h"
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
-
-
-#include "reone/game/di/services.h"
-#include "reone/game/game.h"
-#include "reone/game/party.h"
-#include "reone/game/types.h"
 
 using namespace reone::audio;
 

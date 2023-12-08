@@ -250,7 +250,6 @@ void Pipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
         screenEffect.ssaoSampleRadius = sampleRadius;
         screenEffect.ssaoBias = bias;
     });
-
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSAO));
@@ -289,7 +288,6 @@ void Pipeline::drawOITBlend(Framebuffer &dst) {
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
     _context.bindTexture(*_renderTargets.cbDeferredOpaque1);
@@ -339,7 +337,6 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     _uniforms.setScreenEffect([&dim](auto &screenEffect) {
         screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     });
-
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postFXAA));
     _context.bindTexture(srcTexture);

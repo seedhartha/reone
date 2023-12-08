@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-struct LocalsUniforms;
+struct SceneLocalUniforms;
 
 class Context;
 class Material;
@@ -142,7 +142,7 @@ private:
     TextureRegistry &_textureRegistry;
     Uniforms &_uniforms;
 
-    void applyMaterialToLocals(const Material &material, LocalsUniforms &locals);
+    void applyMaterialToSceneLocals(const Material &material, SceneLocalUniforms &locals);
 
     int materialFeatureMask(const Material &material) const;
 
