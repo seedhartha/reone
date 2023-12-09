@@ -32,30 +32,6 @@ namespace reone {
 
 namespace resource {
 
-static const std::string kUniformsGlobals = "u_globals";
-static const std::string kUniformsLocals = "u_locals";
-static const std::string kUniformsSceneGlobals = "u_sceneglobals";
-static const std::string kUniformsSceneLocals = "u_scenelocals";
-static const std::string kUniformsBones = "u_bones";
-static const std::string kUniformsParticles = "u_particles";
-static const std::string kUniformsGrass = "u_grass";
-static const std::string kUniformsWalkmesh = "u_walkmesh";
-static const std::string kUniformsScreenEffect = "u_screeneffect";
-static const std::string kUniformsText = "u_text";
-
-static const std::string kIncludeBlinnPhong = "i_blinnphong";
-static const std::string kIncludeEnvMap = "i_envmap";
-static const std::string kIncludeFog = "i_fog";
-static const std::string kIncludeHash = "i_hash";
-static const std::string kIncludeHashedAlpha = "i_hashedalpha";
-static const std::string kIncludeLighting = "i_lighting";
-static const std::string kIncludeLuma = "i_luma";
-static const std::string kIncludeMath = "i_math";
-static const std::string kIncludeNormalMap = "i_normalmap";
-static const std::string kIncludeOIT = "i_oit";
-static const std::string kIncludePBR = "i_pbr";
-static const std::string kIncludeShadowMap = "i_shadowmap";
-
 static const std::string kVertBillboard = "v_billboard";
 static const std::string kVertGrass = "v_grass";
 static const std::string kVertModel = "v_model";
