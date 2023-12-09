@@ -54,3 +54,12 @@ float getPointLightShadow(vec3 worldPos, samplerCube tex) {
 
     return shadow;
 }
+
+float getShadow(vec3 eyePos, vec3 worldPos, vec3 normal,
+                sampler2DArray tex, samplerCube cubeTex) {
+    float shadow = (uShadowLightPosition.w == 0.0)
+                       ? getDirectionalLightShadow(eyePos, worldPos, tex)
+                       : getPointLightShadow(worldPos, cubeTex);
+    shadow *= uShadowStrength;
+    return shadow;
+}

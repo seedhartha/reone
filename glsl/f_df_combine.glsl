@@ -33,13 +33,6 @@ noperspective in vec2 fragUV1;
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
 
-float getShadow(vec3 eyePos, vec3 worldPos, vec3 normal) {
-    float shadow = (uShadowLightPosition.w == 0.0) ? getDirectionalLightShadow(eyePos, worldPos, sShadowMap) : getPointLightShadow(worldPos, sShadowMapCube);
-
-    shadow *= uShadowStrength;
-    return shadow;
-}
-
 void main() {
     vec2 uv = fragUV1;
 
@@ -61,7 +54,7 @@ void main() {
     vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).rgb;
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
-    float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
+    float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal, sShadowMap, sShadowMapCube), featuresSample.r);
     float fog = mix(0.0, getFog(worldPos), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
 
     vec3 albedo = mainTexSample.rgb;
