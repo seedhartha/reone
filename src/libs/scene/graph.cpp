@@ -516,11 +516,6 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
 
         pipeline.inPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
             if (!_flareLights.empty()) {
-                _graphicsSvc.uniforms.setGlobals([&camera](auto &globals) {
-                    globals.reset();
-                    globals.projection = camera->projection();
-                    globals.view = camera->view();
-                });
                 drawLensFlares(pass);
             }
         });
