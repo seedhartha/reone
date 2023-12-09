@@ -266,21 +266,21 @@ void HUD::update(float dt) {
     _controls.LBL_MAPBORDER->setVisible(_game.map().isLoaded());
 }
 
-void HUD::draw() {
-    _gui->draw();
+void HUD::render() {
+    _gui->render();
 
-    drawMinimap();
+    renderMinimap();
 
     Party &party = _game.party();
     for (int i = 0; i < party.getSize(); ++i) {
-        drawHealth(i);
+        renderHealth(i);
     }
 
-    _barkBubble->draw();
-    _select.draw();
+    _barkBubble->render();
+    _select.render();
 }
 
-void HUD::drawMinimap() {
+void HUD::renderMinimap() {
     const Control::Extent &extent = _controls.LBL_MAPVIEW->extent();
 
     glm::vec4 bounds;
@@ -290,10 +290,10 @@ void HUD::drawMinimap() {
     bounds[3] = static_cast<float>(extent.height);
 
     std::shared_ptr<Area> area(_game.module()->area());
-    _game.map().draw(Map::Mode::Minimap, bounds);
+    _game.map().render(Map::Mode::Minimap, bounds);
 }
 
-void HUD::drawHealth(int memberIndex) {
+void HUD::renderHealth(int memberIndex) {
     if (_game.isTSL())
         return;
 

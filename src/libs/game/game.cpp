@@ -68,7 +68,6 @@
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
 
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::gui;
@@ -180,7 +179,7 @@ void Game::mainLoopIteration(float dt) {
         return;
     }
     update(dt);
-    drawAll();
+    renderAll();
 }
 
 void Game::update(float dt) {
@@ -216,17 +215,17 @@ void Game::update(float dt) {
     updateCursor();
 }
 
-void Game::drawAll() {
+void Game::renderAll() {
     _services.graphics.context.clearColorDepth();
 
     if (_movie) {
         _movie->render();
     } else {
-        drawWorld();
-        drawGUI();
-        _profileOverlay->draw();
+        renderScene();
+        renderGUI();
+        _profileOverlay->render();
         if (_cursor) {
-            _cursor->draw();
+            _cursor->render();
         }
     }
 
@@ -250,7 +249,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
             }
-            drawAll();
+            renderAll();
 
             _services.scene.graphs.get(kSceneMain).clear();
 
@@ -281,7 +280,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (_loadScreen) {
                 _loadScreen->setProgress(100);
             }
-            drawAll();
+            renderAll();
 
             std::string musicName(_module->area()->music());
             playMusic(musicName);
@@ -360,12 +359,12 @@ void Game::playMusic(const std::string &resRef) {
     _musicResRef = resRef;
 }
 
-void Game::drawWorld() {
+void Game::renderScene() {
     if (!_module) {
         return;
     }
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto &output = scene.draw(glm::ivec2(_options.graphics.width, _options.graphics.height));
+    auto &output = scene.render(glm::ivec2(_options.graphics.width, _options.graphics.height));
     _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
     _services.graphics.context.bindTexture(output);
     _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
@@ -421,21 +420,21 @@ std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     }
 }
 
-void Game::drawGUI() {
+void Game::renderGUI() {
     switch (_screen) {
     case Screen::InGame:
         if (_cameraType == CameraType::ThirdPerson) {
-            drawHUD();
+            renderHUD();
         }
         if (_console->isOpen()) {
-            _console->draw();
+            _console->render();
         }
         break;
 
     default: {
         auto gui = getScreenGUI();
         if (gui) {
-            gui->draw();
+            gui->render();
         }
         break;
     }
@@ -527,8 +526,8 @@ void Game::updateSceneGraph(float dt) {
     auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->cameraSceneNode().get());
     sceneGraph.setUpdateRoots(!_paused);
-    sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
-    sceneGraph.setDrawTriggers(isShowTriggersEnabled());
+    sceneGraph.setRenderWalkmeshes(isShowWalkmeshEnabled());
+    sceneGraph.setRenderTriggers(isShowTriggersEnabled());
     sceneGraph.update(dt);
 }
 
@@ -686,7 +685,7 @@ void Game::withLoadingScreen(const std::string &imageResRef, const std::function
         _loadScreen->setProgress(0);
     }
     changeScreen(Screen::Loading);
-    drawAll();
+    renderAll();
     block();
 }
 
@@ -781,7 +780,7 @@ void Game::startCharacterGeneration() {
     }
     withLoadingScreen(_charGen->loadScreenResRef(), [this]() {
         _loadScreen->setProgress(100);
-        drawAll();
+        renderAll();
         playMusic(_charGen->musicResRef());
         changeScreen(Screen::CharacterGeneration);
     });
@@ -875,8 +874,8 @@ void Game::onModuleSelected(const std::string &module) {
     _mainMenu->onModuleSelected(module);
 }
 
-void Game::drawHUD() {
-    _hud->draw();
+void Game::renderHUD() {
+    _hud->render();
 }
 
 CameraType Game::getConversationCamera(int &cameraId) const {

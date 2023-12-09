@@ -32,7 +32,7 @@ public:
 
     MOCK_METHOD(bool, handle, (const SDL_Event &), (override));
     MOCK_METHOD(void, update, (float), (override));
-    MOCK_METHOD(void, draw, (), (override));
+    MOCK_METHOD(void, render, (), (override));
 
     MOCK_METHOD(void, resetFocus, (), (override));
 

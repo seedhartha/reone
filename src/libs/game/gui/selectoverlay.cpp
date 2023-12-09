@@ -245,21 +245,21 @@ void SelectionOverlay::update() {
     }
 }
 
-void SelectionOverlay::draw() {
+void SelectionOverlay::render() {
     _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         if (_hilightedObject) {
-            drawReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
+            renderReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
         }
         if (_selectedObject) {
-            drawReticle(_selectedHostile ? _hostileReticle2 : _friendlyReticle2, _selectedScreenCoords);
-            drawActionBar();
-            drawTitleBar();
-            drawHealthBar();
+            renderReticle(_selectedHostile ? _hostileReticle2 : _friendlyReticle2, _selectedScreenCoords);
+            renderActionBar();
+            renderTitleBar();
+            renderHealthBar();
         }
     });
 }
 
-void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
+void SelectionOverlay::renderReticle(std::shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
     _services.graphics.context.bindTexture(*texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
@@ -281,7 +281,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
-void SelectionOverlay::drawTitleBar() {
+void SelectionOverlay::renderTitleBar() {
     if (_selectedObject->name().empty())
         return;
 
@@ -317,11 +317,11 @@ void SelectionOverlay::drawTitleBar() {
             y -= kActionHeight + 2 * kActionBarMargin;
         }
         glm::vec3 position(x, y, 0.0f);
-        _font->draw(_selectedObject->name(), position, getColorFromSelectedObject());
+        _font->render(_selectedObject->name(), position, getColorFromSelectedObject());
     }
 }
 
-void SelectionOverlay::drawHealthBar() {
+void SelectionOverlay::renderHealthBar() {
     const GraphicsOptions &opts = _game.options().graphics;
     float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - kHealthBarHeight - kOffsetToReticle;
@@ -346,17 +346,17 @@ void SelectionOverlay::drawHealthBar() {
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
-void SelectionOverlay::drawActionBar() {
+void SelectionOverlay::renderActionBar() {
     if (!_hasActions)
         return;
 
     for (int i = 0; i < kNumActionSlots; ++i) {
-        drawActionFrame(i);
-        drawActionIcon(i);
+        renderActionFrame(i);
+        renderActionIcon(i);
     }
 }
 
-void SelectionOverlay::drawActionFrame(int index) {
+void SelectionOverlay::renderActionFrame(int index) {
     std::shared_ptr<Texture> frameTexture;
     if (index == _selectedActionSlot) {
         frameTexture = _hilightedScroll;
@@ -396,7 +396,7 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
     return true;
 }
 
-void SelectionOverlay::drawActionIcon(int index) {
+void SelectionOverlay::renderActionIcon(int index) {
     const ActionSlot &slot = _actionSlots[index];
     if (slot.indexSelected >= slot.actions.size())
         return;

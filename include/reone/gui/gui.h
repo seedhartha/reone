@@ -59,7 +59,7 @@ public:
 
     virtual bool handle(const SDL_Event &event) = 0;
     virtual void update(float dt) = 0;
-    virtual void draw() = 0;
+    virtual void render() = 0;
 
     virtual void clearSelection() = 0;
 
@@ -102,7 +102,7 @@ public:
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void draw() override;
+    void render() override;
 
     void clearSelection() override;
 
@@ -210,7 +210,7 @@ private:
     void stretchControl(Control &control);
     void updateSelection(int x, int y);
 
-    void drawBackground();
+    void renderBackground();
 
     std::optional<std::reference_wrapper<Control>> findControlAt(int x, int y,
                                                                  const std::function<bool(const Control &)> &test) const;

@@ -45,7 +45,7 @@ void ProgressBar::load(const resource::generated::GUI_BASECONTROL &gui, bool pro
     }
 }
 
-void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+void ProgressBar::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (_value == 0 || !_progress.fill) {
         return;
     }

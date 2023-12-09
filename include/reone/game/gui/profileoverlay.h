@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "reone/system/timer.h"
 #include "reone/graphics/font.h"
+#include "reone/system/timer.h"
 
 #include "../options.h"
 
@@ -39,7 +39,7 @@ public:
 
     bool handle(const SDL_Event &event);
     void update(float dt);
-    void draw();
+    void render();
 
 private:
     ServicesView &_services;

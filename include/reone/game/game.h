@@ -429,7 +429,7 @@ private:
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
     void onModuleSelected(const std::string &name);
-    void drawHUD();
+    void renderHUD();
 
     GameGUI *getScreenGUI() const;
     CameraType getConversationCamera(int &cameraId) const;
@@ -450,10 +450,10 @@ private:
 
     // Rendering
 
-    void drawAll();
+    void renderAll();
 
-    void drawWorld();
-    void drawGUI();
+    void renderScene();
+    void renderGUI();
 
     // END Rendering
 

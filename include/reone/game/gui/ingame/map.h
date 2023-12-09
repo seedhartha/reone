@@ -39,7 +39,7 @@ public:
         _resRef = guiResRef("map");
     }
 
-    void draw() override;
+    void render() override;
 
     void refreshControls();
 

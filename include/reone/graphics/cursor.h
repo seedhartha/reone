@@ -48,7 +48,7 @@ public:
         _window(window) {
     }
 
-    void draw();
+    void render();
 
     void setPosition(glm::ivec2 position) { _position = std::move(position); }
     void setPressed(bool pressed) { _pressed = pressed; }

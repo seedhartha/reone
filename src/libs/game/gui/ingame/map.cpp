@@ -63,8 +63,8 @@ void MapMenu::onGUILoaded() {
     }
 }
 
-void MapMenu::draw() {
-    GameGUI::draw();
+void MapMenu::render() {
+    GameGUI::render();
 
     const Control::Extent &extent = _controls.LBL_Map->extent();
 
@@ -74,7 +74,7 @@ void MapMenu::draw() {
         extent.width,
         extent.height);
 
-    _game.map().draw(Map::Mode::Default, bounds);
+    _game.map().render(Map::Mode::Default, bounds);
 }
 
 void MapMenu::refreshControls() {

@@ -75,18 +75,18 @@ void Map::loadTextures(const std::string &area) {
     }
 }
 
-void Map::draw(Mode mode, const glm::vec4 &bounds) {
+void Map::render(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) {
         return;
     }
     _services.graphics.context.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
-        drawArea(mode, bounds);
-        drawNotes(mode, bounds);
-        drawPartyLeader(mode, bounds);
+        renderArea(mode, bounds);
+        renderNotes(mode, bounds);
+        renderPartyLeader(mode, bounds);
     });
 }
 
-void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
+void Map::renderArea(Mode mode, const glm::vec4 &bounds) {
     if (mode == Mode::Minimap) {
         std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
         if (!partyLeader) {
@@ -139,7 +139,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
     }
 }
 
-void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
+void Map::renderNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) {
         return;
     }
@@ -208,7 +208,7 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
     return result;
 }
 
-void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
+void Map::renderPartyLeader(Mode mode, const glm::vec4 &bounds) {
     std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (!partyLeader) {
         return;

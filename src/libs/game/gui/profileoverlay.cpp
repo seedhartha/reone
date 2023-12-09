@@ -78,13 +78,13 @@ void ProfileOverlay::update(float dt) {
     }
 }
 
-void ProfileOverlay::draw() {
+void ProfileOverlay::render() {
     if (!_enabled) {
         return;
     }
 
     _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
-        _font->draw(
+        _font->render(
             std::to_string(_fps),
             glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),
             glm::vec3(1.0f),

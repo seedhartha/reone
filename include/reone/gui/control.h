@@ -185,7 +185,7 @@ public:
 
     // Rendering
 
-    virtual void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset);
+    virtual void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset);
 
     // END Rendering
 
@@ -247,8 +247,8 @@ protected:
         _resourceSvc(resourceSvc) {
     }
 
-    void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
-    void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void renderBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void renderText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
 
     virtual const glm::vec3 &getBorderColor() const;
 

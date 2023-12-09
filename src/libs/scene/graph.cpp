@@ -441,7 +441,7 @@ void SceneGraph::prepareTransparentLeafs() {
     }
 }
 
-Texture &SceneGraph::draw(const glm::ivec2 &dim) {
+Texture &SceneGraph::render(const glm::ivec2 &dim) {
     if (!_renderPipeline) {
         _renderPipeline = _renderPipelineFactory.create(dim);
         _renderPipeline->init();
@@ -502,21 +502,21 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
                                 ? RenderPassName::DirLightShadowsPass
                                 : RenderPassName::PointLightShadows;
             pipeline.inRenderPass(passName, [this](auto &pass) {
-                drawShadows(pass);
+                renderShadows(pass);
             });
         }
 
         pipeline.inRenderPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
-            drawOpaque(pass);
+            renderOpaque(pass);
         });
 
         pipeline.inRenderPass(RenderPassName::TransparentGeometry, [this](auto &pass) {
-            drawTransparent(pass);
+            renderTransparent(pass);
         });
 
         pipeline.inRenderPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
             if (!_flareLights.empty()) {
-                drawLensFlares(pass);
+                renderLensFlares(pass);
             }
         });
     }
@@ -524,22 +524,22 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
     return pipeline.output();
 }
 
-void SceneGraph::drawShadows(IRenderPass &pass) {
+void SceneGraph::renderShadows(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
     _graphicsSvc.context.withFaceCulling(FaceCullMode::Front, [this, &pass]() {
         for (auto &mesh : _shadowMeshes) {
-            mesh->drawShadow(pass);
+            mesh->renderShadow(pass);
         }
     });
 }
 
-void SceneGraph::drawOpaque(IRenderPass &pass) {
+void SceneGraph::renderOpaque(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
-    if (_drawWalkmeshes || _drawTriggers) {
+    if (_renderWalkmeshes || _renderTriggers) {
         _graphicsSvc.uniforms.setWalkmesh([this](auto &walkmesh) {
             for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
                 walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -550,45 +550,45 @@ void SceneGraph::drawOpaque(IRenderPass &pass) {
 
     // Draw opaque meshes
     for (auto &mesh : _opaqueMeshes) {
-        mesh->draw(pass);
+        mesh->render(pass);
     }
     // Draw opaque leafs
     for (auto &[node, leafs] : _opaqueLeafs) {
-        node->drawLeafs(pass, leafs);
+        node->renderLeafs(pass, leafs);
     }
 
-    if (_drawAABB) {
+    if (_renderAABB) {
         for (auto &model : _modelRoots) {
-            model->drawAABB(pass);
+            model->renderAABB(pass);
         }
     }
-    if (_drawWalkmeshes) {
+    if (_renderWalkmeshes) {
         for (auto &walkmesh : _walkmeshRoots) {
             if (walkmesh->isEnabled()) {
-                walkmesh->draw(pass);
+                walkmesh->render(pass);
             }
         }
     }
-    if (_drawTriggers) {
+    if (_renderTriggers) {
         for (auto &trigger : _triggerRoots) {
-            trigger->draw(pass);
+            trigger->render(pass);
         }
     }
 }
 
-void SceneGraph::drawTransparent(IRenderPass &pass) {
-    if (!_activeCamera || _drawWalkmeshes) {
+void SceneGraph::renderTransparent(IRenderPass &pass) {
+    if (!_activeCamera || _renderWalkmeshes) {
         return;
     }
     // Draw transparent leafs (incl. meshes)
     for (auto &[node, leafs] : _transparentLeafs) {
-        node->drawLeafs(pass, leafs);
+        node->renderLeafs(pass, leafs);
     }
 }
 
-void SceneGraph::drawLensFlares(IRenderPass &pass) {
+void SceneGraph::renderLensFlares(IRenderPass &pass) {
     // Draw lens flares
-    if (_flareLights.empty() || _drawWalkmeshes) {
+    if (_flareLights.empty() || _renderWalkmeshes) {
         return;
     }
     _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this, &pass]() {
@@ -597,7 +597,7 @@ void SceneGraph::drawLensFlares(IRenderPass &pass) {
             if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
                 continue;
             }
-            light->drawLensFlare(pass, light->modelNode().light()->flares.front());
+            light->renderLensFlare(pass, light->modelNode().light()->flares.front());
         }
     });
 }

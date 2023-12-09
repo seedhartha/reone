@@ -36,7 +36,6 @@
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -177,7 +176,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
     return model.usage() == ModelUsage::Room;
 }
 
-void MeshSceneNode::draw(IRenderPass &pass) {
+void MeshSceneNode::render(IRenderPass &pass) {
     auto mesh = _modelNode.mesh();
     if (!mesh || !_nodeTextures.diffuse) {
         return;
@@ -244,7 +243,7 @@ void MeshSceneNode::draw(IRenderPass &pass) {
     }
 }
 
-void MeshSceneNode::drawShadow(IRenderPass &pass) {
+void MeshSceneNode::renderShadow(IRenderPass &pass) {
     std::shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh) {
         return;

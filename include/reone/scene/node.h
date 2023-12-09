@@ -55,7 +55,7 @@ public:
 
     virtual void update(float dt);
 
-    virtual void drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
+    virtual void renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     }
 
     bool isEnabled() const { return _enabled; }

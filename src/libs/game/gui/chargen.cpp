@@ -177,9 +177,9 @@ void CharacterGeneration::update(float dt) {
     getSubGUI()->update(dt);
 }
 
-void CharacterGeneration::draw() {
-    GameGUI::draw();
-    getSubGUI()->draw();
+void CharacterGeneration::render() {
+    GameGUI::render();
+    getSubGUI()->render();
 }
 
 void CharacterGeneration::openClassSelection() {

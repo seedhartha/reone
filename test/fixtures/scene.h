@@ -31,7 +31,7 @@ namespace scene {
 class MockSceneGraph : public ISceneGraph, boost::noncopyable {
 public:
     MOCK_METHOD(void, update, (float dt), (override));
-    MOCK_METHOD(graphics::Texture &, draw, (const glm::ivec2 &dim), (override));
+    MOCK_METHOD(graphics::Texture &, render, (const glm::ivec2 &dim), (override));
 
     MOCK_METHOD(void, clear, (), (override));
 
@@ -65,9 +65,9 @@ public:
     MOCK_METHOD(void, setActiveCamera, (CameraSceneNode *), (override));
     MOCK_METHOD(void, setUpdateRoots, (bool), (override));
 
-    MOCK_METHOD(void, setDrawAABB, (bool), (override));
-    MOCK_METHOD(void, setDrawWalkmeshes, (bool), (override));
-    MOCK_METHOD(void, setDrawTriggers, (bool), (override));
+    MOCK_METHOD(void, setRenderAABB, (bool), (override));
+    MOCK_METHOD(void, setRenderWalkmeshes, (bool), (override));
+    MOCK_METHOD(void, setRenderTriggers, (bool), (override));
 
     MOCK_METHOD(std::shared_ptr<CameraSceneNode>, newCamera, (), (override));
     MOCK_METHOD(std::shared_ptr<ModelSceneNode>, newModel, (graphics::Model &, ModelUsage), (override));

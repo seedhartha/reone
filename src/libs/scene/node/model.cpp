@@ -35,7 +35,6 @@
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
 
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -124,13 +123,13 @@ void ModelSceneNode::update(float dt) {
     updateAnimations(dt);
 }
 
-void ModelSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
+void ModelSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     for (auto &leaf : leafs) {
-        static_cast<MeshSceneNode *>(leaf)->draw(pass);
+        static_cast<MeshSceneNode *>(leaf)->render(pass);
     }
 }
 
-void ModelSceneNode::drawAABB(IRenderPass &pass) {
+void ModelSceneNode::renderAABB(IRenderPass &pass) {
     auto &mesh = _graphicsSvc.meshRegistry.get(MeshName::box);
     Material material;
     material.programId = ShaderProgramId::deferredAABB;

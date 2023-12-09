@@ -181,11 +181,11 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+void ListBox::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (!_visible)
         return;
 
-    Control::draw(screenSize, offset);
+    Control::render(screenSize, offset);
 
     if (!_protoItem)
         return;
@@ -205,10 +205,10 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
 
         auto imageButton = std::dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
-            imageButton->draw(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
+            imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
         } else {
             _protoItem->setTextLines(item._textLines);
-            _protoItem->draw(screenSize, itemOffset);
+            _protoItem->render(screenSize, itemOffset);
         }
 
         if (_protoMatchContent) {
@@ -225,7 +225,7 @@ void ListBox::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setScrollState(std::move(state));
-        scrollBar.draw(screenSize, offset);
+        scrollBar.render(screenSize, offset);
     }
 }
 

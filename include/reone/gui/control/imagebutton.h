@@ -42,7 +42,7 @@ public:
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;
 
-    void draw(
+    void render(
         const glm::ivec2 &offset,
         const std::vector<std::string> &text,
         const std::string &iconText,
@@ -53,7 +53,7 @@ private:
     std::shared_ptr<graphics::Texture> _iconFrame;
     std::shared_ptr<graphics::Font> _iconFont;
 
-    void drawIcon(
+    void renderIcon(
         const glm::ivec2 &offset,
         const std::string &iconText,
         const std::shared_ptr<graphics::Texture> &iconTexture,

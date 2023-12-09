@@ -45,7 +45,7 @@ void ImageButton::load(const resource::generated::GUI_BASECONTROL &gui, bool pro
     _iconFont = _resourceSvc.fonts.get(kIconFontResRef);
 }
 
-void ImageButton::draw(
+void ImageButton::render(
     const glm::ivec2 &offset,
     const std::vector<std::string> &text,
     const std::string &iconText,
@@ -61,19 +61,19 @@ void ImageButton::draw(
     glm::ivec2 size(_extent.width - _extent.height, _extent.height);
 
     if (_selected && _hilight) {
-        drawBorder(*_hilight, borderOffset, size);
+        renderBorder(*_hilight, borderOffset, size);
     } else if (_border) {
-        drawBorder(*_border, borderOffset, size);
+        renderBorder(*_border, borderOffset, size);
     }
 
-    drawIcon(offset, iconText, iconTexture, iconFrame);
+    renderIcon(offset, iconText, iconTexture, iconFrame);
 
     if (!text.empty()) {
-        drawText(text, borderOffset, size);
+        renderText(text, borderOffset, size);
     }
 }
 
-void ImageButton::drawIcon(
+void ImageButton::renderIcon(
     const glm::ivec2 &offset,
     const std::string &iconText,
     const std::shared_ptr<Texture> &iconTexture,
@@ -130,7 +130,7 @@ void ImageButton::drawIcon(
         glm::vec3 position(0.0f);
         position.x = static_cast<float>(offset.x + _extent.left + _extent.height);
         position.y = static_cast<float>(offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height());
-        _iconFont->draw(iconText, position, color, TextGravity::LeftCenter);
+        _iconFont->render(iconText, position, color, TextGravity::LeftCenter);
     }
 }
 

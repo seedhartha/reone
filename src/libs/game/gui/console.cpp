@@ -182,14 +182,14 @@ void Console::executeInputText() {
     }
 }
 
-void Console::draw() {
+void Console::render() {
     _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
-        drawBackground();
-        drawLines();
+        renderBackground();
+        renderLines();
     });
 }
 
-void Console::drawBackground() {
+void Console::renderBackground() {
     float height = kVertexisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
@@ -208,7 +208,7 @@ void Console::drawBackground() {
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
-void Console::drawLines() {
+void Console::renderLines() {
     float height = kVertexisibleLineCount * _font->height();
 
     glm::vec3 position(kTextOffset, height - 0.5f * _font->height(), 0.0f);
@@ -216,14 +216,14 @@ void Console::drawLines() {
     // Input
 
     std::string text("> " + _input.text());
-    _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
+    _font->render(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
 
     // Output
 
     for (int i = 0; i < kVertexisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
         const std::string &line = _output[static_cast<size_t>(i) + _outputOffset];
         position.y -= _font->height();
-        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
+        _font->render(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
 

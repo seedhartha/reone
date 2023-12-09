@@ -25,7 +25,6 @@
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/renderpipeline.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -97,7 +96,7 @@ void TriggerSceneNode::init() {
     }
 }
 
-void TriggerSceneNode::draw(IRenderPass &pass) {
+void TriggerSceneNode::render(IRenderPass &pass) {
     Material material;
     material.programId = ShaderProgramId::deferredWalkmesh;
     material.faceCulling = FaceCullMode::Back;

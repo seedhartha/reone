@@ -70,7 +70,7 @@ public:
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
-    void draw() override;
+    void render() override;
 
     void startQuick();
     void startCustom();

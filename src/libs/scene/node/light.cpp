@@ -32,7 +32,6 @@
 #include "reone/scene/node/camera.h"
 #include "reone/scene/renderpipeline.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -68,7 +67,7 @@ void LightSceneNode::update(float dt) {
     }
 }
 
-void LightSceneNode::drawLensFlare(IRenderPass &pass, const ModelNode::LensFlare &flare) {
+void LightSceneNode::renderLensFlare(IRenderPass &pass, const ModelNode::LensFlare &flare) {
     std::shared_ptr<Camera> camera(_sceneGraph.camera());
     if (!camera) {
         return;

@@ -91,9 +91,9 @@ void GameGUI::update(float dt) {
     }
 }
 
-void GameGUI::draw() {
+void GameGUI::render() {
     if (_gui) {
-        _gui->draw();
+        _gui->render();
     }
 }
 

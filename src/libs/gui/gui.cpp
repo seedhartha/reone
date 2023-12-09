@@ -246,10 +246,10 @@ void GUI::update(float dt) {
     _rootControl->get().update(dt);
 }
 
-void GUI::draw() {
+void GUI::render() {
     _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
         if (_background) {
-            drawBackground();
+            renderBackground();
         }
         if (!_rootControl) {
             return;
@@ -260,7 +260,7 @@ void GUI::draw() {
             auto &[controlWrapper, offset] = controls.front();
             auto &control = controlWrapper.get();
             controls.pop();
-            control.draw({_options.width, _options.height}, offset);
+            control.render({_options.width, _options.height}, offset);
             for (auto &child : control.children()) {
                 controls.push({child, _controlOffset});
             }
@@ -268,7 +268,7 @@ void GUI::draw() {
     });
 }
 
-void GUI::drawBackground() {
+void GUI::renderBackground() {
     _graphicsSvc.context.bindTexture(*_background);
 
     glm::mat4 transform(1.0f);

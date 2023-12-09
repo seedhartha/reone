@@ -68,7 +68,7 @@ public:
     virtual ~ISceneGraph() = default;
 
     virtual void update(float dt) = 0;
-    virtual graphics::Texture &draw(const glm::ivec2 &dim) = 0;
+    virtual graphics::Texture &render(const glm::ivec2 &dim) = 0;
 
     virtual void clear() = 0;
 
@@ -102,9 +102,9 @@ public:
     virtual void setActiveCamera(CameraSceneNode *camera) = 0;
     virtual void setUpdateRoots(bool update) = 0;
 
-    virtual void setDrawAABB(bool draw) = 0;
-    virtual void setDrawWalkmeshes(bool draw) = 0;
-    virtual void setDrawTriggers(bool draw) = 0;
+    virtual void setRenderAABB(bool render) = 0;
+    virtual void setRenderWalkmeshes(bool render) = 0;
+    virtual void setRenderTriggers(bool render) = 0;
 
     virtual std::shared_ptr<CameraSceneNode> newCamera() = 0;
     virtual std::shared_ptr<ModelSceneNode> newModel(graphics::Model &model, ModelUsage usage) = 0;
@@ -138,12 +138,12 @@ public:
     }
 
     void update(float dt) override;
-    graphics::Texture &draw(const glm::ivec2 &dim) override;
+    graphics::Texture &render(const glm::ivec2 &dim) override;
 
-    void drawShadows(IRenderPass &pass);
-    void drawOpaque(IRenderPass &pass);
-    void drawTransparent(IRenderPass &pass);
-    void drawLensFlares(IRenderPass &pass);
+    void renderShadows(IRenderPass &pass);
+    void renderOpaque(IRenderPass &pass);
+    void renderTransparent(IRenderPass &pass);
+    void renderLensFlares(IRenderPass &pass);
 
     const std::string &name() const override {
         return _name;
@@ -160,9 +160,9 @@ public:
     void setActiveCamera(CameraSceneNode *camera) override { _activeCamera = camera; }
     void setUpdateRoots(bool update) override { _updateRoots = update; }
 
-    void setDrawAABB(bool draw) override { _drawAABB = draw; }
-    void setDrawWalkmeshes(bool draw) override { _drawWalkmeshes = draw; }
-    void setDrawTriggers(bool draw) override { _drawTriggers = draw; }
+    void setRenderAABB(bool render) override { _renderAABB = render; }
+    void setRenderWalkmeshes(bool render) override { _renderWalkmeshes = render; }
+    void setRenderTriggers(bool render) override { _renderTriggers = render; }
 
     // Roots
 
@@ -271,9 +271,9 @@ private:
 
     bool _updateRoots {true};
 
-    bool _drawAABB {false};
-    bool _drawWalkmeshes {false};
-    bool _drawTriggers {false};
+    bool _renderAABB {false};
+    bool _renderWalkmeshes {false};
+    bool _renderTriggers {false};
 
     std::set<std::shared_ptr<SceneNode>> _nodes;
 

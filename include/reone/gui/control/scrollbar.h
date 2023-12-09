@@ -45,7 +45,7 @@ public:
     }
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;
-    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
+    void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
 
     void setScrollState(ScrollState state);
 
@@ -62,11 +62,11 @@ private:
     Thumb _thumb;
     ScrollState _state;
 
-    void drawThumb(const glm::ivec2 &offset);
-    void drawArrows(const glm::ivec2 &offset);
+    void renderThumb(const glm::ivec2 &offset);
+    void renderArrows(const glm::ivec2 &offset);
 
-    void drawUpArrow(const glm::ivec2 &offset);
-    void drawDownArrow(const glm::ivec2 &offset);
+    void renderUpArrow(const glm::ivec2 &offset);
+    void renderDownArrow(const glm::ivec2 &offset);
 };
 
 } // namespace gui

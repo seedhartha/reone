@@ -32,7 +32,6 @@
 #include "reone/scene/renderpass.h"
 #include "reone/system/randomutil.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -240,7 +239,7 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
+void EmitterSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }

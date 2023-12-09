@@ -51,7 +51,7 @@ void Font::load(std::shared_ptr<Texture> texture) {
     }
 }
 
-void Font::draw(const std::string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
+void Font::render(const std::string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) {
         return;
     }

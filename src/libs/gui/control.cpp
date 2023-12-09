@@ -32,7 +32,6 @@
 #include "reone/scene/graphs.h"
 #include "reone/scene/renderpipeline.h"
 
-
 #include "reone/gui/gui.h"
 
 using namespace reone::graphics;
@@ -199,25 +198,25 @@ void Control::update(float dt) {
     }
 }
 
-void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+void Control::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (!_visible) {
         return;
     }
     glm::ivec2 size(_extent.width, _extent.height);
     if (_selected && _hilight) {
-        drawBorder(*_hilight, offset, size);
+        renderBorder(*_hilight, offset, size);
     } else if (_border) {
-        drawBorder(*_border, offset, size);
+        renderBorder(*_border, offset, size);
     }
     if (!_textLines.empty()) {
-        drawText(_textLines, offset, size);
+        renderText(_textLines, offset, size);
     }
     if (!_sceneName.empty()) {
         std::optional<std::reference_wrapper<Texture>> output;
         _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
             _graphicsSvc.context.withViewport({0, 0, _extent.width, _extent.height}, [this, &output]() {
                 auto &scene = _sceneGraphs.get(_sceneName);
-                output = scene.draw({_extent.width, _extent.height});
+                output = scene.render({_extent.width, _extent.height});
             });
         });
         glm::mat4 projection(glm::ortho(
@@ -245,7 +244,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     }
 }
 
-void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
+void Control::renderBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
     _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
 
     glm::vec3 color(getBorderColor());
@@ -452,7 +451,7 @@ const glm::vec3 &Control::getBorderColor() const {
     return (_selected && _hilight) ? _hilight->color : _border->color;
 }
 
-void Control::drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
+void Control::renderText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size) {
     glm::ivec2 position;
     TextGravity gravity;
     getTextPosition(position, static_cast<int>(lines.size()), size, gravity);
@@ -463,7 +462,7 @@ void Control::drawText(const std::vector<std::string> &lines, const glm::ivec2 &
     for (auto &line : lines) {
         linePosition.x = static_cast<float>(position.x + offset.x);
         linePosition.y = static_cast<float>(position.y + offset.y);
-        _text.font->draw(line, linePosition, color, gravity);
+        _text.font->render(line, linePosition, color, gravity);
         position.y += static_cast<int>(_text.font->height());
     }
 }

@@ -25,7 +25,6 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/renderpipeline.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -65,7 +64,7 @@ void WalkmeshSceneNode::init() {
     _mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), std::move(spec));
 }
 
-void WalkmeshSceneNode::draw(IRenderPass &pass) {
+void WalkmeshSceneNode::render(IRenderPass &pass) {
     Material material;
     material.programId = ShaderProgramId::deferredWalkmesh;
     material.faceCulling = FaceCullMode::Back;

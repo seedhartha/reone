@@ -52,12 +52,12 @@ void ScrollBar::load(const resource::generated::GUI_BASECONTROL &gui, bool proto
     }
 }
 
-void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
-    drawThumb(offset);
-    drawArrows(offset);
+void ScrollBar::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+    renderThumb(offset);
+    renderArrows(offset);
 }
 
-void ScrollBar::drawThumb(const glm::ivec2 &offset) {
+void ScrollBar::renderThumb(const glm::ivec2 &offset) {
     if (!_thumb.image || _state.numVisible >= _state.count) {
         return;
     }
@@ -108,7 +108,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
-void ScrollBar::drawArrows(const glm::ivec2 &offset) {
+void ScrollBar::renderArrows(const glm::ivec2 &offset) {
     if (!_dir.image)
         return;
 
@@ -120,14 +120,14 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     _graphicsSvc.context.bindTexture(*_dir.image);
 
     if (canScrollUp) {
-        drawUpArrow(offset);
+        renderUpArrow(offset);
     }
     if (canScrollDown) {
-        drawDownArrow(offset);
+        renderDownArrow(offset);
     }
 }
 
-void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
+void ScrollBar::renderUpArrow(const glm::ivec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
@@ -143,7 +143,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
-void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
+void ScrollBar::renderDownArrow(const glm::ivec2 &offset) {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + _extent.height + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));

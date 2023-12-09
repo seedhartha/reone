@@ -29,7 +29,7 @@ namespace reone {
 
 namespace graphics {
 
-void Cursor::draw() {
+void Cursor::render() {
     std::shared_ptr<Texture> texture(_pressed ? _down : _up);
     _context.bindTexture(*texture);
 

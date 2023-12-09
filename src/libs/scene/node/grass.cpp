@@ -32,7 +32,6 @@
 #include "reone/scene/node/grasscluster.h"
 #include "reone/scene/renderpipeline.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -140,7 +139,7 @@ void GrassSceneNode::update(float dt) {
     }
 }
 
-void GrassSceneNode::drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
+void GrassSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }

@@ -686,7 +686,7 @@ void MainViewModel::render3D(int w, int h) {
     auto &scene = _sceneModule->graphs().get(kSceneMain);
     std::optional<std::reference_wrapper<Texture>> output;
     _graphicsModule->context().withViewport({0, 0, w, h}, [&scene, &output, &w, &h]() {
-        output = scene.draw(glm::ivec2(w, h));
+        output = scene.render(glm::ivec2(w, h));
     });
 
     _graphicsModule->uniforms().setGlobals([](auto &globals) {
