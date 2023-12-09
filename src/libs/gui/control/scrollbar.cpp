@@ -62,7 +62,7 @@ void ScrollBar::renderThumb(const glm::ivec2 &offset) {
         return;
     }
 
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
     _graphicsSvc.context.bindTexture(*_thumb.image);
 
     // Top edge
@@ -139,7 +139,7 @@ void ScrollBar::renderUpArrow(const glm::ivec2 &offset) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -156,7 +156,7 @@ void ScrollBar::renderDownArrow(const glm::ivec2 &offset) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 

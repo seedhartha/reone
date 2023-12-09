@@ -26,7 +26,6 @@ namespace graphics {
 
 struct ShaderProgramId {
     static constexpr char billboard[] = "billboard";
-    static constexpr char color[] = "color";
     static constexpr char deferredAABB[] = "deferred_aabb";
     static constexpr char deferredCombine[] = "deferred_combine";
     static constexpr char deferredGrass[] = "deferred_grass";
@@ -35,6 +34,9 @@ struct ShaderProgramId {
     static constexpr char deferredSSR[] = "deferred_ssr";
     static constexpr char deferredWalkmesh[] = "deferred_walkmesh";
     static constexpr char dirLightShadows[] = "dir_light_shadows";
+    static constexpr char mvpColor[] = "mvp_color";
+    static constexpr char mvpTexture[] = "mvp_texture";
+    static constexpr char ndcTexture[] = "ndc_texture";
     static constexpr char oitBlend[] = "oit_blend";
     static constexpr char oitModel[] = "oit_model";
     static constexpr char oitParticles[] = "oit_particles";
@@ -47,7 +49,6 @@ struct ShaderProgramId {
     static constexpr char postMedianFilter5[] = "post_median_filter5";
     static constexpr char postSharpen[] = "post_sharpen";
     static constexpr char text[] = "text";
-    static constexpr char texture[] = "texture";
 };
 
 struct GraphicsOptions;

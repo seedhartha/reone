@@ -1,5 +1,5 @@
-#include "u_sceneglobals.glsl"
-#include "u_scenelocals.glsl"
+#include "u_globals.glsl"
+#include "u_locals.glsl"
 #include "u_walkmesh.glsl"
 
 layout(location = 0) in vec3 aPosition;

@@ -27,14 +27,12 @@ namespace graphics {
 struct UniformBlockBindingPoints {
     static constexpr int globals = 0;
     static constexpr int locals = 1;
-    static constexpr int sceneGlobals = 2;
-    static constexpr int sceneLocals = 3;
-    static constexpr int bones = 4;
-    static constexpr int particles = 5;
-    static constexpr int grass = 6;
-    static constexpr int walkmesh = 7;
-    static constexpr int text = 8;
-    static constexpr int screenEffect = 9;
+    static constexpr int bones = 2;
+    static constexpr int particles = 3;
+    static constexpr int grass = 4;
+    static constexpr int walkmesh = 5;
+    static constexpr int text = 6;
+    static constexpr int screenEffect = 7;
 };
 
 struct UniformsFeatureFlags {
@@ -52,37 +50,7 @@ struct UniformsFeatureFlags {
     static constexpr int envmapcube = 2048;
 };
 
-struct GlobalUniforms {
-    glm::mat4 projection {1.0f};
-    glm::mat4 view {1.0f};
-    glm::mat4 viewInv {1.0f};
-    float clipNear {kDefaultClipPlaneNear};
-    float clipFar {kDefaultClipPlaneFar};
-
-    void reset() {
-        projection = glm::mat4(1.0f);
-        view = glm::mat4(1.0f);
-        viewInv = glm::mat4(1.0f);
-        clipNear = kDefaultClipPlaneNear;
-        clipFar = kDefaultClipPlaneFar;
-    }
-};
-
-struct LocalUniforms {
-    glm::mat4 model {1.0f};
-    glm::mat4 modelInv {1.0f};
-    glm::mat3x4 uv {1.0f};
-    glm::vec4 color {1.0f};
-
-    void reset() {
-        model = glm::mat4(1.0f);
-        modelInv = glm::mat4(1.0f);
-        uv = glm::mat3x4(1.0f);
-        color = glm::vec4(1.0f);
-    }
-};
-
-struct alignas(16) SceneGlobalUniformsLight {
+struct alignas(16) GlobalUniformsLight {
     glm::vec4 position {0.0f}; /**< W = 0 if light is directional */
     glm::vec4 color {1.0f};
     float multiplier {1.0f};
@@ -91,13 +59,13 @@ struct alignas(16) SceneGlobalUniformsLight {
     int dynamicType {0};
 };
 
-struct SceneGlobalUniforms {
+struct GlobalUniforms {
     glm::mat4 projection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 worldAmbientColor {1.0f};
-    SceneGlobalUniformsLight lights[kMaxLights];
+    GlobalUniformsLight lights[kMaxLights];
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
     glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
@@ -129,7 +97,7 @@ struct SceneGlobalUniforms {
     }
 };
 
-struct SceneLocalUniforms {
+struct LocalUniforms {
     glm::mat4 model {1.0f};
     glm::mat4 modelInv {1.0f};
     glm::mat3x4 uv {1.0f};
@@ -221,8 +189,6 @@ public:
 
     virtual void setGlobals(const std::function<void(GlobalUniforms &)> &block) = 0;
     virtual void setLocals(const std::function<void(LocalUniforms &)> &block) = 0;
-    virtual void setSceneGlobals(const std::function<void(SceneGlobalUniforms &)> &block) = 0;
-    virtual void setSceneLocals(const std::function<void(SceneLocalUniforms &)> &block) = 0;
     virtual void setBones(const std::function<void(BoneUniforms &)> &block) = 0;
     virtual void setParticles(const std::function<void(ParticleUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
@@ -244,8 +210,6 @@ public:
 
     void setGlobals(const std::function<void(GlobalUniforms &)> &block) override;
     void setLocals(const std::function<void(LocalUniforms &)> &block) override;
-    void setSceneGlobals(const std::function<void(SceneGlobalUniforms &)> &block) override;
-    void setSceneLocals(const std::function<void(SceneLocalUniforms &)> &block) override;
     void setBones(const std::function<void(BoneUniforms &)> &block) override;
     void setParticles(const std::function<void(ParticleUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
@@ -262,8 +226,6 @@ private:
 
     GlobalUniforms _globals;
     LocalUniforms _locals;
-    SceneGlobalUniforms _sceneGlobals;
-    SceneLocalUniforms _sceneLocals;
     BoneUniforms _bones;
     ParticleUniforms _particles;
     GrassUniforms _grass;
@@ -277,8 +239,6 @@ private:
 
     std::shared_ptr<UniformBuffer> _ubGlobals;
     std::shared_ptr<UniformBuffer> _ubLocals;
-    std::shared_ptr<UniformBuffer> _ubSceneGlobals;
-    std::shared_ptr<UniformBuffer> _ubSceneLocals;
     std::shared_ptr<UniformBuffer> _ubBones;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;

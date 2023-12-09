@@ -451,7 +451,7 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
 
     auto camera = this->camera();
     if (camera) {
-        _graphicsSvc.uniforms.setSceneGlobals([this, &camera](auto &globals) {
+        _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
             globals.projection = camera->projection();
             globals.view = camera->view();
             globals.viewInv = glm::inverse(camera->view());

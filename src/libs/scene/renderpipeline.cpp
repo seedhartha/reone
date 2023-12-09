@@ -435,12 +435,6 @@ void RenderPipeline::endTransparentGeometryPass() {
 }
 
 void RenderPipeline::blendTransparentGeometry() {
-    _uniforms.setGlobals([](auto &globals) {
-        globals.reset();
-    });
-    _uniforms.setLocals([](auto &locals) {
-        locals.reset();
-    });
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
     _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
     _context.bindTexture(*_renderTargets.cbDeferredOpaque1);

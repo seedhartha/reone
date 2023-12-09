@@ -1,6 +1,6 @@
+#include "u_globals.glsl"
 #include "u_grass.glsl"
-#include "u_sceneglobals.glsl"
-#include "u_scenelocals.glsl"
+#include "u_locals.glsl"
 
 #include "i_hash.glsl"
 #include "i_hashedalpha.glsl"

@@ -105,14 +105,11 @@ void Map::renderArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-            globals.projection = _services.graphics.window.getOrthoProjection();
-        });
         _services.graphics.uniforms.setLocals([transform](auto &locals) {
             locals.reset();
             locals.model = std::move(transform);
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
@@ -127,14 +124,11 @@ void Map::renderArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-            globals.projection = _services.graphics.window.getOrthoProjection();
-        });
         _services.graphics.uniforms.setLocals([transform](auto &locals) {
             locals.reset();
             locals.model = std::move(transform);
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
 }
@@ -168,15 +162,12 @@ void Map::renderNotes(Mode mode, const glm::vec4 &bounds) {
         auto guiColorHilight = _game.isTSL() ? kTSLGUIColorHilight : kGeometryUIColorHilight;
         auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGeometryUIColorBase;
 
-        _services.graphics.uniforms.setGlobals([&](auto &globals) {
-            globals.projection = _services.graphics.window.getOrthoProjection();
-        });
         _services.graphics.uniforms.setLocals([&](auto &locals) {
             locals.reset();
             locals.model = std::move(transform);
             locals.color = glm::vec4(selected ? guiColorHilight : guiColorBase, 1.0f);
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
 }
@@ -253,14 +244,11 @@ void Map::renderPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpTexture));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 

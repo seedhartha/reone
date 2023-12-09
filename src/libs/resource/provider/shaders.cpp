@@ -46,7 +46,6 @@ static const std::string kVertWalkmesh = "v_walkmesh";
 static const std::string kGeometryDirLightShadows = "g_dirlightshadow";
 static const std::string kGeometryPointLightShadows = "g_ptlightshadow";
 
-static const std::string kFragBillboard = "f_billboard";
 static const std::string kFragColor = "f_color";
 static const std::string kFragDeferredAABB = "f_df_aabb";
 static const std::string kFragDeferredCombine = "f_df_combine";
@@ -69,6 +68,7 @@ static const std::string kFragPostMedianFilter5 = "f_pp_medianfilt5";
 static const std::string kFragPostSharpen = "f_pp_sharpen";
 static const std::string kFragText = "f_text";
 static const std::string kFragTexture = "f_texture";
+static const std::string kFragTextureNoPerspective = "f_texnoper";
 
 void Shaders::init() {
     if (_inited) {
@@ -90,7 +90,6 @@ void Shaders::init() {
     auto geomDirLightShadows = initShader(ShaderType::Geometry, kGeometryDirLightShadows);
     auto geomPointLightShadows = initShader(ShaderType::Geometry, kGeometryPointLightShadows);
 
-    auto fragBillboard = initShader(ShaderType::Fragment, kFragBillboard);
     auto fragColor = initShader(ShaderType::Fragment, kFragColor);
     auto fragDeferredAABB = initShader(ShaderType::Fragment, kFragDeferredAABB);
     auto fragDeferredCombine = initShader(ShaderType::Fragment, kFragDeferredCombine);
@@ -113,9 +112,10 @@ void Shaders::init() {
     auto fragPostSharpen = initShader(ShaderType::Fragment, kFragPostSharpen);
     auto fragText = initShader(ShaderType::Fragment, kFragText);
     auto fragTexture = initShader(ShaderType::Fragment, kFragTexture);
+    auto fragTextureNoPerspective = initShader(ShaderType::Fragment, kFragTextureNoPerspective);
 
     // Shader Programs
-    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragBillboard}));
+    _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
     _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVPScene, fragDeferredAABB}));
     _shaderRegistry.add(ShaderProgramId::deferredCombine, initShaderProgram({vertPassthrough, fragDeferredCombine}));
     _shaderRegistry.add(ShaderProgramId::deferredGrass, initShaderProgram({vertGrass, fragDeferredGrass}));
@@ -124,6 +124,9 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::deferredSSR, initShaderProgram({vertPassthrough, fragDeferredSSR}));
     _shaderRegistry.add(ShaderProgramId::deferredWalkmesh, initShaderProgram({vertWalkmesh, fragDeferredWalkmesh}));
     _shaderRegistry.add(ShaderProgramId::dirLightShadows, initShaderProgram({vertShadows, geomDirLightShadows, fragNull}));
+    _shaderRegistry.add(ShaderProgramId::mvpColor, initShaderProgram({vertMVP, fragColor}));
+    _shaderRegistry.add(ShaderProgramId::mvpTexture, initShaderProgram({vertMVP, fragTexture}));
+    _shaderRegistry.add(ShaderProgramId::ndcTexture, initShaderProgram({vertPassthrough, fragTextureNoPerspective}));
     _shaderRegistry.add(ShaderProgramId::oitBlend, initShaderProgram({vertPassthrough, fragOITBlend}));
     _shaderRegistry.add(ShaderProgramId::oitModel, initShaderProgram({vertModel, fragOITModel}));
     _shaderRegistry.add(ShaderProgramId::oitParticles, initShaderProgram({vertParticles, fragOITParticles}));
@@ -135,8 +138,6 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::postMedianFilter3, initShaderProgram({vertPassthrough, fragPostMedianFilter3}));
     _shaderRegistry.add(ShaderProgramId::postMedianFilter5, initShaderProgram({vertPassthrough, fragPostMedianFilter5}));
     _shaderRegistry.add(ShaderProgramId::postSharpen, initShaderProgram({vertPassthrough, fragPostSharpen}));
-    _shaderRegistry.add(ShaderProgramId::color, initShaderProgram({vertMVP, fragColor}));
-    _shaderRegistry.add(ShaderProgramId::texture, initShaderProgram({vertMVP, fragTexture}));
     _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
 
     _inited = true;
@@ -226,8 +227,6 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     // Uniform Blocks
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);
     program->bindUniformBlock("Locals", UniformBlockBindingPoints::locals);
-    program->bindUniformBlock("SceneGlobals", UniformBlockBindingPoints::sceneGlobals);
-    program->bindUniformBlock("SceneLocals", UniformBlockBindingPoints::sceneLocals);
     program->bindUniformBlock("Bones", UniformBlockBindingPoints::bones);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);

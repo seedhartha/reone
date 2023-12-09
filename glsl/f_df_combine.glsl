@@ -1,5 +1,5 @@
-#include "u_sceneglobals.glsl"
-#include "u_scenelocals.glsl"
+#include "u_globals.glsl"
+#include "u_locals.glsl"
 
 #include "i_fog.glsl"
 #include "i_lighting.glsl"

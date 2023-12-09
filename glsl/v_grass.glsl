@@ -1,5 +1,6 @@
+#include "u_globals.glsl"
 #include "u_grass.glsl"
-#include "u_sceneglobals.glsl"
+
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;

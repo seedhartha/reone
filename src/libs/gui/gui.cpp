@@ -282,7 +282,7 @@ void GUI::renderBackground() {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
     _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
 }
 

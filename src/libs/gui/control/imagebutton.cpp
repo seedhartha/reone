@@ -104,7 +104,7 @@ void ImageButton::renderIcon(
             locals.model = std::move(transform);
             locals.color = glm::vec4(color, 1.0f);
         });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
         _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     }
 
@@ -122,7 +122,7 @@ void ImageButton::renderIcon(
             locals.reset();
             locals.model = std::move(transform);
         });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
         _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
     }
 

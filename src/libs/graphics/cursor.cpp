@@ -38,13 +38,14 @@ void Cursor::render() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     _uniforms.setGlobals([this, transform](auto &globals) {
+        globals.reset();
         globals.projection = _window.getOrthoProjection();
     });
     _uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::texture));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::mvpTexture));
     _context.withBlending(BlendMode::Normal, [this]() {
         _meshRegistry.get(MeshName::quad).draw();
     });

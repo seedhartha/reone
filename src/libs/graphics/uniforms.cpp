@@ -30,8 +30,6 @@ void Uniforms::init() {
 
     static GlobalUniforms defaultGlobals;
     static LocalUniforms defaultLocals;
-    static SceneGlobalUniforms defaultSceneGlobals;
-    static SceneLocalUniforms defaultSceneLocals;
     static BoneUniforms defaultBones;
     static ParticleUniforms defaultParticles;
     static GrassUniforms defaultGrass;
@@ -41,8 +39,6 @@ void Uniforms::init() {
 
     _ubGlobals = initBuffer(&defaultGlobals, sizeof(GlobalUniforms));
     _ubLocals = initBuffer(&defaultLocals, sizeof(LocalUniforms));
-    _ubSceneGlobals = initBuffer(&defaultSceneGlobals, sizeof(SceneGlobalUniforms));
-    _ubSceneLocals = initBuffer(&defaultSceneLocals, sizeof(SceneLocalUniforms));
     _ubBones = initBuffer(&defaultBones, sizeof(BoneUniforms));
     _ubParticles = initBuffer(&defaultParticles, sizeof(ParticleUniforms));
     _ubGrass = initBuffer(&defaultGrass, sizeof(GrassUniforms));
@@ -52,8 +48,6 @@ void Uniforms::init() {
 
     _context.bindUniformBuffer(*_ubGlobals, UniformBlockBindingPoints::globals);
     _context.bindUniformBuffer(*_ubLocals, UniformBlockBindingPoints::locals);
-    _context.bindUniformBuffer(*_ubSceneGlobals, UniformBlockBindingPoints::sceneGlobals);
-    _context.bindUniformBuffer(*_ubSceneLocals, UniformBlockBindingPoints::sceneLocals);
     _context.bindUniformBuffer(*_ubBones, UniformBlockBindingPoints::bones);
     _context.bindUniformBuffer(*_ubParticles, UniformBlockBindingPoints::particles);
     _context.bindUniformBuffer(*_ubGrass, UniformBlockBindingPoints::grass);
@@ -71,8 +65,6 @@ void Uniforms::deinit() {
 
     _ubGlobals.reset();
     _ubLocals.reset();
-    _ubSceneGlobals.reset();
-    _ubSceneLocals.reset();
     _ubBones.reset();
     _ubParticles.reset();
     _ubGrass.reset();
@@ -93,18 +85,6 @@ void Uniforms::setLocals(const std::function<void(LocalUniforms &)> &block) {
     block(_locals);
     _context.bindUniformBuffer(*_ubLocals, UniformBlockBindingPoints::locals);
     _ubLocals->setData(&_locals, sizeof(LocalUniforms));
-}
-
-void Uniforms::setSceneGlobals(const std::function<void(SceneGlobalUniforms &)> &block) {
-    block(_sceneGlobals);
-    _context.bindUniformBuffer(*_ubSceneGlobals, UniformBlockBindingPoints::sceneGlobals);
-    _ubSceneGlobals->setData(&_sceneGlobals, sizeof(SceneGlobalUniforms));
-}
-
-void Uniforms::setSceneLocals(const std::function<void(SceneLocalUniforms &)> &block) {
-    block(_sceneLocals);
-    _context.bindUniformBuffer(*_ubSceneLocals, UniformBlockBindingPoints::sceneLocals);
-    _ubSceneLocals->setData(&_sceneLocals, sizeof(SceneLocalUniforms));
 }
 
 void Uniforms::setBones(const std::function<void(BoneUniforms &)> &block) {

@@ -1,6 +1,6 @@
+#include "u_globals.glsl"
+#include "u_locals.glsl"
 #include "u_particles.glsl"
-#include "u_sceneglobals.glsl"
-#include "u_scenelocals.glsl"
 
 #include "i_luma.glsl"
 #include "i_oit.glsl"

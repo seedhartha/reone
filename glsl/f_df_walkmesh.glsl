@@ -1,4 +1,4 @@
-#include "u_sceneglobals.glsl"
+#include "u_globals.glsl"
 #include "u_walkmesh.glsl"
 
 in vec4 fragPosWorldSpace;

@@ -1,4 +1,4 @@
-#include "u_sceneglobals.glsl"
+#include "u_globals.glsl"
 
 const int NUM_CUBE_FACES = 6;
 

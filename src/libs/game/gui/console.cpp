@@ -204,7 +204,7 @@ void Console::renderBackground() {
         locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         locals.color.a = 0.5f;
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::mvpColor));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 

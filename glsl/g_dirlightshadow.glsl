@@ -1,4 +1,4 @@
-#include "u_sceneglobals.glsl"
+#include "u_globals.glsl"
 
 const int NUM_SHADOW_CASCADES = 4;
 

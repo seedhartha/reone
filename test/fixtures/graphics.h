@@ -92,8 +92,6 @@ class MockUniforms : public IUniforms, boost::noncopyable {
 public:
     MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalUniforms &)> &), (override));
     MOCK_METHOD(void, setLocals, (const std::function<void(LocalUniforms &)> &), (override));
-    MOCK_METHOD(void, setSceneGlobals, (const std::function<void(SceneGlobalUniforms &)> &), (override));
-    MOCK_METHOD(void, setSceneLocals, (const std::function<void(SceneLocalUniforms &)> &), (override));
     MOCK_METHOD(void, setBones, (const std::function<void(BoneUniforms &)> &), (override));
     MOCK_METHOD(void, setParticles, (const std::function<void(ParticleUniforms &)> &), (override));
     MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &), (override));

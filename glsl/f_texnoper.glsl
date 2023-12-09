@@ -1,8 +1,8 @@
-#include "u_scenelocals.glsl"
+#include "u_locals.glsl"
 
 uniform sampler2D sMainTex;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 

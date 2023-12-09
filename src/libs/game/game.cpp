@@ -223,10 +223,6 @@ void Game::renderAll() {
     } else {
         renderScene();
         renderGUI();
-        _profileOverlay->render();
-        if (_cursor) {
-            _cursor->render();
-        }
     }
 
     _services.graphics.window.swapBuffers();
@@ -364,8 +360,9 @@ void Game::renderScene() {
         return;
     }
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    auto &output = scene.render(glm::ivec2(_options.graphics.width, _options.graphics.height));
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
+    auto &output = scene.render({_options.graphics.width, _options.graphics.height});
+    _services.graphics.uniforms.setLocals(std::bind(&LocalUniforms::reset, std::placeholders::_1));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::ndcTexture));
     _services.graphics.context.bindTexture(output);
     _services.graphics.meshRegistry.get(MeshName::quadNDC).draw();
 }
@@ -421,6 +418,10 @@ std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
 }
 
 void Game::renderGUI() {
+    _services.graphics.uniforms.setGlobals([this](auto &globals) {
+        globals.reset();
+        globals.projection = _services.graphics.window.getOrthoProjection();
+    });
     switch (_screen) {
     case Screen::InGame:
         if (_cameraType == CameraType::ThirdPerson) {
@@ -438,6 +439,10 @@ void Game::renderGUI() {
         }
         break;
     }
+    }
+    _profileOverlay->render();
+    if (_cursor) {
+        _cursor->render();
     }
 }
 

@@ -234,7 +234,7 @@ void Control::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
             locals.reset();
             locals.model = std::move(transform);
         });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
         _graphicsSvc.context.bindTexture(*output);
         _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this]() {
             _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
@@ -243,7 +243,7 @@ void Control::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
 }
 
 void Control::renderBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::texture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
 
     glm::vec3 color(getBorderColor());
     glm::mat4 transform(1.0f);
