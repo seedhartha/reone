@@ -19,9 +19,8 @@
 
 #include "reone/graphics/framebuffer.h"
 #include "reone/graphics/renderbuffer.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/texture.h"
-
-#include "renderpass.h"
 
 template <>
 struct std::hash<glm::ivec2> {
@@ -56,7 +55,7 @@ public:
     virtual void init() = 0;
 
     virtual void reset() = 0;
-    virtual void inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
+    virtual void inRenderPass(graphics::RenderPassName name, std::function<void(graphics::IRenderPass &)> block) = 0;
 
     virtual graphics::Texture &render() = 0;
 };
@@ -70,7 +69,7 @@ public:
 
 class RenderPipeline : public IRenderPipeline, boost::noncopyable {
 public:
-    using RenderPassCallback = std::function<void(IRenderPass &)>;
+    using RenderPassCallback = std::function<void(graphics::IRenderPass &)>;
 
     RenderPipeline(glm::ivec2 targetSize,
                    graphics::GraphicsOptions &options,
@@ -94,7 +93,7 @@ public:
         _passCallbacks.clear();
     }
 
-    void inRenderPass(RenderPassName name, RenderPassCallback callback) override {
+    void inRenderPass(graphics::RenderPassName name, RenderPassCallback callback) override {
         _passCallbacks[name] = std::move(callback);
     }
 
@@ -161,8 +160,8 @@ private:
     glm::mat4 _shadowLightSpace[graphics::kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
 
-    RenderPassName _passName {RenderPassName::None};
-    std::map<RenderPassName, RenderPassCallback> _passCallbacks;
+    graphics::RenderPassName _passName {graphics::RenderPassName::None};
+    std::map<graphics::RenderPassName, RenderPassCallback> _passCallbacks;
 
     void initRenderTargets();
     void initSSAOSamples();

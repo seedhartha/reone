@@ -51,7 +51,7 @@ public:
 
     void update(float dt) override;
 
-    void renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) override;
+    void renderLeafs(graphics::IRenderPass &pass, const std::vector<SceneNode *> &leafs) override;
 
     void detonate();
 

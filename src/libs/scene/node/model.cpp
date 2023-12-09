@@ -23,6 +23,7 @@
 #include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/di/services.h"
@@ -31,7 +32,6 @@
 #include "reone/scene/node/emitter.h"
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/mesh.h"
-#include "reone/scene/renderpass.h"
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
 

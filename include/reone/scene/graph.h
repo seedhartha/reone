@@ -39,6 +39,7 @@ namespace graphics {
 struct GraphicsOptions;
 struct GraphicsServices;
 
+class IRenderPass;
 class Walkmesh;
 
 } // namespace graphics
@@ -61,7 +62,6 @@ struct Collision;
 
 class IAnimationEventListener;
 class IRenderPipelineFactory;
-class IRenderPass;
 
 class ISceneGraph {
 public:
@@ -140,10 +140,10 @@ public:
     void update(float dt) override;
     graphics::Texture &render(const glm::ivec2 &dim) override;
 
-    void renderShadows(IRenderPass &pass);
-    void renderOpaque(IRenderPass &pass);
-    void renderTransparent(IRenderPass &pass);
-    void renderLensFlares(IRenderPass &pass);
+    void renderShadows(graphics::IRenderPass &pass);
+    void renderOpaque(graphics::IRenderPass &pass);
+    void renderTransparent(graphics::IRenderPass &pass);
+    void renderLensFlares(graphics::IRenderPass &pass);
 
     const std::string &name() const override {
         return _name;

@@ -54,7 +54,7 @@ public:
     }
 
     void init();
-    void render(IRenderPass &pass);
+    void render(graphics::IRenderPass &pass);
 
     const graphics::Walkmesh &walkmesh() const { return _walkmesh; }
 

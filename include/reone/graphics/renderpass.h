@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/graphics/types.h"
+#include "types.h"
 
 namespace reone {
 
@@ -33,10 +33,6 @@ class ShaderRegistry;
 class Texture;
 class TextureRegistry;
 class Uniforms;
-
-} // namespace graphics
-
-namespace scene {
 
 enum class RenderPassName {
     None,
@@ -66,43 +62,43 @@ class IRenderPass {
 public:
     virtual ~IRenderPass() = default;
 
-    virtual void draw(graphics::Mesh &mesh,
-                      graphics::Material &material,
+    virtual void draw(Mesh &mesh,
+                      Material &material,
                       const glm::mat4 &transform,
                       const glm::mat4 &transformInv) = 0;
 
-    virtual void drawSkinned(graphics::Mesh &mesh,
-                             graphics::Material &material,
+    virtual void drawSkinned(Mesh &mesh,
+                             Material &material,
                              const glm::mat4 &transform,
                              const glm::mat4 &transformInv,
                              const std::vector<glm::mat4> &bones) = 0;
 
-    virtual void drawBillboard(graphics::Texture &texture,
+    virtual void drawBillboard(Texture &texture,
                                const glm::vec4 &color,
                                const glm::mat4 &transform,
                                const glm::mat4 &transformInv,
                                std::optional<float> size) = 0;
 
-    virtual void drawParticles(graphics::Texture &texture,
-                               graphics::FaceCullMode faceCulling,
+    virtual void drawParticles(Texture &texture,
+                               FaceCullMode faceCulling,
                                bool premultipliedAlpha,
                                const glm::ivec2 &gridSize,
                                const std::vector<ParticleInstance> &particles) = 0;
 
     virtual void drawGrass(float radius,
                            float quadSize,
-                           graphics::Texture &texture,
-                           std::optional<std::reference_wrapper<graphics::Texture>> &lightmap,
+                           Texture &texture,
+                           std::optional<std::reference_wrapper<Texture>> &lightmap,
                            const std::vector<GrassInstance> &instances) = 0;
 };
 
 class RenderPass : public IRenderPass, boost::noncopyable {
 public:
-    RenderPass(graphics::Context &context,
-               graphics::ShaderRegistry &shaderRegistry,
-               graphics::MeshRegistry &meshRegistry,
-               graphics::TextureRegistry &textureRegistry,
-               graphics::Uniforms &uniforms) :
+    RenderPass(Context &context,
+               ShaderRegistry &shaderRegistry,
+               MeshRegistry &meshRegistry,
+               TextureRegistry &textureRegistry,
+               Uniforms &uniforms) :
         _context(context),
         _shaderRegistry(shaderRegistry),
         _meshRegistry(meshRegistry),
@@ -110,49 +106,49 @@ public:
         _uniforms(uniforms) {
     }
 
-    void draw(graphics::Mesh &mesh,
-              graphics::Material &material,
+    void draw(Mesh &mesh,
+              Material &material,
               const glm::mat4 &transform,
               const glm::mat4 &transformInv) override;
 
-    void drawSkinned(graphics::Mesh &mesh,
-                     graphics::Material &material,
+    void drawSkinned(Mesh &mesh,
+                     Material &material,
                      const glm::mat4 &transform,
                      const glm::mat4 &transformInv,
                      const std::vector<glm::mat4> &bones) override;
 
-    void drawBillboard(graphics::Texture &texture,
+    void drawBillboard(Texture &texture,
                        const glm::vec4 &color,
                        const glm::mat4 &transform,
                        const glm::mat4 &transformInv,
                        std::optional<float> size) override;
 
-    void drawParticles(graphics::Texture &texture,
-                       graphics::FaceCullMode faceCulling,
+    void drawParticles(Texture &texture,
+                       FaceCullMode faceCulling,
                        bool premultipliedAlpha,
                        const glm::ivec2 &gridSize,
                        const std::vector<ParticleInstance> &particles) override;
 
     void drawGrass(float radius,
                    float quadSize,
-                   graphics::Texture &texture,
-                   std::optional<std::reference_wrapper<graphics::Texture>> &lightmap,
+                   Texture &texture,
+                   std::optional<std::reference_wrapper<Texture>> &lightmap,
                    const std::vector<GrassInstance> &instances) override;
 
 private:
-    graphics::Context &_context;
-    graphics::ShaderRegistry &_shaderRegistry;
-    graphics::MeshRegistry &_meshRegistry;
-    graphics::TextureRegistry &_textureRegistry;
-    graphics::Uniforms &_uniforms;
+    Context &_context;
+    ShaderRegistry &_shaderRegistry;
+    MeshRegistry &_meshRegistry;
+    TextureRegistry &_textureRegistry;
+    Uniforms &_uniforms;
 
-    void applyMaterialToLocals(const graphics::Material &material, graphics::LocalUniforms &locals);
+    void applyMaterialToLocals(const Material &material, LocalUniforms &locals);
 
-    int materialFeatureMask(const graphics::Material &material) const;
+    int materialFeatureMask(const Material &material) const;
 
-    void withMaterialAppliedToContext(const graphics::Material &material, std::function<void()> block);
+    void withMaterialAppliedToContext(const Material &material, std::function<void()> block);
 };
 
-} // namespace scene
+} // namespace graphics
 
 } // namespace reone
