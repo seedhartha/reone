@@ -27,28 +27,20 @@
 #include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"
 
-#define R_GAUSSIAN_BLUR_HORIZONTAL false
-#define R_GAUSSIAN_BLUR_VERTICAL true
-#define R_GAUSSIAN_BLUR_STRONG true
-
-#define R_MEDIAN_FILTER_STRONG true
-
 using namespace reone::graphics;
 
 namespace reone {
 
 namespace scene {
 
-static constexpr GLenum kColorAttachments[] {
-    GL_COLOR_ATTACHMENT0,
-    GL_COLOR_ATTACHMENT1,
-    GL_COLOR_ATTACHMENT2,
-    GL_COLOR_ATTACHMENT3,
-    GL_COLOR_ATTACHMENT4,
-    GL_COLOR_ATTACHMENT5,
-    GL_COLOR_ATTACHMENT6,
-    GL_COLOR_ATTACHMENT7,
-    GL_COLOR_ATTACHMENT8};
+static constexpr float kSSAOSampleRadius = 0.5f;
+static constexpr float kSSAOBias = 0.1f;
+
+static constexpr float kSSRBias = 0.25f;
+static constexpr float kSSRPixelStride = 4.0f;
+static constexpr float kSSRMaxSteps = 64.0f;
+
+static constexpr float kSharpenAmount = 0.25f;
 
 void RenderPipeline::init() {
     checkThat(!_inited, "Pipeline already initialized");
@@ -247,92 +239,174 @@ void RenderPipeline::initSSAOSamples() {
 }
 
 Texture &RenderPipeline::render() {
-    auto pass = RenderPass(_context, _shaderRegistry, _meshRegistry, _textureRegistry, _uniforms);
-    if (_passCallbacks.count(RenderPassName::DirLightShadowsPass) > 0) {
-        beginDirLightShadowsPass();
-        _passCallbacks.at(RenderPassName::DirLightShadowsPass)(pass);
-        endDirLightShadowsPass();
-    } else if (_passCallbacks.count(RenderPassName::PointLightShadows) > 0) {
-        beginPointLightShadowsPass();
-        _passCallbacks.at(RenderPassName::PointLightShadows)(pass);
-        endPointLightShadowsPass();
-    }
-    beginOpaqueGeometryPass();
-    if (_passCallbacks.count(RenderPassName::OpaqueGeometry) > 0) {
-        _passCallbacks.at(RenderPassName::OpaqueGeometry)(pass);
-    }
-    endOpaqueGeometryPass();
-    beginTransparentGeometryPass();
-    if (_passCallbacks.count(RenderPassName::TransparentGeometry) > 0) {
-        _passCallbacks.at(RenderPassName::TransparentGeometry)(pass);
-    }
-    endTransparentGeometryPass();
-    beginPostProcessingPass();
-    if (_passCallbacks.count(RenderPassName::PostProcessing) > 0) {
-        _passCallbacks.at(RenderPassName::PostProcessing)(pass);
-    }
-    endPostProcessingPass();
+    _context.withViewport(glm::ivec4(0, 0, _targetSize), [this]() {
+        auto pass = RenderPass(_context, _shaderRegistry, _meshRegistry, _textureRegistry, _uniforms);
+
+        // Shadows pass
+        if (_passCallbacks.count(RenderPassName::DirLightShadowsPass) > 0) {
+            beginDirLightShadowsPass();
+            _passCallbacks.at(RenderPassName::DirLightShadowsPass)(pass);
+            endDirLightShadowsPass();
+        } else if (_passCallbacks.count(RenderPassName::PointLightShadows) > 0) {
+            beginPointLightShadowsPass();
+            _passCallbacks.at(RenderPassName::PointLightShadows)(pass);
+            endPointLightShadowsPass();
+        }
+
+        // Opaque geometry pass
+        beginOpaqueGeometryPass();
+        if (_passCallbacks.count(RenderPassName::OpaqueGeometry) > 0) {
+            _passCallbacks.at(RenderPassName::OpaqueGeometry)(pass);
+        }
+        endOpaqueGeometryPass();
+        if (_options.ssao || _options.ssr) {
+            auto halfSize = _targetSize / 2;
+            if (_options.ssao) {
+                renderSSAO(kSSAOSampleRadius, kSSAOBias);
+                applyBoxBlur(*_renderTargets.cbSSAO, *_renderTargets.fbPingHalf, halfSize);
+                _context.blitFramebuffer(
+                    *_renderTargets.fbPingHalf,
+                    *_renderTargets.fbSSAO,
+                    glm::ivec4(0, 0, halfSize),
+                    glm::ivec4(0, 0, halfSize));
+            }
+            if (_options.ssr) {
+                renderSSR(kSSRBias, kSSRPixelStride, kSSRMaxSteps);
+                applyGaussianBlur(*_renderTargets.cbSSR, *_renderTargets.fbPingHalf, halfSize, GaussianBlurParams {false, true});
+                applyGaussianBlur(*_renderTargets.cbPingHalf, *_renderTargets.fbSSR, halfSize, GaussianBlurParams {true, true});
+            }
+        }
+
+        // Blur highlights
+        applyGaussianBlur(*_renderTargets.cbDeferredOpaque2, *_renderTargets.fbPing, _targetSize, GaussianBlurParams {false, true});
+        applyGaussianBlur(*_renderTargets.cbPing, *_renderTargets.fbPong, _targetSize, GaussianBlurParams {true, true});
+        _context.blitFramebuffer(
+            *_renderTargets.fbPong,
+            *_renderTargets.fbDeferredCombine,
+            glm::ivec4(0, 0, _targetSize),
+            glm::ivec4(0, 0, _targetSize),
+            0, 1);
+
+        combineOpaqueGeometry();
+
+        // Blit opaque geometry colors into transparent geometry
+        _context.blitFramebuffer(*_renderTargets.fbOpaqueGeometry,
+                                 *_renderTargets.fbTransparentGeometry,
+                                 glm::ivec4(0, 0, _targetSize),
+                                 glm::ivec4(0, 0, _targetSize),
+                                 0,
+                                 0,
+                                 FramebufferBlitFlags::depth);
+
+        // Transparent geometry pass
+        beginTransparentGeometryPass();
+        if (_passCallbacks.count(RenderPassName::TransparentGeometry) > 0) {
+            _passCallbacks.at(RenderPassName::TransparentGeometry)(pass);
+        }
+        endTransparentGeometryPass();
+        blendTransparentGeometry();
+
+        // Post-processing pass
+        beginPostProcessingPass();
+        if (_passCallbacks.count(RenderPassName::PostProcessing) > 0) {
+            _passCallbacks.at(RenderPassName::PostProcessing)(pass);
+        }
+        endPostProcessingPass();
+        if (_options.fxaa && _options.sharpen) {
+            applyFXAA(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize);
+            applySharpen(*_renderTargets.cbPing, *_renderTargets.fbOutput, _targetSize, kSharpenAmount);
+        } else if (_options.fxaa || _options.sharpen) {
+            if (_options.fxaa) {
+                applyFXAA(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize);
+            } else {
+                applySharpen(*_renderTargets.cbOutput, *_renderTargets.fbPing, _targetSize, kSharpenAmount);
+            }
+            _context.blitFramebuffer(
+                *_renderTargets.fbPing,
+                *_renderTargets.fbOutput,
+                glm::ivec4(0, 0, _targetSize),
+                glm::ivec4(0, 0, _targetSize));
+        }
+    });
+
+    _context.resetDrawFramebuffer();
+    _context.resetReadFramebuffer();
+
     return *_renderTargets.cbOutput;
 }
 
 void RenderPipeline::beginDirLightShadowsPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDirLightShadows->nameGL());
-    glDrawBuffer(GL_NONE);
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
+    _context.bindDrawFramebuffer(*_renderTargets.fbDirLightShadows);
     _context.clearDepth();
-}
-
-void RenderPipeline::beginPointLightShadowsPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbPointLightShadows->nameGL());
-    glDrawBuffer(GL_NONE);
-    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
-    _context.clearDepth();
-}
-
-void RenderPipeline::beginOpaqueGeometryPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOpaqueGeometry->nameGL());
-    glDrawBuffers(7, kColorAttachments);
-    _context.clearColorDepth();
-}
-
-void RenderPipeline::beginTransparentGeometryPass() {
-    blitFramebuffer(_targetSize, *_renderTargets.fbOpaqueGeometry, 0, *_renderTargets.fbTransparentGeometry, 0, BlitFlags::depth);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbTransparentGeometry->nameGL());
-    glDrawBuffers(2, kColorAttachments);
-    glDepthMask(GL_FALSE);
-    _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
-    _context.pushBlending(BlendMode::OIT_Transparent);
-}
-
-void RenderPipeline::beginPostProcessingPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOutput->nameGL());
 }
 
 void RenderPipeline::endDirLightShadowsPass() {
     _context.popViewport();
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::beginPointLightShadowsPass() {
+    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
+    _context.bindDrawFramebuffer(*_renderTargets.fbPointLightShadows);
+    _context.clearDepth();
 }
 
 void RenderPipeline::endPointLightShadowsPass() {
     _context.popViewport();
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::beginOpaqueGeometryPass() {
+    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3, 4, 5, 6});
+    _context.clearColorDepth();
 }
 
 void RenderPipeline::endOpaqueGeometryPass() {
-    auto halfSize = _targetSize / 2;
-    _context.withViewport(glm::ivec4(0, 0, halfSize.x, halfSize.y), [this, &halfSize]() {
-        if (_options.ssao) {
-            drawSSAO(halfSize, 0.5f, 0.1f);
-            drawBoxBlur(halfSize, *_renderTargets.cbSSAO, *_renderTargets.fbPingHalf);
-            blitFramebuffer(halfSize, *_renderTargets.fbPingHalf, 0, *_renderTargets.fbSSAO, 0);
-        }
-        if (_options.ssr) {
-            drawSSR(halfSize, 0.25f, 4.0f, 64.0f);
-            drawGaussianBlur(halfSize, *_renderTargets.cbSSR, *_renderTargets.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
-            drawGaussianBlur(halfSize, *_renderTargets.cbPingHalf, *_renderTargets.fbSSR, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
-        }
-    });
+}
 
+void RenderPipeline::renderSSAO(float sampleRadius, float bias) {
+    auto size = _targetSize / 2;
+    _uniforms.setScreenEffect([&size, &sampleRadius, &bias](auto &se) {
+        se.screenResolution = glm::vec2(size);
+        se.screenResolutionRcp = 1.0f / se.screenResolution;
+        se.ssaoSampleRadius = sampleRadius;
+        se.ssaoBias = bias;
+    });
+    _context.bindDrawFramebuffer(*_renderTargets.fbSSAO, {0});
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSAO));
+    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
+    _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
+}
+
+void RenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps) {
+    auto size = _targetSize / 2;
+    _uniforms.setScreenEffect([&](auto &se) {
+        se.screenResolution = glm::vec2(size);
+        se.screenResolutionRcp = 1.0f / se.screenResolution;
+        se.ssrBias = bias;
+        se.ssrPixelStride = pixelStride;
+        se.ssrMaxSteps = maxSteps;
+    });
+    _context.bindDrawFramebuffer(*_renderTargets.fbSSR, {0});
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSR));
+    _context.bindTexture(*_renderTargets.cbGBufferDiffuse);
+    _context.bindTexture(*_renderTargets.cbGBufferLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*_renderTargets.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
+}
+
+void RenderPipeline::combineOpaqueGeometry() {
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
+    _context.bindDrawFramebuffer(*_renderTargets.fbDeferredCombine, {0, 1});
     _context.bindTexture(*_renderTargets.cbGBufferDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufferLightmap, TextureUnits::lightmap);
     _context.bindTexture(*_renderTargets.cbGBufferEnvMap, TextureUnits::envmapColor);
@@ -344,86 +418,31 @@ void RenderPipeline::endOpaqueGeometryPass() {
     _context.bindTexture(_options.ssr ? *_renderTargets.cbSSR : _textureRegistry.get(TextureName::ssrRgb), TextureUnits::ssr);
     _context.bindTexture(*_renderTargets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
     _context.bindTexture(*_renderTargets.dbPointLightShadows, TextureUnits::shadowMapCube);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDeferredCombine->nameGL());
-    glDrawBuffers(2, kColorAttachments);
     _context.clearColorDepth();
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
     _meshRegistry.get(MeshName::quadNDC).draw();
+}
 
-    drawGaussianBlur(_targetSize, *_renderTargets.cbDeferredOpaque2, *_renderTargets.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
-    drawGaussianBlur(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
-    blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbDeferredCombine, 1);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+void RenderPipeline::beginTransparentGeometryPass() {
+    _context.bindDrawFramebuffer(*_renderTargets.fbTransparentGeometry, {0, 1});
+    _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
+    _context.pushBlending(BlendMode::OIT_Transparent);
+    glDepthMask(GL_FALSE);
 }
 
 void RenderPipeline::endTransparentGeometryPass() {
-    _context.popBlending();
     glDepthMask(GL_TRUE);
-    drawOITBlend(*_renderTargets.fbOutput);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    _context.popBlending();
 }
 
-void RenderPipeline::endPostProcessingPass() {
-    if (_options.fxaa && _options.sharpen) {
-        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
-        drawSharpen(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, 0.25f);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbOutput, 0);
-    } else if (_options.fxaa) {
-        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
-    } else if (_options.sharpen) {
-        drawSharpen(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing, 0.25f);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
-    }
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-void RenderPipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
-    _uniforms.setScreenEffect([&dim, &sampleRadius, &bias](auto &screenEffect) {
-        screenEffect.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-        screenEffect.ssaoSampleRadius = sampleRadius;
-        screenEffect.ssaoBias = bias;
-    });
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbSSAO->nameGL());
-    glDrawBuffer(kColorAttachments[0]);
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSAO));
-    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
-}
-
-void RenderPipeline::drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, float maxSteps) {
-    _uniforms.setScreenEffect([&](auto &screenEffect) {
-        screenEffect.screenResolution = glm::vec2(dim.x, dim.y);
-        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenEffect.ssrBias = bias;
-        screenEffect.ssrPixelStride = pixelStride;
-        screenEffect.ssrMaxSteps = maxSteps;
-    });
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbSSR->nameGL());
-    glDrawBuffer(kColorAttachments[0]);
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSR));
-    _context.bindTexture(*_renderTargets.cbGBufferDiffuse);
-    _context.bindTexture(*_renderTargets.cbGBufferLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
-}
-
-void RenderPipeline::drawOITBlend(Framebuffer &dst) {
+void RenderPipeline::blendTransparentGeometry() {
     _uniforms.setGlobals([](auto &globals) {
         globals.reset();
     });
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
+    _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
     _context.bindTexture(*_renderTargets.cbDeferredOpaque1);
     _context.bindTexture(*_renderTargets.cbDeferredOpaque2, TextureUnits::hilights);
     _context.bindTexture(*_renderTargets.cbTransparentGeometry1, TextureUnits::oitAccum);
@@ -432,79 +451,88 @@ void RenderPipeline::drawOITBlend(Framebuffer &dst) {
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void RenderPipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+void RenderPipeline::beginPostProcessingPass() {
+    _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
+}
+
+void RenderPipeline::endPostProcessingPass() {
+}
+
+void RenderPipeline::applyBoxBlur(Texture &srcTexture, Framebuffer &dst, const glm::ivec2 &size) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postBoxBlur4));
+    _context.bindDrawFramebuffer(dst, {0});
     _context.bindTexture(srcTexture);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
+    _context.withViewport(glm::ivec4(0, 0, size), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
 }
 
-void RenderPipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
-    _uniforms.setScreenEffect([&dim, &vertical](auto &screenEffect) {
-        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenEffect.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+void RenderPipeline::applyGaussianBlur(Texture &tex,
+                                       Framebuffer &dst,
+                                       const glm::ivec2 &size,
+                                       const GaussianBlurParams &params) {
+    _uniforms.setScreenEffect([&size, &params](auto &se) {
+        se.screenResolution = glm::vec2(size);
+        se.screenResolutionRcp = 1.0f / se.screenResolution;
+        se.blurDirection = params.vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
     });
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _context.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::postGaussianBlur13 : ShaderProgramId::postGaussianBlur9));
-    _context.bindTexture(srcTexture);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
+    _context.useProgram(_shaderRegistry.get(params.strong
+                                                ? ShaderProgramId::postGaussianBlur13
+                                                : ShaderProgramId::postGaussianBlur9));
+    _context.bindDrawFramebuffer(dst, {0});
+    _context.bindTexture(tex);
+    _context.withViewport(glm::ivec4(0, 0, size), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
 }
 
-void RenderPipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _context.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::postMedianFilter5 : ShaderProgramId::postMedianFilter3));
-    _context.bindTexture(srcTexture);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
+void RenderPipeline::applyMedianFilter(Texture &tex,
+                                       Framebuffer &dst,
+                                       const glm::ivec2 &size,
+                                       bool strong) {
+    _context.useProgram(_shaderRegistry.get(strong
+                                                ? ShaderProgramId::postMedianFilter5
+                                                : ShaderProgramId::postMedianFilter3));
+    _context.bindDrawFramebuffer(dst, {0});
+    _context.bindTexture(tex);
+    _context.withViewport(glm::ivec4(0, 0, size), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
 }
 
-void RenderPipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniforms.setGlobals([](auto &globals) {
-        globals.reset();
+void RenderPipeline::applyFXAA(Texture &tex, Framebuffer &dst, const glm::ivec2 &size) {
+    _uniforms.setScreenEffect([&size](auto &se) {
+        se.screenResolution = glm::vec2(size);
+        se.screenResolutionRcp = 1.0f / se.screenResolution;
     });
-    _uniforms.setLocals([](auto &locals) {
-        locals.reset();
-    });
-    _uniforms.setScreenEffect([&dim](auto &screenEffect) {
-        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-    });
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postFXAA));
-    _context.bindTexture(srcTexture);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
-}
-
-void RenderPipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
-    _uniforms.setScreenEffect([&dim, &amount](auto &screenEffect) {
-        screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-        screenEffect.sharpenAmount = amount;
+    _context.bindDrawFramebuffer(dst, {0});
+    _context.bindTexture(tex);
+    _context.withViewport(glm::ivec4(0, 0, size), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
     });
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::postSharpen));
-    _context.bindTexture(srcTexture);
-    _context.clearColorDepth();
-    _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void RenderPipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags) {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, src.nameGL());
-    glReadBuffer(kColorAttachments[srcColorIdx]);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    glDrawBuffer(kColorAttachments[dstColorIdx]);
-
-    int flagsGL = 0;
-    if (flags & BlitFlags::color) {
-        flagsGL |= GL_COLOR_BUFFER_BIT;
-    }
-    if (flags & BlitFlags::depth) {
-        flagsGL |= GL_DEPTH_BUFFER_BIT;
-    }
-    glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, flagsGL, GL_NEAREST);
+void RenderPipeline::applySharpen(Texture &tex,
+                                  Framebuffer &dst,
+                                  const glm::ivec2 &size,
+                                  float amount) {
+    _uniforms.setScreenEffect([&size, &amount](auto &se) {
+        se.screenResolution = glm::vec2(size);
+        se.screenResolutionRcp = 1.0f / se.screenResolution;
+        se.sharpenAmount = amount;
+    });
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::postSharpen));
+    _context.bindDrawFramebuffer(dst, {0});
+    _context.bindTexture(tex);
+    _context.withViewport(glm::ivec4(0, 0, size), [this]() {
+        _context.clearColorDepth();
+        _meshRegistry.get(MeshName::quadNDC).draw();
+    });
 }
 
 } // namespace scene

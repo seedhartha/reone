@@ -101,13 +101,6 @@ public:
     graphics::Texture &render() override;
 
 private:
-    struct BlitFlags {
-        static constexpr int color = 1;
-        static constexpr int depth = 2;
-
-        static constexpr int colorDepth = color | depth;
-    };
-
     struct RenderTargets {
         std::shared_ptr<graphics::Texture> cbGBufferDiffuse;
         std::shared_ptr<graphics::Texture> cbGBufferLightmap;
@@ -149,6 +142,11 @@ private:
         std::shared_ptr<graphics::Framebuffer> fbOutput;
     };
 
+    struct GaussianBlurParams {
+        bool vertical {false};
+        bool strong {false};
+    };
+
     glm::ivec2 _targetSize;
     graphics::GraphicsOptions &_options;
     graphics::Context &_context;
@@ -169,17 +167,17 @@ private:
     void initRenderTargets();
     void initSSAOSamples();
 
-    void drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias);
-    void drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, float maxSteps);
-    void drawOITBlend(graphics::Framebuffer &dst);
+    void combineOpaqueGeometry();
+    void blendTransparentGeometry();
 
-    void drawBoxBlur(const glm::ivec2 &dim, graphics::Texture &srcTexture, graphics::Framebuffer &dst);
-    void drawGaussianBlur(const glm::ivec2 &dim, graphics::Texture &srcTexture, graphics::Framebuffer &dst, bool vertical, bool strong = false);
-    void drawMedianFilter(const glm::ivec2 &dim, graphics::Texture &srcTexture, graphics::Framebuffer &dst, bool strong = false);
-    void drawFXAA(const glm::ivec2 &dim, graphics::Texture &srcTexture, graphics::Framebuffer &dst);
-    void drawSharpen(const glm::ivec2 &dim, graphics::Texture &srcTexture, graphics::Framebuffer &dst, float amount);
+    void renderSSAO(float sampleRadius, float bias);
+    void renderSSR(float bias, float pixelStride, float maxSteps);
 
-    void blitFramebuffer(const glm::ivec2 &dim, graphics::Framebuffer &src, int srcColorIdx, graphics::Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
+    void applyBoxBlur(graphics::Texture &tex, graphics::Framebuffer &dst, const glm::ivec2 &size);
+    void applyGaussianBlur(graphics::Texture &tex, graphics::Framebuffer &dst, const glm::ivec2 &size, const GaussianBlurParams &params);
+    void applyMedianFilter(graphics::Texture &tex, graphics::Framebuffer &dst, const glm::ivec2 &size, bool strong = false);
+    void applyFXAA(graphics::Texture &tex, graphics::Framebuffer &dst, const glm::ivec2 &size);
+    void applySharpen(graphics::Texture &tex, graphics::Framebuffer &dst, const glm::ivec2 &size, float amount);
 
     // Render Passes
 

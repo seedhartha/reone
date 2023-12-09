@@ -24,9 +24,23 @@ namespace reone {
 
 namespace graphics {
 
+class Framebuffer;
 class ShaderProgram;
 class Texture;
 class UniformBuffer;
+
+enum class FramebufferBlitFilter {
+    Nearest,
+    Linear
+};
+
+struct FramebufferBlitFlags {
+    static constexpr int color = 1;
+    static constexpr int depth = 2;
+    static constexpr int stencil = 3;
+
+    static constexpr int colorDepth = color | depth;
+};
 
 class IContext {
 public:
@@ -36,13 +50,24 @@ public:
     virtual void clearDepth() = 0;
     virtual void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) = 0;
 
-    virtual void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) = 0;
-
-    virtual void useProgram(ShaderProgram &program) = 0;
     virtual void resetProgram() = 0;
+    virtual void useProgram(ShaderProgram &program) = 0;
 
-    virtual void bind(UniformBuffer &buffer, int index) = 0;
-    virtual UniformBuffer &uniformBufferAt(int index) = 0;
+    virtual void resetDrawFramebuffer() = 0;
+    virtual void resetReadFramebuffer() = 0;
+    virtual void bindDrawFramebuffer(Framebuffer &buffer, std::vector<int> colorIndices = std::vector<int>()) = 0;
+    virtual void bindReadFramebuffer(Framebuffer &buffer, std::optional<int> colorIdx = std::nullopt) = 0;
+    virtual void blitFramebuffer(Framebuffer &source,
+                                 Framebuffer &destination,
+                                 const glm::ivec4 &srcRect,
+                                 const glm::ivec4 &dstRect,
+                                 int srcColorIdx = 0,
+                                 int dstColorIdx = 0,
+                                 int mask = FramebufferBlitFlags::color,
+                                 FramebufferBlitFilter filter = FramebufferBlitFilter::Nearest) = 0;
+
+    virtual void bindUniformBuffer(UniformBuffer &buffer, int index) = 0;
+    virtual void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) = 0;
 
     virtual FaceCullMode faceCulling() const = 0;
     virtual BlendMode blending() const = 0;
@@ -78,19 +103,24 @@ public:
     void clearDepth() override;
     void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)) override;
 
-    void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) override;
-
-    void useProgram(ShaderProgram &program) override;
     void resetProgram() override;
+    void useProgram(ShaderProgram &program) override;
 
-    void bind(UniformBuffer &buffer, int index) override;
+    void resetDrawFramebuffer() override;
+    void resetReadFramebuffer() override;
+    void bindDrawFramebuffer(Framebuffer &buffer, std::vector<int> colorIndices = std::vector<int>()) override;
+    void bindReadFramebuffer(Framebuffer &buffer, std::optional<int> colorIdx = std::nullopt) override;
+    void blitFramebuffer(Framebuffer &source,
+                         Framebuffer &destination,
+                         const glm::ivec4 &srcRect,
+                         const glm::ivec4 &dstRect,
+                         int srcColorIdx = 0,
+                         int dstColorIdx = 0,
+                         int mask = FramebufferBlitFlags::color,
+                         FramebufferBlitFilter filter = FramebufferBlitFilter::Nearest) override;
 
-    UniformBuffer &uniformBufferAt(int index) override {
-        if (_uniformBuffers.empty()) {
-            throw std::out_of_range("Uniform buffer index out of range: " + std::to_string(index));
-        }
-        return *_uniformBuffers.at(index);
-    }
+    void bindUniformBuffer(UniformBuffer &buffer, int index) override;
+    void bindTexture(Texture &texture, int unit = TextureUnits::mainTex) override;
 
     FaceCullMode faceCulling() const override {
         return _faceCullModes.top();
@@ -126,9 +156,10 @@ private:
 
     bool _inited {false};
 
-    ShaderProgram *_usedProgram {nullptr};
+    std::optional<std::reference_wrapper<ShaderProgram>> _program;
+    std::optional<std::reference_wrapper<Framebuffer>> _readFramebuffer;
+    std::optional<std::reference_wrapper<Framebuffer>> _drawFramebuffer;
     int _activeTexUnit {0};
-    std::map<int, UniformBuffer *> _uniformBuffers;
 
     // States
 

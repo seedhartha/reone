@@ -42,6 +42,10 @@ public:
         }
     }
 
+    uint32_t nameGL() const {
+        return _nameGL;
+    }
+
 private:
     bool _inited {false};
     const void *_data {nullptr};

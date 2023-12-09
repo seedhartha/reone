@@ -214,10 +214,8 @@ void Control::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
     if (!_sceneName.empty()) {
         std::optional<std::reference_wrapper<Texture>> output;
         _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
-            _graphicsSvc.context.withViewport({0, 0, _extent.width, _extent.height}, [this, &output]() {
-                auto &scene = _sceneGraphs.get(_sceneName);
-                output = scene.render({_extent.width, _extent.height});
-            });
+            auto &scene = _sceneGraphs.get(_sceneName);
+            output = scene.render({_extent.width, _extent.height});
         });
         glm::mat4 projection(glm::ortho(
             0.0f,

@@ -16,6 +16,7 @@
  */
 
 #include "reone/graphics/context.h"
+#include "reone/graphics/framebuffer.h"
 #include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniformbuffer.h"
@@ -24,6 +25,17 @@
 namespace reone {
 
 namespace graphics {
+
+static constexpr GLenum kColorAttachments[] {
+    GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3,
+    GL_COLOR_ATTACHMENT4,
+    GL_COLOR_ATTACHMENT5,
+    GL_COLOR_ATTACHMENT6,
+    GL_COLOR_ATTACHMENT7,
+    GL_COLOR_ATTACHMENT8};
 
 void Context::init() {
     if (_inited) {
@@ -71,33 +83,111 @@ void Context::clearColorDepth(glm::vec4 color) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Context::resetProgram() {
+    if (!_program) {
+        return;
+    }
+    glUseProgram(0);
+    _program.reset();
+}
+
+void Context::useProgram(ShaderProgram &program) {
+    if (_program && &_program->get() == &program) {
+        return;
+    }
+    program.use();
+    _program = program;
+}
+
+void Context::resetDrawFramebuffer() {
+    if (_drawFramebuffer) {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        _drawFramebuffer.reset();
+    }
+}
+
+void Context::resetReadFramebuffer() {
+    if (_readFramebuffer) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        _readFramebuffer.reset();
+    }
+}
+
+void Context::bindDrawFramebuffer(Framebuffer &buffer, std::vector<int> colorIndices) {
+    if (!_drawFramebuffer || _drawFramebuffer->get().nameGL() != buffer.nameGL()) {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer.nameGL());
+        _drawFramebuffer = buffer;
+    }
+    if (!colorIndices.empty()) {
+        auto attachments = std::vector<GLenum>(colorIndices.size());
+        for (size_t i = 0; i < colorIndices.size(); ++i) {
+            attachments[i] = kColorAttachments[colorIndices[i]];
+        }
+        glDrawBuffers(attachments.size(), &attachments[0]);
+    } else {
+        glDrawBuffer(GL_NONE);
+    }
+}
+
+void Context::bindReadFramebuffer(Framebuffer &buffer, std::optional<int> colorIdx) {
+    if (!_readFramebuffer || _readFramebuffer->get().nameGL() != buffer.nameGL()) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, buffer.nameGL());
+        _readFramebuffer = buffer;
+    }
+    if (colorIdx) {
+        glReadBuffer(kColorAttachments[*colorIdx]);
+    } else {
+        glReadBuffer(GL_NONE);
+    }
+}
+
+void Context::blitFramebuffer(Framebuffer &source,
+                              Framebuffer &destination,
+                              const glm::ivec4 &srcRect,
+                              const glm::ivec4 &dstRect,
+                              int srcColorIdx,
+                              int dstColorIdx,
+                              int mask,
+                              FramebufferBlitFilter filter) {
+    bindReadFramebuffer(source, srcColorIdx);
+    bindDrawFramebuffer(destination, {dstColorIdx});
+    GLenum glMask = 0;
+    if ((mask & FramebufferBlitFlags::color) != 0) {
+        glMask |= GL_COLOR_BUFFER_BIT;
+    }
+    if ((mask & FramebufferBlitFlags::depth) != 0) {
+        glMask |= GL_DEPTH_BUFFER_BIT;
+    }
+    if ((mask & FramebufferBlitFlags::stencil) != 0) {
+        glMask |= GL_STENCIL_BUFFER_BIT;
+    }
+    GLenum glFilter = 0;
+    switch (filter) {
+    case FramebufferBlitFilter::Nearest:
+        glFilter = GL_NEAREST;
+        break;
+    case FramebufferBlitFilter::Linear:
+        glFilter = GL_LINEAR;
+        break;
+    default:
+        throw std::invalid_argument("filter");
+    }
+    glBlitFramebuffer(srcRect[0], srcRect[1], srcRect[2], srcRect[3],
+                      dstRect[0], dstRect[1], dstRect[2], dstRect[3],
+                      glMask,
+                      glFilter);
+}
+
+void Context::bindUniformBuffer(UniformBuffer &buffer, int index) {
+    buffer.bind(index);
+}
+
 void Context::bindTexture(Texture &texture, int unit) {
     if (_activeTexUnit != unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         _activeTexUnit = unit;
     }
     texture.bind();
-}
-
-void Context::useProgram(ShaderProgram &program) {
-    if (_usedProgram == &program) {
-        return;
-    }
-    program.use();
-    _usedProgram = &program;
-}
-
-void Context::resetProgram() {
-    if (!_usedProgram) {
-        return;
-    }
-    glUseProgram(0);
-    _usedProgram = nullptr;
-}
-
-void Context::bind(UniformBuffer &buffer, int index) {
-    _uniformBuffers[index] = &buffer;
-    buffer.bind(index);
 }
 
 void Context::pushFaceCulling(FaceCullMode mode) {

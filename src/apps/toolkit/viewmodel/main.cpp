@@ -684,10 +684,7 @@ void MainViewModel::render3D(int w, int h) {
     _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
     auto &scene = _sceneModule->graphs().get(kSceneMain);
-    std::optional<std::reference_wrapper<Texture>> output;
-    _graphicsModule->context().withViewport({0, 0, w, h}, [&scene, &output, &w, &h]() {
-        output = scene.render(glm::ivec2(w, h));
-    });
+    auto &output = scene.render(glm::ivec2(w, h));
 
     _graphicsModule->uniforms().setGlobals([](auto &globals) {
         globals.reset();
@@ -698,7 +695,7 @@ void MainViewModel::render3D(int w, int h) {
     _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
         _graphicsModule->context().clearColorDepth();
         _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::texture));
-        _graphicsModule->context().bindTexture(output->get());
+        _graphicsModule->context().bindTexture(output);
         _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
     });
 }

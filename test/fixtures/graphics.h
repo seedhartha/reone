@@ -21,6 +21,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
+#include "reone/graphics/framebuffer.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureregistry.h"
@@ -38,13 +39,17 @@ public:
     MOCK_METHOD(void, clearDepth, (), (override));
     MOCK_METHOD(void, clearColorDepth, (glm::vec4 color), (override));
 
-    MOCK_METHOD(void, bindTexture, (Texture &, int), (override));
-
-    MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
     MOCK_METHOD(void, resetProgram, (), (override));
+    MOCK_METHOD(void, useProgram, (ShaderProgram &), (override));
 
-    MOCK_METHOD(void, bind, (UniformBuffer &, int), (override));
-    MOCK_METHOD(UniformBuffer &, uniformBufferAt, (int), (override));
+    MOCK_METHOD(void, resetDrawFramebuffer, (), (override));
+    MOCK_METHOD(void, resetReadFramebuffer, (), (override));
+    MOCK_METHOD(void, bindDrawFramebuffer, (Framebuffer &, std::vector<int>), (override));
+    MOCK_METHOD(void, bindReadFramebuffer, (Framebuffer &, std::optional<int>), (override));
+    MOCK_METHOD(void, blitFramebuffer, (Framebuffer &, Framebuffer &, const glm::ivec4 &, const glm::ivec4 &, int, int, int, FramebufferBlitFilter), (override));
+
+    MOCK_METHOD(void, bindUniformBuffer, (UniformBuffer &, int), (override));
+    MOCK_METHOD(void, bindTexture, (Texture &, int), (override));
 
     MOCK_METHOD(FaceCullMode, faceCulling, (), (const override));
     MOCK_METHOD(BlendMode, blending, (), (const override));
