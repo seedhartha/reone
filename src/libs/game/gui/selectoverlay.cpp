@@ -277,7 +277,7 @@ void SelectionOverlay::drawReticle(std::shared_ptr<Texture> texture, const glm::
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2D));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -307,7 +307,7 @@ void SelectionOverlay::drawTitleBar() {
             locals.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             locals.color.a = 0.5f;
         });
-        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2D));
+        _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color));
         _services.graphics.meshRegistry.get(MeshName::quad).draw();
     }
     {
@@ -342,7 +342,7 @@ void SelectionOverlay::drawHealthBar() {
         locals.model = std::move(transform);
         locals.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color2D));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::color));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -381,7 +381,7 @@ void SelectionOverlay::drawActionFrame(int index) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2D));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 
@@ -446,7 +446,7 @@ void SelectionOverlay::drawActionIcon(int index) {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture2D));
+    _services.graphics.context.useProgram(_services.graphics.shaderRegistry.get(ShaderProgramId::texture));
     _services.graphics.meshRegistry.get(MeshName::quad).draw();
 }
 

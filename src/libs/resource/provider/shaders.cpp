@@ -35,8 +35,8 @@ namespace resource {
 static const std::string kVertBillboard = "v_billboard";
 static const std::string kVertGrass = "v_grass";
 static const std::string kVertModel = "v_model";
-static const std::string kVertMVP2D = "v_mvp2d";
-static const std::string kVertMVP3D = "v_mvp3d";
+static const std::string kVertMVP = "v_mvp";
+static const std::string kVertMVPScene = "v_mvpscene";
 static const std::string kVertParticles = "v_particles";
 static const std::string kVertPassthrough = "v_passthrough";
 static const std::string kVertShadows = "v_shadows";
@@ -79,19 +79,19 @@ void Shaders::init() {
     auto vertBillboard = initShader(ShaderType::Vertex, kVertBillboard);
     auto vertGrass = initShader(ShaderType::Vertex, kVertGrass);
     auto vertModel = initShader(ShaderType::Vertex, kVertModel);
-    auto vertMVP3D = initShader(ShaderType::Vertex, kVertMVP3D);
+    auto vertMVP = initShader(ShaderType::Vertex, kVertMVP);
+    auto vertMVPScene = initShader(ShaderType::Vertex, kVertMVPScene);
     auto vertParticles = initShader(ShaderType::Vertex, kVertParticles);
     auto vertPassthrough = initShader(ShaderType::Vertex, kVertPassthrough);
     auto vertShadows = initShader(ShaderType::Vertex, kVertShadows);
-    auto vertWalkmesh = initShader(ShaderType::Vertex, kVertWalkmesh);
-
-    auto vertMVP2D = initShader(ShaderType::Vertex, kVertMVP2D);
     auto vertText = initShader(ShaderType::Vertex, kVertText);
+    auto vertWalkmesh = initShader(ShaderType::Vertex, kVertWalkmesh);
 
     auto geomDirLightShadows = initShader(ShaderType::Geometry, kGeometryDirLightShadows);
     auto geomPointLightShadows = initShader(ShaderType::Geometry, kGeometryPointLightShadows);
 
     auto fragBillboard = initShader(ShaderType::Fragment, kFragBillboard);
+    auto fragColor = initShader(ShaderType::Fragment, kFragColor);
     auto fragDeferredAABB = initShader(ShaderType::Fragment, kFragDeferredAABB);
     auto fragDeferredCombine = initShader(ShaderType::Fragment, kFragDeferredCombine);
     auto fragDeferredGrass = initShader(ShaderType::Fragment, kFragDeferredGrass);
@@ -111,14 +111,12 @@ void Shaders::init() {
     auto fragPostMedianFilter3 = initShader(ShaderType::Fragment, kFragPostMedianFilter3);
     auto fragPostMedianFilter5 = initShader(ShaderType::Fragment, kFragPostMedianFilter5);
     auto fragPostSharpen = initShader(ShaderType::Fragment, kFragPostSharpen);
-
     auto fragText = initShader(ShaderType::Fragment, kFragText);
-    auto fragColor = initShader(ShaderType::Fragment, kFragColor);
     auto fragTexture = initShader(ShaderType::Fragment, kFragTexture);
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragBillboard}));
-    _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVP3D, fragDeferredAABB}));
+    _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVPScene, fragDeferredAABB}));
     _shaderRegistry.add(ShaderProgramId::deferredCombine, initShaderProgram({vertPassthrough, fragDeferredCombine}));
     _shaderRegistry.add(ShaderProgramId::deferredGrass, initShaderProgram({vertGrass, fragDeferredGrass}));
     _shaderRegistry.add(ShaderProgramId::deferredOpaqueModel, initShaderProgram({vertModel, fragDeferredOpaqueModel}));
@@ -137,9 +135,8 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::postMedianFilter3, initShaderProgram({vertPassthrough, fragPostMedianFilter3}));
     _shaderRegistry.add(ShaderProgramId::postMedianFilter5, initShaderProgram({vertPassthrough, fragPostMedianFilter5}));
     _shaderRegistry.add(ShaderProgramId::postSharpen, initShaderProgram({vertPassthrough, fragPostSharpen}));
-
-    _shaderRegistry.add(ShaderProgramId::color2D, initShaderProgram({vertMVP2D, fragColor}));
-    _shaderRegistry.add(ShaderProgramId::texture2D, initShaderProgram({vertMVP2D, fragTexture}));
+    _shaderRegistry.add(ShaderProgramId::color, initShaderProgram({vertMVP, fragColor}));
+    _shaderRegistry.add(ShaderProgramId::texture, initShaderProgram({vertMVP, fragTexture}));
     _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
 
     _inited = true;

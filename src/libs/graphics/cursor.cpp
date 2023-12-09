@@ -44,7 +44,7 @@ void Cursor::draw() {
         locals.reset();
         locals.model = std::move(transform);
     });
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::texture2D));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::texture));
     _context.withBlending(BlendMode::Normal, [this]() {
         _meshRegistry.get(MeshName::quad).draw();
     });
