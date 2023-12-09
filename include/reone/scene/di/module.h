@@ -23,6 +23,7 @@
 #include "reone/resource/di/module.h"
 
 #include "../graphs.h"
+#include "../renderpipeline.h"
 
 #include "services.h"
 
@@ -49,6 +50,7 @@ public:
     void deinit();
 
     SceneGraphs &graphs() { return *_graphs; }
+    RenderPipelineFactory &renderPipelineFactory() { return *_renderPipelineFactory; }
 
     SceneServices &services() { return *_services; }
 
@@ -59,6 +61,7 @@ private:
     resource::ResourceModule &_resource;
 
     std::unique_ptr<SceneGraphs> _graphs;
+    std::unique_ptr<RenderPipelineFactory> _renderPipelineFactory;
 
     std::unique_ptr<SceneServices> _services;
 };

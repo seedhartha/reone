@@ -23,7 +23,6 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/walkmesh.h"
@@ -39,6 +38,7 @@
 #include "reone/scene/node/sound.h"
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
+#include "reone/scene/renderpipeline.h"
 
 using namespace reone::graphics;
 
@@ -442,11 +442,11 @@ void SceneGraph::prepareTransparentLeafs() {
 }
 
 Texture &SceneGraph::draw(const glm::ivec2 &dim) {
-    if (!_pipeline) {
-        _pipeline = _graphicsSvc.pipelineFactory.create(dim);
-        _pipeline->init();
+    if (!_renderPipeline) {
+        _renderPipeline = _renderPipelineFactory.create(dim);
+        _renderPipeline->init();
     }
-    auto &pipeline = *_pipeline;
+    auto &pipeline = *_renderPipeline;
 
     auto camera = this->camera();
     if (camera) {
@@ -501,20 +501,20 @@ Texture &SceneGraph::draw(const glm::ivec2 &dim) {
             auto passName = isShadowLightDirectional()
                                 ? RenderPassName::DirLightShadowsPass
                                 : RenderPassName::PointLightShadows;
-            pipeline.inPass(passName, [this](auto &pass) {
+            pipeline.inRenderPass(passName, [this](auto &pass) {
                 drawShadows(pass);
             });
         }
 
-        pipeline.inPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
+        pipeline.inRenderPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
             drawOpaque(pass);
         });
 
-        pipeline.inPass(RenderPassName::TransparentGeometry, [this](auto &pass) {
+        pipeline.inRenderPass(RenderPassName::TransparentGeometry, [this](auto &pass) {
             drawTransparent(pass);
         });
 
-        pipeline.inPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
+        pipeline.inRenderPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
             if (!_flareLights.empty()) {
                 drawLensFlares(pass);
             }

@@ -22,12 +22,16 @@ namespace reone {
 namespace scene {
 
 class ISceneGraphs;
+class IRenderPipelineFactory;
 
 struct SceneServices {
     ISceneGraphs &graphs;
+    IRenderPipelineFactory &renderPipelineFactory;
 
-    SceneServices(ISceneGraphs &graphs) :
-        graphs(graphs) {
+    SceneServices(ISceneGraphs &graphs,
+                  IRenderPipelineFactory &renderPipelineFactory) :
+        graphs(graphs),
+        renderPipelineFactory(renderPipelineFactory) {
     }
 };
 

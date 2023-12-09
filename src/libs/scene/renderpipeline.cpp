@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/pipeline.h"
+#include "reone/scene/renderpipeline.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshregistry.h"
@@ -33,9 +33,11 @@
 
 #define R_MEDIAN_FILTER_STRONG true
 
+using namespace reone::graphics;
+
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
 static constexpr GLenum kColorAttachments[] {
     GL_COLOR_ATTACHMENT0,
@@ -48,7 +50,7 @@ static constexpr GLenum kColorAttachments[] {
     GL_COLOR_ATTACHMENT7,
     GL_COLOR_ATTACHMENT8};
 
-void Pipeline::init() {
+void RenderPipeline::init() {
     checkThat(!_inited, "Pipeline already initialized");
     checkMainThread();
 
@@ -58,7 +60,7 @@ void Pipeline::init() {
     _inited = true;
 }
 
-void Pipeline::initRenderTargets() {
+void RenderPipeline::initRenderTargets() {
     auto halfSize = _targetSize / 2;
 
     // Reusable targets
@@ -231,7 +233,7 @@ void Pipeline::initRenderTargets() {
     _renderTargets.fbOutput->init();
 }
 
-void Pipeline::initSSAOSamples() {
+void RenderPipeline::initSSAOSamples() {
     _uniforms.setScreenEffect([](auto &screenEffect) {
         for (int i = 0; i < kNumSSAOSamples; ++i) {
             float scale = i / static_cast<float>(kNumSSAOSamples);
@@ -244,7 +246,7 @@ void Pipeline::initSSAOSamples() {
     });
 }
 
-void Pipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
+void RenderPipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
     _uniforms.setScreenEffect([&dim, &sampleRadius, &bias](auto &screenEffect) {
         screenEffect.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
         screenEffect.ssaoSampleRadius = sampleRadius;
@@ -260,7 +262,7 @@ void Pipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, float maxSteps) {
+void RenderPipeline::drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, float maxSteps) {
     _uniforms.setScreenEffect([&](auto &screenEffect) {
         screenEffect.screenResolution = glm::vec2(dim.x, dim.y);
         screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
@@ -281,7 +283,7 @@ void Pipeline::drawSSR(const glm::ivec2 &dim, float bias, float pixelStride, flo
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawOITBlend(Framebuffer &dst) {
+void RenderPipeline::drawOITBlend(Framebuffer &dst) {
     _uniforms.setGlobals([](auto &globals) {
         globals.reset();
     });
@@ -298,7 +300,7 @@ void Pipeline::drawOITBlend(Framebuffer &dst) {
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+void RenderPipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postBoxBlur4));
     _context.bindTexture(srcTexture);
@@ -306,7 +308,7 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
+void RenderPipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
     _uniforms.setScreenEffect([&dim, &vertical](auto &screenEffect) {
         screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
         screenEffect.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
@@ -319,7 +321,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
+void RenderPipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _context.useProgram(_shaderRegistry.get(strong ? ShaderProgramId::postMedianFilter5 : ShaderProgramId::postMedianFilter3));
     _context.bindTexture(srcTexture);
@@ -327,7 +329,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+void RenderPipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
     _uniforms.setGlobals([](auto &globals) {
         globals.reset();
     });
@@ -344,7 +346,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
+void RenderPipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
     _uniforms.setScreenEffect([&dim, &amount](auto &screenEffect) {
         screenEffect.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
         screenEffect.sharpenAmount = amount;
@@ -357,7 +359,7 @@ void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void Pipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags) {
+void RenderPipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src.nameGL());
     glReadBuffer(kColorAttachments[srcColorIdx]);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
@@ -373,7 +375,7 @@ void Pipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcC
     glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, flagsGL, GL_NEAREST);
 }
 
-void Pipeline::inPass(RenderPassName name, std::function<void(IRenderPass &)> block) {
+void RenderPipeline::inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) {
     checkEqual("Current pass", _passName, RenderPassName::None);
     checkNotEqual("New pass", name, RenderPassName::None);
 
@@ -414,27 +416,27 @@ void Pipeline::inPass(RenderPassName name, std::function<void(IRenderPass &)> bl
     }
 }
 
-void Pipeline::beginDirLightShadowsPass() {
+void RenderPipeline::beginDirLightShadowsPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDirLightShadows->nameGL());
     glDrawBuffer(GL_NONE);
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
     _context.clearDepth();
 }
 
-void Pipeline::beginPointLightShadowsPass() {
+void RenderPipeline::beginPointLightShadowsPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbPointLightShadows->nameGL());
     glDrawBuffer(GL_NONE);
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
     _context.clearDepth();
 }
 
-void Pipeline::beginOpaqueGeometryPass() {
+void RenderPipeline::beginOpaqueGeometryPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOpaqueGeometry->nameGL());
     glDrawBuffers(7, kColorAttachments);
     _context.clearColorDepth();
 }
 
-void Pipeline::beginTransparentGeometryPass() {
+void RenderPipeline::beginTransparentGeometryPass() {
     blitFramebuffer(_targetSize, *_renderTargets.fbOpaqueGeometry, 0, *_renderTargets.fbTransparentGeometry, 0, BlitFlags::depth);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbTransparentGeometry->nameGL());
     glDrawBuffers(2, kColorAttachments);
@@ -443,21 +445,21 @@ void Pipeline::beginTransparentGeometryPass() {
     _context.pushBlending(BlendMode::OIT_Transparent);
 }
 
-void Pipeline::beginPostProcessingPass() {
+void RenderPipeline::beginPostProcessingPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOutput->nameGL());
 }
 
-void Pipeline::endDirLightShadowsPass() {
+void RenderPipeline::endDirLightShadowsPass() {
     _context.popViewport();
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-void Pipeline::endPointLightShadowsPass() {
+void RenderPipeline::endPointLightShadowsPass() {
     _context.popViewport();
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-void Pipeline::endOpaqueGeometryPass() {
+void RenderPipeline::endOpaqueGeometryPass() {
     auto halfSize = _targetSize / 2;
     _context.withViewport(glm::ivec4(0, 0, halfSize.x, halfSize.y), [this, &halfSize]() {
         if (_options.ssao) {
@@ -495,14 +497,14 @@ void Pipeline::endOpaqueGeometryPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-void Pipeline::endTransparentGeometryPass() {
+void RenderPipeline::endTransparentGeometryPass() {
     _context.popBlending();
     glDepthMask(GL_TRUE);
     drawOITBlend(*_renderTargets.fbOutput);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-void Pipeline::endPostProcessingPass() {
+void RenderPipeline::endPostProcessingPass() {
     if (_options.fxaa && _options.sharpen) {
         drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
         drawSharpen(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, 0.25f);
@@ -517,10 +519,10 @@ void Pipeline::endPostProcessingPass() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-Texture &Pipeline::output() {
+Texture &RenderPipeline::output() {
     return *_renderTargets.cbOutput;
 }
 
-} // namespace graphics
+} // namespace scene
 
 } // namespace reone

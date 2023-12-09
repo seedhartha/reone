@@ -27,6 +27,7 @@ void SceneGraphs::reserve(std::string name) {
     }
     auto scene = std::make_unique<SceneGraph>(
         name,
+        _renderPipelineFactory,
         _graphicsOpt,
         _graphicsSvc,
         _audioSvc,

@@ -20,10 +20,11 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/material.h"
-#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/graph.h"
+#include "reone/scene/renderpipeline.h"
+
 
 using namespace reone::graphics;
 

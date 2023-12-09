@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/graphics/pipeline.h"
+#include "reone/scene/renderpipeline.h"
 
 #include "fogproperties.h"
 #include "node/camera.h"
@@ -39,7 +39,6 @@ namespace graphics {
 struct GraphicsOptions;
 struct GraphicsServices;
 
-class IRenderPass;
 class Walkmesh;
 
 } // namespace graphics
@@ -61,6 +60,8 @@ namespace scene {
 struct Collision;
 
 class IAnimationEventListener;
+class IRenderPipelineFactory;
+class IRenderPass;
 
 class ISceneGraph {
 public:
@@ -123,11 +124,13 @@ class SceneGraph : public ISceneGraph, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
+        IRenderPipelineFactory &renderPipelineFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
         _name(std::move(name)),
+        _renderPipelineFactory(renderPipelineFactory),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
         _audioSvc(audioSvc),
@@ -137,10 +140,10 @@ public:
     void update(float dt) override;
     graphics::Texture &draw(const glm::ivec2 &dim) override;
 
-    void drawShadows(graphics::IRenderPass &pass);
-    void drawOpaque(graphics::IRenderPass &pass);
-    void drawTransparent(graphics::IRenderPass &pass);
-    void drawLensFlares(graphics::IRenderPass &pass);
+    void drawShadows(IRenderPass &pass);
+    void drawOpaque(IRenderPass &pass);
+    void drawTransparent(IRenderPass &pass);
+    void drawLensFlares(IRenderPass &pass);
 
     const std::string &name() const override {
         return _name;
@@ -258,12 +261,13 @@ public:
 
 private:
     std::string _name;
+    IRenderPipelineFactory &_renderPipelineFactory;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
     resource::ResourceServices &_resourceSvc;
 
-    std::unique_ptr<graphics::IPipeline> _pipeline;
+    std::unique_ptr<IRenderPipeline> _renderPipeline;
 
     bool _updateRoots {true};
 

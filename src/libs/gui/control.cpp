@@ -20,7 +20,6 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"
@@ -31,6 +30,8 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/graphs.h"
+#include "reone/scene/renderpipeline.h"
+
 
 #include "reone/gui/gui.h"
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/renderpass.h"
+#include "reone/scene/renderpass.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/material.h"
@@ -25,9 +25,11 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 
+using namespace reone::graphics;
+
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
 void RenderPass::draw(Mesh &mesh,
                       Material &material,
@@ -263,6 +265,6 @@ void RenderPass::applyMaterialToSceneLocals(const Material &material,
     }
 }
 
-} // namespace graphics
+} // namespace scene
 
 } // namespace reone

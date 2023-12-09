@@ -27,8 +27,6 @@ namespace graphics {
 
 struct GraphicsServices;
 
-class IRenderPass;
-
 } // namespace graphics
 
 namespace audio {
@@ -45,6 +43,7 @@ struct ResourceServices;
 
 namespace scene {
 
+class IRenderPass;
 class IUser;
 class SceneGraph;
 
@@ -56,7 +55,7 @@ public:
 
     virtual void update(float dt);
 
-    virtual void drawLeafs(graphics::IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
+    virtual void drawLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) {
     }
 
     bool isEnabled() const { return _enabled; }

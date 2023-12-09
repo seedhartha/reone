@@ -31,7 +31,6 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/format/tgawriter.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/pipeline.h"
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
@@ -60,6 +59,7 @@
 #include "reone/resource/resources.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
+#include "reone/scene/renderpipeline.h"
 #include "reone/script/di/services.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/clock.h"
@@ -67,6 +67,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
+
 
 using namespace reone::audio;
 using namespace reone::graphics;

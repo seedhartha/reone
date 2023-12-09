@@ -26,8 +26,21 @@ namespace reone {
 namespace scene {
 
 void SceneModule::init() {
-    _graphs = std::make_unique<SceneGraphs>(_graphicsOpt, _graphics.services(), _audio.services(), _resource.services());
-    _services = std::make_unique<SceneServices>(*_graphs);
+    _renderPipelineFactory = std::make_unique<RenderPipelineFactory>(
+        _graphicsOpt,
+        _graphics.context(),
+        _graphics.meshRegistry(),
+        _graphics.shaderRegistry(),
+        _graphics.textureRegistry(),
+        _graphics.uniforms());
+    _graphs = std::make_unique<SceneGraphs>(
+        *_renderPipelineFactory,
+        _graphicsOpt,
+        _graphics.services(),
+        _audio.services(),
+        _resource.services());
+
+    _services = std::make_unique<SceneServices>(*_graphs, *_renderPipelineFactory);
 
     // Init scenes
     _graphs->reserve(kSceneMain);
@@ -42,7 +55,9 @@ void SceneModule::init() {
 
 void SceneModule::deinit() {
     _services.reset();
+
     _graphs.reset();
+    _renderPipelineFactory.reset();
 }
 
 } // namespace scene

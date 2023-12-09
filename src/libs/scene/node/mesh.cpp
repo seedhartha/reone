@@ -22,7 +22,6 @@
 #include "reone/graphics/lumautil.h"
 #include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
-#include "reone/graphics/pipeline.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/textureutil.h"
@@ -33,8 +32,10 @@
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/model.h"
+#include "reone/scene/renderpipeline.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
+
 
 using namespace reone::graphics;
 

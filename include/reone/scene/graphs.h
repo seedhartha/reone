@@ -42,6 +42,8 @@ struct ResourceServices;
 
 namespace scene {
 
+class IRenderPipelineFactory;
+
 class ISceneGraphs {
 public:
     virtual ~ISceneGraphs() = default;
@@ -56,10 +58,12 @@ public:
 class SceneGraphs : public ISceneGraphs, boost::noncopyable {
 public:
     SceneGraphs(
+        IRenderPipelineFactory &renderPipelineFactory,
         graphics::GraphicsOptions &graphicsOpt,
         graphics::GraphicsServices &graphicsSvc,
         audio::AudioServices &audioSvc,
         resource::ResourceServices &resourceSvc) :
+        _renderPipelineFactory(renderPipelineFactory),
         _graphicsOpt(graphicsOpt),
         _graphicsSvc(graphicsSvc),
         _audioSvc(audioSvc),
@@ -78,7 +82,8 @@ public:
         return names;
     }
 
-protected:
+private:
+    IRenderPipelineFactory &_renderPipelineFactory;
     graphics::GraphicsOptions &_graphicsOpt;
     graphics::GraphicsServices &_graphicsSvc;
     audio::AudioServices &_audioSvc;
