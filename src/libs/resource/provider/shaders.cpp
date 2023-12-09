@@ -36,7 +36,7 @@ static const std::string kVertBillboard = "v_billboard";
 static const std::string kVertGrass = "v_grass";
 static const std::string kVertModel = "v_model";
 static const std::string kVertMVP = "v_mvp";
-static const std::string kVertMVPScene = "v_mvpscene";
+static const std::string kVertMVPNormal = "v_mvpnormal";
 static const std::string kVertParticles = "v_particles";
 static const std::string kVertPassthrough = "v_passthrough";
 static const std::string kVertShadows = "v_shadows";
@@ -80,7 +80,7 @@ void Shaders::init() {
     auto vertGrass = initShader(ShaderType::Vertex, kVertGrass);
     auto vertModel = initShader(ShaderType::Vertex, kVertModel);
     auto vertMVP = initShader(ShaderType::Vertex, kVertMVP);
-    auto vertMVPScene = initShader(ShaderType::Vertex, kVertMVPScene);
+    auto vertMVPNormal = initShader(ShaderType::Vertex, kVertMVPNormal);
     auto vertParticles = initShader(ShaderType::Vertex, kVertParticles);
     auto vertPassthrough = initShader(ShaderType::Vertex, kVertPassthrough);
     auto vertShadows = initShader(ShaderType::Vertex, kVertShadows);
@@ -116,7 +116,7 @@ void Shaders::init() {
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
-    _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVPScene, fragDeferredAABB}));
+    _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVPNormal, fragDeferredAABB}));
     _shaderRegistry.add(ShaderProgramId::deferredCombine, initShaderProgram({vertPassthrough, fragDeferredCombine}));
     _shaderRegistry.add(ShaderProgramId::deferredGrass, initShaderProgram({vertGrass, fragDeferredGrass}));
     _shaderRegistry.add(ShaderProgramId::deferredOpaqueModel, initShaderProgram({vertModel, fragDeferredOpaqueModel}));
