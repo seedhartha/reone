@@ -447,6 +447,7 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
         _renderPipeline->init();
     }
     auto &pipeline = *_renderPipeline;
+    pipeline.reset();
 
     auto camera = this->camera();
     if (camera) {
@@ -496,7 +497,6 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
             screenEffect.clipNear = camera->zNear();
             screenEffect.clipFar = camera->zFar();
         });
-
         if (hasShadowLight()) {
             auto passName = isShadowLightDirectional()
                                 ? RenderPassName::DirLightShadowsPass
@@ -505,15 +505,12 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
                 renderShadows(pass);
             });
         }
-
         pipeline.inRenderPass(RenderPassName::OpaqueGeometry, [this](auto &pass) {
             renderOpaque(pass);
         });
-
         pipeline.inRenderPass(RenderPassName::TransparentGeometry, [this](auto &pass) {
             renderTransparent(pass);
         });
-
         pipeline.inRenderPass(RenderPassName::PostProcessing, [this, &camera](auto &pass) {
             if (!_flareLights.empty()) {
                 renderLensFlares(pass);
@@ -521,7 +518,7 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
         });
     }
 
-    return pipeline.output();
+    return pipeline.render();
 }
 
 void SceneGraph::renderShadows(IRenderPass &pass) {

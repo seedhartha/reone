@@ -55,9 +55,10 @@ public:
 
     virtual void init() = 0;
 
+    virtual void reset() = 0;
     virtual void inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
 
-    virtual graphics::Texture &output() = 0;
+    virtual graphics::Texture &render() = 0;
 };
 
 class IRenderPipelineFactory {
@@ -69,6 +70,8 @@ public:
 
 class RenderPipeline : public IRenderPipeline, boost::noncopyable {
 public:
+    using RenderPassCallback = std::function<void(IRenderPass &)>;
+
     RenderPipeline(glm::ivec2 targetSize,
                    graphics::GraphicsOptions &options,
                    graphics::Context &context,
@@ -87,9 +90,15 @@ public:
 
     void init() override;
 
-    void inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) override;
+    void reset() override {
+        _passCallbacks.clear();
+    }
 
-    graphics::Texture &output() override;
+    void inRenderPass(RenderPassName name, RenderPassCallback callback) override {
+        _passCallbacks[name] = std::move(callback);
+    }
+
+    graphics::Texture &render() override;
 
 private:
     struct BlitFlags {
@@ -155,6 +164,7 @@ private:
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
 
     RenderPassName _passName {RenderPassName::None};
+    std::map<RenderPassName, RenderPassCallback> _passCallbacks;
 
     void initRenderTargets();
     void initSSAOSamples();

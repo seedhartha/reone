@@ -106,16 +106,17 @@ public:
     MOCK_METHOD(std::set<std::string>, sceneNames, (), (const override));
 };
 
-class MockPipeline : public IRenderPipeline, boost::noncopyable {
+class MockRenderPipeline : public IRenderPipeline, boost::noncopyable {
 public:
     MOCK_METHOD(void, init, (), (override));
 
+    MOCK_METHOD(void, reset, (), (override));
     MOCK_METHOD(void, inRenderPass, (RenderPassName, std::function<void(IRenderPass &)>), (override));
 
-    MOCK_METHOD(graphics::Texture &, output, (), (override));
+    MOCK_METHOD(graphics::Texture &, render, (), (override));
 };
 
-class MockPipelineFactory : public IRenderPipelineFactory, boost::noncopyable {
+class MockRenderPipelineFactory : public IRenderPipelineFactory, boost::noncopyable {
 public:
     MOCK_METHOD(std::unique_ptr<IRenderPipeline>, create, (glm::ivec2), (override));
 };
@@ -124,7 +125,7 @@ class TestSceneModule : boost::noncopyable {
 public:
     void init() {
         _graphs = std::make_unique<MockSceneGraphs>();
-        _renderPipelineFactory = std::make_unique<MockPipelineFactory>();
+        _renderPipelineFactory = std::make_unique<MockRenderPipelineFactory>();
 
         _services = std::make_unique<SceneServices>(*_graphs, *_renderPipelineFactory);
     }
@@ -133,7 +134,7 @@ public:
         return *_graphs;
     }
 
-    MockPipelineFactory &renderPipelineFactory() {
+    MockRenderPipelineFactory &renderPipelineFactory() {
         return *_renderPipelineFactory;
     }
 
@@ -143,7 +144,7 @@ public:
 
 private:
     std::unique_ptr<MockSceneGraphs> _graphs;
-    std::unique_ptr<MockPipelineFactory> _renderPipelineFactory;
+    std::unique_ptr<MockRenderPipelineFactory> _renderPipelineFactory;
 
     std::unique_ptr<SceneServices> _services;
 };

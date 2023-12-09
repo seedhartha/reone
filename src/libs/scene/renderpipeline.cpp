@@ -246,6 +246,138 @@ void RenderPipeline::initSSAOSamples() {
     });
 }
 
+Texture &RenderPipeline::render() {
+    auto pass = RenderPass(_context, _shaderRegistry, _meshRegistry, _textureRegistry, _uniforms);
+    if (_passCallbacks.count(RenderPassName::DirLightShadowsPass) > 0) {
+        beginDirLightShadowsPass();
+        _passCallbacks.at(RenderPassName::DirLightShadowsPass)(pass);
+        endDirLightShadowsPass();
+    } else if (_passCallbacks.count(RenderPassName::PointLightShadows) > 0) {
+        beginPointLightShadowsPass();
+        _passCallbacks.at(RenderPassName::PointLightShadows)(pass);
+        endPointLightShadowsPass();
+    }
+    beginOpaqueGeometryPass();
+    if (_passCallbacks.count(RenderPassName::OpaqueGeometry) > 0) {
+        _passCallbacks.at(RenderPassName::OpaqueGeometry)(pass);
+    }
+    endOpaqueGeometryPass();
+    beginTransparentGeometryPass();
+    if (_passCallbacks.count(RenderPassName::TransparentGeometry) > 0) {
+        _passCallbacks.at(RenderPassName::TransparentGeometry)(pass);
+    }
+    endTransparentGeometryPass();
+    beginPostProcessingPass();
+    if (_passCallbacks.count(RenderPassName::PostProcessing) > 0) {
+        _passCallbacks.at(RenderPassName::PostProcessing)(pass);
+    }
+    endPostProcessingPass();
+    return *_renderTargets.cbOutput;
+}
+
+void RenderPipeline::beginDirLightShadowsPass() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDirLightShadows->nameGL());
+    glDrawBuffer(GL_NONE);
+    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
+    _context.clearDepth();
+}
+
+void RenderPipeline::beginPointLightShadowsPass() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbPointLightShadows->nameGL());
+    glDrawBuffer(GL_NONE);
+    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
+    _context.clearDepth();
+}
+
+void RenderPipeline::beginOpaqueGeometryPass() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOpaqueGeometry->nameGL());
+    glDrawBuffers(7, kColorAttachments);
+    _context.clearColorDepth();
+}
+
+void RenderPipeline::beginTransparentGeometryPass() {
+    blitFramebuffer(_targetSize, *_renderTargets.fbOpaqueGeometry, 0, *_renderTargets.fbTransparentGeometry, 0, BlitFlags::depth);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbTransparentGeometry->nameGL());
+    glDrawBuffers(2, kColorAttachments);
+    glDepthMask(GL_FALSE);
+    _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
+    _context.pushBlending(BlendMode::OIT_Transparent);
+}
+
+void RenderPipeline::beginPostProcessingPass() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOutput->nameGL());
+}
+
+void RenderPipeline::endDirLightShadowsPass() {
+    _context.popViewport();
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::endPointLightShadowsPass() {
+    _context.popViewport();
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::endOpaqueGeometryPass() {
+    auto halfSize = _targetSize / 2;
+    _context.withViewport(glm::ivec4(0, 0, halfSize.x, halfSize.y), [this, &halfSize]() {
+        if (_options.ssao) {
+            drawSSAO(halfSize, 0.5f, 0.1f);
+            drawBoxBlur(halfSize, *_renderTargets.cbSSAO, *_renderTargets.fbPingHalf);
+            blitFramebuffer(halfSize, *_renderTargets.fbPingHalf, 0, *_renderTargets.fbSSAO, 0);
+        }
+        if (_options.ssr) {
+            drawSSR(halfSize, 0.25f, 4.0f, 64.0f);
+            drawGaussianBlur(halfSize, *_renderTargets.cbSSR, *_renderTargets.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
+            drawGaussianBlur(halfSize, *_renderTargets.cbPingHalf, *_renderTargets.fbSSR, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
+        }
+    });
+
+    _context.bindTexture(*_renderTargets.cbGBufferDiffuse);
+    _context.bindTexture(*_renderTargets.cbGBufferLightmap, TextureUnits::lightmap);
+    _context.bindTexture(*_renderTargets.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _context.bindTexture(*_renderTargets.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
+    _context.bindTexture(*_renderTargets.cbGBufferFeatures, TextureUnits::features);
+    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
+    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _context.bindTexture(_options.ssao ? *_renderTargets.cbSSAO : _textureRegistry.get(TextureName::ssaoRgb), TextureUnits::ssao);
+    _context.bindTexture(_options.ssr ? *_renderTargets.cbSSR : _textureRegistry.get(TextureName::ssrRgb), TextureUnits::ssr);
+    _context.bindTexture(*_renderTargets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
+    _context.bindTexture(*_renderTargets.dbPointLightShadows, TextureUnits::shadowMapCube);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDeferredCombine->nameGL());
+    glDrawBuffers(2, kColorAttachments);
+    _context.clearColorDepth();
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
+    _meshRegistry.get(MeshName::quadNDC).draw();
+
+    drawGaussianBlur(_targetSize, *_renderTargets.cbDeferredOpaque2, *_renderTargets.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
+    drawGaussianBlur(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
+    blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbDeferredCombine, 1);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::endTransparentGeometryPass() {
+    _context.popBlending();
+    glDepthMask(GL_TRUE);
+    drawOITBlend(*_renderTargets.fbOutput);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::endPostProcessingPass() {
+    if (_options.fxaa && _options.sharpen) {
+        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
+        drawSharpen(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, 0.25f);
+        blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbOutput, 0);
+    } else if (_options.fxaa) {
+        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
+        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
+    } else if (_options.sharpen) {
+        drawSharpen(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing, 0.25f);
+        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
+    }
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
 void RenderPipeline::drawSSAO(const glm::ivec2 &dim, float sampleRadius, float bias) {
     _uniforms.setScreenEffect([&dim, &sampleRadius, &bias](auto &screenEffect) {
         screenEffect.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
@@ -373,154 +505,6 @@ void RenderPipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, in
         flagsGL |= GL_DEPTH_BUFFER_BIT;
     }
     glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, flagsGL, GL_NEAREST);
-}
-
-void RenderPipeline::inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) {
-    checkEqual("Current pass", _passName, RenderPassName::None);
-    checkNotEqual("New pass", name, RenderPassName::None);
-
-    auto pass = RenderPass(
-        _context,
-        _shaderRegistry,
-        _meshRegistry,
-        _textureRegistry,
-        _uniforms);
-    switch (name) {
-    case RenderPassName::DirLightShadowsPass:
-        beginDirLightShadowsPass();
-        block(pass);
-        endDirLightShadowsPass();
-        break;
-    case RenderPassName::PointLightShadows:
-        beginPointLightShadowsPass();
-        block(pass);
-        endPointLightShadowsPass();
-        break;
-    case RenderPassName::OpaqueGeometry:
-        beginOpaqueGeometryPass();
-        block(pass);
-        endOpaqueGeometryPass();
-        break;
-    case RenderPassName::TransparentGeometry:
-        beginTransparentGeometryPass();
-        block(pass);
-        endTransparentGeometryPass();
-        break;
-    case RenderPassName::PostProcessing:
-        beginPostProcessingPass();
-        block(pass);
-        endPostProcessingPass();
-        break;
-    default:
-        throw std::invalid_argument("Unexpected new render pass");
-    }
-}
-
-void RenderPipeline::beginDirLightShadowsPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDirLightShadows->nameGL());
-    glDrawBuffer(GL_NONE);
-    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
-    _context.clearDepth();
-}
-
-void RenderPipeline::beginPointLightShadowsPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbPointLightShadows->nameGL());
-    glDrawBuffer(GL_NONE);
-    _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
-    _context.clearDepth();
-}
-
-void RenderPipeline::beginOpaqueGeometryPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOpaqueGeometry->nameGL());
-    glDrawBuffers(7, kColorAttachments);
-    _context.clearColorDepth();
-}
-
-void RenderPipeline::beginTransparentGeometryPass() {
-    blitFramebuffer(_targetSize, *_renderTargets.fbOpaqueGeometry, 0, *_renderTargets.fbTransparentGeometry, 0, BlitFlags::depth);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbTransparentGeometry->nameGL());
-    glDrawBuffers(2, kColorAttachments);
-    glDepthMask(GL_FALSE);
-    _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
-    _context.pushBlending(BlendMode::OIT_Transparent);
-}
-
-void RenderPipeline::beginPostProcessingPass() {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbOutput->nameGL());
-}
-
-void RenderPipeline::endDirLightShadowsPass() {
-    _context.popViewport();
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-void RenderPipeline::endPointLightShadowsPass() {
-    _context.popViewport();
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-void RenderPipeline::endOpaqueGeometryPass() {
-    auto halfSize = _targetSize / 2;
-    _context.withViewport(glm::ivec4(0, 0, halfSize.x, halfSize.y), [this, &halfSize]() {
-        if (_options.ssao) {
-            drawSSAO(halfSize, 0.5f, 0.1f);
-            drawBoxBlur(halfSize, *_renderTargets.cbSSAO, *_renderTargets.fbPingHalf);
-            blitFramebuffer(halfSize, *_renderTargets.fbPingHalf, 0, *_renderTargets.fbSSAO, 0);
-        }
-        if (_options.ssr) {
-            drawSSR(halfSize, 0.25f, 4.0f, 64.0f);
-            drawGaussianBlur(halfSize, *_renderTargets.cbSSR, *_renderTargets.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
-            drawGaussianBlur(halfSize, *_renderTargets.cbPingHalf, *_renderTargets.fbSSR, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
-        }
-    });
-
-    _context.bindTexture(*_renderTargets.cbGBufferDiffuse);
-    _context.bindTexture(*_renderTargets.cbGBufferLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.cbGBufferEnvMap, TextureUnits::envmapColor);
-    _context.bindTexture(*_renderTargets.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
-    _context.bindTexture(*_renderTargets.cbGBufferFeatures, TextureUnits::features);
-    _context.bindTexture(*_renderTargets.cbGBufferEyePos, TextureUnits::eyePos);
-    _context.bindTexture(*_renderTargets.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _context.bindTexture(_options.ssao ? *_renderTargets.cbSSAO : _textureRegistry.get(TextureName::ssaoRgb), TextureUnits::ssao);
-    _context.bindTexture(_options.ssr ? *_renderTargets.cbSSR : _textureRegistry.get(TextureName::ssrRgb), TextureUnits::ssr);
-    _context.bindTexture(*_renderTargets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
-    _context.bindTexture(*_renderTargets.dbPointLightShadows, TextureUnits::shadowMapCube);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _renderTargets.fbDeferredCombine->nameGL());
-    glDrawBuffers(2, kColorAttachments);
-    _context.clearColorDepth();
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
-    _meshRegistry.get(MeshName::quadNDC).draw();
-
-    drawGaussianBlur(_targetSize, *_renderTargets.cbDeferredOpaque2, *_renderTargets.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
-    drawGaussianBlur(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
-    blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbDeferredCombine, 1);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-void RenderPipeline::endTransparentGeometryPass() {
-    _context.popBlending();
-    glDepthMask(GL_TRUE);
-    drawOITBlend(*_renderTargets.fbOutput);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-void RenderPipeline::endPostProcessingPass() {
-    if (_options.fxaa && _options.sharpen) {
-        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
-        drawSharpen(_targetSize, *_renderTargets.cbPing, *_renderTargets.fbPong, 0.25f);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPong, 0, *_renderTargets.fbOutput, 0);
-    } else if (_options.fxaa) {
-        drawFXAA(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
-    } else if (_options.sharpen) {
-        drawSharpen(_targetSize, *_renderTargets.cbOutput, *_renderTargets.fbPing, 0.25f);
-        blitFramebuffer(_targetSize, *_renderTargets.fbPing, 0, *_renderTargets.fbOutput, 0);
-    }
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
-Texture &RenderPipeline::output() {
-    return *_renderTargets.cbOutput;
 }
 
 } // namespace scene

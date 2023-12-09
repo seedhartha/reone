@@ -42,7 +42,7 @@ using testing::ReturnRef;
 TEST(model_scene_node, should_build_from_model) {
     // given
     auto graphicsOpt = GraphicsOptions();
-    auto pipelineFactory = MockPipelineFactory();
+    auto pipelineFactory = MockRenderPipelineFactory();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
@@ -109,7 +109,7 @@ TEST(model_scene_node, should_build_from_model) {
 TEST(model_scene_node, should_play_single_fire_forget_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
-    auto pipelineFactory = MockPipelineFactory();
+    auto pipelineFactory = MockRenderPipelineFactory();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
@@ -162,7 +162,7 @@ TEST(model_scene_node, should_play_single_fire_forget_animation) {
 TEST(model_scene_node, should_play_single_looping_animation) {
     // given
     auto graphicsOpt = GraphicsOptions();
-    auto pipelineFactory = MockPipelineFactory();
+    auto pipelineFactory = MockRenderPipelineFactory();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
@@ -214,7 +214,7 @@ TEST(model_scene_node, should_play_single_looping_animation) {
 TEST(model_scene_node, should_play_two_overlayed_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
-    auto pipelineFactory = MockPipelineFactory();
+    auto pipelineFactory = MockRenderPipelineFactory();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
@@ -284,7 +284,7 @@ TEST(model_scene_node, should_play_two_overlayed_animations) {
 TEST(model_scene_node, hould_transition_between_two_animations) {
     // given
     auto graphicsOpt = GraphicsOptions();
-    auto pipelineFactory = MockPipelineFactory();
+    auto pipelineFactory = MockRenderPipelineFactory();
 
     auto graphicsModule = TestGraphicsModule();
     graphicsModule.init();
