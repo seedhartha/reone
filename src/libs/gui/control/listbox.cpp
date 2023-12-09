@@ -22,15 +22,13 @@
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"
-#include "reone/resource/gff.h"
-#include "reone/resource/resources.h"
-#include "reone/system/logutil.h"
-
-#include "reone/gui/gui.h"
-
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/imagebutton.h"
 #include "reone/gui/control/scrollbar.h"
+#include "reone/gui/gui.h"
+#include "reone/resource/gff.h"
+#include "reone/resource/resources.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -181,11 +179,13 @@ bool ListBox::handleClick(int x, int y) {
     return true;
 }
 
-void ListBox::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+void ListBox::render(const glm::ivec2 &screenSize,
+                     const glm::ivec2 &offset,
+                     IRenderPass &pass) {
     if (!_visible)
         return;
 
-    Control::render(screenSize, offset);
+    Control::render(screenSize, offset, pass);
 
     if (!_protoItem)
         return;
@@ -205,10 +205,10 @@ void ListBox::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
 
         auto imageButton = std::dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
-            imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame);
+            imageButton->render(itemOffset, item._textLines, item.iconText, item.iconTexture, item.iconFrame, pass);
         } else {
             _protoItem->setTextLines(item._textLines);
-            _protoItem->render(screenSize, itemOffset);
+            _protoItem->render(screenSize, itemOffset, pass);
         }
 
         if (_protoMatchContent) {
@@ -225,7 +225,7 @@ void ListBox::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
         state.offset = _itemOffset;
         auto &scrollBar = static_cast<ScrollBar &>(*_scrollBar);
         scrollBar.setScrollState(std::move(state));
-        scrollBar.render(screenSize, offset);
+        scrollBar.render(screenSize, offset, pass);
     }
 }
 

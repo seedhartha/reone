@@ -37,10 +37,6 @@ void Cursor::render() {
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    _uniforms.setGlobals([this, transform](auto &globals) {
-        globals.reset();
-        globals.projection = _window.getOrthoProjection();
-    });
     _uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);

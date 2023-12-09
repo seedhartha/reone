@@ -25,14 +25,14 @@ namespace graphics {
 
 struct LocalUniforms;
 
-class Context;
+class IContext;
+class IMeshRegistry;
+class IShaderRegistry;
+class ITextureRegistry;
+class IUniforms;
 class Material;
 class Mesh;
-class MeshRegistry;
-class ShaderRegistry;
 class Texture;
-class TextureRegistry;
-class Uniforms;
 
 enum class RenderPassName {
     None,
@@ -90,15 +90,21 @@ public:
                            Texture &texture,
                            std::optional<std::reference_wrapper<Texture>> &lightmap,
                            const std::vector<GrassInstance> &instances) = 0;
+
+    virtual void drawImage(Texture &texture,
+                           const glm::ivec2 &position,
+                           const glm::ivec2 &scale,
+                           glm::vec4 color = glm::vec4(1.0f),
+                           glm::mat3x4 uv = glm::mat3x4(1.0f)) = 0;
 };
 
 class RenderPass : public IRenderPass, boost::noncopyable {
 public:
-    RenderPass(Context &context,
-               ShaderRegistry &shaderRegistry,
-               MeshRegistry &meshRegistry,
-               TextureRegistry &textureRegistry,
-               Uniforms &uniforms) :
+    RenderPass(IContext &context,
+               IShaderRegistry &shaderRegistry,
+               IMeshRegistry &meshRegistry,
+               ITextureRegistry &textureRegistry,
+               IUniforms &uniforms) :
         _context(context),
         _shaderRegistry(shaderRegistry),
         _meshRegistry(meshRegistry),
@@ -135,12 +141,18 @@ public:
                    std::optional<std::reference_wrapper<Texture>> &lightmap,
                    const std::vector<GrassInstance> &instances) override;
 
+    void drawImage(Texture &texture,
+                   const glm::ivec2 &position,
+                   const glm::ivec2 &scale,
+                   glm::vec4 color,
+                   glm::mat3x4 uv) override;
+
 private:
-    Context &_context;
-    ShaderRegistry &_shaderRegistry;
-    MeshRegistry &_meshRegistry;
-    TextureRegistry &_textureRegistry;
-    Uniforms &_uniforms;
+    IContext &_context;
+    IShaderRegistry &_shaderRegistry;
+    IMeshRegistry &_meshRegistry;
+    ITextureRegistry &_textureRegistry;
+    IUniforms &_uniforms;
 
     void applyMaterialToLocals(const Material &material, LocalUniforms &locals);
 

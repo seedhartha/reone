@@ -270,9 +270,6 @@ void SelectionOverlay::renderReticle(std::shared_ptr<Texture> texture, const glm
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
@@ -298,9 +295,6 @@ void SelectionOverlay::renderTitleBar() {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-            globals.projection = _services.graphics.window.getOrthoProjection();
-        });
         _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
             locals.reset();
             locals.model = std::move(transform);
@@ -334,9 +328,6 @@ void SelectionOverlay::renderHealthBar() {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
@@ -374,9 +365,6 @@ void SelectionOverlay::renderActionFrame(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);
@@ -439,9 +427,6 @@ void SelectionOverlay::renderActionIcon(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);

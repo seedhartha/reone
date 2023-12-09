@@ -99,9 +99,6 @@ void Movie::render() {
         _graphicsSvc.context.bindTexture(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    _graphicsSvc.uniforms.setGlobals([](auto &globals) {
-        globals.reset();
-    });
     _graphicsSvc.uniforms.setLocals([](auto &locals) {
         locals.reset();
         locals.uv = glm::mat3x4(
@@ -109,7 +106,7 @@ void Movie::render() {
             glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
             glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
     });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
+    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::ndcTexture));
     _graphicsSvc.meshRegistry.get(MeshName::quadNDC).draw();
 }
 

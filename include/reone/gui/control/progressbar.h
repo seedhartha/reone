@@ -39,7 +39,7 @@ public:
     }
 
     void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem) override;
-    void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
+    void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset, graphics::IRenderPass &pass) override;
 
     void setValue(int value);
 

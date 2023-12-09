@@ -22,14 +22,14 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/graphics/window.h"
+#include "reone/gui/gui.h"
 #include "reone/resource/provider/fonts.h"
 #include "reone/resource/provider/textures.h"
-
-#include "reone/gui/gui.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -50,7 +50,8 @@ void ImageButton::render(
     const std::vector<std::string> &text,
     const std::string &iconText,
     const std::shared_ptr<Texture> &iconTexture,
-    const std::shared_ptr<Texture> &iconFrame) {
+    const std::shared_ptr<Texture> &iconFrame,
+    IRenderPass &pass) {
 
     if (!_visible)
         return;
@@ -61,15 +62,15 @@ void ImageButton::render(
     glm::ivec2 size(_extent.width - _extent.height, _extent.height);
 
     if (_selected && _hilight) {
-        renderBorder(*_hilight, borderOffset, size);
+        renderBorder(*_hilight, borderOffset, size, pass);
     } else if (_border) {
-        renderBorder(*_border, borderOffset, size);
+        renderBorder(*_border, borderOffset, size, pass);
     }
 
-    renderIcon(offset, iconText, iconTexture, iconFrame);
+    renderIcon(offset, iconText, iconTexture, iconFrame, pass);
 
     if (!text.empty()) {
-        renderText(text, borderOffset, size);
+        renderText(text, borderOffset, size, pass);
     }
 }
 
@@ -77,7 +78,8 @@ void ImageButton::renderIcon(
     const glm::ivec2 &offset,
     const std::string &iconText,
     const std::shared_ptr<Texture> &iconTexture,
-    const std::shared_ptr<Texture> &iconFrame) {
+    const std::shared_ptr<Texture> &iconFrame,
+    IRenderPass &pass) {
 
     if (!iconFrame && !iconTexture)
         return;
@@ -90,40 +92,18 @@ void ImageButton::renderIcon(
     }
 
     if (iconFrame) {
-        _graphicsSvc.context.bindTexture(*iconFrame);
-
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
-        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
-
-        _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
-            globals.projection = _graphicsSvc.window.getOrthoProjection();
-        });
-        _graphicsSvc.uniforms.setLocals([transform, &color](auto &locals) {
-            locals.reset();
-            locals.model = std::move(transform);
-            locals.color = glm::vec4(color, 1.0f);
-        });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
-        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+        pass.drawImage(
+            *iconFrame,
+            {offset.x + _extent.left, offset.y + _extent.top},
+            {_extent.height, _extent.height},
+            glm::vec4(color, 1.0f));
     }
 
     if (iconTexture) {
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
-        transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
-
-        _graphicsSvc.context.bindTexture(*iconTexture);
-
-        _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
-            globals.projection = _graphicsSvc.window.getOrthoProjection();
-        });
-        _graphicsSvc.uniforms.setLocals([transform](auto &locals) {
-            locals.reset();
-            locals.model = std::move(transform);
-        });
-        _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
-        _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+        pass.drawImage(
+            *iconTexture,
+            {offset.x + _extent.left, offset.y + _extent.top},
+            {_extent.height, _extent.height});
     }
 
     if (!iconText.empty()) {

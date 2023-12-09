@@ -195,9 +195,6 @@ void Console::renderBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
-    _services.graphics.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _services.graphics.window.getOrthoProjection();
-    });
     _services.graphics.uniforms.setLocals([this, transform](auto &locals) {
         locals.reset();
         locals.model = std::move(transform);

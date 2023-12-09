@@ -35,10 +35,11 @@ struct ResourceServices;
 
 namespace graphics {
 
-class Font;
-class Texture;
-
 struct GraphicsServices;
+
+class Font;
+class IRenderPass;
+class Texture;
 
 } // namespace graphics
 
@@ -107,6 +108,7 @@ public:
 
     virtual void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem = false);
     virtual void update(float dt);
+    virtual void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset, graphics::IRenderPass &pass);
 
     void updateTransform();
     void updateTextLines();
@@ -183,12 +185,6 @@ public:
 
     // END User input
 
-    // Rendering
-
-    virtual void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset);
-
-    // END Rendering
-
     // Event listeners
 
     void setOnClick(std::function<void()> fn) { _onClick = std::move(fn); }
@@ -247,8 +243,15 @@ protected:
         _resourceSvc(resourceSvc) {
     }
 
-    void renderBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
-    void renderText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);
+    void renderBorder(const Border &border,
+                      const glm::ivec2 &offset,
+                      const glm::ivec2 &size,
+                      graphics::IRenderPass &pass);
+
+    void renderText(const std::vector<std::string> &lines,
+                    const glm::ivec2 &offset,
+                    const glm::ivec2 &size,
+                    graphics::IRenderPass &pass);
 
     virtual const glm::vec3 &getBorderColor() const;
 

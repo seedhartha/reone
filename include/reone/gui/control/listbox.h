@@ -67,7 +67,7 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) override;
+    void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset, graphics::IRenderPass &pass) override;
     void stretch(float x, float y, int mask) override;
 
     void changeProtoItemType(ControlType type);

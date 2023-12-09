@@ -20,6 +20,7 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -248,8 +249,14 @@ void GUI::update(float dt) {
 
 void GUI::render() {
     _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
+        auto pass = RenderPass(
+            _graphicsSvc.context,
+            _graphicsSvc.shaderRegistry,
+            _graphicsSvc.meshRegistry,
+            _graphicsSvc.textureRegistry,
+            _graphicsSvc.uniforms);
         if (_background) {
-            renderBackground();
+            renderBackground(pass);
         }
         if (!_rootControl) {
             return;
@@ -260,7 +267,7 @@ void GUI::render() {
             auto &[controlWrapper, offset] = controls.front();
             auto &control = controlWrapper.get();
             controls.pop();
-            control.render({_options.width, _options.height}, offset);
+            control.render({_options.width, _options.height}, offset, pass);
             for (auto &child : control.children()) {
                 controls.push({child, _controlOffset});
             }
@@ -268,22 +275,11 @@ void GUI::render() {
     });
 }
 
-void GUI::renderBackground() {
-    _graphicsSvc.context.bindTexture(*_background);
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
-    transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
-
-    _graphicsSvc.uniforms.setGlobals([this, transform](auto &globals) {
-        globals.projection = _graphicsSvc.window.getOrthoProjection();
-    });
-    _graphicsSvc.uniforms.setLocals([this, transform](auto &locals) {
-        locals.reset();
-        locals.model = std::move(transform);
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
-    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+void GUI::renderBackground(IRenderPass &pass) {
+    pass.drawImage(
+        *_background,
+        {0, 0},
+        {_options.width, _options.height});
 }
 
 void GUI::clearSelection() {

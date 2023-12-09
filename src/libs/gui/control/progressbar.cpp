@@ -21,6 +21,7 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
+#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -45,27 +46,17 @@ void ProgressBar::load(const resource::generated::GUI_BASECONTROL &gui, bool pro
     }
 }
 
-void ProgressBar::render(const glm::ivec2 &screenSize, const glm::ivec2 &offset) {
+void ProgressBar::render(const glm::ivec2 &screenSize,
+                         const glm::ivec2 &offset,
+                         graphics::IRenderPass &pass) {
     if (_value == 0 || !_progress.fill) {
         return;
     }
-    _graphicsSvc.context.bindTexture(*_progress.fill);
-
     float w = _extent.width * _value / 100.0f;
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
-
-    _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
-        globals.projection = _graphicsSvc.window.getOrthoProjection();
-    });
-    _graphicsSvc.uniforms.setLocals([transform](auto &locals) {
-        locals.reset();
-        locals.model = std::move(transform);
-    });
-    _graphicsSvc.context.useProgram(_graphicsSvc.shaderRegistry.get(ShaderProgramId::mvpTexture));
-    _graphicsSvc.meshRegistry.get(MeshName::quad).draw();
+    pass.drawImage(
+        *_progress.fill,
+        {_extent.left + offset.x, _extent.top + offset.y},
+        {w, _extent.height});
 }
 
 void ProgressBar::setValue(int value) {
