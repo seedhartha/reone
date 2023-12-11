@@ -28,18 +28,17 @@
 using namespace reone;
 
 int main(int argc, char **argv) {
-#ifdef _WIN32
-    SetProcessDPIAware();
-#endif
-    markMainThread();
-
-    auto engine = Engine(argc, argv);
     try {
+        markMainThread();
+#ifdef _WIN32
+        SetProcessDPIAware();
+#endif
+        Engine engine {argc, argv};
         engine.init();
         return engine.run();
     } catch (const std::exception &ex) {
         try {
-            error("Program terminated exceptionally: " + std::string(ex.what()));
+            std::cerr << "Engine startup failed: " << ex.what() << std::endl;
         } catch (...) {
         }
         return 1;
