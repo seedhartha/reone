@@ -34,9 +34,8 @@ namespace reone {
 
 class Engine : boost::noncopyable {
 public:
-    Engine(int argc, char **argv) :
-        _argc(argc),
-        _argv(argv) {
+    Engine(Options &options) :
+        _options(options) {
     }
 
     ~Engine() {
@@ -52,8 +51,7 @@ public:
     int run();
 
 private:
-    int _argc;
-    char **_argv;
+    Options &_options;
 
     std::unique_ptr<SystemModule> _systemModule;
     std::unique_ptr<resource::ResourceModule> _resourceModule;
@@ -65,13 +63,11 @@ private:
     std::unique_ptr<script::ScriptModule> _scriptModule;
     std::unique_ptr<game::GameModule> _gameModule;
 
-    std::unique_ptr<Options> _options;
-    std::unique_ptr<game::OptionsView> _optionsView;
-
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
 
-    void loadOptions();
+    std::unique_ptr<game::OptionsView> _optionsView;
+
     void initServices(resource::GameID gameId);
 };
 

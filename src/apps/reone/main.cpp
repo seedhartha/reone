@@ -21,11 +21,15 @@
 #undef min
 #endif
 
+#include "reone/system/logutil.h"
 #include "reone/system/threadutil.h"
 
 #include "engine.h"
+#include "optionsparser.h"
 
 using namespace reone;
+
+static constexpr char kLogFilename[] = "reone.log";
 
 int main(int argc, char **argv) {
     try {
@@ -33,7 +37,10 @@ int main(int argc, char **argv) {
 #ifdef _WIN32
         SetProcessDPIAware();
 #endif
-        Engine engine {argc, argv};
+        OptionsParser optionsParser {argc, argv};
+        auto options = optionsParser.parse();
+        initLog(options->logging.severity, options->logging.channels, kLogFilename);
+        Engine engine {*options};
         engine.init();
         return engine.run();
     } catch (const std::exception &ex) {
