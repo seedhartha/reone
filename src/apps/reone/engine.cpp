@@ -17,11 +17,7 @@
 
 #include "engine.h"
 
-#include "reone/game/game.h"
 #include "reone/resource/gameprobe.h"
-#include "reone/system/logutil.h"
-
-#include "optionsparser.h"
 
 using namespace reone::audio;
 using namespace reone::game;
@@ -36,22 +32,33 @@ namespace reone {
 
 void Engine::init() {
     _optionsView = _options.toView();
+
     GameProbe probe {_options.game.path};
     auto gameId = probe.probe();
-    initServices(gameId);
-    _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
-    _game->init();
-}
 
-void Engine::initServices(GameID gameId) {
     _systemModule = std::make_unique<SystemModule>();
     _graphicsModule = std::make_unique<GraphicsModule>(_options.graphics);
     _audioModule = std::make_unique<AudioModule>(_options.audio);
     _movieModule = std::make_unique<MovieModule>();
     _scriptModule = std::make_unique<ScriptModule>();
-    _resourceModule = std::make_unique<ResourceModule>(gameId, _options.game.path, _options.graphics, _options.audio, *_graphicsModule, *_audioModule, *_scriptModule);
-    _sceneModule = std::make_unique<SceneModule>(_options.graphics, *_resourceModule, *_graphicsModule, *_audioModule);
-    _guiModule = std::make_unique<GUIModule>(_options.graphics, *_sceneModule, *_graphicsModule, *_resourceModule);
+    _resourceModule = std::make_unique<ResourceModule>(
+        gameId,
+        _options.game.path,
+        _options.graphics,
+        _options.audio,
+        *_graphicsModule,
+        *_audioModule,
+        *_scriptModule);
+    _sceneModule = std::make_unique<SceneModule>(
+        _options.graphics,
+        *_resourceModule,
+        *_graphicsModule,
+        *_audioModule);
+    _guiModule = std::make_unique<GUIModule>(
+        _options.graphics,
+        *_sceneModule,
+        *_graphicsModule,
+        *_resourceModule);
     _gameModule = std::make_unique<GameModule>(
         gameId,
         *_optionsView,
@@ -60,7 +67,6 @@ void Engine::initServices(GameID gameId) {
         *_audioModule,
         *_sceneModule,
         *_scriptModule);
-
     _systemModule->init();
     _graphicsModule->init();
     _audioModule->init();
@@ -81,6 +87,8 @@ void Engine::initServices(GameID gameId) {
         _scriptModule->services(),
         _resourceModule->services(),
         _systemModule->services());
+    _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
+    _game->init();
 }
 
 void Engine::deinit() {
@@ -98,10 +106,6 @@ void Engine::deinit() {
     _systemModule.reset();
 
     _optionsView.reset();
-}
-
-int Engine::run() {
-    return _game->run();
 }
 
 } // namespace reone

@@ -48,10 +48,14 @@ public:
     /**
      * @return exit code
      */
-    int run();
+    int run() {
+        return _game->run();
+    }
 
 private:
     Options &_options;
+
+    std::unique_ptr<game::OptionsView> _optionsView;
 
     std::unique_ptr<SystemModule> _systemModule;
     std::unique_ptr<resource::ResourceModule> _resourceModule;
@@ -65,10 +69,6 @@ private:
 
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
-
-    std::unique_ptr<game::OptionsView> _optionsView;
-
-    void initServices(resource::GameID gameId);
 };
 
 } // namespace reone
