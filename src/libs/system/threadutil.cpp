@@ -21,7 +21,7 @@ namespace reone {
 
 static std::thread::id g_mainThreadId;
 
-void setMainThread() {
+void markMainThread() {
     g_mainThreadId = std::this_thread::get_id();
 }
 

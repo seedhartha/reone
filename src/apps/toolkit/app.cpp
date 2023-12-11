@@ -32,7 +32,7 @@ bool ToolkitApp::OnInit() {
 #ifdef _WIN32
     SetProcessDPIAware();
 #endif
-    setMainThread();
+    markMainThread();
     initLog(
         LogSeverity::Debug,
         std::set<LogChannel> {LogChannel::Global, LogChannel::Resources, LogChannel::Graphics, LogChannel::Audio},

@@ -31,7 +31,7 @@ bool LauncherApp::OnInit() {
 #ifdef _WIN32
     SetProcessDPIAware();
 #endif
-    setMainThread();
+    markMainThread();
     auto frame = new LauncherFrame(); // managed by the library
     frame->Show();
     return true;

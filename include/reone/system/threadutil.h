@@ -19,7 +19,7 @@
 
 namespace reone {
 
-void setMainThread();
+void markMainThread();
 void checkMainThread();
 
 } // namespace reone

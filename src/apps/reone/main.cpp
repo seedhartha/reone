@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 #ifdef _WIN32
     SetProcessDPIAware();
 #endif
-    setMainThread();
+    markMainThread();
 
     auto engine = Engine(argc, argv);
     try {
