@@ -17,14 +17,12 @@ set(REONE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/reone)
 
 set(REONE_HEADERS
     ${REONE_SOURCE_DIR}/engine.h
-    ${REONE_SOURCE_DIR}/gameprobe.h
     ${REONE_SOURCE_DIR}/options.h
     ${REONE_SOURCE_DIR}/optionsparser.h)
 
 set(REONE_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${REONE_SOURCE_DIR}/engine.cpp
-    ${REONE_SOURCE_DIR}/gameprobe.cpp
     ${REONE_SOURCE_DIR}/main.cpp
     ${REONE_SOURCE_DIR}/optionsparser.cpp)
 

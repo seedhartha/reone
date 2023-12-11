@@ -15,14 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gameprobe.h"
-
+#include "reone/resource/gameprobe.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/fileutil.h"
 
-using namespace reone::resource;
-
 namespace reone {
+
+namespace resource {
 
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
@@ -39,5 +38,7 @@ GameID GameProbe::probe() {
 
     throw std::runtime_error("Unable to determine game ID: " + _gamePath.string());
 }
+
+} // namespace resource
 
 } // namespace reone

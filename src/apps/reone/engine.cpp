@@ -18,9 +18,9 @@
 #include "engine.h"
 
 #include "reone/game/game.h"
+#include "reone/resource/gameprobe.h"
 #include "reone/system/logutil.h"
 
-#include "gameprobe.h"
 #include "optionsparser.h"
 
 using namespace reone::audio;
@@ -37,7 +37,8 @@ namespace reone {
 void Engine::init() {
     loadOptions();
 
-    auto gameId = GameProbe(_options->game.path).probe();
+    GameProbe probe {_options->game.path};
+    auto gameId = probe.probe();
 
     initServices(gameId);
 

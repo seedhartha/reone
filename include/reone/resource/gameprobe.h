@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "reone/resource/types.h"
+#include "types.h"
 
 namespace reone {
+
+namespace resource {
 
 class GameProbe {
 public:
@@ -32,5 +34,7 @@ public:
 private:
     std::filesystem::path _gamePath;
 };
+
+} // namespace resource
 
 } // namespace reone
