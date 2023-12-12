@@ -39,6 +39,11 @@ endif()
 set_target_properties(toolkit PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
 target_precompile_headers(toolkit PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(toolkit PRIVATE tools ${wxWidgets_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+if(MSVC)
+    target_link_libraries(toolkit PRIVATE SDL2::SDL2)
+else()
+    target_link_libraries(toolkit PRIVATE ${SDL2_LIBRARIES})
+endif()
 
 list(APPEND InstallTargets toolkit)
 
