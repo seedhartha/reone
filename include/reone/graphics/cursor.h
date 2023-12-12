@@ -21,8 +21,6 @@ namespace reone {
 
 namespace graphics {
 
-class IWindow;
-
 class Context;
 class MeshRegistry;
 class ShaderRegistry;
@@ -37,15 +35,13 @@ public:
         Context &context,
         MeshRegistry &meshRegistry,
         ShaderRegistry &shaderRegistry,
-        Uniforms &uniforms,
-        IWindow &window) :
+        Uniforms &uniforms) :
         _up(std::move(up)),
         _down(std::move(down)),
         _context(context),
         _meshRegistry(meshRegistry),
         _shaderRegistry(shaderRegistry),
-        _uniforms(uniforms),
-        _window(window) {
+        _uniforms(uniforms) {
     }
 
     void render();
@@ -66,7 +62,6 @@ private:
     MeshRegistry &_meshRegistry;
     ShaderRegistry &_shaderRegistry;
     Uniforms &_uniforms;
-    IWindow &_window;
 
     // END Services
 };

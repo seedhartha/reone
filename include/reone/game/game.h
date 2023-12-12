@@ -74,7 +74,7 @@ class GUI;
 
 namespace game {
 
-class Game : public graphics::IEventHandler, boost::noncopyable {
+class Game : public graphics::EventHandler, boost::noncopyable {
 public:
     enum class Screen {
         None,
@@ -102,26 +102,10 @@ public:
         _combat(*this, services) {
     }
 
-    ~Game() {
-        deinit();
-    }
-
     void init();
 
-    void deinit() {
-        if (_updateThread.joinable()) {
-            _updateThread.join();
-        }
-    }
-
-    /**
-     * @return exit code
-     */
-    int run();
-
-    void quit() {
-        setState(State::Quitting);
-    }
+    void update(float frameTime);
+    void render();
 
     void playVideo(const std::string &name);
 
@@ -171,6 +155,22 @@ public:
 
     std::shared_ptr<movie::IMovie> movie() const {
         return _movie;
+    }
+
+    void quit() {
+        _quitRequested = true;
+    }
+
+    bool isQuitRequested() {
+        return _quitRequested;
+    }
+
+    resource::CursorType cursorType() const {
+        return _cursorType;
+    }
+
+    bool relativeMouseMode() const {
+        return _relativeMouseMode;
     }
 
     // Module loading
@@ -309,38 +309,28 @@ public:
 
     // END Global variables
 
-    // IEventHandler
+    // EventHandler
 
     bool handle(const SDL_Event &event) override;
-
-    // END IEventHandler
+    // END EventHandler
 
 private:
-    enum class State {
-        Created,
-        Running,
-        ModuleLoad,
-        Quitting
-    };
-
     resource::GameID _gameId;
     std::filesystem::path _path;
     OptionsView &_options;
     ServicesView &_services;
-
-    std::atomic<State> _state {State::Created};
-    uint32_t _ticks {0};
-    uint32_t _updateTicks {0};
 
     Screen _screen {Screen::None};
 
     std::shared_ptr<movie::IMovie> _movie;
     resource::CursorType _cursorType {resource::CursorType::None};
     std::shared_ptr<graphics::Cursor> _cursor;
-    std::atomic<float> _gameSpeed {1.0f};
+    float _gameSpeed {1.0f};
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
+    bool _quitRequested {false};
+    bool _relativeMouseMode {false};
 
     uint32_t _nextObjectId {2}; // ids 0 and 1 are reserved
     std::map<uint32_t, std::shared_ptr<Object>> _objectById;
@@ -401,32 +391,17 @@ private:
 
     // END Global variables
 
-    // Update thread
-
-    std::thread _updateThread;
-    std::mutex _updateMutex;
-    std::condition_variable _updateCondVar;
-    std::atomic_bool _updateFlushed {false};
-
-    // END Update thread
-
-    void setState(State state) {
-        std::lock_guard<std::mutex> lock(_updateMutex);
-        _state = state;
-        _updateCondVar.notify_one();
-    }
-
     void stopMovement();
-
-    void mainLoopIteration(float dt);
 
     void loadDefaultParty();
     void loadNextModule();
     void playMusic(const std::string &resRef);
     void toggleInGameCameraType();
 
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
 
     void onModuleSelected(const std::string &name);
     void renderHUD();
@@ -436,21 +411,14 @@ private:
 
     // Updates
 
-    void update(float dt);
-
     void updateMovie(float dt);
     void updateMusic();
     void updateCamera(float dt);
     void updateSceneGraph(float dt);
-    void updateCursor();
-
-    void updateThreadFunc();
 
     // END Updates
 
     // Rendering
-
-    void renderAll();
 
     void renderScene();
     void renderGUI();

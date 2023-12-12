@@ -20,7 +20,6 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
-#include "reone/graphics/window.h"
 #include "reone/resource/provider/textures.h"
 
 using namespace reone::graphics;

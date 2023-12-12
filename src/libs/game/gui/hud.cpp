@@ -22,7 +22,6 @@
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 #include "reone/gui/control/label.h"
 #include "reone/system/logutil.h"
 

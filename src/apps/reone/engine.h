@@ -21,6 +21,7 @@
 #include "reone/game/di/module.h"
 #include "reone/game/game.h"
 #include "reone/graphics/di/module.h"
+#include "reone/graphics/window.h"
 #include "reone/gui/di/module.h"
 #include "reone/movie/di/module.h"
 #include "reone/resource/di/module.h"
@@ -48,14 +49,13 @@ public:
     /**
      * @return exit code
      */
-    int run() {
-        return _game->run();
-    }
+    int run();
 
 private:
     Options &_options;
 
     std::unique_ptr<game::OptionsView> _optionsView;
+    std::unique_ptr<graphics::Window> _window;
 
     std::unique_ptr<SystemModule> _systemModule;
     std::unique_ptr<resource::ResourceModule> _resourceModule;
@@ -69,6 +69,17 @@ private:
 
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
+
+    bool _quit {false};
+    uint32_t _ticks {0};
+
+    bool _showCursor {true};
+    bool _relativeMouseMode {false};
+
+    void processEvents();
+
+    void showCursor(bool show);
+    void setRelativeMouseMode(bool relative);
 };
 
 } // namespace reone

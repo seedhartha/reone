@@ -25,25 +25,19 @@ namespace reone {
 namespace graphics {
 
 class Cursor;
-class IEventHandler;
+class EventHandler;
 
 class IWindow {
 public:
     virtual ~IWindow() = default;
 
-    virtual void processEvents(bool &quit) = 0;
+    virtual bool isAssociatedWith(const SDL_Event &event) const = 0;
+    virtual bool handle(const SDL_Event &event) = 0;
 
-    virtual void swapBuffers() const = 0;
+    virtual void swap() = 0;
 
     virtual bool isInFocus() const = 0;
-
-    virtual glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const = 0;
-
-    virtual void setEventHandler(IEventHandler *eventHandler) = 0;
-    virtual void setRelativeMouseMode(bool enabled) = 0;
-
-    virtual uint32_t mouseState(int *x, int *y) = 0;
-    virtual void showCursor(bool show) = 0;
+    virtual bool isCloseRequested() const = 0;
 };
 
 class Window : public IWindow, boost::noncopyable {
@@ -52,40 +46,41 @@ public:
         _options(options) {
     }
 
-    ~Window() { deinit(); }
+    ~Window() {
+        deinit();
+    }
 
     void init();
     void deinit();
 
-    void processEvents(bool &quit) override;
+    bool isAssociatedWith(const SDL_Event &event) const override;
+    bool handle(const SDL_Event &event) override;
 
-    void swapBuffers() const override;
+    void swap() override;
 
-    bool isInFocus() const override { return _focus; }
+    bool isInFocus() const override {
+        return _inFocus;
+    }
 
-    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const override;
-
-    void setEventHandler(IEventHandler *eventHandler) override { _eventHandler = eventHandler; }
-    void setRelativeMouseMode(bool enabled) override;
-
-    uint32_t mouseState(int *x, int *y) override;
-    void showCursor(bool show) override;
+    bool isCloseRequested() const override {
+        return _closeRequested;
+    }
 
 private:
     GraphicsOptions &_options;
 
-    IEventHandler *_eventHandler {nullptr};
     bool _inited {false};
+
     SDL_Window *_window {nullptr};
     SDL_GLContext _context {nullptr};
-    bool _relativeMouseMode {false};
-    bool _focus {true};
 
-    bool handleEvent(const SDL_Event &event, bool &quit);
-    bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);
+    uint32_t _windowID {0};
+
+    bool _inFocus {true};
+    bool _closeRequested {false};
+
     bool handleWindowEvent(const SDL_WindowEvent &event);
-
-    inline int getWindowFlags() const;
+    bool handleKeyDownEvent(const SDL_KeyboardEvent &event);
 };
 
 } // namespace graphics

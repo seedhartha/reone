@@ -34,21 +34,18 @@ struct GraphicsServices {
     IShaderRegistry &shaderRegistry;
     ITextureRegistry &textureRegistry;
     IUniforms &uniforms;
-    IWindow &window;
 
     GraphicsServices(
         IContext &context,
         IMeshRegistry &meshRegistry,
         IShaderRegistry &shaderRegistry,
         ITextureRegistry &textureRegistry,
-        IUniforms &uniforms,
-        IWindow &window) :
+        IUniforms &uniforms) :
         context(context),
         meshRegistry(meshRegistry),
         shaderRegistry(shaderRegistry),
         textureRegistry(textureRegistry),
-        uniforms(uniforms),
-        window(window) {
+        uniforms(uniforms) {
     }
 };
 

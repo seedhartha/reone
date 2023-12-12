@@ -20,7 +20,7 @@
 namespace reone {
 
 uint32_t Clock::ticks() const {
-    return SDL_GetTicks();
+    return SDL_GetTicks(); // TODO: SDL_GetTicks64
 }
 
 uint64_t Clock::performanceFrequency() const {

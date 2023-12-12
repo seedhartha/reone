@@ -24,7 +24,6 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/provider/fonts.h"
 #include "reone/resource/provider/textures.h"
@@ -218,9 +217,13 @@ void Control::render(const glm::ivec2 &screenSize,
         _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
             output = _sceneGraphs.get(_sceneName).render({_extent.width, _extent.height});
         });
-        _graphicsSvc.uniforms.setGlobals([this](auto &globals) {
+        _graphicsSvc.uniforms.setGlobals([&screenSize](auto &globals) {
             globals.reset();
-            globals.projection = _graphicsSvc.window.getOrthoProjection();
+            globals.projection = glm::ortho(
+                0.0f,
+                static_cast<float>(screenSize.x),
+                static_cast<float>(screenSize.y),
+                0.0f, 0.0f, 100.0f);
         });
         _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this, &offset, &pass, &output]() {
             pass.drawImage(

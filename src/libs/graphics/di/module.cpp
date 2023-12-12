@@ -22,7 +22,6 @@ namespace reone {
 namespace graphics {
 
 void GraphicsModule::init() {
-    _window = newWindow();
     _context = std::make_unique<Context>(_options);
     _meshRegistry = std::make_unique<MeshRegistry>();
     _shaderRegistry = std::make_unique<ShaderRegistry>();
@@ -34,8 +33,7 @@ void GraphicsModule::init() {
         *_meshRegistry,
         *_shaderRegistry,
         *_textureRegistry,
-        *_uniforms,
-        *_window);
+        *_uniforms);
 
     _context->init();
     _meshRegistry->init();
@@ -50,13 +48,6 @@ void GraphicsModule::deinit() {
     _meshRegistry.reset();
     _textureRegistry.reset();
     _context.reset();
-    _window.reset();
-}
-
-std::unique_ptr<IWindow> GraphicsModule::newWindow() {
-    auto window = std::make_unique<Window>(_options);
-    window->init();
-    return window;
 }
 
 } // namespace graphics

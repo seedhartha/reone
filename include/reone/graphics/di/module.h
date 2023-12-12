@@ -22,7 +22,6 @@
 #include "../shaderregistry.h"
 #include "../textureregistry.h"
 #include "../uniforms.h"
-#include "../window.h"
 
 #include "services.h"
 
@@ -36,7 +35,7 @@ public:
         _options(options) {
     }
 
-    virtual ~GraphicsModule() { deinit(); }
+    ~GraphicsModule() { deinit(); }
 
     void init();
     void deinit();
@@ -46,11 +45,10 @@ public:
     ShaderRegistry &shaderRegistry() { return *_shaderRegistry; }
     TextureRegistry &textureRegistry() { return *_textureRegistry; }
     Uniforms &uniforms() { return *_uniforms; }
-    IWindow &window() { return *_window; }
 
     GraphicsServices &services() { return *_services; }
 
-protected:
+private:
     GraphicsOptions &_options;
 
     std::unique_ptr<Context> _context;
@@ -58,11 +56,8 @@ protected:
     std::unique_ptr<ShaderRegistry> _shaderRegistry;
     std::unique_ptr<TextureRegistry> _textureRegistry;
     std::unique_ptr<Uniforms> _uniforms;
-    std::unique_ptr<IWindow> _window;
 
     std::unique_ptr<GraphicsServices> _services;
-
-    virtual std::unique_ptr<IWindow> newWindow();
 };
 
 } // namespace graphics

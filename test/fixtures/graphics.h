@@ -26,7 +26,6 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureregistry.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 #include "reone/system/exception/notimplemented.h"
 
 namespace reone {
@@ -100,18 +99,6 @@ public:
     MOCK_METHOD(void, setScreenEffect, (const std::function<void(ScreenEffectUniforms &)> &), (override));
 };
 
-class MockWindow : public IWindow, boost::noncopyable {
-public:
-    MOCK_METHOD(void, processEvents, (bool &quit), (override));
-    MOCK_METHOD(void, swapBuffers, (), (const override));
-    MOCK_METHOD(bool, isInFocus, (), (const override));
-    MOCK_METHOD(glm::mat4, getOrthoProjection, (float near, float far), (const override));
-    MOCK_METHOD(void, setEventHandler, (IEventHandler * eventHandler), (override));
-    MOCK_METHOD(void, setRelativeMouseMode, (bool enabled), (override));
-    MOCK_METHOD(uint32_t, mouseState, (int *x, int *y), (override));
-    MOCK_METHOD(void, showCursor, (bool show), (override));
-};
-
 class TestGraphicsModule : boost::noncopyable {
 public:
     void init() {
@@ -120,23 +107,17 @@ public:
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
         _textureRegistry = std::make_unique<MockTextureRegistry>();
         _uniforms = std::make_unique<MockUniforms>();
-        _window = std::make_unique<MockWindow>();
 
         _services = std::make_unique<GraphicsServices>(
             *_context,
             *_meshRegistry,
             *_shaderRegistry,
             *_textureRegistry,
-            *_uniforms,
-            *_window);
+            *_uniforms);
     }
 
     MockContext &context() {
         return *_context;
-    }
-
-    MockWindow &window() {
-        return *_window;
     }
 
     MockShaderRegistry &shaderRegistry() {
@@ -153,7 +134,6 @@ private:
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;
     std::unique_ptr<MockTextureRegistry> _textureRegistry;
     std::unique_ptr<MockUniforms> _uniforms;
-    std::unique_ptr<MockWindow> _window;
 
     std::unique_ptr<GraphicsServices> _services;
 };

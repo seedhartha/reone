@@ -49,8 +49,6 @@
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 
-#include "../di/graphicsmodule.h"
-
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -455,7 +453,7 @@ void MainViewModel::loadEngine() {
     _graphicsOpt.sharpen = false;
 
     _systemModule = std::make_unique<SystemModule>();
-    _graphicsModule = std::make_unique<ToolkitGraphicsModule>(_graphicsOpt);
+    _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>(_audioOpt);
     _scriptModule = std::make_unique<ScriptModule>();
     _resourceModule = std::make_unique<ResourceModule>(GameID::KotOR, _gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);

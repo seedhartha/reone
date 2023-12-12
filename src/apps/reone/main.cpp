@@ -28,26 +28,42 @@
 #include "optionsparser.h"
 
 using namespace reone;
+using namespace reone::graphics;
 
 static constexpr char kLogFilename[] = "reone.log";
 
 int main(int argc, char **argv) {
-    try {
-        markMainThread();
 #ifdef _WIN32
-        SetProcessDPIAware();
+    SetProcessDPIAware();
 #endif
-        OptionsParser optionsParser {argc, argv};
-        auto options = optionsParser.parse();
-        initLog(options->logging.severity, options->logging.channels, kLogFilename);
-        Engine engine {*options};
-        engine.init();
-        return engine.run();
+    markMainThread();
+
+    std::unique_ptr<Options> options;
+    OptionsParser optionsParser {argc, argv};
+    try {
+        options = optionsParser.parse();
     } catch (const std::exception &ex) {
-        try {
-            std::cerr << "Engine startup failed: " << ex.what() << std::endl;
-        } catch (...) {
-        }
+        std::cerr << "Error parsing options: " << ex.what() << std::endl;
         return 1;
+    }
+    try {
+        initLog(options->logging.severity, options->logging.channels, kLogFilename);
+    } catch (const std::exception &ex) {
+        std::cerr << "Error initializing logging: " << ex.what() << std::endl;
+        return 2;
+    }
+    Engine engine {*options};
+    try {
+        engine.init();
+        int exitCode = engine.run();
+        return exitCode;
+    } catch (const std::exception &ex) {
+        auto message = str(boost::format("Engine failure: %1%") % ex.what());
+        try {
+            error(message);
+        } catch (...) {
+            std::cerr << message << std::endl;
+        }
+        return 3;
     }
 }

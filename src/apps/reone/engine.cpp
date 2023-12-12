@@ -17,6 +17,9 @@
 
 #include "engine.h"
 
+#include "SDL2/SDL.h"
+
+#include "reone/graphics/window.h"
 #include "reone/resource/gameprobe.h"
 
 using namespace reone::audio;
@@ -31,8 +34,13 @@ using namespace reone::script;
 namespace reone {
 
 void Engine::init() {
-    _optionsView = _options.toView();
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+        throw std::runtime_error("SDL_Init failed: " + std::string(SDL_GetError()));
+    }
+    _window = std::make_unique<Window>(_options.graphics);
+    _window->init();
 
+    _optionsView = _options.toView();
     GameProbe probe {_options.game.path};
     auto gameId = probe.probe();
 
@@ -106,6 +114,70 @@ void Engine::deinit() {
     _systemModule.reset();
 
     _optionsView.reset();
+
+    SDL_Quit();
+}
+
+int Engine::run() {
+    auto &clock = _services->system.clock;
+    _ticks = clock.ticks();
+    while (!_quit) {
+        processEvents();
+        if (_quit) {
+            break;
+        }
+        auto ticks = clock.ticks();
+        auto frameTime = (ticks - _ticks) / 1000.0f;
+        if (_window->isInFocus()) {
+            _game->update(frameTime);
+            showCursor(_game->cursorType() == CursorType::None);
+            setRelativeMouseMode(_game->relativeMouseMode());
+            _services->graphics.context.clearColorDepth();
+            _game->render();
+            _window->swap();
+        }
+        _ticks = ticks;
+    }
+    return 0;
+}
+
+void Engine::processEvents() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            _quit = true;
+            break;
+        }
+        if (!_window->isAssociatedWith(event)) {
+            continue;
+        }
+        if (_window->handle(event)) {
+            if (_window->isCloseRequested()) {
+                _quit = true;
+                break;
+            }
+            continue;
+        }
+        if (_game->handle(event) && _game->isQuitRequested()) {
+            _quit = true;
+        }
+    }
+}
+
+void Engine::showCursor(bool show) {
+    if (_showCursor == show) {
+        return;
+    }
+    SDL_ShowCursor(show ? SDL_ENABLE : SDL_DISABLE);
+    _showCursor = show;
+}
+
+void Engine::setRelativeMouseMode(bool relative) {
+    if (_relativeMouseMode == relative) {
+        return;
+    }
+    SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
+    _relativeMouseMode = relative;
 }
 
 } // namespace reone

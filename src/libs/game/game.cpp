@@ -34,7 +34,6 @@
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 #include "reone/gui/gui.h"
 #include "reone/movie/format/bikreader.h"
 #include "reone/resource/2da.h"
@@ -85,10 +84,10 @@ void Game::init() {
     setSceneSurfaces();
     setCursorType(CursorType::Default);
 
-    _services.graphics.window.setEventHandler(this);
     _moduleNames = _services.resource.director.moduleNames();
 
-    _updateThread = std::thread(std::bind(&Game::updateThreadFunc, this));
+    playVideo("legal");
+    openMainMenu();
 }
 
 void Game::initLocalServices() {
@@ -121,68 +120,8 @@ void Game::setSceneSurfaces() {
     }
 }
 
-void Game::updateThreadFunc() {
-    while (true) {
-        State state = _state;
-        if (state == State::Quitting) {
-            return;
-        } else if (state == State::Created || state == State::ModuleLoad) {
-            std::unique_lock<std::mutex> lock {_updateMutex};
-            _updateCondVar.wait(lock, [this]() { return _state == State::Running || _state == State::Quitting; });
-            _updateTicks = _services.system.clock.ticks();
-            if (_state == State::Quitting) {
-                return;
-            }
-        }
-
-        if (!_updateFlushed) {
-            std::this_thread::yield();
-            continue;
-        }
-
-        uint32_t ticks = _services.system.clock.ticks();
-        float dt = _gameSpeed * (ticks - _updateTicks) / 1000.0f;
-        _updateTicks = ticks;
-
-        std::lock_guard<std::mutex> lock {_updateMutex};
-        // update game objects
-        _updateFlushed = false;
-    }
-}
-
-int Game::run() {
-    playVideo("legal");
-    openMainMenu();
-
-    _ticks = _services.system.clock.ticks();
-    setState(State::Running);
-
-    while (_state != State::Quitting) {
-        uint32_t ticks = _services.system.clock.ticks();
-        float dt = (ticks - _ticks) / 1000.0f;
-        _ticks = ticks;
-
-        mainLoopIteration(dt * _gameSpeed);
-    }
-
-    return 0;
-}
-
-void Game::mainLoopIteration(float dt) {
-    bool quit = false;
-    _services.graphics.window.processEvents(quit);
-    if (quit) {
-        setState(State::Quitting);
-        return;
-    }
-    if (!_services.graphics.window.isInFocus()) {
-        return;
-    }
-    update(dt);
-    renderAll();
-}
-
-void Game::update(float dt) {
+void Game::update(float frameTime) {
+    float dt = frameTime * _gameSpeed;
     if (_movie) {
         updateMovie(dt);
         return;
@@ -194,14 +133,10 @@ void Game::update(float dt) {
     }
     updateCamera(dt);
 
-    {
-        std::lock_guard<std::mutex> lock {_updateMutex};
-        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-        if (updModule && !_paused) {
-            _module->update(dt);
-            _combat.update(dt);
-        }
-        _updateFlushed = true;
+    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+    if (updModule && !_paused) {
+        _module->update(dt);
+        _combat.update(dt);
     }
 
     auto gui = getScreenGUI();
@@ -211,21 +146,15 @@ void Game::update(float dt) {
     updateSceneGraph(dt);
 
     _profileOverlay->update(dt);
-
-    updateCursor();
 }
 
-void Game::renderAll() {
-    _services.graphics.context.clearColorDepth();
-
+void Game::render() {
     if (_movie) {
         _movie->render();
     } else {
         renderScene();
         renderGUI();
     }
-
-    _services.graphics.window.swapBuffers();
 }
 
 void Game::loadModule(const std::string &name, std::string entry) {
@@ -245,7 +174,7 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
             }
-            renderAll();
+            render();
 
             _services.scene.graphs.get(kSceneMain).clear();
 
@@ -276,12 +205,12 @@ void Game::loadModule(const std::string &name, std::string entry) {
             if (_loadScreen) {
                 _loadScreen->setProgress(100);
             }
-            renderAll();
+            render();
 
             std::string musicName(_module->area()->music());
             playMusic(musicName);
 
-            _ticks = _services.system.clock.ticks();
+            //_ticks = _services.system.clock.ticks();
             openInGame();
         } catch (const std::exception &e) {
             error("Failed loading module '" + name + "': " + std::string(e.what()));
@@ -324,10 +253,8 @@ void Game::setCursorType(CursorType type) {
     }
     if (type == CursorType::None) {
         _cursor.reset();
-        _services.graphics.window.showCursor(true);
     } else {
         _cursor = _services.resource.cursors.get(type);
-        _services.graphics.window.showCursor(false);
     }
     _cursorType = type;
 }
@@ -420,7 +347,11 @@ std::shared_ptr<Object> Game::getObjectById(uint32_t id) const {
 void Game::renderGUI() {
     _services.graphics.uniforms.setGlobals([this](auto &globals) {
         globals.reset();
-        globals.projection = _services.graphics.window.getOrthoProjection();
+        globals.projection = glm::ortho(
+            0.0f,
+            static_cast<float>(_options.graphics.width),
+            static_cast<float>(_options.graphics.height),
+            0.0f, 0.0f, 100.0f);
     });
     switch (_screen) {
     case Screen::InGame:
@@ -441,7 +372,7 @@ void Game::renderGUI() {
     }
     }
     _profileOverlay->render();
-    if (_cursor) {
+    if (_cursor && !_relativeMouseMode) {
         _cursor->render();
     }
 }
@@ -466,9 +397,7 @@ void Game::updateMusic() {
 }
 
 void Game::loadNextModule() {
-    setState(State::ModuleLoad);
     loadModule(_nextModule, _nextEntry);
-    setState(State::Running);
 
     _nextModule.clear();
     _nextEntry.clear();
@@ -536,19 +465,35 @@ void Game::updateSceneGraph(float dt) {
     sceneGraph.update(dt);
 }
 
-void Game::updateCursor() {
-    int x, y;
-    auto state = _services.graphics.window.mouseState(&x, &y);
-    auto pressed = state & SDL_BUTTON(1);
-    if (_cursor) {
-        _cursor->setPosition(glm::ivec2(x, y));
-        _cursor->setPressed(pressed);
-    }
-}
-
 bool Game::handle(const SDL_Event &event) {
-    if (_profileOverlay->handle(event))
+    switch (event.type) {
+    case SDL_KEYDOWN:
+        if (handleKeyDown(event.key)) {
+            return true;
+        }
+        break;
+    case SDL_MOUSEMOTION:
+        if (handleMouseMotion(event.motion)) {
+            return true;
+        }
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (handleMouseButtonDown(event.button)) {
+            return true;
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (handleMouseButtonUp(event.button)) {
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
+
+    if (_profileOverlay->handle(event)) {
         return true;
+    }
 
     if (!_movie) {
         auto gui = getScreenGUI();
@@ -575,30 +520,6 @@ bool Game::handle(const SDL_Event &event) {
         default:
             break;
         }
-    }
-    switch (event.type) {
-    case SDL_MOUSEBUTTONDOWN:
-        if (handleMouseButtonDown(event.button))
-            return true;
-        break;
-    case SDL_KEYDOWN:
-        if (handleKeyDown(event.key))
-            return true;
-        break;
-    default:
-        break;
-    }
-
-    return false;
-}
-
-bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT)
-        return false;
-
-    if (_movie) {
-        _movie->finish();
-        return true;
     }
 
     return false;
@@ -634,6 +555,28 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
         break;
     }
 
+    return false;
+}
+
+bool Game::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+    _cursor->setPosition({event.x, event.y});
+    return false;
+}
+
+bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
+    _cursor->setPressed(event.state & SDL_BUTTON(1));
+    if (event.button != SDL_BUTTON_LEFT) {
+        return false;
+    }
+    if (_movie) {
+        _movie->finish();
+        return true;
+    }
+    return false;
+}
+
+bool Game::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
+    _cursor->setPressed(event.state & SDL_BUTTON(1));
     return false;
 }
 
@@ -678,7 +621,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _services.graphics.window.setRelativeMouseMode(relative);
+    _relativeMouseMode = relative;
 }
 
 void Game::withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block) {
@@ -690,7 +633,7 @@ void Game::withLoadingScreen(const std::string &imageResRef, const std::function
         _loadScreen->setProgress(0);
     }
     changeScreen(Screen::Loading);
-    renderAll();
+    render();
     block();
 }
 
@@ -785,7 +728,7 @@ void Game::startCharacterGeneration() {
     }
     withLoadingScreen(_charGen->loadScreenResRef(), [this]() {
         _loadScreen->setProgress(100);
-        renderAll();
+        render();
         playMusic(_charGen->musicResRef());
         changeScreen(Screen::CharacterGeneration);
     });

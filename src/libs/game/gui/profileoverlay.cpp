@@ -24,7 +24,6 @@
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textutil.h"
-#include "reone/graphics/window.h"
 #include "reone/resource/provider/fonts.h"
 #include "reone/system/clock.h"
 #include "reone/system/di/services.h"

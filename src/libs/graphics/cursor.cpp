@@ -23,7 +23,6 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 
 namespace reone {
 

@@ -20,6 +20,8 @@
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
 #include "reone/resource/format/gffreader.h"
+#include "reone/resource/template/generated/are.h"
+#include "reone/resource/template/generated/git.h"
 #include "reone/resource/types.h"
 #include "reone/system/timer.h"
 
@@ -31,16 +33,8 @@
 #include "../object/camera/thirdperson.h"
 #include "../pathfinder.h"
 #include "../types.h"
-#include "reone/resource/template/generated/are.h"
-#include "reone/resource/template/generated/git.h"
 
 namespace reone {
-
-namespace graphics {
-
-class Window;
-
-}
 
 namespace game {
 

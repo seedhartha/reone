@@ -24,7 +24,6 @@
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/uniforms.h"
-#include "reone/graphics/window.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/system/logutil.h"

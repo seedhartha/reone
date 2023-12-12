@@ -21,8 +21,10 @@ namespace reone {
 
 namespace graphics {
 
-class IEventHandler {
+class EventHandler {
 public:
+    virtual ~EventHandler() = default;
+
     virtual bool handle(const SDL_Event &event) = 0;
 };
 
