@@ -23,17 +23,42 @@ namespace reone {
 
 void initLog(LogSeverity minSeverity = LogSeverity::Info,
              std::set<LogChannel> channels = std::set<LogChannel> {LogChannel::Global},
-             std::string filename = "");
-
-void error(const std::string &s, LogChannel channel = LogChannel::Global);
-void error(const boost::format &s, LogChannel channel = LogChannel::Global);
-void warn(const std::string &s, LogChannel channel = LogChannel::Global);
-void warn(const boost::format &s, LogChannel channel = LogChannel::Global);
-void info(const std::string &s, LogChannel channel = LogChannel::Global);
-void info(const boost::format &s, LogChannel channel = LogChannel::Global);
-void debug(const std::string &s, LogChannel channel = LogChannel::Global);
-void debug(const boost::format &s, LogChannel channel = LogChannel::Global);
+             std::optional<std::string> filename = std::nullopt);
 
 bool isLogChannelEnabled(LogChannel channel);
+
+void log(const char *message, LogChannel channel, LogSeverity severity);
+
+inline void error(const char *message, LogChannel channel = LogChannel::Global) {
+    log(message, channel, LogSeverity::Error);
+}
+
+inline void error(const std::string &message, LogChannel channel = LogChannel::Global) {
+    error(message.c_str(), channel);
+}
+
+inline void warn(const char *message, LogChannel channel = LogChannel::Global) {
+    log(message, channel, LogSeverity::Warn);
+}
+
+inline void warn(const std::string &message, LogChannel channel = LogChannel::Global) {
+    warn(message.c_str(), channel);
+}
+
+inline void info(const char *message, LogChannel channel = LogChannel::Global) {
+    log(message, channel, LogSeverity::Info);
+}
+
+inline void info(const std::string &message, LogChannel channel = LogChannel::Global) {
+    info(message.c_str(), channel);
+}
+
+inline void debug(const char *message, LogChannel channel = LogChannel::Global) {
+    log(message, channel, LogSeverity::Debug);
+}
+
+inline void debug(const std::string &message, LogChannel channel = LogChannel::Global) {
+    debug(message.c_str(), channel);
+}
 
 } // namespace reone

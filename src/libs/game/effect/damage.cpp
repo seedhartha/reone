@@ -26,7 +26,7 @@ namespace reone {
 namespace game {
 
 void DamageEffect::applyTo(Object &object) {
-    debug(boost::format("Damage taken: %s %d") % object.tag() % _amount);
+    debug(str(boost::format("Damage taken: %s %d") % object.tag() % _amount));
     object.setCurrentHitPoints(glm::max(object.isMinOneHP() ? 1 : 0, object.currentHitPoints() - _amount));
 }
 

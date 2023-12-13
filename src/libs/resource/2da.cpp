@@ -102,7 +102,7 @@ std::string TwoDa::getString(int row, const std::string &column, std::string def
     const std::string &value = _rows[row].values[columnIdx];
 
     if (value == kCellValueDeleted) {
-        warn(boost::format("2DA: cell value was deleted: %d %s") % row % column);
+        warn(str(boost::format("2DA: cell value was deleted: %d %s") % row % column));
         return defValue;
     }
 

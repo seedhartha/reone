@@ -221,7 +221,7 @@ void Module::onObjectClick(const std::shared_ptr<Object> &object) {
 }
 
 void Module::onCreatureClick(const std::shared_ptr<Creature> &creature) {
-    debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
+    debug(str(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction())));
 
     std::shared_ptr<Creature> partyLeader(_game.party().getLeader());
 

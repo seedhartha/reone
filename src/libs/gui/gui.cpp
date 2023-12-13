@@ -101,7 +101,7 @@ void GUI::loadControl(const resource::generated::GUI_CONTROLS &gui) {
     auto type = Control::getType(gui);
     auto tag = Control::getTag(gui);
     auto parentTag = Control::getParent(gui);
-    debug(boost::format("Loading control: type=%s, tag='%s', parent='%s'") % static_cast<int>(type) % tag % parentTag,
+    debug(str(boost::format("Loading control: type=%s, tag='%s', parent='%s'") % static_cast<int>(type) % tag % parentTag),
           LogChannel::GUI);
 
     auto control = newControl(type, tag);

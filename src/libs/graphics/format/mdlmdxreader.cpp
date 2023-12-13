@@ -672,7 +672,7 @@ void MdlMdxReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const 
         if (fn) {
             fn(key, data, node);
         } else {
-            debug(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type), LogChannel::Graphics);
+            debug(str(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type)), LogChannel::Graphics);
         }
     }
 }

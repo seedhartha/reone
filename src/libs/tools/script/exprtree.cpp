@@ -104,7 +104,7 @@ ExpressionTree ExpressionTree::fromProgram(const ScriptProgram &program, IRoutin
 }
 
 void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<DecompilationContext> ctx) {
-    debug(boost::format("Decompiling function at %08x") % func.start);
+    debug(str(boost::format("Decompiling function at %08x") % func.start));
 
     auto mainBlock = std::make_shared<BlockExpression>();
     mainBlock->offset = func.start;
@@ -124,7 +124,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
         decompiledBlocks[std::make_pair(block->offset, ctx->stack.size())] = block;
 
         try {
-            debug(boost::format("Begin decompiling block at %08x") % block->offset);
+            debug(str(boost::format("Begin decompiling block at %08x") % block->offset));
 
             for (uint32_t offset = block->offset; offset < ctx->program.length();) {
                 maxOffset = std::max(maxOffset, offset);
@@ -134,14 +134,14 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                     block->append(maybeLabel->second);
                 }
 
-                // debug(boost::format("Stack: size=%d") % ctx->stack.size());
+                // debug(str(boost::format("Stack: size=%d") % ctx->stack.size()));
                 // for (auto it = ctx->stack.rbegin(); it != ctx->stack.rend(); ++it) {
                 //     auto type = describeVariableType(it->param->variableType);
                 //     debug("    " + type);
                 // }
 
                 auto &ins = ctx->program.getInstruction(offset);
-                debug(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type));
+                debug(str(boost::format("Decompiling instruction at %08x of type %s") % offset % describeInstructionType(ins.type)));
 
                 if (ins.type == InstructionType::NOP ||
                     ins.type == InstructionType::NOP2) {
@@ -941,16 +941,16 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                 offset = ins.nextOffset;
             }
 
-            debug(boost::format("End decompiling block at %08x") % block->offset);
+            debug(str(boost::format("End decompiling block at %08x") % block->offset));
 
         } catch (const std::logic_error &e) {
-            error(boost::format("Error decompiling block at %08x: %s") % block->offset % std::string(e.what()));
+            error(str(boost::format("Error decompiling block at %08x: %s") % block->offset % std::string(e.what())));
         }
     }
 
     func.end = maxOffset;
 
-    debug(boost::format("End decompiling function at %08x") % func.start);
+    debug(str(boost::format("End decompiling function at %08x") % func.start));
 }
 
 std::unique_ptr<ConstantExpression> ExpressionTree::constantExpression(const Instruction &ins) {

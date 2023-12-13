@@ -491,7 +491,7 @@ void Creature::die() {
     _dead = true;
     _name = _services.resource.strings.getText(kStrRefRemains);
 
-    debug(boost::format("Creature %s is dead") % _tag);
+    debug(str(boost::format("Creature %s is dead") % _tag));
 
     playSound(SoundSetEntry::Dead);
     playAnimation(getDieAnimation());

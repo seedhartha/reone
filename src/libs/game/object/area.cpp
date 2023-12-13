@@ -386,7 +386,7 @@ void Area::loadPTH() {
         const Path::Point &point = path->points[i];
         Collision collision;
         if (!sceneGraph.testElevation(glm::vec2(point.x, point.y), collision)) {
-            warn(boost::format("Point %d elevation not found") % i);
+            warn(str(boost::format("Point %d elevation not found") % i));
             continue;
         }
         pointZ.insert(std::make_pair(static_cast<int>(i), collision.intersection.z));
@@ -853,7 +853,7 @@ void Area::checkTriggersIntersection(const std::shared_ptr<Object> &triggerrer) 
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) {
             continue;
         }
-        debug(boost::format("Trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
+        debug(str(boost::format("Trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag()));
         trigger->addTenant(triggerrer);
 
         if (!trigger->linkedToModule().empty()) {
@@ -1033,7 +1033,7 @@ std::shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth,
 
     int candidateCount = static_cast<int>(candidates.size());
     if (nth >= candidateCount) {
-        debug(boost::format("getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount);
+        debug(str(boost::format("getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount));
         return nullptr;
     }
 
@@ -1187,20 +1187,20 @@ void Area::doUpdatePerception() {
             // Hearing
             bool wasHeard = creature->perception().heard.count(other) > 0;
             if (!wasHeard && heard) {
-                debug(boost::format("%s heard by %s") % other->tag() % creature->tag(), LogChannel::Perception);
+                debug(str(boost::format("%s heard by %s") % other->tag() % creature->tag()), LogChannel::Perception);
                 creature->onObjectHeard(other);
             } else if (wasHeard && !heard) {
-                debug(boost::format("%s inaudible to %s") % other->tag() % creature->tag(), LogChannel::Perception);
+                debug(str(boost::format("%s inaudible to %s") % other->tag() % creature->tag()), LogChannel::Perception);
                 creature->onObjectInaudible(other);
             }
 
             // Sight
             bool wasSeen = creature->perception().seen.count(other) > 0;
             if (!wasSeen && seen) {
-                debug(boost::format("%s seen by %s") % other->tag() % creature->tag(), LogChannel::Perception);
+                debug(str(boost::format("%s seen by %s") % other->tag() % creature->tag()), LogChannel::Perception);
                 creature->onObjectSeen(other);
             } else if (wasSeen && !seen) {
-                debug(boost::format("%s vanished from %s") % other->tag() % creature->tag(), LogChannel::Perception);
+                debug(str(boost::format("%s vanished from %s") % other->tag() % creature->tag()), LogChannel::Perception);
                 creature->onObjectVanished(other);
             }
         }

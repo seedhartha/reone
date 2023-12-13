@@ -440,7 +440,7 @@ private:
             gui->init();
             return gui;
         } catch (const std::exception &e) {
-            error(boost::format("Error loading GUI: %s") % std::string(e.what()));
+            error(str(boost::format("Error loading GUI: %s") % std::string(e.what())));
             return nullptr;
         }
     }

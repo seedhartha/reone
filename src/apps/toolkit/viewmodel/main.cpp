@@ -81,7 +81,7 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
         try {
             openResource(*item.resId, res);
         } catch (const std::exception &e) {
-            error(boost::format("Error opening resource: %s") % std::string(e.what()));
+            error(str(boost::format("Error opening resource: %s") % std::string(e.what())));
         }
     });
 }

@@ -17,17 +17,7 @@
 
 #include "reone/system/logutil.h"
 
-#include <boost/log/expressions.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_channel_logger.hpp>
-#include <boost/log/utility/setup.hpp>
-
 namespace reone {
-
-BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", LogChannel)
-BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", LogSeverity)
-
-using SeverityChannelLogger = boost::log::sources::severity_channel_logger_mt<LogSeverity, LogChannel>;
 
 static const std::unordered_map<LogSeverity, std::string> kSeverityToName {
     {LogSeverity::Error, "ERROR"},
@@ -49,94 +39,34 @@ static const std::unordered_map<LogChannel, std::string> kChannelToName {
     {LogChannel::Script2, "script"},
     {LogChannel::Script3, "script"}};
 
-static LogSeverity g_minSeverity = LogSeverity::None;
+static LogSeverity g_minSeverity = LogSeverity::Warn;
 static std::set<LogChannel> g_enabledChannels;
-
-static std::unordered_map<LogChannel, SeverityChannelLogger> g_channelToLogger {
-    {LogChannel::Global, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Global}},             //
-    {LogChannel::Resources, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Resources}},       //
-    {LogChannel::Resources2, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Resources2}},     //
-    {LogChannel::Graphics, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Graphics}},         //
-    {LogChannel::Audio, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Audio}},               //
-    {LogChannel::GUI, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::GUI}},                   //
-    {LogChannel::Perception, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Perception}},     //
-    {LogChannel::Conversation, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Conversation}}, //
-    {LogChannel::Combat, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Combat}},             //
-    {LogChannel::Script, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script}},             //
-    {LogChannel::Script2, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script2}},           //
-    {LogChannel::Script3, SeverityChannelLogger {boost::log::keywords::channel = LogChannel::Script3}}            //
-};
-
-static std::ostream &operator<<(std::ostream &stream, LogSeverity severity) {
-    stream << kSeverityToName.at(severity);
-    return stream;
-}
-
-static std::ostream &operator<<(std::ostream &stream, LogChannel channel) {
-    stream << kChannelToName.at(channel);
-    return stream;
-}
+static std::unique_ptr<std::ostream> g_stream;
 
 void initLog(LogSeverity minSeverity,
              std::set<LogChannel> enabledChannels,
-             std::string filename) {
+             std::optional<std::string> filename) {
     g_minSeverity = minSeverity;
     g_enabledChannels = enabledChannels;
-
-    boost::log::core::get()->set_filter(severity >= minSeverity);
-    if (!filename.empty()) {
-        boost::log::add_file_log(
-            boost::log::keywords::file_name = filename,
-            boost::log::keywords::format = (boost::log::expressions::stream << severity << " [" << channel << "] " << boost::log::expressions::smessage));
+    if (filename) {
+        g_stream = std::make_unique<std::ofstream>(*filename);
     } else {
-        boost::log::add_console_log(
-            std::clog,
-            boost::log::keywords::format = (boost::log::expressions::stream << severity << " [" << channel << "] " << boost::log::expressions::smessage));
+        g_stream = std::make_unique<std::ostream>(std::clog.rdbuf());
     }
-    boost::log::add_common_attributes();
-}
-
-static void log(LogSeverity severity, const std::string &s, LogChannel channel) {
-    if (!isLogChannelEnabled(channel)) {
-        return;
-    }
-    BOOST_LOG_SEV(g_channelToLogger.at(channel), severity) << s;
-}
-
-void error(const std::string &s, LogChannel channel) {
-    log(LogSeverity::Error, s, channel);
-}
-
-void error(const boost::format &s, LogChannel channel) {
-    log(LogSeverity::Error, str(s), channel);
-}
-
-void warn(const std::string &s, LogChannel channel) {
-    log(LogSeverity::Warn, s, channel);
-}
-
-void warn(const boost::format &s, LogChannel channel) {
-    log(LogSeverity::Warn, str(s), channel);
-}
-
-void info(const std::string &s, LogChannel channel) {
-    log(LogSeverity::Info, s, channel);
-}
-
-void info(const boost::format &s, LogChannel channel) {
-    log(LogSeverity::Info, str(s), channel);
-}
-
-void debug(const std::string &s, LogChannel channel) {
-    log(LogSeverity::Debug, s, channel);
-}
-
-void debug(const boost::format &s, LogChannel channel) {
-    return debug(str(s), channel);
 }
 
 bool isLogChannelEnabled(LogChannel channel) {
     return g_enabledChannels.count(channel) > 0;
+}
+
+void log(const char *message, LogChannel channel, LogSeverity severity) {
+    if (static_cast<int>(severity) < static_cast<int>(g_minSeverity)) {
+        return;
+    }
+    if (g_enabledChannels.count(channel) == 0) {
+        return;
+    }
+    (*g_stream) << kSeverityToName.at(severity) << "[" << kChannelToName.at(channel) << "] " << message << std::endl;
 }
 
 } // namespace reone

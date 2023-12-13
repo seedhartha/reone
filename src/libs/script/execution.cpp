@@ -150,11 +150,11 @@ int ScriptExecution::run() {
         insOff = _context->savedState->insOffset;
     }
 
-    debug(boost::format("Run '%s': offset=%04x, caller=%u, triggerrer=%u") %
+    debug(str(boost::format("Run '%s': offset=%04x, caller=%u, triggerrer=%u") %
               _program->name() %
               insOff %
               _context->callerId %
-              _context->triggererId,
+              _context->triggererId),
           LogChannel::Script);
 
     while (insOff < _program->length()) {
@@ -162,18 +162,18 @@ int ScriptExecution::run() {
         auto handler = _handlers.find(ins.type);
 
         if (handler == _handlers.end()) {
-            error(boost::format("Instruction not implemented: %04x") % static_cast<int>(ins.type), LogChannel::Script);
+            error(str(boost::format("Instruction not implemented: %04x") % static_cast<int>(ins.type)), LogChannel::Script);
             return -1;
         }
         _nextInstruction = ins.nextOffset;
 
         if (isLogChannelEnabled(LogChannel::Script3)) {
-            debug(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines), LogChannel::Script3);
+            debug(str(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines)), LogChannel::Script3);
         }
         try {
             handler->second(ins);
         } catch (const std::exception &ex) {
-            debug(boost::format("Halt '%s'") % _program->name(), LogChannel::Script);
+            debug(str(boost::format("Halt '%s'") % _program->name()), LogChannel::Script);
             return -1;
         }
 
@@ -293,7 +293,7 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
             argStrings.push_back(arg.toString());
         }
         std::string argsString(boost::join(argStrings, ", "));
-        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannel::Script2);
+        debug(str(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString()), LogChannel::Script2);
     }
     switch (routine.returnType()) {
     case VariableType::Void:

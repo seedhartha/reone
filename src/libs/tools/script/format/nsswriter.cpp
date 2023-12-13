@@ -89,7 +89,7 @@ struct BlockLevelCompare {
 };
 
 void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
-    debug(boost::format("Writing blocks of function at %08x") % func.block->offset);
+    debug(str(boost::format("Writing blocks of function at %08x") % func.block->offset));
     std::set<std::pair<BlockExpression *, int>, BlockLevelCompare> blocksToWrite;
 
     std::queue<std::pair<Expression *, int>> exprToVisit;
@@ -99,7 +99,7 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
         exprToVisit.pop();
         if (expr->type == ExpressionType::Block) {
             auto blockExpr = static_cast<BlockExpression *>(expr);
-            debug(boost::format("Visiting block (%p, %d) at %08x") % blockExpr % level % blockExpr->offset);
+            debug(str(boost::format("Visiting block (%p, %d) at %08x") % blockExpr % level % blockExpr->offset));
             auto blockKey = std::make_pair(blockExpr, level);
             if (blocksToWrite.count(blockKey) == 0) {
                 blocksToWrite.insert(blockKey);
@@ -145,7 +145,7 @@ void NssWriter::writeBlocks(const Function &func, TextWriter &writer) {
     auto blockWriter = TextWriter(blockStream);
     auto ctx = WriteContext();
     for (auto [block, level] : blocksToWrite) {
-        debug(boost::format("Writing block (%p, %d)") % block % level);
+        debug(str(boost::format("Writing block (%p, %d)") % block % level));
         blockBytes.clear();
         writeBlock(level, *block, ctx, blockWriter);
         auto blockKey = std::make_pair(block, level);
@@ -250,7 +250,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
                 if (ctx.writtenBlocks.count(blockKey) > 0) {
                     writer.write(ctx.writtenBlocks.at(blockKey));
                 } else {
-                    warn(boost::format("Block (%p, %d) not written") % blockArg % blockLevel);
+                    warn(str(boost::format("Block (%p, %d) not written") % blockArg % blockLevel));
                 }
             } else {
                 writeExpression(blockLevel, false, *argExpr, ctx, writer);
@@ -382,7 +382,7 @@ void NssWriter::writeExpression(int blockLevel, bool declare, const Expression &
             if (ctx.writtenBlocks.count(blockKey) > 0) {
                 writer.write(ctx.writtenBlocks.at(blockKey));
             } else {
-                warn(boost::format("Block (%p, %d) not written") % condExpr.ifTrue % blockLevel);
+                warn(str(boost::format("Block (%p, %d) not written") % condExpr.ifTrue % blockLevel));
             }
         }
         writer.writeLine("");

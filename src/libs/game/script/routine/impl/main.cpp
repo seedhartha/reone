@@ -1206,7 +1206,7 @@ static Variable SignalEvent(const std::vector<Variable> &args, const RoutineCont
     // Transform
 
     // Execute
-    debug(boost::format("Event signalled: %s %s") % oObject->tag() % evToRun->number(), LogChannel::Script);
+    debug(str(boost::format("Event signalled: %s %s") % oObject->tag() % evToRun->number()), LogChannel::Script);
     ctx.game.scriptRunner().run(oObject->getOnUserDefined(), oObject->id(), kObjectInvalid, evToRun->number());
     return Variable::ofNull();
 }

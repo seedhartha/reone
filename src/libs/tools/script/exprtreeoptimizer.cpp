@@ -142,7 +142,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
         for (auto it = tree.globals().begin(); it != tree.globals().end();) {
             auto &globalEvents = ctx.parameters[it->param];
             if (globalEvents.reads.empty()) {
-                debug(boost::format("Unread global variable at %08x removed") % it->param->offset);
+                debug(str(boost::format("Unread global variable at %08x removed") % it->param->offset));
                 it = tree.globals().erase(it);
                 continue;
             }
@@ -172,7 +172,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
         }
         if (func->returnType == VariableType::Void) {
             if (!func->block->expressions.empty() && func->block->expressions.back()->type == ExpressionType::Return) {
-                debug(boost::format("Trailing return at %08x removed") % func->block->expressions.back()->offset);
+                debug(str(boost::format("Trailing return at %08x removed") % func->block->expressions.back()->offset));
                 func->block->expressions.pop_back();
             }
         } else {
@@ -199,7 +199,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                     }
                 }
             }
-            debug(boost::format("Argument %d in function at %08x converted to return value") % retValArgIdx % func->start);
+            debug(str(boost::format("Argument %d in function at %08x converted to return value") % retValArgIdx % func->start));
         }
     }
 
@@ -226,7 +226,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                 if (!paramEvents.writes.empty()) {
                     auto &write = paramEvents.writes.front();
                     if (write.writeExpr->type == ExpressionType::Assign) {
-                        debug(boost::format("Write-once variable declaration at %08x merged with initialization") % paramExpr->offset);
+                        debug(str(boost::format("Write-once variable declaration at %08x merged with initialization") % paramExpr->offset));
                         auto assignExpr = static_cast<BinaryExpression *>(write.writeExpr);
                         assignExpr->declareLeft = true;
                         it = block->expressions.erase(it);
@@ -243,7 +243,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                             blockArg->expressions.back()->type == ExpressionType::Return &&
                             (blockArg->expressions.front()->type == ExpressionType::Action || blockArg->expressions.front()->type == ExpressionType::Call)) {
                             int argIdx = std::distance(actionExpr->arguments.begin(), argIter);
-                            debug(boost::format("Degenerate block argument %d in action call at %08x collapsed") % argIdx % blockArg->offset);
+                            debug(str(boost::format("Degenerate block argument %d in action call at %08x collapsed") % argIdx % blockArg->offset));
                             argIter = actionExpr->arguments.erase(argIter);
                             argIter = actionExpr->arguments.insert(argIter, blockArg->expressions.front());
                         }
@@ -254,7 +254,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                 if (ctx.callDestinations.count(callExpr) > 0) {
                     auto destination = ctx.callDestinations.at(callExpr);
                     ctx.callDestinations.erase(callExpr);
-                    debug(boost::format("Return value stored to variable at %08x in function call at %08x") % destination->offset % callExpr->offset);
+                    debug(str(boost::format("Return value stored to variable at %08x in function call at %08x") % destination->offset % callExpr->offset));
                     auto assignExpr = std::make_shared<BinaryExpression>(ExpressionType::Assign);
                     assignExpr->offset = callExpr->offset;
                     assignExpr->left = destination;
@@ -298,19 +298,19 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                             continue;
                         }
                         if (read.expression->type == ExpressionType::Action) {
-                            debug(boost::format("Write-once / read-once variable at %08x inlined as argument %d in action call at %08x") % leftParam->offset % read.actionArgIdx % read.expression->offset);
+                            debug(str(boost::format("Write-once / read-once variable at %08x inlined as argument %d in action call at %08x") % leftParam->offset % read.actionArgIdx % read.expression->offset));
                             auto readAction = static_cast<ActionExpression *>(read.expression);
                             readAction->arguments[read.actionArgIdx] = write.value;
                             it = block->expressions.erase(it);
                             continue;
                         } else if (read.expression->type == ExpressionType::Call) {
-                            debug(boost::format("Write-once / read-once variable at %08x inlined as argument %d in function call at %08x") % leftParam->offset % read.callArgIdx % read.expression->offset);
+                            debug(str(boost::format("Write-once / read-once variable at %08x inlined as argument %d in function call at %08x") % leftParam->offset % read.callArgIdx % read.expression->offset));
                             auto readCall = static_cast<CallExpression *>(read.expression);
                             readCall->arguments[read.callArgIdx] = write.value;
                             it = block->expressions.erase(it);
                             continue;
                         } else if (ExpressionTree::isUnaryExpression(read.expression->type)) {
-                            debug(boost::format("Write-once / read-once variable at %08x inlined as operand in unary expression at %08x") % leftParam->offset % read.expression->offset);
+                            debug(str(boost::format("Write-once / read-once variable at %08x inlined as operand in unary expression at %08x") % leftParam->offset % read.expression->offset));
                             auto readUnary = static_cast<UnaryExpression *>(read.expression);
                             readUnary->operand = write.value;
                             it = block->expressions.erase(it);
@@ -318,10 +318,10 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                         } else if (ExpressionTree::isBinaryExpression(read.expression->type)) {
                             auto readBinary = static_cast<BinaryExpression *>(read.expression);
                             if (read.binaryDir == -1) {
-                                debug(boost::format("Write-once / read-once variable at %08x inlined as left in binary expression at %08x") % leftParam->offset % read.expression->offset);
+                                debug(str(boost::format("Write-once / read-once variable at %08x inlined as left in binary expression at %08x") % leftParam->offset % read.expression->offset));
                                 readBinary->left = write.value;
                             } else {
-                                debug(boost::format("Write-once / read-once variable at %08x inlined as right in binary expression at %08x") % leftParam->offset % read.expression->offset);
+                                debug(str(boost::format("Write-once / read-once variable at %08x inlined as right in binary expression at %08x") % leftParam->offset % read.expression->offset));
                                 readBinary->right = write.value;
                                 if (readBinary->type == ExpressionType::Assign && readBinary->declareLeft) {
                                     auto destination = static_cast<ParameterExpression *>(readBinary->left);
@@ -333,7 +333,7 @@ void ExpressionTreeOptimizer::compact(ExpressionTree &tree, OptimizationContext 
                             continue;
                         }
                     } else if (paramEvents.reads.empty()) {
-                        debug(boost::format("Unread variable at %08x removed") % leftParam->offset);
+                        debug(str(boost::format("Unread variable at %08x removed") % leftParam->offset));
                         it = block->expressions.erase(it);
                         if (binaryExpr->right->type == ExpressionType::Action ||
                             binaryExpr->right->type == ExpressionType::Call ||

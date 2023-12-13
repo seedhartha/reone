@@ -25,7 +25,6 @@
 #include "reone/system/logutil.h"
 #include "reone/system/stream/memoryinput.h"
 
-
 using namespace reone::graphics;
 
 namespace reone {
@@ -74,7 +73,7 @@ std::shared_ptr<Model> Models::doGet(const std::string &resRef) {
                 model->setSuperModel(std::move(superModel));
             }
         } catch (const ValidationException &e) {
-            error(boost::format("Error loading model %s: %s") % resRef % std::string(e.what()), LogChannel::Graphics);
+            error(str(boost::format("Error loading model %s: %s") % resRef % std::string(e.what())), LogChannel::Graphics);
         }
     }
 

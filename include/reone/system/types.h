@@ -29,9 +29,7 @@ enum class LogSeverity {
     Debug,
     Info,
     Warn,
-    Error,
-
-    None
+    Error
 };
 
 enum class LogChannel {
