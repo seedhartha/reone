@@ -75,12 +75,12 @@ TEST(script_execution, should_run_script_program__boolean_logic) {
     // then
     EXPECT_EQ(1, result);
     EXPECT_EQ(6, execution.getStackSize());
-    EXPECT_EQ(0, execution.getStackVertexariable(0).intValue);
-    EXPECT_EQ(0, execution.getStackVertexariable(1).intValue);
-    EXPECT_EQ(1, execution.getStackVertexariable(2).intValue);
-    EXPECT_EQ(0, execution.getStackVertexariable(3).intValue);
-    EXPECT_EQ(1, execution.getStackVertexariable(4).intValue);
-    EXPECT_EQ(1, execution.getStackVertexariable(5).intValue);
+    EXPECT_EQ(0, execution.getStackVariable(0).intValue);
+    EXPECT_EQ(0, execution.getStackVariable(1).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(2).intValue);
+    EXPECT_EQ(0, execution.getStackVariable(3).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(4).intValue);
+    EXPECT_EQ(1, execution.getStackVariable(5).intValue);
 }
 
 TEST(script_execution, should_run_script_program__math) {
@@ -129,7 +129,7 @@ TEST(script_execution, should_run_script_program__math) {
     // then
     EXPECT_EQ(-1, result);
     EXPECT_EQ(1, execution.getStackSize());
-    EXPECT_NEAR(-14.4f, execution.getStackVertexariable(0).floatValue, 1e-5);
+    EXPECT_NEAR(-14.4f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
 TEST(script_execution, should_run_script_program__comparisons) {
@@ -264,9 +264,9 @@ TEST(script_execution, should_run_script_program__action_with_vectors) {
     // then
     EXPECT_EQ(-1, result);
     EXPECT_EQ(3, execution.getStackSize());
-    EXPECT_NEAR(7.0f, execution.getStackVertexariable(0).floatValue, 1e-5);
-    EXPECT_NEAR(6.0f, execution.getStackVertexariable(1).floatValue, 1e-5);
-    EXPECT_NEAR(5.0f, execution.getStackVertexariable(2).floatValue, 1e-5);
+    EXPECT_NEAR(7.0f, execution.getStackVariable(0).floatValue, 1e-5);
+    EXPECT_NEAR(6.0f, execution.getStackVariable(1).floatValue, 1e-5);
+    EXPECT_NEAR(5.0f, execution.getStackVariable(2).floatValue, 1e-5);
     EXPECT_EQ(1ll, routine->invokeInvocations().size());
     auto &invocation = routine->invokeInvocations();
     auto inVecValue = std::get<0>(invocation[0])[0].vecValue;
@@ -422,7 +422,7 @@ TEST(script_execution, should_run_script_program__vector_math) {
     // then
     EXPECT_EQ(-1, result);
     EXPECT_EQ(1, execution.getStackSize());
-    EXPECT_NEAR(15015.0f, execution.getStackVertexariable(0).floatValue, 1e-5);
+    EXPECT_NEAR(15015.0f, execution.getStackVariable(0).floatValue, 1e-5);
 }
 
 TEST(script_execution, should_run_script_program__structs) {

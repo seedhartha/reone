@@ -212,7 +212,7 @@ void Conversation::loadReplies() {
     }
 
     // If there is only one empty reply, pick it automatically when the current entry ends
-    _autoPickFragmentirstReply = _replies.size() == 1ll && _replies.front()->text.empty();
+    _autoPickFirstReply = _replies.size() == 1ll && _replies.front()->text.empty();
 
     refreshReplies();
 }
@@ -223,7 +223,7 @@ static std::string getReplyText(const Dialog::EntryReply &reply, int index) {
 
 void Conversation::refreshReplies() {
     std::vector<std::string> lines;
-    if (!_autoPickFragmentirstReply) {
+    if (!_autoPickFirstReply) {
         for (size_t i = 0; i < _replies.size(); ++i) {
             lines.push_back(getReplyText(*_replies[i], static_cast<int>(i)));
         }
@@ -289,7 +289,7 @@ void Conversation::endCurrentEntry() {
 
     onEntryEnded();
 
-    if (_autoPickFragmentirstReply) {
+    if (_autoPickFirstReply) {
         pickReply(0);
     } else if (_replies.empty()) {
         debug("Finish (no active replies", LogChannel::Conversation);

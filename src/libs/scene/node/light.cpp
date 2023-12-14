@@ -37,7 +37,7 @@ namespace reone {
 
 namespace scene {
 
-static constexpr float kFragmentadeSpeed = 2.0f;
+static constexpr float kFadeSpeed = 2.0f;
 static constexpr float kMinDirectionalLightRadius = 100.0f;
 
 void LightSceneNode::init() {
@@ -53,13 +53,13 @@ void LightSceneNode::update(float dt) {
     bool fading = _modelNode.light()->fading;
     if (_active) {
         if (fading) {
-            _strength = glm::min(1.0f, _strength + kFragmentadeSpeed * dt);
+            _strength = glm::min(1.0f, _strength + kFadeSpeed * dt);
         } else {
             _strength = 1.0f;
         }
     } else {
         if (fading) {
-            _strength = glm::max(0.0f, _strength - kFragmentadeSpeed * dt);
+            _strength = glm::max(0.0f, _strength - kFadeSpeed * dt);
         } else {
             _strength = 0.0f;
         }

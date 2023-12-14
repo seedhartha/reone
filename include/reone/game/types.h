@@ -39,9 +39,9 @@ constexpr char kSceneClassSelect[] = "classselect";
 constexpr char kScenePortraitSelect[] = "portraitselect";
 constexpr char kSceneCharacter[] = "character";
 
-constexpr glm::vec3 kGeometryUIColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
-constexpr glm::vec3 kGeometryUIColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
-constexpr glm::vec3 kGeometryUIColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+constexpr glm::vec3 kGUIColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+constexpr glm::vec3 kGUIColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+constexpr glm::vec3 kGUIColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
 
 constexpr glm::vec3 kTSLGUIColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
 constexpr glm::vec3 kTSLGUIColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
@@ -108,7 +108,7 @@ enum class AttackResultType {
     AutomaticHit = 3,
     Miss = 4,
     AttackResisted = 5,
-    AttackFragmentailed = 6,
+    AttackFailed = 6,
     Parried = 8,
     Deflected = 9
 };
@@ -275,7 +275,7 @@ enum class AnimationType {
     LoopingWorship = 4,
     LoopingTalkNormal = 5,
     LoopingTalkPleading = 6,
-    LoopingTalkFragmentorceful = 7,
+    LoopingTalkForceful = 7,
     LoopingTalkLaughing = 8,
     LoopingTalkSad = 9,
     LoopingGetLow = 10,
@@ -919,7 +919,7 @@ enum class ActionType {
     QueueEmpty = 0xfffe
 };
 
-enum class TalkVertexolume {
+enum class TalkVolume {
     Talk = 0,
     Whisper = 1,
     Shout = 2,

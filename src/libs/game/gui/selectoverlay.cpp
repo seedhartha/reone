@@ -437,7 +437,7 @@ void SelectionOverlay::renderActionIcon(int index) {
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGeometryUIColorBase;
+    auto guiColorBase = _game.isTSL() ? kTSLGUIColorBase : kGUIColorBase;
 
     return (_selectedObject && _selectedHostile) ? red : guiColorBase;
 }

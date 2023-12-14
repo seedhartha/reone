@@ -43,7 +43,7 @@ public:
     }
 
     int getStackSize() const;
-    const Variable &getStackVertexariable(int index) const;
+    const Variable &getStackVariable(int index) const;
 
 private:
     std::shared_ptr<ScriptProgram> _program;
@@ -63,7 +63,7 @@ private:
     float getFloatFromStack();
     glm::vec3 getVectorFromStack();
 
-    void withStackVertexariables(const std::function<void(const Variable &, const Variable &)> &fn);
+    void withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn);
     void withIntsFromStack(const std::function<void(int, int)> &fn);
     void withIntFloatFromStack(const std::function<void(int, float)> &fn);
     void withFloatIntFromStack(const std::function<void(float, int)> &fn);

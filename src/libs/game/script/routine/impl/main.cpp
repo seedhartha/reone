@@ -1899,7 +1899,7 @@ static Variable ApplyEffectToObject(const std::vector<Variable> &args, const Rou
 static Variable SpeakString(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto sStringToSpeak = getString(args, 0);
-    auto nTalkVertexolume = getIntOrElse(args, 1, 0);
+    auto nTalkVolume = getIntOrElse(args, 1, 0);
 
     // Transform
 

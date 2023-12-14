@@ -28,10 +28,10 @@ public:
     SpeakStringAction(Game &game,
                       ServicesView &services,
                       std::string stringToSpeak,
-                      int talkVertexolume) :
+                      int talkVolume) :
         Action(game, services, ActionType::SpeakString),
         _stringToSpeak(stringToSpeak),
-        _talkVertexolume(talkVertexolume) {
+        _talkVolume(talkVolume) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override {
@@ -40,7 +40,7 @@ public:
 
 private:
     std::string _stringToSpeak;
-    int _talkVertexolume;
+    int _talkVolume;
 };
 
 } // namespace game

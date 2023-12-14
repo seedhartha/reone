@@ -135,12 +135,13 @@ private:
     void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
-    void OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event);
+    void OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);
 
-    void OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event);
+    void OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event);
+    void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);
 

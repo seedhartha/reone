@@ -213,12 +213,12 @@ static Variable ActionAttack(const std::vector<Variable> &args, const RoutineCon
 static Variable ActionSpeakString(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto sStringToSpeak = getString(args, 0);
-    auto nTalkVertexolume = getIntOrElse(args, 1, 0);
+    auto nTalkVolume = getIntOrElse(args, 1, 0);
 
     // Transform
 
     // Execute
-    auto action = ctx.game.newAction<SpeakStringAction>(sStringToSpeak, nTalkVertexolume);
+    auto action = ctx.game.newAction<SpeakStringAction>(sStringToSpeak, nTalkVolume);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();
@@ -458,12 +458,12 @@ static Variable ActionCastSpellAtLocation(const std::vector<Variable> &args, con
 static Variable ActionSpeakStringByStrRef(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto nStrRef = getInt(args, 0);
-    auto nTalkVertexolume = getIntOrElse(args, 1, 0);
+    auto nTalkVolume = getIntOrElse(args, 1, 0);
 
     // Transform
 
     // Execute
-    auto action = ctx.game.newAction<SpeakStringByStrRefAction>(nStrRef, nTalkVertexolume);
+    auto action = ctx.game.newAction<SpeakStringByStrRefAction>(nStrRef, nTalkVolume);
     auto caller = getCaller(ctx);
     caller->addAction(std::move(action));
     return Variable::ofNull();

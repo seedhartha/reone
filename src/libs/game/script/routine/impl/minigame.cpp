@@ -413,7 +413,7 @@ static Variable SWMG_GetGunBankBulletModel(const std::vector<Variable> &args, co
     throw RoutineNotImplementedException("SWMG_GetGunBankBulletModel");
 }
 
-static Variable SWMG_GetGunBankGeometryunModel(const std::vector<Variable> &args, const RoutineContext &ctx) {
+static Variable SWMG_GetGunBankGunModel(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto oFollower = getObject(args, 0, ctx);
     auto nGunBank = getInt(args, 1);
@@ -421,7 +421,7 @@ static Variable SWMG_GetGunBankGeometryunModel(const std::vector<Variable> &args
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("SWMG_GetGunBankGeometryunModel");
+    throw RoutineNotImplementedException("SWMG_GetGunBankGunModel");
 }
 
 static Variable SWMG_GetGunBankDamage(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -491,7 +491,7 @@ static Variable SWMG_SetGunBankBulletModel(const std::vector<Variable> &args, co
     throw RoutineNotImplementedException("SWMG_SetGunBankBulletModel");
 }
 
-static Variable SWMG_SetGunBankGeometryunModel(const std::vector<Variable> &args, const RoutineContext &ctx) {
+static Variable SWMG_SetGunBankGunModel(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto oFollower = getObject(args, 0, ctx);
     auto nGunBank = getInt(args, 1);
@@ -500,7 +500,7 @@ static Variable SWMG_SetGunBankGeometryunModel(const std::vector<Variable> &args
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("SWMG_SetGunBankGeometryunModel");
+    throw RoutineNotImplementedException("SWMG_SetGunBankGunModel");
 }
 
 static Variable SWMG_SetGunBankDamage(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -710,7 +710,7 @@ static Variable SWMG_GetGunBankHorizontalSpread(const std::vector<Variable> &arg
     throw RoutineNotImplementedException("SWMG_GetGunBankHorizontalSpread");
 }
 
-static Variable SWMG_GetGunBankVertexerticalSpread(const std::vector<Variable> &args, const RoutineContext &ctx) {
+static Variable SWMG_GetGunBankVerticalSpread(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto oEnemy = getObject(args, 0, ctx);
     auto nGunBank = getInt(args, 1);
@@ -718,7 +718,7 @@ static Variable SWMG_GetGunBankVertexerticalSpread(const std::vector<Variable> &
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("SWMG_GetGunBankVertexerticalSpread");
+    throw RoutineNotImplementedException("SWMG_GetGunBankVerticalSpread");
 }
 
 static Variable SWMG_GetGunBankSensingRadius(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -755,7 +755,7 @@ static Variable SWMG_SetGunBankHorizontalSpread(const std::vector<Variable> &arg
     throw RoutineNotImplementedException("SWMG_SetGunBankHorizontalSpread");
 }
 
-static Variable SWMG_SetGunBankVertexerticalSpread(const std::vector<Variable> &args, const RoutineContext &ctx) {
+static Variable SWMG_SetGunBankVerticalSpread(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto oEnemy = getObject(args, 0, ctx);
     auto nGunBank = getInt(args, 1);
@@ -764,7 +764,7 @@ static Variable SWMG_SetGunBankVertexerticalSpread(const std::vector<Variable> &
     // Transform
 
     // Execute
-    throw RoutineNotImplementedException("SWMG_SetGunBankVertexerticalSpread");
+    throw RoutineNotImplementedException("SWMG_SetGunBankVerticalSpread");
 }
 
 static Variable SWMG_SetGunBankSensingRadius(const std::vector<Variable> &args, const RoutineContext &ctx) {
@@ -1017,14 +1017,14 @@ void Routines::registerMinigameKotorRoutines() {
     insert(623, "SWMG_GetPosition", R_VECTOR, {R_OBJECT}, &SWMG_GetPosition);
     insert(624, "SWMG_GetGunBankCount", R_INT, {R_OBJECT}, &SWMG_GetGunBankCount);
     insert(625, "SWMG_GetGunBankBulletModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankBulletModel);
-    insert(626, "SWMG_GetGunBankGeometryunModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankGeometryunModel);
+    insert(626, "SWMG_GetGunBankGunModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankGunModel);
     insert(627, "SWMG_GetGunBankDamage", R_INT, {R_OBJECT, R_INT}, &SWMG_GetGunBankDamage);
     insert(628, "SWMG_GetGunBankTimeBetweenShots", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankTimeBetweenShots);
     insert(629, "SWMG_GetGunBankLifespan", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankLifespan);
     insert(630, "SWMG_GetGunBankSpeed", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankSpeed);
     insert(631, "SWMG_GetGunBankTarget", R_INT, {R_OBJECT, R_INT}, &SWMG_GetGunBankTarget);
     insert(632, "SWMG_SetGunBankBulletModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankBulletModel);
-    insert(633, "SWMG_SetGunBankGeometryunModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankGeometryunModel);
+    insert(633, "SWMG_SetGunBankGunModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankGunModel);
     insert(634, "SWMG_SetGunBankDamage", R_VOID, {R_OBJECT, R_INT, R_INT}, &SWMG_SetGunBankDamage);
     insert(635, "SWMG_SetGunBankTimeBetweenShots", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankTimeBetweenShots);
     insert(636, "SWMG_SetGunBankLifespan", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankLifespan);
@@ -1049,11 +1049,11 @@ void Routines::registerMinigameKotorRoutines() {
     insert(655, "SWMG_GetPlayerOrigin", R_VECTOR, {}, &SWMG_GetPlayerOrigin);
     insert(656, "SWMG_SetPlayerOrigin", R_VOID, {R_VECTOR}, &SWMG_SetPlayerOrigin);
     insert(657, "SWMG_GetGunBankHorizontalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankHorizontalSpread);
-    insert(658, "SWMG_GetGunBankVertexerticalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankVertexerticalSpread);
+    insert(658, "SWMG_GetGunBankVerticalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankVerticalSpread);
     insert(659, "SWMG_GetGunBankSensingRadius", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankSensingRadius);
     insert(660, "SWMG_GetGunBankInaccuracy", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankInaccuracy);
     insert(661, "SWMG_SetGunBankHorizontalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankHorizontalSpread);
-    insert(662, "SWMG_SetGunBankVertexerticalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankVertexerticalSpread);
+    insert(662, "SWMG_SetGunBankVerticalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankVerticalSpread);
     insert(663, "SWMG_SetGunBankSensingRadius", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankSensingRadius);
     insert(664, "SWMG_SetGunBankInaccuracy", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankInaccuracy);
     insert(665, "SWMG_GetIsInvulnerable", R_INT, {R_OBJECT}, &SWMG_GetIsInvulnerable);
@@ -1117,14 +1117,14 @@ void Routines::registerMinigameTslRoutines() {
     insert(623, "SWMG_GetPosition", R_VECTOR, {R_OBJECT}, &SWMG_GetPosition);
     insert(624, "SWMG_GetGunBankCount", R_INT, {R_OBJECT}, &SWMG_GetGunBankCount);
     insert(625, "SWMG_GetGunBankBulletModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankBulletModel);
-    insert(626, "SWMG_GetGunBankGeometryunModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankGeometryunModel);
+    insert(626, "SWMG_GetGunBankGunModel", R_STRING, {R_OBJECT, R_INT}, &SWMG_GetGunBankGunModel);
     insert(627, "SWMG_GetGunBankDamage", R_INT, {R_OBJECT, R_INT}, &SWMG_GetGunBankDamage);
     insert(628, "SWMG_GetGunBankTimeBetweenShots", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankTimeBetweenShots);
     insert(629, "SWMG_GetGunBankLifespan", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankLifespan);
     insert(630, "SWMG_GetGunBankSpeed", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankSpeed);
     insert(631, "SWMG_GetGunBankTarget", R_INT, {R_OBJECT, R_INT}, &SWMG_GetGunBankTarget);
     insert(632, "SWMG_SetGunBankBulletModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankBulletModel);
-    insert(633, "SWMG_SetGunBankGeometryunModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankGeometryunModel);
+    insert(633, "SWMG_SetGunBankGunModel", R_VOID, {R_OBJECT, R_INT, R_STRING}, &SWMG_SetGunBankGunModel);
     insert(634, "SWMG_SetGunBankDamage", R_VOID, {R_OBJECT, R_INT, R_INT}, &SWMG_SetGunBankDamage);
     insert(635, "SWMG_SetGunBankTimeBetweenShots", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankTimeBetweenShots);
     insert(636, "SWMG_SetGunBankLifespan", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankLifespan);
@@ -1149,11 +1149,11 @@ void Routines::registerMinigameTslRoutines() {
     insert(655, "SWMG_GetPlayerOrigin", R_VECTOR, {}, &SWMG_GetPlayerOrigin);
     insert(656, "SWMG_SetPlayerOrigin", R_VOID, {R_VECTOR}, &SWMG_SetPlayerOrigin);
     insert(657, "SWMG_GetGunBankHorizontalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankHorizontalSpread);
-    insert(658, "SWMG_GetGunBankVertexerticalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankVertexerticalSpread);
+    insert(658, "SWMG_GetGunBankVerticalSpread", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankVerticalSpread);
     insert(659, "SWMG_GetGunBankSensingRadius", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankSensingRadius);
     insert(660, "SWMG_GetGunBankInaccuracy", R_FLOAT, {R_OBJECT, R_INT}, &SWMG_GetGunBankInaccuracy);
     insert(661, "SWMG_SetGunBankHorizontalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankHorizontalSpread);
-    insert(662, "SWMG_SetGunBankVertexerticalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankVertexerticalSpread);
+    insert(662, "SWMG_SetGunBankVerticalSpread", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankVerticalSpread);
     insert(663, "SWMG_SetGunBankSensingRadius", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankSensingRadius);
     insert(664, "SWMG_SetGunBankInaccuracy", R_VOID, {R_OBJECT, R_INT, R_FLOAT}, &SWMG_SetGunBankInaccuracy);
     insert(665, "SWMG_GetIsInvulnerable", R_INT, {R_OBJECT}, &SWMG_GetIsInvulnerable);

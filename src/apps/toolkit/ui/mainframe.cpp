@@ -65,7 +65,7 @@ namespace reone {
 
 static constexpr char kIconName[] = "toolkit";
 
-static const std::set<std::string> kFragmentilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
+static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
 static const std::set<PageType> kStaticPageTypes {
     PageType::Image,
@@ -154,7 +154,7 @@ MainFrame::MainFrame() :
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &MainFrame::OnFilesTreeCtrlItemExpanding, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnFilesTreeCtrlItemContextMenu, this);
     _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &MainFrame::OnFilesTreeCtrlItemActivated, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnFilesTreeCtrlItemEditingDone, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &MainFrame::OnFilesTreeCtrlItemStartEditing, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Game Directory");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
@@ -362,7 +362,8 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         auto gffPanel = new wxPanel(_notebook);
         auto gffSizer = new wxBoxSizer(wxVERTICAL);
         auto gffTreeCtrl = new wxDataViewTreeCtrl(gffPanel, wxID_ANY);
-        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, &MainFrame::OnGffTreeCtrlItemEditingDone, this);
+        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &MainFrame::OnGffTreeCtrlItemStartEditing, this);
+        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnGffTreeCtrlItemContextMenu, this);
         gffTreeCtrl->Freeze();
         AppendGffStructToTree(*gffTreeCtrl, wxDataViewItem(), "/", *page.gffContent);
         gffTreeCtrl->Thaw();
@@ -597,7 +598,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             return;
         }
         auto extension = item.path.extension().string();
-        if (kFragmentilesArchiveExtensions.count(extension) == 0) {
+        if (kFilesArchiveExtensions.count(extension) == 0) {
             return;
         }
         auto menu = wxMenu();
@@ -608,7 +609,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     }
 }
 
-void MainFrame::OnFilesTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+void MainFrame::OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
 }
 
@@ -639,8 +640,39 @@ void MainFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
     event.Skip();
 }
 
-void MainFrame::OnGffTreeCtrlItemEditingDone(wxDataViewEvent &event) {
+void MainFrame::OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
+}
+
+void MainFrame::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+    enum class MenuItemId {
+        AddField,
+        RenameField,
+        SetFieldValue,
+        SetFieldType,
+        DeleteField,
+        AddListItem,
+        DuplicateListItem,
+        DeleteListItem
+    };
+    auto item = event.GetItem();
+    if (!item.IsOk()) {
+        return;
+    }
+    auto control = wxDynamicCast(event.GetEventObject(), wxDataViewTreeCtrl);
+    wxMenu menu;
+    menu.Append(static_cast<int>(MenuItemId::AddField), "Add field...");
+    menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
+    menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
+    menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
+    menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
+    menu.Append(static_cast<int>(MenuItemId::AddListItem), "Add list item...");
+    menu.Append(static_cast<int>(MenuItemId::DuplicateListItem), "Duplicate list item");
+    menu.Append(static_cast<int>(MenuItemId::DeleteListItem), "Delete list item");
+    menu.Bind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent &event) {
+        wxMessageBox("Hello, world!");
+    });
+    PopupMenu(&menu, event.GetPosition());
 }
 
 void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {

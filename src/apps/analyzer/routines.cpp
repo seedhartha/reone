@@ -34,9 +34,9 @@ namespace reone {
 static const std::regex kConstRegex = std::regex("^(\\w+)\\s+(\\w+)\\s*=(.*);.*");
 static const std::regex kConstVecRegex = std::regex("^\\[\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?),\\s*([\\.\\d]+f?)\\s*\\]$");
 
-static const std::regex kFragmentuncDeclRegex = std::regex("^(\\w+)\\s+(\\w+)\\s*\\((.*)\\);$");
-static const std::regex kFragmentuncArgRegEx = std::regex("^(\\w+)\\s+(\\w+)(.*)$");
-static const std::regex kFragmentuncArgDefValRegEx = std::regex("^(\\w+)\\s+(\\w+)\\s*=(.*)$");
+static const std::regex kFuncDeclRegex = std::regex("^(\\w+)\\s+(\\w+)\\s*\\((.*)\\);$");
+static const std::regex kFuncArgRegEx = std::regex("^(\\w+)\\s+(\\w+)(.*)$");
+static const std::regex kFuncArgDefValRegEx = std::regex("^(\\w+)\\s+(\\w+)\\s*=(.*)$");
 
 struct Constant {
     std::string type;
@@ -83,14 +83,14 @@ static Constant parseConstant(const std::smatch &match) {
 
 static FunctionArgument parseFunctionArgument(const std::string &str) {
     std::smatch match;
-    if (!std::regex_search(str, match, kFragmentuncArgRegEx)) {
+    if (!std::regex_search(str, match, kFuncArgRegEx)) {
         throw std::invalid_argument("Invalid function argument format: " + str);
     }
     auto type = boost::to_lower_copy(match[1].str());
     auto name = match[2].str();
     std::smatch defValMatch;
     std::string defVal;
-    if (std::regex_search(str, defValMatch, kFragmentuncArgDefValRegEx)) {
+    if (std::regex_search(str, defValMatch, kFuncArgDefValRegEx)) {
         defVal = boost::trim_copy(defValMatch[3].str());
     }
     return FunctionArgument(type, name, defVal);
@@ -160,7 +160,7 @@ static std::tuple<std::map<std::string, Constant>, std::vector<Function>> parseN
             constants[constant.name] = std::move(constant);
         }
         std::smatch funcMatch;
-        if (std::regex_search(*line, funcMatch, kFragmentuncDeclRegex)) {
+        if (std::regex_search(*line, funcMatch, kFuncDeclRegex)) {
             functions.push_back(parseFunction(funcMatch));
         }
     }

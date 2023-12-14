@@ -31,7 +31,7 @@ namespace reone {
 namespace script {
 
 static constexpr int kStartInstructionOffset = 13;
-static constexpr float kFragmentloatTolerance = 1e-5;
+static constexpr float kFloatTolerance = 1e-5;
 
 ScriptExecution::ScriptExecution(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context) :
     _context(std::move(context)),
@@ -348,7 +348,7 @@ void ScriptExecution::executeEQUALII(const Instruction &ins) {
 
 void ScriptExecution::executeEQUALFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
-        _stack.push_back(Variable::ofInt(static_cast<int>(fabs(left - right) < kFragmentloatTolerance)));
+        _stack.push_back(Variable::ofInt(static_cast<int>(fabs(left - right) < kFloatTolerance)));
     });
 }
 
@@ -662,7 +662,7 @@ void ScriptExecution::executeDIVII(const Instruction &ins) {
 
 void ScriptExecution::executeDIVIF(const Instruction &ins) {
     withIntFloatFromStack([this](int left, float right) {
-        _stack.push_back(Variable::ofFloat(left / std::max(kFragmentloatTolerance, right)));
+        _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
@@ -674,7 +674,7 @@ void ScriptExecution::executeDIVFI(const Instruction &ins) {
 
 void ScriptExecution::executeDIVFF(const Instruction &ins) {
     withFloatsFromStack([this](float left, float right) {
-        _stack.push_back(Variable::ofFloat(left / std::max(kFragmentloatTolerance, right)));
+        _stack.push_back(Variable::ofFloat(left / std::max(kFloatTolerance, right)));
     });
 }
 
@@ -860,7 +860,7 @@ glm::vec3 ScriptExecution::getVectorFromStack() {
     return glm::vec3(x, y, z);
 }
 
-void ScriptExecution::withStackVertexariables(const std::function<void(const Variable &, const Variable &)> &fn) {
+void ScriptExecution::withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn) {
     Variable second(std::move(_stack.back()));
     _stack.pop_back();
 
@@ -871,7 +871,7 @@ void ScriptExecution::withStackVertexariables(const std::function<void(const Var
 }
 
 void ScriptExecution::withIntsFromStack(const std::function<void(int, int)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
         fn(left.intValue, right.intValue);
@@ -879,7 +879,7 @@ void ScriptExecution::withIntsFromStack(const std::function<void(int, int)> &fn)
 }
 
 void ScriptExecution::withIntFloatFromStack(const std::function<void(int, float)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Int, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
         fn(left.intValue, right.floatValue);
@@ -887,7 +887,7 @@ void ScriptExecution::withIntFloatFromStack(const std::function<void(int, float)
 }
 
 void ScriptExecution::withFloatIntFromStack(const std::function<void(float, int)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Int, right.type);
         fn(left.floatValue, right.intValue);
@@ -895,7 +895,7 @@ void ScriptExecution::withFloatIntFromStack(const std::function<void(float, int)
 }
 
 void ScriptExecution::withFloatsFromStack(const std::function<void(float, float)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Float, left.type);
         throwIfInvalidType(VariableType::Float, right.type);
         fn(left.floatValue, right.floatValue);
@@ -903,7 +903,7 @@ void ScriptExecution::withFloatsFromStack(const std::function<void(float, float)
 }
 
 void ScriptExecution::withStringsFromStack(const std::function<void(const std::string &, const std::string &)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::String, left.type);
         throwIfInvalidType(VariableType::String, right.type);
         fn(left.strValue, right.strValue);
@@ -911,7 +911,7 @@ void ScriptExecution::withStringsFromStack(const std::function<void(const std::s
 }
 
 void ScriptExecution::withObjectsFromStack(const std::function<void(uint32_t, uint32_t)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Object, left.type);
         throwIfInvalidType(VariableType::Object, right.type);
         fn(left.objectId, right.objectId);
@@ -919,7 +919,7 @@ void ScriptExecution::withObjectsFromStack(const std::function<void(uint32_t, ui
 }
 
 void ScriptExecution::withEffectsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Effect, left.type);
         throwIfInvalidType(VariableType::Effect, right.type);
         fn(left.engineType, right.engineType);
@@ -927,7 +927,7 @@ void ScriptExecution::withEffectsFromStack(const std::function<void(const std::s
 }
 
 void ScriptExecution::withEventsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Event, left.type);
         throwIfInvalidType(VariableType::Event, right.type);
         fn(left.engineType, right.engineType);
@@ -935,7 +935,7 @@ void ScriptExecution::withEventsFromStack(const std::function<void(const std::sh
 }
 
 void ScriptExecution::withLocationsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Location, left.type);
         throwIfInvalidType(VariableType::Location, right.type);
         fn(left.engineType, right.engineType);
@@ -943,7 +943,7 @@ void ScriptExecution::withLocationsFromStack(const std::function<void(const std:
 }
 
 void ScriptExecution::withTalentsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn) {
-    withStackVertexariables([this, &fn](auto &left, auto &right) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
         throwIfInvalidType(VariableType::Talent, left.type);
         throwIfInvalidType(VariableType::Talent, right.type);
         fn(left.engineType, right.engineType);
@@ -983,7 +983,7 @@ int ScriptExecution::getStackSize() const {
     return static_cast<int>(_stack.size());
 }
 
-const Variable &ScriptExecution::getStackVertexariable(int index) const {
+const Variable &ScriptExecution::getStackVariable(int index) const {
     return _stack[index];
 }
 

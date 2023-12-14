@@ -19,11 +19,11 @@
 
 namespace reone {
 
-using TaskFragmentunc = std::function<void(const std::atomic_bool &canceled)>;
+using TaskFunc = std::function<void(const std::atomic_bool &canceled)>;
 
 class Task : boost::noncopyable {
 public:
-    Task(TaskFragmentunc func) :
+    Task(TaskFunc func) :
         _func(std::move(func)) {
     }
 
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    TaskFragmentunc _func;
+    TaskFunc _func;
     std::atomic_bool _canceled {false};
 
     inline void operator()() {
@@ -46,7 +46,7 @@ class IThreadPool {
 public:
     virtual ~IThreadPool() = default;
 
-    virtual std::shared_ptr<Task> enqueue(TaskFragmentunc func) = 0;
+    virtual std::shared_ptr<Task> enqueue(TaskFunc func) = 0;
 };
 
 class ThreadPool : public IThreadPool, boost::noncopyable {
@@ -67,7 +67,7 @@ public:
     void init();
     void deinit();
 
-    std::shared_ptr<Task> enqueue(TaskFragmentunc func) override {
+    std::shared_ptr<Task> enqueue(TaskFunc func) override {
         std::lock_guard<std::mutex> lock(_mutex);
         auto task = std::make_shared<Task>(std::move(func));
         _tasks.push(task);

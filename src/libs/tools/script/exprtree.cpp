@@ -455,7 +455,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                         assignExpr->declareLeft = true;
                         block->append(assignExpr.get());
 
-                        ctx->stack.push_back(StackFragmentrame(paramExpr.get(), ctx->topCall().function));
+                        ctx->stack.push_back(StackFrame(paramExpr.get(), ctx->topCall().function));
                         ctx->expressions.push_back(std::move(paramExpr));
                         ctx->expressions.push_back(std::move(assignExpr));
                     }
@@ -800,12 +800,12 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                 } else if (ins.type == InstructionType::EQUALTT ||
                            ins.type == InstructionType::NEQUALTT) {
                     auto numFrames = ins.size / 4;
-                    std::vector<StackFragmentrame> rightFrames;
+                    std::vector<StackFrame> rightFrames;
                     for (int i = 0; i < numFrames; ++i) {
                         rightFrames.push_back(ctx->stack.back());
                         ctx->stack.pop_back();
                     }
-                    std::vector<StackFragmentrame> leftFrames;
+                    std::vector<StackFrame> leftFrames;
                     for (int i = 0; i < numFrames; ++i) {
                         leftFrames.push_back(ctx->stack.back());
                         ctx->stack.pop_back();
@@ -923,7 +923,7 @@ void ExpressionTree::decompileFunction(Function &func, std::shared_ptr<Decompila
                     auto startNoDestroy = static_cast<int>(ctx->stack.size()) - numFrames + (ins.stackOffset / 4);
                     auto numFramesNoDestroy = ins.sizeNoDestroy / 4;
 
-                    std::vector<StackFragmentrame> framesNoDestroy;
+                    std::vector<StackFrame> framesNoDestroy;
                     for (int i = 0; i < numFramesNoDestroy; ++i) {
                         auto &frame = ctx->stack[startNoDestroy + i];
                         framesNoDestroy.push_back(frame);

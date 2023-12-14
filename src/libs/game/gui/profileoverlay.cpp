@@ -34,16 +34,16 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kFragmentontResRef[] = "fnt_console";
+static constexpr char kFontResRef[] = "fnt_console";
 
 static constexpr float kRefreshDelay = 1.0f;  // seconds
 static constexpr float kRefreshPeriod = 5.0f; // seconds
 
-static constexpr int kFragmentrameWidth = 125;
+static constexpr int kFrameWidth = 125;
 static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
-    _font = _services.resource.fonts.get(kFragmentontResRef);
+    _font = _services.resource.fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {

@@ -39,13 +39,13 @@ namespace reone {
 namespace game {
 
 static constexpr int kSwitchToResRef = 47884;
-static constexpr int kGeometryiveItemResRef = 47885;
+static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
 void ContainerGUI::onGUILoaded() {
     bindControls();
 
-    std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGeometryiveItemResRef));
+    std::string btnMessage(_services.resource.strings.getText(kSwitchToResRef) + " " + _services.resource.strings.getText(kGiveItemResRef));
     _controls.BTN_GIVEITEMS->setTextMessage(btnMessage);
 
     std::string LBL_MESSAGE(_services.resource.strings.getText(kInventoryResRef));
