@@ -43,7 +43,6 @@ static constexpr int kFragmentrameWidth = 125;
 static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
-    _frequency = _services.system.clock.performanceFrequency();
     _font = _services.resource.fonts.get(kFragmentontResRef);
 }
 
@@ -51,7 +50,7 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
         _enabled = !_enabled;
         if (_enabled) {
-            _counter = _services.system.clock.performanceCounter();
+            _ticks = _services.system.clock.ticks();
             _refreshTimer.reset(kRefreshDelay);
         }
         return true;
@@ -69,10 +68,10 @@ void ProfileOverlay::update(float dt) {
 
     _refreshTimer.update(dt);
     if (_refreshTimer.elapsed()) {
-        uint64_t counter = _services.system.clock.performanceCounter();
-        _fps = static_cast<int>(_numFrames * _frequency / (counter - _counter));
+        uint64_t ticks = _services.system.clock.ticks();
+        _fps = static_cast<int>(_numFrames * 1000 / (ticks - _ticks));
         _numFrames = 0;
-        _counter = counter;
+        _ticks = ticks;
         _refreshTimer.reset(kRefreshPeriod);
     }
 }

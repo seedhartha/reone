@@ -57,6 +57,7 @@ private:
     std::unique_ptr<game::OptionsView> _optionsView;
     std::unique_ptr<graphics::Window> _window;
 
+    std::unique_ptr<Clock> _clock;
     std::unique_ptr<SystemModule> _systemModule;
     std::unique_ptr<resource::ResourceModule> _resourceModule;
     std::unique_ptr<graphics::GraphicsModule> _graphicsModule;

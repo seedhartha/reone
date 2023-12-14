@@ -19,16 +19,8 @@
 
 namespace reone {
 
-uint32_t Clock::ticks() const {
-    return SDL_GetTicks(); // TODO: SDL_GetTicks64
-}
-
-uint64_t Clock::performanceFrequency() const {
-    return SDL_GetPerformanceFrequency();
-}
-
-uint64_t Clock::performanceCounter() const {
-    return SDL_GetPerformanceCounter();
+uint64_t Clock::ticks() const {
+    return SDL_GetPerformanceCounter() / (SDL_GetPerformanceFrequency() / 1000);
 }
 
 } // namespace reone

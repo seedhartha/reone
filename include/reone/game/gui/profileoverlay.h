@@ -47,8 +47,7 @@ private:
 
     bool _enabled {false};
 
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
+    uint64_t _ticks {0};
     int _numFrames {0};
     int _fps {0};
 

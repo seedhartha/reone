@@ -242,6 +242,7 @@ private:
     graphics::GraphicsOptions _graphicsOpt;
     audio::AudioOptions _audioOpt;
 
+    std::unique_ptr<IClock> _clock;
     std::unique_ptr<SystemModule> _systemModule;
     std::unique_ptr<resource::ResourceModule> _resourceModule;
     std::unique_ptr<graphics::GraphicsModule> _graphicsModule;

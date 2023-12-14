@@ -17,6 +17,8 @@
 
 #include "main.h"
 
+#include <wx/stopwatch.h>
+
 #include "reone/audio/format/mp3reader.h"
 #include "reone/audio/format/wavreader.h"
 #include "reone/graphics/animation.h"
@@ -75,6 +77,20 @@ static const std::set<ResType> kFragmentilesPlaintextResTypes {
     ResType::Txi,
     ResType::Lyt,
     ResType::Vis};
+
+class wxClock : public IClock, boost::noncopyable {
+public:
+    wxClock() {
+        _stopWatch.Start();
+    }
+
+    uint64_t ticks() const override {
+        return _stopWatch.Time();
+    }
+
+private:
+    wxStopWatch _stopWatch;
+};
 
 void MainViewModel::openFile(const GameDirectoryItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
@@ -452,7 +468,8 @@ void MainViewModel::loadEngine() {
     _graphicsOpt.fxaa = false;
     _graphicsOpt.sharpen = false;
 
-    _systemModule = std::make_unique<SystemModule>();
+    _clock = std::make_unique<wxClock>();
+    _systemModule = std::make_unique<SystemModule>(*_clock);
     _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>(_audioOpt);
     _scriptModule = std::make_unique<ScriptModule>();

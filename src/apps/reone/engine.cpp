@@ -44,7 +44,8 @@ void Engine::init() {
     GameProbe probe {_options.game.path};
     auto gameId = probe.probe();
 
-    _systemModule = std::make_unique<SystemModule>();
+    _clock = std::make_unique<Clock>();
+    _systemModule = std::make_unique<SystemModule>(*_clock);
     _graphicsModule = std::make_unique<GraphicsModule>(_options.graphics);
     _audioModule = std::make_unique<AudioModule>(_options.audio);
     _movieModule = std::make_unique<MovieModule>();
@@ -112,6 +113,7 @@ void Engine::deinit() {
     _audioModule.reset();
     _graphicsModule.reset();
     _systemModule.reset();
+    _clock.reset();
 
     _optionsView.reset();
 

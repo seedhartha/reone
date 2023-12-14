@@ -22,19 +22,16 @@ namespace reone {
 static constexpr int kNumThreadPoolThreads = 2;
 
 void SystemModule::init() {
-    _clock = std::make_unique<Clock>();
     _threadPool = std::make_unique<ThreadPool>(kNumThreadPoolThreads);
-
     _threadPool->init();
 
-    _services = std::make_unique<SystemServices>(*_clock, *_threadPool);
+    _services = std::make_unique<SystemServices>(_clock, *_threadPool);
 }
 
 void SystemModule::deinit() {
     _services.reset();
 
     _threadPool.reset();
-    _clock.reset();
 }
 
 } // namespace reone
