@@ -30,6 +30,7 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/exception/notimplemented.h
     ${SYSTEM_INCLUDE_DIR}/fileutil.h
     ${SYSTEM_INCLUDE_DIR}/hexutil.h
+    ${SYSTEM_INCLUDE_DIR}/logger.h
     ${SYSTEM_INCLUDE_DIR}/logutil.h
     ${SYSTEM_INCLUDE_DIR}/randomutil.h
     ${SYSTEM_INCLUDE_DIR}/stream/fileinput.h
@@ -54,7 +55,7 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/di/module.cpp
     ${SYSTEM_SOURCE_DIR}/fileutil.cpp
     ${SYSTEM_SOURCE_DIR}/hexutil.cpp
-    ${SYSTEM_SOURCE_DIR}/logutil.cpp
+    ${SYSTEM_SOURCE_DIR}/logger.cpp
     ${SYSTEM_SOURCE_DIR}/randomutil.cpp
     ${SYSTEM_SOURCE_DIR}/stream/memoryinput.cpp
     ${SYSTEM_SOURCE_DIR}/textreader.cpp

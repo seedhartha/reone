@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/system/logutil.h"
+#include "reone/system/logger.h"
 
 #include "audio.h"
 #include "game.h"
@@ -34,7 +34,7 @@ namespace reone {
 class TestEngine : boost::noncopyable {
 public:
     void init() {
-        initLog();
+        Logger::instance.init(LogSeverity::Error, {}, std::nullopt);
 
         _gameModule = std::make_unique<game::TestGameModule>();
         _movieModule = std::make_unique<movie::TestMovieModule>();

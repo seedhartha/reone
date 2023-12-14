@@ -21,7 +21,7 @@
 #include <windows.h>
 #endif
 
-#include "reone/system/logutil.h"
+#include "reone/system/logger.h"
 #include "reone/system/threadutil.h"
 
 #include "ui/mainframe.h"
@@ -33,7 +33,7 @@ bool ToolkitApp::OnInit() {
     SetProcessDPIAware();
 #endif
     markMainThread();
-    initLog(
+    Logger::instance.init(
         LogSeverity::Debug,
         std::set<LogChannel> {LogChannel::Global, LogChannel::Resources, LogChannel::Graphics, LogChannel::Audio},
         "toolkit.log");

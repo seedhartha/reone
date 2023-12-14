@@ -21,7 +21,7 @@
 #undef min
 #endif
 
-#include "reone/system/logutil.h"
+#include "reone/system/logger.h"
 #include "reone/system/threadutil.h"
 
 #include "engine.h"
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     try {
-        initLog(options->logging.severity, options->logging.channels, kLogFilename);
+        Logger::instance.init(options->logging.severity, options->logging.channels, kLogFilename);
     } catch (const std::exception &ex) {
         std::cerr << "Error initializing logging: " << ex.what() << std::endl;
         return 2;

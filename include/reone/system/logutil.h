@@ -17,20 +17,13 @@
 
 #pragma once
 
+#include "logger.h"
 #include "types.h"
 
 namespace reone {
 
-void initLog(LogSeverity minSeverity = LogSeverity::Info,
-             std::set<LogChannel> channels = std::set<LogChannel> {LogChannel::Global},
-             std::optional<std::string> filename = std::nullopt);
-
-bool isLogChannelEnabled(LogChannel channel);
-
-void log(const char *message, LogChannel channel, LogSeverity severity);
-
 inline void error(const char *message, LogChannel channel = LogChannel::Global) {
-    log(message, channel, LogSeverity::Error);
+    Logger::instance.append(message, channel, LogSeverity::Error);
 }
 
 inline void error(const std::string &message, LogChannel channel = LogChannel::Global) {
@@ -38,7 +31,7 @@ inline void error(const std::string &message, LogChannel channel = LogChannel::G
 }
 
 inline void warn(const char *message, LogChannel channel = LogChannel::Global) {
-    log(message, channel, LogSeverity::Warn);
+    Logger::instance.append(message, channel, LogSeverity::Warn);
 }
 
 inline void warn(const std::string &message, LogChannel channel = LogChannel::Global) {
@@ -46,7 +39,7 @@ inline void warn(const std::string &message, LogChannel channel = LogChannel::Gl
 }
 
 inline void info(const char *message, LogChannel channel = LogChannel::Global) {
-    log(message, channel, LogSeverity::Info);
+    Logger::instance.append(message, channel, LogSeverity::Info);
 }
 
 inline void info(const std::string &message, LogChannel channel = LogChannel::Global) {
@@ -54,7 +47,7 @@ inline void info(const std::string &message, LogChannel channel = LogChannel::Gl
 }
 
 inline void debug(const char *message, LogChannel channel = LogChannel::Global) {
-    log(message, channel, LogSeverity::Debug);
+    Logger::instance.append(message, channel, LogSeverity::Debug);
 }
 
 inline void debug(const std::string &message, LogChannel channel = LogChannel::Global) {

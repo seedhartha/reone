@@ -23,6 +23,7 @@
 #include "reone/script/routine.h"
 #include "reone/script/routines.h"
 #include "reone/script/variable.h"
+#include "reone/system/logger.h"
 #include "reone/system/logutil.h"
 
 namespace reone {
@@ -167,7 +168,7 @@ int ScriptExecution::run() {
         }
         _nextInstruction = ins.nextOffset;
 
-        if (isLogChannelEnabled(LogChannel::Script3)) {
+        if (Logger::instance.isChannelEnabled(LogChannel::Script3)) {
             debug(str(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines)), LogChannel::Script3);
         }
         try {
@@ -287,7 +288,7 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     }
 
     Variable retValue = routine.invoke(args, *_context);
-    if (isLogChannelEnabled(LogChannel::Script2)) {
+    if (Logger::instance.isChannelEnabled(LogChannel::Script2)) {
         std::vector<std::string> argStrings;
         for (auto &arg : args) {
             argStrings.push_back(arg.toString());
