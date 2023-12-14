@@ -16,6 +16,8 @@
  */
 
 #include "reone/system/logutil.h"
+#include "reone/system/checkutil.h"
+#include "reone/system/threadutil.h"
 
 namespace reone {
 
@@ -39,34 +41,108 @@ static const std::unordered_map<LogChannel, std::string> kChannelToName {
     {LogChannel::Script2, "script"},
     {LogChannel::Script3, "script"}};
 
-static LogSeverity g_minSeverity = LogSeverity::Warn;
-static std::set<LogChannel> g_enabledChannels;
-static std::unique_ptr<std::ostream> g_stream;
+class Logger {
+public:
+    static constexpr int kBufferSize = 512;
+
+    static Logger instance;
+
+    void init(LogSeverity minSeverity,
+              std::set<LogChannel> enabledChannels,
+              std::optional<std::string> filename) {
+        checkThat(!_inited, "Logger already initialized");
+        _minSeverity = minSeverity;
+        _enabledChannels = std::move(enabledChannels);
+        if (filename) {
+            _stream = std::make_unique<std::ofstream>(*filename);
+        } else {
+            _stream = std::make_unique<std::ostream>(std::clog.rdbuf());
+        }
+        _inited = true;
+    }
+
+    void append(std::string message,
+                LogSeverity severity,
+                LogChannel channel = LogChannel::Global) {
+        if (static_cast<int>(severity) < static_cast<int>(_minSeverity)) {
+            return;
+        }
+        if (_enabledChannels.count(channel) == 0) {
+            return;
+        }
+        auto formatted = str(boost::format("%1$5s [%2%][%3%] %4%\n") %
+                             kSeverityToName.at(severity) %
+                             threadName() %
+                             kChannelToName.at(channel) %
+                             message);
+        if (!buffer) {
+            std::lock_guard<std::mutex> lock {_buffersMutex};
+            buffer = _buffers.emplace_back();
+        }
+        auto &buf = buffer->get();
+        buf.write(&formatted[0], formatted.length());
+        if (buf.tellp() >= kBufferSize) {
+            flush(buf);
+        }
+    }
+
+    bool isChannelEnabled(LogChannel channel) const {
+        return _enabledChannels.count(channel) > 0;
+    }
+
+private:
+    static thread_local std::optional<std::reference_wrapper<std::ostringstream>> buffer;
+
+    LogSeverity _minSeverity {LogSeverity::Warn};
+    std::set<LogChannel> _enabledChannels;
+    std::unique_ptr<std::ostream> _stream;
+    bool _inited {false};
+
+    std::list<std::ostringstream> _buffers;
+
+    std::mutex _buffersMutex;
+    std::mutex _streamMutex;
+
+    Logger() = default;
+
+    ~Logger() {
+        std::lock_guard<std::mutex> lock {_buffersMutex};
+        for (auto &buffer : _buffers) {
+            flush(buffer);
+        }
+    }
+
+    void flush(std::ostringstream &buffer) {
+        if (!_stream) {
+            return;
+        }
+        auto str = buffer.str();
+        {
+            std::lock_guard<std::mutex> lock {_streamMutex};
+            _stream->write(&str[0], str.length());
+        }
+        buffer.str("");
+    }
+};
+
+Logger Logger::instance;
+thread_local std::optional<std::reference_wrapper<std::ostringstream>> Logger::buffer;
 
 void initLog(LogSeverity minSeverity,
              std::set<LogChannel> enabledChannels,
              std::optional<std::string> filename) {
-    g_minSeverity = minSeverity;
-    g_enabledChannels = enabledChannels;
-    if (filename) {
-        g_stream = std::make_unique<std::ofstream>(*filename);
-    } else {
-        g_stream = std::make_unique<std::ostream>(std::clog.rdbuf());
-    }
+    Logger::instance.init(
+        minSeverity,
+        std::move(enabledChannels),
+        std::move(filename));
 }
 
 bool isLogChannelEnabled(LogChannel channel) {
-    return g_enabledChannels.count(channel) > 0;
+    return Logger::instance.isChannelEnabled(channel);
 }
 
 void log(const char *message, LogChannel channel, LogSeverity severity) {
-    if (static_cast<int>(severity) < static_cast<int>(g_minSeverity)) {
-        return;
-    }
-    if (g_enabledChannels.count(channel) == 0) {
-        return;
-    }
-    (*g_stream) << kSeverityToName.at(severity) << "[" << kChannelToName.at(channel) << "] " << message << std::endl;
+    Logger::instance.append(message, severity, channel);
 }
 
 } // namespace reone

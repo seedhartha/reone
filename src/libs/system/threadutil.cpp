@@ -20,15 +20,38 @@
 namespace reone {
 
 static std::thread::id g_mainThreadId;
+static std::unordered_map<std::thread::id, std::string> g_threadNames;
+static std::mutex g_threadNamesMutex;
 
 void markMainThread() {
     g_mainThreadId = std::this_thread::get_id();
+    setThreadName("main");
+}
+
+bool isMainThread() {
+    return std::this_thread::get_id() == g_mainThreadId;
 }
 
 void checkMainThread() {
     if (std::this_thread::get_id() != g_mainThreadId) {
         throw std::logic_error("Operation forbidden outside the main thread");
     }
+}
+
+void setThreadName(std::string name) {
+    std::lock_guard<std::mutex> lock {g_threadNamesMutex};
+    g_threadNames.insert_or_assign(std::this_thread::get_id(), std::move(name));
+}
+
+const std::string &threadName() {
+    std::lock_guard<std::mutex> lock {g_threadNamesMutex};
+    auto id = std::this_thread::get_id();
+    if (g_threadNames.count(id) == 0) {
+        std::ostringstream stream;
+        stream << id;
+        g_threadNames.insert({id, stream.str()});
+    }
+    return g_threadNames.at(id);
 }
 
 } // namespace reone

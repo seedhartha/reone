@@ -20,6 +20,10 @@
 namespace reone {
 
 void markMainThread();
+bool isMainThread();
 void checkMainThread();
+
+void setThreadName(std::string name);
+const std::string &threadName();
 
 } // namespace reone
