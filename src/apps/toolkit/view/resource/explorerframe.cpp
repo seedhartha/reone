@@ -209,29 +209,37 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     }
 
     _viewModel = std::make_unique<ResourceExplorerViewModel>();
-    _viewModel->pageAdded().addChangedHandler([this](const auto &page) {
-        wxWindow *window;
-        if (kStaticPageTypes.count(page->type) > 0) {
-            window = GetStaticPageWindow(page->type);
-        } else {
-            window = NewPageWindow(*page);
+    _viewModel->pages().addChangedHandler([this](const auto &args) {
+        switch (args.type) {
+        case CollectionChangeType::Add: {
+            auto &page = args.addedItem->get();
+            wxWindow *window;
+            if (kStaticPageTypes.count(page->type) > 0) {
+                window = GetStaticPageWindow(page->type);
+            } else {
+                window = NewPageWindow(*page);
+            }
+            window->Show();
+            _notebook->AddPage(window, page->displayName, true);
+        } break;
+        case CollectionChangeType::Remove: {
+            auto &page = args.removedItem->get();
+            if (kStaticPageTypes.count(page->type) > 0) {
+                auto window = GetStaticPageWindow(page->type);
+                window->Hide();
+                _notebook->RemovePage(*args.removedItemIdx);
+            } else {
+                _notebook->DeletePage(*args.removedItemIdx);
+            }
+        } break;
+        default:
+            throw std::logic_error("Unsupported collection state change type");
         }
-        window->Show();
-        _notebook->AddPage(window, page->displayName, true);
     });
-    _viewModel->pageRemoving().addChangedHandler([this](const auto &data) {
-        if (kStaticPageTypes.count(data.page->type) > 0) {
-            auto window = GetStaticPageWindow(data.page->type);
-            window->Hide();
-            _notebook->RemovePage(data.index);
-        } else {
-            _notebook->DeletePage(data.index);
-        }
-    });
-    _viewModel->pageSelected().addChangedHandler([this](const auto &page) {
+    _viewModel->selectedPage().addChangedHandler([this](const auto &page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->imageChanged().addChangedHandler([this](const auto &data) {
+    _viewModel->imageContent().addChangedHandler([this](const auto &data) {
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
@@ -635,14 +643,7 @@ void ResourceExplorerFrame::OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &eve
 
 void ResourceExplorerFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
-    auto &page = _viewModel->getPage(pageIdx);
-    if (kStaticPageTypes.count(page.type) > 0) {
-        _notebook->RemovePage(pageIdx);
-    } else {
-        _notebook->DeletePage(pageIdx);
-    }
     _viewModel->onNotebookPageClose(pageIdx);
-
     event.Veto();
 }
 

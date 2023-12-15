@@ -109,12 +109,12 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
     } catch (const std::invalid_argument &e) {
         return;
     }
-    auto samePage = std::find_if(_pages.begin(), _pages.end(), [&id, &pageType](auto &page) {
-        return page->resourceId == id && page->type == pageType;
-    });
-    if (samePage != _pages.end()) {
-        _pageSelected.operator=(std::distance(_pages.begin(), samePage));
-        return;
+    for (size_t i = 0; i < _pages->size(); ++i) {
+        const auto &page = _pages.at(i);
+        if (page->resourceId == id && page->type == pageType) {
+            _selectedPage = i;
+            break;
+        }
     }
 
     if (kFilesPlaintextResTypes.count(id.type) > 0) {
@@ -126,8 +126,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::Text, id.string(), id);
         page->textContent = text;
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::TwoDa) {
         auto reader = TwoDaReader(data);
@@ -152,8 +151,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
         page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (isGFFCompatibleResType(id.type)) {
         auto reader = GffReader(data);
@@ -161,8 +159,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::GFF, id.string(), id);
         page->gffContent = reader.root();
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tlk) {
         auto reader = TlkReader(data);
@@ -187,8 +184,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
         page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ncs) {
         auto pcodeBytes = ByteBuffer();
@@ -197,8 +193,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::NCS, id.string(), id);
         page->pcodeContent = std::string(pcodeBytes.begin(), pcodeBytes.end());
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Nss) {
         data.seek(0, SeekOrigin::End);
@@ -209,8 +204,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::NSS, id.string(), id);
         page->nssContent = text;
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Lip) {
         auto reader = LipReader(data, "");
@@ -230,8 +224,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
         page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ssf) {
         auto reader = SsfReader(data);
@@ -261,8 +254,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
         page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tpc || id.type == ResType::Tga) {
         auto tgaBytes = std::make_shared<ByteBuffer>();
@@ -278,24 +270,16 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
             tgaBytes->resize(length, '\0');
             data.read(&(*tgaBytes)[0], length);
         }
-        _imageChanged.operator=(ImageContent(tgaBytes, txiBytes));
+        _imageContent = ImageContent(tgaBytes, txiBytes);
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page->type == PageType::Image;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.operator=(PageRemovingEventData(index, pageToErase->get()));
-            _pages.erase(pageToErase);
-        }
+        _pages.removeIf([](auto &page) { return page->type == PageType::Image; });
         auto page = std::make_shared<Page>(PageType::Image, id.string(), id);
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Mdl) {
         loadEngine();
 
-        _renderEnabled.operator=(false);
+        _renderEnabled = false;
 
         auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResType::Mdx));
         if (!mdxRes) {
@@ -316,7 +300,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
             _model->setSuperModel(std::move(superModel));
         }
         _model->init();
-        _animations.operator=(_model->getAnimationNames());
+        _animations = _model->getAnimationNames();
 
         _modelNode = scene.newModel(*_model, ModelUsage::Creature);
         _modelHeading = 0.0f;
@@ -327,43 +311,27 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
         updateCameraTransform();
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page->type == PageType::Model;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.operator=(PageRemovingEventData(index, pageToErase->get()));
-            _pages.erase(pageToErase);
-        }
+        _pages.removeIf([](auto &page) { return page->type == PageType::Model; });
         auto page = std::make_shared<Page>(PageType::Model, id.string(), id);
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else if (id.type == ResType::Wav) {
         loadEngine();
         auto mp3ReaderFactory = Mp3ReaderFactory();
         auto reader = WavReader(data, mp3ReaderFactory);
         reader.load();
-        _audioStream.operator=(reader.stream());
+        _audioStream = reader.stream();
 
-        auto pageToErase = std::find_if(_pages.begin(), _pages.end(), [](auto &page) {
-            return page->type == PageType::Audio;
-        });
-        if (pageToErase != _pages.end()) {
-            auto index = std::distance(_pages.begin(), pageToErase);
-            _pageRemoving.operator=(PageRemovingEventData(index, pageToErase->get()));
-            _pages.erase(pageToErase);
-        }
+        _pages.removeIf([](auto &page) { return page->type == PageType::Audio; });
         auto page = std::make_shared<Page>(PageType::Audio, id.string(), id);
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
 
     } else {
         return;
     }
 
     if (id.type == ResType::Mdl) {
-        _renderEnabled.operator=(true);
+        _renderEnabled = true;
     }
 }
 
@@ -459,7 +427,7 @@ void ResourceExplorerViewModel::loadEngine() {
     if (_engineLoaded || _gamePath.empty()) {
         return;
     }
-    _engineLoadRequested.operator=(true);
+    _engineLoadRequested = true;
 
     _graphicsOpt.grass = false;
     _graphicsOpt.pbr = false;
@@ -517,8 +485,7 @@ void ResourceExplorerViewModel::decompile(GameDirectoryItemId itemId, bool optim
 
         auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef.value()), *item.resId);
         page->nssContent = std::string(nssBytes.begin(), nssBytes.end());
-        _pages.push_back(std::move(page));
-        _pageAdded.operator=(_pages.back().get());
+        _pages.add(std::move(page));
     });
 }
 
@@ -581,7 +548,7 @@ void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &dest
     auto progress = Progress();
     progress.visible = true;
     progress.title = "Extract all BIF archives";
-    _progress.operator=(progress);
+    _progress = progress;
 
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
@@ -592,11 +559,11 @@ void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &dest
         }
         progress.value = 100 * bifIdx / static_cast<int>(_keyFiles.size());
         tool.extractBIF(keyReader, bifIdx++, *bifPath, destPath);
-        _progress.operator=(progress);
+        _progress = progress;
     }
 
     progress.visible = false;
-    _progress.operator=(progress);
+    _progress = progress;
 }
 
 void ResourceExplorerViewModel::batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
@@ -614,19 +581,19 @@ void ResourceExplorerViewModel::batchConvertTpcToTga(const std::filesystem::path
     auto progress = Progress();
     progress.visible = true;
     progress.title = "Batch convert TPC to TGA/TXI";
-    _progress.operator=(progress);
+    _progress = progress;
 
     auto tool = TpcTool();
     for (size_t i = 0; i < tpcFiles.size(); ++i) {
         progress.value = 100 * static_cast<int>(i / tpcFiles.size());
-        _progress.operator=(progress);
+        _progress = progress;
 
         auto &tpcPath = tpcFiles[i];
         tool.toTGA(tpcPath, destPath);
     }
 
     progress.visible = false;
-    _progress.operator=(progress);
+    _progress = progress;
 }
 
 bool ResourceExplorerViewModel::invokeTool(Operation operation,
@@ -689,7 +656,7 @@ void ResourceExplorerViewModel::update3D() {
         if (animChannel.anim) {
             float time = animChannel.time;
             float duration = animChannel.lipAnim ? animChannel.lipAnim->length() : animChannel.anim->length();
-            _animationProgress.operator=(AnimationProgress {time, duration});
+            _animationProgress = AnimationProgress {time, duration};
         }
     }
 }
@@ -799,20 +766,17 @@ void ResourceExplorerViewModel::onViewCreated() {
 }
 
 void ResourceExplorerViewModel::onViewDestroyed() {
-    _audioStream.operator=(nullptr);
+    _audioStream = nullptr;
 }
 
 void ResourceExplorerViewModel::onNotebookPageClose(int page) {
-    auto pageIterator = _pages.begin();
-    std::advance(pageIterator, page);
-    auto pageResId = (*pageIterator)->resourceId;
-    _pages.erase(pageIterator);
-
-    if (pageResId.type == ResType::Mdl) {
-        _renderEnabled.operator=(false);
+    auto resId = _pages.at(page)->resourceId;
+    _pages.removeAt(page);
+    if (resId.type == ResType::Mdl) {
+        _renderEnabled = false;
     }
-    if (pageResId.type == ResType::Wav) {
-        _audioStream.operator=(nullptr);
+    if (resId.type == ResType::Wav) {
+        _audioStream = nullptr;
     }
 }
 

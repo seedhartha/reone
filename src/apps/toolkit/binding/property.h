@@ -24,11 +24,11 @@ class Property : boost::noncopyable {
 public:
     using ChangedHandler = std::function<void(const T &)>;
 
-    inline T &operator*() {
+    inline const T &operator*() const {
         return _value;
     }
 
-    inline T *operator->() {
+    inline const T *operator->() const {
         return &_value;
     }
 

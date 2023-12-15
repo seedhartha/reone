@@ -35,6 +35,7 @@
 #include "reone/tools/legacy/tool.h"
 #include "reone/tools/types.h"
 
+#include "../../binding/collection.h"
 #include "../../binding/property.h"
 #include "../../viewmodel.h"
 
@@ -96,18 +97,6 @@ struct Page : boost::noncopyable {
     }
 };
 
-struct PageRemovingEventData {
-    int index {0};
-    Page *page {nullptr};
-
-    PageRemovingEventData() {}
-
-    PageRemovingEventData(int index, Page *page) :
-        index(index),
-        page(page) {
-    }
-};
-
 struct ImageContent {
     std::shared_ptr<ByteBuffer> tgaBytes;
     std::shared_ptr<ByteBuffer> txiBytes;
@@ -162,9 +151,7 @@ public:
     GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
 
     Page &getPage(int index) {
-        auto pageIterator = _pages.begin();
-        std::advance(pageIterator, index);
-        return **pageIterator;
+        return *_pages.at(index);
     }
 
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
@@ -172,10 +159,9 @@ public:
 
     bool isAnimationPlaying() const { return _animationPlaying; }
 
-    Property<Page *> &pageAdded() { return _pageAdded; }
-    Property<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
-    Property<int> &pageSelected() { return _pageSelected; }
-    Property<ImageContent> &imageChanged() { return _imageChanged; }
+    Collection<std::shared_ptr<Page>> &pages() { return _pages; }
+    Property<int> &selectedPage() { return _selectedPage; }
+    Property<ImageContent> &imageContent() { return _imageContent; }
     Property<std::vector<std::string>> &animations() { return _animations; }
     Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
     Property<Progress> &progress() { return _progress; }
@@ -221,14 +207,11 @@ private:
     int _lastMouseY {0};
     uint32_t _lastTicks {0};
 
-    std::list<std::shared_ptr<Page>> _pages;
-
     // Event handlers
 
-    Property<Page *> _pageAdded;
-    Property<PageRemovingEventData> _pageRemoving;
-    Property<int> _pageSelected;
-    Property<ImageContent> _imageChanged;
+    Collection<std::shared_ptr<Page>> _pages;
+    Property<int> _selectedPage;
+    Property<ImageContent> _imageContent;
     Property<std::vector<std::string>> _animations;
     Property<std::shared_ptr<audio::AudioClip>> _audioStream;
     Property<Progress> _progress;
