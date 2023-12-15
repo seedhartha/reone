@@ -189,7 +189,8 @@ MainFrame::MainFrame() :
     }
 
     _viewModel = std::make_unique<MainViewModel>();
-    _viewModel->pageAdded().subscribe([this](auto &page) {
+    _viewModel->pageAdded().addChangedHandler([this]() {
+        auto page = *_viewModel->pageAdded();
         wxWindow *window;
         if (kStaticPageTypes.count(page->type) > 0) {
             window = GetStaticPageWindow(page->type);
@@ -199,7 +200,8 @@ MainFrame::MainFrame() :
         window->Show();
         _notebook->AddPage(window, page->displayName, true);
     });
-    _viewModel->pageRemoving().subscribe([this](auto &data) {
+    _viewModel->pageRemoving().addChangedHandler([this]() {
+        auto &data = *_viewModel->pageRemoving();
         if (kStaticPageTypes.count(data.page->type) > 0) {
             auto window = GetStaticPageWindow(data.page->type);
             window->Hide();
@@ -208,10 +210,12 @@ MainFrame::MainFrame() :
             _notebook->DeletePage(data.index);
         }
     });
-    _viewModel->pageSelected().subscribe([this](int page) {
+    _viewModel->pageSelected().addChangedHandler([this]() {
+        auto page = *_viewModel->pageSelected();
         _notebook->SetSelection(page);
     });
-    _viewModel->imageChanged().subscribe([this](auto &data) {
+    _viewModel->imageChanged().addChangedHandler([this]() {
+        auto &data = *_viewModel->imageChanged();
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
@@ -224,7 +228,8 @@ MainFrame::MainFrame() :
             _imageSplitter->Unsplit(_imageInfoCtrl);
         }
     });
-    _viewModel->animations().subscribe([this](auto &animations) {
+    _viewModel->animations().addChangedHandler([this]() {
+        auto &animations = *_viewModel->animations();
         if (!animations.empty()) {
             _animationsListBox->Freeze();
             _animationsListBox->Clear();
@@ -237,7 +242,8 @@ MainFrame::MainFrame() :
             _renderSplitter->Unsplit();
         }
     });
-    _viewModel->audioStream().subscribe([this](auto &stream) {
+    _viewModel->audioStream().addChangedHandler([this]() {
+        auto &stream = *_viewModel->audioStream();
         if (stream) {
             _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             _audioSource->init();
@@ -247,7 +253,8 @@ MainFrame::MainFrame() :
             _audioSource.reset();
         }
     });
-    _viewModel->progress().subscribe([this](auto &progress) {
+    _viewModel->progress().addChangedHandler([this]() {
+        auto &progress = *_viewModel->progress();
         if (progress.visible) {
             if (!_progressDialog) {
                 _progressDialog = new wxProgressDialog("", "", 100, this);
@@ -261,7 +268,8 @@ MainFrame::MainFrame() :
             }
         }
     });
-    _viewModel->engineLoadRequested().subscribe([this](auto &requested) {
+    _viewModel->engineLoadRequested().addChangedHandler([this]() {
+        auto requested = *_viewModel->engineLoadRequested();
         if (!requested) {
             return;
         }
@@ -308,12 +316,14 @@ MainFrame::MainFrame() :
 
         _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
     });
-    _viewModel->animationProgress().subscribe([this](const auto &progress) {
+    _viewModel->animationProgress().addChangedHandler([this]() {
+        auto &progress = *_viewModel->animationProgress();
         _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
         int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
         _animTimeSlider->SetValue(value);
     });
-    _viewModel->renderEnabled().subscribe([this](const auto &enabled) {
+    _viewModel->renderEnabled().addChangedHandler([this]() {
+        auto enabled = *_viewModel->renderEnabled();
         if (enabled) {
             wxWakeUpIdle();
         }
@@ -437,7 +447,7 @@ void MainFrame::OnClose(wxCloseEvent &event) {
 }
 
 void MainFrame::OnIdle(wxIdleEvent &event) {
-    bool renderEnabled = _viewModel->renderEnabled().data();
+    bool renderEnabled = *_viewModel->renderEnabled();
     if (renderEnabled) {
         _viewModel->update3D();
         _glCanvas->Refresh();
@@ -755,7 +765,7 @@ void MainFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
 }
 
 void MainFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
-    float duration = _viewModel->animationProgress().data().duration;
+    float duration = _viewModel->animationProgress()->duration;
     if (duration == 0.0f) {
         return;
     }

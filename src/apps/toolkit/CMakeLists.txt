@@ -17,9 +17,11 @@ set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 
 set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/app.h
+    ${TOOLKIT_SOURCE_DIR}/binding/command.h
+    ${TOOLKIT_SOURCE_DIR}/binding/property.h
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/view/mainframe.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/eventhandler.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/main.h)
 
 set(TOOLKIT_SOURCES

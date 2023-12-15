@@ -17,29 +17,13 @@
 
 #pragma once
 
+#include "property.h"
+
 namespace reone {
 
-template <class T>
-class EventHandler : boost::noncopyable {
+class ViewModel : boost::noncopyable {
 public:
-    using Subscriber = std::function<void(const T &)>;
-
-    void invoke(T data) {
-        _data = std::move(data);
-        for (auto &subscriber : _subscribers) {
-            subscriber(_data);
-        }
-    }
-
-    void subscribe(Subscriber subscriber) {
-        _subscribers.push_back(subscriber);
-    }
-
-    const T &data() const { return _data; }
-
-private:
-    T _data;
-    std::list<Subscriber> _subscribers;
+    virtual ~ViewModel() = default;
 };
 
 } // namespace reone

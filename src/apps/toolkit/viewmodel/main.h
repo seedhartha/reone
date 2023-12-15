@@ -35,7 +35,7 @@
 #include "reone/tools/legacy/tool.h"
 #include "reone/tools/types.h"
 
-#include "eventhandler.h"
+#include "../binding/property.h"
 
 namespace reone {
 
@@ -171,16 +171,16 @@ public:
 
     bool isAnimationPlaying() const { return _animationPlaying; }
 
-    EventHandler<Page *> &pageAdded() { return _pageAdded; }
-    EventHandler<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
-    EventHandler<int> &pageSelected() { return _pageSelected; }
-    EventHandler<ImageContent> &imageChanged() { return _imageChanged; }
-    EventHandler<std::vector<std::string>> &animations() { return _animations; }
-    EventHandler<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
-    EventHandler<Progress> &progress() { return _progress; }
-    EventHandler<bool> &engineLoadRequested() { return _engineLoadRequested; }
-    EventHandler<AnimationProgress> &animationProgress() { return _animationProgress; }
-    EventHandler<bool> &renderEnabled() { return _renderEnabled; }
+    Property<Page *> &pageAdded() { return _pageAdded; }
+    Property<PageRemovingEventData> &pageRemoving() { return _pageRemoving; }
+    Property<int> &pageSelected() { return _pageSelected; }
+    Property<ImageContent> &imageChanged() { return _imageChanged; }
+    Property<std::vector<std::string>> &animations() { return _animations; }
+    Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
+    Property<Progress> &progress() { return _progress; }
+    Property<bool> &engineLoadRequested() { return _engineLoadRequested; }
+    Property<AnimationProgress> &animationProgress() { return _animationProgress; }
+    Property<bool> &renderEnabled() { return _renderEnabled; }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -224,16 +224,16 @@ private:
 
     // Event handlers
 
-    EventHandler<Page *> _pageAdded;
-    EventHandler<PageRemovingEventData> _pageRemoving;
-    EventHandler<int> _pageSelected;
-    EventHandler<ImageContent> _imageChanged;
-    EventHandler<std::vector<std::string>> _animations;
-    EventHandler<std::shared_ptr<audio::AudioClip>> _audioStream;
-    EventHandler<Progress> _progress;
-    EventHandler<bool> _engineLoadRequested;
-    EventHandler<AnimationProgress> _animationProgress;
-    EventHandler<bool> _renderEnabled;
+    Property<Page *> _pageAdded;
+    Property<PageRemovingEventData> _pageRemoving;
+    Property<int> _pageSelected;
+    Property<ImageContent> _imageChanged;
+    Property<std::vector<std::string>> _animations;
+    Property<std::shared_ptr<audio::AudioClip>> _audioStream;
+    Property<Progress> _progress;
+    Property<bool> _engineLoadRequested;
+    Property<AnimationProgress> _animationProgress;
+    Property<bool> _renderEnabled;
 
     // END Event handlers
 
