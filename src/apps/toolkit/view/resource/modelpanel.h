@@ -17,9 +17,21 @@
 
 #pragma once
 
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
+#include <wx/panel.h>
+
 namespace reone {
 
-class TLKPanel {
+class MDLPanel : public wxPanel {
+public:
+    MDLPanel(wxWindow *parent) :
+        wxPanel(parent) {
+    }
 };
 
 } // namespace reone

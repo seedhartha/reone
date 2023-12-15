@@ -17,11 +17,21 @@
 
 #pragma once
 
-#include "../viewmodel.h"
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
+#include <wx/panel.h>
 
 namespace reone {
 
-class MDLResourceViewModel : public ViewModel {
+class TwoDAPanel : public wxPanel {
+public:
+    TwoDAPanel(wxWindow *parent) :
+        wxPanel(parent) {
+    }
 };
 
 } // namespace reone

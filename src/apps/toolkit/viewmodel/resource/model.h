@@ -17,9 +17,11 @@
 
 #pragma once
 
+#include "../viewmodel.h"
+
 namespace reone {
 
-class WAVPanel {
+class ModelResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

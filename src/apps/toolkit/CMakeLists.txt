@@ -21,29 +21,24 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/binding/property.h
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/view/mainframe.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/2dapanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/lippanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/mdlpanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/ncspanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/nsspanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/plaintextpanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/ssfpanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/tlkpanel.h
-    ${TOOLKIT_SOURCE_DIR}/view/resource/tpctgapanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/tablepanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/textpanel.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/2da.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/gff.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/lip.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/mdl.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/model.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/ncs.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/nss.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/plaintext.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/ssf.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/tlk.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/tpctga.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/wav.h)
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/table.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/text.h)
 
 set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp

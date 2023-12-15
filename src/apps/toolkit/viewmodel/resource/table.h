@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class LIPResourceViewModel : public ViewModel {
+class TableResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

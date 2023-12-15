@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class TPCTGAResourceViewModel : public ViewModel {
+class TextResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

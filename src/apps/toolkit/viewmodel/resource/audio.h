@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class WAVResourceViewModel : public ViewModel {
+class AudioResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

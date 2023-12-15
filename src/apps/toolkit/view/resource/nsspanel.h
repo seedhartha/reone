@@ -17,9 +17,21 @@
 
 #pragma once
 
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
+#include <wx/panel.h>
+
 namespace reone {
 
-class NSSPanel {
+class NSSPanel : public wxPanel {
+public:
+    NSSPanel(wxWindow *parent) :
+        wxPanel(parent) {
+    }
 };
 
 } // namespace reone

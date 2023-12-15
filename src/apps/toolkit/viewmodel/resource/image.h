@@ -21,7 +21,7 @@
 
 namespace reone {
 
-class PlainTextResourceViewModel : public ViewModel {
+class ImageResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

@@ -54,6 +54,14 @@
 #include "reone/tools/legacy/tpc.h"
 
 #include "composelipdialog.h"
+#include "resource/audiopanel.h"
+#include "resource/gffpanel.h"
+#include "resource/imagepanel.h"
+#include "resource/modelpanel.h"
+#include "resource/ncspanel.h"
+#include "resource/nsspanel.h"
+#include "resource/tablepanel.h"
+#include "resource/textpanel.h"
 
 using namespace reone::audio;
 using namespace reone::game;

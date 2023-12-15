@@ -17,11 +17,21 @@
 
 #pragma once
 
-#include "../viewmodel.h"
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
+#include <wx/panel.h>
 
 namespace reone {
 
-class TLKResourceViewModel : public ViewModel {
+class AudioPanel : public wxPanel {
+public:
+    AudioPanel(wxWindow *parent) :
+        wxPanel(parent) {
+    }
 };
 
 } // namespace reone
