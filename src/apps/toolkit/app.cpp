@@ -24,7 +24,7 @@
 #include "reone/system/logger.h"
 #include "reone/system/threadutil.h"
 
-#include "ui/mainframe.h"
+#include "view/mainframe.h"
 
 namespace reone {
 
