@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "main.h"
+#include "resexplorer.h"
 
 #include <wx/stopwatch.h>
 
@@ -92,7 +92,7 @@ private:
     wxStopWatch _stopWatch;
 };
 
-void MainViewModel::openFile(const GameDirectoryItem &item) {
+void ResourceExplorerViewModel::openFile(const GameDirectoryItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
         try {
             openResource(*item.resId, res);
@@ -102,7 +102,7 @@ void MainViewModel::openFile(const GameDirectoryItem &item) {
     });
 }
 
-void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
+void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream &data) {
     PageType pageType;
     try {
         pageType = getPageType(id.type);
@@ -367,7 +367,7 @@ void MainViewModel::openResource(const ResourceId &id, IInputStream &data) {
     }
 }
 
-PageType MainViewModel::getPageType(ResType type) const {
+PageType ResourceExplorerViewModel::getPageType(ResType type) const {
     if (kFilesPlaintextResTypes.count(type) > 0) {
         return PageType::Text;
     }
@@ -396,7 +396,7 @@ PageType MainViewModel::getPageType(ResType type) const {
     }
 }
 
-void MainViewModel::loadGameDirectory() {
+void ResourceExplorerViewModel::loadGameDirectory() {
     auto tslExePath = findFileIgnoreCase(_gamePath, "swkotor2.exe");
     _gameId = tslExePath ? GameID::TSL : GameID::KotOR;
 
@@ -440,7 +440,7 @@ void MainViewModel::loadGameDirectory() {
     }
 }
 
-void MainViewModel::loadTools() {
+void ResourceExplorerViewModel::loadTools() {
     _tools.clear();
     _tools.push_back(std::make_shared<KeyBifTool>());
     _tools.push_back(std::make_shared<ErfTool>());
@@ -455,7 +455,7 @@ void MainViewModel::loadTools() {
     _tools.push_back(std::make_shared<NcsTool>(_gameId));
 }
 
-void MainViewModel::loadEngine() {
+void ResourceExplorerViewModel::loadEngine() {
     if (_engineLoaded || _gamePath.empty()) {
         return;
     }
@@ -507,7 +507,7 @@ void MainViewModel::loadEngine() {
     _engineLoaded = true;
 }
 
-void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
+void ResourceExplorerViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     auto &item = *_idToGameDirItem.at(itemId);
 
     withResourceStream(item, [this, &item, &optimize](auto &res) {
@@ -522,7 +522,7 @@ void MainViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
     });
 }
 
-void MainViewModel::extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
         auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
@@ -551,7 +551,7 @@ void MainViewModel::extractArchive(const std::filesystem::path &srcPath, const s
     }
 }
 
-void MainViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath) {
     auto &item = *_idToGameDirItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
@@ -570,7 +570,7 @@ void MainViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem
     });
 }
 
-void MainViewModel::extractAllBifs(const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
     auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
@@ -599,7 +599,7 @@ void MainViewModel::extractAllBifs(const std::filesystem::path &destPath) {
     _progress.operator=(progress);
 }
 
-void MainViewModel::batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
     std::vector<std::filesystem::path> tpcFiles;
     for (auto &file : std::filesystem::directory_iterator(srcPath)) {
         if (!file.is_regular_file()) {
@@ -629,9 +629,9 @@ void MainViewModel::batchConvertTpcToTga(const std::filesystem::path &srcPath, c
     _progress.operator=(progress);
 }
 
-bool MainViewModel::invokeTool(Operation operation,
-                               const std::filesystem::path &srcPath,
-                               const std::filesystem::path &destPath) {
+bool ResourceExplorerViewModel::invokeTool(Operation operation,
+                                           const std::filesystem::path &srcPath,
+                                           const std::filesystem::path &destPath) {
     for (auto &tool : _tools) {
         if (!tool->supports(operation, srcPath)) {
             continue;
@@ -642,7 +642,7 @@ bool MainViewModel::invokeTool(Operation operation,
     return false;
 }
 
-void MainViewModel::playAnimation(std::string anim, graphics::LipAnimation *lipAnim) {
+void ResourceExplorerViewModel::playAnimation(std::string anim, graphics::LipAnimation *lipAnim) {
     if (!_modelNode) {
         return;
     }
@@ -650,7 +650,7 @@ void MainViewModel::playAnimation(std::string anim, graphics::LipAnimation *lipA
     _animationPlaying = true;
 }
 
-void MainViewModel::pauseAnimation() {
+void ResourceExplorerViewModel::pauseAnimation() {
     if (!_modelNode) {
         return;
     }
@@ -658,7 +658,7 @@ void MainViewModel::pauseAnimation() {
     _animationPlaying = false;
 }
 
-void MainViewModel::resumeAnimation() {
+void ResourceExplorerViewModel::resumeAnimation() {
     if (!_modelNode) {
         return;
     }
@@ -666,14 +666,14 @@ void MainViewModel::resumeAnimation() {
     _animationPlaying = true;
 }
 
-void MainViewModel::setAnimationTime(float time) {
+void ResourceExplorerViewModel::setAnimationTime(float time) {
     if (!_modelNode) {
         return;
     }
     _modelNode->setAnimationTime(time);
 }
 
-void MainViewModel::update3D() {
+void ResourceExplorerViewModel::update3D() {
     auto ticks = _systemModule->services().clock.ticks();
     if (_lastTicks == 0) {
         _lastTicks = ticks;
@@ -694,7 +694,7 @@ void MainViewModel::update3D() {
     }
 }
 
-void MainViewModel::render3D(int w, int h) {
+void ResourceExplorerViewModel::render3D(int w, int h) {
     float aspect = w / static_cast<float>(h);
     _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
@@ -709,14 +709,14 @@ void MainViewModel::render3D(int w, int h) {
     });
 }
 
-void MainViewModel::updateModelTransform() {
+void ResourceExplorerViewModel::updateModelTransform() {
     auto transform = glm::mat4(1.0f);
     transform *= glm::rotate(_modelHeading, glm::vec3(0.0f, 0.0f, 1.0f));
     transform *= glm::rotate(_modelPitch, glm::vec3(-1.0f, 0.0f, 0.0f));
     _modelNode->setLocalTransform(transform);
 }
 
-void MainViewModel::updateCameraTransform() {
+void ResourceExplorerViewModel::updateCameraTransform() {
     auto cameraTransform = glm::mat4(1.0f);
     cameraTransform = glm::translate(cameraTransform, _cameraPosition);
     cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -725,7 +725,7 @@ void MainViewModel::updateCameraTransform() {
     _cameraNode->setLocalTransform(cameraTransform);
 }
 
-void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block) {
+void ResourceExplorerViewModel::withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block) {
     if (!item.resId) {
         return;
     }
@@ -794,15 +794,15 @@ void MainViewModel::withResourceStream(const GameDirectoryItem &item, std::funct
     }
 }
 
-void MainViewModel::onViewCreated() {
+void ResourceExplorerViewModel::onViewCreated() {
     loadTools();
 }
 
-void MainViewModel::onViewDestroyed() {
+void ResourceExplorerViewModel::onViewDestroyed() {
     _audioStream.operator=(nullptr);
 }
 
-void MainViewModel::onNotebookPageClose(int page) {
+void ResourceExplorerViewModel::onNotebookPageClose(int page) {
     auto pageIterator = _pages.begin();
     std::advance(pageIterator, page);
     auto pageResId = (*pageIterator)->resourceId;
@@ -816,7 +816,7 @@ void MainViewModel::onNotebookPageClose(int page) {
     }
 }
 
-void MainViewModel::onGameDirectoryChanged(std::filesystem::path path) {
+void ResourceExplorerViewModel::onGameDirectoryChanged(std::filesystem::path path) {
     _gamePath = path;
     _gameDirItems.clear();
     _idToGameDirItem.clear();
@@ -825,13 +825,13 @@ void MainViewModel::onGameDirectoryChanged(std::filesystem::path path) {
     loadTools();
 }
 
-void MainViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
+void ResourceExplorerViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
     auto &item = _gameDirItems[index];
     item->id = id;
     _idToGameDirItem.insert(std::make_pair(id, item.get()));
 }
 
-void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
+void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
     if (_idToGameDirItem.count(id) == 0) {
         return;
     }
@@ -917,12 +917,12 @@ void MainViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
     expandingItem.loaded = true;
 }
 
-void MainViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
+void ResourceExplorerViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
     auto &item = *_idToGameDirItem.at(id);
     openFile(item);
 }
 
-void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown) {
+void ResourceExplorerViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown) {
     int dx = x - _lastMouseX;
     int dy = y - _lastMouseY;
 
@@ -940,7 +940,7 @@ void MainViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool righ
     _lastMouseY = y;
 }
 
-void MainViewModel::onGLCanvasMouseWheel(int delta) {
+void ResourceExplorerViewModel::onGLCanvasMouseWheel(int delta) {
     _cameraPosition.y = glm::max(0.0f, _cameraPosition.y - glm::clamp(delta, -1, 1));
     updateCameraTransform();
 }

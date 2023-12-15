@@ -47,7 +47,7 @@
 #include "reone/resource/id.h"
 #include "reone/system/stream/input.h"
 
-#include "../viewmodel/main.h"
+#include "../viewmodel/resexplorer.h"
 
 namespace reone {
 
@@ -56,7 +56,7 @@ public:
     MainFrame();
 
 private:
-    std::unique_ptr<MainViewModel> _viewModel;
+    std::unique_ptr<ResourceExplorerViewModel> _viewModel;
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;

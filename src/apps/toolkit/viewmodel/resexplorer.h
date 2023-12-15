@@ -132,7 +132,7 @@ struct Progress {
     int value {0};
 };
 
-class MainViewModel : boost::noncopyable {
+class ResourceExplorerViewModel : boost::noncopyable {
 public:
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId, bool optimize = true);

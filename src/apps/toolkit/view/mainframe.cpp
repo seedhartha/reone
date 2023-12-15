@@ -188,9 +188,8 @@ MainFrame::MainFrame() :
         window->Hide();
     }
 
-    _viewModel = std::make_unique<MainViewModel>();
-    _viewModel->pageAdded().addChangedHandler([this]() {
-        auto page = *_viewModel->pageAdded();
+    _viewModel = std::make_unique<ResourceExplorerViewModel>();
+    _viewModel->pageAdded().addChangedHandler([this](const auto &page) {
         wxWindow *window;
         if (kStaticPageTypes.count(page->type) > 0) {
             window = GetStaticPageWindow(page->type);
@@ -200,8 +199,7 @@ MainFrame::MainFrame() :
         window->Show();
         _notebook->AddPage(window, page->displayName, true);
     });
-    _viewModel->pageRemoving().addChangedHandler([this]() {
-        auto &data = *_viewModel->pageRemoving();
+    _viewModel->pageRemoving().addChangedHandler([this](const auto &data) {
         if (kStaticPageTypes.count(data.page->type) > 0) {
             auto window = GetStaticPageWindow(data.page->type);
             window->Hide();
@@ -210,12 +208,10 @@ MainFrame::MainFrame() :
             _notebook->DeletePage(data.index);
         }
     });
-    _viewModel->pageSelected().addChangedHandler([this]() {
-        auto page = *_viewModel->pageSelected();
+    _viewModel->pageSelected().addChangedHandler([this](const auto &page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->imageChanged().addChangedHandler([this]() {
-        auto &data = *_viewModel->imageChanged();
+    _viewModel->imageChanged().addChangedHandler([this](const auto &data) {
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
@@ -228,8 +224,7 @@ MainFrame::MainFrame() :
             _imageSplitter->Unsplit(_imageInfoCtrl);
         }
     });
-    _viewModel->animations().addChangedHandler([this]() {
-        auto &animations = *_viewModel->animations();
+    _viewModel->animations().addChangedHandler([this](const auto &animations) {
         if (!animations.empty()) {
             _animationsListBox->Freeze();
             _animationsListBox->Clear();
@@ -242,8 +237,7 @@ MainFrame::MainFrame() :
             _renderSplitter->Unsplit();
         }
     });
-    _viewModel->audioStream().addChangedHandler([this]() {
-        auto &stream = *_viewModel->audioStream();
+    _viewModel->audioStream().addChangedHandler([this](const auto &stream) {
         if (stream) {
             _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             _audioSource->init();
@@ -253,8 +247,7 @@ MainFrame::MainFrame() :
             _audioSource.reset();
         }
     });
-    _viewModel->progress().addChangedHandler([this]() {
-        auto &progress = *_viewModel->progress();
+    _viewModel->progress().addChangedHandler([this](const auto &progress) {
         if (progress.visible) {
             if (!_progressDialog) {
                 _progressDialog = new wxProgressDialog("", "", 100, this);
@@ -268,8 +261,7 @@ MainFrame::MainFrame() :
             }
         }
     });
-    _viewModel->engineLoadRequested().addChangedHandler([this]() {
-        auto requested = *_viewModel->engineLoadRequested();
+    _viewModel->engineLoadRequested().addChangedHandler([this](const auto &requested) {
         if (!requested) {
             return;
         }
@@ -316,14 +308,12 @@ MainFrame::MainFrame() :
 
         _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
     });
-    _viewModel->animationProgress().addChangedHandler([this]() {
-        auto &progress = *_viewModel->animationProgress();
+    _viewModel->animationProgress().addChangedHandler([this](const auto &progress) {
         _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
         int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
         _animTimeSlider->SetValue(value);
     });
-    _viewModel->renderEnabled().addChangedHandler([this]() {
-        auto enabled = *_viewModel->renderEnabled();
+    _viewModel->renderEnabled().addChangedHandler([this](const auto &enabled) {
         if (enabled) {
             wxWakeUpIdle();
         }

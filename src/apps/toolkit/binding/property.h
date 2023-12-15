@@ -22,7 +22,7 @@ namespace reone {
 template <class T>
 class Property : boost::noncopyable {
 public:
-    using ChangedHandler = std::function<void()>;
+    using ChangedHandler = std::function<void(const T &)>;
 
     inline T &operator*() {
         return _value;
@@ -35,7 +35,7 @@ public:
     Property<T> &operator=(T value) {
         _value = std::move(value);
         for (auto &handler : _changedHandlers) {
-            handler();
+            handler(_value);
         }
         return *this;
     }

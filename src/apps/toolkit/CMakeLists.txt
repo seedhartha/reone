@@ -22,14 +22,14 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/view/mainframe.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/main.h)
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resexplorer.h)
 
 set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/mainframe.cpp
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/main.cpp)
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resexplorer.cpp)
 
 if(WIN32)
     list(APPEND TOOLKIT_SOURCES ${CMAKE_SOURCE_DIR}/assets/toolkit.rc)

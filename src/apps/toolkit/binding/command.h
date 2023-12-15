@@ -21,7 +21,7 @@ namespace reone {
 
 class Command : boost::noncopyable {
 public:
-    using CanExecuteChangedHandler = std::function<void()>;
+    using CanExecuteChangedHandler = std::function<void(bool)>;
 
     Command(std::function<void()> execute, bool canExecute = true) :
         _execute(std::move(execute)),
@@ -39,7 +39,7 @@ public:
     void setCanExecute(bool canExecute) {
         _canExecute = canExecute;
         for (auto &handler : _canExecuteChangedHandlers) {
-            handler();
+            handler(_canExecute);
         }
     }
 
