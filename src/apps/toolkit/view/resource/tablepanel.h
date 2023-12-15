@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class TwoDAPanel : public wxPanel {
+class TableResourceViewModel;
+
+class TableResourcePanel : public wxPanel {
 public:
-    TwoDAPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    TableResourcePanel(TableResourceViewModel &viewModel,
+                       wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    TableResourceViewModel &_viewModel;
 };
 
 } // namespace reone

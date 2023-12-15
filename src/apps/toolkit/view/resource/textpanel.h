@@ -27,11 +27,17 @@
 
 namespace reone {
 
-class TextPanel : public wxPanel {
+class TextResourceViewModel;
+
+class TextResourcePanel : public wxPanel {
 public:
-    TextPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    TextResourceViewModel &_viewModel;
 };
 
 } // namespace reone

@@ -47,7 +47,10 @@
 #include "reone/resource/id.h"
 #include "reone/system/stream/input.h"
 
+#include "../viewmodel/resource/audio.h"
 #include "../viewmodel/resource/explorer.h"
+#include "../viewmodel/resource/image.h"
+#include "../viewmodel/resource/model.h"
 
 namespace reone {
 
@@ -57,6 +60,10 @@ public:
 
 private:
     std::unique_ptr<ResourceExplorerViewModel> _viewModel;
+
+    std::unique_ptr<ImageResourceViewModel> _imageResViewModel;
+    std::unique_ptr<ModelResourceViewModel> _modelResViewModel;
+    std::unique_ptr<AudioResourceViewModel> _audioResViewModel;
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
@@ -79,10 +86,12 @@ private:
     wxAuiNotebook *_notebook {nullptr};
 
     wxSplitterWindow *_imageSplitter {nullptr};
+    wxPanel *_modelPanel {nullptr};
     wxSplitterWindow *_renderSplitter {nullptr};
     wxPanel *_animationPanel {nullptr};
     wxPanel *_audioPanel {nullptr};
 
+    wxPanel *_imagePanel {nullptr};
     wxPanel *_imageCanvas {nullptr};
     wxTextCtrl *_imageInfoCtrl {nullptr};
     wxButton *_animPauseResumeBtn {nullptr};

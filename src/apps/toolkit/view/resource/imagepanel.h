@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class ImagePanel : public wxPanel {
+class ImageResourceViewModel;
+
+class ImageResourcePanel : public wxPanel {
 public:
-    ImagePanel(wxWindow *parent) :
-        wxPanel(parent) {
+    ImageResourcePanel(ImageResourceViewModel &viewModel,
+                       wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    ImageResourceViewModel &_viewModel;
 };
 
 } // namespace reone

@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class AudioPanel : public wxPanel {
+class AudioResourceViewModel;
+
+class AudioResourcePanel : public wxPanel {
 public:
-    AudioPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    AudioResourcePanel(AudioResourceViewModel &viewModel,
+                       wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    AudioResourceViewModel &_viewModel;
 };
 
 } // namespace reone

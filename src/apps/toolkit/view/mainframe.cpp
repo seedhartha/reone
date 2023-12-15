@@ -171,18 +171,29 @@ MainFrame::MainFrame() :
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MainFrame::OnNotebookPageChanged, this);
 
-    _imageSplitter = new wxSplitterWindow(_notebook, wxID_ANY);
+    _imageResViewModel = std::make_unique<ImageResourceViewModel>();
+    _imagePanel = new ImageResourcePanel(*_imageResViewModel, _notebook);
+    _imageSplitter = new wxSplitterWindow(_imagePanel, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     _imageCanvas->Bind(wxEVT_PAINT, &MainFrame::OnImageCanvasPaint, this);
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
     _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+    auto imageSizer = new wxBoxSizer(wxHORIZONTAL);
+    imageSizer->Add(_imageSplitter, wxSizerFlags(1).Expand());
+    _imagePanel->SetSizer(imageSizer);
 
-    _renderSplitter = new wxSplitterWindow(_notebook);
+    _modelResViewModel = std::make_unique<ModelResourceViewModel>();
+    _modelPanel = new ModelResourcePanel(*_modelResViewModel, _notebook);
+    _renderSplitter = new wxSplitterWindow(_modelPanel);
     _renderSplitter->SetMinimumPaneSize(100);
+    auto modelSizer = new wxBoxSizer(wxHORIZONTAL);
+    modelSizer->Add(_renderSplitter, wxSizerFlags(1).Expand());
+    _modelPanel->SetSizer(modelSizer);
 
-    _audioPanel = new wxPanel(_notebook);
+    _audioResViewModel = std::make_unique<AudioResourceViewModel>();
+    _audioPanel = new AudioResourcePanel(*_audioResViewModel, _notebook);
     auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
     stopAudioButton->Bind(wxEVT_BUTTON, &MainFrame::OnStopAudioCommand, this);
     auto audioSizer = new wxBoxSizer(wxVERTICAL);
@@ -429,9 +440,9 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
 wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
     switch (type) {
     case PageType::Image:
-        return _imageSplitter;
+        return _imagePanel;
     case PageType::Model:
-        return _renderSplitter;
+        return _modelPanel;
     case PageType::Audio:
         return _audioPanel;
     default:

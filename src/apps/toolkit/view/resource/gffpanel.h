@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class GFFPanel : public wxPanel {
+class GFFResourceViewModel;
+
+class GFFResourcePanel : public wxPanel {
 public:
-    GFFPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    GFFResourcePanel(GFFResourceViewModel &viewModel,
+                     wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    GFFResourceViewModel &_viewModel;
 };
 
 } // namespace reone

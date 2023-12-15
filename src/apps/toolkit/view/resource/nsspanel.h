@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class NSSPanel : public wxPanel {
+class NSSResourceViewModel;
+
+class NSSResourcePanel : public wxPanel {
 public:
-    NSSPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    NSSResourcePanel(NSSResourceViewModel &viewModel,
+                     wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    NSSResourceViewModel &_viewModel;
 };
 
 } // namespace reone

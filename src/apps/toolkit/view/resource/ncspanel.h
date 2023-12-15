@@ -27,11 +27,18 @@
 
 namespace reone {
 
-class NCSPanel : public wxPanel {
+class NCSResourceViewModel;
+
+class NCSResourcePanel : public wxPanel {
 public:
-    NCSPanel(wxWindow *parent) :
-        wxPanel(parent) {
+    NCSResourcePanel(NCSResourceViewModel &viewModel,
+                     wxWindow *parent) :
+        wxPanel(parent),
+        _viewModel(viewModel) {
     }
+
+private:
+    NCSResourceViewModel &_viewModel;
 };
 
 } // namespace reone

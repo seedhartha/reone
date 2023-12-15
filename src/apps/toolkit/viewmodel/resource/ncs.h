@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../viewmodel.h"
+#include "../../viewmodel.h"
 
 namespace reone {
 
