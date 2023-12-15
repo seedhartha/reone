@@ -17,13 +17,11 @@
 
 #pragma once
 
-#include "binding/property.h"
+#include "../viewmodel.h"
 
 namespace reone {
 
-class ViewModel : boost::noncopyable {
-public:
-    virtual ~ViewModel() = default;
+class NSSResourceViewModel : public ViewModel {
 };
 
 } // namespace reone

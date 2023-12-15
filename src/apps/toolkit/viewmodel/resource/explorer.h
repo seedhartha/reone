@@ -35,7 +35,8 @@
 #include "reone/tools/legacy/tool.h"
 #include "reone/tools/types.h"
 
-#include "../binding/property.h"
+#include "../../binding/property.h"
+#include "../../viewmodel.h"
 
 namespace reone {
 
@@ -132,7 +133,7 @@ struct Progress {
     int value {0};
 };
 
-class ResourceExplorerViewModel : boost::noncopyable {
+class ResourceExplorerViewModel : public ViewModel {
 public:
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId, bool optimize = true);

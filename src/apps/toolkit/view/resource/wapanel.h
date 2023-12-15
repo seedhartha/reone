@@ -17,13 +17,9 @@
 
 #pragma once
 
-#include "binding/property.h"
-
 namespace reone {
 
-class ViewModel : boost::noncopyable {
-public:
-    virtual ~ViewModel() = default;
+class WAVPanel {
 };
 
 } // namespace reone
