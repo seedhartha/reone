@@ -24,7 +24,7 @@
 #include "reone/system/logger.h"
 #include "reone/system/threadutil.h"
 
-#include "view/mainframe.h"
+#include "view/resource/explorerframe.h"
 
 namespace reone {
 
@@ -40,7 +40,7 @@ bool ToolkitApp::OnInit() {
 
     wxImage::AddHandler(new wxTGAHandler());
 
-    auto frame = new MainFrame();
+    auto frame = new ResourceExplorerFrame();
     frame->Show();
 
     return true;

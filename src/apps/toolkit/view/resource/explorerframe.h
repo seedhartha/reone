@@ -47,16 +47,16 @@
 #include "reone/resource/id.h"
 #include "reone/system/stream/input.h"
 
-#include "../viewmodel/resource/audio.h"
-#include "../viewmodel/resource/explorer.h"
-#include "../viewmodel/resource/image.h"
-#include "../viewmodel/resource/model.h"
+#include "../../viewmodel/resource/audio.h"
+#include "../../viewmodel/resource/explorer.h"
+#include "../../viewmodel/resource/image.h"
+#include "../../viewmodel/resource/model.h"
 
 namespace reone {
 
-class MainFrame : public wxFrame {
+class ResourceExplorerFrame : public wxFrame {
 public:
-    MainFrame();
+    ResourceExplorerFrame();
 
 private:
     std::unique_ptr<ResourceExplorerViewModel> _viewModel;

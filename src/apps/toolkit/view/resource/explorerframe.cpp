@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "mainframe.h"
+#include "explorerframe.h"
 
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
@@ -53,15 +53,16 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 
-#include "composelipdialog.h"
-#include "resource/audiopanel.h"
-#include "resource/gffpanel.h"
-#include "resource/imagepanel.h"
-#include "resource/modelpanel.h"
-#include "resource/ncspanel.h"
-#include "resource/nsspanel.h"
-#include "resource/tablepanel.h"
-#include "resource/textpanel.h"
+#include "../composelipdialog.h"
+
+#include "audiopanel.h"
+#include "gffpanel.h"
+#include "imagepanel.h"
+#include "modelpanel.h"
+#include "ncspanel.h"
+#include "nsspanel.h"
+#include "tablepanel.h"
+#include "textpanel.h"
 
 using namespace reone::audio;
 using namespace reone::game;
@@ -115,7 +116,7 @@ struct TimerID {
     static constexpr int audio = 2;
 };
 
-MainFrame::MainFrame() :
+ResourceExplorerFrame::ResourceExplorerFrame() :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
 
 #ifdef _WIN32
@@ -159,23 +160,23 @@ MainFrame::MainFrame() :
 
     auto filesPanel = new wxPanel(_splitter);
     _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &MainFrame::OnFilesTreeCtrlItemExpanding, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnFilesTreeCtrlItemContextMenu, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &MainFrame::OnFilesTreeCtrlItemActivated, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &MainFrame::OnFilesTreeCtrlItemStartEditing, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnFilesTreeCtrlItemExpanding, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnFilesTreeCtrlItemActivated, this);
+    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnFilesTreeCtrlItemStartEditing, this);
     auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Game Directory");
     filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
     filesPanel->SetSizer(filesSizer);
 
     _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
-    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MainFrame::OnNotebookPageClose, this);
-    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MainFrame::OnNotebookPageChanged, this);
+    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
+    _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
 
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
     _imagePanel = new ImageResourcePanel(*_imageResViewModel, _notebook);
     _imageSplitter = new wxSplitterWindow(_imagePanel, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _imageCanvas->Bind(wxEVT_PAINT, &MainFrame::OnImageCanvasPaint, this);
+    _imageCanvas->Bind(wxEVT_PAINT, &ResourceExplorerFrame::OnImageCanvasPaint, this);
     _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     _imageInfoCtrl->SetEditable(false);
     _imageSplitter->SetMinimumPaneSize(100);
@@ -195,7 +196,7 @@ MainFrame::MainFrame() :
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
     _audioPanel = new AudioResourcePanel(*_audioResViewModel, _notebook);
     auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
-    stopAudioButton->Bind(wxEVT_BUTTON, &MainFrame::OnStopAudioCommand, this);
+    stopAudioButton->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnStopAudioCommand, this);
     auto audioSizer = new wxBoxSizer(wxVERTICAL);
     audioSizer->Add(stopAudioButton);
     _audioPanel->SetSizer(audioSizer);
@@ -285,9 +286,9 @@ MainFrame::MainFrame() :
             return;
         }
         _glCanvas = new wxGLCanvas(_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-        _glCanvas->Bind(wxEVT_PAINT, &MainFrame::OnGLCanvasPaint, this);
-        _glCanvas->Bind(wxEVT_MOTION, &MainFrame::OnGLCanvasMouseMotion, this);
-        _glCanvas->Bind(wxEVT_MOUSEWHEEL, &MainFrame::OnGLCanvasMouseWheel, this);
+        _glCanvas->Bind(wxEVT_PAINT, &ResourceExplorerFrame::OnGLCanvasPaint, this);
+        _glCanvas->Bind(wxEVT_MOTION, &ResourceExplorerFrame::OnGLCanvasMouseMotion, this);
+        _glCanvas->Bind(wxEVT_MOUSEWHEEL, &ResourceExplorerFrame::OnGLCanvasMouseWheel, this);
 
 #if wxCHECK_VERSION(3, 1, 0)
         wxGLContextAttrs glCtxAttrs;
@@ -300,9 +301,9 @@ MainFrame::MainFrame() :
 
         _animationPanel = new wxPanel(_renderSplitter);
         _animPauseResumeBtn = new wxButton(_animationPanel, wxID_ANY, "Pause");
-        _animPauseResumeBtn->Bind(wxEVT_BUTTON, &MainFrame::OnAnimPauseResumeCommand, this);
+        _animPauseResumeBtn->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnAnimPauseResumeCommand, this);
         _animTimeSlider = new wxSlider(_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
-        _animTimeSlider->Bind(wxEVT_SLIDER, &MainFrame::OnAnimTimeSliderCommand, this);
+        _animTimeSlider->Bind(wxEVT_SLIDER, &ResourceExplorerFrame::OnAnimTimeSliderCommand, this);
         _animTimeCtrl = new wxTextCtrl(_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
         auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
         animPlaybackSizer->Add(_animPauseResumeBtn, wxSizerFlags(0).Center().Border(wxALL, 3));
@@ -310,11 +311,11 @@ MainFrame::MainFrame() :
         animPlaybackSizer->Add(_animTimeCtrl, wxSizerFlags(0).Center().Border(wxALL, 3));
         _animationsListBox = new wxListBox(_animationPanel, wxID_ANY);
         _animationsListBox->SetMinSize(wxSize(400, 100));
-        _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &MainFrame::OnAnimationsListBoxDoubleClick, this);
+        _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &ResourceExplorerFrame::OnAnimationsListBoxDoubleClick, this);
         auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Animations");
         animationsSizer->Add(_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
         auto lipLoadBtn = new wxButton(_animationPanel, wxID_ANY, "Load LIP...");
-        lipLoadBtn->Bind(wxEVT_BUTTON, &MainFrame::OnLipLoadCommand, this);
+        lipLoadBtn->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnLipLoadCommand, this);
         auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Lip Sync");
         lipSyncSizer->Add(lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
         auto animationHSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -342,10 +343,10 @@ MainFrame::MainFrame() :
     // CreateStatusBar();
 }
 
-void MainFrame::SaveFile() {
+void ResourceExplorerFrame::SaveFile() {
 }
 
-wxWindow *MainFrame::NewPageWindow(Page &page) {
+wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     switch (page.type) {
     case PageType::Text: {
         auto textPanel = new wxPanel(_notebook);
@@ -381,8 +382,8 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
         auto gffPanel = new wxPanel(_notebook);
         auto gffSizer = new wxBoxSizer(wxVERTICAL);
         auto gffTreeCtrl = new wxDataViewTreeCtrl(gffPanel, wxID_ANY);
-        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &MainFrame::OnGffTreeCtrlItemStartEditing, this);
-        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &MainFrame::OnGffTreeCtrlItemContextMenu, this);
+        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnGffTreeCtrlItemStartEditing, this);
+        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnGffTreeCtrlItemContextMenu, this);
         gffTreeCtrl->Freeze();
         AppendGffStructToTree(*gffTreeCtrl, wxDataViewItem(), "/", *page.gffContent);
         gffTreeCtrl->Thaw();
@@ -437,7 +438,7 @@ wxWindow *MainFrame::NewPageWindow(Page &page) {
     }
 }
 
-wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
+wxWindow *ResourceExplorerFrame::GetStaticPageWindow(PageType type) const {
     switch (type) {
     case PageType::Image:
         return _imagePanel;
@@ -450,12 +451,12 @@ wxWindow *MainFrame::GetStaticPageWindow(PageType type) const {
     }
 }
 
-void MainFrame::OnClose(wxCloseEvent &event) {
+void ResourceExplorerFrame::OnClose(wxCloseEvent &event) {
     Destroy();
     _viewModel->onViewDestroyed();
 }
 
-void MainFrame::OnIdle(wxIdleEvent &event) {
+void ResourceExplorerFrame::OnIdle(wxIdleEvent &event) {
     bool renderEnabled = *_viewModel->renderEnabled();
     if (renderEnabled) {
         _viewModel->update3D();
@@ -469,7 +470,7 @@ void MainFrame::OnIdle(wxIdleEvent &event) {
     }
 }
 
-void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog->ShowModal() != wxID_OK) {
         return;
@@ -507,11 +508,11 @@ void MainFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
     _filesTreeCtrl->Thaw();
 }
 
-void MainFrame::OnSaveFileCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnSaveFileCommand(wxCommandEvent &event) {
     SaveFile();
 }
 
-void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
     auto &expandingItem = _viewModel->getGameDirItemById(expandingItemId);
     if (expandingItem.loaded) {
@@ -539,12 +540,12 @@ void MainFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     expandingItem.loaded = true;
 }
 
-void MainFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     _viewModel->onGameDirectoryItemActivated(itemId);
 }
 
-void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const Gff &gff) {
+void ResourceExplorerFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const Gff &gff) {
     auto structItem = ctrl.AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
     for (auto &field : gff.fields()) {
         switch (field.type) {
@@ -599,7 +600,7 @@ void MainFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem p
     }
 }
 
-void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     auto &item = _viewModel->getGameDirItemById(itemId);
     if (item.resId) {
@@ -610,7 +611,7 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
         }
         menu.SetClientData(itemId);
-        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
+        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
     } else {
         if (item.archived || !std::filesystem::is_regular_file(item.path)) {
@@ -623,16 +624,16 @@ void MainFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         auto menu = wxMenu();
         menu.Append(CommandID::extract, "Extract...");
         menu.SetClientData(itemId);
-        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnPopupCommandSelected), nullptr, this);
+        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
     }
 }
 
-void MainFrame::OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
 }
 
-void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
+void ResourceExplorerFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
     auto &page = _viewModel->getPage(pageIdx);
     if (kStaticPageTypes.count(page.type) > 0) {
@@ -645,7 +646,7 @@ void MainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     event.Veto();
 }
 
-void MainFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
+void ResourceExplorerFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
     if (pageIdx == -1) {
         return;
@@ -659,11 +660,11 @@ void MainFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
     event.Skip();
 }
 
-void MainFrame::OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
 }
 
-void MainFrame::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     enum class MenuItemId {
         AddField,
         RenameField,
@@ -694,7 +695,7 @@ void MainFrame::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     PopupMenu(&menu, event.GetPosition());
 }
 
-void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     auto menu = static_cast<wxMenu *>(event.GetEventObject());
 
     if (event.GetId() == CommandID::extract) {
@@ -730,7 +731,7 @@ void MainFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     }
 }
 
-void MainFrame::OnImageCanvasPaint(wxPaintEvent &event) {
+void ResourceExplorerFrame::OnImageCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_imageCanvas);
 
     if (!_image) {
@@ -743,7 +744,7 @@ void MainFrame::OnImageCanvasPaint(wxPaintEvent &event) {
     dc.DrawBitmap(*_image, x, y, true);
 }
 
-void MainFrame::OnGLCanvasPaint(wxPaintEvent &event) {
+void ResourceExplorerFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_glCanvas);
 
     auto clientSize = _glCanvas->GetClientSize();
@@ -752,18 +753,18 @@ void MainFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     _glCanvas->SwapBuffers();
 }
 
-void MainFrame::OnGLCanvasMouseWheel(wxMouseEvent &event) {
+void ResourceExplorerFrame::OnGLCanvasMouseWheel(wxMouseEvent &event) {
     auto delta = event.GetWheelDelta() * event.GetWheelRotation();
     _viewModel->onGLCanvasMouseWheel(delta);
 }
 
-void MainFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
+void ResourceExplorerFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
     wxClientDC dc(_glCanvas);
     auto position = event.GetLogicalPosition(dc);
     _viewModel->onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
-void MainFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
     if (_viewModel->isAnimationPlaying()) {
         _viewModel->pauseAnimation();
         _animPauseResumeBtn->SetLabelText("Resume");
@@ -773,7 +774,7 @@ void MainFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
     }
 }
 
-void MainFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
     float duration = _viewModel->animationProgress()->duration;
     if (duration == 0.0f) {
         return;
@@ -782,7 +783,7 @@ void MainFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
     _viewModel->setAnimationTime(time);
 }
 
-void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     int selection = event.GetSelection();
     if (selection == -1) {
         return;
@@ -792,7 +793,7 @@ void MainFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     _animPauseResumeBtn->SetLabelText("Pause");
 }
 
-void MainFrame::OnLipLoadCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnLipLoadCommand(wxCommandEvent &event) {
     auto dialog = wxFileDialog(
         this,
         "Choose LIP file",
@@ -811,14 +812,14 @@ void MainFrame::OnLipLoadCommand(wxCommandEvent &event) {
     _viewModel->playAnimation("talk", _lipAnim.get());
 }
 
-void MainFrame::OnStopAudioCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnStopAudioCommand(wxCommandEvent &event) {
     if (_audioSource) {
         _audioSource->stop();
         _audioSource.reset();
     }
 }
 
-void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     if (_viewModel->gamePath().empty()) {
         wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
         return;
@@ -832,7 +833,7 @@ void MainFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     wxMessageBox("Operation completed successfully", "Success");
 }
 
-void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     auto srcDirDialog = new wxDirDialog(nullptr, "Choose source directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (srcDirDialog->ShowModal() != wxID_OK) {
         return;
@@ -847,73 +848,73 @@ void MainFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
     wxMessageBox("Operation completed successfully", "Success");
 }
 
-void MainFrame::OnComposeLipCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnComposeLipCommand(wxCommandEvent &event) {
     auto dialog = ComposeLipDialog(this, -1, "LIP Composer");
     if (dialog.ShowModal() != wxID_OK) {
     }
 }
 
-void MainFrame::OnExtractToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnExtractToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::Extract);
 }
 
-void MainFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::Unwrap);
 }
 
-void MainFrame::OnToRimToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToRimToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToRIM);
 }
 
-void MainFrame::OnToErfToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToErfToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToERF);
 }
 
-void MainFrame::OnToModToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToModToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToMOD);
 }
 
-void MainFrame::OnToXmlToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToXmlToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToXML);
 }
 
-void MainFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::To2DA);
 }
 
-void MainFrame::OnToGffToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToGffToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToGFF);
 }
 
-void MainFrame::OnToTlkToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToTlkToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToTLK);
 }
 
-void MainFrame::OnToLipToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToLipToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToLIP);
 }
 
-void MainFrame::OnToSsfToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToSsfToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToSSF);
 }
 
-void MainFrame::OnToTgaToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToTgaToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToTGA);
 }
 
-void MainFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToPCODE);
 }
 
-void MainFrame::OnToNcsToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToNcsToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToNCS);
 }
 
-void MainFrame::OnToNssToolCommand(wxCommandEvent &event) {
+void ResourceExplorerFrame::OnToNssToolCommand(wxCommandEvent &event) {
     InvokeTool(Operation::ToNSS);
 }
 
-void MainFrame::InvokeTool(Operation operation) {
+void ResourceExplorerFrame::InvokeTool(Operation operation) {
     std::filesystem::path srcPath;
     switch (operation) {
     case Operation::ToERF:
@@ -955,29 +956,29 @@ void MainFrame::InvokeTool(Operation operation) {
     }
 }
 
-wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-    EVT_CLOSE(MainFrame::OnClose)                                                     //
-    EVT_IDLE(MainFrame::OnIdle)                                                       //
-    EVT_MENU(EventHandlerID::openGameDir, MainFrame::OnOpenGameDirectoryCommand)      //
-    EVT_MENU(EventHandlerID::saveFile, MainFrame::OnSaveFileCommand)                  //
-    EVT_MENU(EventHandlerID::extractAllBifs, MainFrame::OnExtractAllBifsCommand)      //
-    EVT_MENU(EventHandlerID::batchTpcToTga, MainFrame::OnBatchConvertTpcToTgaCommand) //
-    EVT_MENU(EventHandlerID::composeLip, MainFrame::OnComposeLipCommand)              //
-    EVT_MENU(EventHandlerID::extractTool, MainFrame::OnExtractToolCommand)            //
-    EVT_MENU(EventHandlerID::unwrapTool, MainFrame::OnUnwrapToolCommand)              //
-    EVT_MENU(EventHandlerID::toRimTool, MainFrame::OnToRimToolCommand)                //
-    EVT_MENU(EventHandlerID::toErfTool, MainFrame::OnToErfToolCommand)                //
-    EVT_MENU(EventHandlerID::toModTool, MainFrame::OnToModToolCommand)                //
-    EVT_MENU(EventHandlerID::toXmlTool, MainFrame::OnToXmlToolCommand)                //
-    EVT_MENU(EventHandlerID::toTwoDaTool, MainFrame::OnToTwoDaToolCommand)            //
-    EVT_MENU(EventHandlerID::toGffTool, MainFrame::OnToGffToolCommand)                //
-    EVT_MENU(EventHandlerID::toTlkTool, MainFrame::OnToTlkToolCommand)                //
-    EVT_MENU(EventHandlerID::toLipTool, MainFrame::OnToLipToolCommand)                //
-    EVT_MENU(EventHandlerID::toSsfTool, MainFrame::OnToSsfToolCommand)                //
-    EVT_MENU(EventHandlerID::toTgaTool, MainFrame::OnToTgaToolCommand)                //
-    EVT_MENU(EventHandlerID::toPcodeTool, MainFrame::OnToPcodeToolCommand)            //
-    EVT_MENU(EventHandlerID::toNcsTool, MainFrame::OnToNcsToolCommand)                //
-    EVT_MENU(EventHandlerID::toNssTool, MainFrame::OnToNssToolCommand)                //
+wxBEGIN_EVENT_TABLE(ResourceExplorerFrame, wxFrame)
+    EVT_CLOSE(ResourceExplorerFrame::OnClose)                                                     //
+    EVT_IDLE(ResourceExplorerFrame::OnIdle)                                                       //
+    EVT_MENU(EventHandlerID::openGameDir, ResourceExplorerFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::saveFile, ResourceExplorerFrame::OnSaveFileCommand)                  //
+    EVT_MENU(EventHandlerID::extractAllBifs, ResourceExplorerFrame::OnExtractAllBifsCommand)      //
+    EVT_MENU(EventHandlerID::batchTpcToTga, ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand) //
+    EVT_MENU(EventHandlerID::composeLip, ResourceExplorerFrame::OnComposeLipCommand)              //
+    EVT_MENU(EventHandlerID::extractTool, ResourceExplorerFrame::OnExtractToolCommand)            //
+    EVT_MENU(EventHandlerID::unwrapTool, ResourceExplorerFrame::OnUnwrapToolCommand)              //
+    EVT_MENU(EventHandlerID::toRimTool, ResourceExplorerFrame::OnToRimToolCommand)                //
+    EVT_MENU(EventHandlerID::toErfTool, ResourceExplorerFrame::OnToErfToolCommand)                //
+    EVT_MENU(EventHandlerID::toModTool, ResourceExplorerFrame::OnToModToolCommand)                //
+    EVT_MENU(EventHandlerID::toXmlTool, ResourceExplorerFrame::OnToXmlToolCommand)                //
+    EVT_MENU(EventHandlerID::toTwoDaTool, ResourceExplorerFrame::OnToTwoDaToolCommand)            //
+    EVT_MENU(EventHandlerID::toGffTool, ResourceExplorerFrame::OnToGffToolCommand)                //
+    EVT_MENU(EventHandlerID::toTlkTool, ResourceExplorerFrame::OnToTlkToolCommand)                //
+    EVT_MENU(EventHandlerID::toLipTool, ResourceExplorerFrame::OnToLipToolCommand)                //
+    EVT_MENU(EventHandlerID::toSsfTool, ResourceExplorerFrame::OnToSsfToolCommand)                //
+    EVT_MENU(EventHandlerID::toTgaTool, ResourceExplorerFrame::OnToTgaToolCommand)                //
+    EVT_MENU(EventHandlerID::toPcodeTool, ResourceExplorerFrame::OnToPcodeToolCommand)            //
+    EVT_MENU(EventHandlerID::toNcsTool, ResourceExplorerFrame::OnToNcsToolCommand)                //
+    EVT_MENU(EventHandlerID::toNssTool, ResourceExplorerFrame::OnToNssToolCommand)                //
     wxEND_EVENT_TABLE()
 
 } // namespace reone

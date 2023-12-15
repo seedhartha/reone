@@ -20,8 +20,8 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/binding/command.h
     ${TOOLKIT_SOURCE_DIR}/binding/property.h
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.h
-    ${TOOLKIT_SOURCE_DIR}/view/mainframe.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.h
@@ -44,7 +44,7 @@ set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
-    ${TOOLKIT_SOURCE_DIR}/view/mainframe.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp)
 
 if(WIN32)
