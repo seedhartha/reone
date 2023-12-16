@@ -113,7 +113,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         const auto &page = _pages.at(i);
         if (page->resourceId == id && page->type == pageType) {
             _selectedPage = i;
-            break;
+            return;
         }
     }
 
@@ -280,12 +280,13 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         loadEngine();
 
         _renderEnabled = false;
-
         _modelResViewModel->openModel(id, data);
 
         _pages.removeIf([](auto &page) { return page->type == PageType::Model; });
         auto page = std::make_shared<Page>(PageType::Model, id.string(), id);
         _pages.add(std::move(page));
+
+        _renderEnabled = true;
 
     } else if (id.type == ResType::Wav) {
         loadEngine();
@@ -300,10 +301,6 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
     } else {
         return;
-    }
-
-    if (id.type == ResType::Mdl) {
-        _renderEnabled = true;
     }
 }
 
