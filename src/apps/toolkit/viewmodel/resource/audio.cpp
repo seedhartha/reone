@@ -15,25 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "audio.h"
 
-#include "reone/audio/clip.h"
-#include "reone/resource/id.h"
-#include "reone/system/stream/input.h"
+#include "reone/audio/format/mp3reader.h"
+#include "reone/audio/format/wavreader.h"
 
-#include "../../binding/property.h"
-#include "../../viewmodel.h"
+using namespace reone::audio;
+using namespace reone::resource;
 
 namespace reone {
 
-class AudioResourceViewModel : public ViewModel {
-public:
-    void openAudio(const resource::ResourceId &id, IInputStream &audio);
-
-    Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
-
-private:
-    Property<std::shared_ptr<audio::AudioClip>> _audioStream;
-};
+void AudioResourceViewModel::openAudio(const ResourceId &id, IInputStream &audio) {
+    auto mp3ReaderFactory = Mp3ReaderFactory();
+    auto reader = WavReader(audio, mp3ReaderFactory);
+    reader.load();
+    _audioStream = reader.stream();
+}
 
 } // namespace reone

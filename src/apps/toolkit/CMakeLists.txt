@@ -45,9 +45,11 @@ set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/model.cpp)

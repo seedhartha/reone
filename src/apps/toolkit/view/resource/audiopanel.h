@@ -25,20 +25,36 @@
 
 #include <wx/panel.h>
 
+#include "reone/audio/source.h"
+
 namespace reone {
 
 class AudioResourceViewModel;
 
 class AudioResourcePanel : public wxPanel {
 public:
-    AudioResourcePanel(AudioResourceViewModel &viewModel,
-                       wxWindow *parent) :
-        wxPanel(parent),
-        _viewModel(viewModel) {
+    AudioResourcePanel(wxWindow *parent);
+
+    void SetViewModel(AudioResourceViewModel &viewModel) {
+        _viewModel = viewModel;
+    }
+
+    void OnEngineLoadRequested();
+
+    bool HasAudioSource() const {
+        return static_cast<bool>(_audioSource);
+    }
+
+    void UpdateAudioSource() {
+        _audioSource->update();
     }
 
 private:
-    AudioResourceViewModel &_viewModel;
+    std::optional<std::reference_wrapper<AudioResourceViewModel>> _viewModel;
+
+    std::unique_ptr<audio::AudioSource> _audioSource;
+
+    void OnStopAudioCommand(wxCommandEvent &event);
 };
 
 } // namespace reone

@@ -175,13 +175,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
 
     _imagePanel = new ImageResourcePanel(_viewModel->imageResViewModel(), _notebook);
     _modelPanel = new ModelResourcePanel(_notebook);
-
-    _audioPanel = new AudioResourcePanel(_viewModel->audioResViewModel(), _notebook);
-    auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
-    stopAudioButton->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnStopAudioCommand, this);
-    auto audioSizer = new wxBoxSizer(wxVERTICAL);
-    audioSizer->Add(stopAudioButton);
-    _audioPanel->SetSizer(audioSizer);
+    _audioPanel = new AudioResourcePanel(_notebook);
 
     _splitter->SplitVertically(filesPanel, _notebook, 1);
 
@@ -220,16 +214,6 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _viewModel->selectedPage().addChangedHandler([this](const auto &page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->audioStream().addChangedHandler([this](const auto &stream) {
-        if (stream) {
-            _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
-            _audioSource->init();
-            _audioSource->play();
-            wxWakeUpIdle();
-        } else {
-            _audioSource.reset();
-        }
-    });
     _viewModel->progress().addChangedHandler([this](const auto &progress) {
         if (progress.visible) {
             if (!_progressDialog) {
@@ -250,6 +234,8 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
         }
         _modelPanel->SetViewModel(_viewModel->modelResViewModel());
         _modelPanel->OnEngineLoadRequested();
+        _audioPanel->SetViewModel(_viewModel->audioResViewModel());
+        _audioPanel->OnEngineLoadRequested();
     });
     _viewModel->renderEnabled().addChangedHandler([this](const auto &enabled) {
         if (enabled) {
@@ -380,10 +366,11 @@ void ResourceExplorerFrame::OnIdle(wxIdleEvent &event) {
         _viewModel->modelResViewModel().update3D();
         _modelPanel->RefreshGL();
     }
-    if (_audioSource) {
-        _audioSource->update();
+    bool hasAudio = _audioPanel->HasAudioSource();
+    if (hasAudio) {
+        _audioPanel->UpdateAudioSource();
     }
-    if (renderEnabled || _audioSource) {
+    if (renderEnabled || hasAudio) {
         event.RequestMore();
     }
 }
@@ -639,13 +626,6 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
         _viewModel->exportFile(itemId, destPath);
         wxMessageBox("Operation completed successfully", "Success");
-    }
-}
-
-void ResourceExplorerFrame::OnStopAudioCommand(wxCommandEvent &event) {
-    if (_audioSource) {
-        _audioSource->stop();
-        _audioSource.reset();
     }
 }
 

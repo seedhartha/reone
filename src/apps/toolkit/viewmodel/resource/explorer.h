@@ -142,7 +142,6 @@ public:
 
     Collection<std::shared_ptr<Page>> &pages() { return _pages; }
     Property<int> &selectedPage() { return _selectedPage; }
-    Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
     Property<Progress> &progress() { return _progress; }
     Property<bool> &engineLoadRequested() { return _engineLoadRequested; }
     Property<bool> &renderEnabled() { return _renderEnabled; }
@@ -192,7 +191,6 @@ private:
 
     Collection<std::shared_ptr<Page>> _pages;
     Property<int> _selectedPage;
-    Property<std::shared_ptr<audio::AudioClip>> _audioStream;
     Property<Progress> _progress;
     Property<bool> _engineLoadRequested;
     Property<bool> _renderEnabled;

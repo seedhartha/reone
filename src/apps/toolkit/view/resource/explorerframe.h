@@ -68,8 +68,6 @@ private:
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
-    std::unique_ptr<audio::AudioSource> _audioSource;
-
     // Menus
 
     wxMenuItem *_saveFileMenuItem {nullptr};
@@ -139,8 +137,6 @@ private:
     void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);
-
-    void OnStopAudioCommand(wxCommandEvent &event);
 
     // END Events
 

@@ -277,10 +277,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
     } else if (id.type == ResType::Wav) {
         loadEngine();
-        auto mp3ReaderFactory = Mp3ReaderFactory();
-        auto reader = WavReader(data, mp3ReaderFactory);
-        reader.load();
-        _audioStream = reader.stream();
+        _audioResViewModel->openAudio(id, data);
 
         _pages.removeIf([](auto &page) { return page->type == PageType::Audio; });
         auto page = std::make_shared<Page>(PageType::Audio, id.string(), id);
@@ -634,7 +631,7 @@ void ResourceExplorerViewModel::onViewCreated() {
 }
 
 void ResourceExplorerViewModel::onViewDestroyed() {
-    _audioStream = nullptr;
+    _audioResViewModel->audioStream() = nullptr;
 }
 
 void ResourceExplorerViewModel::onNotebookPageClose(int page) {
@@ -644,7 +641,7 @@ void ResourceExplorerViewModel::onNotebookPageClose(int page) {
         _renderEnabled = false;
     }
     if (resId.type == ResType::Wav) {
-        _audioStream = nullptr;
+        _audioResViewModel->audioStream() = nullptr;
     }
 }
 
