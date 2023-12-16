@@ -48,6 +48,7 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/model.cpp)
 
 if(WIN32)

@@ -231,7 +231,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _viewModel->selectedPage().addChangedHandler([this](const auto &page) {
         _notebook->SetSelection(page);
     });
-    _viewModel->imageContent().addChangedHandler([this](const auto &data) {
+    _viewModel->imageResViewModel().imageContent().addChangedHandler([this](const auto &data) {
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);

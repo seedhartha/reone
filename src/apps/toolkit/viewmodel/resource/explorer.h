@@ -101,19 +101,6 @@ struct Page : boost::noncopyable {
     }
 };
 
-struct ImageContent {
-    std::shared_ptr<ByteBuffer> tgaBytes;
-    std::shared_ptr<ByteBuffer> txiBytes;
-
-    ImageContent() {
-    }
-
-    ImageContent(std::shared_ptr<ByteBuffer> tgaBytes, std::shared_ptr<ByteBuffer> txiBytes) :
-        tgaBytes(tgaBytes),
-        txiBytes(txiBytes) {
-    }
-};
-
 struct Progress {
     bool visible {false};
     std::string title;
@@ -155,7 +142,6 @@ public:
 
     Collection<std::shared_ptr<Page>> &pages() { return _pages; }
     Property<int> &selectedPage() { return _selectedPage; }
-    Property<ImageContent> &imageContent() { return _imageContent; }
     Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
     Property<Progress> &progress() { return _progress; }
     Property<bool> &engineLoadRequested() { return _engineLoadRequested; }
@@ -206,7 +192,6 @@ private:
 
     Collection<std::shared_ptr<Page>> _pages;
     Property<int> _selectedPage;
-    Property<ImageContent> _imageContent;
     Property<std::shared_ptr<audio::AudioClip>> _audioStream;
     Property<Progress> _progress;
     Property<bool> _engineLoadRequested;

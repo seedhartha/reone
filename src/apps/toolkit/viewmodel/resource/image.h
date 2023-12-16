@@ -17,11 +17,35 @@
 
 #pragma once
 
+#include "reone/resource/id.h"
+#include "reone/system/stream/input.h"
+
+#include "../../binding/property.h"
 #include "../../viewmodel.h"
 
 namespace reone {
 
+struct ImageContent {
+    std::shared_ptr<ByteBuffer> tgaBytes;
+    std::shared_ptr<ByteBuffer> txiBytes;
+
+    ImageContent() {
+    }
+
+    ImageContent(std::shared_ptr<ByteBuffer> tgaBytes, std::shared_ptr<ByteBuffer> txiBytes) :
+        tgaBytes(tgaBytes),
+        txiBytes(txiBytes) {
+    }
+};
+
 class ImageResourceViewModel : public ViewModel {
+public:
+    void openImage(const resource::ResourceId &id, IInputStream &stream);
+
+    Property<ImageContent> &imageContent() { return _imageContent; }
+
+private:
+    Property<ImageContent> _imageContent;
 };
 
 } // namespace reone

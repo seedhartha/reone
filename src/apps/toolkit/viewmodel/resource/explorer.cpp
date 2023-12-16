@@ -257,20 +257,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tpc || id.type == ResType::Tga) {
-        auto tgaBytes = std::make_shared<ByteBuffer>();
-        auto txiBytes = std::make_shared<ByteBuffer>();
-        if (id.type == ResType::Tpc) {
-            auto tga = MemoryOutputStream(*tgaBytes);
-            auto txi = MemoryOutputStream(*txiBytes);
-            TpcTool().toTGA(data, tga, txi, false);
-        } else {
-            data.seek(0, SeekOrigin::End);
-            auto length = data.position();
-            data.seek(0, SeekOrigin::Begin);
-            tgaBytes->resize(length, '\0');
-            data.read(&(*tgaBytes)[0], length);
-        }
-        _imageContent = ImageContent(tgaBytes, txiBytes);
+        _imageResViewModel->openImage(id, data);
 
         _pages.removeIf([](auto &page) { return page->type == PageType::Image; });
         auto page = std::make_shared<Page>(PageType::Image, id.string(), id);
