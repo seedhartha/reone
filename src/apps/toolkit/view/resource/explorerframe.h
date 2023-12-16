@@ -54,6 +54,10 @@
 
 namespace reone {
 
+class ImageResourcePanel;
+class ModelResourcePanel;
+class AudioResourcePanel;
+
 class ResourceExplorerFrame : public wxFrame {
 public:
     ResourceExplorerFrame();
@@ -81,22 +85,13 @@ private:
     wxListBox *_modulesListBox {nullptr};
     wxAuiNotebook *_notebook {nullptr};
 
-    wxSplitterWindow *_imageSplitter {nullptr};
-    wxPanel *_modelPanel {nullptr};
-    wxSplitterWindow *_renderSplitter {nullptr};
-    wxPanel *_animationPanel {nullptr};
-    wxPanel *_audioPanel {nullptr};
+    ImageResourcePanel *_imagePanel {nullptr};
+    ModelResourcePanel *_modelPanel {nullptr};
+    AudioResourcePanel *_audioPanel {nullptr};
 
-    wxPanel *_imagePanel {nullptr};
+    wxSplitterWindow *_imageSplitter {nullptr};
     wxPanel *_imageCanvas {nullptr};
     wxTextCtrl *_imageInfoCtrl {nullptr};
-    wxButton *_animPauseResumeBtn {nullptr};
-    wxSlider *_animTimeSlider {nullptr};
-    wxTextCtrl *_animTimeCtrl {nullptr};
-    wxListBox *_animationsListBox {nullptr};
-    wxGLCanvas *_glCanvas {nullptr};
-
-    std::shared_ptr<graphics::LipAnimation> _lipAnim;
     std::unique_ptr<wxBitmap> _image;
 
     // END Widgets
@@ -151,15 +146,6 @@ private:
     void OnPopupCommandSelected(wxCommandEvent &event);
 
     void OnImageCanvasPaint(wxPaintEvent &event);
-
-    void OnGLCanvasPaint(wxPaintEvent &event);
-    void OnGLCanvasMouseWheel(wxMouseEvent &event);
-    void OnGLCanvasMouseMotion(wxMouseEvent &event);
-
-    void OnAnimPauseResumeCommand(wxCommandEvent &event);
-    void OnAnimTimeSliderCommand(wxCommandEvent &event);
-    void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
-    void OnLipLoadCommand(wxCommandEvent &event);
 
     void OnStopAudioCommand(wxCommandEvent &event);
 

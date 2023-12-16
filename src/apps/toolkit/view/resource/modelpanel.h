@@ -23,7 +23,23 @@
 #include <wx/wx.h>
 #endif
 
+#include <wx/button.h>
+#include <wx/glcanvas.h>
+#include <wx/listbox.h>
 #include <wx/panel.h>
+#include <wx/slider.h>
+#include <wx/splitter.h>
+#include <wx/textctrl.h>
+
+// Xlib conflicts workaround
+#ifdef None
+#undef None
+#endif
+#ifdef Always
+#undef Always
+#endif
+
+#include "reone/graphics/lipanimation.h"
 
 namespace reone {
 
@@ -31,16 +47,39 @@ class ModelResourceViewModel;
 
 class ModelResourcePanel : public wxPanel {
 public:
-    ModelResourcePanel(wxWindow *parent) :
-        wxPanel(parent) {
-    }
+    ModelResourcePanel(wxWindow *parent);
 
-    void setViewModel(ModelResourceViewModel &viewModel) {
+    void SetViewModel(ModelResourceViewModel &viewModel) {
         _viewModel = viewModel;
     }
 
+    void RefreshGL() {
+        _glCanvas->Refresh();
+    }
+
+    void OnEngineLoadRequested();
+
 private:
+    wxSplitterWindow *_renderSplitter {nullptr};
+    wxGLCanvas *_glCanvas {nullptr};
+    wxPanel *_animationPanel {nullptr};
+    wxButton *_animPauseResumeBtn {nullptr};
+    wxSlider *_animTimeSlider {nullptr};
+    wxTextCtrl *_animTimeCtrl {nullptr};
+    wxListBox *_animationsListBox {nullptr};
+
     std::optional<std::reference_wrapper<ModelResourceViewModel>> _viewModel;
+
+    std::shared_ptr<graphics::LipAnimation> _lipAnim;
+
+    void OnGLCanvasPaint(wxPaintEvent &event);
+    void OnGLCanvasMouseWheel(wxMouseEvent &event);
+    void OnGLCanvasMouseMotion(wxMouseEvent &event);
+
+    void OnAnimPauseResumeCommand(wxCommandEvent &event);
+    void OnAnimTimeSliderCommand(wxCommandEvent &event);
+    void OnAnimationsListBoxDoubleClick(wxCommandEvent &event);
+    void OnLipLoadCommand(wxCommandEvent &event);
 };
 
 } // namespace reone
