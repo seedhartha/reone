@@ -26,25 +26,55 @@
 #include <wx/dataview.h>
 #include <wx/panel.h>
 
+#include "reone/resource/gff.h"
+
 namespace reone {
 
 namespace resource {
 
-class Gff;
+class TalkTable;
 
 }
 
 class GFFResourceViewModel;
 
+struct GFFTreeItemClientData : public wxClientData {
+    resource::Gff &gff;
+    std::optional<std::reference_wrapper<resource::Gff::Field>> field;
+    std::optional<std::reference_wrapper<resource::Gff::Field>> parentField;
+    std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff;
+    std::optional<int> parentListIdx;
+
+    GFFTreeItemClientData(resource::Gff &gff,
+                          std::optional<std::reference_wrapper<resource::Gff::Field>> field = std::nullopt,
+                          std::optional<std::reference_wrapper<resource::Gff::Field>> parentField = std::nullopt,
+                          std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff = std::nullopt,
+                          std::optional<int> parentListIdx = std::nullopt) :
+        gff(gff),
+        field(std::move(field)),
+        parentField(std::move(parentField)),
+        parentFieldGff(std::move(parentFieldGff)),
+        parentListIdx(std::move(parentListIdx)) {
+    }
+};
+
 class GFFResourcePanel : public wxPanel {
 public:
     GFFResourcePanel(GFFResourceViewModel &viewModel,
+                     const resource::TalkTable &talkTable,
                      wxWindow *parent);
 
 private:
     GFFResourceViewModel &_viewModel;
+    const resource::TalkTable &_talkTable;
 
-    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
+    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl,
+                               wxDataViewItem parent,
+                               const std::string &text,
+                               resource::Gff &gff,
+                               std::optional<std::reference_wrapper<resource::Gff::Field>> parentField = std::nullopt,
+                               std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff = std::nullopt,
+                               std::optional<int> parentListIdx = std::nullopt);
 
     void OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event);
     void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);

@@ -122,6 +122,10 @@ public:
         return *_pages.at(index);
     }
 
+    const resource::TalkTable &talkTable() const {
+        return *_talkTable;
+    }
+
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
     std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 

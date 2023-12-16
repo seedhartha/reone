@@ -45,7 +45,7 @@ public:
     }
 
 private:
-    T _value;
+    T _value {T()};
     std::list<ChangedHandler> _changedHandlers;
 };
 

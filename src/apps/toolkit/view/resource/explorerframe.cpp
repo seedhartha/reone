@@ -259,17 +259,17 @@ void ResourceExplorerFrame::SaveFile() {
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     switch (page.type) {
     case PageType::Text:
-        return new TextResourcePanel(*std::static_pointer_cast<TextResourceViewModel>(page.viewModel), _notebook);
+        return new TextResourcePanel {*std::static_pointer_cast<TextResourceViewModel>(page.viewModel), _notebook};
     case PageType::Table:
-        return new TableResourcePanel(*std::static_pointer_cast<TableResourceViewModel>(page.viewModel), _notebook);
+        return new TableResourcePanel {*std::static_pointer_cast<TableResourceViewModel>(page.viewModel), _notebook};
     case PageType::GFF:
-        return new GFFResourcePanel(*std::static_pointer_cast<GFFResourceViewModel>(page.viewModel), _notebook);
+        return new GFFResourcePanel {*std::static_pointer_cast<GFFResourceViewModel>(page.viewModel), _viewModel->talkTable(), _notebook};
     case PageType::NCS:
-        return new NCSResourcePanel(*std::static_pointer_cast<NCSResourceViewModel>(page.viewModel), _notebook);
+        return new NCSResourcePanel {*std::static_pointer_cast<NCSResourceViewModel>(page.viewModel), _notebook};
     case PageType::NSS:
-        return new NSSResourcePanel(*std::static_pointer_cast<NSSResourceViewModel>(page.viewModel), _notebook);
+        return new NSSResourcePanel {*std::static_pointer_cast<NSSResourceViewModel>(page.viewModel), _notebook};
     default:
-        throw std::invalid_argument("Invalid page type: " + std::to_string(static_cast<int>(page.type)));
+        throw std::invalid_argument {"Invalid page type: " + std::to_string(static_cast<int>(page.type))};
     }
 }
 

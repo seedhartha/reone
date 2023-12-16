@@ -29,7 +29,7 @@ public:
         _content(std::move(content)) {
     }
 
-    const resource::Gff &content() const {
+    resource::Gff &content() {
         return *_content;
     }
 
