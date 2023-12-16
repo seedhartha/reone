@@ -32,10 +32,7 @@ class TableResourceViewModel;
 class TableResourcePanel : public wxPanel {
 public:
     TableResourcePanel(TableResourceViewModel &viewModel,
-                       wxWindow *parent) :
-        wxPanel(parent),
-        _viewModel(viewModel) {
-    }
+                       wxWindow *parent);
 
 private:
     TableResourceViewModel &_viewModel;

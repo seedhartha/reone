@@ -31,10 +31,7 @@ class TextResourceViewModel;
 
 class TextResourcePanel : public wxPanel {
 public:
-    TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent) :
-        wxPanel(parent),
-        _viewModel(viewModel) {
-    }
+    TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent);
 
 private:
     TextResourceViewModel &_viewModel;

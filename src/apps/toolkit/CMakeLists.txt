@@ -47,8 +47,13 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/ncspanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/nsspanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/tablepanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/textpanel.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp

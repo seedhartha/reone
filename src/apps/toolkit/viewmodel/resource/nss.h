@@ -22,6 +22,17 @@
 namespace reone {
 
 class NSSResourceViewModel : public ViewModel {
+public:
+    NSSResourceViewModel(std::string content) :
+        _content(std::move(content)) {
+    }
+
+    const std::string &content() const {
+        return _content;
+    }
+
+private:
+    std::string _content;
 };
 
 } // namespace reone

@@ -69,28 +69,13 @@ enum class PageType {
     Audio
 };
 
-struct TableContent {
-    std::vector<std::string> columns;
-    std::vector<std::vector<std::string>> rows;
-
-    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
-        columns(columns),
-        rows(rows) {
-    }
-};
-
 struct Page : boost::noncopyable {
     PageType type;
     std::string displayName;
     resource::ResourceId resourceId;
-
-    std::string textContent;
-    std::string xmlContent;
-    std::shared_ptr<TableContent> tableContent;
-    std::shared_ptr<resource::Gff> gffContent;
-    std::string pcodeContent;
-    std::string nssContent;
     bool dirty {false};
+
+    std::shared_ptr<ViewModel> viewModel;
 
     Page(PageType type,
          std::string displayName,

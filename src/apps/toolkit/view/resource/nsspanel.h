@@ -32,10 +32,7 @@ class NSSResourceViewModel;
 class NSSResourcePanel : public wxPanel {
 public:
     NSSResourcePanel(NSSResourceViewModel &viewModel,
-                     wxWindow *parent) :
-        wxPanel(parent),
-        _viewModel(viewModel) {
-    }
+                     wxWindow *parent);
 
 private:
     NSSResourceViewModel &_viewModel;

@@ -15,39 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "textpanel.h"
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-
-#include <wx/dataview.h>
-#include <wx/panel.h>
+#include "../../viewmodel/resource/text.h"
 
 namespace reone {
 
-namespace resource {
+TextResourcePanel::TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent) :
+    wxPanel(parent),
+    _viewModel(viewModel) {
 
-class Gff;
+    auto textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    textCtrl->AppendText(viewModel.content());
+    textCtrl->SetEditable(false);
 
+    auto sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(textCtrl, 1, wxEXPAND);
+    SetSizer(sizer);
 }
-
-class GFFResourceViewModel;
-
-class GFFResourcePanel : public wxPanel {
-public:
-    GFFResourcePanel(GFFResourceViewModel &viewModel,
-                     wxWindow *parent);
-
-private:
-    GFFResourceViewModel &_viewModel;
-
-    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
-
-    void OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event);
-    void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
-};
 
 } // namespace reone

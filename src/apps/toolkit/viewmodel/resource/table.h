@@ -21,7 +21,28 @@
 
 namespace reone {
 
+struct TableContent {
+    std::vector<std::string> columns;
+    std::vector<std::vector<std::string>> rows;
+
+    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
+        columns(columns),
+        rows(rows) {
+    }
+};
+
 class TableResourceViewModel : public ViewModel {
+public:
+    TableResourceViewModel(std::shared_ptr<TableContent> content) :
+        _content(std::move(content)) {
+    }
+
+    TableContent &content() const {
+        return *_content;
+    }
+
+private:
+    std::shared_ptr<TableContent> _content;
 };
 
 } // namespace reone

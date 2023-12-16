@@ -17,11 +17,24 @@
 
 #pragma once
 
+#include "reone/resource/gff.h"
+
 #include "../../viewmodel.h"
 
 namespace reone {
 
 class GFFResourceViewModel : public ViewModel {
+public:
+    GFFResourceViewModel(std::shared_ptr<resource::Gff> content) :
+        _content(std::move(content)) {
+    }
+
+    const resource::Gff &content() const {
+        return *_content;
+    }
+
+private:
+    std::shared_ptr<resource::Gff> _content;
 };
 
 } // namespace reone

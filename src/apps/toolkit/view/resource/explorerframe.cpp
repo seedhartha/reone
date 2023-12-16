@@ -53,6 +53,12 @@
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 
+#include "../../viewmodel/resource/gff.h"
+#include "../../viewmodel/resource/ncs.h"
+#include "../../viewmodel/resource/nss.h"
+#include "../../viewmodel/resource/table.h"
+#include "../../viewmodel/resource/text.h"
+
 #include "../composelipdialog.h"
 
 #include "audiopanel.h"
@@ -252,91 +258,16 @@ void ResourceExplorerFrame::SaveFile() {
 
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     switch (page.type) {
-    case PageType::Text: {
-        auto textPanel = new wxPanel(_notebook);
-        auto textSizer = new wxBoxSizer(wxVERTICAL);
-        auto plainTextCtrl = new wxTextCtrl(textPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-        plainTextCtrl->AppendText(page.textContent);
-        plainTextCtrl->SetEditable(false);
-        textSizer->Add(plainTextCtrl, 1, wxEXPAND);
-        textPanel->SetSizer(textSizer);
-        return textPanel;
-    }
-    case PageType::Table: {
-        auto tablePanel = new wxPanel(_notebook);
-        auto tableSizer = new wxBoxSizer(wxVERTICAL);
-        auto tableCtrl = new wxDataViewListCtrl(tablePanel, wxID_ANY);
-        tableCtrl->Freeze();
-        for (auto &column : page.tableContent->columns) {
-            tableCtrl->AppendTextColumn(column);
-        }
-        for (auto &row : page.tableContent->rows) {
-            auto values = wxVector<wxVariant>();
-            for (auto &value : row) {
-                values.push_back(wxVariant(value));
-            }
-            tableCtrl->AppendItem(values);
-        }
-        tableCtrl->Thaw();
-        tableSizer->Add(tableCtrl, 1, wxEXPAND);
-        tablePanel->SetSizer(tableSizer);
-        return tablePanel;
-    }
-    case PageType::GFF: {
-        auto gffPanel = new wxPanel(_notebook);
-        auto gffSizer = new wxBoxSizer(wxVERTICAL);
-        auto gffTreeCtrl = new wxDataViewTreeCtrl(gffPanel, wxID_ANY);
-        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnGffTreeCtrlItemStartEditing, this);
-        gffTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnGffTreeCtrlItemContextMenu, this);
-        gffTreeCtrl->Freeze();
-        AppendGffStructToTree(*gffTreeCtrl, wxDataViewItem(), "/", *page.gffContent);
-        gffTreeCtrl->Thaw();
-        gffSizer->Add(gffTreeCtrl, 1, wxEXPAND);
-        gffPanel->SetSizer(gffSizer);
-        return gffPanel;
-    }
-    case PageType::NCS: {
-        auto pcodePanel = new wxPanel(_notebook);
-        auto pcodeSizer = new wxBoxSizer(wxVERTICAL);
-        auto pcodeTextCtrl = new wxTextCtrl(pcodePanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-        pcodeTextCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-        pcodeTextCtrl->AppendText(page.pcodeContent);
-        pcodeTextCtrl->SetEditable(false);
-        pcodeSizer->Add(pcodeTextCtrl, 1, wxEXPAND);
-        pcodePanel->SetSizer(pcodeSizer);
-        return pcodePanel;
-    }
-    case PageType::NSS: {
-        auto nssPanel = new wxPanel(_notebook);
-        auto nssSizer = new wxBoxSizer(wxVERTICAL);
-        auto nssTextCtrl = new wxStyledTextCtrl(nssPanel);
-        nssTextCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-        nssTextCtrl->SetLexer(wxSTC_LEX_CPP);
-        nssTextCtrl->SetKeyWords(0, "break case continue default do else for if return switch while");
-        nssTextCtrl->SetKeyWords(1, "action command const effect event float int itemproperty location object std::string struct talent vector void");
-        nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSOR, wxColour(128, 64, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_DEFAULT, wxColour(0, 0, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_WORD, wxColour(0, 0, 255));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_WORD2, wxColour(128, 0, 255));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_NUMBER, wxColour(255, 128, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_STRING, wxColour(128, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_CHARACTER, wxColour(128, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_OPERATOR, wxColour(0, 0, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_VERBATIM, wxColour(0, 0, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_REGEX, wxColour(0, 0, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENT, wxColour(0, 128, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINE, wxColour(0, 128, 0));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOC, wxColour(0, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTLINEDOC, wxColour(0, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
-        nssTextCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
-        nssTextCtrl->SetText(page.nssContent);
-        nssTextCtrl->SetEditable(false);
-        nssSizer->Add(nssTextCtrl, 1, wxEXPAND);
-        nssPanel->SetSizer(nssSizer);
-        return nssPanel;
-    }
+    case PageType::Text:
+        return new TextResourcePanel(*std::static_pointer_cast<TextResourceViewModel>(page.viewModel), _notebook);
+    case PageType::Table:
+        return new TableResourcePanel(*std::static_pointer_cast<TableResourceViewModel>(page.viewModel), _notebook);
+    case PageType::GFF:
+        return new GFFResourcePanel(*std::static_pointer_cast<GFFResourceViewModel>(page.viewModel), _notebook);
+    case PageType::NCS:
+        return new NCSResourcePanel(*std::static_pointer_cast<NCSResourceViewModel>(page.viewModel), _notebook);
+    case PageType::NSS:
+        return new NSSResourcePanel(*std::static_pointer_cast<NSSResourceViewModel>(page.viewModel), _notebook);
     default:
         throw std::invalid_argument("Invalid page type: " + std::to_string(static_cast<int>(page.type)));
     }
@@ -450,61 +381,6 @@ void ResourceExplorerFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event)
     _viewModel->onGameDirectoryItemActivated(itemId);
 }
 
-void ResourceExplorerFrame::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const Gff &gff) {
-    auto structItem = ctrl.AppendContainer(parent, str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())));
-    for (auto &field : gff.fields()) {
-        switch (field.type) {
-        case Gff::FieldType::CExoString:
-        case Gff::FieldType::ResRef: {
-            auto cleaned = boost::replace_all_copy(field.strValue, "\n", "\\n");
-            ctrl.AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)));
-        } break;
-        case Gff::FieldType::CExoLocString: {
-            auto locStringItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            ctrl.AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
-            ctrl.AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
-            if (field.intValue != -1) {
-                auto tlkText = _viewModel->getTalkTableText(field.intValue);
-                auto cleanedTlkText = boost::replace_all_copy(tlkText, "\n", "\\n");
-                ctrl.AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
-            }
-        } break;
-        case Gff::FieldType::Void:
-            ctrl.AppendItem(structItem, str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)));
-            break;
-        case Gff::FieldType::Struct:
-            AppendGffStructToTree(ctrl, structItem, field.label, *field.children[0]);
-            break;
-        case Gff::FieldType::List: {
-            auto listItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            for (auto it = field.children.begin(); it != field.children.end(); ++it) {
-                auto childIdx = std::distance(field.children.begin(), it);
-                AppendGffStructToTree(ctrl, listItem, std::to_string(childIdx), **it);
-            }
-        } break;
-        case Gff::FieldType::Orientation: {
-            auto orientationItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            ctrl.AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
-            ctrl.AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
-            ctrl.AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
-            ctrl.AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
-        } break;
-        case Gff::FieldType::Vector: {
-            auto vectorItem = ctrl.AppendContainer(structItem, str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)));
-            ctrl.AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
-            ctrl.AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
-            ctrl.AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
-        } break;
-        case Gff::FieldType::StrRef:
-            ctrl.AppendItem(structItem, str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)));
-            break;
-        default:
-            ctrl.AppendItem(structItem, str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)));
-            break;
-        }
-    }
-}
-
 void ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
     auto &item = _viewModel->getGameDirItemById(itemId);
@@ -556,41 +432,6 @@ void ResourceExplorerFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
         _saveFileMenuItem->Enable(false);
     }
     event.Skip();
-}
-
-void ResourceExplorerFrame::OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event) {
-    event.Veto();
-}
-
-void ResourceExplorerFrame::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
-    enum class MenuItemId {
-        AddField,
-        RenameField,
-        SetFieldValue,
-        SetFieldType,
-        DeleteField,
-        AddListItem,
-        DuplicateListItem,
-        DeleteListItem
-    };
-    auto item = event.GetItem();
-    if (!item.IsOk()) {
-        return;
-    }
-    auto control = wxDynamicCast(event.GetEventObject(), wxDataViewTreeCtrl);
-    wxMenu menu;
-    menu.Append(static_cast<int>(MenuItemId::AddField), "Add field...");
-    menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
-    menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
-    menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
-    menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
-    menu.Append(static_cast<int>(MenuItemId::AddListItem), "Add list item...");
-    menu.Append(static_cast<int>(MenuItemId::DuplicateListItem), "Duplicate list item");
-    menu.Append(static_cast<int>(MenuItemId::DeleteListItem), "Delete list item");
-    menu.Bind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent &event) {
-        wxMessageBox("Hello, world!");
-    });
-    PopupMenu(&menu, event.GetPosition());
 }
 
 void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {

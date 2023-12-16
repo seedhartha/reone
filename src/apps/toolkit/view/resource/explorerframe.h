@@ -89,8 +89,6 @@ private:
 
     // END Widgets
 
-    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
-
     void InvokeTool(Operation operation);
 
     void SaveFile();
@@ -132,9 +130,6 @@ private:
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);
-
-    void OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event);
-    void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);
 

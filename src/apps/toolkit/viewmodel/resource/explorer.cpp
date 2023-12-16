@@ -51,6 +51,12 @@
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 
+#include "gff.h"
+#include "ncs.h"
+#include "nss.h"
+#include "table.h"
+#include "text.h"
+
 using namespace reone::audio;
 using namespace reone::game;
 using namespace reone::graphics;
@@ -125,7 +131,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         data.read(&text[0], length);
 
         auto page = std::make_shared<Page>(PageType::Text, id.string(), id);
-        page->textContent = text;
+        page->viewModel = std::make_shared<TextResourceViewModel>(std::move(text));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::TwoDa) {
@@ -150,7 +156,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
+        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
         _pages.add(std::move(page));
 
     } else if (isGFFCompatibleResType(id.type)) {
@@ -158,7 +164,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
 
         auto page = std::make_shared<Page>(PageType::GFF, id.string(), id);
-        page->gffContent = reader.root();
+        page->viewModel = std::make_shared<GFFResourceViewModel>(reader.root());
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tlk) {
@@ -183,7 +189,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
+        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ncs) {
@@ -192,7 +198,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         NcsTool(_gameId).toPCODE(data, pcode, *_routines);
 
         auto page = std::make_shared<Page>(PageType::NCS, id.string(), id);
-        page->pcodeContent = std::string(pcodeBytes.begin(), pcodeBytes.end());
+        page->viewModel = std::make_shared<NCSResourceViewModel>(std::string(pcodeBytes.begin(), pcodeBytes.end()));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Nss) {
@@ -203,7 +209,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         data.read(&text[0], length);
 
         auto page = std::make_shared<Page>(PageType::NSS, id.string(), id);
-        page->nssContent = text;
+        page->viewModel = std::make_shared<NSSResourceViewModel>(std::move(text));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Lip) {
@@ -223,7 +229,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
+        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ssf) {
@@ -253,7 +259,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->tableContent = std::make_shared<TableContent>(std::move(columns), std::move(rows));
+        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tpc || id.type == ResType::Tga) {
@@ -432,7 +438,7 @@ void ResourceExplorerViewModel::decompile(GameDirectoryItemId itemId, bool optim
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
         auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef.value()), *item.resId);
-        page->nssContent = std::string(nssBytes.begin(), nssBytes.end());
+        page->viewModel = std::make_shared<NSSResourceViewModel>(std::string(nssBytes.begin(), nssBytes.end()));
         _pages.add(std::move(page));
     });
 }
