@@ -15,32 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-
-#include <wx/panel.h>
+#include "modelpanel.h"
 
 namespace reone {
-
-class ModelResourceViewModel;
-
-class ModelResourcePanel : public wxPanel {
-public:
-    ModelResourcePanel(wxWindow *parent) :
-        wxPanel(parent) {
-    }
-
-    void setViewModel(ModelResourceViewModel &viewModel) {
-        _viewModel = viewModel;
-    }
-
-private:
-    std::optional<std::reference_wrapper<ModelResourceViewModel>> _viewModel;
-};
 
 } // namespace reone

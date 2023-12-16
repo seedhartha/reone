@@ -118,6 +118,7 @@ struct TimerID {
 
 ResourceExplorerFrame::ResourceExplorerFrame() :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
+    _viewModel = std::make_unique<ResourceExplorerViewModel>();
 
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
@@ -172,8 +173,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
 
-    _imageResViewModel = std::make_unique<ImageResourceViewModel>();
-    _imagePanel = new ImageResourcePanel(*_imageResViewModel, _notebook);
+    _imagePanel = new ImageResourcePanel(_viewModel->imageResViewModel(), _notebook);
     _imageSplitter = new wxSplitterWindow(_imagePanel, wxID_ANY);
     _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     _imageCanvas->Bind(wxEVT_PAINT, &ResourceExplorerFrame::OnImageCanvasPaint, this);
@@ -185,16 +185,14 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     imageSizer->Add(_imageSplitter, wxSizerFlags(1).Expand());
     _imagePanel->SetSizer(imageSizer);
 
-    _modelResViewModel = std::make_unique<ModelResourceViewModel>();
-    _modelPanel = new ModelResourcePanel(*_modelResViewModel, _notebook);
+    _modelPanel = new ModelResourcePanel(_notebook);
     _renderSplitter = new wxSplitterWindow(_modelPanel);
     _renderSplitter->SetMinimumPaneSize(100);
     auto modelSizer = new wxBoxSizer(wxHORIZONTAL);
     modelSizer->Add(_renderSplitter, wxSizerFlags(1).Expand());
     _modelPanel->SetSizer(modelSizer);
 
-    _audioResViewModel = std::make_unique<AudioResourceViewModel>();
-    _audioPanel = new AudioResourcePanel(*_audioResViewModel, _notebook);
+    _audioPanel = new AudioResourcePanel(_viewModel->audioResViewModel(), _notebook);
     auto stopAudioButton = new wxButton(_audioPanel, wxID_ANY, "Stop");
     stopAudioButton->Bind(wxEVT_BUTTON, &ResourceExplorerFrame::OnStopAudioCommand, this);
     auto audioSizer = new wxBoxSizer(wxVERTICAL);
@@ -208,7 +206,6 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
         window->Hide();
     }
 
-    _viewModel = std::make_unique<ResourceExplorerViewModel>();
     _viewModel->pages().addChangedHandler([this](const auto &args) {
         switch (args.type) {
         case CollectionChangeType::Add: {
@@ -250,19 +247,6 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
             _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
         } else {
             _imageSplitter->Unsplit(_imageInfoCtrl);
-        }
-    });
-    _viewModel->animations().addChangedHandler([this](const auto &animations) {
-        if (!animations.empty()) {
-            _animationsListBox->Freeze();
-            _animationsListBox->Clear();
-            for (auto &animation : animations) {
-                _animationsListBox->Append(animation);
-            }
-            _animationsListBox->Thaw();
-            _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
-        } else {
-            _renderSplitter->Unsplit();
         }
     });
     _viewModel->audioStream().addChangedHandler([this](const auto &stream) {
@@ -336,17 +320,30 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
 
         _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
     });
-    _viewModel->animationProgress().addChangedHandler([this](const auto &progress) {
-        _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
-        int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
-        _animTimeSlider->SetValue(value);
-    });
     _viewModel->renderEnabled().addChangedHandler([this](const auto &enabled) {
         if (enabled) {
             wxWakeUpIdle();
         }
     });
     _viewModel->onViewCreated();
+    // _viewModel->modelResViewModel().animations().addChangedHandler([this](const auto &animations) {
+    //     if (!animations.empty()) {
+    //         _animationsListBox->Freeze();
+    //         _animationsListBox->Clear();
+    //         for (auto &animation : animations) {
+    //             _animationsListBox->Append(animation);
+    //         }
+    //         _animationsListBox->Thaw();
+    //         _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
+    //     } else {
+    //         _renderSplitter->Unsplit();
+    //     }
+    // });
+    // _viewModel->modelResViewModel().animationProgress().addChangedHandler([this](const auto &progress) {
+    //     _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
+    //     int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
+    //     _animTimeSlider->SetValue(value);
+    // });
 
     // CreateStatusBar();
 }
@@ -467,7 +464,7 @@ void ResourceExplorerFrame::OnClose(wxCloseEvent &event) {
 void ResourceExplorerFrame::OnIdle(wxIdleEvent &event) {
     bool renderEnabled = *_viewModel->renderEnabled();
     if (renderEnabled) {
-        _viewModel->update3D();
+        _viewModel->modelResViewModel().update3D();
         _glCanvas->Refresh();
     }
     if (_audioSource) {
@@ -749,39 +746,39 @@ void ResourceExplorerFrame::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(_glCanvas);
 
     auto clientSize = _glCanvas->GetClientSize();
-    _viewModel->render3D(clientSize.x, clientSize.y);
+    _viewModel->modelResViewModel().render3D(clientSize.x, clientSize.y);
 
     _glCanvas->SwapBuffers();
 }
 
 void ResourceExplorerFrame::OnGLCanvasMouseWheel(wxMouseEvent &event) {
     auto delta = event.GetWheelDelta() * event.GetWheelRotation();
-    _viewModel->onGLCanvasMouseWheel(delta);
+    _viewModel->modelResViewModel().onGLCanvasMouseWheel(delta);
 }
 
 void ResourceExplorerFrame::OnGLCanvasMouseMotion(wxMouseEvent &event) {
     wxClientDC dc(_glCanvas);
     auto position = event.GetLogicalPosition(dc);
-    _viewModel->onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
+    _viewModel->modelResViewModel().onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
 void ResourceExplorerFrame::OnAnimPauseResumeCommand(wxCommandEvent &event) {
-    if (_viewModel->isAnimationPlaying()) {
-        _viewModel->pauseAnimation();
+    if (_viewModel->modelResViewModel().isAnimationPlaying()) {
+        _viewModel->modelResViewModel().pauseAnimation();
         _animPauseResumeBtn->SetLabelText("Resume");
     } else {
-        _viewModel->resumeAnimation();
+        _viewModel->modelResViewModel().resumeAnimation();
         _animPauseResumeBtn->SetLabelText("Pause");
     }
 }
 
 void ResourceExplorerFrame::OnAnimTimeSliderCommand(wxCommandEvent &event) {
-    float duration = _viewModel->animationProgress()->duration;
+    float duration = _viewModel->modelResViewModel().animationProgress()->duration;
     if (duration == 0.0f) {
         return;
     }
     float time = duration * _animTimeSlider->GetValue() / static_cast<float>(_animTimeSlider->GetMax());
-    _viewModel->setAnimationTime(time);
+    _viewModel->modelResViewModel().setAnimationTime(time);
 }
 
 void ResourceExplorerFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
@@ -790,7 +787,7 @@ void ResourceExplorerFrame::OnAnimationsListBoxDoubleClick(wxCommandEvent &event
         return;
     }
     auto animation = _animationsListBox->GetString(selection);
-    _viewModel->playAnimation(animation.ToStdString());
+    _viewModel->modelResViewModel().playAnimation(animation.ToStdString());
     _animPauseResumeBtn->SetLabelText("Pause");
 }
 
@@ -810,7 +807,7 @@ void ResourceExplorerFrame::OnLipLoadCommand(wxCommandEvent &event) {
     auto reader = LipReader(lip, "");
     reader.load();
     _lipAnim = reader.animation();
-    _viewModel->playAnimation("talk", _lipAnim.get());
+    _viewModel->modelResViewModel().playAnimation("talk", _lipAnim.get());
 }
 
 void ResourceExplorerFrame::OnStopAudioCommand(wxCommandEvent &event) {

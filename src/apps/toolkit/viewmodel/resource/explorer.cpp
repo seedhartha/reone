@@ -281,35 +281,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
 
         _renderEnabled = false;
 
-        auto mdxRes = _resourceModule->resources().find(ResourceId(id.resRef, ResType::Mdx));
-        if (!mdxRes) {
-            throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
-        }
-        auto mdx = MemoryInputStream(mdxRes->data);
-        auto reader = MdlMdxReader(data, mdx);
-        reader.load();
-
-        auto &scene = _sceneModule->graphs().get(kSceneMain);
-        scene.clear();
-        scene.update(0.0f);
-        _modelNode.reset();
-
-        _model = reader.model();
-        if (!_model->superModelName().empty()) {
-            auto superModel = _resourceModule->models().get(_model->superModelName());
-            _model->setSuperModel(std::move(superModel));
-        }
-        _model->init();
-        _animations = _model->getAnimationNames();
-
-        _modelNode = scene.newModel(*_model, ModelUsage::Creature);
-        _modelHeading = 0.0f;
-        _modelPitch = 0.0f;
-        updateModelTransform();
-        scene.addRoot(_modelNode);
-
-        _cameraPosition = glm::vec3(0.0f, 8.0f, 0.0f);
-        updateCameraTransform();
+        _modelResViewModel->openModel(id, data);
 
         _pages.removeIf([](auto &page) { return page->type == PageType::Model; });
         auto page = std::make_shared<Page>(PageType::Model, id.string(), id);
@@ -406,6 +378,23 @@ void ResourceExplorerViewModel::loadGameDirectory() {
         }
         _gameDirItems.push_back(std::move(item));
     }
+
+    _graphicsOpt.grass = false;
+    _graphicsOpt.pbr = false;
+    _graphicsOpt.ssao = false;
+    _graphicsOpt.ssr = false;
+    _graphicsOpt.fxaa = false;
+    _graphicsOpt.sharpen = false;
+
+    _clock = std::make_unique<wxClock>();
+    _systemModule = std::make_unique<SystemModule>(*_clock);
+    _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
+    _audioModule = std::make_unique<AudioModule>(_audioOpt);
+    _scriptModule = std::make_unique<ScriptModule>();
+    _resourceModule = std::make_unique<ResourceModule>(GameID::KotOR, _gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
+    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
+
+    _modelResViewModel = std::make_unique<ModelResourceViewModel>(*_systemModule, *_graphicsModule, *_resourceModule, *_sceneModule);
 }
 
 void ResourceExplorerViewModel::loadTools() {
@@ -429,21 +418,6 @@ void ResourceExplorerViewModel::loadEngine() {
     }
     _engineLoadRequested = true;
 
-    _graphicsOpt.grass = false;
-    _graphicsOpt.pbr = false;
-    _graphicsOpt.ssao = false;
-    _graphicsOpt.ssr = false;
-    _graphicsOpt.fxaa = false;
-    _graphicsOpt.sharpen = false;
-
-    _clock = std::make_unique<wxClock>();
-    _systemModule = std::make_unique<SystemModule>(*_clock);
-    _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
-    _audioModule = std::make_unique<AudioModule>(_audioOpt);
-    _scriptModule = std::make_unique<ScriptModule>();
-    _resourceModule = std::make_unique<ResourceModule>(GameID::KotOR, _gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
-    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
-
     _systemModule->init();
     _graphicsModule->init();
     _audioModule->init();
@@ -463,14 +437,7 @@ void ResourceExplorerViewModel::loadEngine() {
     resources.addERF(tpaTexPackPath);
     resources.addFolder(overridePath);
 
-    auto &sceneGraphs = _sceneModule->graphs();
-    sceneGraphs.reserve(kSceneMain);
-    auto &scene = sceneGraphs.get(kSceneMain);
-
-    _cameraNode = scene.newCamera();
-
-    scene.setActiveCamera(_cameraNode.get());
-    scene.setAmbientLightColor(glm::vec3(1.0f));
+    _modelResViewModel->initScene();
 
     _engineLoaded = true;
 }
@@ -607,89 +574,6 @@ bool ResourceExplorerViewModel::invokeTool(Operation operation,
         return true;
     }
     return false;
-}
-
-void ResourceExplorerViewModel::playAnimation(std::string anim, graphics::LipAnimation *lipAnim) {
-    if (!_modelNode) {
-        return;
-    }
-    _modelNode->playAnimation(anim, lipAnim, AnimationProperties::fromFlags(AnimationFlags::loop));
-    _animationPlaying = true;
-}
-
-void ResourceExplorerViewModel::pauseAnimation() {
-    if (!_modelNode) {
-        return;
-    }
-    _modelNode->pauseAnimation();
-    _animationPlaying = false;
-}
-
-void ResourceExplorerViewModel::resumeAnimation() {
-    if (!_modelNode) {
-        return;
-    }
-    _modelNode->resumeAnimation();
-    _animationPlaying = true;
-}
-
-void ResourceExplorerViewModel::setAnimationTime(float time) {
-    if (!_modelNode) {
-        return;
-    }
-    _modelNode->setAnimationTime(time);
-}
-
-void ResourceExplorerViewModel::update3D() {
-    auto ticks = _systemModule->services().clock.ticks();
-    if (_lastTicks == 0) {
-        _lastTicks = ticks;
-    }
-    float delta = (ticks - _lastTicks) / 1000.0f;
-    _lastTicks = ticks;
-
-    auto &scene = _sceneModule->graphs().get(kSceneMain);
-    scene.update(delta);
-
-    if (_modelNode && !_modelNode->animationChannels().empty()) {
-        const auto &animChannel = _modelNode->animationChannels().front();
-        if (animChannel.anim) {
-            float time = animChannel.time;
-            float duration = animChannel.lipAnim ? animChannel.lipAnim->length() : animChannel.anim->length();
-            _animationProgress = AnimationProgress {time, duration};
-        }
-    }
-}
-
-void ResourceExplorerViewModel::render3D(int w, int h) {
-    float aspect = w / static_cast<float>(h);
-    _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
-
-    auto &scene = _sceneModule->graphs().get(kSceneMain);
-    auto &output = scene.render(glm::ivec2(w, h));
-    _graphicsModule->uniforms().setLocals(std::bind(&LocalUniforms::reset, std::placeholders::_1));
-    _graphicsModule->context().useProgram(_graphicsModule->shaderRegistry().get(ShaderProgramId::ndcTexture));
-    _graphicsModule->context().bindTexture(output);
-    _graphicsModule->context().withViewport(glm::ivec4(0, 0, w, h), [this, &output]() {
-        _graphicsModule->context().clearColorDepth();
-        _graphicsModule->meshRegistry().get(MeshName::quadNDC).draw();
-    });
-}
-
-void ResourceExplorerViewModel::updateModelTransform() {
-    auto transform = glm::mat4(1.0f);
-    transform *= glm::rotate(_modelHeading, glm::vec3(0.0f, 0.0f, 1.0f));
-    transform *= glm::rotate(_modelPitch, glm::vec3(-1.0f, 0.0f, 0.0f));
-    _modelNode->setLocalTransform(transform);
-}
-
-void ResourceExplorerViewModel::updateCameraTransform() {
-    auto cameraTransform = glm::mat4(1.0f);
-    cameraTransform = glm::translate(cameraTransform, _cameraPosition);
-    cameraTransform *= glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraTransform *= glm::rotate(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    _cameraNode->setLocalTransform(cameraTransform);
 }
 
 void ResourceExplorerViewModel::withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block) {
@@ -884,29 +768,6 @@ void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId
 void ResourceExplorerViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
     auto &item = *_idToGameDirItem.at(id);
     openFile(item);
-}
-
-void ResourceExplorerViewModel::onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown) {
-    int dx = x - _lastMouseX;
-    int dy = y - _lastMouseY;
-
-    if (leftDown) {
-        _modelHeading += dx / glm::pi<float>() / 64.0f;
-        //_modelPitch += dy / glm::pi<float>() / 64.0f;
-        updateModelTransform();
-    } else if (rightDown) {
-        _cameraPosition.x += dx / static_cast<float>(256.0f);
-        _cameraPosition.z += dy / static_cast<float>(256.0f);
-        updateCameraTransform();
-    }
-
-    _lastMouseX = x;
-    _lastMouseY = y;
-}
-
-void ResourceExplorerViewModel::onGLCanvasMouseWheel(int delta) {
-    _cameraPosition.y = glm::max(0.0f, _cameraPosition.y - glm::clamp(delta, -1, 1));
-    updateCameraTransform();
 }
 
 } // namespace reone

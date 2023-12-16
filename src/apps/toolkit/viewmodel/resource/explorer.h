@@ -39,6 +39,10 @@
 #include "../../binding/property.h"
 #include "../../viewmodel.h"
 
+#include "audio.h"
+#include "image.h"
+#include "model.h"
+
 namespace reone {
 
 using GameDirectoryItemId = void *;
@@ -110,11 +114,6 @@ struct ImageContent {
     }
 };
 
-struct AnimationProgress {
-    float time {0.0f};
-    float duration {0.0f};
-};
-
 struct Progress {
     bool visible {false};
     std::string title;
@@ -124,6 +123,11 @@ struct Progress {
 
 class ResourceExplorerViewModel : public ViewModel {
 public:
+    ResourceExplorerViewModel() {
+        _imageResViewModel = std::make_unique<ImageResourceViewModel>();
+        _audioResViewModel = std::make_unique<AudioResourceViewModel>();
+    }
+
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(GameDirectoryItemId itemId, bool optimize = true);
     void exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath);
@@ -134,14 +138,6 @@ public:
     bool invokeTool(Operation operation,
                     const std::filesystem::path &srcPath,
                     const std::filesystem::path &destPath);
-
-    void playAnimation(std::string anim, graphics::LipAnimation *lipAnim = nullptr);
-    void pauseAnimation();
-    void resumeAnimation();
-    void setAnimationTime(float time);
-
-    void update3D();
-    void render3D(int w, int h);
 
     resource::GameID gameId() const { return _gameId; }
     const std::filesystem::path &gamePath() const { return _gamePath; }
@@ -157,17 +153,25 @@ public:
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
     std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
-    bool isAnimationPlaying() const { return _animationPlaying; }
-
     Collection<std::shared_ptr<Page>> &pages() { return _pages; }
     Property<int> &selectedPage() { return _selectedPage; }
     Property<ImageContent> &imageContent() { return _imageContent; }
-    Property<std::vector<std::string>> &animations() { return _animations; }
     Property<std::shared_ptr<audio::AudioClip>> &audioStream() { return _audioStream; }
     Property<Progress> &progress() { return _progress; }
     Property<bool> &engineLoadRequested() { return _engineLoadRequested; }
-    Property<AnimationProgress> &animationProgress() { return _animationProgress; }
     Property<bool> &renderEnabled() { return _renderEnabled; }
+
+    ImageResourceViewModel &imageResViewModel() {
+        return *_imageResViewModel;
+    }
+
+    ModelResourceViewModel &modelResViewModel() {
+        return *_modelResViewModel;
+    }
+
+    AudioResourceViewModel &audioResViewModel() {
+        return *_audioResViewModel;
+    }
 
     void onViewCreated();
     void onViewDestroyed();
@@ -178,9 +182,6 @@ public:
     void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
     void onGameDirectoryItemExpanding(GameDirectoryItemId id);
     void onGameDirectoryItemActivated(GameDirectoryItemId id);
-
-    void onGLCanvasMouseMotion(int x, int y, bool leftDown, bool rightDown);
-    void onGLCanvasMouseWheel(int delta);
 
 private:
     std::filesystem::path _gamePath;
@@ -197,26 +198,18 @@ private:
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
-    std::shared_ptr<scene::CameraSceneNode> _cameraNode;
-    std::shared_ptr<graphics::Model> _model;
-    std::shared_ptr<scene::ModelSceneNode> _modelNode;
-    glm::vec3 _cameraPosition {0.0f};
-    float _modelHeading {0.0f};
-    float _modelPitch {0.0f};
-    int _lastMouseX {0};
-    int _lastMouseY {0};
-    uint32_t _lastTicks {0};
+    std::unique_ptr<ImageResourceViewModel> _imageResViewModel;
+    std::unique_ptr<ModelResourceViewModel> _modelResViewModel;
+    std::unique_ptr<AudioResourceViewModel> _audioResViewModel;
 
     // Event handlers
 
     Collection<std::shared_ptr<Page>> _pages;
     Property<int> _selectedPage;
     Property<ImageContent> _imageContent;
-    Property<std::vector<std::string>> _animations;
     Property<std::shared_ptr<audio::AudioClip>> _audioStream;
     Property<Progress> _progress;
     Property<bool> _engineLoadRequested;
-    Property<AnimationProgress> _animationProgress;
     Property<bool> _renderEnabled;
 
     // END Event handlers
@@ -235,7 +228,6 @@ private:
     std::unique_ptr<script::ScriptModule> _scriptModule;
 
     bool _engineLoaded {false};
-    bool _animationPlaying {false};
 
     // END Embedded engine
 
@@ -245,9 +237,6 @@ private:
 
     void openFile(const GameDirectoryItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
-
-    void updateModelTransform();
-    void updateCameraTransform();
 
     PageType getPageType(resource::ResType type) const;
 

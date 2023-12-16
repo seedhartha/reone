@@ -46,7 +46,9 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
-    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp)
+    ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/model.cpp)
 
 if(WIN32)
     list(APPEND TOOLKIT_SOURCES ${CMAKE_SOURCE_DIR}/assets/toolkit.rc)

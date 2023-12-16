@@ -33,6 +33,10 @@ public:
     void init();
     void deinit();
 
+    IClock &clock() {
+        return _clock;
+    }
+
     SystemServices &services() {
         return *_services;
     }

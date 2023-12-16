@@ -61,10 +61,6 @@ public:
 private:
     std::unique_ptr<ResourceExplorerViewModel> _viewModel;
 
-    std::unique_ptr<ImageResourceViewModel> _imageResViewModel;
-    std::unique_ptr<ModelResourceViewModel> _modelResViewModel;
-    std::unique_ptr<AudioResourceViewModel> _audioResViewModel;
-
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
 
