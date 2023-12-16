@@ -23,7 +23,10 @@
 #include <wx/wx.h>
 #endif
 
+#include <wx/bitmap.h>
 #include <wx/panel.h>
+#include <wx/splitter.h>
+#include <wx/textctrl.h>
 
 namespace reone {
 
@@ -32,13 +35,17 @@ class ImageResourceViewModel;
 class ImageResourcePanel : public wxPanel {
 public:
     ImageResourcePanel(ImageResourceViewModel &viewModel,
-                       wxWindow *parent) :
-        wxPanel(parent),
-        _viewModel(viewModel) {
-    }
+                       wxWindow *parent);
 
 private:
     ImageResourceViewModel &_viewModel;
+
+    wxSplitterWindow *_imageSplitter {nullptr};
+    wxPanel *_imageCanvas {nullptr};
+    wxTextCtrl *_imageInfoCtrl {nullptr};
+    std::unique_ptr<wxBitmap> _image;
+
+    void OnImageCanvasPaint(wxPaintEvent &event);
 };
 
 } // namespace reone

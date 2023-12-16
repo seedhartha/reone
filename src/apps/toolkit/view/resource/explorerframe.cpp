@@ -174,17 +174,6 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
 
     _imagePanel = new ImageResourcePanel(_viewModel->imageResViewModel(), _notebook);
-    _imageSplitter = new wxSplitterWindow(_imagePanel, wxID_ANY);
-    _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _imageCanvas->Bind(wxEVT_PAINT, &ResourceExplorerFrame::OnImageCanvasPaint, this);
-    _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _imageInfoCtrl->SetEditable(false);
-    _imageSplitter->SetMinimumPaneSize(100);
-    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
-    auto imageSizer = new wxBoxSizer(wxHORIZONTAL);
-    imageSizer->Add(_imageSplitter, wxSizerFlags(1).Expand());
-    _imagePanel->SetSizer(imageSizer);
-
     _modelPanel = new ModelResourcePanel(_notebook);
 
     _audioPanel = new AudioResourcePanel(_viewModel->audioResViewModel(), _notebook);
@@ -230,19 +219,6 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     });
     _viewModel->selectedPage().addChangedHandler([this](const auto &page) {
         _notebook->SetSelection(page);
-    });
-    _viewModel->imageResViewModel().imageContent().addChangedHandler([this](const auto &data) {
-        auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
-        auto image = wxImage();
-        image.LoadFile(stream, wxBITMAP_TYPE_TGA);
-        _image = std::make_unique<wxBitmap>(image);
-        _imageInfoCtrl->Clear();
-        _imageInfoCtrl->AppendText(std::string(data.txiBytes->begin(), data.txiBytes->end()));
-        if (!data.txiBytes->empty()) {
-            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
-        } else {
-            _imageSplitter->Unsplit(_imageInfoCtrl);
-        }
     });
     _viewModel->audioStream().addChangedHandler([this](const auto &stream) {
         if (stream) {
@@ -664,19 +640,6 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         _viewModel->exportFile(itemId, destPath);
         wxMessageBox("Operation completed successfully", "Success");
     }
-}
-
-void ResourceExplorerFrame::OnImageCanvasPaint(wxPaintEvent &event) {
-    wxPaintDC dc(_imageCanvas);
-
-    if (!_image) {
-        return;
-    }
-    int w, h;
-    dc.GetSize(&w, &h);
-    int x = (w - _image->GetWidth()) / 2;
-    int y = (h - _image->GetHeight()) / 2;
-    dc.DrawBitmap(*_image, x, y, true);
 }
 
 void ResourceExplorerFrame::OnStopAudioCommand(wxCommandEvent &event) {

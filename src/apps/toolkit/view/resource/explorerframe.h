@@ -89,11 +89,6 @@ private:
     ModelResourcePanel *_modelPanel {nullptr};
     AudioResourcePanel *_audioPanel {nullptr};
 
-    wxSplitterWindow *_imageSplitter {nullptr};
-    wxPanel *_imageCanvas {nullptr};
-    wxTextCtrl *_imageInfoCtrl {nullptr};
-    std::unique_ptr<wxBitmap> _image;
-
     // END Widgets
 
     void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl, wxDataViewItem parent, const std::string &text, const resource::Gff &gff);
@@ -144,8 +139,6 @@ private:
     void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
 
     void OnPopupCommandSelected(wxCommandEvent &event);
-
-    void OnImageCanvasPaint(wxPaintEvent &event);
 
     void OnStopAudioCommand(wxCommandEvent &event);
 

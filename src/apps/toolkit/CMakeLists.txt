@@ -46,6 +46,7 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp
