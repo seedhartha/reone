@@ -225,21 +225,21 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractToolCommand, this, EventHandlerID::extractTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnUnwrapToolCommand, this, EventHandlerID::unwrapTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToRimToolCommand, this, EventHandlerID::toRimTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToErfToolCommand, this, EventHandlerID::toErfTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToModToolCommand, this, EventHandlerID::toModTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToXmlToolCommand, this, EventHandlerID::toXmlTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTwoDaToolCommand, this, EventHandlerID::toTwoDaTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToGffToolCommand, this, EventHandlerID::toGffTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTlkToolCommand, this, EventHandlerID::toTlkTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToLipToolCommand, this, EventHandlerID::toLipTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToSsfToolCommand, this, EventHandlerID::toSsfTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTgaToolCommand, this, EventHandlerID::toTgaTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToPcodeToolCommand, this, EventHandlerID::toPcodeTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNcsToolCommand, this, EventHandlerID::toNcsTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNssToolCommand, this, EventHandlerID::toNssTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::Extract), EventHandlerID::extractTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::Unwrap), EventHandlerID::unwrapTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToXML), EventHandlerID::toXmlTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::To2DA), EventHandlerID::toTwoDaTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToGFF), EventHandlerID::toGffTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToTLK), EventHandlerID::toTlkTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToLIP), EventHandlerID::toLipTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToSSF), EventHandlerID::toSsfTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToTGA), EventHandlerID::toTgaTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToPCODE), EventHandlerID::toPcodeTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNCS), EventHandlerID::toNcsTool);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNSS), EventHandlerID::toNssTool);
 }
 
 void ResourceExplorerFrame::BindViewModel() {
@@ -719,66 +719,6 @@ void ResourceExplorerFrame::OnComposeLipCommand(wxCommandEvent &event) {
     auto dialog = ComposeLipDialog(this, -1, "LIP Composer");
     if (dialog.ShowModal() != wxID_OK) {
     }
-}
-
-void ResourceExplorerFrame::OnExtractToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::Extract);
-}
-
-void ResourceExplorerFrame::OnUnwrapToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::Unwrap);
-}
-
-void ResourceExplorerFrame::OnToRimToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToRIM);
-}
-
-void ResourceExplorerFrame::OnToErfToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToERF);
-}
-
-void ResourceExplorerFrame::OnToModToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToMOD);
-}
-
-void ResourceExplorerFrame::OnToXmlToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToXML);
-}
-
-void ResourceExplorerFrame::OnToTwoDaToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::To2DA);
-}
-
-void ResourceExplorerFrame::OnToGffToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToGFF);
-}
-
-void ResourceExplorerFrame::OnToTlkToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToTLK);
-}
-
-void ResourceExplorerFrame::OnToLipToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToLIP);
-}
-
-void ResourceExplorerFrame::OnToSsfToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToSSF);
-}
-
-void ResourceExplorerFrame::OnToTgaToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToTGA);
-}
-
-void ResourceExplorerFrame::OnToPcodeToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToPCODE);
-}
-
-void ResourceExplorerFrame::OnToNcsToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToNCS);
-}
-
-void ResourceExplorerFrame::OnToNssToolCommand(wxCommandEvent &event) {
-    InvokeTool(Operation::ToNSS);
 }
 
 void ResourceExplorerFrame::InvokeTool(Operation operation) {

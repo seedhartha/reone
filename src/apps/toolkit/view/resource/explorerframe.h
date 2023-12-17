@@ -109,22 +109,6 @@ private:
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
     void OnComposeLipCommand(wxCommandEvent &event);
 
-    void OnExtractToolCommand(wxCommandEvent &event);
-    void OnUnwrapToolCommand(wxCommandEvent &event);
-    void OnToRimToolCommand(wxCommandEvent &event);
-    void OnToErfToolCommand(wxCommandEvent &event);
-    void OnToModToolCommand(wxCommandEvent &event);
-    void OnToXmlToolCommand(wxCommandEvent &event);
-    void OnToTwoDaToolCommand(wxCommandEvent &event);
-    void OnToGffToolCommand(wxCommandEvent &event);
-    void OnToTlkToolCommand(wxCommandEvent &event);
-    void OnToLipToolCommand(wxCommandEvent &event);
-    void OnToSsfToolCommand(wxCommandEvent &event);
-    void OnToTgaToolCommand(wxCommandEvent &event);
-    void OnToPcodeToolCommand(wxCommandEvent &event);
-    void OnToNcsToolCommand(wxCommandEvent &event);
-    void OnToNssToolCommand(wxCommandEvent &event);
-
     void OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event);
     void OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event);
     void OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event);
