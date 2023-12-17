@@ -23,11 +23,16 @@
 #include <wx/wx.h>
 #endif
 
+#include "viewmodel/resource/explorer.h"
+
 namespace reone {
 
 class ToolkitApp : public wxApp {
 public:
     bool OnInit() override;
+
+private:
+    std::unique_ptr<ResourceExplorerViewModel> m_viewModel;
 };
 
 } // namespace reone

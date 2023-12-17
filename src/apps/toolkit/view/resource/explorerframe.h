@@ -60,10 +60,10 @@ class AudioResourcePanel;
 
 class ResourceExplorerFrame : public wxFrame {
 public:
-    ResourceExplorerFrame();
+    ResourceExplorerFrame(ResourceExplorerViewModel &viewModel);
 
 private:
-    std::unique_ptr<ResourceExplorerViewModel> m_viewModel;
+    ResourceExplorerViewModel &m_viewModel;
 
     // Menus
 

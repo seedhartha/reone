@@ -132,9 +132,9 @@ struct TimerID {
     static constexpr int audio = 2;
 };
 
-ResourceExplorerFrame::ResourceExplorerFrame() :
-    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE) {
-    m_viewModel = std::make_unique<ResourceExplorerViewModel>();
+ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewModel) :
+    wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
+    m_viewModel(viewModel) {
 
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
@@ -189,7 +189,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
     m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
 
-    m_imagePanel = new ImageResourcePanel(m_viewModel->imageResViewModel(), m_notebook);
+    m_imagePanel = new ImageResourcePanel(m_viewModel.imageResViewModel(), m_notebook);
     m_modelPanel = new ModelResourcePanel(m_notebook);
     m_audioPanel = new AudioResourcePanel(m_notebook);
 
@@ -200,7 +200,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
         window->Hide();
     }
 
-    m_viewModel->pages().addChangedHandler([this](const auto &args) {
+    m_viewModel.pages().addChangedHandler([this](const auto &args) {
         switch (args.type) {
         case CollectionChangeType::Add: {
             auto &page = args.addedItem->get();
@@ -227,10 +227,10 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
             throw std::logic_error("Unsupported collection state change type");
         }
     });
-    m_viewModel->selectedPage().addChangedHandler([this](const auto &page) {
+    m_viewModel.selectedPage().addChangedHandler([this](const auto &page) {
         m_notebook->SetSelection(page);
     });
-    m_viewModel->progress().addChangedHandler([this](const auto &progress) {
+    m_viewModel.progress().addChangedHandler([this](const auto &progress) {
         if (progress.visible) {
             if (!m_progressDialog) {
                 m_progressDialog = new wxProgressDialog("", "", 100, this);
@@ -244,21 +244,21 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
             }
         }
     });
-    m_viewModel->engineLoadRequested().addChangedHandler([this](const auto &requested) {
+    m_viewModel.engineLoadRequested().addChangedHandler([this](const auto &requested) {
         if (!requested) {
             return;
         }
-        m_modelPanel->SetViewModel(m_viewModel->modelResViewModel());
+        m_modelPanel->SetViewModel(m_viewModel.modelResViewModel());
         m_modelPanel->OnEngineLoadRequested();
-        m_audioPanel->SetViewModel(m_viewModel->audioResViewModel());
+        m_audioPanel->SetViewModel(m_viewModel.audioResViewModel());
         m_audioPanel->OnEngineLoadRequested();
     });
-    m_viewModel->renderEnabled().addChangedHandler([this](const auto &enabled) {
+    m_viewModel.renderEnabled().addChangedHandler([this](const auto &enabled) {
         if (enabled) {
             wxWakeUpIdle();
         }
     });
-    m_viewModel->onViewCreated();
+    m_viewModel.onViewCreated();
 
     // CreateStatusBar();
 
@@ -289,9 +289,9 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
 void ResourceExplorerFrame::SaveFile() {
     auto pageIdx = m_notebook->GetSelection();
     checkGreaterOrEqual("pageIdx", pageIdx, 0);
-    checkLess("pageIdx", static_cast<size_t>(pageIdx), m_viewModel->pages()->size());
+    checkLess("pageIdx", static_cast<size_t>(pageIdx), m_viewModel.pages()->size());
 
-    auto &page = m_viewModel->pages().at(pageIdx);
+    auto &page = m_viewModel.pages().at(pageIdx);
     checkThat(page->dirty, "Page must have dirty flag set");
 
     auto filename = page->resourceId.string();
@@ -382,7 +382,7 @@ void ResourceExplorerFrame::SaveFile() {
         auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page->viewModel);
         auto &content = viewModel.content();
         MemoryInputStream stream {content};
-        Routines routines {m_viewModel->gameId(), nullptr, nullptr};
+        Routines routines {m_viewModel.gameId(), nullptr, nullptr};
         routines.init();
         PcodeReader reader {page->resourceId.resRef.value(), stream, routines};
         reader.load();
@@ -397,8 +397,8 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     case PageType::Text: {
         auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);
         viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel->pages()->size(); ++i) {
-                const auto &p = m_viewModel->pages().at(i);
+            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
+                const auto &p = m_viewModel.pages().at(i);
                 if (p->resourceId != page.resourceId) {
                     continue;
                 }
@@ -413,8 +413,8 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     case PageType::Table: {
         auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page.viewModel);
         viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel->pages()->size(); ++i) {
-                const auto &p = m_viewModel->pages().at(i);
+            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
+                const auto &p = m_viewModel.pages().at(i);
                 if (p->resourceId != page.resourceId) {
                     continue;
                 }
@@ -429,8 +429,8 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     case PageType::GFF: {
         auto &viewModel = *std::static_pointer_cast<GFFResourceViewModel>(page.viewModel);
         viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel->pages()->size(); ++i) {
-                const auto &p = m_viewModel->pages().at(i);
+            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
+                const auto &p = m_viewModel.pages().at(i);
                 if (p->resourceId != page.resourceId) {
                     continue;
                 }
@@ -440,13 +440,13 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
             }
             page.dirty = true;
         });
-        return new GFFResourcePanel {viewModel, m_viewModel->talkTable(), m_notebook};
+        return new GFFResourcePanel {viewModel, m_viewModel.talkTable(), m_notebook};
     }
     case PageType::NCS: {
         auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page.viewModel);
         viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel->pages()->size(); ++i) {
-                const auto &p = m_viewModel->pages().at(i);
+            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
+                const auto &p = m_viewModel.pages().at(i);
                 if (p->resourceId != page.resourceId) {
                     continue;
                 }
@@ -456,7 +456,7 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
             }
             page.dirty = true;
         });
-        return new NCSResourcePanel {m_viewModel->gameId(), viewModel, m_notebook};
+        return new NCSResourcePanel {m_viewModel.gameId(), viewModel, m_notebook};
     }
     case PageType::NSS:
         return new NSSResourcePanel {*std::static_pointer_cast<NSSResourceViewModel>(page.viewModel), m_notebook};
@@ -480,13 +480,13 @@ wxWindow *ResourceExplorerFrame::GetStaticPageWindow(PageType type) const {
 
 void ResourceExplorerFrame::OnClose(wxCloseEvent &event) {
     Destroy();
-    m_viewModel->onViewDestroyed();
+    m_viewModel.onViewDestroyed();
 }
 
 void ResourceExplorerFrame::OnIdle(wxIdleEvent &event) {
-    bool renderEnabled = *m_viewModel->renderEnabled();
+    bool renderEnabled = *m_viewModel.renderEnabled();
     if (renderEnabled) {
-        m_viewModel->modelResViewModel().update3D();
+        m_viewModel.modelResViewModel().update3D();
         m_modelPanel->RefreshGL();
     }
     bool hasAudio = m_audioPanel->HasAudioSource();
@@ -523,13 +523,13 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
             gameId = static_cast<GameID>(dialog.GetSelection());
         }
     }
-    m_viewModel->onResourcesDirectoryChanged(gameId, resourcesPath);
+    m_viewModel.onResourcesDirectoryChanged(gameId, resourcesPath);
 
     m_resourcesTreeCtrl->Freeze();
     m_resourcesTreeCtrl->DeleteAllItems();
-    int numGameDirItems = m_viewModel->getNumResourcesItems();
+    int numGameDirItems = m_viewModel.getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = m_viewModel->getResourcesItem(i);
+        auto &item = m_viewModel.getResourcesItem(i);
         void *itemId;
         if (item.container) {
             auto treeItem = m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
@@ -538,7 +538,7 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
             auto treeItem = m_resourcesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
             itemId = treeItem.GetID();
         }
-        m_viewModel->onResourcesItemIdentified(i, itemId);
+        m_viewModel.onResourcesItemIdentified(i, itemId);
     }
     m_resourcesTreeCtrl->Thaw();
 }
@@ -549,15 +549,15 @@ void ResourceExplorerFrame::OnSaveFileCommand(wxCommandEvent &event) {
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
-    auto &expandingItem = m_viewModel->getResourcesItemById(expandingItemId);
+    auto &expandingItem = m_viewModel.getResourcesItemById(expandingItemId);
     if (expandingItem.loaded) {
         return;
     }
-    m_viewModel->onResourcesItemExpanding(expandingItemId);
+    m_viewModel.onResourcesItemExpanding(expandingItemId);
     m_resourcesTreeCtrl->Freeze();
-    int numGameDirItems = m_viewModel->getNumResourcesItems();
+    int numGameDirItems = m_viewModel.getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = m_viewModel->getResourcesItem(i);
+        auto &item = m_viewModel.getResourcesItem(i);
         if (item.id || item.parentId != expandingItemId) {
             continue;
         }
@@ -569,7 +569,7 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &ev
             auto treeItem = m_resourcesTreeCtrl->AppendItem(wxDataViewItem(expandingItemId), item.displayName);
             itemId = treeItem.GetID();
         }
-        m_viewModel->onResourcesItemIdentified(i, itemId);
+        m_viewModel.onResourcesItemIdentified(i, itemId);
     }
     m_resourcesTreeCtrl->Thaw();
     expandingItem.loaded = true;
@@ -577,12 +577,12 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &ev
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    m_viewModel->onResourcesItemActivated(itemId);
+    m_viewModel.onResourcesItemActivated(itemId);
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto &item = m_viewModel->getResourcesItemById(itemId);
+    auto &item = m_viewModel.getResourcesItemById(itemId);
     if (item.resId) {
         auto menu = wxMenu();
         menu.Append(CommandID::exportFile, "Export...");
@@ -615,7 +615,7 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent 
 
 void ResourceExplorerFrame::OnNotebookPageClose(wxAuiNotebookEvent &event) {
     int pageIdx = event.GetSelection();
-    m_viewModel->onNotebookPageClose(pageIdx);
+    m_viewModel.onNotebookPageClose(pageIdx);
     event.Veto();
 }
 
@@ -624,7 +624,7 @@ void ResourceExplorerFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
     if (pageIdx == -1) {
         return;
     }
-    auto &page = m_viewModel->getPage(pageIdx);
+    auto &page = m_viewModel.getPage(pageIdx);
     if (page.dirty) {
         m_saveFileMenuItem->Enable(true);
     } else {
@@ -638,7 +638,7 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
 
     if (event.GetId() == CommandID::extract) {
         auto itemId = menu->GetClientData();
-        auto &item = m_viewModel->getResourcesItemById(itemId);
+        auto &item = m_viewModel.getResourcesItemById(itemId);
 
         auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
@@ -646,16 +646,16 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
 
-        m_viewModel->extractArchive(item.path, destPath);
+        m_viewModel.extractArchive(item.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
 
     } else if (event.GetId() == CommandID::decompile) {
         auto itemId = menu->GetClientData();
-        m_viewModel->decompile(itemId, true);
+        m_viewModel.decompile(itemId, true);
 
     } else if (event.GetId() == CommandID::decompileNoOptimize) {
         auto itemId = menu->GetClientData();
-        m_viewModel->decompile(itemId, false);
+        m_viewModel.decompile(itemId, false);
 
     } else if (event.GetId() == CommandID::exportFile) {
         auto itemId = menu->GetClientData();
@@ -664,13 +664,13 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
             return;
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
-        m_viewModel->exportFile(itemId, destPath);
+        m_viewModel.exportFile(itemId, destPath);
         wxMessageBox("Operation completed successfully", "Success");
     }
 }
 
 void ResourceExplorerFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
-    if (m_viewModel->gamePath().empty()) {
+    if (m_viewModel.gamePath().empty()) {
         wxMessageBox("Game directory must be open", "Error", wxICON_ERROR);
         return;
     }
@@ -679,7 +679,7 @@ void ResourceExplorerFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
         return;
     }
     auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
-    m_viewModel->extractAllBifs(destPath);
+    m_viewModel.extractAllBifs(destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
 
@@ -694,7 +694,7 @@ void ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event)
         return;
     }
     auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
-    m_viewModel->batchConvertTpcToTga(srcPath, destPath);
+    m_viewModel.batchConvertTpcToTga(srcPath, destPath);
     wxMessageBox("Operation completed successfully", "Success");
 }
 
@@ -799,7 +799,7 @@ void ResourceExplorerFrame::InvokeTool(Operation operation) {
         return;
     }
     auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
-    if (m_viewModel->invokeTool(operation, srcPath, destPath)) {
+    if (m_viewModel.invokeTool(operation, srcPath, destPath)) {
         wxMessageBox("Operation completed successfully", "Success");
     } else {
         wxMessageBox("Tool not found", "Error", wxICON_ERROR);
