@@ -64,7 +64,7 @@ if(BUILD_LAUNCHER OR BUILD_TOOLKIT)
 endif()
 
 set(REONE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/extern/glm ${CMAKE_SOURCE_DIR}/extern/tinyxml2 ${REONE_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/extern/glm ${REONE_INCLUDE_DIR})
 
 add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
 
@@ -99,7 +99,6 @@ add_subdirectory(src/libs/movie) # movie static library
 add_subdirectory(src/libs/script) # script static library
 add_subdirectory(src/libs/game) # game static library
 add_subdirectory(src/libs/tools) # tools static library
-add_subdirectory(extern/tinyxml2) # tinyxml2 static library
 
 # END Libraries
 

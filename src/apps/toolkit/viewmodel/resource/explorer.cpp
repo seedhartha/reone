@@ -44,16 +44,11 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stream/memoryoutput.h"
-#include "reone/tools/legacy/2da.h"
 #include "reone/tools/legacy/audio.h"
 #include "reone/tools/legacy/erf.h"
-#include "reone/tools/legacy/gff.h"
 #include "reone/tools/legacy/keybif.h"
-#include "reone/tools/legacy/lip.h"
 #include "reone/tools/legacy/ncs.h"
 #include "reone/tools/legacy/rim.h"
-#include "reone/tools/legacy/ssf.h"
-#include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 #include "reone/tools/lip/shapeutil.h"
 #include "reone/tools/script/format/pcodereader.h"
@@ -403,11 +398,6 @@ void ResourceExplorerViewModel::loadTools() {
     _tools.push_back(std::make_shared<KeyBifTool>());
     _tools.push_back(std::make_shared<ErfTool>());
     _tools.push_back(std::make_shared<RimTool>());
-    _tools.push_back(std::make_shared<TwoDaTool>());
-    _tools.push_back(std::make_shared<TlkTool>());
-    _tools.push_back(std::make_shared<LipTool>());
-    _tools.push_back(std::make_shared<SsfTool>());
-    _tools.push_back(std::make_shared<GffTool>());
     _tools.push_back(std::make_shared<TpcTool>());
     _tools.push_back(std::make_shared<AudioTool>());
     _tools.push_back(std::make_shared<NcsTool>(_gameId));

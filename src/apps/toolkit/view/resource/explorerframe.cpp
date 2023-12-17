@@ -43,16 +43,11 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stream/memoryoutput.h"
-#include "reone/tools/legacy/2da.h"
 #include "reone/tools/legacy/audio.h"
 #include "reone/tools/legacy/erf.h"
-#include "reone/tools/legacy/gff.h"
 #include "reone/tools/legacy/keybif.h"
-#include "reone/tools/legacy/lip.h"
 #include "reone/tools/legacy/ncs.h"
 #include "reone/tools/legacy/rim.h"
-#include "reone/tools/legacy/ssf.h"
-#include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
 
 #include "../../viewmodel/resource/gff.h"
@@ -100,17 +95,11 @@ struct EventHandlerID {
     static constexpr int toRimTool = wxID_HIGHEST + 7;
     static constexpr int toErfTool = wxID_HIGHEST + 8;
     static constexpr int toModTool = wxID_HIGHEST + 9;
-    static constexpr int toXmlTool = wxID_HIGHEST + 10;
-    static constexpr int toTwoDaTool = wxID_HIGHEST + 11;
-    static constexpr int toGffTool = wxID_HIGHEST + 12;
-    static constexpr int toTlkTool = wxID_HIGHEST + 13;
-    static constexpr int toLipTool = wxID_HIGHEST + 14;
-    static constexpr int toSsfTool = wxID_HIGHEST + 15;
-    static constexpr int toTgaTool = wxID_HIGHEST + 16;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 17;
-    static constexpr int toNcsTool = wxID_HIGHEST + 18;
-    static constexpr int toNssTool = wxID_HIGHEST + 19;
-    static constexpr int saveFile = wxID_HIGHEST + 20;
+    static constexpr int toTgaTool = wxID_HIGHEST + 10;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 11;
+    static constexpr int toNcsTool = wxID_HIGHEST + 12;
+    static constexpr int toNssTool = wxID_HIGHEST + 13;
+    static constexpr int saveFile = wxID_HIGHEST + 14;
 };
 
 struct CommandID {
@@ -193,12 +182,6 @@ void ResourceExplorerFrame::InitMenu() {
     toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
     toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
     toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
-    toolsMenu->Append(EventHandlerID::toXmlTool, "Convert 2DA/GFF/TLK/LIP/SSF to XML...");
-    toolsMenu->Append(EventHandlerID::toTwoDaTool, "Convert XML to 2DA...");
-    toolsMenu->Append(EventHandlerID::toGffTool, "Convert XML to GFF...");
-    toolsMenu->Append(EventHandlerID::toTlkTool, "Convert XML to TLK...");
-    toolsMenu->Append(EventHandlerID::toLipTool, "Convert XML to LIP...");
-    toolsMenu->Append(EventHandlerID::toSsfTool, "Convert XML to SSF...");
     toolsMenu->Append(EventHandlerID::toTgaTool, "Convert TPC to TGA/TXI...");
     toolsMenu->Append(EventHandlerID::toPcodeTool, "Disassemble NCS to PCODE...");
     toolsMenu->Append(EventHandlerID::toNcsTool, "Assemble NCS from PCODE...");
@@ -223,12 +206,6 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToXML), EventHandlerID::toXmlTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::To2DA), EventHandlerID::toTwoDaTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToGFF), EventHandlerID::toGffTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToTLK), EventHandlerID::toTlkTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToLIP), EventHandlerID::toLipTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToSSF), EventHandlerID::toSsfTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToTGA), EventHandlerID::toTgaTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToPCODE), EventHandlerID::toPcodeTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNCS), EventHandlerID::toNcsTool);

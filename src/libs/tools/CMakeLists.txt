@@ -19,16 +19,11 @@ set(TOOLS_INCLUDE_DIR ${REONE_INCLUDE_DIR}/reone/tools)
 set(TOOLS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libs/tools)
 
 set(TOOLS_HEADERS
-    ${TOOLS_INCLUDE_DIR}/legacy/2da.h
     ${TOOLS_INCLUDE_DIR}/legacy/audio.h
     ${TOOLS_INCLUDE_DIR}/legacy/erf.h
-    ${TOOLS_INCLUDE_DIR}/legacy/gff.h
     ${TOOLS_INCLUDE_DIR}/legacy/keybif.h
-    ${TOOLS_INCLUDE_DIR}/legacy/lip.h
     ${TOOLS_INCLUDE_DIR}/legacy/ncs.h
     ${TOOLS_INCLUDE_DIR}/legacy/rim.h
-    ${TOOLS_INCLUDE_DIR}/legacy/ssf.h
-    ${TOOLS_INCLUDE_DIR}/legacy/tlk.h
     ${TOOLS_INCLUDE_DIR}/legacy/tool.h
     ${TOOLS_INCLUDE_DIR}/legacy/tpc.h
     ${TOOLS_INCLUDE_DIR}/lip/audioanalyzer.h
@@ -42,16 +37,11 @@ set(TOOLS_HEADERS
     ${TOOLS_INCLUDE_DIR}/types.h)
 
 set(TOOLS_SOURCES
-    ${TOOLS_SOURCE_DIR}/legacy/2da.cpp
     ${TOOLS_SOURCE_DIR}/legacy/audio.cpp
     ${TOOLS_SOURCE_DIR}/legacy/erf.cpp
-    ${TOOLS_SOURCE_DIR}/legacy/gff.cpp
     ${TOOLS_SOURCE_DIR}/legacy/keybif.cpp
-    ${TOOLS_SOURCE_DIR}/legacy/lip.cpp
     ${TOOLS_SOURCE_DIR}/legacy/ncs.cpp
     ${TOOLS_SOURCE_DIR}/legacy/rim.cpp
-    ${TOOLS_SOURCE_DIR}/legacy/ssf.cpp
-    ${TOOLS_SOURCE_DIR}/legacy/tlk.cpp
     ${TOOLS_SOURCE_DIR}/legacy/tpc.cpp
     ${TOOLS_SOURCE_DIR}/lip/audioanalyzer.cpp
     ${TOOLS_SOURCE_DIR}/lip/composer.cpp
@@ -65,4 +55,4 @@ add_library(tools ${TOOLS_HEADERS} ${TOOLS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(tools PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)
 set_target_properties(tools PROPERTIES DEBUG_POSTFIX "d")
 target_precompile_headers(tools PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
-target_link_libraries(tools PRIVATE game tinyxml2)
+target_link_libraries(tools PRIVATE game)
