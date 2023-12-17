@@ -17,10 +17,9 @@
 
 #include "reone/resource/format/gffwriter.h"
 
+#include "reone/resource/gff.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/stream/fileoutput.h"
-
-#include "reone/resource/gff.h"
 
 namespace reone {
 
@@ -174,7 +173,7 @@ static FieldClassification getFieldData(const Gff::Field &field, uint32_t &simpl
 
 void GffWriter::processTree() {
     std::queue<const Gff *> aQueue;
-    aQueue.push(_root.get());
+    aQueue.push(&_root);
 
     int structIdx = 0;
     int numStructs = 0;

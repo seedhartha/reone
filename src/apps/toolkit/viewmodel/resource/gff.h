@@ -19,6 +19,7 @@
 
 #include "reone/resource/gff.h"
 
+#include "../../binding/property.h"
 #include "../../viewmodel.h"
 
 namespace reone {
@@ -29,12 +30,18 @@ public:
         _content(std::move(content)) {
     }
 
+    Property<bool> &modified() {
+        return _modified;
+    }
+
     resource::Gff &content() {
         return *_content;
     }
 
 private:
     std::shared_ptr<resource::Gff> _content;
+
+    Property<bool> _modified;
 };
 
 } // namespace reone

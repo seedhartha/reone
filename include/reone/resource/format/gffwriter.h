@@ -34,9 +34,9 @@ class GffWriter {
 public:
     GffWriter(
         ResType resType,
-        std::shared_ptr<Gff> root) :
+        const Gff &root) :
         _resType(resType),
-        _root(std::move(root)) {
+        _root(root) {
     }
 
     void save(const std::filesystem::path &path);
@@ -65,7 +65,8 @@ private:
     };
 
     ResType _resType;
-    std::shared_ptr<Gff> _root;
+    const Gff &_root;
+
     WriteContext _context;
     std::unique_ptr<BinaryWriter> _writer;
 

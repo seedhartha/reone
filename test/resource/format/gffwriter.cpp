@@ -199,7 +199,7 @@ TEST(gff_writer, should_write_gff) {
 
     auto bytes = ByteBuffer();
     auto stream = MemoryOutputStream(bytes);
-    auto writer = GffWriter(ResType::Res, root);
+    auto writer = GffWriter(ResType::Res, *root);
 
     // when
 

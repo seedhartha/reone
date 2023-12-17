@@ -210,12 +210,12 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         }
     }
     menu.Bind(wxEVT_COMMAND_MENU_SELECTED, [&](wxCommandEvent &event) {
-        bool refresh = false;
+        bool modified = false;
         switch (static_cast<MenuItemId>(event.GetId())) {
         case MenuItemId::AppendListItem: {
             auto child = Gff::Builder().build();
             field->get().children.push_back(std::move(child));
-            refresh = true;
+            modified = true;
             break;
         }
         case MenuItemId::DuplicateListItem: {
@@ -223,26 +223,26 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             std::advance(listIter, *parentListIdx);
             auto copy = parentField->get().children.at(*parentListIdx)->deepCopy();
             parentField->get().children.insert(listIter, std::move(copy));
-            refresh = true;
+            modified = true;
             break;
         }
         case MenuItemId::DeleteListItem: {
             auto listIter = parentField->get().children.begin();
             std::advance(listIter, *parentListIdx);
             parentField->get().children.erase(listIter);
-            refresh = true;
+            modified = true;
         } break;
         case MenuItemId::AppendField: {
             auto field = Gff::Field::newInt("New Field", 0);
             gff.fields().push_back(std::move(field));
-            refresh = true;
+            modified = true;
             break;
         }
         case MenuItemId::RenameField: {
             wxTextEntryDialog dialog(nullptr, "New field name:", "Field rename", field->get().label);
             if (dialog.ShowModal() == wxID_OK) {
                 field->get().label = dialog.GetValue().ToStdString();
-                refresh = true;
+                modified = true;
             }
             break;
         }
@@ -258,7 +258,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto value = std::stol(dialog.GetValue().ToStdString());
                     if (field->get().intValue != value) {
                         field->get().intValue = value;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -271,7 +271,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto value = std::stoul(dialog.GetValue().ToStdString());
                     if (field->get().uintValue != value) {
                         field->get().uintValue = value;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -282,7 +282,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto value = std::stoll(dialog.GetValue().ToStdString());
                     if (field->get().int64Value != value) {
                         field->get().int64Value = value;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -293,7 +293,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto value = std::stoull(dialog.GetValue().ToStdString());
                     if (field->get().uint64Value != value) {
                         field->get().uint64Value = value;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -304,7 +304,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto newValue = std::stof(dialog.GetValue().ToStdString());
                     if (field->get().floatValue != newValue) {
                         field->get().floatValue = newValue;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -315,7 +315,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto newValue = std::stod(dialog.GetValue().ToStdString());
                     if (field->get().doubleValue != newValue) {
                         field->get().doubleValue = newValue;
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -327,7 +327,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto newValue = dialog.GetValue().ToStdString();
                     if (field->get().strValue != newValue) {
                         field->get().strValue = std::move(newValue);
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -359,7 +359,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     if (field->get().intValue != newStrRef || field->get().strValue != newSubstring) {
                         field->get().intValue = newStrRef;
                         field->get().strValue = std::move(newSubstring);
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -403,7 +403,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto newValue = glm::quat {w, x, y, z};
                     if (field->get().quatValue != newValue) {
                         field->get().quatValue = std::move(newValue);
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -442,7 +442,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     if (field->get().vecValue != newValue) {
                         field->get().vecValue = std::move(newValue);
                     }
-                    refresh = true;
+                    modified = true;
                 }
             } break;
             case Gff::FieldType::Void: {
@@ -452,7 +452,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     auto newValue = dialog.GetValue().ToStdString();
                     if (value != newValue) {
                         field->get().data = unhexify(newValue);
-                        refresh = true;
+                        modified = true;
                     }
                 }
             } break;
@@ -503,7 +503,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     field->get().uint64Value = 0;
                     field->get().floatValue = 0.0f;
                     field->get().doubleValue = 0.0f;
-                    refresh = true;
+                    modified = true;
                 }
             }
         } break;
@@ -516,7 +516,7 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     }
                     ++it;
                 }
-                refresh = true;
+                modified = true;
             } else if (parentField) {
                 for (auto it = parentFieldGff->get().fields().begin(); it != parentFieldGff->get().fields().end();) {
                     if (it->label == parentField->get().label) {
@@ -525,18 +525,19 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     }
                     ++it;
                 }
-                refresh = true;
+                modified = true;
             }
             break;
         }
         default:
             break;
         }
-        if (refresh) {
+        if (modified) {
             control->Freeze();
             control->DeleteAllItems();
             AppendGffStructToTree(*control, wxDataViewItem(), "/", _viewModel.content());
             control->Thaw();
+            _viewModel.modified() = true;
         }
     });
     PopupMenu(&menu, event.GetPosition());

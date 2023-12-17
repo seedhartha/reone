@@ -248,7 +248,7 @@ static void convertXmlToGff(const std::filesystem::path &input, const std::files
     auto gffPath = outputDir;
     gffPath.append(extensionless.filename().string());
 
-    auto writer = GffWriter(resType, elementToGff(*rootElement));
+    auto writer = GffWriter(resType, *elementToGff(*rootElement));
     writer.save(gffPath);
 }
 
