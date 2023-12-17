@@ -52,6 +52,10 @@ public:
 
     using ChangedHandler = std::function<void(const ChangedArgs &)>;
 
+    size_t size() const {
+        return _items.size();
+    }
+
     T &at(size_t index) {
         checkLess("index", index, _items.size());
         auto it = _items.begin();
@@ -62,6 +66,11 @@ public:
     void add(T item) {
         _items.push_back(std::move(item));
         notifyChangedHandlers({CollectionChangeType::Add, _items.back()});
+    }
+
+    void clear() {
+        _items.clear();
+        notifyChangedHandlers({CollectionChangeType::Reset});
     }
 
     void removeAt(size_t index) {
