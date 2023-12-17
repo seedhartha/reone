@@ -17,6 +17,8 @@
 
 #include "tablepanel.h"
 
+#include <wx/numdlg.h>
+
 #include "../../viewmodel/resource/table.h"
 
 using namespace reone::resource;
@@ -161,8 +163,18 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
         });
     }
 
+    auto goToRowBtn = new wxButton(this, wxID_ANY, "Go to row...");
+    goToRowBtn->Bind(wxEVT_BUTTON, [this](const auto &event) {
+        wxNumberEntryDialog dialog(nullptr, "Row number:", wxEmptyString, "Go to row", 0, 0, _viewModel.content().rows.size());
+        if (dialog.ShowModal() == wxID_OK) {
+            auto row = dialog.GetValue();
+            _tableCtrl->EnsureVisible(_tableCtrl->RowToItem(row));
+        }
+    });
+
     auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(_tableCtrl, 1, wxEXPAND);
+    sizer->Add(goToRowBtn, wxSizerFlags(0).Border(wxALL, 3));
+    sizer->Add(_tableCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
     SetSizer(sizer);
 }
 
