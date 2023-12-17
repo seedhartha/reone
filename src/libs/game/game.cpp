@@ -158,7 +158,7 @@ void Game::render() {
 }
 
 void Game::loadModule(const std::string &name, std::string entry) {
-    info("Load module '" + name + "'");
+    info("Loading module '" + name + "'");
 
     withLoadingScreen("load_" + name, [this, &name, &entry]() {
         loadInGameMenus();

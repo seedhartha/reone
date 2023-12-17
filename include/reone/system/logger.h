@@ -24,8 +24,6 @@ namespace reone {
 
 class Logger {
 public:
-    static constexpr int kBufferSize = 512;
-
     static Logger instance;
 
     void init(LogSeverity minSeverity,

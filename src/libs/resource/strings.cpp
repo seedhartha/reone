@@ -29,7 +29,7 @@ namespace resource {
 void Strings::init(const std::filesystem::path &gameDir) {
     auto tlkPath = findFileIgnoreCase(gameDir, "dialog.tlk");
     if (!tlkPath) {
-        throw ResourceNotFoundException("dialog.tlk file not found");
+        return;
     }
     auto tlk = FileInputStream(*tlkPath);
     auto tlkReader = TlkReader(tlk);

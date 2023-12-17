@@ -47,7 +47,7 @@ namespace reone {
 
 using ResourcesItemId = void *;
 
-struct GameDirectoryItem {
+struct ResourcesItem {
     ResourcesItemId id {nullptr};
     ResourcesItemId parentId {nullptr};
     std::string displayName;
@@ -115,8 +115,8 @@ public:
     const std::filesystem::path &gamePath() const { return _resourcesPath; }
 
     int getNumResourcesItems() const { return static_cast<int>(_resItems.size()); }
-    GameDirectoryItem &getResourcesItem(int index) { return *_resItems[index]; }
-    GameDirectoryItem &getResourcesItemById(ResourcesItemId id) { return *_idToResItem.at(id); }
+    ResourcesItem &getResourcesItem(int index) { return *_resItems[index]; }
+    ResourcesItem &getResourcesItemById(ResourcesItemId id) { return *_idToResItem.at(id); }
 
     Page &getPage(int index) {
         return *_pages.at(index);
@@ -167,8 +167,8 @@ private:
     std::shared_ptr<resource::TalkTable> _talkTable;
     std::unique_ptr<game::Routines> _routines;
 
-    std::vector<std::shared_ptr<GameDirectoryItem>> _resItems;
-    std::map<ResourcesItemId, GameDirectoryItem *> _idToResItem;
+    std::vector<std::shared_ptr<ResourcesItem>> _resItems;
+    std::map<ResourcesItemId, ResourcesItem *> _idToResItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
@@ -207,12 +207,12 @@ private:
     void loadTools();
     void loadEngine();
 
-    void openFile(const GameDirectoryItem &item);
+    void openFile(const ResourcesItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
 
     PageType getPageType(resource::ResType type) const;
 
-    void withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block);
+    void withResourceStream(const ResourcesItem &item, std::function<void(IInputStream &)> block);
 };
 
 } // namespace reone

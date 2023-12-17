@@ -48,7 +48,6 @@ static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
 static constexpr char kModulesDirectoryName[] = "modules";
 static constexpr char kLipsDirectoryName[] = "lips";
-static constexpr char kLocalizationLipFilename[] = "localization.mod";
 static constexpr char kOverrideDirectoryName[] = "override";
 
 static constexpr char kTexturePackFilenameGUI[] = "swpc_tex_gui.erf";
@@ -100,42 +99,74 @@ std::set<std::string> ResourceDirector::moduleNames() {
 }
 
 void ResourceDirector::loadGlobalResources() {
-    _resources.addKEY(getFileIgnoreCase(_gamePath, kKeyFilename));
     _resources.addERF(getFileIgnoreCase(std::filesystem::current_path(), kShaderPackFilename));
 
-    auto texPacksPath = getFileIgnoreCase(_gamePath, kTexturePackDirectoryName);
-    auto &texPack = kTexQualityToTexPack.at(_graphicsOpt.textureQuality);
+    auto keyPath = findFileIgnoreCase(_gamePath, kKeyFilename);
+    if (keyPath) {
+        _resources.addKEY(*keyPath);
+    }
+
+    auto texPacksPath = findFileIgnoreCase(_gamePath, kTexturePackDirectoryName);
+    if (texPacksPath) {
+        auto guiPackPath = findFileIgnoreCase(*texPacksPath, kTexturePackFilenameGUI);
+        if (guiPackPath) {
+            _resources.addERF(*guiPackPath);
+        }
+        auto &texPack = kTexQualityToTexPack.at(_graphicsOpt.textureQuality);
+        auto texPackPath = findFileIgnoreCase(*texPacksPath, texPack);
+        if (texPackPath) {
+            _resources.addERF(*texPackPath);
+        }
+    }
+
+    auto musicPath = findFileIgnoreCase(_gamePath, kMusicDirectoryName);
+    if (musicPath) {
+        _resources.addFolder(*musicPath);
+    }
+    auto soundsPath = findFileIgnoreCase(_gamePath, kSoundsDirectoryName);
+    if (soundsPath) {
+        _resources.addFolder(*soundsPath);
+    }
 
     if (_gameId == GameID::TSL) {
-        _resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
-        _resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
-
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kVoiceDirectoryName));
-
-        auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
-        _resources.addERF(getFileIgnoreCase(lipsPath, kLocalizationLipFilename));
-
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
-        _resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameTsl));
-
-    } else {
-        _resources.addERF(getFileIgnoreCase(_gamePath, kPatchFilename));
-        _resources.addERF(getFileIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
-        _resources.addERF(getFileIgnoreCase(texPacksPath, texPack));
-
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kMusicDirectoryName));
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kSoundsDirectoryName));
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kWavesDirectoryName));
-
-        auto lipsPath = getFileIgnoreCase(_gamePath, kLipsDirectoryName);
-        for (auto &filename : g_globalLipFiles) {
-            _resources.addERF(getFileIgnoreCase(lipsPath, filename));
+        auto voicePath = findFileIgnoreCase(_gamePath, kVoiceDirectoryName);
+        if (voicePath) {
+            _resources.addFolder(*voicePath);
         }
+    } else {
+        auto wavesPath = findFileIgnoreCase(_gamePath, kWavesDirectoryName);
+        if (wavesPath) {
+            _resources.addFolder(*wavesPath);
+        }
+    }
 
-        _resources.addFolder(getFileIgnoreCase(_gamePath, kOverrideDirectoryName));
-        _resources.addEXE(getFileIgnoreCase(_gamePath, kExeFilenameKotor));
+    auto lipsPath = findFileIgnoreCase(_gamePath, kLipsDirectoryName);
+    if (lipsPath) {
+        for (auto &filename : g_globalLipFiles) {
+            auto globalLipPath = findFileIgnoreCase(*lipsPath, filename);
+            if (globalLipPath) {
+                _resources.addERF(*globalLipPath);
+            }
+        }
+    }
+
+    auto patchPath = findFileIgnoreCase(_gamePath, kPatchFilename);
+    if (patchPath) {
+        _resources.addERF(*patchPath);
+    }
+    auto overridePath = findFileIgnoreCase(_gamePath, kOverrideDirectoryName);
+    if (overridePath) {
+        _resources.addFolder(*overridePath);
+    }
+
+    std::optional<std::filesystem::path> exePath;
+    if (_gameId == GameID::TSL) {
+        exePath = findFileIgnoreCase(_gamePath, kExeFilenameTsl);
+    } else {
+        exePath = findFileIgnoreCase(_gamePath, kExeFilenameKotor);
+    }
+    if (exePath) {
+        _resources.addEXE(*exePath);
     }
 }
 

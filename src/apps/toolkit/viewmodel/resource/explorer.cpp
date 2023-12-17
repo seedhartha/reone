@@ -98,17 +98,19 @@ private:
     wxStopWatch _stopWatch;
 };
 
-void ResourceExplorerViewModel::openFile(const GameDirectoryItem &item) {
+void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
         try {
             openResource(*item.resId, res);
         } catch (const std::exception &e) {
-            error(str(boost::format("Error opening resource: %s") % std::string(e.what())));
+            error(str(boost::format("Error opening resource '%s': %s") % item.resId->string() % std::string(e.what())));
         }
     });
 }
 
 void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream &data) {
+    info(str(boost::format("Opening resource '%s'") % id.string()));
+
     PageType pageType;
     try {
         pageType = getPageType(id.type);
@@ -347,14 +349,20 @@ void ResourceExplorerViewModel::loadResources() {
         } else {
             continue;
         }
-        auto item = std::make_shared<GameDirectoryItem>();
+        std::shared_ptr<ResourceId> resId;
+        if (!container) {
+            auto dotFirstIdx = filename.find_first_of('.');
+            if (dotFirstIdx != -1) {
+                auto resRef = filename.substr(0, dotFirstIdx);
+                auto type = getResTypeByExt(filename.substr(dotFirstIdx + 1));
+                resId = std::make_shared<ResourceId>(std::move(resRef), type);
+            }
+        }
+        auto item = std::make_shared<ResourcesItem>();
         item->displayName = filename;
         item->path = file.path();
         item->container = container;
-        if (extension == ".tlk") {
-            auto resRef = filename.substr(0, filename.size() - 4);
-            item->resId = std::make_unique<ResourceId>(resRef, ResType::Tlk);
-        }
+        item->resId = std::move(resId);
         _resItems.push_back(std::move(item));
     }
 
@@ -395,6 +403,7 @@ void ResourceExplorerViewModel::loadEngine() {
     if (_engineLoaded || _resourcesPath.empty()) {
         return;
     }
+    info("Loading engine");
     _engineLoadRequested = true;
 
     _systemModule->init();
@@ -403,18 +412,10 @@ void ResourceExplorerViewModel::loadEngine() {
     _resourceModule->init();
     _sceneModule->init();
 
-    auto keyPath = getFileIgnoreCase(_resourcesPath, "chitin.key");
-    auto shaderPackPath = getFileIgnoreCase(std::filesystem::current_path(), "shaderpack.erf");
-    auto guiTexPackPath = getFileIgnoreCase(_resourcesPath, "texturepacks/swpc_tex_gui.erf");
-    auto tpaTexPackPath = getFileIgnoreCase(_resourcesPath, "texturepacks/swpc_tex_tpa.erf");
-    auto overridePath = getFileIgnoreCase(_resourcesPath, "override");
-
-    auto &resources = _resourceModule->resources();
-    resources.addKEY(keyPath);
-    resources.addERF(shaderPackPath);
-    resources.addERF(guiTexPackPath);
-    resources.addERF(tpaTexPackPath);
-    resources.addFolder(overridePath);
+    auto keyPath = findFileIgnoreCase(_resourcesPath, "chitin.key");
+    if (!keyPath) {
+        _resourceModule->resources().addFolder(_resourcesPath);
+    }
 
     _modelResViewModel->initScene();
 
@@ -555,7 +556,7 @@ bool ResourceExplorerViewModel::invokeTool(Operation operation,
     return false;
 }
 
-void ResourceExplorerViewModel::withResourceStream(const GameDirectoryItem &item, std::function<void(IInputStream &)> block) {
+void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, std::function<void(IInputStream &)> block) {
     if (!item.resId) {
         return;
     }
@@ -676,7 +677,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
             } else {
                 continue;
             }
-            auto item = std::make_shared<GameDirectoryItem>();
+            auto item = std::make_shared<ResourcesItem>();
             item->parentId = expandingItem.id;
             item->displayName = filename;
             item->path = file.path();
@@ -703,7 +704,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
                     if (key.bifIdx != bifIdx) {
                         continue;
                     }
-                    auto item = std::make_shared<GameDirectoryItem>();
+                    auto item = std::make_shared<ResourcesItem>();
                     item->parentId = expandingItem.id;
                     item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                     item->path = expandingItem.path;
@@ -718,7 +719,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
             erfReader.load();
             auto &keys = erfReader.keys();
             for (auto &key : keys) {
-                auto item = std::make_shared<GameDirectoryItem>();
+                auto item = std::make_shared<ResourcesItem>();
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                 item->path = expandingItem.path;
@@ -732,7 +733,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
             rimReader.load();
             auto &resources = rimReader.resources();
             for (auto &resource : resources) {
-                auto item = std::make_shared<GameDirectoryItem>();
+                auto item = std::make_shared<ResourcesItem>();
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % resource.resId.resRef.value() % getExtByResType(resource.resId.type));
                 item->path = expandingItem.path;

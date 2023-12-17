@@ -40,6 +40,8 @@ static const std::unordered_map<LogChannel, std::string> kChannelToName {
     {LogChannel::Script2, "script"},
     {LogChannel::Script3, "script"}};
 
+static constexpr int kBufferSize = 512;
+
 Logger Logger::instance;
 thread_local std::optional<std::reference_wrapper<std::ostringstream>> Logger::buffer;
 
