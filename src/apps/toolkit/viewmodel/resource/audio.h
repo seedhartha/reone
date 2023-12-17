@@ -21,7 +21,7 @@
 #include "reone/resource/id.h"
 #include "reone/system/stream/input.h"
 
-#include "../../binding/property.h"
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 namespace reone {

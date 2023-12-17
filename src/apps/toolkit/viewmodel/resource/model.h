@@ -23,6 +23,7 @@
 #include "reone/scene/node/model.h"
 #include "reone/system/stream/input.h"
 
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 namespace reone {

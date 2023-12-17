@@ -19,7 +19,7 @@
 
 #include "reone/resource/gff.h"
 
-#include "../../binding/property.h"
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 namespace reone {

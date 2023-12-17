@@ -35,8 +35,8 @@
 #include "reone/tools/legacy/tool.h"
 #include "reone/tools/types.h"
 
-#include "../../binding/collection.h"
-#include "../../binding/property.h"
+#include "../../collectionproperty.h"
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 #include "audio.h"
@@ -143,7 +143,7 @@ public:
 
     // Properties
 
-    Collection<std::shared_ptr<Page>> &pages() {
+    CollectionProperty<std::shared_ptr<Page>> &pages() {
         return _pages;
     }
 
@@ -210,7 +210,7 @@ private:
 
     // Properties
 
-    Collection<std::shared_ptr<Page>> _pages;
+    CollectionProperty<std::shared_ptr<Page>> _pages;
 
     Property<int> _selectedPage;
     Property<Progress> _progress;

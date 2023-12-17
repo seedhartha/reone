@@ -28,7 +28,7 @@ enum class CollectionChangeType {
 };
 
 template <class T>
-class Collection : boost::noncopyable {
+class CollectionProperty : boost::noncopyable {
 public:
     struct ChangedArgs {
         CollectionChangeType type;
@@ -93,7 +93,7 @@ public:
         return &_items;
     }
 
-    inline Collection<T> &operator=(std::list<T> items) {
+    inline CollectionProperty<T> &operator=(std::list<T> items) {
         _items = std::move(items);
         ChangedArgs args {CollectionChangeType::Reset};
         notifyChangedHandlers(std::move(args));

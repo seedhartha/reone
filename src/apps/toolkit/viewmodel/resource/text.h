@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../binding/property.h"
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 namespace reone {

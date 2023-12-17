@@ -19,7 +19,7 @@
 
 #include "reone/resource/types.h"
 
-#include "../../binding/property.h"
+#include "../../property.h"
 #include "../../viewmodel.h"
 
 namespace reone {

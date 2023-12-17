@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "binding/property.h"
-
 namespace reone {
 
 class ViewModel : boost::noncopyable {
