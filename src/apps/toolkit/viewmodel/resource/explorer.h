@@ -36,7 +36,6 @@
 #include "reone/tools/types.h"
 
 #include "../../binding/collection.h"
-#include "../../binding/command.h"
 #include "../../binding/property.h"
 #include "../../viewmodel.h"
 
@@ -142,7 +141,7 @@ public:
 
     // END View models
 
-    // Data binding
+    // Properties
 
     Collection<std::shared_ptr<Page>> &pages() {
         return _pages;
@@ -164,23 +163,17 @@ public:
         return _renderEnabled;
     }
 
-    Command<Page &, const std::filesystem::path &> &saveFile() {
-        return *_saveFile;
-    }
+    // END Properties
 
-    Command<ResourcesItemId, const std::filesystem::path &> &exportResource() {
-        return *_exportResource;
-    }
+    // Commands
 
-    Command<ResourcesItemId, const std::filesystem::path &> &exportTgaTxi() {
-        return *_exportTgaTxi;
-    }
+    void exportResource(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void exportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void exportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath);
 
-    Command<ResourcesItemId, const std::filesystem::path &> &exportWavMp3() {
-        return *_exportWavMp3;
-    }
+    void saveFile(Page &page, const std::filesystem::path &destPath);
 
-    // END Data binding
+    // END Commands
 
     void onViewCreated();
     void onViewDestroyed();
@@ -215,7 +208,7 @@ private:
 
     // END View models
 
-    // Data binding
+    // Properties
 
     Collection<std::shared_ptr<Page>> _pages;
 
@@ -224,12 +217,7 @@ private:
     Property<bool> _engineLoadRequested;
     Property<bool> _renderEnabled;
 
-    std::unique_ptr<Command<Page &, const std::filesystem::path &>> _saveFile;
-    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportResource;
-    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportTgaTxi;
-    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportWavMp3;
-
-    // END Data binding
+    // END Properties
 
     // Embedded engine
 
@@ -254,12 +242,6 @@ private:
 
     void openFile(const ResourcesItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
-
-    void doExportResource(ResourcesItemId itemId, const std::filesystem::path &destPath);
-    void doExportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath);
-    void doExportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath);
-
-    void doSaveFile(Page &page, const std::filesystem::path &destPath);
 
     PageType getPageType(resource::ResType type) const;
 

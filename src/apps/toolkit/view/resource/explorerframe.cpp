@@ -278,7 +278,7 @@ void ResourceExplorerFrame::SaveFile() {
         return;
     }
     auto destPath = std::filesystem::path(destFileDialog.GetPath().ToStdString());
-    m_viewModel.saveFile().execute(*page, destPath);
+    m_viewModel.saveFile(*page, destPath);
 }
 
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
@@ -556,11 +556,11 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
         if (event.GetId() == CommandID::exportTgaTxi) {
-            m_viewModel.exportTgaTxi().execute(itemId, destPath);
+            m_viewModel.exportTgaTxi(itemId, destPath);
         } else if (event.GetId() == CommandID::exportWavMp3) {
-            m_viewModel.exportWavMp3().execute(itemId, destPath);
+            m_viewModel.exportWavMp3(itemId, destPath);
         } else {
-            m_viewModel.exportResource().execute(itemId, destPath);
+            m_viewModel.exportResource(itemId, destPath);
         }
         wxMessageBox("Operation completed successfully", "Success");
     }

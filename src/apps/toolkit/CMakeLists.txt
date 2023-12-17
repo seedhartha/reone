@@ -18,7 +18,6 @@ set(TOOLKIT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/apps/toolkit)
 set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/app.h
     ${TOOLKIT_SOURCE_DIR}/binding/collection.h
-    ${TOOLKIT_SOURCE_DIR}/binding/command.h
     ${TOOLKIT_SOURCE_DIR}/binding/property.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.h

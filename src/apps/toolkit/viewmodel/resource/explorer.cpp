@@ -103,15 +103,6 @@ private:
 ResourceExplorerViewModel::ResourceExplorerViewModel() {
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
-
-    _saveFile = std::make_unique<Command<Page &, const std::filesystem::path &>>(
-        std::bind(&ResourceExplorerViewModel::doSaveFile, this, std::placeholders::_1, std::placeholders::_2));
-    _exportResource = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
-        std::bind(&ResourceExplorerViewModel::doExportResource, this, std::placeholders::_1, std::placeholders::_2));
-    _exportTgaTxi = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
-        std::bind(&ResourceExplorerViewModel::doExportTgaTxi, this, std::placeholders::_1, std::placeholders::_2));
-    _exportWavMp3 = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
-        std::bind(&ResourceExplorerViewModel::doExportWavMp3, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
@@ -613,7 +604,7 @@ void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, st
     }
 }
 
-void ResourceExplorerViewModel::doExportResource(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::exportResource(ResourcesItemId itemId, const std::filesystem::path &destPath) {
     auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
@@ -632,7 +623,7 @@ void ResourceExplorerViewModel::doExportResource(ResourcesItemId itemId, const s
     });
 }
 
-void ResourceExplorerViewModel::doExportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::exportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath) {
     auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto tgaPath = destPath;
@@ -652,7 +643,7 @@ void ResourceExplorerViewModel::doExportTgaTxi(ResourcesItemId itemId, const std
     });
 }
 
-void ResourceExplorerViewModel::doExportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::exportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath) {
     auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         ByteBuffer unwrappedBuffer;
@@ -669,7 +660,7 @@ void ResourceExplorerViewModel::doExportWavMp3(ResourcesItemId itemId, const std
     });
 }
 
-void ResourceExplorerViewModel::doSaveFile(Page &page, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path &destPath) {
     if (page.type == PageType::Text) {
         auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);
         auto &text = viewModel.content();
