@@ -86,6 +86,11 @@ private:
 
     // END Widgets
 
+    void InitControls();
+    void InitMenu();
+    void BindEvents();
+    void BindViewModel();
+
     void InvokeTool(Operation operation);
 
     void SaveFile();

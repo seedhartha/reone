@@ -142,11 +142,54 @@ ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewMode
     SetMinClientSize(wxSize(1024, 768));
     Maximize();
 
+    InitControls();
+    InitMenu();
+    BindEvents();
+    BindViewModel();
+
+    m_viewModel.onViewCreated();
+}
+
+void ResourceExplorerFrame::InitControls() {
+    m_splitter = new wxSplitterWindow(this, wxID_ANY);
+    m_splitter->SetMinimumPaneSize(300);
+
+    auto resourcesPanel = new wxPanel(m_splitter);
+
+    m_resourcesTreeCtrl = new wxDataViewTreeCtrl(resourcesPanel, wxID_ANY);
+    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding, this);
+    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu, this);
+    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated, this);
+    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing, this);
+
+    auto resourcesSizer = new wxStaticBoxSizer(wxVERTICAL, resourcesPanel, "Resources");
+    resourcesSizer->Add(m_resourcesTreeCtrl, 1, wxEXPAND);
+    resourcesPanel->SetSizer(resourcesSizer);
+
+    m_notebook = new wxAuiNotebook(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
+    m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
+    m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
+
+    m_imagePanel = new ImageResourcePanel(m_viewModel.imageResViewModel(), m_notebook);
+    m_modelPanel = new ModelResourcePanel(m_notebook);
+    m_audioPanel = new AudioResourcePanel(m_notebook);
+
+    m_splitter->SplitVertically(resourcesPanel, m_notebook, 1);
+
+    for (auto &page : kStaticPageTypes) {
+        auto window = GetStaticPageWindow(page);
+        window->Hide();
+    }
+}
+
+void ResourceExplorerFrame::InitMenu() {
     auto fileMenu = new wxMenu();
     fileMenu->Append(EventHandlerID::openDir, "&Open directory...");
     fileMenu->AppendSeparator();
+
     m_saveFileMenuItem = fileMenu->Append(EventHandlerID::saveFile, "&Save copy as...");
     m_saveFileMenuItem->Enable(false);
+
     auto toolsMenu = new wxMenu();
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
@@ -167,39 +210,39 @@ ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewMode
     toolsMenu->Append(EventHandlerID::toPcodeTool, "Disassemble NCS to PCODE...");
     toolsMenu->Append(EventHandlerID::toNcsTool, "Assemble NCS from PCODE...");
     toolsMenu->Append(EventHandlerID::toNssTool, "Decompile NCS (experimental)...");
+
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
     menuBar->Append(toolsMenu, "&Tools");
     SetMenuBar(menuBar);
+}
 
-    m_splitter = new wxSplitterWindow(this, wxID_ANY);
-    m_splitter->SetMinimumPaneSize(300);
+void ResourceExplorerFrame::BindEvents() {
+    Bind(wxEVT_CLOSE_WINDOW, &ResourceExplorerFrame::OnClose, this);
+    Bind(wxEVT_IDLE, &ResourceExplorerFrame::OnIdle, this);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnOpenDirectoryCommand, this, EventHandlerID::openDir);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnSaveFileCommand, this, EventHandlerID::saveFile);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractToolCommand, this, EventHandlerID::extractTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnUnwrapToolCommand, this, EventHandlerID::unwrapTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToRimToolCommand, this, EventHandlerID::toRimTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToErfToolCommand, this, EventHandlerID::toErfTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToModToolCommand, this, EventHandlerID::toModTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToXmlToolCommand, this, EventHandlerID::toXmlTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTwoDaToolCommand, this, EventHandlerID::toTwoDaTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToGffToolCommand, this, EventHandlerID::toGffTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTlkToolCommand, this, EventHandlerID::toTlkTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToLipToolCommand, this, EventHandlerID::toLipTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToSsfToolCommand, this, EventHandlerID::toSsfTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTgaToolCommand, this, EventHandlerID::toTgaTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToPcodeToolCommand, this, EventHandlerID::toPcodeTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNcsToolCommand, this, EventHandlerID::toNcsTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNssToolCommand, this, EventHandlerID::toNssTool);
+}
 
-    auto resourcesPanel = new wxPanel(m_splitter);
-    m_resourcesTreeCtrl = new wxDataViewTreeCtrl(resourcesPanel, wxID_ANY);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated, this);
-    m_resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing, this);
-    auto resourcesSizer = new wxStaticBoxSizer(wxVERTICAL, resourcesPanel, "Resources");
-    resourcesSizer->Add(m_resourcesTreeCtrl, 1, wxEXPAND);
-    resourcesPanel->SetSizer(resourcesSizer);
-
-    m_notebook = new wxAuiNotebook(m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
-    m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
-    m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
-
-    m_imagePanel = new ImageResourcePanel(m_viewModel.imageResViewModel(), m_notebook);
-    m_modelPanel = new ModelResourcePanel(m_notebook);
-    m_audioPanel = new AudioResourcePanel(m_notebook);
-
-    m_splitter->SplitVertically(resourcesPanel, m_notebook, 1);
-
-    for (auto &page : kStaticPageTypes) {
-        auto window = GetStaticPageWindow(page);
-        window->Hide();
-    }
-
+void ResourceExplorerFrame::BindViewModel() {
     m_viewModel.pages().addChangedHandler([this](const auto &args) {
         switch (args.type) {
         case CollectionChangeType::Add: {
@@ -258,32 +301,6 @@ ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewMode
             wxWakeUpIdle();
         }
     });
-    m_viewModel.onViewCreated();
-
-    // CreateStatusBar();
-
-    Bind(wxEVT_CLOSE_WINDOW, &ResourceExplorerFrame::OnClose, this);
-    Bind(wxEVT_IDLE, &ResourceExplorerFrame::OnIdle, this);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnOpenDirectoryCommand, this, EventHandlerID::openDir);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnSaveFileCommand, this, EventHandlerID::saveFile);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractToolCommand, this, EventHandlerID::extractTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnUnwrapToolCommand, this, EventHandlerID::unwrapTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToRimToolCommand, this, EventHandlerID::toRimTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToErfToolCommand, this, EventHandlerID::toErfTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToModToolCommand, this, EventHandlerID::toModTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToXmlToolCommand, this, EventHandlerID::toXmlTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTwoDaToolCommand, this, EventHandlerID::toTwoDaTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToGffToolCommand, this, EventHandlerID::toGffTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTlkToolCommand, this, EventHandlerID::toTlkTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToLipToolCommand, this, EventHandlerID::toLipTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToSsfToolCommand, this, EventHandlerID::toSsfTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTgaToolCommand, this, EventHandlerID::toTgaTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToPcodeToolCommand, this, EventHandlerID::toPcodeTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNcsToolCommand, this, EventHandlerID::toNcsTool);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNssToolCommand, this, EventHandlerID::toNssTool);
 }
 
 void ResourceExplorerFrame::SaveFile() {
