@@ -401,11 +401,9 @@ void ResourceExplorerViewModel::loadResources() {
 }
 
 void ResourceExplorerViewModel::loadTools() {
-    _tools.clear();
     _tools.push_back(std::make_shared<KeyBifTool>());
     _tools.push_back(std::make_shared<ErfTool>());
     _tools.push_back(std::make_shared<RimTool>());
-    _tools.push_back(std::make_shared<NcsTool>(_gameId));
 }
 
 void ResourceExplorerViewModel::loadEngine() {
@@ -782,7 +780,6 @@ void ResourceExplorerViewModel::onResourcesDirectoryChanged(GameID gameId, std::
     _idToResItem.clear();
 
     loadResources();
-    loadTools();
 }
 
 void ResourceExplorerViewModel::onResourcesItemIdentified(int index, ResourcesItemId id) {

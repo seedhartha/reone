@@ -90,14 +90,10 @@ struct EventHandlerID {
     static constexpr int extractAllBifs = wxID_HIGHEST + 2;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
     static constexpr int composeLip = wxID_HIGHEST + 4;
-    static constexpr int extractTool = wxID_HIGHEST + 5;
-    static constexpr int toRimTool = wxID_HIGHEST + 6;
-    static constexpr int toErfTool = wxID_HIGHEST + 7;
-    static constexpr int toModTool = wxID_HIGHEST + 8;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 9;
-    static constexpr int toNcsTool = wxID_HIGHEST + 10;
-    static constexpr int toNssTool = wxID_HIGHEST + 11;
-    static constexpr int saveFile = wxID_HIGHEST + 12;
+    static constexpr int toRimTool = wxID_HIGHEST + 5;
+    static constexpr int toErfTool = wxID_HIGHEST + 6;
+    static constexpr int toModTool = wxID_HIGHEST + 7;
+    static constexpr int saveFile = wxID_HIGHEST + 8;
 };
 
 struct CommandID {
@@ -177,13 +173,9 @@ void ResourceExplorerFrame::InitMenu() {
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
     toolsMenu->Append(EventHandlerID::composeLip, "Compose LIP...");
     toolsMenu->AppendSeparator();
-    toolsMenu->Append(EventHandlerID::extractTool, "Extract BIF/RIM/ERF archive...");
     toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
     toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
     toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
-    toolsMenu->Append(EventHandlerID::toPcodeTool, "Disassemble NCS to PCODE...");
-    toolsMenu->Append(EventHandlerID::toNcsTool, "Assemble NCS from PCODE...");
-    toolsMenu->Append(EventHandlerID::toNssTool, "Decompile NCS (experimental)...");
 
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
@@ -199,13 +191,9 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::Extract), EventHandlerID::extractTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToPCODE), EventHandlerID::toPcodeTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNCS), EventHandlerID::toNcsTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNSS), EventHandlerID::toNssTool);
 }
 
 void ResourceExplorerFrame::BindViewModel() {
