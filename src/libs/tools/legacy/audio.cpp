@@ -21,17 +21,20 @@
 #include "reone/system/exception/endofstream.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/stream/fileinput.h"
+#include "reone/system/stream/fileoutput.h"
+#include "reone/system/stream/memoryoutput.h"
+
+using namespace reone::resource;
 
 namespace reone {
 
 void AudioTool::invoke(Operation operation, const std::filesystem::path &input, const std::filesystem::path &outputDir, const std::filesystem::path &gamePath) {
-    if (operation == Operation::Unwrap) {
-        unwrap(input, outputDir);
-    }
+    throw NotImplementedException();
 }
 
-void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem::path &destPath) {
-    auto wav = FileInputStream(path);
+void AudioTool::unwrap(IInputStream &wav, IOutputStream &unwrapped, ResType &actualType) {
+    actualType = ResType::Invalid;
+
     BinaryReader reader(wav);
     size_t filesize = reader.length();
     std::string suffix;
@@ -39,44 +42,39 @@ void AudioTool::unwrap(const std::filesystem::path &path, const std::filesystem:
     // Read magic number
     uint32_t magic = reader.readUint32();
     if (magic == 0xc460f3ff) { // WAV in MP3
+        actualType = ResType::Wav;
         reader.seek(0x1d6);
-        suffix = "-unwrap.wav";
-    } else if (magic == 0x46464952) { // MP3 in WAV
+    } else if (magic == 0x46464952) { // regular WAV or MP3 in WAV
         // Read subchunks
         reader.skipBytes(8); // chunk size + format
         while (true) {
-            std::string subchunkId;
-            try {
-                subchunkId = reader.readString(4);
-            } catch (const EndOfStreamException &ignored) {
-                break;
-            }
+            std::string subchunkId = reader.readString(4);
             uint32_t subchunkSize = reader.readInt32();
             if (subchunkId == "data") {
-                break;
+                if (subchunkSize == 0) { // MP3 in WAV
+                    actualType = ResType::Mp3;
+                    break;
+                } else { // regular WAV
+                    actualType = ResType::Wav;
+                    reader.seek(0);
+                    break;
+                }
             } else {
                 reader.skipBytes(subchunkSize);
             }
         }
-        suffix = ".mp3";
     } else {
         throw ValidationException("Unsupported audio format");
     }
 
     int dataSize = static_cast<int>(filesize - reader.position());
-    ByteBuffer data(reader.readBytes(dataSize));
-
-    std::filesystem::path unwrappedPath(path);
-    unwrappedPath.replace_extension();
-    unwrappedPath += suffix;
-
-    std::ofstream unwrapped(unwrappedPath, std::ios::binary);
+    auto data = reader.readBytes(dataSize);
     unwrapped.write(&data[0], data.size());
 }
 
 bool AudioTool::supports(Operation operation, const std::filesystem::path &input) const {
     return !std::filesystem::is_directory(input) &&
-           input.extension() == ".wav" &&
+           input.extension().string() == ".wav" &&
            operation == Operation::Unwrap;
 }
 

@@ -91,14 +91,13 @@ struct EventHandlerID {
     static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
     static constexpr int composeLip = wxID_HIGHEST + 4;
     static constexpr int extractTool = wxID_HIGHEST + 5;
-    static constexpr int unwrapTool = wxID_HIGHEST + 6;
-    static constexpr int toRimTool = wxID_HIGHEST + 7;
-    static constexpr int toErfTool = wxID_HIGHEST + 8;
-    static constexpr int toModTool = wxID_HIGHEST + 9;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 10;
-    static constexpr int toNcsTool = wxID_HIGHEST + 11;
-    static constexpr int toNssTool = wxID_HIGHEST + 12;
-    static constexpr int saveFile = wxID_HIGHEST + 13;
+    static constexpr int toRimTool = wxID_HIGHEST + 6;
+    static constexpr int toErfTool = wxID_HIGHEST + 7;
+    static constexpr int toModTool = wxID_HIGHEST + 8;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 9;
+    static constexpr int toNcsTool = wxID_HIGHEST + 10;
+    static constexpr int toNssTool = wxID_HIGHEST + 11;
+    static constexpr int saveFile = wxID_HIGHEST + 12;
 };
 
 struct CommandID {
@@ -107,6 +106,7 @@ struct CommandID {
     static constexpr int decompileNoOptimize = 3;
     static constexpr int exportRes = 4;
     static constexpr int exportTgaTxi = 5;
+    static constexpr int exportWavMp3 = 6;
 };
 
 struct TimerID {
@@ -178,7 +178,6 @@ void ResourceExplorerFrame::InitMenu() {
     toolsMenu->Append(EventHandlerID::composeLip, "Compose LIP...");
     toolsMenu->AppendSeparator();
     toolsMenu->Append(EventHandlerID::extractTool, "Extract BIF/RIM/ERF archive...");
-    toolsMenu->Append(EventHandlerID::unwrapTool, "Unwrap WAV to WAV/MP3...");
     toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
     toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
     toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
@@ -201,7 +200,6 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::Extract), EventHandlerID::extractTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::Unwrap), EventHandlerID::unwrapTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
@@ -487,6 +485,8 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
         menu.Append(CommandID::exportRes, "Export...");
         if (item.resId->type == ResType::Tpc) {
             menu.Append(CommandID::exportTgaTxi, "Export as TGA/TXI...");
+        } else if (item.resId->type == ResType::Wav) {
+            menu.Append(CommandID::exportWavMp3, "Export as regular WAV/MP3...");
         } else if (item.resId->type == ResType::Ncs) {
             menu.Append(CommandID::decompile, "Decompile");
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
@@ -558,7 +558,9 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto itemId = menu->GetClientData();
         m_viewModel.decompile(itemId, false);
 
-    } else if (event.GetId() == CommandID::exportRes || event.GetId() == CommandID::exportTgaTxi) {
+    } else if (event.GetId() == CommandID::exportRes ||
+               event.GetId() == CommandID::exportTgaTxi ||
+               event.GetId() == CommandID::exportWavMp3) {
         auto itemId = menu->GetClientData();
         auto dialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
@@ -567,6 +569,8 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
         if (event.GetId() == CommandID::exportTgaTxi) {
             m_viewModel.exportTgaTxi().execute(itemId, destPath);
+        } else if (event.GetId() == CommandID::exportWavMp3) {
+            m_viewModel.exportWavMp3().execute(itemId, destPath);
         } else {
             m_viewModel.exportResource().execute(itemId, destPath);
         }

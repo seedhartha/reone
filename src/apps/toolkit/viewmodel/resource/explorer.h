@@ -165,15 +165,19 @@ public:
     }
 
     Command<Page &, const std::filesystem::path &> &saveFile() {
-        return *_saveFileCommand;
+        return *_saveFile;
     }
 
     Command<ResourcesItemId, const std::filesystem::path &> &exportResource() {
-        return *_exportResCommand;
+        return *_exportResource;
     }
 
     Command<ResourcesItemId, const std::filesystem::path &> &exportTgaTxi() {
-        return *_exportTgaTxiCommand;
+        return *_exportTgaTxi;
+    }
+
+    Command<ResourcesItemId, const std::filesystem::path &> &exportWavMp3() {
+        return *_exportWavMp3;
     }
 
     // END Data binding
@@ -220,9 +224,10 @@ private:
     Property<bool> _engineLoadRequested;
     Property<bool> _renderEnabled;
 
-    std::unique_ptr<Command<Page &, const std::filesystem::path &>> _saveFileCommand;
-    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportResCommand;
-    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportTgaTxiCommand;
+    std::unique_ptr<Command<Page &, const std::filesystem::path &>> _saveFile;
+    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportResource;
+    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportTgaTxi;
+    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportWavMp3;
 
     // END Data binding
 
@@ -252,6 +257,8 @@ private:
 
     void doExportResource(ResourcesItemId itemId, const std::filesystem::path &destPath);
     void doExportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void doExportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath);
+
     void doSaveFile(Page &page, const std::filesystem::path &destPath);
 
     PageType getPageType(resource::ResType type) const;

@@ -104,12 +104,14 @@ ResourceExplorerViewModel::ResourceExplorerViewModel() {
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
 
-    _saveFileCommand = std::make_unique<Command<Page &, const std::filesystem::path &>>(
+    _saveFile = std::make_unique<Command<Page &, const std::filesystem::path &>>(
         std::bind(&ResourceExplorerViewModel::doSaveFile, this, std::placeholders::_1, std::placeholders::_2));
-    _exportResCommand = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
+    _exportResource = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
         std::bind(&ResourceExplorerViewModel::doExportResource, this, std::placeholders::_1, std::placeholders::_2));
-    _exportTgaTxiCommand = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
+    _exportTgaTxi = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
         std::bind(&ResourceExplorerViewModel::doExportTgaTxi, this, std::placeholders::_1, std::placeholders::_2));
+    _exportWavMp3 = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
+        std::bind(&ResourceExplorerViewModel::doExportWavMp3, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
@@ -403,7 +405,6 @@ void ResourceExplorerViewModel::loadTools() {
     _tools.push_back(std::make_shared<KeyBifTool>());
     _tools.push_back(std::make_shared<ErfTool>());
     _tools.push_back(std::make_shared<RimTool>());
-    _tools.push_back(std::make_shared<AudioTool>());
     _tools.push_back(std::make_shared<NcsTool>(_gameId));
 }
 
@@ -650,6 +651,23 @@ void ResourceExplorerViewModel::doExportTgaTxi(ResourcesItemId itemId, const std
             auto txi = FileOutputStream(txiPath);
             txi.write(&txiBuffer[0], txiBuffer.size());
         }
+    });
+}
+
+void ResourceExplorerViewModel::doExportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    auto &item = *_idToResItem.at(itemId);
+    withResourceStream(item, [&destPath, &item](auto &res) {
+        ByteBuffer unwrappedBuffer;
+        MemoryOutputStream unwrappedMemory {unwrappedBuffer};
+        ResType actualType;
+        AudioTool().unwrap(res, unwrappedMemory, actualType);
+        auto unwrappedPath = destPath;
+        unwrappedPath /= item.resId->string();
+        if (actualType == ResType::Mp3) {
+            unwrappedPath.replace_extension(".mp3");
+        }
+        FileOutputStream unwrapped {unwrappedPath};
+        unwrapped.write(&unwrappedBuffer[0], unwrappedBuffer.size());
     });
 }
 

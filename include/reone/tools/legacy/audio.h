@@ -17,11 +17,17 @@
 
 #pragma once
 
+#include "reone/resource/types.h"
+
 #include "tool.h"
 
 namespace reone {
 
+class IInputStream;
+class IOutputStream;
+
 class AudioTool : public Tool {
+public:
     void invoke(
         Operation operation,
         const std::filesystem::path &input,
@@ -30,8 +36,7 @@ class AudioTool : public Tool {
 
     bool supports(Operation operation, const std::filesystem::path &input) const override;
 
-private:
-    void unwrap(const std::filesystem::path &path, const std::filesystem::path &destPath);
+    void unwrap(IInputStream &wav, IOutputStream &unwrapped, resource::ResType &actualType);
 };
 
 } // namespace reone
