@@ -104,7 +104,6 @@ private:
     void OnClose(wxCloseEvent &event);
 
     void OnOpenDirectoryCommand(wxCommandEvent &event);
-    void OnSaveFileCommand(wxCommandEvent &event);
     void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
     void OnComposeLipCommand(wxCommandEvent &event);

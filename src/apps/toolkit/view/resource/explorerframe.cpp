@@ -26,23 +26,17 @@
 #include "reone/audio/format/wavreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
-#include "reone/graphics/format/lipwriter.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
-#include "reone/resource/format/2dawriter.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
-#include "reone/resource/format/gffwriter.h"
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/format/ssfreader.h"
-#include "reone/resource/format/ssfwriter.h"
 #include "reone/resource/format/tlkreader.h"
-#include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
-#include "reone/script/format/ncswriter.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/hexutil.h"
 #include "reone/system/stream/fileinput.h"
@@ -60,7 +54,6 @@
 #include "reone/tools/legacy/ssf.h"
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
-#include "reone/tools/script/format/pcodereader.h"
 
 #include "../../viewmodel/resource/gff.h"
 #include "../../viewmodel/resource/ncs.h"
@@ -221,7 +214,7 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_CLOSE_WINDOW, &ResourceExplorerFrame::OnClose, this);
     Bind(wxEVT_IDLE, &ResourceExplorerFrame::OnIdle, this);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnOpenDirectoryCommand, this, EventHandlerID::openDir);
-    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnSaveFileCommand, this, EventHandlerID::saveFile);
+    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::SaveFile, this), EventHandlerID::saveFile);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
@@ -324,89 +317,7 @@ void ResourceExplorerFrame::SaveFile() {
         return;
     }
     auto destPath = std::filesystem::path(destFileDialog.GetPath().ToStdString());
-
-    if (page->type == PageType::Text) {
-        auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page->viewModel);
-        auto &text = viewModel.content();
-        FileOutputStream stream {destPath};
-        stream.write(&text[0], text.size());
-    } else if (page->type == PageType::GFF) {
-        auto &viewModel = *std::static_pointer_cast<GFFResourceViewModel>(page->viewModel);
-        auto &gff = viewModel.content();
-        FileOutputStream stream {destPath};
-        GffWriter writer {page->resourceId.type, gff};
-        writer.save(stream);
-    } else if (page->type == PageType::Table) {
-        auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page->viewModel);
-        auto &table = viewModel.content();
-        switch (page->resourceId.type) {
-        case ResType::TwoDa: {
-            std::vector<std::string> columns;
-            std::vector<TwoDa::Row> rows;
-            for (const auto &column : table.columns) {
-                columns.emplace_back(column);
-            }
-            for (const auto &row : table.rows) {
-                rows.push_back(TwoDa::Row {row});
-            }
-            TwoDa twoDa {std::move(columns), std::move(rows)};
-            TwoDaWriter writer {twoDa};
-            FileOutputStream stream {destPath};
-            writer.save(stream);
-            break;
-        }
-        case ResType::Lip: {
-            float length = 0.0f;
-            std::vector<LipAnimation::Keyframe> keyframes;
-            for (const auto &row : table.rows) {
-                float time = std::stof(row[0]);
-                length = std::max(length, time);
-                keyframes.push_back({time, static_cast<uint8_t>(std::stoul(row[1]))});
-            }
-            LipAnimation lip {page->resourceId.resRef.value(), length, std::move(keyframes)};
-            LipWriter writer {lip};
-            writer.save(destPath);
-            break;
-        }
-        case ResType::Tlk: {
-            TalkTable::Builder builder;
-            for (const auto &row : table.rows) {
-                auto text = boost::replace_all_copy(row[0], "\\n", "\n");
-                auto soundResRef = row[1];
-                builder.string(std::move(text), std::move(soundResRef));
-            }
-            auto talkTable = builder.build();
-            TlkWriter writer {*talkTable};
-            writer.save(destPath);
-            break;
-        }
-        case ResType::Ssf: {
-            float length = 0.0f;
-            std::vector<uint32_t> soundSet;
-            for (const auto &row : table.rows) {
-                auto strRef = std::stol(row[0]);
-                auto unsignedStrRef = *reinterpret_cast<uint32_t *>(&strRef);
-                soundSet.emplace_back(unsignedStrRef);
-            }
-            SsfWriter writer {soundSet};
-            writer.save(destPath);
-            break;
-        }
-        default:
-            break;
-        }
-    } else if (page->type == PageType::NCS) {
-        auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page->viewModel);
-        auto &content = viewModel.content();
-        MemoryInputStream stream {content};
-        Routines routines {m_viewModel.gameId(), nullptr, nullptr};
-        routines.init();
-        PcodeReader reader {page->resourceId.resRef.value(), stream, routines};
-        reader.load();
-        auto program = reader.program();
-        NcsWriter writer {*program};
-        writer.save(destPath);
-    }
+    m_viewModel.saveFileCommand().execute(*page, destPath);
 }
 
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
@@ -558,10 +469,6 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
         m_viewModel.onResourcesItemIdentified(i, itemId);
     }
     m_resourcesTreeCtrl->Thaw();
-}
-
-void ResourceExplorerFrame::OnSaveFileCommand(wxCommandEvent &event) {
-    SaveFile();
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {

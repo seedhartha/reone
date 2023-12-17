@@ -36,6 +36,7 @@
 #include "reone/tools/types.h"
 
 #include "../../binding/collection.h"
+#include "../../binding/command.h"
 #include "../../binding/property.h"
 #include "../../viewmodel.h"
 
@@ -95,10 +96,7 @@ struct Progress {
 
 class ResourceExplorerViewModel : public ViewModel {
 public:
-    ResourceExplorerViewModel() {
-        _imageResViewModel = std::make_unique<ImageResourceViewModel>();
-        _audioResViewModel = std::make_unique<AudioResourceViewModel>();
-    }
+    ResourceExplorerViewModel();
 
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(ResourcesItemId itemId, bool optimize = true);
@@ -129,11 +127,7 @@ public:
     std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
     std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
-    Collection<std::shared_ptr<Page>> &pages() { return _pages; }
-    Property<int> &selectedPage() { return _selectedPage; }
-    Property<Progress> &progress() { return _progress; }
-    Property<bool> &engineLoadRequested() { return _engineLoadRequested; }
-    Property<bool> &renderEnabled() { return _renderEnabled; }
+    // View models
 
     ImageResourceViewModel &imageResViewModel() {
         return *_imageResViewModel;
@@ -146,6 +140,36 @@ public:
     AudioResourceViewModel &audioResViewModel() {
         return *_audioResViewModel;
     }
+
+    // END View models
+
+    // Data binding
+
+    Collection<std::shared_ptr<Page>> &pages() {
+        return _pages;
+    }
+
+    Property<int> &selectedPage() {
+        return _selectedPage;
+    }
+
+    Property<Progress> &progress() {
+        return _progress;
+    }
+
+    Property<bool> &engineLoadRequested() {
+        return _engineLoadRequested;
+    }
+
+    Property<bool> &renderEnabled() {
+        return _renderEnabled;
+    }
+
+    Command<Page &, const std::filesystem::path &> &saveFileCommand() {
+        return *_saveFileCommand;
+    }
+
+    // END Data binding
 
     void onViewCreated();
     void onViewDestroyed();
@@ -172,19 +196,26 @@ private:
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
+    // View models
+
     std::unique_ptr<ImageResourceViewModel> _imageResViewModel;
     std::unique_ptr<ModelResourceViewModel> _modelResViewModel;
     std::unique_ptr<AudioResourceViewModel> _audioResViewModel;
 
-    // Event handlers
+    // END View models
+
+    // Data binding
 
     Collection<std::shared_ptr<Page>> _pages;
+
     Property<int> _selectedPage;
     Property<Progress> _progress;
     Property<bool> _engineLoadRequested;
     Property<bool> _renderEnabled;
 
-    // END Event handlers
+    std::unique_ptr<Command<Page &, const std::filesystem::path &>> _saveFileCommand;
+
+    // END Data binding
 
     // Embedded engine
 
@@ -209,6 +240,8 @@ private:
 
     void openFile(const ResourcesItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
+
+    void saveFile(Page &page, const std::filesystem::path &destPath);
 
     PageType getPageType(resource::ResType type) const;
 
