@@ -63,26 +63,26 @@ public:
     ResourceExplorerFrame();
 
 private:
-    std::unique_ptr<ResourceExplorerViewModel> _viewModel;
+    std::unique_ptr<ResourceExplorerViewModel> m_viewModel;
 
     // Menus
 
-    wxMenuItem *_saveFileMenuItem {nullptr};
+    wxMenuItem *m_saveFileMenuItem {nullptr};
 
     // END Menus
 
     // Widgets
 
-    wxSplitterWindow *_splitter {nullptr};
-    wxProgressDialog *_progressDialog {nullptr};
+    wxSplitterWindow *m_splitter {nullptr};
+    wxProgressDialog *m_progressDialog {nullptr};
 
-    wxDataViewTreeCtrl *_resourcesTreeCtrl {nullptr};
-    wxListBox *_modulesListBox {nullptr};
-    wxAuiNotebook *_notebook {nullptr};
+    wxDataViewTreeCtrl *m_resourcesTreeCtrl {nullptr};
+    wxListBox *m_modulesListBox {nullptr};
+    wxAuiNotebook *m_notebook {nullptr};
 
-    ImageResourcePanel *_imagePanel {nullptr};
-    ModelResourcePanel *_modelPanel {nullptr};
-    AudioResourcePanel *_audioPanel {nullptr};
+    ImageResourcePanel *m_imagePanel {nullptr};
+    ModelResourcePanel *m_modelPanel {nullptr};
+    AudioResourcePanel *m_audioPanel {nullptr};
 
     // END Widgets
 

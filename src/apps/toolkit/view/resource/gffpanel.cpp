@@ -33,8 +33,8 @@ GFFResourcePanel::GFFResourcePanel(GFFResourceViewModel &viewModel,
                                    const TalkTable &talkTable,
                                    wxWindow *parent) :
     wxPanel(parent),
-    _talkTable(talkTable),
-    _viewModel(viewModel) {
+    m_talkTable(talkTable),
+    m_viewModel(viewModel) {
 
     auto treeCtrl = new wxDataViewTreeCtrl(this, wxID_ANY);
     treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &GFFResourcePanel::OnGffTreeCtrlItemStartEditing, this);
@@ -84,7 +84,7 @@ void GFFResourcePanel::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl,
             ctrl.AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
             ctrl.AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
             if (field.intValue != -1) {
-                auto tlkText = _talkTable.getString(field.intValue).text;
+                auto tlkText = m_talkTable.getString(field.intValue).text;
                 auto cleanedTlkText = boost::replace_all_copy(tlkText, "\n", "\\n");
                 ctrl.AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
             }
@@ -535,9 +535,9 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         if (modified) {
             control->Freeze();
             control->DeleteAllItems();
-            AppendGffStructToTree(*control, wxDataViewItem(), "/", _viewModel.content());
+            AppendGffStructToTree(*control, wxDataViewItem(), "/", m_viewModel.content());
             control->Thaw();
-            _viewModel.modified() = true;
+            m_viewModel.modified() = true;
         }
     });
     PopupMenu(&menu, event.GetPosition());

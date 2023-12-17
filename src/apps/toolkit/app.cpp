@@ -37,12 +37,9 @@ bool ToolkitApp::OnInit() {
         LogSeverity::Debug,
         std::set<LogChannel> {LogChannel::Global, LogChannel::Resources, LogChannel::Graphics, LogChannel::Audio},
         "toolkit.log");
-
     wxImage::AddHandler(new wxTGAHandler());
-
     auto frame = new ResourceExplorerFrame();
     frame->Show();
-
     return true;
 };
 

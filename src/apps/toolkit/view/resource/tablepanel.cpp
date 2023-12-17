@@ -28,35 +28,35 @@ namespace reone {
 TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
                                        wxWindow *parent) :
     wxPanel(parent),
-    _viewModel(viewModel) {
+    m_viewModel(viewModel) {
 
-    _tableCtrl = new wxDataViewListCtrl(this, wxID_ANY);
+    m_tableCtrl = new wxDataViewListCtrl(this, wxID_ANY);
     RefreshDataView();
 
-    _tableCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, [this](const auto &event) {
+    m_tableCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, [this](const auto &event) {
         auto item = event.GetItem();
         if (!item) {
             return;
         }
         auto control = wxDynamicCast(event.GetEventObject(), wxDataViewListCtrl);
         auto column = event.GetColumn();
-        if (_viewModel.content().rowNumberColumn) {
+        if (m_viewModel.content().rowNumberColumn) {
             --column;
         }
         auto row = control->ItemToRow(item);
         auto newValue = event.GetValue().GetString();
-        if (_viewModel.content().rows[row][column] != newValue) {
-            _viewModel.content().rows[row][column] = newValue;
-            _viewModel.modified() = true;
+        if (m_viewModel.content().rows[row][column] != newValue) {
+            m_viewModel.content().rows[row][column] = newValue;
+            m_viewModel.modified() = true;
         }
     });
-    _tableCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [this](const auto &event) {
+    m_tableCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [this](const auto &event) {
         enum class MenuItemId {
             AppendRow = 1,
             DeleteRow
         };
         auto column = event.GetColumn();
-        if (_viewModel.content().rowNumberColumn && column == 0) {
+        if (m_viewModel.content().rowNumberColumn && column == 0) {
             return;
         }
         auto item = event.GetItem();
@@ -72,43 +72,43 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
             bool modified = false;
             switch (static_cast<MenuItemId>(event.GetId())) {
             case MenuItemId::AppendRow: {
-                auto iter = _viewModel.content().rows.begin();
+                auto iter = m_viewModel.content().rows.begin();
                 std::advance(iter, row + 1);
                 std::vector<std::string> values;
-                for (size_t i = 0; i < _viewModel.content().columns.size(); ++i) {
+                for (size_t i = 0; i < m_viewModel.content().columns.size(); ++i) {
                     values.emplace_back("****");
                 }
-                _viewModel.content().rows.insert(iter, std::move(values));
+                m_viewModel.content().rows.insert(iter, std::move(values));
                 modified = true;
             } break;
             case MenuItemId::DeleteRow: {
-                auto iter = _viewModel.content().rows.begin();
+                auto iter = m_viewModel.content().rows.begin();
                 std::advance(iter, row);
-                _viewModel.content().rows.erase(iter);
+                m_viewModel.content().rows.erase(iter);
                 modified = true;
             } break;
             default:
                 break;
             }
             if (modified) {
-                _viewModel.modified() = true;
+                m_viewModel.modified() = true;
                 RefreshDataView();
             }
         });
         PopupMenu(&menu, event.GetPosition());
     });
-    if (_viewModel.resType() == ResType::TwoDa) {
-        _tableCtrl->Bind(wxEVT_DATAVIEW_COLUMN_HEADER_RIGHT_CLICK, [this](const auto &event) {
+    if (m_viewModel.resType() == ResType::TwoDa) {
+        m_tableCtrl->Bind(wxEVT_DATAVIEW_COLUMN_HEADER_RIGHT_CLICK, [this](const auto &event) {
             enum class MenuItemId {
                 RenameColumn = 1,
                 AppendColumn,
                 DeleteColumn
             };
             auto column = event.GetColumn();
-            if (column == -1 || (_viewModel.content().rowNumberColumn && column == 0)) {
+            if (column == -1 || (m_viewModel.content().rowNumberColumn && column == 0)) {
                 return;
             }
-            if (_viewModel.content().rowNumberColumn) {
+            if (m_viewModel.content().rowNumberColumn) {
                 --column;
             }
             auto control = wxDynamicCast(event.GetEventObject(), wxDataViewListCtrl);
@@ -120,20 +120,20 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
                 bool modified = false;
                 switch (static_cast<MenuItemId>(event.GetId())) {
                 case MenuItemId::RenameColumn: {
-                    wxTextEntryDialog dialog(nullptr, "New name:", "Column rename", _viewModel.content().columns[column]);
+                    wxTextEntryDialog dialog(nullptr, "New name:", "Column rename", m_viewModel.content().columns[column]);
                     if (dialog.ShowModal() == wxID_OK) {
                         auto newName = dialog.GetValue().ToStdString();
-                        if (_viewModel.content().columns[column] != newName) {
-                            _viewModel.content().columns[column] = newName;
+                        if (m_viewModel.content().columns[column] != newName) {
+                            m_viewModel.content().columns[column] = newName;
                             modified = true;
                         }
                     }
                 } break;
                 case MenuItemId::AppendColumn: {
-                    auto iter = _viewModel.content().columns.begin();
+                    auto iter = m_viewModel.content().columns.begin();
                     std::advance(iter, column + 1);
-                    _viewModel.content().columns.insert(iter, "New Column");
-                    for (auto &row : _viewModel.content().rows) {
+                    m_viewModel.content().columns.insert(iter, "New Column");
+                    for (auto &row : m_viewModel.content().rows) {
                         auto valuesIter = row.begin();
                         std::advance(valuesIter, column + 1);
                         row.insert(valuesIter, "****");
@@ -141,10 +141,10 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
                     modified = true;
                 } break;
                 case MenuItemId::DeleteColumn: {
-                    auto iter = _viewModel.content().columns.begin();
+                    auto iter = m_viewModel.content().columns.begin();
                     std::advance(iter, column);
-                    _viewModel.content().columns.erase(iter);
-                    for (auto &row : _viewModel.content().rows) {
+                    m_viewModel.content().columns.erase(iter);
+                    for (auto &row : m_viewModel.content().rows) {
                         auto valuesIter = row.begin();
                         std::advance(valuesIter, column);
                         row.erase(valuesIter);
@@ -155,7 +155,7 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
                     break;
                 }
                 if (modified) {
-                    _viewModel.modified() = true;
+                    m_viewModel.modified() = true;
                     RefreshDataView();
                 }
             });
@@ -165,41 +165,41 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
 
     auto goToRowBtn = new wxButton(this, wxID_ANY, "Go to row...");
     goToRowBtn->Bind(wxEVT_BUTTON, [this](const auto &event) {
-        wxNumberEntryDialog dialog(nullptr, "Row number:", wxEmptyString, "Go to row", 0, 0, _viewModel.content().rows.size());
+        wxNumberEntryDialog dialog(nullptr, "Row number:", wxEmptyString, "Go to row", 0, 0, m_viewModel.content().rows.size());
         if (dialog.ShowModal() == wxID_OK) {
             auto row = dialog.GetValue();
-            _tableCtrl->EnsureVisible(_tableCtrl->RowToItem(row));
+            m_tableCtrl->EnsureVisible(m_tableCtrl->RowToItem(row));
         }
     });
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(goToRowBtn, wxSizerFlags(0).Border(wxALL, 3));
-    sizer->Add(_tableCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    sizer->Add(m_tableCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
     SetSizer(sizer);
 }
 
 void TableResourcePanel::RefreshDataView() {
-    _tableCtrl->Freeze();
-    _tableCtrl->DeleteAllItems();
-    _tableCtrl->ClearColumns();
-    if (_viewModel.content().rowNumberColumn) {
-        _tableCtrl->AppendTextColumn("Index");
+    m_tableCtrl->Freeze();
+    m_tableCtrl->DeleteAllItems();
+    m_tableCtrl->ClearColumns();
+    if (m_viewModel.content().rowNumberColumn) {
+        m_tableCtrl->AppendTextColumn("Index");
     }
-    for (const auto &column : _viewModel.content().columns) {
-        _tableCtrl->AppendTextColumn(column, wxDATAVIEW_CELL_EDITABLE);
+    for (const auto &column : m_viewModel.content().columns) {
+        m_tableCtrl->AppendTextColumn(column, wxDATAVIEW_CELL_EDITABLE);
     }
-    for (size_t i = 0; i < _viewModel.content().rows.size(); ++i) {
-        auto &row = _viewModel.content().rows[i];
+    for (size_t i = 0; i < m_viewModel.content().rows.size(); ++i) {
+        auto &row = m_viewModel.content().rows[i];
         auto values = wxVector<wxVariant>();
-        if (_viewModel.content().rowNumberColumn) {
+        if (m_viewModel.content().rowNumberColumn) {
             values.push_back(wxVariant(std::to_string(i)));
         }
         for (auto &value : row) {
             values.push_back(wxVariant(value));
         }
-        _tableCtrl->AppendItem(values);
+        m_tableCtrl->AppendItem(values);
     }
-    _tableCtrl->Thaw();
+    m_tableCtrl->Thaw();
 }
 
 } // namespace reone

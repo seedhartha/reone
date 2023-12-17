@@ -35,22 +35,22 @@ AudioResourcePanel::AudioResourcePanel(wxWindow *parent) :
 }
 
 void AudioResourcePanel::OnEngineLoadRequested() {
-    _viewModel->get().audioStream().addChangedHandler([this](const auto &stream) {
+    m_viewModel->get().audioStream().addChangedHandler([this](const auto &stream) {
         if (stream) {
-            _audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
-            _audioSource->init();
-            _audioSource->play();
+            m_audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
+            m_audioSource->init();
+            m_audioSource->play();
             wxWakeUpIdle();
         } else {
-            _audioSource.reset();
+            m_audioSource.reset();
         }
     });
 }
 
 void AudioResourcePanel::OnStopAudioCommand(wxCommandEvent &event) {
-    if (_audioSource) {
-        _audioSource->stop();
-        _audioSource.reset();
+    if (m_audioSource) {
+        m_audioSource->stop();
+        m_audioSource.reset();
     }
 }
 

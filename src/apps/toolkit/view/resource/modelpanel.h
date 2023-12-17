@@ -50,27 +50,27 @@ public:
     ModelResourcePanel(wxWindow *parent);
 
     void SetViewModel(ModelResourceViewModel &viewModel) {
-        _viewModel = viewModel;
+        m_viewModel = viewModel;
     }
 
     void RefreshGL() {
-        _glCanvas->Refresh();
+        m_glCanvas->Refresh();
     }
 
     void OnEngineLoadRequested();
 
 private:
-    wxSplitterWindow *_renderSplitter {nullptr};
-    wxGLCanvas *_glCanvas {nullptr};
-    wxPanel *_animationPanel {nullptr};
-    wxButton *_animPauseResumeBtn {nullptr};
-    wxSlider *_animTimeSlider {nullptr};
-    wxTextCtrl *_animTimeCtrl {nullptr};
-    wxListBox *_animationsListBox {nullptr};
+    wxSplitterWindow *m_renderSplitter {nullptr};
+    wxGLCanvas *m_glCanvas {nullptr};
+    wxPanel *m_animationPanel {nullptr};
+    wxButton *m_animPauseResumeBtn {nullptr};
+    wxSlider *m_animTimeSlider {nullptr};
+    wxTextCtrl *m_animTimeCtrl {nullptr};
+    wxListBox *m_animationsListBox {nullptr};
 
-    std::optional<std::reference_wrapper<ModelResourceViewModel>> _viewModel;
+    std::optional<std::reference_wrapper<ModelResourceViewModel>> m_viewModel;
 
-    std::shared_ptr<graphics::LipAnimation> _lipAnim;
+    std::shared_ptr<graphics::LipAnimation> m_lipAnim;
 
     void OnGLCanvasPaint(wxPaintEvent &event);
     void OnGLCanvasMouseWheel(wxMouseEvent &event);

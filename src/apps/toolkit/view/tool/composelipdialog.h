@@ -45,21 +45,21 @@ public:
                      long style = wxDEFAULT_DIALOG_STYLE);
 
 private:
-    wxTextCtrl *_textCtrl;
-    wxPanel *_soundWaveformPanel;
-    wxTextCtrl *_soundDurationCtrl;
-    wxSlider *_minSilenceDurationSlider;
-    wxSlider *_maxSilenceAmplitudeSlider;
-    wxTextCtrl *_pronounciationCtrl;
+    wxTextCtrl *m_textCtrl;
+    wxPanel *m_soundWaveformPanel;
+    wxTextCtrl *m_soundDurationCtrl;
+    wxSlider *m_minSilenceDurationSlider;
+    wxSlider *m_maxSilenceAmplitudeSlider;
+    wxTextCtrl *m_pronounciationCtrl;
 
-    wxFloatingPointValidator<float> _soundDurationValidator;
-    float _soundDuration {1.0f};
+    wxFloatingPointValidator<float> m_soundDurationValidator;
+    float m_soundDuration {1.0f};
 
-    std::shared_ptr<audio::AudioClip> _sound;
-    std::vector<TimeSpan> _silentSpans;
-    std::vector<float> _soundWaveform;
+    std::shared_ptr<audio::AudioClip> m_sound;
+    std::vector<TimeSpan> m_silentSpans;
+    std::vector<float> m_soundWaveform;
 
-    ByteBuffer _cmudictBytes;
+    ByteBuffer m_cmudictBytes;
 
     void analyzeAudio();
 

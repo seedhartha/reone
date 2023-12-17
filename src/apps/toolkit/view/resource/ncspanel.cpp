@@ -33,8 +33,8 @@ NCSResourcePanel::NCSResourcePanel(GameID gameId,
                                    NCSResourceViewModel &viewModel,
                                    wxWindow *parent) :
     wxPanel(parent),
-    _gameId(gameId),
-    _viewModel(viewModel) {
+    m_gameId(gameId),
+    m_viewModel(viewModel) {
 
     auto textCtrl = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     textCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
@@ -42,15 +42,15 @@ NCSResourcePanel::NCSResourcePanel(GameID gameId,
     textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
         auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
         auto text = ctrl->GetValue().ToStdString();
-        _viewModel.content() = text;
-        _viewModel.modified() = true;
+        m_viewModel.content() = text;
+        m_viewModel.modified() = true;
     });
     // textCtrl->SetEditable(false);
 
     auto compileCtrl = new wxButton(this, wxID_ANY, "Compile");
     compileCtrl->Bind(wxEVT_BUTTON, [this](const auto &event) {
-        MemoryInputStream stream {_viewModel.content()};
-        Routines routines {_gameId, nullptr, nullptr};
+        MemoryInputStream stream {m_viewModel.content()};
+        Routines routines {m_gameId, nullptr, nullptr};
         routines.init();
         PcodeReader reader {"", stream, routines};
         try {

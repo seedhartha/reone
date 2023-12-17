@@ -34,7 +34,7 @@ public:
     TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent);
 
 private:
-    TextResourceViewModel &_viewModel;
+    TextResourceViewModel &m_viewModel;
 };
 
 } // namespace reone

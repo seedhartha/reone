@@ -29,47 +29,47 @@ namespace reone {
 ModelResourcePanel::ModelResourcePanel(wxWindow *parent) :
     wxPanel(parent) {
 
-    _renderSplitter = new wxSplitterWindow(this);
-    _renderSplitter->SetMinimumPaneSize(100);
+    m_renderSplitter = new wxSplitterWindow(this);
+    m_renderSplitter->SetMinimumPaneSize(100);
 
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(_renderSplitter, wxSizerFlags(1).Expand());
+    sizer->Add(m_renderSplitter, wxSizerFlags(1).Expand());
     SetSizer(sizer);
 }
 
 void ModelResourcePanel::OnEngineLoadRequested() {
-    _glCanvas = new wxGLCanvas(_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _glCanvas->Bind(wxEVT_PAINT, &ModelResourcePanel::OnGLCanvasPaint, this);
-    _glCanvas->Bind(wxEVT_MOTION, &ModelResourcePanel::OnGLCanvasMouseMotion, this);
-    _glCanvas->Bind(wxEVT_MOUSEWHEEL, &ModelResourcePanel::OnGLCanvasMouseWheel, this);
+    m_glCanvas = new wxGLCanvas(m_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    m_glCanvas->Bind(wxEVT_PAINT, &ModelResourcePanel::OnGLCanvasPaint, this);
+    m_glCanvas->Bind(wxEVT_MOTION, &ModelResourcePanel::OnGLCanvasMouseMotion, this);
+    m_glCanvas->Bind(wxEVT_MOUSEWHEEL, &ModelResourcePanel::OnGLCanvasMouseWheel, this);
 
 #if wxCHECK_VERSION(3, 1, 0)
     wxGLContextAttrs glCtxAttrs;
     glCtxAttrs.CoreProfile().OGLVersion(3, 3).EndList();
-    auto glContext = new wxGLContext(_glCanvas, nullptr, &glCtxAttrs);
+    auto glContext = new wxGLContext(m_glCanvas, nullptr, &glCtxAttrs);
 #else
     auto glContext = new wxGLContext(_glCanvas);
 #endif
-    glContext->SetCurrent(*_glCanvas);
+    glContext->SetCurrent(*m_glCanvas);
 
-    _animationPanel = new wxPanel(_renderSplitter);
-    _animPauseResumeBtn = new wxButton(_animationPanel, wxID_ANY, "Pause");
-    _animPauseResumeBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnAnimPauseResumeCommand, this);
-    _animTimeSlider = new wxSlider(_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
-    _animTimeSlider->Bind(wxEVT_SLIDER, &ModelResourcePanel::OnAnimTimeSliderCommand, this);
-    _animTimeCtrl = new wxTextCtrl(_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    m_animationPanel = new wxPanel(m_renderSplitter);
+    m_animPauseResumeBtn = new wxButton(m_animationPanel, wxID_ANY, "Pause");
+    m_animPauseResumeBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnAnimPauseResumeCommand, this);
+    m_animTimeSlider = new wxSlider(m_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
+    m_animTimeSlider->Bind(wxEVT_SLIDER, &ModelResourcePanel::OnAnimTimeSliderCommand, this);
+    m_animTimeCtrl = new wxTextCtrl(m_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
-    animPlaybackSizer->Add(_animPauseResumeBtn, wxSizerFlags(0).Center().Border(wxALL, 3));
-    animPlaybackSizer->Add(_animTimeSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    animPlaybackSizer->Add(_animTimeCtrl, wxSizerFlags(0).Center().Border(wxALL, 3));
-    _animationsListBox = new wxListBox(_animationPanel, wxID_ANY);
-    _animationsListBox->SetMinSize(wxSize(400, 100));
-    _animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &ModelResourcePanel::OnAnimationsListBoxDoubleClick, this);
-    auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Animations");
-    animationsSizer->Add(_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    auto lipLoadBtn = new wxButton(_animationPanel, wxID_ANY, "Load LIP...");
+    animPlaybackSizer->Add(m_animPauseResumeBtn, wxSizerFlags(0).Center().Border(wxALL, 3));
+    animPlaybackSizer->Add(m_animTimeSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    animPlaybackSizer->Add(m_animTimeCtrl, wxSizerFlags(0).Center().Border(wxALL, 3));
+    m_animationsListBox = new wxListBox(m_animationPanel, wxID_ANY);
+    m_animationsListBox->SetMinSize(wxSize(400, 100));
+    m_animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &ModelResourcePanel::OnAnimationsListBoxDoubleClick, this);
+    auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, m_animationPanel, "Animations");
+    animationsSizer->Add(m_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    auto lipLoadBtn = new wxButton(m_animationPanel, wxID_ANY, "Load LIP...");
     lipLoadBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnLipLoadCommand, this);
-    auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, _animationPanel, "Lip Sync");
+    auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, m_animationPanel, "Lip Sync");
     lipSyncSizer->Add(lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
     auto animationHSizer = new wxBoxSizer(wxHORIZONTAL);
     animationHSizer->Add(animationsSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
@@ -77,67 +77,67 @@ void ModelResourcePanel::OnEngineLoadRequested() {
     auto animationVSizer = new wxBoxSizer(wxVERTICAL);
     animationVSizer->Add(animPlaybackSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     animationVSizer->Add(animationHSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    _animationPanel->SetSizer(animationVSizer);
+    m_animationPanel->SetSizer(animationVSizer);
 
-    _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
+    m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, std::numeric_limits<int>::max());
 
-    _viewModel->get().animations().addChangedHandler([this](const auto &animations) {
+    m_viewModel->get().animations().addChangedHandler([this](const auto &animations) {
         if (!animations.empty()) {
-            _animationsListBox->Freeze();
-            _animationsListBox->Clear();
+            m_animationsListBox->Freeze();
+            m_animationsListBox->Clear();
             for (auto &animation : animations) {
-                _animationsListBox->Append(animation);
+                m_animationsListBox->Append(animation);
             }
-            _animationsListBox->Thaw();
-            _renderSplitter->SplitHorizontally(_glCanvas, _animationPanel, std::numeric_limits<int>::max());
+            m_animationsListBox->Thaw();
+            m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, std::numeric_limits<int>::max());
         } else {
-            _renderSplitter->Unsplit();
+            m_renderSplitter->Unsplit();
         }
     });
-    _viewModel->get().animationProgress().addChangedHandler([this](const auto &progress) {
-        _animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
-        int value = static_cast<int>(_animTimeSlider->GetMax() * (progress.time / progress.duration));
-        _animTimeSlider->SetValue(value);
+    m_viewModel->get().animationProgress().addChangedHandler([this](const auto &progress) {
+        m_animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
+        int value = static_cast<int>(m_animTimeSlider->GetMax() * (progress.time / progress.duration));
+        m_animTimeSlider->SetValue(value);
     });
 }
 
 void ModelResourcePanel::OnGLCanvasPaint(wxPaintEvent &event) {
-    wxPaintDC dc(_glCanvas);
+    wxPaintDC dc(m_glCanvas);
 
-    auto clientSize = _glCanvas->GetClientSize();
-    _viewModel->get().render3D(clientSize.x, clientSize.y);
+    auto clientSize = m_glCanvas->GetClientSize();
+    m_viewModel->get().render3D(clientSize.x, clientSize.y);
 
-    _glCanvas->SwapBuffers();
+    m_glCanvas->SwapBuffers();
 }
 
 void ModelResourcePanel::OnGLCanvasMouseWheel(wxMouseEvent &event) {
     auto delta = event.GetWheelDelta() * event.GetWheelRotation();
-    _viewModel->get().onGLCanvasMouseWheel(delta);
+    m_viewModel->get().onGLCanvasMouseWheel(delta);
 }
 
 void ModelResourcePanel::OnGLCanvasMouseMotion(wxMouseEvent &event) {
-    wxClientDC dc(_glCanvas);
+    wxClientDC dc(m_glCanvas);
     auto position = event.GetLogicalPosition(dc);
-    _viewModel->get().onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
+    m_viewModel->get().onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
 void ModelResourcePanel::OnAnimPauseResumeCommand(wxCommandEvent &event) {
-    if (_viewModel->get().isAnimationPlaying()) {
-        _viewModel->get().pauseAnimation();
-        _animPauseResumeBtn->SetLabelText("Resume");
+    if (m_viewModel->get().isAnimationPlaying()) {
+        m_viewModel->get().pauseAnimation();
+        m_animPauseResumeBtn->SetLabelText("Resume");
     } else {
-        _viewModel->get().resumeAnimation();
-        _animPauseResumeBtn->SetLabelText("Pause");
+        m_viewModel->get().resumeAnimation();
+        m_animPauseResumeBtn->SetLabelText("Pause");
     }
 }
 
 void ModelResourcePanel::OnAnimTimeSliderCommand(wxCommandEvent &event) {
-    float duration = _viewModel->get().animationProgress()->duration;
+    float duration = m_viewModel->get().animationProgress()->duration;
     if (duration == 0.0f) {
         return;
     }
-    float time = duration * _animTimeSlider->GetValue() / static_cast<float>(_animTimeSlider->GetMax());
-    _viewModel->get().setAnimationTime(time);
+    float time = duration * m_animTimeSlider->GetValue() / static_cast<float>(m_animTimeSlider->GetMax());
+    m_viewModel->get().setAnimationTime(time);
 }
 
 void ModelResourcePanel::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
@@ -145,9 +145,9 @@ void ModelResourcePanel::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
     if (selection == -1) {
         return;
     }
-    auto animation = _animationsListBox->GetString(selection);
-    _viewModel->get().playAnimation(animation.ToStdString());
-    _animPauseResumeBtn->SetLabelText("Pause");
+    auto animation = m_animationsListBox->GetString(selection);
+    m_viewModel->get().playAnimation(animation.ToStdString());
+    m_animPauseResumeBtn->SetLabelText("Pause");
 }
 
 void ModelResourcePanel::OnLipLoadCommand(wxCommandEvent &event) {
@@ -165,8 +165,8 @@ void ModelResourcePanel::OnLipLoadCommand(wxCommandEvent &event) {
     auto lip = FileInputStream(path);
     auto reader = LipReader(lip, "");
     reader.load();
-    _lipAnim = reader.animation();
-    _viewModel->get().playAnimation("talk", _lipAnim.get());
+    m_lipAnim = reader.animation();
+    m_viewModel->get().playAnimation("talk", m_lipAnim.get());
 }
 
 } // namespace reone

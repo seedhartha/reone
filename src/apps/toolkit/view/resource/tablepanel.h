@@ -36,9 +36,9 @@ public:
                        wxWindow *parent);
 
 private:
-    TableResourceViewModel &_viewModel;
+    TableResourceViewModel &m_viewModel;
 
-    wxDataViewListCtrl *_tableCtrl;
+    wxDataViewListCtrl *m_tableCtrl;
 
     void RefreshDataView();
 };

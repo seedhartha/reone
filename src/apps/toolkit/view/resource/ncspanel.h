@@ -38,8 +38,8 @@ public:
                      wxWindow *parent);
 
 private:
-    resource::GameID _gameId;
-    NCSResourceViewModel &_viewModel;
+    resource::GameID m_gameId;
+    NCSResourceViewModel &m_viewModel;
 };
 
 } // namespace reone

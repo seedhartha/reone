@@ -26,46 +26,46 @@ namespace reone {
 ImageResourcePanel::ImageResourcePanel(ImageResourceViewModel &viewModel,
                                        wxWindow *parent) :
     wxPanel(parent),
-    _viewModel(viewModel) {
+    m_viewModel(viewModel) {
 
-    _imageSplitter = new wxSplitterWindow(this, wxID_ANY);
-    _imageCanvas = new wxPanel(_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    _imageCanvas->Bind(wxEVT_PAINT, &ImageResourcePanel::OnImageCanvasPaint, this);
-    _imageInfoCtrl = new wxTextCtrl(_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    _imageInfoCtrl->SetEditable(false);
-    _imageSplitter->SetMinimumPaneSize(100);
-    _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+    m_imageSplitter = new wxSplitterWindow(this, wxID_ANY);
+    m_imageCanvas = new wxPanel(m_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+    m_imageCanvas->Bind(wxEVT_PAINT, &ImageResourcePanel::OnImageCanvasPaint, this);
+    m_imageInfoCtrl = new wxTextCtrl(m_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    m_imageInfoCtrl->SetEditable(false);
+    m_imageSplitter->SetMinimumPaneSize(100);
+    m_imageSplitter->SplitHorizontally(m_imageCanvas, m_imageInfoCtrl, std::numeric_limits<int>::max());
 
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(_imageSplitter, wxSizerFlags(1).Expand());
+    sizer->Add(m_imageSplitter, wxSizerFlags(1).Expand());
     SetSizer(sizer);
 
-    _viewModel.imageContent().addChangedHandler([this](const auto &data) {
+    m_viewModel.imageContent().addChangedHandler([this](const auto &data) {
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();
         image.LoadFile(stream, wxBITMAP_TYPE_TGA);
-        _image = std::make_unique<wxBitmap>(image);
-        _imageInfoCtrl->Clear();
-        _imageInfoCtrl->AppendText(std::string(data.txiBytes->begin(), data.txiBytes->end()));
+        m_image = std::make_unique<wxBitmap>(image);
+        m_imageInfoCtrl->Clear();
+        m_imageInfoCtrl->AppendText(std::string(data.txiBytes->begin(), data.txiBytes->end()));
         if (!data.txiBytes->empty()) {
-            _imageSplitter->SplitHorizontally(_imageCanvas, _imageInfoCtrl, std::numeric_limits<int>::max());
+            m_imageSplitter->SplitHorizontally(m_imageCanvas, m_imageInfoCtrl, std::numeric_limits<int>::max());
         } else {
-            _imageSplitter->Unsplit(_imageInfoCtrl);
+            m_imageSplitter->Unsplit(m_imageInfoCtrl);
         }
     });
 }
 
 void ImageResourcePanel::OnImageCanvasPaint(wxPaintEvent &event) {
-    wxPaintDC dc(_imageCanvas);
+    wxPaintDC dc(m_imageCanvas);
 
-    if (!_image) {
+    if (!m_image) {
         return;
     }
     int w, h;
     dc.GetSize(&w, &h);
-    int x = (w - _image->GetWidth()) / 2;
-    int y = (h - _image->GetHeight()) / 2;
-    dc.DrawBitmap(*_image, x, y, true);
+    int x = (w - m_image->GetWidth()) / 2;
+    int y = (h - m_image->GetHeight()) / 2;
+    dc.DrawBitmap(*m_image, x, y, true);
 }
 
 } // namespace reone

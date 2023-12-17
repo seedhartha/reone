@@ -38,12 +38,12 @@ public:
                        wxWindow *parent);
 
 private:
-    ImageResourceViewModel &_viewModel;
+    ImageResourceViewModel &m_viewModel;
 
-    wxSplitterWindow *_imageSplitter {nullptr};
-    wxPanel *_imageCanvas {nullptr};
-    wxTextCtrl *_imageInfoCtrl {nullptr};
-    std::unique_ptr<wxBitmap> _image;
+    wxSplitterWindow *m_imageSplitter {nullptr};
+    wxPanel *m_imageCanvas {nullptr};
+    wxTextCtrl *m_imageInfoCtrl {nullptr};
+    std::unique_ptr<wxBitmap> m_image;
 
     void OnImageCanvasPaint(wxPaintEvent &event);
 };

@@ -35,7 +35,7 @@ public:
                      wxWindow *parent);
 
 private:
-    NSSResourceViewModel &_viewModel;
+    NSSResourceViewModel &m_viewModel;
 };
 
 } // namespace reone

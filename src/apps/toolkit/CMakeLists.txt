@@ -20,7 +20,6 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/binding/collection.h
     ${TOOLKIT_SOURCE_DIR}/binding/command.h
     ${TOOLKIT_SOURCE_DIR}/binding/property.h
-    ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.h
@@ -30,6 +29,7 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/view/resource/nsspanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/tablepanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/textpanel.h
+    ${TOOLKIT_SOURCE_DIR}/view/tool/composelipdialog.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.h
@@ -44,7 +44,6 @@ set(TOOLKIT_HEADERS
 set(TOOLKIT_SOURCES
     ${CMAKE_SOURCE_DIR}/src/apps/highperfgfx.cpp
     ${TOOLKIT_SOURCE_DIR}/app.cpp
-    ${TOOLKIT_SOURCE_DIR}/view/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.cpp
@@ -54,6 +53,7 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/view/resource/nsspanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/tablepanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/textpanel.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/tool/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp

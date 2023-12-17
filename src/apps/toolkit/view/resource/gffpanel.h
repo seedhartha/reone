@@ -65,8 +65,8 @@ public:
                      wxWindow *parent);
 
 private:
-    GFFResourceViewModel &_viewModel;
-    const resource::TalkTable &_talkTable;
+    GFFResourceViewModel &m_viewModel;
+    const resource::TalkTable &m_talkTable;
 
     void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl,
                                wxDataViewItem parent,

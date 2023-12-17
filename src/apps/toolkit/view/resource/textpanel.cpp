@@ -23,15 +23,15 @@ namespace reone {
 
 TextResourcePanel::TextResourcePanel(TextResourceViewModel &viewModel, wxWindow *parent) :
     wxPanel(parent),
-    _viewModel(viewModel) {
+    m_viewModel(viewModel) {
 
     auto textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     textCtrl->AppendText(viewModel.content());
     textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
         auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
         auto text = ctrl->GetValue().ToStdString();
-        _viewModel.content() = text;
-        _viewModel.modified() = true;
+        m_viewModel.content() = text;
+        m_viewModel.modified() = true;
     });
     // textCtrl->SetEditable(false);
 

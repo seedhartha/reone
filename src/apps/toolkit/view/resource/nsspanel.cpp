@@ -26,7 +26,7 @@ namespace reone {
 NSSResourcePanel::NSSResourcePanel(NSSResourceViewModel &viewModel,
                                    wxWindow *parent) :
     wxPanel(parent),
-    _viewModel(viewModel) {
+    m_viewModel(viewModel) {
 
     auto textCtrl = new wxStyledTextCtrl(this);
     textCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
