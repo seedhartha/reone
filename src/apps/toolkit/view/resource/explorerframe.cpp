@@ -263,22 +263,28 @@ void ResourceExplorerFrame::SaveFile() {
     auto &page = _viewModel->pages().at(pageIdx);
     checkThat(page->dirty, "Page must have dirty flag set");
 
-    if (page->type == PageType::GFF) {
-        auto filename = page->resourceId.string();
-        auto &ext = getExtByResType(page->resourceId.type);
+    auto filename = page->resourceId.string();
+    auto &ext = getExtByResType(page->resourceId.type);
+    auto destFileDialog = wxFileDialog(
+        this,
+        "Choose destination file",
+        wxEmptyString,
+        filename,
+        str(boost::format("*.%1%") % ext),
+        wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if (destFileDialog.ShowModal() != wxID_OK) {
+        return;
+    }
+    auto destPath = std::filesystem::path(destFileDialog.GetPath().ToStdString());
+
+    if (page->type == PageType::Text) {
+        auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page->viewModel);
+        auto &text = viewModel.content();
+        FileOutputStream stream {destPath};
+        stream.write(&text[0], text.size());
+    } else if (page->type == PageType::GFF) {
         auto &viewModel = *std::static_pointer_cast<GFFResourceViewModel>(page->viewModel);
         auto &gff = viewModel.content();
-        auto destFileDialog = wxFileDialog(
-            this,
-            "Choose destination file",
-            wxEmptyString,
-            filename,
-            str(boost::format("*.%1%") % ext),
-            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-        if (destFileDialog.ShowModal() != wxID_OK) {
-            return;
-        }
-        auto destPath = std::filesystem::path(destFileDialog.GetPath().ToStdString());
         FileOutputStream stream {destPath};
         GffWriter writer {page->resourceId.type, gff};
         writer.save(stream);
@@ -287,8 +293,22 @@ void ResourceExplorerFrame::SaveFile() {
 
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     switch (page.type) {
-    case PageType::Text:
-        return new TextResourcePanel {*std::static_pointer_cast<TextResourceViewModel>(page.viewModel), _notebook};
+    case PageType::Text: {
+        auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);
+        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
+            for (size_t i = 0; i < _viewModel->pages()->size(); ++i) {
+                const auto &p = _viewModel->pages().at(i);
+                if (p->resourceId != page.resourceId) {
+                    continue;
+                }
+                _notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
+                _saveFileMenuItem->Enable(_notebook->GetSelection() == i);
+                break;
+            }
+            page.dirty = true;
+        });
+        return new TextResourcePanel {viewModel, _notebook};
+    }
     case PageType::Table:
         return new TableResourcePanel {*std::static_pointer_cast<TableResourceViewModel>(page.viewModel), _notebook};
     case PageType::GFF: {

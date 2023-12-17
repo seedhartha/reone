@@ -27,7 +27,13 @@ TextResourcePanel::TextResourcePanel(TextResourceViewModel &viewModel, wxWindow 
 
     auto textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     textCtrl->AppendText(viewModel.content());
-    textCtrl->SetEditable(false);
+    textCtrl->Bind(wxEVT_TEXT, [this, &textCtrl](const auto &event) {
+        auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
+        auto text = ctrl->GetValue().ToStdString();
+        _viewModel.content() = text;
+        _viewModel.modified() = true;
+    });
+    // textCtrl->SetEditable(false);
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(textCtrl, 1, wxEXPAND);
