@@ -41,6 +41,7 @@
 #include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
+#include "reone/script/format/ncswriter.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/hexutil.h"
 #include "reone/system/stream/fileinput.h"
@@ -58,6 +59,7 @@
 #include "reone/tools/legacy/ssf.h"
 #include "reone/tools/legacy/tlk.h"
 #include "reone/tools/legacy/tpc.h"
+#include "reone/tools/script/format/pcodereader.h"
 
 #include "../../viewmodel/resource/gff.h"
 #include "../../viewmodel/resource/ncs.h"
@@ -81,6 +83,7 @@ using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
@@ -351,6 +354,17 @@ void ResourceExplorerFrame::SaveFile() {
         default:
             break;
         }
+    } else if (page->type == PageType::NCS) {
+        auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page->viewModel);
+        auto &content = viewModel.content();
+        MemoryInputStream stream {content};
+        Routines routines {_viewModel->gameId(), nullptr, nullptr};
+        routines.init();
+        PcodeReader reader {page->resourceId.resRef.value(), stream, routines};
+        reader.load();
+        auto program = reader.program();
+        NcsWriter writer {*program};
+        writer.save(destPath);
     }
 }
 
@@ -404,8 +418,22 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
         });
         return new GFFResourcePanel {viewModel, _viewModel->talkTable(), _notebook};
     }
-    case PageType::NCS:
-        return new NCSResourcePanel {*std::static_pointer_cast<NCSResourceViewModel>(page.viewModel), _notebook};
+    case PageType::NCS: {
+        auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page.viewModel);
+        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
+            for (size_t i = 0; i < _viewModel->pages()->size(); ++i) {
+                const auto &p = _viewModel->pages().at(i);
+                if (p->resourceId != page.resourceId) {
+                    continue;
+                }
+                _notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
+                _saveFileMenuItem->Enable(_notebook->GetSelection() == i);
+                break;
+            }
+            page.dirty = true;
+        });
+        return new NCSResourcePanel {_viewModel->gameId(), viewModel, _notebook};
+    }
     case PageType::NSS:
         return new NSSResourcePanel {*std::static_pointer_cast<NSSResourceViewModel>(page.viewModel), _notebook};
     default:

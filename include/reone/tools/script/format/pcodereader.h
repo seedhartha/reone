@@ -21,14 +21,19 @@
 
 namespace reone {
 
+class IInputStream;
+
 namespace script {
 
 class IRoutines;
 
 class PcodeReader {
 public:
-    PcodeReader(std::filesystem::path path, IRoutines &routines) :
-        _path(std::move(path)),
+    PcodeReader(std::string programName,
+                IInputStream &pcode,
+                IRoutines &routines) :
+        _programName(std::move(programName)),
+        _pcode(pcode),
         _routines(routines) {
     }
 
@@ -37,7 +42,8 @@ public:
     std::shared_ptr<ScriptProgram> program() { return _program; }
 
 private:
-    std::filesystem::path _path;
+    std::string _programName;
+    IInputStream &_pcode;
     IRoutines &_routines;
 
     std::shared_ptr<ScriptProgram> _program;

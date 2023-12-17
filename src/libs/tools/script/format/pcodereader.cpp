@@ -20,6 +20,7 @@
 #include "reone/script/instrutil.h"
 #include "reone/script/routines.h"
 #include "reone/system/exception/validation.h"
+#include "reone/system/textreader.h"
 
 namespace reone {
 
@@ -30,40 +31,35 @@ void PcodeReader::load() {
     std::map<int, std::string> labelByLineIdx;
     std::map<int, uint32_t> addrByLineIdx;
 
-    std::ifstream pcode(_path);
-    std::string line;
+    TextReader reader {_pcode};
     std::smatch what;
     std::regex labelRegex("^([_\\d\\w]+):$");
     uint32_t addr = 13;
-    while (getline(pcode, line)) {
-        auto addrSepIdx = line.find_first_of("\t");
+    while (auto line = reader.readLine()) {
+        auto addrSepIdx = line->find_first_of("\t");
         if (addrSepIdx != std::string::npos) {
-            line = line.substr(addrSepIdx + 1);
+            line = line->substr(addrSepIdx + 1);
         }
-        boost::trim(line);
-        if (line.empty()) {
+        boost::trim(*line);
+        if (line->empty()) {
             continue;
         }
         int lineIdx = static_cast<int>(insLines.size());
-        if (std::regex_match(line, what, labelRegex)) {
+        if (std::regex_match(*line, what, labelRegex)) {
             labelByLineIdx[lineIdx] = what[1].str();
             continue;
         }
         addrByLineIdx[lineIdx] = addr;
-        addr += getInstructionSize(line);
-        insLines.push_back(line);
+        addr += getInstructionSize(*line);
+        insLines.push_back(*line);
     }
-
-    std::filesystem::path filename(_path.filename());
-    filename.replace_extension(); // drop .pcode
-    filename.replace_extension(); // drop .ncs
 
     _addrByLabel.clear();
     for (auto &pair : labelByLineIdx) {
         _addrByLabel[pair.second] = addrByLineIdx[pair.first];
     }
 
-    _program = std::make_shared<ScriptProgram>(filename.string());
+    _program = std::make_shared<ScriptProgram>(_programName);
     for (size_t i = 0; i < insLines.size(); ++i) {
         uint32_t insAddr = addrByLineIdx.find(static_cast<int>(i))->second;
         _program->add(parseInstruction(insLines[i], insAddr));

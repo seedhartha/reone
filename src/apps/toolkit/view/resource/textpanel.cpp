@@ -27,7 +27,7 @@ TextResourcePanel::TextResourcePanel(TextResourceViewModel &viewModel, wxWindow 
 
     auto textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     textCtrl->AppendText(viewModel.content());
-    textCtrl->Bind(wxEVT_TEXT, [this, &textCtrl](const auto &event) {
+    textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
         auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
         auto text = ctrl->GetValue().ToStdString();
         _viewModel.content() = text;

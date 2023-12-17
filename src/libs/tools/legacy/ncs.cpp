@@ -85,7 +85,15 @@ void NcsTool::toPCODE(IInputStream &ncs, IOutputStream &pcode, Routines &routine
 }
 
 void NcsTool::toNCS(const std::filesystem::path &input, const std::filesystem::path &outputDir, Routines &routines) {
-    PcodeReader pcode(input, routines);
+    std::string programName {input.string()};
+    auto dotFirstIdx = programName.find_first_of(".");
+    if (dotFirstIdx != -1) {
+        programName = programName.substr(0, dotFirstIdx);
+    }
+
+    FileInputStream pcodeFile {input};
+
+    PcodeReader pcode(std::move(programName), pcodeFile, routines);
     pcode.load();
     auto program = pcode.program();
 

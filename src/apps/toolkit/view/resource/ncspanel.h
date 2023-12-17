@@ -25,16 +25,20 @@
 
 #include <wx/panel.h>
 
+#include "reone/resource/types.h"
+
 namespace reone {
 
 class NCSResourceViewModel;
 
 class NCSResourcePanel : public wxPanel {
 public:
-    NCSResourcePanel(NCSResourceViewModel &viewModel,
+    NCSResourcePanel(resource::GameID gameId,
+                     NCSResourceViewModel &viewModel,
                      wxWindow *parent);
 
 private:
+    resource::GameID _gameId;
     NCSResourceViewModel &_viewModel;
 };
 

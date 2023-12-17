@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../binding/property.h"
 #include "../../viewmodel.h"
 
 namespace reone {
@@ -27,12 +28,18 @@ public:
         _content(std::move(content)) {
     }
 
-    const std::string &content() const {
+    Property<bool> &modified() {
+        return _modified;
+    }
+
+    std::string &content() {
         return _content;
     }
 
 private:
     std::string _content;
+
+    Property<bool> _modified;
 };
 
 } // namespace reone
