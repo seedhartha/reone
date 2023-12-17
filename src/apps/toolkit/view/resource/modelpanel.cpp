@@ -48,7 +48,7 @@ void ModelResourcePanel::OnEngineLoadRequested() {
     glCtxAttrs.CoreProfile().OGLVersion(3, 3).EndList();
     auto glContext = new wxGLContext(m_glCanvas, nullptr, &glCtxAttrs);
 #else
-    auto glContext = new wxGLContext(_glCanvas);
+    auto glContext = new wxGLContext(m_glCanvas);
 #endif
     glContext->SetCurrent(*m_glCanvas);
 
