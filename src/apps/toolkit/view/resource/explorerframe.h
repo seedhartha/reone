@@ -131,8 +131,6 @@ private:
     void OnPopupCommandSelected(wxCommandEvent &event);
 
     // END Events
-
-    wxDECLARE_EVENT_TABLE();
 };
 
 } // namespace reone

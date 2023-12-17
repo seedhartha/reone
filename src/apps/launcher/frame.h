@@ -91,8 +91,6 @@ private:
 
     void LoadConfiguration();
     void SaveConfiguration();
-
-    wxDECLARE_EVENT_TABLE();
 };
 
 } // namespace reone

@@ -291,6 +291,9 @@ LauncherFrame::LauncherFrame() :
     topSizer2->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     SetSizerAndFit(topSizer2);
+
+    Bind(wxEVT_BUTTON, &LauncherFrame::OnLaunch, this, WindowID::launch);
+    Bind(wxEVT_BUTTON, &LauncherFrame::OnSaveConfig, this, WindowID::saveConfig);
 }
 
 void LauncherFrame::LoadConfiguration() {
@@ -505,10 +508,5 @@ void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
         _textCtrlGameDir->SetValue(dlg.GetPath());
     }
 }
-
-wxBEGIN_EVENT_TABLE(LauncherFrame, wxFrame)                       //
-    EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)         //
-    EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig) //
-    wxEND_EVENT_TABLE()
 
 } // namespace reone

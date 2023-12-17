@@ -71,8 +71,6 @@ private:
     void OnHelpCommmand(wxCommandEvent &evt);
     void OnPronounciationSaveCommand(wxCommandEvent &evt);
     void OnComposeCommand(wxCommandEvent &evt);
-
-    wxDECLARE_EVENT_TABLE();
 };
 
 } // namespace reone

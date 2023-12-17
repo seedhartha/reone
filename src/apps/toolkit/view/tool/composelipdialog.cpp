@@ -349,7 +349,4 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
     writer.save(destPath);
 }
 
-wxBEGIN_EVENT_TABLE(ComposeLipDialog, wxDialog)
-    wxEND_EVENT_TABLE()
-
 } // namespace reone

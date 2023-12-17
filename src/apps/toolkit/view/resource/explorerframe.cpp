@@ -261,6 +261,29 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     m_viewModel->onViewCreated();
 
     // CreateStatusBar();
+
+    Bind(wxEVT_CLOSE_WINDOW, &ResourceExplorerFrame::OnClose, this);
+    Bind(wxEVT_IDLE, &ResourceExplorerFrame::OnIdle, this);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnOpenDirectoryCommand, this, EventHandlerID::openDir);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnSaveFileCommand, this, EventHandlerID::saveFile);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractToolCommand, this, EventHandlerID::extractTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnUnwrapToolCommand, this, EventHandlerID::unwrapTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToRimToolCommand, this, EventHandlerID::toRimTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToErfToolCommand, this, EventHandlerID::toErfTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToModToolCommand, this, EventHandlerID::toModTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToXmlToolCommand, this, EventHandlerID::toXmlTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTwoDaToolCommand, this, EventHandlerID::toTwoDaTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToGffToolCommand, this, EventHandlerID::toGffTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTlkToolCommand, this, EventHandlerID::toTlkTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToLipToolCommand, this, EventHandlerID::toLipTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToSsfToolCommand, this, EventHandlerID::toSsfTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToTgaToolCommand, this, EventHandlerID::toTgaTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToPcodeToolCommand, this, EventHandlerID::toPcodeTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNcsToolCommand, this, EventHandlerID::toNcsTool);
+    Bind(wxEVT_MENU, &ResourceExplorerFrame::OnToNssToolCommand, this, EventHandlerID::toNssTool);
 }
 
 void ResourceExplorerFrame::SaveFile() {
@@ -782,30 +805,5 @@ void ResourceExplorerFrame::InvokeTool(Operation operation) {
         wxMessageBox("Tool not found", "Error", wxICON_ERROR);
     }
 }
-
-wxBEGIN_EVENT_TABLE(ResourceExplorerFrame, wxFrame)
-    EVT_CLOSE(ResourceExplorerFrame::OnClose)                                                     //
-    EVT_IDLE(ResourceExplorerFrame::OnIdle)                                                       //
-    EVT_MENU(EventHandlerID::openDir, ResourceExplorerFrame::OnOpenDirectoryCommand)              //
-    EVT_MENU(EventHandlerID::saveFile, ResourceExplorerFrame::OnSaveFileCommand)                  //
-    EVT_MENU(EventHandlerID::extractAllBifs, ResourceExplorerFrame::OnExtractAllBifsCommand)      //
-    EVT_MENU(EventHandlerID::batchTpcToTga, ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand) //
-    EVT_MENU(EventHandlerID::composeLip, ResourceExplorerFrame::OnComposeLipCommand)              //
-    EVT_MENU(EventHandlerID::extractTool, ResourceExplorerFrame::OnExtractToolCommand)            //
-    EVT_MENU(EventHandlerID::unwrapTool, ResourceExplorerFrame::OnUnwrapToolCommand)              //
-    EVT_MENU(EventHandlerID::toRimTool, ResourceExplorerFrame::OnToRimToolCommand)                //
-    EVT_MENU(EventHandlerID::toErfTool, ResourceExplorerFrame::OnToErfToolCommand)                //
-    EVT_MENU(EventHandlerID::toModTool, ResourceExplorerFrame::OnToModToolCommand)                //
-    EVT_MENU(EventHandlerID::toXmlTool, ResourceExplorerFrame::OnToXmlToolCommand)                //
-    EVT_MENU(EventHandlerID::toTwoDaTool, ResourceExplorerFrame::OnToTwoDaToolCommand)            //
-    EVT_MENU(EventHandlerID::toGffTool, ResourceExplorerFrame::OnToGffToolCommand)                //
-    EVT_MENU(EventHandlerID::toTlkTool, ResourceExplorerFrame::OnToTlkToolCommand)                //
-    EVT_MENU(EventHandlerID::toLipTool, ResourceExplorerFrame::OnToLipToolCommand)                //
-    EVT_MENU(EventHandlerID::toSsfTool, ResourceExplorerFrame::OnToSsfToolCommand)                //
-    EVT_MENU(EventHandlerID::toTgaTool, ResourceExplorerFrame::OnToTgaToolCommand)                //
-    EVT_MENU(EventHandlerID::toPcodeTool, ResourceExplorerFrame::OnToPcodeToolCommand)            //
-    EVT_MENU(EventHandlerID::toNcsTool, ResourceExplorerFrame::OnToNcsToolCommand)                //
-    EVT_MENU(EventHandlerID::toNssTool, ResourceExplorerFrame::OnToNssToolCommand)                //
-    wxEND_EVENT_TABLE()
 
 } // namespace reone
