@@ -316,27 +316,26 @@ PageType ResourceExplorerViewModel::getPageType(ResType type) const {
     }
 }
 
-void ResourceExplorerViewModel::loadGameDirectory() {
-    auto tslExePath = findFileIgnoreCase(_gamePath, "swkotor2.exe");
-    _gameId = tslExePath ? GameID::TSL : GameID::KotOR;
-
-    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
-    auto key = FileInputStream(keyPath);
-    auto keyReader = KeyReader(key);
-    keyReader.load();
-    _keyKeys = keyReader.keys();
-    _keyFiles = keyReader.files();
-
-    auto tlkPath = getFileIgnoreCase(_gamePath, "dialog.tlk");
-    auto tlk = FileInputStream(tlkPath);
-    auto tlkReader = TlkReader(tlk);
-    tlkReader.load();
-    _talkTable = tlkReader.table();
-
+void ResourceExplorerViewModel::loadResources() {
+    auto keyPath = findFileIgnoreCase(_resourcesPath, "chitin.key");
+    if (keyPath) {
+        auto key = FileInputStream(*keyPath);
+        auto keyReader = KeyReader(key);
+        keyReader.load();
+        _keyKeys = keyReader.keys();
+        _keyFiles = keyReader.files();
+    }
+    auto tlkPath = findFileIgnoreCase(_resourcesPath, "dialog.tlk");
+    if (tlkPath) {
+        auto tlk = FileInputStream(*tlkPath);
+        auto tlkReader = TlkReader(tlk);
+        tlkReader.load();
+        _talkTable = tlkReader.table();
+    }
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
 
-    for (auto &file : std::filesystem::directory_iterator(_gamePath)) {
+    for (auto &file : std::filesystem::directory_iterator(_resourcesPath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         bool container;
@@ -356,7 +355,7 @@ void ResourceExplorerViewModel::loadGameDirectory() {
             auto resRef = filename.substr(0, filename.size() - 4);
             item->resId = std::make_unique<ResourceId>(resRef, ResType::Tlk);
         }
-        _gameDirItems.push_back(std::move(item));
+        _resItems.push_back(std::move(item));
     }
 
     _graphicsOpt.grass = false;
@@ -371,7 +370,7 @@ void ResourceExplorerViewModel::loadGameDirectory() {
     _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>(_audioOpt);
     _scriptModule = std::make_unique<ScriptModule>();
-    _resourceModule = std::make_unique<ResourceModule>(GameID::KotOR, _gamePath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
+    _resourceModule = std::make_unique<ResourceModule>(_gameId, _resourcesPath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
     _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
 
     _modelResViewModel = std::make_unique<ModelResourceViewModel>(*_systemModule, *_graphicsModule, *_resourceModule, *_sceneModule);
@@ -393,7 +392,7 @@ void ResourceExplorerViewModel::loadTools() {
 }
 
 void ResourceExplorerViewModel::loadEngine() {
-    if (_engineLoaded || _gamePath.empty()) {
+    if (_engineLoaded || _resourcesPath.empty()) {
         return;
     }
     _engineLoadRequested = true;
@@ -404,11 +403,11 @@ void ResourceExplorerViewModel::loadEngine() {
     _resourceModule->init();
     _sceneModule->init();
 
-    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto keyPath = getFileIgnoreCase(_resourcesPath, "chitin.key");
     auto shaderPackPath = getFileIgnoreCase(std::filesystem::current_path(), "shaderpack.erf");
-    auto guiTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_gui.erf");
-    auto tpaTexPackPath = getFileIgnoreCase(_gamePath, "texturepacks/swpc_tex_tpa.erf");
-    auto overridePath = getFileIgnoreCase(_gamePath, "override");
+    auto guiTexPackPath = getFileIgnoreCase(_resourcesPath, "texturepacks/swpc_tex_gui.erf");
+    auto tpaTexPackPath = getFileIgnoreCase(_resourcesPath, "texturepacks/swpc_tex_tpa.erf");
+    auto overridePath = getFileIgnoreCase(_resourcesPath, "override");
 
     auto &resources = _resourceModule->resources();
     resources.addKEY(keyPath);
@@ -422,8 +421,8 @@ void ResourceExplorerViewModel::loadEngine() {
     _engineLoaded = true;
 }
 
-void ResourceExplorerViewModel::decompile(GameDirectoryItemId itemId, bool optimize) {
-    auto &item = *_idToGameDirItem.at(itemId);
+void ResourceExplorerViewModel::decompile(ResourcesItemId itemId, bool optimize) {
+    auto &item = *_idToResItem.at(itemId);
 
     withResourceStream(item, [this, &item, &optimize](auto &res) {
         auto nssBytes = ByteBuffer();
@@ -439,7 +438,7 @@ void ResourceExplorerViewModel::decompile(GameDirectoryItemId itemId, bool optim
 void ResourceExplorerViewModel::extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath) {
     auto extension = boost::to_lower_copy(srcPath.extension().string());
     if (extension == ".bif") {
-        auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+        auto keyPath = getFileIgnoreCase(_resourcesPath, "chitin.key");
         auto key = FileInputStream(keyPath);
         auto keyReader = KeyReader(key);
         keyReader.load();
@@ -465,8 +464,8 @@ void ResourceExplorerViewModel::extractArchive(const std::filesystem::path &srcP
     }
 }
 
-void ResourceExplorerViewModel::exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath) {
-    auto &item = *_idToGameDirItem.at(itemId);
+void ResourceExplorerViewModel::exportFile(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
         exportedPath.append(item.resId->string());
@@ -487,7 +486,7 @@ void ResourceExplorerViewModel::exportFile(GameDirectoryItemId itemId, const std
 void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &destPath) {
     auto tool = KeyBifTool();
 
-    auto keyPath = getFileIgnoreCase(_gamePath, "chitin.key");
+    auto keyPath = getFileIgnoreCase(_resourcesPath, "chitin.key");
     auto key = FileInputStream(keyPath);
     auto keyReader = KeyReader(key);
     keyReader.load();
@@ -500,7 +499,7 @@ void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &dest
     int bifIdx = 0;
     for (auto &file : _keyFiles) {
         auto cleanedFilename = boost::replace_all_copy(file.filename, "\\", "/");
-        auto bifPath = findFileIgnoreCase(_gamePath, cleanedFilename);
+        auto bifPath = findFileIgnoreCase(_resourcesPath, cleanedFilename);
         if (!bifPath) {
             continue;
         }
@@ -550,7 +549,7 @@ bool ResourceExplorerViewModel::invokeTool(Operation operation,
         if (!tool->supports(operation, srcPath)) {
             continue;
         }
-        tool->invoke(operation, srcPath, destPath, _gamePath);
+        tool->invoke(operation, srcPath, destPath, _resourcesPath);
         return true;
     }
     return false;
@@ -644,26 +643,27 @@ void ResourceExplorerViewModel::onNotebookPageClose(int page) {
     }
 }
 
-void ResourceExplorerViewModel::onGameDirectoryChanged(std::filesystem::path path) {
-    _gamePath = path;
-    _gameDirItems.clear();
-    _idToGameDirItem.clear();
+void ResourceExplorerViewModel::onResourcesDirectoryChanged(GameID gameId, std::filesystem::path path) {
+    _gameId = gameId;
+    _resourcesPath = path;
+    _resItems.clear();
+    _idToResItem.clear();
 
-    loadGameDirectory();
+    loadResources();
     loadTools();
 }
 
-void ResourceExplorerViewModel::onGameDirectoryItemIdentified(int index, GameDirectoryItemId id) {
-    auto &item = _gameDirItems[index];
+void ResourceExplorerViewModel::onResourcesItemIdentified(int index, ResourcesItemId id) {
+    auto &item = _resItems[index];
     item->id = id;
-    _idToGameDirItem.insert(std::make_pair(id, item.get()));
+    _idToResItem.insert(std::make_pair(id, item.get()));
 }
 
-void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId id) {
-    if (_idToGameDirItem.count(id) == 0) {
+void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
+    if (_idToResItem.count(id) == 0) {
         return;
     }
-    auto &expandingItem = *_idToGameDirItem.at(id);
+    auto &expandingItem = *_idToResItem.at(id);
     if (std::filesystem::is_directory(expandingItem.path)) {
         for (auto &file : std::filesystem::directory_iterator(expandingItem.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
@@ -688,7 +688,7 @@ void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId
                 }
             }
             item->container = container;
-            _gameDirItems.push_back(std::move(item));
+            _resItems.push_back(std::move(item));
         }
     } else {
         auto extension = boost::to_lower_copy(expandingItem.path.extension().string());
@@ -709,7 +709,7 @@ void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId
                     item->path = expandingItem.path;
                     item->resId = std::make_shared<ResourceId>(key.resId);
                     item->archived = true;
-                    _gameDirItems.push_back(std::move(item));
+                    _resItems.push_back(std::move(item));
                 }
             }
         } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
@@ -724,7 +724,7 @@ void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId
                 item->path = expandingItem.path;
                 item->resId = std::make_shared<ResourceId>(key.resId);
                 item->archived = true;
-                _gameDirItems.push_back(std::move(item));
+                _resItems.push_back(std::move(item));
             }
         } else if (boost::ends_with(extension, ".rim")) {
             auto rim = FileInputStream(expandingItem.path);
@@ -738,15 +738,15 @@ void ResourceExplorerViewModel::onGameDirectoryItemExpanding(GameDirectoryItemId
                 item->path = expandingItem.path;
                 item->resId = std::make_shared<ResourceId>(resource.resId);
                 item->archived = true;
-                _gameDirItems.push_back(std::move(item));
+                _resItems.push_back(std::move(item));
             }
         }
     }
     expandingItem.loaded = true;
 }
 
-void ResourceExplorerViewModel::onGameDirectoryItemActivated(GameDirectoryItemId id) {
-    auto &item = *_idToGameDirItem.at(id);
+void ResourceExplorerViewModel::onResourcesItemActivated(ResourcesItemId id) {
+    auto &item = *_idToResItem.at(id);
     openFile(item);
 }
 

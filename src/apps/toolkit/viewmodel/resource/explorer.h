@@ -45,11 +45,11 @@
 
 namespace reone {
 
-using GameDirectoryItemId = void *;
+using ResourcesItemId = void *;
 
 struct GameDirectoryItem {
-    GameDirectoryItemId id {nullptr};
-    GameDirectoryItemId parentId {nullptr};
+    ResourcesItemId id {nullptr};
+    ResourcesItemId parentId {nullptr};
     std::string displayName;
     std::filesystem::path path;
     std::shared_ptr<resource::ResourceId> resId;
@@ -101,8 +101,8 @@ public:
     }
 
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
-    void decompile(GameDirectoryItemId itemId, bool optimize = true);
-    void exportFile(GameDirectoryItemId itemId, const std::filesystem::path &destPath);
+    void decompile(ResourcesItemId itemId, bool optimize = true);
+    void exportFile(ResourcesItemId itemId, const std::filesystem::path &destPath);
 
     void extractAllBifs(const std::filesystem::path &destPath);
     void batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
@@ -112,11 +112,11 @@ public:
                     const std::filesystem::path &destPath);
 
     resource::GameID gameId() const { return _gameId; }
-    const std::filesystem::path &gamePath() const { return _gamePath; }
+    const std::filesystem::path &gamePath() const { return _resourcesPath; }
 
-    int getGameDirItemCount() const { return static_cast<int>(_gameDirItems.size()); }
-    GameDirectoryItem &getGameDirItem(int index) { return *_gameDirItems[index]; }
-    GameDirectoryItem &getGameDirItemById(GameDirectoryItemId id) { return *_idToGameDirItem.at(id); }
+    int getNumResourcesItems() const { return static_cast<int>(_resItems.size()); }
+    GameDirectoryItem &getResourcesItem(int index) { return *_resItems[index]; }
+    GameDirectoryItem &getResourcesItemById(ResourcesItemId id) { return *_idToResItem.at(id); }
 
     Page &getPage(int index) {
         return *_pages.at(index);
@@ -152,14 +152,14 @@ public:
 
     void onNotebookPageClose(int page);
 
-    void onGameDirectoryChanged(std::filesystem::path path);
-    void onGameDirectoryItemIdentified(int index, GameDirectoryItemId id);
-    void onGameDirectoryItemExpanding(GameDirectoryItemId id);
-    void onGameDirectoryItemActivated(GameDirectoryItemId id);
+    void onResourcesDirectoryChanged(resource::GameID gameId, std::filesystem::path path);
+    void onResourcesItemIdentified(int index, ResourcesItemId id);
+    void onResourcesItemExpanding(ResourcesItemId id);
+    void onResourcesItemActivated(ResourcesItemId id);
 
 private:
-    std::filesystem::path _gamePath;
     resource::GameID _gameId {resource::GameID::KotOR};
+    std::filesystem::path _resourcesPath;
 
     std::vector<resource::KeyReader::KeyEntry> _keyKeys;
     std::vector<resource::KeyReader::FileEntry> _keyFiles;
@@ -167,8 +167,8 @@ private:
     std::shared_ptr<resource::TalkTable> _talkTable;
     std::unique_ptr<game::Routines> _routines;
 
-    std::vector<std::shared_ptr<GameDirectoryItem>> _gameDirItems;
-    std::map<GameDirectoryItemId, GameDirectoryItem *> _idToGameDirItem;
+    std::vector<std::shared_ptr<GameDirectoryItem>> _resItems;
+    std::map<ResourcesItemId, GameDirectoryItem *> _idToResItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
 
@@ -203,7 +203,7 @@ private:
 
     // END Embedded engine
 
-    void loadGameDirectory();
+    void loadResources();
     void loadTools();
     void loadEngine();
 

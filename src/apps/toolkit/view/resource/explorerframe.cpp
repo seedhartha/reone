@@ -17,6 +17,7 @@
 
 #include "explorerframe.h"
 
+#include <wx/choicdlg.h>
 #include <wx/dirdlg.h>
 #include <wx/mstream.h>
 
@@ -97,7 +98,7 @@ static const std::set<PageType> kStaticPageTypes {
     PageType::Audio};
 
 struct EventHandlerID {
-    static constexpr int openGameDir = wxID_HIGHEST + 1;
+    static constexpr int openDir = wxID_HIGHEST + 1;
     static constexpr int extractAllBifs = wxID_HIGHEST + 2;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
     static constexpr int composeLip = wxID_HIGHEST + 4;
@@ -142,7 +143,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     Maximize();
 
     auto fileMenu = new wxMenu();
-    fileMenu->Append(EventHandlerID::openGameDir, "&Open game directory...");
+    fileMenu->Append(EventHandlerID::openDir, "&Open directory...");
     fileMenu->AppendSeparator();
     _saveFileMenuItem = fileMenu->Append(EventHandlerID::saveFile, "&Save copy as...");
     _saveFileMenuItem->Enable(false);
@@ -174,15 +175,15 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _splitter = new wxSplitterWindow(this, wxID_ANY);
     _splitter->SetMinimumPaneSize(300);
 
-    auto filesPanel = new wxPanel(_splitter);
-    _filesTreeCtrl = new wxDataViewTreeCtrl(filesPanel, wxID_ANY);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnFilesTreeCtrlItemExpanding, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnFilesTreeCtrlItemActivated, this);
-    _filesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnFilesTreeCtrlItemStartEditing, this);
-    auto filesSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, "Game Directory");
-    filesSizer->Add(_filesTreeCtrl, 1, wxEXPAND);
-    filesPanel->SetSizer(filesSizer);
+    auto resourcesPanel = new wxPanel(_splitter);
+    _resourcesTreeCtrl = new wxDataViewTreeCtrl(resourcesPanel, wxID_ANY);
+    _resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding, this);
+    _resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu, this);
+    _resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, &ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated, this);
+    _resourcesTreeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing, this);
+    auto resourcesSizer = new wxStaticBoxSizer(wxVERTICAL, resourcesPanel, "Resources");
+    resourcesSizer->Add(_resourcesTreeCtrl, 1, wxEXPAND);
+    resourcesPanel->SetSizer(resourcesSizer);
 
     _notebook = new wxAuiNotebook(_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE & ~(wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE));
     _notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &ResourceExplorerFrame::OnNotebookPageClose, this);
@@ -192,7 +193,7 @@ ResourceExplorerFrame::ResourceExplorerFrame() :
     _modelPanel = new ModelResourcePanel(_notebook);
     _audioPanel = new AudioResourcePanel(_notebook);
 
-    _splitter->SplitVertically(filesPanel, _notebook, 1);
+    _splitter->SplitVertically(resourcesPanel, _notebook, 1);
 
     for (auto &page : kStaticPageTypes) {
         auto window = GetStaticPageWindow(page);
@@ -474,84 +475,91 @@ void ResourceExplorerFrame::OnIdle(wxIdleEvent &event) {
     }
 }
 
-void ResourceExplorerFrame::OnOpenGameDirectoryCommand(wxCommandEvent &event) {
-    auto dialog = new wxDirDialog(nullptr, "Choose game directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
+    auto dialog = new wxDirDialog(nullptr, "Choose directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog->ShowModal() != wxID_OK) {
         return;
     }
-    auto gamePath = std::filesystem::path((std::string)dialog->GetPath());
-    auto keyPath = findFileIgnoreCase(gamePath, "chitin.key");
-    auto modulesPath = findFileIgnoreCase(gamePath, "modules");
-    if (!keyPath || !modulesPath) {
-        wxMessageBox("Not a valid game directory", "Error", wxICON_ERROR);
-        return;
+    GameID gameId {GameID::KotOR};
+    auto resourcesPath = std::filesystem::path {dialog->GetPath().ToStdString()};
+    auto keyPath = findFileIgnoreCase(resourcesPath, "chitin.key");
+    if (keyPath) {
+        auto tslExePath = findFileIgnoreCase(resourcesPath, "swkotor2.exe");
+        gameId = tslExePath ? GameID::TSL : GameID::KotOR;
+    } else {
+        const char *choices[] = {
+            "KotOR", //
+            "TSL"    //
+        };
+        wxSingleChoiceDialog dialog {
+            nullptr,
+            "Not a game directory. Choose game manually:",
+            "Choose game",
+            wxArrayString {2, choices}};
+        if (dialog.ShowModal() == wxID_OK) {
+            gameId = static_cast<GameID>(dialog.GetSelection());
+        }
     }
-    _viewModel->onGameDirectoryChanged(gamePath);
+    _viewModel->onResourcesDirectoryChanged(gameId, resourcesPath);
 
-    auto key = FileInputStream(*keyPath);
-    auto keyReader = KeyReader(key);
-    keyReader.load();
-    _keyKeys = keyReader.keys();
-    _keyFiles = keyReader.files();
-
-    _filesTreeCtrl->Freeze();
-    _filesTreeCtrl->DeleteAllItems();
-    int numGameDirItems = _viewModel->getGameDirItemCount();
+    _resourcesTreeCtrl->Freeze();
+    _resourcesTreeCtrl->DeleteAllItems();
+    int numGameDirItems = _viewModel->getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = _viewModel->getGameDirItem(i);
+        auto &item = _viewModel->getResourcesItem(i);
         void *itemId;
         if (item.container) {
-            auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
+            auto treeItem = _resourcesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
             itemId = treeItem.GetID();
         } else {
-            auto treeItem = _filesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
+            auto treeItem = _resourcesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
             itemId = treeItem.GetID();
         }
-        _viewModel->onGameDirectoryItemIdentified(i, itemId);
+        _viewModel->onResourcesItemIdentified(i, itemId);
     }
-    _filesTreeCtrl->Thaw();
+    _resourcesTreeCtrl->Thaw();
 }
 
 void ResourceExplorerFrame::OnSaveFileCommand(wxCommandEvent &event) {
     SaveFile();
 }
 
-void ResourceExplorerFrame::OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
     auto expandingItemId = event.GetItem().GetID();
-    auto &expandingItem = _viewModel->getGameDirItemById(expandingItemId);
+    auto &expandingItem = _viewModel->getResourcesItemById(expandingItemId);
     if (expandingItem.loaded) {
         return;
     }
-    _viewModel->onGameDirectoryItemExpanding(expandingItemId);
-    _filesTreeCtrl->Freeze();
-    int numGameDirItems = _viewModel->getGameDirItemCount();
+    _viewModel->onResourcesItemExpanding(expandingItemId);
+    _resourcesTreeCtrl->Freeze();
+    int numGameDirItems = _viewModel->getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = _viewModel->getGameDirItem(i);
+        auto &item = _viewModel->getResourcesItem(i);
         if (item.id || item.parentId != expandingItemId) {
             continue;
         }
         void *itemId;
         if (item.container) {
-            auto treeItem = _filesTreeCtrl->AppendContainer(wxDataViewItem(expandingItemId), item.displayName);
+            auto treeItem = _resourcesTreeCtrl->AppendContainer(wxDataViewItem(expandingItemId), item.displayName);
             itemId = treeItem.GetID();
         } else {
-            auto treeItem = _filesTreeCtrl->AppendItem(wxDataViewItem(expandingItemId), item.displayName);
+            auto treeItem = _resourcesTreeCtrl->AppendItem(wxDataViewItem(expandingItemId), item.displayName);
             itemId = treeItem.GetID();
         }
-        _viewModel->onGameDirectoryItemIdentified(i, itemId);
+        _viewModel->onResourcesItemIdentified(i, itemId);
     }
-    _filesTreeCtrl->Thaw();
+    _resourcesTreeCtrl->Thaw();
     expandingItem.loaded = true;
 }
 
-void ResourceExplorerFrame::OnFilesTreeCtrlItemActivated(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    _viewModel->onGameDirectoryItemActivated(itemId);
+    _viewModel->onResourcesItemActivated(itemId);
 }
 
-void ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto itemId = event.GetItem().GetID();
-    auto &item = _viewModel->getGameDirItemById(itemId);
+    auto &item = _viewModel->getResourcesItemById(itemId);
     if (item.resId) {
         auto menu = wxMenu();
         menu.Append(CommandID::exportFile, "Export...");
@@ -578,7 +586,7 @@ void ResourceExplorerFrame::OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &even
     }
 }
 
-void ResourceExplorerFrame::OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
+void ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
 }
 
@@ -607,7 +615,7 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
 
     if (event.GetId() == CommandID::extract) {
         auto itemId = menu->GetClientData();
-        auto &item = _viewModel->getGameDirItemById(itemId);
+        auto &item = _viewModel->getResourcesItemById(itemId);
 
         auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
@@ -778,7 +786,7 @@ void ResourceExplorerFrame::InvokeTool(Operation operation) {
 wxBEGIN_EVENT_TABLE(ResourceExplorerFrame, wxFrame)
     EVT_CLOSE(ResourceExplorerFrame::OnClose)                                                     //
     EVT_IDLE(ResourceExplorerFrame::OnIdle)                                                       //
-    EVT_MENU(EventHandlerID::openGameDir, ResourceExplorerFrame::OnOpenGameDirectoryCommand)      //
+    EVT_MENU(EventHandlerID::openDir, ResourceExplorerFrame::OnOpenDirectoryCommand)              //
     EVT_MENU(EventHandlerID::saveFile, ResourceExplorerFrame::OnSaveFileCommand)                  //
     EVT_MENU(EventHandlerID::extractAllBifs, ResourceExplorerFrame::OnExtractAllBifsCommand)      //
     EVT_MENU(EventHandlerID::batchTpcToTga, ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand) //

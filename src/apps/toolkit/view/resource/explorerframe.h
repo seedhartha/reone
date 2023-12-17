@@ -65,9 +65,6 @@ public:
 private:
     std::unique_ptr<ResourceExplorerViewModel> _viewModel;
 
-    std::vector<resource::KeyReader::KeyEntry> _keyKeys;
-    std::vector<resource::KeyReader::FileEntry> _keyFiles;
-
     // Menus
 
     wxMenuItem *_saveFileMenuItem {nullptr};
@@ -79,7 +76,7 @@ private:
     wxSplitterWindow *_splitter {nullptr};
     wxProgressDialog *_progressDialog {nullptr};
 
-    wxDataViewTreeCtrl *_filesTreeCtrl {nullptr};
+    wxDataViewTreeCtrl *_resourcesTreeCtrl {nullptr};
     wxListBox *_modulesListBox {nullptr};
     wxAuiNotebook *_notebook {nullptr};
 
@@ -101,7 +98,7 @@ private:
     void OnIdle(wxIdleEvent &event);
     void OnClose(wxCloseEvent &event);
 
-    void OnOpenGameDirectoryCommand(wxCommandEvent &event);
+    void OnOpenDirectoryCommand(wxCommandEvent &event);
     void OnSaveFileCommand(wxCommandEvent &event);
     void OnExtractAllBifsCommand(wxCommandEvent &event);
     void OnBatchConvertTpcToTgaCommand(wxCommandEvent &event);
@@ -123,10 +120,10 @@ private:
     void OnToNcsToolCommand(wxCommandEvent &event);
     void OnToNssToolCommand(wxCommandEvent &event);
 
-    void OnFilesTreeCtrlItemExpanding(wxDataViewEvent &event);
-    void OnFilesTreeCtrlItemActivated(wxDataViewEvent &event);
-    void OnFilesTreeCtrlItemContextMenu(wxDataViewEvent &event);
-    void OnFilesTreeCtrlItemStartEditing(wxDataViewEvent &event);
+    void OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event);
+    void OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event);
+    void OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event);
+    void OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent &event);
 
     void OnNotebookPageClose(wxAuiNotebookEvent &event);
     void OnNotebookPageChanged(wxAuiNotebookEvent &event);

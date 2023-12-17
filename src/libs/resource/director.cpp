@@ -48,7 +48,7 @@ static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
 static constexpr char kModulesDirectoryName[] = "modules";
 static constexpr char kLipsDirectoryName[] = "lips";
-static constexpr char kLocalizationLipFilename[] = "localization";
+static constexpr char kLocalizationLipFilename[] = "localization.mod";
 static constexpr char kOverrideDirectoryName[] = "override";
 
 static constexpr char kTexturePackFilenameGUI[] = "swpc_tex_gui.erf";
