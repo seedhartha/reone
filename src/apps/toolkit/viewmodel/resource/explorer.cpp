@@ -103,8 +103,13 @@ private:
 ResourceExplorerViewModel::ResourceExplorerViewModel() {
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
+
     _saveFileCommand = std::make_unique<Command<Page &, const std::filesystem::path &>>(
-        std::bind(&ResourceExplorerViewModel::saveFile, this, std::placeholders::_1, std::placeholders::_2));
+        std::bind(&ResourceExplorerViewModel::doSaveFile, this, std::placeholders::_1, std::placeholders::_2));
+    _exportResCommand = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
+        std::bind(&ResourceExplorerViewModel::doExportResource, this, std::placeholders::_1, std::placeholders::_2));
+    _exportTgaTxiCommand = std::make_unique<Command<ResourcesItemId, const std::filesystem::path &>>(
+        std::bind(&ResourceExplorerViewModel::doExportTgaTxi, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
@@ -398,7 +403,6 @@ void ResourceExplorerViewModel::loadTools() {
     _tools.push_back(std::make_shared<KeyBifTool>());
     _tools.push_back(std::make_shared<ErfTool>());
     _tools.push_back(std::make_shared<RimTool>());
-    _tools.push_back(std::make_shared<TpcTool>());
     _tools.push_back(std::make_shared<AudioTool>());
     _tools.push_back(std::make_shared<NcsTool>(_gameId));
 }
@@ -467,25 +471,6 @@ void ResourceExplorerViewModel::extractArchive(const std::filesystem::path &srcP
         rimReader.load();
         RimTool().extract(rimReader, srcPath, destPath);
     }
-}
-
-void ResourceExplorerViewModel::exportFile(ResourcesItemId itemId, const std::filesystem::path &destPath) {
-    auto &item = *_idToResItem.at(itemId);
-    withResourceStream(item, [&destPath, &item](auto &res) {
-        auto exportedPath = destPath;
-        exportedPath.append(item.resId->string());
-        auto exported = FileOutputStream(exportedPath);
-        auto buffer = ByteBuffer();
-        buffer.resize(8192);
-        bool eof = false;
-        while (!eof) {
-            int bytesRead = res.read(&buffer[0], buffer.size());
-            if (bytesRead < buffer.size()) {
-                eof = true;
-            }
-            exported.write(&buffer[0], bytesRead);
-        }
-    });
 }
 
 void ResourceExplorerViewModel::extractAllBifs(const std::filesystem::path &destPath) {
@@ -629,7 +614,46 @@ void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, st
     }
 }
 
-void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path &destPath) {
+void ResourceExplorerViewModel::doExportResource(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    auto &item = *_idToResItem.at(itemId);
+    withResourceStream(item, [&destPath, &item](auto &res) {
+        auto exportedPath = destPath;
+        exportedPath.append(item.resId->string());
+        auto exported = FileOutputStream(exportedPath);
+        auto buffer = ByteBuffer();
+        buffer.resize(8192);
+        bool eof = false;
+        while (!eof) {
+            int bytesRead = res.read(&buffer[0], buffer.size());
+            if (bytesRead < buffer.size()) {
+                eof = true;
+            }
+            exported.write(&buffer[0], bytesRead);
+        }
+    });
+}
+
+void ResourceExplorerViewModel::doExportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    auto &item = *_idToResItem.at(itemId);
+    withResourceStream(item, [&destPath, &item](auto &res) {
+        auto tgaPath = destPath;
+        tgaPath /= item.resId->string();
+        tgaPath.replace_extension(std::string(".tga"));
+        auto tga = FileOutputStream(tgaPath);
+        auto txiBuffer = ByteBuffer();
+        auto txiMemory = MemoryOutputStream(txiBuffer);
+        TpcTool().toTGA(res, tga, txiMemory, false);
+        if (!txiBuffer.empty()) {
+            auto txiPath = destPath;
+            txiPath /= item.resId->string();
+            txiPath.replace_extension(std::string(".txi"));
+            auto txi = FileOutputStream(txiPath);
+            txi.write(&txiBuffer[0], txiBuffer.size());
+        }
+    });
+}
+
+void ResourceExplorerViewModel::doSaveFile(Page &page, const std::filesystem::path &destPath) {
     if (page.type == PageType::Text) {
         auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);
         auto &text = viewModel.content();

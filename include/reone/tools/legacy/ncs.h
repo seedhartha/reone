@@ -44,12 +44,6 @@ public:
         const std::filesystem::path &outputDir,
         const std::filesystem::path &gamePath) override;
 
-    void invokeBatch(
-        Operation operation,
-        const std::vector<std::filesystem::path> &input,
-        const std::filesystem::path &outputDir,
-        const std::filesystem::path &gamePath) override;
-
     bool supports(Operation operation, const std::filesystem::path &input) const override;
 
     void toPCODE(IInputStream &ncs, IOutputStream &pcode, game::Routines &routines);

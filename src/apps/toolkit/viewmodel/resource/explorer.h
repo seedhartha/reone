@@ -100,7 +100,6 @@ public:
 
     void extractArchive(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
     void decompile(ResourcesItemId itemId, bool optimize = true);
-    void exportFile(ResourcesItemId itemId, const std::filesystem::path &destPath);
 
     void extractAllBifs(const std::filesystem::path &destPath);
     void batchConvertTpcToTga(const std::filesystem::path &srcPath, const std::filesystem::path &destPath);
@@ -165,8 +164,16 @@ public:
         return _renderEnabled;
     }
 
-    Command<Page &, const std::filesystem::path &> &saveFileCommand() {
+    Command<Page &, const std::filesystem::path &> &saveFile() {
         return *_saveFileCommand;
+    }
+
+    Command<ResourcesItemId, const std::filesystem::path &> &exportResource() {
+        return *_exportResCommand;
+    }
+
+    Command<ResourcesItemId, const std::filesystem::path &> &exportTgaTxi() {
+        return *_exportTgaTxiCommand;
     }
 
     // END Data binding
@@ -214,6 +221,8 @@ private:
     Property<bool> _renderEnabled;
 
     std::unique_ptr<Command<Page &, const std::filesystem::path &>> _saveFileCommand;
+    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportResCommand;
+    std::unique_ptr<Command<ResourcesItemId, const std::filesystem::path &>> _exportTgaTxiCommand;
 
     // END Data binding
 
@@ -241,7 +250,9 @@ private:
     void openFile(const ResourcesItem &item);
     void openResource(const resource::ResourceId &id, IInputStream &data);
 
-    void saveFile(Page &page, const std::filesystem::path &destPath);
+    void doExportResource(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void doExportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void doSaveFile(Page &page, const std::filesystem::path &destPath);
 
     PageType getPageType(resource::ResType type) const;
 

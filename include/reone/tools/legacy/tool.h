@@ -33,35 +33,7 @@ public:
         const std::filesystem::path &outputDir,
         const std::filesystem::path &gamePath) = 0;
 
-    virtual void invokeBatch(
-        Operation operation,
-        const std::vector<std::filesystem::path> &input,
-        const std::filesystem::path &outputDir,
-        const std::filesystem::path &gamePath) {
-
-        throw NotImplementedException("invokeBatch not implemented");
-    }
-
     virtual bool supports(Operation operation, const std::filesystem::path &input) const = 0;
-
-protected:
-    void doInvokeBatch(
-        const std::vector<std::filesystem::path> &input,
-        const std::filesystem::path &outputDir,
-        std::function<void(const std::filesystem::path &, const std::filesystem::path &)> block) {
-
-        for (auto &path : input) {
-            auto outDir = outputDir;
-            if (outDir.empty()) {
-                outDir = path.parent_path();
-            }
-            try {
-                block(path, outDir);
-            } catch (const ValidationException &e) {
-                error(str(boost::format("Error while processing '%s': %s") % path % std::string(e.what())));
-            }
-        }
-    }
 };
 
 } // namespace reone

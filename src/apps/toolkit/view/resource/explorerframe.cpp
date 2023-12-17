@@ -95,18 +95,18 @@ struct EventHandlerID {
     static constexpr int toRimTool = wxID_HIGHEST + 7;
     static constexpr int toErfTool = wxID_HIGHEST + 8;
     static constexpr int toModTool = wxID_HIGHEST + 9;
-    static constexpr int toTgaTool = wxID_HIGHEST + 10;
-    static constexpr int toPcodeTool = wxID_HIGHEST + 11;
-    static constexpr int toNcsTool = wxID_HIGHEST + 12;
-    static constexpr int toNssTool = wxID_HIGHEST + 13;
-    static constexpr int saveFile = wxID_HIGHEST + 14;
+    static constexpr int toPcodeTool = wxID_HIGHEST + 10;
+    static constexpr int toNcsTool = wxID_HIGHEST + 11;
+    static constexpr int toNssTool = wxID_HIGHEST + 12;
+    static constexpr int saveFile = wxID_HIGHEST + 13;
 };
 
 struct CommandID {
     static constexpr int extract = 1;
     static constexpr int decompile = 2;
     static constexpr int decompileNoOptimize = 3;
-    static constexpr int exportFile = 4;
+    static constexpr int exportRes = 4;
+    static constexpr int exportTgaTxi = 5;
 };
 
 struct TimerID {
@@ -182,7 +182,6 @@ void ResourceExplorerFrame::InitMenu() {
     toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
     toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
     toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
-    toolsMenu->Append(EventHandlerID::toTgaTool, "Convert TPC to TGA/TXI...");
     toolsMenu->Append(EventHandlerID::toPcodeTool, "Disassemble NCS to PCODE...");
     toolsMenu->Append(EventHandlerID::toNcsTool, "Assemble NCS from PCODE...");
     toolsMenu->Append(EventHandlerID::toNssTool, "Decompile NCS (experimental)...");
@@ -206,7 +205,6 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToTGA), EventHandlerID::toTgaTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToPCODE), EventHandlerID::toPcodeTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNCS), EventHandlerID::toNcsTool);
     Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToNSS), EventHandlerID::toNssTool);
@@ -294,7 +292,7 @@ void ResourceExplorerFrame::SaveFile() {
         return;
     }
     auto destPath = std::filesystem::path(destFileDialog.GetPath().ToStdString());
-    m_viewModel.saveFileCommand().execute(*page, destPath);
+    m_viewModel.saveFile().execute(*page, destPath);
 }
 
 wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
@@ -486,8 +484,10 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
     auto &item = m_viewModel.getResourcesItemById(itemId);
     if (item.resId) {
         auto menu = wxMenu();
-        menu.Append(CommandID::exportFile, "Export...");
-        if (item.resId->type == ResType::Ncs) {
+        menu.Append(CommandID::exportRes, "Export...");
+        if (item.resId->type == ResType::Tpc) {
+            menu.Append(CommandID::exportTgaTxi, "Export as TGA/TXI...");
+        } else if (item.resId->type == ResType::Ncs) {
             menu.Append(CommandID::decompile, "Decompile");
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
         }
@@ -558,14 +558,18 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto itemId = menu->GetClientData();
         m_viewModel.decompile(itemId, false);
 
-    } else if (event.GetId() == CommandID::exportFile) {
+    } else if (event.GetId() == CommandID::exportRes || event.GetId() == CommandID::exportTgaTxi) {
         auto itemId = menu->GetClientData();
         auto dialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
             return;
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
-        m_viewModel.exportFile(itemId, destPath);
+        if (event.GetId() == CommandID::exportTgaTxi) {
+            m_viewModel.exportTgaTxi().execute(itemId, destPath);
+        } else {
+            m_viewModel.exportResource().execute(itemId, destPath);
+        }
         wxMessageBox("Operation completed successfully", "Success");
     }
 }

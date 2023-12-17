@@ -35,20 +35,7 @@ void TpcTool::invoke(
     const std::filesystem::path &outputDir,
     const std::filesystem::path &gamePath) {
 
-    invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
-}
-
-void TpcTool::invokeBatch(
-    Operation operation,
-    const std::vector<std::filesystem::path> &input,
-    const std::filesystem::path &outputDir,
-    const std::filesystem::path &gamePath) {
-
-    return doInvokeBatch(input, outputDir, [this, &operation](auto &path, auto &outDir) {
-        if (operation == Operation::ToTGA) {
-            toTGA(path, outDir);
-        }
-    });
+    throw NotImplementedException();
 }
 
 void TpcTool::toTGA(const std::filesystem::path &path, const std::filesystem::path &destPath) {
@@ -56,7 +43,7 @@ void TpcTool::toTGA(const std::filesystem::path &path, const std::filesystem::pa
 
     auto tgaPath = destPath;
     tgaPath.append(path.filename().string());
-    tgaPath.replace_extension("tga");
+    tgaPath.replace_extension(std::string("tga"));
 
     auto tga = FileOutputStream(tgaPath);
     auto txiBytes = ByteBuffer();
@@ -86,7 +73,7 @@ void TpcTool::toTGA(IInputStream &tpc, IOutputStream &tga, IOutputStream &txi, b
 
 bool TpcTool::supports(Operation operation, const std::filesystem::path &input) const {
     return !std::filesystem::is_directory(input) &&
-           input.extension() == ".tpc" &&
+           input.extension().string() == ".tpc" &&
            operation == Operation::ToTGA;
 }
 

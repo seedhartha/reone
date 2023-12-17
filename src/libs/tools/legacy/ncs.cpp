@@ -43,27 +43,16 @@ void NcsTool::invoke(
     const std::filesystem::path &outputDir,
     const std::filesystem::path &gamePath) {
 
-    invokeBatch(operation, std::vector<std::filesystem::path> {input}, outputDir, gamePath);
-}
-
-void NcsTool::invokeBatch(
-    Operation operation,
-    const std::vector<std::filesystem::path> &input,
-    const std::filesystem::path &outputDir,
-    const std::filesystem::path &gamePath) {
-
     auto routines = Routines(_gameId, nullptr, nullptr);
     routines.init();
 
-    return doInvokeBatch(input, outputDir, [this, &operation, &routines](auto &path, auto &outDir) {
-        if (operation == Operation::ToPCODE) {
-            toPCODE(path, outDir, routines);
-        } else if (operation == Operation::ToNCS) {
-            toNCS(path, outDir, routines);
-        } else if (operation == Operation::ToNSS) {
-            toNSS(path, outDir, routines);
-        }
-    });
+    if (operation == Operation::ToPCODE) {
+        toPCODE(input, outputDir, routines);
+    } else if (operation == Operation::ToNCS) {
+        toNCS(input, outputDir, routines);
+    } else if (operation == Operation::ToNSS) {
+        toNSS(input, outputDir, routines);
+    }
 }
 
 void NcsTool::toPCODE(const std::filesystem::path &input, const std::filesystem::path &outputDir, Routines &routines) {
