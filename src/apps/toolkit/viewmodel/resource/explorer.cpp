@@ -140,7 +140,6 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         auto twoDa = reader.twoDa();
 
         auto columns = std::vector<std::string>();
-        columns.push_back("Index");
         for (auto &column : twoDa->columns()) {
             columns.push_back(column);
         }
@@ -148,7 +147,6 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         for (int i = 0; i < twoDa->getRowCount(); ++i) {
             auto &row = twoDa->rows()[i];
             auto values = std::vector<std::string>();
-            values.push_back(std::to_string(i));
             for (auto &value : row.values) {
                 values.push_back(value);
             }
@@ -156,7 +154,9 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
+        page->viewModel = std::make_shared<TableResourceViewModel>(
+            id.type,
+            std::make_shared<TableContent>(std::move(columns), std::move(rows), true));
         _pages.add(std::move(page));
 
     } else if (isGFFCompatibleResType(id.type)) {
@@ -173,7 +173,6 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         auto tlk = reader.table();
 
         auto columns = std::vector<std::string>();
-        columns.push_back("Index");
         columns.push_back("Text");
         columns.push_back("Sound");
 
@@ -182,14 +181,15 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
             auto &str = tlk->getString(i);
             auto cleanedText = boost::replace_all_copy(str.text, "\n", "\\n");
             auto values = std::vector<std::string>();
-            values.push_back(std::to_string(i));
             values.push_back(cleanedText);
             values.push_back(str.soundResRef);
             rows.push_back(std::move(values));
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
+        page->viewModel = std::make_shared<TableResourceViewModel>(
+            id.type,
+            std::make_shared<TableContent>(std::move(columns), std::move(rows), true));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ncs) {
@@ -224,12 +224,14 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         for (auto &kf : animation->keyframes()) {
             auto values = std::vector<std::string>();
             values.push_back(std::to_string(kf.time));
-            values.push_back(str(boost::format("%s [%d]") % describeLipShape(static_cast<LipShape>(kf.shape)) % static_cast<int>(kf.shape)));
+            values.push_back(std::to_string(kf.shape));
             rows.push_back(std::move(values));
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
+        page->viewModel = std::make_shared<TableResourceViewModel>(
+            id.type,
+            std::make_shared<TableContent>(std::move(columns), std::move(rows), false));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Ssf) {
@@ -238,28 +240,19 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         auto &soundSet = reader.soundSet();
 
         auto columns = std::vector<std::string>();
-        columns.push_back("Index");
         columns.push_back("StrRef");
-        columns.push_back("TalkTableText");
-        columns.push_back("TalkTableSound");
         auto rows = std::vector<std::vector<std::string>>();
         for (size_t i = 0; i < soundSet.size(); ++i) {
             auto values = std::vector<std::string>();
-            values.push_back(std::to_string(i));
             auto strRef = soundSet.at(i);
             values.push_back(std::to_string(strRef));
-            if (strRef != -1) {
-                values.push_back(getTalkTableText(strRef));
-                values.push_back(getTalkTableSound(strRef));
-            } else {
-                values.push_back("");
-                values.push_back("");
-            }
             rows.push_back(std::move(values));
         }
 
         auto page = std::make_shared<Page>(PageType::Table, id.string(), id);
-        page->viewModel = std::make_shared<TableResourceViewModel>(std::make_shared<TableContent>(std::move(columns), std::move(rows)));
+        page->viewModel = std::make_shared<TableResourceViewModel>(
+            id.type,
+            std::make_shared<TableContent>(std::move(columns), std::move(rows), true));
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tpc || id.type == ResType::Tga) {

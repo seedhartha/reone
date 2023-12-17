@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "reone/resource/types.h"
+
+#include "../../binding/property.h"
 #include "../../viewmodel.h"
 
 namespace reone {
@@ -24,17 +27,31 @@ namespace reone {
 struct TableContent {
     std::vector<std::string> columns;
     std::vector<std::vector<std::string>> rows;
+    bool rowNumberColumn;
 
-    TableContent(std::vector<std::string> columns, std::vector<std::vector<std::string>> rows) :
+    TableContent(std::vector<std::string> columns,
+                 std::vector<std::vector<std::string>> rows,
+                 bool rowNumberColumn = false) :
         columns(columns),
-        rows(rows) {
+        rows(rows),
+        rowNumberColumn(rowNumberColumn) {
     }
 };
 
 class TableResourceViewModel : public ViewModel {
 public:
-    TableResourceViewModel(std::shared_ptr<TableContent> content) :
+    TableResourceViewModel(resource::ResType resType,
+                           std::shared_ptr<TableContent> content) :
+        _resType(resType),
         _content(std::move(content)) {
+    }
+
+    Property<bool> &modified() {
+        return _modified;
+    }
+
+    resource::ResType resType() const {
+        return _resType;
     }
 
     TableContent &content() const {
@@ -42,7 +59,10 @@ public:
     }
 
 private:
+    resource::ResType _resType;
     std::shared_ptr<TableContent> _content;
+
+    Property<bool> _modified;
 };
 
 } // namespace reone

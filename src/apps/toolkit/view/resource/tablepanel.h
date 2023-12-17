@@ -23,6 +23,7 @@
 #include <wx/wx.h>
 #endif
 
+#include <wx/dataview.h>
 #include <wx/panel.h>
 
 namespace reone {
@@ -36,6 +37,10 @@ public:
 
 private:
     TableResourceViewModel &_viewModel;
+
+    wxDataViewListCtrl *_tableCtrl;
+
+    void RefreshDataView();
 };
 
 } // namespace reone

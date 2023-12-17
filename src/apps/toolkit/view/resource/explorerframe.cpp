@@ -25,8 +25,10 @@
 #include "reone/audio/format/wavreader.h"
 #include "reone/game/script/routines.h"
 #include "reone/graphics/format/lipreader.h"
+#include "reone/graphics/format/lipwriter.h"
 #include "reone/graphics/lipanimation.h"
 #include "reone/resource/format/2dareader.h"
+#include "reone/resource/format/2dawriter.h"
 #include "reone/resource/format/bifreader.h"
 #include "reone/resource/format/erfreader.h"
 #include "reone/resource/format/gffreader.h"
@@ -34,7 +36,9 @@
 #include "reone/resource/format/keyreader.h"
 #include "reone/resource/format/rimreader.h"
 #include "reone/resource/format/ssfreader.h"
+#include "reone/resource/format/ssfwriter.h"
 #include "reone/resource/format/tlkreader.h"
+#include "reone/resource/format/tlkwriter.h"
 #include "reone/resource/talktable.h"
 #include "reone/resource/typeutil.h"
 #include "reone/system/fileutil.h"
@@ -288,6 +292,65 @@ void ResourceExplorerFrame::SaveFile() {
         FileOutputStream stream {destPath};
         GffWriter writer {page->resourceId.type, gff};
         writer.save(stream);
+    } else if (page->type == PageType::Table) {
+        auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page->viewModel);
+        auto &table = viewModel.content();
+        switch (page->resourceId.type) {
+        case ResType::TwoDa: {
+            std::vector<std::string> columns;
+            std::vector<TwoDa::Row> rows;
+            for (const auto &column : table.columns) {
+                columns.emplace_back(column);
+            }
+            for (const auto &row : table.rows) {
+                rows.push_back(TwoDa::Row {row});
+            }
+            TwoDa twoDa {std::move(columns), std::move(rows)};
+            TwoDaWriter writer {twoDa};
+            FileOutputStream stream {destPath};
+            writer.save(stream);
+            break;
+        }
+        case ResType::Lip: {
+            float length = 0.0f;
+            std::vector<LipAnimation::Keyframe> keyframes;
+            for (const auto &row : table.rows) {
+                float time = std::stof(row[0]);
+                length = std::max(length, time);
+                keyframes.push_back({time, static_cast<uint8_t>(std::stoul(row[1]))});
+            }
+            LipAnimation lip {page->resourceId.resRef.value(), length, std::move(keyframes)};
+            LipWriter writer {lip};
+            writer.save(destPath);
+            break;
+        }
+        case ResType::Tlk: {
+            TalkTable::Builder builder;
+            for (const auto &row : table.rows) {
+                auto text = boost::replace_all_copy(row[0], "\\n", "\n");
+                auto soundResRef = row[1];
+                builder.string(std::move(text), std::move(soundResRef));
+            }
+            auto talkTable = builder.build();
+            TlkWriter writer {*talkTable};
+            writer.save(destPath);
+            break;
+        }
+        case ResType::Ssf: {
+            float length = 0.0f;
+            std::vector<uint32_t> soundSet;
+            for (const auto &row : table.rows) {
+                auto strRef = std::stol(row[0]);
+                auto unsignedStrRef = *reinterpret_cast<uint32_t *>(&strRef);
+                soundSet.emplace_back(unsignedStrRef);
+            }
+            SsfWriter writer {soundSet};
+            writer.save(destPath);
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
@@ -309,8 +372,22 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
         });
         return new TextResourcePanel {viewModel, _notebook};
     }
-    case PageType::Table:
-        return new TableResourcePanel {*std::static_pointer_cast<TableResourceViewModel>(page.viewModel), _notebook};
+    case PageType::Table: {
+        auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page.viewModel);
+        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
+            for (size_t i = 0; i < _viewModel->pages()->size(); ++i) {
+                const auto &p = _viewModel->pages().at(i);
+                if (p->resourceId != page.resourceId) {
+                    continue;
+                }
+                _notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
+                _saveFileMenuItem->Enable(_notebook->GetSelection() == i);
+                break;
+            }
+            page.dirty = true;
+        });
+        return new TableResourcePanel {viewModel, _notebook};
+    }
     case PageType::GFF: {
         auto &viewModel = *std::static_pointer_cast<GFFResourceViewModel>(page.viewModel);
         viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
