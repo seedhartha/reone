@@ -72,6 +72,13 @@ inline void checkNotEqual(const std::string &param, const std::string &actual, c
     }
 }
 
+template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+inline void checkClose(const std::string &param, const T &actual, const T &expected, T epsilon = std::numeric_limits<T>::epsilon()) {
+    if (std::fabs(actual - expected) > epsilon) {
+        throw ValidationException(str(boost::format("%s expected to be within %f of %f, was %f") % param % epsilon % expected % actual));
+    }
+}
+
 template <class T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
 inline void checkLess(const std::string &param, const T &lhs, const T &rhs) {
     if (lhs >= rhs) {
