@@ -65,6 +65,8 @@ public:
 private:
     ResourceExplorerViewModel &m_viewModel;
 
+    std::map<ResourcesItemId, wxDataViewItem> _resItemIdToTreeItem;
+
     // Menus
 
     wxMenuItem *m_saveFileMenuItem {nullptr};

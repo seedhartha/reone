@@ -79,7 +79,7 @@ struct ResourcesItemId {
 
 struct ResourcesItem {
     ResourcesItemId id;
-    ResourcesItemId parentId;
+    std::optional<ResourcesItemId> parentId;
     std::string displayName;
     bool container {false};
     bool loaded {false};
@@ -135,15 +135,16 @@ public:
                     const std::filesystem::path &srcPath,
                     const std::filesystem::path &destPath);
 
-    resource::GameID gameId() const { return _gameId; }
-    const std::filesystem::path &gamePath() const { return _resourcesPath; }
+    resource::GameID gameId() const {
+        return _gameId;
+    }
 
-    int getNumResourcesItems() const { return static_cast<int>(_resItems.size()); }
-    ResourcesItem &getResourcesItem(int index) { return *_resItems[index]; }
-    ResourcesItem &getResourcesItemById(const ResourcesItemId &id) { return *_idToResItem.at(id); }
+    const std::filesystem::path &gamePath() const {
+        return _resourcesPath;
+    }
 
-    Page &getPage(int index) {
-        return *_pages.at(index);
+    ResourcesItem &getResourcesItemById(const ResourcesItemId &id) {
+        return *_idToResItem.at(id);
     }
 
     const resource::TalkTable &talkTable() const {
@@ -167,6 +168,10 @@ public:
     // END View models
 
     // Properties
+
+    CollectionProperty<std::shared_ptr<ResourcesItem>> &resourcesItems() {
+        return _resItems;
+    }
 
     CollectionProperty<std::shared_ptr<Page>> &pages() {
         return _pages;
@@ -219,7 +224,6 @@ private:
     std::shared_ptr<resource::TalkTable> _talkTable;
     std::unique_ptr<game::Routines> _routines;
 
-    std::vector<std::shared_ptr<ResourcesItem>> _resItems;
     std::map<ResourcesItemId, ResourcesItem *> _idToResItem;
 
     std::vector<std::shared_ptr<Tool>> _tools;
@@ -234,6 +238,7 @@ private:
 
     // Properties
 
+    CollectionProperty<std::shared_ptr<ResourcesItem>> _resItems;
     CollectionProperty<std::shared_ptr<Page>> _pages;
 
     Property<int> _selectedPage;

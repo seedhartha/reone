@@ -344,6 +344,8 @@ void ResourceExplorerViewModel::loadResources() {
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
 
+    std::list<std::shared_ptr<ResourcesItem>> resItems;
+    _idToResItem.clear();
     for (auto &file : std::filesystem::directory_iterator(_resourcesPath)) {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
@@ -371,8 +373,9 @@ void ResourceExplorerViewModel::loadResources() {
         item->displayName = filename;
         item->container = container;
         _idToResItem.insert({item->id, item.get()});
-        _resItems.push_back(std::move(item));
+        resItems.push_back(std::move(item));
     }
+    _resItems = resItems;
 
     _graphicsOpt.grass = false;
     _graphicsOpt.pbr = false;
@@ -768,8 +771,6 @@ void ResourceExplorerViewModel::onNotebookPageClose(int page) {
 void ResourceExplorerViewModel::onResourcesDirectoryChanged(GameID gameId, std::filesystem::path path) {
     _gameId = gameId;
     _resourcesPath = path;
-    _resItems.clear();
-    _idToResItem.clear();
 
     loadResources();
 }
@@ -804,7 +805,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &
             item->displayName = filename;
             item->container = container;
             _idToResItem.insert({item->id, item.get()});
-            _resItems.push_back(std::move(item));
+            _resItems.add(std::move(item));
         }
     } else {
         auto extension = boost::to_lower_copy(expandingItem.id.path.extension().string());
@@ -826,7 +827,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &
                     item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                     item->archived = true;
                     _idToResItem.insert({item->id, item.get()});
-                    _resItems.push_back(std::move(item));
+                    _resItems.add(std::move(item));
                 }
             }
         } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
@@ -842,7 +843,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &
                 item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
                 item->archived = true;
                 _idToResItem.insert({item->id, item.get()});
-                _resItems.push_back(std::move(item));
+                _resItems.add(std::move(item));
             }
         } else if (boost::ends_with(extension, ".rim")) {
             auto rim = FileInputStream(expandingItem.id.path);
@@ -857,7 +858,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &
                 item->displayName = str(boost::format("%s.%s") % resource.resId.resRef.value() % getExtByResType(resource.resId.type));
                 item->archived = true;
                 _idToResItem.insert({item->id, item.get()});
-                _resItems.push_back(std::move(item));
+                _resItems.add(std::move(item));
             }
         }
     }

@@ -211,6 +211,54 @@ void ResourceExplorerFrame::BindEvents() {
 }
 
 void ResourceExplorerFrame::BindViewModel() {
+    m_viewModel.resourcesItems().addChangedHandler([this](const auto &args) {
+        switch (args.type) {
+        case CollectionChangeType::Add: {
+            auto &resItem = args.addedItem->get();
+            wxDataViewItem parentItem;
+            if (resItem->parentId) {
+                parentItem = _resItemIdToTreeItem.at(*resItem->parentId);
+            }
+            wxDataViewItem appended;
+            if (resItem->container) {
+                appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
+            } else {
+                appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
+            }
+            _resItemIdToTreeItem.insert({resItem->id, appended});
+            break;
+        }
+        case CollectionChangeType::Remove: {
+            auto item = args.removedItem->get();
+            auto &treeItem = _resItemIdToTreeItem.at(item->id);
+            m_resourcesTreeCtrl->DeleteItem(treeItem);
+            _resItemIdToTreeItem.erase(item->id);
+            break;
+        }
+        case CollectionChangeType::Reset: {
+            m_resourcesTreeCtrl->Freeze();
+            m_resourcesTreeCtrl->DeleteAllItems();
+            _resItemIdToTreeItem.clear();
+            for (const auto &resItem : *m_viewModel.resourcesItems()) {
+                wxDataViewItem parentItem;
+                if (resItem->parentId) {
+                    parentItem = _resItemIdToTreeItem.at(*resItem->parentId);
+                }
+                wxDataViewItem appended;
+                if (resItem->container) {
+                    appended = m_resourcesTreeCtrl->AppendContainer(parentItem, resItem->displayName, -1, -1, new ResourcesItemClientData {resItem->id});
+                } else {
+                    appended = m_resourcesTreeCtrl->AppendItem(parentItem, resItem->displayName, -1, new ResourcesItemClientData {resItem->id});
+                }
+                _resItemIdToTreeItem.insert({resItem->id, appended});
+            }
+            m_resourcesTreeCtrl->Thaw();
+            break;
+        }
+        default:
+            throw std::logic_error("Unsupported collection change type: " + std::to_string(static_cast<int>(args.type)));
+        }
+    });
     m_viewModel.pages().addChangedHandler([this](const auto &args) {
         switch (args.type) {
         case CollectionChangeType::Add: {
@@ -427,19 +475,6 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
         }
     }
     m_viewModel.onResourcesDirectoryChanged(gameId, resourcesPath);
-
-    m_resourcesTreeCtrl->Freeze();
-    m_resourcesTreeCtrl->DeleteAllItems();
-    int numGameDirItems = m_viewModel.getNumResourcesItems();
-    for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = m_viewModel.getResourcesItem(i);
-        if (item.container) {
-            m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName, -1, -1, new ResourcesItemClientData {item.id});
-        } else {
-            m_resourcesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName, -1, new ResourcesItemClientData {item.id});
-        }
-    }
-    m_resourcesTreeCtrl->Thaw();
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
@@ -451,20 +486,6 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &ev
         return;
     }
     m_viewModel.onResourcesItemExpanding(expandingResItemId);
-    m_resourcesTreeCtrl->Freeze();
-    int numGameDirItems = m_viewModel.getNumResourcesItems();
-    for (int i = 0; i < numGameDirItems; ++i) {
-        auto &item = m_viewModel.getResourcesItem(i);
-        if (item.parentId != expandingResItemId) {
-            continue;
-        }
-        if (item.container) {
-            m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(expandingTreeItem), item.displayName, -1, -1, new ResourcesItemClientData {item.id});
-        } else {
-            m_resourcesTreeCtrl->AppendItem(wxDataViewItem(expandingTreeItem), item.displayName, -1, new ResourcesItemClientData {item.id});
-        }
-    }
-    m_resourcesTreeCtrl->Thaw();
     expandingItem.loaded = true;
 }
 
@@ -525,7 +546,7 @@ void ResourceExplorerFrame::OnNotebookPageChanged(wxAuiNotebookEvent &event) {
     if (pageIdx == -1) {
         return;
     }
-    auto &page = m_viewModel.getPage(pageIdx);
+    auto &page = *m_viewModel.pages().at(pageIdx);
     if (page.dirty) {
         m_saveFileMenuItem->Enable(true);
     } else {
