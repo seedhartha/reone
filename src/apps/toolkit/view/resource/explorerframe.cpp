@@ -110,6 +110,20 @@ struct TimerID {
     static constexpr int audio = 2;
 };
 
+class ResourcesItemClientData : public wxClientData {
+public:
+    ResourcesItemClientData(ResourcesItemId id) :
+        _id(std::move(id)) {
+    }
+
+    const ResourcesItemId &id() const {
+        return _id;
+    }
+
+private:
+    ResourcesItemId _id;
+};
+
 ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewModel) :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
     m_viewModel(viewModel) {
@@ -419,80 +433,78 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
     int numGameDirItems = m_viewModel.getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
         auto &item = m_viewModel.getResourcesItem(i);
-        void *itemId;
         if (item.container) {
-            auto treeItem = m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName);
-            itemId = treeItem.GetID();
+            m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(), item.displayName, -1, -1, new ResourcesItemClientData {item.id});
         } else {
-            auto treeItem = m_resourcesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName);
-            itemId = treeItem.GetID();
+            m_resourcesTreeCtrl->AppendItem(wxDataViewItem(), item.displayName, -1, new ResourcesItemClientData {item.id});
         }
-        m_viewModel.onResourcesItemIdentified(i, itemId);
     }
     m_resourcesTreeCtrl->Thaw();
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
-    auto expandingItemId = event.GetItem().GetID();
-    auto &expandingItem = m_viewModel.getResourcesItemById(expandingItemId);
+    auto expandingTreeItem = event.GetItem();
+    auto expandingTreeItemData = m_resourcesTreeCtrl->GetItemData(expandingTreeItem);
+    auto &expandingResItemId = static_cast<ResourcesItemClientData *>(expandingTreeItemData)->id();
+    auto &expandingItem = m_viewModel.getResourcesItemById(expandingResItemId);
     if (expandingItem.loaded) {
         return;
     }
-    m_viewModel.onResourcesItemExpanding(expandingItemId);
+    m_viewModel.onResourcesItemExpanding(expandingResItemId);
     m_resourcesTreeCtrl->Freeze();
     int numGameDirItems = m_viewModel.getNumResourcesItems();
     for (int i = 0; i < numGameDirItems; ++i) {
         auto &item = m_viewModel.getResourcesItem(i);
-        if (item.id || item.parentId != expandingItemId) {
+        if (item.parentId != expandingResItemId) {
             continue;
         }
-        void *itemId;
         if (item.container) {
-            auto treeItem = m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(expandingItemId), item.displayName);
-            itemId = treeItem.GetID();
+            m_resourcesTreeCtrl->AppendContainer(wxDataViewItem(expandingTreeItem), item.displayName, -1, -1, new ResourcesItemClientData {item.id});
         } else {
-            auto treeItem = m_resourcesTreeCtrl->AppendItem(wxDataViewItem(expandingItemId), item.displayName);
-            itemId = treeItem.GetID();
+            m_resourcesTreeCtrl->AppendItem(wxDataViewItem(expandingTreeItem), item.displayName, -1, new ResourcesItemClientData {item.id});
         }
-        m_viewModel.onResourcesItemIdentified(i, itemId);
     }
     m_resourcesTreeCtrl->Thaw();
     expandingItem.loaded = true;
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event) {
-    auto itemId = event.GetItem().GetID();
-    m_viewModel.onResourcesItemActivated(itemId);
+    auto item = event.GetItem();
+    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
+    auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
+    m_viewModel.onResourcesItemActivated(resItemId);
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
-    auto itemId = event.GetItem().GetID();
-    auto &item = m_viewModel.getResourcesItemById(itemId);
-    if (item.resId) {
+    auto item = event.GetItem();
+    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
+    auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
+    auto &resItem = m_viewModel.getResourcesItemById(resItemId);
+    if (resItem.id.resId) {
         auto menu = wxMenu();
         menu.Append(CommandID::exportRes, "Export...");
-        if (item.resId->type == ResType::Tpc) {
+        if (resItem.id.resId->type == ResType::Tpc) {
             menu.Append(CommandID::exportTgaTxi, "Export as TGA/TXI...");
-        } else if (item.resId->type == ResType::Wav) {
+        } else if (resItem.id.resId->type == ResType::Wav) {
             menu.Append(CommandID::exportWavMp3, "Export as regular WAV/MP3...");
-        } else if (item.resId->type == ResType::Ncs) {
+        } else if (resItem.id.resId->type == ResType::Ncs) {
             menu.Append(CommandID::decompile, "Decompile");
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
         }
-        menu.SetClientData(itemId);
+        menu.SetClientData(new ResourcesItemClientData {resItemId});
         menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
     } else {
-        if (item.archived || !std::filesystem::is_regular_file(item.path)) {
+        if (resItem.archived || !std::filesystem::is_regular_file(resItem.id.path)) {
             return;
         }
-        auto extension = item.path.extension().string();
+        auto extension = resItem.id.path.extension().string();
         if (kFilesArchiveExtensions.count(extension) == 0) {
             return;
         }
         auto menu = wxMenu();
         menu.Append(CommandID::extract, "Extract...");
-        menu.SetClientData(itemId);
+        menu.SetClientData(new ResourcesItemClientData {resItemId});
         menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
         PopupMenu(&menu, event.GetPosition());
     }
@@ -526,8 +538,8 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
     auto menu = static_cast<wxMenu *>(event.GetEventObject());
 
     if (event.GetId() == CommandID::extract) {
-        auto itemId = menu->GetClientData();
-        auto &item = m_viewModel.getResourcesItemById(itemId);
+        auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
+        auto &resItem = m_viewModel.getResourcesItemById(resItemId);
 
         auto dialog = new wxDirDialog(nullptr, "Choose extraction directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
@@ -535,32 +547,32 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
 
-        m_viewModel.extractArchive(item.path, destPath);
+        m_viewModel.extractArchive(resItem.id.path, destPath);
         wxMessageBox("Operation completed successfully", "Success");
 
     } else if (event.GetId() == CommandID::decompile) {
-        auto itemId = menu->GetClientData();
-        m_viewModel.decompile(itemId, true);
+        auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
+        m_viewModel.decompile(resItemId, true);
 
     } else if (event.GetId() == CommandID::decompileNoOptimize) {
-        auto itemId = menu->GetClientData();
-        m_viewModel.decompile(itemId, false);
+        auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
+        m_viewModel.decompile(resItemId, false);
 
     } else if (event.GetId() == CommandID::exportRes ||
                event.GetId() == CommandID::exportTgaTxi ||
                event.GetId() == CommandID::exportWavMp3) {
-        auto itemId = menu->GetClientData();
+        auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
         auto dialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
         if (dialog->ShowModal() != wxID_OK) {
             return;
         }
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
         if (event.GetId() == CommandID::exportTgaTxi) {
-            m_viewModel.exportTgaTxi(itemId, destPath);
+            m_viewModel.exportTgaTxi(resItemId, destPath);
         } else if (event.GetId() == CommandID::exportWavMp3) {
-            m_viewModel.exportWavMp3(itemId, destPath);
+            m_viewModel.exportWavMp3(resItemId, destPath);
         } else {
-            m_viewModel.exportResource(itemId, destPath);
+            m_viewModel.exportResource(resItemId, destPath);
         }
         wxMessageBox("Operation completed successfully", "Success");
     }

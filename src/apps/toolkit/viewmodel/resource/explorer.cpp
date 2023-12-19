@@ -108,9 +108,9 @@ ResourceExplorerViewModel::ResourceExplorerViewModel() {
 void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
     withResourceStream(item, [this, &item](auto &res) {
         try {
-            openResource(*item.resId, res);
+            openResource(*item.id.resId, res);
         } catch (const std::exception &e) {
-            error(str(boost::format("Error opening resource '%s': %s") % item.resId->string() % std::string(e.what())));
+            error(str(boost::format("Error opening resource '%s': %s") % item.id.resId->string() % std::string(e.what())));
         }
     });
 }
@@ -366,10 +366,11 @@ void ResourceExplorerViewModel::loadResources() {
             }
         }
         auto item = std::make_shared<ResourcesItem>();
+        item->id.path = file.path();
+        item->id.resId = std::move(resId);
         item->displayName = filename;
-        item->path = file.path();
         item->container = container;
-        item->resId = std::move(resId);
+        _idToResItem.insert({item->id, item.get()});
         _resItems.push_back(std::move(item));
     }
 
@@ -428,7 +429,7 @@ void ResourceExplorerViewModel::decompile(ResourcesItemId itemId, bool optimize)
         auto nss = MemoryOutputStream(nssBytes);
         NcsTool(_gameId).toNSS(res, nss, *_routines, optimize);
 
-        auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.resId->resRef.value()), *item.resId);
+        auto page = std::make_shared<Page>(PageType::NSS, str(boost::format("%s.nss") % item.id.resId->resRef.value()), *item.id.resId);
         page->viewModel = std::make_shared<NSSResourceViewModel>(std::string(nssBytes.begin(), nssBytes.end()));
         _pages.add(std::move(page));
     });
@@ -536,20 +537,20 @@ bool ResourceExplorerViewModel::invokeTool(Operation operation,
 }
 
 void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, std::function<void(IInputStream &)> block) {
-    if (!item.resId) {
+    if (!item.id.resId) {
         return;
     }
     if (item.archived) {
-        auto extension = boost::to_lower_copy(item.path.extension().string());
+        auto extension = boost::to_lower_copy(item.id.path.extension().string());
         if (extension == ".bif") {
             auto maybeKey = std::find_if(_keyKeys.begin(), _keyKeys.end(), [&item](auto &key) {
-                return key.resId == *item.resId;
+                return key.resId == *item.id.resId;
             });
             if (maybeKey == _keyKeys.end()) {
                 return;
             }
             auto resIdx = maybeKey->resIdx;
-            auto bif = FileInputStream(item.path);
+            auto bif = FileInputStream(item.id.path);
             auto bifReader = BifReader(bif);
             bifReader.load();
             if (bifReader.resources().size() <= resIdx) {
@@ -563,11 +564,11 @@ void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, st
             auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".erf" || extension == ".sav" || extension == ".mod") {
-            auto erf = FileInputStream(item.path);
+            auto erf = FileInputStream(item.id.path);
             auto erfReader = ErfReader(erf);
             erfReader.load();
             auto maybeKey = std::find_if(erfReader.keys().begin(), erfReader.keys().end(), [&item](auto &key) {
-                return key.resId == *item.resId;
+                return key.resId == *item.id.resId;
             });
             if (maybeKey == erfReader.keys().end()) {
                 return;
@@ -581,11 +582,11 @@ void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, st
             auto res = MemoryInputStream(resBytes);
             block(res);
         } else if (extension == ".rim") {
-            auto rim = FileInputStream(item.path);
+            auto rim = FileInputStream(item.id.path);
             auto rimReader = RimReader(rim);
             rimReader.load();
             auto maybeRes = std::find_if(rimReader.resources().begin(), rimReader.resources().end(), [&item](auto &res) {
-                return res.resId == *item.resId;
+                return res.resId == *item.id.resId;
             });
             if (maybeRes == rimReader.resources().end()) {
                 return;
@@ -599,7 +600,7 @@ void ResourceExplorerViewModel::withResourceStream(const ResourcesItem &item, st
             block(res);
         }
     } else {
-        auto res = FileInputStream(item.path);
+        auto res = FileInputStream(item.id.path);
         block(res);
     }
 }
@@ -608,7 +609,7 @@ void ResourceExplorerViewModel::exportResource(ResourcesItemId itemId, const std
     auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto exportedPath = destPath;
-        exportedPath.append(item.resId->string());
+        exportedPath.append(item.id.resId->string());
         auto exported = FileOutputStream(exportedPath);
         auto buffer = ByteBuffer();
         buffer.resize(8192);
@@ -627,7 +628,7 @@ void ResourceExplorerViewModel::exportTgaTxi(ResourcesItemId itemId, const std::
     auto &item = *_idToResItem.at(itemId);
     withResourceStream(item, [&destPath, &item](auto &res) {
         auto tgaPath = destPath;
-        tgaPath /= item.resId->string();
+        tgaPath /= item.id.resId->string();
         tgaPath.replace_extension(std::string(".tga"));
         auto tga = FileOutputStream(tgaPath);
         auto txiBuffer = ByteBuffer();
@@ -635,7 +636,7 @@ void ResourceExplorerViewModel::exportTgaTxi(ResourcesItemId itemId, const std::
         TpcTool().toTGA(res, tga, txiMemory, false);
         if (!txiBuffer.empty()) {
             auto txiPath = destPath;
-            txiPath /= item.resId->string();
+            txiPath /= item.id.resId->string();
             txiPath.replace_extension(std::string(".txi"));
             auto txi = FileOutputStream(txiPath);
             txi.write(&txiBuffer[0], txiBuffer.size());
@@ -651,7 +652,7 @@ void ResourceExplorerViewModel::exportWavMp3(ResourcesItemId itemId, const std::
         ResType actualType;
         AudioTool().unwrap(res, unwrappedMemory, actualType);
         auto unwrappedPath = destPath;
-        unwrappedPath /= item.resId->string();
+        unwrappedPath /= item.id.resId->string();
         if (actualType == ResType::Mp3) {
             unwrappedPath.replace_extension(".mp3");
         }
@@ -773,19 +774,13 @@ void ResourceExplorerViewModel::onResourcesDirectoryChanged(GameID gameId, std::
     loadResources();
 }
 
-void ResourceExplorerViewModel::onResourcesItemIdentified(int index, ResourcesItemId id) {
-    auto &item = _resItems[index];
-    item->id = id;
-    _idToResItem.insert(std::make_pair(id, item.get()));
-}
-
-void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
+void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &id) {
     if (_idToResItem.count(id) == 0) {
         return;
     }
     auto &expandingItem = *_idToResItem.at(id);
-    if (std::filesystem::is_directory(expandingItem.path)) {
-        for (auto &file : std::filesystem::directory_iterator(expandingItem.path)) {
+    if (std::filesystem::is_directory(expandingItem.id.path)) {
+        for (auto &file : std::filesystem::directory_iterator(expandingItem.id.path)) {
             auto filename = boost::to_lower_copy(file.path().filename().string());
             auto extension = boost::to_lower_copy(file.path().extension().string());
             bool container;
@@ -797,23 +792,24 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
                 continue;
             }
             auto item = std::make_shared<ResourcesItem>();
-            item->parentId = expandingItem.id;
-            item->displayName = filename;
-            item->path = file.path();
+            item->id.path = file.path();
             if (!extension.empty()) {
                 auto resType = getResTypeByExt(extension.substr(1), false);
                 if (resType != ResType::Invalid) {
                     auto resRef = filename.substr(0, filename.size() - 4);
-                    item->resId = std::make_shared<ResourceId>(resRef, resType);
+                    item->id.resId = std::make_shared<ResourceId>(resRef, resType);
                 }
             }
+            item->parentId = expandingItem.id;
+            item->displayName = filename;
             item->container = container;
+            _idToResItem.insert({item->id, item.get()});
             _resItems.push_back(std::move(item));
         }
     } else {
-        auto extension = boost::to_lower_copy(expandingItem.path.extension().string());
+        auto extension = boost::to_lower_copy(expandingItem.id.path.extension().string());
         if (boost::ends_with(extension, ".bif")) {
-            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(expandingItem.path.filename().string()));
+            auto filename = str(boost::format("data/%s") % boost::to_lower_copy(expandingItem.id.path.filename().string()));
             auto maybeFile = std::find_if(_keyFiles.begin(), _keyFiles.end(), [&filename](auto &file) {
                 return boost::to_lower_copy(file.filename) == filename;
             });
@@ -824,40 +820,43 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
                         continue;
                     }
                     auto item = std::make_shared<ResourcesItem>();
+                    item->id.path = expandingItem.id.path;
+                    item->id.resId = std::make_shared<ResourceId>(key.resId);
                     item->parentId = expandingItem.id;
                     item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
-                    item->path = expandingItem.path;
-                    item->resId = std::make_shared<ResourceId>(key.resId);
                     item->archived = true;
+                    _idToResItem.insert({item->id, item.get()});
                     _resItems.push_back(std::move(item));
                 }
             }
         } else if (boost::ends_with(extension, ".erf") || boost::ends_with(extension, ".sav") || boost::ends_with(extension, ".mod")) {
-            auto erf = FileInputStream(expandingItem.path);
+            auto erf = FileInputStream(expandingItem.id.path);
             auto erfReader = ErfReader(erf);
             erfReader.load();
             auto &keys = erfReader.keys();
             for (auto &key : keys) {
                 auto item = std::make_shared<ResourcesItem>();
+                item->id.path = expandingItem.id.path;
+                item->id.resId = std::make_shared<ResourceId>(key.resId);
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % key.resId.resRef.value() % getExtByResType(key.resId.type));
-                item->path = expandingItem.path;
-                item->resId = std::make_shared<ResourceId>(key.resId);
                 item->archived = true;
+                _idToResItem.insert({item->id, item.get()});
                 _resItems.push_back(std::move(item));
             }
         } else if (boost::ends_with(extension, ".rim")) {
-            auto rim = FileInputStream(expandingItem.path);
+            auto rim = FileInputStream(expandingItem.id.path);
             auto rimReader = RimReader(rim);
             rimReader.load();
             auto &resources = rimReader.resources();
             for (auto &resource : resources) {
                 auto item = std::make_shared<ResourcesItem>();
+                item->id.path = expandingItem.id.path;
+                item->id.resId = std::make_shared<ResourceId>(resource.resId);
                 item->parentId = expandingItem.id;
                 item->displayName = str(boost::format("%s.%s") % resource.resId.resRef.value() % getExtByResType(resource.resId.type));
-                item->path = expandingItem.path;
-                item->resId = std::make_shared<ResourceId>(resource.resId);
                 item->archived = true;
+                _idToResItem.insert({item->id, item.get()});
                 _resItems.push_back(std::move(item));
             }
         }
@@ -865,7 +864,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(ResourcesItemId id) {
     expandingItem.loaded = true;
 }
 
-void ResourceExplorerViewModel::onResourcesItemActivated(ResourcesItemId id) {
+void ResourceExplorerViewModel::onResourcesItemActivated(const ResourcesItemId &id) {
     auto &item = *_idToResItem.at(id);
     openFile(item);
 }

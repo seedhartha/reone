@@ -45,14 +45,42 @@
 
 namespace reone {
 
-using ResourcesItemId = void *;
-
-struct ResourcesItem {
-    ResourcesItemId id {nullptr};
-    ResourcesItemId parentId {nullptr};
-    std::string displayName;
+struct ResourcesItemId {
     std::filesystem::path path;
     std::shared_ptr<resource::ResourceId> resId;
+
+    size_t hash() const {
+        size_t hash = 0ll;
+        boost::hash_combine(hash, path);
+        if (resId) {
+            boost::hash_combine(hash, resId->hash());
+        }
+        return hash;
+    }
+
+    inline bool operator==(const ResourcesItemId &rhs) const {
+        return path == rhs.path && resId == rhs.resId;
+    }
+
+    inline bool operator!=(const ResourcesItemId &rhs) const {
+        return path != rhs.path || resId != rhs.resId;
+    }
+
+    inline bool operator<(const ResourcesItemId &rhs) const {
+        if (path < rhs.path) {
+            return true;
+        }
+        if (path > rhs.path) {
+            return false;
+        }
+        return resId < rhs.resId;
+    }
+};
+
+struct ResourcesItem {
+    ResourcesItemId id;
+    ResourcesItemId parentId;
+    std::string displayName;
     bool container {false};
     bool loaded {false};
     bool archived {false};
@@ -112,7 +140,7 @@ public:
 
     int getNumResourcesItems() const { return static_cast<int>(_resItems.size()); }
     ResourcesItem &getResourcesItem(int index) { return *_resItems[index]; }
-    ResourcesItem &getResourcesItemById(ResourcesItemId id) { return *_idToResItem.at(id); }
+    ResourcesItem &getResourcesItemById(const ResourcesItemId &id) { return *_idToResItem.at(id); }
 
     Page &getPage(int index) {
         return *_pages.at(index);
@@ -121,9 +149,6 @@ public:
     const resource::TalkTable &talkTable() const {
         return *_talkTable;
     }
-
-    std::string getTalkTableText(int index) const { return _talkTable->getString(index).text; }
-    std::string getTalkTableSound(int index) const { return _talkTable->getString(index).soundResRef; }
 
     // View models
 
@@ -181,9 +206,8 @@ public:
     void onNotebookPageClose(int page);
 
     void onResourcesDirectoryChanged(resource::GameID gameId, std::filesystem::path path);
-    void onResourcesItemIdentified(int index, ResourcesItemId id);
-    void onResourcesItemExpanding(ResourcesItemId id);
-    void onResourcesItemActivated(ResourcesItemId id);
+    void onResourcesItemExpanding(const ResourcesItemId &id);
+    void onResourcesItemActivated(const ResourcesItemId &id);
 
 private:
     resource::GameID _gameId {resource::GameID::KotOR};
