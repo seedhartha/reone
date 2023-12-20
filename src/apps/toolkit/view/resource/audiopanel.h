@@ -33,13 +33,7 @@ class AudioResourceViewModel;
 
 class AudioResourcePanel : public wxPanel {
 public:
-    AudioResourcePanel(wxWindow *parent);
-
-    void SetViewModel(AudioResourceViewModel &viewModel) {
-        m_viewModel = viewModel;
-    }
-
-    void OnEngineLoadRequested();
+    AudioResourcePanel(AudioResourceViewModel &viewModel, wxWindow *parent);
 
     bool HasAudioSource() const {
         return static_cast<bool>(m_audioSource);
@@ -50,9 +44,12 @@ public:
     }
 
 private:
-    std::optional<std::reference_wrapper<AudioResourceViewModel>> m_viewModel;
+    AudioResourceViewModel &m_viewModel;
 
     std::unique_ptr<audio::AudioSource> m_audioSource;
+
+    void InitControls();
+    void BindViewModel();
 
     void OnStopAudioCommand(wxCommandEvent &event);
 };

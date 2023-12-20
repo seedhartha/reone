@@ -185,10 +185,6 @@ public:
         return _progress;
     }
 
-    Property<bool> &engineLoadRequested() {
-        return _engineLoadRequested;
-    }
-
     Property<bool> &renderEnabled() {
         return _renderEnabled;
     }
@@ -243,7 +239,6 @@ private:
 
     Property<int> _selectedPage;
     Property<Progress> _progress;
-    Property<bool> _engineLoadRequested;
     Property<bool> _renderEnabled;
 
     // END Properties

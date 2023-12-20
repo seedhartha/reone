@@ -47,19 +47,15 @@ class ModelResourceViewModel;
 
 class ModelResourcePanel : public wxPanel {
 public:
-    ModelResourcePanel(wxWindow *parent);
-
-    void SetViewModel(ModelResourceViewModel &viewModel) {
-        m_viewModel = viewModel;
-    }
+    ModelResourcePanel(ModelResourceViewModel &viewModel, wxWindow *parent);
 
     void RefreshGL() {
         m_glCanvas->Refresh();
     }
 
-    void OnEngineLoadRequested();
-
 private:
+    ModelResourceViewModel &m_viewModel;
+
     wxSplitterWindow *m_renderSplitter {nullptr};
     wxGLCanvas *m_glCanvas {nullptr};
     wxPanel *m_animationPanel {nullptr};
@@ -68,9 +64,10 @@ private:
     wxTextCtrl *m_animTimeCtrl {nullptr};
     wxListBox *m_animationsListBox {nullptr};
 
-    std::optional<std::reference_wrapper<ModelResourceViewModel>> m_viewModel;
-
     std::shared_ptr<graphics::LipAnimation> m_lipAnim;
+
+    void InitControls();
+    void BindViewModel();
 
     void OnGLCanvasPaint(wxPaintEvent &event);
     void OnGLCanvasMouseWheel(wxMouseEvent &event);

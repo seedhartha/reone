@@ -177,8 +177,8 @@ void ResourceExplorerFrame::InitControls() {
     m_notebook->Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &ResourceExplorerFrame::OnNotebookPageChanged, this);
 
     m_imagePanel = new ImageResourcePanel(m_viewModel.imageResViewModel(), m_notebook);
-    m_modelPanel = new ModelResourcePanel(m_notebook);
-    m_audioPanel = new AudioResourcePanel(m_notebook);
+    m_modelPanel = new ModelResourcePanel(m_viewModel.modelResViewModel(), m_notebook);
+    m_audioPanel = new AudioResourcePanel(m_viewModel.audioResViewModel(), m_notebook);
 
     m_splitter->SplitVertically(resourcesPanel, m_notebook, 1);
 
@@ -330,15 +330,6 @@ void ResourceExplorerFrame::BindViewModel() {
                 m_progressDialog = nullptr;
             }
         }
-    });
-    m_viewModel.engineLoadRequested().addChangedHandler([this](const auto &requested) {
-        if (!requested) {
-            return;
-        }
-        m_modelPanel->SetViewModel(m_viewModel.modelResViewModel());
-        m_modelPanel->OnEngineLoadRequested();
-        m_audioPanel->SetViewModel(m_viewModel.audioResViewModel());
-        m_audioPanel->OnEngineLoadRequested();
     });
     m_viewModel.renderEnabled().addChangedHandler([this](const auto &enabled) {
         if (enabled) {

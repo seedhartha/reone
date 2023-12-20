@@ -26,18 +26,19 @@ using namespace reone::graphics;
 
 namespace reone {
 
-ModelResourcePanel::ModelResourcePanel(wxWindow *parent) :
-    wxPanel(parent) {
+ModelResourcePanel::ModelResourcePanel(ModelResourceViewModel &viewModel,
+                                       wxWindow *parent) :
+    wxPanel(parent),
+    m_viewModel(viewModel) {
 
+    InitControls();
+    BindViewModel();
+}
+
+void ModelResourcePanel::InitControls() {
     m_renderSplitter = new wxSplitterWindow(this);
     m_renderSplitter->SetMinimumPaneSize(100);
 
-    auto sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(m_renderSplitter, wxSizerFlags(1).Expand());
-    SetSizer(sizer);
-}
-
-void ModelResourcePanel::OnEngineLoadRequested() {
     m_glCanvas = new wxGLCanvas(m_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
     m_glCanvas->Bind(wxEVT_PAINT, &ModelResourcePanel::OnGLCanvasPaint, this);
     m_glCanvas->Bind(wxEVT_MOTION, &ModelResourcePanel::OnGLCanvasMouseMotion, this);
@@ -81,7 +82,13 @@ void ModelResourcePanel::OnEngineLoadRequested() {
 
     m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, std::numeric_limits<int>::max());
 
-    m_viewModel->get().animations().addChangedHandler([this](const auto &animations) {
+    auto sizer = new wxBoxSizer(wxHORIZONTAL);
+    sizer->Add(m_renderSplitter, wxSizerFlags(1).Expand());
+    SetSizer(sizer);
+}
+
+void ModelResourcePanel::BindViewModel() {
+    m_viewModel.animations().addChangedHandler([this](const auto &animations) {
         if (!animations.empty()) {
             m_animationsListBox->Freeze();
             m_animationsListBox->Clear();
@@ -94,7 +101,7 @@ void ModelResourcePanel::OnEngineLoadRequested() {
             m_renderSplitter->Unsplit();
         }
     });
-    m_viewModel->get().animationProgress().addChangedHandler([this](const auto &progress) {
+    m_viewModel.animationProgress().addChangedHandler([this](const auto &progress) {
         m_animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
         int value = static_cast<int>(m_animTimeSlider->GetMax() * (progress.time / progress.duration));
         m_animTimeSlider->SetValue(value);
@@ -105,39 +112,39 @@ void ModelResourcePanel::OnGLCanvasPaint(wxPaintEvent &event) {
     wxPaintDC dc(m_glCanvas);
 
     auto clientSize = m_glCanvas->GetClientSize();
-    m_viewModel->get().render3D(clientSize.x, clientSize.y);
+    m_viewModel.render3D(clientSize.x, clientSize.y);
 
     m_glCanvas->SwapBuffers();
 }
 
 void ModelResourcePanel::OnGLCanvasMouseWheel(wxMouseEvent &event) {
     auto delta = event.GetWheelDelta() * event.GetWheelRotation();
-    m_viewModel->get().onGLCanvasMouseWheel(delta);
+    m_viewModel.onGLCanvasMouseWheel(delta);
 }
 
 void ModelResourcePanel::OnGLCanvasMouseMotion(wxMouseEvent &event) {
     wxClientDC dc(m_glCanvas);
     auto position = event.GetLogicalPosition(dc);
-    m_viewModel->get().onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
+    m_viewModel.onGLCanvasMouseMotion(position.x, position.y, event.LeftIsDown(), event.RightIsDown());
 }
 
 void ModelResourcePanel::OnAnimPauseResumeCommand(wxCommandEvent &event) {
-    if (m_viewModel->get().isAnimationPlaying()) {
-        m_viewModel->get().pauseAnimation();
+    if (m_viewModel.isAnimationPlaying()) {
+        m_viewModel.pauseAnimation();
         m_animPauseResumeBtn->SetLabelText("Resume");
     } else {
-        m_viewModel->get().resumeAnimation();
+        m_viewModel.resumeAnimation();
         m_animPauseResumeBtn->SetLabelText("Pause");
     }
 }
 
 void ModelResourcePanel::OnAnimTimeSliderCommand(wxCommandEvent &event) {
-    float duration = m_viewModel->get().animationProgress()->duration;
+    float duration = m_viewModel.animationProgress()->duration;
     if (duration == 0.0f) {
         return;
     }
     float time = duration * m_animTimeSlider->GetValue() / static_cast<float>(m_animTimeSlider->GetMax());
-    m_viewModel->get().setAnimationTime(time);
+    m_viewModel.setAnimationTime(time);
 }
 
 void ModelResourcePanel::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
@@ -146,7 +153,7 @@ void ModelResourcePanel::OnAnimationsListBoxDoubleClick(wxCommandEvent &event) {
         return;
     }
     auto animation = m_animationsListBox->GetString(selection);
-    m_viewModel->get().playAnimation(animation.ToStdString());
+    m_viewModel.playAnimation(animation.ToStdString());
     m_animPauseResumeBtn->SetLabelText("Pause");
 }
 
@@ -166,7 +173,7 @@ void ModelResourcePanel::OnLipLoadCommand(wxCommandEvent &event) {
     auto reader = LipReader(lip, "");
     reader.load();
     m_lipAnim = reader.animation();
-    m_viewModel->get().playAnimation("talk", m_lipAnim.get());
+    m_viewModel.playAnimation("talk", m_lipAnim.get());
 }
 
 } // namespace reone

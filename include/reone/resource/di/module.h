@@ -107,6 +107,14 @@ public:
 
     ResourceServices &services() { return *_services; }
 
+    void setGameID(GameID id) {
+        _gameId = id;
+    }
+
+    void setGamePath(std::filesystem::path path) {
+        _gamePath = std::move(path);
+    }
+
 private:
     GameID _gameId;
     std::filesystem::path _gamePath;

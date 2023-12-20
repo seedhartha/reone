@@ -101,7 +101,23 @@ private:
 };
 
 ResourceExplorerViewModel::ResourceExplorerViewModel() {
+    _graphicsOpt.grass = false;
+    _graphicsOpt.pbr = false;
+    _graphicsOpt.ssao = false;
+    _graphicsOpt.ssr = false;
+    _graphicsOpt.fxaa = false;
+    _graphicsOpt.sharpen = false;
+
+    _clock = std::make_unique<wxClock>();
+    _systemModule = std::make_unique<SystemModule>(*_clock);
+    _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
+    _audioModule = std::make_unique<AudioModule>(_audioOpt);
+    _scriptModule = std::make_unique<ScriptModule>();
+    _resourceModule = std::make_unique<ResourceModule>(_gameId, _resourcesPath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
+    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
+
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
+    _modelResViewModel = std::make_unique<ModelResourceViewModel>(*_systemModule, *_graphicsModule, *_resourceModule, *_sceneModule);
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
 }
 
@@ -377,22 +393,8 @@ void ResourceExplorerViewModel::loadResources() {
     }
     _resItems = resItems;
 
-    _graphicsOpt.grass = false;
-    _graphicsOpt.pbr = false;
-    _graphicsOpt.ssao = false;
-    _graphicsOpt.ssr = false;
-    _graphicsOpt.fxaa = false;
-    _graphicsOpt.sharpen = false;
-
-    _clock = std::make_unique<wxClock>();
-    _systemModule = std::make_unique<SystemModule>(*_clock);
-    _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
-    _audioModule = std::make_unique<AudioModule>(_audioOpt);
-    _scriptModule = std::make_unique<ScriptModule>();
-    _resourceModule = std::make_unique<ResourceModule>(_gameId, _resourcesPath, _graphicsOpt, _audioOpt, *_graphicsModule, *_audioModule, *_scriptModule);
-    _sceneModule = std::make_unique<SceneModule>(_graphicsOpt, *_resourceModule, *_graphicsModule, *_audioModule);
-
-    _modelResViewModel = std::make_unique<ModelResourceViewModel>(*_systemModule, *_graphicsModule, *_resourceModule, *_sceneModule);
+    _resourceModule->setGameID(_gameId);
+    _resourceModule->setGamePath(_resourcesPath);
 }
 
 void ResourceExplorerViewModel::loadTools() {
@@ -406,7 +408,6 @@ void ResourceExplorerViewModel::loadEngine() {
         return;
     }
     info("Loading engine");
-    _engineLoadRequested = true;
 
     _systemModule->init();
     _graphicsModule->init();

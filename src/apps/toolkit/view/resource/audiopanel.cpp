@@ -23,9 +23,16 @@ using namespace reone::audio;
 
 namespace reone {
 
-AudioResourcePanel::AudioResourcePanel(wxWindow *parent) :
-    wxPanel(parent) {
+AudioResourcePanel::AudioResourcePanel(AudioResourceViewModel &viewModel,
+                                       wxWindow *parent) :
+    wxPanel(parent),
+    m_viewModel(viewModel) {
 
+    InitControls();
+    BindViewModel();
+}
+
+void AudioResourcePanel::InitControls() {
     auto stopAudioButton = new wxButton(this, wxID_ANY, "Stop");
     stopAudioButton->Bind(wxEVT_BUTTON, &AudioResourcePanel::OnStopAudioCommand, this);
 
@@ -34,8 +41,8 @@ AudioResourcePanel::AudioResourcePanel(wxWindow *parent) :
     SetSizer(sizer);
 }
 
-void AudioResourcePanel::OnEngineLoadRequested() {
-    m_viewModel->get().audioStream().addChangedHandler([this](const auto &stream) {
+void AudioResourcePanel::BindViewModel() {
+    m_viewModel.audioStream().addChangedHandler([this](const auto &stream) {
         if (stream) {
             m_audioSource = std::make_unique<AudioSource>(stream, false, 1.0f, false, glm::vec3());
             m_audioSource->init();
