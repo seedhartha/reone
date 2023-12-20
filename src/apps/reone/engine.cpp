@@ -116,6 +116,7 @@ void Engine::deinit() {
     _clock.reset();
 
     _optionsView.reset();
+    _window.reset();
 
     SDL_Quit();
 }
