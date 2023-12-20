@@ -37,7 +37,7 @@
 
 #include "../../collectionproperty.h"
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 #include "audio.h"
 #include "image.h"
@@ -103,7 +103,7 @@ struct Page : boost::noncopyable {
     resource::ResourceId resourceId;
     bool dirty {false};
 
-    std::shared_ptr<ViewModel> viewModel;
+    std::shared_ptr<ResourceViewModel> viewModel;
 
     Page(PageType type,
          std::string displayName,
@@ -121,7 +121,7 @@ struct Progress {
     int value {0};
 };
 
-class ResourceExplorerViewModel : public ViewModel {
+class ResourceExplorerViewModel : public ResourceViewModel {
 public:
     ResourceExplorerViewModel();
 

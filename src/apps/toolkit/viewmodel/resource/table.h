@@ -20,7 +20,7 @@
 #include "reone/resource/types.h"
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
@@ -38,16 +38,12 @@ struct TableContent {
     }
 };
 
-class TableResourceViewModel : public ViewModel {
+class TableResourceViewModel : public ResourceViewModel {
 public:
     TableResourceViewModel(resource::ResType resType,
                            std::shared_ptr<TableContent> content) :
         _resType(resType),
         _content(std::move(content)) {
-    }
-
-    Property<bool> &modified() {
-        return _modified;
     }
 
     resource::ResType resType() const {
@@ -61,8 +57,6 @@ public:
 private:
     resource::ResType _resType;
     std::shared_ptr<TableContent> _content;
-
-    Property<bool> _modified;
 };
 
 } // namespace reone

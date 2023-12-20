@@ -17,11 +17,20 @@
 
 #pragma once
 
+#include "../property.h"
+
 namespace reone {
 
-class ViewModel : boost::noncopyable {
+class ResourceViewModel : boost::noncopyable {
 public:
-    virtual ~ViewModel() = default;
+    virtual ~ResourceViewModel() = default;
+
+    Property<bool> &modified() {
+        return _modified;
+    }
+
+protected:
+    Property<bool> _modified;
 };
 
 } // namespace reone

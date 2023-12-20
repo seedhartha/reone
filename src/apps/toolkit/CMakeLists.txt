@@ -29,7 +29,7 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/view/resource/tablepanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/textpanel.h
     ${TOOLKIT_SOURCE_DIR}/view/tool/composelipdialog.h
-    ${TOOLKIT_SOURCE_DIR}/viewmodel.h
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.h
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/gff.h

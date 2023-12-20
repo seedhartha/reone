@@ -124,6 +124,20 @@ private:
     ResourcesItemId _id;
 };
 
+class PageClientData : public wxClientData {
+public:
+    PageClientData(ResourceId resId) :
+        _resId(std::move(resId)) {
+    }
+
+    const ResourceId &resId() const {
+        return _resId;
+    }
+
+private:
+    ResourceId _resId;
+};
+
 ResourceExplorerFrame::ResourceExplorerFrame(ResourceExplorerViewModel &viewModel) :
     wxFrame(nullptr, wxID_ANY, "reone toolkit", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE),
     m_viewModel(viewModel) {
@@ -268,7 +282,21 @@ void ResourceExplorerFrame::BindViewModel() {
                 window = GetStaticPageWindow(page->type);
             } else {
                 window = NewPageWindow(*page);
+                page->viewModel->modified().addChangedHandler([this, &page](const auto &modified) {
+                    for (size_t i = 0; i < m_notebook->GetPageCount(); ++i) {
+                        auto notebookPage = m_notebook->GetPage(i);
+                        auto &pageData = *static_cast<PageClientData *>(notebookPage->GetClientData());
+                        if (pageData.resId() != page->resourceId) {
+                            continue;
+                        }
+                        m_notebook->SetPageText(i, str(boost::format("*%1%") % page->displayName));
+                        m_saveFileMenuItem->Enable(m_notebook->GetSelection() == i);
+                        break;
+                    }
+                    page->dirty = true;
+                });
             }
+            window->SetClientData(new PageClientData {page->resourceId});
             window->Show();
             m_notebook->AddPage(window, page->displayName, true);
         } break;
@@ -347,66 +375,18 @@ wxWindow *ResourceExplorerFrame::NewPageWindow(Page &page) {
     switch (page.type) {
     case PageType::Text: {
         auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);
-        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
-                const auto &p = m_viewModel.pages().at(i);
-                if (p->resourceId != page.resourceId) {
-                    continue;
-                }
-                m_notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
-                m_saveFileMenuItem->Enable(m_notebook->GetSelection() == i);
-                break;
-            }
-            page.dirty = true;
-        });
         return new TextResourcePanel {viewModel, m_notebook};
     }
     case PageType::Table: {
         auto &viewModel = *std::static_pointer_cast<TableResourceViewModel>(page.viewModel);
-        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
-                const auto &p = m_viewModel.pages().at(i);
-                if (p->resourceId != page.resourceId) {
-                    continue;
-                }
-                m_notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
-                m_saveFileMenuItem->Enable(m_notebook->GetSelection() == i);
-                break;
-            }
-            page.dirty = true;
-        });
         return new TableResourcePanel {viewModel, m_notebook};
     }
     case PageType::GFF: {
         auto &viewModel = *std::static_pointer_cast<GFFResourceViewModel>(page.viewModel);
-        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
-                const auto &p = m_viewModel.pages().at(i);
-                if (p->resourceId != page.resourceId) {
-                    continue;
-                }
-                m_notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
-                m_saveFileMenuItem->Enable(m_notebook->GetSelection() == i);
-                break;
-            }
-            page.dirty = true;
-        });
         return new GFFResourcePanel {viewModel, m_viewModel.talkTable(), m_notebook};
     }
     case PageType::NCS: {
         auto &viewModel = *std::static_pointer_cast<NCSResourceViewModel>(page.viewModel);
-        viewModel.modified().addChangedHandler([this, &page](const auto &modified) {
-            for (size_t i = 0; i < m_viewModel.pages()->size(); ++i) {
-                const auto &p = m_viewModel.pages().at(i);
-                if (p->resourceId != page.resourceId) {
-                    continue;
-                }
-                m_notebook->SetPageText(i, str(boost::format("*%1%") % page.displayName));
-                m_saveFileMenuItem->Enable(m_notebook->GetSelection() == i);
-                break;
-            }
-            page.dirty = true;
-        });
         return new NCSResourcePanel {m_viewModel.gameId(), viewModel, m_notebook};
     }
     case PageType::NSS:

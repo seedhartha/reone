@@ -20,18 +20,14 @@
 #include "reone/resource/gff.h"
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
-class GFFResourceViewModel : public ViewModel {
+class GFFResourceViewModel : public ResourceViewModel {
 public:
     GFFResourceViewModel(std::shared_ptr<resource::Gff> content) :
         _content(std::move(content)) {
-    }
-
-    Property<bool> &modified() {
-        return _modified;
     }
 
     resource::Gff &content() {
@@ -40,8 +36,6 @@ public:
 
 private:
     std::shared_ptr<resource::Gff> _content;
-
-    Property<bool> _modified;
 };
 
 } // namespace reone

@@ -24,7 +24,7 @@
 #include "reone/system/stream/input.h"
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
@@ -53,7 +53,7 @@ struct AnimationProgress {
     float duration {0.0f};
 };
 
-class ModelResourceViewModel : public ViewModel {
+class ModelResourceViewModel : public ResourceViewModel {
 public:
     ModelResourceViewModel(SystemModule &systemSvc,
                            graphics::GraphicsModule &graphicsSvc,

@@ -18,18 +18,14 @@
 #pragma once
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
-class NCSResourceViewModel : public ViewModel {
+class NCSResourceViewModel : public ResourceViewModel {
 public:
     NCSResourceViewModel(std::string content) :
         _content(std::move(content)) {
-    }
-
-    Property<bool> &modified() {
-        return _modified;
     }
 
     std::string &content() {
@@ -38,8 +34,6 @@ public:
 
 private:
     std::string _content;
-
-    Property<bool> _modified;
 };
 
 } // namespace reone

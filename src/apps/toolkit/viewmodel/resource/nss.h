@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
-class NSSResourceViewModel : public ViewModel {
+class NSSResourceViewModel : public ResourceViewModel {
 public:
     NSSResourceViewModel(std::string content) :
         _content(std::move(content)) {

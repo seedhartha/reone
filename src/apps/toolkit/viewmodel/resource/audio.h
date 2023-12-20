@@ -22,11 +22,11 @@
 #include "reone/system/stream/input.h"
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
-class AudioResourceViewModel : public ViewModel {
+class AudioResourceViewModel : public ResourceViewModel {
 public:
     void openAudio(const resource::ResourceId &id, IInputStream &audio);
 

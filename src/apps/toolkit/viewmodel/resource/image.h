@@ -21,7 +21,7 @@
 #include "reone/system/stream/input.h"
 
 #include "../../property.h"
-#include "../../viewmodel.h"
+#include "../resource.h"
 
 namespace reone {
 
@@ -38,7 +38,7 @@ struct ImageContent {
     }
 };
 
-class ImageResourceViewModel : public ViewModel {
+class ImageResourceViewModel : public ResourceViewModel {
 public:
     void openImage(const resource::ResourceId &id, IInputStream &stream);
 
