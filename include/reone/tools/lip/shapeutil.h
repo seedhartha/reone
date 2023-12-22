@@ -26,33 +26,33 @@ std::string describeLipShape(LipShape shape) {
     case LipShape::Neutral:
         return "Neutral";
     case LipShape::IH_IY:
-        return "IH_IY";
+        return "IH, IY";
     case LipShape::EH_ER_EY:
-        return "EH_ER_EY";
+        return "EH, ER, EY";
     case LipShape::AA_AE_AH:
-        return "AA_AE_AH";
+        return "AA, AE, AH";
     case LipShape::OW_OY:
-        return "OW_OY";
+        return "OW, OY";
     case LipShape::UH_UW_W:
-        return "UH_UW_W";
+        return "UH, UW, W";
     case LipShape::D_DH_S_Y_Z:
-        return "D_DH_S_Y_Z";
+        return "D, DH, S, Y, Z";
     case LipShape::CH_JH_SH_ZH:
-        return "CH_JH_SH_ZH";
+        return "CH, JH, SH, ZH";
     case LipShape::F_V:
-        return "F_V";
+        return "F, V";
     case LipShape::G_HH_K_NG:
-        return "G_HH_K_NG";
+        return "G, HH, K, NG";
     case LipShape::T_TH:
-        return "T_TH";
+        return "T, TH";
     case LipShape::B_M_P:
-        return "B_M_P";
+        return "B, M, P";
     case LipShape::L_N:
-        return "L_N";
+        return "L, N";
     case LipShape::R:
         return "R";
     case LipShape::AW_AY:
-        return "AW_AY";
+        return "AW, AY";
     case LipShape::AO:
         return "AO";
     default:

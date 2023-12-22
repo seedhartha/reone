@@ -133,11 +133,11 @@ void TableResourcePanel::BindEvents() {
                 bool modified = false;
                 switch (static_cast<MenuItemId>(event.GetId())) {
                 case MenuItemId::RenameColumn: {
-                    wxTextEntryDialog dialog(nullptr, "New name:", "Column rename", m_viewModel.content().columns[column]);
+                    wxTextEntryDialog dialog(nullptr, "New name:", "Column rename", m_viewModel.content().columns[column].name);
                     if (dialog.ShowModal() == wxID_OK) {
                         auto newName = dialog.GetValue().ToStdString();
-                        if (m_viewModel.content().columns[column] != newName) {
-                            m_viewModel.content().columns[column] = newName;
+                        if (m_viewModel.content().columns[column].name != newName) {
+                            m_viewModel.content().columns[column].name = newName;
                             modified = true;
                         }
                     }
@@ -145,7 +145,7 @@ void TableResourcePanel::BindEvents() {
                 case MenuItemId::AppendColumn: {
                     auto iter = m_viewModel.content().columns.begin();
                     std::advance(iter, column + 1);
-                    m_viewModel.content().columns.insert(iter, "New Column");
+                    m_viewModel.content().columns.insert(iter, {"New Column"});
                     for (auto &row : m_viewModel.content().rows) {
                         auto valuesIter = row.begin();
                         std::advance(valuesIter, column + 1);
@@ -191,8 +191,20 @@ void TableResourcePanel::RefreshDataView() {
     if (m_viewModel.content().rowNumberColumn) {
         m_tableCtrl->AppendTextColumn("Index");
     }
-    for (const auto &column : m_viewModel.content().columns) {
-        m_tableCtrl->AppendTextColumn(column, wxDATAVIEW_CELL_EDITABLE);
+    for (size_t i = 0; i < m_viewModel.content().columns.size(); ++i) {
+        const auto &column = m_viewModel.content().columns.at(i);
+        if (column.choices.empty()) {
+            m_tableCtrl->AppendTextColumn(column.name, wxDATAVIEW_CELL_EDITABLE);
+        } else {
+            wxArrayString choices;
+            for (const auto &choice : column.choices) {
+                choices.Add(choice);
+            }
+            m_tableCtrl->AppendColumn(new wxDataViewColumn(
+                column.name,
+                new wxDataViewChoiceRenderer {choices},
+                m_viewModel.content().rowNumberColumn ? i + 1 : i));
+        }
     }
     for (size_t i = 0; i < m_viewModel.content().rows.size(); ++i) {
         auto &row = m_viewModel.content().rows[i];

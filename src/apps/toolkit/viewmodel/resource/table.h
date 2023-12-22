@@ -24,16 +24,30 @@
 
 namespace reone {
 
+struct TableColumn {
+    std::string name;
+    std::vector<std::string> choices;
+
+    TableColumn(std::string name) :
+        name(std::move(name)) {
+    }
+
+    TableColumn(std::string name, std::vector<std::string> choices) :
+        name(std::move(name)),
+        choices(std::move(choices)) {
+    }
+};
+
 struct TableContent {
-    std::vector<std::string> columns;
+    std::vector<TableColumn> columns;
     std::vector<std::vector<std::string>> rows;
     bool rowNumberColumn;
 
-    TableContent(std::vector<std::string> columns,
+    TableContent(std::vector<TableColumn> columns,
                  std::vector<std::vector<std::string>> rows,
                  bool rowNumberColumn = false) :
-        columns(columns),
-        rows(rows),
+        columns(std::move(columns)),
+        rows(std::move(rows)),
         rowNumberColumn(rowNumberColumn) {
     }
 };

@@ -86,6 +86,9 @@ static const std::set<ResType> kFilesPlaintextResTypes {
     ResType::Lyt,
     ResType::Vis};
 
+static std::unordered_map<LipShape, std::string> g_lipShapeToName;
+static std::unordered_map<std::string, LipShape> g_nameToLipShape;
+
 class wxClock : public IClock, boost::noncopyable {
 public:
     wxClock() {
@@ -119,6 +122,13 @@ ResourceExplorerViewModel::ResourceExplorerViewModel() {
     _imageResViewModel = std::make_unique<ImageResourceViewModel>();
     _modelResViewModel = std::make_unique<ModelResourceViewModel>(*_systemModule, *_graphicsModule, *_resourceModule, *_sceneModule);
     _audioResViewModel = std::make_unique<AudioResourceViewModel>();
+
+    for (int i = 0; i < 16; ++i) {
+        auto shape = static_cast<LipShape>(i);
+        auto name = describeLipShape(shape);
+        g_lipShapeToName.insert({shape, name});
+        g_nameToLipShape.insert({name, shape});
+    }
 }
 
 void ResourceExplorerViewModel::openFile(const ResourcesItem &item) {
@@ -164,9 +174,9 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
         auto twoDa = reader.twoDa();
 
-        auto columns = std::vector<std::string>();
+        auto columns = std::vector<TableColumn>();
         for (auto &column : twoDa->columns()) {
-            columns.push_back(column);
+            columns.emplace_back(column);
         }
         auto rows = std::vector<std::vector<std::string>>();
         for (int i = 0; i < twoDa->getRowCount(); ++i) {
@@ -197,9 +207,9 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
         auto tlk = reader.table();
 
-        auto columns = std::vector<std::string>();
-        columns.push_back("Text");
-        columns.push_back("Sound");
+        auto columns = std::vector<TableColumn>();
+        columns.emplace_back("Text");
+        columns.emplace_back("Sound");
 
         auto rows = std::vector<std::vector<std::string>>();
         for (int i = 0; i < tlk->getStringCount(); ++i) {
@@ -242,14 +252,19 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
         auto animation = reader.animation();
 
-        auto columns = std::vector<std::string>();
-        columns.push_back("Time");
-        columns.push_back("Shape");
+        std::vector<std::string> shapeNames;
+        for (size_t i = 0; i < 16; ++i) {
+            shapeNames.emplace_back(describeLipShape(static_cast<LipShape>(i)));
+        }
+        auto columns = std::vector<TableColumn>();
+        columns.emplace_back("Time");
+        columns.emplace_back("Shape", shapeNames);
+
         auto rows = std::vector<std::vector<std::string>>();
         for (auto &kf : animation->keyframes()) {
             auto values = std::vector<std::string>();
             values.push_back(std::to_string(kf.time));
-            values.push_back(std::to_string(kf.shape));
+            values.push_back(shapeNames.at(kf.shape));
             rows.push_back(std::move(values));
         }
 
@@ -264,8 +279,9 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
         auto &soundSet = reader.soundSet();
 
-        auto columns = std::vector<std::string>();
-        columns.push_back("StrRef");
+        auto columns = std::vector<TableColumn>();
+        columns.emplace_back("StrRef");
+
         auto rows = std::vector<std::vector<std::string>>();
         for (size_t i = 0; i < soundSet.size(); ++i) {
             auto values = std::vector<std::string>();
@@ -685,10 +701,10 @@ void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path
             std::vector<std::string> columns;
             std::vector<TwoDa::Row> rows;
             for (const auto &column : table.columns) {
-                columns.emplace_back(column);
+                columns.emplace_back(column.name);
             }
             for (const auto &row : table.rows) {
-                rows.push_back(TwoDa::Row {row});
+                rows.push_back({row});
             }
             TwoDa twoDa {std::move(columns), std::move(rows)};
             TwoDaWriter writer {twoDa};
@@ -701,8 +717,10 @@ void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path
             std::vector<LipAnimation::Keyframe> keyframes;
             for (const auto &row : table.rows) {
                 float time = std::stof(row[0]);
+                auto shapeName = row[1];
+                auto shape = g_nameToLipShape.at(shapeName);
                 length = std::max(length, time);
-                keyframes.push_back({time, static_cast<uint8_t>(std::stoul(row[1]))});
+                keyframes.push_back({time, static_cast<uint8_t>(shape)});
             }
             LipAnimation lip {page.resourceId.resRef.value(), length, std::move(keyframes)};
             LipWriter writer {lip};
