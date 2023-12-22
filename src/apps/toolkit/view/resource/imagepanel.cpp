@@ -28,18 +28,32 @@ ImageResourcePanel::ImageResourcePanel(ImageResourceViewModel &viewModel,
     wxPanel(parent),
     m_viewModel(viewModel) {
 
+    InitControls();
+    BindEvents();
+    BindViewModel();
+}
+
+void ImageResourcePanel::InitControls() {
     m_imageSplitter = new wxSplitterWindow(this, wxID_ANY);
+    m_imageSplitter->SetMinimumPaneSize(100);
+
     m_imageCanvas = new wxPanel(m_imageSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    m_imageCanvas->Bind(wxEVT_PAINT, &ImageResourcePanel::OnImageCanvasPaint, this);
+
     m_imageInfoCtrl = new wxTextCtrl(m_imageSplitter, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     m_imageInfoCtrl->SetEditable(false);
-    m_imageSplitter->SetMinimumPaneSize(100);
+
     m_imageSplitter->SplitHorizontally(m_imageCanvas, m_imageInfoCtrl, std::numeric_limits<int>::max());
 
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(m_imageSplitter, wxSizerFlags(1).Expand());
     SetSizer(sizer);
+}
 
+void ImageResourcePanel::BindEvents() {
+    m_imageCanvas->Bind(wxEVT_PAINT, &ImageResourcePanel::OnImageCanvasPaint, this);
+}
+
+void ImageResourcePanel::BindViewModel() {
     m_viewModel.imageContent().addChangedHandler([this](const auto &data) {
         auto stream = wxMemoryInputStream(&(*data.tgaBytes)[0], data.tgaBytes->size());
         auto image = wxImage();

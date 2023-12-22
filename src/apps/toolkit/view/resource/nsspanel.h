@@ -36,6 +36,8 @@ public:
 
 private:
     NSSResourceViewModel &m_viewModel;
+
+    void InitControls();
 };
 
 } // namespace reone

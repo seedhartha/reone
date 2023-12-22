@@ -40,6 +40,12 @@ public:
 private:
     resource::GameID m_gameId;
     NCSResourceViewModel &m_viewModel;
+
+    wxTextCtrl *m_textCtrl {nullptr};
+    wxButton *m_compileBtn {nullptr};
+
+    void InitControls();
+    void BindEvents();
 };
 
 } // namespace reone

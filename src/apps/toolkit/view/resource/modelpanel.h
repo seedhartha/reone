@@ -63,10 +63,12 @@ private:
     wxSlider *m_animTimeSlider {nullptr};
     wxTextCtrl *m_animTimeCtrl {nullptr};
     wxListBox *m_animationsListBox {nullptr};
+    wxButton *m_lipLoadBtn {nullptr};
 
     std::shared_ptr<graphics::LipAnimation> m_lipAnim;
 
     void InitControls();
+    void BindEvents();
     void BindViewModel();
 
     void OnGLCanvasPaint(wxPaintEvent &event);

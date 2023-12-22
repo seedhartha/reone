@@ -43,7 +43,12 @@ private:
     wxSplitterWindow *m_imageSplitter {nullptr};
     wxPanel *m_imageCanvas {nullptr};
     wxTextCtrl *m_imageInfoCtrl {nullptr};
+
     std::unique_ptr<wxBitmap> m_image;
+
+    void InitControls();
+    void BindEvents();
+    void BindViewModel();
 
     void OnImageCanvasPaint(wxPaintEvent &event);
 };

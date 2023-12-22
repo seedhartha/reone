@@ -35,6 +35,11 @@ public:
 
 private:
     TextResourceViewModel &m_viewModel;
+
+    wxTextCtrl *m_textCtrl {nullptr};
+
+    void InitControls();
+    void BindEvents();
 };
 
 } // namespace reone

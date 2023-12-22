@@ -40,9 +40,6 @@ void ModelResourcePanel::InitControls() {
     m_renderSplitter->SetMinimumPaneSize(100);
 
     m_glCanvas = new wxGLCanvas(m_renderSplitter, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
-    m_glCanvas->Bind(wxEVT_PAINT, &ModelResourcePanel::OnGLCanvasPaint, this);
-    m_glCanvas->Bind(wxEVT_MOTION, &ModelResourcePanel::OnGLCanvasMouseMotion, this);
-    m_glCanvas->Bind(wxEVT_MOUSEWHEEL, &ModelResourcePanel::OnGLCanvasMouseWheel, this);
 
 #if wxCHECK_VERSION(3, 1, 0)
     wxGLContextAttrs glCtxAttrs;
@@ -55,26 +52,29 @@ void ModelResourcePanel::InitControls() {
 
     m_animationPanel = new wxPanel(m_renderSplitter);
     m_animPauseResumeBtn = new wxButton(m_animationPanel, wxID_ANY, "Pause");
-    m_animPauseResumeBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnAnimPauseResumeCommand, this);
     m_animTimeSlider = new wxSlider(m_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
-    m_animTimeSlider->Bind(wxEVT_SLIDER, &ModelResourcePanel::OnAnimTimeSliderCommand, this);
     m_animTimeCtrl = new wxTextCtrl(m_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+
     auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
     animPlaybackSizer->Add(m_animPauseResumeBtn, wxSizerFlags(0).Center().Border(wxALL, 3));
     animPlaybackSizer->Add(m_animTimeSlider, wxSizerFlags(1).Expand().Border(wxALL, 3));
     animPlaybackSizer->Add(m_animTimeCtrl, wxSizerFlags(0).Center().Border(wxALL, 3));
+
     m_animationsListBox = new wxListBox(m_animationPanel, wxID_ANY);
     m_animationsListBox->SetMinSize(wxSize(400, 100));
-    m_animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &ModelResourcePanel::OnAnimationsListBoxDoubleClick, this);
+
     auto animationsSizer = new wxStaticBoxSizer(wxVERTICAL, m_animationPanel, "Animations");
     animationsSizer->Add(m_animationsListBox, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    auto lipLoadBtn = new wxButton(m_animationPanel, wxID_ANY, "Load LIP...");
-    lipLoadBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnLipLoadCommand, this);
+
+    m_lipLoadBtn = new wxButton(m_animationPanel, wxID_ANY, "Load LIP...");
+
     auto lipSyncSizer = new wxStaticBoxSizer(wxVERTICAL, m_animationPanel, "Lip Sync");
-    lipSyncSizer->Add(lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    lipSyncSizer->Add(m_lipLoadBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
     auto animationHSizer = new wxBoxSizer(wxHORIZONTAL);
     animationHSizer->Add(animationsSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
     animationHSizer->Add(lipSyncSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
     auto animationVSizer = new wxBoxSizer(wxVERTICAL);
     animationVSizer->Add(animPlaybackSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     animationVSizer->Add(animationHSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
@@ -85,6 +85,16 @@ void ModelResourcePanel::InitControls() {
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(m_renderSplitter, wxSizerFlags(1).Expand());
     SetSizer(sizer);
+}
+
+void ModelResourcePanel::BindEvents() {
+    m_glCanvas->Bind(wxEVT_PAINT, &ModelResourcePanel::OnGLCanvasPaint, this);
+    m_glCanvas->Bind(wxEVT_MOTION, &ModelResourcePanel::OnGLCanvasMouseMotion, this);
+    m_glCanvas->Bind(wxEVT_MOUSEWHEEL, &ModelResourcePanel::OnGLCanvasMouseWheel, this);
+    m_animPauseResumeBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnAnimPauseResumeCommand, this);
+    m_animTimeSlider->Bind(wxEVT_SLIDER, &ModelResourcePanel::OnAnimTimeSliderCommand, this);
+    m_animationsListBox->Bind(wxEVT_LISTBOX_DCLICK, &ModelResourcePanel::OnAnimationsListBoxDoubleClick, this);
+    m_lipLoadBtn->Bind(wxEVT_BUTTON, &ModelResourcePanel::OnLipLoadCommand, this);
 }
 
 void ModelResourcePanel::BindViewModel() {

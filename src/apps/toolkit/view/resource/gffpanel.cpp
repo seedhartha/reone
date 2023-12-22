@@ -36,11 +36,14 @@ GFFResourcePanel::GFFResourcePanel(GFFResourceViewModel &viewModel,
     m_talkTable(talkTable),
     m_viewModel(viewModel) {
 
+    InitControls();
+    BindEvents();
+}
+
+void GFFResourcePanel::InitControls() {
     auto treeCtrl = new wxDataViewTreeCtrl(this, wxID_ANY);
-    treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &GFFResourcePanel::OnGffTreeCtrlItemStartEditing, this);
-    treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &GFFResourcePanel::OnGffTreeCtrlItemContextMenu, this);
     treeCtrl->Freeze();
-    AppendGffStructToTree(*treeCtrl, wxDataViewItem(), "/", viewModel.content());
+    AppendGffStructToTree(wxDataViewItem(), "/", m_viewModel.content());
     treeCtrl->Thaw();
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
@@ -48,104 +51,108 @@ GFFResourcePanel::GFFResourcePanel(GFFResourceViewModel &viewModel,
     SetSizer(sizer);
 }
 
-void GFFResourcePanel::AppendGffStructToTree(wxDataViewTreeCtrl &ctrl,
-                                             wxDataViewItem parent,
+void GFFResourcePanel::BindEvents() {
+    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &GFFResourcePanel::OnGffTreeCtrlItemStartEditing, this);
+    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &GFFResourcePanel::OnGffTreeCtrlItemContextMenu, this);
+}
+
+void GFFResourcePanel::AppendGffStructToTree(wxDataViewItem parent,
                                              const std::string &text,
                                              Gff &gff,
                                              std::optional<std::reference_wrapper<Gff::Field>> parentField,
                                              std::optional<std::reference_wrapper<Gff>> parentFieldGff,
                                              std::optional<int> parentListIdx) {
-    auto structItem = ctrl.AppendContainer(
+    auto structItem = m_treeCtrl->AppendContainer(
         parent,
         str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())),
         -1,
         -1,
         new GFFTreeItemClientData {gff, std::nullopt, parentField, parentFieldGff, parentListIdx});
-    ctrl.Expand(structItem);
+    m_treeCtrl->Expand(structItem);
     for (auto &field : gff.fields()) {
         switch (field.type) {
         case Gff::FieldType::CExoString:
         case Gff::FieldType::ResRef: {
             auto cleaned = boost::replace_all_copy(field.strValue, "\n", "\\n");
-            ctrl.AppendItem(
+            m_treeCtrl->AppendItem(
                 structItem,
                 str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)),
                 -1,
                 new GFFTreeItemClientData {gff, field});
         } break;
         case Gff::FieldType::CExoLocString: {
-            auto locStringItem = ctrl.AppendContainer(
+            auto locStringItem = m_treeCtrl->AppendContainer(
                 structItem,
                 str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
                 -1,
                 -1,
                 new GFFTreeItemClientData {gff, field});
-            ctrl.Expand(locStringItem);
-            ctrl.AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
-            ctrl.AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
+            m_treeCtrl->Expand(locStringItem);
+            m_treeCtrl->AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
+            m_treeCtrl->AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
             if (field.intValue != -1) {
                 auto tlkText = m_talkTable.getString(field.intValue).text;
                 auto cleanedTlkText = boost::replace_all_copy(tlkText, "\n", "\\n");
-                ctrl.AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
+                m_treeCtrl->AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
             }
         } break;
         case Gff::FieldType::Void:
-            ctrl.AppendItem(
+            m_treeCtrl->AppendItem(
                 structItem,
                 str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)),
                 -1,
                 new GFFTreeItemClientData {gff, field});
             break;
         case Gff::FieldType::Struct:
-            AppendGffStructToTree(ctrl, structItem, field.label, *field.children[0], field);
+            AppendGffStructToTree(structItem, field.label, *field.children[0], field);
             break;
         case Gff::FieldType::List: {
-            auto listItem = ctrl.AppendContainer(
+            auto listItem = m_treeCtrl->AppendContainer(
                 structItem,
                 str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
                 -1,
                 -1,
                 new GFFTreeItemClientData {gff, field});
-            ctrl.Expand(listItem);
+            m_treeCtrl->Expand(listItem);
             for (auto it = field.children.begin(); it != field.children.end(); ++it) {
                 auto childIdx = std::distance(field.children.begin(), it);
-                AppendGffStructToTree(ctrl, listItem, std::to_string(childIdx), **it, field, gff, childIdx);
+                AppendGffStructToTree(listItem, std::to_string(childIdx), **it, field, gff, childIdx);
             }
         } break;
         case Gff::FieldType::Orientation: {
-            auto orientationItem = ctrl.AppendContainer(
+            auto orientationItem = m_treeCtrl->AppendContainer(
                 structItem,
                 str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
                 -1,
                 -1,
                 new GFFTreeItemClientData {gff, field});
-            ctrl.Expand(orientationItem);
-            ctrl.AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
-            ctrl.AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
-            ctrl.AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
-            ctrl.AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
+            m_treeCtrl->Expand(orientationItem);
+            m_treeCtrl->AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
+            m_treeCtrl->AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
+            m_treeCtrl->AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
+            m_treeCtrl->AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
         } break;
         case Gff::FieldType::Vector: {
-            auto vectorItem = ctrl.AppendContainer(
+            auto vectorItem = m_treeCtrl->AppendContainer(
                 structItem,
                 str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
                 -1,
                 -1,
                 new GFFTreeItemClientData {gff, field});
-            ctrl.Expand(vectorItem);
-            ctrl.AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
-            ctrl.AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
-            ctrl.AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
+            m_treeCtrl->Expand(vectorItem);
+            m_treeCtrl->AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
+            m_treeCtrl->AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
+            m_treeCtrl->AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
         } break;
         case Gff::FieldType::StrRef:
-            ctrl.AppendItem(
+            m_treeCtrl->AppendItem(
                 structItem,
                 str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)),
                 -1,
                 new GFFTreeItemClientData {gff, field});
             break;
         default:
-            ctrl.AppendItem(
+            m_treeCtrl->AppendItem(
                 structItem,
                 str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)),
                 -1,
@@ -533,10 +540,10 @@ void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             break;
         }
         if (modified) {
-            control->Freeze();
-            control->DeleteAllItems();
-            AppendGffStructToTree(*control, wxDataViewItem(), "/", m_viewModel.content());
-            control->Thaw();
+            m_treeCtrl->Freeze();
+            m_treeCtrl->DeleteAllItems();
+            AppendGffStructToTree(wxDataViewItem(), "/", m_viewModel.content());
+            m_treeCtrl->Thaw();
             m_viewModel.modified() = true;
         }
     });

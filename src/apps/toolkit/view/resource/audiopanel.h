@@ -46,9 +46,12 @@ public:
 private:
     AudioResourceViewModel &m_viewModel;
 
+    wxButton *m_stopAudioBtn {nullptr};
+
     std::unique_ptr<audio::AudioSource> m_audioSource;
 
     void InitControls();
+    void BindEvents();
     void BindViewModel();
 
     void OnStopAudioCommand(wxCommandEvent &event);

@@ -38,7 +38,11 @@ public:
 private:
     TableResourceViewModel &m_viewModel;
 
-    wxDataViewListCtrl *m_tableCtrl;
+    wxDataViewListCtrl *m_tableCtrl {nullptr};
+    wxButton *m_goToRowBtn {nullptr};
+
+    void InitControls();
+    void BindEvents();
 
     void RefreshDataView();
 };

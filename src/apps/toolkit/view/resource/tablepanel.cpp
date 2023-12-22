@@ -30,9 +30,22 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
     wxPanel(parent),
     m_viewModel(viewModel) {
 
-    m_tableCtrl = new wxDataViewListCtrl(this, wxID_ANY);
+    InitControls();
+    BindEvents();
     RefreshDataView();
+}
 
+void TableResourcePanel::InitControls() {
+    m_tableCtrl = new wxDataViewListCtrl(this, wxID_ANY);
+    m_goToRowBtn = new wxButton(this, wxID_ANY, "Go to row...");
+
+    auto sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(m_goToRowBtn, wxSizerFlags(0).Border(wxALL, 3));
+    sizer->Add(m_tableCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    SetSizer(sizer);
+}
+
+void TableResourcePanel::BindEvents() {
     m_tableCtrl->Bind(wxEVT_DATAVIEW_ITEM_EDITING_DONE, [this](const auto &event) {
         auto item = event.GetItem();
         if (!item) {
@@ -162,20 +175,13 @@ TableResourcePanel::TableResourcePanel(TableResourceViewModel &viewModel,
             PopupMenu(&menu, event.GetPosition());
         });
     }
-
-    auto goToRowBtn = new wxButton(this, wxID_ANY, "Go to row...");
-    goToRowBtn->Bind(wxEVT_BUTTON, [this](const auto &event) {
+    m_goToRowBtn->Bind(wxEVT_BUTTON, [this](const auto &event) {
         wxNumberEntryDialog dialog(nullptr, "Row number:", wxEmptyString, "Go to row", 0, 0, m_viewModel.content().rows.size());
         if (dialog.ShowModal() == wxID_OK) {
             auto row = dialog.GetValue();
             m_tableCtrl->EnsureVisible(m_tableCtrl->RowToItem(row));
         }
     });
-
-    auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(goToRowBtn, wxSizerFlags(0).Border(wxALL, 3));
-    sizer->Add(m_tableCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    SetSizer(sizer);
 }
 
 void TableResourcePanel::RefreshDataView() {

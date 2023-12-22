@@ -68,8 +68,12 @@ private:
     GFFResourceViewModel &m_viewModel;
     const resource::TalkTable &m_talkTable;
 
-    void AppendGffStructToTree(wxDataViewTreeCtrl &ctrl,
-                               wxDataViewItem parent,
+    wxDataViewTreeCtrl *m_treeCtrl {nullptr};
+
+    void InitControls();
+    void BindEvents();
+
+    void AppendGffStructToTree(wxDataViewItem parent,
                                const std::string &text,
                                resource::Gff &gff,
                                std::optional<std::reference_wrapper<resource::Gff::Field>> parentField = std::nullopt,

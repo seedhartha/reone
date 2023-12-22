@@ -25,19 +25,26 @@ TextResourcePanel::TextResourcePanel(TextResourceViewModel &viewModel, wxWindow 
     wxPanel(parent),
     m_viewModel(viewModel) {
 
-    auto textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    textCtrl->AppendText(viewModel.content());
-    textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
+    InitControls();
+    BindEvents();
+}
+
+void TextResourcePanel::InitControls() {
+    m_textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    m_textCtrl->AppendText(m_viewModel.content());
+
+    auto sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(m_textCtrl, 1, wxEXPAND);
+    SetSizer(sizer);
+}
+
+void TextResourcePanel::BindEvents() {
+    m_textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
         auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
         auto text = ctrl->GetValue().ToStdString();
         m_viewModel.content() = text;
         m_viewModel.modified() = true;
     });
-    // textCtrl->SetEditable(false);
-
-    auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(textCtrl, 1, wxEXPAND);
-    SetSizer(sizer);
 }
 
 } // namespace reone

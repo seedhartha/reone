@@ -28,6 +28,10 @@ NSSResourcePanel::NSSResourcePanel(NSSResourceViewModel &viewModel,
     wxPanel(parent),
     m_viewModel(viewModel) {
 
+    InitControls();
+}
+
+void NSSResourcePanel::InitControls() {
     auto textCtrl = new wxStyledTextCtrl(this);
     textCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
     textCtrl->SetLexer(wxSTC_LEX_CPP);
@@ -50,7 +54,7 @@ NSSResourcePanel::NSSResourcePanel(NSSResourceViewModel &viewModel,
     textCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORD, wxColour(0, 128, 128));
     textCtrl->StyleSetForeground(wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0, 128, 128));
     textCtrl->StyleSetForeground(wxSTC_C_PREPROCESSORCOMMENT, wxColour(0, 128, 0));
-    textCtrl->SetText(viewModel.content());
+    textCtrl->SetText(m_viewModel.content());
     textCtrl->SetEditable(false);
 
     auto sizer = new wxBoxSizer(wxVERTICAL);

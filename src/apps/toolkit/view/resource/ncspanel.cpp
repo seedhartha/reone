@@ -36,19 +36,31 @@ NCSResourcePanel::NCSResourcePanel(GameID gameId,
     m_gameId(gameId),
     m_viewModel(viewModel) {
 
-    auto textCtrl = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-    textCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-    textCtrl->AppendText(viewModel.content());
-    textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
+    InitControls();
+    BindEvents();
+}
+
+void NCSResourcePanel::InitControls() {
+    m_textCtrl = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    m_textCtrl->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+    m_textCtrl->AppendText(m_viewModel.content());
+
+    m_compileBtn = new wxButton(this, wxID_ANY, "Compile");
+
+    auto sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(m_compileBtn, wxSizerFlags(0).Border(wxALL, 3));
+    sizer->Add(m_textCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    SetSizer(sizer);
+}
+
+void NCSResourcePanel::BindEvents() {
+    m_textCtrl->Bind(wxEVT_TEXT, [this](const auto &event) {
         auto ctrl = wxDynamicCast(event.GetEventObject(), wxTextCtrl);
         auto text = ctrl->GetValue().ToStdString();
         m_viewModel.content() = text;
         m_viewModel.modified() = true;
     });
-    // textCtrl->SetEditable(false);
-
-    auto compileCtrl = new wxButton(this, wxID_ANY, "Compile");
-    compileCtrl->Bind(wxEVT_BUTTON, [this](const auto &event) {
+    m_compileBtn->Bind(wxEVT_BUTTON, [this](const auto &event) {
         MemoryInputStream stream {m_viewModel.content()};
         Routines routines {m_gameId, nullptr, nullptr};
         routines.init();
@@ -60,11 +72,6 @@ NCSResourcePanel::NCSResourcePanel(GameID gameId,
             wxMessageBox(ex.what(), "Error", wxICON_ERROR);
         }
     });
-
-    auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(compileCtrl, wxSizerFlags(0).Border(wxALL, 3));
-    sizer->Add(textCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    SetSizer(sizer);
 }
 
 } // namespace reone

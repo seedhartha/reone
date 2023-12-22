@@ -29,16 +29,20 @@ AudioResourcePanel::AudioResourcePanel(AudioResourceViewModel &viewModel,
     m_viewModel(viewModel) {
 
     InitControls();
+    BindEvents();
     BindViewModel();
 }
 
 void AudioResourcePanel::InitControls() {
-    auto stopAudioButton = new wxButton(this, wxID_ANY, "Stop");
-    stopAudioButton->Bind(wxEVT_BUTTON, &AudioResourcePanel::OnStopAudioCommand, this);
+    m_stopAudioBtn = new wxButton(this, wxID_ANY, "Stop");
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(stopAudioButton);
+    sizer->Add(m_stopAudioBtn);
     SetSizer(sizer);
+}
+
+void AudioResourcePanel::BindEvents() {
+    m_stopAudioBtn->Bind(wxEVT_BUTTON, &AudioResourcePanel::OnStopAudioCommand, this);
 }
 
 void AudioResourcePanel::BindViewModel() {
