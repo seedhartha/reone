@@ -158,6 +158,10 @@ public:
     std::vector<Field> &fields() { return _fields; }
     const std::vector<Field> &fields() const { return _fields; }
 
+    void setType(uint32_t type) {
+        _type = type;
+    }
+
     std::shared_ptr<Gff> deepCopy() const {
         std::vector<Field> copyFields;
         for (const auto &field : _fields) {

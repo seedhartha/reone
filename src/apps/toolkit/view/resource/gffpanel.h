@@ -37,24 +37,13 @@ class TalkTable;
 }
 
 class GFFResourceViewModel;
+class GFFTreeNode;
 
 struct GFFTreeItemClientData : public wxClientData {
-    resource::Gff &gff;
-    std::optional<std::reference_wrapper<resource::Gff::Field>> field;
-    std::optional<std::reference_wrapper<resource::Gff::Field>> parentField;
-    std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff;
-    std::optional<int> parentListIdx;
+    std::string nodeId;
 
-    GFFTreeItemClientData(resource::Gff &gff,
-                          std::optional<std::reference_wrapper<resource::Gff::Field>> field = std::nullopt,
-                          std::optional<std::reference_wrapper<resource::Gff::Field>> parentField = std::nullopt,
-                          std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff = std::nullopt,
-                          std::optional<int> parentListIdx = std::nullopt) :
-        gff(gff),
-        field(std::move(field)),
-        parentField(std::move(parentField)),
-        parentFieldGff(std::move(parentFieldGff)),
-        parentListIdx(std::move(parentListIdx)) {
+    GFFTreeItemClientData(std::string nodeId) :
+        nodeId(std::move(nodeId)) {
     }
 };
 
@@ -70,18 +59,17 @@ private:
 
     wxDataViewTreeCtrl *m_treeCtrl {nullptr};
 
+    std::map<std::string, wxDataViewItem> m_nodeIdToDataViewItem;
+
     void InitControls();
     void BindEvents();
+    void BindViewModel();
 
-    void AppendGffStructToTree(wxDataViewItem parent,
-                               const std::string &text,
-                               resource::Gff &gff,
-                               std::optional<std::reference_wrapper<resource::Gff::Field>> parentField = std::nullopt,
-                               std::optional<std::reference_wrapper<resource::Gff>> parentFieldGff = std::nullopt,
-                               std::optional<int> parentListIdx = std::nullopt);
+    void RefreshTreeControl();
+    void AppendTreeNode(const GFFTreeNode &node);
 
-    void OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event);
-    void OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event);
+    void OnTreeCtrlItemStartEditing(wxDataViewEvent &event);
+    void OnTreeCtrlItemContextMenu(wxDataViewEvent &event);
 };
 
 } // namespace reone

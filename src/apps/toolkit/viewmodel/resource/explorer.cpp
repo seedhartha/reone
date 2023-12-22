@@ -199,7 +199,7 @@ void ResourceExplorerViewModel::openResource(const ResourceId &id, IInputStream 
         reader.load();
 
         auto page = std::make_shared<Page>(PageType::GFF, id.string(), id);
-        page->viewModel = std::make_shared<GFFResourceViewModel>(reader.root());
+        page->viewModel = std::make_shared<GFFResourceViewModel>(*_talkTable, reader.root());
         _pages.add(std::move(page));
 
     } else if (id.type == ResType::Tlk) {

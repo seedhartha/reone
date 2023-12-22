@@ -19,23 +19,101 @@
 
 #include "reone/resource/gff.h"
 
+#include "../../collectionproperty.h"
 #include "../../property.h"
+
 #include "../resource.h"
 
 namespace reone {
 
+namespace resource {
+
+class TalkTable;
+
+}
+
+using GFFTreeNodeId = std::string;
+
+enum class GFFTreeNodeType {
+    Struct,
+    Field,
+    FieldComponent,
+    StructField,
+    ListField,
+    ListItemStruct
+};
+
+struct GFFTreeNode {
+    GFFTreeNodeId id;
+    GFFTreeNodeType type;
+    std::string displayName;
+    std::optional<GFFTreeNodeId> parentId;
+
+    GFFTreeNode(GFFTreeNodeId id,
+                GFFTreeNodeType type,
+                std::string displayName,
+                std::optional<GFFTreeNodeId> parentId = std::nullopt) :
+        id(id),
+        type(type),
+        displayName(std::move(displayName)),
+        parentId(std::move(parentId)) {
+    }
+};
+
 class GFFResourceViewModel : public ResourceViewModel {
 public:
-    GFFResourceViewModel(std::shared_ptr<resource::Gff> content) :
+    GFFResourceViewModel(resource::TalkTable &talkTable,
+                         std::shared_ptr<resource::Gff> content) :
+        _talkTable(talkTable),
         _content(std::move(content)) {
+
+        rebuildTreeFromGff();
     }
 
     resource::Gff &content() {
         return *_content;
     }
 
+    CollectionProperty<std::shared_ptr<GFFTreeNode>> &treeNodes() {
+        return _treeNodes;
+    }
+
+    const GFFTreeNode &treeNodeById(const GFFTreeNodeId &id) const {
+        return _idToTreeNode.at(id);
+    }
+
+    const resource::Gff &gffByTreeNodeId(const GFFTreeNodeId &id) const {
+        return _treeNodeIdToGff.at(id);
+    }
+
+    const resource::Gff::Field &fieldByTreeNodeId(const GFFTreeNodeId &id) const {
+        return _treeNodeIdToField.at(id);
+    }
+
+    bool isContainerNode(const GFFTreeNodeId &id) const;
+
+    void setStructType(const GFFTreeNodeId &id, uint32_t type);
+    void appendField(const GFFTreeNodeId &id);
+    void renameField(const GFFTreeNodeId &id, std::string name);
+    void setFieldType(const GFFTreeNodeId &id, resource::Gff::FieldType type);
+    void modifyField(const GFFTreeNodeId &id, std::function<void(resource::Gff::Field &)> block);
+    void deleteField(const GFFTreeNodeId &id);
+    void appendListItem(const GFFTreeNodeId &id);
+    void duplicateListItem(const GFFTreeNodeId &id);
+    void deleteListItem(const GFFTreeNodeId &id);
+
 private:
+    resource::TalkTable &_talkTable;
     std::shared_ptr<resource::Gff> _content;
+
+    CollectionProperty<std::shared_ptr<GFFTreeNode>> _treeNodes;
+
+    std::unordered_map<GFFTreeNodeId, std::reference_wrapper<GFFTreeNode>> _idToTreeNode;
+    std::unordered_map<GFFTreeNodeId, std::reference_wrapper<resource::Gff>> _treeNodeIdToGff;
+    std::unordered_map<GFFTreeNodeId, std::reference_wrapper<resource::Gff::Field>> _treeNodeIdToField;
+    std::unordered_map<GFFTreeNodeId, int> _treeNodeIdToListIdx;
+
+    void rebuildTreeFromGff();
 };
 
 } // namespace reone

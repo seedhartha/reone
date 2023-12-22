@@ -17,13 +17,15 @@
 
 #include "gffpanel.h"
 
-#include <wx/statline.h>
-
 #include "reone/resource/gff.h"
 #include "reone/resource/talktable.h"
 #include "reone/system/hexutil.h"
 
 #include "../../viewmodel/resource/gff.h"
+
+#include "gff/locstringvaluedialog.h"
+#include "gff/orientvaluedialog.h"
+#include "gff/vectorvaluedialog.h"
 
 using namespace reone::resource;
 
@@ -38,513 +40,311 @@ GFFResourcePanel::GFFResourcePanel(GFFResourceViewModel &viewModel,
 
     InitControls();
     BindEvents();
+    BindViewModel();
+    RefreshTreeControl();
 }
 
 void GFFResourcePanel::InitControls() {
-    auto treeCtrl = new wxDataViewTreeCtrl(this, wxID_ANY);
-    treeCtrl->Freeze();
-    AppendGffStructToTree(wxDataViewItem(), "/", m_viewModel.content());
-    treeCtrl->Thaw();
+    m_treeCtrl = new wxDataViewTreeCtrl(this, wxID_ANY);
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(treeCtrl, 1, wxEXPAND);
+    sizer->Add(m_treeCtrl, wxSizerFlags(1).Expand().Border(wxALL, 3));
     SetSizer(sizer);
 }
 
 void GFFResourcePanel::BindEvents() {
-    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &GFFResourcePanel::OnGffTreeCtrlItemStartEditing, this);
-    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &GFFResourcePanel::OnGffTreeCtrlItemContextMenu, this);
+    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_START_EDITING, &GFFResourcePanel::OnTreeCtrlItemStartEditing, this);
+    m_treeCtrl->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &GFFResourcePanel::OnTreeCtrlItemContextMenu, this);
 }
 
-void GFFResourcePanel::AppendGffStructToTree(wxDataViewItem parent,
-                                             const std::string &text,
-                                             Gff &gff,
-                                             std::optional<std::reference_wrapper<Gff::Field>> parentField,
-                                             std::optional<std::reference_wrapper<Gff>> parentFieldGff,
-                                             std::optional<int> parentListIdx) {
-    auto structItem = m_treeCtrl->AppendContainer(
-        parent,
-        str(boost::format("%s [%d]") % text % static_cast<int>(gff.type())),
-        -1,
-        -1,
-        new GFFTreeItemClientData {gff, std::nullopt, parentField, parentFieldGff, parentListIdx});
-    m_treeCtrl->Expand(structItem);
-    for (auto &field : gff.fields()) {
-        switch (field.type) {
-        case Gff::FieldType::CExoString:
-        case Gff::FieldType::ResRef: {
-            auto cleaned = boost::replace_all_copy(field.strValue, "\n", "\\n");
-            m_treeCtrl->AppendItem(
-                structItem,
-                str(boost::format("%s = \"%s\" [%d]") % field.label % cleaned % static_cast<int>(field.type)),
-                -1,
-                new GFFTreeItemClientData {gff, field});
-        } break;
-        case Gff::FieldType::CExoLocString: {
-            auto locStringItem = m_treeCtrl->AppendContainer(
-                structItem,
-                str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
-                -1,
-                -1,
-                new GFFTreeItemClientData {gff, field});
-            m_treeCtrl->Expand(locStringItem);
-            m_treeCtrl->AppendItem(locStringItem, str(boost::format("StrRef = %d") % field.intValue));
-            m_treeCtrl->AppendItem(locStringItem, str(boost::format("Substring = \"%s\"") % field.strValue));
-            if (field.intValue != -1) {
-                auto tlkText = m_talkTable.getString(field.intValue).text;
-                auto cleanedTlkText = boost::replace_all_copy(tlkText, "\n", "\\n");
-                m_treeCtrl->AppendItem(locStringItem, str(boost::format("TalkTableText = \"%s\"") % cleanedTlkText));
-            }
-        } break;
-        case Gff::FieldType::Void:
-            m_treeCtrl->AppendItem(
-                structItem,
-                str(boost::format("%s = \"%s\" [%d]") % field.label % hexify(field.data, "") % static_cast<int>(field.type)),
-                -1,
-                new GFFTreeItemClientData {gff, field});
+void GFFResourcePanel::BindViewModel() {
+    m_viewModel.treeNodes().addChangedHandler([this](const auto &args) {
+        switch (args.type) {
+        case CollectionChangeType::Add:
+            AppendTreeNode(*args.addedItem->get());
             break;
-        case Gff::FieldType::Struct:
-            AppendGffStructToTree(structItem, field.label, *field.children[0], field);
-            break;
-        case Gff::FieldType::List: {
-            auto listItem = m_treeCtrl->AppendContainer(
-                structItem,
-                str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
-                -1,
-                -1,
-                new GFFTreeItemClientData {gff, field});
-            m_treeCtrl->Expand(listItem);
-            for (auto it = field.children.begin(); it != field.children.end(); ++it) {
-                auto childIdx = std::distance(field.children.begin(), it);
-                AppendGffStructToTree(listItem, std::to_string(childIdx), **it, field, gff, childIdx);
-            }
-        } break;
-        case Gff::FieldType::Orientation: {
-            auto orientationItem = m_treeCtrl->AppendContainer(
-                structItem,
-                str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
-                -1,
-                -1,
-                new GFFTreeItemClientData {gff, field});
-            m_treeCtrl->Expand(orientationItem);
-            m_treeCtrl->AppendItem(orientationItem, str(boost::format("W = %f") % field.quatValue.w));
-            m_treeCtrl->AppendItem(orientationItem, str(boost::format("X = %f") % field.quatValue.x));
-            m_treeCtrl->AppendItem(orientationItem, str(boost::format("Y = %f") % field.quatValue.y));
-            m_treeCtrl->AppendItem(orientationItem, str(boost::format("Z = %f") % field.quatValue.z));
-        } break;
-        case Gff::FieldType::Vector: {
-            auto vectorItem = m_treeCtrl->AppendContainer(
-                structItem,
-                str(boost::format("%s [%d]") % field.label % static_cast<int>(field.type)),
-                -1,
-                -1,
-                new GFFTreeItemClientData {gff, field});
-            m_treeCtrl->Expand(vectorItem);
-            m_treeCtrl->AppendItem(vectorItem, str(boost::format("X = %f") % field.vecValue.x));
-            m_treeCtrl->AppendItem(vectorItem, str(boost::format("Y = %f") % field.vecValue.y));
-            m_treeCtrl->AppendItem(vectorItem, str(boost::format("Z = %f") % field.vecValue.z));
-        } break;
-        case Gff::FieldType::StrRef:
-            m_treeCtrl->AppendItem(
-                structItem,
-                str(boost::format("%s = %d [%d]") % field.label % field.intValue % static_cast<int>(field.type)),
-                -1,
-                new GFFTreeItemClientData {gff, field});
-            break;
-        default:
-            m_treeCtrl->AppendItem(
-                structItem,
-                str(boost::format("%s = %s [%d]") % field.label % field.toString() % static_cast<int>(field.type)),
-                -1,
-                new GFFTreeItemClientData {gff, field});
+        case CollectionChangeType::Remove: {
+            auto nodeId = args.removedItem->get()->id;
+            auto item = m_nodeIdToDataViewItem.at(nodeId);
+            m_nodeIdToDataViewItem.erase(nodeId);
+            m_treeCtrl->DeleteItem(item);
             break;
         }
-    }
+        case CollectionChangeType::Reset:
+            RefreshTreeControl();
+            break;
+        }
+    });
 }
 
-void GFFResourcePanel::OnGffTreeCtrlItemStartEditing(wxDataViewEvent &event) {
+void GFFResourcePanel::RefreshTreeControl() {
+    m_nodeIdToDataViewItem.clear();
+    m_treeCtrl->Freeze();
+    m_treeCtrl->DeleteAllItems();
+    for (auto &node : *m_viewModel.treeNodes()) {
+        AppendTreeNode(*node);
+    }
+    m_treeCtrl->Thaw();
+}
+
+void GFFResourcePanel::AppendTreeNode(const GFFTreeNode &node) {
+    wxDataViewItem parentItem;
+    if (node.parentId) {
+        parentItem = m_nodeIdToDataViewItem.at(*node.parentId);
+    }
+    wxDataViewItem item;
+    if (m_viewModel.isContainerNode(node.id)) {
+        item = m_treeCtrl->AppendContainer(parentItem, node.displayName, -1, -1, new GFFTreeItemClientData {node.id});
+    } else {
+        item = m_treeCtrl->AppendItem(parentItem, node.displayName, -1, new GFFTreeItemClientData {node.id});
+    }
+    m_nodeIdToDataViewItem.insert({node.id, item});
+}
+
+void GFFResourcePanel::OnTreeCtrlItemStartEditing(wxDataViewEvent &event) {
     event.Veto();
 }
 
-void GFFResourcePanel::OnGffTreeCtrlItemContextMenu(wxDataViewEvent &event) {
+void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     enum class MenuItemId {
+        SetStructType,
+        AppendField,
+        RenameField,
+        SetFieldType,
+        SetFieldValue,
+        DeleteField,
         AppendListItem,
         DuplicateListItem,
         DeleteListItem,
-        AppendField,
-        RenameField,
-        SetFieldValue,
-        SetFieldType,
-        DeleteField
     };
     auto item = event.GetItem();
     if (!item.IsOk()) {
         return;
     }
     auto control = wxDynamicCast(event.GetEventObject(), wxDataViewTreeCtrl);
-    auto clientData = static_cast<GFFTreeItemClientData *>(control->GetItemData(item));
-    if (!clientData) {
+    auto data = static_cast<GFFTreeItemClientData *>(control->GetItemData(item));
+    if (!data) {
         return;
     }
+    const auto &node = m_viewModel.treeNodeById(data->nodeId);
     wxMenu menu;
-    auto &gff = clientData->gff;
-    auto &field = clientData->field;
-    auto &parentField = clientData->parentField;
-    auto &parentFieldGff = clientData->parentFieldGff;
-    auto &parentListIdx = clientData->parentListIdx;
-    if (field) {
-        if (field->get().type == Gff::FieldType::Struct) {
-            menu.Append(static_cast<int>(MenuItemId::AppendField), "Append field");
-        } else if (field->get().type == Gff::FieldType::List) {
+    switch (node.type) {
+    case GFFTreeNodeType::Struct:
+    case GFFTreeNodeType::StructField:
+        menu.Append(static_cast<int>(MenuItemId::SetStructType), "Set struct type...");
+        menu.Append(static_cast<int>(MenuItemId::AppendField), "Append field");
+        if (node.type == GFFTreeNodeType::StructField) {
+            menu.AppendSeparator();
+            menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
+            menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
+            menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
+            menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
+        }
+        break;
+    case GFFTreeNodeType::Field:
+    case GFFTreeNodeType::ListField:
+        menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
+        if (node.type == GFFTreeNodeType::ListField) {
             menu.Append(static_cast<int>(MenuItemId::AppendListItem), "Append list item");
         } else {
             menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
         }
         menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
-        menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
         menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
-    } else {
+        break;
+    case GFFTreeNodeType::FieldComponent:
+        break;
+    case GFFTreeNodeType::ListItemStruct:
+        menu.Append(static_cast<int>(MenuItemId::SetStructType), "Set struct type...");
         menu.Append(static_cast<int>(MenuItemId::AppendField), "Append field");
-        if (parentField) {
-            if (parentListIdx) {
-                menu.Append(static_cast<int>(MenuItemId::DuplicateListItem), "Duplicate list item");
-                menu.Append(static_cast<int>(MenuItemId::DeleteListItem), "Delete list item");
-            } else {
-                menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
-                menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
-                menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
-            }
-        }
+        menu.Append(static_cast<int>(MenuItemId::DuplicateListItem), "Duplicate list item");
+        menu.Append(static_cast<int>(MenuItemId::DeleteListItem), "Delete list item");
+        break;
     }
     menu.Bind(wxEVT_COMMAND_MENU_SELECTED, [&](wxCommandEvent &event) {
-        bool modified = false;
         switch (static_cast<MenuItemId>(event.GetId())) {
-        case MenuItemId::AppendListItem: {
-            auto child = Gff::Builder().build();
-            field->get().children.push_back(std::move(child));
-            modified = true;
+        case MenuItemId::SetStructType: {
+            auto &gff = m_viewModel.gffByTreeNodeId(node.id);
+            wxTextEntryDialog dialog {nullptr, "New struct type:", "Struct type change", std::to_string(gff.type())};
+            if (dialog.ShowModal() == wxID_OK) {
+                auto newValue = std::stoul(dialog.GetValue().ToStdString());
+                if (newValue != gff.type()) {
+                    m_viewModel.setStructType(node.id, newValue);
+                }
+            }
             break;
         }
-        case MenuItemId::DuplicateListItem: {
-            auto listIter = parentField->get().children.begin();
-            std::advance(listIter, *parentListIdx);
-            auto copy = parentField->get().children.at(*parentListIdx)->deepCopy();
-            parentField->get().children.insert(listIter, std::move(copy));
-            modified = true;
-            break;
-        }
-        case MenuItemId::DeleteListItem: {
-            auto listIter = parentField->get().children.begin();
-            std::advance(listIter, *parentListIdx);
-            parentField->get().children.erase(listIter);
-            modified = true;
-        } break;
         case MenuItemId::AppendField: {
-            auto field = Gff::Field::newInt("New Field", 0);
-            gff.fields().push_back(std::move(field));
-            modified = true;
+            m_viewModel.appendField(node.id);
             break;
         }
         case MenuItemId::RenameField: {
-            wxTextEntryDialog dialog(nullptr, "New field name:", "Field rename", field->get().label);
+            auto &field = m_viewModel.fieldByTreeNodeId(node.id);
+            wxTextEntryDialog dialog {nullptr, "New field name:", "Field rename", field.label};
             if (dialog.ShowModal() == wxID_OK) {
-                field->get().label = dialog.GetValue().ToStdString();
-                modified = true;
-            }
-            break;
-        }
-        case MenuItemId::SetFieldValue: {
-            switch (field->get().type) {
-            case Gff::FieldType::Char:
-            case Gff::FieldType::Short:
-            case Gff::FieldType::Int:
-            case Gff::FieldType::StrRef: {
-                auto value = std::to_string(field->get().intValue);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto value = std::stol(dialog.GetValue().ToStdString());
-                    if (field->get().intValue != value) {
-                        field->get().intValue = value;
-                        modified = true;
-                    }
+                auto newName = dialog.GetValue().ToStdString();
+                if (newName != field.label) {
+                    m_viewModel.renameField(node.id, newName);
                 }
-            } break;
-            case Gff::FieldType::Byte:
-            case Gff::FieldType::Word:
-            case Gff::FieldType::Dword: {
-                auto value = std::to_string(field->get().uintValue);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto value = std::stoul(dialog.GetValue().ToStdString());
-                    if (field->get().uintValue != value) {
-                        field->get().uintValue = value;
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Int64: {
-                auto value = std::to_string(field->get().int64Value);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto value = std::stoll(dialog.GetValue().ToStdString());
-                    if (field->get().int64Value != value) {
-                        field->get().int64Value = value;
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Dword64: {
-                auto value = std::to_string(field->get().uint64Value);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto value = std::stoull(dialog.GetValue().ToStdString());
-                    if (field->get().uint64Value != value) {
-                        field->get().uint64Value = value;
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Float: {
-                auto value = std::to_string(field->get().floatValue);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto newValue = std::stof(dialog.GetValue().ToStdString());
-                    if (field->get().floatValue != newValue) {
-                        field->get().floatValue = newValue;
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Double: {
-                auto value = std::to_string(field->get().doubleValue);
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto newValue = std::stod(dialog.GetValue().ToStdString());
-                    if (field->get().doubleValue != newValue) {
-                        field->get().doubleValue = newValue;
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::CExoString:
-            case Gff::FieldType::ResRef: {
-                auto value = field->get().toString();
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto newValue = dialog.GetValue().ToStdString();
-                    if (field->get().strValue != newValue) {
-                        field->get().strValue = std::move(newValue);
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::CExoLocString: {
-                wxDialog dialog {nullptr, wxID_ANY, "Field value change"};
-                auto strRefLabel = new wxStaticText(&dialog, wxID_ANY, "StrRef:");
-                auto strRefCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().intValue));
-                strRefCtrl->SetMinSize(wxSize {400, strRefCtrl->GetMinSize().GetHeight()});
-                auto substringLabel = new wxStaticText(&dialog, wxID_ANY, "Substring:");
-                auto substringCtrl = new wxTextCtrl(&dialog, wxID_ANY, field->get().strValue);
-                substringCtrl->SetMinSize(wxSize {400, substringCtrl->GetMinSize().GetHeight()});
-                auto okBtn = new wxButton(&dialog, wxID_ANY, "OK");
-                okBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_OK); });
-                auto cancelBtn = new wxButton(&dialog, wxID_ANY, "Cancel");
-                cancelBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_CANCEL); });
-                auto buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-                buttonsSizer->Add(okBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                buttonsSizer->Add(cancelBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                auto sizer = new wxBoxSizer(wxVERTICAL);
-                sizer->Add(strRefLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(strRefCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(substringLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(substringCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(buttonsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                dialog.SetSizerAndFit(sizer);
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto newStrRef = std::stoi(strRefCtrl->GetValue().ToStdString());
-                    auto newSubstring = substringCtrl->GetValue().ToStdString();
-                    if (field->get().intValue != newStrRef || field->get().strValue != newSubstring) {
-                        field->get().intValue = newStrRef;
-                        field->get().strValue = std::move(newSubstring);
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Orientation: {
-                wxDialog dialog {nullptr, wxID_ANY, "Field value change"};
-                auto wLabel = new wxStaticText(&dialog, wxID_ANY, "W:");
-                auto wCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().quatValue.w));
-                wCtrl->SetMinSize(wxSize {400, wCtrl->GetMinSize().GetHeight()});
-                auto xLabel = new wxStaticText(&dialog, wxID_ANY, "X:");
-                auto xCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().quatValue.x));
-                xCtrl->SetMinSize(wxSize {400, xCtrl->GetMinSize().GetHeight()});
-                auto yLabel = new wxStaticText(&dialog, wxID_ANY, "Y:");
-                auto yCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().quatValue.y));
-                yCtrl->SetMinSize(wxSize {400, yCtrl->GetMinSize().GetHeight()});
-                auto zLabel = new wxStaticText(&dialog, wxID_ANY, "Z:");
-                auto zCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().quatValue.z));
-                zCtrl->SetMinSize(wxSize {400, zCtrl->GetMinSize().GetHeight()});
-                auto okBtn = new wxButton(&dialog, wxID_ANY, "OK");
-                okBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_OK); });
-                auto cancelBtn = new wxButton(&dialog, wxID_ANY, "Cancel");
-                cancelBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_CANCEL); });
-                auto buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-                buttonsSizer->Add(okBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                buttonsSizer->Add(cancelBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                auto sizer = new wxBoxSizer(wxVERTICAL);
-                sizer->Add(wLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(wCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(xLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(xCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(yLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(yCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(zLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(zCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(buttonsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                dialog.SetSizerAndFit(sizer);
-                if (dialog.ShowModal() == wxID_OK) {
-                    float w = std::stof(wCtrl->GetValue().ToStdString());
-                    float x = std::stof(xCtrl->GetValue().ToStdString());
-                    float y = std::stof(yCtrl->GetValue().ToStdString());
-                    float z = std::stof(zCtrl->GetValue().ToStdString());
-                    auto newValue = glm::quat {w, x, y, z};
-                    if (field->get().quatValue != newValue) {
-                        field->get().quatValue = std::move(newValue);
-                        modified = true;
-                    }
-                }
-            } break;
-            case Gff::FieldType::Vector: {
-                wxDialog dialog {nullptr, wxID_ANY, "Field value change"};
-                auto xLabel = new wxStaticText(&dialog, wxID_ANY, "X:");
-                auto xCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().vecValue.x));
-                xCtrl->SetMinSize(wxSize {400, xCtrl->GetMinSize().GetHeight()});
-                auto yLabel = new wxStaticText(&dialog, wxID_ANY, "Y:");
-                auto yCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().vecValue.y));
-                yCtrl->SetMinSize(wxSize {400, yCtrl->GetMinSize().GetHeight()});
-                auto zLabel = new wxStaticText(&dialog, wxID_ANY, "Z:");
-                auto zCtrl = new wxTextCtrl(&dialog, wxID_ANY, std::to_string(field->get().vecValue.z));
-                zCtrl->SetMinSize(wxSize {400, zCtrl->GetMinSize().GetHeight()});
-                auto okBtn = new wxButton(&dialog, wxID_ANY, "OK");
-                okBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_OK); });
-                auto cancelBtn = new wxButton(&dialog, wxID_ANY, "Cancel");
-                cancelBtn->Bind(wxEVT_BUTTON, [&dialog](const auto &event) { dialog.EndModal(wxID_CANCEL); });
-                auto buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-                buttonsSizer->Add(okBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                buttonsSizer->Add(cancelBtn, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                auto sizer = new wxBoxSizer(wxVERTICAL);
-                sizer->Add(xLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(xCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(yLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(yCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(zLabel, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(zCtrl, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                sizer->Add(buttonsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-                dialog.SetSizerAndFit(sizer);
-                if (dialog.ShowModal() == wxID_OK) {
-                    float x = std::stof(xCtrl->GetValue().ToStdString());
-                    float y = std::stof(yCtrl->GetValue().ToStdString());
-                    float z = std::stof(zCtrl->GetValue().ToStdString());
-                    auto newValue = glm::vec3 {x, y, z};
-                    if (field->get().vecValue != newValue) {
-                        field->get().vecValue = std::move(newValue);
-                    }
-                    modified = true;
-                }
-            } break;
-            case Gff::FieldType::Void: {
-                auto value = hexify(field->get().data, "");
-                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
-                if (dialog.ShowModal() == wxID_OK) {
-                    auto newValue = dialog.GetValue().ToStdString();
-                    if (value != newValue) {
-                        field->get().data = unhexify(newValue);
-                        modified = true;
-                    }
-                }
-            } break;
-            default:
-                break;
             }
             break;
         }
         case MenuItemId::SetFieldType: {
             const char *choices[] {
-                "Byte",          //
-                "Char",          //
-                "Word",          //
-                "Short",         //
-                "Dword",         //
-                "Int",           //
-                "Dword64",       //
-                "Int64",         //
-                "Float",         //
-                "Double",        //
-                "CExoString",    //
-                "ResRef",        //
-                "CExoLocString", //
-                "Void",          //
-                "Struct",        //
-                "List",          //
-                "Orientation",   //
-                "Vector",        //
-                "StrRef"         //
+                "Byte", "Char", "Word", "Short", "Dword", "Int", "Dword64", "Int64", //
+                "Float", "Double", "CExoString", "ResRef", "CExoLocString", "Void",  //
+                "Struct", "List", "Orientation", "Vector", "StrRef"                  //
             };
             wxSingleChoiceDialog dialog {nullptr, "New field type:", "Field type change", wxArrayString {19, choices}};
-            dialog.SetSelection(static_cast<int>(field->get().type));
+            auto &field = m_viewModel.fieldByTreeNodeId(node.id);
+            dialog.SetSelection(static_cast<int>(field.type));
             if (dialog.ShowModal() == wxID_OK) {
                 auto newType = static_cast<Gff::FieldType>(dialog.GetSelection());
-                if (field->get().type != newType) {
-                    field->get().type = newType;
-                    field->get().strValue = "";
-                    field->get().vecValue = glm::vec3 {0.0f};
-                    field->get().quatValue = glm::quat {1.0f, 0.0f, 0.0f, 0.0f};
-                    field->get().data.clear();
-                    field->get().children.clear();
-                    if (field->get().type == Gff::FieldType::Struct) {
-                        field->get().children.push_back(Gff::Builder().build());
-                    }
-                    field->get().intValue = 0;
-                    field->get().uintValue = 0;
-                    field->get().int64Value = 0;
-                    field->get().uint64Value = 0;
-                    field->get().floatValue = 0.0f;
-                    field->get().doubleValue = 0.0f;
-                    modified = true;
+                if (newType != field.type) {
+                    m_viewModel.setFieldType(node.id, newType);
                 }
             }
-        } break;
+            break;
+        }
+        case MenuItemId::SetFieldValue: {
+            auto &field = m_viewModel.fieldByTreeNodeId(node.id);
+            switch (field.type) {
+            case Gff::FieldType::CExoLocString: {
+                LocStringFieldValueDialog dialog {nullptr, "Field value change", field.intValue, field.strValue};
+                if (dialog.ShowModal() == wxID_OK) {
+                    int strRef = dialog.GetStrRef();
+                    auto substring = dialog.GetSubstring();
+                    if (strRef != field.intValue || substring != field.strValue) {
+                        m_viewModel.modifyField(node.id, [&strRef, &substring](auto &field) {
+                            field.intValue = strRef;
+                            field.strValue = substring;
+                        });
+                    }
+                }
+                break;
+            }
+            case Gff::FieldType::Orientation: {
+                OrientationFieldValueDialog dialog {nullptr, "Field value change", field.quatValue};
+                if (dialog.ShowModal() == wxID_OK) {
+                    auto newValue = dialog.GetValue();
+                    if (newValue != field.quatValue) {
+                        m_viewModel.modifyField(node.id, [&newValue](auto &field) {
+                            field.quatValue = newValue;
+                        });
+                    }
+                }
+                break;
+            }
+            case Gff::FieldType::Vector: {
+                VectorFieldValueDialog dialog {nullptr, "Field value change", field.vecValue};
+                if (dialog.ShowModal() == wxID_OK) {
+                    auto newValue = dialog.GetValue();
+                    if (newValue != field.vecValue) {
+                        m_viewModel.modifyField(node.id, [&newValue](auto &field) {
+                            field.vecValue = newValue;
+                        });
+                    }
+                }
+                break;
+            }
+            default: {
+                std::string value;
+                switch (field.type) {
+                case Gff::FieldType::Byte:
+                case Gff::FieldType::Word:
+                case Gff::FieldType::Dword:
+                    value = std::to_string(field.uintValue);
+                    break;
+                case Gff::FieldType::Char:
+                case Gff::FieldType::Short:
+                case Gff::FieldType::Int:
+                case Gff::FieldType::StrRef:
+                    value = std::to_string(field.intValue);
+                    break;
+                case Gff::FieldType::Dword64:
+                    value = std::to_string(field.uint64Value);
+                    break;
+                case Gff::FieldType::Int64:
+                    value = std::to_string(field.int64Value);
+                    break;
+                case Gff::FieldType::Float:
+                    value = std::to_string(field.floatValue);
+                case Gff::FieldType::Double:
+                    value = std::to_string(field.doubleValue);
+                    break;
+                case Gff::FieldType::CExoString:
+                case Gff::FieldType::ResRef:
+                    value = field.strValue;
+                    break;
+                case Gff::FieldType::Void:
+                    value = hexify(field.data);
+                    break;
+                default:
+                    throw std::logic_error("Unexpected field type: " + std::to_string(static_cast<int>(field.type)));
+                }
+                wxTextEntryDialog dialog {nullptr, "New field value:", "Field value change", value};
+                if (dialog.ShowModal() == wxID_OK) {
+                    auto newValue = dialog.GetValue().ToStdString();
+                    if (newValue != value) {
+                        m_viewModel.modifyField(node.id, [&newValue](auto &field) {
+                            switch (field.type) {
+                            case Gff::FieldType::Byte:
+                            case Gff::FieldType::Word:
+                            case Gff::FieldType::Dword:
+                                field.uintValue = std::stoul(newValue);
+                                break;
+                            case Gff::FieldType::Char:
+                            case Gff::FieldType::Short:
+                            case Gff::FieldType::Int:
+                            case Gff::FieldType::StrRef:
+                                field.intValue = std::stol(newValue);
+                                break;
+                            case Gff::FieldType::Dword64:
+                                field.uint64Value = std::stoull(newValue);
+                                break;
+                            case Gff::FieldType::Int64:
+                                field.int64Value = std::stoll(newValue);
+                                break;
+                            case Gff::FieldType::Float:
+                                field.floatValue = std::stof(newValue);
+                                break;
+                            case Gff::FieldType::Double:
+                                field.doubleValue = std::stod(newValue);
+                                break;
+                            case Gff::FieldType::CExoString:
+                            case Gff::FieldType::ResRef:
+                                field.strValue = newValue;
+                                break;
+                            case Gff::FieldType::Void:
+                                field.data = unhexify(newValue);
+                                break;
+                            default:
+                                throw std::logic_error("Unexpected field type: " + std::to_string(static_cast<int>(field.type)));
+                            }
+                        });
+                    }
+                }
+                break;
+            }
+            }
+            break;
+        }
         case MenuItemId::DeleteField: {
-            if (field) {
-                for (auto it = gff.fields().begin(); it != gff.fields().end();) {
-                    if (it->label == field->get().label) {
-                        it = gff.fields().erase(it);
-                        break;
-                    }
-                    ++it;
-                }
-                modified = true;
-            } else if (parentField) {
-                for (auto it = parentFieldGff->get().fields().begin(); it != parentFieldGff->get().fields().end();) {
-                    if (it->label == parentField->get().label) {
-                        it = gff.fields().erase(it);
-                        break;
-                    }
-                    ++it;
-                }
-                modified = true;
-            }
+            m_viewModel.deleteField(node.id);
             break;
         }
-        default:
+        case MenuItemId::AppendListItem: {
+            m_viewModel.appendListItem(node.id);
             break;
         }
-        if (modified) {
-            m_treeCtrl->Freeze();
-            m_treeCtrl->DeleteAllItems();
-            AppendGffStructToTree(wxDataViewItem(), "/", m_viewModel.content());
-            m_treeCtrl->Thaw();
-            m_viewModel.modified() = true;
+        case MenuItemId::DuplicateListItem: {
+            m_viewModel.duplicateListItem(node.id);
+            break;
+        }
+        case MenuItemId::DeleteListItem: {
+            m_viewModel.deleteListItem(node.id);
+            break;
+        }
         }
     });
     PopupMenu(&menu, event.GetPosition());

@@ -21,6 +21,9 @@ set(TOOLKIT_HEADERS
     ${TOOLKIT_SOURCE_DIR}/property.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/locstringvaluedialog.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/orientvaluedialog.h
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/vectorvaluedialog.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.h
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.h
@@ -45,6 +48,9 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/app.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/audiopanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/explorerframe.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/locstringvaluedialog.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/orientvaluedialog.cpp
+    ${TOOLKIT_SOURCE_DIR}/view/resource/gff/vectorvaluedialog.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/gffpanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/imagepanel.cpp
     ${TOOLKIT_SOURCE_DIR}/view/resource/modelpanel.cpp
@@ -55,6 +61,7 @@ set(TOOLKIT_SOURCES
     ${TOOLKIT_SOURCE_DIR}/view/tool/composelipdialog.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/audio.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/explorer.cpp
+    ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/gff.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/image.cpp
     ${TOOLKIT_SOURCE_DIR}/viewmodel/resource/model.cpp)
 
