@@ -68,17 +68,7 @@ using namespace reone::script;
 
 namespace reone {
 
-static const std::set<std::string> kFilesSubdirectoryWhitelist {
-    "data", "lips", "localvault", "modules", "movies", "override", "rims", "saves", "texturepacks", //
-    "streammusic", "streamsounds", "streamwaves", "streamvoice"};
-
 static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
-
-static const std::set<std::string> kFilesExtensionBlacklist {
-    ".key",                                         //
-    ".lnk", ".bat", ".exe", ".dll", ".ini", ".ico", //
-    ".zip", ".pdf",                                 //
-    ".hashdb", ".info", ".script", ".dat", ".msg", ".sdb", ".ds_store"};
 
 static const std::set<ResType> kFilesPlaintextResTypes {
     ResType::Txt,
@@ -382,10 +372,10 @@ void ResourceExplorerViewModel::loadResources() {
         auto filename = boost::to_lower_copy(file.path().filename().string());
         auto extension = boost::to_lower_copy(file.path().extension().string());
         bool container;
-        if ((file.is_directory() && kFilesSubdirectoryWhitelist.count(filename) > 0) ||
+        if (file.is_directory() ||
             (file.is_regular_file() && kFilesArchiveExtensions.count(extension) > 0)) {
             container = true;
-        } else if (file.is_regular_file() && (kFilesExtensionBlacklist.count(extension) == 0 && extension != ".txt")) {
+        } else if (file.is_regular_file() && getResTypeByExt(extension.substr(1), false) != ResType::Invalid) {
             container = false;
         } else {
             continue;
@@ -806,7 +796,7 @@ void ResourceExplorerViewModel::onResourcesItemExpanding(const ResourcesItemId &
             bool container;
             if (file.is_directory() || kFilesArchiveExtensions.count(extension) > 0) {
                 container = true;
-            } else if (file.is_regular_file() && kFilesExtensionBlacklist.count(extension) == 0) {
+            } else if (file.is_regular_file() && getResTypeByExt(extension.substr(1), false) != ResType::Invalid) {
                 container = false;
             } else {
                 continue;
