@@ -36,13 +36,13 @@ namespace reone {
 
 namespace graphics {
 
-struct GraphicsOptions;
-
 class Context;
 class MeshRegistry;
 class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
+
+struct GraphicsOptions;
 
 } // namespace graphics
 

@@ -23,16 +23,17 @@ namespace reone {
 
 namespace graphics {
 
-struct LocalUniforms;
 
 class IContext;
 class IMeshRegistry;
 class IShaderRegistry;
 class ITextureRegistry;
 class IUniforms;
-class Material;
 class Mesh;
 class Texture;
+
+struct LocalUniforms;
+struct Material;
 
 enum class RenderPassName {
     None,
