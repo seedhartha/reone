@@ -93,14 +93,16 @@ void ModelResourceViewModel::update3D() {
     auto &scene = _sceneSvc.graphs().get(kSceneMain);
     scene.update(delta);
 
+    AnimationProgress progress;
     if (_modelNode && !_modelNode->animationChannels().empty()) {
         const auto &animChannel = _modelNode->animationChannels().front();
         if (animChannel.anim) {
-            float time = animChannel.time;
-            float duration = animChannel.lipAnim ? animChannel.lipAnim->length() : animChannel.anim->length();
-            _animationProgress = {time, duration};
+            progress.playing = true;
+            progress.time = animChannel.time;
+            progress.duration = animChannel.lipAnim ? animChannel.lipAnim->length() : animChannel.anim->length();
         }
     }
+    _animationProgress = std::move(progress);
 }
 
 void ModelResourceViewModel::render3D(int w, int h) {

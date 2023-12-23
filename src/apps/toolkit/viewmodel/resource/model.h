@@ -49,6 +49,7 @@ class SceneModule;
 class SystemModule;
 
 struct AnimationProgress {
+    bool playing {false};
     float time {0.0f};
     float duration {0.0f};
 };

@@ -52,8 +52,13 @@ void ModelResourcePanel::InitControls() {
     glContext->SetCurrent(*m_glCanvas);
 
     m_animationPanel = new wxPanel(m_renderSplitter);
+
     m_animPauseResumeBtn = new wxButton(m_animationPanel, wxID_ANY, "Pause");
+    m_animPauseResumeBtn->Enable(false);
+
     m_animTimeSlider = new wxSlider(m_animationPanel, wxID_ANY, 0, 0, 500, wxDefaultPosition, wxDefaultSize);
+    m_animTimeSlider->Enable(false);
+
     m_animTimeCtrl = new wxTextCtrl(m_animationPanel, wxID_ANY, "0.0", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
 
     auto animPlaybackSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -81,7 +86,7 @@ void ModelResourcePanel::InitControls() {
     animationVSizer->Add(animationHSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
     m_animationPanel->SetSizer(animationVSizer);
 
-    m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, std::numeric_limits<int>::max());
+    m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, -200);
 
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(m_renderSplitter, wxSizerFlags(1).Expand());
@@ -107,15 +112,17 @@ void ModelResourcePanel::BindViewModel() {
                 m_animationsListBox->Append(animation);
             }
             m_animationsListBox->Thaw();
-            m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, std::numeric_limits<int>::max());
+            m_renderSplitter->SplitHorizontally(m_glCanvas, m_animationPanel, -200);
         } else {
             m_renderSplitter->Unsplit();
         }
     });
     m_viewModel.animationProgress().addChangedHandler([this](const auto &progress) {
-        m_animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
+        m_animPauseResumeBtn->Enable(progress.playing);
         int value = static_cast<int>(m_animTimeSlider->GetMax() * (progress.time / progress.duration));
         m_animTimeSlider->SetValue(value);
+        m_animTimeSlider->Enable(progress.playing);
+        m_animTimeCtrl->SetValue(str(boost::format("%.04f") % progress.time));
     });
 }
 
