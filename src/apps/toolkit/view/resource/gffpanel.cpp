@@ -78,11 +78,39 @@ void GFFResourcePanel::BindViewModel() {
 }
 
 void GFFResourcePanel::RefreshTreeControl() {
-    m_nodeIdToDataViewItem.clear();
+    std::set<GFFTreeNodeId> viewModelNodes;
+    for (const auto &node : *m_viewModel.treeNodes()) {
+        viewModelNodes.emplace(node->id);
+    }
+    std::set<GFFTreeNodeId> viewNodes;
+    for (const auto &[nodeId, item] : m_nodeIdToDataViewItem) {
+        viewNodes.emplace(nodeId);
+    }
     m_treeCtrl->Freeze();
-    m_treeCtrl->DeleteAllItems();
-    for (auto &node : *m_viewModel.treeNodes()) {
-        AppendTreeNode(*node);
+    for (const auto &nodeId : viewNodes) {
+        if (viewModelNodes.count(nodeId) > 0) {
+            continue;
+        }
+        m_treeCtrl->DeleteItem(m_nodeIdToDataViewItem.at(nodeId));
+        m_nodeIdToDataViewItem.erase(nodeId);
+    }
+    for (const auto &node : *m_viewModel.treeNodes()) {
+        if (viewNodes.count(node->id) == 0) {
+            AppendTreeNode(m_viewModel.treeNodeById(node->id));
+        } else {
+            bool viewModelContainer = m_viewModel.isContainerNode(node->id);
+            auto &viewModelText = node->displayName;
+            auto &item = m_nodeIdToDataViewItem.at(node->id);
+            bool viewContainer = m_treeCtrl->IsContainer(item);
+            auto viewText = m_treeCtrl->GetItemText(item);
+            if (viewContainer == viewModelContainer && viewText != viewModelText) {
+                m_treeCtrl->SetItemText(item, viewModelText);
+            } else if (viewContainer != viewModelContainer) {
+                m_treeCtrl->DeleteItem(item);
+                m_nodeIdToDataViewItem.erase(node->id);
+                AppendTreeNode(*node);
+            }
+        }
     }
     m_treeCtrl->Thaw();
 }
@@ -137,7 +165,6 @@ void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
             menu.AppendSeparator();
             menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
             menu.Append(static_cast<int>(MenuItemId::SetFieldType), "Set field type...");
-            menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
             menu.Append(static_cast<int>(MenuItemId::DeleteField), "Delete field");
         }
         break;

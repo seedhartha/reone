@@ -93,6 +93,52 @@ public:
             return copy;
         }
 
+        bool operator==(const Field &rhs) const {
+            if (this == &rhs) {
+                return true;
+            }
+            if (type != rhs.type) {
+                return false;
+            }
+            switch (type) {
+            case FieldType::Byte:
+            case FieldType::Word:
+            case FieldType::Dword:
+                return uintValue == rhs.uintValue;
+            case FieldType::Char:
+            case FieldType::Short:
+            case FieldType::Int:
+            case FieldType::StrRef:
+                return intValue == rhs.intValue;
+            case FieldType::Dword64:
+                return uint64Value == rhs.uint64Value;
+            case FieldType::Int64:
+                return int64Value == rhs.int64Value;
+            case FieldType::Float:
+                return floatValue == rhs.floatValue;
+            case FieldType::Double:
+                return doubleValue == rhs.doubleValue;
+            case FieldType::CExoString:
+            case FieldType::ResRef:
+                return strValue == rhs.strValue;
+            case FieldType::CExoLocString:
+                return intValue == rhs.intValue && strValue == rhs.strValue;
+            case FieldType::Void:
+                return data == rhs.data;
+            case FieldType::Struct:
+            case FieldType::List:
+                return children == rhs.children;
+            case FieldType::Orientation:
+                return quatValue == rhs.quatValue;
+            case FieldType::Vector:
+                return vecValue == rhs.vecValue;
+            }
+        }
+
+        inline bool operator!=(const Field &rhs) const {
+            return !operator==(rhs);
+        }
+
         static Field newByte(std::string label, uint32_t val);
         static Field newChar(std::string label, int32_t val);
         static Field newWord(std::string label, uint32_t val);

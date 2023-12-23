@@ -193,40 +193,49 @@ void GFFResourceViewModel::rebuildTreeFromGff() {
 }
 
 void GFFResourceViewModel::setStructType(const GFFTreeNodeId &id, uint32_t type) {
-    // TODO: optimize
     _treeNodeIdToGff.at(id).get().setType(type);
     _modified = true;
     rebuildTreeFromGff();
 }
 
 void GFFResourceViewModel::appendField(const GFFTreeNodeId &id) {
-    // TODO: optimize
-    auto field = resource::Gff::Field::newInt("New_Field", 0);
-    _treeNodeIdToGff.at(id).get().fields().push_back(std::move(field));
+    auto &fields = _treeNodeIdToGff.at(id).get().fields();
+    int numNewFields = 1;
+    for (const auto &field : fields) {
+        if (boost::starts_with(field.label, "New_Field")) {
+            ++numNewFields;
+        }
+    }
+    std::string label {"New_Field"};
+    if (numNewFields > 1) {
+        label += std::to_string(numNewFields);
+    }
+    auto newField = Gff::Field::newInt(label, 0);
+    _treeNodeIdToGff.at(id).get().fields().push_back(std::move(newField));
     _modified = true;
     rebuildTreeFromGff();
 }
 
 void GFFResourceViewModel::renameField(const GFFTreeNodeId &id, std::string name) {
-    // TODO: optimize
     _treeNodeIdToField.at(id).get().label = std::move(name);
     _modified = true;
     rebuildTreeFromGff();
 }
 
-void GFFResourceViewModel::setFieldType(const GFFTreeNodeId &id, resource::Gff::FieldType type) {
-    // TODO: optimize
+void GFFResourceViewModel::setFieldType(const GFFTreeNodeId &id, Gff::FieldType type) {
     auto &field = _treeNodeIdToField.at(id).get();
+    if (field.type == Gff::FieldType::Struct || field.type == Gff::FieldType::List) {
+        field.children.clear();
+    }
     field.type = type;
-    if (type == resource::Gff::FieldType::Struct && field.children.empty()) {
-        field.children.push_back(resource::Gff::Builder().build());
+    if (field.type == Gff::FieldType::Struct) {
+        field.children.push_back(Gff::Builder().build());
     }
     _modified = true;
     rebuildTreeFromGff();
 }
 
-void GFFResourceViewModel::modifyField(const GFFTreeNodeId &id, std::function<void(resource::Gff::Field &)> block) {
-    // TODO: optimize
+void GFFResourceViewModel::modifyField(const GFFTreeNodeId &id, std::function<void(Gff::Field &)> block) {
     auto &field = _treeNodeIdToField.at(id).get();
     block(field);
     _modified = true;
@@ -234,7 +243,6 @@ void GFFResourceViewModel::modifyField(const GFFTreeNodeId &id, std::function<vo
 }
 
 void GFFResourceViewModel::deleteField(const GFFTreeNodeId &id) {
-    // TODO: optimize
     auto &node = _idToTreeNode.at(id).get();
     auto &parentGff = _treeNodeIdToGff.at(*node.parentId).get();
     auto &field = _treeNodeIdToField.at(id).get();
@@ -249,16 +257,14 @@ void GFFResourceViewModel::deleteField(const GFFTreeNodeId &id) {
 }
 
 void GFFResourceViewModel::appendListItem(const GFFTreeNodeId &id) {
-    // TODO: optimize
     auto &node = _idToTreeNode.at(id).get();
-    auto &parentField = _treeNodeIdToField.at(*node.parentId).get();
-    parentField.children.push_back(resource::Gff::Builder().build());
+    auto &field = _treeNodeIdToField.at(id).get();
+    field.children.push_back(Gff::Builder().build());
     _modified = true;
     rebuildTreeFromGff();
 }
 
 void GFFResourceViewModel::duplicateListItem(const GFFTreeNodeId &id) {
-    // TODO: optimize
     auto &node = _idToTreeNode.at(id).get();
     auto &parentField = _treeNodeIdToField.at(*node.parentId).get();
     auto iter = parentField.children.begin();
@@ -272,7 +278,6 @@ void GFFResourceViewModel::duplicateListItem(const GFFTreeNodeId &id) {
 }
 
 void GFFResourceViewModel::deleteListItem(const GFFTreeNodeId &id) {
-    // TODO: optimize
     auto &node = _idToTreeNode.at(id).get();
     auto &parentField = _treeNodeIdToField.at(*node.parentId).get();
     auto iter = parentField.children.begin();
