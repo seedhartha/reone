@@ -71,6 +71,7 @@ namespace reone {
 static const std::set<std::string> kFilesArchiveExtensions {".bif", ".erf", ".sav", ".rim", ".mod"};
 
 static const std::set<ResType> kFilesPlaintextResTypes {
+    ResType::Ini,
     ResType::Txt,
     ResType::Txi,
     ResType::Lyt,
