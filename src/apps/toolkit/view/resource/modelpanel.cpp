@@ -32,6 +32,7 @@ ModelResourcePanel::ModelResourcePanel(ModelResourceViewModel &viewModel,
     m_viewModel(viewModel) {
 
     InitControls();
+    BindEvents();
     BindViewModel();
 }
 
