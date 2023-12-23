@@ -151,12 +151,16 @@ void Shaders::deinit() {
 }
 
 std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::string resRef) {
+    debug(
+        str(boost::format("Initializing shader: type=%d resRef='%s'") % static_cast<int>(type) % resRef),
+        LogChannel::Graphics);
+
     std::list<std::string> sources;
 
     std::list<std::string> resRefs;
     resRefs.push_back(resRef);
     while (!resRefs.empty()) {
-        const auto &rr = resRefs.back();
+        auto rr = resRefs.back();
         resRefs.pop_back();
         if (_sourceResRefToData.count(rr) == 0) {
             auto res = _resources.get(ResourceId(rr, ResType::Glsl));
