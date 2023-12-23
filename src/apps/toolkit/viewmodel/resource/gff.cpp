@@ -112,7 +112,7 @@ void GFFResourceViewModel::rebuildTreeFromGff() {
                 nodes.push_back(std::make_shared<GFFTreeNode>(substrNodeId, GFFTreeNodeType::FieldComponent, substrDisplayName, fieldNodeId));
                 if (field.intValue != -1) {
                     auto talkTableTextNodeID = str(boost::format("%s.TalkTableText") % fieldNodeId);
-                    auto text = _talkTable.getString(field.intValue).text;
+                    auto text = boost::replace_all_copy(_talkTable.getString(field.intValue).text, "\n", "\\n");
                     auto talkTableTextDisplayName = str(boost::format("TalkTableText = \"%s\"") % text);
                     nodes.push_back(std::make_shared<GFFTreeNode>(talkTableTextNodeID, GFFTreeNodeType::FieldComponent, talkTableTextDisplayName, fieldNodeId));
                 }
