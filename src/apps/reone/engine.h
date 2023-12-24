@@ -23,6 +23,7 @@
 #include "reone/graphics/di/module.h"
 #include "reone/graphics/window.h"
 #include "reone/gui/di/module.h"
+#include "reone/input/event.h"
 #include "reone/movie/di/module.h"
 #include "reone/resource/di/module.h"
 #include "reone/scene/di/module.h"
@@ -81,6 +82,8 @@ private:
 
     void showCursor(bool show);
     void setRelativeMouseMode(bool relative);
+
+    std::optional<input::Event> eventFromSDLEvent(const SDL_Event &sdlEvent) const;
 };
 
 } // namespace reone

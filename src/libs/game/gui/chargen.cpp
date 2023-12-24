@@ -138,7 +138,7 @@ void CharacterGeneration::loadLevelUp() {
     _levelUp->init();
 }
 
-bool CharacterGeneration::handle(const SDL_Event &event) {
+bool CharacterGeneration::handle(const input::Event &event) {
     if (getSubGUI()->handle(event)) {
         return true;
     }

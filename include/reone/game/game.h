@@ -19,7 +19,7 @@
 
 #include "reone/audio/source.h"
 #include "reone/graphics/cursor.h"
-#include "reone/graphics/eventhandler.h"
+#include "reone/input/event.h"
 #include "reone/movie/movie.h"
 #include "reone/script/routines.h"
 #include "reone/system/logutil.h"
@@ -74,7 +74,7 @@ class GUI;
 
 namespace game {
 
-class Game : public graphics::EventHandler, boost::noncopyable {
+class Game : boost::noncopyable {
 public:
     enum class Screen {
         None,
@@ -104,6 +104,7 @@ public:
 
     void init();
 
+    bool handle(const input::Event &event);
     void update(float frameTime);
     void render();
 
@@ -309,11 +310,6 @@ public:
 
     // END Global variables
 
-    // EventHandler
-
-    bool handle(const SDL_Event &event) override;
-    // END EventHandler
-
 private:
     resource::GameID _gameId;
     std::filesystem::path _path;
@@ -398,10 +394,10 @@ private:
     void playMusic(const std::string &resRef);
     void toggleInGameCameraType();
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
+    bool handleMouseMotion(const input::MouseMotionEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleMouseButtonUp(const input::MouseButtonEvent &event);
 
     void onModuleSelected(const std::string &name);
     void renderHUD();

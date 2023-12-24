@@ -249,13 +249,13 @@ void Conversation::pickReply(int index) {
     loadEntry(entryIdx);
 }
 
-bool Conversation::handle(const SDL_Event &event) {
+bool Conversation::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         if (handleMouseButtonDown(event.button))
             return true;
         break;
-    case SDL_KEYUP:
+    case input::EventType::KeyUp:
         if (handleKeyUp(event.key))
             return true;
         break;
@@ -266,8 +266,8 @@ bool Conversation::handle(const SDL_Event &event) {
     return GameGUI::handle(event);
 }
 
-bool Conversation::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button == SDL_BUTTON_LEFT && !_entryEnded && isSkippableEntry()) {
+bool Conversation::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button == input::MouseButton::Left && !_entryEnded && isSkippableEntry()) {
         endCurrentEntry();
         return true;
     }
@@ -300,10 +300,10 @@ void Conversation::endCurrentEntry() {
 void Conversation::onEntryEnded() {
 }
 
-bool Conversation::handleKeyUp(const SDL_KeyboardEvent &event) {
-    SDL_Scancode key = event.keysym.scancode;
-    if (key >= SDL_SCANCODE_1 && key <= SDL_SCANCODE_9) {
-        int index = key - SDL_SCANCODE_1;
+bool Conversation::handleKeyUp(const input::KeyEvent &event) {
+    char code = static_cast<char>(event.code);
+    if (code >= static_cast<char>(input::KeyCode::Key1) && code <= static_cast<char>(input::KeyCode::Key9)) {
+        int index = code - static_cast<char>(input::KeyCode::Key1);
         if (_entryEnded) {
             pickReply(index);
             return true;

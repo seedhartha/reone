@@ -605,16 +605,16 @@ void Area::reloadParty() {
     loadParty(player->position(), player->getFacing());
 }
 
-bool Area::handle(const SDL_Event &event) {
+bool Area::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         return handleKeyDown(event.key);
     default:
         return false;
     }
 }
 
-bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
+bool Area::handleKeyDown(const input::KeyEvent &event) {
     return false;
 }
 

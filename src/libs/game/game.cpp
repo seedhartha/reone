@@ -465,24 +465,24 @@ void Game::updateSceneGraph(float dt) {
     sceneGraph.update(dt);
 }
 
-bool Game::handle(const SDL_Event &event) {
+bool Game::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         if (handleKeyDown(event.key)) {
             return true;
         }
         break;
-    case SDL_MOUSEMOTION:
+    case input::EventType::MouseMotion:
         if (handleMouseMotion(event.motion)) {
             return true;
         }
         break;
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         if (handleMouseButtonDown(event.button)) {
             return true;
         }
         break;
-    case SDL_MOUSEBUTTONUP:
+    case input::EventType::MouseButtonUp:
         if (handleMouseButtonUp(event.button)) {
             return true;
         }
@@ -525,26 +525,26 @@ bool Game::handle(const SDL_Event &event) {
     return false;
 }
 
-bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
+bool Game::handleKeyDown(const input::KeyEvent &event) {
     if (event.repeat)
         return false;
 
-    switch (event.keysym.sym) {
-    case SDLK_MINUS:
+    switch (event.code) {
+    case input::KeyCode::Minus:
         if (_options.game.developer && _gameSpeed > 1.0f) {
             _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
             return true;
         }
         break;
 
-    case SDLK_EQUALS:
+    case input::KeyCode::Equals:
         if (_options.game.developer && _gameSpeed < 8.0f) {
             _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
             return true;
         }
         break;
 
-    case SDLK_v:
+    case input::KeyCode::V:
         if (_options.game.developer && _screen == Screen::InGame) {
             toggleInGameCameraType();
             return true;
@@ -558,16 +558,16 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-bool Game::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+bool Game::handleMouseMotion(const input::MouseMotionEvent &event) {
     _cursor->setPosition({event.x, event.y});
     return false;
 }
 
-bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    _cursor->setPressed(event.state & SDL_BUTTON(1));
-    if (event.button != SDL_BUTTON_LEFT) {
+bool Game::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left) {
         return false;
     }
+    _cursor->setPressed(true);
     if (_movie) {
         _movie->finish();
         return true;
@@ -575,8 +575,11 @@ bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     return false;
 }
 
-bool Game::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    _cursor->setPressed(event.state & SDL_BUTTON(1));
+bool Game::handleMouseButtonUp(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left) {
+        return false;
+    }
+    _cursor->setPressed(false);
     return false;
 }
 

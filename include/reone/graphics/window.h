@@ -25,7 +25,6 @@ namespace reone {
 namespace graphics {
 
 class Cursor;
-class EventHandler;
 
 class IWindow {
 public:

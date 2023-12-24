@@ -194,7 +194,7 @@ void HUD::onGUILoaded() {
     _barkBubble->init();
 }
 
-bool HUD::handle(const SDL_Event &event) {
+bool HUD::handle(const input::Event &event) {
     if (_select.handle(event)) {
         return true;
     }

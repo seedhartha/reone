@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/input/event.h"
+
 #include "../../camerastyle.h"
 
 #include "../camera.h"
@@ -45,7 +47,7 @@ public:
 
     void load();
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
     void update(float dt) override;
     void stopMovement() override;
 
@@ -64,11 +66,11 @@ private:
 
     void updateSceneNode();
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
-    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
+    bool handleKeyUp(const input::KeyEvent &event);
+    bool handleMouseMotion(const input::MouseMotionEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleMouseButtonUp(const input::MouseButtonEvent &event);
 };
 
 } // namespace game

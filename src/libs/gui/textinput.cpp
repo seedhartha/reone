@@ -29,129 +29,129 @@ void TextInput::clear() {
     _text.clear();
 }
 
-bool TextInput::handle(const SDL_Event &event) {
+bool TextInput::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         return handleKeyDown(event.key);
     default:
         return false;
     }
 }
 
-static inline bool isDigitKey(const SDL_Keysym &key) {
-    return key.sym >= SDLK_0 && key.sym <= SDLK_9;
+static inline bool isDigitKey(const input::KeyEvent &event) {
+    return event.code >= input::KeyCode::Key0 && event.code <= input::KeyCode::Key9;
 }
 
-static inline bool isLetterKey(const SDL_Keysym &key) {
-    return key.sym >= SDLK_a && key.sym <= SDLK_z;
+static inline bool isLetterKey(const input::KeyEvent &event) {
+    return event.code >= input::KeyCode::A && event.code <= input::KeyCode::Z;
 }
 
-static inline bool isSymbolKey(const SDL_Keysym &key) {
-    return key.sym == SDLK_MINUS ||
-           key.sym == SDLK_EQUALS ||
-           key.sym == SDLK_LEFTBRACKET ||
-           key.sym == SDLK_RIGHTBRACKET ||
-           key.sym == SDLK_SEMICOLON ||
-           key.sym == SDLK_QUOTE ||
-           key.sym == SDLK_COMMA ||
-           key.sym == SDLK_PERIOD ||
-           key.sym == SDLK_SLASH ||
-           key.sym == SDLK_BACKSLASH;
+static inline bool isSymbolKey(const input::KeyEvent &event) {
+    return event.code == input::KeyCode::Minus ||
+           event.code == input::KeyCode::Equals ||
+           event.code == input::KeyCode::LeftBracket ||
+           event.code == input::KeyCode::RightBracket ||
+           event.code == input::KeyCode::Semicolon ||
+           event.code == input::KeyCode::Quote ||
+           event.code == input::KeyCode::Comma ||
+           event.code == input::KeyCode::Period ||
+           event.code == input::KeyCode::Slash ||
+           event.code == input::KeyCode::Backslash;
 }
 
-static inline bool isShiftPressed(const SDL_Keysym &key) {
-    return key.mod & KMOD_SHIFT;
+static inline bool isShiftPressed(const input::KeyEvent &event) {
+    return event.mod & input::KeyModifiers::shift;
 }
 
-bool TextInput::handleKeyDown(const SDL_KeyboardEvent &event) {
-    if (!isKeyAllowed(event.keysym)) {
+bool TextInput::handleKeyDown(const input::KeyEvent &event) {
+    if (!isKeyAllowed(event)) {
         return false;
     }
 
-    bool digit = isDigitKey(event.keysym);
-    bool letter = isLetterKey(event.keysym);
-    bool symbol = isSymbolKey(event.keysym);
-    bool shift = isShiftPressed(event.keysym);
+    bool digit = isDigitKey(event);
+    bool letter = isLetterKey(event);
+    bool symbol = isSymbolKey(event);
+    bool shift = isShiftPressed(event);
 
-    if (event.keysym.sym == SDLK_BACKSPACE) {
+    if (event.code == input::KeyCode::Backspace) {
         if (!_text.empty()) {
             _text.resize(_text.size() - 1);
         }
-    } else if (event.keysym.sym == SDLK_SPACE) {
-        _text += event.keysym.sym;
+    } else if (event.code == input::KeyCode::Space) {
+        _text += static_cast<char>(event.code);
     } else if (digit) {
         if (shift) {
-            if (event.keysym.sym == SDLK_1) {
+            if (event.code == input::KeyCode::Key1) {
                 _text += "!";
-            } else if (event.keysym.sym == SDLK_2) {
+            } else if (event.code == input::KeyCode::Key2) {
                 _text += "@";
-            } else if (event.keysym.sym == SDLK_3) {
+            } else if (event.code == input::KeyCode::Key3) {
                 _text += "#";
-            } else if (event.keysym.sym == SDLK_4) {
+            } else if (event.code == input::KeyCode::Key4) {
                 _text += "$";
-            } else if (event.keysym.sym == SDLK_5) {
+            } else if (event.code == input::KeyCode::Key5) {
                 _text += "%";
-            } else if (event.keysym.sym == SDLK_6) {
+            } else if (event.code == input::KeyCode::Key6) {
                 _text += "^";
-            } else if (event.keysym.sym == SDLK_7) {
+            } else if (event.code == input::KeyCode::Key7) {
                 _text += "&";
-            } else if (event.keysym.sym == SDLK_8) {
+            } else if (event.code == input::KeyCode::Key8) {
                 _text += "*";
-            } else if (event.keysym.sym == SDLK_9) {
+            } else if (event.code == input::KeyCode::Key9) {
                 _text += "(";
-            } else if (event.keysym.sym == SDLK_0) {
+            } else if (event.code == input::KeyCode::Key0) {
                 _text += ")";
             }
         } else {
-            _text += event.keysym.sym;
+            _text += static_cast<char>(event.code);
         }
     } else if (letter) {
-        _text += shift ? toupper(event.keysym.sym) : event.keysym.sym;
+        _text += shift ? toupper(static_cast<char>(event.code)) : static_cast<char>(event.code);
     } else if (symbol) {
         if (shift) {
-            if (event.keysym.sym == SDLK_MINUS) {
+            if (event.code == input::KeyCode::Minus) {
                 _text += "_";
-            } else if (event.keysym.sym == SDLK_EQUALS) {
+            } else if (event.code == input::KeyCode::Equals) {
                 _text += "+";
-            } else if (event.keysym.sym == SDLK_LEFTBRACKET) {
+            } else if (event.code == input::KeyCode::LeftBracket) {
                 _text += "{";
-            } else if (event.keysym.sym == SDLK_RIGHTBRACKET) {
+            } else if (event.code == input::KeyCode::RightBracket) {
                 _text += "}";
-            } else if (event.keysym.sym == SDLK_SEMICOLON) {
+            } else if (event.code == input::KeyCode::Semicolon) {
                 _text += ":";
-            } else if (event.keysym.sym == SDLK_QUOTE) {
+            } else if (event.code == input::KeyCode::Quote) {
                 _text += "\"";
-            } else if (event.keysym.sym == SDLK_COMMA) {
+            } else if (event.code == input::KeyCode::Comma) {
                 _text += "<";
-            } else if (event.keysym.sym == SDLK_PERIOD) {
+            } else if (event.code == input::KeyCode::Period) {
                 _text += ">";
-            } else if (event.keysym.sym == SDLK_SLASH) {
+            } else if (event.code == input::KeyCode::Slash) {
                 _text += "?";
-            } else if (event.keysym.sym == SDLK_BACKSLASH) {
+            } else if (event.code == input::KeyCode::Backslash) {
                 _text += "|";
             }
         } else {
-            _text += event.keysym.sym;
+            _text += static_cast<char>(event.code);
         }
     }
 
     return true;
 }
 
-bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
-    if (key.sym == SDLK_BACKSPACE) {
+bool TextInput::isKeyAllowed(const input::KeyEvent &event) const {
+    if (event.code == input::KeyCode::Backspace) {
         return true;
     }
-    if (key.sym == SDLK_SPACE) {
+    if (event.code == input::KeyCode::Space) {
         return (_mask & TextInputFlags::whitespace) != 0;
     }
-    if (isDigitKey(key)) {
+    if (isDigitKey(event)) {
         return (_mask & TextInputFlags::digits) != 0;
     }
-    if (isLetterKey(key)) {
+    if (isLetterKey(event)) {
         return (_mask & TextInputFlags::letters) != 0;
     }
-    if (isSymbolKey(key)) {
+    if (isSymbolKey(event)) {
         return (_mask & TextInputFlags::symbols) != 0;
     }
     return false;

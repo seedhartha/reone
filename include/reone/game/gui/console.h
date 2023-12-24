@@ -21,6 +21,7 @@
 #include "reone/graphics/options.h"
 #include "reone/graphics/types.h"
 #include "reone/gui/textinput.h"
+#include "reone/input/event.h"
 
 namespace reone {
 
@@ -44,7 +45,7 @@ public:
 
     void init();
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void render();
 
     bool isOpen() const { return _open; }
@@ -77,8 +78,8 @@ private:
 
     // END Commands
 
-    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
+    bool handleMouseWheel(const input::MouseWheelEvent &event);
+    bool handleKeyUp(const input::KeyEvent &event);
 
     void executeInputText();
     void print(const std::string &text);

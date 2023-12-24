@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/input/event.h"
+
 namespace reone {
 
 namespace gui {
@@ -36,7 +38,7 @@ public:
     TextInput(int mask);
 
     void clear();
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
 
     const std::string &text() const { return _text; }
 
@@ -46,8 +48,8 @@ private:
     int _mask {0};
     std::string _text;
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool isKeyAllowed(const SDL_Keysym &key) const;
+    bool handleKeyDown(const input::KeyEvent &event);
+    bool isKeyAllowed(const input::KeyEvent &event) const;
 };
 
 } // namespace gui

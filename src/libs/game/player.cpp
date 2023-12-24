@@ -27,49 +27,49 @@ namespace reone {
 
 namespace game {
 
-bool Player::handle(const SDL_Event &event) {
+bool Player::handle(const input::Event &event) {
     std::shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader)
         return false;
 
     switch (event.type) {
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         return handleKeyDown(event.key);
-    case SDL_KEYUP:
+    case input::EventType::KeyUp:
         return handleKeyUp(event.key);
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         return handleMouseButtonDown(event.button);
-    case SDL_MOUSEBUTTONUP:
+    case input::EventType::MouseButtonUp:
         return handleMouseButtonUp(event.button);
     default:
         return false;
     }
 }
 
-bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-    case SDL_SCANCODE_W: {
+bool Player::handleKeyDown(const input::KeyEvent &event) {
+    switch (event.code) {
+    case input::KeyCode::W: {
         _moveForward = true;
         return true;
     }
-    case SDL_SCANCODE_Z: {
+    case input::KeyCode::Z: {
         _moveLeft = true;
         return true;
     }
-    case SDL_SCANCODE_S: {
+    case input::KeyCode::S: {
         _moveBackward = true;
         return true;
     }
-    case SDL_SCANCODE_C: {
+    case input::KeyCode::C: {
         _moveRight = true;
         return true;
     }
-    case SDL_SCANCODE_X: {
+    case input::KeyCode::X: {
         std::shared_ptr<Creature> partyLeader(_party.getLeader());
         partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
         return true;
     }
-    case SDL_SCANCODE_B: {
+    case input::KeyCode::B: {
         _walk = true;
         return true;
     }
@@ -78,25 +78,25 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
 }
 
-bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-    case SDL_SCANCODE_W:
+bool Player::handleKeyUp(const input::KeyEvent &event) {
+    switch (event.code) {
+    case input::KeyCode::W:
         _moveForward = false;
         return true;
 
-    case SDL_SCANCODE_Z:
+    case input::KeyCode::Z:
         _moveLeft = false;
         return true;
 
-    case SDL_SCANCODE_S:
+    case input::KeyCode::S:
         _moveBackward = false;
         return true;
 
-    case SDL_SCANCODE_C:
+    case input::KeyCode::C:
         _moveRight = false;
         return true;
 
-    case SDL_SCANCODE_B:
+    case input::KeyCode::B:
         _walk = false;
         return true;
 
@@ -105,8 +105,8 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
     }
 }
 
-bool Player::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (_camera.isMouseLookMode() && event.button == SDL_BUTTON_LEFT) {
+bool Player::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (_camera.isMouseLookMode() && event.button == input::MouseButton::Left) {
         _moveForward = true;
         _leftPressedInMouseLook = true;
         return true;
@@ -115,8 +115,8 @@ bool Player::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     return false;
 }
 
-bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    if (_leftPressedInMouseLook && event.button == SDL_BUTTON_LEFT) {
+bool Player::handleMouseButtonUp(const input::MouseButtonEvent &event) {
+    if (_leftPressedInMouseLook && event.button == input::MouseButton::Left) {
         _moveForward = false;
         _leftPressedInMouseLook = false;
         return true;

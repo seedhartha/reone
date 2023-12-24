@@ -20,6 +20,7 @@
 #include "reone/audio/source.h"
 #include "reone/game/di/services.h"
 #include "reone/gui/gui.h"
+#include "reone/input/event.h"
 
 #include "types.h"
 
@@ -33,7 +34,7 @@ class GameGUI : public gui::IGUIEventListener, boost::noncopyable {
 public:
     virtual void init();
 
-    virtual bool handle(const SDL_Event &event);
+    virtual bool handle(const input::Event &event);
     virtual void update(float dt);
     virtual void render();
 

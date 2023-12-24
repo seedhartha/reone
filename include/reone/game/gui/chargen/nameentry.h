@@ -20,6 +20,7 @@
 #include "reone/gui/control/button.h"
 #include "reone/gui/control/label.h"
 #include "reone/gui/textinput.h"
+#include "reone/input/event.h"
 #include "reone/resource/ltr.h"
 
 #include "../../gui.h"
@@ -48,7 +49,7 @@ public:
         _resRef = guiResRef("name");
     }
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
 
     void loadRandomName();
 

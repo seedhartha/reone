@@ -145,15 +145,15 @@ void GUI::positionRelativeToCenter(Control &control) {
     control.setExtent(std::move(extent));
 }
 
-bool GUI::handle(const SDL_Event &event) {
+bool GUI::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_KEYDOWN:
-        return handleKeyDown(event.key.keysym.scancode);
+    case input::EventType::KeyDown:
+        return handleKeyDown(event.key.code);
 
-    case SDL_KEYUP:
-        return handleKeyUp(event.key.keysym.scancode);
+    case input::EventType::KeyUp:
+        return handleKeyUp(event.key.code);
 
-    case SDL_MOUSEMOTION: {
+    case input::EventType::MouseMotion: {
         glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
         updateSelection(ctrlCoords.x, ctrlCoords.y);
         if (_selection) {
@@ -161,13 +161,13 @@ bool GUI::handle(const SDL_Event &event) {
         }
         break;
     }
-    case SDL_MOUSEBUTTONDOWN:
-        if (event.button.button == SDL_BUTTON_LEFT) {
+    case input::EventType::MouseButtonDown:
+        if (event.button.button == input::MouseButton::Left) {
             _leftMouseDown = true;
         }
         break;
-    case SDL_MOUSEBUTTONUP:
-        if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
+    case input::EventType::MouseButtonUp:
+        if (_leftMouseDown && event.button.button == input::MouseButton::Left) {
             _leftMouseDown = false;
             glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
             auto control = findControlAt(
@@ -181,7 +181,7 @@ bool GUI::handle(const SDL_Event &event) {
         }
         break;
 
-    case SDL_MOUSEWHEEL:
+    case input::EventType::MouseWheel:
         if (_selection && _selection->get().handleMouseWheel(event.wheel.x, event.wheel.y))
             return true;
         break;
@@ -190,11 +190,11 @@ bool GUI::handle(const SDL_Event &event) {
     return false;
 }
 
-bool GUI::handleKeyDown(SDL_Scancode key) {
+bool GUI::handleKeyDown(input::KeyCode key) {
     return false;
 }
 
-bool GUI::handleKeyUp(SDL_Scancode key) {
+bool GUI::handleKeyUp(input::KeyCode key) {
     return false;
 }
 

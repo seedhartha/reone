@@ -37,7 +37,7 @@ public:
         GameGUI(game, services) {
     }
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
     void update(float dt) override;
 
     void start(const std::shared_ptr<resource::Dialog> &dialog, const std::shared_ptr<Object> &owner);
@@ -97,8 +97,8 @@ private:
 
     // Event handlers
 
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleKeyUp(const input::KeyEvent &event);
 
     // END Event handlers
 };

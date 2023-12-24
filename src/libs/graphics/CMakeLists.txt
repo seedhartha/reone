@@ -30,7 +30,6 @@ set(GRAPHICS_HEADERS
     ${GRAPHICS_INCLUDE_DIR}/di/module.h
     ${GRAPHICS_INCLUDE_DIR}/di/services.h
     ${GRAPHICS_INCLUDE_DIR}/dxtutil.h
-    ${GRAPHICS_INCLUDE_DIR}/eventhandler.h
     ${GRAPHICS_INCLUDE_DIR}/font.h
     ${GRAPHICS_INCLUDE_DIR}/format/bwmreader.h
     ${GRAPHICS_INCLUDE_DIR}/format/curreader.h

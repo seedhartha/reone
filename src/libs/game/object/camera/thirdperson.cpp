@@ -43,26 +43,26 @@ void ThirdPersonCamera::load() {
     cameraSceneNode()->setPerspectiveProjection(glm::radians(_style.viewAngle), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
-bool ThirdPersonCamera::handle(const SDL_Event &event) {
+bool ThirdPersonCamera::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         return handleKeyDown(event.key);
-    case SDL_KEYUP:
+    case input::EventType::KeyUp:
         return handleKeyUp(event.key);
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         return handleMouseButtonDown(event.button);
-    case SDL_MOUSEBUTTONUP:
+    case input::EventType::MouseButtonUp:
         return handleMouseButtonUp(event.button);
-    case SDL_MOUSEMOTION:
+    case input::EventType::MouseMotion:
         return handleMouseMotion(event.motion);
     default:
         return false;
     }
 }
 
-bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-    case SDL_SCANCODE_A:
+bool ThirdPersonCamera::handleKeyDown(const input::KeyEvent &event) {
+    switch (event.code) {
+    case input::KeyCode::A:
         if (!event.repeat && !_mouseLookMode) {
             _rotateCCW = true;
             _rotateCW = false;
@@ -70,7 +70,7 @@ bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
             return true;
         }
         break;
-    case SDL_SCANCODE_D:
+    case input::KeyCode::D:
         if (!event.repeat && !_mouseLookMode) {
             _rotateCCW = false;
             _rotateCW = true;
@@ -85,15 +85,15 @@ bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-    case SDL_SCANCODE_A:
+bool ThirdPersonCamera::handleKeyUp(const input::KeyEvent &event) {
+    switch (event.code) {
+    case input::KeyCode::A:
         if (!_mouseLookMode) {
             _rotateCCW = false;
             return true;
         }
         break;
-    case SDL_SCANCODE_D:
+    case input::KeyCode::D:
         if (!_mouseLookMode) {
             _rotateCW = false;
             return true;
@@ -106,7 +106,7 @@ bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
     return false;
 }
 
-bool ThirdPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+bool ThirdPersonCamera::handleMouseMotion(const input::MouseMotionEvent &event) {
     if (_mouseLookMode) {
         _facing -= kMouseRotationSpeed * event.xrel;
         _facing = glm::mod(_facing, glm::two_pi<float>());
@@ -115,8 +115,8 @@ bool ThirdPersonCamera::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     return false;
 }
 
-bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button == SDL_BUTTON_RIGHT) {
+bool ThirdPersonCamera::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button == input::MouseButton::Right) {
         _mouseLookMode = true;
         _rotateCCW = false;
         _rotateCW = false;
@@ -126,8 +126,8 @@ bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event)
     return false;
 }
 
-bool ThirdPersonCamera::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
-    if (event.button == SDL_BUTTON_RIGHT) {
+bool ThirdPersonCamera::handleMouseButtonUp(const input::MouseButtonEvent &event) {
+    if (event.button == input::MouseButton::Right) {
         _mouseLookMode = false;
         _game.setRelativeMouseMode(false);
         return true;

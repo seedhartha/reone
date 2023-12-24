@@ -21,117 +21,129 @@ namespace reone {
 
 namespace input {
 
-enum class KeyState {
-    Released,
-    Pressed
-};
+enum class KeyCode {
+    Unknown = 0,
 
-enum class Scancode : uint16_t {
-    None = 0,
+    Return = '\r',
+    Escape = '\x1B',
+    Backspace = '\b',
+    Tab = '\t',
+    Space = ' ',
+    Exclaim = '!',
+    DoubleQuote = '"',
+    Hash = '#',
+    Percent = '%',
+    Dollar = '$',
+    Ampersand = '&',
+    Quote = '\'',
+    LeftParenthesis = '(',
+    RightParenthesis = ')',
+    Asterisk = '*',
+    Plus = '+',
+    Comma = ',',
+    Minus = '-',
+    Period = '.',
+    Slash = '/',
+    Key0 = '0',
+    Key1 = '1',
+    Key2 = '2',
+    Key3 = '3',
+    Key4 = '4',
+    Key5 = '5',
+    Key6 = '6',
+    Key7 = '7',
+    Key8 = '8',
+    Key9 = '9',
+    Colon = ':',
+    Semicolon = ';',
+    Less = '<',
+    Equals = '=',
+    Greater = '>',
+    Question = '?',
+    At = '@',
 
-    A = 4,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
-    M,
-    N,
-    O,
-    P,
-    Q,
-    R,
-    S,
-    T,
-    U,
-    V,
-    W,
-    X,
-    Y,
-    Z,
+    LeftBracket = '[',
+    Backslash = '\\',
+    RightBracket = ']',
+    Caret = '^',
+    Underscore = '_',
+    Backquote = '`',
+    A = 'a',
+    B = 'b',
+    C = 'c',
+    D = 'd',
+    E = 'e',
+    F = 'f',
+    G = 'g',
+    H = 'h',
+    I = 'i',
+    J = 'j',
+    K = 'k',
+    L = 'l',
+    M = 'm',
+    N = 'n',
+    O = 'o',
+    P = 'p',
+    Q = 'q',
+    R = 'r',
+    S = 's',
+    T = 't',
+    U = 'u',
+    V = 'v',
+    W = 'w',
+    X = 'x',
+    Y = 'y',
+    Z = 'z',
 
-    Key1 = 30,
-    Key2,
-    Key3,
-    Key4,
-    Key5,
-    Key6,
-    Key7,
-    Key8,
-    Key9,
-    Key0,
+    CapsLock = 57 | (1 << 30),
 
-    Enter = 40,
-    Esc,
-    Backspace,
-    Tab,
-    Space,
-    Minus,
-    Equal,
-    LeftBrace,
-    RightBrace,
-    Backslash,
-    HashTilde,
-    Semicolon,
-    Apostrophe,
-    Grave,
-    Comma,
-    Dot,
-    Slash,
-    CapsLock,
+    F1 = 58 | (1 << 30),
+    F2 = 59 | (1 << 30),
+    F3 = 60 | (1 << 30),
+    F4 = 61 | (1 << 30),
+    F5 = 62 | (1 << 30),
+    F6 = 63 | (1 << 30),
+    F7 = 64 | (1 << 30),
+    F8 = 65 | (1 << 30),
+    F9 = 66 | (1 << 30),
+    F10 = 67 | (1 << 30),
+    F11 = 68 | (1 << 30),
+    F12 = 69 | (1 << 30),
 
-    F1 = 58,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
+    PrintScreen = 70 | (1 << 30),
+    ScrollLock = 71 | (1 << 30),
+    Pause = 72 | (1 << 30),
+    Insert = 73 | (1 << 30),
+    Home = 74 | (1 << 30),
+    PageUp = 75 | (1 << 30),
+    Delete = '\x7F',
+    End = 77 | (1 << 30),
+    PageDown = 78 | (1 << 30),
+    Right = 79 | (1 << 30),
+    Left = 80 | (1 << 30),
+    Down = 81 | (1 << 30),
+    Up = 82 | (1 << 30),
 
-    SysReq = 70,
-    ScrollLock,
-    Pause,
-    Insert,
-    Home,
-    PageUp,
-    Delete,
-    End,
-    PageDown,
-    Right,
-    Left,
-    Down,
-    Up,
-
-    LeftControl = 224,
-    LeftShift,
-    LeftAlt,
-    LeftGUI,
-    RightControl,
-    RightShift,
-    RightAlt,
-    RightGUI
+    LeftControl = 224 | (1 << 30),
+    LeftShift = 225 | (1 << 30),
+    LeftAlt = 226 | (1 << 30),
+    LeftGUI = 227 | (1 << 30),
+    RightControl = 228 | (1 << 30),
+    RightShift = 229 | (1 << 30),
+    RightAlt = 230 | (1 << 30),
+    RightGUI = 231 | (1 << 30)
 };
 
 struct KeyModifiers {
-    static constexpr int leftControl = 1 << 0;
-    static constexpr int leftShift = 1 << 1;
-    static constexpr int leftAlt = 1 << 2;
-    static constexpr int leftGUI = 1 << 3;
-    static constexpr int rightControl = 1 << 4;
-    static constexpr int rightShift = 1 << 5;
-    static constexpr int rightAlt = 1 << 6;
-    static constexpr int rightGUI = 1 << 7;
+    static constexpr int leftShift = 1 << 0;
+    static constexpr int rightShift = 1 << 1;
+    static constexpr int leftControl = 1 << 6;
+    static constexpr int rightControl = 1 << 7;
+    static constexpr int leftAlt = 1 << 8;
+    static constexpr int rightAlt = 1 << 9;
+    static constexpr int leftGUI = 1 << 10;
+    static constexpr int rightGUI = 1 << 11;
+    static constexpr int capsLock = 1 << 13;
 
     static constexpr int control = leftControl | rightControl;
     static constexpr int shift = leftShift | rightShift;
@@ -140,17 +152,17 @@ struct KeyModifiers {
 };
 
 struct KeyEvent {
-    KeyState state;
-    Scancode scancode;
+    bool pressed;
+    KeyCode code;
     uint16_t mod;
     bool repeat;
 
-    KeyEvent(KeyState state,
-             Scancode scancode,
+    KeyEvent(bool pressed,
+             KeyCode code,
              uint16_t mod,
              bool repeat) :
-        state(state),
-        scancode(scancode),
+        pressed(pressed),
+        code(code),
         mod(mod),
         repeat(repeat) {
     }
@@ -175,32 +187,27 @@ struct MouseMotionEvent {
 };
 
 enum class MouseButton {
-    Left,
+    Left = 1,
     Middle,
     Right,
     X1,
     X2
 };
 
-enum class MouseState {
-    Released,
-    Pressed
-};
-
 struct MouseButtonEvent {
     MouseButton button;
-    MouseState state;
+    bool pressed;
     uint8_t clicks;
     int32_t x;
     int32_t y;
 
     MouseButtonEvent(MouseButton button,
-                     MouseState state,
+                     bool pressed,
                      uint8_t clicks,
                      int32_t x,
                      int32_t y) :
         button(button),
-        state(state),
+        pressed(pressed),
         clicks(clicks),
         x(x),
         y(y) {

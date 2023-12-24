@@ -19,10 +19,11 @@
 
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/options.h"
+#include "reone/input/event.h"
 #include "reone/resource/di/services.h"
+#include "reone/resource/template/generated/gui.h"
 
 #include "control.h"
-#include "reone/resource/template/generated/gui.h"
 
 namespace reone {
 
@@ -57,7 +58,7 @@ public:
 
     virtual void load(const resource::Gff &gui) = 0;
 
-    virtual bool handle(const SDL_Event &event) = 0;
+    virtual bool handle(const input::Event &event) = 0;
     virtual void update(float dt) = 0;
     virtual void render() = 0;
 
@@ -100,7 +101,7 @@ public:
 
     void load(const resource::Gff &gui) override;
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
     void update(float dt) override;
     void render() override;
 
@@ -217,8 +218,8 @@ private:
 
     // User input
 
-    virtual bool handleKeyDown(SDL_Scancode key);
-    virtual bool handleKeyUp(SDL_Scancode key);
+    virtual bool handleKeyDown(input::KeyCode key);
+    virtual bool handleKeyUp(input::KeyCode key);
 
     // END User input
 };

@@ -18,13 +18,14 @@
 #pragma once
 
 #include "reone/graphics/types.h"
+#include "reone/input/event.h"
 #include "reone/resource/format/gffreader.h"
+#include "reone/resource/template/generated/ifo.h"
 #include "reone/resource/types.h"
 
 #include "../contextaction.h"
 #include "../object.h"
 #include "../player.h"
-#include "reone/resource/template/generated/ifo.h"
 
 #include "area.h"
 
@@ -64,7 +65,7 @@ public:
     void load(std::string name, const resource::Gff &ifo, bool fromSave = false);
     void loadParty(const std::string &entry = "", bool fromSave = false);
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void update(float dt);
 
     std::vector<ContextAction> getContextActions(const std::shared_ptr<Object> &object) const;
@@ -97,9 +98,9 @@ private:
 
     // User input
 
-    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleMouseMotion(const input::MouseMotionEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
 
     // END User input
 };

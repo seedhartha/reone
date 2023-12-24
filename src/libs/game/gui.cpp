@@ -75,7 +75,7 @@ void GameGUI::preload(IGUI &gui) {
     }
 }
 
-bool GameGUI::handle(const SDL_Event &event) {
+bool GameGUI::handle(const input::Event &event) {
     if (!_gui) {
         return false;
     }

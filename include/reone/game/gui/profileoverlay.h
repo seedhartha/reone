@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/graphics/font.h"
+#include "reone/input/event.h"
 #include "reone/system/timer.h"
 
 #include "../options.h"
@@ -37,7 +38,7 @@ public:
 
     void init();
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void update(float dt);
     void render();
 

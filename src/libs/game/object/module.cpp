@@ -122,22 +122,22 @@ void Module::getEntryPoint(const std::string &waypoint, glm::vec3 &position, flo
     }
 }
 
-bool Module::handle(const SDL_Event &event) {
+bool Module::handle(const input::Event &event) {
     if (_player && _player->handle(event))
         return true;
     if (_area->handle(event))
         return true;
 
     switch (event.type) {
-    case SDL_MOUSEMOTION:
+    case input::EventType::MouseMotion:
         if (handleMouseMotion(event.motion))
             return true;
         break;
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         if (handleMouseButtonDown(event.button))
             return true;
         break;
-    case SDL_KEYDOWN:
+    case input::EventType::KeyDown:
         if (handleKeyDown(event.key))
             return true;
         break;
@@ -148,7 +148,7 @@ bool Module::handle(const SDL_Event &event) {
     return false;
 }
 
-bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+bool Module::handleMouseMotion(const input::MouseMotionEvent &event) {
     CursorType cursor = CursorType::Default;
 
     auto object = _area->getObjectAt(event.x, event.y);
@@ -185,8 +185,8 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     return true;
 }
 
-bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT) {
+bool Module::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left) {
         return false;
     }
     auto object = _area->getObjectAt(event.x, event.y);
@@ -349,9 +349,9 @@ std::vector<ContextAction> Module::getContextActions(const std::shared_ptr<Objec
     return actions;
 }
 
-bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.sym) {
-    case SDLK_SPACE: {
+bool Module::handleKeyDown(const input::KeyEvent &event) {
+    switch (event.code) {
+    case input::KeyCode::Space: {
         bool paused = !_game.isPaused();
         _game.setPaused(paused);
         return true;

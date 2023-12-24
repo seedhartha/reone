@@ -145,23 +145,27 @@ int Engine::run() {
 }
 
 void Engine::processEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
+    SDL_Event sdlEvent;
+    while (SDL_PollEvent(&sdlEvent)) {
+        if (sdlEvent.type == SDL_QUIT) {
             _quit = true;
             break;
         }
-        if (!_window->isAssociatedWith(event)) {
+        if (!_window->isAssociatedWith(sdlEvent)) {
             continue;
         }
-        if (_window->handle(event)) {
+        if (_window->handle(sdlEvent)) {
             if (_window->isCloseRequested()) {
                 _quit = true;
                 break;
             }
             continue;
         }
-        if (_game->handle(event) && _game->isQuitRequested()) {
+        auto event = eventFromSDLEvent(sdlEvent);
+        if (!event) {
+            continue;
+        }
+        if (_game->handle(*event) && _game->isQuitRequested()) {
             _quit = true;
         }
     }
@@ -181,6 +185,51 @@ void Engine::setRelativeMouseMode(bool relative) {
     }
     SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
     _relativeMouseMode = relative;
+}
+
+std::optional<input::Event> Engine::eventFromSDLEvent(const SDL_Event &sdlEvent) const {
+    switch (sdlEvent.type) {
+    case SDL_KEYDOWN:
+        return input::Event::newKeyDown(input::KeyEvent {
+            sdlEvent.key.state == SDL_PRESSED,
+            static_cast<input::KeyCode>(sdlEvent.key.keysym.sym),
+            sdlEvent.key.keysym.mod,
+            static_cast<bool>(sdlEvent.key.repeat)});
+    case SDL_KEYUP:
+        return input::Event::newKeyUp(input::KeyEvent {
+            sdlEvent.key.state == SDL_PRESSED,
+            static_cast<input::KeyCode>(sdlEvent.key.keysym.sym),
+            sdlEvent.key.keysym.mod,
+            static_cast<bool>(sdlEvent.key.repeat)});
+    case SDL_MOUSEMOTION:
+        return input::Event::newMouseMotion(input::MouseMotionEvent {
+            sdlEvent.motion.x,
+            sdlEvent.motion.y,
+            sdlEvent.motion.xrel,
+            sdlEvent.motion.yrel});
+    case SDL_MOUSEBUTTONDOWN:
+        return input::Event::newMouseButtonDown(input::MouseButtonEvent {
+            static_cast<input::MouseButton>(sdlEvent.button.button),
+            sdlEvent.button.state == SDL_PRESSED,
+            sdlEvent.button.clicks,
+            sdlEvent.button.x,
+            sdlEvent.button.y});
+    case SDL_MOUSEBUTTONUP:
+        return input::Event::newMouseButtonUp(input::MouseButtonEvent {
+            static_cast<input::MouseButton>(sdlEvent.button.button),
+            sdlEvent.button.state == SDL_PRESSED,
+            sdlEvent.button.clicks,
+            sdlEvent.button.x,
+            sdlEvent.button.y});
+    case SDL_MOUSEWHEEL: {
+        return input::Event::newMouseWheel(input::MouseWheelEvent {
+            sdlEvent.wheel.x,
+            sdlEvent.wheel.y,
+            static_cast<input::MouseWheelDirection>(sdlEvent.wheel.direction)});
+    default:
+        return std::nullopt;
+    }
+    }
 }
 
 } // namespace reone

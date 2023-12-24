@@ -19,6 +19,7 @@
 
 #include "reone/graphics/texture.h"
 #include "reone/graphics/types.h"
+#include "reone/input/event.h"
 #include "reone/resource/format/gffreader.h"
 #include "reone/resource/template/generated/are.h"
 #include "reone/resource/template/generated/git.h"
@@ -69,7 +70,7 @@ public:
 
     void load(std::string name, const resource::Gff &are, const resource::Gff &git, bool fromSave = false);
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void update(float dt);
 
     void destroyObject(const Object &object);
@@ -330,7 +331,7 @@ private:
 
     // User input
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
 
     // END User input
 };

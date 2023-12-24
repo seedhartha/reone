@@ -68,7 +68,7 @@ public:
 
     CharacterGeneration(Game &game, ServicesView &services);
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
     void update(float dt) override;
     void render() override;
 

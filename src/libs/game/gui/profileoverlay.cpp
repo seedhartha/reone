@@ -46,8 +46,8 @@ void ProfileOverlay::init() {
     _font = _services.resource.fonts.get(kFontResRef);
 }
 
-bool ProfileOverlay::handle(const SDL_Event &event) {
-    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
+bool ProfileOverlay::handle(const input::Event &event) {
+    if (event.type == input::EventType::KeyDown && event.key.code == input::KeyCode::F5) {
         _enabled = !_enabled;
         if (_enabled) {
             _ticks = _services.system.clock.ticks();

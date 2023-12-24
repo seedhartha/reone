@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "../contextaction.h"
 #include "reone/graphics/font.h"
 #include "reone/graphics/texture.h"
+#include "reone/input/event.h"
+
+#include "../contextaction.h"
 
 namespace reone {
 
@@ -38,7 +40,7 @@ public:
 
     void init();
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void update();
     void render();
 
@@ -70,9 +72,9 @@ private:
     bool _selectedHostile {false};
     bool _hasActions {false};
 
-    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
+    bool handleMouseMotion(const input::MouseMotionEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleMouseWheel(const input::MouseWheelEvent &event);
 
     void renderReticle(std::shared_ptr<graphics::Texture> texture, const glm::vec3 &screenCoords);
     void renderTitleBar();

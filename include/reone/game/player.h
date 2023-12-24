@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/input/event.h"
+
 namespace reone {
 
 namespace game {
@@ -39,7 +41,7 @@ public:
         _party(party) {
     }
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
     void update(float dt);
 
     void stopMovement();
@@ -63,10 +65,10 @@ private:
     bool _restrictMode {false};
     bool _walk {false};
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleMouseButtonUp(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
+    bool handleKeyUp(const input::KeyEvent &event);
+    bool handleMouseButtonDown(const input::MouseButtonEvent &event);
+    bool handleMouseButtonUp(const input::MouseButtonEvent &event);
 };
 
 } // namespace game

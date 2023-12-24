@@ -40,7 +40,7 @@ public:
         _resRef = guiResRef("mipc28x6");
     }
 
-    bool handle(const SDL_Event &event) override;
+    bool handle(const input::Event &event) override;
     void update(float dt) override;
     void render() override;
 

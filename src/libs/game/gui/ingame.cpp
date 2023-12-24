@@ -122,7 +122,7 @@ void InGameMenu::loadOptions() {
     _options->init();
 }
 
-bool InGameMenu::handle(const SDL_Event &event) {
+bool InGameMenu::handle(const input::Event &event) {
     auto tabGui = getActiveTabGUI();
     if (tabGui && tabGui->handle(event))
         return true;

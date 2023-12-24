@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "reone/input/event.h"
+
 namespace reone {
 
 namespace game {
@@ -36,7 +38,7 @@ public:
         _game(game) {
     }
 
-    bool handle(const SDL_Event &event);
+    bool handle(const input::Event &event);
 
     void clear();
     void switchLeader();
@@ -97,7 +99,7 @@ private:
     std::vector<Member> _members;
     bool _solo {false};
 
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
+    bool handleKeyDown(const input::KeyEvent &event);
 
     void onLeaderChanged();
 };

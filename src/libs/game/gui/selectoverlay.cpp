@@ -80,20 +80,20 @@ void SelectionOverlay::init() {
     _reticleHeight = _friendlyReticle2->height();
 }
 
-bool SelectionOverlay::handle(const SDL_Event &event) {
+bool SelectionOverlay::handle(const input::Event &event) {
     switch (event.type) {
-    case SDL_MOUSEMOTION:
+    case input::EventType::MouseMotion:
         return handleMouseMotion(event.motion);
-    case SDL_MOUSEBUTTONDOWN:
+    case input::EventType::MouseButtonDown:
         return handleMouseButtonDown(event.button);
-    case SDL_MOUSEWHEEL:
+    case input::EventType::MouseWheel:
         return handleMouseWheel(event.wheel);
     default:
         return false;
     }
 }
 
-bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
+bool SelectionOverlay::handleMouseMotion(const input::MouseMotionEvent &event) {
     _selectedActionSlot = -1;
 
     if (!_selectedObject)
@@ -111,8 +111,8 @@ bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     return false;
 }
 
-bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT)
+bool SelectionOverlay::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left)
         return false;
     if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
         return false;
@@ -153,7 +153,7 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     return true;
 }
 
-bool SelectionOverlay::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+bool SelectionOverlay::handleMouseWheel(const input::MouseWheelEvent &event) {
     if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
         return false;
 

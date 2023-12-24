@@ -89,21 +89,21 @@ void Console::addCommand(std::string name, std::string alias, std::string descri
     }
 }
 
-bool Console::handle(const SDL_Event &event) {
+bool Console::handle(const input::Event &event) {
     if (_open && _input.handle(event)) {
         return true;
     }
     switch (event.type) {
-    case SDL_MOUSEWHEEL:
+    case input::EventType::MouseWheel:
         return handleMouseWheel(event.wheel);
-    case SDL_KEYUP:
+    case input::EventType::KeyUp:
         return handleKeyUp(event.key);
     default:
         return false;
     }
 }
 
-bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+bool Console::handleMouseWheel(const input::MouseWheelEvent &event) {
     bool up = event.y < 0;
     if (up) {
         if (_outputOffset > 0) {
@@ -117,14 +117,14 @@ bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
     return true;
 }
 
-bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
+bool Console::handleKeyUp(const input::KeyEvent &event) {
     if (_open) {
-        switch (event.keysym.sym) {
-        case SDLK_BACKQUOTE:
+        switch (event.code) {
+        case input::KeyCode::Backquote:
             _open = false;
             return true;
 
-        case SDLK_RETURN: {
+        case input::KeyCode::Return: {
             std::string text(_input.text());
             if (!text.empty()) {
                 executeInputText();
@@ -133,7 +133,7 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
             }
             return true;
         }
-        case SDLK_UP:
+        case input::KeyCode::Up:
             if (!_history.empty()) {
                 _input.setText(_history.top());
                 _history.pop();
@@ -143,8 +143,8 @@ bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
             return false;
         }
     } else {
-        switch (event.keysym.sym) {
-        case SDLK_BACKQUOTE:
+        switch (event.code) {
+        case input::KeyCode::Backquote:
             _open = true;
             return true;
 

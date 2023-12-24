@@ -33,20 +33,20 @@ static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
 static constexpr char kBlueprintResRefAtton[] = "p_atton";
 static constexpr char kBlueprintResRefKreia[] = "p_kreia";
 
-bool Party::handle(const SDL_Event &event) {
-    if (event.type == SDL_KEYDOWN) {
+bool Party::handle(const input::Event &event) {
+    if (event.type == input::EventType::KeyDown) {
         return handleKeyDown(event.key);
     }
 
     return false;
 }
 
-bool Party::handleKeyDown(const SDL_KeyboardEvent &event) {
+bool Party::handleKeyDown(const input::KeyEvent &event) {
     if (event.repeat)
         return false;
 
-    switch (event.keysym.sym) {
-    case SDLK_TAB:
+    switch (event.code) {
+    case input::KeyCode::Tab:
         switchLeader();
         return true;
     }
