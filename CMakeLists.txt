@@ -93,6 +93,7 @@ add_subdirectory(src/libs/system) # system static library
 add_subdirectory(src/libs/resource) # resource static library
 add_subdirectory(src/libs/graphics) # graphics static library
 add_subdirectory(src/libs/audio) # audio static library
+add_subdirectory(src/libs/input) # input static library
 add_subdirectory(src/libs/gui) # gui static library
 add_subdirectory(src/libs/scene) # scene static library
 add_subdirectory(src/libs/movie) # movie static library
