@@ -296,6 +296,7 @@ void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
                     break;
                 case Gff::FieldType::Float:
                     value = std::to_string(field.floatValue);
+                    break;
                 case Gff::FieldType::Double:
                     value = std::to_string(field.doubleValue);
                     break;
