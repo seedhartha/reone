@@ -363,6 +363,8 @@ void ResourceExplorerViewModel::loadResources() {
         auto tlkReader = TlkReader(tlk);
         tlkReader.load();
         _talkTable = tlkReader.table();
+    } else {
+        _talkTable = TalkTable::Builder().build();
     }
     _routines = std::make_unique<Routines>(_gameId, nullptr, nullptr);
     _routines->init();
