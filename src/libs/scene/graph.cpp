@@ -53,7 +53,6 @@ static constexpr float kShadowFadeSpeed = 2.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 
 static constexpr float kLightRadiusBias = 64.0f;
-static constexpr float kLightRadiusBias2 = kLightRadiusBias * kLightRadiusBias;
 
 static constexpr float kMaxCollisionDistanceWalk = 8.0f;
 static constexpr float kMaxCollisionDistanceWalk2 = kMaxCollisionDistanceWalk * kMaxCollisionDistanceWalk;
@@ -190,8 +189,8 @@ void SceneGraph::cullRoots() {
 void SceneGraph::updateLighting() {
     // Find closest lights and create a lookup
     auto closestLights = computeClosestLights(kMaxLights, [](auto &light, float distance2) {
-        float radius2 = light.radius() * light.radius();
-        return distance2 < radius2 * radius2 + kLightRadiusBias2;
+        float radius = light.radius() + kLightRadiusBias;
+        return distance2 < radius * radius;
     });
     std::set<LightSceneNode *> lookup;
     for (auto &light : closestLights) {

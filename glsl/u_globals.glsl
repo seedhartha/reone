@@ -1,4 +1,4 @@
-const int MAX_LIGHTS = 16;
+const int MAX_LIGHTS = 32;
 const int NUM_SHADOW_LIGHT_SPACE = 6;
 
 struct Light {

@@ -2,6 +2,7 @@
 #include "u_locals.glsl"
 
 #include "i_fog.glsl"
+#include "i_gamma.glsl"
 #include "i_lighting.glsl"
 #include "i_math.glsl"
 #include "i_shadowmap.glsl"
@@ -40,6 +41,12 @@ void main() {
     vec4 lightmapSample = texture(sLightmap, uv);
     vec4 envmapSample = texture(sEnvmapColor, uv);
     vec4 selfIllumSample = texture(sSelfIllumColor, uv);
+#ifdef R_PBR
+    mainTexSample.rgb = gammaToLinear(mainTexSample.rgb);
+    lightmapSample.rgb = gammaToLinear(lightmapSample.rgb);
+    envmapSample.rgb = gammaToLinear(envmapSample.rgb);
+    selfIllumSample.rgb = gammaToLinear(selfIllumSample.rgb);
+#endif
     vec4 featuresSample = texture(sFeatures, uv);
     vec3 eyePos = texture(sEyePos, uv).rgb;
     vec3 eyeNormal = normalize(2.0 * texture(sEyeNormal, uv).rgb - 1.0);
@@ -48,12 +55,18 @@ void main() {
 #endif
 #ifdef R_SSR
     vec4 ssrSample = texture(sSSR, uv);
+#ifdef R_PBR
+    ssrSample.rgb = gammaToLinear(ssrSample.rgb);
 #endif
+#endif // R_SSR
 
-    vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).rgb;
-    vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).rgb;
-    float envmapped = step(0.0001, envmapSample.a);
+    vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).xyz;
+    vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).xyz;
     float lightmapped = step(0.0001, lightmapSample.a);
+#ifdef R_PBR
+    lightmapped *= 0.5;
+#endif
+    float envmapped = step(0.0001, envmapSample.a);
     float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal, sShadowMap, sShadowMapCube), featuresSample.r);
     float fog = mix(0.0, getFog(worldPos), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
 
@@ -78,7 +91,7 @@ void main() {
                           ambientD, ambientS);
     PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, 1.0 - lightmapped,
                          directD, directS);
-    vec3 colorDynamic = clamp(ambientD * ao + directD + emission, 0.0, 1.0) * albedo +
+    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
                         ambientS + directS;
     vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
                             ambientS + directS;
@@ -99,6 +112,11 @@ void main() {
     color = mix(color, uFogColor.rgb, fog);
     float alpha = step(0.0001, mainTexSample.a);
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, emission * albedo * mainTexSample.a);
+
+#ifdef R_PBR
+    color = linearToGamma(color);
+    hilights = linearToGamma(hilights);
+#endif
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);

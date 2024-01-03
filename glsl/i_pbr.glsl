@@ -22,18 +22,18 @@ void PBR_irradianceAmbient(
     vec3 worldPos, vec3 normal, vec3 albedo, vec3 environment, float metallic, float roughness,
     out vec3 ambientD, out vec3 ambientS) {
 
-    vec3 irradiance = uWorldAmbientColor.rgb;
+    vec3 irradiance = gammaToLinear(uWorldAmbientColor.rgb);
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) {
             continue;
         }
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) {
+        if (length(fragToLight) > uLights[i].radius) {
             continue;
         }
-        float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
-        irradiance += attenuation * uLights[i].multiplier * uLights[i].color.rgb;
+        float attenuation = lightAttenuationInverseSquare(uLights[i], worldPos);
+        irradiance += attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
     }
 
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
@@ -73,8 +73,11 @@ void PBR_irradianceDirect(
         if (length(fragToLight) > uLights[i].radius * uLights[i].radius) {
             continue;
         }
+        if (dynamic == 0.0 && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
+            continue;
+        }
         float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
-        vec3 radiance = attenuation * uLights[i].multiplier * uLights[i].color.rgb;
+        vec3 radiance = attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
 
         vec3 L = normalize(fragToLight);
         vec3 H = normalize(V + L);
@@ -91,10 +94,7 @@ void PBR_irradianceDirect(
         vec3 kD = vec3(1.0) - F;
         kD *= 1.0 - metallic;
 
-        if (dynamic == 0.0 && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
-            continue;
-        }
-        diffuse += kD * radiance * NdotL;
+        diffuse += kD / PI * radiance * NdotL;
         specular += spec * radiance * NdotL;
     }
 }
