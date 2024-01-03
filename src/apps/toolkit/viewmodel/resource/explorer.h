@@ -197,6 +197,10 @@ public:
     void exportTgaTxi(ResourcesItemId itemId, const std::filesystem::path &destPath);
     void exportWavMp3(ResourcesItemId itemId, const std::filesystem::path &destPath);
 
+    void createRim(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void createErf(ResourcesItemId itemId, const std::filesystem::path &destPath);
+    void createMod(ResourcesItemId itemId, const std::filesystem::path &destPath);
+
     void saveFile(Page &page, const std::filesystem::path &destPath);
 
     // END Commands

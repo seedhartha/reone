@@ -113,8 +113,10 @@ void RimTool::toRIM(const std::filesystem::path &target, const std::filesystem::
         rim.add(std::move(res));
     }
 
-    auto rimPath = destPath;
-    rimPath.append(target.filename().string() + ".rim");
+    std::filesystem::path rimPath {destPath};
+    if (std::filesystem::is_directory(destPath)) {
+        rimPath.append(target.filename().string() + ".rim");
+    }
     rim.save(rimPath);
 }
 

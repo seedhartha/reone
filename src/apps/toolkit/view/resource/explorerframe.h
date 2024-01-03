@@ -93,8 +93,6 @@ private:
     void BindEvents();
     void BindViewModel();
 
-    void InvokeTool(Operation operation);
-
     void SaveFile();
 
     wxWindow *NewPageWindow(Page &page);

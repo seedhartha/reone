@@ -674,6 +674,18 @@ void ResourceExplorerViewModel::exportWavMp3(ResourcesItemId itemId, const std::
     });
 }
 
+void ResourceExplorerViewModel::createRim(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    RimTool().invoke(Operation::ToRIM, itemId.path, destPath, _resourcesPath);
+}
+
+void ResourceExplorerViewModel::createErf(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    ErfTool().invoke(Operation::ToERF, itemId.path, destPath, _resourcesPath);
+}
+
+void ResourceExplorerViewModel::createMod(ResourcesItemId itemId, const std::filesystem::path &destPath) {
+    ErfTool().invoke(Operation::ToMOD, itemId.path, destPath, _resourcesPath);
+}
+
 void ResourceExplorerViewModel::saveFile(Page &page, const std::filesystem::path &destPath) {
     if (page.type == PageType::Text) {
         auto &viewModel = *std::static_pointer_cast<TextResourceViewModel>(page.viewModel);

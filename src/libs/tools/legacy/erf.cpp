@@ -115,7 +115,6 @@ void ErfTool::toERF(Operation operation, const std::filesystem::path &target, co
 
     ErfWriter::FileType type;
     std::string ext;
-
     if (operation == Operation::ToMOD) {
         type = ErfWriter::FileType::MOD;
         ext = ".mod";
@@ -123,9 +122,10 @@ void ErfTool::toERF(Operation operation, const std::filesystem::path &target, co
         type = ErfWriter::FileType::ERF;
         ext = ".erf";
     }
-
-    auto erfPath = destPath;
-    erfPath.append(target.filename().string() + ext);
+    std::filesystem::path erfPath {destPath};
+    if (std::filesystem::is_directory(destPath)) {
+        erfPath.append(target.filename().string() + ext);
+    }
     erf.save(type, erfPath);
 }
 

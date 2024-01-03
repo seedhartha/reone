@@ -43,12 +43,6 @@
 #include "reone/system/stream/fileoutput.h"
 #include "reone/system/stream/memoryinput.h"
 #include "reone/system/stream/memoryoutput.h"
-#include "reone/tools/legacy/audio.h"
-#include "reone/tools/legacy/erf.h"
-#include "reone/tools/legacy/keybif.h"
-#include "reone/tools/legacy/ncs.h"
-#include "reone/tools/legacy/rim.h"
-#include "reone/tools/legacy/tpc.h"
 
 #include "../../viewmodel/resource/gff.h"
 #include "../../viewmodel/resource/ncs.h"
@@ -90,10 +84,7 @@ struct EventHandlerID {
     static constexpr int extractAllBifs = wxID_HIGHEST + 2;
     static constexpr int batchTpcToTga = wxID_HIGHEST + 3;
     static constexpr int composeLip = wxID_HIGHEST + 4;
-    static constexpr int toRimTool = wxID_HIGHEST + 5;
-    static constexpr int toErfTool = wxID_HIGHEST + 6;
-    static constexpr int toModTool = wxID_HIGHEST + 7;
-    static constexpr int saveFile = wxID_HIGHEST + 8;
+    static constexpr int saveFile = wxID_HIGHEST + 5;
 };
 
 struct CommandID {
@@ -103,6 +94,9 @@ struct CommandID {
     static constexpr int exportRes = 4;
     static constexpr int exportTgaTxi = 5;
     static constexpr int exportWavMp3 = 6;
+    static constexpr int createErf = 7;
+    static constexpr int createRim = 8;
+    static constexpr int createMod = 9;
 };
 
 struct TimerID {
@@ -200,10 +194,6 @@ void ResourceExplorerFrame::InitMenu() {
     toolsMenu->Append(EventHandlerID::extractAllBifs, "Extract all BIF archives...");
     toolsMenu->Append(EventHandlerID::batchTpcToTga, "Batch convert TPC to TGA/TXI...");
     toolsMenu->Append(EventHandlerID::composeLip, "Compose LIP...");
-    toolsMenu->AppendSeparator();
-    toolsMenu->Append(EventHandlerID::toRimTool, "Create RIM from directory...");
-    toolsMenu->Append(EventHandlerID::toErfTool, "Create ERF from directory...");
-    toolsMenu->Append(EventHandlerID::toModTool, "Create MOD from directory...");
 
     auto menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
@@ -219,9 +209,6 @@ void ResourceExplorerFrame::BindEvents() {
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnExtractAllBifsCommand, this, EventHandlerID::extractAllBifs);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand, this, EventHandlerID::batchTpcToTga);
     Bind(wxEVT_MENU, &ResourceExplorerFrame::OnComposeLipCommand, this, EventHandlerID::composeLip);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToRIM), EventHandlerID::toRimTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToERF), EventHandlerID::toErfTool);
-    Bind(wxEVT_MENU, std::bind(&ResourceExplorerFrame::InvokeTool, this, Operation::ToMOD), EventHandlerID::toModTool);
 }
 
 void ResourceExplorerFrame::BindViewModel() {
@@ -481,8 +468,8 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
     auto itemData = m_resourcesTreeCtrl->GetItemData(item);
     auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
     auto &resItem = m_viewModel.getResourcesItemById(resItemId);
+    auto menu = wxMenu();
     if (resItem.id.resId) {
-        auto menu = wxMenu();
         menu.Append(CommandID::exportRes, "Export...");
         if (resItem.id.resId->type == ResType::Tpc) {
             menu.Append(CommandID::exportTgaTxi, "Export as TGA/TXI...");
@@ -492,23 +479,19 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
             menu.Append(CommandID::decompile, "Decompile");
             menu.Append(CommandID::decompileNoOptimize, "Decompile without optimization");
         }
-        menu.SetClientData(new ResourcesItemClientData {resItemId});
-        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
-        PopupMenu(&menu, event.GetPosition());
-    } else {
-        if (resItem.archived || !std::filesystem::is_regular_file(resItem.id.path)) {
-            return;
-        }
+    } else if (!resItem.archived && std::filesystem::is_regular_file(resItem.id.path)) {
         auto extension = resItem.id.path.extension().string();
-        if (kFilesArchiveExtensions.count(extension) == 0) {
-            return;
+        if (kFilesArchiveExtensions.count(extension) > 0) {
+            menu.Append(CommandID::extract, "Extract...");
         }
-        auto menu = wxMenu();
-        menu.Append(CommandID::extract, "Extract...");
-        menu.SetClientData(new ResourcesItemClientData {resItemId});
-        menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
-        PopupMenu(&menu, event.GetPosition());
+    } else if (std::filesystem::is_directory(resItem.id.path)) {
+        menu.Append(CommandID::createRim, "Create RIM archive");
+        menu.Append(CommandID::createErf, "Create ERF archive");
+        menu.Append(CommandID::createMod, "Create MOD archive");
     }
+    menu.SetClientData(new ResourcesItemClientData {resItemId});
+    menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);
+    PopupMenu(&menu, event.GetPosition());
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemStartEditing(wxDataViewEvent &event) {
@@ -549,7 +532,6 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
 
         m_viewModel.extractArchive(resItem.id.path, destPath);
-        wxMessageBox("Operation completed successfully", "Success");
 
     } else if (event.GetId() == CommandID::decompile) {
         auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
@@ -575,7 +557,38 @@ void ResourceExplorerFrame::OnPopupCommandSelected(wxCommandEvent &event) {
         } else {
             m_viewModel.exportResource(resItemId, destPath);
         }
-        wxMessageBox("Operation completed successfully", "Success");
+
+    } else if (event.GetId() == CommandID::createRim ||
+               event.GetId() == CommandID::createErf ||
+               event.GetId() == CommandID::createMod) {
+        std::unordered_map<int, std::string> cmdToExt {
+            {CommandID::createRim, "rim"}, //
+            {CommandID::createErf, "erf"}, //
+            {CommandID::createMod, "mod"}  //
+        };
+        const auto &resItemId = static_cast<ResourcesItemClientData *>(menu->GetClientData())->id();
+        auto defDir = resItemId.path.parent_path().string();
+        auto defFilename = resItemId.path.filename().string();
+        const auto &ext = cmdToExt.at(event.GetId());
+        auto wildcard = str(boost::format("%1% archive (*.%2%)|*.%2%") % boost::to_upper_copy(ext) % ext);
+        auto dialog = new wxFileDialog(
+            nullptr,
+            "Choose destination file",
+            defDir,
+            defFilename,
+            wildcard,
+            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        if (dialog->ShowModal() != wxID_OK) {
+            return;
+        }
+        auto destPath = std::filesystem::path(std::string(dialog->GetPath()));
+        if (event.GetId() == CommandID::createRim) {
+            m_viewModel.createRim(resItemId, destPath);
+        } else if (event.GetId() == CommandID::createErf) {
+            m_viewModel.createErf(resItemId, destPath);
+        } else {
+            m_viewModel.createMod(resItemId, destPath);
+        }
     }
 }
 
@@ -590,7 +603,6 @@ void ResourceExplorerFrame::OnExtractAllBifsCommand(wxCommandEvent &event) {
     }
     auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
     m_viewModel.extractAllBifs(destPath);
-    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event) {
@@ -605,54 +617,11 @@ void ResourceExplorerFrame::OnBatchConvertTpcToTgaCommand(wxCommandEvent &event)
     }
     auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
     m_viewModel.batchConvertTpcToTga(srcPath, destPath);
-    wxMessageBox("Operation completed successfully", "Success");
 }
 
 void ResourceExplorerFrame::OnComposeLipCommand(wxCommandEvent &event) {
     auto dialog = ComposeLipDialog(this, -1, "LIP Composer");
     if (dialog.ShowModal() != wxID_OK) {
-    }
-}
-
-void ResourceExplorerFrame::InvokeTool(Operation operation) {
-    std::filesystem::path srcPath;
-    switch (operation) {
-    case Operation::ToERF:
-    case Operation::ToRIM:
-    case Operation::ToMOD: {
-        auto srcDirDialog = new wxDirDialog(
-            nullptr,
-            "Choose source directory",
-            "",
-            wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-        if (srcDirDialog->ShowModal() != wxID_OK) {
-            return;
-        }
-        srcPath = (std::string)srcDirDialog->GetPath();
-    } break;
-    default: {
-        auto srcFileDialog = new wxFileDialog(
-            nullptr,
-            "Choose source file",
-            "",
-            "",
-            wxString::FromAscii(wxFileSelectorDefaultWildcardStr),
-            wxFD_DEFAULT_STYLE | wxFD_FILE_MUST_EXIST);
-        if (srcFileDialog->ShowModal() != wxID_OK) {
-            return;
-        }
-        srcPath = (std::string)srcFileDialog->GetPath();
-    } break;
-    }
-    auto destDirDialog = new wxDirDialog(nullptr, "Choose destination directory", "", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
-    if (destDirDialog->ShowModal() != wxID_OK) {
-        return;
-    }
-    auto destPath = std::filesystem::path((std::string)destDirDialog->GetPath());
-    if (m_viewModel.invokeTool(operation, srcPath, destPath)) {
-        wxMessageBox("Operation completed successfully", "Success");
-    } else {
-        wxMessageBox("Tool not found", "Error", wxICON_ERROR);
     }
 }
 
