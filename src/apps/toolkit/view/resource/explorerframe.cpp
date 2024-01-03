@@ -449,19 +449,25 @@ void ResourceExplorerFrame::OnOpenDirectoryCommand(wxCommandEvent &event) {
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemExpanding(wxDataViewEvent &event) {
-    auto expandingTreeItem = event.GetItem();
-    auto expandingTreeItemData = m_resourcesTreeCtrl->GetItemData(expandingTreeItem);
-    auto &expandingResItemId = static_cast<ResourcesItemClientData *>(expandingTreeItemData)->id();
-    auto &expandingItem = m_viewModel.getResourcesItemById(expandingResItemId);
-    if (expandingItem.loaded) {
+    auto item = event.GetItem();
+    if (!item.IsOk()) {
         return;
     }
-    m_viewModel.onResourcesItemExpanding(expandingResItemId);
-    expandingItem.loaded = true;
+    auto itemData = m_resourcesTreeCtrl->GetItemData(item);
+    auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
+    auto &resItem = m_viewModel.getResourcesItemById(resItemId);
+    if (resItem.loaded) {
+        return;
+    }
+    m_viewModel.onResourcesItemExpanding(resItemId);
+    resItem.loaded = true;
 }
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &event) {
     auto item = event.GetItem();
+    if (!item.IsOk()) {
+        return;
+    }
     auto itemData = m_resourcesTreeCtrl->GetItemData(item);
     auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
     m_viewModel.onResourcesItemActivated(resItemId);
@@ -469,6 +475,9 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemActivated(wxDataViewEvent &ev
 
 void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     auto item = event.GetItem();
+    if (!item.IsOk()) {
+        return;
+    }
     auto itemData = m_resourcesTreeCtrl->GetItemData(item);
     auto &resItemId = static_cast<ResourcesItemClientData *>(itemData)->id();
     auto &resItem = m_viewModel.getResourcesItemById(resItemId);
