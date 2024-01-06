@@ -301,20 +301,21 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         uint32_t offDanglyVertices = _mdl.readUint32();
 
         danglymesh = std::make_shared<ModelNode::Danglymesh>();
-        danglymesh->displacement = 0.5f * displacement; // displacement is allegedly 1/2 meters per unit
+        danglymesh->displacement = displacement; // 1/2 meters per unit
         danglymesh->tightness = tightness;
         danglymesh->period = period;
 
         danglymesh->constraints.resize(constraintArrayDef.count);
+        danglymesh->positions.resize(constraintArrayDef.count);
         _mdl.seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-            float multiplier = _mdl.readFloat();
-            danglymesh->constraints[i].multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
+            float constraint = _mdl.readFloat();
+            danglymesh->constraints[i] = glm::clamp(constraint / 255.0f, 0.0f, 1.0f);
         }
         _mdl.seek(kMdlDataOffset + offDanglyVertices);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-            std::vector<float> positionValues(_mdl.readFloatArray(3));
-            danglymesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
+            std::vector<float> position {_mdl.readFloatArray(3)};
+            danglymesh->positions[i] = glm::make_vec3(&position[0]);
         }
 
     } else if (flags & MdlNodeFlags::aabb) {

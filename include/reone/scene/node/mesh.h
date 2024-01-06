@@ -74,6 +74,15 @@ private:
         graphics::Texture *bumpmap {nullptr};
     } _nodeTextures;
 
+    struct DanglyVertex {
+        glm::vec3 displacement {0.0f};
+        glm::vec3 velocity {0.0f};
+    };
+
+    struct DanglyMesh {
+        std::vector<DanglyVertex> vertices;
+    } _dangly;
+
     ModelSceneNode &_model;
 
     glm::vec2 _uvOffset {0.0f};
@@ -82,7 +91,12 @@ private:
     float _alpha {1.0f};
     glm::vec3 _selfIllumColor {0.0f};
 
+    glm::vec3 _prevWorldPos {0.0f};
+    glm::vec3 _prevVelocity {0.0f};
+    float _windTime {0.0f};
+
     void initTextures();
+    void initDanglyMesh();
 
     void refreshAdditionalTextures();
 
@@ -92,6 +106,7 @@ private:
 
     void updateUVAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
     void updateBumpmapAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
+    void updateDanglyAnimation(float dt, const graphics::ModelNode::Danglymesh &mesh);
 
     // END Animation
 };

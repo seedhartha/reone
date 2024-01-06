@@ -24,6 +24,7 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/system/logutil.h"
 
 namespace reone {
 
@@ -133,6 +134,27 @@ void RenderPass::drawSkinned(Mesh &mesh,
         });
         _uniforms.setBones([&bones](auto &b) {
             std::memcpy(b.bones, &bones[0], kMaxBones * sizeof(glm::mat4));
+        });
+        mesh.draw();
+    });
+}
+
+void RenderPass::drawDangly(Mesh &mesh,
+                            Material &material,
+                            const glm::mat4 &transform,
+                            const glm::mat4 &transformInv,
+                            const std::vector<glm::vec4> &positions) {
+    withMaterialAppliedToContext(material, [&]() {
+        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+            locals.reset();
+            locals.featureMask |= UniformsFeatureFlags::dangly;
+            locals.model = transform;
+            locals.modelInv = transformInv;
+            applyMaterialToLocals(material, locals);
+        });
+        _uniforms.setDangly([&positions](auto &dangly) {
+            auto numPositions = std::min<int>(kMaxDanglyVertices, positions.size());
+            std::memcpy(dangly.positions, &positions[0], numPositions * sizeof(glm::vec4));
         });
         mesh.draw();
     });

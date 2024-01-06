@@ -50,6 +50,7 @@ void MeshSceneNode::init() {
     _selfIllumColor = _modelNode.selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
 
     initTextures();
+    initDanglyMesh();
 }
 
 void MeshSceneNode::initTextures() {
@@ -95,6 +96,9 @@ void MeshSceneNode::update(float dt) {
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
+        if (mesh->danglymesh) {
+            updateDanglyAnimation(dt, *mesh->danglymesh);
+        }
     }
 }
 
@@ -117,6 +121,65 @@ void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMe
         _bumpmapCycleFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapCycleTime / length)));
         if (_bumpmapCycleTime == length) {
             _bumpmapCycleTime = 0.0f;
+        }
+    }
+}
+
+static std::string vectorToString(const glm::vec3 &vec) {
+    return str(boost::format("[%.04f, %.04f, %.04f]") % vec.x % vec.y % vec.z);
+}
+
+void MeshSceneNode::updateDanglyAnimation(float dt, const ModelNode::Danglymesh &mesh) {
+    if (dt == 0.0f) {
+        return;
+    }
+    float step = 5.0f * dt / mesh.period;
+    float oneOverTightness = 1.0f / mesh.tightness;
+
+    glm::vec3 worldPos = _absTransform[3];
+    if (glm::distance(worldPos, _prevWorldPos) > 1.0f) {
+        _prevWorldPos = worldPos;
+    }
+    auto objVelocity = (worldPos - _prevWorldPos) / dt;
+    auto objAcceleration = (objVelocity - _prevVelocity) / dt;
+    auto forceInertia = oneOverTightness * -objAcceleration;
+    _prevWorldPos = worldPos;
+    _prevVelocity = objVelocity;
+
+    _windTime = glm::mod(_windTime + dt, glm::two_pi<float>());
+    glm::vec3 windDir {-glm::abs(glm::sin(_windTime)), glm::cos(_windTime), 0.0f};
+    float windPower = 1.0f;
+    auto forceWind = oneOverTightness * windPower * windDir;
+
+    for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
+        auto &vertex = _dangly.vertices[i];
+        if (mesh.constraints[i] == 0.0f) {
+            continue;
+        }
+        glm::vec3 forceSpring {0.0f};
+        float dispmag = glm::length(vertex.displacement);
+        float maxdispmag = 0.5f * mesh.displacement * mesh.constraints[i];
+        if (dispmag > 0.0f) {
+            auto dispdir = vertex.displacement / dispmag;
+            auto worlddispdir = _absTransform * glm::vec4 {dispdir, 0.0f};
+            forceSpring = 5.0f * mesh.tightness * dispmag / maxdispmag * -worlddispdir;
+        }
+        auto forceDamp = -vertex.velocity;
+        glm::vec3 forceNet {0.0f};
+        // forceNet += forceInertia;
+        forceNet += forceWind;
+        forceNet += forceSpring;
+        forceNet += forceDamp;
+        auto acceleration = forceNet;
+        vertex.velocity += acceleration * step;
+
+        glm::vec3 localVelocity = _absTransformInv * glm::vec4 {vertex.velocity, 0.0f};
+        vertex.displacement += localVelocity * step;
+        dispmag = glm::length(vertex.displacement);
+        if (dispmag > maxdispmag) {
+            auto dispdir = vertex.displacement / dispmag;
+            vertex.displacement = maxdispmag * dispdir;
+            // vertex.velocity = glm::vec3 {0.0f};
         }
     }
 }
@@ -238,6 +301,17 @@ void MeshSceneNode::render(IRenderPass &pass) {
             bones[i] *= skin.boneMatrices[skin.boneSerial[i]]; // extract changes to the bone transform in this model node space
         }
         pass.drawSkinned(*mesh->mesh, material, _absTransform, _absTransformInv, std::move(bones));
+    } else if (_modelNode.isDanglymesh()) {
+        std::vector<glm::vec4> positions;
+        positions.reserve(_dangly.vertices.size());
+        for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
+            positions.emplace_back(mesh->danglymesh->positions[i] + _dangly.vertices[i].displacement, 1.0f);
+        }
+        pass.drawDangly(*mesh->mesh,
+                        material,
+                        _absTransform,
+                        _absTransformInv,
+                        positions);
     } else {
         pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
     }
@@ -276,6 +350,14 @@ void MeshSceneNode::setDiffuseMap(Texture *texture) {
 void MeshSceneNode::setEnvironmentMap(Texture *texture) {
     ModelNodeSceneNode::setEnvironmentMap(texture);
     _nodeTextures.envmap = std::move(texture);
+}
+
+void MeshSceneNode::initDanglyMesh() {
+    auto mesh = _modelNode.mesh();
+    if (!mesh || !mesh->danglymesh) {
+        return;
+    }
+    _dangly.vertices.resize(mesh->danglymesh->positions.size());
 }
 
 } // namespace scene

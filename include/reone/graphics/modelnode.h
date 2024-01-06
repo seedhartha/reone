@@ -49,16 +49,12 @@ public:
         glm::vec2 dir {0.0f};
     };
 
-    struct DanglymeshConstraint {
-        float multiplier {0.0f};
-        glm::vec3 position {0.0f};
-    };
-
     struct Danglymesh {
         float displacement {0.0f};
         float tightness {0.0f};
         float period {0.0f};
-        std::vector<DanglymeshConstraint> constraints;
+        std::vector<float> constraints;
+        std::vector<glm::vec3> positions;
     };
 
     struct AABBTree {

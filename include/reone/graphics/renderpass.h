@@ -23,7 +23,6 @@ namespace reone {
 
 namespace graphics {
 
-
 class IContext;
 class IMeshRegistry;
 class IShaderRegistry;
@@ -74,6 +73,12 @@ public:
                              const glm::mat4 &transformInv,
                              const std::vector<glm::mat4> &bones) = 0;
 
+    virtual void drawDangly(Mesh &mesh,
+                            Material &material,
+                            const glm::mat4 &transform,
+                            const glm::mat4 &transformInv,
+                            const std::vector<glm::vec4> &positions) = 0;
+
     virtual void drawBillboard(Texture &texture,
                                const glm::vec4 &color,
                                const glm::mat4 &transform,
@@ -123,6 +128,12 @@ public:
                      const glm::mat4 &transform,
                      const glm::mat4 &transformInv,
                      const std::vector<glm::mat4> &bones) override;
+
+    void drawDangly(Mesh &mesh,
+                    Material &material,
+                    const glm::mat4 &transform,
+                    const glm::mat4 &transformInv,
+                    const std::vector<glm::vec4> &positions) override;
 
     void drawBillboard(Texture &texture,
                        const glm::vec4 &color,

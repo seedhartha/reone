@@ -28,26 +28,28 @@ struct UniformBlockBindingPoints {
     static constexpr int globals = 0;
     static constexpr int locals = 1;
     static constexpr int bones = 2;
-    static constexpr int particles = 3;
-    static constexpr int grass = 4;
-    static constexpr int walkmesh = 5;
-    static constexpr int text = 6;
-    static constexpr int screenEffect = 7;
+    static constexpr int dangly = 3;
+    static constexpr int particles = 4;
+    static constexpr int grass = 5;
+    static constexpr int walkmesh = 6;
+    static constexpr int text = 7;
+    static constexpr int screenEffect = 8;
 };
 
 struct UniformsFeatureFlags {
-    static constexpr int lightmap = 1;
-    static constexpr int envmap = 2;
-    static constexpr int normalmap = 4;
-    static constexpr int heightmap = 8;
-    static constexpr int skin = 16;
-    static constexpr int shadows = 32;
-    static constexpr int water = 64;
-    static constexpr int fog = 128;
-    static constexpr int fixedsize = 256;
-    static constexpr int hashedalphatest = 512;
-    static constexpr int premulalpha = 1024;
-    static constexpr int envmapcube = 2048;
+    static constexpr int lightmap = 1 << 0;
+    static constexpr int envmap = 1 << 1;
+    static constexpr int normalmap = 1 << 2;
+    static constexpr int heightmap = 1 << 3;
+    static constexpr int skin = 1 << 4;
+    static constexpr int dangly = 1 << 5;
+    static constexpr int shadows = 1 << 6;
+    static constexpr int water = 1 << 7;
+    static constexpr int fog = 1 << 8;
+    static constexpr int fixedsize = 1 << 9;
+    static constexpr int hashedalphatest = 1 << 10;
+    static constexpr int premulalpha = 1 << 11;
+    static constexpr int envmapcube = 1 << 12;
 };
 
 struct alignas(16) GlobalUniformsLight {
@@ -127,6 +129,10 @@ struct BoneUniforms {
     glm::mat4 bones[kMaxBones] {glm::mat4(1.0f)};
 };
 
+struct DanglyUniforms {
+    glm::vec4 positions[kMaxDanglyVertices] {glm::vec4(0.0f)};
+};
+
 struct alignas(16) ParticleUniformsParticle {
     glm::vec4 positionFrame {0.0f};
     glm::vec4 right {1.0f, 0.0f, 0.0f, 0.0f};
@@ -190,6 +196,7 @@ public:
     virtual void setGlobals(const std::function<void(GlobalUniforms &)> &block) = 0;
     virtual void setLocals(const std::function<void(LocalUniforms &)> &block) = 0;
     virtual void setBones(const std::function<void(BoneUniforms &)> &block) = 0;
+    virtual void setDangly(const std::function<void(DanglyUniforms &)> &block) = 0;
     virtual void setParticles(const std::function<void(ParticleUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
     virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
@@ -211,6 +218,7 @@ public:
     void setGlobals(const std::function<void(GlobalUniforms &)> &block) override;
     void setLocals(const std::function<void(LocalUniforms &)> &block) override;
     void setBones(const std::function<void(BoneUniforms &)> &block) override;
+    void setDangly(const std::function<void(DanglyUniforms &)> &block) override;
     void setParticles(const std::function<void(ParticleUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
@@ -227,6 +235,7 @@ private:
     GlobalUniforms _globals;
     LocalUniforms _locals;
     BoneUniforms _bones;
+    DanglyUniforms _dangly;
     ParticleUniforms _particles;
     GrassUniforms _grass;
     WalkmeshUniforms _walkmesh;
@@ -240,6 +249,7 @@ private:
     std::shared_ptr<UniformBuffer> _ubGlobals;
     std::shared_ptr<UniformBuffer> _ubLocals;
     std::shared_ptr<UniformBuffer> _ubBones;
+    std::shared_ptr<UniformBuffer> _ubDangly;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;

@@ -1,4 +1,5 @@
 #include "u_bones.glsl"
+#include "u_dangly.glsl"
 #include "u_globals.glsl"
 #include "u_locals.glsl"
 
@@ -45,10 +46,17 @@ void main() {
             (uBones[i2] * N) * w2 +
             (uBones[i3] * N) * w3 +
             (uBones[i4] * N) * w4;
+
+        fragPosObjSpace = P;
+
+    } else if (isFeatureEnabled(FEATURE_DANGLY)) {
+        fragPosObjSpace = uDanglyPositions[gl_VertexID];
+
+    } else {
+        fragPosObjSpace = P;
     }
 
-    fragPosObjSpace = P;
-    fragPosWorldSpace = uModel * P;
+    fragPosWorldSpace = uModel * fragPosObjSpace;
 
     mat3 normalMatrix = transpose(mat3(uModelInv));
     fragNormalWorldSpace = normalize(normalMatrix * N.xyz);

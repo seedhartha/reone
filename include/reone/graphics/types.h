@@ -31,6 +31,7 @@ constexpr int kNumShadowLightSpace = 6;
 constexpr int kNumSSAOSamples = 64;
 
 constexpr int kMaxBones = 24;
+constexpr int kMaxDanglyVertices = 768;
 constexpr int kMaxLights = 32;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;

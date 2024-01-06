@@ -485,9 +485,9 @@ void ResourceExplorerFrame::OnResourcesTreeCtrlItemContextMenu(wxDataViewEvent &
             menu.Append(CommandID::extract, "Extract...");
         }
     } else if (std::filesystem::is_directory(resItem.id.path)) {
-        menu.Append(CommandID::createRim, "Create RIM archive");
-        menu.Append(CommandID::createErf, "Create ERF archive");
-        menu.Append(CommandID::createMod, "Create MOD archive");
+        menu.Append(CommandID::createRim, "Create RIM archive...");
+        menu.Append(CommandID::createErf, "Create ERF archive...");
+        menu.Append(CommandID::createMod, "Create MOD archive...");
     }
     menu.SetClientData(new ResourcesItemClientData {resItemId});
     menu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ResourceExplorerFrame::OnPopupCommandSelected), nullptr, this);

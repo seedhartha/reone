@@ -92,6 +92,7 @@ public:
     MOCK_METHOD(void, setGlobals, (const std::function<void(GlobalUniforms &)> &), (override));
     MOCK_METHOD(void, setLocals, (const std::function<void(LocalUniforms &)> &), (override));
     MOCK_METHOD(void, setBones, (const std::function<void(BoneUniforms &)> &), (override));
+    MOCK_METHOD(void, setDangly, (const std::function<void(DanglyUniforms &)> &), (override));
     MOCK_METHOD(void, setParticles, (const std::function<void(ParticleUniforms &)> &), (override));
     MOCK_METHOD(void, setGrass, (const std::function<void(GrassUniforms &)> &), (override));
     MOCK_METHOD(void, setWalkmesh, (const std::function<void(WalkmeshUniforms &)> &), (override));

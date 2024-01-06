@@ -31,6 +31,7 @@ void Uniforms::init() {
     static GlobalUniforms defaultGlobals;
     static LocalUniforms defaultLocals;
     static BoneUniforms defaultBones;
+    static DanglyUniforms defaultDangly;
     static ParticleUniforms defaultParticles;
     static GrassUniforms defaultGrass;
     static WalkmeshUniforms defaultWalkmesh;
@@ -40,6 +41,7 @@ void Uniforms::init() {
     _ubGlobals = initBuffer(&defaultGlobals, sizeof(GlobalUniforms));
     _ubLocals = initBuffer(&defaultLocals, sizeof(LocalUniforms));
     _ubBones = initBuffer(&defaultBones, sizeof(BoneUniforms));
+    _ubDangly = initBuffer(&defaultDangly, sizeof(DanglyUniforms));
     _ubParticles = initBuffer(&defaultParticles, sizeof(ParticleUniforms));
     _ubGrass = initBuffer(&defaultGrass, sizeof(GrassUniforms));
     _ubWalkmesh = initBuffer(&defaultWalkmesh, sizeof(WalkmeshUniforms));
@@ -49,6 +51,7 @@ void Uniforms::init() {
     _context.bindUniformBuffer(*_ubGlobals, UniformBlockBindingPoints::globals);
     _context.bindUniformBuffer(*_ubLocals, UniformBlockBindingPoints::locals);
     _context.bindUniformBuffer(*_ubBones, UniformBlockBindingPoints::bones);
+    _context.bindUniformBuffer(*_ubDangly, UniformBlockBindingPoints::dangly);
     _context.bindUniformBuffer(*_ubParticles, UniformBlockBindingPoints::particles);
     _context.bindUniformBuffer(*_ubGrass, UniformBlockBindingPoints::grass);
     _context.bindUniformBuffer(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh);
@@ -66,6 +69,7 @@ void Uniforms::deinit() {
     _ubGlobals.reset();
     _ubLocals.reset();
     _ubBones.reset();
+    _ubDangly.reset();
     _ubParticles.reset();
     _ubGrass.reset();
     _ubWalkmesh.reset();
@@ -91,6 +95,12 @@ void Uniforms::setBones(const std::function<void(BoneUniforms &)> &block) {
     block(_bones);
     _context.bindUniformBuffer(*_ubBones, UniformBlockBindingPoints::bones);
     _ubBones->setData(&_bones, sizeof(BoneUniforms));
+}
+
+void Uniforms::setDangly(const std::function<void(DanglyUniforms &)> &block) {
+    block(_dangly);
+    _context.bindUniformBuffer(*_ubDangly, UniformBlockBindingPoints::dangly);
+    _ubDangly->setData(&_dangly, sizeof(DanglyUniforms));
 }
 
 void Uniforms::setParticles(const std::function<void(ParticleUniforms &)> &block) {
