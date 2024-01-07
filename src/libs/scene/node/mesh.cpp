@@ -130,58 +130,40 @@ static std::string vectorToString(const glm::vec3 &vec) {
 }
 
 void MeshSceneNode::updateDanglyAnimation(float dt, const ModelNode::Danglymesh &mesh) {
-    if (dt == 0.0f) {
-        return;
+    if (dt < 0.0125f) {
+        dt = 0.0125f;
+    } else if (dt > 0.035f) {
+        dt = 0.035f;
     }
-    float step = 5.0f * dt / mesh.period;
-    float oneOverTightness = 1.0f / mesh.tightness;
-
     glm::vec3 worldPos = _absTransform[3];
-    if (glm::distance(worldPos, _prevWorldPos) > 1.0f) {
-        _prevWorldPos = worldPos;
-    }
-    auto objVelocity = (worldPos - _prevWorldPos) / dt;
-    auto objAcceleration = (objVelocity - _prevVelocity) / dt;
-    auto forceInertia = oneOverTightness * -objAcceleration;
-    _prevWorldPos = worldPos;
-    _prevVelocity = objVelocity;
+    if (glm::distance(worldPos, _dangly.prevWorldPos) < 5.0f) {
+        for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
+            if (mesh.constraints[i] == 0.0f) {
+                continue;
+            }
+            auto &vertex = _dangly.vertices[i];
+            glm::vec3 acceleration {0.0f};
+            acceleration += -vertex.displacement * (0.5f * mesh.tightness * mesh.constraints[i]);
+            acceleration += -vertex.velocity * (1.5f * mesh.period);
+            bool wind = true;
+            if (wind) {
+                // TODO: implement wind
+            }
+            vertex.velocity += acceleration * dt;
+            vertex.displacement += vertex.velocity * dt;
 
-    _windTime = glm::mod(_windTime + dt, glm::two_pi<float>());
-    glm::vec3 windDir {-glm::abs(glm::sin(_windTime)), glm::cos(_windTime), 0.0f};
-    float windPower = 1.0f;
-    auto forceWind = oneOverTightness * windPower * windDir;
+            auto inertia = 20.0f * mesh.displacement * (1.0f - mesh.constraints[i] / 255.0f) * (worldPos - _dangly.prevWorldPos);
+            inertia = _absTransformInv * glm::vec4 {inertia, 0.0f};
+            vertex.displacement += inertia;
 
-    for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
-        auto &vertex = _dangly.vertices[i];
-        if (mesh.constraints[i] == 0.0f) {
-            continue;
-        }
-        glm::vec3 forceSpring {0.0f};
-        float dispmag = glm::length(vertex.displacement);
-        float maxdispmag = 0.5f * mesh.displacement * mesh.constraints[i];
-        if (dispmag > 0.0f) {
-            auto dispdir = vertex.displacement / dispmag;
-            auto worlddispdir = _absTransform * glm::vec4 {dispdir, 0.0f};
-            forceSpring = 5.0f * mesh.tightness * dispmag / maxdispmag * -worlddispdir;
-        }
-        auto forceDamp = -vertex.velocity;
-        glm::vec3 forceNet {0.0f};
-        // forceNet += forceInertia;
-        forceNet += forceWind;
-        forceNet += forceSpring;
-        forceNet += forceDamp;
-        auto acceleration = forceNet;
-        vertex.velocity += acceleration * step;
-
-        glm::vec3 localVelocity = _absTransformInv * glm::vec4 {vertex.velocity, 0.0f};
-        vertex.displacement += localVelocity * step;
-        dispmag = glm::length(vertex.displacement);
-        if (dispmag > maxdispmag) {
-            auto dispdir = vertex.displacement / dispmag;
-            vertex.displacement = maxdispmag * dispdir;
-            // vertex.velocity = glm::vec3 {0.0f};
+            float dispmag = glm::length(vertex.displacement);
+            if (dispmag > 0.0f) {
+                float maxdisp = mesh.displacement * mesh.constraints[i] / 255.0f;
+                vertex.displacement = glm::min(dispmag, maxdisp) * vertex.displacement / dispmag;
+            }
         }
     }
+    _dangly.prevWorldPos = std::move(worldPos);
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -304,8 +286,8 @@ void MeshSceneNode::render(IRenderPass &pass) {
     } else if (_modelNode.isDanglymesh()) {
         std::vector<glm::vec4> positions;
         positions.reserve(_dangly.vertices.size());
-        for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
-            positions.emplace_back(mesh->danglymesh->positions[i] + _dangly.vertices[i].displacement, 1.0f);
+        for (const auto &vertex : _dangly.vertices) {
+            positions.emplace_back(vertex.position + vertex.displacement, 1.0f);
         }
         pass.drawDangly(*mesh->mesh,
                         material,
@@ -357,7 +339,12 @@ void MeshSceneNode::initDanglyMesh() {
     if (!mesh || !mesh->danglymesh) {
         return;
     }
-    _dangly.vertices.resize(mesh->danglymesh->positions.size());
+    _dangly.vertices.reserve(mesh->danglymesh->positions.size());
+    for (const auto &position : mesh->danglymesh->positions) {
+        DanglyVertex vertex;
+        vertex.position = position;
+        _dangly.vertices.push_back(std::move(vertex));
+    }
 }
 
 } // namespace scene

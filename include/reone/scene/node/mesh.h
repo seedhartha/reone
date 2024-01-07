@@ -75,12 +75,14 @@ private:
     } _nodeTextures;
 
     struct DanglyVertex {
+        glm::vec3 position {0.0f};
         glm::vec3 displacement {0.0f};
         glm::vec3 velocity {0.0f};
     };
 
     struct DanglyMesh {
         std::vector<DanglyVertex> vertices;
+        glm::vec3 prevWorldPos {0.0f};
     } _dangly;
 
     ModelSceneNode &_model;
@@ -91,8 +93,6 @@ private:
     float _alpha {1.0f};
     glm::vec3 _selfIllumColor {0.0f};
 
-    glm::vec3 _prevWorldPos {0.0f};
-    glm::vec3 _prevVelocity {0.0f};
     float _windTime {0.0f};
 
     void initTextures();

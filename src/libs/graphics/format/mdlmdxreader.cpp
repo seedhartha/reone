@@ -309,8 +309,7 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         danglymesh->positions.resize(constraintArrayDef.count);
         _mdl.seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-            float constraint = _mdl.readFloat();
-            danglymesh->constraints[i] = glm::clamp(constraint / 255.0f, 0.0f, 1.0f);
+            danglymesh->constraints[i] = _mdl.readFloat();
         }
         _mdl.seek(kMdlDataOffset + offDanglyVertices);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {

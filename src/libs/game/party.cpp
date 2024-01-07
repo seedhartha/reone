@@ -28,7 +28,7 @@ namespace game {
 
 static constexpr int kMaxMemberCount = 3;
 
-static constexpr char kBlueprintResRefCarth[] = "p_carth";
+static constexpr char kBlueprintResRefCarth[] = "p_juhani";
 static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
 static constexpr char kBlueprintResRefAtton[] = "p_atton";
 static constexpr char kBlueprintResRefKreia[] = "p_kreia";
