@@ -136,30 +136,37 @@ void MeshSceneNode::updateDanglyAnimation(float dt, const ModelNode::Danglymesh 
         dt = 0.035f;
     }
     glm::vec3 worldPos = _absTransform[3];
-    if (glm::distance(worldPos, _dangly.prevWorldPos) < 5.0f) {
+    glm::vec3 deltaPos {worldPos - _dangly.prevWorldPos};
+    glm::vec3 objSpaceDeltaPos = _absTransformInv * glm::vec4 {worldPos - _dangly.prevWorldPos, 0.0f};
+
+    _windTime = glm::mod(_windTime + dt, glm::two_pi<float>());
+    auto wind = 0.01f * glm::vec3 {glm::abs(glm::sin(_windTime)), 0.0f, 0.0f};
+    glm::vec3 objSpaceWind = _absTransformInv * glm::vec4 {wind, 0.0f};
+
+    float deltaPosMag = glm::length(deltaPos);
+    if (deltaPosMag <= 5.0f) {
         for (size_t i = 0; i < _dangly.vertices.size(); ++i) {
             if (mesh.constraints[i] == 0.0f) {
                 continue;
             }
             auto &vertex = _dangly.vertices[i];
+            auto displacement = vertex.displacement - objSpaceDeltaPos;
+
             glm::vec3 acceleration {0.0f};
-            acceleration += -vertex.displacement * (0.5f * mesh.tightness * mesh.constraints[i]);
-            acceleration += -vertex.velocity * (1.5f * mesh.period);
-            bool wind = true;
-            if (wind) {
-                // TODO: implement wind
-            }
+            acceleration += -displacement * (0.5f * mesh.tightness * mesh.constraints[i]); // spring force
+            acceleration += -vertex.velocity * (1.5f * mesh.period);                       // damp force
             vertex.velocity += acceleration * dt;
-            vertex.displacement += vertex.velocity * dt;
+            displacement += vertex.velocity * dt;
 
-            auto inertia = 20.0f * mesh.displacement * (1.0f - mesh.constraints[i] / 255.0f) * (worldPos - _dangly.prevWorldPos);
-            inertia = _absTransformInv * glm::vec4 {inertia, 0.0f};
-            vertex.displacement += inertia;
+            auto windScaled = 20.0f * mesh.displacement * (1.0f - mesh.constraints[i] / 255.0f) * objSpaceWind;
+            displacement += windScaled;
 
-            float dispmag = glm::length(vertex.displacement);
+            float dispmag = glm::length(displacement);
             if (dispmag > 0.0f) {
-                float maxdisp = mesh.displacement * mesh.constraints[i] / 255.0f;
-                vertex.displacement = glm::min(dispmag, maxdisp) * vertex.displacement / dispmag;
+                float maxdisp = mesh.displacement * (1.0f - mesh.constraints[i] / 255.0f);
+                vertex.displacement = glm::min(dispmag, maxdisp) * displacement / dispmag;
+            } else {
+                vertex.displacement = glm::vec3 {0.0f};
             }
         }
     }
