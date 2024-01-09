@@ -32,7 +32,7 @@ void PBR_irradianceAmbient(
         if (length(fragToLight) > uLights[i].radius) {
             continue;
         }
-        float attenuation = lightAttenuationInverseSquare(uLights[i], worldPos);
+        float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
         irradiance += attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
     }
 

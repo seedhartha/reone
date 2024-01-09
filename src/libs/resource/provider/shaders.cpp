@@ -69,6 +69,9 @@ static const std::string kFragPostSharpen = "f_pp_sharpen";
 static const std::string kFragText = "f_text";
 static const std::string kFragTexture = "f_texture";
 static const std::string kFragTextureNoPerspective = "f_texnoper";
+static const std::string kFragPBRIrradiance = "f_pbr_irradiance";
+static const std::string kFragPBRBRDF = "f_pbr_brdf";
+static const std::string kFragPBRPrefilter = "f_pbr_prefilter";
 
 void Shaders::init() {
     if (_inited) {
@@ -113,6 +116,9 @@ void Shaders::init() {
     auto fragText = initShader(ShaderType::Fragment, kFragText);
     auto fragTexture = initShader(ShaderType::Fragment, kFragTexture);
     auto fragTextureNoPerspective = initShader(ShaderType::Fragment, kFragTextureNoPerspective);
+    auto fragPBRIrradiance = initShader(ShaderType::Fragment, kFragPBRIrradiance);
+    auto fragPBRBRDF = initShader(ShaderType::Fragment, kFragPBRBRDF);
+    auto fragPBRPrefilter = initShader(ShaderType::Fragment, kFragPBRPrefilter);
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
@@ -139,6 +145,9 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::postMedianFilter5, initShaderProgram({vertPassthrough, fragPostMedianFilter5}));
     _shaderRegistry.add(ShaderProgramId::postSharpen, initShaderProgram({vertPassthrough, fragPostSharpen}));
     _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
+    _shaderRegistry.add(ShaderProgramId::pbrIrradiance, initShaderProgram({vertMVP, fragPBRIrradiance}));
+    _shaderRegistry.add(ShaderProgramId::pbrBRDF, initShaderProgram({vertMVP, fragPBRBRDF}));
+    _shaderRegistry.add(ShaderProgramId::pbrPrefilter, initShaderProgram({vertMVP, fragPBRPrefilter}));
 
     _inited = true;
 }

@@ -92,20 +92,20 @@ void main() {
     PBR_irradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, 1.0 - lightmapped,
                          directD, directS);
     vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                        ambientS + directS;
+                        ambientS * ao + directS;
     vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                            ambientS + directS;
+                            ambientS * ao + directS;
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
 #else
     vec3 ambient, directDiff, directSpec;
     BP_lighting(worldPos, worldNormal, 1.0 - lightmapped,
                 ambient, directDiff, directSpec);
-    vec3 indirectDiff = ao * (ambient + uWorldAmbientColor.rgb);
+    vec3 indirectDiff = ambient + uWorldAmbientColor.rgb;
     vec3 indirectSpec = environment * (1.0 - mainTexSample.a);
-    vec3 colorDynamic = clamp(indirectDiff + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                        indirectSpec + directSpec;
+    vec3 colorDynamic = clamp(indirectDiff * ao + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
+                        indirectSpec * ao + directSpec;
     vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                            indirectSpec + directSpec;
+                            indirectSpec * ao + directSpec;
     vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
 #endif
 
