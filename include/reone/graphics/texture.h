@@ -69,6 +69,7 @@ public:
         Blending blending {Blending::None};
         float waterAlpha {-1.0f};
         bool cube {false};
+        bool decal {false};
 
         // Companion textures
 

@@ -236,6 +236,7 @@ void Game::loadDefaultParty() {
         _objectById.insert(std::make_pair(companion->id(), companion));
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
+        companion->equip("g_w_dblsbr001");
         _party.addMember(0, companion);
     }
     if (!member3.empty()) {

@@ -85,6 +85,25 @@ private:
         glm::vec3 prevWorldPos {0.0f};
     } _dangly;
 
+    struct SaberVertex {
+        glm::vec3 position {0.0f};
+        glm::vec3 displacement {0.0f};
+    };
+
+    struct SaberSegment {
+        glm::vec3 objWorldPos {0.0f};
+        float time {0.0f};
+    };
+
+    struct SaberMesh {
+        std::vector<SaberVertex> vertices;
+        std::vector<SaberSegment> segments;
+        glm::vec3 prevWorldPos {0.0f};
+        int currSegmentIdx {0};
+        int nextSegmentIdx {0};
+        int numActiveSegments {0};
+    } _saber;
+
     ModelSceneNode &_model;
 
     glm::vec2 _uvOffset {0.0f};
@@ -97,6 +116,7 @@ private:
 
     void initTextures();
     void initDanglyMesh();
+    void initSaberMesh();
 
     void refreshAdditionalTextures();
 
@@ -107,6 +127,7 @@ private:
     void updateUVAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
     void updateBumpmapAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
     void updateDanglyAnimation(float dt, const graphics::ModelNode::Danglymesh &mesh);
+    void updateSaberAnimation(float dt);
 
     // END Animation
 };

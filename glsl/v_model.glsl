@@ -2,6 +2,7 @@
 #include "u_dangly.glsl"
 #include "u_globals.glsl"
 #include "u_locals.glsl"
+#include "u_saber.glsl"
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -51,6 +52,9 @@ void main() {
 
     } else if (isFeatureEnabled(FEATURE_DANGLY)) {
         fragPosObjSpace = uDanglyPositions[gl_VertexID];
+
+    } else if (isFeatureEnabled(FEATURE_SABER)) {
+        fragPosObjSpace = uSaberPositions[gl_VertexID];
 
     } else {
         fragPosObjSpace = P;

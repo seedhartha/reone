@@ -93,6 +93,8 @@ void TxiReader::processLine(const std::vector<std::string> &tokens) {
             _features.numY = stoi(tokens[1]);
         } else if (key == "fps") {
             _features.fps = stoi(tokens[1]);
+        } else if (key == "decal") {
+            _features.decal = stoi(tokens[1]) != 0;
         }
         break;
 

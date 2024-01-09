@@ -54,7 +54,10 @@ public:
         }
     };
 
-    Mesh(std::vector<float> vertices, std::vector<Face> faces, VertexSpec spec) :
+    Mesh(std::vector<float> vertices,
+         std::vector<Face> faces,
+         VertexSpec spec) :
+        _numVertices(vertices.size() / (spec.stride / sizeof(float))),
         _vertices(std::move(vertices)),
         _faces(std::move(faces)),
         _spec(std::move(spec)) {
@@ -70,14 +73,17 @@ public:
     void draw();
     void drawInstanced(int count);
 
-    std::vector<glm::vec3> getVertexCoords(const Face &face) const;
+    std::vector<glm::vec3> getVertexCoords() const;
+    std::vector<glm::vec3> getFaceVertexCoords(const Face &face) const;
     glm::vec2 getUV1(const Face &face, const glm::vec3 &baryPosition) const;
     glm::vec2 getUV2(const Face &face, const glm::vec3 &baryPosition) const;
 
+    int numVertices() const { return _numVertices; }
     const std::vector<Face> &faces() const { return _faces; }
     const AABB &aabb() const { return _aabb; }
 
 private:
+    int _numVertices;
     std::vector<float> _vertices;
     std::vector<Face> _faces;
     VertexSpec _spec;

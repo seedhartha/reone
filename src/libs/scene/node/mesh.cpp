@@ -51,6 +51,7 @@ void MeshSceneNode::init() {
 
     initTextures();
     initDanglyMesh();
+    initSaberMesh();
 }
 
 void MeshSceneNode::initTextures() {
@@ -98,6 +99,9 @@ void MeshSceneNode::update(float dt) {
         updateBumpmapAnimation(dt, *mesh);
         if (mesh->danglymesh) {
             updateDanglyAnimation(dt, *mesh->danglymesh);
+        }
+        if (mesh->saber) {
+            updateSaberAnimation(dt);
         }
     }
 }
@@ -171,6 +175,68 @@ void MeshSceneNode::updateDanglyAnimation(float dt, const ModelNode::Danglymesh 
         }
     }
     _dangly.prevWorldPos = std::move(worldPos);
+}
+
+static constexpr float kSaberSegmentLifetime = 0.012f;
+
+void MeshSceneNode::updateSaberAnimation(float dt) {
+    if (dt <= 0.01f) {
+        dt = 0.01f;
+    }
+    int segmentIdx = _saber.nextSegmentIdx;
+    int numExpiredSegments = 0;
+    for (int i = 0; i < _saber.numActiveSegments; ++i) {
+        auto &segment = _saber.segments[segmentIdx];
+        if ((segment.time += dt) > kSaberSegmentLifetime && _saber.numActiveSegments - numExpiredSegments > 1) {
+            ++numExpiredSegments;
+            if (++_saber.nextSegmentIdx == kNumSaberSegments) {
+                _saber.nextSegmentIdx = 0;
+            }
+        }
+        if (++segmentIdx == kNumSaberSegments) {
+            segmentIdx = 0;
+        }
+    }
+    _saber.numActiveSegments -= numExpiredSegments;
+
+    glm::vec3 worldPos = _absTransform[3];
+    glm::vec3 deltaPos = worldPos - _saber.prevWorldPos;
+    float deltaPosMag = glm::length(deltaPos);
+    if (deltaPosMag > 1.0f) {
+        _saber.currSegmentIdx = 0;
+        _saber.nextSegmentIdx = 0;
+        _saber.numActiveSegments = 0;
+        for (auto &segment : _saber.segments) {
+            segment.objWorldPos = worldPos;
+        }
+        for (auto &vertex : _saber.vertices) {
+            vertex.displacement = glm::vec3 {0.0f};
+        }
+    }
+    _saber.prevWorldPos = worldPos;
+
+    auto &segment = _saber.segments[_saber.currSegmentIdx];
+    segment.objWorldPos = worldPos;
+    segment.time = 0.0f;
+
+    if (_saber.numActiveSegments != kNumSaberSegments) {
+        ++_saber.numActiveSegments;
+        if (++_saber.currSegmentIdx >= kNumSaberSegments) {
+            _saber.currSegmentIdx = 0;
+        }
+    }
+
+    for (int i = 0; i < kNumSaberSegments + 2; ++i) {
+        int segmentIdx = std::min(i, kNumSaberSegments - 1);
+        float hdist = i / static_cast<float>(kNumSaberSegments + 1);
+        glm::vec3 objDispWorld = _saber.segments[segmentIdx].objWorldPos - worldPos;
+        glm::vec3 objDispLocal = _absTransformInv * glm::vec4 {objDispWorld, 0.0f};
+        for (int j = 0; j < 4; ++j) {
+            float vdist = j / 3.0f;
+            _saber.vertices[4 * i + j].displacement = 0.5f * hdist * vdist * objDispLocal;
+            _saber.vertices[88 + 4 * i + j].displacement = -0.5f * hdist * vdist * objDispLocal;
+        }
+    }
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -268,7 +334,7 @@ void MeshSceneNode::render(IRenderPass &pass) {
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         material.affectedByFog = true;
     }
-    material.faceCulling = FaceCullMode::Back;
+    material.faceCulling = _nodeTextures.diffuse->features().decal ? FaceCullMode::None : FaceCullMode::Back;
     if (_modelNode.isSkinMesh()) {
         const auto &skin = *mesh->skin;
         auto bones = std::vector<glm::mat4>(kMaxBones, glm::mat4(1.0f));
@@ -301,6 +367,17 @@ void MeshSceneNode::render(IRenderPass &pass) {
                         _absTransform,
                         _absTransformInv,
                         positions);
+    } else if (_modelNode.isSaberMesh()) {
+        std::vector<glm::vec4> positions;
+        positions.reserve(_saber.vertices.size());
+        for (const auto &vertex : _saber.vertices) {
+            positions.emplace_back(vertex.position + vertex.displacement, 1.0f);
+        }
+        pass.drawSaber(*mesh->mesh,
+                       material,
+                       _absTransform,
+                       _absTransformInv,
+                       positions);
     } else {
         pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
     }
@@ -352,6 +429,20 @@ void MeshSceneNode::initDanglyMesh() {
         vertex.position = position;
         _dangly.vertices.push_back(std::move(vertex));
     }
+}
+
+void MeshSceneNode::initSaberMesh() {
+    auto mesh = _modelNode.mesh();
+    if (!mesh || !mesh->saber) {
+        return;
+    }
+    _saber.vertices.reserve(mesh->mesh->numVertices());
+    for (const auto &position : mesh->mesh->getVertexCoords()) {
+        SaberVertex vertex;
+        vertex.position = position;
+        _saber.vertices.push_back(std::move(vertex));
+    }
+    _saber.segments.resize(kNumSaberSegments);
 }
 
 } // namespace scene

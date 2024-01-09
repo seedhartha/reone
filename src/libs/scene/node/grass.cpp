@@ -120,7 +120,7 @@ void GrassSceneNode::update(float dt) {
             continue;
         }
         auto &face = faces[faceIdx];
-        auto verts = mesh->getVertexCoords(face);
+        auto verts = mesh->getFaceVertexCoords(face);
         for (int i = 0; i < getNumClustersInFace(face.area); ++i) {
             if (_clusterPool.empty()) {
                 return;

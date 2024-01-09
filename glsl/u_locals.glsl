@@ -4,13 +4,14 @@ const int FEATURE_NORMALMAP = 1 << 2;
 const int FEATURE_HEIGHTMAP = 1 << 3;
 const int FEATURE_SKIN = 1 << 4;
 const int FEATURE_DANGLY = 1 << 5;
-const int FEATURE_SHADOWS = 1 << 6;
-const int FEATURE_WATER = 1 << 7;
-const int FEATURE_FOG = 1 << 8;
-const int FEATURE_FIXEDSIZE = 1 << 9;
-const int FEATURE_HASHEDALPHATEST = 1 << 10;
-const int FEATURE_PREMULALPHA = 1 << 11;
-const int FEATURE_ENVMAPCUBE = 1 << 12;
+const int FEATURE_SABER = 1 << 6;
+const int FEATURE_SHADOWS = 1 << 7;
+const int FEATURE_WATER = 1 << 8;
+const int FEATURE_FOG = 1 << 9;
+const int FEATURE_FIXEDSIZE = 1 << 10;
+const int FEATURE_HASHEDALPHATEST = 1 << 11;
+const int FEATURE_PREMULALPHA = 1 << 12;
+const int FEATURE_ENVMAPCUBE = 1 << 13;
 
 layout(std140) uniform Locals {
     mat4 uModel;

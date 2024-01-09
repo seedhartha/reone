@@ -129,7 +129,7 @@ void Mesh::drawInstanced(int count) {
 
 void Mesh::computeFaceData() {
     for (auto &face : _faces) {
-        std::vector<glm::vec3> verts(getVertexCoords(face));
+        std::vector<glm::vec3> verts(getFaceVertexCoords(face));
         // Normal
         if (face.normal[0] == 0.0f && face.normal[1] == 0.0f && face.normal[2] == 0.0f) {
             face.normal = calculateTriangleNormal(verts);
@@ -156,7 +156,17 @@ void Mesh::computeAABB() {
     }
 }
 
-std::vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
+std::vector<glm::vec3> Mesh::getVertexCoords() const {
+    std::vector<glm::vec3> coords;
+    coords.resize(_numVertices);
+    for (int i = 0; i < _numVertices; ++i) {
+        auto vertPtr = &_vertices[i * (_spec.stride / sizeof(float))];
+        coords[i] = glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]);
+    }
+    return coords;
+}
+
+std::vector<glm::vec3> Mesh::getFaceVertexCoords(const Face &face) const {
     std::vector<glm::vec3> coords(3);
     for (int i = 0; i < 3; ++i) {
         auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];

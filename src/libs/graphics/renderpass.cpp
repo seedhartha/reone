@@ -160,6 +160,27 @@ void RenderPass::drawDangly(Mesh &mesh,
     });
 }
 
+void RenderPass::drawSaber(Mesh &mesh,
+                           Material &material,
+                           const glm::mat4 &transform,
+                           const glm::mat4 &transformInv,
+                           const std::vector<glm::vec4> &positions) {
+    withMaterialAppliedToContext(material, [&]() {
+        _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
+            locals.reset();
+            locals.featureMask |= UniformsFeatureFlags::saber;
+            locals.model = transform;
+            locals.modelInv = transformInv;
+            applyMaterialToLocals(material, locals);
+        });
+        _uniforms.setSaber([&positions](auto &saber) {
+            auto numPositions = std::min<int>(kNumSaberVertices, positions.size());
+            std::memcpy(saber.positions, &positions[0], numPositions * sizeof(glm::vec4));
+        });
+        mesh.draw();
+    });
+}
+
 void RenderPass::drawBillboard(Texture &texture,
                                const glm::vec4 &color,
                                const glm::mat4 &transform,

@@ -111,7 +111,7 @@ bool TriggerSceneNode::isIn(const glm::vec2 &pt) const {
     float distance = 0.0f;
 
     for (auto &face : _mesh->faces()) {
-        auto verts = _mesh->getVertexCoords(face);
+        auto verts = _mesh->getFaceVertexCoords(face);
         if (glm::intersectRayTriangle(pointObjSpace, down, verts[0], verts[1], verts[2], intersection, distance)) {
             return true;
         }

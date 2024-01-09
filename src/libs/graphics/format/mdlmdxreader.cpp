@@ -28,6 +28,8 @@ namespace reone {
 namespace graphics {
 
 static constexpr int kFlagBezier = 16;
+static constexpr int kNumSaberPieceFaces = 6;
+static constexpr int kNumSaberPieceVertices = 8;
 
 struct EmitterFlags {
     static constexpr int p2p = 1;
@@ -323,21 +325,11 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         aabbTree = readAABBTree(offTree);
 
     } else if (flags & MdlNodeFlags::saber) {
-        // Lightsaber blade is a special case. It consists of four to eight
-        // planes. Some of these planes are normal meshes, but some differ in
-        // that their geometry is stored in the MDL, not MDX.
-        //
-        // Values stored in the MDL are vertex coordinates, texture coordinates
-        // and normals. However, most of the vertex coordinates seem to be
-        // procedurally generated based on vertices 0-7 and 88-95.
-
         // Saber Mesh Header
         uint32_t offSaberVertices = _mdl.readUint32();
         uint32_t offTexCoords = _mdl.readUint32();
         uint32_t offNormals = _mdl.readUint32();
         _mdl.skipBytes(2 * 4); // unknown
-
-        static int referenceIndices[] {0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95};
 
         _mdl.seek(static_cast<size_t>(kMdlDataOffset) + offSaberVertices);
         std::vector<float> saberVertices(_mdl.readFloatArray(3 * numVertices));
@@ -348,31 +340,37 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         _mdl.seek(static_cast<size_t>(kMdlDataOffset) + offNormals);
         std::vector<float> normals(_mdl.readFloatArray(3 * numVertices));
 
-        int numVertices = 16;
-        vertices.resize(8ll * numVertices);
+        vertices.resize((3 + 2 + 3) * numVertices);
         float *verticesPtr = &vertices[0];
-
         for (int i = 0; i < numVertices; ++i) {
-            int referenceIdx = referenceIndices[i];
+            int vertexIdx;
+            if (i < 20 * 4) {
+                vertexIdx = i + 8;
+            } else if (i >= 20 * 4 && i < 20 * 4 + 8) {
+                vertexIdx = i - 20 * 4;
+            } else if (i >= 20 * 4 + 8 && i < 20 * 4 + 8 + 20 * 4) {
+                vertexIdx = i + 8;
+            } else {
+                vertexIdx = i - 20 * 4;
+            }
 
             // Vertex coordinates
-            float *vertexCoordsPtr = &saberVertices[3ll * referenceIdx];
+            float *vertexCoordsPtr = &saberVertices[3 * vertexIdx];
             *(verticesPtr++) = vertexCoordsPtr[0];
             *(verticesPtr++) = vertexCoordsPtr[1];
             *(verticesPtr++) = vertexCoordsPtr[2];
 
             // Normals
-            float *normalsPtr = &normals[3ll * referenceIdx];
+            float *normalsPtr = &normals[3 * vertexIdx];
             *(verticesPtr++) = normalsPtr[0];
             *(verticesPtr++) = normalsPtr[1];
             *(verticesPtr++) = normalsPtr[2];
 
             // Texture coordinates
-            float *texCoordsPtr = &texCoords[2ll * referenceIdx];
+            float *texCoordsPtr = &texCoords[2 * vertexIdx];
             *(verticesPtr++) = texCoordsPtr[0];
             *(verticesPtr++) = texCoordsPtr[1];
         }
-
         spec.stride = 8 * sizeof(float);
         spec.offCoords = 0;
         spec.offNormals = 3 * sizeof(float);
@@ -417,18 +415,36 @@ std::shared_ptr<ModelNode::TriangleMesh> MdlMdxReader::readMesh(int flags) {
         indices = _mdl.readUint16Array(3 * faceArrayDef.count);
 
     } else if (flags & MdlNodeFlags::saber) {
-        faces.emplace_back(0, 13, 12);
-        faces.emplace_back(0, 1, 13);
-        faces.emplace_back(1, 14, 13);
-        faces.emplace_back(1, 2, 14);
-        faces.emplace_back(2, 15, 14);
-        faces.emplace_back(2, 3, 15);
-        faces.emplace_back(8, 4, 5);
-        faces.emplace_back(8, 5, 9);
-        faces.emplace_back(9, 5, 6);
-        faces.emplace_back(9, 6, 10);
-        faces.emplace_back(10, 6, 7);
-        faces.emplace_back(10, 7, 11);
+        static const int kSaberPieceFaceIndices[] {
+            4, 5, 0,
+            5, 1, 0,
+            5, 6, 1,
+            6, 2, 1,
+            6, 7, 2,
+            7, 3, 2 //
+        };
+        // rightside pieces
+        int indexOffset = 0;
+        for (int i = 0; i < kNumSaberSegments + 1; ++i) {
+            for (int j = 0; j < kNumSaberPieceFaces; ++j) {
+                faces.emplace_back(
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 0],
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 1],
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 2]);
+            }
+            indexOffset += kNumSaberSegmentVertices;
+        }
+        // leftside pieces
+        indexOffset += kNumSaberSegmentVertices;
+        for (int i = 0; i < kNumSaberSegments + 1; ++i) {
+            for (int j = 0; j < kNumSaberPieceFaces; ++j) {
+                faces.emplace_back(
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 2],
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 1],
+                    indexOffset + kSaberPieceFaceIndices[3 * j + 0]);
+            }
+            indexOffset += kNumSaberSegmentVertices;
+        }
     }
 
     auto mesh = std::make_unique<Mesh>(std::move(vertices), std::move(faces), spec);
