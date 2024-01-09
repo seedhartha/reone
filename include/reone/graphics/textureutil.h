@@ -24,6 +24,7 @@ namespace reone {
 namespace graphics {
 
 void prepareCubemap(Texture &texture);
+void convertGridTextureToArray(Texture &texture, int numX, int numY);
 
 Texture::Properties getTextureProperties(TextureUsage usage);
 

@@ -11,7 +11,8 @@
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sEnvironmentMap;
-uniform sampler2D sBumpMap;
+uniform sampler2D sNormalMap;
+uniform sampler2DArray sBumpMapArray;
 uniform samplerCube sEnvironmentMapCube;
 
 in vec4 fragPosWorldSpace;
@@ -25,9 +26,9 @@ layout(location = 1) out vec4 fragColor2;
 
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
-        return getNormalFromNormalMap(sBumpMap, uv, fragTBN);
-    } else if (isFeatureEnabled(FEATURE_HEIGHTMAP)) {
-        return getNormalFromHeightMap(sBumpMap, uv, fragTBN);
+        return getNormalFromNormalMap(sNormalMap, uv, fragTBN);
+    } else if (isFeatureEnabled(FEATURE_BUMPMAP)) {
+        return getNormalFromBumpMap(sBumpMapArray, uv, fragTBN);
     } else {
         return normalize(fragNormalWorldSpace);
     }

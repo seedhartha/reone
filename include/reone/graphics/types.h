@@ -148,7 +148,7 @@ struct TextureUnits {
     static constexpr int mainTex = 0;
     static constexpr int lightmap = 1;
     static constexpr int environmentMap = 2;
-    static constexpr int bumpMap = 3;
+    static constexpr int normalMap = 3;
     static constexpr int envmapColor = 4;
     static constexpr int selfIllumColor = 5;
     static constexpr int features = 6;
@@ -168,7 +168,8 @@ struct TextureUnits {
 
     // Arrays
 
-    static constexpr int shadowMapArray = 17;
+    static constexpr int bumpMapArray = 17;
+    static constexpr int shadowMapArray = 18;
 };
 
 // MDL

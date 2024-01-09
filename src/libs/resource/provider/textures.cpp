@@ -59,6 +59,15 @@ std::shared_ptr<Texture> Textures::get(const std::string &resRef, TextureUsage u
 
 std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage usage) {
     std::shared_ptr<Texture> texture;
+    std::optional<Texture::Features> features;
+
+    auto txiRes = _resources.find(ResourceId(resRef, ResType::Txi));
+    if (txiRes) {
+        auto txi = MemoryInputStream(txiRes->data);
+        auto txiReader = TxiReader();
+        txiReader.load(txi);
+        features = txiReader.features();
+    }
 
     auto tgaRes = _resources.find(ResourceId(resRef, ResType::Tga));
     if (tgaRes) {
@@ -66,15 +75,8 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
         auto tgaReader = TgaReader(tga, resRef, usage);
         tgaReader.load();
         texture = tgaReader.texture();
-
-        if (texture) {
-            auto txiRes = _resources.find(ResourceId(resRef, ResType::Txi));
-            if (txiRes) {
-                auto txi = MemoryInputStream(txiRes->data);
-                auto txiReader = TxiReader();
-                txiReader.load(txi);
-                texture->setFeatures(txiReader.features());
-            }
+        if (texture && features) {
+            texture->setFeatures(*features);
         }
     }
 
@@ -85,10 +87,22 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
             auto tpcReader = TpcReader(tpc, resRef, usage);
             tpcReader.load();
             texture = tpcReader.texture();
+            if (texture) {
+                if (features) {
+                    texture->setFeatures(*features);
+                } else {
+                    features = texture->features();
+                }
+            }
         }
     }
 
     if (texture) {
+        if (features &&
+            features->procedureType != Texture::ProcedureType::Invalid &&
+            (features->numX > 1 || features->numY > 1)) {
+            convertGridTextureToArray(*texture, features->numX, features->numY);
+        }
         if (texture->isCubemap()) {
             prepareCubemap(*texture);
         }

@@ -105,10 +105,11 @@ int RenderPass::materialFeatureMask(const Material &material) const {
     if (textures.count(TextureUnits::environmentMapCube) > 0) {
         mask |= UniformsFeatureFlags::envmap | UniformsFeatureFlags::envmapcube;
     }
-    if (textures.count(TextureUnits::bumpMap) > 0) {
-        mask |= textures.at(TextureUnits::bumpMap).get().isGrayscale()
-                    ? UniformsFeatureFlags::heightmap
-                    : UniformsFeatureFlags::normalmap;
+    if (textures.count(TextureUnits::normalMap) > 0) {
+        mask |= UniformsFeatureFlags::normalmap;
+    }
+    if (textures.count(TextureUnits::bumpMapArray) > 0) {
+        mask |= UniformsFeatureFlags::bumpmap;
     }
     if (material.affectedByShadows) {
         mask |= UniformsFeatureFlags::shadows;
@@ -278,31 +279,10 @@ void RenderPass::applyMaterialToLocals(const Material &material,
             locals.waterAlpha = mainTex.features().waterAlpha;
         }
     }
-    if (material.textures.count(TextureUnits::bumpMap) > 0) {
-        const auto &bumpmap = material.textures.at(TextureUnits::bumpMap).get();
-        locals.heightMapScaling = bumpmap.features().bumpMapScaling;
-        int bumpmapW = bumpmap.width();
-        int bumpmapH = bumpmap.height();
-        int gridX = bumpmap.features().numX;
-        int gridY = bumpmap.features().numY;
-        int frameW = bumpmapW / gridX;
-        int frameH = bumpmapH / gridY;
-        switch (bumpmap.features().procedureType) {
-        case Texture::ProcedureType::Cycle:
-            locals.heightMapFrameBounds = glm::vec4(
-                static_cast<float>(frameW * (material.heightMapFrame % gridX)),
-                static_cast<float>(frameH * (material.heightMapFrame / gridX)),
-                static_cast<float>(frameW),
-                static_cast<float>(frameH));
-            break;
-        default:
-            locals.heightMapFrameBounds = glm::vec4(
-                0.0f,
-                0.0f,
-                static_cast<float>(frameW),
-                static_cast<float>(frameH));
-            break;
-        }
+    if (material.textures.count(TextureUnits::bumpMapArray) > 0) {
+        const auto &bumpmap = material.textures.at(TextureUnits::bumpMapArray).get();
+        locals.bumpMapFrame = material.bumpMapFrame;
+        locals.bumpMapScale = bumpmap.features().bumpMapScaling;
     }
 }
 

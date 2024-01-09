@@ -34,7 +34,7 @@ public:
     TextureUnitToTexture textures;
     glm::mat3x4 uv {1.0f};
     glm::vec4 color {1.0f};
-    int heightMapFrame {0};
+    int bumpMapFrame {0};
 
     glm::vec3 ambient {0.2f};
     glm::vec3 diffuse {0.8f};

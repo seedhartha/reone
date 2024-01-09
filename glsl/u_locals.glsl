@@ -1,7 +1,7 @@
 const int FEATURE_LIGHTMAP = 1 << 0;
 const int FEATURE_ENVMAP = 1 << 1;
 const int FEATURE_NORMALMAP = 1 << 2;
-const int FEATURE_HEIGHTMAP = 1 << 3;
+const int FEATURE_BUMPMAP = 1 << 3;
 const int FEATURE_SKIN = 1 << 4;
 const int FEATURE_DANGLY = 1 << 5;
 const int FEATURE_SABER = 1 << 6;
@@ -19,10 +19,10 @@ layout(std140) uniform Locals {
     mat3 uUV;
     vec4 uColor;
     vec4 uSelfIllumColor;
-    vec4 uHeightMapFrameBounds;
     int uFeatureMask;
+    int uBumpMapFrame;
+    float uBumpMapScale;
     float uWaterAlpha;
-    float uHeightMapScaling;
     float uBillboardSize;
 };
 

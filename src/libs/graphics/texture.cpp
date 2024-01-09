@@ -225,6 +225,20 @@ void Texture::refreshCubemap() {
 void Texture::refresh2DArray() {
     int numLayers = static_cast<int>(_layers.size());
     fillTarget3D(_width, _height, numLayers);
+    for (size_t i = 0; i < numLayers; ++i) {
+        const auto &layer = _layers[i];
+        if (!layer.pixels || layer.pixels->empty()) {
+            continue;
+        }
+        glTexSubImage3D(
+            GL_TEXTURE_2D_ARRAY,
+            0,
+            0, 0, i,
+            _width, _height, 1,
+            getPixelFormatGL(_pixelFormat),
+            getPixelTypeGL(_pixelFormat),
+            layer.pixels->data());
+    }
 }
 
 void Texture::refresh2D() {

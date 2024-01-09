@@ -68,7 +68,7 @@ void main() {
     fragUV1 = aUV1;
     fragUV2 = aUV2;
 
-    if (isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP)) {
+    if (isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_BUMPMAP)) {
         vec3 T = normalize(normalMatrix * aTangent);
         vec3 B = normalize(normalMatrix * aBitangent);
         vec3 TSN = normalize(normalMatrix * aTanSpaceNormal);

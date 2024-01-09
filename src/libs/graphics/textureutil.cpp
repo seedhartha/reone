@@ -18,6 +18,7 @@
 #include "reone/graphics/textureutil.h"
 
 #include "reone/graphics/dxtutil.h"
+#include "reone/system/checkutil.h"
 
 namespace reone {
 
@@ -87,7 +88,7 @@ static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp)
     }
 }
 
-static int getBitsPerPixel(PixelFormat format) {
+static int getBytesPerPixel(PixelFormat format) {
     switch (format) {
     case PixelFormat::R8:
         return 1;
@@ -123,12 +124,51 @@ void prepareCubemap(Texture &texture) {
                 texture.setPixelFormat(dstFormat);
             }
             for (int j = 0; j < rotations[i]; ++j) {
-                rotateLayer90(texture.width(), texture.height(), layer, getBitsPerPixel(dstFormat));
+                rotateLayer90(texture.width(), texture.height(), layer, getBytesPerPixel(dstFormat));
             }
         }
     } else {
         throw std::invalid_argument(str(boost::format("Texture '%s' has %d layers, %d expected") % texture.name() % numLayers % kNumCubeFaces));
     }
+}
+
+void convertGridTextureToArray(Texture &texture, int numX, int numY) {
+    checkEqual("layers size", static_cast<int>(texture.layers().size()), 1);
+    if (isCompressed(texture.pixelFormat())) {
+        PixelFormat newFormat;
+        decompressLayer(
+            texture.width(),
+            texture.height(),
+            texture.layers().front(),
+            texture.pixelFormat(),
+            newFormat);
+        texture.setPixelFormat(newFormat);
+    }
+    auto gridPixels = *texture.layers().front().pixels;
+    glm::ivec2 frameSize {texture.width() / numX, texture.height() / numY};
+    std::vector<Texture::Layer> frameLayers;
+    int bytesPerPixel = getBytesPerPixel(texture.pixelFormat());
+    size_t framePixelsSize = frameSize.x * frameSize.y * bytesPerPixel;
+    for (int i = 0; i < numX * numY; ++i) {
+        auto framePixels = std::make_shared<ByteBuffer>();
+        framePixels->resize(framePixelsSize);
+        for (int x = 0; x < frameSize.x; ++x) {
+            for (int y = 0; y < frameSize.y; ++y) {
+                int srcRowsToSkip = (i / numX) * frameSize.y + y;
+                int srcColsToSkip = (i % numX) * frameSize.x + x;
+                int srcPixelIdx = srcRowsToSkip * texture.width() + srcColsToSkip;
+                auto srcPixel = &gridPixels[srcPixelIdx * bytesPerPixel];
+                int dstPixelIdx = (y * frameSize.x + x);
+                auto dstPixel = &(*framePixels)[dstPixelIdx * bytesPerPixel];
+                std::memcpy(dstPixel, srcPixel, bytesPerPixel);
+            }
+        }
+        frameLayers.push_back(Texture::Layer {std::move(framePixels)});
+    }
+    texture.setPixels(
+        frameSize.x, frameSize.y,
+        texture.pixelFormat(),
+        std::move(frameLayers));
 }
 
 Texture::Properties getTextureProperties(TextureUsage usage) {
@@ -148,7 +188,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
     } else if (usage == TextureUsage::BumpMap) {
-        properties.minFilter = Texture::Filtering::Linear;
 
     } else if (usage == TextureUsage::GUI || usage == TextureUsage::Movie) {
         properties.minFilter = Texture::Filtering::Linear;

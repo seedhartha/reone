@@ -315,9 +315,11 @@ void MeshSceneNode::render(IRenderPass &pass) {
         }
     }
     if (_nodeTextures.bumpmap) {
-        material.textures.insert({TextureUnits::bumpMap, *_nodeTextures.bumpmap});
         if (_nodeTextures.bumpmap->isGrayscale()) {
-            material.heightMapFrame = _bumpmapCycleFrame;
+            material.textures.insert({TextureUnits::bumpMapArray, *_nodeTextures.bumpmap});
+            material.bumpMapFrame = _bumpmapCycleFrame;
+        } else {
+            material.textures.insert({TextureUnits::normalMap, *_nodeTextures.bumpmap});
         }
     }
     material.uv = glm::mat3x4(

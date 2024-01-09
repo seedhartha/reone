@@ -212,7 +212,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sMainTex", TextureUnits::mainTex);
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
-    program->setUniform("sBumpMap", TextureUnits::bumpMap);
+    program->setUniform("sNormalMap", TextureUnits::normalMap);
     program->setUniform("sEnvmapColor", TextureUnits::envmapColor);
     program->setUniform("sSelfIllumColor", TextureUnits::selfIllumColor);
     program->setUniform("sFeatures", TextureUnits::features);
@@ -226,6 +226,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sNoise", TextureUnits::noise);
     program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
+    program->setUniform("sBumpMapArray", TextureUnits::bumpMapArray);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
 
     // Uniform Blocks

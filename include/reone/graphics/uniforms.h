@@ -41,7 +41,7 @@ struct UniformsFeatureFlags {
     static constexpr int lightmap = 1 << 0;
     static constexpr int envmap = 1 << 1;
     static constexpr int normalmap = 1 << 2;
-    static constexpr int heightmap = 1 << 3;
+    static constexpr int bumpmap = 1 << 3;
     static constexpr int skin = 1 << 4;
     static constexpr int dangly = 1 << 5;
     static constexpr int saber = 1 << 6;
@@ -102,16 +102,20 @@ struct GlobalUniforms {
 };
 
 struct LocalUniforms {
-    glm::mat4 model {1.0f};
-    glm::mat4 modelInv {1.0f};
-    glm::mat3x4 uv {1.0f};
-    glm::vec4 color {1.0f};
-    glm::vec4 selfIllumColor {0.0f};
-    glm::vec4 heightMapFrameBounds {0.0f};
-    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    float waterAlpha {0.0f};
-    float heightMapScaling {1.0f};
-    float billboardSize {1.0f};
+    glm::mat4 model;
+    glm::mat4 modelInv;
+    glm::mat3x4 uv;
+    glm::vec4 color;
+    glm::vec4 selfIllumColor;
+    int featureMask;
+    int bumpMapFrame;
+    float bumpMapScale;
+    float waterAlpha;
+    float billboardSize;
+
+    LocalUniforms() {
+        reset();
+    }
 
     void reset() {
         model = glm::mat4(1.0f);
@@ -119,10 +123,10 @@ struct LocalUniforms {
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
         selfIllumColor = glm::vec4(0.0f);
-        heightMapFrameBounds = glm::vec4(0.0f);
         featureMask = 0;
+        bumpMapFrame = 0;
+        bumpMapScale = 1.0f;
         waterAlpha = 0.0f;
-        heightMapScaling = 1.0f;
         billboardSize = 1.0f;
     }
 };
