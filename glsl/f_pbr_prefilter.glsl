@@ -1,3 +1,4 @@
+#include "i_gamma.glsl"
 #include "i_math.glsl"
 
 in vec4 fragPosWorldSpace;
@@ -87,7 +88,7 @@ void main() {
 
             float mipLevel = uRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
 
-            prefilteredColor += textureLod(sEnvironmentMapCube, L, mipLevel).rgb * NdotL;
+            prefilteredColor += gammaToLinear(textureLod(sEnvironmentMapCube, L, mipLevel).rgb) * NdotL;
             totalWeight += NdotL;
         }
     }

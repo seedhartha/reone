@@ -32,6 +32,7 @@ class IUniforms;
 class Mesh;
 class Texture;
 
+struct GraphicsOptions;
 struct LocalUniforms;
 struct Material;
 
@@ -113,12 +114,14 @@ public:
 
 class RenderPass : public IRenderPass, boost::noncopyable {
 public:
-    RenderPass(IContext &context,
+    RenderPass(GraphicsOptions &options,
+               IContext &context,
                IShaderRegistry &shaderRegistry,
                IMeshRegistry &meshRegistry,
                IPBRTextures &pbrTextures,
                ITextureRegistry &textureRegistry,
                IUniforms &uniforms) :
+        _options(options),
         _context(context),
         _shaderRegistry(shaderRegistry),
         _meshRegistry(meshRegistry),
@@ -175,6 +178,7 @@ public:
                    glm::mat3x4 uv) override;
 
 private:
+    GraphicsOptions &_options;
     IContext &_context;
     IShaderRegistry &_shaderRegistry;
     IMeshRegistry &_meshRegistry;

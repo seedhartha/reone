@@ -25,11 +25,6 @@ namespace reone {
 
 namespace graphics {
 
-class IContext;
-class IMeshRegistry;
-class IShaderRegistry;
-class IUniforms;
-
 struct EnvMapDerivedRequest {
     Texture &texture;
 
@@ -37,6 +32,27 @@ struct EnvMapDerivedRequest {
         texture(texture) {
     }
 };
+
+} // namespace graphics
+
+} // namespace reone
+
+template <>
+struct std::less<reone::graphics::EnvMapDerivedRequest> {
+    bool operator()(const reone::graphics::EnvMapDerivedRequest &lhs,
+                    const reone::graphics::EnvMapDerivedRequest &rhs) const {
+        return lhs.texture.name() < rhs.texture.name();
+    }
+};
+
+namespace reone {
+
+namespace graphics {
+
+class IContext;
+class IMeshRegistry;
+class IShaderRegistry;
+class IUniforms;
 
 struct PBREnvMapTextures {
     std::shared_ptr<Texture> irradiance;
@@ -74,7 +90,7 @@ public:
     void refresh();
 
     void requestEnvMapDerived(EnvMapDerivedRequest request) {
-        _envMapDerivedRequests.push_back(std::move(request));
+        _envMapDerivedRequests.insert(std::move(request));
     }
 
     Texture &brdf() {
@@ -106,7 +122,7 @@ private:
     std::shared_ptr<Framebuffer> _prefilterFramebuffer;
 
     std::map<std::string, PBREnvMapTextures> _envMapToDerived;
-    std::list<EnvMapDerivedRequest> _envMapDerivedRequests;
+    std::set<EnvMapDerivedRequest> _envMapDerivedRequests;
 
     void refreshBRDF();
     void refreshEnvMapDerived(const EnvMapDerivedRequest &request);

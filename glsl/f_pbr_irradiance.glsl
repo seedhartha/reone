@@ -1,3 +1,4 @@
+#include "i_gamma.glsl"
 #include "i_math.glsl"
 
 in vec4 fragPosWorldSpace;
@@ -25,7 +26,7 @@ void main() {
             // tangent space to world
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
 
-            irradiance += texture(sEnvironmentMapCube, sampleVec).rgb * cos(theta) * sin(theta);
+            irradiance += gammaToLinear(texture(sEnvironmentMapCube, sampleVec).rgb) * cos(theta) * sin(theta);
             nrSamples++;
         }
     }

@@ -48,7 +48,9 @@ void RenderPipeline::init() {
     checkMainThread();
 
     initRenderTargets();
-    initSSAOSamples();
+    if (_options.ssao) {
+        initSSAOSamples();
+    }
 
     _inited = true;
 }
@@ -197,23 +199,27 @@ void RenderPipeline::initRenderTargets() {
 
     // SSAO framebuffer
 
-    _renderTargets.cbSSAO = std::make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbSSAO->clear(halfSize.x, halfSize.y, PixelFormat::R8);
-    _renderTargets.cbSSAO->init();
+    if (_options.ssao) {
+        _renderTargets.cbSSAO = std::make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
+        _renderTargets.cbSSAO->clear(halfSize.x, halfSize.y, PixelFormat::R8);
+        _renderTargets.cbSSAO->init();
 
-    _renderTargets.fbSSAO = std::make_shared<Framebuffer>();
-    _renderTargets.fbSSAO->attachColorDepth(_renderTargets.cbSSAO, _renderTargets.dbCommonHalf);
-    _renderTargets.fbSSAO->init();
+        _renderTargets.fbSSAO = std::make_shared<Framebuffer>();
+        _renderTargets.fbSSAO->attachColorDepth(_renderTargets.cbSSAO, _renderTargets.dbCommonHalf);
+        _renderTargets.fbSSAO->init();
+    }
 
     // SSR framebuffer
 
-    _renderTargets.cbSSR = std::make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbSSR->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
-    _renderTargets.cbSSR->init();
+    if (_options.ssr) {
+        _renderTargets.cbSSR = std::make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
+        _renderTargets.cbSSR->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
+        _renderTargets.cbSSR->init();
 
-    _renderTargets.fbSSR = std::make_shared<Framebuffer>();
-    _renderTargets.fbSSR->attachColorDepth(_renderTargets.cbSSR, _renderTargets.dbCommonHalf);
-    _renderTargets.fbSSR->init();
+        _renderTargets.fbSSR = std::make_shared<Framebuffer>();
+        _renderTargets.fbSSR->attachColorDepth(_renderTargets.cbSSR, _renderTargets.dbCommonHalf);
+        _renderTargets.fbSSR->init();
+    }
 
     // Output framebuffer
 
@@ -242,6 +248,7 @@ void RenderPipeline::initSSAOSamples() {
 Texture &RenderPipeline::render() {
     _context.withViewport(glm::ivec4(0, 0, _targetSize), [this]() {
         auto pass = RenderPass(
+            _options,
             _context,
             _shaderRegistry,
             _meshRegistry,

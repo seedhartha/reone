@@ -135,7 +135,9 @@ int Engine::run() {
             _game->update(frameTime);
             showCursor(_game->cursorType() == CursorType::None);
             setRelativeMouseMode(_game->relativeMouseMode());
-            _services->graphics.pbrTextures.refresh();
+            if (_options.graphics.pbr) {
+                _services->graphics.pbrTextures.refresh();
+            }
             _services->graphics.context.clearColorDepth();
             _game->render();
             _window->swap();

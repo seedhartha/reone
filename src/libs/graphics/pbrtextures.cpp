@@ -22,6 +22,7 @@
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/system/logutil.h"
 
 static constexpr int kBRDFTextureSize = 512;
 static constexpr int kIrradianceTextureSize = 32;
@@ -46,10 +47,11 @@ void PBRTextures::refresh() {
     if (!_brdf) {
         refreshBRDF();
     }
-    for (const auto &name : _envMapDerivedRequests) {
-        refreshEnvMapDerived(name);
+    if (!_envMapDerivedRequests.empty()) {
+        auto &request = *_envMapDerivedRequests.begin();
+        refreshEnvMapDerived(request);
+        _envMapDerivedRequests.erase(request);
     }
-    _envMapDerivedRequests.clear();
 }
 
 void PBRTextures::refreshBRDF() {

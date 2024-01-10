@@ -53,15 +53,17 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     }
     if (material.textures.count(TextureUnits::environmentMapCube) > 0) {
         auto &envMap = material.textures.at(TextureUnits::environmentMapCube).get();
-        _context.bindTexture(_pbrTextures.brdf(), TextureUnits::pbrBRDF);
-        auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
-        if (envMapDerived) {
-            _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
-            _context.bindTexture(*envMapDerived->get().prefiltered, TextureUnits::pbrPrefiltered);
-        } else {
-            _context.bindTexture(envMap, TextureUnits::pbrIrradiance);
-            _context.bindTexture(envMap, TextureUnits::pbrPrefiltered);
-            _pbrTextures.requestEnvMapDerived({envMap});
+        if (_options.pbr) {
+            _context.bindTexture(_pbrTextures.brdf(), TextureUnits::pbrBRDF);
+            auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
+            if (envMapDerived) {
+                _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
+                _context.bindTexture(*envMapDerived->get().prefiltered, TextureUnits::pbrPrefiltered);
+            } else {
+                _context.bindTexture(envMap, TextureUnits::pbrIrradiance);
+                _context.bindTexture(envMap, TextureUnits::pbrPrefiltered);
+                _pbrTextures.requestEnvMapDerived({envMap});
+            }
         }
     }
     auto prevBlending = _context.blending();
