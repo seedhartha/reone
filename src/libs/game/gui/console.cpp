@@ -182,6 +182,9 @@ void Console::executeInputText() {
 }
 
 void Console::render() {
+    if (!_open) {
+        return;
+    }
     _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         renderBackground();
         renderLines();

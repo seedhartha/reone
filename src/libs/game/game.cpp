@@ -120,41 +120,166 @@ void Game::setSceneSurfaces() {
     }
 }
 
+bool Game::handle(const input::Event &event) {
+    return _profileOverlay->timeInput([this, &event]() {
+        switch (event.type) {
+        case input::EventType::KeyDown:
+            if (handleKeyDown(event.key)) {
+                return true;
+            }
+            break;
+        case input::EventType::MouseMotion:
+            if (handleMouseMotion(event.motion)) {
+                return true;
+            }
+            break;
+        case input::EventType::MouseButtonDown:
+            if (handleMouseButtonDown(event.button)) {
+                return true;
+            }
+            break;
+        case input::EventType::MouseButtonUp:
+            if (handleMouseButtonUp(event.button)) {
+                return true;
+            }
+            break;
+        default:
+            break;
+        }
+
+        if (_profileOverlay->handle(event)) {
+            return true;
+        }
+
+        if (!_movie) {
+            auto gui = getScreenGUI();
+            if (gui && gui->handle(event)) {
+                return true;
+            }
+            switch (_screen) {
+            case Screen::InGame: {
+                if (_console->handle(event)) {
+                    return true;
+                }
+                if (_party.handle(event)) {
+                    return true;
+                }
+                auto camera = getActiveCamera();
+                if (camera && camera->handle(event)) {
+                    return true;
+                }
+                if (_module->handle(event)) {
+                    return true;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+
+        return false;
+    });
+}
+
 void Game::update(float frameTime) {
-    float dt = frameTime * _gameSpeed;
-    if (_movie) {
-        updateMovie(dt);
-        return;
-    }
-    updateMusic();
+    _profileOverlay->timeUpdate([this, &frameTime]() {
+        float dt = frameTime * _gameSpeed;
+        if (_movie) {
+            updateMovie(dt);
+            return;
+        }
+        updateMusic();
 
-    if (!_nextModule.empty()) {
-        loadNextModule();
-    }
-    updateCamera(dt);
+        if (!_nextModule.empty()) {
+            loadNextModule();
+        }
+        updateCamera(dt);
 
-    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-    if (updModule && !_paused) {
-        _module->update(dt);
-        _combat.update(dt);
-    }
+        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+        if (updModule && !_paused) {
+            _module->update(dt);
+            _combat.update(dt);
+        }
 
-    auto gui = getScreenGUI();
-    if (gui) {
-        gui->update(dt);
-    }
-    updateSceneGraph(dt);
+        auto gui = getScreenGUI();
+        if (gui) {
+            gui->update(dt);
+        }
+        updateSceneGraph(dt);
 
-    _profileOverlay->update(dt);
+        _profileOverlay->update(dt);
+    });
 }
 
 void Game::render() {
-    if (_movie) {
-        _movie->render();
-    } else {
-        renderScene();
-        renderGUI();
+    _profileOverlay->timeRender([this]() {
+        if (_movie) {
+            _movie->render();
+        } else {
+            renderScene();
+            renderGUI();
+        }
+    });
+    _profileOverlay->onFrameEnded();
+}
+
+bool Game::handleKeyDown(const input::KeyEvent &event) {
+    if (event.repeat)
+        return false;
+
+    switch (event.code) {
+    case input::KeyCode::Minus:
+        if (_options.game.developer && _gameSpeed > 1.0f) {
+            _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+            return true;
+        }
+        break;
+
+    case input::KeyCode::Equals:
+        if (_options.game.developer && _gameSpeed < 8.0f) {
+            _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
+            return true;
+        }
+        break;
+
+    case input::KeyCode::V:
+        if (_options.game.developer && _screen == Screen::InGame) {
+            toggleInGameCameraType();
+            return true;
+        }
+        break;
+
+    default:
+        break;
     }
+
+    return false;
+}
+
+bool Game::handleMouseMotion(const input::MouseMotionEvent &event) {
+    _cursor->setPosition({event.x, event.y});
+    return false;
+}
+
+bool Game::handleMouseButtonDown(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left) {
+        return false;
+    }
+    _cursor->setPressed(true);
+    if (_movie) {
+        _movie->finish();
+        return true;
+    }
+    return false;
+}
+
+bool Game::handleMouseButtonUp(const input::MouseButtonEvent &event) {
+    if (event.button != input::MouseButton::Left) {
+        return false;
+    }
+    _cursor->setPressed(false);
+    return false;
 }
 
 void Game::loadModule(const std::string &name, std::string entry) {
@@ -464,124 +589,6 @@ void Game::updateSceneGraph(float dt) {
     sceneGraph.setRenderWalkmeshes(isShowWalkmeshEnabled());
     sceneGraph.setRenderTriggers(isShowTriggersEnabled());
     sceneGraph.update(dt);
-}
-
-bool Game::handle(const input::Event &event) {
-    switch (event.type) {
-    case input::EventType::KeyDown:
-        if (handleKeyDown(event.key)) {
-            return true;
-        }
-        break;
-    case input::EventType::MouseMotion:
-        if (handleMouseMotion(event.motion)) {
-            return true;
-        }
-        break;
-    case input::EventType::MouseButtonDown:
-        if (handleMouseButtonDown(event.button)) {
-            return true;
-        }
-        break;
-    case input::EventType::MouseButtonUp:
-        if (handleMouseButtonUp(event.button)) {
-            return true;
-        }
-        break;
-    default:
-        break;
-    }
-
-    if (_profileOverlay->handle(event)) {
-        return true;
-    }
-
-    if (!_movie) {
-        auto gui = getScreenGUI();
-        if (gui && gui->handle(event)) {
-            return true;
-        }
-        switch (_screen) {
-        case Screen::InGame: {
-            if (_console->handle(event)) {
-                return true;
-            }
-            if (_party.handle(event)) {
-                return true;
-            }
-            auto camera = getActiveCamera();
-            if (camera && camera->handle(event)) {
-                return true;
-            }
-            if (_module->handle(event)) {
-                return true;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    return false;
-}
-
-bool Game::handleKeyDown(const input::KeyEvent &event) {
-    if (event.repeat)
-        return false;
-
-    switch (event.code) {
-    case input::KeyCode::Minus:
-        if (_options.game.developer && _gameSpeed > 1.0f) {
-            _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
-            return true;
-        }
-        break;
-
-    case input::KeyCode::Equals:
-        if (_options.game.developer && _gameSpeed < 8.0f) {
-            _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
-            return true;
-        }
-        break;
-
-    case input::KeyCode::V:
-        if (_options.game.developer && _screen == Screen::InGame) {
-            toggleInGameCameraType();
-            return true;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return false;
-}
-
-bool Game::handleMouseMotion(const input::MouseMotionEvent &event) {
-    _cursor->setPosition({event.x, event.y});
-    return false;
-}
-
-bool Game::handleMouseButtonDown(const input::MouseButtonEvent &event) {
-    if (event.button != input::MouseButton::Left) {
-        return false;
-    }
-    _cursor->setPressed(true);
-    if (_movie) {
-        _movie->finish();
-        return true;
-    }
-    return false;
-}
-
-bool Game::handleMouseButtonUp(const input::MouseButtonEvent &event) {
-    if (event.button != input::MouseButton::Left) {
-        return false;
-    }
-    _cursor->setPressed(false);
-    return false;
 }
 
 bool Game::getGlobalBoolean(const std::string &name) const {

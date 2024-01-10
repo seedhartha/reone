@@ -94,6 +94,12 @@ void ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
     });
 }
 
+void ShaderProgram::setUniform(const std::string &name, const glm::vec4 &v) {
+    setUniform(name, [this, &v](int loc) {
+        glUniform4f(loc, v.x, v.y, v.z, v.w);
+    });
+}
+
 void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     setUniform(name, [this, &m](int loc) {
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));

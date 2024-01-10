@@ -72,6 +72,7 @@ static const std::string kFragTextureNoPerspective = "f_texnoper";
 static const std::string kFragPBRIrradiance = "f_pbr_irradiance";
 static const std::string kFragPBRBRDF = "f_pbr_brdf";
 static const std::string kFragPBRPrefilter = "f_pbr_prefilter";
+static const std::string kFragProfiler = "f_profiler";
 
 void Shaders::init() {
     if (_inited) {
@@ -119,6 +120,7 @@ void Shaders::init() {
     auto fragPBRIrradiance = initShader(ShaderType::Fragment, kFragPBRIrradiance);
     auto fragPBRBRDF = initShader(ShaderType::Fragment, kFragPBRBRDF);
     auto fragPBRPrefilter = initShader(ShaderType::Fragment, kFragPBRPrefilter);
+    auto fragProfiler = initShader(ShaderType::Fragment, kFragProfiler);
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
@@ -148,6 +150,7 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::pbrIrradiance, initShaderProgram({vertMVP, fragPBRIrradiance}));
     _shaderRegistry.add(ShaderProgramId::pbrBRDF, initShaderProgram({vertMVP, fragPBRBRDF}));
     _shaderRegistry.add(ShaderProgramId::pbrPrefilter, initShaderProgram({vertMVP, fragPBRPrefilter}));
+    _shaderRegistry.add(ShaderProgramId::profiler, initShaderProgram({vertMVP, fragProfiler}));
 
     _inited = true;
 }
@@ -253,6 +256,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
     program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
     program->bindUniformBlock("ScreenEffect", UniformBlockBindingPoints::screenEffect);
+    program->bindUniformBlock("FrameTimes", UniformBlockBindingPoints::frameTimes);
 
     return program;
 }

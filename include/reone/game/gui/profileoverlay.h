@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/graphics/font.h"
+#include "reone/graphics/uniformbuffer.h"
 #include "reone/input/event.h"
 #include "reone/system/timer.h"
 
@@ -36,24 +37,59 @@ public:
         _options(options) {
     }
 
+    ~ProfileOverlay() {
+        deinit();
+    }
+
     void init();
+    void deinit();
 
     bool handle(const input::Event &event);
     void update(float dt);
     void render();
 
+    bool timeInput(std::function<bool()> block);
+    void timeUpdate(std::function<void()> block);
+    void timeRender(std::function<void()> block);
+
+    void onFrameEnded();
+
 private:
+    struct FrameTimes {
+        float input;
+        float update;
+        float render;
+        float total;
+
+        FrameTimes(float input, float update, float render) :
+            input(input),
+            update(update),
+            render(render),
+            total(input + update + render) {
+        }
+    };
+
     ServicesView &_services;
     OptionsView &_options;
 
+    bool _inited {false};
     bool _enabled {false};
 
-    uint64_t _ticks {0};
-    int _numFrames {0};
-    int _fps {0};
+    std::deque<FrameTimes> _frameTimes;
+    float _inputTime {0.0f};
+    float _updateTime {0.0f};
+    float _renderTime {0.0f};
 
-    Timer _refreshTimer;
+    Timer _percentilesTimer;
+    float _p99FrameTime {0.0f};
+    float _p95FrameTime {0.0f};
+
     std::shared_ptr<graphics::Font> _font;
+    std::shared_ptr<graphics::UniformBuffer> _frameTimesUBO;
+
+    void renderBackground();
+    void renderFrameTimes();
+    void renderText();
 };
 
 } // namespace game

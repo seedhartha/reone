@@ -35,6 +35,7 @@ struct UniformBlockBindingPoints {
     static constexpr int walkmesh = 7;
     static constexpr int text = 8;
     static constexpr int screenEffect = 9;
+    static constexpr int frameTimes = 10;
 };
 
 struct UniformsFeatureFlags {
