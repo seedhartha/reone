@@ -80,20 +80,28 @@ void FirstPersonCamera::updateSceneNode() {
 
 bool FirstPersonCamera::handleKeyDown(const input::KeyEvent &event) {
     switch (event.code) {
-    case input::KeyCode::W:
-        _moveForward = true;
+    case input::KeyCode::D:
+        _moveDir = MovementDirection::Right;
         return true;
 
     case input::KeyCode::A:
-        _moveLeft = true;
+        _moveDir = MovementDirection::Left;
+        return true;
+
+    case input::KeyCode::W:
+        _moveDir = MovementDirection::Forward;
         return true;
 
     case input::KeyCode::S:
-        _moveBackward = true;
+        _moveDir = MovementDirection::Back;
         return true;
 
-    case input::KeyCode::D:
-        _moveRight = true;
+    case input::KeyCode::Q:
+        _moveDir = MovementDirection::Up;
+        return true;
+
+    case input::KeyCode::Z:
+        _moveDir = MovementDirection::Down;
         return true;
 
     case input::KeyCode::LeftShift:
@@ -107,20 +115,40 @@ bool FirstPersonCamera::handleKeyDown(const input::KeyEvent &event) {
 
 bool FirstPersonCamera::handleKeyUp(const input::KeyEvent &event) {
     switch (event.code) {
-    case input::KeyCode::W:
-        _moveForward = false;
+    case input::KeyCode::D:
+        if (_moveDir == MovementDirection::Right) {
+            _moveDir = MovementDirection::None;
+        }
         return true;
 
     case input::KeyCode::A:
-        _moveLeft = false;
+        if (_moveDir == MovementDirection::Left) {
+            _moveDir = MovementDirection::None;
+        }
+        return true;
+
+    case input::KeyCode::W:
+        if (_moveDir == MovementDirection::Forward) {
+            _moveDir = MovementDirection::None;
+        }
         return true;
 
     case input::KeyCode::S:
-        _moveBackward = false;
+        if (_moveDir == MovementDirection::Back) {
+            _moveDir = MovementDirection::None;
+        }
         return true;
 
-    case input::KeyCode::D:
-        _moveRight = false;
+    case input::KeyCode::Q:
+        if (_moveDir == MovementDirection::Up) {
+            _moveDir = MovementDirection::None;
+        }
+        return true;
+
+    case input::KeyCode::Z:
+        if (_moveDir == MovementDirection::Down) {
+            _moveDir = MovementDirection::None;
+        }
         return true;
 
     case input::KeyCode::LeftShift:
@@ -136,29 +164,46 @@ void FirstPersonCamera::update(float dt) {
     float facingSin = glm::sin(_facing) * _multiplier * kMovementSpeed * dt;
     float facingCos = glm::cos(_facing) * _multiplier * kMovementSpeed * dt;
     float pitchSin = glm::sin(_pitch) * _multiplier * kMovementSpeed * dt;
+    float pitchCos = glm::cos(_pitch) * _multiplier * kMovementSpeed * dt;
     bool positionChanged = false;
 
-    if (_moveForward) {
+    switch (_moveDir) {
+    case MovementDirection::Right:
+        _position.x += facingCos;
+        _position.y += facingSin;
+        positionChanged = true;
+        break;
+    case MovementDirection::Left:
+        _position.x -= facingCos;
+        _position.y -= facingSin;
+        positionChanged = true;
+        break;
+    case MovementDirection::Forward:
         _position.x -= facingSin;
         _position.y += facingCos;
         _position.z += pitchSin;
         positionChanged = true;
-    }
-    if (_moveLeft) {
-        _position.x -= facingCos;
-        _position.y -= facingSin;
-        positionChanged = true;
-    }
-    if (_moveBackward) {
+        break;
+    case MovementDirection::Back:
         _position.x += facingSin;
         _position.y -= facingCos;
         _position.z -= pitchSin;
         positionChanged = true;
-    }
-    if (_moveRight) {
-        _position.x += facingCos;
-        _position.y += facingSin;
+        break;
+    case MovementDirection::Up:
+        _position.x += facingSin * pitchSin;
+        _position.y -= facingCos * pitchSin;
+        _position.z += pitchCos;
         positionChanged = true;
+        break;
+    case MovementDirection::Down:
+        _position.x -= facingSin * pitchSin;
+        _position.y += facingCos * pitchSin;
+        _position.z -= pitchCos;
+        positionChanged = true;
+        break;
+    default:
+        break;
     }
     if (positionChanged) {
         updateSceneNode();
@@ -166,10 +211,7 @@ void FirstPersonCamera::update(float dt) {
 }
 
 void FirstPersonCamera::stopMovement() {
-    _moveForward = false;
-    _moveLeft = false;
-    _moveBackward = false;
-    _moveRight = false;
+    _moveDir = MovementDirection::None;
 }
 
 void FirstPersonCamera::setPosition(const glm::vec3 &pos) {

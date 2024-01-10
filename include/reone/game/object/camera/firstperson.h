@@ -53,16 +53,23 @@ public:
     void setFacing(float facing);
 
 private:
+    enum class MovementDirection {
+        None,
+        Right,
+        Left,
+        Forward,
+        Back,
+        Up,
+        Down
+    };
+
     float _fovy;
     float _aspect;
 
     glm::vec3 _position {0.0f};
     float _pitch {0.0f};
     float _multiplier {1.0f};
-    bool _moveForward {false};
-    bool _moveLeft {false};
-    bool _moveBackward {false};
-    bool _moveRight {false};
+    MovementDirection _moveDir {MovementDirection::None};
 
     bool handleMouseMotion(const input::MouseMotionEvent &event);
     bool handleKeyDown(const input::KeyEvent &event);
