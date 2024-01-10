@@ -51,10 +51,9 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
     }
-    if (material.textures.count(TextureUnits::environmentMapCube) > 0) {
-        auto &envMap = material.textures.at(TextureUnits::environmentMapCube).get();
+    if (material.textures.count(TextureUnits::envMapCube) > 0) {
+        auto &envMap = material.textures.at(TextureUnits::envMapCube).get();
         if (_options.pbr) {
-            _context.bindTexture(_pbrTextures.brdf(), TextureUnits::pbrBRDF);
             auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
             if (envMapDerived) {
                 _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
@@ -100,8 +99,8 @@ int RenderPass::materialFeatureMask(const Material &material) const {
             mask |= UniformsFeatureFlags::hashedalphatest;
             break;
         case Texture::Blending::Additive:
-            if (textures.count(TextureUnits::environmentMap) == 0 &&
-                textures.count(TextureUnits::environmentMapCube) == 0) {
+            if (textures.count(TextureUnits::envMap) == 0 &&
+                textures.count(TextureUnits::envMapCube) == 0) {
                 mask |= UniformsFeatureFlags::premulalpha;
             }
             break;
@@ -115,10 +114,10 @@ int RenderPass::materialFeatureMask(const Material &material) const {
     if (textures.count(TextureUnits::lightmap) > 0) {
         mask |= UniformsFeatureFlags::lightmap;
     }
-    if (textures.count(TextureUnits::environmentMap) > 0) {
+    if (textures.count(TextureUnits::envMap) > 0) {
         mask |= UniformsFeatureFlags::envmap;
     }
-    if (textures.count(TextureUnits::environmentMapCube) > 0) {
+    if (textures.count(TextureUnits::envMapCube) > 0) {
         mask |= UniformsFeatureFlags::envmap | UniformsFeatureFlags::envmapcube;
     }
     if (textures.count(TextureUnits::normalMap) > 0) {

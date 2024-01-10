@@ -10,10 +10,10 @@
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
-uniform sampler2D sEnvironmentMap;
+uniform sampler2D sEnvMap;
 uniform sampler2D sNormalMap;
 uniform sampler2DArray sBumpMapArray;
-uniform samplerCube sEnvironmentMapCube;
+uniform samplerCube sEnvMapCube;
 
 in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
@@ -70,7 +70,7 @@ void main() {
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace.xyz - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
-        vec4 envmapSample = sampleEnvironmentMap(sEnvironmentMap, sEnvironmentMapCube, R);
+        vec4 envmapSample = sampleEnvironmentMap(sEnvMap, sEnvMapCube, R);
         objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
     }
     if (isFeatureEnabled(FEATURE_WATER)) {

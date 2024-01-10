@@ -20,6 +20,7 @@
 #include "reone/graphics/shaderprogram.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniformbuffer.h"
+#include "reone/system/logutil.h"
 #include "reone/system/threadutil.h"
 
 namespace reone {
@@ -34,8 +35,7 @@ static constexpr GLenum kColorAttachments[] {
     GL_COLOR_ATTACHMENT4,
     GL_COLOR_ATTACHMENT5,
     GL_COLOR_ATTACHMENT6,
-    GL_COLOR_ATTACHMENT7,
-    GL_COLOR_ATTACHMENT8};
+    GL_COLOR_ATTACHMENT7};
 
 void Context::init() {
     if (_inited) {
@@ -46,6 +46,8 @@ void Context::init() {
     if (error != GLEW_OK) {
         throw std::runtime_error(str(boost::format("glewInit failed: %s") % glewGetErrorString(error)));
     }
+    int maxBuffers;
+    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     setDepthTestMode(DepthTestMode::LessOrEqual);

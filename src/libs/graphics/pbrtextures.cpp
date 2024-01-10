@@ -124,7 +124,7 @@ void PBRTextures::refreshIrradiance(const EnvMapDerivedRequest &request, Texture
         _context.bindDrawFramebuffer(*_irradianceFramebuffer, {0});
         auto &shader = _shaderRegistry.get(ShaderProgramId::pbrIrradiance);
         _context.useProgram(shader);
-        _context.bindTexture(request.texture, TextureUnits::environmentMapCube);
+        _context.bindTexture(request.texture, TextureUnits::envMapCube);
         _uniforms.setLocals([](auto &locals) {
             locals.reset();
         });
@@ -159,7 +159,7 @@ void PBRTextures::refreshPrefiltered(const EnvMapDerivedRequest &request, Textur
     _context.bindDrawFramebuffer(*_prefilterFramebuffer, {0});
     auto &shader = _shaderRegistry.get(ShaderProgramId::pbrPrefilter);
     _context.useProgram(shader);
-    _context.bindTexture(request.texture, TextureUnits::environmentMapCube);
+    _context.bindTexture(request.texture, TextureUnits::envMapCube);
     _uniforms.setLocals([](auto &locals) {
         locals.reset();
     });

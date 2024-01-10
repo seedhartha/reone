@@ -6,9 +6,9 @@ const float EDGE_FADE_START = 0.8;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
-uniform sampler2D sEnvmapColor;
-uniform sampler2D sEyePos;
-uniform sampler2D sEyeNormal;
+uniform sampler2D sGBufEnvMap;
+uniform sampler2D sGBufEyePos;
+uniform sampler2D sGBufEyeNormal;
 
 noperspective in vec2 fragUV1;
 
@@ -95,7 +95,7 @@ bool traceScreenSpaceRay(
         prevZMax = rayZMax;
         swapIfGreater(rayZMin, rayZMax);
 
-        float sceneZ = texture(sEyePos, sceneUV).z;
+        float sceneZ = texture(sGBufEyePos, sceneUV).z;
         if (rayZMin <= sceneZ && rayZMax >= sceneZ - uSSRBias) {
             hitUV = sceneUV;
             hitPoint = Q * (1.0 / k);
@@ -113,7 +113,7 @@ bool traceScreenSpaceRay(
 
 void main() {
     vec4 mainTexSample = texture(sMainTex, fragUV1);
-    vec4 envmapSample = texture(sEnvmapColor, fragUV1);
+    vec4 envmapSample = texture(sGBufEnvMap, fragUV1);
     if (envmapSample.a == 0.0 || mainTexSample.a == 1.0) {
         fragColor = vec4(0.0);
         return;
@@ -122,10 +122,10 @@ void main() {
     vec3 reflectionColor = vec3(0.0);
     float reflectionStrength = 0.0;
 
-    vec3 fragPosVS = texture(sEyePos, fragUV1).rgb;
+    vec3 fragPosVS = texture(sGBufEyePos, fragUV1).rgb;
     vec3 I = normalize(fragPosVS);
 
-    vec3 N = texture(sEyeNormal, fragUV1).rgb;
+    vec3 N = texture(sGBufEyeNormal, fragUV1).rgb;
     N = normalize(2.0 * N - 1.0);
 
     vec3 R = reflect(I, N);
@@ -141,7 +141,7 @@ void main() {
 
         vec4 hitMainTexSample = texture(sMainTex, hitUV);
         vec4 hitLightmapSample = texture(sLightmap, hitUV);
-        vec4 hitEnvmapSample = texture(sEnvmapColor, hitUV);
+        vec4 hitEnvmapSample = texture(sGBufEnvMap, hitUV);
 
         reflectionColor = mix(hitMainTexSample.rgb, hitMainTexSample.rgb * hitLightmapSample.rgb, hitLightmapSample.a);
         reflectionColor += hitEnvmapSample.rgb * (1.0 - hitMainTexSample.a);

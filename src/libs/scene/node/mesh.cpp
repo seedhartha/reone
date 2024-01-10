@@ -309,9 +309,9 @@ void MeshSceneNode::render(IRenderPass &pass) {
     }
     if (_nodeTextures.envmap) {
         if (_nodeTextures.envmap->isCubemap()) {
-            material.textures.insert({TextureUnits::environmentMapCube, *_nodeTextures.envmap});
+            material.textures.insert({TextureUnits::envMapCube, *_nodeTextures.envmap});
         } else {
-            material.textures.insert({TextureUnits::environmentMap, *_nodeTextures.envmap});
+            material.textures.insert({TextureUnits::envMap, *_nodeTextures.envmap});
         }
     }
     if (_nodeTextures.bumpmap) {

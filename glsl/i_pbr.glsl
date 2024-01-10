@@ -19,10 +19,25 @@ vec3 PBR_fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 }
 
 void PBR_irradianceAmbient(
-    vec3 worldPos, vec3 normal, vec3 albedo, vec3 environment, float metallic, float roughness,
+    sampler2D brdf,
+    vec3 worldPos, vec3 normal,
+    vec3 albedo, vec3 pbrIrradiance, vec3 pbrPrefiltered,
+    float metallic, float roughness, float envmapped,
     out vec3 ambientD, out vec3 ambientS) {
 
+    vec3 V = normalize(uCameraPosition.xyz - worldPos);
+    vec3 R = reflect(-V, normal);
+    float NdotV = max(0.0, dot(normal, V));
+
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = PBR_fresnelSchlickRoughness(NdotV, F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
     vec3 irradiance = gammaToLinear(uWorldAmbientColor.rgb);
+    irradiance += pbrIrradiance;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) {
@@ -36,14 +51,10 @@ void PBR_irradianceAmbient(
         irradiance += attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
     }
 
-    vec3 V = normalize(uCameraPosition.xyz - worldPos);
-    float NdotV = max(0.0, dot(normal, V));
+    vec2 brdfSample = texture(brdf, vec2(NdotV, roughness)).rg;
 
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
-    vec3 F = PBR_fresnelSchlickRoughness(NdotV, F0, roughness);
-
-    ambientD = irradiance;
-    ambientS = F * environment;
+    ambientD = kD * irradiance;
+    ambientS = pbrPrefiltered * (F * brdfSample.x + brdfSample.y);
 }
 
 void PBR_irradianceDirect(

@@ -7,7 +7,7 @@ out vec4 fragColor;
 
 uniform float uRoughness;
 
-uniform samplerCube sEnvironmentMapCube;
+uniform samplerCube sEnvMapCube;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness * roughness;
@@ -88,7 +88,7 @@ void main() {
 
             float mipLevel = uRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
 
-            prefilteredColor += gammaToLinear(textureLod(sEnvironmentMapCube, L, mipLevel).rgb) * NdotL;
+            prefilteredColor += gammaToLinear(textureLod(sEnvMapCube, L, mipLevel).rgb) * NdotL;
             totalWeight += NdotL;
         }
     }

@@ -5,7 +5,7 @@ in vec4 fragPosWorldSpace;
 
 out vec4 fragColor;
 
-uniform samplerCube sEnvironmentMapCube;
+uniform samplerCube sEnvMapCube;
 
 void main() {
     vec3 N = normalize(fragPosWorldSpace.xyz);
@@ -26,7 +26,7 @@ void main() {
             // tangent space to world
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
 
-            irradiance += gammaToLinear(texture(sEnvironmentMapCube, sampleVec).rgb) * cos(theta) * sin(theta);
+            irradiance += gammaToLinear(texture(sEnvMapCube, sampleVec).rgb) * cos(theta) * sin(theta);
             nrSamples++;
         }
     }

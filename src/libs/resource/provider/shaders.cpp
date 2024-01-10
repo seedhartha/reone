@@ -220,26 +220,27 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     // Samplers
     program->setUniform("sMainTex", TextureUnits::mainTex);
     program->setUniform("sLightmap", TextureUnits::lightmap);
-    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
+    program->setUniform("sEnvMap", TextureUnits::envMap);
     program->setUniform("sNormalMap", TextureUnits::normalMap);
-    program->setUniform("sEnvmapColor", TextureUnits::envmapColor);
-    program->setUniform("sSelfIllumColor", TextureUnits::selfIllumColor);
-    program->setUniform("sFeatures", TextureUnits::features);
-    program->setUniform("sEyePos", TextureUnits::eyePos);
-    program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
+    program->setUniform("sGBufEnvMap", TextureUnits::gBufEnvMap);
+    program->setUniform("sGBufSelfIllum", TextureUnits::gBufSelfIllum);
+    program->setUniform("sGBufFeatures", TextureUnits::gBufFeatures);
+    program->setUniform("sGBufEyePos", TextureUnits::gBufEyePos);
+    program->setUniform("sGBufEyeNormal", TextureUnits::gBufEyeNormal);
     program->setUniform("sSSAO", TextureUnits::ssao);
     program->setUniform("sSSR", TextureUnits::ssr);
     program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sOITAccum", TextureUnits::oitAccum);
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
     program->setUniform("sNoise", TextureUnits::noise);
-    program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
+    program->setUniform("sEnvMapCube", TextureUnits::envMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
     program->setUniform("sBumpMapArray", TextureUnits::bumpMapArray);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
     program->setUniform("sPBRBRDF", TextureUnits::pbrBRDF);
     program->setUniform("sPBRIrradiance", TextureUnits::pbrIrradiance);
     program->setUniform("sPBRPrefiltered", TextureUnits::pbrPrefiltered);
+    program->setUniform("sGBufPBRIrradiance", TextureUnits::gBufPBRIrradiance);
 
     // Uniform Blocks
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);

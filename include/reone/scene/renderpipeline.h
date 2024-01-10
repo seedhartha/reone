@@ -104,13 +104,14 @@ public:
 
 private:
     struct RenderTargets {
-        std::shared_ptr<graphics::Texture> cbGBufferDiffuse;
-        std::shared_ptr<graphics::Texture> cbGBufferLightmap;
-        std::shared_ptr<graphics::Texture> cbGBufferEnvMap;
-        std::shared_ptr<graphics::Texture> cbGBufferSelfIllum;
-        std::shared_ptr<graphics::Texture> cbGBufferFeatures;
-        std::shared_ptr<graphics::Texture> cbGBufferEyePos;
-        std::shared_ptr<graphics::Texture> cbGBufferEyeNormal;
+        std::shared_ptr<graphics::Texture> cbGBufDiffuse;
+        std::shared_ptr<graphics::Texture> cbGBufLightmap;
+        std::shared_ptr<graphics::Texture> cbGBufEnvMap;
+        std::shared_ptr<graphics::Texture> cbGBufSelfIllum;
+        std::shared_ptr<graphics::Texture> cbGBufFeatures;
+        std::shared_ptr<graphics::Texture> cbGBufEyePos;
+        std::shared_ptr<graphics::Texture> cbGBufEyeNormal;
+        std::shared_ptr<graphics::Texture> cbGBufPBRIrradiance;
         std::shared_ptr<graphics::Texture> cbDeferredOpaque1;
         std::shared_ptr<graphics::Texture> cbDeferredOpaque2;
         std::shared_ptr<graphics::Texture> cbTransparentGeometry1;
