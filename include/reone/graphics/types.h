@@ -80,6 +80,7 @@ enum class PixelFormat {
     BGRA8,
     DXT1,
     DXT5,
+    Depth24,
     Depth32F,
     Depth32FStencil8
 };
@@ -160,16 +161,19 @@ struct TextureUnits {
     static constexpr int oitAccum = 12;
     static constexpr int oitRevealage = 13;
     static constexpr int noise = 14;
+    static constexpr int pbrBRDF = 15;
 
     // Cubemaps
 
-    static constexpr int environmentMapCube = 15;
-    static constexpr int shadowMapCube = 16;
+    static constexpr int environmentMapCube = 16;
+    static constexpr int shadowMapCube = 17;
+    static constexpr int pbrIrradiance = 18;
+    static constexpr int pbrPrefiltered = 19;
 
     // Arrays
 
-    static constexpr int bumpMapArray = 17;
-    static constexpr int shadowMapArray = 18;
+    static constexpr int bumpMapArray = 20;
+    static constexpr int shadowMapArray = 21;
 };
 
 // MDL

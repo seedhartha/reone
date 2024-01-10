@@ -23,6 +23,7 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/framebuffer.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureregistry.h"
 #include "reone/graphics/uniforms.h"
@@ -77,6 +78,14 @@ public:
     MOCK_METHOD(Mesh &, get, (const std::string &), (override));
 };
 
+class MockPBRTextures : public IPBRTextures, boost::noncopyable {
+public:
+    MOCK_METHOD(void, refresh, (), (override));
+    MOCK_METHOD(void, requestEnvMapDerived, (EnvMapDerivedRequest), (override));
+    MOCK_METHOD(Texture &, brdf, (), (override));
+    MOCK_METHOD(std::optional<std::reference_wrapper<PBREnvMapTextures>>, findEnvMapDerived, (const std::string &), (override));
+};
+
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {
 public:
     MOCK_METHOD(ShaderProgram &, get, (const std::string &), (override));
@@ -106,6 +115,7 @@ public:
     void init() {
         _context = std::make_unique<MockContext>();
         _meshRegistry = std::make_unique<MockMeshRegistry>();
+        _pbrTextures = std::make_unique<MockPBRTextures>();
         _shaderRegistry = std::make_unique<MockShaderRegistry>();
         _textureRegistry = std::make_unique<MockTextureRegistry>();
         _uniforms = std::make_unique<MockUniforms>();
@@ -113,6 +123,7 @@ public:
         _services = std::make_unique<GraphicsServices>(
             *_context,
             *_meshRegistry,
+            *_pbrTextures,
             *_shaderRegistry,
             *_textureRegistry,
             *_uniforms);
@@ -133,6 +144,7 @@ public:
 private:
     std::unique_ptr<MockContext> _context;
     std::unique_ptr<MockMeshRegistry> _meshRegistry;
+    std::unique_ptr<MockPBRTextures> _pbrTextures;
     std::unique_ptr<MockShaderRegistry> _shaderRegistry;
     std::unique_ptr<MockTextureRegistry> _textureRegistry;
     std::unique_ptr<MockUniforms> _uniforms;

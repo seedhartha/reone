@@ -19,6 +19,7 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/textureregistry.h"
 #include "reone/graphics/textureutil.h"
@@ -240,7 +241,13 @@ void RenderPipeline::initSSAOSamples() {
 
 Texture &RenderPipeline::render() {
     _context.withViewport(glm::ivec4(0, 0, _targetSize), [this]() {
-        auto pass = RenderPass(_context, _shaderRegistry, _meshRegistry, _textureRegistry, _uniforms);
+        auto pass = RenderPass(
+            _context,
+            _shaderRegistry,
+            _meshRegistry,
+            _pbrTextures,
+            _textureRegistry,
+            _uniforms);
 
         // Shadows pass
         if (_passCallbacks.count(RenderPassName::DirLightShadowsPass) > 0) {

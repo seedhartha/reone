@@ -21,6 +21,7 @@
 #include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -49,6 +50,19 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     _context.useProgram(_shaderRegistry.get(material.programId));
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
+    }
+    if (material.textures.count(TextureUnits::environmentMapCube) > 0) {
+        auto &envMap = material.textures.at(TextureUnits::environmentMapCube).get();
+        _context.bindTexture(_pbrTextures.brdf(), TextureUnits::pbrBRDF);
+        auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
+        if (envMapDerived) {
+            _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
+            _context.bindTexture(*envMapDerived->get().prefiltered, TextureUnits::pbrPrefiltered);
+        } else {
+            _context.bindTexture(envMap, TextureUnits::pbrIrradiance);
+            _context.bindTexture(envMap, TextureUnits::pbrPrefiltered);
+            _pbrTextures.requestEnvMapDerived({envMap});
+        }
     }
     auto prevBlending = _context.blending();
     if (material.blending && *material.blending != prevBlending) {

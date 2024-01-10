@@ -233,8 +233,11 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sOITAccum", TextureUnits::oitAccum);
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
     program->setUniform("sNoise", TextureUnits::noise);
+    program->setUniform("sPBRBRDF", TextureUnits::pbrBRDF);
     program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
+    program->setUniform("sPBRIrradiance", TextureUnits::pbrIrradiance);
+    program->setUniform("sPBRPrefiltered", TextureUnits::pbrPrefiltered);
     program->setUniform("sBumpMapArray", TextureUnits::bumpMapArray);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
 

@@ -25,6 +25,7 @@ namespace graphics {
 
 class IContext;
 class IMeshRegistry;
+class IPBRTextures;
 class IShaderRegistry;
 class ITextureRegistry;
 class IUniforms;
@@ -115,11 +116,13 @@ public:
     RenderPass(IContext &context,
                IShaderRegistry &shaderRegistry,
                IMeshRegistry &meshRegistry,
+               IPBRTextures &pbrTextures,
                ITextureRegistry &textureRegistry,
                IUniforms &uniforms) :
         _context(context),
         _shaderRegistry(shaderRegistry),
         _meshRegistry(meshRegistry),
+        _pbrTextures(pbrTextures),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
     }
@@ -175,6 +178,7 @@ private:
     IContext &_context;
     IShaderRegistry &_shaderRegistry;
     IMeshRegistry &_meshRegistry;
+    IPBRTextures &_pbrTextures;
     ITextureRegistry &_textureRegistry;
     IUniforms &_uniforms;
 

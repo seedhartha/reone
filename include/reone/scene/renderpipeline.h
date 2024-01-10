@@ -38,6 +38,7 @@ namespace graphics {
 
 class Context;
 class MeshRegistry;
+class PBRTextures;
 class ShaderRegistry;
 class TextureRegistry;
 class Uniforms;
@@ -75,6 +76,7 @@ public:
                    graphics::GraphicsOptions &options,
                    graphics::Context &context,
                    graphics::MeshRegistry &meshRegistry,
+                   graphics::PBRTextures &pbrTextures,
                    graphics::ShaderRegistry &shaderRegistry,
                    graphics::TextureRegistry &textureRegistry,
                    graphics::Uniforms &uniforms) :
@@ -82,6 +84,7 @@ public:
         _options(options),
         _context(context),
         _meshRegistry(meshRegistry),
+        _pbrTextures(pbrTextures),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
@@ -150,6 +153,7 @@ private:
     graphics::GraphicsOptions &_options;
     graphics::Context &_context;
     graphics::MeshRegistry &_meshRegistry;
+    graphics::PBRTextures &_pbrTextures;
     graphics::ShaderRegistry &_shaderRegistry;
     graphics::TextureRegistry &_textureRegistry;
     graphics::Uniforms &_uniforms;
@@ -200,12 +204,14 @@ public:
     RenderPipelineFactory(graphics::GraphicsOptions &options,
                           graphics::Context &context,
                           graphics::MeshRegistry &meshRegistry,
+                          graphics::PBRTextures &pbrTextures,
                           graphics::ShaderRegistry &shaderRegistry,
                           graphics::TextureRegistry &textureRegistry,
                           graphics::Uniforms &uniforms) :
         _options(options),
         _context(context),
         _meshRegistry(meshRegistry),
+        _pbrTextures(pbrTextures),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {
@@ -217,6 +223,7 @@ public:
             _options,
             _context,
             _meshRegistry,
+            _pbrTextures,
             _shaderRegistry,
             _textureRegistry,
             _uniforms);
@@ -226,6 +233,7 @@ private:
     graphics::GraphicsOptions &_options;
     graphics::Context &_context;
     graphics::MeshRegistry &_meshRegistry;
+    graphics::PBRTextures &_pbrTextures;
     graphics::ShaderRegistry &_shaderRegistry;
     graphics::TextureRegistry &_textureRegistry;
     graphics::Uniforms &_uniforms;

@@ -50,9 +50,11 @@ void Framebuffer::configure() {
     for (size_t i = 0; i < _colors.size(); ++i) {
         auto &color = _colors[i];
         if (color->isTexture()) {
-            attachTexture(static_cast<Texture &>(*color), Attachment::Color, i);
+            auto &texture = static_cast<Texture &>(*color);
+            attachTexture(texture, Attachment::Color, i);
         } else if (color->isRenderbuffer()) {
-            attachRenderbuffer(static_cast<Renderbuffer &>(*color), Attachment::Color, i);
+            auto &renderbuffer = static_cast<Renderbuffer &>(*color);
+            attachRenderbuffer(renderbuffer, Attachment::Color, i);
         }
     }
     if (_depth) {
@@ -92,9 +94,26 @@ void Framebuffer::attachTexture(const Texture &texture, Attachment attachment, i
     }
 }
 
+void Framebuffer::attachTextureCube(const Texture &texture, CubeMapFace face, Attachment attachment, int index, int mip) const {
+    auto attachmentGL = getAttachmentGL(attachment, index);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        attachmentGL,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face),
+        texture.nameGL(),
+        mip);
+}
+
 void Framebuffer::attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index) const {
     auto attachmentGL = getAttachmentGL(attachment, index);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentGL, GL_RENDERBUFFER, renderbuffer.nameGL());
+}
+
+void Framebuffer::checkCompleteness() {
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        throw std::runtime_error(str(boost::format("Framebuffer %1% is not complete: %2%") % _nameGL % status));
+    }
 }
 
 } // namespace graphics

@@ -252,6 +252,7 @@ void GUI::render() {
             _graphicsSvc.context,
             _graphicsSvc.shaderRegistry,
             _graphicsSvc.meshRegistry,
+            _graphicsSvc.pbrTextures,
             _graphicsSvc.textureRegistry,
             _graphicsSvc.uniforms);
         if (_background) {

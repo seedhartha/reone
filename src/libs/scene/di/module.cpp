@@ -30,6 +30,7 @@ void SceneModule::init() {
         _graphicsOpt,
         _graphics.context(),
         _graphics.meshRegistry(),
+        _graphics.pbrTextures(),
         _graphics.shaderRegistry(),
         _graphics.textureRegistry(),
         _graphics.uniforms());

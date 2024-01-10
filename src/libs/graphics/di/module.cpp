@@ -27,10 +27,16 @@ void GraphicsModule::init() {
     _shaderRegistry = std::make_unique<ShaderRegistry>();
     _textureRegistry = std::make_unique<TextureRegistry>();
     _uniforms = std::make_unique<Uniforms>(*_context);
+    _pbrTextures = std::make_unique<PBRTextures>(
+        *_context,
+        *_meshRegistry,
+        *_shaderRegistry,
+        *_uniforms);
 
     _services = std::make_unique<GraphicsServices>(
         *_context,
         *_meshRegistry,
+        *_pbrTextures,
         *_shaderRegistry,
         *_textureRegistry,
         *_uniforms);
@@ -44,6 +50,7 @@ void GraphicsModule::init() {
 void GraphicsModule::deinit() {
     _services.reset();
 
+    _pbrTextures.reset();
     _uniforms.reset();
     _meshRegistry.reset();
     _textureRegistry.reset();

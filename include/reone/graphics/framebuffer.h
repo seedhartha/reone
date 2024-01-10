@@ -39,6 +39,9 @@ public:
         deinit();
     }
 
+    void init();
+    void deinit();
+
     void attachDepth(std::shared_ptr<IAttachment> depth) {
         _depth = std::move(depth);
     }
@@ -54,12 +57,11 @@ public:
         _depth = std::move(depth);
     }
 
-    void init();
-    void deinit();
+    void attachTexture(const Texture &texture, Attachment attachment, int index = 0) const;
+    void attachTextureCube(const Texture &texture, CubeMapFace face, Attachment attachment, int index = 0, int mip = 0) const;
+    void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index = 0) const;
 
-    const std::vector<std::shared_ptr<IAttachment>> &colors() const { return _colors; }
-    std::shared_ptr<IAttachment> depth() const { return _depth; }
-    std::shared_ptr<IAttachment> depthStencil() const { return _depthStencil; }
+    void checkCompleteness();
 
     // OpenGL
 
@@ -77,9 +79,6 @@ private:
     std::shared_ptr<IAttachment> _depthStencil;
 
     void configure();
-
-    void attachTexture(const Texture &texture, Attachment attachment, int index = 0) const;
-    void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index = 0) const;
 
     // OpenGL
 

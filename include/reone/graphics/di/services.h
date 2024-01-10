@@ -23,6 +23,7 @@ namespace graphics {
 
 class IContext;
 class IMeshRegistry;
+class IPBRTextures;
 class IShaderRegistry;
 class ITextureRegistry;
 class IUniforms;
@@ -31,6 +32,7 @@ class IWindow;
 struct GraphicsServices {
     IContext &context;
     IMeshRegistry &meshRegistry;
+    IPBRTextures &pbrTextures;
     IShaderRegistry &shaderRegistry;
     ITextureRegistry &textureRegistry;
     IUniforms &uniforms;
@@ -38,11 +40,13 @@ struct GraphicsServices {
     GraphicsServices(
         IContext &context,
         IMeshRegistry &meshRegistry,
+        IPBRTextures &pbrTextures,
         IShaderRegistry &shaderRegistry,
         ITextureRegistry &textureRegistry,
         IUniforms &uniforms) :
         context(context),
         meshRegistry(meshRegistry),
+        pbrTextures(pbrTextures),
         shaderRegistry(shaderRegistry),
         textureRegistry(textureRegistry),
         uniforms(uniforms) {

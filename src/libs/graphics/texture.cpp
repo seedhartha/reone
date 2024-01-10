@@ -58,6 +58,7 @@ static uint32_t getPixelFormatGL(PixelFormat format) {
         return GL_BGR;
     case PixelFormat::BGRA8:
         return GL_BGRA;
+    case PixelFormat::Depth24:
     case PixelFormat::Depth32F:
         return GL_DEPTH_COMPONENT;
     case PixelFormat::Depth32FStencil8:
@@ -76,6 +77,8 @@ static uint32_t getPixelTypeGL(PixelFormat format) {
     case PixelFormat::BGR8:
     case PixelFormat::BGRA8:
         return GL_UNSIGNED_BYTE;
+    case PixelFormat::Depth24:
+        return GL_UNSIGNED_INT;
     case PixelFormat::R16F:
     case PixelFormat::RG16F:
     case PixelFormat::RGB16F:
