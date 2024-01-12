@@ -284,8 +284,9 @@ void ComposeLipDialog::OnPronounciationSaveCommand(wxCommandEvent &evt) {
 }
 
 void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
-    auto text = m_textCtrl->GetValue().ToStdString();
+    auto text = std::string {m_textCtrl->GetValue().ToUTF8().data()};
     if (text.empty()) {
+        wxMessageBox("Text is empty", "Error", wxICON_ERROR);
         return;
     }
 
@@ -323,15 +324,15 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
         message.append("Mismatch between word groups and sound spans.\n");
         message.append(str(boost::format("Expected %llu word groups at the following time spans: %s\n") % spans.size() % spansStr));
         message.append("Wrap words into word groups with parentheses.");
-        wxMessageBox(message.string());
+        wxMessageBox(message.string(), "Error", wxICON_ERROR);
         return;
     } catch (const WordPhonemesNotFoundException &ex) {
-        wxMessageBox(ex.what());
+        wxMessageBox(ex.what(), "Error", wxICON_ERROR);
         auto pronounciationText = m_pronounciationCtrl->GetValue();
         m_pronounciationCtrl->AppendText(ex.word() + " [phonemes]\n");
         return;
     } catch (const std::exception &ex) {
-        wxMessageBox(ex.what());
+        wxMessageBox(ex.what(), "Error", wxICON_ERROR);
         return;
     }
     auto destFileDialog = wxFileDialog(
