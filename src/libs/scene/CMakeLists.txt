@@ -40,7 +40,9 @@ set(SCENE_HEADERS
     ${SCENE_INCLUDE_DIR}/node/sound.h
     ${SCENE_INCLUDE_DIR}/node/trigger.h
     ${SCENE_INCLUDE_DIR}/node/walkmesh.h
-    ${SCENE_INCLUDE_DIR}/renderpipeline.h
+    ${SCENE_INCLUDE_DIR}/render/pipeline.h
+    ${SCENE_INCLUDE_DIR}/render/pipeline/retro.h
+    ${SCENE_INCLUDE_DIR}/render/pipeline/pbr.h
     ${SCENE_INCLUDE_DIR}/types.h
     ${SCENE_INCLUDE_DIR}/user.h)
 
@@ -60,7 +62,9 @@ set(SCENE_SOURCES
     ${SCENE_SOURCE_DIR}/node/sound.cpp
     ${SCENE_SOURCE_DIR}/node/trigger.cpp
     ${SCENE_SOURCE_DIR}/node/walkmesh.cpp
-    ${SCENE_SOURCE_DIR}/renderpipeline.cpp)
+    ${SCENE_SOURCE_DIR}/render/pipeline.cpp
+    ${SCENE_SOURCE_DIR}/render/pipeline/retro.cpp
+    ${SCENE_SOURCE_DIR}/render/pipeline/pbr.cpp)
 
 add_library(scene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(scene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

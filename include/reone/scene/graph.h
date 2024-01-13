@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 
 #include "fogproperties.h"
 #include "node/camera.h"

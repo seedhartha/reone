@@ -32,7 +32,7 @@
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/light.h"
 #include "reone/scene/node/model.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 #include "reone/system/logutil.h"
 #include "reone/system/randomutil.h"
 

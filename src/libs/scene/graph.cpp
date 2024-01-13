@@ -38,7 +38,7 @@
 #include "reone/scene/node/sound.h"
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 
 using namespace reone::graphics;
 

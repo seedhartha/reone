@@ -22,7 +22,7 @@
 #include "reone/scene/di/services.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 
 namespace reone {
 

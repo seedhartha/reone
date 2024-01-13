@@ -29,7 +29,7 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/strings.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 
 #include "reone/gui/gui.h"
 

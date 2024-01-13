@@ -58,7 +58,7 @@
 #include "reone/resource/resources.h"
 #include "reone/scene/di/services.h"
 #include "reone/scene/graphs.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 #include "reone/script/di/services.h"
 #include "reone/system/binarywriter.h"
 #include "reone/system/clock.h"

@@ -30,7 +30,7 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/scene/graph.h"
 #include "reone/scene/node/grasscluster.h"
-#include "reone/scene/renderpipeline.h"
+#include "reone/scene/render/pipeline.h"
 
 using namespace reone::graphics;
 

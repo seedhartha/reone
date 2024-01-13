@@ -23,7 +23,7 @@
 #include "reone/resource/di/module.h"
 
 #include "../graphs.h"
-#include "../renderpipeline.h"
+#include "../render/pipeline.h"
 
 #include "services.h"
 
