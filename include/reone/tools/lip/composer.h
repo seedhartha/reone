@@ -18,6 +18,7 @@
 #pragma once
 
 #include "reone/system/stream/input.h"
+#include "reone/system/unicodeutil.h"
 
 #include "audioanalyzer.h"
 
@@ -60,7 +61,11 @@ public:
      * @throws WordPhonemesNotFoundException
      */
     std::vector<std::string> phonemes(const std::string &word) const {
-        auto lowerWord = boost::to_lower_copy(word);
+        auto codePoints = codePointsFromUTF8(word);
+        for (auto &cp : codePoints) {
+            cp = codePointToLower(cp);
+        }
+        auto lowerWord = utf8FromCodePoints(codePoints);
         if (_wordToPhonemes.count(lowerWord) == 0) {
             throw WordPhonemesNotFoundException(lowerWord);
         }

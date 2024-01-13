@@ -91,9 +91,9 @@ TEST(code_point_to_lower, should_convert_alpha_chars_in_latin_in_cyrillic_to_low
     EXPECT_EQ(codePointToLower('a'), 'a');
     EXPECT_EQ(codePointToLower('z'), 'z');
     EXPECT_EQ(codePointToLower(0x410), 0x430);
-    EXPECT_EQ(codePointToLower(0x429), 0x449);
+    EXPECT_EQ(codePointToLower(0x42f), 0x44f);
     EXPECT_EQ(codePointToLower(0x430), 0x430);
-    EXPECT_EQ(codePointToLower(0x449), 0x449);
+    EXPECT_EQ(codePointToLower(0x44f), 0x44f);
     EXPECT_EQ(codePointToLower(0x401), 0x451);
     EXPECT_EQ(codePointToLower(0x451), 0x451);
 }
@@ -108,9 +108,9 @@ TEST(code_point_to_upper, should_convert_alpha_chars_in_latin_in_cyrillic_to_upp
     EXPECT_EQ(codePointToUpper('a'), 'A');
     EXPECT_EQ(codePointToUpper('z'), 'Z');
     EXPECT_EQ(codePointToUpper(0x410), 0x410);
-    EXPECT_EQ(codePointToUpper(0x429), 0x429);
+    EXPECT_EQ(codePointToUpper(0x42f), 0x42f);
     EXPECT_EQ(codePointToUpper(0x430), 0x410);
-    EXPECT_EQ(codePointToUpper(0x449), 0x429);
+    EXPECT_EQ(codePointToUpper(0x44f), 0x42f);
     EXPECT_EQ(codePointToUpper(0x401), 0x401);
     EXPECT_EQ(codePointToUpper(0x451), 0x401);
 }

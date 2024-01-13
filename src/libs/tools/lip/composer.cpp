@@ -75,7 +75,7 @@ static const std::unordered_map<std::string, LipShape> g_phonemeToShape {
     {"e", LipShape::EH_ER_EY},      //
     {"h", LipShape::G_HH_K_NG},     //
     {"i", LipShape::IH_IY},         //
-    {"j", LipShape::CH_JH_SH_ZH},   //
+    {"j", LipShape::D_DH_S_Y_Z},    //
     {"o", LipShape::AO},            //
     {"sch", LipShape::CH_JH_SH_ZH}, //
     {"u", LipShape::UH_UW_W},       //
@@ -98,7 +98,7 @@ void PronouncingDictionary::load(IInputStream &stream) {
         for (auto &token : tokens) {
             boost::to_lower(token);
         }
-        _wordToPhonemes.insert(std::make_pair(word, tokens));
+        _wordToPhonemes.insert({std::move(word), std::move(tokens)});
     }
 }
 

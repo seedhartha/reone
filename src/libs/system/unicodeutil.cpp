@@ -128,7 +128,7 @@ uint32_t codePointToLower(uint32_t codePoint) {
         // Latin
         return codePoint + 0x20;
     }
-    if (codePoint >= 0x410 && codePoint <= 0x429) {
+    if (codePoint >= 0x410 && codePoint <= 0x42f) {
         // Cyrillic
         return codePoint + 0x20;
     }
@@ -144,7 +144,7 @@ uint32_t codePointToUpper(uint32_t codePoint) {
         // Latin
         return codePoint - 0x20;
     }
-    if (codePoint >= 0x430 && codePoint <= 0x449) {
+    if (codePoint >= 0x430 && codePoint <= 0x44f) {
         // Cyrillic
         return codePoint - 0x20;
     }

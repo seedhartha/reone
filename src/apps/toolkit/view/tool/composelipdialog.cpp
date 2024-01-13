@@ -160,7 +160,7 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
         auto length = pronouncingDict.length();
         auto buffer = std::string(length, '\0');
         pronouncingDict.read(&buffer[0], length);
-        m_pronounciationCtrl->SetValue(buffer);
+        m_pronounciationCtrl->SetValue(wxString::FromUTF8(buffer));
     }
 }
 
@@ -276,7 +276,7 @@ void ComposeLipDialog::OnHelpCommmand(wxCommandEvent &evt) {
 }
 
 void ComposeLipDialog::OnPronounciationSaveCommand(wxCommandEvent &evt) {
-    auto pronounciationValue = m_pronounciationCtrl->GetValue();
+    auto pronounciationValue = std::string {m_pronounciationCtrl->GetValue().ToUTF8().data()};
     auto pronouncingPath = std::filesystem::current_path();
     pronouncingPath.append("pronouncing.dict");
     auto pronouncing = FileOutputStream(pronouncingPath);
@@ -314,7 +314,7 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
     }
     auto rudic = MemoryInputStream(m_rudicBytes);
 
-    auto pronounciationValue = m_pronounciationCtrl->GetValue();
+    auto pronounciationValue = std::string {m_pronounciationCtrl->GetValue().ToUTF8().data()};
     auto pronouncingBuffer = ByteBuffer(pronounciationValue.begin(), pronounciationValue.end());
     auto pronouncing = MemoryInputStream(pronouncingBuffer);
 
@@ -340,12 +340,16 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
         wxMessageBox(message.string(), "Error", wxICON_ERROR);
         return;
     } catch (const WordPhonemesNotFoundException &ex) {
-        wxMessageBox(ex.what(), "Error", wxICON_ERROR);
+        wxMessageBox(wxString::FromUTF8(ex.what()), "Error", wxICON_ERROR);
         auto pronounciationText = m_pronounciationCtrl->GetValue();
-        m_pronounciationCtrl->AppendText(ex.word() + " [phonemes]\n");
+        std::string appendix = ex.word() + " [phonemes]\n";
+        if (!pronounciationText.EndsWith("\n")) {
+            appendix.append("\n");
+        }
+        m_pronounciationCtrl->AppendText(wxString::FromUTF8(appendix));
         return;
     } catch (const std::exception &ex) {
-        wxMessageBox(ex.what(), "Error", wxICON_ERROR);
+        wxMessageBox(wxString::FromUTF8(ex.what()), "Error", wxICON_ERROR);
         return;
     }
     auto destFileDialog = wxFileDialog(
