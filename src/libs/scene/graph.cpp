@@ -525,7 +525,7 @@ void SceneGraph::renderShadows(IRenderPass &pass) {
     if (!_activeCamera) {
         return;
     }
-    _graphicsSvc.context.withFaceCulling(FaceCullMode::Front, [this, &pass]() {
+    _graphicsSvc.context.withFaceCullMode(FaceCullMode::Front, [this, &pass]() {
         for (auto &mesh : _shadowMeshes) {
             mesh->renderShadow(pass);
         }
@@ -588,7 +588,7 @@ void SceneGraph::renderLensFlares(IRenderPass &pass) {
     if (_flareLights.empty() || _renderWalkmeshes) {
         return;
     }
-    _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this, &pass]() {
+    _graphicsSvc.context.withDepthTestMode(DepthTestMode::None, [this, &pass]() {
         for (auto &light : _flareLights) {
             Collision collision;
             if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {

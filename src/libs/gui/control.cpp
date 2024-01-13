@@ -214,7 +214,7 @@ void Control::render(const glm::ivec2 &screenSize,
     }
     if (!_sceneName.empty()) {
         std::optional<std::reference_wrapper<Texture>> output;
-        _graphicsSvc.context.withBlending(BlendMode::None, [this, &output]() {
+        _graphicsSvc.context.withBlendMode(BlendMode::None, [this, &output]() {
             output = _sceneGraphs.get(_sceneName).render({_extent.width, _extent.height});
         });
         _graphicsSvc.uniforms.setGlobals([&screenSize](auto &globals) {
@@ -225,7 +225,7 @@ void Control::render(const glm::ivec2 &screenSize,
                 static_cast<float>(screenSize.y),
                 0.0f, 0.0f, 100.0f);
         });
-        _graphicsSvc.context.withDepthTest(DepthTestMode::None, [this, &offset, &pass, &output]() {
+        _graphicsSvc.context.withDepthTestMode(DepthTestMode::None, [this, &offset, &pass, &output]() {
             pass.drawImage(
                 *output,
                 {_extent.left + offset.x, _extent.top + offset.y},
@@ -248,7 +248,7 @@ void Control::renderBorder(const Border &border,
         auto blending = border.fill->features().blending == Texture::Blending::Additive
                             ? BlendMode::Additive
                             : BlendMode::Normal;
-        _graphicsSvc.context.withBlending(blending, [&]() {
+        _graphicsSvc.context.withBlendMode(blending, [&]() {
             pass.drawImage(
                 *border.fill,
                 {_extent.left + border.dimension + offset.x, _extent.top + border.dimension + offset.y},

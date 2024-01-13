@@ -51,26 +51,34 @@ public:
     MOCK_METHOD(void, bindUniformBuffer, (UniformBuffer &, int), (override));
     MOCK_METHOD(void, bindTexture, (Texture &, int), (override));
 
-    MOCK_METHOD(FaceCullMode, faceCulling, (), (const override));
-    MOCK_METHOD(BlendMode, blending, (), (const override));
+    MOCK_METHOD(const glm::ivec4 &, viewport, (), (const override));
+    MOCK_METHOD(DepthTestMode, depthTestMode, (), (const override));
+    MOCK_METHOD(bool, depthMask, (), (const override));
     MOCK_METHOD(PolygonMode, polygonMode, (), (const override));
+    MOCK_METHOD(FaceCullMode, faceCullMode, (), (const override));
+    MOCK_METHOD(BlendMode, blendMode, (), (const override));
 
-    MOCK_METHOD(void, pushFaceCulling, (FaceCullMode), (override));
-    MOCK_METHOD(void, pushBlending, (BlendMode), (override));
     MOCK_METHOD(void, pushViewport, (glm::ivec4), (override));
+    MOCK_METHOD(void, pushDepthTestMode, (DepthTestMode), (override));
+    MOCK_METHOD(void, pushDepthMask, (bool), (override));
     MOCK_METHOD(void, pushPolygonMode, (PolygonMode), (override));
+    MOCK_METHOD(void, pushFaceCullMode, (FaceCullMode), (override));
+    MOCK_METHOD(void, pushBlendMode, (BlendMode), (override));
 
-    MOCK_METHOD(void, popFaceCulling, (), (override));
-    MOCK_METHOD(void, popBlending, (), (override));
     MOCK_METHOD(void, popViewport, (), (override));
+    MOCK_METHOD(void, popDepthTestMode, (), (override));
+    MOCK_METHOD(void, popDepthMask, (), (override));
     MOCK_METHOD(void, popPolygonMode, (), (override));
+    MOCK_METHOD(void, popFaceCullMode, (), (override));
+    MOCK_METHOD(void, popBlendMode, (), (override));
 
-    MOCK_METHOD(void, withDepthTest, (DepthTestMode mode, const std::function<void()> &), (override));
-    MOCK_METHOD(void, withFaceCulling, (FaceCullMode mode, const std::function<void()> &), (override));
-    MOCK_METHOD(void, withBlending, (BlendMode mode, const std::function<void()> &), (override));
-    MOCK_METHOD(void, withPolygonMode, (PolygonMode mode, const std::function<void()> &), (override));
-    MOCK_METHOD(void, withViewport, (glm::ivec4 viewport, const std::function<void()> &), (override));
-    MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &bounds, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withViewport, (glm::ivec4, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withScissorTest, (const glm::ivec4 &, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withDepthTestMode, (DepthTestMode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withDepthMask, (bool, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withPolygonMode, (PolygonMode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withFaceCullMode, (FaceCullMode, const std::function<void()> &), (override));
+    MOCK_METHOD(void, withBlendMode, (BlendMode, const std::function<void()> &), (override));
 };
 
 class MockMeshRegistry : public IMeshRegistry, boost::noncopyable {

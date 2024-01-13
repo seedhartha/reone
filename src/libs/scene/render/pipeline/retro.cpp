@@ -348,13 +348,13 @@ void RetroRenderPipeline::combineOpaqueGeometry() {
 void RetroRenderPipeline::beginTransparentGeometryPass() {
     _context.bindDrawFramebuffer(*_renderTargets.fbTransparentGeometry, {0, 1});
     _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
-    _context.pushBlending(BlendMode::OIT_Transparent);
-    glDepthMask(GL_FALSE);
+    _context.pushBlendMode(BlendMode::OIT_Transparent);
+    _context.pushDepthMask(false);
 }
 
 void RetroRenderPipeline::endTransparentGeometryPass() {
-    glDepthMask(GL_TRUE);
-    _context.popBlending();
+    _context.popDepthMask();
+    _context.popBlendMode();
 }
 
 void RetroRenderPipeline::blendTransparentGeometry() {

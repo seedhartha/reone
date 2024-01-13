@@ -78,7 +78,7 @@ void Map::render(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) {
         return;
     }
-    _services.graphics.context.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
+    _services.graphics.context.withBlendMode(BlendMode::Normal, [this, &mode, &bounds]() {
         renderArea(mode, bounds);
         renderNotes(mode, bounds);
         renderPartyLeader(mode, bounds);

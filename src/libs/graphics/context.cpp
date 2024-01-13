@@ -50,21 +50,24 @@ void Context::init() {
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+    glm::ivec4 viewport(0.0f);
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    _viewports.push(std::move(viewport));
+
     setDepthTestMode(DepthTestMode::LessOrEqual);
     _depthTestModes.push(DepthTestMode::LessOrEqual);
+
+    setDepthMask(true);
+    _depthMasks.push(true);
+
+    setPolygonMode(PolygonMode::Fill);
+    _polygonModes.push(PolygonMode::Fill);
 
     setFaceCullMode(FaceCullMode::None);
     _faceCullModes.push(FaceCullMode::None);
 
     setBlendMode(BlendMode::None);
     _blendModes.push(BlendMode::None);
-
-    setPolygonMode(PolygonMode::Fill);
-    _polygonModes.push(PolygonMode::Fill);
-
-    glm::ivec4 viewport(0.0f);
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-    _viewports.push(std::move(viewport));
 
     _inited = true;
 }
@@ -192,19 +195,19 @@ void Context::bindTexture(Texture &texture, int unit) {
     texture.bind();
 }
 
-void Context::pushFaceCulling(FaceCullMode mode) {
-    setFaceCullMode(mode);
-    _faceCullModes.push(mode);
-}
-
-void Context::pushBlending(BlendMode mode) {
-    setBlendMode(mode);
-    _blendModes.push(mode);
-}
-
 void Context::pushViewport(glm::ivec4 viewport) {
     setViewport(viewport);
     _viewports.push(std::move(viewport));
+}
+
+void Context::pushDepthTestMode(DepthTestMode mode) {
+    setDepthTestMode(mode);
+    _depthTestModes.push(mode);
+}
+
+void Context::pushDepthMask(bool enabled) {
+    setDepthMask(enabled);
+    _depthMasks.push(enabled);
 }
 
 void Context::pushPolygonMode(PolygonMode mode) {
@@ -212,14 +215,14 @@ void Context::pushPolygonMode(PolygonMode mode) {
     _polygonModes.push(mode);
 }
 
-void Context::popFaceCulling() {
-    _faceCullModes.pop();
-    setFaceCullMode(_faceCullModes.top());
+void Context::pushFaceCullMode(FaceCullMode mode) {
+    setFaceCullMode(mode);
+    _faceCullModes.push(mode);
 }
 
-void Context::popBlending() {
-    _blendModes.pop();
-    setBlendMode(_blendModes.top());
+void Context::pushBlendMode(BlendMode mode) {
+    setBlendMode(mode);
+    _blendModes.push(mode);
 }
 
 void Context::popViewport() {
@@ -227,53 +230,29 @@ void Context::popViewport() {
     setViewport(_viewports.top());
 }
 
+void Context::popDepthTestMode() {
+    _depthTestModes.pop();
+    setDepthTestMode(_depthTestModes.top());
+}
+
+void Context::popDepthMask() {
+    _depthMasks.pop();
+    setDepthMask(_depthMasks.top());
+}
+
 void Context::popPolygonMode() {
     _polygonModes.pop();
     setPolygonMode(_polygonModes.top());
 }
 
-void Context::withBlending(BlendMode mode, const std::function<void()> &block) {
-    if (_blendModes.top() == mode) {
-        block();
-        return;
-    }
-    pushBlending(mode);
-    block();
-    popBlending();
+void Context::popFaceCullMode() {
+    _faceCullModes.pop();
+    setFaceCullMode(_faceCullModes.top());
 }
 
-void Context::withDepthTest(DepthTestMode mode, const std::function<void()> &block) {
-    if (_depthTestModes.top() == mode) {
-        block();
-        return;
-    }
-    setDepthTestMode(mode);
-    _depthTestModes.push(mode);
-
-    block();
-
-    _depthTestModes.pop();
-    setDepthTestMode(_depthTestModes.top());
-}
-
-void Context::withFaceCulling(FaceCullMode mode, const std::function<void()> &block) {
-    if (_faceCullModes.top() == mode) {
-        block();
-        return;
-    }
-    pushFaceCulling(mode);
-    block();
-    popFaceCulling();
-}
-
-void Context::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {
-    if (_polygonModes.top() == mode) {
-        block();
-        return;
-    }
-    pushPolygonMode(mode);
-    block();
-    popPolygonMode();
+void Context::popBlendMode() {
+    _blendModes.pop();
+    setBlendMode(_blendModes.top());
 }
 
 void Context::withViewport(glm::ivec4 viewport, const std::function<void()> &block) {
@@ -294,6 +273,68 @@ void Context::withScissorTest(const glm::ivec4 &bounds, const std::function<void
     block();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void Context::withDepthTestMode(DepthTestMode mode, const std::function<void()> &block) {
+    if (_depthTestModes.top() == mode) {
+        block();
+        return;
+    }
+    setDepthTestMode(mode);
+    _depthTestModes.push(mode);
+
+    block();
+
+    _depthTestModes.pop();
+    setDepthTestMode(_depthTestModes.top());
+}
+
+void Context::withDepthMask(bool enabled, const std::function<void()> &block) {
+    if (_depthMasks.top() == enabled) {
+        block();
+        return;
+    }
+    setDepthMask(enabled);
+    _depthMasks.push(enabled);
+
+    block();
+
+    _depthMasks.pop();
+    setDepthMask(_depthMasks.top());
+}
+
+void Context::withPolygonMode(PolygonMode mode, const std::function<void()> &block) {
+    if (_polygonModes.top() == mode) {
+        block();
+        return;
+    }
+    pushPolygonMode(mode);
+    block();
+    popPolygonMode();
+}
+
+void Context::withFaceCullMode(FaceCullMode mode, const std::function<void()> &block) {
+    if (_faceCullModes.top() == mode) {
+        block();
+        return;
+    }
+    pushFaceCullMode(mode);
+    block();
+    popFaceCullMode();
+}
+
+void Context::withBlendMode(BlendMode mode, const std::function<void()> &block) {
+    if (_blendModes.top() == mode) {
+        block();
+        return;
+    }
+    pushBlendMode(mode);
+    block();
+    popBlendMode();
+}
+
+void Context::setViewport(glm::ivec4 viewport) {
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 void Context::setDepthTestMode(DepthTestMode mode) {
@@ -317,6 +358,18 @@ void Context::setDepthTestMode(DepthTestMode mode) {
             glDepthFunc(GL_LESS);
             break;
         }
+    }
+}
+
+void Context::setDepthMask(bool enabled) {
+    glDepthMask(enabled ? GL_TRUE : GL_FALSE);
+}
+
+void Context::setPolygonMode(PolygonMode mode) {
+    if (mode == PolygonMode::Line) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
 
@@ -358,18 +411,6 @@ void Context::setBlendMode(BlendMode mode) {
             break;
         }
     }
-}
-
-void Context::setPolygonMode(PolygonMode mode) {
-    if (mode == PolygonMode::Line) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-}
-
-void Context::setViewport(glm::ivec4 viewport) {
-    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 } // namespace graphics

@@ -245,7 +245,7 @@ void SelectionOverlay::update() {
 }
 
 void SelectionOverlay::render() {
-    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlendMode(BlendMode::Normal, [this]() {
         if (_hilightedObject) {
             renderReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
         }

@@ -185,7 +185,7 @@ void Console::render() {
     if (!_open) {
         return;
     }
-    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlendMode(BlendMode::Normal, [this]() {
         renderBackground();
         renderLines();
     });

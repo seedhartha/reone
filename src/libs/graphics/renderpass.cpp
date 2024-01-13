@@ -76,13 +76,13 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
             }
         }
     }
-    auto prevBlending = _context.blending();
+    auto prevBlending = _context.blendMode();
     if (material.blending && *material.blending != prevBlending) {
-        _context.pushBlending(*material.blending);
+        _context.pushBlendMode(*material.blending);
     }
-    auto prevFaceCulling = _context.faceCulling();
+    auto prevFaceCulling = _context.faceCullMode();
     if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
-        _context.pushFaceCulling(*material.faceCulling);
+        _context.pushFaceCullMode(*material.faceCulling);
     }
     auto prevPolygonMode = _context.polygonMode();
     if (material.polygonMode && *material.polygonMode != prevPolygonMode) {
@@ -90,10 +90,10 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     }
     block();
     if (material.blending && *material.blending != prevBlending) {
-        _context.popBlending();
+        _context.popBlendMode();
     }
     if (material.faceCulling && *material.faceCulling != prevFaceCulling) {
-        _context.popFaceCulling();
+        _context.popFaceCullMode();
     }
     if (material.polygonMode && *material.polygonMode != prevPolygonMode) {
         _context.popPolygonMode();
@@ -225,9 +225,9 @@ void RenderPass::drawBillboard(Texture &texture,
             locals.billboardSize = *size;
         }
     });
-    _context.pushBlending(BlendMode::Additive);
+    _context.pushBlendMode(BlendMode::Additive);
     _meshRegistry.get(MeshName::billboard).draw();
-    _context.popBlending();
+    _context.popBlendMode();
 }
 
 void RenderPass::drawParticles(Texture &texture,
@@ -254,13 +254,13 @@ void RenderPass::drawParticles(Texture &texture,
             p.particles[i].up = glm::vec4(particle.up, 0.0f);
         }
     });
-    auto prevFaceCulling = _context.faceCulling();
+    auto prevFaceCulling = _context.faceCullMode();
     if (faceCulling != prevFaceCulling) {
-        _context.pushFaceCulling(faceCulling);
+        _context.pushFaceCullMode(faceCulling);
     }
     _meshRegistry.get(MeshName::billboard).drawInstanced(particles.size());
     if (faceCulling != prevFaceCulling) {
-        _context.popFaceCulling();
+        _context.popFaceCullMode();
     }
 }
 

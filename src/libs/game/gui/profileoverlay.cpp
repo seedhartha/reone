@@ -108,7 +108,7 @@ void ProfileOverlay::render() {
     if (!_enabled) {
         return;
     }
-    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlendMode(BlendMode::Normal, [this]() {
         renderBackground();
         renderFrameTimes();
         renderText();

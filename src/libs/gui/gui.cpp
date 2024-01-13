@@ -247,7 +247,7 @@ void GUI::update(float dt) {
 }
 
 void GUI::render() {
-    _graphicsSvc.context.withBlending(BlendMode::Normal, [this]() {
+    _graphicsSvc.context.withBlendMode(BlendMode::Normal, [this]() {
         auto pass = RenderPass(
             _options,
             _graphicsSvc.context,
