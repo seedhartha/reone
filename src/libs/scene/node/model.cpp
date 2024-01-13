@@ -132,7 +132,7 @@ void ModelSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode 
 void ModelSceneNode::renderAABB(IRenderPass &pass) {
     auto &mesh = _graphicsSvc.meshRegistry.get(MeshName::box);
     Material material;
-    material.programId = ShaderProgramId::deferredAABB;
+    material.type = MaterialType::AABB;
     material.polygonMode = PolygonMode::Line;
     auto transform = _absTransform;
     transform *= glm::translate(_aabb.center());

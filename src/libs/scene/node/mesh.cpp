@@ -300,9 +300,9 @@ void MeshSceneNode::render(IRenderPass &pass) {
         return;
     }
     Material material;
-    material.programId = isTransparent()
-                             ? ShaderProgramId::oitModel
-                             : ShaderProgramId::deferredOpaqueModel;
+    material.type = isTransparent()
+                        ? MaterialType::TransparentModel
+                        : MaterialType::OpaqueModel;
     material.textures.insert({TextureUnits::mainTex, *_nodeTextures.diffuse});
     if (_nodeTextures.lightmap) {
         material.textures.insert({TextureUnits::lightmap, *_nodeTextures.lightmap});
@@ -391,9 +391,9 @@ void MeshSceneNode::renderShadow(IRenderPass &pass) {
         return;
     }
     Material material;
-    material.programId = _sceneGraph.isShadowLightDirectional()
-                             ? ShaderProgramId::dirLightShadows
-                             : ShaderProgramId::pointLightShadows;
+    material.type = _sceneGraph.isShadowLightDirectional()
+                        ? MaterialType::DirLightShadow
+                        : MaterialType::PointLightShadow;
     material.color = glm::vec4(1.0f, 1.0f, 1.0f, _alpha);
     pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
 }

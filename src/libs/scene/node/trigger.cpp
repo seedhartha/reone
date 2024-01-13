@@ -98,7 +98,7 @@ void TriggerSceneNode::init() {
 
 void TriggerSceneNode::render(IRenderPass &pass) {
     Material material;
-    material.programId = ShaderProgramId::deferredWalkmesh;
+    material.type = MaterialType::Walkmesh;
     material.faceCulling = FaceCullMode::Back;
     pass.draw(*_mesh, material, _absTransform, _absTransformInv);
 }

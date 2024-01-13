@@ -47,7 +47,18 @@ void RenderPass::draw(Mesh &mesh,
 }
 
 void RenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
-    _context.useProgram(_shaderRegistry.get(material.programId));
+    static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
+        {MaterialType::OpaqueModel, ShaderProgramId::deferredOpaqueModel},    //
+        {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
+        {MaterialType::DirLightShadow, ShaderProgramId::dirLightShadows},     //
+        {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
+        {MaterialType::AABB, ShaderProgramId::deferredAABB},                  //
+        {MaterialType::Walkmesh, ShaderProgramId::deferredWalkmesh}           //
+    };
+    if (kMatTypeToProgramId.count(material.type) == 0) {
+        throw std::invalid_argument(str(boost::format("Material type %1% is not associated with a shader program") % static_cast<int>(material.type)));
+    }
+    _context.useProgram(_shaderRegistry.get(kMatTypeToProgramId.at(material.type)));
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
     }

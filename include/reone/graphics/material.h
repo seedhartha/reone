@@ -25,12 +25,21 @@ namespace graphics {
 
 class Texture;
 
+enum class MaterialType {
+    OpaqueModel,
+    TransparentModel,
+    DirLightShadow,
+    PointLightShadow,
+    AABB,
+    Walkmesh
+};
+
 struct Material : boost::noncopyable {
 public:
     using TextureUnit = int;
     using TextureUnitToTexture = std::unordered_map<TextureUnit, std::reference_wrapper<Texture>>;
 
-    std::string programId;
+    MaterialType type;
     TextureUnitToTexture textures;
     glm::mat3x4 uv {1.0f};
     glm::vec4 color {1.0f};
