@@ -141,6 +141,7 @@ void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         SetFieldType,
         SetFieldValue,
         DeleteField,
+        ClearListItems,
         AppendListItem,
         DuplicateListItem,
         DeleteListItem,
@@ -172,6 +173,7 @@ void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
     case GFFTreeNodeType::ListField:
         menu.Append(static_cast<int>(MenuItemId::RenameField), "Rename field...");
         if (node.type == GFFTreeNodeType::ListField) {
+            menu.Append(static_cast<int>(MenuItemId::ClearListItems), "Clear list items");
             menu.Append(static_cast<int>(MenuItemId::AppendListItem), "Append list item");
         } else {
             menu.Append(static_cast<int>(MenuItemId::SetFieldValue), "Set field value...");
@@ -359,6 +361,10 @@ void GFFResourcePanel::OnTreeCtrlItemContextMenu(wxDataViewEvent &event) {
         }
         case MenuItemId::DeleteField: {
             m_viewModel.deleteField(node.id);
+            break;
+        }
+        case MenuItemId::ClearListItems: {
+            m_viewModel.clearListItems(node.id);
             break;
         }
         case MenuItemId::AppendListItem: {

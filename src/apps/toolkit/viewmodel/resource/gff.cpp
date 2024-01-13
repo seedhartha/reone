@@ -256,6 +256,14 @@ void GFFResourceViewModel::deleteField(const GFFTreeNodeId &id) {
     rebuildTreeFromGff();
 }
 
+void GFFResourceViewModel::clearListItems(const GFFTreeNodeId &id) {
+    auto &node = _idToTreeNode.at(id).get();
+    auto &field = _treeNodeIdToField.at(id).get();
+    field.children.clear();
+    _modified = true;
+    rebuildTreeFromGff();
+}
+
 void GFFResourceViewModel::appendListItem(const GFFTreeNodeId &id) {
     auto &node = _idToTreeNode.at(id).get();
     auto &field = _treeNodeIdToField.at(id).get();

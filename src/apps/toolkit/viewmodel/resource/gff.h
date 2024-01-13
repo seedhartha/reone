@@ -98,6 +98,7 @@ public:
     void setFieldType(const GFFTreeNodeId &id, resource::Gff::FieldType type);
     void modifyField(const GFFTreeNodeId &id, std::function<void(resource::Gff::Field &)> block);
     void deleteField(const GFFTreeNodeId &id);
+    void clearListItems(const GFFTreeNodeId &id);
     void appendListItem(const GFFTreeNodeId &id);
     void duplicateListItem(const GFFTreeNodeId &id);
     void deleteListItem(const GFFTreeNodeId &id);
