@@ -15,8 +15,8 @@ uniform sampler2D sNormalMap;
 uniform sampler2DArray sBumpMapArray;
 uniform samplerCube sEnvMapCube;
 
-in vec4 fragPosWorldSpace;
-in vec3 fragNormalWorldSpace;
+in vec4 fragPosWorld;
+in vec3 fragNormalWorld;
 in vec2 fragUV1;
 in vec2 fragUV2;
 in mat3 fragTBN;
@@ -26,11 +26,11 @@ layout(location = 1) out vec4 fragColor2;
 
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
-        return getNormalFromNormalMap(sNormalMap, uv, fragTBN);
+        return normalFromNormalMap(sNormalMap, uv, fragTBN);
     } else if (isFeatureEnabled(FEATURE_BUMPMAP)) {
-        return getNormalFromBumpMap(sBumpMapArray, uv, fragTBN);
+        return normalFromBumpMap(sBumpMapArray, uv, fragTBN);
     } else {
-        return normalize(fragNormalWorldSpace);
+        return normalize(fragNormalWorld);
     }
 }
 
@@ -68,9 +68,9 @@ void main() {
 
     vec3 objectColor = lighting * uColor.rgb * diffuseColor;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 I = normalize(fragPosWorldSpace.xyz - uCameraPosition.xyz);
+        vec3 I = normalize(fragPosWorld.xyz - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
-        vec4 envmapSample = sampleEnvironmentMap(sEnvMap, sEnvMapCube, R);
+        vec4 envmapSample = sampleEnvMap(sEnvMap, sEnvMapCube, R);
         objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
     }
     if (isFeatureEnabled(FEATURE_WATER)) {

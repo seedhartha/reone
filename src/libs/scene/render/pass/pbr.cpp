@@ -50,12 +50,12 @@ void PBRRenderPass::draw(Mesh &mesh,
 
 void PBRRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
     static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
-        {MaterialType::OpaqueModel, ShaderProgramId::deferredOpaqueModel},    //
+        {MaterialType::OpaqueModel, ShaderProgramId::pbrOpaqueModel},         //
         {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
         {MaterialType::DirLightShadow, ShaderProgramId::dirLightShadows},     //
         {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
-        {MaterialType::AABB, ShaderProgramId::deferredAABB},                  //
-        {MaterialType::Walkmesh, ShaderProgramId::deferredWalkmesh}           //
+        {MaterialType::AABB, ShaderProgramId::pbrAABB},                       //
+        {MaterialType::Walkmesh, ShaderProgramId::pbrWalkmesh}                //
     };
     if (kMatTypeToProgramId.count(material.type) == 0) {
         throw std::invalid_argument(str(boost::format("Material type %1% is not associated with a shader program") % static_cast<int>(material.type)));
@@ -271,7 +271,7 @@ void PBRRenderPass::drawGrass(float radius,
                               Texture &texture,
                               std::optional<std::reference_wrapper<Texture>> &lightmap,
                               const std::vector<GrassInstance> &instances) {
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredGrass));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrGrass));
     _context.bindTexture(texture, TextureUnits::mainTex);
     if (lightmap) {
         _context.bindTexture(lightmap->get(), TextureUnits::lightmap);
@@ -300,6 +300,8 @@ void PBRRenderPass::applyMaterialToLocals(const Material &material,
     locals.featureMask |= materialFeatureMask(material);
     locals.uv = material.uv;
     locals.color = material.color;
+    locals.ambientColor = glm::vec4 {material.ambientColor, 0.0f};
+    locals.diffuseColor = glm::vec4 {material.diffuseColor, 0.0f};
     locals.selfIllumColor = glm::vec4(material.selfIllumColor, 1.0f);
     if (material.textures.count(TextureUnits::mainTex) > 0) {
         const auto &mainTex = material.textures.at(TextureUnits::mainTex).get();

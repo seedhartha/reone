@@ -12,12 +12,15 @@ const int FEATURE_FIXEDSIZE = 1 << 10;
 const int FEATURE_HASHEDALPHATEST = 1 << 11;
 const int FEATURE_PREMULALPHA = 1 << 12;
 const int FEATURE_ENVMAPCUBE = 1 << 13;
+const int FEATURE_STATIC = 1 << 14;
 
 layout(std140) uniform Locals {
     mat4 uModel;
     mat4 uModelInv;
     mat3 uUV;
     vec4 uColor;
+    vec4 uAmbientColor;
+    vec4 uDiffuseColor;
     vec4 uSelfIllumColor;
     int uFeatureMask;
     int uBumpMapFrame;

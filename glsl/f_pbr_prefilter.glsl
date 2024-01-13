@@ -1,7 +1,7 @@
 #include "i_gamma.glsl"
 #include "i_math.glsl"
 
-in vec4 fragPosWorldSpace;
+in vec4 fragPosWorld;
 
 out vec4 fragColor;
 
@@ -58,7 +58,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
 }
 
 void main() {
-    vec3 N = normalize(fragPosWorldSpace.rgb);
+    vec3 N = normalize(fragPosWorld.rgb);
 
     // make the simplifying assumption that V equals R equals the normal
     vec3 R = N;

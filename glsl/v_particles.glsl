@@ -1,13 +1,12 @@
 #include "u_globals.glsl"
 #include "u_particles.glsl"
 
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
-out vec4 fragPosObjSpace;
-out vec4 fragPosWorldSpace;
-out vec3 fragNormalWorldSpace;
+out vec4 fragPos;
+out vec4 fragPosWorld;
+out vec3 fragNormalWorld;
 out vec2 fragUV1;
 flat out int fragInstanceID;
 
@@ -16,15 +15,15 @@ void main() {
     vec3 right = uParticles[gl_InstanceID].right.xyz;
     vec3 up = uParticles[gl_InstanceID].up.xyz;
 
-    fragPosObjSpace = vec4(aPosition, 1.0);
-    fragPosWorldSpace = vec4(position +
-                                 right * aPosition.x * uParticles[gl_InstanceID].size.x +
-                                 up * aPosition.y * uParticles[gl_InstanceID].size.y,
-                             1.0);
+    fragPos = vec4(aPosition, 1.0);
+    fragPosWorld = vec4(position +
+                            right * aPosition.x * uParticles[gl_InstanceID].size.x +
+                            up * aPosition.y * uParticles[gl_InstanceID].size.y,
+                        1.0);
 
-    gl_Position = uProjection * uView * fragPosWorldSpace;
+    gl_Position = uProjection * uView * fragPosWorld;
 
-    fragNormalWorldSpace = cross(right, up);
+    fragNormalWorld = cross(right, up);
     fragUV1 = aUV1;
     fragInstanceID = gl_InstanceID;
 }

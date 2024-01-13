@@ -28,13 +28,25 @@ namespace scene {
 
 class ModelNodeSceneNode : public SceneNode {
 public:
-    const graphics::ModelNode &modelNode() const { return _modelNode; }
+    const graphics::ModelNode &modelNode() const {
+        return _modelNode;
+    }
+
+    bool isStatic() const {
+        return _static;
+    }
+
+    void setStatic(bool stat) {
+        _static = stat;
+    }
 
     virtual void setDiffuseMap(graphics::Texture *texture);
     virtual void setEnvironmentMap(graphics::Texture *texture);
 
 protected:
     graphics::ModelNode &_modelNode;
+
+    bool _static {false};
 
     ModelNodeSceneNode(
         graphics::ModelNode &modelNode,

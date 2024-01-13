@@ -45,10 +45,11 @@ public:
     glm::vec4 color {1.0f};
     int bumpMapFrame {0};
 
-    glm::vec3 ambient {0.2f};
-    glm::vec3 diffuse {0.8f};
+    glm::vec3 ambientColor {1.0f};
+    glm::vec3 diffuseColor {1.0f};
     glm::vec3 selfIllumColor {0.0f};
 
+    bool staticObject {false};
     bool affectedByShadows {false};
     bool affectedByFog {false};
 

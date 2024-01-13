@@ -318,6 +318,25 @@ void Area::loadLYT() {
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
         std::shared_ptr<ModelSceneNode> modelSceneNode(sceneGraph.newModel(*model, ModelUsage::Room));
         modelSceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+
+        // Mark room objects as static when not below "{modelName}a" model node
+        std::stack<std::reference_wrapper<ModelNode>> modelNodes;
+        modelNodes.push(*model->rootNode());
+        while (!modelNodes.empty()) {
+            auto &modelNode = modelNodes.top().get();
+            modelNodes.pop();
+            if (modelNode.name() == model->name() + "a") {
+                continue;
+            }
+            auto sceneNode = modelSceneNode->getNodeByNumber(modelNode.number());
+            if (sceneNode) {
+                sceneNode->setStatic(true);
+            }
+            for (auto &child : modelNode.children()) {
+                modelNodes.push(*child);
+            }
+        }
+
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
                 modelSceneNode->playAnimation(anim, nullptr, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));

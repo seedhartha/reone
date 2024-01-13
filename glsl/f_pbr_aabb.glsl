@@ -1,7 +1,7 @@
 #include "u_globals.glsl"
 
-in vec4 fragPosWorldSpace;
-in vec3 fragNormalWorldSpace;
+in vec4 fragPosWorld;
+in vec3 fragNormalWorld;
 
 layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragLightmapColor;
@@ -13,9 +13,9 @@ layout(location = 6) out vec4 fragEyeNormal;
 layout(location = 7) out vec3 fragPBRIrradiance;
 
 void main() {
-    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+    vec3 eyePos = (uView * fragPosWorld).xyz;
 
-    vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
+    vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorld);
     eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = vec4(1.0);

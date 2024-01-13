@@ -392,7 +392,7 @@ void PBRRenderPipeline::renderSSAO(float sampleRadius, float bias) {
         se.ssaoBias = bias;
     });
     _context.bindDrawFramebuffer(*_renderTargets.fbSSAO, {0});
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSAO));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSAO));
     _context.bindTexture(*_renderTargets.cbGBufEyePos, TextureUnits::gBufEyePos);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
@@ -412,7 +412,7 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
         se.ssrMaxSteps = maxSteps;
     });
     _context.bindDrawFramebuffer(*_renderTargets.fbSSR, {0});
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredSSR));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSR));
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
     _context.bindTexture(*_renderTargets.cbGBufEnvMap, TextureUnits::gBufEnvMap);
@@ -425,7 +425,7 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
 }
 
 void PBRRenderPipeline::combineOpaqueGeometry() {
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrCombine));
     _context.bindDrawFramebuffer(*_renderTargets.fbDeferredCombine, {0, 1});
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);

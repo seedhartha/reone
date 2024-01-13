@@ -66,10 +66,10 @@ Texture &RetroRenderPipeline::render() {
                                      _meshRegistry,
                                      _textureRegistry,
                                      _uniforms};
-        _context.clearColorDepth();
-        // if (_passCallbacks.count(RenderPassName::OpaqueGeometry) > 0) {
-        //     _passCallbacks.at(RenderPassName::OpaqueGeometry)(pass);
-        // }
+        _context.clearColorDepth({0.84, 0.66, 0.66, 0.0f});
+        if (_passCallbacks.count(RenderPassName::OpaqueGeometry) > 0) {
+            _passCallbacks.at(RenderPassName::OpaqueGeometry)(pass);
+        }
         _context.resetDrawFramebuffer();
     });
     return *_targets.outputColor;

@@ -14,14 +14,12 @@ uniform sampler2D sEnvMap;
 uniform sampler2D sNormalMap;
 uniform sampler2DArray sBumpMapArray;
 uniform samplerCube sEnvMapCube;
-#ifdef R_PBR
 uniform samplerCube sPBRIrradiance;
 uniform samplerCube sPBRPrefiltered;
-#endif
 
-in vec4 fragPosObjSpace;
-in vec4 fragPosWorldSpace;
-in vec3 fragNormalWorldSpace;
+in vec4 fragPos;
+in vec4 fragPosWorld;
+in vec3 fragNormalWorld;
 in vec2 fragUV1;
 in vec2 fragUV2;
 in mat3 fragTBN;
@@ -39,11 +37,11 @@ const float MAX_REFLECTION_LOD = 4.0;
 
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
-        return getNormalFromNormalMap(sNormalMap, uv, fragTBN);
+        return normalFromNormalMap(sNormalMap, uv, fragTBN);
     } else if (isFeatureEnabled(FEATURE_BUMPMAP)) {
-        return getNormalFromBumpMap(sBumpMapArray, uv, fragTBN);
+        return normalFromBumpMap(sBumpMapArray, uv, fragTBN);
     } else {
-        return normalize(fragNormalWorldSpace);
+        return normalize(fragNormalWorld);
     }
 }
 
@@ -54,7 +52,7 @@ void main() {
 
     if (!isFeatureEnabled(FEATURE_ENVMAP)) {
         if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
-            hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
+            hashedAlphaTest(mainTexSample.a, fragPos.xyz);
         } else if (mainTexSample.a == 0.0) {
             discard;
         }
@@ -68,17 +66,15 @@ void main() {
     vec4 envmapColor = vec4(0.0);
     vec3 pbrIrradianceColor = vec3(0.0);
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace.xyz);
+        vec3 V = normalize(uCameraPosition.xyz - fragPosWorld.xyz);
         vec3 R = reflect(-V, normal);
-        vec4 envmapSample = sampleEnvironmentMap(sEnvMap, sEnvMapCube, R);
+        vec4 envmapSample = sampleEnvMap(sEnvMap, sEnvMapCube, R);
         envmapColor = vec4(envmapSample.rgb, 1.0);
-#ifdef R_PBR
         if (isFeatureEnabled(FEATURE_ENVMAPCUBE)) {
             float roughness = clamp(mix(1.0, mainTexSample.a, step(0.0001, envmapSample.a)), 0.01, 0.99);
             envmapColor.rgb = textureLod(sPBRPrefiltered, R, roughness * MAX_REFLECTION_LOD).rgb;
             pbrIrradianceColor = texture(sPBRIrradiance, R).rgb;
         }
-#endif
     }
 
     vec4 features = vec4(
@@ -86,7 +82,7 @@ void main() {
         isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
         0.0,
         0.0);
-    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
+    vec3 eyePos = (uView * fragPosWorld).xyz;
 
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
     eyeNormal = 0.5 * eyeNormal + 0.5;

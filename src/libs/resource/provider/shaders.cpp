@@ -47,13 +47,14 @@ static const std::string kGeometryDirLightShadows = "g_dirlightshadow";
 static const std::string kGeometryPointLightShadows = "g_ptlightshadow";
 
 static const std::string kFragColor = "f_color";
-static const std::string kFragDeferredAABB = "f_df_aabb";
-static const std::string kFragDeferredCombine = "f_df_combine";
-static const std::string kFragDeferredGrass = "f_df_grass";
-static const std::string kFragDeferredOpaqueModel = "f_df_opaquemodel";
-static const std::string kFragDeferredSSAO = "f_df_ssao";
-static const std::string kFragDeferredSSR = "f_df_ssr";
-static const std::string kFragDeferredWalkmesh = "f_df_walkmesh";
+static const std::string kFragRTROpaqueModel = "f_rtr_opaqmodel";
+static const std::string kFragPBRAABB = "f_pbr_aabb";
+static const std::string kFragPBRCombine = "f_pbr_combine";
+static const std::string kFragPBRGrass = "f_pbr_grass";
+static const std::string kFragPBROpaqueModel = "f_pbr_opaqmodel";
+static const std::string kFragPBRSSAO = "f_pbr_ssao";
+static const std::string kFragPBRSSR = "f_pbr_ssr";
+static const std::string kFragPBRWalkmesh = "f_pbr_walkmesh";
 static const std::string kFragNull = "f_null";
 static const std::string kFragOITBlend = "f_oit_blend";
 static const std::string kFragOITModel = "f_oit_model";
@@ -95,13 +96,14 @@ void Shaders::init() {
     auto geomPointLightShadows = initShader(ShaderType::Geometry, kGeometryPointLightShadows);
 
     auto fragColor = initShader(ShaderType::Fragment, kFragColor);
-    auto fragDeferredAABB = initShader(ShaderType::Fragment, kFragDeferredAABB);
-    auto fragDeferredCombine = initShader(ShaderType::Fragment, kFragDeferredCombine);
-    auto fragDeferredGrass = initShader(ShaderType::Fragment, kFragDeferredGrass);
-    auto fragDeferredOpaqueModel = initShader(ShaderType::Fragment, kFragDeferredOpaqueModel);
-    auto fragDeferredSSAO = initShader(ShaderType::Fragment, kFragDeferredSSAO);
-    auto fragDeferredSSR = initShader(ShaderType::Fragment, kFragDeferredSSR);
-    auto fragDeferredWalkmesh = initShader(ShaderType::Fragment, kFragDeferredWalkmesh);
+    auto fragRTROpaqueModel = initShader(ShaderType::Fragment, kFragRTROpaqueModel);
+    auto fragPBRAABB = initShader(ShaderType::Fragment, kFragPBRAABB);
+    auto fragPBRCombine = initShader(ShaderType::Fragment, kFragPBRCombine);
+    auto fragPBRGrass = initShader(ShaderType::Fragment, kFragPBRGrass);
+    auto fragPBROpaqueModel = initShader(ShaderType::Fragment, kFragPBROpaqueModel);
+    auto fragPBRSSAO = initShader(ShaderType::Fragment, kFragPBRSSAO);
+    auto fragPBRSSR = initShader(ShaderType::Fragment, kFragPBRSSR);
+    auto fragPBRWalkmesh = initShader(ShaderType::Fragment, kFragPBRWalkmesh);
     auto fragNull = initShader(ShaderType::Fragment, kFragNull);
     auto fragOITBlend = initShader(ShaderType::Fragment, kFragOITBlend);
     auto fragOITModel = initShader(ShaderType::Fragment, kFragOITModel);
@@ -124,13 +126,14 @@ void Shaders::init() {
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
-    _shaderRegistry.add(ShaderProgramId::deferredAABB, initShaderProgram({vertMVPNormal, fragDeferredAABB}));
-    _shaderRegistry.add(ShaderProgramId::deferredCombine, initShaderProgram({vertPassthrough, fragDeferredCombine}));
-    _shaderRegistry.add(ShaderProgramId::deferredGrass, initShaderProgram({vertGrass, fragDeferredGrass}));
-    _shaderRegistry.add(ShaderProgramId::deferredOpaqueModel, initShaderProgram({vertModel, fragDeferredOpaqueModel}));
-    _shaderRegistry.add(ShaderProgramId::deferredSSAO, initShaderProgram({vertPassthrough, fragDeferredSSAO}));
-    _shaderRegistry.add(ShaderProgramId::deferredSSR, initShaderProgram({vertPassthrough, fragDeferredSSR}));
-    _shaderRegistry.add(ShaderProgramId::deferredWalkmesh, initShaderProgram({vertWalkmesh, fragDeferredWalkmesh}));
+    _shaderRegistry.add(ShaderProgramId::rtrOpaqueModel, initShaderProgram({vertModel, fragRTROpaqueModel}));
+    _shaderRegistry.add(ShaderProgramId::pbrAABB, initShaderProgram({vertMVPNormal, fragPBRAABB}));
+    _shaderRegistry.add(ShaderProgramId::pbrCombine, initShaderProgram({vertPassthrough, fragPBRCombine}));
+    _shaderRegistry.add(ShaderProgramId::pbrGrass, initShaderProgram({vertGrass, fragPBRGrass}));
+    _shaderRegistry.add(ShaderProgramId::pbrOpaqueModel, initShaderProgram({vertModel, fragPBROpaqueModel}));
+    _shaderRegistry.add(ShaderProgramId::pbrSSAO, initShaderProgram({vertPassthrough, fragPBRSSAO}));
+    _shaderRegistry.add(ShaderProgramId::pbrSSR, initShaderProgram({vertPassthrough, fragPBRSSR}));
+    _shaderRegistry.add(ShaderProgramId::pbrWalkmesh, initShaderProgram({vertWalkmesh, fragPBRWalkmesh}));
     _shaderRegistry.add(ShaderProgramId::dirLightShadows, initShaderProgram({vertShadows, geomDirLightShadows, fragNull}));
     _shaderRegistry.add(ShaderProgramId::mvpColor, initShaderProgram({vertMVP, fragColor}));
     _shaderRegistry.add(ShaderProgramId::mvpTexture, initShaderProgram({vertMVP, fragTexture}));
@@ -195,9 +198,6 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::string resRef)
 
     // Prepend preprocessor directives
     auto defines = StringBuilder();
-    if (_graphicsOpt.pbr) {
-        defines.append("#define R_PBR\n");
-    }
     if (_graphicsOpt.ssr) {
         defines.append("#define R_SSR\n");
     }

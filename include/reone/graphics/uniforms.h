@@ -53,6 +53,7 @@ struct UniformsFeatureFlags {
     static constexpr int hashedalphatest = 1 << 11;
     static constexpr int premulalpha = 1 << 12;
     static constexpr int envmapcube = 1 << 13;
+    static constexpr int staticobj = 1 << 14;
 };
 
 struct alignas(16) GlobalUniformsLight {
@@ -107,6 +108,8 @@ struct LocalUniforms {
     glm::mat4 modelInv;
     glm::mat3x4 uv;
     glm::vec4 color;
+    glm::vec4 ambientColor;
+    glm::vec4 diffuseColor;
     glm::vec4 selfIllumColor;
     int featureMask;
     int bumpMapFrame;
@@ -123,6 +126,8 @@ struct LocalUniforms {
         modelInv = glm::mat4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
+        ambientColor = glm::vec4(1.0f);
+        diffuseColor = glm::vec4(1.0f);
         selfIllumColor = glm::vec4(0.0f);
         featureMask = 0;
         bumpMapFrame = 0;

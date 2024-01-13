@@ -8,9 +8,9 @@
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 
-in vec4 fragPosObjSpace;
-in vec4 fragPosWorldSpace;
-in vec3 fragNormalWorldSpace;
+in vec4 fragPos;
+in vec4 fragPosWorld;
+in vec3 fragNormalWorld;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
@@ -29,10 +29,10 @@ void main() {
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     vec4 mainTexSample = texture(sMainTex, uv);
-    hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
+    hashedAlphaTest(mainTexSample.a, fragPos.xyz);
 
-    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
-    vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
+    vec3 eyePos = (uView * fragPosWorld).xyz;
+    vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorld);
     eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = mainTexSample;

@@ -26,13 +26,14 @@ namespace graphics {
 
 struct ShaderProgramId {
     static constexpr char billboard[] = "billboard";
-    static constexpr char deferredAABB[] = "deferred_aabb";
-    static constexpr char deferredCombine[] = "deferred_combine";
-    static constexpr char deferredGrass[] = "deferred_grass";
-    static constexpr char deferredOpaqueModel[] = "deferred_opaque_model";
-    static constexpr char deferredSSAO[] = "deferred_ssao";
-    static constexpr char deferredSSR[] = "deferred_ssr";
-    static constexpr char deferredWalkmesh[] = "deferred_walkmesh";
+    static constexpr char rtrOpaqueModel[] = "rtr_opaque_model";
+    static constexpr char pbrAABB[] = "pbr_aabb";
+    static constexpr char pbrCombine[] = "pbr_combine";
+    static constexpr char pbrGrass[] = "pbr_grass";
+    static constexpr char pbrOpaqueModel[] = "pbr_opaque_model";
+    static constexpr char pbrSSAO[] = "pbr_ssao";
+    static constexpr char pbrSSR[] = "pbr_ssr";
+    static constexpr char pbrWalkmesh[] = "pbr_walkmesh";
     static constexpr char dirLightShadows[] = "dir_light_shadows";
     static constexpr char mvpColor[] = "mvp_color";
     static constexpr char mvpTexture[] = "mvp_texture";

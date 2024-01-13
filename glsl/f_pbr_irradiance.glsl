@@ -1,14 +1,14 @@
 #include "i_gamma.glsl"
 #include "i_math.glsl"
 
-in vec4 fragPosWorldSpace;
+in vec4 fragPosWorld;
 
 out vec4 fragColor;
 
 uniform samplerCube sEnvMapCube;
 
 void main() {
-    vec3 N = normalize(fragPosWorldSpace.xyz);
+    vec3 N = normalize(fragPosWorld.xyz);
 
     vec3 irradiance = vec3(0.0);
 

@@ -7,12 +7,11 @@
 #include "i_math.glsl"
 #include "i_shadowmap.glsl"
 
-#include "i_blinnphong.glsl"
 #include "i_pbr.glsl"
 
 const float SELFILLUM_THRESHOLD = 0.8;
 const float LIGHTMAP_AMBIENT_FACTOR = 0.5;
-const float PBR_LIGHTMAP_STRENGTH = 0.5;
+const float LIGHTMAP_STRENGTH = 0.5;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
@@ -29,10 +28,8 @@ uniform sampler2D sSSAO;
 #ifdef R_SSR
 uniform sampler2D sSSR;
 #endif
-#ifdef R_PBR
 uniform sampler2D sPBRBRDF;
 uniform sampler2D sGBufPBRIrradiance;
-#endif
 
 noperspective in vec2 fragUV1;
 
@@ -46,12 +43,10 @@ void main() {
     vec4 lightmapSample = texture(sLightmap, uv);
     vec4 envmapSample = texture(sGBufEnvMap, uv);
     vec4 selfIllumSample = texture(sGBufSelfIllum, uv);
-#ifdef R_PBR
     mainTexSample.rgb = gammaToLinear(mainTexSample.rgb);
     lightmapSample.rgb = gammaToLinear(lightmapSample.rgb);
     // envmapSample.rgb = gammaToLinear(envmapSample.rgb);
     selfIllumSample.rgb = gammaToLinear(selfIllumSample.rgb);
-#endif
     vec4 featuresSample = texture(sGBufFeatures, uv);
     vec3 eyePos = texture(sGBufEyePos, uv).rgb;
     vec3 eyeNormal = normalize(2.0 * texture(sGBufEyeNormal, uv).rgb - 1.0);
@@ -60,9 +55,7 @@ void main() {
 #endif
 #ifdef R_SSR
     vec4 ssrSample = texture(sSSR, uv);
-#ifdef R_PBR
     ssrSample.rgb = gammaToLinear(ssrSample.rgb);
-#endif
 #endif // R_SSR
 
     vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).xyz;
@@ -84,7 +77,6 @@ void main() {
     float ao = 1.0;
 #endif
 
-#ifdef R_PBR
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.01, 0.99);
     vec3 pbrIrradiance = texture(sGBufPBRIrradiance, uv).rgb;
@@ -100,28 +92,14 @@ void main() {
                         ambientS * ao + directS;
     vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
                             ambientS * ao + directS;
-    vec3 color = mix(colorDynamic, colorLightmapped, PBR_LIGHTMAP_STRENGTH);
-#else
-    vec3 ambient, directDiff, directSpec;
-    BP_lighting(worldPos, worldNormal, 1.0 - lightmapped,
-                ambient, directDiff, directSpec);
-    vec3 indirectDiff = ambient + uWorldAmbientColor.rgb;
-    vec3 indirectSpec = environment * (1.0 - mainTexSample.a);
-    vec3 colorDynamic = clamp(indirectDiff * ao + directDiff * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                        indirectSpec * ao + directSpec;
-    vec3 colorLightmapped = clamp(LIGHTMAP_AMBIENT_FACTOR * ao * lightmapSample.rgb + (1.0 - LIGHTMAP_AMBIENT_FACTOR) * lightmapSample.rgb * (1.0 - shadow) + emission, 0.0, 1.0) * albedo +
-                            indirectSpec * ao + directSpec;
-    vec3 color = mix(colorDynamic, colorLightmapped, lightmapped);
-#endif
+    vec3 color = mix(colorDynamic, colorLightmapped, LIGHTMAP_STRENGTH);
 
     color = mix(color, uFogColor.rgb, fog);
     float alpha = step(0.0001, mainTexSample.a);
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, emission * albedo * mainTexSample.a);
 
-#ifdef R_PBR
     color = linearToGamma(color);
     hilights = linearToGamma(hilights);
-#endif
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);

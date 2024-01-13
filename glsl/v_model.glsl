@@ -14,9 +14,9 @@ layout(location = 6) in vec3 aTanSpaceNormal;
 layout(location = 7) in vec4 aBoneIndices;
 layout(location = 8) in vec4 aBoneWeights;
 
-out vec4 fragPosObjSpace;
-out vec4 fragPosWorldSpace;
-out vec3 fragNormalWorldSpace;
+out vec4 fragPos;
+out vec4 fragPosWorld;
+out vec3 fragNormalWorld;
 out vec2 fragUV1;
 out vec2 fragUV2;
 out mat3 fragTBN;
@@ -48,22 +48,22 @@ void main() {
             (uBones[i3] * N) * w3 +
             (uBones[i4] * N) * w4;
 
-        fragPosObjSpace = P;
+        fragPos = P;
 
     } else if (isFeatureEnabled(FEATURE_DANGLY)) {
-        fragPosObjSpace = uDanglyPositions[gl_VertexID];
+        fragPos = uDanglyPositions[gl_VertexID];
 
     } else if (isFeatureEnabled(FEATURE_SABER)) {
-        fragPosObjSpace = uSaberPositions[gl_VertexID];
+        fragPos = uSaberPositions[gl_VertexID];
 
     } else {
-        fragPosObjSpace = P;
+        fragPos = P;
     }
 
-    fragPosWorldSpace = uModel * fragPosObjSpace;
+    fragPosWorld = uModel * fragPos;
 
     mat3 normalMatrix = transpose(mat3(uModelInv));
-    fragNormalWorldSpace = normalize(normalMatrix * N.xyz);
+    fragNormalWorld = normalize(normalMatrix * N.xyz);
 
     fragUV1 = aUV1;
     fragUV2 = aUV2;
@@ -75,5 +75,5 @@ void main() {
         fragTBN = mat3(T, B, TSN);
     }
 
-    gl_Position = uProjection * uView * fragPosWorldSpace;
+    gl_Position = uProjection * uView * fragPosWorld;
 }
