@@ -23,10 +23,10 @@ using namespace reone;
 
 TEST(code_points_from_utf8, should_convert_utf8_string_to_code_points) {
     // given
-    auto s = ",.09AZaz\xc2\xa0\xdf\xbf\xe0\xa2\xa0\xef\xbf\xae\xf0\x92\x80\x80\xf0\x9f\xa7\xbf";
+    auto utf8 = ",.09AZaz\xc2\xa0\xdf\xbf\xe0\xa2\xa0\xef\xbf\xae\xf0\x92\x80\x80\xf0\x9f\xa7\xbf";
 
     // when
-    auto codePoints = codePointsFromUTF8(s);
+    auto codePoints = codePointsFromUTF8(utf8);
 
     // then
     EXPECT_EQ(codePoints.size(), 14);
@@ -62,6 +62,49 @@ TEST(utf8_from_code_points, should_convert_code_points_to_utf8_string) {
 
     // then
     EXPECT_EQ(utf8, ",.09AZaz\xc2\xa0\xdf\xbf\xe0\xa2\xa0\xef\xbf\xae\xf0\x92\x80\x80\xf0\x9f\xa7\xbf");
+}
+
+TEST(code_points_from_utf16, should_convert_utf16_string_to_code_points) {
+    // given
+    auto utf16 = u",.09AZaz\u00a0\u07ff\u08a0\uffee\U00012000\U0001f9ff";
+
+    // when
+    auto codePoints = codePointsFromUTF16(utf16);
+
+    // then
+    EXPECT_EQ(codePoints.size(), 14);
+    EXPECT_EQ(codePoints[0], ',');
+    EXPECT_EQ(codePoints[1], '.');
+    EXPECT_EQ(codePoints[2], '0');
+    EXPECT_EQ(codePoints[3], '9');
+    EXPECT_EQ(codePoints[4], 'A');
+    EXPECT_EQ(codePoints[5], 'Z');
+    EXPECT_EQ(codePoints[6], 'a');
+    EXPECT_EQ(codePoints[7], 'z');
+    EXPECT_EQ(codePoints[8], 0xa0);
+    EXPECT_EQ(codePoints[9], 0x7ff);
+    EXPECT_EQ(codePoints[10], 0x8a0);
+    EXPECT_EQ(codePoints[11], 0xffee);
+    EXPECT_EQ(codePoints[12], 0x12000);
+    EXPECT_EQ(codePoints[13], 0x1f9ff);
+}
+
+TEST(utf16_from_code_points, should_convert_code_points_to_ut16_string) {
+    // given
+    std::vector<uint32_t> codePoints {
+        ',', '.',
+        '0', '9',
+        'A', 'Z',
+        'a', 'z',
+        0xa0, 0x7ff,
+        0x8a0, 0xffee,
+        0x12000, 0x1f9ff};
+
+    // when
+    auto utf16 = utf16FromCodePoints(codePoints);
+
+    // then
+    EXPECT_EQ(utf16, u",.09AZaz\u00a0\u07ff\u08a0\uffee\U00012000\U0001f9ff");
 }
 
 TEST(is_code_point_alpha, should_return_true_for_alpha_chars_in_latin_and_cyrillic) {

@@ -22,6 +22,9 @@ namespace reone {
 std::vector<uint32_t> codePointsFromUTF8(const std::string &s);
 std::string utf8FromCodePoints(const std::vector<uint32_t> codePoints);
 
+std::vector<uint32_t> codePointsFromUTF16(const std::u16string &s);
+std::u16string utf16FromCodePoints(const std::vector<uint32_t> &codePoints);
+
 bool isCodePointAlpha(uint32_t codePoint);
 
 uint32_t codePointToLower(uint32_t codePoint);

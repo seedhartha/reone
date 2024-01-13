@@ -100,7 +100,52 @@ std::string utf8FromCodePoints(const std::vector<uint32_t> codePoints) {
             result.put(b3);
             result.put(b4);
         } else {
-            throw std::invalid_argument(str(boost::format("Code point out of range at %d: %04x") % i % cp));
+            throw std::invalid_argument(str(boost::format("Code point out of range at %d: %08x") % i % cp));
+        }
+    }
+    return result.str();
+}
+
+std::vector<uint32_t> codePointsFromUTF16(const std::u16string &s) {
+    std::vector<uint32_t> result;
+    auto units = reinterpret_cast<const uint16_t *>(&s[0]);
+    for (size_t i = 0; i < s.length();) {
+        auto &unit1 = units[i];
+        if ((unit1 & 0xfc00) == 0xd800) {
+            // surrogate pair
+            checkGreater("length", s.length(), i + 1);
+            auto &unit2 = units[i + 1];
+            checkThat((unit2 & 0xfc00) == 0xdc00, "second code unit must begin with bits 110111");
+            auto codePoint = (unit1 & 0x3ff) << 10;
+            codePoint |= unit2 & 0x3ff;
+            codePoint += 0x10000;
+            result.emplace_back(codePoint);
+            i += 2;
+        } else if (unit1 <= 0xd7ff || (0xe000 <= unit1 && unit1 <= 0xffff)) {
+            // single code
+            result.emplace_back(unit1);
+            ++i;
+        } else {
+            throw std::invalid_argument(str(boost::format("Unsupported UTF-16 code unit at %d: %04x") % i % unit1));
+        }
+    }
+    return std::move(result);
+}
+
+std::u16string utf16FromCodePoints(const std::vector<uint32_t> &codePoints) {
+    std::basic_ostringstream<char16_t> result;
+    for (size_t i = 0; i < codePoints.size(); ++i) {
+        auto &cp = codePoints[i];
+        if (cp <= 0xd7ff || (0xe000 <= cp && cp <= 0xffff)) {
+            result.put(cp);
+        } else if (cp >= 0x10000 && cp <= 0x10ffff) {
+            auto cp2 = cp - 0x10000;
+            auto unit1 = (cp2 >> 10) | 0xd800;
+            auto unit2 = (cp2 & 0x3ff) | 0xdc00;
+            result.put(unit1);
+            result.put(unit2);
+        } else {
+            throw std::invalid_argument(str(boost::format("Unsupported UTF-16 code point at %d: %08x") % i % cp));
         }
     }
     return result.str();
