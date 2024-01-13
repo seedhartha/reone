@@ -66,6 +66,7 @@ private:
     wxTextCtrl *_textCtrlGameDir;
     wxCheckBox *_checkBoxDev;
     wxChoice *_choiceResolution;
+    wxChoice *_choiceRenderer;
     wxChoice *_choiceTextureQuality;
     wxChoice *_choiceShadowResolution;
     wxChoice *_choiceAnisoFilter;
@@ -73,7 +74,6 @@ private:
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxGrass;
-    wxCheckBox *_checkBoxPBR;
     wxCheckBox *_checkBoxSSAO;
     wxCheckBox *_checkBoxSSR;
     wxCheckBox *_checkBoxFXAA;

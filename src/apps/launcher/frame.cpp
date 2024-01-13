@@ -45,8 +45,8 @@ LauncherFrame::LauncherFrame() :
     _textCtrlGameDir->Bind(wxEVT_LEFT_DOWN, &LauncherFrame::OnGameDirLeftDown, this, WindowID::gameDir);
 
     auto gameSizer = new wxBoxSizer(wxVERTICAL);
-    gameSizer->Add(labelGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    gameSizer->Add(_textCtrlGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    gameSizer->Add(labelGameDir, wxSizerFlags(0).Expand());
+    gameSizer->Add(_textCtrlGameDir, wxSizerFlags(0).Expand());
 
     _checkBoxDev = new wxCheckBox(this, wxID_ANY, "Developer Mode", wxDefaultPosition, wxDefaultSize);
     _checkBoxDev->SetValue(_config.devMode);
@@ -89,10 +89,39 @@ LauncherFrame::LauncherFrame() :
     _choiceResolution->SetSelection(resSelection);
 
     auto resSizer = new wxBoxSizer(wxVERTICAL);
-    resSizer->Add(labelResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    resSizer->Add(labelResolution, wxSizerFlags(0).Expand());
+    resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand());
 
     // END Screen Resolution
+
+    // Renderer
+
+    auto labelRenderer = new wxStaticText(this, wxID_ANY, "Renderer", wxDefaultPosition, wxDefaultSize);
+
+    wxArrayString rendererChoices;
+    rendererChoices.Add("Retro");
+    rendererChoices.Add("PBR");
+
+    _choiceRenderer = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, rendererChoices);
+    _choiceRenderer->SetSelection(_config.pbr ? 1 : 0);
+    _choiceRenderer->Bind(wxEVT_COMMAND_CHOICE_SELECTED, [this](const wxCommandEvent &evt) {
+        auto selection = evt.GetSelection();
+        if (selection == 1) {
+            // PBR
+            _checkBoxSSAO->Enable();
+            _checkBoxSSR->Enable();
+        } else {
+            // Retro
+            _checkBoxSSAO->Disable();
+            _checkBoxSSR->Disable();
+        }
+    });
+
+    auto rendererSizer = new wxBoxSizer(wxVERTICAL);
+    rendererSizer->Add(labelRenderer, wxSizerFlags(0).Expand());
+    rendererSizer->Add(_choiceRenderer, wxSizerFlags(0).Expand());
+
+    // END Renderer
 
     // Texture Quality
 
@@ -107,8 +136,8 @@ LauncherFrame::LauncherFrame() :
     _choiceTextureQuality->SetSelection(_config.texQuality);
 
     auto textureQualitySizer = new wxBoxSizer(wxVERTICAL);
-    textureQualitySizer->Add(labelTextureQuality, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    textureQualitySizer->Add(_choiceTextureQuality, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    textureQualitySizer->Add(labelTextureQuality, wxSizerFlags(0).Expand());
+    textureQualitySizer->Add(_choiceTextureQuality, wxSizerFlags(0).Expand());
 
     // END Texture Quality
 
@@ -125,8 +154,8 @@ LauncherFrame::LauncherFrame() :
     _choiceShadowResolution->SetSelection(_config.shadowres);
 
     auto shadowResSizer = new wxBoxSizer(wxVERTICAL);
-    shadowResSizer->Add(labelShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    shadowResSizer->Add(_choiceShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    shadowResSizer->Add(labelShadowResolution, wxSizerFlags(0).Expand());
+    shadowResSizer->Add(_choiceShadowResolution, wxSizerFlags(0).Expand());
 
     // END Shadow Map Resolution
 
@@ -145,8 +174,8 @@ LauncherFrame::LauncherFrame() :
     _choiceAnisoFilter->SetSelection(_config.anisofilter);
 
     auto anisoFilterSizer = new wxBoxSizer(wxVERTICAL);
-    anisoFilterSizer->Add(labelAnisoFilter, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    anisoFilterSizer->Add(_choiceAnisoFilter, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    anisoFilterSizer->Add(labelAnisoFilter, wxSizerFlags(0).Expand());
+    anisoFilterSizer->Add(_choiceAnisoFilter, wxSizerFlags(0).Expand());
 
     // END Anisotropic Filtering
 
@@ -156,8 +185,8 @@ LauncherFrame::LauncherFrame() :
     _sliderDrawDistance = new wxSlider(this, wxID_ANY, _config.drawdist, 32, 128, wxDefaultPosition, wxDefaultSize);
 
     auto drawDistanceSizer = new wxBoxSizer(wxVERTICAL);
-    drawDistanceSizer->Add(labelDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    drawDistanceSizer->Add(_sliderDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    drawDistanceSizer->Add(labelDrawDistance, wxSizerFlags(0).Expand());
+    drawDistanceSizer->Add(_sliderDrawDistance, wxSizerFlags(0).Expand());
 
     // END Object Draw Distance
 
@@ -170,14 +199,16 @@ LauncherFrame::LauncherFrame() :
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
-    _checkBoxPBR = new wxCheckBox(this, wxID_ANY, "Enable PBR", wxDefaultPosition, wxDefaultSize);
-    _checkBoxPBR->SetValue(_config.pbr);
-
     _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable SSAO", wxDefaultPosition, wxDefaultSize);
     _checkBoxSSAO->SetValue(_config.ssao);
 
     _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable SSR", wxDefaultPosition, wxDefaultSize);
     _checkBoxSSR->SetValue(_config.ssr);
+
+    if (!_config.pbr) {
+        _checkBoxSSAO->Disable();
+        _checkBoxSSR->Disable();
+    }
 
     _checkBoxFXAA = new wxCheckBox(this, wxID_ANY, "Enable FXAA", wxDefaultPosition, wxDefaultSize);
     _checkBoxFXAA->SetValue(_config.fxaa);
@@ -186,19 +217,19 @@ LauncherFrame::LauncherFrame() :
     _checkBoxSharpen->SetValue(_config.sharpen);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
-    graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(anisoFilterSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxPBR, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxSharpen, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(rendererSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(anisoFilterSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand());
+    graphicsSizer->Add(_checkBoxSharpen, wxSizerFlags(0).Expand());
 
     // END Graphics
 
@@ -217,14 +248,14 @@ LauncherFrame::LauncherFrame() :
     _sliderVolumeMovie = new wxSlider(this, wxID_ANY, _config.movievol, 0, 100, wxDefaultPosition, wxDefaultSize);
 
     auto audioSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Audio");
-    audioSizer->Add(labelVolumeMusic, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(_sliderVolumeMusic, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(labelVolumeVoice, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(_sliderVolumeVoice, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(labelVolumeSound, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(_sliderVolumeSound, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(labelVolumeMovie, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    audioSizer->Add(_sliderVolumeMovie, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(labelVolumeMusic, wxSizerFlags(0).Expand());
+    audioSizer->Add(_sliderVolumeMusic, wxSizerFlags(0).Expand());
+    audioSizer->Add(labelVolumeVoice, wxSizerFlags(0).Expand());
+    audioSizer->Add(_sliderVolumeVoice, wxSizerFlags(0).Expand());
+    audioSizer->Add(labelVolumeSound, wxSizerFlags(0).Expand());
+    audioSizer->Add(_sliderVolumeSound, wxSizerFlags(0).Expand());
+    audioSizer->Add(labelVolumeMovie, wxSizerFlags(0).Expand());
+    audioSizer->Add(_sliderVolumeMovie, wxSizerFlags(0).Expand());
 
     // END Audio
 
@@ -270,17 +301,17 @@ LauncherFrame::LauncherFrame() :
     _checkListBoxLogChannels->Check(10, _config.logch & static_cast<int>(LogChannel::Script3));
 
     auto loggingSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Logging");
-    loggingSizer->Add(labelLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    loggingSizer->Add(_choiceLogSeverity, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    loggingSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    loggingSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(labelLogSeverity, wxSizerFlags(0).Expand());
+    loggingSizer->Add(_choiceLogSeverity, wxSizerFlags(0).Expand());
+    loggingSizer->Add(labelLogChannels, wxSizerFlags(0).Expand());
+    loggingSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand());
 
     // END Logging
 
     auto topSizer = new wxBoxSizer(wxHORIZONTAL);
-    topSizer->Add(graphicsSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    topSizer->Add(audioSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    topSizer->Add(loggingSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    topSizer->Add(graphicsSizer, wxSizerFlags(1).Expand());
+    topSizer->Add(audioSizer, wxSizerFlags(1).Expand());
+    topSizer->Add(loggingSizer, wxSizerFlags(1).Expand());
 
     auto topSizer2 = new wxBoxSizer(wxVERTICAL);
     topSizer2->SetMinSize(640, 100);
@@ -438,7 +469,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
-    _config.pbr = _checkBoxPBR->IsChecked();
+    _config.pbr = _choiceRenderer->GetStringSelection() == "PBR";
     _config.ssao = _checkBoxSSAO->IsChecked();
     _config.ssr = _checkBoxSSR->IsChecked();
     _config.fxaa = _checkBoxFXAA->IsChecked();
