@@ -29,7 +29,6 @@ public:
                         graphics::GraphicsOptions &options,
                         graphics::Context &context,
                         graphics::MeshRegistry &meshRegistry,
-                        graphics::PBRTextures &pbrTextures,
                         graphics::ShaderRegistry &shaderRegistry,
                         graphics::TextureRegistry &textureRegistry,
                         graphics::Uniforms &uniforms) :
@@ -38,7 +37,6 @@ public:
             options,
             context,
             meshRegistry,
-            pbrTextures,
             shaderRegistry,
             textureRegistry,
             uniforms) {
@@ -50,65 +48,14 @@ public:
 
 private:
     struct RenderTargets {
-        std::shared_ptr<graphics::Texture> cbGBufDiffuse;
-        std::shared_ptr<graphics::Texture> cbGBufLightmap;
-        std::shared_ptr<graphics::Texture> cbGBufEnvMap;
-        std::shared_ptr<graphics::Texture> cbGBufSelfIllum;
-        std::shared_ptr<graphics::Texture> cbGBufFeatures;
-        std::shared_ptr<graphics::Texture> cbGBufEyePos;
-        std::shared_ptr<graphics::Texture> cbGBufEyeNormal;
-        std::shared_ptr<graphics::Texture> cbGBufPBRIrradiance;
-        std::shared_ptr<graphics::Texture> cbDeferredOpaque1;
-        std::shared_ptr<graphics::Texture> cbDeferredOpaque2;
-        std::shared_ptr<graphics::Texture> cbTransparentGeometry1;
-        std::shared_ptr<graphics::Texture> cbTransparentGeometry2;
-        std::shared_ptr<graphics::Texture> cbPing;
-        std::shared_ptr<graphics::Texture> cbPingHalf;
-        std::shared_ptr<graphics::Texture> cbPong;
-        std::shared_ptr<graphics::Texture> cbPongHalf;
-        std::shared_ptr<graphics::Texture> cbOutput;
-
-        std::shared_ptr<graphics::Renderbuffer> dbCommon;
-        std::shared_ptr<graphics::Renderbuffer> dbCommonHalf;
-        std::shared_ptr<graphics::Renderbuffer> dbGBuffer;
-        std::shared_ptr<graphics::Texture> dbDirectionalLightShadows;
-        std::shared_ptr<graphics::Texture> dbPointLightShadows;
-        std::shared_ptr<graphics::Texture> dbOutput;
-
-        std::shared_ptr<graphics::Framebuffer> fbPointLightShadows;
-        std::shared_ptr<graphics::Framebuffer> fbDirLightShadows;
-        std::shared_ptr<graphics::Framebuffer> fbOpaqueGeometry;
-        std::shared_ptr<graphics::Framebuffer> fbDeferredCombine;
-        std::shared_ptr<graphics::Framebuffer> fbTransparentGeometry;
-        std::shared_ptr<graphics::Framebuffer> fbPing;
-        std::shared_ptr<graphics::Framebuffer> fbPingHalf;
-        std::shared_ptr<graphics::Framebuffer> fbPong;
-        std::shared_ptr<graphics::Framebuffer> fbPongHalf;
-        std::shared_ptr<graphics::Framebuffer> fbOutput;
+        std::shared_ptr<graphics::Texture> outputColor;
+        std::shared_ptr<graphics::Renderbuffer> outputDepth;
+        std::shared_ptr<graphics::Framebuffer> output;
     };
 
-    RenderTargets _renderTargets;
+    RenderTargets _targets;
 
     void initRenderTargets();
-
-    // Render Passes
-
-    void combineOpaqueGeometry();
-    void blendTransparentGeometry();
-
-    void beginDirLightShadowsPass();
-    void beginPointLightShadowsPass();
-    void beginOpaqueGeometryPass();
-    void beginTransparentGeometryPass();
-    void beginPostProcessingPass();
-
-    void endDirLightShadowsPass();
-    void endPointLightShadowsPass();
-    void endOpaqueGeometryPass();
-    void endTransparentGeometryPass();
-    void endPostProcessingPass();
-
-    // END Render Passes
 };
 
 } // namespace scene

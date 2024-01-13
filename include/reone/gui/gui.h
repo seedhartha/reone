@@ -211,7 +211,7 @@ private:
     void stretchControl(Control &control);
     void updateSelection(int x, int y);
 
-    void renderBackground(graphics::IRenderPass &pass);
+    void renderBackground(scene::IRenderPass &pass);
 
     std::optional<std::reference_wrapper<Control>> findControlAt(int x, int y,
                                                                  const std::function<bool(const Control &)> &test) const;

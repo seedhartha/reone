@@ -21,7 +21,6 @@
 #include "reone/graphics/di/services.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -30,7 +29,9 @@
 #include "reone/scene/graph.h"
 #include "reone/scene/node/camera.h"
 #include "reone/scene/node/particle.h"
+#include "reone/scene/render/pass.h"
 #include "reone/system/randomutil.h"
+
 
 using namespace reone::graphics;
 

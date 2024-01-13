@@ -20,7 +20,6 @@
 #include "reone/graphics/context.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
@@ -39,6 +38,8 @@
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
 #include "reone/resource/template/generated/gui.h"
+#include "reone/scene/render/pass/pbr.h"
+#include "reone/scene/render/pass/retro.h"
 #include "reone/system/exception/validation.h"
 #include "reone/system/logutil.h"
 
@@ -248,7 +249,14 @@ void GUI::update(float dt) {
 
 void GUI::render() {
     _graphicsSvc.context.withBlendMode(BlendMode::Normal, [this]() {
-        auto pass = RenderPass(
+        auto retroPass = RetroRenderPass(
+            _options,
+            _graphicsSvc.context,
+            _graphicsSvc.shaderRegistry,
+            _graphicsSvc.meshRegistry,
+            _graphicsSvc.textureRegistry,
+            _graphicsSvc.uniforms);
+        auto pbrPass = PBRRenderPass(
             _options,
             _graphicsSvc.context,
             _graphicsSvc.shaderRegistry,
@@ -256,6 +264,8 @@ void GUI::render() {
             _graphicsSvc.pbrTextures,
             _graphicsSvc.textureRegistry,
             _graphicsSvc.uniforms);
+        auto &pass = _options.pbr ? static_cast<IRenderPass &>(pbrPass)
+                                  : static_cast<IRenderPass &>(retroPass);
         if (_background) {
             renderBackground(pass);
         }

@@ -19,7 +19,9 @@
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/meshregistry.h"
+#include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
+#include "reone/graphics/textureregistry.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/scene/render/pipeline/pbr.h"
 #include "reone/scene/render/pipeline/retro.h"
@@ -115,7 +117,6 @@ std::unique_ptr<IRenderPipeline> RenderPipelineFactory::create(RendererType type
             _options,
             _context,
             _meshRegistry,
-            _pbrTextures,
             _shaderRegistry,
             _textureRegistry,
             _uniforms);

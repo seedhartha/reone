@@ -38,10 +38,10 @@ public:
             options,
             context,
             meshRegistry,
-            pbrTextures,
             shaderRegistry,
             textureRegistry,
-            uniforms) {
+            uniforms),
+        _pbrTextures(pbrTextures) {
     }
 
     void init() override;
@@ -90,6 +90,8 @@ private:
         std::shared_ptr<graphics::Framebuffer> fbPongHalf;
         std::shared_ptr<graphics::Framebuffer> fbOutput;
     };
+
+    graphics::PBRTextures &_pbrTextures;
 
     RenderTargets _renderTargets;
 

@@ -21,13 +21,13 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/resource/gff.h"
 #include "reone/resource/provider/textures.h"
 #include "reone/resource/resources.h"
+#include "reone/scene/render/pass.h"
 
 #include "reone/gui/gui.h"
 
@@ -54,13 +54,13 @@ void ScrollBar::load(const resource::generated::GUI_BASECONTROL &gui, bool proto
 
 void ScrollBar::render(const glm::ivec2 &screenSize,
                        const glm::ivec2 &offset,
-                       graphics::IRenderPass &pass) {
+                       scene::IRenderPass &pass) {
     renderThumb(offset, pass);
     renderArrows(offset, pass);
 }
 
 void ScrollBar::renderThumb(const glm::ivec2 &offset,
-                            graphics::IRenderPass &pass) {
+                            scene::IRenderPass &pass) {
     if (!_thumb.image || _state.numVisible >= _state.count) {
         return;
     }
@@ -100,7 +100,7 @@ void ScrollBar::renderThumb(const glm::ivec2 &offset,
 }
 
 void ScrollBar::renderArrows(const glm::ivec2 &offset,
-                             graphics::IRenderPass &pass) {
+                             scene::IRenderPass &pass) {
     if (!_dir.image)
         return;
 
@@ -118,7 +118,7 @@ void ScrollBar::renderArrows(const glm::ivec2 &offset,
 }
 
 void ScrollBar::renderUpArrow(const glm::ivec2 &offset,
-                              graphics::IRenderPass &pass) {
+                              scene::IRenderPass &pass) {
     pass.drawImage(
         *_dir.image,
         {_extent.left + offset.x, _extent.top + offset.y},
@@ -126,7 +126,7 @@ void ScrollBar::renderUpArrow(const glm::ivec2 &offset,
 }
 
 void ScrollBar::renderDownArrow(const glm::ivec2 &offset,
-                                graphics::IRenderPass &pass) {
+                                scene::IRenderPass &pass) {
     auto uv = glm::mat3x4(
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),

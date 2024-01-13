@@ -24,6 +24,7 @@
 #include "reone/graphics/textureregistry.h"
 #include "reone/graphics/textureutil.h"
 #include "reone/graphics/uniforms.h"
+#include "reone/scene/render/pass/pbr.h"
 #include "reone/system/checkutil.h"
 #include "reone/system/randomutil.h"
 #include "reone/system/threadutil.h"
@@ -252,7 +253,7 @@ void PBRRenderPipeline::initSSAOSamples() {
 
 Texture &PBRRenderPipeline::render() {
     _context.withViewport(glm::ivec4(0, 0, _targetSize), [this]() {
-        auto pass = RenderPass(
+        auto pass = PBRRenderPass(
             _options,
             _context,
             _shaderRegistry,

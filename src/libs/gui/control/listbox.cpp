@@ -32,6 +32,7 @@
 
 using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 

@@ -19,8 +19,9 @@
 
 #include "reone/graphics/framebuffer.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/renderpass.h"
 #include "reone/graphics/texture.h"
+
+#include "pass.h"
 
 template <>
 struct std::hash<glm::ivec2> {
@@ -61,7 +62,7 @@ public:
     virtual void init() = 0;
 
     virtual void reset() = 0;
-    virtual void inRenderPass(graphics::RenderPassName name, std::function<void(graphics::IRenderPass &)> block) = 0;
+    virtual void inRenderPass(RenderPassName name, std::function<void(IRenderPass &)> block) = 0;
 
     virtual graphics::Texture &render() = 0;
 };
@@ -75,13 +76,13 @@ public:
 
 class RenderPipelineBase : public IRenderPipeline, boost::noncopyable {
 public:
-    using RenderPassCallback = std::function<void(graphics::IRenderPass &)>;
+    using RenderPassCallback = std::function<void(IRenderPass &)>;
 
     void reset() override {
         _passCallbacks.clear();
     }
 
-    void inRenderPass(graphics::RenderPassName name, RenderPassCallback callback) override {
+    void inRenderPass(RenderPassName name, RenderPassCallback callback) override {
         _passCallbacks[name] = std::move(callback);
     }
 
@@ -95,7 +96,6 @@ protected:
     graphics::GraphicsOptions &_options;
     graphics::Context &_context;
     graphics::MeshRegistry &_meshRegistry;
-    graphics::PBRTextures &_pbrTextures;
     graphics::ShaderRegistry &_shaderRegistry;
     graphics::TextureRegistry &_textureRegistry;
     graphics::Uniforms &_uniforms;
@@ -105,14 +105,13 @@ protected:
     glm::mat4 _shadowLightSpace[graphics::kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};
 
-    graphics::RenderPassName _passName {graphics::RenderPassName::None};
-    std::map<graphics::RenderPassName, RenderPassCallback> _passCallbacks;
+    RenderPassName _passName {RenderPassName::None};
+    std::map<RenderPassName, RenderPassCallback> _passCallbacks;
 
     RenderPipelineBase(glm::ivec2 targetSize,
                        graphics::GraphicsOptions &options,
                        graphics::Context &context,
                        graphics::MeshRegistry &meshRegistry,
-                       graphics::PBRTextures &pbrTextures,
                        graphics::ShaderRegistry &shaderRegistry,
                        graphics::TextureRegistry &textureRegistry,
                        graphics::Uniforms &uniforms) :
@@ -120,7 +119,6 @@ protected:
         _options(options),
         _context(context),
         _meshRegistry(meshRegistry),
-        _pbrTextures(pbrTextures),
         _shaderRegistry(shaderRegistry),
         _textureRegistry(textureRegistry),
         _uniforms(uniforms) {

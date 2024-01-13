@@ -38,16 +38,16 @@ namespace graphics {
 struct GraphicsServices;
 
 class Font;
-class IRenderPass;
 class Texture;
 
 } // namespace graphics
 
 namespace scene {
 
+class IRenderPass;
 class ISceneGraphs;
 
-}
+} // namespace scene
 
 namespace gui {
 
@@ -108,7 +108,7 @@ public:
 
     virtual void load(const resource::generated::GUI_BASECONTROL &gui, bool protoItem = false);
     virtual void update(float dt);
-    virtual void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset, graphics::IRenderPass &pass);
+    virtual void render(const glm::ivec2 &screenSize, const glm::ivec2 &offset, scene::IRenderPass &pass);
 
     void updateTransform();
     void updateTextLines();
@@ -246,12 +246,12 @@ protected:
     void renderBorder(const Border &border,
                       const glm::ivec2 &offset,
                       const glm::ivec2 &size,
-                      graphics::IRenderPass &pass);
+                      scene::IRenderPass &pass);
 
     void renderText(const std::vector<std::string> &lines,
                     const glm::ivec2 &offset,
                     const glm::ivec2 &size,
-                    graphics::IRenderPass &pass);
+                    scene::IRenderPass &pass);
 
     virtual const glm::vec3 &getBorderColor() const;
 

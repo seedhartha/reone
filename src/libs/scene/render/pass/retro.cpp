@@ -15,26 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "reone/graphics/renderpass.h"
+#include "reone/scene/render/pass/retro.h"
 
 #include "reone/graphics/context.h"
 #include "reone/graphics/material.h"
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
-#include "reone/graphics/pbrtextures.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/system/logutil.h"
 
+using namespace reone::graphics;
+
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
-void RenderPass::draw(Mesh &mesh,
-                      Material &material,
-                      const glm::mat4 &transform,
-                      const glm::mat4 &transformInv) {
+void RetroRenderPass::draw(Mesh &mesh,
+                           Material &material,
+                           const glm::mat4 &transform,
+                           const glm::mat4 &transformInv) {
     withMaterialAppliedToContext(material, [&]() {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
@@ -46,7 +47,7 @@ void RenderPass::draw(Mesh &mesh,
     });
 }
 
-void RenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
+void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
     static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
         {MaterialType::OpaqueModel, ShaderProgramId::deferredOpaqueModel},    //
         {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
@@ -61,20 +62,6 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     _context.useProgram(_shaderRegistry.get(kMatTypeToProgramId.at(material.type)));
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
-    }
-    if (material.textures.count(TextureUnits::envMapCube) > 0) {
-        auto &envMap = material.textures.at(TextureUnits::envMapCube).get();
-        if (_options.pbr) {
-            auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
-            if (envMapDerived) {
-                _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
-                _context.bindTexture(*envMapDerived->get().prefiltered, TextureUnits::pbrPrefiltered);
-            } else {
-                _context.bindTexture(envMap, TextureUnits::pbrIrradiance);
-                _context.bindTexture(envMap, TextureUnits::pbrPrefiltered);
-                _pbrTextures.requestEnvMapDerived({envMap});
-            }
-        }
     }
     auto prevBlending = _context.blendMode();
     if (material.blending && *material.blending != prevBlending) {
@@ -100,7 +87,7 @@ void RenderPass::withMaterialAppliedToContext(const Material &material, std::fun
     }
 }
 
-int RenderPass::materialFeatureMask(const Material &material) const {
+int RetroRenderPass::materialFeatureMask(const Material &material) const {
     int mask = 0;
     const auto &textures = material.textures;
     if (textures.count(TextureUnits::mainTex) > 0) {
@@ -146,11 +133,11 @@ int RenderPass::materialFeatureMask(const Material &material) const {
     return mask;
 }
 
-void RenderPass::drawSkinned(Mesh &mesh,
-                             Material &material,
-                             const glm::mat4 &transform,
-                             const glm::mat4 &transformInv,
-                             const std::vector<glm::mat4> &bones) {
+void RetroRenderPass::drawSkinned(Mesh &mesh,
+                                  Material &material,
+                                  const glm::mat4 &transform,
+                                  const glm::mat4 &transformInv,
+                                  const std::vector<glm::mat4> &bones) {
     withMaterialAppliedToContext(material, [&]() {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
@@ -166,11 +153,11 @@ void RenderPass::drawSkinned(Mesh &mesh,
     });
 }
 
-void RenderPass::drawDangly(Mesh &mesh,
-                            Material &material,
-                            const glm::mat4 &transform,
-                            const glm::mat4 &transformInv,
-                            const std::vector<glm::vec4> &positions) {
+void RetroRenderPass::drawDangly(Mesh &mesh,
+                                 Material &material,
+                                 const glm::mat4 &transform,
+                                 const glm::mat4 &transformInv,
+                                 const std::vector<glm::vec4> &positions) {
     withMaterialAppliedToContext(material, [&]() {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
@@ -187,11 +174,11 @@ void RenderPass::drawDangly(Mesh &mesh,
     });
 }
 
-void RenderPass::drawSaber(Mesh &mesh,
-                           Material &material,
-                           const glm::mat4 &transform,
-                           const glm::mat4 &transformInv,
-                           const std::vector<glm::vec4> &positions) {
+void RetroRenderPass::drawSaber(Mesh &mesh,
+                                Material &material,
+                                const glm::mat4 &transform,
+                                const glm::mat4 &transformInv,
+                                const std::vector<glm::vec4> &positions) {
     withMaterialAppliedToContext(material, [&]() {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
@@ -208,11 +195,11 @@ void RenderPass::drawSaber(Mesh &mesh,
     });
 }
 
-void RenderPass::drawBillboard(Texture &texture,
-                               const glm::vec4 &color,
-                               const glm::mat4 &transform,
-                               const glm::mat4 &transformInv,
-                               std::optional<float> size) {
+void RetroRenderPass::drawBillboard(Texture &texture,
+                                    const glm::vec4 &color,
+                                    const glm::mat4 &transform,
+                                    const glm::mat4 &transformInv,
+                                    std::optional<float> size) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::billboard));
     _context.bindTexture(texture, TextureUnits::mainTex);
     _uniforms.setLocals([&transform, &transformInv, &size, &color](auto &locals) {
@@ -230,11 +217,11 @@ void RenderPass::drawBillboard(Texture &texture,
     _context.popBlendMode();
 }
 
-void RenderPass::drawParticles(Texture &texture,
-                               FaceCullMode faceCulling,
-                               bool premultipliedAlpha,
-                               const glm::ivec2 &gridSize,
-                               const std::vector<ParticleInstance> &particles) {
+void RetroRenderPass::drawParticles(Texture &texture,
+                                    FaceCullMode faceCulling,
+                                    bool premultipliedAlpha,
+                                    const glm::ivec2 &gridSize,
+                                    const std::vector<ParticleInstance> &particles) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitParticles));
     _context.bindTexture(texture, TextureUnits::mainTex);
     _uniforms.setLocals([&premultipliedAlpha](auto &locals) {
@@ -264,11 +251,11 @@ void RenderPass::drawParticles(Texture &texture,
     }
 }
 
-void RenderPass::drawGrass(float radius,
-                           float quadSize,
-                           Texture &texture,
-                           std::optional<std::reference_wrapper<Texture>> &lightmap,
-                           const std::vector<GrassInstance> &instances) {
+void RetroRenderPass::drawGrass(float radius,
+                                float quadSize,
+                                Texture &texture,
+                                std::optional<std::reference_wrapper<Texture>> &lightmap,
+                                const std::vector<GrassInstance> &instances) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredGrass));
     _context.bindTexture(texture, TextureUnits::mainTex);
     if (lightmap) {
@@ -293,8 +280,8 @@ void RenderPass::drawGrass(float radius,
     _meshRegistry.get(MeshName::grass).drawInstanced(instances.size());
 }
 
-void RenderPass::applyMaterialToLocals(const Material &material,
-                                       LocalUniforms &locals) {
+void RetroRenderPass::applyMaterialToLocals(const Material &material,
+                                            LocalUniforms &locals) {
     locals.featureMask |= materialFeatureMask(material);
     locals.uv = material.uv;
     locals.color = material.color;
@@ -312,11 +299,11 @@ void RenderPass::applyMaterialToLocals(const Material &material,
     }
 }
 
-void RenderPass::drawImage(Texture &texture,
-                           const glm::ivec2 &position,
-                           const glm::ivec2 &scale,
-                           glm::vec4 color = glm::vec4(1.0f),
-                           glm::mat3x4 uv = glm::mat3x4(1.0f)) {
+void RetroRenderPass::drawImage(Texture &texture,
+                                const glm::ivec2 &position,
+                                const glm::ivec2 &scale,
+                                glm::vec4 color = glm::vec4(1.0f),
+                                glm::mat3x4 uv = glm::mat3x4(1.0f)) {
     _uniforms.setLocals([&position, &color, &uv, &scale](auto &locals) {
         locals.reset();
         locals.model = glm::translate(glm::vec3(position.x, position.y, 0.0f));
@@ -329,6 +316,6 @@ void RenderPass::drawImage(Texture &texture,
     _meshRegistry.get(MeshName::quad).draw();
 }
 
-} // namespace graphics
+} // namespace scene
 
 } // namespace reone

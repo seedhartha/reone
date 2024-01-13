@@ -111,7 +111,7 @@ public:
     MOCK_METHOD(void, init, (), (override));
 
     MOCK_METHOD(void, reset, (), (override));
-    MOCK_METHOD(void, inRenderPass, (graphics::RenderPassName, std::function<void(graphics::IRenderPass &)>), (override));
+    MOCK_METHOD(void, inRenderPass, (RenderPassName, std::function<void(IRenderPass &)>), (override));
 
     MOCK_METHOD(graphics::Texture &, render, (), (override));
 };

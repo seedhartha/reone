@@ -94,8 +94,8 @@ public:
 
     void update(float dt) override;
 
-    void renderLeafs(graphics::IRenderPass &pass, const std::vector<SceneNode *> &leafs) override;
-    void renderAABB(graphics::IRenderPass &pass);
+    void renderLeafs(IRenderPass &pass, const std::vector<SceneNode *> &leafs) override;
+    void renderAABB(IRenderPass &pass);
 
     void computeAABB();
     void signalEvent(const std::string &name);

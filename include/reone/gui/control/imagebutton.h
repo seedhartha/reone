@@ -48,7 +48,7 @@ public:
         const std::string &iconText,
         const std::shared_ptr<graphics::Texture> &iconTexture,
         const std::shared_ptr<graphics::Texture> &iconFrame,
-        graphics::IRenderPass &pass);
+        scene::IRenderPass &pass);
 
 private:
     std::shared_ptr<graphics::Texture> _iconFrame;
@@ -59,7 +59,7 @@ private:
         const std::string &iconText,
         const std::shared_ptr<graphics::Texture> &iconTexture,
         const std::shared_ptr<graphics::Texture> &iconFrame,
-        graphics::IRenderPass &pass);
+        scene::IRenderPass &pass);
 };
 
 } // namespace gui

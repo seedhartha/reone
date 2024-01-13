@@ -22,16 +22,17 @@
 #include "reone/graphics/mesh.h"
 #include "reone/graphics/meshregistry.h"
 #include "reone/graphics/renderbuffer.h"
-#include "reone/graphics/renderpass.h"
 #include "reone/graphics/shaderregistry.h"
 #include "reone/graphics/texture.h"
 #include "reone/graphics/uniforms.h"
 #include "reone/gui/gui.h"
 #include "reone/resource/provider/fonts.h"
 #include "reone/resource/provider/textures.h"
+#include "reone/scene/render/pass.h"
 
 using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
