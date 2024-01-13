@@ -124,14 +124,14 @@ public:
      * @throws IllegalPhonemeException
      */
     std::unique_ptr<graphics::LipAnimation> compose(const std::string &name,
-                                                    const std::string &text,
+                                                    const std::string &u8Text,
                                                     float duration,
                                                     std::vector<TimeSpan> silentSpans = std::vector<TimeSpan>());
 
 private:
     PronouncingDictionary _dict;
 
-    std::vector<std::vector<std::string>> split(const std::string &text);
+    std::vector<std::vector<std::string>> split(const std::string &u8Text);
 };
 
 } // namespace reone

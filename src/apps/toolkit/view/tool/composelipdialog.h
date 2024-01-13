@@ -60,6 +60,7 @@ private:
     std::vector<float> m_soundWaveform;
 
     ByteBuffer m_cmudictBytes;
+    ByteBuffer m_rudicBytes;
 
     void analyzeAudio();
 

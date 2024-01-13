@@ -77,6 +77,7 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
     ${TESTS_SOURCE_DIR}/system/textreader.cpp
     ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/system/unicodeutil.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/audioanalyzer.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/composer.cpp
     ${TESTS_SOURCE_DIR}/tools/script/exprtree.cpp

@@ -18,8 +18,10 @@
 #include "reone/tools/lip/composer.h"
 
 #include "reone/graphics/lipanimation.h"
+#include "reone/system/checkutil.h"
 #include "reone/system/stringbuilder.h"
 #include "reone/system/textreader.h"
+#include "reone/system/unicodeutil.h"
 #include "reone/tools/types.h"
 
 using namespace reone::graphics;
@@ -66,6 +68,17 @@ static const std::unordered_map<std::string, LipShape> g_phonemeToShape {
     {"y", LipShape::D_DH_S_Y_Z},   //
     {"z", LipShape::D_DH_S_Y_Z},   //
     {"zh", LipShape::CH_JH_SH_ZH}, //
+
+    // Russian
+    {"a", LipShape::AA_AE_AH},      //
+    {"c", LipShape::D_DH_S_Y_Z},    //
+    {"e", LipShape::EH_ER_EY},      //
+    {"h", LipShape::G_HH_K_NG},     //
+    {"i", LipShape::IH_IY},         //
+    {"j", LipShape::CH_JH_SH_ZH},   //
+    {"o", LipShape::AO},            //
+    {"sch", LipShape::CH_JH_SH_ZH}, //
+    {"u", LipShape::UH_UW_W},       //
 };
 
 void PronouncingDictionary::load(IInputStream &stream) {
@@ -78,18 +91,22 @@ void PronouncingDictionary::load(IInputStream &stream) {
         boost::split(tokens, *line, boost::is_space(), boost::token_compress_on);
         auto word = tokens.front();
         if (*word.rbegin() == ')') {
+            // TODO: support variations
             continue;
         }
         tokens.erase(tokens.begin(), tokens.begin() + 1);
+        for (auto &token : tokens) {
+            boost::to_lower(token);
+        }
         _wordToPhonemes.insert(std::make_pair(word, tokens));
     }
 }
 
 std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
-                                                   const std::string &text,
+                                                   const std::string &u8Text,
                                                    float duration,
                                                    std::vector<TimeSpan> silentSpans) {
-    auto wordGroups = split(text);
+    auto wordGroups = split(u8Text);
 
     auto spans = std::vector<TimeSpan>();
     if (silentSpans.empty()) {
@@ -119,14 +136,18 @@ std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
             }
             auto wordPhonemes = _dict.phonemes(word);
             for (const auto &phoneme : wordPhonemes) {
-                auto lowerPhoneme = boost::to_lower_copy(phoneme);
-                if (std::isdigit((*lowerPhoneme.rbegin()))) {
-                    lowerPhoneme.pop_back();
+                auto phonemeCopy = phoneme;
+                if (std::isdigit((*phonemeCopy.rbegin()))) {
+                    phonemeCopy.pop_back();
                 }
-                if (g_phonemeToShape.count(lowerPhoneme) == 0) {
-                    throw IllegalPhonemeException(lowerPhoneme);
+                if (phonemeCopy.length() > 1 && boost::ends_with(phonemeCopy, "j")) {
+                    // de-pallatize consonants from Russian dictionary
+                    phonemeCopy.pop_back();
                 }
-                auto shape = g_phonemeToShape.at(lowerPhoneme);
+                if (g_phonemeToShape.count(phonemeCopy) == 0) {
+                    throw IllegalPhonemeException(phonemeCopy);
+                }
+                auto shape = g_phonemeToShape.at(phonemeCopy);
                 groupPhonemeShapes.push_back(shape);
             }
         }
@@ -152,20 +173,21 @@ std::unique_ptr<LipAnimation> LipComposer::compose(const std::string &name,
         std::move(frames));
 }
 
-std::vector<std::vector<std::string>> LipComposer::split(const std::string &text) {
+std::vector<std::vector<std::string>> LipComposer::split(const std::string &u8Text) {
     std::vector<std::vector<std::string>> wordGroups;
     std::vector<std::string> words;
-    StringBuilder word;
+    std::vector<uint32_t> word;
 
+    auto codePoints = codePointsFromUTF8(u8Text);
     int groupStart = -1;
-    for (size_t i = 0; i < text.length(); ++i) {
-        const auto &ch = text[i];
-        if (ch == '(') {
+    for (size_t i = 0; i < codePoints.size(); ++i) {
+        uint32_t codePoint = codePoints[i];
+        if (codePoint == '(') {
             if (groupStart != -1) {
                 throw TextSyntaxException(str(boost::format("Unexpected '(' character at %d") % i));
             }
             if (!word.empty()) {
-                words.push_back(word.string());
+                words.push_back(utf8FromCodePoints(word));
                 word.clear();
             }
             if (!words.empty()) {
@@ -175,12 +197,12 @@ std::vector<std::vector<std::string>> LipComposer::split(const std::string &text
             groupStart = i;
             continue;
         }
-        if (ch == ')') {
+        if (codePoint == ')') {
             if (groupStart == -1) {
                 throw TextSyntaxException(str(boost::format("Unexpected ')' character at %d") % i));
             }
             if (!word.empty()) {
-                words.push_back(word.string());
+                words.push_back(utf8FromCodePoints(word));
                 word.clear();
             }
             if (!words.empty()) {
@@ -190,35 +212,39 @@ std::vector<std::vector<std::string>> LipComposer::split(const std::string &text
             groupStart = -1;
             continue;
         }
-        if (ch == '|') {
+        if (codePoint == '|') {
             if (!word.empty()) {
-                words.push_back(word.string());
+                words.push_back(utf8FromCodePoints(word));
                 word.clear();
             }
             words.push_back("");
             continue;
         }
-        if (std::isspace(ch)) {
+        if (std::isspace(codePoint)) {
             if (!word.empty()) {
-                words.push_back(word.string());
+                words.push_back(utf8FromCodePoints(word));
                 word.clear();
             }
             continue;
         }
-        if (std::isalpha(ch) || ((ch == '\'' || ch == '-') && !word.empty())) {
-            word.append(std::tolower(ch));
+        if (isCodePointAlpha(codePoint)) {
+            word.push_back(codePointToLower(codePoint));
             continue;
         }
-        if (std::ispunct(ch)) {
+        if ((codePoint == '\'' || codePoint == '-') && !word.empty()) {
+            word.push_back(codePoint);
             continue;
         }
-        throw TextSyntaxException(str(boost::format("Unexpected character %d at %d") % static_cast<int>(ch) % i));
+        if (std::ispunct(codePoint)) {
+            continue;
+        }
+        throw TextSyntaxException(str(boost::format("Unexpected UTF-8 code point %04x at %d") % codePoint % i));
     }
     if (groupStart != -1) {
         throw TextSyntaxException(str(boost::format("Expected matching ')' character for '(' at %d") % groupStart));
     }
     if (!word.empty()) {
-        words.push_back(word.string());
+        words.push_back(utf8FromCodePoints(word));
     }
     if (!words.empty()) {
         wordGroups.push_back(words);

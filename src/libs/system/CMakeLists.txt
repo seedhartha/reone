@@ -46,7 +46,8 @@ set(SYSTEM_HEADERS
     ${SYSTEM_INCLUDE_DIR}/threadutil.h
     ${SYSTEM_INCLUDE_DIR}/timer.h
     ${SYSTEM_INCLUDE_DIR}/timespan.h
-    ${SYSTEM_INCLUDE_DIR}/types.h)
+    ${SYSTEM_INCLUDE_DIR}/types.h
+    ${SYSTEM_INCLUDE_DIR}/unicodeutil.h)
 
 set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/binaryreader.cpp
@@ -61,7 +62,8 @@ set(SYSTEM_SOURCES
     ${SYSTEM_SOURCE_DIR}/textreader.cpp
     ${SYSTEM_SOURCE_DIR}/textwriter.cpp
     ${SYSTEM_SOURCE_DIR}/threadpool.cpp
-    ${SYSTEM_SOURCE_DIR}/threadutil.cpp)
+    ${SYSTEM_SOURCE_DIR}/threadutil.cpp
+    ${SYSTEM_SOURCE_DIR}/unicodeutil.cpp)
 
 add_library(system STATIC ${SYSTEM_HEADERS} ${SYSTEM_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(system PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/lib)

@@ -22,6 +22,7 @@
 #include "reone/system/stream/memoryoutput.h"
 #include "reone/system/textwriter.h"
 #include "reone/tools/lip/composer.h"
+#include "reone/tools/types.h"
 
 using namespace reone;
 
@@ -41,14 +42,32 @@ TEST(pronouncing_dictionary, should_load_phonemes_from_stream) {
 
     // then
     auto phonemes = dict.phonemes("hello");
-    EXPECT_EQ(phonemes, (std::vector<std::string> {"HH", "AH0", "L", "OW1"}));
+    EXPECT_EQ(phonemes, (std::vector<std::string> {"hh", "ah0", "l", "ow1"}));
+}
+
+TEST(pronouncing_dict, should_load_russian_phonemes_from_stream) {
+    // given
+    auto bytes = ByteBuffer();
+    auto ostream = MemoryOutputStream(bytes);
+    auto writer = TextWriter(ostream);
+    writer.writeLine(u8"привет p rj i0 vj e1 t");
+    writer.writeLine(u8"мир mj i1 r");
+    auto istream = MemoryInputStream(bytes);
+    auto dict = PronouncingDictionary();
+
+    // when
+    dict.load(istream);
+
+    // then
+    auto phonemes = dict.phonemes(u8"привет");
+    EXPECT_EQ(phonemes, (std::vector<std::string> {"p", "rj", "i0", "vj", "e1", "t"}));
 }
 
 TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_and_empty_silent_spans) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
-        {"hello", {"HH", "AH0", "L", "OW1"}}, //
-        {"world", {"W", "ER1", "L", "D"}}     //
+        {"hello", {"hh", "ah0", "l", "ow1"}}, //
+        {"world", {"w", "er1", "l", "d"}}     //
     };
     auto dict = PronouncingDictionary(wordToPhonemes);
     auto composer = LipComposer(dict);
@@ -85,10 +104,10 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_implicit_word_groups_a
 TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_and_silent_spans) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
-        {"hello", {"HH", "AH0", "L", "OW1"}},   //
-        {"world", {"W", "ER1", "L", "D"}},      //
-        {"lorem", {"L", "AO", "R", "EH", "M"}}, //
-        {"ipsum", {"IH", "P", "S", "AH0", "M"}} //
+        {"hello", {"hh", "ah0", "l", "ow1"}},   //
+        {"world", {"w", "er1", "l", "d"}},      //
+        {"lorem", {"l", "ao", "r", "eh", "m"}}, //
+        {"ipsum", {"ih", "p", "s", "ah0", "m"}} //
     };
     auto dict = PronouncingDictionary(wordToPhonemes);
     auto composer = LipComposer(dict);
@@ -160,10 +179,10 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_word_groups_a
 TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {{
-        "all", {"AA", "AE", "AH", "AO", "AW", "AY", "B", "CH", "D", "DH", //
-                "EH", "ER", "EY", "F", "G", "HH", "IH", "IY", "JH", "K",  //
-                "L", "M", "N", "NG", "OW", "OY", "P", "R", "S", "SH",     //
-                "T", "TH", "UH", "UW", "V", "W", "Y", "Z", "ZH"}          //
+        "all", {"aa", "ae", "ah", "ao", "aw", "ay", "b", "ch", "d", "dh", //
+                "eh", "er", "ey", "f", "g", "hh", "ih", "iy", "jh", "k",  //
+                "l", "m", "n", "ng", "ow", "oy", "p", "r", "s", "sh",     //
+                "t", "th", "uh", "uw", "v", "w", "y", "z", "zh"}          //
     }};
     auto dict = PronouncingDictionary(wordToPhonemes);
     auto composer = LipComposer(dict);
@@ -262,8 +281,8 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_all_phonemes) {
 TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_pauses) {
     // given
     auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
-        {"hello", {"HH", "AH0", "L", "OW1"}}, //
-        {"world", {"W", "ER1", "L", "D"}}     //
+        {"hello", {"hh", "ah0", "l", "ow1"}}, //
+        {"world", {"w", "er1", "l", "d"}}     //
     };
     auto dict = PronouncingDictionary(wordToPhonemes);
     auto composer = LipComposer(dict);
@@ -297,4 +316,31 @@ TEST(lip_composer, should_compose_lip_file_from_text_with_explicit_pauses) {
     EXPECT_EQ(keyframes[7].shape, 12);
     EXPECT_EQ(keyframes[8].shape, 6);
     EXPECT_EQ(keyframes[9].shape, 0);
+}
+
+TEST(lip_composer, should_compose_lip_file_from_russian_text) {
+    // given
+    auto wordToPhonemes = PronouncingDictionary::WordPhonemesMap {
+        {u8"все", {
+                      "a", "b", "c", "ch",  //
+                      "d", "e", "f", "g",   //
+                      "h", "i", "j", "k",   //
+                      "l", "m", "n", "o",   //
+                      "p", "r", "s", "sch", //
+                      "sh", "t", "u", "v",  //
+                      "y", "z", "zh"        //
+                  }}};
+    auto dict = PronouncingDictionary(wordToPhonemes);
+    auto composer = LipComposer(dict);
+
+    // when
+    auto anim = composer.compose("name", u8"все", 1.0f);
+
+    // then
+    EXPECT_TRUE(anim);
+    EXPECT_EQ(anim->name(), "name");
+    EXPECT_EQ(anim->length(), 1.0f);
+    auto &keyframes = anim->keyframes();
+    EXPECT_EQ(keyframes.size(), 28);
+    EXPECT_EQ(keyframes[27].shape, 0);
 }

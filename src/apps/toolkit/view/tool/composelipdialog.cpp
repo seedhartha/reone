@@ -302,12 +302,25 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
     }
     auto cmudict = MemoryInputStream(m_cmudictBytes);
 
+    if (m_rudicBytes.empty()) {
+        auto rudicPath = std::filesystem::current_path();
+        rudicPath.append("ru.dic");
+        if (std::filesystem::exists(rudicPath)) {
+            auto rudic = FileInputStream(rudicPath);
+            int length = rudic.length();
+            m_rudicBytes.resize(length);
+            rudic.read(&m_rudicBytes[0], length);
+        }
+    }
+    auto rudic = MemoryInputStream(m_rudicBytes);
+
     auto pronounciationValue = m_pronounciationCtrl->GetValue();
     auto pronouncingBuffer = ByteBuffer(pronounciationValue.begin(), pronounciationValue.end());
     auto pronouncing = MemoryInputStream(pronouncingBuffer);
 
     auto dict = PronouncingDictionary();
     dict.load(cmudict);
+    dict.load(rudic);
     dict.load(pronouncing);
 
     std::unique_ptr<LipAnimation> anim;
