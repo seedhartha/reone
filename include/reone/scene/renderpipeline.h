@@ -49,6 +49,11 @@ struct GraphicsOptions;
 
 namespace scene {
 
+enum class RendererType {
+    Retro,
+    PBR
+};
+
 class IRenderPipeline {
 public:
     virtual ~IRenderPipeline() = default;
@@ -65,30 +70,12 @@ class IRenderPipelineFactory {
 public:
     virtual ~IRenderPipelineFactory() = default;
 
-    virtual std::unique_ptr<IRenderPipeline> create(glm::ivec2 targetSize) = 0;
+    virtual std::unique_ptr<IRenderPipeline> create(RendererType type, glm::ivec2 targetSize) = 0;
 };
 
-class RenderPipeline : public IRenderPipeline, boost::noncopyable {
+class RenderPipelineBase : public IRenderPipeline, boost::noncopyable {
 public:
     using RenderPassCallback = std::function<void(graphics::IRenderPass &)>;
-
-    RenderPipeline(glm::ivec2 targetSize,
-                   graphics::GraphicsOptions &options,
-                   graphics::Context &context,
-                   graphics::MeshRegistry &meshRegistry,
-                   graphics::PBRTextures &pbrTextures,
-                   graphics::ShaderRegistry &shaderRegistry,
-                   graphics::TextureRegistry &textureRegistry,
-                   graphics::Uniforms &uniforms) :
-        _targetSize(std::move(targetSize)),
-        _options(options),
-        _context(context),
-        _meshRegistry(meshRegistry),
-        _pbrTextures(pbrTextures),
-        _shaderRegistry(shaderRegistry),
-        _textureRegistry(textureRegistry),
-        _uniforms(uniforms) {
-    }
 
     void init() override;
 
@@ -102,7 +89,7 @@ public:
 
     graphics::Texture &render() override;
 
-private:
+protected:
     struct RenderTargets {
         std::shared_ptr<graphics::Texture> cbGBufDiffuse;
         std::shared_ptr<graphics::Texture> cbGBufLightmap;
@@ -168,6 +155,24 @@ private:
     graphics::RenderPassName _passName {graphics::RenderPassName::None};
     std::map<graphics::RenderPassName, RenderPassCallback> _passCallbacks;
 
+    RenderPipelineBase(glm::ivec2 targetSize,
+                       graphics::GraphicsOptions &options,
+                       graphics::Context &context,
+                       graphics::MeshRegistry &meshRegistry,
+                       graphics::PBRTextures &pbrTextures,
+                       graphics::ShaderRegistry &shaderRegistry,
+                       graphics::TextureRegistry &textureRegistry,
+                       graphics::Uniforms &uniforms) :
+        _targetSize(std::move(targetSize)),
+        _options(options),
+        _context(context),
+        _meshRegistry(meshRegistry),
+        _pbrTextures(pbrTextures),
+        _shaderRegistry(shaderRegistry),
+        _textureRegistry(textureRegistry),
+        _uniforms(uniforms) {
+    }
+
     void initRenderTargets();
     void initSSAOSamples();
 
@@ -200,6 +205,50 @@ private:
     // END Render Passes
 };
 
+class RetroRenderPipeline : public RenderPipelineBase {
+public:
+    RetroRenderPipeline(glm::ivec2 targetSize,
+                        graphics::GraphicsOptions &options,
+                        graphics::Context &context,
+                        graphics::MeshRegistry &meshRegistry,
+                        graphics::PBRTextures &pbrTextures,
+                        graphics::ShaderRegistry &shaderRegistry,
+                        graphics::TextureRegistry &textureRegistry,
+                        graphics::Uniforms &uniforms) :
+        RenderPipelineBase(
+            std::move(targetSize),
+            options,
+            context,
+            meshRegistry,
+            pbrTextures,
+            shaderRegistry,
+            textureRegistry,
+            uniforms) {
+    }
+};
+
+class PBRRenderPipeline : public RenderPipelineBase {
+public:
+    PBRRenderPipeline(glm::ivec2 targetSize,
+                      graphics::GraphicsOptions &options,
+                      graphics::Context &context,
+                      graphics::MeshRegistry &meshRegistry,
+                      graphics::PBRTextures &pbrTextures,
+                      graphics::ShaderRegistry &shaderRegistry,
+                      graphics::TextureRegistry &textureRegistry,
+                      graphics::Uniforms &uniforms) :
+        RenderPipelineBase(
+            std::move(targetSize),
+            options,
+            context,
+            meshRegistry,
+            pbrTextures,
+            shaderRegistry,
+            textureRegistry,
+            uniforms) {
+    }
+};
+
 class RenderPipelineFactory : public IRenderPipelineFactory, boost::noncopyable {
 public:
     RenderPipelineFactory(graphics::GraphicsOptions &options,
@@ -218,16 +267,31 @@ public:
         _uniforms(uniforms) {
     }
 
-    std::unique_ptr<IRenderPipeline> create(glm::ivec2 targetSize) override {
-        return std::make_unique<RenderPipeline>(
-            targetSize,
-            _options,
-            _context,
-            _meshRegistry,
-            _pbrTextures,
-            _shaderRegistry,
-            _textureRegistry,
-            _uniforms);
+    std::unique_ptr<IRenderPipeline> create(RendererType type, glm::ivec2 targetSize) override {
+        switch (type) {
+        case RendererType::Retro:
+            return std::make_unique<RetroRenderPipeline>(
+                std::move(targetSize),
+                _options,
+                _context,
+                _meshRegistry,
+                _pbrTextures,
+                _shaderRegistry,
+                _textureRegistry,
+                _uniforms);
+        case RendererType::PBR:
+            return std::make_unique<PBRRenderPipeline>(
+                std::move(targetSize),
+                _options,
+                _context,
+                _meshRegistry,
+                _pbrTextures,
+                _shaderRegistry,
+                _textureRegistry,
+                _uniforms);
+        default:
+            throw std::invalid_argument("Unsupported renderer type: " + std::to_string(static_cast<int>(type)));
+        }
     }
 
 private:

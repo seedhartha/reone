@@ -442,7 +442,8 @@ void SceneGraph::prepareTransparentLeafs() {
 
 Texture &SceneGraph::render(const glm::ivec2 &dim) {
     if (!_renderPipeline) {
-        _renderPipeline = _renderPipelineFactory.create(dim);
+        auto rendererType = _graphicsOpt.pbr ? RendererType::PBR : RendererType::Retro;
+        _renderPipeline = _renderPipelineFactory.create(rendererType, dim);
         _renderPipeline->init();
     }
     auto &pipeline = *_renderPipeline;

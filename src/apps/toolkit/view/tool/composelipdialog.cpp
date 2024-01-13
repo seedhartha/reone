@@ -160,7 +160,7 @@ ComposeLipDialog::ComposeLipDialog(wxWindow *parent,
         auto length = pronouncingDict.length();
         auto buffer = std::string(length, '\0');
         pronouncingDict.read(&buffer[0], length);
-        m_pronounciationCtrl->SetValue(wxString::FromUTF8(buffer));
+        m_pronounciationCtrl->SetValue(wxString::FromUTF8(buffer.data(), buffer.size()));
     }
 }
 
@@ -346,7 +346,7 @@ void ComposeLipDialog::OnComposeCommand(wxCommandEvent &evt) {
         if (!pronounciationText.EndsWith("\n")) {
             appendix.append("\n");
         }
-        m_pronounciationCtrl->AppendText(wxString::FromUTF8(appendix));
+        m_pronounciationCtrl->AppendText(wxString::FromUTF8(appendix.data(), appendix.size()));
         return;
     } catch (const std::exception &ex) {
         wxMessageBox(wxString::FromUTF8(ex.what()), "Error", wxICON_ERROR);

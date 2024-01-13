@@ -43,7 +43,7 @@ static constexpr float kSSRMaxSteps = 64.0f;
 
 static constexpr float kSharpenAmount = 0.25f;
 
-void RenderPipeline::init() {
+void RenderPipelineBase::init() {
     checkThat(!_inited, "Pipeline already initialized");
     checkMainThread();
 
@@ -55,7 +55,7 @@ void RenderPipeline::init() {
     _inited = true;
 }
 
-void RenderPipeline::initRenderTargets() {
+void RenderPipelineBase::initRenderTargets() {
     auto halfSize = _targetSize / 2;
 
     // Reusable targets
@@ -237,7 +237,7 @@ void RenderPipeline::initRenderTargets() {
     _renderTargets.fbOutput->init();
 }
 
-void RenderPipeline::initSSAOSamples() {
+void RenderPipelineBase::initSSAOSamples() {
     _uniforms.setScreenEffect([](auto &screenEffect) {
         for (int i = 0; i < kNumSSAOSamples; ++i) {
             float scale = i / static_cast<float>(kNumSSAOSamples);
@@ -250,7 +250,7 @@ void RenderPipeline::initSSAOSamples() {
     });
 }
 
-Texture &RenderPipeline::render() {
+Texture &RenderPipelineBase::render() {
     _context.withViewport(glm::ivec4(0, 0, _targetSize), [this]() {
         auto pass = RenderPass(
             _options,
@@ -354,35 +354,35 @@ Texture &RenderPipeline::render() {
     return *_renderTargets.cbOutput;
 }
 
-void RenderPipeline::beginDirLightShadowsPass() {
+void RenderPipelineBase::beginDirLightShadowsPass() {
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
     _context.bindDrawFramebuffer(*_renderTargets.fbDirLightShadows);
     _context.clearDepth();
 }
 
-void RenderPipeline::endDirLightShadowsPass() {
+void RenderPipelineBase::endDirLightShadowsPass() {
     _context.popViewport();
 }
 
-void RenderPipeline::beginPointLightShadowsPass() {
+void RenderPipelineBase::beginPointLightShadowsPass() {
     _context.pushViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
     _context.bindDrawFramebuffer(*_renderTargets.fbPointLightShadows);
     _context.clearDepth();
 }
 
-void RenderPipeline::endPointLightShadowsPass() {
+void RenderPipelineBase::endPointLightShadowsPass() {
     _context.popViewport();
 }
 
-void RenderPipeline::beginOpaqueGeometryPass() {
+void RenderPipelineBase::beginOpaqueGeometryPass() {
     _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3, 4, 5, 6, 7});
     _context.clearColorDepth();
 }
 
-void RenderPipeline::endOpaqueGeometryPass() {
+void RenderPipelineBase::endOpaqueGeometryPass() {
 }
 
-void RenderPipeline::renderSSAO(float sampleRadius, float bias) {
+void RenderPipelineBase::renderSSAO(float sampleRadius, float bias) {
     auto size = _targetSize / 2;
     _uniforms.setScreenEffect([&size, &sampleRadius, &bias](auto &se) {
         se.screenResolution = glm::vec2(size);
@@ -401,7 +401,7 @@ void RenderPipeline::renderSSAO(float sampleRadius, float bias) {
     });
 }
 
-void RenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps) {
+void RenderPipelineBase::renderSSR(float bias, float pixelStride, float maxSteps) {
     auto size = _targetSize / 2;
     _uniforms.setScreenEffect([&](auto &se) {
         se.screenResolution = glm::vec2(size);
@@ -423,7 +423,7 @@ void RenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps) {
     });
 }
 
-void RenderPipeline::combineOpaqueGeometry() {
+void RenderPipelineBase::combineOpaqueGeometry() {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::deferredCombine));
     _context.bindDrawFramebuffer(*_renderTargets.fbDeferredCombine, {0, 1});
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
@@ -449,19 +449,19 @@ void RenderPipeline::combineOpaqueGeometry() {
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void RenderPipeline::beginTransparentGeometryPass() {
+void RenderPipelineBase::beginTransparentGeometryPass() {
     _context.bindDrawFramebuffer(*_renderTargets.fbTransparentGeometry, {0, 1});
     _context.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
     _context.pushBlending(BlendMode::OIT_Transparent);
     glDepthMask(GL_FALSE);
 }
 
-void RenderPipeline::endTransparentGeometryPass() {
+void RenderPipelineBase::endTransparentGeometryPass() {
     glDepthMask(GL_TRUE);
     _context.popBlending();
 }
 
-void RenderPipeline::blendTransparentGeometry() {
+void RenderPipelineBase::blendTransparentGeometry() {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::oitBlend));
     _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
     _context.bindTexture(*_renderTargets.cbDeferredOpaque1);
@@ -472,14 +472,14 @@ void RenderPipeline::blendTransparentGeometry() {
     _meshRegistry.get(MeshName::quadNDC).draw();
 }
 
-void RenderPipeline::beginPostProcessingPass() {
+void RenderPipelineBase::beginPostProcessingPass() {
     _context.bindDrawFramebuffer(*_renderTargets.fbOutput, {0});
 }
 
-void RenderPipeline::endPostProcessingPass() {
+void RenderPipelineBase::endPostProcessingPass() {
 }
 
-void RenderPipeline::applyBoxBlur(Texture &srcTexture, Framebuffer &dst, const glm::ivec2 &size) {
+void RenderPipelineBase::applyBoxBlur(Texture &srcTexture, Framebuffer &dst, const glm::ivec2 &size) {
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::postBoxBlur4));
     _context.bindDrawFramebuffer(dst, {0});
     _context.bindTexture(srcTexture);
@@ -489,10 +489,10 @@ void RenderPipeline::applyBoxBlur(Texture &srcTexture, Framebuffer &dst, const g
     });
 }
 
-void RenderPipeline::applyGaussianBlur(Texture &tex,
-                                       Framebuffer &dst,
-                                       const glm::ivec2 &size,
-                                       const GaussianBlurParams &params) {
+void RenderPipelineBase::applyGaussianBlur(Texture &tex,
+                                           Framebuffer &dst,
+                                           const glm::ivec2 &size,
+                                           const GaussianBlurParams &params) {
     _uniforms.setScreenEffect([&size, &params](auto &se) {
         se.screenResolution = glm::vec2(size);
         se.screenResolutionRcp = 1.0f / se.screenResolution;
@@ -509,10 +509,10 @@ void RenderPipeline::applyGaussianBlur(Texture &tex,
     });
 }
 
-void RenderPipeline::applyMedianFilter(Texture &tex,
-                                       Framebuffer &dst,
-                                       const glm::ivec2 &size,
-                                       bool strong) {
+void RenderPipelineBase::applyMedianFilter(Texture &tex,
+                                           Framebuffer &dst,
+                                           const glm::ivec2 &size,
+                                           bool strong) {
     _context.useProgram(_shaderRegistry.get(strong
                                                 ? ShaderProgramId::postMedianFilter5
                                                 : ShaderProgramId::postMedianFilter3));
@@ -524,7 +524,7 @@ void RenderPipeline::applyMedianFilter(Texture &tex,
     });
 }
 
-void RenderPipeline::applyFXAA(Texture &tex, Framebuffer &dst, const glm::ivec2 &size) {
+void RenderPipelineBase::applyFXAA(Texture &tex, Framebuffer &dst, const glm::ivec2 &size) {
     _uniforms.setScreenEffect([&size](auto &se) {
         se.screenResolution = glm::vec2(size);
         se.screenResolutionRcp = 1.0f / se.screenResolution;
@@ -538,10 +538,10 @@ void RenderPipeline::applyFXAA(Texture &tex, Framebuffer &dst, const glm::ivec2 
     });
 }
 
-void RenderPipeline::applySharpen(Texture &tex,
-                                  Framebuffer &dst,
-                                  const glm::ivec2 &size,
-                                  float amount) {
+void RenderPipelineBase::applySharpen(Texture &tex,
+                                      Framebuffer &dst,
+                                      const glm::ivec2 &size,
+                                      float amount) {
     _uniforms.setScreenEffect([&size, &amount](auto &se) {
         se.screenResolution = glm::vec2(size);
         se.screenResolutionRcp = 1.0f / se.screenResolution;
