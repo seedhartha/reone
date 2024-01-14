@@ -21,95 +21,98 @@ namespace reone {
 
 namespace graphics {
 
-AABB::AABB(const glm::vec3 &min, const glm::vec3 &max) :
-    _empty(false), _min(min), _max(max) {
-    updateTransform();
+void AABB::onMinMaxChanged() {
+    _center = 0.5f * (_min + _max);
+    _size = _max - _min;
 }
 
 AABB AABB::operator*(const glm::mat4 &m) const {
-    AABB aabb;
-    if (!_empty) {
-        glm::vec3 a(m * glm::vec4(_min, 1.0f));
-        glm::vec3 b(m * glm::vec4(_max, 1.0f));
-
-        glm::vec3 min(
-            glm::min(a.x, b.x),
-            glm::min(a.y, b.y),
-            glm::min(a.z, b.z));
-
-        glm::vec3 max(
-            glm::max(a.x, b.x),
-            glm::max(a.y, b.y),
-            glm::max(a.z, b.z));
-
-        aabb = AABB(min, max);
+    if (_degenerate) {
+        return *this;
     }
-
-    return aabb;
+    std::array<glm::vec4, 8> corners;
+    corners[0] = {_min.x, _min.y, _min.z, 1.0f};
+    corners[1] = {_min.x, _min.y, _max.z, 1.0f};
+    corners[2] = {_min.x, _max.y, _min.z, 1.0f};
+    corners[3] = {_min.x, _max.y, _max.z, 1.0f};
+    corners[4] = {_max.x, _min.y, _min.z, 1.0f};
+    corners[5] = {_max.x, _min.y, _max.z, 1.0f};
+    corners[6] = {_max.x, _max.y, _min.z, 1.0f};
+    corners[7] = {_max.x, _max.y, _max.z, 1.0f};
+    glm::vec4 min {std::numeric_limits<float>::max()};
+    glm::vec4 max {std::numeric_limits<float>::min()};
+    for (auto &p : corners) {
+        p = m * p;
+        min = glm::min(min, p);
+        max = glm::max(max, p);
+    }
+    return AABB {min, max};
 }
 
 void AABB::reset() {
-    _min = glm::vec3(0.0f, 0.0f, 0.0f);
-    _max = glm::vec3(0.0f, 0.0f, 0.0f);
-    _empty = true;
-
-    updateTransform();
+    _min = glm::vec3 {0.0f};
+    _max = glm::vec3 {0.0f};
+    _center = glm::vec3 {0.0f};
+    _size = glm::vec3 {0.0f};
+    _degenerate = true;
 }
 
 void AABB::expand(const glm::vec3 &p) {
-    if (_empty) {
+    if (_degenerate) {
         _min.x = p.x;
         _min.y = p.y;
         _min.z = p.z;
         _max = _min;
-        _empty = false;
-    } else {
-        if (p.x < _min.x)
-            _min.x = p.x;
-        if (p.y < _min.y)
-            _min.y = p.y;
-        if (p.z < _min.z)
-            _min.z = p.z;
-        if (p.x > _max.x)
-            _max.x = p.x;
-        if (p.y > _max.y)
-            _max.y = p.y;
-        if (p.z > _max.z)
-            _max.z = p.z;
+        _degenerate = false;
+        return;
     }
-
-    updateTransform();
+    if (p.x < _min.x) {
+        _min.x = p.x;
+    }
+    if (p.y < _min.y) {
+        _min.y = p.y;
+    }
+    if (p.z < _min.z) {
+        _min.z = p.z;
+    }
+    if (p.x > _max.x) {
+        _max.x = p.x;
+    }
+    if (p.y > _max.y) {
+        _max.y = p.y;
+    }
+    if (p.z > _max.z) {
+        _max.z = p.z;
+    }
+    onMinMaxChanged();
 }
 
 void AABB::expand(const AABB &aabb) {
-    if (_empty) {
+    if (_degenerate) {
         _min = aabb._min;
         _max = aabb._max;
-        _empty = false;
-
-    } else {
-        if (aabb._min.x < _min.x)
-            _min.x = aabb._min.x;
-        if (aabb._min.y < _min.y)
-            _min.y = aabb._min.y;
-        if (aabb._min.z < _min.z)
-            _min.z = aabb._min.z;
-        if (aabb._max.x > _max.x)
-            _max.x = aabb._max.x;
-        if (aabb._max.y > _max.y)
-            _max.y = aabb._max.y;
-        if (aabb._max.z > _max.z)
-            _max.z = aabb._max.z;
+        _degenerate = false;
+        return;
     }
-    updateTransform();
-}
-
-void AABB::updateTransform() {
-    glm::vec3 size(glm::abs(_max - _min));
-    _center = 0.5f * (_min + _max);
-
-    _transform = glm::translate(glm::mat4(1.0f), _center);
-    _transform = glm::scale(_transform, size);
+    if (aabb._min.x < _min.x) {
+        _min.x = aabb._min.x;
+    }
+    if (aabb._min.y < _min.y) {
+        _min.y = aabb._min.y;
+    }
+    if (aabb._min.z < _min.z) {
+        _min.z = aabb._min.z;
+    }
+    if (aabb._max.x > _max.x) {
+        _max.x = aabb._max.x;
+    }
+    if (aabb._max.y > _max.y) {
+        _max.y = aabb._max.y;
+    }
+    if (aabb._max.z > _max.z) {
+        _max.z = aabb._max.z;
+    }
+    onMinMaxChanged();
 }
 
 bool AABB::contains(const glm::vec2 &p) const {
@@ -129,7 +132,9 @@ bool AABB::intersect(const AABB &other) const {
            (_min.z <= other._max.z && _max.z >= other._min.z);
 }
 
-bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDistance, float &outDistance) const {
+bool AABB::raycast(const glm::vec3 &origin,
+                   const glm::vec3 &invDir,
+                   float maxDistance, float &outDistance) const {
     float tx1 = (_min.x - origin.x) * invDir.x;
     float tx2 = (_max.x - origin.x) * invDir.x;
 
@@ -157,10 +162,6 @@ bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDi
 
     outDistance = tmin;
     return true;
-}
-
-glm::vec3 AABB::size() const {
-    return _max - _min;
 }
 
 } // namespace graphics

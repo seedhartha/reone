@@ -35,7 +35,6 @@
 #include "reone/scene/types.h"
 #include "reone/system/logutil.h"
 
-
 using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -71,7 +70,7 @@ void ModelSceneNode::init() {
     }
     buildNodeTree(*_model->rootNode(), *this);
     computeAABB();
-    _point = _aabb.isEmpty();
+    _point = _aabb.isDegenerate();
 }
 
 void ModelSceneNode::buildNodeTree(ModelNode &node, SceneNode &parent) {

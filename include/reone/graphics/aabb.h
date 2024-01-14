@@ -24,7 +24,13 @@ namespace graphics {
 class AABB {
 public:
     AABB() = default;
-    AABB(const glm::vec3 &min, const glm::vec3 &max);
+
+    AABB(glm::vec3 min, glm::vec3 max) :
+        _degenerate(false),
+        _min(std::move(min)),
+        _max(std::move(max)) {
+        onMinMaxChanged();
+    }
 
     AABB operator*(const glm::mat4 &m) const;
 
@@ -36,25 +42,27 @@ public:
     bool contains(const glm::vec3 &point) const;
     bool intersect(const AABB &other) const;
 
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float maxDistance, float &outDistance) const;
+    bool raycast(const glm::vec3 &origin,
+                 const glm::vec3 &invDir,
+                 float maxDistance,
+                 float &outDistance) const;
 
-    bool isEmpty() const { return _empty; }
-
-    glm::vec3 size() const;
+    bool isDegenerate() const { return _degenerate; }
 
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
     const glm::vec3 &center() const { return _center; }
-    const glm::mat4 &transform() const { return _transform; }
+    const glm::vec3 &size() const { return _size; }
 
 private:
-    bool _empty {true};
     glm::vec3 _min {0.0f};
     glm::vec3 _max {0.0f};
     glm::vec3 _center {0.0f};
-    glm::mat4 _transform {1.0f};
+    glm::vec3 _size {0.0f};
 
-    void updateTransform();
+    bool _degenerate {true};
+
+    void onMinMaxChanged();
 };
 
 } // namespace graphics
