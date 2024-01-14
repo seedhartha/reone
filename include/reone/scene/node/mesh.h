@@ -90,18 +90,10 @@ private:
         glm::vec3 displacement {0.0f};
     };
 
-    struct SaberSegment {
-        glm::vec3 objWorldPos {0.0f};
-        float time {0.0f};
-    };
-
     struct SaberMesh {
         std::vector<SaberVertex> vertices;
-        std::vector<SaberSegment> segments;
+        glm::vec3 displacement {0.0f};
         glm::vec3 prevWorldPos {0.0f};
-        int currSegmentIdx {0};
-        int nextSegmentIdx {0};
-        int numActiveSegments {0};
     } _saber;
 
     ModelSceneNode &_model;
