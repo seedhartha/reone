@@ -1,4 +1,3 @@
-#include "i_gamma.glsl"
 #include "i_math.glsl"
 
 in vec4 fragPosWorld;

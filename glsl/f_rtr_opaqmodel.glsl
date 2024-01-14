@@ -71,7 +71,6 @@ void main() {
                        ? getShadow(viewPos, fragPosWorld.xyz, normal, sShadowMap, sShadowMapCube)
                        : 0.0;
     vec3 color = min(vec3(1.0), (ambient + (1.0 - shadow) * diffuse)) * mainTexSample.rgb;
-    vec3 hilights = step(1e-4, uSelfIllumColor.rgb) * step(0.95, color) * color;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 R = reflect(-viewDir, normal);
         vec4 envmapSample = sampleEnvMap(sEnvMap, sEnvMapCube, R);
@@ -81,6 +80,7 @@ void main() {
         float fog = getFog(fragPosWorld.xyz);
         color = mix(color, uFogColor.rgb, fog);
     }
+    vec3 hilights = step(1e-4, uSelfIllumColor.rgb) * step(0.95, color) * color;
     fragColor = vec4(color, 1.0);
     fragHilights = vec4(hilights, 1.0);
 }

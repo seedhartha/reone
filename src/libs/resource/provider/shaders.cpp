@@ -126,7 +126,7 @@ void Shaders::init() {
     auto fragText = initShader(ShaderType::Fragment, kFragText);
     auto fragTexture = initShader(ShaderType::Fragment, kFragTexture);
     auto fragTextureNoPerspective = initShader(ShaderType::Fragment, kFragTextureNoPerspective);
-    auto fragPBRIrradiance = initShader(ShaderType::Fragment, kFragPBRIrradiance);
+    auto fragIrradiance = initShader(ShaderType::Fragment, kFragPBRIrradiance);
     auto fragPBRBRDF = initShader(ShaderType::Fragment, kFragPBRBRDF);
     auto fragPBRPrefilter = initShader(ShaderType::Fragment, kFragPBRPrefilter);
     auto fragProfiler = initShader(ShaderType::Fragment, kFragProfiler);
@@ -160,7 +160,7 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::postMedianFilter5, initShaderProgram({vertPassthrough, fragPostMedianFilter5}));
     _shaderRegistry.add(ShaderProgramId::postSharpen, initShaderProgram({vertPassthrough, fragPostSharpen}));
     _shaderRegistry.add(ShaderProgramId::text, initShaderProgram({vertText, fragText}));
-    _shaderRegistry.add(ShaderProgramId::pbrIrradiance, initShaderProgram({vertMVP, fragPBRIrradiance}));
+    _shaderRegistry.add(ShaderProgramId::pbrIrradiance, initShaderProgram({vertMVP, fragIrradiance}));
     _shaderRegistry.add(ShaderProgramId::brdfLUT, initShaderProgram({vertMVP, fragPBRBRDF}));
     _shaderRegistry.add(ShaderProgramId::pbrPrefilter, initShaderProgram({vertMVP, fragPBRPrefilter}));
     _shaderRegistry.add(ShaderProgramId::profiler, initShaderProgram({vertMVP, fragProfiler}));
@@ -235,7 +235,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sEnvMap", TextureUnits::envMap);
     program->setUniform("sNormalMap", TextureUnits::normalMap);
-    program->setUniform("sGBufPrefilteredEnv", TextureUnits::gBufEnvMap);
+    program->setUniform("sGBufPrefilteredEnv", TextureUnits::gBufPrefilteredEnv);
     program->setUniform("sGBufSelfIllum", TextureUnits::gBufSelfIllum);
     program->setUniform("sGBufFeatures", TextureUnits::gBufFeatures);
     program->setUniform("sGBufEyePos", TextureUnits::gBufEyePos);
@@ -253,7 +253,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sBRDFLUT", TextureUnits::brdfLUT);
     program->setUniform("sPBRIrradiance", TextureUnits::pbrIrradiance);
     program->setUniform("sPBRPrefiltered", TextureUnits::pbrPrefiltered);
-    program->setUniform("sGBufIrradiance", TextureUnits::gBufPBRIrradiance);
+    program->setUniform("sGBufIrradiance", TextureUnits::gBufIrradiance);
 
     // Uniform Blocks
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);

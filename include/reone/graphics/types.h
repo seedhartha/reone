@@ -150,7 +150,7 @@ struct TextureUnits {
     static constexpr int lightmap = 1;
     static constexpr int envMap = 2;
     static constexpr int normalMap = 3;
-    static constexpr int gBufEnvMap = 4;
+    static constexpr int gBufPrefilteredEnv = 4;
     static constexpr int gBufSelfIllum = 5;
     static constexpr int gBufFeatures = 6;
     static constexpr int gBufEyePos = 7;
@@ -162,7 +162,7 @@ struct TextureUnits {
     static constexpr int oitRevealage = 13;
     static constexpr int noise = 14;
     static constexpr int brdfLUT = 15;
-    static constexpr int gBufPBRIrradiance = 16;
+    static constexpr int gBufIrradiance = 16;
 
     // Cubemaps
 

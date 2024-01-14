@@ -26,12 +26,12 @@ in mat3 fragTBN;
 
 layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragLightmapColor;
-layout(location = 2) out vec4 fragEnvmapColor;
+layout(location = 2) out vec4 fragPrefilteredEnvColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
 layout(location = 4) out vec4 fragFeatures;
 layout(location = 5) out vec4 fragEyePos;
 layout(location = 6) out vec4 fragEyeNormal;
-layout(location = 7) out vec3 fragPBRIrradiance;
+layout(location = 7) out vec3 fragIrradiance;
 
 const float MAX_REFLECTION_LOD = 4.0;
 
@@ -89,10 +89,10 @@ void main() {
 
     fragDiffuseColor = diffuseColor;
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
-    fragEnvmapColor = envmapColor;
+    fragPrefilteredEnvColor = envmapColor;
     fragSelfIllumColor = vec4(uSelfIllumColor.rgb, 1.0);
     fragFeatures = features;
     fragEyePos = vec4(eyePos, 0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
-    fragPBRIrradiance = pbrIrradianceColor;
+    fragIrradiance = pbrIrradianceColor;
 }
