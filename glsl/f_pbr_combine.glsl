@@ -148,8 +148,8 @@ void main() {
         ambientS = environment * (F * brdfSample.x + brdfSample.y);
     }
 
-    vec3 color = min(vec3(1.0), ao * ambientD + (1.0 - shadow) * (directD + emission)) * albedo;
-    color += ao * ambientS + directS;
+    vec3 color = min(vec3(1.0), ao * ambientD + (1.0 - shadow) * (max(vec3(0.0), directD) + emission)) * albedo;
+    color += ao * ambientS + max(vec3(0.0), directS);
     color = linearToGamma(color);
     color = mix(color, uFogColor.rgb, fog);
 

@@ -70,7 +70,7 @@ void main() {
     float shadow = isFeatureEnabled(FEATURE_SHADOWS)
                        ? getShadow(viewPos, fragPosWorld.xyz, normal, sShadowMap, sShadowMapCube)
                        : 0.0;
-    vec3 color = min(vec3(1.0), (ambient + (1.0 - shadow) * diffuse)) * mainTexSample.rgb;
+    vec3 color = min(vec3(1.0), (ambient + (1.0 - shadow) * max(vec3(0.0), diffuse))) * mainTexSample.rgb;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 R = reflect(-viewDir, normal);
         vec4 envmapSample = sampleEnvMap(sEnvMap, sEnvMapCube, R);
