@@ -77,7 +77,8 @@ public:
     virtual void setBackground(std::shared_ptr<graphics::Texture> texture) = 0;
 
     virtual std::unique_ptr<Control> newControl(ControlType type, std::string tag) = 0;
-    virtual void addControl(std::shared_ptr<Control> control) = 0;
+    virtual void addControlToFront(std::shared_ptr<Control> control) = 0;
+    virtual void addControlToBack(std::shared_ptr<Control> control) = 0;
 
     virtual std::shared_ptr<Control> findControl(const std::string &tag) const = 0;
 };
@@ -147,7 +148,8 @@ public:
 
     std::unique_ptr<Control> newControl(ControlType type, std::string tag) override;
 
-    void addControl(std::shared_ptr<Control> control) override;
+    void addControlToFront(std::shared_ptr<Control> control) override;
+    void addControlToBack(std::shared_ptr<Control> control) override;
 
     std::shared_ptr<Control> findControl(const std::string &tag) const override;
 

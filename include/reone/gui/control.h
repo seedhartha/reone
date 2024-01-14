@@ -167,7 +167,11 @@ public:
 
     // Childen
 
-    void addChild(Control &child) {
+    void addChildToFront(Control &child) {
+        _children.insert(_children.begin(), child);
+    }
+
+    void addChildToBack(Control &child) {
         _children.push_back(child);
     }
 

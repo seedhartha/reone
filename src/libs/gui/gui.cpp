@@ -87,7 +87,7 @@ void GUI::load(const Gff &gui) {
         }
         auto &parent = maybeParent->second.get();
         for (auto &child : children) {
-            parent.addChild(child);
+            parent.addChildToBack(child);
         }
     }
 }
@@ -352,8 +352,14 @@ std::unique_ptr<Control> GUI::newControl(
     return control;
 }
 
-void GUI::addControl(std::shared_ptr<Control> control) {
-    _rootControl->get().addChild(*control);
+void GUI::addControlToFront(std::shared_ptr<Control> control) {
+    _rootControl->get().addChildToFront(*control);
+    _tagToControl.insert({control->tag(), *control});
+    _controls.push_back(std::move(control));
+}
+
+void GUI::addControlToBack(std::shared_ptr<Control> control) {
+    _rootControl->get().addChildToBack(*control);
     _tagToControl.insert({control->tag(), *control});
     _controls.push_back(std::move(control));
 }

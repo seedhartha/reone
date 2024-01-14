@@ -120,7 +120,7 @@ void DialogGUI::addFrame(std::string tag, int top, int height) {
     frame->setExtent(std::move(extent));
     frame->setBorderFill("blackfill");
 
-    _gui->addControl(std::move(frame));
+    _gui->addControlToFront(std::move(frame));
 }
 
 void DialogGUI::configureMessage() {
