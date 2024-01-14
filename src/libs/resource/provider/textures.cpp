@@ -103,9 +103,6 @@ std::shared_ptr<Texture> Textures::doGet(const std::string &resRef, TextureUsage
             (features->numX > 1 || features->numY > 1)) {
             convertGridTextureToArray(*texture, features->numX, features->numY);
         }
-        // if (texture->isCubemap()) {
-        //     prepareCubemap(*texture);
-        // }
         float anisotropy = std::max(1.0f, exp2f(_options.anisotropicFiltering));
         texture->setAnisotropy(anisotropy);
     } else {

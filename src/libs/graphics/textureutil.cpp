@@ -61,33 +61,6 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
     dstFormat = alpha ? PixelFormat::RGBA8 : PixelFormat::RGB8;
 }
 
-static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp) {
-    if (width != height) {
-        throw std::invalid_argument(str(boost::format("Invalid texture size: width=%d, height=%d") % width % height));
-    }
-    size_t n = width;
-    size_t w = n / 2;
-    size_t h = (n + 1) / 2;
-    uint8_t *pixels = reinterpret_cast<uint8_t *>(layer.pixels->data());
-
-    for (size_t x = 0; x < w; ++x) {
-        for (size_t y = 0; y < h; ++y) {
-            const size_t d0 = (y * n + x) * bpp;
-            const size_t d1 = ((n - 1 - x) * n + y) * bpp;
-            const size_t d2 = ((n - 1 - y) * n + (n - 1 - x)) * bpp;
-            const size_t d3 = (x * n + (n - 1 - y)) * bpp;
-
-            for (size_t p = 0; p < static_cast<size_t>(bpp); ++p) {
-                uint8_t tmp = pixels[d0 + p];
-                pixels[d0 + p] = pixels[d1 + p];
-                pixels[d1 + p] = pixels[d2 + p];
-                pixels[d2 + p] = pixels[d3 + p];
-                pixels[d3 + p] = tmp;
-            }
-        }
-    }
-}
-
 static int getBytesPerPixel(PixelFormat format) {
     switch (format) {
     case PixelFormat::R8:
@@ -100,35 +73,6 @@ static int getBytesPerPixel(PixelFormat format) {
         return 4;
     default:
         throw std::invalid_argument("Unsupported pixel format: " + std::to_string(static_cast<int>(format)));
-    }
-}
-
-void prepareCubemap(Texture &texture) {
-    static constexpr int rotations[] = {1, 3, 0, 2, 2, 0};
-
-    PixelFormat srcFormat = texture.pixelFormat();
-    PixelFormat dstFormat = texture.pixelFormat();
-    bool compressed = isCompressed(srcFormat);
-
-    auto &layers = texture.layers();
-    int numLayers = static_cast<int>(layers.size());
-    if (numLayers == kNumCubeFaces) {
-        std::swap(layers[0], layers[1]);
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            auto &layer = layers[i];
-            if (!layer.pixels) {
-                throw std::invalid_argument(str(boost::format("Layer %d of texture '%s' is empty") % i % texture.name()));
-            }
-            if (compressed) {
-                decompressLayer(texture.width(), texture.height(), layer, srcFormat, dstFormat);
-                texture.setPixelFormat(dstFormat);
-            }
-            for (int j = 0; j < rotations[i]; ++j) {
-                rotateLayer90(texture.width(), texture.height(), layer, getBytesPerPixel(dstFormat));
-            }
-        }
-    } else {
-        throw std::invalid_argument(str(boost::format("Texture '%s' has %d layers, %d expected") % texture.name() % numLayers % kNumCubeFaces));
     }
 }
 
