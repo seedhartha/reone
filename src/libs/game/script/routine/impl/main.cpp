@@ -62,6 +62,9 @@ namespace game {
 static Variable Random(const std::vector<Variable> &args, const RoutineContext &ctx) {
     // Load
     auto nMaxInteger = getInt(args, 0);
+    if (nMaxInteger <= 0) {
+        return Variable::ofInt(0);
+    }
 
     // Transform
 

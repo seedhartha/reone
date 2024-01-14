@@ -50,6 +50,9 @@ void Pathfinder::load(const std::vector<Path::Point> &points, const std::unorder
 
         glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
+            if (pointZ.count(adjPointIdx) == 0) {
+                continue;
+            }
             const Path::Point &adjPoint = points[adjPointIdx];
             _adjacentVertices[i].push_back(static_cast<uint16_t>(adjPointIdx));
         }

@@ -86,8 +86,12 @@ void Equipment::onGUILoaded() {
         _btnInv[slotName.first] = findControl<Button>("BTN_INV_" + slotName.second);
     }
 
-    _controls.BTN_CHANGE1->setSelectable(false);
-    _controls.BTN_CHANGE2->setSelectable(false);
+    if (_controls.BTN_CHANGE1) {
+        _controls.BTN_CHANGE1->setSelectable(false);
+    }
+    if (_controls.BTN_CHANGE2) {
+        _controls.BTN_CHANGE2->setSelectable(false);
+    }
     // _controls.btnCharLeft->setVisible(false);
     // _controls.btnCharRight->setVisible(false);
     _controls.LB_DESC->setVisible(false);
