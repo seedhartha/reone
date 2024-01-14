@@ -69,7 +69,7 @@ void PBRTextures::refreshBRDF() {
 
     _context.withViewport(glm::ivec4 {0, 0, kBRDFTextureSize, kBRDFTextureSize}, [this]() {
         _context.bindDrawFramebuffer(*_brdfFramebuffer, {0});
-        auto &shader = _shaderRegistry.get(ShaderProgramId::pbrBRDF);
+        auto &shader = _shaderRegistry.get(ShaderProgramId::brdfLUT);
         _context.useProgram(shader);
         _uniforms.setGlobals([](auto &globals) {
             globals.reset();

@@ -443,7 +443,7 @@ void PBRRenderPipeline::combineOpaqueGeometry() {
         _context.bindTexture(*_renderTargets.cbSSR, TextureUnits::ssr);
     }
     if (_options.pbr) {
-        _context.bindTexture(_pbrTextures.brdf(), TextureUnits::pbrBRDF);
+        _context.bindTexture(_pbrTextures.brdf(), TextureUnits::brdfLUT);
         _context.bindTexture(*_renderTargets.cbGBufPBRIrradiance, TextureUnits::gBufPBRIrradiance);
     }
     _context.clearColorDepth();

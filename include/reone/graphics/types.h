@@ -161,7 +161,7 @@ struct TextureUnits {
     static constexpr int oitAccum = 12;
     static constexpr int oitRevealage = 13;
     static constexpr int noise = 14;
-    static constexpr int pbrBRDF = 15;
+    static constexpr int brdfLUT = 15;
     static constexpr int gBufPBRIrradiance = 16;
 
     // Cubemaps

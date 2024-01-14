@@ -88,7 +88,7 @@ void main() {
 
             float mipLevel = uRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
 
-            prefilteredColor += gammaToLinear(textureLod(sEnvMapCube, L, mipLevel).rgb) * NdotL;
+            prefilteredColor += textureLod(sEnvMapCube, L, mipLevel).rgb * NdotL;
             totalWeight += NdotL;
         }
     }

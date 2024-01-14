@@ -54,7 +54,7 @@ struct ShaderProgramId {
     static constexpr char postSharpen[] = "post_sharpen";
     static constexpr char text[] = "text";
     static constexpr char pbrIrradiance[] = "pbr_irradiance";
-    static constexpr char pbrBRDF[] = "pbr_brdf";
+    static constexpr char brdfLUT[] = "pbr_brdf";
     static constexpr char pbrPrefilter[] = "pbr_prefilter";
     static constexpr char profiler[] = "profiler";
 };
