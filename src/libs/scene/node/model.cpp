@@ -326,6 +326,9 @@ void ModelSceneNode::updateAnimations(float dt) {
     }
 
     for (auto &channel : _animChannels) {
+        if (!channel.anim) {
+            continue;
+        }
         if (!channel.freeze) {
             updateAnimationChannel(channel, dt);
         }
