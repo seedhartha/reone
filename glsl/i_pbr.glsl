@@ -44,11 +44,12 @@ void PBR_irradianceAmbient(
             continue;
         }
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius) {
+        float lightDist = length(fragToLight);
+        if (lightDist > uLights[i].radius * uLights[i].radius) {
             continue;
         }
-        float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
-        irradiance += attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
+        float attenuation = lightAttenuationQuadratic(uLights[i], lightDist);
+        irradiance += uLights[i].multiplier * attenuation * gammaToLinear(uLights[i].color.rgb);
     }
 
     vec2 brdfSample = texture(brdf, vec2(NdotV, roughness)).rg;
@@ -81,14 +82,15 @@ void PBR_irradianceDirect(
             continue;
         }
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) {
+        float lightDist = length(fragToLight);
+        if (lightDist > uLights[i].radius * uLights[i].radius) {
             continue;
         }
         if (dynamic == 0.0 && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
             continue;
         }
-        float attenuation = lightAttenuationQuadratic(uLights[i], worldPos);
-        vec3 radiance = attenuation * uLights[i].multiplier * gammaToLinear(uLights[i].color.rgb);
+        float attenuation = lightAttenuationQuadratic(uLights[i], lightDist);
+        vec3 radiance = uLights[i].multiplier * attenuation * gammaToLinear(uLights[i].color.rgb);
 
         vec3 L = normalize(fragToLight);
         vec3 H = normalize(V + L);
