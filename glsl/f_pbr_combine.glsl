@@ -58,6 +58,8 @@ void main() {
     float fog = mix(0.0, getFog(fragPosWorld), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
 
     vec3 albedo = gammaToLinear(mainTexSample.rgb);
+    float metallic = 0.0;
+    float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.2, 1.0);
 #ifdef R_SSAO
     float ao = ssaoSample.r;
 #else
@@ -67,14 +69,12 @@ void main() {
     vec3 environment = mix(
         gammaToLinear(prefilteredEnvSample.rgb),
         gammaToLinear(ssrSample.rgb),
-        ssrSample.a);
+        (1.0 - roughness) * ssrSample.a);
 #else
     vec3 environment = gammaToLinear(prefilteredEnvSample.rgb);
 #endif
     vec3 emission = gammaToLinear(selfIllumSample.rgb);
 
-    float metallic = 0.0;
-    float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.2, 1.0);
     vec3 ambientD = vec3(0.0);
     vec3 ambientS = vec3(0.0);
     vec3 directD = vec3(0.0);
