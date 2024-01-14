@@ -48,6 +48,26 @@ public:
 
 private:
     struct RenderTargets {
+        std::shared_ptr<graphics::Texture> dirLightShadowsDepth;
+        std::shared_ptr<graphics::Texture> pointLightShadowsDepth;
+        std::shared_ptr<graphics::Framebuffer> shadows;
+
+        std::shared_ptr<graphics::Texture> opaqueColor;
+        std::shared_ptr<graphics::Texture> opaqueHilights;
+        std::shared_ptr<graphics::Renderbuffer> opaqueDepth;
+        std::shared_ptr<graphics::Framebuffer> opaque;
+
+        std::shared_ptr<graphics::Texture> transparentAccum;
+        std::shared_ptr<graphics::Texture> transparentRevealage;
+        std::shared_ptr<graphics::Renderbuffer> transparentDepth;
+        std::shared_ptr<graphics::Framebuffer> transparent;
+
+        std::shared_ptr<graphics::Texture> pingColor;
+        std::shared_ptr<graphics::Texture> pongColor;
+        std::shared_ptr<graphics::Renderbuffer> pingPongDepth;
+        std::shared_ptr<graphics::Framebuffer> ping;
+        std::shared_ptr<graphics::Framebuffer> pong;
+
         std::shared_ptr<graphics::Texture> outputColor;
         std::shared_ptr<graphics::Renderbuffer> outputDepth;
         std::shared_ptr<graphics::Framebuffer> output;

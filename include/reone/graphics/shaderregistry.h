@@ -26,7 +26,10 @@ namespace graphics {
 
 struct ShaderProgramId {
     static constexpr char billboard[] = "billboard";
-    static constexpr char rtrOpaqueModel[] = "rtr_opaque_model";
+    static constexpr char retroOpaqueModel[] = "retro_opaque_model";
+    static constexpr char retroGrass[] = "retro_grass";
+    static constexpr char retroAABB[] = "retro_aabb";
+    static constexpr char retroWalkmesh[] = "retro_walkmesh";
     static constexpr char pbrAABB[] = "pbr_aabb";
     static constexpr char pbrCombine[] = "pbr_combine";
     static constexpr char pbrGrass[] = "pbr_grass";

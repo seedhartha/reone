@@ -47,7 +47,11 @@ static const std::string kGeometryDirLightShadows = "g_dirlightshadow";
 static const std::string kGeometryPointLightShadows = "g_ptlightshadow";
 
 static const std::string kFragColor = "f_color";
-static const std::string kFragRTROpaqueModel = "f_rtr_opaqmodel";
+static const std::string kFragRetroOpaqueModel = "f_rtr_opaqmodel";
+static const std::string kFragRetroGrass = "f_rtr_grass";
+static const std::string kFragRetroAABB = "f_rtr_aabb";
+static const std::string kFragRetroWalkmesh = "f_rtr_walkmesh";
+static const std::string kFragRetroCombine = "f_rtr_combine";
 static const std::string kFragPBRAABB = "f_pbr_aabb";
 static const std::string kFragPBRCombine = "f_pbr_combine";
 static const std::string kFragPBRGrass = "f_pbr_grass";
@@ -96,7 +100,10 @@ void Shaders::init() {
     auto geomPointLightShadows = initShader(ShaderType::Geometry, kGeometryPointLightShadows);
 
     auto fragColor = initShader(ShaderType::Fragment, kFragColor);
-    auto fragRTROpaqueModel = initShader(ShaderType::Fragment, kFragRTROpaqueModel);
+    auto fragRetroOpaqueModel = initShader(ShaderType::Fragment, kFragRetroOpaqueModel);
+    auto fragRetroGrass = initShader(ShaderType::Fragment, kFragRetroGrass);
+    auto fragRetroAABB = initShader(ShaderType::Fragment, kFragRetroAABB);
+    auto fragRetroWalkmesh = initShader(ShaderType::Fragment, kFragRetroWalkmesh);
     auto fragPBRAABB = initShader(ShaderType::Fragment, kFragPBRAABB);
     auto fragPBRCombine = initShader(ShaderType::Fragment, kFragPBRCombine);
     auto fragPBRGrass = initShader(ShaderType::Fragment, kFragPBRGrass);
@@ -126,7 +133,10 @@ void Shaders::init() {
 
     // Shader Programs
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
-    _shaderRegistry.add(ShaderProgramId::rtrOpaqueModel, initShaderProgram({vertModel, fragRTROpaqueModel}));
+    _shaderRegistry.add(ShaderProgramId::retroOpaqueModel, initShaderProgram({vertModel, fragRetroOpaqueModel}));
+    _shaderRegistry.add(ShaderProgramId::retroGrass, initShaderProgram({vertGrass, fragRetroGrass}));
+    _shaderRegistry.add(ShaderProgramId::retroAABB, initShaderProgram({vertMVPNormal, fragRetroAABB}));
+    _shaderRegistry.add(ShaderProgramId::retroWalkmesh, initShaderProgram({vertWalkmesh, fragRetroWalkmesh}));
     _shaderRegistry.add(ShaderProgramId::pbrAABB, initShaderProgram({vertMVPNormal, fragPBRAABB}));
     _shaderRegistry.add(ShaderProgramId::pbrCombine, initShaderProgram({vertPassthrough, fragPBRCombine}));
     _shaderRegistry.add(ShaderProgramId::pbrGrass, initShaderProgram({vertGrass, fragPBRGrass}));

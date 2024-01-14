@@ -10,10 +10,10 @@ const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
     vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
     vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1));
 
-float getDirectionalLightShadow(vec3 eyePos, vec3 worldPos, sampler2DArray tex) {
+float getDirectionalLightShadow(vec3 viewPos, vec3 worldPos, sampler2DArray tex) {
     int cascade = NUM_SHADOW_CASCADES - 1;
     for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
-        if (abs(eyePos.z) < uShadowCascadeFarPlanes[i]) {
+        if (abs(viewPos.z) < uShadowCascadeFarPlanes[i]) {
             cascade = i;
             break;
         }
@@ -55,10 +55,10 @@ float getPointLightShadow(vec3 worldPos, samplerCube tex) {
     return shadow;
 }
 
-float getShadow(vec3 eyePos, vec3 worldPos, vec3 normal,
+float getShadow(vec3 viewPos, vec3 worldPos, vec3 normal,
                 sampler2DArray tex, samplerCube cubeTex) {
     float shadow = (uShadowLightPosition.w == 0.0)
-                       ? getDirectionalLightShadow(eyePos, worldPos, tex)
+                       ? getDirectionalLightShadow(viewPos, worldPos, tex)
                        : getPointLightShadow(worldPos, cubeTex);
     shadow *= uShadowStrength;
     return shadow;

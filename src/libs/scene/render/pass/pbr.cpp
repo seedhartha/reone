@@ -50,10 +50,10 @@ void PBRRenderPass::draw(Mesh &mesh,
 
 void PBRRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
     static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
-        {MaterialType::OpaqueModel, ShaderProgramId::pbrOpaqueModel},         //
-        {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
         {MaterialType::DirLightShadow, ShaderProgramId::dirLightShadows},     //
         {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
+        {MaterialType::OpaqueModel, ShaderProgramId::pbrOpaqueModel},         //
+        {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
         {MaterialType::AABB, ShaderProgramId::pbrAABB},                       //
         {MaterialType::Walkmesh, ShaderProgramId::pbrWalkmesh}                //
     };

@@ -328,7 +328,7 @@ void Area::loadLYT() {
             if (modelNode.name() == model->name() + "a") {
                 continue;
             }
-            auto sceneNode = modelSceneNode->getNodeByNumber(modelNode.number());
+            auto sceneNode = modelSceneNode->getNodeByName(modelNode.name());
             if (sceneNode) {
                 sceneNode->setStatic(true);
             }

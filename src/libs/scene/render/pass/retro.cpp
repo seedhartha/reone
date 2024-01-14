@@ -49,7 +49,12 @@ void RetroRenderPass::draw(Mesh &mesh,
 
 void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
     static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
-        {MaterialType::OpaqueModel, ShaderProgramId::rtrOpaqueModel}, //
+        {MaterialType::DirLightShadow, ShaderProgramId::dirLightShadows},     //
+        {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
+        {MaterialType::OpaqueModel, ShaderProgramId::retroOpaqueModel},       //
+        {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
+        {MaterialType::AABB, ShaderProgramId::retroAABB},                     //
+        {MaterialType::Walkmesh, ShaderProgramId::retroWalkmesh}              //
     };
     if (kMatTypeToProgramId.count(material.type) == 0) {
         throw std::invalid_argument(str(boost::format("Material type %1% is not associated with a shader program") % static_cast<int>(material.type)));
@@ -254,7 +259,7 @@ void RetroRenderPass::drawGrass(float radius,
                                 Texture &texture,
                                 std::optional<std::reference_wrapper<Texture>> &lightmap,
                                 const std::vector<GrassInstance> &instances) {
-    _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrGrass));
+    _context.useProgram(_shaderRegistry.get(ShaderProgramId::retroGrass));
     _context.bindTexture(texture, TextureUnits::mainTex);
     if (lightmap) {
         _context.bindTexture(lightmap->get(), TextureUnits::lightmap);
