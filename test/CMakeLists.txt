@@ -37,6 +37,7 @@ set(TESTS_HEADERS
 
 set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/audio/format/wavreader.cpp
+    ${TESTS_SOURCE_DIR}/game/pathfinder.cpp
     ${TESTS_SOURCE_DIR}/graphics/aabb.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/bwmreader.cpp
     ${TESTS_SOURCE_DIR}/graphics/format/mdlmdxreader.cpp
@@ -77,13 +78,13 @@ set(TESTS_SOURCES
     ${TESTS_SOURCE_DIR}/system/stringbuilder.cpp
     ${TESTS_SOURCE_DIR}/system/textreader.cpp
     ${TESTS_SOURCE_DIR}/system/textwriter.cpp
+    ${TESTS_SOURCE_DIR}/system/threadpool.cpp
+    ${TESTS_SOURCE_DIR}/system/timer.cpp
     ${TESTS_SOURCE_DIR}/system/unicodeutil.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/audioanalyzer.cpp
     ${TESTS_SOURCE_DIR}/tools/lip/composer.cpp
     ${TESTS_SOURCE_DIR}/tools/script/exprtree.cpp
-    ${TESTS_SOURCE_DIR}/tools/script/exprtreeoptimizer.cpp
-    ${TESTS_SOURCE_DIR}/system/threadpool.cpp
-    ${TESTS_SOURCE_DIR}/system/timer.cpp)
+    ${TESTS_SOURCE_DIR}/tools/script/exprtreeoptimizer.cpp)
 
 add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}$<$<CONFIG:Debug>:/debug>/bin)
