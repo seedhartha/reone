@@ -40,19 +40,14 @@ const Pathfinder::ContextVertex &Pathfinder::Context::getVertexWithLeastTotalCos
 
 void Pathfinder::load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ) {
     for (uint16_t i = 0; i < points.size(); ++i) {
-        if (pointZ.count(i) == 0) {
-            continue;
-        }
+        float z = pointZ.count(i) > 0 ? pointZ.at(i) : 0.0f;
 
         const auto &point = points[i];
-        glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
+        glm::vec3 pointVec(point.x, point.y, z);
         _vertices.push_back(pointVec);
 
         glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
-            if (pointZ.count(adjPointIdx) == 0) {
-                continue;
-            }
             const Path::Point &adjPoint = points[adjPointIdx];
             _adjacentVertices[i].push_back(static_cast<uint16_t>(adjPointIdx));
         }

@@ -68,9 +68,10 @@ TEST(pathfinder, should_find_shortest_path) {
     auto path = pathfinder.findPath(from, to);
 
     // then
-    EXPECT_EQ(path.size(), 4);
+    EXPECT_EQ(path.size(), 5);
     EXPECT_EQ(path.at(0), (glm::vec3 {1.0f, 1.0f, 0.0f}));
     EXPECT_EQ(path.at(1), (glm::vec3 {0.0f, 1.0f, 0.0f}));
     EXPECT_EQ(path.at(2), (glm::vec3 {0.0f, 2.0f, 0.0f}));
-    EXPECT_EQ(path.at(3), (glm::vec3 {1.0f, 3.0f, 0.0f}));
+    EXPECT_EQ(path.at(3), (glm::vec3 {0.0f, 3.0f, 0.0f}));
+    EXPECT_EQ(path.at(4), (glm::vec3 {1.0f, 3.0f, 0.0f}));
 }
