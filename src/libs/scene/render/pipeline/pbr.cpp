@@ -420,7 +420,6 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSR));
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.cbGBufPrefilteredEnv, TextureUnits::gBufPrefilteredEnv);
     _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {

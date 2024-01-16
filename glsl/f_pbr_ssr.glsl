@@ -8,7 +8,6 @@ const float EDGE_FADE_START = 0.8;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
-uniform sampler2D sGBufPrefilteredEnv;
 uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufEyeNormal;
 
@@ -115,8 +114,7 @@ bool traceScreenSpaceRay(
 
 void main() {
     vec4 mainTexSample = texture(sMainTex, fragUV1);
-    vec4 envmapSample = texture(sGBufPrefilteredEnv, fragUV1);
-    if (envmapSample.a == 0.0 || mainTexSample.a == 1.0) {
+    if (mainTexSample.a == 1.0) {
         fragColor = vec4(0.0);
         return;
     }
@@ -143,13 +141,10 @@ void main() {
 
         vec4 hitMainTexSample = texture(sMainTex, hitUV);
         vec4 hitLightmapSample = texture(sLightmap, hitUV);
-        vec4 hitEnvmapSample = texture(sGBufPrefilteredEnv, hitUV);
 
-        reflectionColor = mix(hitMainTexSample.rgb, hitMainTexSample.rgb * hitLightmapSample.rgb, hitLightmapSample.a);
-        reflectionColor += hitEnvmapSample.rgb * (1.0 - hitMainTexSample.a);
+        reflectionColor = hitMainTexSample.rgb * hitMainTexSample.a * mix(vec3(1.0), hitLightmapSample.rgb, hitLightmapSample.a);
         reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
         reflectionStrength *= 1.0 - numSteps / uSSRMaxSteps;
-        reflectionStrength *= 1.0 - clamp(distance(fragPosVS, hitPoint) / MAX_DISTANCE, 0.0, 1.0);
         reflectionStrength *= 1.0 - max(0.0, (maxDim - EDGE_FADE_START) / (1.0 - EDGE_FADE_START));
     }
 
