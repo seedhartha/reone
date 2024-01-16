@@ -16,11 +16,11 @@ in vec2 fragUV1;
 flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragDiffuseColor;
-layout(location = 1) out vec4 fragLightmapColor;
-layout(location = 2) out vec4 fragPrefilteredEnvColor;
+layout(location = 1) out vec4 fragEyeNormal;
+layout(location = 2) out vec4 fragLightmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec4 fragEyeNormal;
-layout(location = 5) out vec3 fragIrradiance;
+layout(location = 4) out vec3 fragIrradiance;
+layout(location = 5) out vec4 fragPrefilteredEnvColor;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;

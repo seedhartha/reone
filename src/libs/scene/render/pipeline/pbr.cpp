@@ -155,11 +155,11 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.fbOpaqueGeometry = std::make_shared<Framebuffer>();
     _renderTargets.fbOpaqueGeometry->attachColorsDepth(
         {_renderTargets.cbGBufDiffuse,
-         _renderTargets.cbGBufLightmap,
-         _renderTargets.cbGBufPrefilteredEnv,
-         _renderTargets.cbGBufSelfIllum,
          _renderTargets.cbGBufEyeNormal,
-         _renderTargets.cbGBufIrradiance},
+         _renderTargets.cbGBufLightmap,
+         _renderTargets.cbGBufSelfIllum,
+         _renderTargets.cbGBufIrradiance,
+         _renderTargets.cbGBufPrefilteredEnv},
         _renderTargets.dbGBuffer);
     _renderTargets.fbOpaqueGeometry->init();
 
