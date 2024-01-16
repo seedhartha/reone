@@ -30,7 +30,6 @@ enum class MaterialType {
     TransparentModel,
     DirLightShadow,
     PointLightShadow,
-    AABB,
     Walkmesh
 };
 

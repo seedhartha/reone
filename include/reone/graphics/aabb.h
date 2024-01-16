@@ -29,7 +29,7 @@ public:
         _degenerate(false),
         _min(std::move(min)),
         _max(std::move(max)) {
-        onMinMaxChanged();
+        updateCorners();
     }
 
     AABB operator*(const glm::mat4 &m) const;
@@ -51,18 +51,16 @@ public:
 
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
-    const glm::vec3 &center() const { return _center; }
-    const glm::vec3 &size() const { return _size; }
+    const std::vector<glm::vec3> &corners() const { return _corners; }
 
 private:
+    bool _degenerate {true};
     glm::vec3 _min {0.0f};
     glm::vec3 _max {0.0f};
-    glm::vec3 _center {0.0f};
-    glm::vec3 _size {0.0f};
 
-    bool _degenerate {true};
+    std::vector<glm::vec3> _corners;
 
-    void onMinMaxChanged();
+    void updateCorners();
 };
 
 } // namespace graphics

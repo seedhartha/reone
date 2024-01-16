@@ -105,6 +105,7 @@ private:
     void cmdKill(std::string input, std::vector<std::string> tokens);
     void cmdAddItem(std::string input, std::vector<std::string> tokens);
     void cmdGiveXP(std::string input, std::vector<std::string> tokens);
+    void cmdShowAABB(std::string input, std::vector<std::string> tokens);
     void cmdShowWalkmesh(std::string input, std::vector<std::string> tokens);
     void cmdShowTriggers(std::string input, std::vector<std::string> tokens);
     void cmdHelp(std::string input, std::vector<std::string> tokens);

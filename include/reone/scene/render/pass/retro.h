@@ -86,6 +86,8 @@ public:
                    std::optional<std::reference_wrapper<graphics::Texture>> &lightmap,
                    const std::vector<GrassInstance> &instances) override;
 
+    void drawAABB(const std::vector<glm::vec4> &corners) override;
+
     void drawImage(graphics::Texture &texture,
                    const glm::ivec2 &position,
                    const glm::ivec2 &scale,

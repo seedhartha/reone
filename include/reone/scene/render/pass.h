@@ -109,6 +109,8 @@ public:
                            std::optional<std::reference_wrapper<graphics::Texture>> &lightmap,
                            const std::vector<GrassInstance> &instances) = 0;
 
+    virtual void drawAABB(const std::vector<glm::vec4> &corners) = 0;
+
     virtual void drawImage(graphics::Texture &texture,
                            const glm::ivec2 &position,
                            const glm::ivec2 &scale,

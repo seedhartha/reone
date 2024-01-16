@@ -44,6 +44,7 @@ public:
     void setUniform(const std::string &name, const glm::vec3 &v);
     void setUniform(const std::string &name, const glm::vec4 &v);
     void setUniform(const std::string &name, const glm::mat4 &m);
+    void setUniform(const std::string &name, const std::vector<glm::vec4> &arr);
     void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
     void setUniform(const std::string &name, const std::function<void(int)> &setter);
 

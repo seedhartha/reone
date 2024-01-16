@@ -54,7 +54,6 @@ void PBRRenderPass::withMaterialAppliedToContext(const Material &material, std::
         {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
         {MaterialType::OpaqueModel, ShaderProgramId::pbrOpaqueModel},         //
         {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
-        {MaterialType::AABB, ShaderProgramId::pbrAABB},                       //
         {MaterialType::Walkmesh, ShaderProgramId::pbrWalkmesh}                //
     };
     if (kMatTypeToProgramId.count(material.type) == 0) {
@@ -310,6 +309,17 @@ void PBRRenderPass::applyMaterialToLocals(const Material &material,
         locals.bumpMapFrame = material.bumpMapFrame;
         locals.bumpMapScale = bumpmap.features().bumpMapScaling;
     }
+}
+
+void PBRRenderPass::drawAABB(const std::vector<glm::vec4> &corners) {
+    auto &program = _shaderRegistry.get(ShaderProgramId::pbrAABB);
+    _context.useProgram(program);
+    program.setUniform("uCorners", corners);
+    _context.withDepthTestMode(DepthTestMode::None, [this]() {
+        _context.withPolygonMode(PolygonMode::Line, [this]() {
+            _meshRegistry.get(MeshName::aabb).draw();
+        });
+    });
 }
 
 void PBRRenderPass::drawImage(Texture &texture,

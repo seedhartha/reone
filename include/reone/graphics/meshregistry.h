@@ -28,7 +28,7 @@ struct MeshName {
     static constexpr char quadNDC[] = "quad_ndc";
     static constexpr char billboard[] = "billboard";
     static constexpr char grass[] = "grass";
-    static constexpr char box[] = "box";
+    static constexpr char aabb[] = "box";
     static constexpr char cubemap[] = "cubemap";
 };
 

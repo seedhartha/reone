@@ -21,28 +21,26 @@ namespace reone {
 
 namespace graphics {
 
-void AABB::onMinMaxChanged() {
-    _center = 0.5f * (_min + _max);
-    _size = _max - _min;
+void AABB::updateCorners() {
+    _corners.resize(8);
+    _corners[0] = {_min.x, _min.y, _min.z};
+    _corners[1] = {_min.x, _min.y, _max.z};
+    _corners[2] = {_min.x, _max.y, _min.z};
+    _corners[3] = {_min.x, _max.y, _max.z};
+    _corners[4] = {_max.x, _min.y, _min.z};
+    _corners[5] = {_max.x, _min.y, _max.z};
+    _corners[6] = {_max.x, _max.y, _min.z};
+    _corners[7] = {_max.x, _max.y, _max.z};
 }
 
 AABB AABB::operator*(const glm::mat4 &m) const {
     if (_degenerate) {
         return *this;
     }
-    std::array<glm::vec4, 8> corners;
-    corners[0] = {_min.x, _min.y, _min.z, 1.0f};
-    corners[1] = {_min.x, _min.y, _max.z, 1.0f};
-    corners[2] = {_min.x, _max.y, _min.z, 1.0f};
-    corners[3] = {_min.x, _max.y, _max.z, 1.0f};
-    corners[4] = {_max.x, _min.y, _min.z, 1.0f};
-    corners[5] = {_max.x, _min.y, _max.z, 1.0f};
-    corners[6] = {_max.x, _max.y, _min.z, 1.0f};
-    corners[7] = {_max.x, _max.y, _max.z, 1.0f};
-    glm::vec4 min {std::numeric_limits<float>::max()};
-    glm::vec4 max {std::numeric_limits<float>::min()};
-    for (auto &p : corners) {
-        p = m * p;
+    glm::vec3 min {std::numeric_limits<float>::max()};
+    glm::vec3 max {std::numeric_limits<float>::lowest()};
+    for (auto &corner : _corners) {
+        glm::vec3 p = m * glm::vec4 {corner, 1.0f};
         min = glm::min(min, p);
         max = glm::max(max, p);
     }
@@ -50,20 +48,18 @@ AABB AABB::operator*(const glm::mat4 &m) const {
 }
 
 void AABB::reset() {
+    _degenerate = true;
     _min = glm::vec3 {0.0f};
     _max = glm::vec3 {0.0f};
-    _center = glm::vec3 {0.0f};
-    _size = glm::vec3 {0.0f};
-    _degenerate = true;
+    _corners.clear();
 }
 
 void AABB::expand(const glm::vec3 &p) {
     if (_degenerate) {
-        _min.x = p.x;
-        _min.y = p.y;
-        _min.z = p.z;
-        _max = _min;
         _degenerate = false;
+        _min = p;
+        _max = p;
+        updateCorners();
         return;
     }
     if (p.x < _min.x) {
@@ -84,35 +80,12 @@ void AABB::expand(const glm::vec3 &p) {
     if (p.z > _max.z) {
         _max.z = p.z;
     }
-    onMinMaxChanged();
+    updateCorners();
 }
 
 void AABB::expand(const AABB &aabb) {
-    if (_degenerate) {
-        _min = aabb._min;
-        _max = aabb._max;
-        _degenerate = false;
-        return;
-    }
-    if (aabb._min.x < _min.x) {
-        _min.x = aabb._min.x;
-    }
-    if (aabb._min.y < _min.y) {
-        _min.y = aabb._min.y;
-    }
-    if (aabb._min.z < _min.z) {
-        _min.z = aabb._min.z;
-    }
-    if (aabb._max.x > _max.x) {
-        _max.x = aabb._max.x;
-    }
-    if (aabb._max.y > _max.y) {
-        _max.y = aabb._max.y;
-    }
-    if (aabb._max.z > _max.z) {
-        _max.z = aabb._max.z;
-    }
-    onMinMaxChanged();
+    expand(aabb._min);
+    expand(aabb._max);
 }
 
 bool AABB::contains(const glm::vec2 &p) const {

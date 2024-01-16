@@ -587,6 +587,7 @@ void Game::updateSceneGraph(float dt) {
     auto &sceneGraph = _services.scene.graphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->cameraSceneNode().get());
     sceneGraph.setUpdateRoots(!_paused);
+    sceneGraph.setRenderAABB(isShowAABBEnabled());
     sceneGraph.setRenderWalkmeshes(isShowWalkmeshEnabled());
     sceneGraph.setRenderTriggers(isShowTriggersEnabled());
     sceneGraph.update(dt);

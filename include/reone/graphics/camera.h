@@ -43,21 +43,7 @@ public:
     }
 
     bool isInFrustum(const AABB &aabb) const {
-        glm::vec3 center(aabb.center());
-        if (isInFrustum(center)) {
-            return true;
-        }
-        glm::vec3 halfSize(aabb.size() * 0.5f);
-        std::vector<glm::vec3> corners {
-            glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
-            glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
-            glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z - halfSize.z),
-            glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z + halfSize.z),
-            glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z - halfSize.z),
-            glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z + halfSize.z),
-            glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z),
-            glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z)};
-        for (auto &corner : corners) {
+        for (auto &corner : aabb.corners()) {
             if (isInFrustum(corner)) {
                 return true;
             }

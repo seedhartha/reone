@@ -96,7 +96,7 @@ float SceneNode::getSquareDistanceTo2D(const glm::vec2 &point) const {
 }
 
 glm::vec3 SceneNode::getWorldCenterOfAABB() const {
-    return _absTransform * glm::vec4(_aabb.center(), 1.0f);
+    return _absTransform * glm::vec4(0.5f * (_aabb.min() + _aabb.max()), 1.0f);
 }
 
 void SceneNode::setLocalTransform(glm::mat4 transform) {

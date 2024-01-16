@@ -37,6 +37,7 @@ static const std::string kVertGrass = "v_grass";
 static const std::string kVertModel = "v_model";
 static const std::string kVertMVP = "v_mvp";
 static const std::string kVertMVPNormal = "v_mvpnormal";
+static const std::string kVertAABB = "v_aabb";
 static const std::string kVertParticles = "v_particles";
 static const std::string kVertPassthrough = "v_passthrough";
 static const std::string kVertShadows = "v_shadows";
@@ -90,6 +91,7 @@ void Shaders::init() {
     auto vertModel = initShader(ShaderType::Vertex, kVertModel);
     auto vertMVP = initShader(ShaderType::Vertex, kVertMVP);
     auto vertMVPNormal = initShader(ShaderType::Vertex, kVertMVPNormal);
+    auto vertAABB = initShader(ShaderType::Vertex, kVertAABB);
     auto vertParticles = initShader(ShaderType::Vertex, kVertParticles);
     auto vertPassthrough = initShader(ShaderType::Vertex, kVertPassthrough);
     auto vertShadows = initShader(ShaderType::Vertex, kVertShadows);
@@ -135,9 +137,9 @@ void Shaders::init() {
     _shaderRegistry.add(ShaderProgramId::billboard, initShaderProgram({vertBillboard, fragTexture}));
     _shaderRegistry.add(ShaderProgramId::retroOpaqueModel, initShaderProgram({vertModel, fragRetroOpaqueModel}));
     _shaderRegistry.add(ShaderProgramId::retroGrass, initShaderProgram({vertGrass, fragRetroGrass}));
-    _shaderRegistry.add(ShaderProgramId::retroAABB, initShaderProgram({vertMVPNormal, fragRetroAABB}));
+    _shaderRegistry.add(ShaderProgramId::retroAABB, initShaderProgram({vertAABB, fragRetroAABB}));
     _shaderRegistry.add(ShaderProgramId::retroWalkmesh, initShaderProgram({vertWalkmesh, fragRetroWalkmesh}));
-    _shaderRegistry.add(ShaderProgramId::pbrAABB, initShaderProgram({vertMVPNormal, fragPBRAABB}));
+    _shaderRegistry.add(ShaderProgramId::pbrAABB, initShaderProgram({vertAABB, fragPBRAABB}));
     _shaderRegistry.add(ShaderProgramId::pbrCombine, initShaderProgram({vertPassthrough, fragPBRCombine}));
     _shaderRegistry.add(ShaderProgramId::pbrGrass, initShaderProgram({vertGrass, fragPBRGrass}));
     _shaderRegistry.add(ShaderProgramId::pbrOpaqueModel, initShaderProgram({vertModel, fragPBROpaqueModel}));

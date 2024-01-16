@@ -130,31 +130,17 @@ void ModelSceneNode::renderLeafs(IRenderPass &pass, const std::vector<SceneNode 
 }
 
 void ModelSceneNode::renderAABB(IRenderPass &pass) {
-    auto &mesh = _graphicsSvc.meshRegistry.get(MeshName::box);
-    Material material;
-    material.type = MaterialType::AABB;
-    material.polygonMode = PolygonMode::Line;
-    auto transform = _absTransform;
-    transform *= glm::translate(_aabb.center());
-    transform *= glm::scale(0.5f * _aabb.size());
-    pass.draw(mesh, material, transform, glm::inverse(transform));
+    auto aabbWorld = _aabb * _absTransform;
+    std::vector<glm::vec4> corners;
+    corners.reserve(8);
+    for (const auto &corner : aabbWorld.corners()) {
+        corners.emplace_back(corner, 1.0f);
+    }
+    pass.drawAABB(corners);
 }
 
 void ModelSceneNode::computeAABB() {
-    _aabb.reset();
-
-    for (auto &node : _nodeByNumber) {
-        if (node.second->type() == SceneNodeType::Mesh) {
-            auto &modelNode = node.second->modelNode();
-            auto mesh = modelNode.mesh();
-            if (!mesh || !mesh->mesh) {
-                continue;
-            }
-            auto modelSpaceAABB = mesh->mesh->aabb() * modelNode.absoluteTransform();
-            _aabb.expand(modelSpaceAABB);
-        }
-    }
-
+    _aabb = _model->aabb();
     for (auto &attachment : _attachments) {
         if (attachment.second->type() == SceneNodeType::Model) {
             AABB modelSpaceAABB(attachment.second->aabb() * attachment.second->absoluteTransform() * _absTransformInv);

@@ -68,6 +68,7 @@ void Console::init() {
     addCommand("kill", "k", "kill selected object", std::bind(&Console::cmdKill, this, std::placeholders::_1, std::placeholders::_2));
     addCommand("additem", "ai", "add item to selected object", std::bind(&Console::cmdAddItem, this, std::placeholders::_1, std::placeholders::_2));
     addCommand("givexp", "xp", "give experience to selected creature", std::bind(&Console::cmdGiveXP, this, std::placeholders::_1, std::placeholders::_2));
+    addCommand("showaabb", "sw", "toggle rendering AABB", std::bind(&Console::cmdShowAABB, this, std::placeholders::_1, std::placeholders::_2));
     addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", std::bind(&Console::cmdShowWalkmesh, this, std::placeholders::_1, std::placeholders::_2));
     addCommand("showtriggers", "st", "toggle rendering triggers", std::bind(&Console::cmdShowTriggers, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -431,6 +432,15 @@ void Console::cmdRunScript(std::string input, std::vector<std::string> tokens) {
 
     int result = _game.scriptRunner().run(resRef, callerId, triggerrerId, eventNumber, scriptVar);
     print(str(boost::format("%s -> %d") % resRef % result));
+}
+
+void Console::cmdShowAABB(std::string input, std::vector<std::string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: showaabb 1|0");
+        return;
+    }
+    bool show = stoi(tokens[1]);
+    setShowAABB(show);
 }
 
 void Console::cmdShowWalkmesh(std::string input, std::vector<std::string> tokens) {

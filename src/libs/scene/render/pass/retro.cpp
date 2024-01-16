@@ -53,7 +53,6 @@ void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std
         {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
         {MaterialType::OpaqueModel, ShaderProgramId::retroOpaqueModel},       //
         {MaterialType::TransparentModel, ShaderProgramId::oitModel},          //
-        {MaterialType::AABB, ShaderProgramId::retroAABB},                     //
         {MaterialType::Walkmesh, ShaderProgramId::retroWalkmesh}              //
     };
     if (kMatTypeToProgramId.count(material.type) == 0) {
@@ -279,6 +278,17 @@ void RetroRenderPass::drawGrass(float radius,
         }
     });
     _meshRegistry.get(MeshName::grass).drawInstanced(instances.size());
+}
+
+void RetroRenderPass::drawAABB(const std::vector<glm::vec4> &corners) {
+    auto &program = _shaderRegistry.get(ShaderProgramId::retroAABB);
+    _context.useProgram(program);
+    program.setUniform("uCorners", corners);
+    _context.withDepthTestMode(DepthTestMode::None, [this]() {
+        _context.withPolygonMode(PolygonMode::Line, [this]() {
+            _meshRegistry.get(MeshName::aabb).draw();
+        });
+    });
 }
 
 void RetroRenderPass::applyMaterialToLocals(const Material &material,

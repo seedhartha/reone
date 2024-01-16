@@ -106,6 +106,12 @@ void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     });
 }
 
+void ShaderProgram::setUniform(const std::string &name, const std::vector<glm::vec4> &arr) {
+    setUniform(name, [this, &arr](int loc) {
+        glUniform4fv(loc, static_cast<GLsizei>(arr.size()), reinterpret_cast<const GLfloat *>(&arr[0]));
+    });
+}
+
 void ShaderProgram::setUniform(const std::string &name, const std::vector<glm::mat4> &arr) {
     setUniform(name, [this, &arr](int loc) {
         glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));

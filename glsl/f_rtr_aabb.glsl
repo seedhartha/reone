@@ -1,12 +1,12 @@
 #include "u_globals.glsl"
 
 in vec4 fragPosWorld;
-in vec3 fragNormalWorld;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragHilights;
 
 void main() {
-    fragColor = vec4(1.0);
+    float closeness = 1.0 - min(1.0, distance(uCameraPosition.xyz, fragPosWorld.xyz) / 10.0);
+    fragColor = vec4(vec3(closeness), 1.0);
     fragHilights = vec4(0.0);
 }
