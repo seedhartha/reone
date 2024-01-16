@@ -61,11 +61,18 @@ void main() {
         }
         vec3 lightPos = uLights[i].position.xyz - fragPosWorld.xyz;
         float lightDist = length(lightPos);
+        if (lightDist > uLights[i].radius * uLights[i].radius) {
+            continue;
+        }
         vec3 lightDir = lightPos / max(1e-4, lightDist);
         float diff = max(0.0, dot(normal, lightDir));
         float attenuation = lightAttenuationQuadratic(uLights[i], lightDist);
         vec3 lightColor = uLights[i].color.rgb;
-        diffuse += uLights[i].multiplier * diff * attenuation * uDiffuseColor.rgb * lightColor;
+        if (uLights[i].ambientOnly) {
+            ambient += uLights[i].multiplier * attenuation * uAmbientColor.rgb * lightColor;
+        } else {
+            diffuse += uLights[i].multiplier * diff * attenuation * uDiffuseColor.rgb * lightColor;
+        }
     }
     float shadow = isFeatureEnabled(FEATURE_SHADOWS)
                        ? getShadow(viewPos, fragPosWorld.xyz, normal, sShadowMap, sShadowMapCube)
