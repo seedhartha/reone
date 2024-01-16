@@ -1,6 +1,7 @@
 #include "u_globals.glsl"
 #include "u_locals.glsl"
 
+#include "i_gbuf.glsl"
 #include "i_hash.glsl"
 #include "i_hashedalpha.glsl"
 #include "i_math.glsl"
@@ -28,9 +29,8 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragLightmapColor;
 layout(location = 2) out vec4 fragPrefilteredEnvColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec4 fragFeatures;
-layout(location = 5) out vec4 fragEyeNormal;
-layout(location = 6) out vec3 fragIrradiance;
+layout(location = 4) out vec4 fragEyeNormal;
+layout(location = 5) out vec3 fragIrradiance;
 
 const float MAX_REFLECTION_LOD = 4.0;
 
@@ -76,20 +76,18 @@ void main() {
         }
     }
 
-    vec4 features = vec4(
-        isFeatureEnabled(FEATURE_SHADOWS) ? 1.0 : 0.0,
-        isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
-        0.0,
-        0.0);
+    float features = packGeometryFeatures(isFeatureEnabled(FEATURE_SHADOWS),
+                                          isFeatureEnabled(FEATURE_FOG));
 
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
     eyeNormal = 0.5 * eyeNormal + 0.5;
 
     fragDiffuseColor = diffuseColor;
-    fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
+    fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP)
+                            ? vec4(texture(sLightmap, fragUV2).rgb, features)
+                            : vec4(vec3(1.0), features);
     fragPrefilteredEnvColor = envmapColor;
     fragSelfIllumColor = vec4(uSelfIllumColor.rgb, 1.0);
-    fragFeatures = features;
     fragEyeNormal = vec4(eyeNormal, 0.0);
     fragIrradiance = pbrIrradianceColor;
 }

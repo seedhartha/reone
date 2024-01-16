@@ -4,6 +4,7 @@
 #include "i_coords.glsl"
 #include "i_fog.glsl"
 #include "i_gamma.glsl"
+#include "i_gbuf.glsl"
 #include "i_lighting.glsl"
 #include "i_math.glsl"
 #include "i_shadowmap.glsl"
@@ -14,7 +15,6 @@ uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sGBufPrefilteredEnv;
 uniform sampler2D sGBufSelfIllum;
-uniform sampler2D sGBufFeatures;
 uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufEyeNormal;
 uniform sampler2D sBRDFLUT;
@@ -41,7 +41,6 @@ void main() {
     vec4 prefilteredEnvSample = texture(sGBufPrefilteredEnv, uv);
     vec4 irradianceSample = texture(sGBufIrradiance, uv);
     vec4 selfIllumSample = texture(sGBufSelfIllum, uv);
-    vec4 featuresSample = texture(sGBufFeatures, uv);
     vec3 eyePos = reconstructViewPos(uv, sGBufDepth);
     vec3 eyeNormal = normalize(2.0 * texture(sGBufEyeNormal, uv).xyz - 1.0);
 #ifdef R_SSAO
@@ -53,10 +52,17 @@ void main() {
 
     vec3 fragPosWorld = (uViewInv * vec4(eyePos, 1.0)).xyz;
     vec3 normal = (uViewInv * vec4(eyeNormal, 0.0)).xyz;
-    float lightmapped = step(1e-4, lightmapSample.a);
     float envmapped = step(1e-4, prefilteredEnvSample.a);
-    float shadow = mix(0.0, getShadow(eyePos, fragPosWorld, normal, sShadowMap, sShadowMapCube), featuresSample.r);
-    float fog = mix(0.0, getFog(fragPosWorld), isFeatureEnabled(FEATURE_FOG) ? featuresSample.g : 0.0);
+
+    bool shadowsEnabled;
+    bool fogEnabled;
+    unpackGeometryFeatures(lightmapSample.a, shadowsEnabled, fogEnabled);
+    if (!isFeatureEnabled(FEATURE_FOG)) {
+        fogEnabled = false;
+    }
+
+    float shadow = int(shadowsEnabled) * getShadow(eyePos, fragPosWorld, normal, sShadowMap, sShadowMapCube);
+    float fog = int(fogEnabled) * getFog(fragPosWorld);
 
     vec3 albedo = gammaToLinear(mainTexSample.rgb);
     float metallic = 0.0;
@@ -112,7 +118,7 @@ void main() {
                     irradiance += radiance;
                 } else {
                     // TODO: use static flag
-                    if (false && lightmapped == 1.0 && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
+                    if (false && uLights[i].dynamicType != LIGHT_DYNAMIC_TYPE_ALL) {
                         continue;
                     }
                     vec3 L = normalize(fragToLight);

@@ -142,7 +142,7 @@ void main() {
         vec4 hitMainTexSample = texture(sMainTex, hitUV);
         vec4 hitLightmapSample = texture(sLightmap, hitUV);
 
-        reflectionColor = hitMainTexSample.rgb * hitMainTexSample.a * mix(vec3(1.0), hitLightmapSample.rgb, hitLightmapSample.a);
+        reflectionColor = hitMainTexSample.rgb * hitMainTexSample.a * hitLightmapSample.rgb;
         reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
         reflectionStrength *= 1.0 - numSteps / uSSRMaxSteps;
         reflectionStrength *= 1.0 - max(0.0, (maxDim - EDGE_FADE_START) / (1.0 - EDGE_FADE_START));
