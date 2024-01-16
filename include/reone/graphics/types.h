@@ -152,7 +152,7 @@ struct TextureUnits {
     static constexpr int gBufPrefilteredEnv = 4;
     static constexpr int gBufSelfIllum = 5;
     static constexpr int gBufFeatures = 6;
-    static constexpr int gBufEyePos = 7;
+    static constexpr int gBufDepth = 7;
     static constexpr int gBufEyeNormal = 8;
     static constexpr int ssao = 9;
     static constexpr int ssr = 10;

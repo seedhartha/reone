@@ -1,5 +1,7 @@
 #include "u_screeneffect.glsl"
 
+#include "i_coords.glsl"
+
 const float MAX_DISTANCE = 100.0;
 
 const float EDGE_FADE_START = 0.8;
@@ -7,7 +9,7 @@ const float EDGE_FADE_START = 0.8;
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sGBufPrefilteredEnv;
-uniform sampler2D sGBufEyePos;
+uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufEyeNormal;
 
 noperspective in vec2 fragUV1;
@@ -95,7 +97,7 @@ bool traceScreenSpaceRay(
         prevZMax = rayZMax;
         swapIfGreater(rayZMin, rayZMax);
 
-        float sceneZ = texture(sGBufEyePos, sceneUV).z;
+        float sceneZ = reconstructViewPos(sceneUV, sGBufDepth).z;
         if (rayZMin <= sceneZ && rayZMax >= sceneZ - uSSRBias) {
             hitUV = sceneUV;
             hitPoint = Q * (1.0 / k);
@@ -122,7 +124,7 @@ void main() {
     vec3 reflectionColor = vec3(0.0);
     float reflectionStrength = 0.0;
 
-    vec3 fragPosVS = texture(sGBufEyePos, fragUV1).rgb;
+    vec3 fragPosVS = reconstructViewPos(fragUV1, sGBufDepth);
     vec3 I = normalize(fragPosVS);
 
     vec3 N = texture(sGBufEyeNormal, fragUV1).rgb;

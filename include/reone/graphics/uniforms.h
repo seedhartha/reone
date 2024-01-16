@@ -67,6 +67,7 @@ struct alignas(16) GlobalUniformsLight {
 
 struct GlobalUniforms {
     glm::mat4 projection {1.0f};
+    glm::mat4 projectionInv {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 viewInv {1.0f};
     glm::vec4 cameraPosition {0.0f};
@@ -86,6 +87,7 @@ struct GlobalUniforms {
 
     void reset() {
         projection = glm::mat4(1.0f);
+        projectionInv = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         viewInv = glm::mat4(1.0f);
         cameraPosition = glm::vec4(0.0f);
@@ -184,6 +186,7 @@ struct WalkmeshUniforms {
 
 struct ScreenEffectUniforms {
     glm::mat4 projection {1.0f};
+    glm::mat4 projectionInv {1.0f};
     glm::mat4 screenProjection {1.0f};
     glm::vec4 ssaoSamples[kNumSSAOSamples] {glm::vec4(0.0f)};
     glm::vec2 screenResolution {0.0f};

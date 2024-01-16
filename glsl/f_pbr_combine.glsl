@@ -1,6 +1,7 @@
 #include "u_globals.glsl"
 #include "u_locals.glsl"
 
+#include "i_coords.glsl"
 #include "i_fog.glsl"
 #include "i_gamma.glsl"
 #include "i_lighting.glsl"
@@ -14,7 +15,7 @@ uniform sampler2D sLightmap;
 uniform sampler2D sGBufPrefilteredEnv;
 uniform sampler2D sGBufSelfIllum;
 uniform sampler2D sGBufFeatures;
-uniform sampler2D sGBufEyePos;
+uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufEyeNormal;
 uniform sampler2D sBRDFLUT;
 uniform sampler2D sGBufIrradiance;
@@ -41,7 +42,7 @@ void main() {
     vec4 irradianceSample = texture(sGBufIrradiance, uv);
     vec4 selfIllumSample = texture(sGBufSelfIllum, uv);
     vec4 featuresSample = texture(sGBufFeatures, uv);
-    vec3 eyePos = texture(sGBufEyePos, uv).xyz;
+    vec3 eyePos = reconstructViewPos(uv, sGBufDepth);
     vec3 eyeNormal = normalize(2.0 * texture(sGBufEyeNormal, uv).xyz - 1.0);
 #ifdef R_SSAO
     vec4 ssaoSample = texture(sSSAO, uv);

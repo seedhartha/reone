@@ -144,10 +144,6 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.cbGBufFeatures->clear(_targetSize.x, _targetSize.y, PixelFormat::RG8);
     _renderTargets.cbGBufFeatures->init();
 
-    _renderTargets.cbGBufEyePos = std::make_unique<Texture>("gbuffer_eyepos", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufEyePos->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB16F);
-    _renderTargets.cbGBufEyePos->init();
-
     _renderTargets.cbGBufEyeNormal = std::make_unique<Texture>("gbuffer_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbGBufEyeNormal->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
     _renderTargets.cbGBufEyeNormal->init();
@@ -156,8 +152,8 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.cbGBufIrradiance->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
     _renderTargets.cbGBufIrradiance->init();
 
-    _renderTargets.dbGBuffer = std::make_shared<Renderbuffer>();
-    _renderTargets.dbGBuffer->configure(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
+    _renderTargets.dbGBuffer = std::make_shared<Texture>("gbuffer_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _renderTargets.dbGBuffer->clear(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
     _renderTargets.dbGBuffer->init();
 
     _renderTargets.fbOpaqueGeometry = std::make_shared<Framebuffer>();
@@ -167,7 +163,6 @@ void PBRRenderPipeline::initRenderTargets() {
          _renderTargets.cbGBufPrefilteredEnv,
          _renderTargets.cbGBufSelfIllum,
          _renderTargets.cbGBufFeatures,
-         _renderTargets.cbGBufEyePos,
          _renderTargets.cbGBufEyeNormal,
          _renderTargets.cbGBufIrradiance},
         _renderTargets.dbGBuffer);
@@ -386,7 +381,7 @@ void PBRRenderPipeline::endPointLightShadowsPass() {
 }
 
 void PBRRenderPipeline::beginOpaqueGeometryPass() {
-    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3, 4, 5, 6, 7});
+    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3, 4, 5, 6});
     _context.clearColorDepth();
 }
 
@@ -403,7 +398,7 @@ void PBRRenderPipeline::renderSSAO(float sampleRadius, float bias) {
     });
     _context.bindDrawFramebuffer(*_renderTargets.fbSSAO, {0});
     _context.useProgram(_shaderRegistry.get(ShaderProgramId::pbrSSAO));
-    _context.bindTexture(*_renderTargets.cbGBufEyePos, TextureUnits::gBufEyePos);
+    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.bindTexture(_textureRegistry.get(TextureName::noiseRg), TextureUnits::noise);
     _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
@@ -426,7 +421,7 @@ void PBRRenderPipeline::renderSSR(float bias, float pixelStride, float maxSteps)
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
     _context.bindTexture(*_renderTargets.cbGBufPrefilteredEnv, TextureUnits::gBufPrefilteredEnv);
-    _context.bindTexture(*_renderTargets.cbGBufEyePos, TextureUnits::gBufEyePos);
+    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.withViewport(glm::ivec4(0, 0, size.x, size.y), [this]() {
         _context.clearColorDepth();
@@ -442,7 +437,7 @@ void PBRRenderPipeline::combineOpaqueGeometry() {
     _context.bindTexture(*_renderTargets.cbGBufPrefilteredEnv, TextureUnits::gBufPrefilteredEnv);
     _context.bindTexture(*_renderTargets.cbGBufSelfIllum, TextureUnits::gBufSelfIllum);
     _context.bindTexture(*_renderTargets.cbGBufFeatures, TextureUnits::gBufFeatures);
-    _context.bindTexture(*_renderTargets.cbGBufEyePos, TextureUnits::gBufEyePos);
+    _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
     _context.bindTexture(*_renderTargets.cbGBufIrradiance, TextureUnits::gBufIrradiance);
     _context.bindTexture(_pbrTextures.brdf(), TextureUnits::brdfLUT);

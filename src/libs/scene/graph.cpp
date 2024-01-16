@@ -453,8 +453,9 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
     if (camera) {
         _graphicsSvc.uniforms.setGlobals([this, &camera](auto &globals) {
             globals.projection = camera->projection();
+            globals.projectionInv = glm::inverse(globals.projection);
             globals.view = camera->view();
-            globals.viewInv = glm::inverse(camera->view());
+            globals.viewInv = glm::inverse(globals.view);
             globals.cameraPosition = glm::vec4(camera->position(), 1.0f);
             globals.worldAmbientColor = glm::vec4(ambientLightColor(), 1.0f);
             globals.clipNear = camera->zNear();
@@ -493,6 +494,7 @@ Texture &SceneGraph::render(const glm::ivec2 &dim) {
         screenProjection *= camera->projection();
         _graphicsSvc.uniforms.setScreenEffect([&camera, &screenProjection](auto &screenEffect) {
             screenEffect.projection = camera->projection();
+            screenEffect.projectionInv = glm::inverse(screenEffect.projection);
             screenEffect.screenProjection = screenProjection;
             screenEffect.clipNear = camera->zNear();
             screenEffect.clipFar = camera->zFar();

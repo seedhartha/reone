@@ -238,7 +238,7 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sGBufPrefilteredEnv", TextureUnits::gBufPrefilteredEnv);
     program->setUniform("sGBufSelfIllum", TextureUnits::gBufSelfIllum);
     program->setUniform("sGBufFeatures", TextureUnits::gBufFeatures);
-    program->setUniform("sGBufEyePos", TextureUnits::gBufEyePos);
+    program->setUniform("sGBufDepth", TextureUnits::gBufDepth);
     program->setUniform("sGBufEyeNormal", TextureUnits::gBufEyeNormal);
     program->setUniform("sSSAO", TextureUnits::ssao);
     program->setUniform("sSSR", TextureUnits::ssr);

@@ -1,9 +1,11 @@
 #include "u_screeneffect.glsl"
 
+#include "i_coords.glsl"
+
 const float NOISE_SCALE = 1.0 / 4.0;
 const float MAX_DISTANCE = 500.0;
 
-uniform sampler2D sGBufEyePos;
+uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufEyeNormal;
 uniform sampler2D sNoise;
 
@@ -13,9 +15,8 @@ out vec4 fragColor;
 
 void main() {
     vec2 uvM = fragUV1;
-    vec3 posM = texture(sGBufEyePos, uvM).rgb;
-
-    vec3 normal = texture(sGBufEyeNormal, uvM).rgb;
+    vec3 posM = reconstructViewPos(uvM, sGBufDepth);
+    vec3 normal = texture(sGBufEyeNormal, uvM).xyz;
     normal = normalize(2.0 * normal - 1.0);
 
     vec3 randomVec = vec3(texture(sNoise, uvM * uScreenResolution * NOISE_SCALE).rg, 0.0);
@@ -29,7 +30,7 @@ void main() {
         vec4 uvSample = uProjection * vec4(posSample, 1.0);
         uvSample.xy /= uvSample.w;
         uvSample.xy = uvSample.xy * 0.5 + 0.5;
-        float sceneZ = texture(sGBufEyePos, uvSample.xy).z;
+        float sceneZ = reconstructViewPos(uvSample.xy, sGBufDepth).z;
         float rangeCheck = smoothstep(0.0, 1.0, uSSAOSampleRadius / abs(posM.z - sceneZ));
         occlusion += ((sceneZ >= posSample.z + uSSAOBias) ? 1.0 : 0.0) * rangeCheck;
     }

@@ -29,9 +29,8 @@ layout(location = 1) out vec4 fragLightmapColor;
 layout(location = 2) out vec4 fragPrefilteredEnvColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
 layout(location = 4) out vec4 fragFeatures;
-layout(location = 5) out vec4 fragEyePos;
-layout(location = 6) out vec4 fragEyeNormal;
-layout(location = 7) out vec3 fragIrradiance;
+layout(location = 5) out vec4 fragEyeNormal;
+layout(location = 6) out vec3 fragIrradiance;
 
 const float MAX_REFLECTION_LOD = 4.0;
 
@@ -82,7 +81,6 @@ void main() {
         isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
         0.0,
         0.0);
-    vec3 eyePos = (uView * fragPosWorld).xyz;
 
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
     eyeNormal = 0.5 * eyeNormal + 0.5;
@@ -92,7 +90,6 @@ void main() {
     fragPrefilteredEnvColor = envmapColor;
     fragSelfIllumColor = vec4(uSelfIllumColor.rgb, 1.0);
     fragFeatures = features;
-    fragEyePos = vec4(eyePos, 0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
     fragIrradiance = pbrIrradianceColor;
 }

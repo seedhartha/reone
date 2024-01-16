@@ -55,7 +55,6 @@ private:
         std::shared_ptr<graphics::Texture> cbGBufPrefilteredEnv;
         std::shared_ptr<graphics::Texture> cbGBufSelfIllum;
         std::shared_ptr<graphics::Texture> cbGBufFeatures;
-        std::shared_ptr<graphics::Texture> cbGBufEyePos;
         std::shared_ptr<graphics::Texture> cbGBufEyeNormal;
         std::shared_ptr<graphics::Texture> cbGBufIrradiance;
         std::shared_ptr<graphics::Texture> cbDeferredOpaque1;
@@ -72,7 +71,7 @@ private:
 
         std::shared_ptr<graphics::Renderbuffer> dbCommon;
         std::shared_ptr<graphics::Renderbuffer> dbCommonHalf;
-        std::shared_ptr<graphics::Renderbuffer> dbGBuffer;
+        std::shared_ptr<graphics::Texture> dbGBuffer;
         std::shared_ptr<graphics::Texture> dbDirectionalLightShadows;
         std::shared_ptr<graphics::Texture> dbPointLightShadows;
         std::shared_ptr<graphics::Texture> dbOutput;

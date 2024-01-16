@@ -224,6 +224,7 @@ void Control::render(const glm::ivec2 &screenSize,
                 static_cast<float>(screenSize.x),
                 static_cast<float>(screenSize.y),
                 0.0f, 0.0f, 100.0f);
+            globals.projectionInv = glm::inverse(globals.projection);
         });
         _graphicsSvc.context.withDepthTestMode(DepthTestMode::None, [this, &offset, &pass, &output]() {
             pass.drawImage(

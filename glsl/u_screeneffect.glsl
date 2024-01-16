@@ -2,6 +2,7 @@ const int NUM_SSAO_SAMPLES = 64;
 
 layout(std140) uniform ScreenEffect {
     mat4 uProjection;
+    mat4 uProjectionInv;
     mat4 uScreenProjection;
     vec4 uSSAOSamples[NUM_SSAO_SAMPLES];
     vec2 uScreenResolution;

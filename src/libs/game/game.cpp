@@ -478,6 +478,7 @@ void Game::renderGUI() {
             static_cast<float>(_options.graphics.width),
             static_cast<float>(_options.graphics.height),
             0.0f, 0.0f, 100.0f);
+        globals.projectionInv = glm::inverse(globals.projection);
     });
     switch (_screen) {
     case Screen::InGame:
