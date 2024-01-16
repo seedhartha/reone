@@ -26,6 +26,13 @@ namespace reone {
 
 namespace graphics {
 
+enum class TextureType {
+    TwoDim,
+    TwoDimArray,
+    CubeMap,
+    CubeMapArray
+};
+
 class Texture : public IAttachment, boost::noncopyable {
 public:
     enum class Filtering {
@@ -104,8 +111,11 @@ public:
         std::shared_ptr<ByteBuffer> pixels;
     };
 
-    Texture(std::string name, Properties properties) :
+    Texture(std::string name,
+            TextureType type,
+            Properties properties) :
         _name(std::move(name)),
+        _type(type),
         _properties(std::move(properties)) {
     }
 
@@ -119,8 +129,10 @@ public:
 
     void flushGPUToCPU();
 
-    bool isCubemap() const { return _features.cube; }
-    bool is2DArray() const { return _layers.size() > 1ll && !isCubemap(); }
+    bool is2D() const { return _type == TextureType::TwoDim; }
+    bool is2DArray() const { return _type == TextureType::TwoDimArray; }
+    bool isCubeMap() const { return _type == TextureType::CubeMap; }
+    bool isCubeMapArray() const { return _type == TextureType::CubeMapArray; };
 
     bool isGrayscale() const { return _pixelFormat == PixelFormat::R8; }
 
@@ -128,6 +140,7 @@ public:
     bool isRenderbuffer() const override { return false; }
 
     const std::string &name() const { return _name; }
+    TextureType type() const { return _type; }
     int width() const { return _width; }
     int height() const { return _height; }
     std::vector<Layer> &layers() { return _layers; }
@@ -135,9 +148,9 @@ public:
     const Features &features() const { return _features; }
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
+    void setType(TextureType type) { _type = type; }
     void setFeatures(Features features) { _features = std::move(features); }
     void setPixelFormat(PixelFormat format) { _pixelFormat = format; }
-    void setCubemap(bool cubemap) { _features.cube = cubemap; }
     void setAnisotropy(float anisotropy) { _properties.anisotropy = anisotropy; }
 
     // Pixels
@@ -157,6 +170,7 @@ public:
 
 private:
     std::string _name;
+    TextureType _type;
     Properties _properties;
 
     bool _inited {false};
@@ -177,14 +191,12 @@ private:
     void refresh();
 
     void configure2D();
-    void configureCubemap();
+    void configureCubeMap();
 
     void refresh2D();
     void refresh2DArray();
-    void refreshCubemap();
-
-    void fillTarget2D(uint32_t target, int width, int height, const void *pixels = nullptr, int size = 0);
-    void fillTarget3D(int width, int height, int depth);
+    void refreshCubeMap();
+    void refreshCubeMapArray();
 
     uint32_t getTargetGL() const;
 };

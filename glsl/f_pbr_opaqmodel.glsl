@@ -15,8 +15,6 @@ uniform sampler2D sEnvMap;
 uniform sampler2D sNormalMap;
 uniform sampler2DArray sBumpMapArray;
 uniform samplerCube sEnvMapCube;
-uniform samplerCube sPBRIrradiance;
-uniform samplerCube sPBRPrefiltered;
 
 in vec4 fragPos;
 in vec4 fragPosWorld;
@@ -29,10 +27,6 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragEyeNormal;
 layout(location = 2) out vec4 fragLightmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec3 fragIrradiance;
-layout(location = 5) out vec4 fragPrefilteredEnvColor;
-
-const float MAX_REFLECTION_LOD = 4.0;
 
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
@@ -62,21 +56,8 @@ void main() {
         diffuseColor *= uWaterAlpha;
     }
 
-    vec4 envmapColor = vec4(0.0);
-    vec3 pbrIrradianceColor = vec3(0.0);
-    if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 V = normalize(uCameraPosition.xyz - fragPosWorld.xyz);
-        vec3 R = reflect(-V, normal);
-        vec4 envmapSample = sampleEnvMap(sEnvMap, sEnvMapCube, R);
-        envmapColor = vec4(envmapSample.rgb, 1.0);
-        if (isFeatureEnabled(FEATURE_ENVMAPCUBE)) {
-            float roughness = clamp(mix(1.0, mainTexSample.a, step(0.0001, envmapSample.a)), 0.01, 0.99);
-            envmapColor.rgb = textureLod(sPBRPrefiltered, R, roughness * MAX_REFLECTION_LOD).rgb;
-            pbrIrradianceColor = texture(sPBRIrradiance, R).rgb;
-        }
-    }
-
-    float features = packGeometryFeatures(isFeatureEnabled(FEATURE_SHADOWS),
+    float features = packGeometryFeatures(isFeatureEnabled(FEATURE_ENVMAPCUBE),
+                                          isFeatureEnabled(FEATURE_SHADOWS),
                                           isFeatureEnabled(FEATURE_FOG));
 
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
@@ -86,8 +67,6 @@ void main() {
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP)
                             ? vec4(texture(sLightmap, fragUV2).rgb, features)
                             : vec4(vec3(1.0), features);
-    fragPrefilteredEnvColor = envmapColor;
-    fragSelfIllumColor = vec4(uSelfIllumColor.rgb, 1.0);
+    fragSelfIllumColor = vec4(uSelfIllumColor.rgb, uEnvMapDerivedLayer / 255.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
-    fragIrradiance = pbrIrradianceColor;
 }

@@ -29,6 +29,8 @@ layout(std140) uniform Locals {
     float uBillboardSize;
 };
 
+uniform int uEnvMapDerivedLayer;
+
 bool isFeatureEnabled(int flag) {
     return (uFeatureMask & flag) != 0;
 }

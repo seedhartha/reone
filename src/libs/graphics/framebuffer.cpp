@@ -19,6 +19,7 @@
 
 #include "reone/graphics/renderbuffer.h"
 #include "reone/graphics/texture.h"
+#include "reone/system/exception/notimplemented.h"
 #include "reone/system/threadutil.h"
 
 namespace reone {
@@ -87,21 +88,23 @@ static GLenum getAttachmentGL(Framebuffer::Attachment attachment, int index = 0)
 
 void Framebuffer::attachTexture(const Texture &texture, Attachment attachment, int index) const {
     auto attachmentGL = getAttachmentGL(attachment, index);
-    if (texture.isCubemap() || texture.is2DArray()) {
+    if (texture.isCubeMap() || texture.is2DArray()) {
         glFramebufferTexture(GL_FRAMEBUFFER, attachmentGL, texture.nameGL(), 0);
-    } else {
+    } else if (texture.is2D()) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentGL, GL_TEXTURE_2D, texture.nameGL(), 0);
+    } else {
+        throw NotImplementedException("Texture cannot be used as a framebuffer attachment");
     }
 }
 
-void Framebuffer::attachTextureCube(const Texture &texture, CubeMapFace face, Attachment attachment, int index, int mip) const {
+void Framebuffer::attachTextureLayer(const Texture &texture, int layer, int mip, Attachment attachment, int index) const {
     auto attachmentGL = getAttachmentGL(attachment, index);
-    glFramebufferTexture2D(
+    glFramebufferTextureLayer(
         GL_FRAMEBUFFER,
         attachmentGL,
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face),
         texture.nameGL(),
-        mip);
+        mip,
+        layer);
 }
 
 void Framebuffer::attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index) const {

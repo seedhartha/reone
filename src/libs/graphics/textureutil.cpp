@@ -109,6 +109,7 @@ void convertGridTextureToArray(Texture &texture, int numX, int numY) {
         }
         frameLayers.push_back(Texture::Layer {std::move(framePixels)});
     }
+    texture.setType(TextureType::TwoDimArray);
     texture.setPixels(
         frameSize.x, frameSize.y,
         texture.pixelFormat(),

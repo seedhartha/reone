@@ -149,30 +149,28 @@ struct TextureUnits {
     static constexpr int lightmap = 1;
     static constexpr int envMap = 2;
     static constexpr int normalMap = 3;
-    static constexpr int gBufPrefilteredEnv = 4;
-    static constexpr int gBufSelfIllum = 5;
-    static constexpr int gBufDepth = 6;
-    static constexpr int gBufEyeNormal = 7;
-    static constexpr int ssao = 8;
-    static constexpr int ssr = 9;
-    static constexpr int hilights = 10;
-    static constexpr int oitAccum = 11;
-    static constexpr int oitRevealage = 12;
-    static constexpr int noise = 13;
-    static constexpr int brdfLUT = 14;
-    static constexpr int gBufIrradiance = 15;
-
-    // Cubemaps
-
-    static constexpr int envMapCube = 17;
-    static constexpr int shadowMapCube = 18;
-    static constexpr int pbrIrradiance = 19;
-    static constexpr int pbrPrefiltered = 20;
+    static constexpr int gBufSelfIllum = 4;
+    static constexpr int gBufDepth = 5;
+    static constexpr int gBufEyeNormal = 6;
+    static constexpr int ssao = 7;
+    static constexpr int ssr = 8;
+    static constexpr int hilights = 9;
+    static constexpr int oitAccum = 10;
+    static constexpr int oitRevealage = 11;
+    static constexpr int noise = 12;
+    static constexpr int brdfLUT = 13;
 
     // Arrays
 
-    static constexpr int bumpMapArray = 21;
-    static constexpr int shadowMapArray = 22;
+    static constexpr int bumpMapArray = 14;
+    static constexpr int shadowMapArray = 15;
+    static constexpr int irradianceMapArray = 16;
+    static constexpr int prefilteredEnvMapArray = 17;
+
+    // Cubemaps
+
+    static constexpr int envMapCube = 18;
+    static constexpr int shadowMapCube = 19;
 };
 
 // MDL

@@ -52,10 +52,8 @@ private:
     struct RenderTargets {
         std::shared_ptr<graphics::Texture> cbGBufDiffuse;
         std::shared_ptr<graphics::Texture> cbGBufLightmap;
-        std::shared_ptr<graphics::Texture> cbGBufPrefilteredEnv;
         std::shared_ptr<graphics::Texture> cbGBufSelfIllum;
         std::shared_ptr<graphics::Texture> cbGBufEyeNormal;
-        std::shared_ptr<graphics::Texture> cbGBufIrradiance;
         std::shared_ptr<graphics::Texture> cbDeferredOpaque1;
         std::shared_ptr<graphics::Texture> cbDeferredOpaque2;
         std::shared_ptr<graphics::Texture> cbTransparentGeometry1;

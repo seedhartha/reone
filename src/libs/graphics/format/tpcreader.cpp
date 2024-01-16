@@ -96,7 +96,10 @@ void TpcReader::loadFeatures() {
 }
 
 void TpcReader::loadTexture() {
-    _texture = std::make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture = std::make_shared<Texture>(
+        _resRef,
+        _numLayers == kNumCubeFaces ? TextureType::CubeMap : TextureType::TwoDim,
+        getTextureProperties(_usage));
     _texture->setPixels(_width, _height, getPixelFormat(), _layers);
     _texture->setFeatures(_features);
 }

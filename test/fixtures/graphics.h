@@ -91,7 +91,7 @@ public:
     MOCK_METHOD(void, refresh, (), (override));
     MOCK_METHOD(void, requestEnvMapDerived, (EnvMapDerivedRequest), (override));
     MOCK_METHOD(Texture &, brdf, (), (override));
-    MOCK_METHOD(std::optional<std::reference_wrapper<PBREnvMapTextures>>, findEnvMapDerived, (const std::string &), (override));
+    MOCK_METHOD(std::optional<int>, findEnvMapDerivedLayer, (const std::string &), (override));
 };
 
 class MockShaderRegistry : public IShaderRegistry, boost::noncopyable {

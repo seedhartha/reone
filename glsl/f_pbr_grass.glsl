@@ -19,8 +19,6 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragEyeNormal;
 layout(location = 2) out vec4 fragLightmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec3 fragIrradiance;
-layout(location = 5) out vec4 fragPrefilteredEnvColor;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -33,15 +31,13 @@ void main() {
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorld);
     eyeNormal = 0.5 * eyeNormal + 0.5;
 
-    float features = packGeometryFeatures(false, false);
+    float features = packGeometryFeatures(false, false, false);
 
     fragDiffuseColor = mainTexSample;
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP)
                             ? vec4(texture(sLightmap, uGrassClusters[fragInstanceID].lightmapUV).rgb, features)
                             : vec4(vec3(1.0), features);
 
-    fragPrefilteredEnvColor = vec4(0.0);
     fragSelfIllumColor = vec4(0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
-    fragIrradiance = vec3(0.0);
 }

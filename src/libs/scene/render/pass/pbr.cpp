@@ -68,13 +68,11 @@ void PBRRenderPass::withMaterialAppliedToContext(const Material &material, std::
     if (material.textures.count(TextureUnits::envMapCube) > 0) {
         auto &envMap = material.textures.at(TextureUnits::envMapCube).get();
         if (_options.pbr) {
-            auto envMapDerived = _pbrTextures.findEnvMapDerived(envMap.name());
-            if (envMapDerived) {
-                _context.bindTexture(*envMapDerived->get().irradiance, TextureUnits::pbrIrradiance);
-                _context.bindTexture(*envMapDerived->get().prefiltered, TextureUnits::pbrPrefiltered);
+            auto layer = _pbrTextures.findEnvMapDerivedLayer(envMap.name());
+            if (layer) {
+                program.setUniform("uEnvMapDerivedLayer", *layer);
             } else {
-                _context.bindTexture(envMap, TextureUnits::pbrIrradiance);
-                _context.bindTexture(envMap, TextureUnits::pbrPrefiltered);
+                program.setUniform("uEnvMapDerivedLayer", 0);
                 _pbrTextures.requestEnvMapDerived({envMap});
             }
         }

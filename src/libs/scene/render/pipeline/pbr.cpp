@@ -69,7 +69,10 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.dbCommonHalf->configure(halfSize.x, halfSize.y, PixelFormat::Depth32F);
     _renderTargets.dbCommonHalf->init();
 
-    _renderTargets.cbPing = std::make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbPing = std::make_unique<Texture>(
+        "ping_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbPing->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbPing->init();
 
@@ -77,7 +80,10 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.fbPing->attachColorDepth(_renderTargets.cbPing, _renderTargets.dbCommon);
     _renderTargets.fbPing->init();
 
-    _renderTargets.cbPingHalf = std::make_unique<Texture>("ping_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbPingHalf = std::make_unique<Texture>(
+        "ping_color_half",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbPingHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
     _renderTargets.cbPingHalf->init();
 
@@ -85,7 +91,10 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.fbPingHalf->attachColorDepth(_renderTargets.cbPingHalf, _renderTargets.dbCommonHalf);
     _renderTargets.fbPingHalf->init();
 
-    _renderTargets.cbPong = std::make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbPong = std::make_unique<Texture>(
+        "pong_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbPong->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbPong->init();
 
@@ -93,7 +102,10 @@ void PBRRenderPipeline::initRenderTargets() {
     _renderTargets.fbPong->attachColorDepth(_renderTargets.cbPong, _renderTargets.dbCommon);
     _renderTargets.fbPong->init();
 
-    _renderTargets.cbPongHalf = std::make_unique<Texture>("pong_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbPongHalf = std::make_unique<Texture>(
+        "pong_color_half",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbPongHalf->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
     _renderTargets.cbPongHalf->init();
 
@@ -103,7 +115,10 @@ void PBRRenderPipeline::initRenderTargets() {
 
     // Directional light shadows framebuffer
 
-    _renderTargets.dbDirectionalLightShadows = std::make_unique<Texture>("point_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
+    _renderTargets.dbDirectionalLightShadows = std::make_unique<Texture>(
+        "point_light_shadows_color",
+        TextureType::TwoDimArray,
+        getTextureProperties(TextureUsage::DepthBuffer));
     _renderTargets.dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
     _renderTargets.dbDirectionalLightShadows->init();
 
@@ -113,8 +128,10 @@ void PBRRenderPipeline::initRenderTargets() {
 
     // Point light shadows framebuffer
 
-    _renderTargets.dbPointLightShadows = std::make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
-    _renderTargets.dbPointLightShadows->setCubemap(true);
+    _renderTargets.dbPointLightShadows = std::make_unique<Texture>(
+        "directional_light_shadows_color",
+        TextureType::CubeMap,
+        getTextureProperties(TextureUsage::DepthBuffer));
     _renderTargets.dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
     _renderTargets.dbPointLightShadows->init();
 
@@ -124,31 +141,38 @@ void PBRRenderPipeline::initRenderTargets() {
 
     // G-Buffer framebuffer
 
-    _renderTargets.cbGBufDiffuse = std::make_unique<Texture>("gbuffer_diffuse", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbGBufDiffuse = std::make_unique<Texture>(
+        "gbuffer_diffuse",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbGBufDiffuse->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbGBufDiffuse->init();
 
-    _renderTargets.cbGBufLightmap = std::make_unique<Texture>("gbuffer_lightmap", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbGBufLightmap = std::make_unique<Texture>(
+        "gbuffer_lightmap",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbGBufLightmap->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbGBufLightmap->init();
 
-    _renderTargets.cbGBufPrefilteredEnv = std::make_unique<Texture>("gbuffer_prefiltered_env", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufPrefilteredEnv->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
-    _renderTargets.cbGBufPrefilteredEnv->init();
-
-    _renderTargets.cbGBufSelfIllum = std::make_unique<Texture>("gbuffer_selfillum", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufSelfIllum->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
+    _renderTargets.cbGBufSelfIllum = std::make_unique<Texture>(
+        "gbuffer_selfillum",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbGBufSelfIllum->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbGBufSelfIllum->init();
 
-    _renderTargets.cbGBufEyeNormal = std::make_unique<Texture>("gbuffer_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbGBufEyeNormal = std::make_unique<Texture>(
+        "gbuffer_eyenormal",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbGBufEyeNormal->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
     _renderTargets.cbGBufEyeNormal->init();
 
-    _renderTargets.cbGBufIrradiance = std::make_unique<Texture>("gbuffer_irradiance", getTextureProperties(TextureUsage::ColorBuffer));
-    _renderTargets.cbGBufIrradiance->clear(_targetSize.x, _targetSize.y, PixelFormat::RGB8);
-    _renderTargets.cbGBufIrradiance->init();
-
-    _renderTargets.dbGBuffer = std::make_shared<Texture>("gbuffer_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _renderTargets.dbGBuffer = std::make_shared<Texture>(
+        "gbuffer_depth",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::DepthBuffer));
     _renderTargets.dbGBuffer->clear(_targetSize.x, _targetSize.y, PixelFormat::Depth32F);
     _renderTargets.dbGBuffer->init();
 
@@ -157,33 +181,45 @@ void PBRRenderPipeline::initRenderTargets() {
         {_renderTargets.cbGBufDiffuse,
          _renderTargets.cbGBufEyeNormal,
          _renderTargets.cbGBufLightmap,
-         _renderTargets.cbGBufSelfIllum,
-         _renderTargets.cbGBufIrradiance,
-         _renderTargets.cbGBufPrefilteredEnv},
+         _renderTargets.cbGBufSelfIllum},
         _renderTargets.dbGBuffer);
     _renderTargets.fbOpaqueGeometry->init();
 
     // Opaque geometry framebuffer
 
-    _renderTargets.cbDeferredOpaque1 = std::make_unique<Texture>("deferred_opaque_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbDeferredOpaque1 = std::make_unique<Texture>(
+        "deferred_opaque_color1",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbDeferredOpaque1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbDeferredOpaque1->init();
 
-    _renderTargets.cbDeferredOpaque2 = std::make_unique<Texture>("deferred_opaque_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbDeferredOpaque2 = std::make_unique<Texture>(
+        "deferred_opaque_color2",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbDeferredOpaque2->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbDeferredOpaque2->init();
 
     _renderTargets.fbDeferredCombine = std::make_shared<Framebuffer>();
-    _renderTargets.fbDeferredCombine->attachColorsDepth({_renderTargets.cbDeferredOpaque1, _renderTargets.cbDeferredOpaque2}, _renderTargets.dbCommon);
+    _renderTargets.fbDeferredCombine->attachColorsDepth({_renderTargets.cbDeferredOpaque1,
+                                                         _renderTargets.cbDeferredOpaque2},
+                                                        _renderTargets.dbCommon);
     _renderTargets.fbDeferredCombine->init();
 
     // Transparent geometry framebuffer
 
-    _renderTargets.cbTransparentGeometry1 = std::make_unique<Texture>("transparent_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbTransparentGeometry1 = std::make_unique<Texture>(
+        "transparent_geometry_color1",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbTransparentGeometry1->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA16F);
     _renderTargets.cbTransparentGeometry1->init();
 
-    _renderTargets.cbTransparentGeometry2 = std::make_unique<Texture>("transparent_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbTransparentGeometry2 = std::make_unique<Texture>(
+        "transparent_geometry_color2",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbTransparentGeometry2->clear(_targetSize.x, _targetSize.y, PixelFormat::R16F);
     _renderTargets.cbTransparentGeometry2->init();
 
@@ -196,7 +232,10 @@ void PBRRenderPipeline::initRenderTargets() {
     // SSAO framebuffer
 
     if (_options.ssao) {
-        _renderTargets.cbSSAO = std::make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
+        _renderTargets.cbSSAO = std::make_shared<Texture>(
+            "ssao_color",
+            TextureType::TwoDim,
+            getTextureProperties(TextureUsage::ColorBuffer));
         _renderTargets.cbSSAO->clear(halfSize.x, halfSize.y, PixelFormat::R8);
         _renderTargets.cbSSAO->init();
 
@@ -208,7 +247,10 @@ void PBRRenderPipeline::initRenderTargets() {
     // SSR framebuffer
 
     if (_options.ssr) {
-        _renderTargets.cbSSR = std::make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
+        _renderTargets.cbSSR = std::make_unique<Texture>(
+            "ssr_color",
+            TextureType::TwoDim,
+            getTextureProperties(TextureUsage::ColorBuffer));
         _renderTargets.cbSSR->clear(halfSize.x, halfSize.y, PixelFormat::RGBA8);
         _renderTargets.cbSSR->init();
 
@@ -219,7 +261,10 @@ void PBRRenderPipeline::initRenderTargets() {
 
     // Output framebuffer
 
-    _renderTargets.cbOutput = std::make_unique<Texture>("output_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _renderTargets.cbOutput = std::make_unique<Texture>(
+        "output_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _renderTargets.cbOutput->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _renderTargets.cbOutput->init();
 
@@ -376,7 +421,7 @@ void PBRRenderPipeline::endPointLightShadowsPass() {
 }
 
 void PBRRenderPipeline::beginOpaqueGeometryPass() {
-    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3, 4, 5});
+    _context.bindDrawFramebuffer(*_renderTargets.fbOpaqueGeometry, {0, 1, 2, 3});
     _context.clearColorDepth();
 }
 
@@ -428,14 +473,14 @@ void PBRRenderPipeline::combineOpaqueGeometry() {
     _context.bindDrawFramebuffer(*_renderTargets.fbDeferredCombine, {0, 1});
     _context.bindTexture(*_renderTargets.cbGBufDiffuse);
     _context.bindTexture(*_renderTargets.cbGBufLightmap, TextureUnits::lightmap);
-    _context.bindTexture(*_renderTargets.cbGBufPrefilteredEnv, TextureUnits::gBufPrefilteredEnv);
     _context.bindTexture(*_renderTargets.cbGBufSelfIllum, TextureUnits::gBufSelfIllum);
     _context.bindTexture(*_renderTargets.dbGBuffer, TextureUnits::gBufDepth);
     _context.bindTexture(*_renderTargets.cbGBufEyeNormal, TextureUnits::gBufEyeNormal);
-    _context.bindTexture(*_renderTargets.cbGBufIrradiance, TextureUnits::gBufIrradiance);
-    _context.bindTexture(_pbrTextures.brdf(), TextureUnits::brdfLUT);
     _context.bindTexture(*_renderTargets.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
     _context.bindTexture(*_renderTargets.dbPointLightShadows, TextureUnits::shadowMapCube);
+    _context.bindTexture(_pbrTextures.brdf(), TextureUnits::brdfLUT);
+    _context.bindTexture(_pbrTextures.irradianceMapArray(), TextureUnits::irradianceMapArray);
+    _context.bindTexture(_pbrTextures.prefilteredEnvMapArray(), TextureUnits::prefilteredEnvMapArray);
     if (_options.ssao) {
         _context.bindTexture(*_renderTargets.cbSSAO, TextureUnits::ssao);
     }

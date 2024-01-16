@@ -83,7 +83,10 @@ void TgaReader::loadTexture() {
     }
 
     PixelFormat format = isGrayscale() ? PixelFormat::R8 : (_alpha ? PixelFormat::BGRA8 : PixelFormat::BGR8);
-    _texture = std::make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture = std::make_shared<Texture>(
+        _resRef,
+        _numLayers == kNumCubeFaces ? TextureType::CubeMap : TextureType::TwoDim,
+        getTextureProperties(_usage));
     _texture->setPixels(_width, _height, format, std::move(layers));
 }
 

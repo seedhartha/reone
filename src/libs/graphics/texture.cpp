@@ -145,33 +145,12 @@ void Texture::unbind() {
 }
 
 void Texture::configure() {
-    if (isCubemap()) {
-        configureCubemap();
-    } else {
+    if (isCubeMap() || isCubeMapArray()) {
+        configureCubeMap();
+    } else if (is2D() || is2DArray()) {
         configure2D();
-    }
-}
-
-void Texture::configureCubemap() {
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.magFilter));
-
-    switch (_properties.wrap) {
-    case Wrapping::ClampToBorder:
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-        glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
-        break;
-    case Wrapping::ClampToEdge:
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        break;
-    case Wrapping::Repeat:
-    default:
-        // Wrap is GL_REPEAT by default in OpenGL
-        break;
+    } else {
+        throw NotImplementedException("Unsupported texture type: " + std::to_string(static_cast<int>(_type)));
     }
 }
 
@@ -197,37 +176,98 @@ void Texture::configure2D() {
     }
 }
 
+void Texture::configureCubeMap() {
+    auto target = getTargetGL();
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.magFilter));
+
+    switch (_properties.wrap) {
+    case Wrapping::ClampToBorder:
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+        break;
+    case Wrapping::ClampToEdge:
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        break;
+    case Wrapping::Repeat:
+    default:
+        // Wrap is GL_REPEAT by default in OpenGL
+        break;
+    }
+}
+
 void Texture::refresh() {
-    if (isCubemap()) {
-        refreshCubemap();
+    if (isCubeMapArray()) {
+        refreshCubeMapArray();
+    } else if (isCubeMap()) {
+        refreshCubeMap();
     } else if (is2DArray()) {
         refresh2DArray();
-    } else {
+    } else if (is2D()) {
         refresh2D();
+    } else {
+        throw NotImplementedException("Unsupported texture type: " + std::to_string(static_cast<int>(_type)));
     }
     if (isMipmapFilter(_properties.minFilter)) {
         auto target = getTargetGL();
         glGenerateMipmap(target);
         if (_properties.anisotropy > 1.0f) {
-            glTexParameterf(getTargetGL(), GL_TEXTURE_MAX_ANISOTROPY_EXT, _properties.anisotropy);
+            glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, _properties.anisotropy);
         }
     }
 }
 
-void Texture::refreshCubemap() {
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        if (_layers.size() > i && _layers[i].pixels) {
-            auto &pixels = _layers[i].pixels;
-            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
-        } else {
-            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, _width, _height);
-        }
+void Texture::refresh2D() {
+    const void *pixelsData;
+    size_t pixelsSize;
+    if (!_layers.empty() && _layers.front().pixels) {
+        auto &pixels = _layers.front().pixels;
+        pixelsData = pixels->data();
+        pixelsSize = pixels->size();
+    } else {
+        pixelsData = nullptr;
+        pixelsSize = 0;
+    }
+    switch (_pixelFormat) {
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        glCompressedTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            getInternalPixelFormatGL(_pixelFormat),
+            _width, _height,
+            0,
+            pixelsSize, pixelsData);
+        break;
+    default:
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            getInternalPixelFormatGL(_pixelFormat),
+            _width, _height,
+            0,
+            getPixelFormatGL(_pixelFormat),
+            getPixelTypeGL(_pixelFormat),
+            pixelsData);
+        break;
     }
 }
 
 void Texture::refresh2DArray() {
     int numLayers = static_cast<int>(_layers.size());
-    fillTarget3D(_width, _height, numLayers);
+    glTexImage3D(
+        GL_TEXTURE_2D_ARRAY,
+        0,
+        getInternalPixelFormatGL(_pixelFormat),
+        _width, _height, numLayers,
+        0,
+        getPixelFormatGL(_pixelFormat),
+        getPixelTypeGL(_pixelFormat),
+        nullptr);
     for (size_t i = 0; i < numLayers; ++i) {
         const auto &layer = _layers[i];
         if (!layer.pixels || layer.pixels->empty()) {
@@ -244,13 +284,56 @@ void Texture::refresh2DArray() {
     }
 }
 
-void Texture::refresh2D() {
-    if (!_layers.empty() && _layers.front().pixels) {
-        auto &pixels = _layers.front().pixels;
-        fillTarget2D(GL_TEXTURE_2D, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
-    } else {
-        fillTarget2D(GL_TEXTURE_2D, _width, _height);
+void Texture::refreshCubeMap() {
+    const void *pixelsData;
+    size_t pixelsSize;
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        if (_layers.size() > i && _layers[i].pixels) {
+            auto &pixels = _layers[i].pixels;
+            pixelsData = pixels->data();
+            pixelsSize = pixels->size();
+        } else {
+            pixelsData = nullptr;
+            pixelsSize = 0;
+        }
+        switch (_pixelFormat) {
+        case PixelFormat::DXT1:
+        case PixelFormat::DXT5:
+            glCompressedTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0,
+                getInternalPixelFormatGL(_pixelFormat),
+                _width, _height,
+                0,
+                pixelsSize, pixelsData);
+            break;
+        default:
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0,
+                getInternalPixelFormatGL(_pixelFormat),
+                _width, _height,
+                0,
+                getPixelFormatGL(_pixelFormat),
+                getPixelTypeGL(_pixelFormat),
+                pixelsData);
+            break;
+        }
     }
+}
+
+void Texture::refreshCubeMapArray() {
+    // TODO: fill with pixel data
+    int numLayers = static_cast<int>(_layers.size());
+    glTexImage3D(
+        GL_TEXTURE_CUBE_MAP_ARRAY,
+        0,
+        getInternalPixelFormatGL(_pixelFormat),
+        _width, _height, numLayers,
+        0,
+        getPixelFormatGL(_pixelFormat),
+        getPixelTypeGL(_pixelFormat),
+        nullptr);
 }
 
 void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refresh) {
@@ -267,12 +350,12 @@ void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refres
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, Layer layer, bool refresh) {
-    setPixels(w, h, format, std::vector<Layer> {std::move(layer)}, refresh);
+    setPixels(w, h, format, std::vector<Layer>{std::move(layer)}, refresh);
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh) {
     if (layers.empty()) {
-        throw std::invalid_argument("layers empty");
+        throw std::invalid_argument("layers is empty");
     }
     _width = w;
     _height = h;
@@ -284,11 +367,22 @@ void Texture::setPixels(int w, int h, PixelFormat format, std::vector<Layer> lay
     }
 }
 
-void Texture::flushGPUToCPU() {
-    if (isCubemap() || is2DArray()) {
-        throw NotImplementedException("Flushing cubemap or array textures not implemented");
+uint32_t Texture::getTargetGL() const {
+    if (isCubeMapArray()) {
+        return GL_TEXTURE_CUBE_MAP_ARRAY;
+    } else if (isCubeMap()) {
+        return GL_TEXTURE_CUBE_MAP;
+    } else if (is2DArray()) {
+        return GL_TEXTURE_2D_ARRAY;
+    } else {
+        return GL_TEXTURE_2D;
     }
+}
 
+void Texture::flushGPUToCPU() {
+    if (!is2D()) {
+        throw NotImplementedException("Flushing is only supported for 2D textures");
+    }
     if (_layers.empty()) {
         _layers.push_back(Texture::Layer());
     }
@@ -330,48 +424,6 @@ void Texture::flushGPUToCPU() {
     layer.pixels->resize(bpp * _width * _height);
 
     glGetTexImage(GL_TEXTURE_2D, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), &(*layer.pixels)[0]);
-}
-
-void Texture::fillTarget2D(uint32_t target, int width, int height, const void *pixels, int size) {
-    switch (_pixelFormat) {
-    case PixelFormat::DXT1:
-    case PixelFormat::DXT5:
-        glCompressedTexImage2D(target, 0, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
-        break;
-    default:
-        glTexImage2D(
-            target,
-            0,
-            getInternalPixelFormatGL(_pixelFormat),
-            width, height,
-            0,
-            getPixelFormatGL(_pixelFormat),
-            getPixelTypeGL(_pixelFormat),
-            pixels);
-        break;
-    }
-}
-
-void Texture::fillTarget3D(int width, int height, int depth) {
-    glTexImage3D(
-        GL_TEXTURE_2D_ARRAY,
-        0,
-        getInternalPixelFormatGL(_pixelFormat),
-        width, height, depth,
-        0,
-        getPixelFormatGL(_pixelFormat),
-        getPixelTypeGL(_pixelFormat),
-        nullptr);
-}
-
-uint32_t Texture::getTargetGL() const {
-    if (isCubemap()) {
-        return GL_TEXTURE_CUBE_MAP;
-    } else if (is2DArray()) {
-        return GL_TEXTURE_2D_ARRAY;
-    } else {
-        return GL_TEXTURE_2D;
-    }
 }
 
 } // namespace graphics

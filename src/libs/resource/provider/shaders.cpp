@@ -218,7 +218,7 @@ std::shared_ptr<Shader> Shaders::initShader(ShaderType type, std::string resRef)
         defines.append("\n");
         sources.push_front(defines.string());
     }
-    sources.push_front("#version 330 core\n\n");
+    sources.push_front("#version 400 core\n\n");
 
     auto shader = std::make_unique<Shader>(type, std::move(sources));
     shader->init();
@@ -235,7 +235,6 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sEnvMap", TextureUnits::envMap);
     program->setUniform("sNormalMap", TextureUnits::normalMap);
-    program->setUniform("sGBufPrefilteredEnv", TextureUnits::gBufPrefilteredEnv);
     program->setUniform("sGBufSelfIllum", TextureUnits::gBufSelfIllum);
     program->setUniform("sGBufDepth", TextureUnits::gBufDepth);
     program->setUniform("sGBufEyeNormal", TextureUnits::gBufEyeNormal);
@@ -250,9 +249,8 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->setUniform("sBumpMapArray", TextureUnits::bumpMapArray);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
     program->setUniform("sBRDFLUT", TextureUnits::brdfLUT);
-    program->setUniform("sPBRIrradiance", TextureUnits::pbrIrradiance);
-    program->setUniform("sPBRPrefiltered", TextureUnits::pbrPrefiltered);
-    program->setUniform("sGBufIrradiance", TextureUnits::gBufIrradiance);
+    program->setUniform("sIrradianceMapArray", TextureUnits::irradianceMapArray);
+    program->setUniform("sPrefilteredEnvMapArray", TextureUnits::prefilteredEnvMapArray);
 
     // Uniform Blocks
     program->bindUniformBlock("Globals", UniformBlockBindingPoints::globals);

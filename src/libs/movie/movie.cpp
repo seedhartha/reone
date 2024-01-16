@@ -41,8 +41,11 @@ void Movie::init() {
     if (!_texture && _videoStream) {
         _width = _videoStream->width();
         _height = _videoStream->height();
-        _texture = std::make_shared<Texture>("video", getTextureProperties(TextureUsage::Movie));
-        _texture->clear(1, 1, PixelFormat::RGB8, 1);
+        _texture = std::make_shared<Texture>(
+            "video",
+            TextureType::TwoDim,
+            getTextureProperties(TextureUsage::Movie));
+        _texture->clear(1, 1, PixelFormat::RGB8);
     }
     if (!_audioSource && _audioStream) {
         _audioSource = _audioPlayer.play(_audioStream, AudioType::Movie);

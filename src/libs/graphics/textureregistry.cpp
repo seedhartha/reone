@@ -29,24 +29,34 @@ void TextureRegistry::init() {
         return;
     }
 
-    auto default2DRGB = std::make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
+    auto default2DRGB = std::make_shared<Texture>(
+        "default_rgb",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::Default));
     default2DRGB->clear(1, 1, PixelFormat::RGB8);
     default2DRGB->init();
     add(TextureName::default2dRgb, std::move(default2DRGB));
 
-    auto defaultCubemapRGB = std::make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
-    defaultCubemapRGB->setCubemap(true);
+    auto defaultCubemapRGB = std::make_shared<Texture>(
+        "default_cubemap_rgb",
+        TextureType::CubeMap,
+        getTextureProperties(TextureUsage::Default));
     defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
     defaultCubemapRGB->init();
     add(TextureName::defaultCubemapRgb, std::move(defaultCubemapRGB));
 
-    auto defaultCubemapDepth = std::make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
-    defaultCubemapDepth->setCubemap(true);
+    auto defaultCubemapDepth = std::make_shared<Texture>(
+        "default_cubemap_depth",
+        TextureType::CubeMap,
+        getTextureProperties(TextureUsage::Default));
     defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
     defaultCubemapDepth->init();
     add(TextureName::defaultCubemapDepth, std::move(defaultCubemapDepth));
 
-    auto defaultArrayDepth = std::make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
+    auto defaultArrayDepth = std::make_shared<Texture>(
+        "default_array_depth",
+        TextureType::TwoDimArray,
+        getTextureProperties(TextureUsage::Default));
     defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     defaultArrayDepth->init();
     add(TextureName::defaultArrayDepth, std::move(defaultArrayDepth));
@@ -58,7 +68,10 @@ void TextureRegistry::init() {
         *pixel = randomFloat(-1.0f, 1.0f);
     }
     auto noiseLayer = Texture::Layer {std::move(noisePixels)};
-    auto noiseRG = std::make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
+    auto noiseRG = std::make_shared<Texture>(
+        "noise_rg",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::Noise));
     noiseRG->setPixels(4, 4, PixelFormat::RG16F, std::move(noiseLayer));
     noiseRG->init();
     add(TextureName::noiseRg, std::move(noiseRG));
@@ -69,7 +82,10 @@ void TextureRegistry::init() {
     (*ssaoPixels)[1] = 0xff;
     (*ssaoPixels)[2] = 0xff;
     auto ssaoLayer = Texture::Layer {std::move(ssaoPixels)};
-    auto ssaoRGB = std::make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
+    auto ssaoRGB = std::make_shared<Texture>(
+        "ssao_rgb",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::Default));
     ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, std::move(ssaoLayer));
     ssaoRGB->init();
     add(TextureName::ssaoRgb, std::move(ssaoRGB));
@@ -81,7 +97,10 @@ void TextureRegistry::init() {
     (*ssrPixels)[2] = 0;
     (*ssrPixels)[3] = 0;
     auto ssrLayer = Texture::Layer {std::move(ssrPixels)};
-    auto ssrRGBA = std::make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
+    auto ssrRGBA = std::make_shared<Texture>(
+        "ssr_rgba",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::Default));
     ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, std::move(ssrLayer));
     ssrRGBA->init();
     add(TextureName::ssrRgb, std::move(ssrRGBA));

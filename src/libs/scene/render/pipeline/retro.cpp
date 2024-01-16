@@ -48,13 +48,18 @@ void RetroRenderPipeline::init() {
 void RetroRenderPipeline::initRenderTargets() {
     // Shadows framebuffer
 
-    _targets.dirLightShadowsDepth = std::make_shared<Texture>("retro_dir_light_shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    _targets.dirLightShadowsDepth = std::make_shared<Texture>(
+        "retro_dir_light_shadows_depth",
+        TextureType::TwoDimArray,
+        getTextureProperties(TextureUsage::DepthBuffer));
     _targets.dirLightShadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
     _targets.dirLightShadowsDepth->init();
 
-    _targets.pointLightShadowsDepth = std::make_shared<Texture>("retro_point_light_shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _targets.pointLightShadowsDepth->setCubemap(true);
-    _targets.pointLightShadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
+    _targets.pointLightShadowsDepth = std::make_shared<Texture>(
+        "retro_point_light_shadows_depth",
+        TextureType::CubeMap,
+        getTextureProperties(TextureUsage::DepthBuffer));
+    _targets.pointLightShadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumCubeFaces);
     _targets.pointLightShadowsDepth->init();
 
     _targets.shadows = std::make_shared<Framebuffer>();
@@ -62,11 +67,17 @@ void RetroRenderPipeline::initRenderTargets() {
 
     // Opaque framebuffer
 
-    _targets.opaqueColor = std::make_unique<Texture>("retro_opaque_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.opaqueColor = std::make_unique<Texture>(
+        "retro_opaque_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.opaqueColor->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _targets.opaqueColor->init();
 
-    _targets.opaqueHilights = std::make_unique<Texture>("retro_opaque_hilights", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.opaqueHilights = std::make_unique<Texture>(
+        "retro_opaque_hilights",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.opaqueHilights->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _targets.opaqueHilights->init();
 
@@ -80,11 +91,17 @@ void RetroRenderPipeline::initRenderTargets() {
 
     // Transparent framebuffer
 
-    _targets.transparentAccum = std::make_unique<Texture>("retro_transparent_accum", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.transparentAccum = std::make_unique<Texture>(
+        "retro_transparent_accum",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.transparentAccum->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA16F);
     _targets.transparentAccum->init();
 
-    _targets.transparentRevealage = std::make_unique<Texture>("retro_transparent_revealage", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.transparentRevealage = std::make_unique<Texture>(
+        "retro_transparent_revealage",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.transparentRevealage->clear(_targetSize.x, _targetSize.y, PixelFormat::R16F);
     _targets.transparentRevealage->init();
 
@@ -93,16 +110,24 @@ void RetroRenderPipeline::initRenderTargets() {
     _targets.transparentDepth->init();
 
     _targets.transparent = std::make_unique<Framebuffer>();
-    _targets.transparent->attachColorsDepth({_targets.transparentAccum, _targets.transparentRevealage}, _targets.transparentDepth);
+    _targets.transparent->attachColorsDepth({_targets.transparentAccum,
+                                             _targets.transparentRevealage},
+                                            _targets.transparentDepth);
     _targets.transparent->init();
 
     // Ping-pong framebuffers
 
-    _targets.pingColor = std::make_unique<Texture>("retro_ping_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.pingColor = std::make_unique<Texture>(
+        "retro_ping_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.pingColor->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _targets.pingColor->init();
 
-    _targets.pongColor = std::make_unique<Texture>("retro_pong_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.pongColor = std::make_unique<Texture>(
+        "retro_pong_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.pongColor->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _targets.pongColor->init();
 
@@ -120,7 +145,10 @@ void RetroRenderPipeline::initRenderTargets() {
 
     // Output framebuffer
 
-    _targets.outputColor = std::make_unique<Texture>("retro_output_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _targets.outputColor = std::make_unique<Texture>(
+        "retro_output_color",
+        TextureType::TwoDim,
+        getTextureProperties(TextureUsage::ColorBuffer));
     _targets.outputColor->clear(_targetSize.x, _targetSize.y, PixelFormat::RGBA8);
     _targets.outputColor->init();
 

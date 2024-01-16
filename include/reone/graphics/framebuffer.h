@@ -58,7 +58,7 @@ public:
     }
 
     void attachTexture(const Texture &texture, Attachment attachment, int index = 0) const;
-    void attachTextureCube(const Texture &texture, CubeMapFace face, Attachment attachment, int index = 0, int mip = 0) const;
+    void attachTextureLayer(const Texture &texture, int layer, int mip, Attachment attachment, int index = 0) const;
     void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index = 0) const;
 
     void checkCompleteness();

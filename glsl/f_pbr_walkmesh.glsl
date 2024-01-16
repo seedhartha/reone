@@ -9,8 +9,6 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragEyeNormal;
 layout(location = 2) out vec4 fragLightmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec3 fragIrradiance;
-layout(location = 5) out vec4 fragPrefilteredEnvColor;
 
 void main() {
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorld);
@@ -18,8 +16,6 @@ void main() {
 
     fragDiffuseColor = vec4(uWalkmeshMaterials[fragMaterial].rgb, 1.0);
     fragLightmapColor = vec4(vec3(1.0), 0.0);
-    fragPrefilteredEnvColor = vec4(0.0);
     fragSelfIllumColor = vec4(0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
-    fragIrradiance = vec3(0.0);
 }
