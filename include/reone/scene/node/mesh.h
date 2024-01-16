@@ -91,7 +91,6 @@ private:
     };
 
     struct SaberMesh {
-        std::vector<SaberVertex> vertices;
         glm::vec3 displacement {0.0f};
         glm::vec3 prevWorldPos {0.0f};
     } _saber;
@@ -108,7 +107,6 @@ private:
 
     void initTextures();
     void initDanglyMesh();
-    void initSaberMesh();
 
     void refreshAdditionalTextures();
 

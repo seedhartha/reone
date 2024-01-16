@@ -51,7 +51,6 @@ void MeshSceneNode::init() {
 
     initTextures();
     initDanglyMesh();
-    initSaberMesh();
 }
 
 void MeshSceneNode::initTextures() {
@@ -189,17 +188,6 @@ void MeshSceneNode::updateSaberAnimation(float dt) {
     }
     _saber.displacement -= _saber.displacement * glm::min(8.0f * dt, 1.0f);
     _saber.prevWorldPos = worldPos;
-
-    // TODO: optimize
-    for (int i = 0; i < kNumSaberSegments + 2; ++i) {
-        int segmentIdx = std::min(i, kNumSaberSegments - 1);
-        float hdist = i / static_cast<float>(kNumSaberSegments + 1);
-        for (int j = 0; j < 4; ++j) {
-            float vdist = j / 3.0f;
-            _saber.vertices[4 * i + j].displacement = 0.5f * hdist * vdist * _saber.displacement;
-            _saber.vertices[88 + 4 * i + j].displacement = -0.5f * hdist * vdist * _saber.displacement;
-        }
-    }
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -334,16 +322,11 @@ void MeshSceneNode::render(IRenderPass &pass) {
                         _absTransformInv,
                         positions);
     } else if (_modelNode.isSaberMesh()) {
-        std::vector<glm::vec4> positions;
-        positions.reserve(_saber.vertices.size());
-        for (const auto &vertex : _saber.vertices) {
-            positions.emplace_back(vertex.position + vertex.displacement, 1.0f);
-        }
         pass.drawSaber(*mesh->mesh,
                        material,
                        _absTransform,
                        _absTransformInv,
-                       positions);
+                       glm::vec4 {_saber.displacement, 0.0f});
     } else {
         pass.draw(*mesh->mesh, material, _absTransform, _absTransformInv);
     }
@@ -394,19 +377,6 @@ void MeshSceneNode::initDanglyMesh() {
         DanglyVertex vertex;
         vertex.position = position;
         _dangly.vertices.push_back(std::move(vertex));
-    }
-}
-
-void MeshSceneNode::initSaberMesh() {
-    auto mesh = _modelNode.mesh();
-    if (!mesh || !mesh->saber) {
-        return;
-    }
-    _saber.vertices.reserve(mesh->mesh->numVertices());
-    for (const auto &position : mesh->mesh->getVertexCoords()) {
-        SaberVertex vertex;
-        vertex.position = position;
-        _saber.vertices.push_back(std::move(vertex));
     }
 }
 

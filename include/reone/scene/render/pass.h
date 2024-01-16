@@ -89,7 +89,7 @@ public:
                            graphics::Material &material,
                            const glm::mat4 &transform,
                            const glm::mat4 &transformInv,
-                           const std::vector<glm::vec4> &positions) = 0;
+                           const glm::vec4 &displacement) = 0;
 
     virtual void drawBillboard(graphics::Texture &texture,
                                const glm::vec4 &color,

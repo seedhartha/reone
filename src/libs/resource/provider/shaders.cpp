@@ -260,7 +260,6 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Locals", UniformBlockBindingPoints::locals);
     program->bindUniformBlock("Bones", UniformBlockBindingPoints::bones);
     program->bindUniformBlock("Dangly", UniformBlockBindingPoints::dangly);
-    program->bindUniformBlock("Saber", UniformBlockBindingPoints::saber);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);

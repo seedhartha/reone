@@ -36,7 +36,7 @@ void RetroRenderPass::draw(Mesh &mesh,
                            Material &material,
                            const glm::mat4 &transform,
                            const glm::mat4 &transformInv) {
-    withMaterialAppliedToContext(material, [&]() {
+    withMaterialAppliedToContext(material, [&](auto &program) {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
             locals.model = transform;
@@ -47,7 +47,7 @@ void RetroRenderPass::draw(Mesh &mesh,
     });
 }
 
-void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void()> block) {
+void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std::function<void(ShaderProgram &)> block) {
     static const std::unordered_map<MaterialType, std::string> kMatTypeToProgramId {
         {MaterialType::DirLightShadow, ShaderProgramId::dirLightShadows},     //
         {MaterialType::PointLightShadow, ShaderProgramId::pointLightShadows}, //
@@ -59,7 +59,8 @@ void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std
     if (kMatTypeToProgramId.count(material.type) == 0) {
         throw std::invalid_argument(str(boost::format("Material type %1% is not associated with a shader program") % static_cast<int>(material.type)));
     }
-    _context.useProgram(_shaderRegistry.get(kMatTypeToProgramId.at(material.type)));
+    auto &program = _shaderRegistry.get(kMatTypeToProgramId.at(material.type));
+    _context.useProgram(program);
     for (const auto &[unit, texture] : material.textures) {
         _context.bindTexture(texture, unit);
     }
@@ -75,7 +76,7 @@ void RetroRenderPass::withMaterialAppliedToContext(const Material &material, std
     if (material.polygonMode && *material.polygonMode != prevPolygonMode) {
         _context.pushPolygonMode(*material.polygonMode);
     }
-    block();
+    block(program);
     if (material.blending && *material.blending != prevBlending) {
         _context.popBlendMode();
     }
@@ -141,7 +142,7 @@ void RetroRenderPass::drawSkinned(Mesh &mesh,
                                   const glm::mat4 &transform,
                                   const glm::mat4 &transformInv,
                                   const std::vector<glm::mat4> &bones) {
-    withMaterialAppliedToContext(material, [&]() {
+    withMaterialAppliedToContext(material, [&](auto &program) {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
             locals.featureMask |= UniformsFeatureFlags::skin;
@@ -161,7 +162,7 @@ void RetroRenderPass::drawDangly(Mesh &mesh,
                                  const glm::mat4 &transform,
                                  const glm::mat4 &transformInv,
                                  const std::vector<glm::vec4> &positions) {
-    withMaterialAppliedToContext(material, [&]() {
+    withMaterialAppliedToContext(material, [&](auto &program) {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
             locals.featureMask |= UniformsFeatureFlags::dangly;
@@ -181,8 +182,8 @@ void RetroRenderPass::drawSaber(Mesh &mesh,
                                 Material &material,
                                 const glm::mat4 &transform,
                                 const glm::mat4 &transformInv,
-                                const std::vector<glm::vec4> &positions) {
-    withMaterialAppliedToContext(material, [&]() {
+                                const glm::vec4 &displacement) {
+    withMaterialAppliedToContext(material, [&](auto &program) {
         _uniforms.setLocals([this, &material, &transform, &transformInv](auto &locals) {
             locals.reset();
             locals.featureMask |= UniformsFeatureFlags::saber;
@@ -190,10 +191,7 @@ void RetroRenderPass::drawSaber(Mesh &mesh,
             locals.modelInv = transformInv;
             applyMaterialToLocals(material, locals);
         });
-        _uniforms.setSaber([&positions](auto &saber) {
-            auto numPositions = std::min<int>(kNumSaberVertices, positions.size());
-            std::memcpy(saber.positions, &positions[0], numPositions * sizeof(glm::vec4));
-        });
+        program.setUniform("uSaberDisplacement", displacement);
         mesh.draw();
     });
 }

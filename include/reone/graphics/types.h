@@ -25,7 +25,6 @@ constexpr float kDefaultClipPlaneNear = 0.25f;
 constexpr float kDefaultClipPlaneFar = 2500.0f;
 constexpr float kDefaultObjectDrawDistance = 64.0f;
 
-constexpr int kNumSaberVertices = 176;
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumShadowCascades = 4;
 constexpr int kNumShadowLightSpace = 6;

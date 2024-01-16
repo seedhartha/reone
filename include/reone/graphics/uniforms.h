@@ -145,10 +145,6 @@ struct DanglyUniforms {
     glm::vec4 positions[kMaxDanglyVertices] {glm::vec4(0.0f)};
 };
 
-struct SaberUniforms {
-    glm::vec4 positions[kNumSaberVertices] {glm::vec4 {0.0f}};
-};
-
 struct alignas(16) ParticleUniformsParticle {
     glm::vec4 positionFrame {0.0f};
     glm::vec4 right {1.0f, 0.0f, 0.0f, 0.0f};
@@ -213,7 +209,6 @@ public:
     virtual void setLocals(const std::function<void(LocalUniforms &)> &block) = 0;
     virtual void setBones(const std::function<void(BoneUniforms &)> &block) = 0;
     virtual void setDangly(const std::function<void(DanglyUniforms &)> &block) = 0;
-    virtual void setSaber(const std::function<void(SaberUniforms &)> &block) = 0;
     virtual void setParticles(const std::function<void(ParticleUniforms &)> &block) = 0;
     virtual void setGrass(const std::function<void(GrassUniforms &)> &block) = 0;
     virtual void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) = 0;
@@ -236,7 +231,6 @@ public:
     void setLocals(const std::function<void(LocalUniforms &)> &block) override;
     void setBones(const std::function<void(BoneUniforms &)> &block) override;
     void setDangly(const std::function<void(DanglyUniforms &)> &block) override;
-    void setSaber(const std::function<void(SaberUniforms &)> &block) override;
     void setParticles(const std::function<void(ParticleUniforms &)> &block) override;
     void setGrass(const std::function<void(GrassUniforms &)> &block) override;
     void setWalkmesh(const std::function<void(WalkmeshUniforms &)> &block) override;
@@ -254,7 +248,6 @@ private:
     LocalUniforms _locals;
     BoneUniforms _bones;
     DanglyUniforms _dangly;
-    SaberUniforms _saber;
     ParticleUniforms _particles;
     GrassUniforms _grass;
     WalkmeshUniforms _walkmesh;
@@ -269,7 +262,6 @@ private:
     std::shared_ptr<UniformBuffer> _ubLocals;
     std::shared_ptr<UniformBuffer> _ubBones;
     std::shared_ptr<UniformBuffer> _ubDangly;
-    std::shared_ptr<UniformBuffer> _ubSaber;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubWalkmesh;
