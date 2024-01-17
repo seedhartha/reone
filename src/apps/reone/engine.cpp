@@ -21,6 +21,7 @@
 
 #include "reone/graphics/window.h"
 #include "reone/resource/gameprobe.h"
+#include "reone/system/threadutil.h"
 
 using namespace reone::audio;
 using namespace reone::game;
@@ -98,9 +99,17 @@ void Engine::init() {
         _systemModule->services());
     _game = std::make_unique<Game>(gameId, _options.game.path, *_optionsView, *_services);
     _game->init();
+
+    _profiler = std::make_unique<Profiler>(
+        _options.graphics,
+        _services->graphics,
+        _services->resource,
+        _services->system);
+    _profiler->init();
 }
 
 void Engine::deinit() {
+    _profiler.reset();
     _game.reset();
     _services.reset();
 
@@ -122,36 +131,82 @@ void Engine::deinit() {
 }
 
 int Engine::run() {
+    std::thread gameThread {std::bind(&Engine::gameThreadFunc, this)};
+
     auto &clock = _services->system.clock;
     _ticks = clock.ticks();
-    while (!_quit) {
+
+    while (!_quit.load(std::memory_order::memory_order_acquire)) {
         processEvents();
-        if (_quit) {
+        if (_quit.load(std::memory_order::memory_order_acquire)) {
+            break;
+        }
+        bool focus = _window->isInFocus();
+        _focus.store(focus, std::memory_order::memory_order_release);
+        if (!focus) {
+            std::this_thread::sleep_for(std::chrono::milliseconds {100});
+            continue;
+        }
+        _profiler->timeInput([this]() {
+            while (!_events.empty()) {
+                auto &event = _events.front();
+                if (_game->handle(event) && _game->isQuitRequested()) {
+                    _quit.store(true, std::memory_order::memory_order_release);
+                    break;
+                }
+                _profiler->handle(event);
+                _events.pop();
+            }
+        });
+        if (_quit.load(std::memory_order::memory_order_acquire)) {
             break;
         }
         auto ticks = clock.ticks();
         auto frameTime = (ticks - _ticks) / 1000.0f;
-        if (_window->isInFocus()) {
+        _ticks = ticks;
+        _profiler->timeUpdate([this, &frameTime]() {
             _game->update(frameTime);
-            showCursor(_game->cursorType() == CursorType::None);
-            setRelativeMouseMode(_game->relativeMouseMode());
+            _profiler->update(frameTime);
+        });
+        bool showcur = _game->cursorType() == CursorType::None;
+        bool relmouse = _game->relativeMouseMode();
+        showCursor(showcur);
+        setRelativeMouseMode(relmouse);
+        _profiler->timeRender([this]() {
+            _services->graphics.context.clearColorDepth();
+            _game->render();
+            _profiler->render();
+            _window->swap();
             if (_options.graphics.pbr) {
                 _services->graphics.pbrTextures.refresh();
             }
-            _services->graphics.context.clearColorDepth();
-            _game->render();
-            _window->swap();
-        }
-        _ticks = ticks;
+        });
+        runMainThreadTasks();
     }
+
+    if (gameThread.joinable()) {
+        gameThread.join();
+    }
+
     return 0;
 }
 
+void Engine::gameThreadFunc() {
+    while (!_quit.load(std::memory_order::memory_order_acquire)) {
+        if (false && !_focus.load(std::memory_order::memory_order_acquire)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds {100});
+            continue;
+        }
+        // TODO: move input handling and updates here from the main thread
+    }
+}
+
 void Engine::processEvents() {
+    std::queue<input::Event> unhandled;
     SDL_Event sdlEvent;
     while (SDL_PollEvent(&sdlEvent)) {
         if (sdlEvent.type == SDL_QUIT) {
-            _quit = true;
+            _quit.store(true, std::memory_order::memory_order_release);
             break;
         }
         if (!_window->isAssociatedWith(sdlEvent)) {
@@ -159,7 +214,7 @@ void Engine::processEvents() {
         }
         if (_window->handle(sdlEvent)) {
             if (_window->isCloseRequested()) {
-                _quit = true;
+                _quit.store(true, std::memory_order::memory_order_release);
                 break;
             }
             continue;
@@ -168,9 +223,15 @@ void Engine::processEvents() {
         if (!event) {
             continue;
         }
-        if (_game->handle(*event) && _game->isQuitRequested()) {
-            _quit = true;
+        if (_profiler->handle(*event)) {
+            continue;
         }
+        unhandled.push(*event);
+    }
+    // std::lock_guard<std::mutex> lock {_eventsMutex};
+    while (!unhandled.empty()) {
+        _events.push(std::move(unhandled.front()));
+        unhandled.pop();
     }
 }
 

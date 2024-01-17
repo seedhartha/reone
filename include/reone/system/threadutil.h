@@ -20,8 +20,11 @@
 namespace reone {
 
 void markMainThread();
-bool isMainThread();
 void checkMainThread();
+void runOnMainThread(std::function<void()> task);
+void runMainThreadTasks();
+
+bool isMainThread();
 
 void setThreadName(std::string name);
 const std::string &threadName();

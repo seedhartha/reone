@@ -22,22 +22,36 @@
 #include "reone/input/event.h"
 #include "reone/system/timer.h"
 
-#include "../options.h"
-
 namespace reone {
 
-namespace game {
+namespace graphics {
 
-struct ServicesView;
+struct GraphicsOptions;
+struct GraphicsServices;
 
-class ProfileOverlay {
+} // namespace graphics
+
+namespace resource {
+
+struct ResourceServices;
+
+}
+
+struct SystemServices;
+
+class Profiler : boost::noncopyable {
 public:
-    ProfileOverlay(ServicesView &services, OptionsView &options) :
-        _services(services),
-        _options(options) {
+    Profiler(graphics::GraphicsOptions &graphicsOpt,
+             graphics::GraphicsServices &graphicsSvc,
+             resource::ResourceServices &resourceSvc,
+             SystemServices &systemSvc) :
+        _graphicsOpt(graphicsOpt),
+        _graphicsSvc(graphicsSvc),
+        _resourceSvc(resourceSvc),
+        _systemSvc(systemSvc) {
     }
 
-    ~ProfileOverlay() {
+    ~Profiler() {
         deinit();
     }
 
@@ -48,50 +62,33 @@ public:
     void update(float dt);
     void render();
 
-    bool timeInput(std::function<bool()> block);
+    void timeInput(std::function<void()> block);
     void timeUpdate(std::function<void()> block);
     void timeRender(std::function<void()> block);
 
-    void onFrameEnded();
-
 private:
-    struct FrameTimes {
-        float input;
-        float update;
-        float render;
-        float total;
-
-        FrameTimes(float input, float update, float render) :
-            input(input),
-            update(update),
-            render(render),
-            total(input + update + render) {
-        }
-    };
-
-    ServicesView &_services;
-    OptionsView &_options;
+    graphics::GraphicsOptions &_graphicsOpt;
+    graphics::GraphicsServices &_graphicsSvc;
+    resource::ResourceServices &_resourceSvc;
+    SystemServices &_systemSvc;
 
     bool _inited {false};
-    bool _enabled {false};
+    std::atomic_bool _enabled {false};
 
-    std::deque<FrameTimes> _frameTimes;
-    float _inputTime {0.0f};
-    float _updateTime {0.0f};
-    float _renderTime {0.0f};
+    std::deque<float> _inputTimes;
+    std::deque<float> _updateTimes;
+    std::deque<float> _renderTimes;
 
     Timer _percentilesTimer;
     float _p99FrameTime {0.0f};
     float _p95FrameTime {0.0f};
 
     std::shared_ptr<graphics::Font> _font;
-    std::shared_ptr<graphics::UniformBuffer> _frameTimesUBO;
+    std::mutex _mutex;
 
     void renderBackground();
     void renderFrameTimes();
     void renderText();
 };
-
-} // namespace game
 
 } // namespace reone

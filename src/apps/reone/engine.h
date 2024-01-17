@@ -31,6 +31,7 @@
 #include "reone/system/di/module.h"
 
 #include "options.h"
+#include "profiler.h"
 
 namespace reone {
 
@@ -71,12 +72,18 @@ private:
 
     std::unique_ptr<game::ServicesView> _services;
     std::unique_ptr<game::Game> _game;
+    std::unique_ptr<Profiler> _profiler;
 
-    bool _quit {false};
+    std::atomic_bool _focus {false};
+    std::atomic_bool _quit {false};
+    std::queue<input::Event> _events;
+    std::mutex _eventsMutex;
     uint32_t _ticks {0};
 
     bool _showCursor {true};
     bool _relativeMouseMode {false};
+
+    void gameThreadFunc();
 
     void processEvents();
 

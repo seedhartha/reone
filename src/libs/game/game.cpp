@@ -66,6 +66,7 @@
 #include "reone/system/exception/validation.h"
 #include "reone/system/fileutil.h"
 #include "reone/system/logutil.h"
+#include "reone/system/threadutil.h"
 
 using namespace reone::audio;
 using namespace reone::graphics;
@@ -95,10 +96,6 @@ void Game::initLocalServices() {
     console->init();
     _console = std::move(console);
 
-    auto profileOverlay = std::make_unique<ProfileOverlay>(_services, _options);
-    profileOverlay->init();
-    _profileOverlay = std::move(profileOverlay);
-
     auto routines = std::make_unique<Routines>(_gameId, this, &_services);
     routines->init();
     _routines = std::move(routines);
@@ -121,107 +118,94 @@ void Game::setSceneSurfaces() {
 }
 
 bool Game::handle(const input::Event &event) {
-    return _profileOverlay->timeInput([this, &event]() {
-        switch (event.type) {
-        case input::EventType::KeyDown:
-            if (handleKeyDown(event.key)) {
+    switch (event.type) {
+    case input::EventType::KeyDown:
+        if (handleKeyDown(event.key)) {
+            return true;
+        }
+        break;
+    case input::EventType::MouseMotion:
+        if (handleMouseMotion(event.motion)) {
+            return true;
+        }
+        break;
+    case input::EventType::MouseButtonDown:
+        if (handleMouseButtonDown(event.button)) {
+            return true;
+        }
+        break;
+    case input::EventType::MouseButtonUp:
+        if (handleMouseButtonUp(event.button)) {
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
+
+    if (!_movie) {
+        auto gui = getScreenGUI();
+        if (gui && gui->handle(event)) {
+            return true;
+        }
+        switch (_screen) {
+        case Screen::InGame: {
+            if (_console->handle(event)) {
+                return true;
+            }
+            if (_party.handle(event)) {
+                return true;
+            }
+            auto camera = getActiveCamera();
+            if (camera && camera->handle(event)) {
+                return true;
+            }
+            if (_module->handle(event)) {
                 return true;
             }
             break;
-        case input::EventType::MouseMotion:
-            if (handleMouseMotion(event.motion)) {
-                return true;
-            }
-            break;
-        case input::EventType::MouseButtonDown:
-            if (handleMouseButtonDown(event.button)) {
-                return true;
-            }
-            break;
-        case input::EventType::MouseButtonUp:
-            if (handleMouseButtonUp(event.button)) {
-                return true;
-            }
-            break;
+        }
         default:
             break;
         }
+    }
 
-        if (_profileOverlay->handle(event)) {
-            return true;
-        }
-
-        if (!_movie) {
-            auto gui = getScreenGUI();
-            if (gui && gui->handle(event)) {
-                return true;
-            }
-            switch (_screen) {
-            case Screen::InGame: {
-                if (_console->handle(event)) {
-                    return true;
-                }
-                if (_party.handle(event)) {
-                    return true;
-                }
-                auto camera = getActiveCamera();
-                if (camera && camera->handle(event)) {
-                    return true;
-                }
-                if (_module->handle(event)) {
-                    return true;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        return false;
-    });
+    return false;
 }
 
 void Game::update(float frameTime) {
-    _profileOverlay->timeUpdate([this, &frameTime]() {
-        float dt = frameTime * _gameSpeed;
-        if (_movie) {
-            updateMovie(dt);
-            return;
-        }
-        updateMusic();
+    float dt = frameTime * _gameSpeed;
+    if (_movie) {
+        updateMovie(dt);
+        return;
+    }
+    updateMusic();
 
-        if (!_nextModule.empty()) {
-            loadNextModule();
-        }
-        updateCamera(dt);
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    updateCamera(dt);
 
-        bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
-        if (updModule && !_paused) {
-            _module->update(dt);
-            _combat.update(dt);
-        }
+    bool updModule = !_movie && _module && (_screen == Screen::InGame || _screen == Screen::Conversation);
+    if (updModule && !_paused) {
+        _module->update(dt);
+        _combat.update(dt);
+    }
 
-        auto gui = getScreenGUI();
-        if (gui) {
-            gui->update(dt);
-        }
-        updateSceneGraph(dt);
-
-        _profileOverlay->update(dt);
-    });
+    auto gui = getScreenGUI();
+    if (gui) {
+        gui->update(dt);
+    }
+    updateSceneGraph(dt);
 }
 
 void Game::render() {
-    _profileOverlay->timeRender([this]() {
-        if (_movie) {
-            _movie->render();
-        } else {
-            renderScene();
-            renderGUI();
-        }
-    });
-    _profileOverlay->onFrameEnded();
+    if (_movie) {
+        _movie->render();
+    } else {
+        renderScene();
+        renderGUI();
+    }
 }
 
 bool Game::handleKeyDown(const input::KeyEvent &event) {
@@ -498,7 +482,6 @@ void Game::renderGUI() {
         break;
     }
     }
-    _profileOverlay->render();
     if (_cursor && !_relativeMouseMode) {
         _cursor->render();
     }

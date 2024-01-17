@@ -22,20 +22,44 @@ namespace reone {
 static std::thread::id g_mainThreadId;
 static std::unordered_map<std::thread::id, std::string> g_threadNames;
 static std::mutex g_threadNamesMutex;
+static std::queue<std::function<void()>> g_mainThreadTasks;
+static std::mutex g_mainThreadTasksMutex;
 
 void markMainThread() {
     g_mainThreadId = std::this_thread::get_id();
     setThreadName("main");
 }
 
-bool isMainThread() {
-    return std::this_thread::get_id() == g_mainThreadId;
-}
-
 void checkMainThread() {
     if (std::this_thread::get_id() != g_mainThreadId) {
         throw std::logic_error("Operation forbidden outside the main thread");
     }
+}
+
+void runOnMainThread(std::function<void()> task) {
+    if (isMainThread()) {
+        task();
+        return;
+    }
+    std::lock_guard<std::mutex> lock {g_mainThreadTasksMutex};
+    g_mainThreadTasks.push(std::move(task));
+}
+
+void runMainThreadTasks() {
+    std::queue<std::function<void()>> tasks;
+    {
+        std::lock_guard<std::mutex> lock {g_mainThreadTasksMutex};
+        tasks = g_mainThreadTasks;
+        g_mainThreadTasks = std::queue<std::function<void()>> {};
+    }
+    while (!tasks.empty()) {
+        tasks.front()();
+        tasks.pop();
+    }
+}
+
+bool isMainThread() {
+    return std::this_thread::get_id() == g_mainThreadId;
 }
 
 void setThreadName(std::string name) {

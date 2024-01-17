@@ -264,7 +264,6 @@ std::shared_ptr<ShaderProgram> Shaders::initShaderProgram(std::vector<std::share
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
     program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
     program->bindUniformBlock("ScreenEffect", UniformBlockBindingPoints::screenEffect);
-    program->bindUniformBlock("FrameTimes", UniformBlockBindingPoints::frameTimes);
 
     return program;
 }

@@ -41,7 +41,6 @@
 #include "gui/mainmenu.h"
 #include "gui/map.h"
 #include "gui/partyselect.h"
-#include "gui/profileoverlay.h"
 #include "gui/saveload.h"
 #include "location.h"
 #include "object/area.h"
@@ -356,7 +355,6 @@ private:
     std::unique_ptr<Map> _map;
     std::unique_ptr<Console> _console;
     std::unique_ptr<LoadingScreen> _loadScreen;
-    std::unique_ptr<ProfileOverlay> _profileOverlay;
 
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
 
