@@ -49,8 +49,7 @@ void runMainThreadTasks() {
     std::queue<std::function<void()>> tasks;
     {
         std::lock_guard<std::mutex> lock {g_mainThreadTasksMutex};
-        tasks = g_mainThreadTasks;
-        g_mainThreadTasks = std::queue<std::function<void()>> {};
+        std::swap(tasks, g_mainThreadTasks);
     }
     while (!tasks.empty()) {
         tasks.front()();

@@ -147,41 +147,56 @@ int Engine::run() {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
-        _profiler->timeInput([this]() {
-            while (!_events.empty()) {
-                auto &event = _events.front();
-                if (_game->handle(event) && _game->isQuitRequested()) {
-                    _quit.store(true, std::memory_order::memory_order_release);
-                    break;
-                }
-                _profiler->handle(event);
-                _events.pop();
-            }
-        });
-        if (_quit.load(std::memory_order::memory_order_acquire)) {
-            break;
+        int expectedState = FrameStates::updated;
+        if (!_frameState.compare_exchange_strong(
+                expectedState,
+                FrameStates::rendering,
+                std::memory_order::memory_order_acq_rel)) {
+            continue;
         }
         auto ticks = clock.ticks();
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
+        bool quit = false;
+        _profiler->timeInput([this, &quit]() {
+            std::queue<input::Event> events;
+            {
+                std::lock_guard<std::mutex> lock {_eventsMutex};
+                std::swap(events, _events);
+            }
+            while (!events.empty()) {
+                auto &event = events.front();
+                if (_game->handle(event) && _game->isQuitRequested()) {
+                    quit = true;
+                    break;
+                }
+                _profiler->handle(event);
+                events.pop();
+            }
+        });
+        if (quit) {
+            _quit.store(true, std::memory_order::memory_order_release);
+            break;
+        }
         _profiler->timeUpdate([this, &frameTime]() {
             _game->update(frameTime);
+            bool showcur = _game->cursorType() == CursorType::None;
+            bool relmouse = _game->relativeMouseMode();
+            showCursor(showcur);
+            setRelativeMouseMode(relmouse);
             _profiler->update(frameTime);
         });
-        bool showcur = _game->cursorType() == CursorType::None;
-        bool relmouse = _game->relativeMouseMode();
-        showCursor(showcur);
-        setRelativeMouseMode(relmouse);
         _profiler->timeRender([this]() {
+            runMainThreadTasks();
+            if (_options.graphics.pbr) {
+                _services->graphics.pbrTextures.refresh();
+            }
             _services->graphics.context.clearColorDepth();
             _game->render();
             _profiler->render();
             _window->swap();
-            if (_options.graphics.pbr) {
-                _services->graphics.pbrTextures.refresh();
-            }
         });
-        runMainThreadTasks();
+        _frameState.store(FrameStates::rendered, std::memory_order_release);
     }
 
     if (gameThread.joinable()) {
@@ -193,11 +208,19 @@ int Engine::run() {
 
 void Engine::gameThreadFunc() {
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
-        if (false && !_focus.load(std::memory_order::memory_order_acquire)) {
+        if (!_focus.load(std::memory_order::memory_order_acquire)) {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
+        int expectedState = FrameStates::rendered;
+        if (!_frameState.compare_exchange_strong(
+                expectedState,
+                FrameStates::updating,
+                std::memory_order_acq_rel)) {
+            continue;
+        }
         // TODO: move input handling and updates here from the main thread
+        _frameState.store(FrameStates::updated, std::memory_order::memory_order_release);
     }
 }
 
@@ -228,7 +251,7 @@ void Engine::processEvents() {
         }
         unhandled.push(*event);
     }
-    // std::lock_guard<std::mutex> lock {_eventsMutex};
+    std::lock_guard<std::mutex> lock {_eventsMutex};
     while (!unhandled.empty()) {
         _events.push(std::move(unhandled.front()));
         unhandled.pop();

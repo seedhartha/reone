@@ -208,6 +208,7 @@ private:
 
         // Do nothing if last packet timestamp is greater or equals requested
         if (_lastPacketTimestamp != -1 && _lastPacketTimestamp >= timestamp) {
+            _frame.pixels.reset();
             return;
         }
 
@@ -216,29 +217,23 @@ private:
             if (packet.stream_index != _videoStreamIdx) {
                 continue;
             }
-
-            // Read packets until packet timestamp is greater or equals requested
             _lastPacketTimestamp = packet.pts;
+
+            avcodec_send_packet(_videoCodecCtx, &packet);
+            ret = avcodec_receive_frame(_videoCodecCtx, _avFrame);
+            if (ret == AVERROR(EAGAIN)) {
+                continue;
+            } else if (ret < 0) {
+                break;
+            }
+
             if (_lastPacketTimestamp < timestamp) {
                 continue;
             }
-
-            avcodec_send_packet(_videoCodecCtx, &packet);
-            if ((ret = avcodec_receive_frame(_videoCodecCtx, _avFrame)) < 0) {
-                if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN)) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            // Scale frame
             sws_scale(
                 _swsContext,
                 _avFrame->data, _avFrame->linesize, 0, _videoCodecCtx->height,
                 _avFrameScaled->data, _avFrameScaled->linesize);
-
-            // Save frame
             auto pixels = std::make_shared<ByteBuffer>(3ll * _videoCodecCtx->width * _videoCodecCtx->height, '\0');
             for (int y = 0; y < _videoCodecCtx->height; ++y) {
                 int dstIdx = 3 * _videoCodecCtx->width * y;

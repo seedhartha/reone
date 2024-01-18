@@ -54,6 +54,13 @@ public:
     int run();
 
 private:
+    struct FrameStates {
+        static constexpr int rendered = 0;
+        static constexpr int updating = 1;
+        static constexpr int updated = 2;
+        static constexpr int rendering = 3;
+    };
+
     Options &_options;
 
     std::unique_ptr<game::OptionsView> _optionsView;
@@ -74,10 +81,13 @@ private:
     std::unique_ptr<game::Game> _game;
     std::unique_ptr<Profiler> _profiler;
 
-    std::atomic_bool _focus {false};
     std::atomic_bool _quit {false};
+    std::atomic_bool _focus {false};
+    std::atomic_int _frameState {FrameStates::rendered};
+
     std::queue<input::Event> _events;
     std::mutex _eventsMutex;
+
     uint32_t _ticks {0};
 
     bool _showCursor {true};
