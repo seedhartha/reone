@@ -137,8 +137,10 @@ int Engine::run() {
     _ticks = clock.ticks();
 
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
-        processEvents();
-        if (_quit.load(std::memory_order::memory_order_acquire)) {
+        bool quit;
+        processEvents(quit);
+        if (quit) {
+            _quit.store(true, std::memory_order::memory_order_release);
             break;
         }
         bool focus = _window->isInFocus();
@@ -157,7 +159,6 @@ int Engine::run() {
         auto ticks = clock.ticks();
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
-        bool quit = false;
         _profiler->timeInput([this, &quit]() {
             std::queue<input::Event> events;
             {
@@ -224,12 +225,12 @@ void Engine::gameThreadFunc() {
     }
 }
 
-void Engine::processEvents() {
+void Engine::processEvents(bool &quit) {
     std::queue<input::Event> unhandled;
     SDL_Event sdlEvent;
     while (SDL_PollEvent(&sdlEvent)) {
         if (sdlEvent.type == SDL_QUIT) {
-            _quit.store(true, std::memory_order::memory_order_release);
+            quit = true;
             break;
         }
         if (!_window->isAssociatedWith(sdlEvent)) {
@@ -237,7 +238,7 @@ void Engine::processEvents() {
         }
         if (_window->handle(sdlEvent)) {
             if (_window->isCloseRequested()) {
-                _quit.store(true, std::memory_order::memory_order_release);
+                quit = true;
                 break;
             }
             continue;

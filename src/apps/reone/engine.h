@@ -95,7 +95,7 @@ private:
 
     void gameThreadFunc();
 
-    void processEvents();
+    void processEvents(bool &quit);
 
     void showCursor(bool show);
     void setRelativeMouseMode(bool relative);
