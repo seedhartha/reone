@@ -149,13 +149,6 @@ int Engine::run() {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
-        int expectedState = FrameStates::updated;
-        if (!_frameState.compare_exchange_strong(
-                expectedState,
-                FrameStates::rendering,
-                std::memory_order::memory_order_acq_rel)) {
-            continue;
-        }
         auto ticks = clock.ticks();
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
@@ -208,6 +201,8 @@ int Engine::run() {
 }
 
 void Engine::gameThreadFunc() {
+    setThreadName("game");
+
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
         if (!_focus.load(std::memory_order::memory_order_acquire)) {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
