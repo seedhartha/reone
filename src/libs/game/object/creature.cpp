@@ -725,7 +725,7 @@ bool Creature::navigateTo(const glm::vec3 &dest, bool run, float distance, float
 
     bool updPath = true;
     if (_path) {
-        uint32_t now = _services.system.clock.ticks();
+        uint32_t now = _services.system.clock.millis();
         if (_path->destination == dest || now - _path->timeFound <= kKeepPathDuration) {
             advanceOnPath(run, dt);
             updPath = false;
@@ -778,7 +778,7 @@ void Creature::advanceOnPath(bool run, float dt) {
 
 void Creature::updatePath(const glm::vec3 &dest) {
     std::vector<glm::vec3> points(_game.module()->area()->pathfinder().findPath(_position, dest));
-    uint32_t now = _services.system.clock.ticks();
+    uint32_t now = _services.system.clock.millis();
     setPath(dest, std::move(points), now);
 }
 

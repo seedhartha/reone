@@ -190,36 +190,36 @@ void Profiler::renderText() {
 }
 
 void Profiler::timeInput(std::function<void()> block) {
-    uint64_t before = _systemSvc.clock.ticks();
+    uint64_t before = _systemSvc.clock.micros();
     block();
-    uint64_t after = _systemSvc.clock.ticks();
+    uint64_t after = _systemSvc.clock.micros();
     std::lock_guard<std::mutex> lock {_mutex};
     if (_inputTimes.size() == kNumTimedFrames) {
         _inputTimes.pop_front();
     }
-    _inputTimes.push_back((after - before) / 1000.0f);
+    _inputTimes.push_back((after - before) / 1e6f);
 }
 
 void Profiler::timeUpdate(std::function<void()> block) {
-    uint64_t before = _systemSvc.clock.ticks();
+    uint64_t before = _systemSvc.clock.micros();
     block();
-    uint64_t after = _systemSvc.clock.ticks();
+    uint64_t after = _systemSvc.clock.micros();
     std::lock_guard<std::mutex> lock {_mutex};
     if (_updateTimes.size() == kNumTimedFrames) {
         _updateTimes.pop_front();
     }
-    _updateTimes.push_back((after - before) / 1000.0f);
+    _updateTimes.push_back((after - before) / 1e6f);
 }
 
 void Profiler::timeRender(std::function<void()> block) {
-    uint64_t before = _systemSvc.clock.ticks();
+    uint64_t before = _systemSvc.clock.micros();
     block();
-    uint64_t after = _systemSvc.clock.ticks();
+    uint64_t after = _systemSvc.clock.micros();
     std::lock_guard<std::mutex> lock {_mutex};
     if (_renderTimes.size() == kNumTimedFrames) {
         _renderTimes.pop_front();
     }
-    _renderTimes.push_back((after - before) / 1000.0f);
+    _renderTimes.push_back((after - before) / 1e6f);
 }
 
 } // namespace reone

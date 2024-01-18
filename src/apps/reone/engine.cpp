@@ -46,6 +46,8 @@ void Engine::init() {
     auto gameId = probe.probe();
 
     _clock = std::make_unique<Clock>();
+    _clock->init();
+
     _systemModule = std::make_unique<SystemModule>(*_clock);
     _graphicsModule = std::make_unique<GraphicsModule>(_options.graphics);
     _audioModule = std::make_unique<AudioModule>(_options.audio);
@@ -134,7 +136,7 @@ int Engine::run() {
     std::thread gameThread {std::bind(&Engine::gameThreadFunc, this)};
 
     auto &clock = _services->system.clock;
-    _ticks = clock.ticks();
+    _ticks = clock.millis();
 
     while (!_quit.load(std::memory_order::memory_order_acquire)) {
         bool quit;
@@ -149,7 +151,7 @@ int Engine::run() {
             std::this_thread::sleep_for(std::chrono::milliseconds {100});
             continue;
         }
-        auto ticks = clock.ticks();
+        auto ticks = clock.millis();
         auto frameTime = (ticks - _ticks) / 1000.0f;
         _ticks = ticks;
         _profiler->timeInput([this, &quit]() {

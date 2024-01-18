@@ -82,12 +82,16 @@ static std::unordered_map<std::string, LipShape> g_nameToLipShape;
 
 class wxClock : public IClock, boost::noncopyable {
 public:
-    wxClock() {
+    void init() override {
         _stopWatch.Start();
     }
 
-    uint64_t ticks() const override {
+    uint32_t millis() const override {
         return _stopWatch.Time();
+    }
+
+    uint64_t micros() const override {
+        return _stopWatch.TimeInMicro().GetValue();
     }
 
 private:
@@ -103,6 +107,8 @@ ResourceExplorerViewModel::ResourceExplorerViewModel() {
     _graphicsOpt.sharpen = false;
 
     _clock = std::make_unique<wxClock>();
+    _clock->init();
+
     _systemModule = std::make_unique<SystemModule>(*_clock);
     _graphicsModule = std::make_unique<GraphicsModule>(_graphicsOpt);
     _audioModule = std::make_unique<AudioModule>(_audioOpt);

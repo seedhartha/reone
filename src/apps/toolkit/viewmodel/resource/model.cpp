@@ -83,7 +83,7 @@ void ModelResourceViewModel::openModel(const ResourceId &id, IInputStream &mdl) 
 }
 
 void ModelResourceViewModel::update3D() {
-    auto ticks = _systemSvc.clock().ticks();
+    auto ticks = _systemSvc.clock().millis();
     if (_lastTicks == 0) {
         _lastTicks = ticks;
     }
