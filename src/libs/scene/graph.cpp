@@ -39,6 +39,7 @@
 #include "reone/scene/node/trigger.h"
 #include "reone/scene/node/walkmesh.h"
 #include "reone/scene/render/pipeline.h"
+#include "reone/system/logutil.h"
 
 using namespace reone::graphics;
 
@@ -340,12 +341,14 @@ void SceneGraph::refreshFromNode(SceneNode &node) {
         }
         break;
     }
-    case SceneNodeType::Light:
+    case SceneNodeType::Light: {
         _lights.push_back(static_cast<LightSceneNode *>(&node));
         break;
-    case SceneNodeType::Emitter:
+    }
+    case SceneNodeType::Emitter: {
         _emitters.push_back(static_cast<EmitterSceneNode *>(&node));
         break;
+    }
     default:
         break;
     }

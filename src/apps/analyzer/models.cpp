@@ -243,12 +243,13 @@ static ModelStats analyzeModel(graphics::Model &model) {
         for (const auto &child : node.children()) {
             stack.push(std::ref(*child));
         }
+        auto nodeBase = model.getNodeByName(node.name());
         ModelNodeStats *nodeStats;
-        if (node.isMesh()) {
+        if (nodeBase && nodeBase->isMesh()) {
             nodeStats = &stats.mesh;
-        } else if (node.isLight()) {
+        } else if (nodeBase && nodeBase->isLight()) {
             nodeStats = &stats.light;
-        } else if (node.isEmitter()) {
+        } else if (nodeBase && nodeBase->isEmitter()) {
             nodeStats = &stats.emitter;
         } else {
             nodeStats = &stats.dummy;

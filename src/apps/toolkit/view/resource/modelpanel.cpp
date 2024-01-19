@@ -44,7 +44,7 @@ void ModelResourcePanel::InitControls() {
 
 #if wxCHECK_VERSION(3, 1, 0)
     wxGLContextAttrs glCtxAttrs;
-    glCtxAttrs.CoreProfile().OGLVersion(3, 3).EndList();
+    glCtxAttrs.CoreProfile().OGLVersion(4, 0).EndList();
     auto glContext = new wxGLContext(m_glCanvas, nullptr, &glCtxAttrs);
 #else
     auto glContext = new wxGLContext(m_glCanvas);

@@ -56,8 +56,7 @@ void ModelResourceViewModel::openModel(const ResourceId &id, IInputStream &mdl) 
         throw ResourceNotFoundException("Companion MDX resource not found: " + id.resRef.value());
     }
     auto mdx = MemoryInputStream(mdxRes->data);
-    Statistic statistic;
-    auto reader = MdlMdxReader(mdl, mdx, statistic);
+    auto reader = MdlMdxReader(mdl, mdx, _graphicsSvc.statistic());
     reader.load();
 
     auto &scene = _sceneSvc.graphs().get(kSceneMain);
@@ -108,7 +107,7 @@ void ModelResourceViewModel::update3D() {
 
 void ModelResourceViewModel::render3D(int w, int h) {
     float aspect = w / static_cast<float>(h);
-    _cameraNode->setPerspectiveProjection(glm::radians(46.8), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _cameraNode->setPerspectiveProjection(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 
     auto &scene = _sceneSvc.graphs().get(kSceneMain);
     auto &output = scene.render(glm::ivec2(w, h));
